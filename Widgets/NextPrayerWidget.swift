@@ -111,7 +111,13 @@ struct NextPrayerProvider: TimelineProvider {
             index += 1
         }
 
-        completion(Timeline(entries: entries, policy: .atEnd))
+        // With a single entry, .atEnd would request an immediate reload loop
+        // (the timeline "ends" at its only entry, dated now) — wait for the
+        // featured prayer instead.
+        let policy: TimelineReloadPolicy = entries.count > 1
+            ? .atEnd
+            : .after(first.time)
+        completion(Timeline(entries: entries, policy: policy))
     }
 }
 
