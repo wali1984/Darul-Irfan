@@ -38,14 +38,23 @@ workflows:
           xcodegen generate
       - name: Build app + widgets for simulator (no signing)
         script: |
+          # Compact, readable output: raw log goes to an artifact, the console
+          # shows only per-file progress and errors via xcbeautify.
+          set -o pipefail
+          command -v xcbeautify >/dev/null || brew install xcbeautify
+          mkdir -p build/logs
           xcodebuild build \
             -project DarulIrfan.xcodeproj \
             -scheme DarulIrfan \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO \
-            -resultBundlePath build/Build.xcresult
+            -resultBundlePath build/Build.xcresult \
+            2>&1 | tee build/logs/xcodebuild-build.log | xcbeautify
       - name: Run unit tests on simulator
         script: |
+          set -o pipefail
+          command -v xcbeautify >/dev/null || brew install xcbeautify
+          mkdir -p build/logs
           # Pick the first available iPhone simulator on this image so the
           # workflow survives Xcode image updates that rename devices.
           DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
@@ -56,7 +65,8 @@ workflows:
             -destination "platform=iOS Simulator,name=${DEVICE}" \
             -only-testing:DarulIrfanTests \
             CODE_SIGNING_ALLOWED=NO \
-            -resultBundlePath build/Tests.xcresult
+            -resultBundlePath build/Tests.xcresult \
+            2>&1 | tee build/logs/xcodebuild-tests.log | xcbeautify
       - name: Run content-ingest pipeline tests
         script: |
           cd Tools/ContentIngest
@@ -64,7 +74,22 @@ workflows:
           python3 -m pytest tests -q
     artifacts:
       - build/*.xcresult
+      - build/logs/*.log
     publishing:
+      scripts:
+        # Publishing scripts run even when a build step fails: print a small,
+        # copy-pasteable summary of every compiler/test error at the very end
+        # of the build page.
+        - name: Error summary
+          script: |
+            echo "================ ERROR SUMMARY ================"
+            if ls build/logs/*.log >/dev/null 2>&1; then
+              grep -hE "(error|fatal error): |Testing failed|BUILD FAILED|TEST FAILED|BUILD SUCCEEDED|Test Suite.*(passed|failed)" build/logs/*.log | sort -u | head -120 \
+                || echo "No error lines found in xcodebuild logs."
+            else
+              echo "No xcodebuild logs were produced (failure before the build step)."
+            fi
+            echo "==============================================="
       email:
         recipients:
           - wajidali1984@hotmail.com
