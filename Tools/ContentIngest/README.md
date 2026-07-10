@@ -113,16 +113,20 @@ manifest's `generatedAt` moves.
 
 ## Rights policy
 
-The website's content is copyright reserved. Until the owner confirms
-permission:
+The website's content is copyright reserved. **The owner granted content
+permission on 2026-07-10** (keep the written confirmation on file), so the
+standard crawl mode for site content is now `--full-text --rights-confirmed`
+and ingested items carry `rightsStatus: "permissionConfirmed"`. The
+mechanical gate is unchanged:
 
-- every ingested item carries `rightsStatus: "linkOnly"` — metadata plus
-  the source URL only, **no body text**;
-- the app shows such items with a "Read on naqshbandiaowaisiah.org" link
-  and streams public MP3 URLs natively (no bulk re-hosting);
-- `--full-text` alone is refused; passing `--full-text --rights-confirmed`
-  (only after written permission) ingests body text and marks items
-  `rightsStatus: "permissionConfirmed"`.
+- an item ingested **without** `--full-text --rights-confirmed` carries
+  `rightsStatus: "linkOnly"` — metadata plus the source URL only, **no body
+  text** — and the app shows it with a "Read on naqshbandiaowaisiah.org"
+  link;
+- `--full-text` alone is still refused; `--rights-confirmed` asserts the
+  (now on-file) permission and marks items `permissionConfirmed`;
+- PDFs and MP3s are never bundled or re-hosted regardless of rights — the
+  app downloads/streams them from the site's own URLs.
 
 Religious content is never paraphrased or summarized by this tool —
 parsers copy text verbatim or not at all.
@@ -141,8 +145,11 @@ parsers copy text verbatim or not at all.
    `generatedAt`/`counts`, and pull only the changed files; per-item
    `checksum` makes row-level upserts cheap.
 3. **`quran_tafsir_manifest.json`** feeds the Quran tab's tafsir edition
-   list (`QuranEdition`) and its per-surah "Read on the website" links
-   until full-text permission is confirmed.
+   list (`QuranEdition`) and its per-surah "Read on the website" links.
+   These stay pointer rows even though rights are granted: the site's
+   tafsir pages contain no HTML text, only image-scan PDF booklets with no
+   text layer (verified 2026-07-10), and OCR is ruled out because religious
+   text must ship verbatim.
 
 ## Tests
 

@@ -26,7 +26,8 @@ final class SurahReaderViewModel {
     /// Stored tafsir entries for this surah across all tafsir editions.
     private(set) var tafsirEntries: [QuranTafsir] = []
     /// Tafsir editions with no stored text for this surah but a website link
-    /// (rights-restricted content stays on naqshbandiaowaisiah.org).
+    /// (the tafsir text is not machine-readable on naqshbandiaowaisiah.org —
+    /// only image-scan PDF booklets — so the app points to the source pages).
     private(set) var tafsirEditionPointers: [QuranEdition] = []
 
     var showTranslation = true

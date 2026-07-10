@@ -868,6 +868,23 @@
         }
       }
     },
+    "Alerts play a short azan clip so they stay within the iOS notification sound limit. The full azan can be played here inside the app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerts play a short azan clip so they stay within the iOS notification sound limit. The full azan can be played here inside the app."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الرٹس ایک مختصر اذان کلپ چلاتے ہیں تاکہ iOS کی اطلاعاتی آواز کی حد میں رہیں۔ مکمل اذان ایپ کے اندر یہاں چلائی جا سکتی ہے۔"
+          }
+        }
+      }
+    },
     "Alerts use this short chime so they stay within the iOS notification sound limit. Full recitations can be played inside the app.": {
       "extractionState": "manual",
       "localizations": {
@@ -1442,6 +1459,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "اذان کلپ"
+          }
+        }
+      }
+    },
+    "Azan Recordings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Azan Recordings"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اذان کی ریکارڈنگز"
           }
         }
       }
@@ -4336,19 +4370,19 @@
         }
       }
     },
-    "Items shown as link-only present metadata with a link to the original page until publication permission is confirmed.": {
+    "Content from the website is included in the app with the owner's permission. Items without stored text link to the original page on naqshbandiaowaisiah.org.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Items shown as link-only present metadata with a link to the original page until publication permission is confirmed."
+            "value": "Content from the website is included in the app with the owner's permission. Items without stored text link to the original page on naqshbandiaowaisiah.org."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "صرف لنک کے طور پر دکھائی جانے والی چیزیں اشاعت کی اجازت کی توثیق تک صرف تفصیلات اور اصل صفحے کا لنک پیش کرتی ہیں۔"
+            "value": "ویب سائٹ کا مواد مالک کی اجازت سے ایپ میں شامل ہے۔ جن چیزوں کا متن ایپ میں محفوظ نہیں، ان کے لیے naqshbandiaowaisiah.org پر اصل صفحے کا لنک دیا گیا ہے۔"
           }
         }
       }
@@ -6665,19 +6699,19 @@
         }
       }
     },
-    "Out of respect for the publisher's rights, the full text of this item is hosted on the official Naqshbandia Owaisiah website.": {
+    "The full text of this item is available on the official Naqshbandia Owaisiah website.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Out of respect for the publisher's rights, the full text of this item is hosted on the official Naqshbandia Owaisiah website."
+            "value": "The full text of this item is available on the official Naqshbandia Owaisiah website."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "ناشر کے حقوق کے احترام میں اس تحریر کا مکمل متن نقشبندیہ اویسیہ کی آفیشل ویب سائٹ پر موجود ہے۔"
+            "value": "اس تحریر کا مکمل متن نقشبندیہ اویسیہ کی آفیشل ویب سائٹ پر موجود ہے۔"
           }
         }
       }
@@ -6763,6 +6797,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ چلائیں"
+          }
+        }
+      }
+    },
+    "Play Fajr Azan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play Fajr Azan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فجر کی اذان چلائیں"
+          }
+        }
+      }
+    },
+    "Play Full Azan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play Full Azan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مکمل اذان چلائیں"
           }
         }
       }
@@ -7290,6 +7358,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "پریس ریلیز"
+          }
+        }
+      }
+    },
+    "Preview Alert Sound": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preview Alert Sound"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الرٹ کی آواز سنیں"
           }
         }
       }
@@ -8535,19 +8620,19 @@
         }
       }
     },
-    "Silent shows a banner without sound. Azan Clip plays a short chime with the alert.": {
+    "Silent shows a banner without sound. Azan Clip plays the opening of the azan with the alert.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Silent shows a banner without sound. Azan Clip plays a short chime with the alert."
+            "value": "Silent shows a banner without sound. Azan Clip plays the opening of the azan with the alert."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "خاموش بغیر آواز کے بینر دکھاتا ہے۔ اذان کلپ الرٹ کے ساتھ ایک مختصر گھنٹی چلاتا ہے۔"
+            "value": "خاموش بغیر آواز کے بینر دکھاتا ہے۔ اذان کلپ الرٹ کے ساتھ اذان کا ابتدائی حصہ چلاتا ہے۔"
           }
         }
       }
@@ -8752,6 +8837,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%2$lld میں سے مرحلہ %1$lld"
+          }
+        }
+      }
+    },
+    "Stop Azan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop Azan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اذان روکیں"
           }
         }
       }
@@ -9402,6 +9504,40 @@
         }
       }
     },
+    "The azan could not be played right now.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The azan could not be played right now."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اذان اس وقت نہیں چل سکی۔"
+          }
+        }
+      }
+    },
+    "The azan notification clip and the full azan playback use the recording “Beautiful adhan” by Adam-synagda, from Wikimedia Commons, dedicated to the public domain under CC0 1.0.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The azan notification clip and the full azan playback use the recording “Beautiful adhan” by Adam-synagda, from Wikimedia Commons, dedicated to the public domain under CC0 1.0."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اذان کی اطلاعاتی کلپ اور مکمل اذان کی پلے بیک “Beautiful adhan” ریکارڈنگ پر مبنی ہے، جو Adam-synagda نے Wikimedia Commons پر CC0 1.0 کے تحت پبلک ڈومین میں وقف کی ہے۔"
+          }
+        }
+      }
+    },
     "The bookmark could not be removed. Please try again.": {
       "extractionState": "manual",
       "localizations": {
@@ -9742,19 +9878,36 @@
         }
       }
     },
-    "The short prayer chime used for alerts is an original recording created for this app.": {
+    "The Fajr azan recording is by Islamic Center Malmö, from Wikimedia Commons, used under the Creative Commons Attribution 3.0 license. The audio was extracted from the original video and converted for playback in the app.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The short prayer chime used for alerts is an original recording created for this app."
+            "value": "The Fajr azan recording is by Islamic Center Malmö, from Wikimedia Commons, used under the Creative Commons Attribution 3.0 license. The audio was extracted from the original video and converted for playback in the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "الرٹس کے لیے استعمال ہونے والی مختصر گھنٹی اسی ایپ کے لیے تیار کردہ اصل ریکارڈنگ ہے۔"
+            "value": "فجر کی اذان کی ریکارڈنگ Islamic Center Malmö کی ہے، جو Wikimedia Commons سے Creative Commons Attribution 3.0 لائسنس کے تحت استعمال کی گئی ہے۔ آڈیو اصل ویڈیو سے نکال کر ایپ میں چلانے کے لیے تبدیل کی گئی ہے۔"
+          }
+        }
+      }
+    },
+    "The short prayer chime is an original recording created for this app, kept as a fallback alert sound.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The short prayer chime is an original recording created for this app, kept as a fallback alert sound."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مختصر نمازی گھنٹی اس ایپ کے لیے تیار کردہ اصل ریکارڈنگ ہے، جو متبادل الرٹ آواز کے طور پر رکھی گئی ہے۔"
           }
         }
       }
@@ -10622,6 +10775,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "GitHub پر adhan-swift پروجیکٹ دیکھیں"
+          }
+        }
+      }
+    },
+    "View the azan recording on Wikimedia Commons": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View the azan recording on Wikimedia Commons"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اذان کی ریکارڈنگ Wikimedia Commons پر دیکھیں"
+          }
+        }
+      }
+    },
+    "View the Fajr azan recording on Wikimedia Commons": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View the Fajr azan recording on Wikimedia Commons"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فجر اذان کی ریکارڈنگ Wikimedia Commons پر دیکھیں"
           }
         }
       }

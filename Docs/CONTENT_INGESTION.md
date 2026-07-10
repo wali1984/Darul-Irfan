@@ -35,20 +35,25 @@ Two hard rules follow from this design:
 
 ## Rights gating
 
-The website's content is copyright reserved. The pipeline enforces the app's
-rights model mechanically:
+The website's content is copyright reserved. **The owner granted content
+permission on 2026-07-10** (owner confirmation — keep the written record on
+file), so the `--rights-confirmed` precondition is satisfied and the normal
+posture for site content is now `permissionConfirmed`. The pipeline still
+enforces the rights model mechanically:
 
 | `rightsStatus` | Meaning | How it is produced |
 |---|---|---|
-| `linkOnly` | Metadata + source URL only — **no body text** | Default for everything crawled from the site |
-| `permissionConfirmed` | Full body text may ship | Only via `crawl --full-text --rights-confirmed`, run **after written permission** |
+| `permissionConfirmed` | Full body text may ship | Via `crawl --full-text --rights-confirmed` — the standard mode since the 2026-07-10 grant. First run: 2026-07-10 (seed manifest v2) |
 | `publicDomain` | Freely shippable | Hand-curated seed only (Quran Arabic, Pickthall translation, surah index, 99 Names, Quranic duas) |
+| `linkOnly` | Metadata + source URL only — **no body text** | The pre-grant default; no longer used for newly crawled site content, but the gate below still applies to any item carrying it |
 
 `--full-text` without `--rights-confirmed` is refused. `validate` fails any
-`linkOnly` item that carries `bodyHtml`/`bodyPlainText`, so a permission
-violation cannot pass CI-style checks. The app renders `linkOnly` items as
-metadata plus a "Read on naqshbandiaowaisiah.org" link, and streams public
-MP3 URLs natively (no bulk re-hosting). Religious text is copied verbatim or
+`linkOnly` item that carries `bodyHtml`/`bodyPlainText`, so a rights
+violation cannot pass CI-style checks. The app still renders any `linkOnly`
+item as metadata plus a "Read on naqshbandiaowaisiah.org" link. Even with
+permission granted, book/magazine/tafsir PDFs and lecture MP3s stay as
+**remote URLs on the site** — the app downloads/streams them natively but
+never bulk re-hosts or bundles them. Religious text is copied verbatim or
 not at all — the pipeline never paraphrases or summarizes.
 
 ## How to run
@@ -58,10 +63,12 @@ cd Tools/ContentIngest
 python -m venv .venv && source .venv/bin/activate   # optional
 pip install -r requirements.txt                      # requests + beautifulsoup4
 
-# Crawl (metadata-only; sections and years to taste)
+# Crawl with full text — the standard mode since the owner's permission
+# grant of 2026-07-10 (sections and years to taste)
 python ingest.py crawl \
     --sections about,lectures,books,magazines,articles,tafsir \
     --years 2024-2026 \
+    --full-text --rights-confirmed \
     --out output \
     --rate-limit 1.5 \
     --max-pages 200
@@ -98,8 +105,11 @@ cheap monotonic counters you bump routinely.
 
 ## Updating the bundled seed data, step by step
 
-The seed bundle is a **small, curated, representative subset** of pipeline
-output plus hand-maintained files — not a full site mirror.
+The seed bundle is a **curated subset** of pipeline output plus
+hand-maintained files. Since the 2026-07-10 full-text ingest (seed manifest
+v2) it carries the full library/media catalog — 291 library items and 199
+media items, ~0.8 MB — but it is still text/metadata only: PDFs and MP3s are
+never bundled; they stay remote URLs on the site.
 
 1. **Crawl and validate** into a fresh folder (commands above).
 2. **Diff against the previous output**; resolve any `CONFLICT` lines (exit
@@ -109,7 +119,9 @@ output plus hand-maintained files — not a full site mirror.
    - `media.json` items → `media_items.json`
    - `events.json` → `events.json`; announcements → `announcements.json`
    - `quran_tafsir_manifest.json` informs `quran_editions.json` /
-     `quran_tafsir.json` (per-surah link rows until full text is permitted)
+     `quran_tafsir.json` (per-surah pointer rows — rights are granted, but
+     the site's tafsir pages carry no HTML text and the PDF booklets are
+     image scans with no text layer; no OCR, religious text must be verbatim)
 
    Copy items verbatim — same keys, same ISO-8601 dates. These files are
    decoded by `Core/Persistence/SeedBundle.swift` with a plain `JSONDecoder`;
@@ -140,9 +152,9 @@ robots.txt is fully permissive; all pages are static server-rendered HTML.
 | Magazine PDF | `/uploads/almurshid-magazines/almurshid_{month(s)}_{year}.pdf` | e.g. `almurshid_february_march_1981.pdf` |
 | Books index | `/books-on-tasawwuf.html` | Reached from `/download` |
 | Book PDF | `/uploads/books/{Title-Slug-Language}.pdf` | e.g. `Dalael-us-Salook-Urdu.pdf` |
-| Tafsir (Asrar-at-Tanzil) | `/asrar-at-tanzil/{ID}/tafseer-quran-in-english-surah-{name}.html` | 114 static pages, IDs from 1229 |
+| Tafsir (Asrar-at-Tanzil) | `/asrar-at-tanzil/{ID}/tafseer-quran-in-english-surah-{name}.html` | 114 static pages, IDs from 1229. **No HTML tafsir text** — the pages only link to per-surah PDF booklets, which are image scans with no text layer (verified 2026-07-10) |
 | About pages | `/hazrat-ameer-abdul-qadeer-awan.html`, `/hazrat-ameer-muhammad-akram-awan-ra.html`, `/silsila-naqshbandia-owaisiah.html`, `/shajra-silsila-naqshbandia-owaisiah.html` | |
-| Method of Zikr | `/method-of-zikr.html` | Instructions are **images** — needs OCR/manual transcription after permission; the app links instead |
+| Method of Zikr | `/method-of-zikr.html` | Instructions are **images** (English JPG + Urdu PNG) — shipped as image URLs in `mediaUrls` plus the verbatim on-page caption; not OCR'd (religious text must be verbatim) |
 
 Item IDs are slugs of the item's most specific source URL path, so re-runs
 are stable; each item's `checksum` (sha256 of normalized fields) lets the

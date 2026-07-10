@@ -157,8 +157,9 @@ struct SurahReaderView: View {
         }
     }
 
-    /// Shown when tafsir is toggled on and rights-restricted editions exist
-    /// whose full text lives on the website rather than in the app.
+    /// Shown when tafsir is toggled on and editions exist whose full text is
+    /// not stored in the app — the website publishes it only as image-scan
+    /// PDF booklets, so the app links to the per-surah source pages.
     private var tafsirPointerCard: some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {

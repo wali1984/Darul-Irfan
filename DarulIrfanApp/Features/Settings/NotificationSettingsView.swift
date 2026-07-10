@@ -5,7 +5,8 @@ import UIKit
 import UserNotifications
 
 /// Notification settings: permission status, per-prayer alert styles,
-/// a shared pre-prayer reminder, and a chime preview.
+/// a shared pre-prayer reminder, an alert-sound preview, and in-app
+/// playback of the bundled full azan recordings.
 @MainActor
 struct NotificationSettingsView: View {
     private let appState: AppState
@@ -37,6 +38,9 @@ struct NotificationSettingsView: View {
             if scenePhase == .active {
                 Task { await viewModel.refresh() }
             }
+        }
+        .onDisappear {
+            viewModel.stopFullAzan()
         }
     }
 
@@ -152,7 +156,7 @@ struct NotificationSettingsView: View {
         } header: {
             Text("Prayer Alerts")
         } footer: {
-            Text("Silent shows a banner without sound. Azan Clip plays a short chime with the alert.")
+            Text("Silent shows a banner without sound. Azan Clip plays the opening of the azan with the alert.")
         }
     }
 
@@ -208,9 +212,9 @@ struct NotificationSettingsView: View {
     private var soundSection: some View {
         Section {
             Button {
-                viewModel.previewChime()
+                viewModel.previewAlertSound()
             } label: {
-                Label("Preview Chime", systemImage: "speaker.wave.2.fill")
+                Label("Preview Alert Sound", systemImage: "speaker.wave.2.fill")
             }
             .foregroundStyle(DIColor.primary)
             .listRowBackground(DIColor.surface)
@@ -221,10 +225,45 @@ struct NotificationSettingsView: View {
                     .foregroundStyle(DIColor.textMuted)
                     .listRowBackground(DIColor.surface)
             }
+
+            if viewModel.hasFullAzan {
+                Button {
+                    viewModel.toggleFullAzan(resource: NotificationSettingsViewModel.fullAzanResource)
+                } label: {
+                    if viewModel.playingAzanResource == NotificationSettingsViewModel.fullAzanResource {
+                        Label("Stop Azan", systemImage: "stop.fill")
+                    } else {
+                        Label("Play Full Azan", systemImage: "play.fill")
+                    }
+                }
+                .foregroundStyle(DIColor.primary)
+                .listRowBackground(DIColor.surface)
+            }
+
+            if viewModel.hasFajrAzan {
+                Button {
+                    viewModel.toggleFullAzan(resource: NotificationSettingsViewModel.fajrAzanResource)
+                } label: {
+                    if viewModel.playingAzanResource == NotificationSettingsViewModel.fajrAzanResource {
+                        Label("Stop Azan", systemImage: "stop.fill")
+                    } else {
+                        Label("Play Fajr Azan", systemImage: "play.fill")
+                    }
+                }
+                .foregroundStyle(DIColor.primary)
+                .listRowBackground(DIColor.surface)
+            }
+
+            if viewModel.azanUnavailable {
+                Text("The azan could not be played right now.")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .listRowBackground(DIColor.surface)
+            }
         } header: {
             Text("Sound")
         } footer: {
-            Text("Alerts use this short chime so they stay within the iOS notification sound limit. Full recitations can be played inside the app.")
+            Text("Alerts play a short azan clip so they stay within the iOS notification sound limit. The full azan can be played here inside the app.")
         }
     }
 }
@@ -241,16 +280,36 @@ final class NotificationSettingsViewModel {
         case authorized
     }
 
+    /// Bundle resource names of the licensed full azan recordings
+    /// (see Resources/Audio/README.md for sources and licenses).
+    static let fullAzanResource = "azan-full"
+    static let fajrAzanResource = "azan-fajr-full"
+
     private let notifications: any NotificationScheduling
     private var chimePlayer: AVAudioPlayer?
+    private var azanPlayer: AVAudioPlayer?
+    private let azanPlaybackDelegate = AzanPlaybackDelegate()
 
     private(set) var permission: PermissionState = .unknown
     private(set) var pendingCount: Int?
     private(set) var isRequestingPermission = false
     private(set) var chimeUnavailable = false
+    private(set) var azanUnavailable = false
+    /// Resource name of the full azan currently playing, if any.
+    private(set) var playingAzanResource: String?
+
+    /// Whether the bundled full azan recordings are present; the playback
+    /// rows are hidden when the assets are missing.
+    let hasFullAzan = Bundle.main.url(forResource: "azan-full", withExtension: "mp3") != nil
+    let hasFajrAzan = Bundle.main.url(forResource: "azan-fajr-full", withExtension: "mp3") != nil
 
     init(notifications: any NotificationScheduling) {
         self.notifications = notifications
+        azanPlaybackDelegate.onFinish = { [weak self] in
+            Task { @MainActor in
+                self?.azanPlaybackDidFinish()
+            }
+        }
     }
 
     /// Reads the system authorization status directly because
@@ -283,11 +342,15 @@ final class NotificationSettingsViewModel {
         await refresh()
     }
 
-    /// Plays the bundled prayer chime once, in-app, so the user can hear what
-    /// the Azan Clip alert style sounds like.
-    func previewChime() {
+    /// Plays the bundled short azan clip once, in-app, so the user can hear
+    /// what the Azan Clip alert style sounds like. Mirrors the lookup order
+    /// used by `NotificationScheduler`: `azan-short.caf` first, then the
+    /// original `prayer-chime.wav`.
+    func previewAlertSound() {
         chimeUnavailable = false
-        guard let url = Bundle.main.url(forResource: "prayer-chime", withExtension: "wav") else {
+        let clipURL = Bundle.main.url(forResource: "azan-short", withExtension: "caf")
+            ?? Bundle.main.url(forResource: "prayer-chime", withExtension: "wav")
+        guard let url = clipURL else {
             chimeUnavailable = true
             return
         }
@@ -302,5 +365,59 @@ final class NotificationSettingsViewModel {
         } catch {
             chimeUnavailable = true
         }
+    }
+
+    /// Starts in-app playback of a bundled full azan recording
+    /// (`Self.fullAzanResource` or `Self.fajrAzanResource`), or stops it when
+    /// the same recording is already playing.
+    func toggleFullAzan(resource: String) {
+        azanUnavailable = false
+        if playingAzanResource == resource {
+            stopFullAzan()
+            return
+        }
+        stopFullAzan()
+        guard let url = Bundle.main.url(forResource: resource, withExtension: "mp3") else {
+            azanUnavailable = true
+            return
+        }
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.delegate = azanPlaybackDelegate
+            player.prepareToPlay()
+            if player.play() {
+                azanPlayer = player
+                playingAzanResource = resource
+            } else {
+                azanUnavailable = true
+            }
+        } catch {
+            azanUnavailable = true
+        }
+    }
+
+    /// Stops any full azan playback (also called when the view disappears).
+    func stopFullAzan() {
+        azanPlayer?.stop()
+        azanPlayer = nil
+        playingAzanResource = nil
+    }
+
+    private func azanPlaybackDidFinish() {
+        azanPlayer = nil
+        playingAzanResource = nil
+    }
+}
+
+// MARK: - Playback finish bridge
+
+/// Small `NSObject` bridge so the view model can reset its playback state
+/// when a full azan recording finishes (`AVAudioPlayerDelegate` requires an
+/// `NSObject` conformer). The callback hops to the main actor in the owner.
+private final class AzanPlaybackDelegate: NSObject, AVAudioPlayerDelegate {
+    var onFinish: (() -> Void)?
+
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        onFinish?()
     }
 }

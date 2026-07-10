@@ -53,26 +53,28 @@ before archiving.
       - iPhone 6.9" (Pro Max class) — mandatory
       - iPhone 6.5" — optional but recommended
       - iPad Pro 13" — mandatory because the app installs on iPad
-      Suggested shot list (all safe on rights): Prayer dashboard with
-      next-prayer countdown; Monthly timetable; Qibla compass; Quran reader on
-      Surah Al-Fatihah (public-domain Arabic + Pickthall); Next Prayer widget
+      Suggested shot list: Prayer dashboard with next-prayer countdown;
+      Monthly timetable; Qibla compass; Quran reader on Surah Al-Fatihah
+      (public-domain Arabic + Pickthall); Library article reader (real
+      content — permitted, see below); Media lecture list; Next Prayer widget
       on the Home/Lock Screen; Tasbih counter; Settings/privacy screen.
-- [ ] **What may NOT appear in screenshots** until content permission is
-      confirmed: article/tafsir/book body text, magazine or book page images,
-      and any screen presenting copyrighted site content as if it ships in
-      the app. Library/Media screens show only metadata (titles, dates,
-      links) — legally these are link-only references, but to stay
-      conservative get the owner's written OK before featuring
-      lecture/publication titles in marketing imagery.
+- [ ] **Screenshots may show real site content** — the owner of
+      naqshbandiaowaisiah.org granted content permission on 2026-07-10, so
+      article/page body text, lecture titles, and publication listings that
+      ship in the app may appear in screenshots and marketing imagery. Keep
+      the written confirmation on file before submission, and keep religious
+      text in screenshots verbatim (no crops that distort meaning).
 
 ## 4. App Review notes (paste into the Review Notes field)
 
 - [ ] **Religious content sourcing**: explain that organizational and
       spiritual content comes from naqshbandiaowaisiah.org (the order's
-      official site); that copyrighted items ship as *metadata + link to the
-      original page* pending the owner's written permission; that Quran
-      Arabic text and the Pickthall translation are public domain; and that
-      audio lectures stream from the site's own public URLs (no re-hosting).
+      official site) and is included **with the content owner's permission
+      (granted 2026-07-10)**; that Quran Arabic text and the Pickthall
+      translation are public domain; that book/magazine/tafsir PDFs download
+      from the site's own URLs and audio lectures stream from the site's own
+      public URLs (no re-hosting); and that religious text is preserved
+      verbatim.
 - [ ] **Location**: used only on-device for prayer-time calculation and Qibla
       direction; the app is fully functional with a manually chosen city and
       never transmits location (see `Docs/PRIVACY.md`).
@@ -96,19 +98,28 @@ before archiving.
       expanding to the full text, record the exact source edition here.
 - [ ] **prayer-chime.wav** — original work created for this app (no rights
       issues); noted in Acknowledgements.
-- [ ] **Azan notification clip** — not yet shipped. Requires a licensed or
-      permitted recording; conversion instructions in
-      `DarulIrfanApp/Resources/Audio/README.md` (`azan-short.caf`, IMA4,
-      under 30 s). Until then the "Azan Clip" alert style plays the chime.
-- [ ] **Site content permission status** — **not yet confirmed.** All site
-      content is `rightsStatus: linkOnly`. After written permission: re-run
-      the ingest pipeline with `--full-text --rights-confirmed`, refresh the
-      seed data (see `Docs/CONTENT_INGESTION.md`), and update this line with
-      the permission date and scope.
+- [x] **Azan notification clip & full azan recordings** — shipped 2026-07-10.
+      `azan-short.caf` + `azan-full.mp3` from "Beautiful adhan" (Wikimedia
+      Commons, CC0 1.0); `azan-fajr-full.mp3` from Islamic Center Malmö
+      (Wikimedia Commons, CC BY 3.0 — attribution shown in Acknowledgements).
+      Full source/license records in `DarulIrfanApp/Resources/Audio/README.md`.
+      `prayer-chime.wav` remains the fallback.
+- [x] **Site content permission status** — **GRANTED 2026-07-10** by the
+      owner of naqshbandiaowaisiah.org. Scope: full text and assets from the
+      site may ship in the app; the 2026-07-10 ingest
+      (`--full-text --rights-confirmed`, seed manifest v2) shipped full
+      verbatim text for About pages, Method of Zikr, zikr-joining
+      instructions, and articles as `rightsStatus: permissionConfirmed`;
+      books/magazines/tafsir PDFs and lecture MP3s remain remote URLs on the
+      site (no re-hosting).
+- [ ] **[blocker]** Obtain and keep the owner's **written confirmation on
+      file** before submission (the 2026-07-10 grant is recorded; archive the
+      written record with the submission materials).
 - [ ] **AlMurshid TV stream** (`stream.darulirfan.org`) — confirm with the
       owner that the URL is correct and intended for public app use.
-- [ ] **App icon / visual identity** — attributed to naqshbandiaowaisiah.org;
-      obtain approval alongside the content permission.
+- [ ] **App icon / visual identity** — attributed to naqshbandiaowaisiah.org.
+      Content permission was granted 2026-07-10; confirm the icon/visual
+      identity is covered by that grant or obtain separate approval.
 
 ## 6. Pre-submission QA pass (on a physical device where noted)
 
@@ -130,15 +141,17 @@ before archiving.
 - [ ] Seeded Quran surahs, 99 Names, duas, Islamic days, zikr schedule open.
 - [ ] Downloaded PDFs/MP3s open and play; non-downloaded media fails with the
       gentle message, not a spinner.
-- [ ] Link-only items show metadata and a clearly disabled/erroring web path.
+- [ ] Items without stored text (book/magazine entries, any remaining
+      link-only item) show metadata and a clearly disabled/erroring web path;
+      seeded article/page bodies read fully offline.
 - [ ] Launch is clean offline (manifest poll fails silently).
 
 **Notification limit sanity** (device):
 - [ ] After onboarding with alerts on, pending requests stay **at or under
       64** (`NotificationScheduler.pendingCount()` is available for a debug
       readout; the plan caps at 63 + 1 trailing refresh reminder).
-- [ ] Per-prayer styles behave: off/silent/default/azan-clip (chime), and the
-      chime is under 30 s so it actually plays.
+- [ ] Per-prayer styles behave: off/silent/default/azan-clip (azan-short.caf,
+      18 s Linear PCM — under 30 s so it actually plays).
 - [ ] Pre-reminders fire N minutes early; timezone change triggers a
       reschedule (toggle timezone in Settings → General → Date & Time).
 - [ ] The trailing "Open Darul Irfan to keep prayer alerts fresh" reminder

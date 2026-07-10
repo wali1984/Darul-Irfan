@@ -3,8 +3,9 @@ import Foundation
 // MARK: - Rights
 
 /// Whether the app may store/display an item's full text or only link to it.
-/// The website's content is copyright-reserved; until permission is confirmed,
-/// ingested items are `linkOnly`.
+/// The website's content is copyright-reserved; the owner granted content
+/// permission on 2026-07-10, so ingested items are `permissionConfirmed`.
+/// `linkOnly` remains valid for anything ingested without that grant.
 enum RightsStatus: String, Codable, Sendable {
     /// Only metadata + source link may be shown; body must not be stored.
     case linkOnly

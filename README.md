@@ -60,23 +60,33 @@ Prayer times are computed entirely on-device by
 `PrayerCalculationService` (the only file that imports `Adhan`). Bundled seed
 JSON (`DarulIrfanApp/Resources/SeedData/`) is imported idempotently on first
 launch by `ContentSyncService`, guarded by a `seed.version` row, so the Quran
-index, library catalog, sample lectures, events, 99 Names, duas, and zikr
-schedule all work with no network. A remote content manifest endpoint is
+index, the full library catalog (291 items), the lecture catalog (199 items),
+events, 99 Names, duas, and zikr schedule all work with no network. A remote content manifest endpoint is
 documented and polled (`/app/content_manifest.json`), but it is **future
 work** — until it exists every fetch quietly resolves to "nothing new."
 
 ### Rights model
 
-Content from naqshbandiaowaisiah.org is copyright reserved and permission is
-**not yet confirmed**. Every item therefore carries a `rightsStatus`:
+Content from naqshbandiaowaisiah.org is copyright reserved. The owner
+**granted content permission on 2026-07-10** (keep the written confirmation
+on file). Every item carries a `rightsStatus`:
 
-- `linkOnly` — metadata + source URL only, no body text. The UI shows the
-  metadata with a "Read on naqshbandiaowaisiah.org" link (in-app Safari) and
-  streams public MP3 URLs natively (streaming is fine; bulk re-hosting is not).
+- `permissionConfirmed` — full text/assets may ship; produced by the ingest
+  tool's `--full-text --rights-confirmed` mode. Since the 2026-07-10 grant
+  this is the status of all bundled site content (seed manifest v2): full
+  verbatim page text for the About pages, Method of Zikr (its illustrated
+  instructions are images on the site — the image URLs ship, untranscribed),
+  online-zikr instructions, and articles; books, magazines, and tafsir
+  booklets as metadata + remote PDF URLs; lectures as metadata + the site's
+  own MP3 stream URLs (no bulk re-hosting of PDFs/MP3s).
 - `publicDomain` — Quran Arabic text, the Pickthall English translation,
   surah index, 99 Names, Quranic duas.
-- `permissionConfirmed` — reserved for after written permission; produced by
-  the ingest tool's `--full-text --rights-confirmed` mode.
+- `linkOnly` — metadata + source URL only, no body text. No longer the
+  default for site content, but the UI still degrades gracefully for any
+  item carrying it (metadata plus a "Read on naqshbandiaowaisiah.org" link).
+
+Religious text is always copied verbatim — never summarized or paraphrased;
+a clearly-labeled excerpt field is the only exception.
 
 ## Repository layout
 
@@ -106,9 +116,9 @@ DarulIrfan-iOS/
 │   ├── Features/                # Prayer, Quran, Library, Media, Zikr, Events,
 │   │                            #   Companion, Qibla, Search, Settings, Onboarding, More
 │   └── Resources/
-│       ├── Audio/               # prayer-chime.wav + azan-clip instructions
+│       ├── Audio/               # azan-short.caf, azan-full.mp3, azan-fajr-full.mp3, chime
 │       ├── Images/              # Asset catalog (AppIcon, AccentColor, launch color)
-│       └── SeedData/            # 15 JSON files, schema v1
+│       └── SeedData/            # 15 JSON files, wire schema v1, seed v2
 ├── Widgets/                     # Widget extension (Next Prayer, Today's Times)
 └── Tools/ContentIngest/         # Python ingest pipeline + offline pytest suite
 ```
@@ -225,8 +235,8 @@ from this repo.
 | Hijri date (Umm al-Qura) with ±2 day offset + live preview | Implemented |
 | Widgets: Next Prayer (small + Lock Screen circular/rectangular/inline), Today's Times (medium), App Group snapshot bridge | Implemented |
 | Quran: 114-surah index, ayah reader, translation toggle (Pickthall), tafsir section, bookmarks, continue reading, reader font scale | Implemented — Arabic text bundled for 6 surahs (1, 103, 108, 112, 113, 114); full text pack is a content task |
-| Library: category browser, filters, favorites, rights-aware reader, PDF download + native viewer, reading progress | Implemented — bodies are link-only pending permission |
-| Media: AlMurshid TV live card, categories, year/month archive, background audio, Lock Screen controls, 0.75–2× speed, queue, lecture bookmarks, continue listening, MP3 downloads | Implemented — catalog is a curated seed sample; YouTube items open externally |
+| Library: category browser, filters, favorites, rights-aware reader, PDF download + native viewer, reading progress | Implemented — permission granted 2026-07-10: 291 seeded items; full verbatim text for About pages, Method of Zikr, zikr-joining instructions, and 10+ articles; 20 books + 249 Al-Murshid issues as metadata + PDF download links |
+| Media: AlMurshid TV live card, categories, year/month archive, background audio, Lock Screen controls, 0.75–2× speed, queue, lecture bookmarks, continue listening, MP3 downloads | Implemented — 199 seeded items incl. 2024–2026 audio lectures streaming from the site's own MP3 URLs; YouTube items open externally |
 | Zikr: verified Method of Zikr summary, online zikr schedule (Paltalk) with reminders, tasbih counters, daily habit strip | Implemented |
 | Events & Dar-ul-Irfan: programs, detail + reminders, add-to-calendar, map/directions, contact actions, announcements | Implemented — add-to-calendar needs an Info.plist key (see APP_STORE_CHECKLIST) |
 | Companion: 99 Names of Allah, sourced duas, Islamic days | Implemented |
@@ -234,27 +244,47 @@ from this repo.
 | Onboarding (language → location → calculation → notifications) | Implemented |
 | Settings (location, calculation, offsets, notifications, appearance, Hijri, storage, privacy) | Implemented |
 | Content sync: idempotent seed import + remote manifest polling | Implemented — server endpoint not yet deployed |
-| Urdu localization | Structure ready; String Catalog not yet created |
-| Swift unit/UI test suites | Not yet written (targets declared) |
+| Urdu localization | Implemented — String Catalog (~665 keys) with en + ur units |
+| Swift unit/UI test suites | Written, never executed (no compiler on the authoring machine) — see Testing |
 | Live Activities (next prayer, Ramadan) | Future |
 | Apple Watch app | Future (architecture allows it) |
 | Server-hosted content manifest endpoint | Future |
 
-## Content permissions still required
+## Content permissions & remaining content work
 
-Before these ship, written permission from the content owner
-(naqshbandiaowaisiah.org / Dar-ul-Irfan) is required:
+**Content permission was granted by the owner of naqshbandiaowaisiah.org on
+2026-07-10.** Keep the written confirmation on file before App Store
+submission. What this changed, and what still remains:
 
-1. **Full-text articles, books, and pages** — currently metadata + link only.
-2. **Akram-ut-Tarajum translation and Asrar-at-Tanzil / Akram-ut-Tafaseer
-   tafsir text** — currently listed as editions with per-surah website links.
-3. **A licensed short azan recording** for notification sounds — the app ships
-   an original 6-second chime; see `DarulIrfanApp/Resources/Audio/README.md`
-   for the drop-in instructions (`azan-short.caf`).
-4. **AlMurshid TV stream URL confirmation** — the prototype's
+1. ~~Full-text articles and pages~~ — **done** (2026-07-10 ingest, seed
+   manifest v2): full verbatim text ships for the four About pages, Method of
+   Zikr, online-zikr joining instructions, and 10 articles; 20 books and 249
+   Al-Murshid magazine issues (1981–2015) ship as metadata + PDF download
+   URLs (PDFs stay on the site, not re-hosted); 195 audio lectures
+   (2024–2026) stream from the site's own MP3 URLs.
+2. **Akram-ut-Tarajum per-ayah translation** — rights are granted, but the
+   app still needs **structured per-ayah source data from the owner**; the
+   website does not publish it in a machine-readable form. Listed as an
+   edition with a website link until then.
+3. **Asrar-at-Tanzil / Akram-ut-Tafaseer tafsir text** — rights are granted,
+   but the site's per-surah tafsir pages contain no HTML text, only links to
+   PDF booklets that are **image scans with no text layer**. OCR is ruled out
+   (religious text must ship verbatim), so the app keeps accurate per-surah
+   pointer entries with links; `isAvailableOffline` stays `false`.
+4. **Method of Zikr illustrations** — the instructions are images on the
+   site (English JPG + Urdu PNG); the image URLs and the verbatim on-page
+   caption ship, but no transcription (no OCR).
+5. ~~A licensed short azan recording~~ — **done**: the app ships
+   `azan-short.caf` + `azan-full.mp3` (Wikimedia Commons, CC0 1.0) and
+   `azan-fajr-full.mp3` (Wikimedia Commons, CC BY 3.0, attribution in-app);
+   sources and licenses are recorded in
+   `DarulIrfanApp/Resources/Audio/README.md`.
+6. **AlMurshid TV stream URL confirmation** — the prototype's
    `stream.darulirfan.org` URL is treated as a default that may be
    unavailable; playback failure is handled gracefully.
+7. **Server-hosted content manifest endpoint** — still future work; until it
+   exists the manifest poll quietly resolves to "nothing new."
 
-Once permission is confirmed, re-run the ingest pipeline with
-`--full-text --rights-confirmed` (see `Docs/CONTENT_INGESTION.md`) and refresh
-the seed data.
+For future content refreshes, re-run the ingest pipeline with
+`--full-text --rights-confirmed` (see `Docs/CONTENT_INGESTION.md`) and bump
+the seed manifest version.

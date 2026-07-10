@@ -64,9 +64,9 @@ tasbih), Settings, About.
 ## Data & rights rules
 
 - Seed JSON lives in `DarulIrfanApp/Resources/SeedData/` (schema v1, camelCase keys matching the Codable models; dates ISO-8601). `ContentSyncService` imports it idempotently (guarded by a `seed.version` row in `key_value`).
-- Anything sourced from naqshbandiaowaisiah.org ships as `rightsStatus: "linkOnly"` — metadata + source URL only, **no full body text** — until permission is confirmed. Quran Arabic text and standard factual data (surah index, 99 Names, Quranic duas) are `publicDomain`.
-- UI must degrade gracefully for `linkOnly` items: show metadata + "Read on naqshbandiaowaisiah.org" link (SafariView), and for media play the public MP3 stream URL natively (streaming a public URL is fine; bulk re-hosting is not).
-- Never invent religious content: zikr instructions, tafsir, aqwal must come verbatim from `Docs/RESEARCH_NOTES.md` verified facts or seed data marked with a source.
+- Content permission for naqshbandiaowaisiah.org was **granted by the owner on 2026-07-10** (keep the written confirmation on file). Content sourced from the site now ships as `rightsStatus: "permissionConfirmed"` — full verbatim body text is allowed, produced only via the ingest pipeline's `--full-text --rights-confirmed` mode. Book/magazine/tafsir PDFs and lecture MP3s stay as **remote URLs on the site** (download/stream natively; never bundle or bulk re-host). Quran Arabic text and standard factual data (surah index, 99 Names, Quranic duas) are `publicDomain`.
+- UI must still degrade gracefully for any `linkOnly` item (the pre-grant status; none remain in the current seed but the status stays valid): show metadata + "Read on naqshbandiaowaisiah.org" link (SafariView), and for media play the public MP3 stream URL natively (streaming a public URL is fine; bulk re-hosting is not).
+- Never invent religious content: zikr instructions, tafsir, aqwal must come verbatim from `Docs/RESEARCH_NOTES.md` verified facts or seed data marked with a source. Permission does **not** relax the verbatim rule — religious text is never summarized or paraphrased; a clearly-labeled excerpt field is the only exception.
 
 ## Testing conventions
 

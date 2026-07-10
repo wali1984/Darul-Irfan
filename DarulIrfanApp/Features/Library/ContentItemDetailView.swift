@@ -1,8 +1,9 @@
 import SwiftUI
 
 /// Detail screen for one library item: metadata card, rights-aware native
-/// reader (or an official-website link for link-only items), downloadable
-/// files, and the source link with last-updated date.
+/// reader (or an official-website link for items without stored text, such
+/// as PDF publications and any link-only item), downloadable files, and the
+/// source link with last-updated date.
 struct ContentItemDetailView: View {
     private let appState: AppState
     private let libraryViewModel: LibraryViewModel
@@ -250,7 +251,7 @@ struct ContentItemDetailView: View {
                 Label("Available on the official website", systemImage: "globe")
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
-                Text("Out of respect for the publisher's rights, the full text of this item is hosted on the official Naqshbandia Owaisiah website.")
+                Text("The full text of this item is available on the official Naqshbandia Owaisiah website.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                 if viewModel.sourceURL != nil {
