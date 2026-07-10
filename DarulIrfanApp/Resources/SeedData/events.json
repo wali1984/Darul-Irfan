@@ -1,0 +1,29 @@
+[
+  {
+    "id": "event-monthly-ijtema",
+    "kind": "monthlyIjtema",
+    "title": "Monthly Ijtema",
+    "details": "The monthly congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan. Dates are announced on naqshbandiaowaisiah.org.",
+    "datesAreApproximate": true,
+    "venue": "Dar-ul-Irfan, Munara, District Chakwal",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/"
+  },
+  {
+    "id": "event-salana-ijtema",
+    "kind": "salanaIjtema",
+    "title": "Salana Ijtema",
+    "details": "The annual congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan. Dates are announced on naqshbandiaowaisiah.org.",
+    "datesAreApproximate": true,
+    "venue": "Dar-ul-Irfan, Munara, District Chakwal",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/"
+  },
+  {
+    "id": "event-ramadan-aitekaaf",
+    "kind": "ramadanAitekaaf",
+    "title": "Ramadan Aitekaaf",
+    "details": "Collective Aitekaaf observed at Dar-ul-Irfan during Ramadan. Dates follow the Islamic lunar calendar and are announced each year on naqshbandiaowaisiah.org.",
+    "datesAreApproximate": true,
+    "venue": "Dar-ul-Irfan, Munara, District Chakwal",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/"
+  }
+]

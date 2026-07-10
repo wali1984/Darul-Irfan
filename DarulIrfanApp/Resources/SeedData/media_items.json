@@ -1,0 +1,57 @@
+[
+  {
+    "id": "lecture-3725-dawat-o-tabligh-ke-usool",
+    "title": "دعوت و تبلیغ کے اصول",
+    "language": "ur",
+    "speaker": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "date": "2026-01-02T00:00:00Z",
+    "mediaType": "audio",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/lecture/3725/2026-01-02-dawat-o-tabligh-ke-usool.html",
+    "streamUrl": "https://www.naqshbandiaowaisiah.org/uploads/3725/02-01-2026.mp3",
+    "downloadUrl": "https://www.naqshbandiaowaisiah.org/uploads/3725/02-01-2026.mp3",
+    "year": 2026,
+    "month": 1,
+    "category": "audioLectures",
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "lecture-3835-azmat-mohammad-rasool-ul-allah",
+    "title": "عظمت محمد الرسول اللہ",
+    "language": "ur",
+    "speaker": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "date": "2026-02-06T00:00:00Z",
+    "mediaType": "audio",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/lecture/3835/2026-02-06-azmat-mohammad-rasool-ul-allah.html",
+    "streamUrl": "https://www.naqshbandiaowaisiah.org/uploads/3835/06-02-2026%20s.mp3",
+    "downloadUrl": "https://www.naqshbandiaowaisiah.org/uploads/3835/06-02-2026%20s.mp3",
+    "year": 2026,
+    "month": 2,
+    "category": "audioLectures",
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "lecture-4141-khankah-ki-zimadari",
+    "title": "خانقاہ کی ذمہ داری",
+    "language": "ur",
+    "speaker": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "date": "2026-05-01T00:00:00Z",
+    "mediaType": "audio",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/lecture/4141/2026-05-01-khankah-ki-zimadari.html",
+    "streamUrl": "https://www.naqshbandiaowaisiah.org/uploads/4141/01-05-2026.mp3",
+    "downloadUrl": "https://www.naqshbandiaowaisiah.org/uploads/4141/01-05-2026.mp3",
+    "year": 2026,
+    "month": 5,
+    "category": "audioLectures",
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "almurshid-tv-live",
+    "title": "AlMurshid TV (Live Audio)",
+    "language": "ur",
+    "mediaType": "audio",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/almurshidtv",
+    "streamUrl": "https://stream.darulirfan.org/almurshid-tv.mp3",
+    "category": "alMurshidTV",
+    "rightsStatus": "linkOnly"
+  }
+]

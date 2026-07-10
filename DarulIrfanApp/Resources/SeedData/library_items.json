@@ -1,0 +1,180 @@
+[
+  {
+    "id": "page-silsila-naqshbandia-owaisiah",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/silsila-naqshbandia-owaisiah.html",
+    "type": "page",
+    "title": "Silsila Naqshbandia Owaisiah",
+    "language": "en",
+    "category": "aboutSilsila",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "An introduction to Silsila Naqshbandia Owaisiah, a Sufi order whose spiritual lineage traces to Khawajah Owais Qarni. Read the full page on naqshbandiaowaisiah.org.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "page-hazrat-ameer-abdul-qadeer-awan",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/hazrat-ameer-abdul-qadeer-awan.html",
+    "type": "page",
+    "title": "Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "language": "en",
+    "category": "sheikhAbdulQadeerAwan",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "About Hazrat Ameer Abdul Qadeer Awan (MZA), the current Sheikh-e-Silsila, born 26 March 1973 in Munara, District Chakwal.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "page-hazrat-ameer-muhammad-akram-awan",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/hazrat-ameer-muhammad-akram-awan-ra.html",
+    "type": "page",
+    "title": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "language": "en",
+    "category": "sheikhMuhammadAkramAwan",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "About Hazrat Ameer Muhammad Akram Awan (RA), the previous Sheikh-e-Silsila and author of the tafsir Asrar-at-Tanzil.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "page-shajra-silsila-naqshbandia-owaisiah",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/shajra-silsila-naqshbandia-owaisiah.html",
+    "type": "page",
+    "title": "Shajra Silsila Naqshbandia Owaisiah",
+    "language": "en",
+    "category": "shajra",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "The chain of transmission (Shajra) of Silsila Naqshbandia Owaisiah, from the holy Prophet (peace be upon him) through Khawajah Owais Qarni to the present Sheikh.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "book-dalael-us-salook-urdu",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/books-on-tasawwuf.html",
+    "type": "book",
+    "title": "Dalael-us-Salook in Urdu",
+    "language": "ur",
+    "category": "books",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "The Urdu book Dalael-us-Salook, offered as a free PDF in the books collection on naqshbandiaowaisiah.org.",
+    "mediaUrls": [],
+    "downloadUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/books/Dalael-us-Salook-Urdu.pdf"
+    ],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "book-hayyat-e-tayyabah-i",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/books-on-tasawwuf.html",
+    "type": "book",
+    "title": "Hayyat-e-Tayyabah - I",
+    "language": "ur",
+    "category": "books",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "Volume I of Hayyat-e-Tayyabah, offered as a free PDF in the books collection on naqshbandiaowaisiah.org.",
+    "mediaUrls": [],
+    "downloadUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/books/Hayyat-e-Tayyabah-I.pdf"
+    ],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "magazine-almurshid-february-march-1981",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/almurshid-magazine.html",
+    "type": "magazine",
+    "title": "Al-Murshid Magazine: February - March 1981",
+    "language": "ur",
+    "category": "alMurshidMagazine",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "The February - March 1981 issue of Al-Murshid magazine, available as a PDF from the official archive.",
+    "mediaUrls": [],
+    "downloadUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_march_1981.pdf"
+    ],
+    "rightsStatus": "linkOnly",
+    "publishedAt": "1981-02-01T00:00:00Z"
+  },
+  {
+    "id": "magazine-almurshid-may-1983",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/almurshid-magazine.html",
+    "type": "magazine",
+    "title": "Al-Murshid Magazine: May 1983",
+    "language": "ur",
+    "category": "alMurshidMagazine",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "The May 1983 issue of Al-Murshid magazine, available as a PDF from the official archive.",
+    "mediaUrls": [],
+    "downloadUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1983.pdf"
+    ],
+    "rightsStatus": "linkOnly",
+    "publishedAt": "1983-05-01T00:00:00Z"
+  },
+  {
+    "id": "page-method-of-zikr",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/method-of-zikr.html",
+    "type": "page",
+    "title": "Method of Zikr",
+    "language": "en",
+    "category": "methodOfZikr",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "The official page describing the method of Zikr-e-Khafi Qalbi with Pas Anfas (guarding every breath). Read the full instructions on naqshbandiaowaisiah.org.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "page-online-zikr-joining-instructions",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html",
+    "type": "page",
+    "title": "Online Zikr Joining Instructions",
+    "language": "en",
+    "category": "zikrAllah",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "Official instructions for joining the online zikr sessions held twice daily on Paltalk - after Isha and at Tahajjud, Pakistan time.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "page-articles-index",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/articles",
+    "type": "page",
+    "title": "Articles",
+    "language": "en",
+    "category": "articles",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "The index of articles published on naqshbandiaowaisiah.org.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  },
+  {
+    "id": "page-downloads-index",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/download",
+    "type": "page",
+    "title": "Downloads",
+    "language": "en",
+    "category": "books",
+    "bodyHtml": null,
+    "bodyPlainText": null,
+    "excerpt": "The downloads index on naqshbandiaowaisiah.org, listing free books and other publications.",
+    "mediaUrls": [],
+    "downloadUrls": [],
+    "rightsStatus": "linkOnly"
+  }
+]

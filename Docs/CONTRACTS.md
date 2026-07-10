@@ -32,8 +32,8 @@ missing, extend your own feature files, never the contracts.
 ## UI conventions
 
 - Every screen: tokens from `DIColor/DISpacing/DIRadius/DIFont`, components from `Components.swift`, `.diScreenBackground()` on tab roots.
-- All user-facing strings via String Catalog keys — `Text("prayer.dashboard.title")` style keys, defined in `DarulIrfanApp/Resources/Localizations/Localizable.xcstrings` (en + ur). Never concatenate localized strings; use interpolation keys.
-- Localization keys already implied by models (`Prayer.localizationKey` = `prayer.name.fajr` etc., `ContentCategory.localizationKey`, `settings.theme.*`, `notification.style.*`, `calculation.method.*`, `search.domain.*`, `media.category.*`, `library.category.*`) — the localization agent owns the catalog; feature agents just use the documented key patterns and English fallback text is fine while the catalog fills in.
+- All user-facing strings use **natural English literals as String Catalog keys** — `Text("Prayer Times")`, `Label("Settings", systemImage: ...)` — localized via `DarulIrfanApp/Resources/Localizations/Localizable.xcstrings` (en source, ur translations). This guarantees a readable English fallback with no compiler. Never concatenate localized strings; use interpolation (`Text("Next prayer: \(name)")`).
+- Enum display names: use the model's `englishName` property wrapped as `Text(LocalizedStringKey(x.englishName))` so the catalog can translate it at runtime. Do not use the `localizationKey` computed properties for display (raw keys would show if a catalog entry is missing); they remain available for future keyed migration.
 - RTL: rely on SwiftUI semantic layout (leading/trailing). Urdu/Arabic text blocks: `.environment(\.layoutDirection, .rightToLeft)` where content (not chrome) is RTL, `DIFont.urduBody`/`DIFont.quranArabic`.
 - Accessibility: Dynamic Type everywhere (no fixed frames on text), meaningful `accessibilityLabel` on icon-only buttons, headers marked `.isHeader`.
 - Dates: display via `Text(date, style:)` / `formatted()`; compute via injected services.

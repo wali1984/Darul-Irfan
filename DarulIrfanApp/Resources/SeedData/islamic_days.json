@@ -1,0 +1,68 @@
+[
+  {
+    "id": "islamic-new-year",
+    "title": "Islamic New Year",
+    "hijriMonth": 1,
+    "hijriDay": 1,
+    "note": "The first day of Muharram begins the Hijri year."
+  },
+  {
+    "id": "ashura",
+    "title": "Ashura",
+    "hijriMonth": 1,
+    "hijriDay": 10
+  },
+  {
+    "id": "eid-milad-un-nabi",
+    "title": "Eid Milad-un-Nabi",
+    "hijriMonth": 3,
+    "hijriDay": 12,
+    "note": "Commemoration of the birth of the holy Prophet (peace be upon him); observed dates vary by community."
+  },
+  {
+    "id": "isra-and-miraj",
+    "title": "Isra and Mi'raj",
+    "hijriMonth": 7,
+    "hijriDay": 27,
+    "note": "Widely observed on 27 Rajab; observed dates vary."
+  },
+  {
+    "id": "shab-e-barat",
+    "title": "Shab-e-Barat",
+    "hijriMonth": 8,
+    "hijriDay": 15,
+    "note": "The night of 15 Sha'ban."
+  },
+  {
+    "id": "first-of-ramadan",
+    "title": "First of Ramadan",
+    "hijriMonth": 9,
+    "hijriDay": 1,
+    "note": "The start of fasting depends on the sighting of the moon."
+  },
+  {
+    "id": "laylat-ul-qadr",
+    "title": "Laylat-ul-Qadr",
+    "hijriMonth": 9,
+    "hijriDay": 27,
+    "note": "Sought on the odd nights of the last ten days of Ramadan; the 27th night is widely observed."
+  },
+  {
+    "id": "eid-ul-fitr",
+    "title": "Eid-ul-Fitr",
+    "hijriMonth": 10,
+    "hijriDay": 1
+  },
+  {
+    "id": "day-of-arafah",
+    "title": "Day of Arafah",
+    "hijriMonth": 12,
+    "hijriDay": 9
+  },
+  {
+    "id": "eid-ul-adha",
+    "title": "Eid-ul-Adha",
+    "hijriMonth": 12,
+    "hijriDay": 10
+  }
+]

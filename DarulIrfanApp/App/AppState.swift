@@ -105,7 +105,7 @@ final class AppState {
             .map { entry in
                 WidgetPrayerTime(
                     prayerKey: entry.prayer.rawValue,
-                    displayName: entry.prayer.englishName,
+                    displayName: String(localized: String.LocalizationValue(entry.prayer.englishName)),
                     time: entry.time,
                     isObligatory: entry.prayer.isObligatory
                 )
