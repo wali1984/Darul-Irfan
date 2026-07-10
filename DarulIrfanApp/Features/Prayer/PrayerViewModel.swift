@@ -79,7 +79,7 @@ final class PrayerViewModel {
             offsetDays: settings.hijri.dayOffset,
             locale: Locale.current
         )
-        gregorianDateText = now.formatted(Date.FormatStyle(date: .full, time: .omitted))
+        gregorianDateText = now.formatted(date: .complete, time: .omitted)
         isRamadan = hijriService.isRamadan(now, offsetDays: settings.hijri.dayOffset)
 
         guard let place = appState.activePlace else {
