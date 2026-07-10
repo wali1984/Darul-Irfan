@@ -113,11 +113,28 @@ DarulIrfan-iOS/
 └── Tools/ContentIngest/         # Python ingest pipeline + offline pytest suite
 ```
 
-## Building on macOS
+## Building with Codemagic (no Mac required)
 
-This project was **authored on Windows and has never been compiled** — there
-is no Xcode here. The project file is generated from `project.yml` with
-XcodeGen on a Mac.
+CI/CD runs on [Codemagic](https://codemagic.io) macOS machines —
+`codemagic.yaml` at the repo root defines two workflows:
+
+- **`ios-verify`** — zero configuration: XcodeGen-generates the project,
+  builds app + widgets for the simulator (unsigned), runs the unit test suite
+  and the ingest pipeline's pytest suite. Triggers on every push/PR. Use this
+  as the compile/test loop from a Windows dev machine.
+- **`ios-testflight`** — signed App Store archive published to TestFlight on
+  `v*` tags. One-time setup required first (documented in comments inside
+  `codemagic.yaml`): register both bundle IDs + the App Group in the Apple
+  Developer portal, and add an App Store Connect API key in the Codemagic UI.
+
+To connect: push this repo to GitHub/GitLab/Bitbucket, add the app in
+Codemagic, and it picks up `codemagic.yaml` automatically.
+
+## Building locally on macOS
+
+This project was **authored on Windows and first compiled in CI** — there is
+no Xcode here. The project file is generated from `project.yml` with XcodeGen
+on a Mac.
 
 Requirements:
 

@@ -1,0 +1,133 @@
+# Codemagic CI/CD for Darul Irfan iOS
+#
+# Two workflows:
+#   ios-verify     — zero-config: generates the Xcode project with XcodeGen,
+#                    builds the app + widgets for the simulator (no signing),
+#                    and runs the unit test suite. Use this to compile-verify
+#                    every push from a Windows/Linux dev machine.
+#   ios-testflight — signed App Store archive published to TestFlight.
+#                    Requires one-time setup in the Codemagic UI (see the
+#                    comments on that workflow) — until then, run ios-verify.
+#
+# Xcode: adhan-swift 1.5.0 uses swift-tools-version 6.0, so Xcode 16 is the
+# minimum. `latest` keeps App Store submissions compatible with Apple's
+# current-SDK requirement; the app targets iOS 17 with conservative APIs, so
+# newer SDKs are expected to compile cleanly.
+
+workflows:
+  ios-verify:
+    name: iOS verify (build + unit tests, unsigned)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: latest
+    cache:
+      cache_paths:
+        - ~/Library/Caches/org.swift.swiftpm
+    triggering:
+      events:
+        - push
+        - pull_request
+      cancel_previous_builds: true
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen
+      - name: Generate Xcode project
+        script: |
+          xcodegen generate
+      - name: Build app + widgets for simulator (no signing)
+        script: |
+          xcodebuild build \
+            -project DarulIrfan.xcodeproj \
+            -scheme DarulIrfan \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath build/Build.xcresult
+      - name: Run unit tests on simulator
+        script: |
+          # Pick the first available iPhone simulator on this image so the
+          # workflow survives Xcode image updates that rename devices.
+          DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
+          echo "Using simulator: ${DEVICE}"
+          xcodebuild test \
+            -project DarulIrfan.xcodeproj \
+            -scheme DarulIrfan \
+            -destination "platform=iOS Simulator,name=${DEVICE}" \
+            -only-testing:DarulIrfanTests \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath build/Tests.xcresult
+      - name: Run content-ingest pipeline tests
+        script: |
+          cd Tools/ContentIngest
+          pip3 install -r requirements.txt pytest
+          python3 -m pytest tests -q
+    artifacts:
+      - build/*.xcresult
+    publishing:
+      email:
+        recipients:
+          - wajidali1984@hotmail.com
+        notify:
+          success: false
+          failure: true
+
+  # One-time setup before this workflow can run:
+  # 1. Apple Developer portal: register bundle IDs
+  #    org.naqshbandiaowaisiah.darulirfan and
+  #    org.naqshbandiaowaisiah.darulirfan.widgets, plus the App Group
+  #    group.org.naqshbandiaowaisiah.darulirfan (enable the App Groups
+  #    capability on both IDs).
+  # 2. Codemagic UI → Teams → Integrations → App Store Connect: add an API
+  #    key and name it below under `integrations.app_store_connect`.
+  # 3. Create the app record in App Store Connect with the same bundle ID.
+  ios-testflight:
+    name: iOS TestFlight release (signed)
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: org.naqshbandiaowaisiah.darulirfan
+    integrations:
+      app_store_connect: darul-irfan-asc-key   # rename to your Codemagic API-key name
+    cache:
+      cache_paths:
+        - ~/Library/Caches/org.swift.swiftpm
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: "v*"
+      cancel_previous_builds: true
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen
+      - name: Generate Xcode project
+        script: |
+          xcodegen generate
+      - name: Apply signing profiles
+        script: |
+          xcode-project use-profiles
+      - name: Build signed archive
+        script: |
+          xcode-project build-ipa \
+            --project DarulIrfan.xcodeproj \
+            --scheme DarulIrfan \
+            --archive-xcargs "CURRENT_PROJECT_VERSION=${BUILD_NUMBER}"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+      email:
+        recipients:
+          - wajidali1984@hotmail.com
+        notify:
+          success: true
+          failure: true
