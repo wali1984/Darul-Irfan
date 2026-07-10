@@ -127,7 +127,9 @@ final class OnboardingViewModel {
         }
         locationPhase = .locating
         do {
-            let place = try await location.currentPlace()
+            // Round to city precision before persisting — the app never
+            // stores precise coordinates (see PrivacySettingsView).
+            let place = try await location.currentPlace().roundedToCityPrecision()
             await appState.updateSettings {
                 $0.lastKnownPlace = place
                 $0.locationMode = .device

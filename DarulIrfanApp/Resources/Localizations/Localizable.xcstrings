@@ -7107,19 +7107,19 @@
         }
       }
     },
-    "Prayer times and the Qibla direction are calculated locally. Your coordinates are never sent to a server, and no location history is kept — only the name of the city used for calculations is saved.": {
+    "Prayer times and the Qibla direction are calculated locally. Your coordinates are never sent to a server, and no location history is kept — only the city used for calculations is saved, with its coordinates rounded to city-level accuracy.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prayer times and the Qibla direction are calculated locally. Your coordinates are never sent to a server, and no location history is kept — only the name of the city used for calculations is saved."
+            "value": "Prayer times and the Qibla direction are calculated locally. Your coordinates are never sent to a server, and no location history is kept — only the city used for calculations is saved, with its coordinates rounded to city-level accuracy."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "نماز کے اوقات اور قبلے کی سمت کا حساب مقامی طور پر ہوتا ہے۔ آپ کے کوآرڈینیٹس کبھی کسی سرور کو نہیں بھیجے جاتے، اور مقام کی کوئی سرگزشت نہیں رکھی جاتی — صرف حساب کے لیے استعمال ہونے والے شہر کا نام محفوظ ہوتا ہے۔"
+            "value": "نماز کے اوقات اور قبلے کی سمت کا حساب مقامی طور پر ہوتا ہے۔ آپ کے کوآرڈینیٹس کبھی کسی سرور کو نہیں بھیجے جاتے، اور مقام کی کوئی سرگزشت نہیں رکھی جاتی — صرف حساب کے لیے استعمال ہونے والا شہر محفوظ ہوتا ہے، جس کے کوآرڈینیٹس شہر کی سطح تک محدود کیے جاتے ہیں۔"
           }
         }
       }
@@ -10966,19 +10966,19 @@
         }
       }
     },
-    "Your precise location is never stored — only the resolved city name is kept so prayer times work offline.": {
+    "Your precise location is never stored — only the resolved city name and approximate, city-level coordinates are kept so prayer times work offline.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your precise location is never stored — only the resolved city name is kept so prayer times work offline."
+            "value": "Your precise location is never stored — only the resolved city name and approximate, city-level coordinates are kept so prayer times work offline."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "آپ کا درست مقام کبھی محفوظ نہیں کیا جاتا — صرف شہر کا نام رکھا جاتا ہے تاکہ نماز کے اوقات آف لائن بھی کام کریں۔"
+            "value": "آپ کا درست مقام کبھی محفوظ نہیں کیا جاتا — صرف شہر کا نام اور شہر کی سطح کے تخمینی کوآرڈینیٹس رکھے جاتے ہیں تاکہ نماز کے اوقات آف لائن بھی کام کریں۔"
           }
         }
       }

@@ -1,4 +1,4 @@
-import XCTest
+﻿import XCTest
 
 /// Launch smoke tests.
 ///
@@ -20,12 +20,20 @@ final class SmokeUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// The assertions match English UI strings; pin the app run to English so
+    /// the suite passes on simulators whose language is Urdu.
+    private func makeApp() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        return app
+    }
+
     // MARK: - Launch
 
     /// The app must reach one of its two valid first screens: the onboarding
     /// welcome step (fresh install) or the five-tab shell (returning user).
     func testLaunchShowsOnboardingOrTabShell() {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
 
         let prayerTab = app.tabBars.buttons["Prayer"]
@@ -59,7 +67,7 @@ final class SmokeUITests: XCTestCase {
     /// it first walks onboarding defensively; when onboarding cannot be
     /// completed in this environment (no location/network), the test skips.
     func testTabBarButtonsExistAndSwitchTabs() throws {
-        let app = XCUIApplication()
+        let app = makeApp()
         app.launch()
 
         let prayerTab = app.tabBars.buttons["Prayer"]
@@ -83,7 +91,7 @@ final class SmokeUITests: XCTestCase {
     // MARK: - Onboarding walk-through (defensive)
 
     /// Advances through onboarding by tapping only buttons that exist:
-    /// welcome → language → location → calculation → notifications → finish.
+    /// welcome â†’ language â†’ location â†’ calculation â†’ notifications â†’ finish.
     /// Never asserts mid-flow; the caller decides whether reaching the tab
     /// bar was possible.
     private func walkOnboarding(app: XCUIApplication) throws {
@@ -113,10 +121,10 @@ final class SmokeUITests: XCTestCase {
         // Step 1: welcome.
         _ = tapIfPresent(app.buttons["Get Started"], timeout: 10)
 
-        // Step 2: language — Continue is always enabled here.
+        // Step 2: language â€” Continue is always enabled here.
         _ = tapIfPresent(app.buttons["Continue"])
 
-        // Step 3: location — Continue stays disabled until a place is chosen.
+        // Step 3: location â€” Continue stays disabled until a place is chosen.
         let useMyLocation = app.buttons["Use My Location"]
         if useMyLocation.waitForExistence(timeout: 5) {
             useMyLocation.tap()
@@ -133,7 +141,7 @@ final class SmokeUITests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         }
         guard continueButton.exists && continueButton.isEnabled else {
-            // No location fix available here — the caller will skip.
+            // No location fix available here â€” the caller will skip.
             return
         }
         continueButton.tap()

@@ -10,7 +10,7 @@ struct PrivacySettingsView: View {
                 PrivacyCard(
                     systemImage: "location.fill",
                     titleKey: "Location stays on this device",
-                    bodyKey: "Prayer times and the Qibla direction are calculated locally. Your coordinates are never sent to a server, and no location history is kept — only the name of the city used for calculations is saved."
+                    bodyKey: "Prayer times and the Qibla direction are calculated locally. Your coordinates are never sent to a server, and no location history is kept — only the city used for calculations is saved, with its coordinates rounded to city-level accuracy."
                 )
 
                 PrivacyCard(

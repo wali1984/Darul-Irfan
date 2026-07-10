@@ -1,0 +1,40 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSCalendarsWriteOnlyAccessUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darul Irfan adds community events such as the Monthly Ijtema to your calendar only when you ask it to."
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دارالعرفان صرف آپ کے کہنے پر ماہانہ اجتماع جیسے اجتماعی پروگرام آپ کے کیلنڈر میں شامل کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darul Irfan uses your location to calculate accurate prayer times and Qibla direction for your area. Your location never leaves your device."
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دارالعرفان آپ کے علاقے کے لیے درست نماز کے اوقات اور قبلہ کی سمت معلوم کرنے کے لیے آپ کا مقام استعمال کرتا ہے۔ آپ کا مقام کبھی آپ کے آلے سے باہر نہیں جاتا۔"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

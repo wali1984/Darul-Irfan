@@ -3,8 +3,9 @@ import WidgetKit
 
 // "Today's Prayer Times" widget: a medium grid of all six of today's times
 // with the next one highlighted, headed by the Hijri date the app precomputed
-// with the user's offset. The timeline reloads at the next prayer time (or in
-// an hour, whichever comes first) so the highlight advances on schedule.
+// with the user's offset. The timeline places one entry per remaining prayer
+// transition today (each dated at that prayer's time) so the highlight
+// advances exactly on time; a discretionary reload handles the day rollover.
 
 // MARK: - Timeline entry
 
@@ -32,23 +33,28 @@ struct TodayTimesProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<TodayTimesEntry>) -> Void) {
         let now = Date()
         let snapshot = PrayerWidgetSnapshot.load()
-        let entry = TodayTimesEntry(date: now, snapshot: snapshot)
 
-        // Reload when the highlight should move: at the next upcoming time,
-        // capped at one hour, and never later than the start of tomorrow so
-        // the grid rolls over to the new day.
-        var refreshDate = now.addingTimeInterval(60 * 60)
-        if let nextTime = snapshot?.upcomingTimes.first(where: { $0.time > now })?.time,
-           nextTime < refreshDate {
-            refreshDate = nextTime
+        // One entry per remaining highlight transition today, each dated at a
+        // prayer's time: the view computes the highlight from `entry.date`, so
+        // it advances exactly on time even if iOS defers the reload below.
+        var entries: [TodayTimesEntry] = [TodayTimesEntry(date: now, snapshot: snapshot)]
+        if let snapshot {
+            for item in snapshot.times(onSameDayAs: now) where item.time > now {
+                entries.append(TodayTimesEntry(date: item.time, snapshot: snapshot))
+            }
         }
+
+        // Reload to roll the grid over to the new day (and to pick up a fresh
+        // snapshot): capped at one hour, and never later than the start of
+        // tomorrow.
+        var refreshDate = now.addingTimeInterval(60 * 60)
         let calendar = Calendar.current
         if let startOfTomorrow = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)),
            startOfTomorrow > now, startOfTomorrow < refreshDate {
             refreshDate = startOfTomorrow
         }
 
-        completion(Timeline(entries: [entry], policy: .after(refreshDate)))
+        completion(Timeline(entries: entries, policy: .after(refreshDate)))
     }
 }
 

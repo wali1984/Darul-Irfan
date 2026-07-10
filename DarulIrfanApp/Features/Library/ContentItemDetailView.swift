@@ -102,7 +102,7 @@ struct ContentItemDetailView: View {
                     .padding(DISpacing.md)
                     .background(scrollMetricsReader(viewportHeight: outer.size.height))
                 }
-                .coordinateSpace(name: "libraryDetailScroll")
+                .coordinateSpace(.named("libraryDetailScroll"))
                 .onPreferenceChange(LibraryScrollMetricsKey.self) { metrics in
                     let fraction = metrics.fraction
                     Task { @MainActor in

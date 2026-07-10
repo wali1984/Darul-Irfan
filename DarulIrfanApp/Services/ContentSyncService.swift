@@ -139,8 +139,11 @@ struct ContentSyncService: ContentSyncServicing {
             return 0
         }
 
-        try await writeValue(String(targetVersion), forKey: Keys.seedVersion)
+        // Reindex BEFORE stamping the version: if reindexing throws, the
+        // stamp stays absent and the next launch retries the whole import
+        // (repository upserts are idempotent).
         try await searchIndex.reindex(domains: SearchDomain.allCases)
+        try await writeValue(String(targetVersion), forKey: Keys.seedVersion)
         return imported
     }
 
@@ -167,30 +170,55 @@ struct ContentSyncService: ContentSyncServicing {
         guard manifest.version > appliedVersion else { return }
 
         var updatedDomains: [SearchDomain] = []
+        var allFilesApplied = true
 
-        if let mediaPath = manifest.files["media_items"],
-           let mediaURL = Self.resolve(mediaPath, against: manifestURL) {
-            let items = await Self.fetchArray(MediaItem.self, from: mediaURL)
-                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
-            if !items.isEmpty {
-                try await mediaRepository.upsertItems(items)
-                updatedDomains.append(.media)
+        // Payload names this app version knows how to apply. A manifest
+        // listing anything else cannot be fully applied here, so it blocks
+        // the version stamp (a future app version re-attempts it).
+        let understoodNames: Set<String> = ["media_items", "events"]
+        if !Set(manifest.files.keys).isSubset(of: understoodNames) {
+            allFilesApplied = false
+        }
+
+        if let mediaPath = manifest.files["media_items"] {
+            if let mediaURL = Self.resolve(mediaPath, against: manifestURL) {
+                let items = await Self.fetchArray(MediaItem.self, from: mediaURL)
+                    .filter { !$0.id.isEmpty && !$0.title.isEmpty }
+                if !items.isEmpty {
+                    try await mediaRepository.upsertItems(items)
+                    updatedDomains.append(.media)
+                } else {
+                    allFilesApplied = false
+                }
+            } else {
+                allFilesApplied = false
             }
         }
 
-        if let eventsPath = manifest.files["events"],
-           let eventsURL = Self.resolve(eventsPath, against: manifestURL) {
-            let events = await Self.fetchArray(CommunityEvent.self, from: eventsURL)
-                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
-            if !events.isEmpty {
-                try await eventsRepository.upsertEvents(events)
-                updatedDomains.append(.events)
+        if let eventsPath = manifest.files["events"] {
+            if let eventsURL = Self.resolve(eventsPath, against: manifestURL) {
+                let events = await Self.fetchArray(CommunityEvent.self, from: eventsURL)
+                    .filter { !$0.id.isEmpty && !$0.title.isEmpty }
+                if !events.isEmpty {
+                    try await eventsRepository.upsertEvents(events)
+                    updatedDomains.append(.events)
+                } else {
+                    allFilesApplied = false
+                }
+            } else {
+                allFilesApplied = false
             }
         }
 
-        guard !updatedDomains.isEmpty else { return }
+        if !updatedDomains.isEmpty {
+            try await searchIndex.reindex(domains: updatedDomains)
+        }
+
+        // Stamp the version only when every file listed in the manifest
+        // applied successfully; otherwise leave it unstamped so the next
+        // refresh retries (upserts and reindexing are idempotent).
+        guard allFilesApplied else { return }
         try await writeValue(String(manifest.version), forKey: Keys.remoteVersion)
-        try await searchIndex.reindex(domains: updatedDomains)
     }
 
     /// Downloads and decodes a JSON array; any failure (network, HTTP

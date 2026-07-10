@@ -137,7 +137,10 @@ final class PrayerViewModel {
         var candidates: [Date] = []
         if let next = nextPrayer?.time { candidates.append(next) }
         if let target = ramadanCountdown?.time { candidates.append(target) }
-        let calendar = Calendar.current
+        // Midnight must be the *place's* midnight, not the device's, so
+        // "Today's Times" flips when the day changes at the active place.
+        var calendar = Calendar.current
+        calendar.timeZone = appState.activePlace?.timeZone ?? .current
         let midnightComponents = DateComponents(hour: 0, minute: 0)
         if let midnight = calendar.nextDate(
             after: now,

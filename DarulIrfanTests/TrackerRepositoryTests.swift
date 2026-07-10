@@ -112,6 +112,28 @@ final class TrackerRepositoryTests: XCTestCase {
         XCTAssertEqual(summary.completionRate, 0, accuracy: 0.0001)
     }
 
+    /// An in-progress today must not reset the streak: with yesterday and the
+    /// day before fully complete and today unmarked, the current streak is
+    /// still 2 (today is a grace day until it is over).
+    func testStreakSummaryInProgressTodayDoesNotResetCurrentStreak() async throws {
+        let now = Date()
+        let keys = DayKey.trailing(7, endingAt: now)
+        try await markDayComplete(keys[4])
+        try await markDayComplete(keys[5])
+        // keys[6] is today: no marks yet.
+
+        let summary = try await repository.streakSummary(endingAt: keys[6], windowDays: 7)
+        XCTAssertEqual(summary.currentStreakDays, 2, "Unmarked today gets grace; streak counts from yesterday")
+        XCTAssertEqual(summary.bestStreakDays, 2)
+
+        // A partially marked today also keeps the grace.
+        try await repository.savePrayerLog(PrayerLogEntry(
+            dayKey: keys[6], prayer: .fajr, completion: .prayed, updatedAt: now
+        ))
+        let partial = try await repository.streakSummary(endingAt: keys[6], windowDays: 7)
+        XCTAssertEqual(partial.currentStreakDays, 2)
+    }
+
     func testStreakSummaryBestRunEarlierThanCurrentRun() async throws {
         // Window of 10: a 4-day run early on, then a gap, then 2 days at the
         // end → best 4, current 2.

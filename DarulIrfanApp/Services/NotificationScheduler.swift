@@ -227,9 +227,10 @@ enum PrayerNotificationPlan {
 /// Stateless: every call reads the shared center, so the type is Sendable.
 final class NotificationScheduler: NotificationScheduling {
 
-    /// Total requests this scheduler may keep pending for prayers, matching
-    /// the iOS 64-pending-notification limit (the plan reserves one slot for
-    /// the trailing refresh reminder).
+    /// Total requests iOS keeps pending per app. The prayer plan gets this
+    /// budget minus any non-prayer requests already pending (zikr/event
+    /// reminders), and the plan itself reserves one slot for the trailing
+    /// refresh reminder.
     static let pendingRequestLimit = 64
 
     init() {}
@@ -263,11 +264,15 @@ final class NotificationScheduler: NotificationScheduling {
             center.removePendingNotificationRequests(withIdentifiers: staleIdentifiers)
         }
 
+        // Requests that are not ours (zikr/event "reminder|" one-offs) share
+        // the iOS 64-pending budget; leave room for them so scheduling the
+        // prayer window never evicts a user-set reminder.
+        let otherPendingCount = pending.count - staleIdentifiers.count
         let planned = PrayerNotificationPlan.build(
             schedules: schedules,
             preferences: preferences,
             now: Date(),
-            limit: Self.pendingRequestLimit
+            limit: max(0, Self.pendingRequestLimit - otherPendingCount)
         )
         guard !planned.isEmpty else { return }
 

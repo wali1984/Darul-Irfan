@@ -59,22 +59,18 @@ final class AppState {
         }
     }
 
-    /// Resolves a fresh device location (if permitted and in device mode),
-    /// stores it as the last known place, and refreshes side effects when it
-    /// moved meaningfully.
+    /// Resolves a fresh device location (if permitted and in device mode)
+    /// and stores it as the last known place. Coordinates are rounded to
+    /// city precision (~1.1 km) before comparison and persistence, so the
+    /// app never stores a precise location and unchanged fixes are no-ops.
     func refreshDevicePlaceIfNeeded() async {
         guard settings.locationMode == .device else { return }
         guard let place = try? await dependencies.location.currentPlace() else { return }
-        let previous = settings.lastKnownPlace
-        let moved = previous.map {
-            abs($0.latitude - place.latitude) > 0.02 || abs($0.longitude - place.longitude) > 0.02
-        } ?? true
-        await updateSettings { $0.lastKnownPlace = place }
-        if !moved {
-            return
-        }
-        // updateSettings already refreshed notifications/widgets via the
+        let rounded = place.roundedToCityPrecision()
+        guard rounded != settings.lastKnownPlace else { return }
+        // updateSettings refreshes notifications/widgets via the
         // lastKnownPlace change; nothing further needed.
+        await updateSettings { $0.lastKnownPlace = rounded }
     }
 
     // MARK: - Side effects
@@ -84,9 +80,12 @@ final class AppState {
     /// change notification, and after onboarding completes.
     func refreshScheduledNotificationsAndWidgets() async {
         guard let place = activePlace else { return }
+        // Start one day back so yesterday's Isha stays scheduled when it
+        // falls after midnight; the notification planner and the widgets
+        // both filter out times already past.
         let schedules = dependencies.prayerCalculation.schedules(
-            forDaysStarting: Date(),
-            days: 8,
+            forDaysStarting: Date().addingTimeInterval(-86_400),
+            days: 9,
             at: place,
             preferences: settings.calculation
         )
@@ -118,13 +117,23 @@ final class AppState {
             locale: Locale.current
         )
 
-        var suhoorEndsAt: Date?
-        var iftarAt: Date?
-        if dependencies.hijri.isRamadan(now, offsetDays: settings.hijri.dayOffset),
-           let today = schedules.first {
-            suhoorEndsAt = today.time(for: .fajr)
-            iftarAt = today.time(for: .maghrib)
-        }
+        // Ramadan extras: the next upcoming fajr/maghrib (not day 0's, which
+        // would already be in the past for most of the day), so the widget's
+        // pre-dawn "Suhoor ends" and afternoon "Iftar" captions keep working
+        // after today's instants pass. Ramadan membership is checked at each
+        // event's own time so the fajr after the last fast (Eid morning) is
+        // never labelled as suhoor; both stay nil outside Ramadan.
+        let hijriOffset = settings.hijri.dayOffset
+        let suhoorEndsAt: Date? = upcoming.first { entry in
+            entry.prayerKey == Prayer.fajr.rawValue
+                && entry.time > now
+                && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset)
+        }?.time
+        let iftarAt: Date? = upcoming.first { entry in
+            entry.prayerKey == Prayer.maghrib.rawValue
+                && entry.time > now
+                && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset)
+        }?.time
 
         PrayerWidgetSnapshot(
             generatedAt: now,
@@ -134,5 +143,21 @@ final class AppState {
             suhoorEndsAt: suhoorEndsAt,
             iftarAt: iftarAt
         ).save()
+    }
+}
+
+// MARK: - City-precision rounding
+
+extension PlaceCoordinate {
+    /// A copy with latitude/longitude rounded to 2 decimal places (~1.1 km,
+    /// city precision). Every device-resolved place is rounded this way
+    /// before persisting, backing the privacy promise that precise
+    /// coordinates are never stored; the difference is far below what
+    /// affects prayer-time or qibla calculations.
+    func roundedToCityPrecision() -> PlaceCoordinate {
+        var copy = self
+        copy.latitude = (latitude * 100).rounded() / 100
+        copy.longitude = (longitude * 100).rounded() / 100
+        return copy
     }
 }

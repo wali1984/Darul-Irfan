@@ -102,7 +102,7 @@ struct LocationSettingsView: View {
             if viewModel.authorization == .denied {
                 Text("Location access is currently off for Darul Irfan. You can allow it in the Settings app, or choose a city manually below.")
             } else {
-                Text("Your precise location is never stored — only the resolved city name is kept so prayer times work offline.")
+                Text("Your precise location is never stored — only the resolved city name and approximate, city-level coordinates are kept so prayer times work offline.")
             }
         }
     }

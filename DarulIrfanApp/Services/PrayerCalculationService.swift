@@ -57,14 +57,17 @@ struct PrayerCalculationService: PrayerCalculationServicing, QiblaServicing {
         at place: PlaceCoordinate,
         preferences: PrayerCalculationPreferences
     ) -> NextPrayerInfo? {
-        // Today's and tomorrow's schedules always contain the next prayer.
-        let twoDays = schedules(
-            forDaysStarting: reference,
-            days: 2,
+        // Start one day early: some methods/latitudes put Isha after
+        // midnight, so just after midnight the next prayer can belong to
+        // yesterday's schedule. The `> reference` filter below discards
+        // everything already past.
+        let window = schedules(
+            forDaysStarting: reference.addingTimeInterval(-86_400),
+            days: 3,
             at: place,
             preferences: preferences
         )
-        for daySchedule in twoDays {
+        for daySchedule in window {
             let upcoming = daySchedule.orderedTimes
                 .filter { $0.prayer.isObligatory && $0.time > reference }
             if let first = upcoming.first {

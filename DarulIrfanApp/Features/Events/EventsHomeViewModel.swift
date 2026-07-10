@@ -52,7 +52,7 @@ final class EventsHomeViewModel {
             ($0.publishedAt ?? Date.distantPast) > ($1.publishedAt ?? Date.distantPast)
         }
 
-        place = try? SeedBundle.darulIrfanPlace()
+        place = SeedBundle.darulIrfanPlace()
         isLoaded = true
     }
 }

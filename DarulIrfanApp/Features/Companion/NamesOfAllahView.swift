@@ -11,7 +11,7 @@ final class NamesOfAllahViewModel {
 
     func load() {
         guard !isLoaded else { return }
-        names = (try? SeedBundle.namesOfAllah()) ?? []
+        names = SeedBundle.namesOfAllah()
         isLoaded = true
     }
 }

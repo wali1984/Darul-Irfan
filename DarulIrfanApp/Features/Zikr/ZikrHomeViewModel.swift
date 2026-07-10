@@ -23,7 +23,7 @@ final class ZikrHomeViewModel {
     }
 
     func load() async {
-        let loaded: [ZikrSession] = (try? SeedBundle.zikrSessions()) ?? []
+        let loaded = SeedBundle.zikrSessions()
         sessions = loaded
 
         var occurrences: [String: Date] = [:]
@@ -79,15 +79,17 @@ final class ZikrHomeViewModel {
     }
 
     private func scheduleReminder(for session: ZikrSession) async {
+        // Always recompute: the occurrence cached at load() may have passed
+        // while the screen stayed open. nextOccurrence(after:) is strictly
+        // in the future, so a valid fire date always exists.
         let now = Date()
-        guard let next = nextOccurrences[session.id]
-                ?? ZikrScheduleMath.nextOccurrence(of: session, after: now) else { return }
+        guard let next = ZikrScheduleMath.nextOccurrence(of: session, after: now) else { return }
+        nextOccurrences[session.id] = next
 
         var fireDate = next.addingTimeInterval(TimeInterval(-reminderLeadMinutes * 60))
         if fireDate <= now {
             fireDate = next
         }
-        guard fireDate > now else { return }
 
         await notifications.scheduleReminder(
             id: reminderKey(session.id),

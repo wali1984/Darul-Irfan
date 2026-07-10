@@ -44,11 +44,14 @@ struct PrayerDaySchedule: Codable, Sendable, Equatable {
 
     func time(for prayer: Prayer) -> Date? { times[prayer] }
 
-    /// Times in chronological order for display.
+    /// Times in chronological order for display. Sorted by actual time, not
+    /// canonical prayer order: opposing manual offsets or wrapped
+    /// high-latitude times must not reorder next/current-prayer logic.
     var orderedTimes: [(prayer: Prayer, time: Date)] {
         Prayer.allCases.compactMap { prayer in
             times[prayer].map { (prayer, $0) }
         }
+        .sorted { $0.time < $1.time }
     }
 }
 

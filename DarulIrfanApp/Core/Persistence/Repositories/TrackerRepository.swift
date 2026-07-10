@@ -106,13 +106,23 @@ struct TrackerRepository: TrackerRepositoryProtocol {
             }
         }
 
+        // Current streak counts back from the end day. If the end day is
+        // today's still-in-progress civil day and not yet complete, it is a
+        // grace day: skip it and keep counting from the previous day, so an
+        // unfinished today never resets an otherwise unbroken run. Only an
+        // incomplete day strictly before the end day breaks the streak.
         var currentStreak = 0
+        let todayKey = DayKey.make(from: Date())
+        var isEndDay = true
         for key in keys.reversed() {
             if isComplete(key) {
                 currentStreak += 1
+            } else if isEndDay && key == todayKey {
+                // Grace day: today is not over yet; continue with yesterday.
             } else {
                 break
             }
+            isEndDay = false
         }
 
         var fulfilledCount = 0

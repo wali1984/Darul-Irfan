@@ -11,7 +11,7 @@ final class DuasViewModel {
 
     func load() {
         guard !isLoaded else { return }
-        duas = (try? SeedBundle.duas()) ?? []
+        duas = SeedBundle.duas()
         isLoaded = true
     }
 }
