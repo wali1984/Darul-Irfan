@@ -103,8 +103,8 @@ workflows:
   #    org.naqshbandiaowaisiah.darulirfan.widgets, plus the App Group
   #    group.org.naqshbandiaowaisiah.darulirfan (enable the App Groups
   #    capability on both IDs).
-  # 2. Codemagic UI → Teams → Integrations → App Store Connect: add an API
-  #    key and name it below under `integrations.app_store_connect`.
+  # 2. Codemagic integration: uses the existing team API key "ASC_API_KEY"
+  #    (must belong to the Apple Developer team that owns the bundle IDs).
   # 3. Create the app record in App Store Connect with the same bundle ID.
   ios-testflight:
     name: iOS TestFlight release (signed)
@@ -116,7 +116,7 @@ workflows:
         distribution_type: app_store
         bundle_identifier: org.naqshbandiaowaisiah.darulirfan
     integrations:
-      app_store_connect: darul-irfan-asc-key   # rename to your Codemagic API-key name
+      app_store_connect: ASC_API_KEY
     cache:
       cache_paths:
         - ~/Library/Caches/org.swift.swiftpm
