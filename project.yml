@@ -31,8 +31,6 @@ targets:
           - "**/*.md"
     dependencies:
       - package: Adhan
-      - target: DarulIrfanWidgets
-        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: us.naqshbaniaowaisiah
@@ -42,40 +40,22 @@ targets:
         ENABLE_USER_SCRIPT_SANDBOXING: true
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
-    entitlements:
-      path: DarulIrfanApp/App/DarulIrfan.entitlements
-      properties:
-        com.apple.security.application-groups:
-          - group.us.naqshbaniaowaisiah
-
-  DarulIrfanWidgets:
-    type: app-extension
-    platform: iOS
-    sources:
-      - path: Widgets
-      - path: DarulIrfanApp/Core/Shared
-        # Shared prayer snapshot models compiled into both app and widget
-    dependencies: []
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: us.naqshbaniaowaisiah.widgets
-        INFOPLIST_FILE: Widgets/Info.plist
-        SKIP_INSTALL: true
-    entitlements:
-      path: Widgets/DarulIrfanWidgets.entitlements
-      properties:
-        com.apple.security.application-groups:
-          - group.us.naqshbaniaowaisiah
-    info:
-      path: Widgets/Info.plist
-      properties:
-        CFBundleDisplayName: Darul Irfan Widgets
-        # Must match the parent app exactly or App Store Connect rejects the
-        # upload; inherit the project-wide version values.
-        CFBundleShortVersionString: $(MARKETING_VERSION)
-        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        NSExtension:
-          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    # NOTE: The home-screen widget (DarulIrfanWidgets app-extension) and its
+    # App Group entitlement are temporarily removed for the first TestFlight
+    # build. Automatic code signing cannot provision an App Group that is not
+    # registered in the Apple Developer portal, which blocked the whole
+    # signed archive. The widget's Swift files remain in Widgets/ and
+    # DarulIrfanApp/Core/Shared/ (the shared snapshot type is still compiled
+    # into the app, and degrades to a no-op without the App Group).
+    #
+    # TO RE-ENABLE THE WIDGET (after registering, in the developer portal:
+    # the App Group group.us.naqshbaniaowaisiah, with App Groups enabled on
+    # both us.naqshbaniaowaisiah and us.naqshbaniaowaisiah.widgets):
+    # restore from this file's git history —
+    #   1) the `- target: DarulIrfanWidgets` + `embed: true` dependency above,
+    #   2) this target's `entitlements:` block (the App Group),
+    #   3) the whole `DarulIrfanWidgets:` target,
+    #   4) `DarulIrfanWidgets: all` under schemes -> DarulIrfan -> build.
 
   DarulIrfanTests:
     type: bundle.unit-test
@@ -107,7 +87,6 @@ schemes:
     build:
       targets:
         DarulIrfan: all
-        DarulIrfanWidgets: all
     run:
       config: Debug
     test:
