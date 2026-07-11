@@ -97,24 +97,23 @@ workflows:
           success: false
           failure: true
 
-  # One-time setup before this workflow can run:
-  # 1. Apple Developer portal: register bundle IDs
-  #    us.naqshbaniaowaisiah and
-  #    us.naqshbaniaowaisiah.widgets, plus the App Group
-  #    group.us.naqshbaniaowaisiah (enable the App Groups
-  #    capability on both IDs).
-  # 2. Codemagic integration: uses the existing team API key "ASC_API_KEY"
-  #    (must belong to the Apple Developer team that owns the bundle IDs).
-  # 3. Create the app record in App Store Connect with the same bundle ID.
+  # Setup: the ASC_API_KEY App Store Connect integration (App Manager role)
+  # must belong to the Apple Developer team that owns bundle id
+  # us.naqshbaniaowaisiah, and an app record with that bundle id must exist in
+  # App Store Connect for the TestFlight upload to land.
+  #
+  # Signing is done EXPLICITLY with `app-store-connect fetch-signing-files
+  # --create`, which registers the bundle id (if missing), creates/reuses the
+  # distribution certificate, and creates the app_store provisioning profile.
+  # The declarative `ios_signing` environment block is intentionally NOT used:
+  # it only *fetches* existing profiles and fails ("No matching profiles
+  # found") when none exist yet.
   ios-testflight:
     name: iOS TestFlight release (signed)
     instance_type: mac_mini_m2
     max_build_duration: 90
     environment:
       xcode: latest
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: us.naqshbaniaowaisiah
     integrations:
       app_store_connect: ASC_API_KEY
     cache:
@@ -133,8 +132,13 @@ workflows:
       - name: Generate Xcode project
         script: |
           xcodegen generate
-      - name: Apply signing profiles
+      - name: Set up code signing (create cert + profile if needed)
         script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "us.naqshbaniaowaisiah" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
           xcode-project use-profiles
       - name: Build signed archive
         script: |
