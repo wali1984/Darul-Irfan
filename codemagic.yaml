@@ -134,12 +134,20 @@ workflows:
           xcodegen generate
       - name: Set up code signing (create cert + profile if needed)
         script: |
+          # set -e so a failure in fetch-signing-files aborts the step and
+          # surfaces the real error instead of being masked by use-profiles.
+          set -e
+          echo "ASC integration -> keyId:${APP_STORE_CONNECT_KEY_IDENTIFIER:+set} issuerId:${APP_STORE_CONNECT_ISSUER_ID:+set} privateKey:${APP_STORE_CONNECT_PRIVATE_KEY:+set}"
           keychain initialize
           app-store-connect fetch-signing-files "us.naqshbaniaowaisiah" \
             --type IOS_APP_STORE \
-            --create
+            --platform IOS \
+            --create \
+            --verbose
           keychain add-certificates
-          xcode-project use-profiles
+          echo "--- Provisioning profiles fetched:"
+          ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || true
+          xcode-project use-profiles --verbose
       - name: Build signed archive
         script: |
           xcode-project build-ipa \
