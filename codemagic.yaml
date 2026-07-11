@@ -114,6 +114,10 @@ workflows:
     max_build_duration: 90
     environment:
       xcode: latest
+      groups:
+        # Codemagic env-var group holding CERTIFICATE_PRIVATE_KEY (a PEM RSA
+        # private key). Used to create/reuse the iOS Distribution certificate.
+        - ios_signing
     integrations:
       app_store_connect: ASC_API_KEY
     cache:
@@ -139,9 +143,13 @@ workflows:
           set -e
           echo "ASC integration -> keyId:${APP_STORE_CONNECT_KEY_IDENTIFIER:+set} issuerId:${APP_STORE_CONNECT_ISSUER_ID:+set} privateKey:${APP_STORE_CONNECT_PRIVATE_KEY:+set}"
           keychain initialize
+          # --certificate-key supplies the private key so the CLI can create a
+          # distribution certificate it can actually sign with (Apple only
+          # returns the public cert; the private key must come from CI).
           app-store-connect fetch-signing-files "us.naqshbaniaowaisiah" \
             --type IOS_APP_STORE \
             --platform IOS \
+            --certificate-key @env:CERTIFICATE_PRIVATE_KEY \
             --create \
             --verbose
           keychain add-certificates
