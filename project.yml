@@ -69,6 +69,10 @@ targets:
       path: Widgets/Info.plist
       properties:
         CFBundleDisplayName: Darul Irfan Widgets
+        # Must match the parent app exactly or App Store Connect rejects the
+        # upload; inherit the project-wide version values.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
