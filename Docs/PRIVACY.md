@@ -84,7 +84,7 @@ All data is on-device. There is no cloud copy and no account to delete.
 | Content catalogs + FTS search index (seeded/synced, not personal) | SQLite tables | Delete the app |
 | Downloaded PDFs/MP3s | `Application Support/DarulIrfan/Downloads/` | **Settings → Content & Storage → clear all downloads**, per-file removal in item screens, or delete the app |
 | Event-reminder toggle flags | `UserDefaults` | Toggle off, or delete the app |
-| Prayer widget snapshot (today's times + place name as JSON) | App Group container `group.org.naqshbandiaowaisiah.darulirfan` | Delete the app |
+| Prayer widget snapshot (today's times + place name as JSON) | App Group container `group.us.naqshbaniaowaisiah` | Delete the app |
 
 The SQLite store lives in Application Support and is therefore included in
 the user's own device/iCloud backup, as users expect; that is the user's

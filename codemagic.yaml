@@ -99,9 +99,9 @@ workflows:
 
   # One-time setup before this workflow can run:
   # 1. Apple Developer portal: register bundle IDs
-  #    org.naqshbandiaowaisiah.darulirfan and
-  #    org.naqshbandiaowaisiah.darulirfan.widgets, plus the App Group
-  #    group.org.naqshbandiaowaisiah.darulirfan (enable the App Groups
+  #    us.naqshbaniaowaisiah and
+  #    us.naqshbaniaowaisiah.widgets, plus the App Group
+  #    group.us.naqshbaniaowaisiah (enable the App Groups
   #    capability on both IDs).
   # 2. Codemagic integration: uses the existing team API key "ASC_API_KEY"
   #    (must belong to the Apple Developer team that owns the bundle IDs).
@@ -114,7 +114,7 @@ workflows:
       xcode: latest
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: org.naqshbandiaowaisiah.darulirfan
+        bundle_identifier: us.naqshbaniaowaisiah
     integrations:
       app_store_connect: ASC_API_KEY
     cache:

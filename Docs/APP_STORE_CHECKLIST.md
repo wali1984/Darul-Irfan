@@ -8,11 +8,11 @@ before archiving.
 
 | Target | Bundle ID |
 |---|---|
-| App | `org.naqshbandiaowaisiah.darulirfan` |
-| Widget extension | `org.naqshbandiaowaisiah.darulirfan.widgets` |
-| Unit tests | `org.naqshbandiaowaisiah.darulirfan.tests` |
-| UI tests | `org.naqshbandiaowaisiah.darulirfan.uitests` |
-| **App Group** (app + widget entitlements) | `group.org.naqshbandiaowaisiah.darulirfan` |
+| App | `us.naqshbaniaowaisiah` |
+| Widget extension | `us.naqshbaniaowaisiah.widgets` |
+| Unit tests | `us.naqshbaniaowaisiah.tests` |
+| UI tests | `us.naqshbaniaowaisiah.uitests` |
+| **App Group** (app + widget entitlements) | `group.us.naqshbaniaowaisiah` |
 
 - [ ] **[blocker]** Register both app IDs and the App Group in the developer
       portal; the App Group must be enabled on the app **and** the widget ID.

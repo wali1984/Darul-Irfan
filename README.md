@@ -165,7 +165,7 @@ Then in Xcode:
 1. Select the **DarulIrfan** scheme and an **iOS 17** simulator (e.g. iPhone 15).
 2. Set your signing team on the `DarulIrfan` and `DarulIrfanWidgets` targets
    (signing style is Automatic). For device builds, the App Group
-   `group.org.naqshbandiaowaisiah.darulirfan` must exist in your developer
+   `group.us.naqshbaniaowaisiah` must exist in your developer
    account, or temporarily change the group ID in `project.yml` **and**
    `Core/Shared/PrayerWidgetSnapshot.swift` together.
 3. Run.

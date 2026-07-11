@@ -61,7 +61,7 @@ struct TodayTimesProvider: TimelineProvider {
 // MARK: - Widget
 
 struct TodayTimesWidget: Widget {
-    let kind: String = "org.naqshbandiaowaisiah.darulirfan.todaytimes"
+    let kind: String = "us.naqshbaniaowaisiah.todaytimes"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: TodayTimesProvider()) { entry in

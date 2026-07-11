@@ -30,7 +30,7 @@ agents: treat these as authoritative; do not re-derive from memory.
 - Families: `.systemSmall/.systemMedium` + Lock Screen `.accessoryCircular/.accessoryRectangular/.accessoryInline` (iOS 16+).
 - `TimelineProvider` members: `placeholder(in:)`, `getSnapshot(in:completion:)`, `getTimeline(in:completion:)`; entries need `let date: Date`; policy `.atEnd` / `.after(date)`.
 - Refresh from app: `WidgetCenter.shared.reloadAllTimelines()`.
-- Data sharing: app writes JSON snapshot to App Group `group.org.naqshbandiaowaisiah.darulirfan` (see `Core/Shared/PrayerWidgetSnapshot.swift`, compiled into both targets).
+- Data sharing: app writes JSON snapshot to App Group `group.us.naqshbaniaowaisiah` (see `Core/Shared/PrayerWidgetSnapshot.swift`, compiled into both targets).
 
 ### Location / compass
 - One-shot fix: `CLLocationManager.requestLocation()` + delegate (`didUpdateLocations` **and** `didFailWithError` are both mandatory). Request `requestWhenInUseAuthorization()` first; wait for `locationManagerDidChangeAuthorization`.

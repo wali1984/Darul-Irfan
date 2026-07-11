@@ -124,7 +124,7 @@ struct NextPrayerProvider: TimelineProvider {
 // MARK: - Widget
 
 struct NextPrayerWidget: Widget {
-    let kind: String = "org.naqshbandiaowaisiah.darulirfan.nextprayer"
+    let kind: String = "us.naqshbaniaowaisiah.nextprayer"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: NextPrayerProvider()) { entry in

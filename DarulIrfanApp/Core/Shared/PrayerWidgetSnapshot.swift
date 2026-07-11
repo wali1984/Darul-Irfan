@@ -7,7 +7,7 @@ import Foundation
 
 /// App Group shared between the app and its widgets.
 enum SharedAppGroup {
-    static let identifier = "group.org.naqshbandiaowaisiah.darulirfan"
+    static let identifier = "group.us.naqshbaniaowaisiah"
     static let prayerSnapshotFilename = "prayer-widget-snapshot.json"
 
     static var containerURL: URL? {
