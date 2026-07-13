@@ -483,11 +483,20 @@ def _write_manifest(out_dir: Path, generated_at: Optional[str] = None) -> None:
         from datetime import datetime, timezone
         generated_at = schema.iso_datetime(datetime.now(timezone.utc))
 
+    # `files` is a name->filename map matching the iOS app's understood
+    # payload names (ContentSyncService.understoodNames): articles, documents,
+    # media, events. Filenames resolve relative to the manifest's own URL.
     manifest = {
         "version": schema.SCHEMA_VERSION,
         "generatedAt": generated_at,
         "counts": counts,
-        "files": sorted(OUTPUT_FILES),
+        "files": {
+            "articles": "articles.json",
+            "documents": "documents.json",
+            "media": "media.json",
+            "events": "events.json",
+            "tafsir": TAFSIR_FILE,
+        },
     }
     write_json(out_dir / MANIFEST_FILE, manifest)
 

@@ -55,12 +55,21 @@ struct ContentSyncService: ContentSyncServicing {
         static let seedVersion = "seed.version"
         /// Remote manifest version already applied.
         static let remoteVersion = "remote.manifest.version"
+        /// Epoch seconds of the last successful manifest contact (drives the
+        /// 14-day cadence, written even when there was nothing new).
+        static let lastCheckedAt = "remote.lastCheckedAt"
     }
 
-    /// Documented future endpoint for content updates. Not live yet —
-    /// failures are always treated as "no update available".
+    /// Published fortnightly by the content-sync GitHub Action
+    /// (.github/workflows/content-sync.yml) and served from the repo via
+    /// raw.githubusercontent.com. Offline/first-run failures are always
+    /// treated as "no update available".
     private static let remoteManifestURLString =
-        "https://www.naqshbandiaowaisiah.org/app/content_manifest.json"
+        "https://raw.githubusercontent.com/wali1984/Darul-Irfan/main/content/content_manifest.json"
+
+    /// Minimum interval between remote checks (14 days), per the product
+    /// requirement to refresh content roughly every two weeks.
+    private static let refreshInterval: TimeInterval = 14 * 86_400
 
     private static let session: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
@@ -152,6 +161,14 @@ struct ContentSyncService: ContentSyncServicing {
     func refreshFromRemoteManifest() async throws {
         guard let manifestURL = URL(string: Self.remoteManifestURLString) else { return }
 
+        // 14-day cadence gate: skip the network entirely if we checked
+        // recently. Cheap enough to call on every launch.
+        let now = Date()
+        if let lastChecked = try await readDoubleValue(forKey: Keys.lastCheckedAt),
+           now.timeIntervalSince1970 - lastChecked < Self.refreshInterval {
+            return
+        }
+
         // Offline-first: an unreachable or not-yet-deployed manifest is the
         // normal case, never an error surfaced to the user.
         let manifest: RemoteManifest
@@ -166,48 +183,67 @@ struct ContentSyncService: ContentSyncServicing {
             return
         }
 
+        // Reaching the manifest counts as a check, even if nothing is new —
+        // advance the fortnightly clock so we don't hammer the endpoint.
+        try? await writeValue(String(now.timeIntervalSince1970), forKey: Keys.lastCheckedAt)
+
         let appliedVersion = try await readIntValue(forKey: Keys.remoteVersion) ?? 0
         guard manifest.version > appliedVersion else { return }
 
         var updatedDomains: [SearchDomain] = []
         var allFilesApplied = true
 
-        // Payload names this app version knows how to apply. A manifest
-        // listing anything else cannot be fully applied here, so it blocks
-        // the version stamp (a future app version re-attempts it).
-        let understoodNames: Set<String> = ["media_items", "events"]
+        // Payload names this app version recognizes. "tafsir" is acknowledged
+        // but not applied inline (the tafsir manifest lists PDF page URLs the
+        // reader links to, not bundled text). Anything unrecognized blocks the
+        // version stamp so a future app version re-attempts it.
+        let understoodNames: Set<String> = ["articles", "documents", "media", "events", "tafsir"]
         if !Set(manifest.files.keys).isSubset(of: understoodNames) {
             allFilesApplied = false
         }
 
-        if let mediaPath = manifest.files["media_items"] {
-            if let mediaURL = Self.resolve(mediaPath, against: manifestURL) {
-                let items = await Self.fetchArray(MediaItem.self, from: mediaURL)
-                    .filter { !$0.id.isEmpty && !$0.title.isEmpty }
-                if !items.isEmpty {
-                    try await mediaRepository.upsertItems(items)
-                    updatedDomains.append(.media)
-                } else {
-                    allFilesApplied = false
-                }
-            } else {
-                allFilesApplied = false
+        // Library content (articles + documents) -> content repository.
+        for name in ["articles", "documents"] {
+            guard let path = manifest.files[name] else { continue }
+            guard let url = Self.resolve(path, against: manifestURL) else { allFilesApplied = false; continue }
+            let items = await Self.fetchArray(ContentItem.self, from: url)
+                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
+            if items.isEmpty { allFilesApplied = false; continue }
+            // Chunk large catalogs so each transaction stays bounded.
+            for chunk in stride(from: 0, to: items.count, by: 500) {
+                try await contentRepository.upsertItems(Array(items[chunk..<min(chunk + 500, items.count)]))
             }
+            if !updatedDomains.contains(.library) { updatedDomains.append(.library) }
         }
 
-        if let eventsPath = manifest.files["events"] {
-            if let eventsURL = Self.resolve(eventsPath, against: manifestURL) {
-                let events = await Self.fetchArray(CommunityEvent.self, from: eventsURL)
-                    .filter { !$0.id.isEmpty && !$0.title.isEmpty }
-                if !events.isEmpty {
-                    try await eventsRepository.upsertEvents(events)
-                    updatedDomains.append(.events)
-                } else {
-                    allFilesApplied = false
-                }
-            } else {
+        if let mediaPath = manifest.files["media"],
+           let mediaURL = Self.resolve(mediaPath, against: manifestURL) {
+            let items = await Self.fetchArray(MediaItem.self, from: mediaURL)
+                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
+            if items.isEmpty {
                 allFilesApplied = false
+            } else {
+                for chunk in stride(from: 0, to: items.count, by: 500) {
+                    try await mediaRepository.upsertItems(Array(items[chunk..<min(chunk + 500, items.count)]))
+                }
+                updatedDomains.append(.media)
             }
+        } else if manifest.files["media"] != nil {
+            allFilesApplied = false
+        }
+
+        if let eventsPath = manifest.files["events"],
+           let eventsURL = Self.resolve(eventsPath, against: manifestURL) {
+            let events = await Self.fetchArray(CommunityEvent.self, from: eventsURL)
+                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
+            if events.isEmpty {
+                allFilesApplied = false
+            } else {
+                try await eventsRepository.upsertEvents(events)
+                updatedDomains.append(.events)
+            }
+        } else if manifest.files["events"] != nil {
+            allFilesApplied = false
         }
 
         if !updatedDomains.isEmpty {
@@ -256,6 +292,15 @@ struct ContentSyncService: ContentSyncServicing {
         )
         guard let text = rows.first?.text("value") else { return nil }
         return Int(text)
+    }
+
+    private func readDoubleValue(forKey key: String) async throws -> Double? {
+        let rows = try await database.connection.query(
+            "SELECT value FROM key_value WHERE key = ?",
+            [.text(key)]
+        )
+        guard let text = rows.first?.text("value") else { return nil }
+        return Double(text)
     }
 
     private func writeValue(_ value: String, forKey key: String) async throws {

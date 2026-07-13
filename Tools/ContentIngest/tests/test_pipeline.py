@@ -114,10 +114,15 @@ class TestManifest:
             "events": 0,
             "quranTafsirPages": 3,
         }
-        assert manifest["files"] == sorted([
-            "articles.json", "documents.json", "media.json", "events.json",
-            "quran_tafsir_manifest.json",
-        ])
+        # `files` is a name->filename map matching the iOS app's understood
+        # payload names (ContentSyncService).
+        assert manifest["files"] == {
+            "articles": "articles.json",
+            "documents": "documents.json",
+            "media": "media.json",
+            "events": "events.json",
+            "tafsir": "quran_tafsir_manifest.json",
+        }
 
 
 class TestBuilders:

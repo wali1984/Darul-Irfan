@@ -1,0 +1,78 @@
+# Fortnightly content catalog refresh.
+#
+# Re-crawls naqshbandiaowaisiah.org, regenerates the catalog JSON under
+# content/, and commits it only when something changed. The iOS app fetches
+# content/content_manifest.json (via raw.githubusercontent.com) at most every
+# 14 days and merges updates locally — see DarulIrfanApp/Services/ContentSyncService.swift.
+#
+# Runs on the 1st and 15th of each month (~fortnightly) and on manual dispatch.
+# Content permission is granted, so the crawl runs with --full-text
+# --rights-confirmed. Media/PDFs are never downloaded here — only their URLs
+# are catalogued; the app streams/reads them on demand.
+
+name: Content sync
+
+on:
+  schedule:
+    - cron: "0 3 1,15 * *"
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Lecture year range to crawl (e.g. 1976-2026)"
+        default: "2015-2026"
+      max_pages:
+        description: "Max pages to crawl"
+        default: "4000"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: content-sync
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install crawler dependencies
+        working-directory: Tools/ContentIngest
+        run: pip install -r requirements.txt
+
+      - name: Crawl and regenerate catalog
+        working-directory: Tools/ContentIngest
+        env:
+          INGEST_CONTACT_EMAIL: ${{ vars.INGEST_CONTACT_EMAIL || 'wajidali1984@hotmail.com' }}
+        run: |
+          python ingest.py crawl \
+            --sections about,lectures,books,magazines,articles,tafsir \
+            --years "${{ github.event.inputs.years || '2015-2026' }}" \
+            --full-text --rights-confirmed \
+            --rate-limit 1.0 \
+            --max-pages "${{ github.event.inputs.max_pages || '4000' }}" \
+            --out "${GITHUB_WORKSPACE}/content"
+
+      - name: Validate catalog
+        working-directory: Tools/ContentIngest
+        run: python ingest.py validate --dir "${GITHUB_WORKSPACE}/content"
+
+      - name: Commit catalog if changed
+        run: |
+          git config user.name "darul-irfan-bot"
+          git config user.email "actions@github.com"
+          git add content
+          if git diff --cached --quiet; then
+            echo "No catalog changes."
+          else
+            git commit -m "content: fortnightly catalog refresh [skip ci]"
+            git push
+          fi
