@@ -2,6 +2,23 @@ import Foundation
 import Observation
 import SwiftUI
 
+// MARK: - Shared archive row icon
+
+/// A small emerald gradient disc used as the leading glyph on archive
+/// year/month rows, so the archive reads as a live panel, not a plain list.
+@ViewBuilder
+private func archiveIcon(_ glyph: String) -> some View {
+    ZStack {
+        Circle().fill(DIGradient.emerald)
+        Image(systemName: glyph)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.white)
+    }
+    .frame(width: 38, height: 38)
+    .shadow(color: DIColor.primary.opacity(0.28), radius: 5, y: 2)
+    .accessibilityHidden(true)
+}
+
 // MARK: - Years view model
 
 /// Loads the distinct archive years for an optional category filter.
@@ -64,12 +81,14 @@ struct ArchiveBrowserView: View {
                     titleKey: "Something went wrong",
                     messageKey: LocalizedStringKey(message)
                 )
+                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else if viewModel.years.isEmpty {
                 DIEmptyState(
                     systemImage: "calendar",
                     titleKey: "No archive yet",
                     messageKey: "Yearly lecture archives will appear here after the library syncs. Pull down to refresh."
                 )
+                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else {
                 yearList
             }
@@ -95,10 +114,8 @@ struct ArchiveBrowserView: View {
                         year: year
                     )
                 } label: {
-                    HStack(spacing: DISpacing.sm) {
-                        Image(systemName: "calendar")
-                            .foregroundStyle(DIColor.primary)
-                            .accessibilityHidden(true)
+                    HStack(spacing: DISpacing.md) {
+                        archiveIcon("calendar")
                         Text(verbatim: String(year))
                             .font(.headline)
                             .foregroundStyle(DIColor.textPrimary)
@@ -199,12 +216,14 @@ struct ArchiveYearView: View {
                     titleKey: "Something went wrong",
                     messageKey: LocalizedStringKey(message)
                 )
+                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else if viewModel.totalCount == 0 {
                 DIEmptyState(
                     systemImage: "calendar",
                     titleKey: "Nothing here yet",
                     messageKey: "Items for this year will appear after the next library sync."
                 )
+                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else {
                 monthList
             }
@@ -228,17 +247,15 @@ struct ArchiveYearView: View {
                     dependencies: dependencies
                 )
             } label: {
-                HStack(spacing: DISpacing.sm) {
-                    Image(systemName: "square.stack")
-                        .foregroundStyle(DIColor.primary)
-                        .accessibilityHidden(true)
+                HStack(spacing: DISpacing.md) {
+                    archiveIcon("square.stack.fill")
                     Text("All of \(String(viewModel.year))")
                         .font(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                     Spacer(minLength: 0)
                     Text("\(viewModel.totalCount) items")
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(DIColor.primary)
                 }
                 .padding(.vertical, DISpacing.xs)
             }
@@ -255,16 +272,14 @@ struct ArchiveYearView: View {
                         dependencies: dependencies
                     )
                 } label: {
-                    HStack(spacing: DISpacing.sm) {
-                        Image(systemName: "calendar")
-                            .foregroundStyle(DIColor.primary)
-                            .accessibilityHidden(true)
+                    HStack(spacing: DISpacing.md) {
+                        archiveIcon("calendar")
                         Text(verbatim: MediaTimeFormat.monthName(bucket.month))
                             .font(.headline)
                             .foregroundStyle(DIColor.textPrimary)
                         Spacer(minLength: 0)
                         Text("\(bucket.count) items")
-                            .font(.caption)
+                            .font(.caption.weight(.medium))
                             .foregroundStyle(DIColor.textMuted)
                     }
                     .padding(.vertical, DISpacing.xs)

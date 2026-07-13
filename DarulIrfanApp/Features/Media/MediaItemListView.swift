@@ -189,12 +189,14 @@ struct MediaItemListView: View {
                     titleKey: "Something went wrong",
                     messageKey: LocalizedStringKey(message)
                 )
+                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else if viewModel.items.isEmpty {
                 DIEmptyState(
                     systemImage: "waveform",
                     titleKey: "Nothing here yet",
                     messageKey: "Items will appear here after the next library sync. Pull down to refresh."
                 )
+                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else {
                 itemList
             }
@@ -294,40 +296,63 @@ struct MediaItemRow: View {
     @ViewBuilder
     private var leadingAction: some View {
         if isWMAOnly {
-            Image(systemName: "exclamationmark.circle")
-                .font(.system(size: 28, weight: .light))
-                .foregroundStyle(DIColor.textMuted)
-                .accessibilityHidden(true)
+            mutedMedallion("exclamationmark")
         } else if canPlay {
             Button {
+                DIHaptics.soft()
                 onPlay()
             } label: {
-                Image(systemName: "play.circle.fill")
-                    .font(.system(size: 30))
-                    .foregroundStyle(DIColor.primary)
+                gradientMedallion("play.fill")
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
             .accessibilityLabel(Text("Play \(item.title)"))
         } else if let youtubeURL {
             Link(destination: youtubeURL) {
-                Image(systemName: "play.rectangle")
-                    .font(.system(size: 26))
-                    .foregroundStyle(DIColor.primary)
+                crimsonMedallion("play.rectangle.fill")
             }
             .accessibilityLabel(Text("Open \(item.title) on YouTube"))
         } else if let sourceURL {
             Link(destination: sourceURL) {
-                Image(systemName: "safari")
-                    .font(.system(size: 26))
-                    .foregroundStyle(DIColor.primary)
+                gradientMedallion("safari")
             }
             .accessibilityLabel(Text("Open \(item.title) on the website"))
         } else {
-            Image(systemName: "waveform")
-                .font(.system(size: 26, weight: .light))
-                .foregroundStyle(DIColor.textMuted)
-                .accessibilityHidden(true)
+            mutedMedallion("waveform")
         }
+    }
+
+    /// The category-tinted gradient disc used for the primary row affordance.
+    private func gradientMedallion(_ glyph: String) -> some View {
+        ZStack {
+            Circle().fill(MediaStyle.iconGradient(item.category))
+            Image(systemName: glyph)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(.white)
+        }
+        .frame(width: 40, height: 40)
+        .shadow(color: MediaStyle.accent(item.category).opacity(0.3), radius: 5, y: 2)
+    }
+
+    private func crimsonMedallion(_ glyph: String) -> some View {
+        ZStack {
+            Circle().fill(MediaStyle.crimson)
+            Image(systemName: glyph)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(.white)
+        }
+        .frame(width: 40, height: 40)
+        .shadow(color: DIColor.crimson.opacity(0.3), radius: 5, y: 2)
+    }
+
+    private func mutedMedallion(_ glyph: String) -> some View {
+        ZStack {
+            Circle().fill(DIColor.sandstone)
+            Image(systemName: glyph)
+                .font(.system(size: 15, weight: .regular))
+                .foregroundStyle(DIColor.textMuted)
+        }
+        .frame(width: 40, height: 40)
+        .accessibilityHidden(true)
     }
 
     // MARK: Metadata
@@ -372,7 +397,7 @@ struct MediaItemRow: View {
         } else {
             HStack(spacing: DISpacing.xs) {
                 if isDownloaded {
-                    DIPillBadge(text: "Offline", color: DIColor.primary)
+                    DIPillBadge(text: "Offline", color: MediaStyle.accent(item.category))
                 }
                 if item.mediaType == .youtube {
                     Text("Opens externally in YouTube")

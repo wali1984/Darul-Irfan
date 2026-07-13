@@ -14,6 +14,16 @@ extension EventKind {
         }
     }
 
+    /// A brand-family accent used for the kind's medallion and gradient trim.
+    /// Gold for the year's high points (Salana, Aitekaaf), emerald otherwise —
+    /// all within the app's reverent palette.
+    var eventTint: Color {
+        switch self {
+        case .salanaIjtema, .ramadanAitekaaf: return DIColor.accent
+        case .monthlyIjtema, .announcement, .other: return DIColor.primary
+        }
+    }
+
     var eventDisplayNameKey: LocalizedStringKey {
         switch self {
         case .monthlyIjtema: return "Monthly Ijtema"

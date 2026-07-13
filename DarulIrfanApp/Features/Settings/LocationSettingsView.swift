@@ -44,6 +44,8 @@ struct LocationSettingsView: View {
             }
             .pickerStyle(.segmented)
             .listRowBackground(DIColor.surface)
+        } header: {
+            SettingsSectionHeader(titleKey: "Location Mode", systemImage: "location.viewfinder")
         } footer: {
             Text("Device mode uses your location only on this phone to calculate prayer times. Manual mode uses a city you choose.")
         }
@@ -97,7 +99,7 @@ struct LocationSettingsView: View {
                 .listRowBackground(DIColor.surface)
             }
         } header: {
-            Text("Current Location")
+            SettingsSectionHeader(titleKey: "Current Location", systemImage: "location.fill")
         } footer: {
             if viewModel.authorization == .denied {
                 Text("Location access is currently off for Darul Irfan. You can allow it in the Settings app, or choose a city manually below.")
@@ -164,11 +166,12 @@ struct LocationSettingsView: View {
                         titleKey: "No matching places",
                         messageKey: "Try searching with the city name in English, for example \"Chakwal\"."
                     )
+                    .diOctagramWatermark(size: 180, opacity: 0.05)
                     .listRowBackground(Color.clear)
                 }
             }
         } header: {
-            Text("Manual City")
+            SettingsSectionHeader(titleKey: "Manual City", systemImage: "map.fill")
         } footer: {
             Text("Choosing a city switches to manual mode, which keeps prayer times accurate while travelling or offline.")
         }

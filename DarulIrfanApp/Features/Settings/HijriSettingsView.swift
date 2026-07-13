@@ -47,7 +47,7 @@ struct HijriSettingsView: View {
             }
             .listRowBackground(DIColor.surface)
         } header: {
-            Text("Today")
+            SettingsSectionHeader(titleKey: "Today", systemImage: "calendar")
         }
     }
 
@@ -67,6 +67,8 @@ struct HijriSettingsView: View {
                 }
             }
             .listRowBackground(DIColor.surface)
+        } header: {
+            SettingsSectionHeader(titleKey: "Day Offset", systemImage: "plusminus.circle.fill")
         } footer: {
             Text("Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. Islamic day reminders follow this setting.")
         }

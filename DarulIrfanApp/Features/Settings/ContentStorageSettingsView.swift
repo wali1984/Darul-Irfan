@@ -52,7 +52,7 @@ struct ContentStorageSettingsView: View {
                 .tint(DIColor.primary)
                 .listRowBackground(DIColor.surface)
         } header: {
-            Text("Downloads")
+            SettingsSectionHeader(titleKey: "Downloads", systemImage: "arrow.down.circle.fill")
         } footer: {
             Text("When enabled, new content packs are fetched automatically while you are on Wi-Fi.")
         }
@@ -104,7 +104,7 @@ struct ContentStorageSettingsView: View {
             .disabled(viewModel.assetCount == 0 || viewModel.isClearing || !viewModel.hasLoaded)
             .listRowBackground(DIColor.surface)
         } header: {
-            Text("Storage")
+            SettingsSectionHeader(titleKey: "Storage", systemImage: "internaldrive.fill")
         } footer: {
             storageFooter
         }

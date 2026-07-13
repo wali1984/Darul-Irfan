@@ -30,13 +30,14 @@ struct CategoryListView: View {
                 emptyState
             } else {
                 ScrollView {
-                    LazyVStack(spacing: DISpacing.sm) {
-                        ForEach(items) { item in
+                    LazyVStack(spacing: DISpacing.md) {
+                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                             ContentItemRow(item: item, isFavorite: viewModel.isFavorite(item.id)) {
                                 Task {
                                     await viewModel.toggleFavorite(contentItemID: item.id)
                                 }
                             }
+                            .diAppear(delay: min(Double(index) * 0.04, 0.4))
                         }
                     }
                     .padding(DISpacing.md)
@@ -83,6 +84,7 @@ struct CategoryListView: View {
                 titleKey: "Nothing here yet",
                 messageKey: "Items in this section will appear after the next content update. The full collection is always available at naqshbandiaowaisiah.org."
             )
+            .diOctagramWatermark(size: 260, opacity: 0.05)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
@@ -120,8 +122,9 @@ struct CategoryListView: View {
 
 // MARK: - Item row
 
-/// One library item card: title (with Urdu title trailing when present),
-/// author and year, type badge, and a favorite star.
+/// One library item as an elevated live panel: a gradient medallion (gilded for
+/// books/booklets/magazines), the title (with Urdu title trailing when present),
+/// author and year, type + language badges, and a favorite star.
 struct ContentItemRow: View {
     let item: ContentItem
     let isFavorite: Bool
@@ -139,36 +142,52 @@ struct ContentItemRow: View {
     }
 
     var body: some View {
-        DICard {
-            HStack(alignment: .top, spacing: DISpacing.sm) {
+        DIElevatedCard(glow: item.type.libraryAccent) {
+            HStack(alignment: .top, spacing: DISpacing.md) {
                 NavigationLink(value: LibraryRoute.item(id: item.id)) {
-                    VStack(alignment: .leading, spacing: DISpacing.xs) {
-                        HStack(alignment: .firstTextBaseline, spacing: DISpacing.sm) {
-                            Text(verbatim: item.title)
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(DIColor.textPrimary)
-                                .multilineTextAlignment(.leading)
-                            Spacer(minLength: 0)
-                            if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                                Text(verbatim: titleUrdu)
-                                    .font(DIFont.urduBody(scale: 0.9))
+                    HStack(alignment: .top, spacing: DISpacing.md) {
+                        LibraryMedallion(
+                            systemImage: item.type.libraryIcon,
+                            isSpecial: item.type.isFeaturedPublication,
+                            diameter: 44
+                        )
+                        VStack(alignment: .leading, spacing: DISpacing.xs) {
+                            HStack(alignment: .firstTextBaseline, spacing: DISpacing.sm) {
+                                Text(verbatim: item.title)
+                                    .font(.body.weight(.semibold))
                                     .foregroundStyle(DIColor.textPrimary)
-                                    .multilineTextAlignment(.trailing)
+                                    .multilineTextAlignment(.leading)
+                                Spacer(minLength: 0)
+                                if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
+                                    Text(verbatim: titleUrdu)
+                                        .font(DIFont.urduBody(scale: 0.9))
+                                        .foregroundStyle(DIColor.textPrimary)
+                                        .multilineTextAlignment(.trailing)
+                                }
+                            }
+                            if !subtitleText.isEmpty {
+                                Text(verbatim: subtitleText)
+                                    .font(.footnote)
+                                    .foregroundStyle(DIColor.textMuted)
+                            }
+                            HStack(spacing: DISpacing.sm) {
+                                DIPillBadge(text: item.type.libraryDisplayName, color: item.type.libraryAccent)
+                                DIPillBadge(
+                                    text: LibraryLanguage.displayName(forCode: item.language),
+                                    color: DIColor.textMuted
+                                )
                             }
                         }
-                        if !subtitleText.isEmpty {
-                            Text(verbatim: subtitleText)
-                                .font(.footnote)
-                                .foregroundStyle(DIColor.textMuted)
-                        }
-                        DIPillBadge(text: item.type.libraryDisplayName)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
 
-                Button(action: onToggleFavorite) {
+                Button {
+                    DIHaptics.light()
+                    onToggleFavorite()
+                } label: {
                     Image(systemName: isFavorite ? "star.fill" : "star")
                         .font(.body)
                         .foregroundStyle(isFavorite ? DIColor.accent : DIColor.textMuted)

@@ -14,14 +14,18 @@ struct OnboardingLocationStep: View {
                 titleKey: "Your Location",
                 subtitleKey: "Prayer times and the Qibla direction depend on where you are."
             )
+            .diAppear()
 
             privacyNote
+                .diAppear(delay: 0.08)
 
             if viewModel.hasSelectedPlace, let name = viewModel.activePlaceName {
                 selectedPlaceCard(name: name)
+                    .transition(.scale(scale: 0.96).combined(with: .opacity))
             }
 
             deviceLocationButton
+                .diAppear(delay: 0.16)
 
             if viewModel.locationPhase == .denied {
                 deniedGuidance
@@ -31,6 +35,7 @@ struct OnboardingLocationStep: View {
             }
 
             manualSearchSection
+                .diAppear(delay: 0.24)
 
             if !viewModel.hasSelectedPlace {
                 Text("Choose one of the options above to continue.")
@@ -39,14 +44,16 @@ struct OnboardingLocationStep: View {
                     .padding(.top, DISpacing.xs)
             }
         }
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.hasSelectedPlace)
     }
 
     // MARK: - Privacy
 
     private var privacyNote: some View {
-        DICard {
+        DIElevatedCard {
             HStack(alignment: .top, spacing: DISpacing.sm) {
-                Image(systemName: "lock.shield")
+                Image(systemName: "lock.shield.fill")
+                    .font(.title3)
                     .foregroundStyle(DIColor.primary)
                     .accessibilityHidden(true)
                 Text("Your location stays on this device. It is used only to calculate prayer times and the Qibla direction, and is never sent to any server.")
@@ -64,6 +71,7 @@ struct OnboardingLocationStep: View {
 
     private var deviceLocationButton: some View {
         Button {
+            DIHaptics.soft()
             Task { await viewModel.useDeviceLocation() }
         } label: {
             if isResolvingDeviceLocation {
@@ -103,6 +111,7 @@ struct OnboardingLocationStep: View {
                 .foregroundStyle(DIColor.primary)
             }
         }
+        .transition(.opacity)
     }
 
     private var failedGuidance: some View {
@@ -116,17 +125,24 @@ struct OnboardingLocationStep: View {
                     .foregroundStyle(DIColor.textMuted)
             }
         }
+        .transition(.opacity)
     }
 
     // MARK: - Selected place
 
     private func selectedPlaceCard(name: String) -> some View {
-        DICard {
-            HStack(spacing: DISpacing.sm) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityHidden(true)
+        DIElevatedCard(tint: DIColor.primary.opacity(0.08), glow: DIColor.primary) {
+            HStack(spacing: DISpacing.md) {
+                ZStack {
+                    Circle()
+                        .fill(DIColor.primary.opacity(0.15))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(DIColor.primary)
+                }
+                .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 10)
+                .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text("Prayer times will be calculated for")
                         .font(.caption)
@@ -135,6 +151,7 @@ struct OnboardingLocationStep: View {
                         .font(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                 }
+                Spacer(minLength: 0)
             }
         }
     }
@@ -154,24 +171,26 @@ struct OnboardingLocationStep: View {
                         Task { await viewModel.searchCities() }
                     }
                     .padding(.horizontal, DISpacing.md)
-                    .frame(minHeight: 44)
+                    .frame(minHeight: 46)
                     .background(DIColor.surface)
-                    .clipShape(RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                        RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
                             .stroke(DIColor.border, lineWidth: 1)
                     )
 
                 Button {
+                    DIHaptics.light()
                     Task { await viewModel.searchCities() }
                 } label: {
                     Image(systemName: "magnifyingglass")
                         .font(.body.weight(.semibold))
                         .foregroundStyle(DIColor.onPrimary)
-                        .frame(width: 44, height: 44)
+                        .frame(width: 46, height: 46)
                         .background(DIColor.primary)
-                        .clipShape(RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
                 }
+                .buttonStyle(DIPressableStyle())
                 .accessibilityLabel(Text("Search"))
                 .disabled(viewModel.isSearchingCities)
             }
@@ -193,8 +212,9 @@ struct OnboardingLocationStep: View {
                     .foregroundStyle(DIColor.textMuted)
             }
 
-            ForEach(viewModel.citySearchResults, id: \.self) { place in
+            ForEach(Array(viewModel.citySearchResults.enumerated()), id: \.element) { index, place in
                 resultRow(place)
+                    .diAppear(delay: 0.05 * Double(index))
             }
         }
         .padding(.top, DISpacing.sm)
@@ -202,10 +222,12 @@ struct OnboardingLocationStep: View {
 
     private func resultRow(_ place: PlaceCoordinate) -> some View {
         Button {
+            DIHaptics.soft()
             Task { await viewModel.chooseManualPlace(place) }
         } label: {
             HStack(spacing: DISpacing.sm) {
-                Image(systemName: "mappin.circle")
+                Image(systemName: "mappin.circle.fill")
+                    .font(.title3)
                     .foregroundStyle(DIColor.accent)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
@@ -231,6 +253,6 @@ struct OnboardingLocationStep: View {
                     .stroke(DIColor.border, lineWidth: 1)
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
     }
 }

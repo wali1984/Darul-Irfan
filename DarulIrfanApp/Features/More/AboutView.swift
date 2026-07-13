@@ -1,19 +1,25 @@
 import SwiftUI
 
-/// About Darul Irfan: app identity, a short verified introduction to Silsila
-/// Naqshbandia Owaisiah, source website, contact details, and
-/// acknowledgements. All organizational facts come from
+/// About Darul Irfan: a premium brand moment (living emerald crest, seal,
+/// wordmark, anchor verse and version), followed by a short verified
+/// introduction to Silsila Naqshbandia Owaisiah, source website, contact
+/// details, and acknowledgements. All organizational facts come from
 /// Docs/RESEARCH_NOTES.md (verified against naqshbandiaowaisiah.org).
 @MainActor
 struct AboutView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: DISpacing.md) {
-                identityCard
+                brandCrest
+                    .diAppear()
                 silsilaCard
+                    .diAppear(delay: 0.08)
                 headquartersCard
+                    .diAppear(delay: 0.14)
                 sourceAndContactCard
+                    .diAppear(delay: 0.20)
                 acknowledgementsLink
+                    .diAppear(delay: 0.26)
             }
             .padding(DISpacing.md)
         }
@@ -22,31 +28,75 @@ struct AboutView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    // MARK: - Identity
+    // MARK: - Brand crest
 
-    private var identityCard: some View {
-        DICard {
+    private var brandCrest: some View {
+        ZStack {
+            DIGradient.emerald
+            DIOctagram(innerRatio: 0.5)
+                .stroke(Color.white, lineWidth: 1.5)
+                .frame(width: 300, height: 300)
+                .opacity(0.06)
+                .offset(x: 90, y: -80)
+                .accessibilityHidden(true)
+
             VStack(spacing: DISpacing.sm) {
+                DISealEmblem(diameter: 96, glow: true)
+                    .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 20)
+
                 Text(verbatim: "دارالعرفان")
-                    .font(DIFont.urduBody(scale: 1.7))
-                    .foregroundStyle(DIColor.primaryDeep)
+                    .font(DIFont.urduBody(scale: 1.6))
+                    .foregroundStyle(.white)
+                    .diGoldGlow(radius: 10, opacity: 0.4)
                     .environment(\.layoutDirection, .rightToLeft)
 
                 Text("Darul Irfan")
                     .font(DIFont.heading)
-                    .foregroundStyle(DIColor.textPrimary)
+                    .foregroundStyle(.white)
 
                 Text("Light of Sacred Knowledge")
                     .font(.subheadline)
-                    .foregroundStyle(DIColor.textMuted)
+                    .foregroundStyle(.white.opacity(0.85))
 
-                Text("Version \(appVersionText)")
-                    .font(.caption)
-                    .foregroundStyle(DIColor.textMuted)
+                DIJaliDivider(tint: Color.white, opacity: 0.35)
+                    .frame(width: 160)
+                    .padding(.vertical, DISpacing.xs)
+
+                Text(DIBrand.anchorVerseArabic)
+                    .font(DIFont.quranArabic(scale: 0.66))
+                    .foregroundStyle(.white)
+                    .diGoldGlow(radius: 12, opacity: 0.5)
+                    .environment(\.layoutDirection, .rightToLeft)
+                    .multilineTextAlignment(.center)
+
+                Text(verbatim: DIBrand.anchorVerseEnglish)
+                    .font(.footnote.italic())
+                    .foregroundStyle(.white.opacity(0.82))
+                    .multilineTextAlignment(.center)
+
+                Text(verbatim: DIBrand.anchorVerseReference)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIColor.goldGlow)
+
+                versionChip
+                    .padding(.top, DISpacing.xs)
             }
+            .padding(.vertical, DISpacing.lg)
+            .padding(.horizontal, DISpacing.md)
             .frame(maxWidth: .infinity)
-            .multilineTextAlignment(.center)
         }
+        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
+        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
+    }
+
+    private var versionChip: some View {
+        Text("Version \(appVersionText)")
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.white)
+            .padding(.horizontal, DISpacing.sm)
+            .padding(.vertical, DISpacing.xs)
+            .background(Capsule().fill(Color.white.opacity(0.16)))
+            .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
     }
 
     private var appVersionText: String {
@@ -59,12 +109,9 @@ struct AboutView: View {
     // MARK: - Silsila
 
     private var silsilaCard: some View {
-        DICard {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Silsila Naqshbandia Owaisiah")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                aboutHeader("Silsila Naqshbandia Owaisiah", systemImage: "link")
 
                 Text("Darul Irfan is the companion app of Silsila Naqshbandia Owaisiah, a Sufi order whose spiritual lineage traces to Khawajah Owais Qarni. The order's method is Zikr-e Khafi Qalbi with Pas Anfas — \"guarding every breath\". A distinguishing feature of the Owaisiah way is spiritual bai'at directly at the hands of the holy Prophet ﷺ.")
                     .font(.subheadline)
@@ -78,12 +125,9 @@ struct AboutView: View {
     }
 
     private var headquartersCard: some View {
-        DICard {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Headquarters")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                aboutHeader("Headquarters", systemImage: "building.columns")
 
                 Label {
                     Text(verbatim: "Dar ul Irfan, Munara, Khushab Road, District Chakwal, Punjab, Pakistan")
@@ -101,12 +145,9 @@ struct AboutView: View {
     // MARK: - Source & contact
 
     private var sourceAndContactCard: some View {
-        DICard {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                Text("Source & Contact")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                aboutHeader("Source & Contact", systemImage: "globe")
 
                 if let websiteURL = URL(string: "https://www.naqshbandiaowaisiah.org/") {
                     Link(destination: websiteURL) {
@@ -159,13 +200,20 @@ struct AboutView: View {
         NavigationLink {
             AcknowledgementsView()
         } label: {
-            DICard {
+            DIElevatedCard {
                 HStack(spacing: DISpacing.md) {
-                    Image(systemName: "text.book.closed")
-                        .foregroundStyle(DIColor.accent)
-                        .accessibilityHidden(true)
+                    ZStack {
+                        Circle().fill(DIGradient.emerald)
+                        Circle().strokeBorder(DIColor.accent.opacity(0.5), lineWidth: 1)
+                        Image(systemName: "text.book.closed.fill")
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 40, height: 40)
+                    .accessibilityHidden(true)
+
                     Text("Acknowledgements")
-                        .font(.body.weight(.medium))
+                        .font(.body.weight(.semibold))
                         .foregroundStyle(DIColor.textPrimary)
                     Spacer(minLength: DISpacing.sm)
                     Image(systemName: "chevron.forward")
@@ -175,6 +223,22 @@ struct AboutView: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
+    }
+
+    // MARK: - Shared
+
+    private func aboutHeader(_ titleKey: LocalizedStringKey, systemImage: String) -> some View {
+        HStack(spacing: DISpacing.sm) {
+            Image(systemName: systemImage)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(DIColor.accent)
+                .accessibilityHidden(true)
+            Text(titleKey)
+                .font(DIFont.subheading)
+                .foregroundStyle(DIColor.textPrimary)
+        }
+        .accessibilityAddTraits(.isHeader)
     }
 }

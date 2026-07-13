@@ -34,7 +34,7 @@ struct AppearanceSettingsView: View {
             .pickerStyle(.segmented)
             .listRowBackground(DIColor.surface)
         } header: {
-            Text("Theme")
+            SettingsSectionHeader(titleKey: "Theme", systemImage: "circle.lefthalf.filled")
         } footer: {
             Text("System follows your device's light or dark appearance.")
         }
@@ -62,7 +62,7 @@ struct AppearanceSettingsView: View {
             }
             .listRowBackground(DIColor.surface)
         } header: {
-            Text("Language")
+            SettingsSectionHeader(titleKey: "Language", systemImage: "globe")
         } footer: {
             Text("Urdu applies a right-to-left layout across the app.")
         }
@@ -90,7 +90,7 @@ struct AppearanceSettingsView: View {
             }
             .listRowBackground(DIColor.surface)
         } header: {
-            Text("Reading")
+            SettingsSectionHeader(titleKey: "Reading", systemImage: "textformat.size")
         } footer: {
             Text("Applies to the Quran and Library reading screens, on top of your system text size.")
         }

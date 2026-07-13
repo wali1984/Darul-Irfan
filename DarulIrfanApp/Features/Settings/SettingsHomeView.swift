@@ -1,7 +1,10 @@
 import SwiftUI
 
-/// Settings root: links to every settings subscreen with a glance at the
-/// current value where helpful.
+/// Settings root: a branded hub linking to every settings subscreen with a
+/// glance at the current value where helpful. Elevated to match the app's
+/// living design language — a slim brand banner and premium card rows grouped
+/// by intent, each with a gold-rimmed emerald medallion, spring press, a soft
+/// haptic and a staggered appear.
 @MainActor
 struct SettingsHomeView: View {
     private let dependencies: AppDependencies
@@ -13,13 +16,20 @@ struct SettingsHomeView: View {
     }
 
     var body: some View {
-        List {
-            prayerSection
-            displaySection
-            contentSection
+        ScrollView {
+            VStack(alignment: .leading, spacing: DISpacing.lg) {
+                SettingsBrandBanner(
+                    titleKey: "Darul Irfan",
+                    subtitleKey: "Prayer, display, content and privacy"
+                )
+                .diAppear()
+
+                prayerSection
+                displaySection
+                contentSection
+            }
+            .padding(DISpacing.md)
         }
-        .listStyle(.insetGrouped)
-        .scrollContentBackground(.hidden)
         .diScreenBackground()
         .navigationTitle("Settings")
     }
@@ -27,97 +37,87 @@ struct SettingsHomeView: View {
     // MARK: - Sections
 
     private var prayerSection: some View {
-        Section {
-            NavigationLink {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            DISectionHeader(titleKey: "Prayer Setup", systemImage: "sun.max")
+                .diAppear(delay: 0.05)
+
+            SettingsNavLink(
+                titleKey: "Location",
+                systemImage: "location.fill",
+                value: locationValue,
+                delay: 0.10
+            ) {
                 LocationSettingsView(dependencies: dependencies, appState: appState)
-            } label: {
-                SettingsHomeRow(
-                    titleKey: "Location",
-                    systemImage: "location.fill",
-                    value: locationValue
-                )
             }
-            .listRowBackground(DIColor.surface)
 
-            NavigationLink {
+            SettingsNavLink(
+                titleKey: "Calculation",
+                systemImage: "sun.and.horizon.fill",
+                value: Text(LocalizedStringKey(appState.settings.calculation.method.englishName)),
+                delay: 0.16
+            ) {
                 CalculationSettingsView(appState: appState)
-            } label: {
-                SettingsHomeRow(
-                    titleKey: "Calculation",
-                    systemImage: "sun.and.horizon.fill",
-                    value: Text(LocalizedStringKey(appState.settings.calculation.method.englishName))
-                )
             }
-            .listRowBackground(DIColor.surface)
 
-            NavigationLink {
+            SettingsNavLink(
+                titleKey: "Notifications",
+                systemImage: "bell.fill",
+                value: Text("\(enabledAlertCount) on"),
+                delay: 0.22
+            ) {
                 NotificationSettingsView(dependencies: dependencies, appState: appState)
-            } label: {
-                SettingsHomeRow(
-                    titleKey: "Notifications",
-                    systemImage: "bell.fill",
-                    value: Text("\(enabledAlertCount) on")
-                )
             }
-            .listRowBackground(DIColor.surface)
-        } header: {
-            Text("Prayer Setup")
         }
     }
 
     private var displaySection: some View {
-        Section {
-            NavigationLink {
-                AppearanceSettingsView(appState: appState)
-            } label: {
-                SettingsHomeRow(
-                    titleKey: "Appearance",
-                    systemImage: "paintbrush.fill",
-                    value: nil
-                )
-            }
-            .listRowBackground(DIColor.surface)
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            DISectionHeader(titleKey: "Display", systemImage: "paintpalette")
+                .diAppear(delay: 0.28)
 
-            NavigationLink {
-                HijriSettingsView(dependencies: dependencies, appState: appState)
-            } label: {
-                SettingsHomeRow(
-                    titleKey: "Hijri Calendar",
-                    systemImage: "moon.stars.fill",
-                    value: hijriValue
-                )
+            SettingsNavLink(
+                titleKey: "Appearance",
+                systemImage: "paintbrush.fill",
+                value: nil,
+                delay: 0.34
+            ) {
+                AppearanceSettingsView(appState: appState)
             }
-            .listRowBackground(DIColor.surface)
-        } header: {
-            Text("Display")
+
+            SettingsNavLink(
+                titleKey: "Hijri Calendar",
+                systemImage: "moon.stars.fill",
+                value: hijriValue,
+                accent: true,
+                delay: 0.40
+            ) {
+                HijriSettingsView(dependencies: dependencies, appState: appState)
+            }
         }
     }
 
     private var contentSection: some View {
-        Section {
-            NavigationLink {
-                ContentStorageSettingsView(dependencies: dependencies, appState: appState)
-            } label: {
-                SettingsHomeRow(
-                    titleKey: "Content & Storage",
-                    systemImage: "internaldrive.fill",
-                    value: nil
-                )
-            }
-            .listRowBackground(DIColor.surface)
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            DISectionHeader(titleKey: "Content & Privacy", systemImage: "hand.raised")
+                .diAppear(delay: 0.46)
 
-            NavigationLink {
-                PrivacySettingsView()
-            } label: {
-                SettingsHomeRow(
-                    titleKey: "Privacy",
-                    systemImage: "hand.raised.fill",
-                    value: nil
-                )
+            SettingsNavLink(
+                titleKey: "Content & Storage",
+                systemImage: "internaldrive.fill",
+                value: nil,
+                delay: 0.52
+            ) {
+                ContentStorageSettingsView(dependencies: dependencies, appState: appState)
             }
-            .listRowBackground(DIColor.surface)
-        } header: {
-            Text("Content & Privacy")
+
+            SettingsNavLink(
+                titleKey: "Privacy",
+                systemImage: "hand.raised.fill",
+                value: nil,
+                delay: 0.58
+            ) {
+                PrivacySettingsView()
+            }
         }
     }
 
@@ -149,35 +149,60 @@ struct SettingsHomeView: View {
     }
 }
 
-// MARK: - Row
+// MARK: - Navigation card row
 
-private struct SettingsHomeRow: View {
+/// A premium settings row: a gold-rimmed medallion icon, a title, an optional
+/// current-value glance, inside an elevated card with spring press, a soft
+/// haptic, and a staggered appear.
+private struct SettingsNavLink<Destination: View>: View {
     let titleKey: LocalizedStringKey
     let systemImage: String
     let value: Text?
+    /// Uses the gold gradient medallion instead of emerald.
+    var accent: Bool = false
+    var delay: Double = 0
+    @ViewBuilder var destination: () -> Destination
 
     var body: some View {
-        HStack(spacing: DISpacing.md) {
-            Image(systemName: systemImage)
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(DIColor.onPrimary)
-                .frame(width: 30, height: 30)
-                .background(DIColor.primary)
-                .clipShape(RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous))
-                .accessibilityHidden(true)
-
-            Text(titleKey)
-                .foregroundStyle(DIColor.textPrimary)
-
-            Spacer(minLength: DISpacing.sm)
-
-            if let value {
-                value
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.textMuted)
-                    .lineLimit(1)
+        NavigationLink {
+            destination()
+        } label: {
+            DIElevatedCard {
+                HStack(spacing: DISpacing.md) {
+                    medallion
+                    Text(titleKey)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(DIColor.textPrimary)
+                    Spacer(minLength: DISpacing.sm)
+                    if let value {
+                        value
+                            .font(.subheadline)
+                            .foregroundStyle(DIColor.textMuted)
+                            .lineLimit(1)
+                    }
+                    Image(systemName: "chevron.forward")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(DIColor.textMuted)
+                        .accessibilityHidden(true)
+                }
             }
         }
-        .padding(.vertical, DISpacing.xs)
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
+        .diAppear(delay: delay)
+    }
+
+    private var medallion: some View {
+        ZStack {
+            Circle()
+                .fill(accent ? DIGradient.goldSheen : DIGradient.emerald)
+            Circle()
+                .strokeBorder(DIColor.accent.opacity(0.5), lineWidth: 1)
+            Image(systemName: systemImage)
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(accent ? DIColor.primaryDeep : Color.white)
+        }
+        .frame(width: 40, height: 40)
+        .accessibilityHidden(true)
     }
 }

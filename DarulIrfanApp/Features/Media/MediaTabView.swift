@@ -25,6 +25,7 @@ struct MediaTabView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.lg) {
                     liveCard
+                        .diAppear()
 
                     if let message = viewModel.loadErrorMessage {
                         loadErrorCard(message)
@@ -32,6 +33,7 @@ struct MediaTabView: View {
 
                     if !viewModel.resumeEntries.isEmpty {
                         continueListeningSection
+                            .diAppear(delay: 0.05)
                     }
 
                     if viewModel.isLoading {
@@ -44,9 +46,13 @@ struct MediaTabView: View {
                             titleKey: "The media library is being prepared",
                             messageKey: "Lectures and programs will appear here after the first content sync. Pull down to refresh."
                         )
+                        .diOctagramWatermark(size: 260, opacity: 0.05)
+                        .diAppear(delay: 0.1)
                     } else {
                         categoriesSection
+                            .diAppear(delay: 0.1)
                         browseByYearLink
+                            .diAppear(delay: 0.15)
                     }
                 }
                 .padding(DISpacing.md)
@@ -91,40 +97,59 @@ struct MediaTabView: View {
 
     // MARK: - AlMurshid TV live card
 
+    /// The AlMurshid TV sub-brand hero — a living crimson panel with a breathing
+    /// glow, a pierced-jali watermark, and a pulsing LIVE pill.
     private var liveCard: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            HStack(spacing: DISpacing.sm) {
-                Image(systemName: "dot.radiowaves.left.and.right")
-                    .font(.title3)
-                    .foregroundStyle(DIColor.accent)
-                    .accessibilityHidden(true)
-                Text("AlMurshid TV")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.onPrimary)
-                Spacer(minLength: 0)
-                DIPillBadge(text: "Live", color: DIColor.accent)
+        ZStack(alignment: .topLeading) {
+            MediaStyle.crimson
+
+            DIOctagram(innerRatio: 0.5)
+                .stroke(Color.white, lineWidth: 1.5)
+                .frame(width: 220, height: 220)
+                .opacity(0.07)
+                .offset(x: 130, y: -60)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                HStack(spacing: DISpacing.sm) {
+                    Image(systemName: "dot.radiowaves.left.and.right")
+                        .font(.title3)
+                        .foregroundStyle(.white)
+                        .accessibilityHidden(true)
+                    Text("AlMurshid TV")
+                        .font(DIFont.subheading)
+                        .foregroundStyle(.white)
+                    Spacer(minLength: 0)
+                    MediaLivePill(fill: Color.white.opacity(0.22), foreground: .white)
+                }
+                Text("Listen to the live audio stream from Dar ul Irfan. The stream plays while a broadcast is on air.")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+                Button {
+                    DIHaptics.light()
+                    viewModel.playLiveStream()
+                } label: {
+                    Label("Listen live", systemImage: "play.fill")
+                        .font(.headline)
+                        .foregroundStyle(DIColor.crimson)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
+                }
+                .buttonStyle(DIPressableStyle())
+                .padding(.top, DISpacing.xs)
+                .accessibilityLabel(Text("Listen to the AlMurshid TV live stream"))
             }
-            Text("Listen to the live audio stream from Dar ul Irfan. The stream plays while a broadcast is on air.")
-                .font(.subheadline)
-                .foregroundStyle(DIColor.onPrimary.opacity(0.85))
-                .fixedSize(horizontal: false, vertical: true)
-            Button {
-                viewModel.playLiveStream()
-            } label: {
-                Label("Listen live", systemImage: "play.fill")
-                    .font(.headline)
-                    .foregroundStyle(DIColor.primaryDeep)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .background(DIColor.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Listen to the AlMurshid TV live stream"))
+            .padding(DISpacing.md)
         }
-        .padding(DISpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(DIColor.primaryDeep)
         .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        )
+        .diBreathingGlow(color: DIColor.crimson, maxRadius: 20)
     }
 
     // MARK: - Continue Listening
@@ -133,42 +158,52 @@ struct MediaTabView: View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             DISectionHeader(titleKey: "Continue Listening", systemImage: "play.circle")
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(alignment: .top, spacing: DISpacing.sm) {
+                LazyHStack(alignment: .top, spacing: DISpacing.md) {
                     ForEach(viewModel.resumeEntries) { entry in
                         resumeCard(entry)
                     }
                 }
                 .padding(.vertical, DISpacing.xs)
+                .padding(.horizontal, DISpacing.xs)
             }
         }
     }
 
+    /// A rich elevated "resume" card: gradient artwork medallion, remaining
+    /// progress, and a live play affordance. Spring press + soft haptic via
+    /// `DIElevatedCard`.
     private func resumeCard(_ entry: MediaResumeEntry) -> some View {
-        Button {
-            viewModel.resume(entry)
-        } label: {
-            DICard {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    MediaTitleText(item: entry.item, latinFont: .subheadline.weight(.semibold), lineLimit: 2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    ProgressView(value: entry.progress.fractionCompleted)
-                        .tint(DIColor.primary)
-                    HStack(spacing: DISpacing.xs) {
-                        Text("\(Int(entry.progress.fractionCompleted * 100))% played")
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
-                        Spacer(minLength: 0)
-                        Image(systemName: "play.fill")
-                            .font(.caption)
-                            .foregroundStyle(DIColor.primary)
-                            .accessibilityHidden(true)
-                    }
+        let accent = MediaStyle.accent(entry.item.category)
+        let percent = Int(entry.progress.fractionCompleted * 100)
+        return DIElevatedCard(glow: accent.opacity(0.5), onTap: { viewModel.resume(entry) }) {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                HStack(alignment: .top) {
+                    MediaIconMedallion(category: entry.item.category, diameter: 40, glyph: "waveform")
+                    Spacer(minLength: 0)
+                    Image(systemName: "play.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(accent)
+                        .accessibilityHidden(true)
                 }
+                MediaTitleText(item: entry.item, latinFont: .subheadline.weight(.semibold), lineLimit: 2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if let speaker = entry.item.speaker {
+                    Text(speaker)
+                        .font(.caption2)
+                        .foregroundStyle(DIColor.textMuted)
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+                ProgressView(value: entry.progress.fractionCompleted)
+                    .tint(accent)
+                Text("\(percent)% played")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(DIColor.textMuted)
             }
-            .frame(width: 240, alignment: .leading)
+            .frame(minHeight: 128, alignment: .top)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text("Resume \(entry.item.title)"))
+        .frame(width: 232)
+        .accessibilityLabel(Text("Resume \(entry.item.title), \(percent) percent played"))
     }
 
     // MARK: - Categories
@@ -177,58 +212,46 @@ struct MediaTabView: View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             DISectionHeader(titleKey: "Browse", systemImage: "square.grid.2x2")
             LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 150), spacing: DISpacing.sm)],
+                columns: [GridItem(.adaptive(minimum: 150), spacing: DISpacing.md)],
                 alignment: .leading,
-                spacing: DISpacing.sm
+                spacing: DISpacing.md
             ) {
-                ForEach(MediaCategory.allCases) { category in
+                ForEach(Array(MediaCategory.allCases.enumerated()), id: \.element) { index, category in
                     categoryCell(category)
+                        .diAppear(delay: 0.12 + Double(index) * 0.04)
                 }
             }
         }
     }
 
     private func categoryCell(_ category: MediaCategory) -> some View {
-        NavigationLink {
+        let count = viewModel.categoryCounts[category] ?? 0
+        return NavigationLink {
             MediaItemListView(filter: .category(category), dependencies: dependencies)
         } label: {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    Image(systemName: categoryIcon(category))
-                        .font(.title3)
-                        .foregroundStyle(DIColor.primary)
-                        .accessibilityHidden(true)
+                    MediaIconMedallion(category: category, diameter: 46)
                     Text(LocalizedStringKey(category.englishName))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(2)
-                    if let count = viewModel.categoryCounts[category], count > 0 {
+                    if count > 0 {
                         Text("\(count) items")
                             .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
+                            .foregroundStyle(MediaStyle.accent(category))
                     } else {
                         Text("No items yet")
                             .font(.caption)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .buttonStyle(.plain)
-    }
-
-    private func categoryIcon(_ category: MediaCategory) -> String {
-        switch category {
-        case .audioLectures: return "headphones"
-        case .videoLectures: return "video"
-        case .tafseerQuranVideos: return "book.closed"
-        case .alMurshidTV: return "dot.radiowaves.left.and.right"
-        case .alMurshidQA: return "questionmark.bubble"
-        case .shortClips: return "waveform"
-        case .recommended: return "star"
-        case .kalamESheikh: return "quote.opening"
-        }
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.light() })
     }
 
     // MARK: - Archive link
@@ -238,11 +261,16 @@ struct MediaTabView: View {
             ArchiveBrowserView(dependencies: dependencies, category: nil)
         } label: {
             DICard {
-                HStack(spacing: DISpacing.sm) {
-                    Image(systemName: "calendar")
-                        .font(.title3)
-                        .foregroundStyle(DIColor.primary)
-                        .accessibilityHidden(true)
+                HStack(spacing: DISpacing.md) {
+                    ZStack {
+                        Circle().fill(DIGradient.emerald)
+                        Image(systemName: "calendar")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 44, height: 44)
+                    .shadow(color: DIColor.primary.opacity(0.3), radius: 6, y: 3)
+                    .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: DISpacing.xs) {
                         Text("Browse by year")
                             .font(.subheadline.weight(.semibold))
@@ -253,13 +281,14 @@ struct MediaTabView: View {
                     }
                     Spacer(minLength: 0)
                     Image(systemName: "chevron.forward")
-                        .font(.caption)
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(DIColor.textMuted)
                         .accessibilityHidden(true)
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.light() })
     }
 
     // MARK: - Error

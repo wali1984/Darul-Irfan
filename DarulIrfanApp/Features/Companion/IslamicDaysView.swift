@@ -64,12 +64,18 @@ final class IslamicDaysViewModel {
         groups = result
         isLoaded = true
     }
+
+    /// The soonest upcoming occurrence, highlighted as "Next" in the timeline.
+    var firstOccurrenceID: String? {
+        groups.first?.occurrences.first?.id
+    }
 }
 
 // MARK: - Screen
 
-/// Notable Islamic days over the next 400 days, grouped by month, with the
-/// Hijri date and the approximate Gregorian date for each.
+/// Notable Islamic days over the next 400 days as a refined vertical timeline,
+/// grouped by month, with the Hijri date and the approximate Gregorian date
+/// for each and the soonest day marked "Next".
 @MainActor
 struct IslamicDaysView: View {
     @State private var viewModel: IslamicDaysViewModel
@@ -84,21 +90,25 @@ struct IslamicDaysView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
                 if viewModel.isLoaded && viewModel.groups.isEmpty {
-                    DIEmptyState(
-                        systemImage: "moon.stars",
-                        titleKey: "No upcoming days found",
-                        messageKey: "Notable Islamic days will appear here. Updating the app should restore the bundled list."
-                    )
+                    DIElevatedCard {
+                        DIEmptyState(
+                            systemImage: "moon.stars",
+                            titleKey: "No upcoming days found",
+                            messageKey: "Notable Islamic days will appear here. Updating the app should restore the bundled list."
+                        )
+                        .diOctagramWatermark(size: 220, opacity: 0.06)
+                    }
                 } else {
                     ForEach(viewModel.groups) { group in
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
-                            Text(verbatim: group.title)
-                                .font(DIFont.subheading)
-                                .foregroundStyle(DIColor.textPrimary)
-                                .padding(.horizontal, DISpacing.xs)
-                                .accessibilityAddTraits(.isHeader)
-                            ForEach(group.occurrences) { occurrence in
-                                IslamicDayRow(occurrence: occurrence)
+                            monthChip(group.title)
+                            VStack(spacing: 0) {
+                                ForEach(group.occurrences) { occurrence in
+                                    IslamicDayTimelineRow(
+                                        occurrence: occurrence,
+                                        isNext: occurrence.id == viewModel.firstOccurrenceID
+                                    )
+                                }
                             }
                         }
                     }
@@ -118,39 +128,78 @@ struct IslamicDaysView: View {
             viewModel.load(offsetDays: appState.settings.hijri.dayOffset)
         }
     }
+
+    private func monthChip(_ title: String) -> some View {
+        Text(verbatim: title)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(DIColor.onPrimary)
+            .padding(.horizontal, DISpacing.md)
+            .padding(.vertical, DISpacing.xs)
+            .background(Capsule().fill(DIGradient.emerald))
+            .diGoldGlow(radius: 5, opacity: 0.2)
+            .padding(.horizontal, DISpacing.xs)
+            .accessibilityAddTraits(.isHeader)
+    }
 }
 
-// MARK: - Row
+// MARK: - Timeline row
 
-private struct IslamicDayRow: View {
+private struct IslamicDayTimelineRow: View {
     let occurrence: IslamicDaysViewModel.Occurrence
+    let isNext: Bool
 
     var body: some View {
-        DICard {
-            HStack(alignment: .top, spacing: DISpacing.md) {
-                VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text(verbatim: occurrence.day.title)
-                        .font(.headline)
-                        .foregroundStyle(DIColor.textPrimary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    if let note = occurrence.day.note {
-                        Text(verbatim: note)
+        HStack(alignment: .top, spacing: DISpacing.sm) {
+            timelineRail
+            DIElevatedCard(glow: isNext ? DIColor.accent.opacity(0.7) : nil) {
+                HStack(alignment: .top, spacing: DISpacing.md) {
+                    VStack(alignment: .leading, spacing: DISpacing.xs) {
+                        if isNext {
+                            DIPillBadge(text: String(localized: "Next"), color: DIColor.accent)
+                        }
+                        Text(verbatim: occurrence.day.title)
+                            .font(.headline)
+                            .foregroundStyle(DIColor.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if let note = occurrence.day.note {
+                            Text(verbatim: note)
+                                .font(.caption)
+                                .foregroundStyle(DIColor.textMuted)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    Spacer(minLength: 0)
+                    VStack(alignment: .trailing, spacing: DISpacing.xs) {
+                        Text(verbatim: occurrence.hijriText)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(DIColor.primary)
+                        Text("≈ \(occurrence.gregorianDate.formatted(date: .abbreviated, time: .omitted))")
                             .font(.caption)
                             .foregroundStyle(DIColor.textMuted)
-                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                Spacer(minLength: 0)
-                VStack(alignment: .trailing, spacing: DISpacing.xs) {
-                    Text(verbatim: occurrence.hijriText)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
-                    Text("≈ \(occurrence.gregorianDate.formatted(date: .abbreviated, time: .omitted))")
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
-                }
             }
+            .padding(.bottom, DISpacing.md)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private var timelineRail: some View {
+        ZStack(alignment: .top) {
+            Rectangle()
+                .fill(DIColor.border)
+                .frame(width: 2)
+                .frame(maxHeight: .infinity)
+            Circle()
+                .fill(isNext ? AnyShapeStyle(DIGradient.goldSheen) : AnyShapeStyle(DIGradient.emerald))
+                .frame(width: 16, height: 16)
+                .overlay(
+                    Circle().strokeBorder(DIColor.background, lineWidth: 2)
+                )
+                .diGoldGlow(radius: isNext ? 8 : 0, opacity: isNext ? 0.5 : 0)
+                .padding(.top, 6)
+        }
+        .frame(width: 18)
+        .accessibilityHidden(true)
     }
 }

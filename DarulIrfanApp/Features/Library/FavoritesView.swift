@@ -22,14 +22,15 @@ struct FavoritesView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
-                    LazyVStack(spacing: DISpacing.sm) {
-                        ForEach(items) { item in
+                    LazyVStack(spacing: DISpacing.md) {
+                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                             ContentItemRow(item: item, isFavorite: viewModel.isFavorite(item.id)) {
                                 Task {
                                     await viewModel.toggleFavorite(contentItemID: item.id)
                                     items.removeAll { $0.id == item.id }
                                 }
                             }
+                            .diAppear(delay: min(Double(index) * 0.04, 0.4))
                         }
                     }
                     .padding(DISpacing.md)

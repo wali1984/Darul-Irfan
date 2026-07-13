@@ -22,9 +22,13 @@ struct PDFViewerView: View {
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ProgressView()
-                    .tint(DIColor.primary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                VStack(spacing: DISpacing.md) {
+                    DISealEmblem(diameter: 64, glow: true)
+                        .diBreathingGlow()
+                    ProgressView("Opening…")
+                        .tint(DIColor.primary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .diScreenBackground()

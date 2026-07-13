@@ -122,6 +122,7 @@ struct PlayerSheetView: View {
                         titleKey: "Nothing is playing",
                         messageKey: "Choose a lecture from the Media tab to begin listening."
                     )
+                    .diOctagramWatermark(size: 280, opacity: 0.05)
                 } else {
                     // Poll playback time twice a second so the elapsed time,
                     // slider, and play/pause icon stay fresh regardless of
@@ -179,6 +180,21 @@ struct PlayerSheetView: View {
         }
     }
 
+    // MARK: Live / accent skin
+
+    /// True when the AlMurshid TV live stream is playing — drives the crimson skin.
+    private var isLiveStream: Bool {
+        audioPlayer.nowPlaying?.id == MediaPlayback.liveStreamID
+    }
+
+    private var accent: Color {
+        isLiveStream ? DIColor.crimson : DIColor.primary
+    }
+
+    private var heroGradient: LinearGradient {
+        isLiveStream ? MediaStyle.crimson : DIGradient.emerald
+    }
+
     // MARK: Content
 
     private var playerContent: some View {
@@ -199,12 +215,32 @@ struct PlayerSheetView: View {
         }
     }
 
+    /// A living artwork hero: a gradient medallion with a breathing glow and a
+    /// pierced-jali watermark, then the title and speaker.
     private var header: some View {
-        VStack(spacing: DISpacing.sm) {
-            Image(systemName: "waveform.circle.fill")
-                .font(.system(size: 56, weight: .light))
-                .foregroundStyle(DIColor.primary)
-                .accessibilityHidden(true)
+        VStack(spacing: DISpacing.md) {
+            ZStack {
+                RoundedRectangle(cornerRadius: DIRadius.lg + 4, style: .continuous)
+                    .fill(heroGradient)
+                DIOctagram(innerRatio: 0.5)
+                    .stroke(Color.white, lineWidth: 1.5)
+                    .frame(width: 200, height: 200)
+                    .opacity(0.08)
+                    .accessibilityHidden(true)
+                Image(systemName: isLiveStream ? "dot.radiowaves.left.and.right" : "waveform")
+                    .font(.system(size: 64, weight: .light))
+                    .foregroundStyle(.white)
+                    .diBreathingGlow(color: isLiveStream ? DIColor.crimson : DIColor.goldGlow, maxRadius: 18)
+            }
+            .frame(height: 200)
+            .frame(maxWidth: 260)
+            .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 4, style: .continuous))
+            .shadow(color: accent.opacity(0.30), radius: 18, y: 10)
+
+            if isLiveStream {
+                MediaLivePill()
+            }
+
             Text(audioPlayer.nowPlaying?.title ?? "")
                 .font(DIFont.heading)
                 .foregroundStyle(DIColor.textPrimary)
@@ -217,7 +253,7 @@ struct PlayerSheetView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, DISpacing.md)
+        .padding(.top, DISpacing.sm)
     }
 
     // MARK: Seeking
@@ -250,7 +286,7 @@ struct PlayerSheetView: View {
                         }
                     }
                 )
-                .tint(DIColor.primary)
+                .tint(accent)
                 .accessibilityLabel(Text("Playback position"))
                 HStack {
                     Text(verbatim: MediaTimeFormat.duration(
@@ -265,7 +301,7 @@ struct PlayerSheetView: View {
                 }
             } else {
                 HStack(spacing: DISpacing.sm) {
-                    DIPillBadge(text: "Live", color: DIColor.accent)
+                    MediaLivePill()
                     Text("Live stream — seeking is unavailable")
                         .font(.caption)
                         .foregroundStyle(DIColor.textMuted)
@@ -291,13 +327,16 @@ struct PlayerSheetView: View {
                 audioPlayer.skipBackward(15)
             }
             Button {
+                DIHaptics.soft()
                 audioPlayer.togglePlayPause()
             } label: {
                 Image(systemName: audioPlayer.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                    .font(.system(size: 64))
-                    .foregroundStyle(DIColor.primary)
+                    .font(.system(size: 68))
+                    .foregroundStyle(accent)
+                    .contentTransition(.symbolEffect(.replace))
+                    .diBreathingGlow(color: accent.opacity(0.6), maxRadius: 12)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
             .accessibilityLabel(Text(audioPlayer.isPlaying ? "Pause" : "Play"))
             transportButton(
                 systemImage: "goforward.15",
@@ -356,11 +395,12 @@ struct PlayerSheetView: View {
             } label: {
                 Text(verbatim: audioPlayer.playbackSpeed.label)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(DIColor.primary)
-                    .padding(.horizontal, DISpacing.sm)
+                    .foregroundStyle(accent)
+                    .padding(.horizontal, DISpacing.md)
                     .padding(.vertical, DISpacing.xs)
-                    .background(DIColor.primary.opacity(0.12))
+                    .background(accent.opacity(0.12))
                     .clipShape(Capsule())
+                    .overlay(Capsule().stroke(accent.opacity(0.25), lineWidth: 1))
             }
             .accessibilityLabel(Text("Playback speed, currently \(audioPlayer.playbackSpeed.label)"))
         }
@@ -374,11 +414,12 @@ struct PlayerSheetView: View {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     Button {
+                        DIHaptics.light()
                         viewModel.beginAddBookmark()
                     } label: {
                         Label("Add bookmark at current position", systemImage: "bookmark.fill")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(DIColor.primary)
+                            .foregroundStyle(accent)
                     }
                     .buttonStyle(.plain)
 
@@ -404,7 +445,7 @@ struct PlayerSheetView: View {
                 HStack(spacing: DISpacing.sm) {
                     Text(verbatim: MediaTimeFormat.duration(bookmark.positionSeconds))
                         .font(.subheadline.monospacedDigit().weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(accent)
                     if let note = bookmark.note {
                         Text(note)
                             .font(.subheadline)

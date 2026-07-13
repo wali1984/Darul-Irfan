@@ -86,7 +86,7 @@ struct NotificationSettingsView: View {
                 EmptyView()
             }
         } header: {
-            Text("Permission")
+            SettingsSectionHeader(titleKey: "Permission", systemImage: "checkmark.shield.fill")
         } footer: {
             permissionFooter
         }
@@ -154,7 +154,7 @@ struct NotificationSettingsView: View {
                 .listRowBackground(DIColor.surface)
             }
         } header: {
-            Text("Prayer Alerts")
+            SettingsSectionHeader(titleKey: "Prayer Alerts", systemImage: "bell.badge.fill")
         } footer: {
             Text("Silent shows a banner without sound. Azan Clip plays the opening of the azan with the alert.")
         }
@@ -182,7 +182,7 @@ struct NotificationSettingsView: View {
             }
             .listRowBackground(DIColor.surface)
         } header: {
-            Text("Pre-Prayer Reminder")
+            SettingsSectionHeader(titleKey: "Pre-Prayer Reminder", systemImage: "clock.badge")
         } footer: {
             Text("A gentle heads-up before Fajr, Dhuhr, Asr, Maghrib and Isha.")
         }
@@ -261,7 +261,7 @@ struct NotificationSettingsView: View {
                     .listRowBackground(DIColor.surface)
             }
         } header: {
-            Text("Sound")
+            SettingsSectionHeader(titleKey: "Sound", systemImage: "speaker.wave.2.fill")
         } footer: {
             Text("Alerts play a short azan clip so they stay within the iOS notification sound limit. The full azan can be played here inside the app.")
         }

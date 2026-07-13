@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 // Shared value types and small display helpers for the Library feature.
 // Everything here is UI-support only; domain models live in Models/.
@@ -100,6 +101,90 @@ extension ContentCategory {
         case .announcements: return "megaphone"
         case .featureArticles: return "doc.richtext"
         case .aqwalESheikh: return "quote.bubble"
+        }
+    }
+}
+
+// MARK: - Premium accents & medallions
+
+extension ContentType {
+    /// SF Symbol for this item type, shown inside the item's gradient medallion.
+    var libraryIcon: String {
+        switch self {
+        case .article: return "doc.text"
+        case .book: return "book.closed"
+        case .booklet: return "book"
+        case .magazine: return "magazine"
+        case .document: return "doc.on.doc"
+        case .announcement: return "megaphone"
+        case .pressRelease: return "newspaper"
+        case .poetry: return "text.quote"
+        case .page: return "doc.richtext"
+        }
+    }
+
+    /// Books, booklets, and magazines are the collection's treasures — they take
+    /// the gold treatment so they read as special alongside articles and notices.
+    var isFeaturedPublication: Bool {
+        switch self {
+        case .book, .booklet, .magazine: return true
+        default: return false
+        }
+    }
+
+    /// Accent used for this type's pill badge and card glow.
+    var libraryAccent: Color {
+        isFeaturedPublication ? DIColor.accent : DIColor.primary
+    }
+}
+
+extension ContentCategory {
+    /// Publication-heavy sections (books, booklets, magazine, documents, courses,
+    /// poetry) carry the gold accent so the reading collections feel special;
+    /// teachings and about-pages keep the emerald brand tone.
+    var isPublicationCategory: Bool {
+        switch self {
+        case .books, .booklets, .alMurshidMagazine, .importantDocuments, .trainingCourses, .sufiPoetry:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Accent used for this category's medallion, badge, and card glow.
+    var libraryAccent: Color {
+        isPublicationCategory ? DIColor.accent : DIColor.primary
+    }
+}
+
+/// A gradient-filled circular icon medallion — emerald for standard items,
+/// gilded gold for the collection's featured publications. The living visual
+/// anchor of every Library card.
+struct LibraryMedallion: View {
+    let systemImage: String
+    var isSpecial: Bool = false
+    var diameter: CGFloat = 46
+    /// Slow breathing halo — used on the sparser home cards, off for long lists.
+    var breathing: Bool = false
+
+    var body: some View {
+        let glowColor = (isSpecial ? DIColor.accent : DIColor.primary).opacity(0.55)
+        let core = ZStack {
+            Circle()
+                .fill(isSpecial ? DIGradient.goldSheen : DIGradient.emerald)
+            Image(systemName: systemImage)
+                .font(.system(size: diameter * 0.42, weight: .semibold))
+                .foregroundStyle(isSpecial ? DIColor.primaryDeep : DIColor.onPrimary)
+        }
+        .frame(width: diameter, height: diameter)
+        .accessibilityHidden(true)
+
+        return Group {
+            if breathing {
+                core.diBreathingGlow(color: glowColor, maxRadius: 7)
+            } else {
+                core
+            }
         }
     }
 }

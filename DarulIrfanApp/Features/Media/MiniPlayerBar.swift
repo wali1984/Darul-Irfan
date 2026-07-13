@@ -50,28 +50,41 @@ struct MiniPlayerBar: View {
         }
     }
 
+    /// True when the AlMurshid TV live stream is playing — drives the crimson skin.
+    private var isLiveStream: Bool {
+        audioPlayer.nowPlaying?.id == MediaPlayback.liveStreamID
+    }
+
+    private var accent: Color {
+        isLiveStream ? DIColor.crimson : DIColor.primary
+    }
+
     @ViewBuilder
     private var barContent: some View {
         if let nowPlaying = audioPlayer.nowPlaying {
             VStack(spacing: 0) {
                 progressLine
                 HStack(spacing: DISpacing.sm) {
+                    artwork
                     openPlayerButton(nowPlaying)
                     controlButton(
                         systemImage: "gobackward.15",
                         label: "Back 15 seconds"
                     ) {
+                        DIHaptics.light()
                         audioPlayer.skipBackward(15)
                     }
                     Button {
+                        DIHaptics.soft()
                         audioPlayer.togglePlayPause()
                     } label: {
                         Image(systemName: audioPlayer.isPlaying ? "pause.fill" : "play.fill")
                             .font(.title3)
-                            .foregroundStyle(DIColor.primary)
+                            .foregroundStyle(accent)
                             .frame(width: 36, height: 36)
+                            .contentTransition(.symbolEffect(.replace))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                     .accessibilityLabel(Text(audioPlayer.isPlaying ? "Pause" : "Play"))
                     controlButton(
                         systemImage: "xmark",
@@ -83,15 +96,45 @@ struct MiniPlayerBar: View {
                 .padding(.horizontal, DISpacing.md)
                 .padding(.vertical, DISpacing.sm)
             }
-            .background(DIColor.surface)
+            .background { barBackground }
             .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                    .stroke(DIColor.border, lineWidth: 1)
+                    .stroke(
+                        LinearGradient(
+                            colors: [accent.opacity(0.35), DIColor.border.opacity(0.5)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1
+                    )
             )
-            .shadow(color: Color.black.opacity(0.12), radius: 8, y: 2)
+            .shadow(color: accent.opacity(0.20), radius: 12, y: 4)
             .padding(.horizontal, DISpacing.sm)
         }
+    }
+
+    /// Frosted glass with a faint accent wash, so the bar floats over content.
+    private var barBackground: some View {
+        ZStack {
+            Rectangle().fill(.ultraThinMaterial)
+            LinearGradient(
+                colors: [accent.opacity(0.10), Color.clear],
+                startPoint: .leading, endPoint: .trailing
+            )
+        }
+    }
+
+    /// A small gradient medallion standing in for artwork; crimson when live.
+    private var artwork: some View {
+        ZStack {
+            Circle().fill(isLiveStream ? MediaStyle.crimson : DIGradient.emerald)
+            Image(systemName: isLiveStream ? "dot.radiowaves.left.and.right" : "waveform")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+        }
+        .frame(width: 34, height: 34)
+        .shadow(color: accent.opacity(0.35), radius: 5, y: 2)
+        .accessibilityHidden(true)
     }
 
     private func openPlayerButton(_ nowPlaying: AudioPlayableItem) -> some View {
@@ -104,7 +147,9 @@ struct MiniPlayerBar: View {
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                if let subtitle = nowPlaying.subtitle {
+                if isLiveStream {
+                    MediaLivePill()
+                } else if let subtitle = nowPlaying.subtitle {
                     Text(subtitle)
                         .font(.caption2)
                         .foregroundStyle(DIColor.textMuted)
@@ -139,12 +184,15 @@ struct MiniPlayerBar: View {
     /// the leading edge, so it mirrors correctly under right-to-left layout.
     private var progressLine: some View {
         GeometryReader { proxy in
-            Capsule()
-                .fill(DIColor.accent)
-                .frame(width: max(0, proxy.size.width * progressFraction))
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ZStack(alignment: .leading) {
+                Capsule().fill(DIColor.border.opacity(0.5))
+                Capsule()
+                    .fill(isLiveStream ? MediaStyle.crimson : DIGradient.goldSheen)
+                    .frame(width: max(0, proxy.size.width * progressFraction))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(height: 2)
+        .frame(height: 2.5)
         .accessibilityHidden(true)
     }
 

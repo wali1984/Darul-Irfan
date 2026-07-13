@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Zikr section entry point, linked from the More tab: the verified Method of
-/// Zikr summary, the online zikr schedule with reminders, and the personal
-/// tasbih counters.
+/// Zikr section entry point, linked from the More tab: a living gradient hero
+/// carrying the anchor verse of remembrance, the verified Method of Zikr, the
+/// online zikr schedule as live session panels, and the personal tasbih.
 @MainActor
 struct ZikrHomeView: View {
     @State private var viewModel: ZikrHomeViewModel
@@ -16,19 +16,28 @@ struct ZikrHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
+                ZikrHeroHeader()
+                    .diAppear()
+
                 DISectionHeader(titleKey: "Method of Zikr", systemImage: "heart")
                 MethodOfZikrCard()
+                    .diAppear(delay: 0.05)
 
                 DISectionHeader(titleKey: "Online Zikr", systemImage: "clock")
                 if viewModel.isLoaded && viewModel.sessions.isEmpty {
-                    DIEmptyState(
-                        systemImage: "clock",
-                        titleKey: "Schedule not available",
-                        messageKey: "The online zikr schedule could not be loaded. Current timings are always announced on naqshbandiaowaisiah.org."
-                    )
+                    DIElevatedCard {
+                        DIEmptyState(
+                            systemImage: "clock",
+                            titleKey: "Schedule not available",
+                            messageKey: "The online zikr schedule could not be loaded. Current timings are always announced on naqshbandiaowaisiah.org."
+                        )
+                        .diOctagramWatermark(size: 200, opacity: 0.06)
+                    }
+                    .diAppear(delay: 0.1)
                 } else {
-                    ForEach(viewModel.sessions) { session in
+                    ForEach(Array(viewModel.sessions.enumerated()), id: \.element.id) { index, session in
                         ZikrSessionCard(session: session, viewModel: viewModel)
+                            .diAppear(delay: 0.1 + 0.05 * Double(index))
                     }
                 }
 
@@ -36,29 +45,10 @@ struct ZikrHomeView: View {
                 NavigationLink {
                     TasbihListView(trackerRepository: dependencies.trackerRepository)
                 } label: {
-                    DICard {
-                        HStack(spacing: DISpacing.md) {
-                            Image(systemName: "hand.tap")
-                                .font(.title3)
-                                .foregroundStyle(DIColor.primary)
-                                .accessibilityHidden(true)
-                            VStack(alignment: .leading, spacing: DISpacing.xs) {
-                                Text("Tasbih Counters")
-                                    .font(DIFont.subheading)
-                                    .foregroundStyle(DIColor.textPrimary)
-                                Text("Count your personal zikr and build a gentle daily habit.")
-                                    .font(.subheadline)
-                                    .foregroundStyle(DIColor.textMuted)
-                            }
-                            Spacer(minLength: 0)
-                            Image(systemName: "chevron.forward")
-                                .font(.footnote)
-                                .foregroundStyle(DIColor.textMuted)
-                                .accessibilityHidden(true)
-                        }
-                    }
+                    tasbihEntryCard
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
+                .diAppear(delay: 0.2)
             }
             .padding(DISpacing.md)
         }
@@ -71,6 +61,95 @@ struct ZikrHomeView: View {
             Text("To receive zikr reminders, please allow notifications for Darul Irfan in iOS Settings.")
         }
     }
+
+    // MARK: - Tasbih entry
+
+    private var tasbihEntryCard: some View {
+        DIElevatedCard(tint: DIColor.sandstone) {
+            HStack(spacing: DISpacing.md) {
+                ZStack {
+                    Circle()
+                        .fill(DIGradient.emerald)
+                        .frame(width: 46, height: 46)
+                    Image(systemName: "hand.tap.fill")
+                        .font(.title3)
+                        .foregroundStyle(DIColor.onPrimary)
+                }
+                .diGoldGlow(radius: 8, opacity: 0.3)
+                .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: DISpacing.xs) {
+                    Text("Tasbih Counters")
+                        .font(DIFont.subheading)
+                        .foregroundStyle(DIColor.textPrimary)
+                    Text("Count your personal zikr and build a gentle daily habit.")
+                        .font(.subheadline)
+                        .foregroundStyle(DIColor.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.forward")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .accessibilityHidden(true)
+            }
+        }
+    }
+}
+
+// MARK: - Hero
+
+/// A living gradient header carrying Qur'an 13:28 — the verse of remembrance
+/// that anchors the whole app and this section in particular.
+private struct ZikrHeroHeader: View {
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            DIGradient.hero()
+                .overlay(alignment: .topTrailing) {
+                    DIOctagram(innerRatio: 0.5)
+                        .stroke(Color.white, lineWidth: 1.5)
+                        .frame(width: 260, height: 260)
+                        .opacity(0.06)
+                        .offset(x: 70, y: -70)
+                }
+
+            VStack(alignment: .leading, spacing: DISpacing.md) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Zikr Allah")
+                            .font(DIFont.heading)
+                            .foregroundStyle(.white)
+                        Text("The remembrance of Allah")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.85))
+                    }
+                    Spacer()
+                    DISealEmblem(diameter: 52, glow: true)
+                        .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 16)
+                }
+
+                VStack(alignment: .center, spacing: DISpacing.sm) {
+                    Text(DIBrand.anchorVerseArabic)
+                        .font(DIFont.quranArabic(scale: 0.78))
+                        .foregroundStyle(.white)
+                        .diGoldGlow(radius: 12, opacity: 0.5)
+                        .environment(\.layoutDirection, .rightToLeft)
+                        .multilineTextAlignment(.center)
+                    Text(DIBrand.anchorVerseEnglish)
+                        .font(.footnote)
+                        .foregroundStyle(.white.opacity(0.88))
+                        .multilineTextAlignment(.center)
+                    Text(DIBrand.anchorVerseReference)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(DIColor.goldGlow)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, DISpacing.xs)
+            }
+            .padding(DISpacing.lg)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
+        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
+    }
 }
 
 // MARK: - Method of Zikr
@@ -82,11 +161,19 @@ private struct MethodOfZikrCard: View {
     private let methodOfZikrURL = URL(string: "https://www.naqshbandiaowaisiah.org/method-of-zikr.html")
 
     var body: some View {
-        DICard {
+        DIElevatedCard(tint: DIColor.sandstone) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Zikr-e Khafi Qalbi")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
+                HStack(spacing: DISpacing.sm) {
+                    Image(systemName: "heart.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(DIColor.primary)
+                        .accessibilityHidden(true)
+                    Text("Zikr-e Khafi Qalbi")
+                        .font(DIFont.subheading)
+                        .foregroundStyle(DIColor.textPrimary)
+                }
+                DIJaliDivider(height: 14, opacity: 0.4)
+                    .padding(.vertical, DISpacing.xs)
                 Text("The method of zikr in the Naqshbandia Owaisiah order is Zikr-e Khafi Qalbi, practised with Pas Anfas — \"guarding every breath\".")
                     .font(.body)
                     .foregroundStyle(DIColor.textPrimary)
@@ -105,6 +192,7 @@ private struct MethodOfZikrCard: View {
                     }
                     .font(.subheadline.weight(.semibold))
                     .tint(DIColor.primary)
+                    .padding(.top, DISpacing.xs)
                 }
             }
         }
@@ -119,11 +207,14 @@ private struct ZikrSessionCard: View {
     let viewModel: ZikrHomeViewModel
 
     var body: some View {
-        DICard {
+        DIElevatedCard(glow: DIColor.primary) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text(verbatim: session.title)
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
+                HStack(spacing: DISpacing.sm) {
+                    liveDot
+                    Text(verbatim: session.title)
+                        .font(DIFont.subheading)
+                        .foregroundStyle(DIColor.textPrimary)
+                }
 
                 HStack(spacing: DISpacing.sm) {
                     if ZikrScheduleMath.isDaily(session.weekdays) {
@@ -132,17 +223,29 @@ private struct ZikrSessionCard: View {
                         DIPillBadge(text: ZikrScheduleMath.shortWeekdaySymbols(for: session.weekdays).joined(separator: " · "))
                     }
                     if session.durationMinutes > 0 {
-                        Text("About \(session.durationMinutes) minutes")
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
+                        DIPillBadge(text: String(localized: "About \(session.durationMinutes) minutes"), color: DIColor.accent)
                     }
                 }
 
                 if let next = viewModel.nextOccurrence(forSessionID: session.id) {
-                    Text("Next session: \(next.formatted(date: .abbreviated, time: .shortened))")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
+                    HStack(spacing: DISpacing.sm) {
+                        Image(systemName: "calendar.badge.clock")
+                            .font(.subheadline)
+                            .foregroundStyle(DIColor.primary)
+                            .accessibilityHidden(true)
+                        Text("Next session: \(next.formatted(date: .abbreviated, time: .shortened))")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(DIColor.primary)
+                    }
+                    .padding(.horizontal, DISpacing.sm)
+                    .padding(.vertical, DISpacing.xs)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                            .fill(DIColor.primary.opacity(0.08))
+                    )
                 }
+
                 Text("Announced time: \(ZikrScheduleMath.announcedTimeText(for: session))")
                     .font(.footnote)
                     .foregroundStyle(DIColor.textMuted)
@@ -194,5 +297,13 @@ private struct ZikrSessionCard: View {
                 }
             }
         }
+    }
+
+    private var liveDot: some View {
+        Circle()
+            .fill(DIColor.primary)
+            .frame(width: 9, height: 9)
+            .diBreathingGlow(color: DIColor.primary, maxRadius: 8)
+            .accessibilityHidden(true)
     }
 }

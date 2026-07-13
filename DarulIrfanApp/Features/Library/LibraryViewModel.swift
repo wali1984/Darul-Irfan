@@ -31,6 +31,11 @@ final class LibraryViewModel {
         categoryCounts.values.reduce(0, +)
     }
 
+    /// Number of favorited library items (drives the home hero stat).
+    var favoritesCount: Int {
+        favoritesByContentID.count
+    }
+
     func count(for category: ContentCategory) -> Int {
         categoryCounts[category] ?? 0
     }

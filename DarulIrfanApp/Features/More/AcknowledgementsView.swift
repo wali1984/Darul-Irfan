@@ -1,16 +1,23 @@
 import SwiftUI
 
-/// Open-source, translation, and content attributions.
+/// Open-source, typography, translation, and content attributions.
 @MainActor
 struct AcknowledgementsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: DISpacing.md) {
                 adhanCard
+                    .diAppear()
+                fontsCard
+                    .diAppear(delay: 0.06)
                 translationCard
+                    .diAppear(delay: 0.12)
                 contentCard
+                    .diAppear(delay: 0.18)
                 azanRecordingsCard
+                    .diAppear(delay: 0.24)
                 chimeCard
+                    .diAppear(delay: 0.30)
             }
             .padding(DISpacing.md)
         }
@@ -20,12 +27,9 @@ struct AcknowledgementsView: View {
     }
 
     private var adhanCard: some View {
-        DICard {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("adhan-swift")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                ackHeader("adhan-swift", systemImage: "chevron.left.forwardslash.chevron.right")
 
                 Text("Prayer times are calculated entirely on this device using the open-source adhan-swift library by Batoul Apps, used under the MIT License.")
                     .font(.subheadline)
@@ -48,13 +52,50 @@ struct AcknowledgementsView: View {
         }
     }
 
-    private var translationCard: some View {
-        DICard {
+    private var fontsCard: some View {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Qur'an Translation")
-                    .font(DIFont.subheading)
+                ackHeader("Typography", systemImage: "textformat")
+
+                Text("Qur'an Arabic text is set in Amiri Quran, and Urdu text in Noto Nastaliq Urdu. Both typefaces are bundled and used under the SIL Open Font License 1.1.")
+                    .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+
+                if let url = URL(string: "https://fonts.google.com/specimen/Amiri+Quran") {
+                    Link(destination: url) {
+                        Label {
+                            Text(verbatim: "Amiri Quran · SIL OFL 1.1")
+                        } icon: {
+                            Image(systemName: "character.book.closed")
+                                .accessibilityHidden(true)
+                        }
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.primary)
+                    .accessibilityLabel("View the Amiri Quran font project")
+                }
+
+                if let url = URL(string: "https://fonts.google.com/noto/specimen/Noto+Nastaliq+Urdu") {
+                    Link(destination: url) {
+                        Label {
+                            Text(verbatim: "Noto Nastaliq Urdu · SIL OFL 1.1")
+                        } icon: {
+                            Image(systemName: "character.book.closed")
+                                .accessibilityHidden(true)
+                        }
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.primary)
+                    .accessibilityLabel("View the Noto Nastaliq Urdu font project")
+                }
+            }
+        }
+    }
+
+    private var translationCard: some View {
+        DIElevatedCard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                ackHeader("Qur'an Translation", systemImage: "text.quote")
 
                 Text("The English translation of the Qur'an included in this app is by Muhammad Marmaduke Pickthall (The Meaning of the Glorious Koran, 1930), which is in the public domain.")
                     .font(.subheadline)
@@ -64,12 +105,9 @@ struct AcknowledgementsView: View {
     }
 
     private var contentCard: some View {
-        DICard {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Content & Artwork")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                ackHeader("Content & Artwork", systemImage: "photo.artframe")
 
                 Text("Library articles, lectures, publications, tafsir, and organizational information are provided by naqshbandiaowaisiah.org, which retains all rights to its content. The app icon and visual identity are inspired by and attributed to naqshbandiaowaisiah.org.")
                     .font(.subheadline)
@@ -83,12 +121,9 @@ struct AcknowledgementsView: View {
     }
 
     private var azanRecordingsCard: some View {
-        DICard {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Azan Recordings")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                ackHeader("Azan Recordings", systemImage: "waveform")
 
                 Text("The azan notification clip and the full azan playback use the recording “Beautiful adhan” by Adam-synagda, from Wikimedia Commons, dedicated to the public domain under CC0 1.0.")
                     .font(.subheadline)
@@ -130,17 +165,29 @@ struct AcknowledgementsView: View {
     }
 
     private var chimeCard: some View {
-        DICard {
+        DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Notification Chime")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .accessibilityAddTraits(.isHeader)
+                ackHeader("Notification Chime", systemImage: "bell.badge")
 
                 Text("The short prayer chime is an original recording created for this app, kept as a fallback alert sound.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
             }
         }
+    }
+
+    // MARK: - Shared
+
+    private func ackHeader(_ titleKey: LocalizedStringKey, systemImage: String) -> some View {
+        HStack(spacing: DISpacing.sm) {
+            Image(systemName: systemImage)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(DIColor.accent)
+                .accessibilityHidden(true)
+            Text(titleKey)
+                .font(DIFont.subheading)
+                .foregroundStyle(DIColor.textPrimary)
+        }
+        .accessibilityAddTraits(.isHeader)
     }
 }

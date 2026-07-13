@@ -1,11 +1,13 @@
 import SwiftUI
 import UIKit
 
-/// One informational search hit: domain icon, title, bolded snippet, and —
-/// for library/media/events items with a known website page — a source link.
-/// Rows deliberately have no chevron: in-app navigation into matched items is
-/// wired by the owning feature teams as a follow-up. A context menu offers
-/// "Copy reference" and, when derivable, opening the source page.
+/// One informational search hit rendered as an elevated "live panel": a gilded
+/// domain crest, the title, a highlighted snippet, and — for library/media/events
+/// items with a known website page — a source link. Rows deliberately have no
+/// chevron: in-app navigation into matched items is wired by the owning feature
+/// teams as a follow-up. A press-and-hold context menu offers "Copy reference"
+/// and, when derivable, opening the source page — its lift is the row's press
+/// feedback.
 struct SearchResultRow: View {
     let result: SearchResult
     let sourceURL: URL?
@@ -13,7 +15,7 @@ struct SearchResultRow: View {
     let reference: String
 
     /// Urdu/Arabic content blocks lay out right-to-left; row chrome (the
-    /// domain icon) stays in the surrounding layout direction.
+    /// domain crest) stays in the surrounding layout direction.
     private var isRightToLeftContent: Bool {
         result.language == "ur" || result.language == "ar"
     }
@@ -27,19 +29,21 @@ struct SearchResultRow: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: DISpacing.sm) {
-            domainIcon
-            if isRightToLeftContent {
-                textBlock
-                    .environment(\.layoutDirection, .rightToLeft)
-            } else {
-                textBlock
+        DIElevatedCard(padding: DISpacing.md) {
+            HStack(alignment: .top, spacing: DISpacing.md) {
+                domainCrest
+                if isRightToLeftContent {
+                    textBlock
+                        .environment(\.layoutDirection, .rightToLeft)
+                } else {
+                    textBlock
+                }
             }
         }
-        .padding(.vertical, DISpacing.xs)
         .contextMenu {
             Button {
                 UIPasteboard.general.string = reference
+                DIHaptics.success()
             } label: {
                 Label("Copy reference", systemImage: "doc.on.doc")
             }
@@ -51,14 +55,19 @@ struct SearchResultRow: View {
         }
     }
 
-    private var domainIcon: some View {
+    // A rounded emerald crest for the domain, echoing the seal's medallion.
+    private var domainCrest: some View {
         Image(systemName: result.domain.iconName)
-            .font(.subheadline)
+            .font(.subheadline.weight(.semibold))
             .foregroundStyle(DIColor.primary)
-            .frame(width: 28, height: 28)
+            .frame(width: 34, height: 34)
             .background(
-                DIColor.primary.opacity(0.12),
-                in: RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                    .fill(DIColor.primary.opacity(0.12))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                    .stroke(DIColor.accent.opacity(0.35), lineWidth: 1)
             )
             .accessibilityHidden(true)
     }
@@ -72,7 +81,7 @@ struct SearchResultRow: View {
                 .lineLimit(3)
 
             if let snippet = result.snippet, !snippet.isEmpty {
-                Text(SearchSnippetFormatter.attributedSnippet(from: snippet))
+                Text(highlightedSnippet(from: snippet))
                     .font(snippetFont)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.leading)
@@ -82,12 +91,26 @@ struct SearchResultRow: View {
             if let sourceURL {
                 Link(destination: sourceURL) {
                     Label("View source", systemImage: "arrow.up.right.square")
-                        .font(.caption.weight(.medium))
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(DIColor.primary)
                 }
                 .accessibilityLabel("View source on the Naqshbandia Owaisiah website")
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Keeps the shared snippet parser intact (marker handling preserved) and
+    /// only tints the already-bolded match ranges emerald so hits truly stand
+    /// out against the muted snippet text.
+    private func highlightedSnippet(from snippet: String) -> AttributedString {
+        var attributed = SearchSnippetFormatter.attributedSnippet(from: snippet)
+        let matchRanges = attributed.runs
+            .filter { $0.inlinePresentationIntent?.contains(.stronglyEmphasized) == true }
+            .map { $0.range }
+        for range in matchRanges {
+            attributed[range].foregroundColor = DIColor.primary
+        }
+        return attributed
     }
 }

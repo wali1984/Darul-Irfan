@@ -2,6 +2,10 @@ import SwiftUI
 
 // Individual onboarding pages. The location page lives in its own file
 // (OnboardingLocationStep.swift) because it carries the manual city search.
+//
+// Visual language: the welcome is a reverent full-bleed emerald hero (matching
+// the flagship "Today" screen), then each setup page uses elevated, springy
+// selection cards on the warm cream canvas with staggered entrance motion.
 
 // MARK: - Shared step header
 
@@ -24,56 +28,184 @@ struct OnboardingStepHeader: View {
     }
 }
 
+// MARK: - Shared selection card
+
+/// An elevated, springy selection row: a tinted leading badge, title + subtitle,
+/// and an animated tick. Selected state lifts the card with an emerald→gold edge
+/// and a soft glow. Used by the language and Asr choices so selection feels
+/// consistent and delightful throughout onboarding.
+private struct OnboardingChoiceCard<Leading: View>: View {
+    let isSelected: Bool
+    let title: Text
+    let subtitle: Text
+    @ViewBuilder var leading: () -> Leading
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            DIHaptics.soft()
+            action()
+        } label: {
+            HStack(spacing: DISpacing.md) {
+                leading()
+                VStack(alignment: .leading, spacing: 2) {
+                    title
+                        .font(.headline)
+                        .foregroundStyle(DIColor.textPrimary)
+                    subtitle
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                }
+                Spacer(minLength: 0)
+                selectionTick
+            }
+            .padding(DISpacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                    .fill(DIColor.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                    .stroke(
+                        isSelected
+                            ? AnyShapeStyle(LinearGradient(
+                                colors: [DIColor.primary, DIColor.accent],
+                                startPoint: .topLeading, endPoint: .bottomTrailing))
+                            : AnyShapeStyle(DIColor.border),
+                        lineWidth: isSelected ? 2 : 1
+                    )
+            )
+            .shadow(color: isSelected ? DIColor.primary.opacity(0.20) : Color.black.opacity(0.05),
+                    radius: isSelected ? 12 : 6, x: 0, y: isSelected ? 6 : 3)
+        }
+        .buttonStyle(DIPressableStyle())
+        .animation(.spring(response: 0.35, dampingFraction: 0.7), value: isSelected)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+
+    private var selectionTick: some View {
+        ZStack {
+            Circle()
+                .stroke(DIColor.border, lineWidth: 1.5)
+                .opacity(isSelected ? 0 : 1)
+            Circle()
+                .fill(DIColor.primary)
+                .opacity(isSelected ? 1 : 0)
+            Image(systemName: "checkmark")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(DIColor.onPrimary)
+                .opacity(isSelected ? 1 : 0)
+                .scaleEffect(isSelected ? 1 : 0.4)
+        }
+        .frame(width: 26, height: 26)
+        .accessibilityHidden(true)
+    }
+}
+
+/// A small rounded, tinted tile that holds a glyph on the leading edge of a card.
+private struct OnboardingBadge<Glyph: View>: View {
+    var tint: Color = DIColor.primary
+    @ViewBuilder var glyph: () -> Glyph
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                .fill(tint.opacity(0.12))
+            glyph()
+        }
+        .frame(width: 46, height: 46)
+        .accessibilityHidden(true)
+    }
+}
+
 // MARK: - 1. Welcome
 
+/// The first moment: a full-bleed emerald hero (the flow supplies the living
+/// gradient background) carrying the glowing seal, the wordmark, the tagline,
+/// and the app's anchoring verse. Everything springs gently into place.
 struct OnboardingWelcomeStep: View {
     var body: some View {
         VStack(spacing: DISpacing.lg) {
-            hero
+            seal
+                .diAppear(delay: 0.05)
 
-            Text("Accurate prayer times and gentle azan reminders, the Holy Quran with translation and tafsir, lectures and books from the Naqshbandia Owaisiah library, and guidance for daily zikr — together in one calm companion.")
-                .font(.body)
-                .foregroundStyle(DIColor.textPrimary)
+            VStack(spacing: DISpacing.xs) {
+                Text(DIBrand.wordmark)
+                    .font(.system(.largeTitle, design: .serif).weight(.semibold))
+                    .foregroundStyle(DIColor.onPrimary)
+                    .tracking(1.5)
+                    .accessibilityAddTraits(.isHeader)
+
+                Text(verbatim: "دارالعرفان")
+                    .font(DIFont.urduBody(scale: 1.15))
+                    .foregroundStyle(DIColor.accent)
+                    .environment(\.layoutDirection, .rightToLeft)
+
+                Text(DIBrand.tagline)
+                    .font(.callout.italic())
+                    .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                    .multilineTextAlignment(.center)
+            }
+            .diAppear(delay: 0.15)
+
+            DIJaliDivider(tint: DIColor.accent, opacity: 0.55)
+                .padding(.horizontal, DISpacing.xl)
+                .diAppear(delay: 0.25)
+
+            anchorVerse
+                .diAppear(delay: 0.35)
+
+            Text("Accurate prayer times, the Holy Quran with translation and tafsir, lectures and books from the Naqshbandia Owaisiah library, and guidance for daily zikr — together in one calm companion.")
+                .font(.subheadline)
+                .foregroundStyle(DIColor.onPrimary.opacity(0.82))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, DISpacing.sm)
-        }
-        .padding(.top, DISpacing.md)
-    }
-
-    private var hero: some View {
-        VStack(spacing: DISpacing.md) {
-            ZStack {
-                Circle()
-                    .stroke(DIColor.accent.opacity(0.45), lineWidth: 1.5)
-                    .frame(width: 124, height: 124)
-                Circle()
-                    .fill(DIColor.onPrimary.opacity(0.06))
-                    .frame(width: 106, height: 106)
-                Image(systemName: "moon.stars.fill")
-                    .font(.system(size: 46, weight: .light))
-                    .foregroundStyle(DIColor.accent)
-            }
-            .accessibilityHidden(true)
-
-            Text("Darul Irfan")
-                .font(.system(.largeTitle, design: .serif).weight(.semibold))
-                .foregroundStyle(DIColor.onPrimary)
-                .accessibilityAddTraits(.isHeader)
-
-            Text(verbatim: "دارالعرفان")
-                .font(DIFont.urduBody(scale: 1.1))
-                .foregroundStyle(DIColor.accent)
-                .environment(\.layoutDirection, .rightToLeft)
-
-            Text("Light of Sacred Knowledge")
-                .font(.callout.italic())
-                .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                .diAppear(delay: 0.45)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, DISpacing.xl)
-        .padding(.horizontal, DISpacing.lg)
-        .background(DIColor.primaryDeep)
-        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
+        .padding(.top, DISpacing.xl)
+        .padding(.bottom, DISpacing.md)
+    }
+
+    private var seal: some View {
+        ZStack {
+            // A soft gold halo that fades fully to clear at its edge.
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [DIColor.goldGlow.opacity(0.32), Color.clear],
+                        center: .center, startRadius: 0, endRadius: 130
+                    )
+                )
+                .frame(width: 260, height: 260)
+                .blur(radius: 4)
+            DISealEmblem(diameter: 132, glow: true)
+                .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 28)
+        }
+        .frame(height: 224)
+    }
+
+    private var anchorVerse: some View {
+        VStack(spacing: DISpacing.sm) {
+            Text(DIBrand.anchorVerseArabic)
+                .font(DIFont.quranArabic(scale: 0.85))
+                .foregroundStyle(DIColor.onPrimary)
+                .diGoldGlow(radius: 14, opacity: 0.55)
+                .environment(\.layoutDirection, .rightToLeft)
+                .multilineTextAlignment(.center)
+
+            Text(DIBrand.anchorVerseEnglish)
+                .font(.callout.italic())
+                .foregroundStyle(DIColor.onPrimary.opacity(0.9))
+                .multilineTextAlignment(.center)
+
+            Text(DIBrand.anchorVerseReference)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIColor.accent)
+                .tracking(0.5)
+        }
+        .padding(.horizontal, DISpacing.sm)
     }
 }
 
@@ -88,44 +220,41 @@ struct OnboardingLanguageStep: View {
                 titleKey: "Choose Your Language",
                 subtitleKey: "You can change this anytime in Settings."
             )
+            .diAppear()
 
-            ForEach(AppLanguage.allCases) { language in
-                languageCard(language)
+            VStack(spacing: DISpacing.sm) {
+                ForEach(Array(AppLanguage.allCases.enumerated()), id: \.element.id) { index, language in
+                    OnboardingChoiceCard(
+                        isSelected: viewModel.selectedLanguage == language,
+                        title: Text(LocalizedStringKey(language.displayName)),
+                        subtitle: subtitle(for: language),
+                        leading: { languageBadge(language) },
+                        action: { Task { await viewModel.selectLanguage(language) } }
+                    )
+                    .diAppear(delay: 0.08 * Double(index + 1))
+                }
             }
         }
     }
 
-    private func languageCard(_ language: AppLanguage) -> some View {
-        let isSelected = viewModel.selectedLanguage == language
-        return Button {
-            Task { await viewModel.selectLanguage(language) }
-        } label: {
-            HStack(spacing: DISpacing.md) {
-                VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text(LocalizedStringKey(language.displayName))
-                        .font(.headline)
-                        .foregroundStyle(DIColor.textPrimary)
-                    subtitle(for: language)
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
-                }
-                Spacer(minLength: 0)
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+    @ViewBuilder
+    private func languageBadge(_ language: AppLanguage) -> some View {
+        OnboardingBadge {
+            switch language {
+            case .system:
+                Image(systemName: "gearshape.fill")
                     .font(.title3)
-                    .foregroundStyle(isSelected ? DIColor.primary : DIColor.border)
-                    .accessibilityHidden(true)
+                    .foregroundStyle(DIColor.primary)
+            case .english:
+                Text(verbatim: "A")
+                    .font(.system(.title3, design: .serif).weight(.bold))
+                    .foregroundStyle(DIColor.primary)
+            case .urdu:
+                Text(verbatim: "اُ")
+                    .font(DIFont.urduBody(scale: 1.05))
+                    .foregroundStyle(DIColor.primary)
             }
-            .padding(DISpacing.md)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(DIColor.surface)
-            .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                    .stroke(isSelected ? DIColor.primary : DIColor.border, lineWidth: isSelected ? 1.5 : 1)
-            )
         }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     private func subtitle(for language: AppLanguage) -> Text {
@@ -153,42 +282,68 @@ struct OnboardingCalculationStep: View {
                 titleKey: "Prayer Time Calculation",
                 subtitleKey: "These defaults suit most people. You can fine-tune angles and minute offsets later in Settings."
             )
+            .diAppear()
 
-            DICard {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
+            methodCard
+                .diAppear(delay: 0.1)
+
+            asrSection
+                .diAppear(delay: 0.2)
+        }
+    }
+
+    private var methodCard: some View {
+        DIElevatedCard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Label {
                     Text("Calculation Method")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.textPrimary)
-                    Picker("Calculation Method", selection: $viewModel.selectedMethod) {
-                        ForEach(Self.methodChoices) { method in
-                            Text(LocalizedStringKey(method.englishName)).tag(method)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .tint(DIColor.primary)
-                    Text(methodExplanationKey)
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
+                } icon: {
+                    Image(systemName: "globe.asia.australia.fill")
+                        .foregroundStyle(DIColor.accent)
                 }
+                Picker("Calculation Method", selection: $viewModel.selectedMethod) {
+                    ForEach(Self.methodChoices) { method in
+                        Text(LocalizedStringKey(method.englishName)).tag(method)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(DIColor.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                Text(methodExplanationKey)
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.selectedMethod)
             }
+        }
+    }
 
-            DICard {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    Text("Asr Method")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DIColor.textPrimary)
-                    Picker("Asr Method", selection: $viewModel.selectedAsrMethod) {
-                        // Hanafi first: it is the preselected default.
-                        ForEach([AsrMethodChoice.hanafi, AsrMethodChoice.shafi]) { method in
-                            Text(LocalizedStringKey(method.englishName)).tag(method)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    Text(asrExplanationKey)
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
-                }
+    private var asrSection: some View {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            Text("Asr Method")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(DIColor.textPrimary)
+                .padding(.horizontal, DISpacing.xs)
+
+            // Hanafi first: it is the preselected default.
+            ForEach([AsrMethodChoice.hanafi, AsrMethodChoice.shafi]) { method in
+                OnboardingChoiceCard(
+                    isSelected: viewModel.selectedAsrMethod == method,
+                    title: Text(LocalizedStringKey(method.englishName)),
+                    subtitle: asrExplanation(for: method),
+                    leading: { asrBadge(method) },
+                    action: { viewModel.selectedAsrMethod = method }
+                )
             }
+        }
+    }
+
+    private func asrBadge(_ method: AsrMethodChoice) -> some View {
+        OnboardingBadge(tint: DIColor.accent) {
+            Image(systemName: method == .hanafi ? "sun.min.fill" : "sun.max.fill")
+                .font(.title3)
+                .foregroundStyle(DIColor.accent)
         }
     }
 
@@ -210,10 +365,10 @@ struct OnboardingCalculationStep: View {
         }
     }
 
-    private var asrExplanationKey: LocalizedStringKey {
-        switch viewModel.selectedAsrMethod {
-        case .hanafi: return "Asr begins when a shadow reaches twice an object's length."
-        case .shafi: return "Asr begins when a shadow equals an object's length."
+    private func asrExplanation(for method: AsrMethodChoice) -> Text {
+        switch method {
+        case .hanafi: return Text("Asr begins when a shadow reaches twice an object's length.")
+        case .shafi: return Text("Asr begins when a shadow equals an object's length.")
         }
     }
 }
@@ -229,60 +384,86 @@ struct OnboardingNotificationsStep: View {
                 titleKey: "Prayer Alerts",
                 subtitleKey: "A gentle azan at each prayer time, only if you'd like."
             )
+            .diAppear()
 
-            DICard {
-                VStack(alignment: .leading, spacing: DISpacing.md) {
-                    HStack(alignment: .top, spacing: DISpacing.md) {
-                        Image(systemName: "bell.badge")
-                            .font(.title2)
-                            .foregroundStyle(DIColor.accent)
-                            .accessibilityHidden(true)
-                        Text("Darul Irfan can play a short, gentle azan clip when each prayer time arrives.")
-                            .font(.body)
-                            .foregroundStyle(DIColor.textPrimary)
-                    }
-                    Text("By default, Fajr, Dhuhr, Asr, Maghrib, and Isha each use the azan clip, and sunrise stays silent. You can adjust every prayer's alert in Settings.")
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
-                }
-            }
+            illustrationCard
+                .diAppear(delay: 0.1)
 
-            switch viewModel.notificationPhase {
-            case .idle, .requesting:
-                Button {
-                    Task { await viewModel.requestNotificationPermission() }
-                } label: {
-                    if viewModel.notificationPhase == .requesting {
-                        ProgressView()
-                            .tint(DIColor.primary)
-                    } else {
-                        Label("Enable Prayer Alerts", systemImage: "bell")
-                    }
-                }
-                .buttonStyle(DISecondaryButtonStyle())
-                .disabled(viewModel.notificationPhase == .requesting)
-
-            case .granted:
-                statusRow(
-                    systemImage: "checkmark.circle.fill",
-                    tint: DIColor.primary,
-                    messageKey: "Prayer alerts are on. You'll be reminded gently at each prayer time."
-                )
-
-            case .denied:
-                statusRow(
-                    systemImage: "bell.slash",
-                    tint: DIColor.textMuted,
-                    messageKey: "Notifications are off for now. Prayer times will always be available in the app, and you can enable alerts later in the iPhone Settings app."
-                )
-            }
+            actionArea
+                .diAppear(delay: 0.2)
         }
     }
 
-    private func statusRow(systemImage: String, tint: Color, messageKey: LocalizedStringKey) -> some View {
-        DICard {
+    private var illustrationCard: some View {
+        DIElevatedCard {
+            VStack(spacing: DISpacing.md) {
+                ZStack {
+                    Circle()
+                        .fill(DIColor.accent.opacity(0.14))
+                        .frame(width: 84, height: 84)
+                    Image(systemName: "bell.badge.fill")
+                        .font(.system(size: 34, weight: .regular))
+                        .foregroundStyle(DIColor.primary)
+                        .symbolRenderingMode(.hierarchical)
+                }
+                .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 14)
+                .accessibilityHidden(true)
+
+                Text("Darul Irfan can play a short, gentle azan clip when each prayer time arrives.")
+                    .font(.body)
+                    .foregroundStyle(DIColor.textPrimary)
+                    .multilineTextAlignment(.center)
+
+                Text("By default, Fajr, Dhuhr, Asr, Maghrib, and Isha each use the azan clip, and sunrise stays silent. You can adjust every prayer's alert in Settings.")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    @ViewBuilder
+    private var actionArea: some View {
+        switch viewModel.notificationPhase {
+        case .idle, .requesting:
+            Button {
+                DIHaptics.soft()
+                Task { await viewModel.requestNotificationPermission() }
+            } label: {
+                if viewModel.notificationPhase == .requesting {
+                    ProgressView()
+                        .tint(DIColor.primary)
+                } else {
+                    Label("Enable Prayer Alerts", systemImage: "bell")
+                }
+            }
+            .buttonStyle(DISecondaryButtonStyle())
+            .disabled(viewModel.notificationPhase == .requesting)
+
+        case .granted:
+            statusRow(
+                systemImage: "checkmark.circle.fill",
+                tint: DIColor.primary,
+                glow: true,
+                messageKey: "Prayer alerts are on. You'll be reminded gently at each prayer time."
+            )
+
+        case .denied:
+            statusRow(
+                systemImage: "bell.slash",
+                tint: DIColor.textMuted,
+                glow: false,
+                messageKey: "Notifications are off for now. Prayer times will always be available in the app, and you can enable alerts later in the iPhone Settings app."
+            )
+        }
+    }
+
+    private func statusRow(systemImage: String, tint: Color, glow: Bool, messageKey: LocalizedStringKey) -> some View {
+        DIElevatedCard(glow: glow ? DIColor.primary : nil) {
             HStack(alignment: .top, spacing: DISpacing.sm) {
                 Image(systemName: systemImage)
+                    .font(.title3)
                     .foregroundStyle(tint)
                     .accessibilityHidden(true)
                 Text(messageKey)
@@ -300,12 +481,10 @@ struct OnboardingFinishStep: View {
 
     var body: some View {
         VStack(spacing: DISpacing.lg) {
-            VStack(spacing: DISpacing.md) {
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 52, weight: .light))
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityHidden(true)
-                    .padding(.top, DISpacing.lg)
+            crest
+                .diAppear(delay: 0.05)
+
+            VStack(spacing: DISpacing.sm) {
                 Text("You're All Set")
                     .font(DIFont.heading)
                     .foregroundStyle(DIColor.textPrimary)
@@ -316,27 +495,55 @@ struct OnboardingFinishStep: View {
                     .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity)
+            .diAppear(delay: 0.15)
 
-            DICard {
-                VStack(spacing: DISpacing.sm) {
-                    summaryRow(systemImage: "mappin.and.ellipse", titleKey: "Location", value: locationValue)
-                    Divider()
-                    summaryRow(
-                        systemImage: "sun.and.horizon",
-                        titleKey: "Calculation",
-                        value: Text(LocalizedStringKey(viewModel.savedMethod.englishName))
+            summaryCard
+                .diAppear(delay: 0.25)
+        }
+    }
+
+    private var crest: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [DIColor.goldGlow.opacity(0.30), Color.clear],
+                        center: .center, startRadius: 0, endRadius: 110
                     )
-                    Divider()
-                    summaryRow(
-                        systemImage: "clock",
-                        titleKey: "Asr Method",
-                        value: Text(LocalizedStringKey(viewModel.savedAsrMethod.englishName))
-                    )
-                    Divider()
-                    summaryRow(systemImage: "bell", titleKey: "Alerts", value: alertsValue)
-                }
+                )
+                .frame(width: 220, height: 220)
+                .blur(radius: 4)
+            DISealEmblem(diameter: 108, glow: true)
+                .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 24)
+        }
+        .frame(height: 200)
+        .padding(.top, DISpacing.md)
+    }
+
+    private var summaryCard: some View {
+        DIElevatedCard {
+            VStack(spacing: DISpacing.sm) {
+                summaryRow(systemImage: "mappin.and.ellipse", titleKey: "Location", value: locationValue)
+                rowDivider
+                summaryRow(
+                    systemImage: "sun.and.horizon",
+                    titleKey: "Calculation",
+                    value: Text(LocalizedStringKey(viewModel.savedMethod.englishName))
+                )
+                rowDivider
+                summaryRow(
+                    systemImage: "clock",
+                    titleKey: "Asr Method",
+                    value: Text(LocalizedStringKey(viewModel.savedAsrMethod.englishName))
+                )
+                rowDivider
+                summaryRow(systemImage: "bell", titleKey: "Alerts", value: alertsValue)
             }
         }
+    }
+
+    private var rowDivider: some View {
+        Divider().overlay(DIColor.border)
     }
 
     private var locationValue: Text {

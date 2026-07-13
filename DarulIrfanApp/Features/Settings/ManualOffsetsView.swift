@@ -16,6 +16,8 @@ struct ManualOffsetsView: View {
                     offsetRow(for: prayer)
                         .listRowBackground(DIColor.surface)
                 }
+            } header: {
+                SettingsSectionHeader(titleKey: "Per-Prayer Offsets", systemImage: "slider.horizontal.3")
             } footer: {
                 Text("Offsets shift each calculated time by up to 30 minutes either way. Notifications and widgets update automatically.")
             }

@@ -90,7 +90,8 @@ struct ContentItemDetailView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: DISpacing.md) {
-                        metadataCard(for: item)
+                        detailHeader(for: item)
+                            .diAppear(delay: 0.03)
                         if viewModel.showsBody {
                             readerCard(for: item)
                         } else {
@@ -140,55 +141,99 @@ struct ContentItemDetailView: View {
         proxy.scrollTo("library-paragraph-\(index)", anchor: .top)
     }
 
-    // MARK: - Metadata
+    // MARK: - Gradient header
 
-    private func metadataCard(for item: ContentItem) -> some View {
-        DICard {
+    private func detailHeader(for item: ContentItem) -> some View {
+        ZStack(alignment: .topLeading) {
+            DIGradient.hero()
+            DIOctagram(innerRatio: 0.5)
+                .stroke(Color.white, lineWidth: 1.5)
+                .frame(width: 220, height: 220)
+                .opacity(0.06)
+                .offset(x: 96, y: -56)
+
             VStack(alignment: .leading, spacing: DISpacing.sm) {
+                HStack(spacing: DISpacing.sm) {
+                    ZStack {
+                        Circle().fill(Color.white.opacity(0.16))
+                        Image(systemName: item.type.libraryIcon)
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 44, height: 44)
+                    .accessibilityHidden(true)
+                    Text(LocalizedStringKey(item.category.englishName))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .multilineTextAlignment(.leading)
+                    Spacer(minLength: 0)
+                }
+
                 Text(verbatim: item.title)
                     .font(DIFont.heading)
-                    .foregroundStyle(DIColor.textPrimary)
+                    .foregroundStyle(.white)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+
                 if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
                     Text(verbatim: titleUrdu)
                         .font(DIFont.urduBody())
-                        .foregroundStyle(DIColor.textPrimary)
+                        .foregroundStyle(.white)
+                        .diGoldGlow(radius: 8, opacity: 0.35)
                         .multilineTextAlignment(.trailing)
                         .frame(maxWidth: .infinity, alignment: .trailing)
+                        .environment(\.layoutDirection, .rightToLeft)
                 }
+
                 HStack(spacing: DISpacing.sm) {
-                    DIPillBadge(text: item.type.libraryDisplayName)
-                    DIPillBadge(text: LibraryLanguage.displayName(forCode: item.language), color: DIColor.accent)
+                    headerBadge(item.type.libraryDisplayName, systemImage: item.type.isFeaturedPublication ? "star.fill" : nil)
+                    headerBadge(LibraryLanguage.displayName(forCode: item.language), systemImage: "character.book.closed")
+                    Spacer(minLength: 0)
                 }
+                .padding(.top, DISpacing.xs)
+
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     if let author = item.author, !author.isEmpty {
-                        metadataRow(systemImage: "person", text: Text(verbatim: author))
+                        headerMetaRow(systemImage: "person", text: Text(verbatim: author))
                     }
-                    metadataRow(
-                        systemImage: "books.vertical",
-                        text: Text(LocalizedStringKey(item.category.englishName))
-                    )
                     if let publishedAt = item.publishedAt {
-                        metadataRow(
+                        headerMetaRow(
                             systemImage: "calendar",
                             text: Text("Published \(publishedAt, format: .dateTime.day().month().year())")
                         )
                     }
                 }
+                .padding(.top, DISpacing.xs)
             }
+            .padding(DISpacing.lg)
         }
+        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
+        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 16, x: 0, y: 8)
     }
 
-    private func metadataRow(systemImage: String, text: Text) -> some View {
+    private func headerBadge(_ text: String, systemImage: String?) -> some View {
+        HStack(spacing: DISpacing.xs) {
+            if let systemImage {
+                Image(systemName: systemImage).font(.caption2)
+            }
+            Text(text).font(.caption.weight(.semibold))
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, DISpacing.sm)
+        .padding(.vertical, 5)
+        .background(Capsule().fill(Color.white.opacity(0.18)))
+    }
+
+    private func headerMetaRow(systemImage: String, text: Text) -> some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.footnote)
-                .foregroundStyle(DIColor.textMuted)
-                .frame(width: 18)
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.75))
+                .frame(width: 16)
                 .accessibilityHidden(true)
             text
-                .font(.subheadline)
-                .foregroundStyle(DIColor.textMuted)
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.9))
                 .multilineTextAlignment(.leading)
         }
     }
@@ -246,16 +291,21 @@ struct ContentItemDetailView: View {
     }
 
     private func officialSiteCard(for item: ContentItem) -> some View {
-        DICard {
+        DIElevatedCard(glow: DIColor.primary) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Label("Available on the official website", systemImage: "globe")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
+                HStack(spacing: DISpacing.md) {
+                    LibraryMedallion(systemImage: "globe", diameter: 40, breathing: true)
+                    Text("Available on the official website")
+                        .font(DIFont.subheading)
+                        .foregroundStyle(DIColor.textPrimary)
+                        .multilineTextAlignment(.leading)
+                }
                 Text("The full text of this item is available on the official Naqshbandia Owaisiah website.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                 if viewModel.sourceURL != nil {
                     Button {
+                        DIHaptics.light()
                         isShowingSource = true
                     } label: {
                         Text("Read on naqshbandiaowaisiah.org")
@@ -294,6 +344,7 @@ struct ContentItemDetailView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 if viewModel.sourceURL != nil {
                     Button {
+                        DIHaptics.light()
                         isShowingSource = true
                     } label: {
                         Label("View source on naqshbandiaowaisiah.org", systemImage: "safari")
