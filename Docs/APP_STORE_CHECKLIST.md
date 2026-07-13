@@ -94,7 +94,9 @@ before archiving.
       substantial portions of the software.
 - [ ] **Pickthall translation** — *The Meaning of the Glorious Koran* (1930),
       public domain; noted in Acknowledgements. No action needed.
-- [ ] **Quran Arabic text** — public domain; bundled for 6 surahs. When
+- [x] **Quran Arabic text** — complete Quran (all 114 surahs / 6,236 ayat)
+      bundled, triple-verified error-free (Docs/QURAN_VERIFICATION.md). Tanzil
+      Uthmani, public domain. When
       expanding to the full text, record the exact source edition here.
 - [ ] **prayer-chime.wav** — original work created for this app (no rights
       issues); noted in Acknowledgements.
