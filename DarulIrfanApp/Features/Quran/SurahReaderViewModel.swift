@@ -21,8 +21,10 @@ final class SurahReaderViewModel {
 
     private(set) var phase: LoadPhase = .loading
     private(set) var ayahs: [QuranAyah] = []
-    /// The first translation edition readable offline, when one exists.
+    /// The chosen translation edition readable offline, when one exists.
     private(set) var translationEdition: QuranEdition?
+    /// All offline translation editions the reader can switch between.
+    private(set) var availableTranslationEditions: [QuranEdition] = []
     /// Stored tafsir entries for this surah across all tafsir editions.
     private(set) var tafsirEntries: [QuranTafsir] = []
     /// Tafsir editions with no stored text for this surah but a website link
@@ -34,6 +36,9 @@ final class SurahReaderViewModel {
     var showTafsir = false
 
     private let repository: any QuranRepositoryProtocol
+    /// Preferred translation language ("en"/"ur"); the reader defaults to the
+    /// matching offline edition when one exists.
+    private let preferredLanguageCode: String
 
     @ObservationIgnored private var translationsByAyah: [Int: QuranTranslation] = [:]
     @ObservationIgnored private var editionsByID: [String: QuranEdition] = [:]
@@ -44,9 +49,10 @@ final class SurahReaderViewModel {
     @ObservationIgnored private var visibleAyahNumber: Int?
     @ObservationIgnored private var lastPersistedAyahNumber: Int?
 
-    init(surah: QuranSurah, repository: any QuranRepositoryProtocol) {
+    init(surah: QuranSurah, repository: any QuranRepositoryProtocol, preferredLanguageCode: String = "en") {
         self.surah = surah
         self.repository = repository
+        self.preferredLanguageCode = preferredLanguageCode
     }
 
     // MARK: - Loading
@@ -67,13 +73,12 @@ final class SurahReaderViewModel {
                 uniquingKeysWith: { first, _ in first }
             )
 
-            if let edition = allEditions.first(where: { $0.kind == .translation && $0.isAvailableOffline }) {
-                translationEdition = edition
-                let rows = (try? await repository.translations(editionID: edition.id, surahNumber: surah.id)) ?? []
-                translationsByAyah = Dictionary(
-                    rows.map { ($0.ayahNumber, $0) },
-                    uniquingKeysWith: { first, _ in first }
-                )
+            availableTranslationEditions = allEditions.filter { $0.kind == .translation && $0.isAvailableOffline }
+            // Prefer the edition matching the user's language, else the first.
+            let preferred = availableTranslationEditions.first(where: { $0.language == preferredLanguageCode })
+                ?? availableTranslationEditions.first
+            if let preferred {
+                await loadTranslations(edition: preferred)
             }
 
             var entries: [QuranTafsir] = []
@@ -96,6 +101,23 @@ final class SurahReaderViewModel {
         } catch {
             phase = .failed
         }
+    }
+
+    /// Loads (or switches to) a translation edition's rows for this surah.
+    private func loadTranslations(edition: QuranEdition) async {
+        translationEdition = edition
+        let rows = (try? await repository.translations(editionID: edition.id, surahNumber: surah.id)) ?? []
+        translationsByAyah = Dictionary(
+            rows.map { ($0.ayahNumber, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+    }
+
+    /// Switches the visible translation to another offline edition.
+    func selectEdition(_ id: String) async {
+        guard let edition = availableTranslationEditions.first(where: { $0.id == id }),
+              edition.id != translationEdition?.id else { return }
+        await loadTranslations(edition: edition)
     }
 
     // MARK: - Per-ayah lookups

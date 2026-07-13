@@ -14,9 +14,11 @@ struct SurahReaderView: View {
     init(surah: QuranSurah, focusAyah: Int?, dependencies: AppDependencies, appState: AppState) {
         self.appState = appState
         self.focusAyah = focusAyah
+        let langCode = appState.settings.language.forcedLocaleIdentifier ?? "en"
         _viewModel = State(initialValue: SurahReaderViewModel(
             surah: surah,
-            repository: dependencies.quranRepository
+            repository: dependencies.quranRepository,
+            preferredLanguageCode: langCode
         ))
     }
 
@@ -198,6 +200,13 @@ struct SurahReaderView: View {
             if viewModel.translationEdition != nil {
                 Toggle("Show translation", isOn: showTranslationBinding)
             }
+            if viewModel.availableTranslationEditions.count > 1 {
+                Picker("Translation", selection: editionBinding) {
+                    ForEach(viewModel.availableTranslationEditions) { edition in
+                        Text(edition.title).tag(edition.id)
+                    }
+                }
+            }
             if viewModel.hasAnyTafsir {
                 Toggle("Show tafsir", isOn: showTafsirBinding)
             }
@@ -213,6 +222,13 @@ struct SurahReaderView: View {
             set: { newValue in
                 Task { await appState.updateSettings { $0.readerFontScale = newValue } }
             }
+        )
+    }
+
+    private var editionBinding: Binding<String> {
+        Binding(
+            get: { viewModel.translationEdition?.id ?? "" },
+            set: { newID in Task { await viewModel.selectEdition(newID) } }
         )
     }
 
