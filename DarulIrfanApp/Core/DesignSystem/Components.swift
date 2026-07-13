@@ -20,6 +20,8 @@ struct DICard<Content: View>: View {
                 RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
                     .stroke(DIColor.border, lineWidth: 1)
             )
+            // Subtle depth so cards read as surfaces, not flat blocks.
+            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
     }
 }
 

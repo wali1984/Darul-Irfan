@@ -20,16 +20,26 @@ struct PrayerTabView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.md) {
-                    // Daily spiritual companion — the landing surface, above the
-                    // prayer dashboard. Works offline and regardless of location.
+                    // Living hero — time-of-day gradient, glowing seal, animated
+                    // next-prayer countdown ring, dates, and the anchor verse.
+                    TodayHeroView(
+                        placeName: appState.activePlace?.name,
+                        gregorian: viewModel.gregorianDateText,
+                        hijri: viewModel.hijriDateText,
+                        nextPrayerName: viewModel.nextPrayer.map {
+                            String(localized: String.LocalizationValue($0.prayer.englishName))
+                        },
+                        nextPrayerTime: viewModel.nextPrayer?.time,
+                        dayTimes: viewModel.todaySchedule?.orderedTimes.map { $0.time } ?? []
+                    )
+                    .diAppear()
+                    // Daily spiritual companion cards, below the hero.
                     TodayDailySection(appState: appState)
                     DISectionHeader(titleKey: "Prayer Times", systemImage: "sun.max")
                     if !viewModel.hasLoaded {
                         loadingView
-                    } else if let place = appState.activePlace {
-                        header(place: place)
+                    } else if appState.activePlace != nil {
                         if let schedule = viewModel.todaySchedule {
-                            heroCard
                             DISectionHeader(titleKey: "Today's Times", systemImage: "clock")
                             timesCard(schedule: schedule)
                             if viewModel.isRamadan {
@@ -89,71 +99,6 @@ struct PrayerTabView: View {
             Spacer()
         }
         .padding(.top, DISpacing.xl)
-    }
-
-    // MARK: - Header
-
-    private func header(place: PlaceCoordinate) -> some View {
-        VStack(alignment: .leading, spacing: DISpacing.xs) {
-            HStack(spacing: DISpacing.xs) {
-                Image(systemName: "location.fill")
-                    .font(.caption)
-                    .foregroundStyle(DIColor.accent)
-                    .accessibilityHidden(true)
-                Text(place.name)
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-            }
-            Text(viewModel.gregorianDateText)
-                .font(.subheadline)
-                .foregroundStyle(DIColor.textMuted)
-            Text(viewModel.hijriDateText)
-                .font(.subheadline)
-                .foregroundStyle(DIColor.primary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
-    }
-
-    // MARK: - Hero
-
-    private var heroCard: some View {
-        DICard(padding: DISpacing.lg) {
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack {
-                    Text("Next Prayer")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(DIColor.textMuted)
-                        .textCase(.uppercase)
-                    Spacer()
-                    if let current = viewModel.currentPrayer {
-                        DIPillBadge(
-                            text: String(localized: "Now: \(current.englishName)"),
-                            color: DIColor.accent
-                        )
-                    }
-                }
-                if let next = viewModel.nextPrayer {
-                    Text(LocalizedStringKey(next.prayer.englishName))
-                        .font(DIFont.heading)
-                        .foregroundStyle(DIColor.textPrimary)
-                    Text(viewModel.timeText(next.time))
-                        .font(.title3.weight(.medium).monospacedDigit())
-                        .foregroundStyle(DIColor.textPrimary)
-                    Text(next.time, style: .timer)
-                        .font(DIFont.countdown)
-                        .foregroundStyle(DIColor.primary)
-                    Text("remaining")
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
-                } else {
-                    Text("Today's times are complete. Tomorrow's schedule will appear after midnight.")
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
-                }
-            }
-        }
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Today's times

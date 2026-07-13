@@ -17,55 +17,18 @@ struct TodayDailySection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
-            brandHero
             if viewModel.isLoaded {
-                verseCard
-                aqwalCard
-                duaCard
-                dhikrCard
-                nameCard
+                verseCard.diAppear(delay: 0.05)
+                aqwalCard.diAppear(delay: 0.10)
+                duaCard.diAppear(delay: 0.15)
+                dhikrCard.diAppear(delay: 0.20)
+                nameCard.diAppear(delay: 0.25)
             }
         }
         .task { viewModel.load() }
         .sheet(item: $shareItem) { item in
             ShareSheet(items: [item.image])
         }
-    }
-
-    // MARK: - Brand hero
-
-    private var brandHero: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
-                .fill(
-                    LinearGradient(colors: [DIColor.primary, DIColor.primaryDeep],
-                                   startPoint: .topLeading, endPoint: .bottomTrailing)
-                )
-            DIOctagram(innerRatio: 0.5)
-                .stroke(DIColor.accent, lineWidth: 2)
-                .frame(width: 240, height: 240)
-                .opacity(0.12)
-            VStack(spacing: DISpacing.sm) {
-                Text("Assalamu alaikum")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(DIColor.onPrimary.opacity(0.85))
-                Text(DIBrand.anchorVerseArabic)
-                    .font(DIFont.quranArabic(scale: 0.9))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .environment(\.layoutDirection, .rightToLeft)
-                    .diGoldGlow(radius: 14, opacity: 0.5)
-                Text(DIBrand.anchorVerseEnglish)
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.onPrimary.opacity(0.85))
-                    .multilineTextAlignment(.center)
-                Text(DIBrand.anchorVerseReference)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(DIColor.accent)
-            }
-            .padding(DISpacing.lg)
-        }
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Verse of the day
