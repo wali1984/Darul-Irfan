@@ -1,0 +1,344 @@
+[
+ {
+  "id": "tawhid",
+  "nameEnglish": "Oneness of Allah",
+  "nameUrdu": "توحید",
+  "systemIcon": "circle.hexagonpath",
+  "searchTerms": [
+   "tawhid",
+   "oneness",
+   "unity of Allah"
+  ],
+  "ayahRefs": [
+   "2:255",
+   "112:1-4",
+   "7:180",
+   "59:22-24",
+   "3:26"
+  ]
+ },
+ {
+  "id": "zikr",
+  "nameEnglish": "Remembrance of Allah",
+  "nameUrdu": "ذکرِ الٰہی",
+  "systemIcon": "waveform.path.ecg",
+  "searchTerms": [
+   "zikr",
+   "remembrance",
+   "dhikr",
+   "qalbi",
+   "pas anfas"
+  ],
+  "ayahRefs": [
+   "13:28",
+   "33:41-42",
+   "50:16",
+   "57:4"
+  ]
+ },
+ {
+  "id": "sabr",
+  "nameEnglish": "Patience",
+  "nameUrdu": "صبر",
+  "systemIcon": "hourglass",
+  "searchTerms": [
+   "patience",
+   "sabr",
+   "perseverance",
+   "steadfast"
+  ],
+  "ayahRefs": [
+   "2:153",
+   "2:155-157",
+   "39:10",
+   "3:8",
+   "41:30"
+  ]
+ },
+ {
+  "id": "shukr",
+  "nameEnglish": "Gratitude",
+  "nameUrdu": "شکر",
+  "systemIcon": "hands.and.sparkles",
+  "searchTerms": [
+   "gratitude",
+   "thankfulness",
+   "shukr"
+  ],
+  "ayahRefs": [
+   "2:152",
+   "14:7",
+   "14:34"
+  ]
+ },
+ {
+  "id": "tawakkul",
+  "nameEnglish": "Trust in Allah",
+  "nameUrdu": "توکل",
+  "systemIcon": "shield.lefthalf.filled",
+  "searchTerms": [
+   "trust",
+   "reliance",
+   "tawakkul"
+  ],
+  "ayahRefs": [
+   "3:173",
+   "65:2-3",
+   "2:216",
+   "3:54"
+  ]
+ },
+ {
+  "id": "tawbah",
+  "nameEnglish": "Repentance",
+  "nameUrdu": "توبہ",
+  "systemIcon": "arrow.uturn.backward.circle",
+  "searchTerms": [
+   "repentance",
+   "forgiveness",
+   "tawbah",
+   "istighfar"
+  ],
+  "ayahRefs": [
+   "21:87",
+   "42:25",
+   "3:133-134",
+   "39:53"
+  ]
+ },
+ {
+  "id": "dua",
+  "nameEnglish": "Supplication",
+  "nameUrdu": "دعا",
+  "systemIcon": "hands.sparkles",
+  "searchTerms": [
+   "dua",
+   "supplication"
+  ],
+  "ayahRefs": [
+   "2:186",
+   "7:55",
+   "17:80",
+   "40:60"
+  ]
+ },
+ {
+  "id": "salah",
+  "nameEnglish": "Prayer (Salah)",
+  "nameUrdu": "نماز",
+  "systemIcon": "figure.mind.and.body",
+  "searchTerms": [
+   "salah",
+   "prayer",
+   "namaz"
+  ],
+  "ayahRefs": [
+   "4:103",
+   "29:45"
+  ]
+ },
+ {
+  "id": "love-prophet",
+  "nameEnglish": "Love of the Prophet ﷺ",
+  "nameUrdu": "عشقِ رسول ﷺ",
+  "systemIcon": "heart.circle",
+  "searchTerms": [
+   "prophet",
+   "muhammad",
+   "love of the holy prophet",
+   "salawat",
+   "durood"
+  ],
+  "ayahRefs": [
+   "33:56"
+  ]
+ },
+ {
+  "id": "tasawwuf",
+  "nameEnglish": "Tasawwuf & Purification",
+  "nameUrdu": "تصوف و تزکیہ",
+  "systemIcon": "leaf.circle",
+  "searchTerms": [
+   "tasawwuf",
+   "tazkiyah",
+   "purification",
+   "nafs",
+   "sufism",
+   "reformation of the heart"
+  ],
+  "ayahRefs": [
+   "87:14-15"
+  ]
+ },
+ {
+  "id": "mercy",
+  "nameEnglish": "Mercy of Allah",
+  "nameUrdu": "رحمت",
+  "systemIcon": "drop.circle",
+  "searchTerms": [
+   "mercy",
+   "rahmah",
+   "compassion",
+   "forgiveness"
+  ],
+  "ayahRefs": [
+   "2:286",
+   "7:56",
+   "15:49"
+  ]
+ },
+ {
+  "id": "hope",
+  "nameEnglish": "Hope & Ease",
+  "nameUrdu": "امید و آسانی",
+  "systemIcon": "sun.horizon",
+  "searchTerms": [
+   "hope",
+   "ease",
+   "relief",
+   "do not despair"
+  ],
+  "ayahRefs": [
+   "3:139",
+   "12:87",
+   "93:4-5",
+   "20:25-28",
+   "65:7",
+   "94:5-6"
+  ]
+ },
+ {
+  "id": "guidance",
+  "nameEnglish": "Guidance",
+  "nameUrdu": "ہدایت",
+  "systemIcon": "signpost.right",
+  "searchTerms": [
+   "guidance",
+   "hidayah",
+   "straight path"
+  ],
+  "ayahRefs": [
+   "18:10",
+   "3:185",
+   "3:190-191"
+  ]
+ },
+ {
+  "id": "reflection",
+  "nameEnglish": "Reflection",
+  "nameUrdu": "تفکر",
+  "systemIcon": "sparkle.magnifyingglass",
+  "searchTerms": [
+   "reflection",
+   "contemplation",
+   "signs"
+  ],
+  "ayahRefs": [
+   "3:185",
+   "3:190-191",
+   "6:59",
+   "20:114"
+  ]
+ },
+ {
+  "id": "knowledge",
+  "nameEnglish": "Knowledge",
+  "nameUrdu": "علم",
+  "systemIcon": "books.vertical.circle",
+  "searchTerms": [
+   "knowledge",
+   "ilm",
+   "learning",
+   "wisdom"
+  ],
+  "ayahRefs": [
+   "6:59",
+   "20:114"
+  ]
+ },
+ {
+  "id": "decree",
+  "nameEnglish": "Divine Decree",
+  "nameUrdu": "تقدیر",
+  "systemIcon": "square.grid.3x3.middle.filled",
+  "searchTerms": [
+   "decree",
+   "qadar",
+   "destiny",
+   "will of Allah"
+  ],
+  "ayahRefs": [
+   "9:51",
+   "64:11"
+  ]
+ },
+ {
+  "id": "baiat",
+  "nameEnglish": "Baiat & the Silsila",
+  "nameUrdu": "بیعت و سلسلہ",
+  "systemIcon": "hand.raised.circle",
+  "searchTerms": [
+   "baiat",
+   "allegiance",
+   "sheikh",
+   "silsila",
+   "murshid",
+   "naqshbandia",
+   "owaisiah"
+  ],
+  "ayahRefs": [
+   "48:10",
+   "48:18",
+   "9:100"
+  ]
+ },
+ {
+  "id": "nearness",
+  "nameEnglish": "Nearness to Allah",
+  "nameUrdu": "قربِ الٰہی",
+  "systemIcon": "sparkles",
+  "searchTerms": [
+   "nearness to allah"
+  ],
+  "ayahRefs": [
+   "50:16",
+   "57:4",
+   "48:4",
+   "36:58"
+  ]
+ },
+ {
+  "id": "company-prophet",
+  "nameEnglish": "Company of the Righteous",
+  "nameUrdu": "صحبتِ صالحین",
+  "systemIcon": "person.2.circle",
+  "searchTerms": [
+   "company",
+   "companions",
+   "sohbat",
+   "association",
+   "blessed company"
+  ],
+  "ayahRefs": [
+   "9:119",
+   "18:28",
+   "25:63"
+  ]
+ },
+ {
+  "id": "parents-family",
+  "nameEnglish": "Parents & Family",
+  "nameUrdu": "والدین و خاندان",
+  "systemIcon": "figure.2.and.child.holdinghands",
+  "searchTerms": [
+   "parents",
+   "family",
+   "children",
+   "rights"
+  ],
+  "ayahRefs": [
+   "46:15",
+   "25:74"
+  ]
+ }
+]

@@ -90,6 +90,10 @@ enum SeedBundle {
         decodeArray(DailyInspiration.self, fromFile: "aqwal_e_sheikh")
     }
 
+    static func topics() -> [Topic] {
+        decodeArray(Topic.self, fromFile: "topics")
+    }
+
     static func islamicDays() -> [IslamicDay] {
         decodeArray(IslamicDay.self, fromFile: "islamic_days")
     }

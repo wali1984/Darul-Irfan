@@ -6,6 +6,7 @@ import SwiftUI
 enum QuranRoute: Hashable {
     case reader(surah: QuranSurah, focusAyah: Int?)
     case bookmarks
+    case topics
 }
 
 // MARK: - Tab entry point
@@ -60,6 +61,8 @@ struct QuranTabView: View {
             )
         case .bookmarks:
             BookmarksListView(viewModel: viewModel)
+        case .topics:
+            TopicsBrowseView(dependencies: dependencies, appState: appState)
         }
     }
 
@@ -93,6 +96,8 @@ struct QuranTabView: View {
     private var surahList: some View {
         ScrollView {
             LazyVStack(spacing: DISpacing.sm) {
+                browseByTopicCard
+                    .padding(.bottom, DISpacing.sm)
                 if let progress = viewModel.lastRead,
                    let surah = viewModel.continueReadingSurah {
                     continueReadingCard(progress: progress, surah: surah)
@@ -120,6 +125,41 @@ struct QuranTabView: View {
             .padding(.top, DISpacing.sm)
             .padding(.bottom, DISpacing.xl)
         }
+    }
+
+    private var browseByTopicCard: some View {
+        NavigationLink(value: QuranRoute.topics) {
+            ZStack {
+                RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                    .fill(DIGradient.emerald)
+                DIOctagram(innerRatio: 0.5)
+                    .stroke(Color.white, lineWidth: 1.5)
+                    .frame(width: 150, height: 150)
+                    .opacity(0.10)
+                    .offset(x: 120)
+                HStack(spacing: DISpacing.md) {
+                    Image(systemName: "square.grid.2x2")
+                        .font(.title2)
+                        .foregroundStyle(DIColor.onPrimary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Explore by Topic")
+                            .font(DIFont.subheading)
+                            .foregroundStyle(DIColor.onPrimary)
+                        Text("Verses, tafseer, books & bayans by theme")
+                            .font(.caption)
+                            .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.forward")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                }
+                .padding(DISpacing.md)
+            }
+            .shadow(color: DIColor.primaryDeep.opacity(0.3), radius: 10, y: 5)
+        }
+        .buttonStyle(DIPressableStyle())
+        .accessibilityElement(children: .combine)
     }
 
     private func continueReadingCard(progress: ReadingProgress, surah: QuranSurah) -> some View {
