@@ -20,6 +20,10 @@ struct PrayerTabView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.md) {
+                    // Daily spiritual companion — the landing surface, above the
+                    // prayer dashboard. Works offline and regardless of location.
+                    TodayDailySection(appState: appState)
+                    DISectionHeader(titleKey: "Prayer Times", systemImage: "sun.max")
                     if !viewModel.hasLoaded {
                         loadingView
                     } else if let place = appState.activePlace {
@@ -48,7 +52,7 @@ struct PrayerTabView: View {
                 .padding(DISpacing.md)
             }
             .diScreenBackground()
-            .navigationTitle("Prayer")
+            .navigationTitle("Today")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {

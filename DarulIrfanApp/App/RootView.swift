@@ -33,7 +33,7 @@ struct RootView: View {
             TabView {
                 PrayerTabView(dependencies: dependencies, appState: appState)
                     .tabItem {
-                        Label("Prayer", systemImage: "sun.max")
+                        Label("Today", systemImage: "moon.stars")
                     }
 
                 QuranTabView(dependencies: dependencies, appState: appState)
