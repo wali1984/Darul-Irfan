@@ -82,6 +82,14 @@ enum SeedBundle {
         decodeArray(Dua.self, fromFile: "duas")
     }
 
+    static func dailyAyat() -> [DailyAyah] {
+        decodeArray(DailyAyah.self, fromFile: "daily_ayat")
+    }
+
+    static func aqwalESheikh() -> [DailyInspiration] {
+        decodeArray(DailyInspiration.self, fromFile: "aqwal_e_sheikh")
+    }
+
     static func islamicDays() -> [IslamicDay] {
         decodeArray(IslamicDay.self, fromFile: "islamic_days")
     }

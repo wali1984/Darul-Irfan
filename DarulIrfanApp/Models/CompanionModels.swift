@@ -22,6 +22,44 @@ struct Dua: Codable, Sendable, Identifiable, Equatable {
     var translationUrdu: String?
     /// e.g. "Quran 2:201" — always present; content must be source-verified.
     var source: String
+    /// Grouping key: "rabbana" | "masnoon" | "adhkarMorning" | "adhkarEvening".
+    /// Optional so older seed rows without it still decode.
+    var category: String?
+    var rightsStatus: RightsStatus?
+
+    /// Human-readable section title for the dua's category.
+    var categoryTitle: String {
+        switch category {
+        case "rabbana": return "Rabbana Duas (from the Qur'an)"
+        case "masnoon": return "Masnoon Duas"
+        case "adhkarMorning": return "Morning Adhkar"
+        case "adhkarEvening": return "Evening Adhkar"
+        default: return "Duas"
+        }
+    }
+}
+
+/// One curated "ayah of the day" candidate. Bundled (daily_ayat.json) so the
+/// Today card works fully offline; text is verbatim from api.alquran.cloud
+/// (Arabic Uthmani + Pickthall English, both public domain) with Urdu where
+/// licensing permits.
+struct DailyAyah: Codable, Sendable, Identifiable, Equatable {
+    /// "surah:ayah" or "surah:start-end".
+    var id: String
+    var surah: Int
+    var ayahStart: Int
+    var ayahEnd: Int
+    var reference: String
+    var arabic: String
+    var english: String?
+    var urdu: String?
+    var theme: String?
+
+    /// Localized translation for the reader's language, English fallback.
+    func translation(for language: AppLanguage) -> String? {
+        if language == .urdu, let urdu, !urdu.isEmpty { return urdu }
+        return english
+    }
 }
 
 /// The "daily inspiration" card: an ayah reference, tafsir excerpt, or

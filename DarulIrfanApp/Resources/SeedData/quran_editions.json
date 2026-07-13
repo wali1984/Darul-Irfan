@@ -1,42 +1,52 @@
 [
-  {
-    "id": "akram-ut-tarajum-ur",
-    "title": "Akram-ut-Tarajum",
-    "kind": "translation",
-    "language": "ur",
-    "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tarajum",
-    "rightsStatus": "permissionConfirmed",
-    "isAvailableOffline": false
-  },
-  {
-    "id": "asrar-at-tanzil-en",
-    "title": "Asrar-at-Tanzil",
-    "kind": "tafsir",
-    "language": "en",
-    "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
-    "rightsStatus": "permissionConfirmed",
-    "isAvailableOffline": false
-  },
-  {
-    "id": "akram-ut-tafaseer-ur",
-    "title": "Akram-ut-Tafaseer",
-    "kind": "tafsir",
-    "language": "ur",
-    "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tafaseer",
-    "rightsStatus": "permissionConfirmed",
-    "isAvailableOffline": false
-  },
-  {
-    "id": "sample-en",
-    "title": "English (Pickthall)",
-    "kind": "translation",
-    "language": "en",
-    "author": "Marmaduke Pickthall",
-    "sourceUrl": "https://alquran.cloud/",
-    "rightsStatus": "publicDomain",
-    "isAvailableOffline": true
-  }
+ {
+  "id": "sample-en",
+  "title": "English — Pickthall",
+  "kind": "translation",
+  "language": "en",
+  "author": "Marmaduke Pickthall",
+  "sourceUrl": "https://alquran.cloud/",
+  "rightsStatus": "publicDomain",
+  "isAvailableOffline": true
+ },
+ {
+  "id": "ur-jalandhry",
+  "title": "اردو ترجمہ — فتح محمد جالندھری",
+  "kind": "translation",
+  "language": "ur",
+  "author": "Fateh Muhammad Jalandhry",
+  "sourceUrl": "https://alquran.cloud/",
+  "rightsStatus": "publicDomain",
+  "isAvailableOffline": true
+ },
+ {
+  "id": "akram-ut-tarajum-ur",
+  "title": "Akram-ut-Tarajum",
+  "kind": "translation",
+  "language": "ur",
+  "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
+  "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tarajum",
+  "rightsStatus": "permissionConfirmed",
+  "isAvailableOffline": false
+ },
+ {
+  "id": "asrar-at-tanzil-en",
+  "title": "Asrar-at-Tanzil (English Tafseer)",
+  "kind": "tafsir",
+  "language": "en",
+  "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
+  "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
+  "rightsStatus": "permissionConfirmed",
+  "isAvailableOffline": false
+ },
+ {
+  "id": "akram-ut-tafaseer-ur",
+  "title": "Akram-ut-Tafaseer",
+  "kind": "tafsir",
+  "language": "ur",
+  "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
+  "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tafaseer",
+  "rightsStatus": "permissionConfirmed",
+  "isAvailableOffline": false
+ }
 ]
