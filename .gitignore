@@ -32,3 +32,5 @@ Thumbs.db
 # Secrets
 .env
 *.local.json
+codemagic_private_key
+codemagic_private_key.pub
