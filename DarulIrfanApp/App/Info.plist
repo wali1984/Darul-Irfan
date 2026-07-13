@@ -27,6 +27,11 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>AmiriQuran-Regular.ttf</string>
+		<string>NotoNastaliqUrdu-Regular.ttf</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>

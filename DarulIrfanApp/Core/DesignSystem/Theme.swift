@@ -84,16 +84,17 @@ enum DIRadius {
 // MARK: - Typography
 
 enum DIFont {
-    /// Quran Arabic text. SF's Arabic glyphs are high quality; sized generously
-    /// and scaled with Dynamic Type via `relativeTo`.
+    /// Quran Arabic text in the bundled Amiri Quran Uthmanic face (OFL) for an
+    /// authentic mushaf look, scaled with Dynamic Type. Falls back to the
+    /// system Arabic face automatically if the font is unavailable.
     static func quranArabic(scale: Double = 1.0) -> Font {
-        .system(size: 28 * scale, weight: .regular)
+        .custom("AmiriQuran-Regular", size: 26 * scale, relativeTo: .title2)
     }
 
-    /// Urdu body text. iOS bundles Noto Nastaliq Urdu; fall back is automatic
-    /// if the face is unavailable.
+    /// Urdu body text in the bundled Noto Nastaliq Urdu face (OFL) for proper
+    /// Nastaliq rendering, scaled with Dynamic Type. Falls back automatically.
     static func urduBody(scale: Double = 1.0) -> Font {
-        .custom("NotoNastaliqUrdu", size: 18 * scale, relativeTo: .body)
+        .custom("NotoNastaliqUrdu-Regular", size: 17 * scale, relativeTo: .body)
     }
 
     /// Section headings with a slightly bookish feel.
