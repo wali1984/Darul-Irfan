@@ -6,6 +6,7 @@ import SwiftUI
 /// source link with last-updated date.
 struct ContentItemDetailView: View {
     private let appState: AppState
+    private let dependencies: AppDependencies
     private let libraryViewModel: LibraryViewModel
     @State private var viewModel: ContentItemDetailViewModel
     @State private var isShowingSource = false
@@ -18,6 +19,7 @@ struct ContentItemDetailView: View {
         libraryViewModel: LibraryViewModel
     ) {
         self.appState = appState
+        self.dependencies = dependencies
         self.libraryViewModel = libraryViewModel
         _viewModel = State(initialValue: ContentItemDetailViewModel(
             itemID: itemID,
@@ -92,11 +94,16 @@ struct ContentItemDetailView: View {
                     VStack(alignment: .leading, spacing: DISpacing.md) {
                         detailHeader(for: item)
                             .diAppear(delay: 0.03)
+                        if hasReadablePDF(item) {
+                            readInAppButton(for: item).diAppear(delay: 0.06)
+                        }
                         if viewModel.showsBody {
                             readerCard(for: item)
                         } else {
                             excerptCard(for: item)
-                            officialSiteCard(for: item)
+                            if !hasReadablePDF(item) {
+                                officialSiteCard(for: item)
+                            }
                         }
                         downloadsSection(for: item)
                         sourceSection(for: item)
@@ -139,6 +146,50 @@ struct ContentItemDetailView: View {
         try? await Task.sleep(nanoseconds: 350_000_000)
         let index = min(count - 1, max(0, Int(fraction * Double(count))))
         proxy.scrollTo("library-paragraph-\(index)", anchor: .top)
+    }
+
+    // MARK: - Read in app
+
+    private func hasReadablePDF(_ item: ContentItem) -> Bool {
+        item.downloadUrls.contains { $0.lowercased().hasSuffix(".pdf") }
+    }
+
+    /// Primary CTA: read the work's actual pages inside the app (cached
+    /// offline), not an external viewer or a bare download.
+    private func readInAppButton(for item: ContentItem) -> some View {
+        NavigationLink {
+            BookReaderView(item: item, dependencies: dependencies)
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                    .fill(DIGradient.emerald)
+                DIPatternTexture(tint: .white, opacity: 0.07)
+                    .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
+                HStack(spacing: DISpacing.md) {
+                    Image(systemName: "book.pages.fill")
+                        .font(.title2)
+                        .foregroundStyle(DIColor.onPrimary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Read in App")
+                            .font(DIFont.subheading)
+                            .foregroundStyle(DIColor.onPrimary)
+                        Text("Read the pages here — offline after first open")
+                            .font(.caption)
+                            .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.forward")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                }
+                .padding(DISpacing.md)
+            }
+            .shadow(color: DIColor.primaryDeep.opacity(0.3), radius: 10, y: 5)
+        }
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("Read in app"))
     }
 
     // MARK: - Gradient header
