@@ -1,0 +1,75 @@
+# On-demand OCR of the English Asrar-at-Tanzil tafseer into native, inline
+# per-surah text for the Quran reader. OCR is compute-heavy, so this runs on
+# GitHub's infrastructure (not the app, not a schedule) — trigger it manually
+# with a surah range. It commits the resulting quran_tafsir.json; the app
+# bundles it on the next build (and picks up updates via the content manifest).
+#
+# English scans OCR reliably. Urdu Nastaliq is NOT run here — it needs a
+# higher-accuracy engine + human verification before it meets the app's bar.
+
+name: OCR tafseer
+
+on:
+  workflow_dispatch:
+    inputs:
+      surahs:
+        description: "Surahs to OCR: e.g. 'all', '78-114', or '1,103,114'"
+        default: "all"
+      max_pages:
+        description: "Max pages per surah PDF"
+        default: "80"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ocr-content
+  cancel-in-progress: false
+
+jobs:
+  ocr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install OCR dependencies
+        working-directory: Tools/OCR
+        run: pip install -r requirements.txt
+
+      - name: OCR English tafseer
+        working-directory: Tools/OCR
+        run: |
+          python ocr_tafseer.py \
+            --surahs "${{ github.event.inputs.surahs || 'all' }}" \
+            --lang en \
+            --max-pages "${{ github.event.inputs.max_pages || '80' }}"
+
+      - name: Bump seed manifest so the app re-imports
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("DarulIrfanApp/Resources/SeedData/manifest.json")
+          m = json.loads(p.read_text(encoding="utf-8"))
+          m["version"] = int(m.get("version", 1)) + 1
+          p.write_text(json.dumps(m, indent=2) + "\n", encoding="utf-8")
+          print("seed version ->", m["version"])
+          PY
+
+      - name: Commit native tafseer if changed
+        run: |
+          git config user.name "darul-irfan-bot"
+          git config user.email "actions@github.com"
+          git add DarulIrfanApp/Resources/SeedData/quran_tafsir.json DarulIrfanApp/Resources/SeedData/manifest.json
+          if git diff --cached --quiet; then
+            echo "No tafseer changes."
+          else
+            git commit -m "content: OCR native English tafseer (Asrar-at-Tanzil) [skip ci]"
+            git push
+          fi

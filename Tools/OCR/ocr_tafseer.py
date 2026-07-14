@@ -86,6 +86,21 @@ def clean(lines):
         paras.append(cur)
     return "\n\n".join(paras).strip()
 
+def parse_surahs(spec):
+    """Accepts '1,103,108' or '78-114' or 'all'."""
+    spec = spec.strip().lower()
+    if spec == "all":
+        return list(range(1, 115))
+    out = []
+    for part in spec.split(","):
+        part = part.strip()
+        if "-" in part:
+            a, b = part.split("-")
+            out.extend(range(int(a), int(b) + 1))
+        elif part:
+            out.append(int(part))
+    return [s for s in out if 1 <= s <= 114]
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--surahs", default="1")
@@ -94,7 +109,7 @@ def main():
     ap.add_argument("--preview", action="store_true", help="print text, do not write JSON")
     args = ap.parse_args()
 
-    surahs = [int(x) for x in args.surahs.split(",") if x.strip()]
+    surahs = parse_surahs(args.surahs)
     li = json.load(open(os.path.join(SEED, "library_items.json"), encoding="utf-8"))
     by_id = {it["id"]: it for it in li}
     surah_meta = {s["id"]: s for s in json.load(open(os.path.join(SEED, "quran_surahs.json"), encoding="utf-8"))}
