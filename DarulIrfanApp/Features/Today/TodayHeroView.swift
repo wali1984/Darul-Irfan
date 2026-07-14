@@ -25,6 +25,7 @@ struct TodayHeroView: View {
     var body: some View {
         ZStack {
             DIGradient.hero()
+            DIPatternTexture(tint: .white, opacity: 0.07)
             DIOctagram(innerRatio: 0.5)
                 .stroke(Color.white, lineWidth: 1.5)
                 .frame(width: 300, height: 300)

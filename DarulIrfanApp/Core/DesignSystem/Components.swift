@@ -124,12 +124,20 @@ struct DIPillBadge: View {
 
 // MARK: - Screen scaffold
 
-/// Standard screen background + insets so tabs feel uniform.
+/// Standard screen background + insets so tabs feel uniform. Layers a faint
+/// Islamic geometric texture over the warm base so screens feel crafted, not
+/// flat.
 struct DIScreenBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(DIColor.background.ignoresSafeArea())
+            .background(
+                ZStack {
+                    DIColor.background
+                    DIPatternTexture(tint: DIColor.accent, opacity: 0.04)
+                }
+                .ignoresSafeArea()
+            )
     }
 }
 

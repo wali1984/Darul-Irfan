@@ -17,6 +17,17 @@ struct MoreTabView: View {
         self.appState = appState
     }
 
+    /// Live app-language switch — changes the whole UI immediately.
+    private var languageBinding: Binding<AppLanguage> {
+        Binding(
+            get: { appState.settings.language },
+            set: { newValue in
+                DIHaptics.light()
+                Task { await appState.updateSettings { $0.language = newValue } }
+            }
+        )
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -33,6 +44,18 @@ struct MoreTabView: View {
             .diScreenBackground()
             .navigationTitle("More")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("Language", selection: languageBinding) {
+                            ForEach(AppLanguage.allCases) { lang in
+                                Text(lang.displayName).tag(lang)
+                            }
+                        }
+                    } label: {
+                        Label("Language", systemImage: "globe")
+                    }
+                    .accessibilityLabel("Change app language")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isSearchPresented = true
