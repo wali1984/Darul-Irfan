@@ -132,8 +132,9 @@ struct SurahReaderView: View {
         DICard {
             VStack(spacing: DISpacing.sm) {
                 Text(viewModel.surah.nameArabic)
-                    .font(DIFont.quranArabic(scale: 1.1))
+                    .font(DIFont.quranArabic(scale: 1.15))
                     .foregroundStyle(DIColor.primary)
+                    .diGoldGlow(radius: 7, opacity: 0.28)
                 Text(viewModel.surah.nameEnglish)
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
@@ -283,9 +284,7 @@ private struct AyahCardView: View {
 
     private var header: some View {
         HStack(spacing: DISpacing.md) {
-            Text("Ayah \(ayah.ayahNumber)")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(DIColor.textMuted)
+            ayahNumberBadge
             Spacer(minLength: 0)
             Button {
                 Task { await viewModel.toggleBookmark(ayahNumber: ayah.ayahNumber) }
@@ -307,13 +306,30 @@ private struct AyahCardView: View {
         }
     }
 
+    /// A small gilded mushaf-style ayah medallion — a gold-sheen disc with a
+    /// hairline gold ring, in place of the plain "Ayah N" caption.
+    private var ayahNumberBadge: some View {
+        Text("\(ayah.ayahNumber)")
+            .font(.caption.weight(.bold).monospacedDigit())
+            .foregroundStyle(DIColor.primaryDeep)
+            .frame(minWidth: 30, minHeight: 30)
+            .background(
+                Circle()
+                    .fill(DIGradient.goldSheen)
+                    .overlay(Circle().stroke(DIColor.accent.opacity(0.6), lineWidth: 1))
+            )
+            .diGoldGlow(radius: 4, opacity: 0.25)
+            .accessibilityLabel(Text("Ayah \(ayah.ayahNumber)"))
+    }
+
     // MARK: Arabic
 
     private var arabicText: some View {
         Text(ayah.textArabic)
-            .font(DIFont.quranArabic(scale: fontScale))
-            .lineSpacing(CGFloat(12 * fontScale))
+            .font(DIFont.quranArabic(scale: fontScale * 1.15))
+            .lineSpacing(CGFloat(16 * fontScale))
             .foregroundStyle(DIColor.textPrimary)
+            .diGoldGlow(radius: 5, opacity: 0.18)
             .textSelection(.enabled)
             .frame(maxWidth: .infinity, alignment: .leading)
             .environment(\.layoutDirection, .rightToLeft)

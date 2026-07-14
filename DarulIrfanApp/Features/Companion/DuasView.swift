@@ -102,14 +102,21 @@ private struct DuaGroupHeader: View {
     let title: String
 
     var body: some View {
-        HStack(spacing: DISpacing.sm) {
-            Image(systemName: "hands.sparkles")
-                .foregroundStyle(DIColor.accent)
+        VStack(alignment: .leading, spacing: DISpacing.xs) {
+            HStack(spacing: DISpacing.sm) {
+                Image(systemName: "hands.sparkles")
+                    .foregroundStyle(DIColor.accent)
+                    .accessibilityHidden(true)
+                Text(verbatim: title)
+                    .font(DIFont.subheading)
+                    .foregroundStyle(DIColor.textPrimary)
+                Spacer(minLength: 0)
+            }
+            RoundedRectangle(cornerRadius: 1, style: .continuous)
+                .fill(DIGradient.goldSheen)
+                .frame(width: 120, height: 1.5)
+                .opacity(0.6)
                 .accessibilityHidden(true)
-            Text(verbatim: title)
-                .font(DIFont.subheading)
-                .foregroundStyle(DIColor.textPrimary)
-            Spacer(minLength: 0)
         }
         .padding(.horizontal, DISpacing.xs)
         .accessibilityAddTraits(.isHeader)
@@ -124,6 +131,7 @@ private struct FeaturedDuaCard: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             DIGradient.hero()
+                .diPatternOverlay(tint: .white, opacity: 0.07)
                 .overlay(alignment: .topTrailing) {
                     DIOctagram(innerRatio: 0.5)
                         .stroke(Color.white, lineWidth: 1.5)

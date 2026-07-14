@@ -87,6 +87,7 @@ private struct EventsHeroHeader: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             DIGradient.hero()
+                .diPatternOverlay(tint: .white, opacity: 0.07)
                 .overlay(alignment: .topTrailing) {
                     DIOctagram(innerRatio: 0.5)
                         .stroke(Color.white, lineWidth: 1.5)

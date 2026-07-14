@@ -132,6 +132,8 @@ struct QuranTabView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
                     .fill(DIGradient.emerald)
+                DIPatternTexture(tint: .white, opacity: 0.07)
+                    .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
                 DIOctagram(innerRatio: 0.5)
                     .stroke(Color.white, lineWidth: 1.5)
                     .frame(width: 150, height: 150)
@@ -164,7 +166,7 @@ struct QuranTabView: View {
 
     private func continueReadingCard(progress: ReadingProgress, surah: QuranSurah) -> some View {
         NavigationLink(value: QuranRoute.reader(surah: surah, focusAyah: progress.ayahNumber)) {
-            DICard {
+            DIElevatedCard(glow: DIColor.accent) {
                 HStack(spacing: DISpacing.md) {
                     Image(systemName: "book")
                         .font(.title3)
