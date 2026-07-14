@@ -85,16 +85,16 @@ enum DIRadius {
 
 enum DIFont {
     /// Quran Arabic text in the bundled Amiri Quran Uthmanic face (OFL) for an
-    /// authentic mushaf look, scaled with Dynamic Type. Falls back to the
-    /// system Arabic face automatically if the font is unavailable.
+    /// authentic mushaf look, scaled with Dynamic Type. Uses the runtime-
+    /// resolved font name (see AppFonts); falls back to system if unavailable.
     static func quranArabic(scale: Double = 1.0) -> Font {
-        .custom("AmiriQuran-Regular", size: 26 * scale, relativeTo: .title2)
+        .custom(AppFonts.quranArabicName, size: 26 * scale, relativeTo: .title2)
     }
 
     /// Urdu body text in the bundled Noto Nastaliq Urdu face (OFL) for proper
-    /// Nastaliq rendering, scaled with Dynamic Type. Falls back automatically.
+    /// Nastaliq rendering, scaled with Dynamic Type.
     static func urduBody(scale: Double = 1.0) -> Font {
-        .custom("NotoNastaliqUrdu-Regular", size: 17 * scale, relativeTo: .body)
+        .custom(AppFonts.urduName, size: 17 * scale, relativeTo: .body)
     }
 
     /// Section headings with a slightly bookish feel.

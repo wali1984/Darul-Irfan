@@ -24,6 +24,12 @@ struct DarulIrfanApp: App {
 
     private static let foregroundRefreshInterval: TimeInterval = 60
 
+    init() {
+        // Register the bundled Amiri Quran + Noto Nastaliq fonts before any
+        // view (and thus any Font.custom) is evaluated.
+        AppFonts.registerBundledFonts()
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {
