@@ -1,0 +1,18 @@
+{
+  "counts": {
+    "articles": 36,
+    "documents": 273,
+    "events": 0,
+    "media": 780,
+    "quranTafsirPages": 114
+  },
+  "files": {
+    "articles": "articles.json",
+    "documents": "documents.json",
+    "events": "events.json",
+    "media": "media.json",
+    "tafsir": "quran_tafsir_manifest.json"
+  },
+  "generatedAt": "2026-07-15T04:02:44Z",
+  "version": 1
+}

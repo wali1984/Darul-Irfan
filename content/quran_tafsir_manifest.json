@@ -1,0 +1,585 @@
+{
+  "edition": {
+    "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "id": "asrar-at-tanzil-en",
+    "isAvailableOffline": false,
+    "kind": "tafsir",
+    "language": "en",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
+    "title": "Asrar-at-Tanzil"
+  },
+  "pages": [
+    {
+      "surahNumber": 1,
+      "title": "1 - Surah Al-Fatihah (The Opening)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1229/tafseer-quran-in-english-surah-al-fatihah.html"
+    },
+    {
+      "surahNumber": 2,
+      "title": "2 - Surah Al-Baqarah (The Cow)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1230/tafseer-quran-in-english-surah-al-baqarah.html"
+    },
+    {
+      "surahNumber": 3,
+      "title": "3 - Surah Al Imran (The Family Of Imraan)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1231/tafseer-quran-in-english-surah-al-imran.html"
+    },
+    {
+      "surahNumber": 4,
+      "title": "4 - Surah An-Nisa (The Women)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1232/tafseer-quran-in-english-surah-an-nisa-the-women.html"
+    },
+    {
+      "surahNumber": 5,
+      "title": "5 - Surah Al-Ma'idah (The Table Spread)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1233/tafseer-quran-in-english-surah-al-maidah.html"
+    },
+    {
+      "surahNumber": 6,
+      "title": "6 - Surah Al-An'am (The Cattle)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1234/tafseer-quran-in-english-surah-al-anaam.html"
+    },
+    {
+      "surahNumber": 7,
+      "title": "7 - Surah Al-A'raf (The Heights)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1235/tafseer-quran-in-english-surah-al-aaraf.html"
+    },
+    {
+      "surahNumber": 8,
+      "title": "8 - Surah Al-Anfal (The Spoils Of War)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1236/tafseer-quran-in-english-surah-al-anfal.html"
+    },
+    {
+      "surahNumber": 9,
+      "title": "9 - Surah At-Tawbah (The Repentance)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1237/tafseer-quran-in-english-surah-at-tawbah.html"
+    },
+    {
+      "surahNumber": 10,
+      "title": "10 - Surah Yunus (Jonah)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1238/tafseer-quran-in-english-surah-yunus.html"
+    },
+    {
+      "surahNumber": 11,
+      "title": "11 - Surah Hud (Hud)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1239/tafseer-quran-in-english-surah-hud.html"
+    },
+    {
+      "surahNumber": 12,
+      "title": "12 - Surah Yusuf (Joseph)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1240/tafseer-quran-in-english-surah-yusuf.html"
+    },
+    {
+      "surahNumber": 13,
+      "title": "13 - Surah Ar-Ra'd (The Thunder)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1241/tafseer-quran-in-english-surah-ar-raad.html"
+    },
+    {
+      "surahNumber": 14,
+      "title": "14 - Surah Ibrahim (Abraham)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1242/tafseer-quran-in-english-surah-ibrahim.html"
+    },
+    {
+      "surahNumber": 15,
+      "title": "15 - Surah Al-Hijr (The Rock)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1243/tafseer-quran-in-english-surah-al-hijr.html"
+    },
+    {
+      "surahNumber": 16,
+      "title": "16 - Surah An-Nahl (The Bee)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1244/tafseer-quran-in-english-surah-an-nahl.html"
+    },
+    {
+      "surahNumber": 17,
+      "title": "17 - Surah Al-Isra (The Night Journey)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1245/tafseer-quran-in-english-surah-al-isra.html"
+    },
+    {
+      "surahNumber": 18,
+      "title": "18 - Surah Al-Kahf (The Cave)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1246/tafseer-quran-in-english-surah-al-kahf.html"
+    },
+    {
+      "surahNumber": 19,
+      "title": "19 - Surah Maryam (Mary)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1247/tafseer-quran-in-english-surah-maryam.html"
+    },
+    {
+      "surahNumber": 20,
+      "title": "20 - Surah Ta-Ha (Ta-Ha)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1248/tafseer-quran-in-english-surah-ta-ha.html"
+    },
+    {
+      "surahNumber": 21,
+      "title": "21 - Surah Al-Anbiya (The Prophets)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1249/tafseer-quran-in-english-surah-al-anbiya.html"
+    },
+    {
+      "surahNumber": 22,
+      "title": "22 - Surah Al-Hajj (The Pilgrimage)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1250/tafseer-quran-in-english-surah-al-hajj.html"
+    },
+    {
+      "surahNumber": 23,
+      "title": "23 - Surah Al-Mu'minun (The Believers)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1251/tafseer-quran-in-english-surah-al-muminun.html"
+    },
+    {
+      "surahNumber": 24,
+      "title": "24 - Surah An-Nur (The Light)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1252/tafseer-quran-in-english-surah-an-nur.html"
+    },
+    {
+      "surahNumber": 25,
+      "title": "25 - Surah Al-Furqan (The Criterion)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1253/tafseer-quran-in-english-surah-al-furqan.html"
+    },
+    {
+      "surahNumber": 26,
+      "title": "26 - Surah Ash-Shu'ara (The Poets)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1254/tafseer-quran-in-english-surah-ash-shuara.html"
+    },
+    {
+      "surahNumber": 27,
+      "title": "27 - Surah An-Naml (The Ant)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1255/tafseer-quran-in-english-surah-an-naml.html"
+    },
+    {
+      "surahNumber": 28,
+      "title": "28 - Surah Al-Qasas (The Narratives)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1256/tafseer-quran-in-english-surah-al-qasas.html"
+    },
+    {
+      "surahNumber": 29,
+      "title": "29 - Surah Al-Ankabut (The Spider)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1257/tafseer-quran-in-english-surah-al-ankabut.html"
+    },
+    {
+      "surahNumber": 30,
+      "title": "30 - Surah Ar-Rum (The Romans)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1258/tafseer-quran-in-english-surah-ar-rum.html"
+    },
+    {
+      "surahNumber": 31,
+      "title": "31 - Surah Luqmaan (Luqman)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1259/tafseer-quran-in-english-surah-luqmaan.html"
+    },
+    {
+      "surahNumber": 32,
+      "title": "32 - Surah As-Sajda (The Prostration)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1260/tafseer-quran-in-english-surah-as-sajda.html"
+    },
+    {
+      "surahNumber": 33,
+      "title": "33 - Surah Al-Ahzaab (The Confederates)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1261/tafseer-quran-in-english-surah-al-ahzaab.html"
+    },
+    {
+      "surahNumber": 34,
+      "title": "34 - Surah Saba (surah) (Sheba)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1262/tafseer-quran-in-english-surah-saba.html"
+    },
+    {
+      "surahNumber": 35,
+      "title": "35 - Surah Faatir (The Originator)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1263/tafseer-quran-in-english-surah-faatir.html"
+    },
+    {
+      "surahNumber": 36,
+      "title": "36 - Surah Yaseen (Ya Seen)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1264/tafseer-quran-in-english-surah-yaseen.html"
+    },
+    {
+      "surahNumber": 37,
+      "title": "37 - Surah As-Saaffaat (The Ranks)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1265/tafseer-quran-in-english-surah-as-saaffaat.html"
+    },
+    {
+      "surahNumber": 38,
+      "title": "38 - Surah Saad (Saad)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1266/tafseer-quran-in-english-surah-saad.html"
+    },
+    {
+      "surahNumber": 39,
+      "title": "39 - Surah Az-Zumar (The Troops)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1267/tafseer-quran-in-english-surah-az-zumar.html"
+    },
+    {
+      "surahNumber": 40,
+      "title": "40 - Surah Ghafir (The Forgiver)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1268/tafseer-quran-in-english-surah-ghafir.html"
+    },
+    {
+      "surahNumber": 41,
+      "title": "41 - Surah Fussilat (Explained In Detail)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1269/tafseer-quran-in-english-surah-fussilat.html"
+    },
+    {
+      "surahNumber": 42,
+      "title": "42 - Surah Ash_Shooraa (The Consultation)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1270/tafseer-quran-in-english-surah-ash_shooraa.html"
+    },
+    {
+      "surahNumber": 43,
+      "title": "43 - Surah Az-Zukhruf (The Gold Ornaments)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1271/tafseer-quran-in-english-surah-az-zukhruf.html"
+    },
+    {
+      "surahNumber": 44,
+      "title": "44 - Surah Ad-Dukhaan (The Smoke)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1272/tafseer-quran-in-english-surah-ad-dukhaan.html"
+    },
+    {
+      "surahNumber": 45,
+      "title": "45 - Surah Al-Jaathiyah (The Kneeling)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1273/tafseer-quran-in-english-surah-al-jaathiyah.html"
+    },
+    {
+      "surahNumber": 46,
+      "title": "46 - Surah Al-Ahqaaf (The Sandhills)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1274/tafseer-quran-in-english-surah-al-ahqaaf.html"
+    },
+    {
+      "surahNumber": 47,
+      "title": "47 - Surah Muhammad (Muhammad)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1275/tafseer-quran-in-english-surah-muhammad.html"
+    },
+    {
+      "surahNumber": 48,
+      "title": "48 - Surah Al-Fath (The Victory)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1276/tafseer-quran-in-english-surah-al-fath.html"
+    },
+    {
+      "surahNumber": 49,
+      "title": "49 - Surah Al-Hujuraat (The Apartments)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1277/tafseer-quran-in-english-surah-al-hujuraat.html"
+    },
+    {
+      "surahNumber": 50,
+      "title": "50 - Surah Qaaf (Qaf)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1278/tafseer-quran-in-english-surah-qaaf.html"
+    },
+    {
+      "surahNumber": 51,
+      "title": "51 - Surah Adh-Dhaariyaat (The Dispersing Winds)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1279/tafseer-quran-in-english-surah-adh-dhaariyaat.html"
+    },
+    {
+      "surahNumber": 52,
+      "title": "52 - Surah At-Toor (The Mount)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1280/tafseer-quran-in-english-surah-at-toor.html"
+    },
+    {
+      "surahNumber": 53,
+      "title": "53 - Surah An-Najm (The Star)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1281/tafseer-quran-in-english-surah-an-najm.html"
+    },
+    {
+      "surahNumber": 54,
+      "title": "54 - Surah Al-Qamar (The Moon)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1282/tafseer-quran-in-english-surah-al-qamar.html"
+    },
+    {
+      "surahNumber": 55,
+      "title": "55 - Surah Ar-Rahman (The Compassionate)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1283/tafseer-quran-in-english-surah-ar-rahman.html"
+    },
+    {
+      "surahNumber": 56,
+      "title": "56 - Surah Al-Waqi'a (The Event)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1284/tafseer-quran-in-english-surah-al-waqia.html"
+    },
+    {
+      "surahNumber": 57,
+      "title": "57 - Surah Al-Hadeed (The Iron)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1285/tafseer-quran-in-english-surah-al-hadeed.html"
+    },
+    {
+      "surahNumber": 58,
+      "title": "58 - Surah Al-Mujadila (The Pleading)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1286/tafseer-quran-in-english-surah-al-mujadila.html"
+    },
+    {
+      "surahNumber": 59,
+      "title": "59 - Surah Al-Hashr (The Exhile)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1287/tafseer-quran-in-english-surah-al-hashr.html"
+    },
+    {
+      "surahNumber": 60,
+      "title": "60 - Surah Al-Mumtahanah (The Test)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1288/tafseer-quran-in-english-surah-al-mumtahanah.html"
+    },
+    {
+      "surahNumber": 61,
+      "title": "61 - Surah As-Saff (The Ranks)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1289/tafseer-quran-in-english-surah-as-saff.html"
+    },
+    {
+      "surahNumber": 62,
+      "title": "62 - Surah Al-Jumu'ah (Friday)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1290/tafseer-quran-in-english-surah-al-jumuah.html"
+    },
+    {
+      "surahNumber": 63,
+      "title": "63 - Surah Al-Munafiqoon (The Hypocrites)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1291/tafseer-quran-in-english-surah-al-munafiqoon.html"
+    },
+    {
+      "surahNumber": 64,
+      "title": "64 - Surah At-Taghabun (The Mutual Deceit)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1292/tafseer-quran-in-english-surah-at-taghabun.html"
+    },
+    {
+      "surahNumber": 65,
+      "title": "65 - Surah At-Talaq (Divorce)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1293/tafseer-quran-in-english-surah-at-talaq.html"
+    },
+    {
+      "surahNumber": 66,
+      "title": "66 - Surah At-Tahreem (The Prohibition)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1294/tafseer-quran-in-english-surah-at-tahreem.html"
+    },
+    {
+      "surahNumber": 67,
+      "title": "67 - Surah Al-Mulk (The Sovereignty)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1295/tafseer-quran-in-english-surah-al-mulk.html"
+    },
+    {
+      "surahNumber": 68,
+      "title": "68 - Surah Al-Qalam (The Pen)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1296/tafseer-quran-in-english-surah-al-qalam.html"
+    },
+    {
+      "surahNumber": 69,
+      "title": "69 - Surah Al-Haaqqa (The Truth)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1297/tafseer-quran-in-english-surah-al-haaqqa.html"
+    },
+    {
+      "surahNumber": 70,
+      "title": "70 - Surah Al-Ma'aarij (The Ascending Steps)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1298/tafseer-quran-in-english-surah-al-maaarij.html"
+    },
+    {
+      "surahNumber": 71,
+      "title": "71 - Surah Nooh (Noah)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1299/tafseer-quran-in-english-surah-nooh.html"
+    },
+    {
+      "surahNumber": 72,
+      "title": "72 - Surah Al-Jinn (he Jinn)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1300/tafseer-quran-in-english-surah-al-jinn.html"
+    },
+    {
+      "surahNumber": 73,
+      "title": "73 - Surah Al-Muzzammil (Wrapped In A Blanket)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1301/tafseer-quran-in-english-surah-al-muzzammil.html"
+    },
+    {
+      "surahNumber": 74,
+      "title": "74 - Surah Al-Muddaththir (The Enveloped)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1302/tafseer-quran-in-english-surah-al-muddaththir.html"
+    },
+    {
+      "surahNumber": 75,
+      "title": "75 - Surah Al-Qiyamah (The Ressurection)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1303/tafseer-quran-in-english-surah-al-qiyamah.html"
+    },
+    {
+      "surahNumber": 76,
+      "title": "76 - Surah Al-Insaan (Man)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1304/tafseer-quran-in-english-surah-al-insaan.html"
+    },
+    {
+      "surahNumber": 77,
+      "title": "77 - Surah Al-Mursalaat (Those Sent)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1305/tafseer-quran-in-english-surah-al-mursalaat.html"
+    },
+    {
+      "surahNumber": 78,
+      "title": "78 - Surah An-Naba (The Announcement)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1306/tafseer-quran-in-english-surah-an-naba.html"
+    },
+    {
+      "surahNumber": 79,
+      "title": "79 - Surah An-Naazi'aat (Those That Drag Forth)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1307/tafseer-quran-in-english-surah-an-naaziaat.html"
+    },
+    {
+      "surahNumber": 80,
+      "title": "80 - Surah Abasa (He Frowned)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1308/tafseer-quran-in-english-surah-abasa.html"
+    },
+    {
+      "surahNumber": 81,
+      "title": "81 - Surah At-Takweer (The Winding Round)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1309/tafseer-quran-in-english-surah-at-takweer.html"
+    },
+    {
+      "surahNumber": 82,
+      "title": "82 - Surah Al-Infitar (The Cleaving)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1310/tafseer-quran-in-english-surah-al-infitar.html"
+    },
+    {
+      "surahNumber": 83,
+      "title": "83 - Surah Al-Mutaffifeen (The Scrimping)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1311/tafseer-quran-in-english-surah-al-mutaffifeen.html"
+    },
+    {
+      "surahNumber": 84,
+      "title": "84 - Surah Al-Inshiqaaq (The Sundering)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1312/tafseer-quran-in-english-surah-al-inshiqaaq.html"
+    },
+    {
+      "surahNumber": 85,
+      "title": "85 - Surah Al-Burooj (The Big Stars)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1313/tafseer-quran-in-english-surah-al-burooj.html"
+    },
+    {
+      "surahNumber": 86,
+      "title": "86 - Surah At-Taariq (The Night Comer)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1314/tafseer-quran-in-english-surah-at-taariq.html"
+    },
+    {
+      "surahNumber": 87,
+      "title": "87 - Surah Al-A'laa (The Most High)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1315/tafseer-quran-in-english-surah-al-alaa.html"
+    },
+    {
+      "surahNumber": 88,
+      "title": "88 - Surah Al-Ghaashiyah (The Enveloping)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1316/tafseer-quran-in-english-surah-al-ghaashiyah.html"
+    },
+    {
+      "surahNumber": 89,
+      "title": "89 - Surah Al-Fajr (The Dawn)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1317/tafseer-quran-in-english-surah-al-fajr.html"
+    },
+    {
+      "surahNumber": 90,
+      "title": "90 - Surah Al-Balad (The City)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1318/tafseer-quran-in-english-surah-al-balad.html"
+    },
+    {
+      "surahNumber": 91,
+      "title": "91 - Surah Ash-Shams (The Sun)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1319/tafseer-quran-in-english-surah-ash-shams.html"
+    },
+    {
+      "surahNumber": 92,
+      "title": "92 - Surah Al-Layl (The Night)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1320/tafseer-quran-in-english-surah-al-layl.html"
+    },
+    {
+      "surahNumber": 93,
+      "title": "93 - Surah Ad-Dhuha (The Morning Brightness)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1321/tafseer-quran-in-english-surah-ad-dhuha.html"
+    },
+    {
+      "surahNumber": 94,
+      "title": "94 - Surah Ash-Sharh (Al-Inshirah) (The Opening Forth)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1322/tafseer-quran-in-english-surah-ash-sharh.html"
+    },
+    {
+      "surahNumber": 95,
+      "title": "95 - Surah At-Teen (The Fig)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1323/tafseer-quran-in-english-surah-at-teen.html"
+    },
+    {
+      "surahNumber": 96,
+      "title": "96 - Surah Al-Alaq (The Clot)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1324/tafseer-quran-in-english-surah-al-alaq.html"
+    },
+    {
+      "surahNumber": 97,
+      "title": "97 - Surah Al-Qadr (The Power)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1325/tafseer-quran-in-english-surah-al-qadr.html"
+    },
+    {
+      "surahNumber": 98,
+      "title": "98 - Surah Al-Bayyinahh (The Evidence)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1326/tafseer-quran-in-english-surah-al-bayyinahh.html"
+    },
+    {
+      "surahNumber": 99,
+      "title": "99 - Surah Az-Zalzalah (The Earthquake)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1327/tafseer-quran-in-english-surah-az-zalzalah.html"
+    },
+    {
+      "surahNumber": 100,
+      "title": "100 - Surah Al-Aadiyaat (The Chargers)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1328/tafseer-quran-in-english-surah-al-aadiyaat.html"
+    },
+    {
+      "surahNumber": 101,
+      "title": "101 - Surah Al-Qaari'ah (The Clatterer)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1329/tafseer-quran-in-english-surah-al-qaariah.html"
+    },
+    {
+      "surahNumber": 102,
+      "title": "102 - Surah At-Takaathur (The Emulous Desire)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1330/tafseer-quran-in-english-surah-at-takaathur.html"
+    },
+    {
+      "surahNumber": 103,
+      "title": "103 - Surah Al-Humazah (The Slanderer)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1332/tafseer-quran-in-english-surah-al-humazah.html"
+    },
+    {
+      "surahNumber": 104,
+      "title": "104 - Surah Al-Maa'oon (The Neighbourly Assistance)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1335/tafseer-quran-in-english-surah-al-maaoon.html"
+    },
+    {
+      "surahNumber": 105,
+      "title": "105 - Surah Al-Asr (The Time)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1331/tafseer-quran-in-english-surah-al-asr.html"
+    },
+    {
+      "surahNumber": 106,
+      "title": "106 - Surah Al-Feel (The Elephant)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1333/tafseer-quran-in-english-surah-al-feel.html"
+    },
+    {
+      "surahNumber": 107,
+      "title": "107 - Surah Al-Naas (Mankind)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1342/tafseer-quran-in-english-surah-al-naas.html"
+    },
+    {
+      "surahNumber": 108,
+      "title": "108 - Surah Quraysh (The Quraish)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1334/tafseer-quran-in-english-surah-quraysh.html"
+    },
+    {
+      "surahNumber": 109,
+      "title": "109 - Surah Al-Kawthar (The Abundance Of Good)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1336/tafseer-quran-in-english-surah-al-kawthar.html"
+    },
+    {
+      "surahNumber": 110,
+      "title": "110 - Surah Al-Kaafiroon (The Infidels)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1337/tafseer-quran-in-english-surah-al-kaafiroon.html"
+    },
+    {
+      "surahNumber": 111,
+      "title": "111 - Surah An-Nasr (Succour)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1338/tafseer-quran-in-english-surah-an-nasr.html"
+    },
+    {
+      "surahNumber": 112,
+      "title": "112 - Surah Al-Masad (The Thorns)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1339/tafseer-quran-in-english-surah-al-masad.html"
+    },
+    {
+      "surahNumber": 113,
+      "title": "113 - Surah Al-Ikhlaas (Purity)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1340/tafseer-quran-in-english-surah-al-ikhlaas.html"
+    },
+    {
+      "surahNumber": 114,
+      "title": "114 - Surah Al-Falaq (The Daybreak)",
+      "url": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil/1341/tafseer-quran-in-english-surah-al-falaq.html"
+    }
+  ],
+  "version": 1
+}
