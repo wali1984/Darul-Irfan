@@ -70,6 +70,8 @@ targets:
       path: Widgets/Info.plist
       properties:
         CFBundleDisplayName: Darul Irfan Widgets
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
@@ -101,6 +103,8 @@ targets:
       path: WatchApp/Info.plist
       properties:
         CFBundleDisplayName: Darul Irfan
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         WKApplication: true
         WKCompanionAppBundleIdentifier: us.naqshbaniaowaisiah
 
@@ -126,6 +130,8 @@ targets:
       path: WatchWidgets/Info.plist
       properties:
         CFBundleDisplayName: Darul Irfan Complications
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 
@@ -134,8 +140,8 @@ targets:
     platform: iOS
     sources:
       - path: DarulIrfanTests
-    resources:
       - path: Server/test/fixtures/bootstrap.json
+        buildPhase: resources
     dependencies:
       - target: DarulIrfan
     settings:
