@@ -3,18 +3,11 @@
 /// Launch smoke tests.
 ///
 /// Assumptions (verified against the app source):
-/// - The app has NO test-only launch arguments (DarulIrfanApp.swift reads
-///   none), so onboarding cannot be skipped via configuration. Onboarding
-///   completion is persisted in the app's database, so on a fresh install the
-///   first launch shows onboarding and later launches show the tab bar.
-/// - Completing onboarding requires selecting a place on the location step
-///   (device fix or geocoded city search), which needs simulator location
-///   and/or network. When that cannot be satisfied, the walk-through test
-///   skips rather than reporting a false failure; the launch test still
-///   verifies the app comes up with a meaningful first screen.
+/// DEBUG-only launch arguments provide deterministic onboarding and completed
+/// states without requesting simulator location or notification permissions.
 final class SmokeUITests: XCTestCase {
 
-    private let tabLabels = ["Prayer", "Quran", "Library", "Media", "More"]
+    private let tabLabels = ["Today", "Quran", "Zikr", "Explore", "More"]
 
     override func setUp() {
         continueAfterFailure = false
@@ -22,43 +15,21 @@ final class SmokeUITests: XCTestCase {
 
     /// The assertions match English UI strings; pin the app run to English so
     /// the suite passes on simulators whose language is Urdu.
-    private func makeApp() -> XCUIApplication {
+    private func makeApp(completedOnboarding: Bool = true) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        app.launchArguments.append(completedOnboarding ? "--uitesting-complete-onboarding" : "--uitesting-reset-onboarding")
         return app
     }
 
     // MARK: - Launch
 
-    /// The app must reach one of its two valid first screens: the onboarding
-    /// welcome step (fresh install) or the five-tab shell (returning user).
-    func testLaunchShowsOnboardingOrTabShell() {
-        let app = makeApp()
+    /// A fresh install must show the contextual onboarding welcome screen.
+    func testFreshLaunchShowsOnboarding() {
+        let app = makeApp(completedOnboarding: false)
         app.launch()
-
-        let prayerTab = app.tabBars.buttons["Prayer"]
         let getStarted = app.buttons["Get Started"]
-
-        // Launch work is async (database open + bootstrap): give the first
-        // real screen a generous-but-bounded window to appear.
-        let deadline = Date().addingTimeInterval(20)
-        var sawValidScreen = false
-        while Date() < deadline {
-            if prayerTab.exists || getStarted.exists {
-                sawValidScreen = true
-                break
-            }
-            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
-        }
-
-        XCTAssertTrue(
-            sawValidScreen,
-            "Expected either the onboarding welcome step or the tab bar after launch"
-        )
-
-        if prayerTab.exists {
-            assertAllTabsExist(in: app)
-        }
+        XCTAssertTrue(getStarted.waitForExistence(timeout: 20), "Expected onboarding on a fresh launch")
     }
 
     // MARK: - Tab bar
@@ -66,18 +37,12 @@ final class SmokeUITests: XCTestCase {
     /// Verifies all five tabs exist and are tappable. If the install is fresh
     /// it first walks onboarding defensively; when onboarding cannot be
     /// completed in this environment (no location/network), the test skips.
-    func testTabBarButtonsExistAndSwitchTabs() throws {
+    func testTabBarButtonsExistAndSwitchTabs() {
         let app = makeApp()
         app.launch()
 
-        let prayerTab = app.tabBars.buttons["Prayer"]
-        if !prayerTab.waitForExistence(timeout: 20) {
-            try walkOnboarding(app: app)
-            try XCTSkipIf(
-                !prayerTab.waitForExistence(timeout: 15),
-                "Onboarding could not be completed in this environment (location step needs a device fix or network geocoding); skipping tab assertions"
-            )
-        }
+        let prayerTab = app.tabBars.buttons["Today"]
+        XCTAssertTrue(prayerTab.waitForExistence(timeout: 20), "Expected the completed five-tab shell")
 
         assertAllTabsExist(in: app)
 
@@ -86,6 +51,18 @@ final class SmokeUITests: XCTestCase {
             button.tap()
             XCTAssertTrue(button.isSelected, "Tapping the \(label) tab should select it")
         }
+    }
+
+    /// Launches under an RTL locale and ensures the app reaches a usable root.
+    /// Exact Urdu copy is intentionally not asserted so translation edits do
+    /// not make this layout smoke test brittle.
+    func testUrduRTLLaunchSmoke() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(ur)", "-AppleLocale", "ur_PK", "--uitesting-complete-onboarding"]
+        app.launch()
+        let hasTabBar = app.tabBars.firstMatch.waitForExistence(timeout: 20)
+        let hasOnboarding = app.buttons.count > 0 || app.scrollViews.count > 0
+        XCTAssertTrue(hasTabBar || hasOnboarding, "Expected a usable tab shell or onboarding screen in Urdu RTL")
     }
 
     // MARK: - Onboarding walk-through (defensive)

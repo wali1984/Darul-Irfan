@@ -18,12 +18,9 @@ struct MediaResumeEntry: Identifiable, Equatable {
 /// items into playable queue entries and classifying items that cannot be
 /// played natively on iOS.
 enum MediaPlayback {
-    /// Queue ID for the AlMurshid TV live stream (not a catalog item).
-    static let liveStreamID = "live-almurshid-tv"
-
-    /// Default AlMurshid TV live audio URL. Treated as a remote-config
-    /// default carried over from the prototype; the stream may be off air.
-    static let liveStreamURLString = "https://stream.darulirfan.org/almurshid-tv.mp3"
+    /// Stable ID used by the official owned-stream player and its Lock Screen
+    /// / mini-player live treatment. No URL is bundled with this identifier.
+    static let liveStreamID = "official-live"
 
     /// Builds the playable representation of a catalog item, preferring the
     /// downloaded local file over the remote stream URL. Returns nil when the
@@ -129,7 +126,7 @@ struct MediaTitleText: View {
 // MARK: - Home view model
 
 /// State for the Media tab home: Continue Listening, category counts, and the
-/// AlMurshid TV live stream entry point.
+/// catalog browsing and playback progress.
 @Observable
 @MainActor
 final class MediaViewModel {
@@ -145,10 +142,6 @@ final class MediaViewModel {
     private(set) var totalItemCount = 0
     private(set) var assetsByMediaItemID: [String: DownloadedAsset] = [:]
 
-    /// Shown when the live stream appears to have failed shortly after start.
-    var showsStreamUnavailableAlert = false
-
-    private var liveCheckTask: Task<Void, Never>?
     private var hasLoadedOnce = false
 
     init(
@@ -213,37 +206,4 @@ final class MediaViewModel {
         }
     }
 
-    /// Starts the AlMurshid TV live audio stream and schedules a best-effort
-    /// check: if the player has stopped (or never started) a few seconds
-    /// later, the stream is likely off air and a gentle alert is shown.
-    func playLiveStream() {
-        guard let url = URL(string: MediaPlayback.liveStreamURLString) else { return }
-        let liveItem = AudioPlayableItem(
-            id: MediaPlayback.liveStreamID,
-            title: "AlMurshid TV",
-            subtitle: "Live audio stream",
-            url: url,
-            mediaItemID: nil
-        )
-        audioPlayer.play(liveItem, queue: [liveItem])
-
-        liveCheckTask?.cancel()
-        liveCheckTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 5_000_000_000)
-            guard let self, !Task.isCancelled else { return }
-            let player = self.audioPlayer
-            let stoppedEntirely = player.nowPlaying == nil
-            let stalledAtStart = player.nowPlaying?.id == MediaPlayback.liveStreamID
-                && !player.isPlaying
-                && player.currentTime < 1
-            if stoppedEntirely || stalledAtStart {
-                self.showsStreamUnavailableAlert = true
-            }
-        }
-    }
-
-    func cancelLiveStreamCheck() {
-        liveCheckTask?.cancel()
-        liveCheckTask = nil
-    }
 }

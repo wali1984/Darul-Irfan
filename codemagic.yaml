@@ -67,6 +67,26 @@ workflows:
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath build/Tests.xcresult \
             2>&1 | tee build/logs/xcodebuild-tests.log | xcbeautify
+      - name: Run UI tests on simulator
+        script: |
+          set -o pipefail
+          command -v xcbeautify >/dev/null || brew install xcbeautify
+          mkdir -p build/logs
+          DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
+          xcodebuild test \
+            -project DarulIrfan.xcodeproj \
+            -scheme DarulIrfan \
+            -destination "platform=iOS Simulator,name=${DEVICE}" \
+            -only-testing:DarulIrfanUITests \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath build/UITests.xcresult \
+            2>&1 | tee build/logs/xcodebuild-ui-tests.log | xcbeautify
+      - name: Verify serverless platform
+        script: |
+          cd Server
+          npm ci
+          npm run check
+          npm test
       - name: Run content-ingest pipeline tests
         script: |
           cd Tools/ContentIngest
@@ -152,6 +172,21 @@ workflows:
             --certificate-key @env:CERTIFICATE_PRIVATE_KEY \
             --create \
             --verbose
+          # Extension profiles must exist separately. All identifiers and the
+          # shared App Group/APNs capabilities must first be registered in the
+          # Apple Developer portal; Codemagic cannot infer those capabilities.
+          for BUNDLE_ID in \
+            us.naqshbaniaowaisiah.widgets \
+            us.naqshbaniaowaisiah.watchkitapp \
+            us.naqshbaniaowaisiah.watchkitapp.widgets
+          do
+            app-store-connect fetch-signing-files "${BUNDLE_ID}" \
+              --type IOS_APP_STORE \
+              --platform IOS \
+              --certificate-key @env:CERTIFICATE_PRIVATE_KEY \
+              --create \
+              --verbose
+          done
           keychain add-certificates
           echo "--- Provisioning profiles fetched:"
           ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || true

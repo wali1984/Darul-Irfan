@@ -32,8 +32,8 @@ tablet screenshots don't look like blown-up phone shots. Localise a full **Urdu
 - Use a clean device state: real city (e.g. Chakwal or the reviewer's city),
   plausible next-prayer countdown, no debug banners, full status bar
   (9:41, full signal/battery).
-- Do not screenshot the **video** (YouTube) player or any "future" surface
-  (Live Activity, Watch) — they are not in-app features.
+- Do not use third-party video frames as marketing artwork. Live Activity and
+  Watch screenshots may be added only from the signed, device-validated build.
 
 ---
 

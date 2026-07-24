@@ -48,17 +48,6 @@
     "rightsStatus": "permissionConfirmed"
   },
   {
-    "id": "almurshid-tv-live",
-    "title": "AlMurshid TV (Live Audio)",
-    "language": "ur",
-    "mediaType": "audio",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/almurshidtv",
-    "streamUrl": "https://stream.darulirfan.org/almurshid-tv.mp3",
-    "category": "alMurshidTV",
-    "checksum": "1a526ad620464a0243fc0b9fca4f4bcf80217b557f8f9e586be716ef577cef6c",
-    "rightsStatus": "permissionConfirmed"
-  },
-  {
     "id": "lecture-2366-2024-01-05-nimaz-ki-fazeelat",
     "title": "نماز کی فضیلت",
     "language": "ur",

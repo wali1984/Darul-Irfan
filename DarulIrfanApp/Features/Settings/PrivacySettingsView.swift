@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// Static privacy summary. Mirrors the app's privacy commitments: on-device
-/// location, no ads, no trackers, no analytics.
+/// Privacy summary reflecting the user's current opt-in service choices.
 @MainActor
 struct PrivacySettingsView: View {
+    let appState: AppState
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
@@ -22,15 +22,19 @@ struct PrivacySettingsView: View {
 
                 PrivacyCard(
                     systemImage: "hand.raised.fill",
-                    titleKey: "No ads, no trackers, no analytics",
-                    bodyKey: "Darul Irfan contains no advertising, no third-party trackers, and no analytics. Nothing about your reading, listening, or prayer habits leaves your device."
+                    titleKey: "No ads or third-party trackers",
+                    bodyKey: "Darul Irfan contains no advertising and no third-party tracking SDK. Reading, listening, prayer history, bookmarks, and tasbih activity remain on this device. Anonymous Apple diagnostics are sent only if you explicitly opt in."
                 )
                 .diAppear(delay: 0.12)
 
                 PrivacyCard(
                     systemImage: "bell.fill",
-                    titleKey: "Notifications are local",
-                    bodyKey: "Prayer alerts and the reminders you set are scheduled entirely on your device by iOS. No notification service in the cloud is involved."
+                    titleKey: "Notification choice",
+                    bodyKey: LocalizedStringKey(
+                        appState.settings.push.isEnabled
+                            ? "Prayer and reminder alerts are scheduled locally. You also opted in to official live/update alerts; only a random installation ID, Apple push token, locale, timezone, app version, and selected topics are registered."
+                            : "Prayer alerts and reminders are scheduled entirely on this device. Official live/update push alerts are currently off."
+                    )
                 )
                 .diAppear(delay: 0.18)
 
@@ -41,7 +45,7 @@ struct PrivacySettingsView: View {
                 )
                 .diAppear(delay: 0.24)
 
-                Text("Network access is used only to stream or download the content you request, such as lectures and publications from naqshbandiaowaisiah.org.")
+                Text("Network access refreshes official public content and live status, and streams or downloads content you request. Precise location is never included.")
                     .font(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .padding(.horizontal, DISpacing.xs)

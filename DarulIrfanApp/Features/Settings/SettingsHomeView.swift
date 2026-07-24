@@ -111,12 +111,21 @@ struct SettingsHomeView: View {
             }
 
             SettingsNavLink(
+                titleKey: "Official Alerts & Privacy",
+                systemImage: "dot.radiowaves.left.and.right",
+                value: Text(appState.settings.push.isEnabled ? "On" : "Off"),
+                delay: 0.55
+            ) {
+                OfficialServicesSettingsView(dependencies: dependencies, appState: appState)
+            }
+
+            SettingsNavLink(
                 titleKey: "Privacy",
                 systemImage: "hand.raised.fill",
                 value: nil,
                 delay: 0.58
             ) {
-                PrivacySettingsView()
+                PrivacySettingsView(appState: appState)
             }
         }
     }

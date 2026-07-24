@@ -135,14 +135,23 @@ final class AppState {
                 && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset)
         }?.time
 
-        PrayerWidgetSnapshot(
+        let snapshot = PrayerWidgetSnapshot(
             generatedAt: now,
             placeName: place.name,
             upcomingTimes: upcoming,
             hijriDateText: hijriText,
             suhoorEndsAt: suhoorEndsAt,
             iftarAt: iftarAt
-        ).save()
+        )
+        snapshot.save()
+        dependencies.watchSync.send(snapshot)
+        Task {
+            await dependencies.prayerLiveActivity.update(
+                upcoming: upcoming,
+                placeName: place.name,
+                enabled: settings.liveActivitiesEnabled
+            )
+        }
     }
 }
 

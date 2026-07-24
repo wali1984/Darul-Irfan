@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-23T20:00:00Z",
+  "minimumSupportedVersion": "1.2.1",
+  "featureFlags": {
+    "officialFeed": true,
+    "liveHub": true,
+    "pushRegistration": true,
+    "diagnostics": false
+  },
+  "officialLinks": {
+    "website": "https://www.naqshbandiaowaisiah.org/"
+  },
+  "schedules": [
+    {
+      "id": "evening",
+      "title": "Online Zikr",
+      "weekdays": [1, 2, 3, 4, 5, 6, 7],
+      "startHour": 21,
+      "startMinute": 15,
+      "durationMinutes": 30,
+      "timeZoneIdentifier": "Asia/Karachi"
+    }
+  ],
+  "live": {
+    "id": "official-live",
+    "state": "live",
+    "title": "Live Zikr",
+    "sources": [
+      {
+        "kind": "youtube",
+        "url": "https://www.youtube.com/watch?v=abc123",
+        "videoID": "abc123",
+        "supportsBackgroundAudio": false
+      }
+    ],
+    "updatedAt": "2026-07-23T20:00:00Z"
+  },
+  "contentVersions": {
+    "officialFeed": 1
+  }
+}

@@ -28,6 +28,10 @@ final class AppDependencies {
     let downloadManager: any DownloadManaging
     let contentSync: any ContentSyncServicing
     let searchIndex: any SearchIndexServicing
+    let officialPlatform: OfficialPlatformService
+    let metricKitDiagnostics: MetricKitDiagnosticsBridge
+    let prayerLiveActivity: PrayerLiveActivityCoordinator
+    let watchSync: WatchSyncService
 
     init(
         database: AppDatabase,
@@ -46,7 +50,11 @@ final class AppDependencies {
         audioPlayer: any AudioPlayerServicing,
         downloadManager: any DownloadManaging,
         contentSync: any ContentSyncServicing,
-        searchIndex: any SearchIndexServicing
+        searchIndex: any SearchIndexServicing,
+        officialPlatform: OfficialPlatformService,
+        metricKitDiagnostics: MetricKitDiagnosticsBridge,
+        prayerLiveActivity: PrayerLiveActivityCoordinator,
+        watchSync: WatchSyncService
     ) {
         self.database = database
         self.quranRepository = quranRepository
@@ -65,6 +73,10 @@ final class AppDependencies {
         self.downloadManager = downloadManager
         self.contentSync = contentSync
         self.searchIndex = searchIndex
+        self.officialPlatform = officialPlatform
+        self.metricKitDiagnostics = metricKitDiagnostics
+        self.prayerLiveActivity = prayerLiveActivity
+        self.watchSync = watchSync
     }
 
     /// Builds the full live graph. Called once from DarulIrfanApp at launch.
@@ -96,6 +108,10 @@ final class AppDependencies {
             database: database,
             searchIndex: searchIndex
         )
+        let officialPlatform = OfficialPlatformService(database: database)
+        let metricKitDiagnostics = MetricKitDiagnosticsBridge(uploader: officialPlatform)
+        let prayerLiveActivity = PrayerLiveActivityCoordinator()
+        let watchSync = WatchSyncService()
 
         return AppDependencies(
             database: database,
@@ -114,7 +130,11 @@ final class AppDependencies {
             audioPlayer: AudioPlayerService(mediaRepository: mediaRepository),
             downloadManager: DownloadManager(downloadsRepository: downloadsRepository),
             contentSync: contentSync,
-            searchIndex: searchIndex
+            searchIndex: searchIndex,
+            officialPlatform: officialPlatform,
+            metricKitDiagnostics: metricKitDiagnostics,
+            prayerLiveActivity: prayerLiveActivity,
+            watchSync: watchSync
         )
     }
 }

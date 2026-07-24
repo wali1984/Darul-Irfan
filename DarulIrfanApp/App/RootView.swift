@@ -1,15 +1,12 @@
 import SwiftUI
 
 /// Root shell shown once dependencies are ready: gates on onboarding, then
-/// hosts the five-tab navigation with the shared mini audio player bar
-/// overlaid above the tab bar. Feature code never draws its own mini player.
+/// hosts the five-tab navigation with the shared mini audio player bar.
 struct RootView: View {
+    private enum AppTab: Hashable { case today, quran, zikr, explore, more }
     let dependencies: AppDependencies
     let appState: AppState
-
-    /// Height of the standard compact tab bar (points above the bottom safe
-    /// area). Used to float the mini player directly above it.
-    private static let tabBarHeight: CGFloat = 49
+    @State private var selectedTab: AppTab = .today
 
     var body: some View {
         if appState.settings.hasCompletedOnboarding {
@@ -23,48 +20,49 @@ struct RootView: View {
     }
 
     private var tabShell: some View {
-        // The mini player lives in a ZStack over the whole TabView, padded by
-        // the tab bar height, instead of a `safeAreaInset` repeated inside all
-        // five tabs. Tradeoff: the 49pt constant matches the compact-height
-        // tab bar (iPhone portrait); tab content does not automatically gain
-        // extra bottom inset while the bar is visible, so scrollable feature
-        // screens keep comfortable bottom padding of their own.
-        ZStack(alignment: .bottom) {
-            TabView {
-                PrayerTabView(dependencies: dependencies, appState: appState)
-                    .tabItem {
-                        Label("Today", systemImage: "moon.stars")
-                    }
+        TabView(selection: $selectedTab) {
+            PrayerTabView(dependencies: dependencies, appState: appState)
+                .tabItem { Label("Today", systemImage: "moon.stars") }
+                .tag(AppTab.today)
 
-                QuranTabView(dependencies: dependencies, appState: appState)
-                    .tabItem {
-                        Label("Quran", systemImage: "book")
-                    }
+            QuranTabView(dependencies: dependencies, appState: appState)
+                .tabItem { Label("Quran", systemImage: "book") }
+                .tag(AppTab.quran)
 
-                LibraryTabView(dependencies: dependencies, appState: appState)
-                    .tabItem {
-                        Label("Library", systemImage: "books.vertical")
-                    }
-
-                MediaTabView(dependencies: dependencies, appState: appState)
-                    .tabItem {
-                        Label("Media", systemImage: "play.circle")
-                    }
-
-                MoreTabView(dependencies: dependencies, appState: appState)
-                    .tabItem {
-                        Label("More", systemImage: "ellipsis.circle")
-                    }
+            NavigationStack {
+                ZikrHomeView(dependencies: dependencies, appState: appState)
             }
-            .tint(DIColor.primary)
+            .tabItem { Label("Zikr", systemImage: "sparkles") }
+            .tag(AppTab.zikr)
 
+            ExploreTabView(dependencies: dependencies, appState: appState)
+                .tabItem { Label("Explore", systemImage: "safari") }
+                .tag(AppTab.explore)
+
+            MoreTabView(dependencies: dependencies, appState: appState)
+                .tabItem { Label("More", systemImage: "ellipsis.circle") }
+                .tag(AppTab.more)
+        }
+        .tint(DIColor.primary)
+        // `safeAreaInset` adapts to compact/regular tab bars, iPad and future
+        // system tab-bar sizes instead of relying on a fixed 49-point offset.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             if dependencies.audioPlayer.nowPlaying != nil {
                 MiniPlayerBar(audioPlayer: dependencies.audioPlayer)
                     .environment(\.diMediaRepository, dependencies.mediaRepository)
-                    .padding(.bottom, Self.tabBarHeight)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .animation(.easeInOut(duration: 0.25), value: dependencies.audioPlayer.nowPlaying)
+        .onReceive(NotificationCenter.default.publisher(for: .didReceiveAppDeepLink)) { notification in
+            guard let path = notification.object as? String else { return }
+            if path.contains("/live") || path.contains("/zikr") { selectedTab = .zikr }
+            else if path.contains("/feed") || path.contains("/events") { selectedTab = .explore }
+        }
+        .onOpenURL { url in
+            let path = ((url.host ?? "") + url.path).lowercased()
+            if path.contains("live") || path.contains("zikr") { selectedTab = .zikr }
+            else if path.contains("feed") || path.contains("event") { selectedTab = .explore }
+        }
     }
 }

@@ -7,6 +7,7 @@ struct MediaTabView: View {
     private let dependencies: AppDependencies
     private let appState: AppState
     @State private var viewModel: MediaViewModel
+    @State private var officialViewModel: OfficialPlatformViewModel
     @State private var showsSearch = false
 
     init(dependencies: AppDependencies, appState: AppState) {
@@ -17,6 +18,10 @@ struct MediaTabView: View {
             downloadsRepository: dependencies.downloadsRepository,
             downloadManager: dependencies.downloadManager,
             audioPlayer: dependencies.audioPlayer
+        ))
+        _officialViewModel = State(initialValue: OfficialPlatformViewModel(
+            feedService: dependencies.officialPlatform,
+            liveService: dependencies.officialPlatform
         ))
     }
 
@@ -73,86 +78,25 @@ struct MediaTabView: View {
                 GlobalSearchView(dependencies: dependencies)
             }
             .task {
-                await viewModel.load()
+                async let media: Void = viewModel.load()
+                async let official: Void = officialViewModel.load()
+                _ = await (media, official)
             }
             .refreshable {
-                await viewModel.load()
-            }
-            .onDisappear {
-                viewModel.cancelLiveStreamCheck()
-            }
-            .alert(
-                "Stream Unavailable",
-                isPresented: Binding(
-                    get: { viewModel.showsStreamUnavailableAlert },
-                    set: { viewModel.showsStreamUnavailableAlert = $0 }
-                )
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("The AlMurshid TV live stream could not be reached. It may be off air right now — please try again later.")
+                async let media: Void = viewModel.load()
+                async let official: Void = officialViewModel.load(forceRefresh: true)
+                _ = await (media, official)
             }
         }
     }
 
     // MARK: - AlMurshid TV live card
 
-    /// The AlMurshid TV sub-brand hero — a living crimson panel with a breathing
-    /// glow, a pierced-jali watermark, and a pulsing LIVE pill.
     private var liveCard: some View {
-        ZStack(alignment: .topLeading) {
-            MediaStyle.crimson
-
-            DIPatternTexture(tint: .white, opacity: 0.07)
-                .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
-
-            DIOctagram(innerRatio: 0.5)
-                .stroke(Color.white, lineWidth: 1.5)
-                .frame(width: 220, height: 220)
-                .opacity(0.07)
-                .offset(x: 130, y: -60)
-                .accessibilityHidden(true)
-
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack(spacing: DISpacing.sm) {
-                    Image(systemName: "dot.radiowaves.left.and.right")
-                        .font(.title3)
-                        .foregroundStyle(.white)
-                        .accessibilityHidden(true)
-                    Text("AlMurshid TV")
-                        .font(DIFont.subheading)
-                        .foregroundStyle(.white)
-                    Spacer(minLength: 0)
-                    MediaLivePill(fill: Color.white.opacity(0.22), foreground: .white)
-                }
-                Text("Listen to the live audio stream from Dar ul Irfan. The stream plays while a broadcast is on air.")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.9))
-                    .fixedSize(horizontal: false, vertical: true)
-                Button {
-                    DIHaptics.light()
-                    viewModel.playLiveStream()
-                } label: {
-                    Label("Listen live", systemImage: "play.fill")
-                        .font(.headline)
-                        .foregroundStyle(DIColor.crimson)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-                }
-                .buttonStyle(DIPressableStyle())
-                .padding(.top, DISpacing.xs)
-                .accessibilityLabel(Text("Listen to the AlMurshid TV live stream"))
-            }
-            .padding(DISpacing.md)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        LiveBroadcastCard(
+            broadcast: officialViewModel.live,
+            audioPlayer: dependencies.audioPlayer
         )
-        .diBreathingGlow(color: DIColor.crimson, maxRadius: 20)
     }
 
     // MARK: - Continue Listening

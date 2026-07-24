@@ -80,7 +80,40 @@ struct AppSettings: Codable, Sendable, Equatable {
     /// Whether to auto-download new content packs on Wi-Fi.
     var autoDownloadOnWifi = false
 
+    // Official platform services. No account or personal profile is created.
+    var push = PushPreferences()
+    var diagnosticsConsent: DiagnosticsConsent = .notAsked
+    var liveActivitiesEnabled = false
+
     static let `default` = AppSettings()
+
+    private enum CodingKeys: String, CodingKey {
+        case language, theme, readerFontScale, locationMode, manualPlace
+        case lastKnownPlace, calculation, prayerNotifications, hijri
+        case hasCompletedOnboarding, autoDownloadOnWifi, push, diagnosticsConsent, liveActivitiesEnabled
+    }
+
+    init() {}
+
+    /// Decode additively so installing a new release never resets settings
+    /// written by schema-v1 builds that predate push and diagnostics choices.
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        language = try values.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .system
+        theme = try values.decodeIfPresent(AppTheme.self, forKey: .theme) ?? .system
+        readerFontScale = try values.decodeIfPresent(ReaderFontScale.self, forKey: .readerFontScale) ?? .standard
+        locationMode = try values.decodeIfPresent(LocationMode.self, forKey: .locationMode) ?? .device
+        manualPlace = try values.decodeIfPresent(PlaceCoordinate.self, forKey: .manualPlace)
+        lastKnownPlace = try values.decodeIfPresent(PlaceCoordinate.self, forKey: .lastKnownPlace)
+        calculation = try values.decodeIfPresent(PrayerCalculationPreferences.self, forKey: .calculation) ?? PrayerCalculationPreferences()
+        prayerNotifications = try values.decodeIfPresent(PrayerNotificationPreferences.self, forKey: .prayerNotifications) ?? .default
+        hijri = try values.decodeIfPresent(HijriPreferences.self, forKey: .hijri) ?? HijriPreferences()
+        hasCompletedOnboarding = try values.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? false
+        autoDownloadOnWifi = try values.decodeIfPresent(Bool.self, forKey: .autoDownloadOnWifi) ?? false
+        push = try values.decodeIfPresent(PushPreferences.self, forKey: .push) ?? PushPreferences()
+        diagnosticsConsent = try values.decodeIfPresent(DiagnosticsConsent.self, forKey: .diagnosticsConsent) ?? .notAsked
+        liveActivitiesEnabled = try values.decodeIfPresent(Bool.self, forKey: .liveActivitiesEnabled) ?? false
+    }
 }
 
 // MARK: - Search

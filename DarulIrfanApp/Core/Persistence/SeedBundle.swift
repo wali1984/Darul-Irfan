@@ -126,13 +126,13 @@ enum SeedBundle {
 
     private static func data(forFile fileName: String) -> Data? {
         guard let url = url(forFile: fileName) else {
-            print("SeedBundle: \(fileName).json is not present in the app bundle.")
+            AppLog.content("Seed file is missing: \(fileName).json")
             return nil
         }
         do {
             return try Data(contentsOf: url)
         } catch {
-            print("SeedBundle: could not read \(fileName).json — \(error)")
+            AppLog.content("Could not read seed file \(fileName).json: \(error.localizedDescription)")
             return nil
         }
     }
@@ -147,7 +147,7 @@ enum SeedBundle {
         do {
             return try makeDecoder().decode([Element].self, from: data)
         } catch {
-            print("SeedBundle: could not decode \(fileName).json — \(error)")
+            AppLog.content("Could not decode seed file \(fileName).json: \(error.localizedDescription)")
             return []
         }
     }
@@ -162,7 +162,7 @@ enum SeedBundle {
         do {
             return try makeDecoder().decode(Value.self, from: data)
         } catch {
-            print("SeedBundle: could not decode \(fileName).json — \(error)")
+            AppLog.content("Could not decode seed file \(fileName).json: \(error.localizedDescription)")
             return nil
         }
     }

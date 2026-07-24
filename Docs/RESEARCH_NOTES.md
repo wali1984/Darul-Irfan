@@ -71,5 +71,7 @@ agents: treat these as authoritative; do not re-derive from memory.
 - Palette (already encoded in `Core/DesignSystem/Theme.swift`): primary #0B6E4F, primaryDark #063D2C, accent #C9A24B, background #F6F3EC, surface #FFFFFF, text #1C1C1C, textMuted #6B6B6B, border #E2DCCD, danger #B3261E. Spacing 4/8/16/24/32; radii 8/12/20.
 - App name ur: **دارالعرفان**; tagline en "Light of Sacred Knowledge" / ur "علمِ مقدس کی روشنی". Full en/ur strings for prayer names, common actions, settings are in the prototype's `src/locales/*.json` — reuse translations in the String Catalog (prayer names: فجر، طلوعِ آفتاب، ظہر، عصر، مغرب، عشاء).
 - Quran recitation audio CDN used by prototype: `https://everyayah.com/data/Alafasy_128kbps/{surah:03d}{ayah:03d}.mp3`.
-- AlMurshid TV live audio URL used by prototype: `https://stream.darulirfan.org/almurshid-tv.mp3` (treat as remote-config default; may be unavailable — handle failure gracefully).
+- Historical prototype only: `stream.darulirfan.org` was never confirmed and
+  must not be compiled as a default. Production owned audio is accepted only
+  through staff-managed remote configuration after authorization.
 - **Deliberately NOT ported**: the prototype's on-the-fly AI translation of religious content (violates the "do not paraphrase religious content" principle) and its client-side Anthropic API key usage.

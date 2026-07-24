@@ -8,22 +8,57 @@ import Observation
 @MainActor
 final class ZikrHomeViewModel {
     private let notifications: any NotificationScheduling
+    private let platform: OfficialPlatformService
 
     private(set) var sessions: [ZikrSession] = []
     private(set) var nextOccurrences: [String: Date] = [:]
     private(set) var reminderEnabled: [String: Bool] = [:]
     private(set) var isLoaded = false
+    private(set) var live: LiveBroadcast = .offline
     var showPermissionAlert = false
 
     /// Minutes before the session start that the reminder fires.
     private let reminderLeadMinutes = 10
 
-    init(notifications: any NotificationScheduling) {
+    init(notifications: any NotificationScheduling, platform: OfficialPlatformService) {
         self.notifications = notifications
+        self.platform = platform
     }
 
     func load() async {
-        let loaded = SeedBundle.zikrSessions()
+        let bootstrap = await platform.bootstrap(forceRefresh: false)
+        live = await platform.currentLiveBroadcast(forceRefresh: false)
+        let remote = bootstrap.schedules.map { schedule in
+            ZikrSession(
+                id: schedule.id,
+                title: schedule.title,
+                weekdays: schedule.weekdays,
+                startHour: schedule.startHour,
+                startMinute: schedule.startMinute,
+                durationMinutes: schedule.durationMinutes,
+                timeZoneIdentifier: schedule.timeZoneIdentifier,
+                joinUrl: schedule.joinURL?.absoluteString,
+                instructions: schedule.instructions,
+                availabilityNote: schedule.availabilityNote,
+                sourceUrl: bootstrap.officialLinks["website"]?.absoluteString
+            )
+        }
+        // A reachable control plane with no active schedule is authoritative:
+        // do not resurrect the old approximate timings that conflicted with
+        // the official site. Bundled sessions are used only for a true
+        // first-launch/offline fallback and are labelled for verification.
+        let loaded: [ZikrSession]
+        if !remote.isEmpty {
+            loaded = remote
+        } else if bootstrap.generatedAt == .distantPast {
+            loaded = SeedBundle.zikrSessions().map { session in
+                var fallback = session
+                fallback.availabilityNote = String(localized: "Offline fallback timing — verify the current schedule on naqshbandiaowaisiah.org before joining.")
+                return fallback
+            }
+        } else {
+            loaded = []
+        }
         sessions = loaded
 
         var occurrences: [String: Date] = [:]

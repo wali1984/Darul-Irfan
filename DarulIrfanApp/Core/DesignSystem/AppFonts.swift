@@ -16,12 +16,12 @@ enum AppFonts {
     static func registerBundledFonts() {
         for base in ["AmiriQuran-Regular", "NotoNastaliqUrdu-Regular"] {
             guard let url = bundleURL(base) else {
-                print("[AppFonts] NOT FOUND in bundle: \(base).ttf")
+                AppLog.presentation("Font not found in bundle: \(base).ttf")
                 continue
             }
             var error: Unmanaged<CFError>?
             let ok = CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error)
-            print("[AppFonts] \(base): \(ok ? "registered" : "already/failed")")
+            AppLog.presentation("Font \(base): \(ok ? "registered" : "already registered or failed")")
         }
         // Force name resolution now that registration has run.
         _ = quranArabicName
@@ -54,7 +54,7 @@ enum AppFonts {
         for name in candidates where UIFont(name: name, size: 16) != nil {
             return name
         }
-        print("[AppFonts] none of \(candidates) resolved; falling back to system")
+        AppLog.presentation("No bundled font candidate resolved; falling back to system")
         return candidates.first ?? "System"
     }
 }

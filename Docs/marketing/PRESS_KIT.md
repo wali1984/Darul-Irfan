@@ -111,7 +111,7 @@ ad-free, and private by design.
 | Prayer engine | On-device (adhan), 12 methods, Hanafi/Shafi, offline |
 | Qur'an | 114 surahs · 6,236 ayat · Amiri Quran face · Pickthall + Jalandhry · triple-verified |
 | Library | 291 items incl. About pages, articles (verbatim), the Sheikh's works catalogue, books |
-| Media | 199 items · audio bayans (background + offline) · Al-Murshid TV & magazine archive |
+| Media | 198 verified items · audio bayans (background + offline) · official live hub and magazine archive |
 | Zikr | Verified Method of Zikr · online zikr schedule · tasbih |
 | Privacy | No ads, no trackers, no accounts, no data collection; location on-device only |
 | Localisation | English & Urdu, full RTL |
@@ -163,7 +163,9 @@ ad-free, and private by design.
 - **HQ:** Dar-ul-Irfan, Munara, Khushab Road, District Chakwal, Punjab, Pakistan
 - **Press assets:** app icon, seal/octagram emblem, and the 8 screenshots (see
   `SCREENSHOTS_PLAN.md`); colours and type in `BRAND_GUIDE.md`.
-- **Privacy:** Data Not Collected — see `Docs/PRIVACY.md`.
+- **Privacy:** no ads or tracking; precise location and devotional activity
+  stay on-device; official alerts and anonymous diagnostics are opt-in — see
+  `Docs/PRIVACY.md`.
 
 *Please observe honorifics when quoting: the Prophet Muhammad ﷺ; Hazrat Ameer
 Abdul Qadeer Awan (MZA); Hazrat Ameer Muhammad Akram Awan (RA). Keep any

@@ -12,9 +12,11 @@ seed data). Character counts are noted where Apple enforces a limit.
 >   **Akram-ut-Tafaseer**, **Akram-ut-Tarajum**) are catalogued as **editions
 >   with source links**, not yet full offline text — describe them as a
 >   *catalogue*, never as "read the full tafsir offline."
-> - **Video** lectures open in YouTube externally; only **audio** bayans stream
->   and download in-app. Do not imply an in-app video player.
-> - Live Activities and an Apple Watch app are **future** — never listed.
+> - Official YouTube broadcasts use a foreground, controlled in-app player
+>   with an external YouTube fallback. YouTube content is never extracted or
+>   downloaded; only organization-owned direct audio supports background play.
+> - Live Activities and the Apple Watch companion may be listed only after the
+>   signed release candidate passes physical-device and TestFlight validation.
 
 ---
 
@@ -300,6 +302,6 @@ Rationale for the App Privacy / age questionnaire:
 | Support email | `Darulirfan@gmail.com` |
 | Copyright | `© 2026 Silsila Naqshbandia Owaisiah, Dar-ul-Irfan` |
 
-> App Privacy answer: **Data Not Collected** for every category (see
-> `Docs/PRIVACY.md`). Review Notes: no account needed; reviewers can exercise
-> every feature after onboarding.
+> App Privacy: disclose the optional APNs installation/device identifier for
+> app functionality and optional MetricKit diagnostics; neither is linked to
+> identity or used for tracking. See `Docs/PRIVACY.md`. No account is needed.

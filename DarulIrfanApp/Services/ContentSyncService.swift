@@ -6,9 +6,8 @@ import Foundation
 ///
 /// `files` maps a payload name (currently understood: "media_items",
 /// "events") to the URL of a JSON file containing an array of the matching
-/// model — absolute, or relative to the manifest's own location. The server
-/// side of this endpoint is future work; until it exists every fetch simply
-/// resolves to "nothing new".
+/// model — absolute, or relative to the deployed GitHub-hosted manifest.
+/// Network failures resolve to cached/bundled content and never block launch.
 struct RemoteManifest: Codable, Sendable, Equatable {
     var version: Int
     var files: [String: String]
@@ -144,7 +143,7 @@ struct ContentSyncService: ContentSyncServicing {
         guard imported > 0 else {
             // A completely empty bundle means the seed files did not ship.
             // Leave seed.version unchanged so a corrected build imports.
-            print("ContentSyncService: seed bundle contained no records; skipping version stamp.")
+            AppLog.content("Seed bundle contained no records; skipping version stamp.")
             return 0
         }
 
@@ -271,7 +270,7 @@ struct ContentSyncService: ContentSyncServicing {
             else { return [] }
             return try makeDecoder().decode([Element].self, from: data)
         } catch {
-            print("ContentSyncService: could not fetch \(url.absoluteString) — \(error)")
+            AppLog.content("Remote content fetch failed for \(url.host ?? "unknown host"): \(error.localizedDescription)")
             return []
         }
     }

@@ -12,7 +12,9 @@ missing, extend your own feature files, never the contracts.
 | `DarulIrfanApp/Models/*.swift` | All domain models: `Prayer`, `PrayerDaySchedule`, `NextPrayerInfo`, `PlaceCoordinate`, `PrayerCalculationPreferences`, `PrayerNotificationPreferences`, `PrayerLogEntry`, Quran/Content/Media/Zikr/Event/Companion/Settings models, `SearchResult` |
 | `DarulIrfanApp/Services/ServiceProtocols.swift` | Every service protocol: `PrayerCalculationServicing`, `QiblaServicing`, `LocationServicing`, `HeadingProviding`, `NotificationScheduling`, `HijriCalendarServicing`, `AudioPlayerServicing` + `AudioPlayableItem`, `DownloadManaging`, `ContentSyncServicing`, `SearchIndexServicing`, `SettingsStoring` |
 | `DarulIrfanApp/Core/Persistence/SQLiteDatabase.swift` | `SQLiteDatabase` actor: `execute(_:_:)`, `query(_:_:) -> [SQLRow]`, `executeBatch(_:)`, `executeScript(_:)`; `SQLValue` (`.text/.integer/.real/.null/.blob` + helpers `.int/.bool/.date/.optionalText/.optionalDate/.optionalInt/.optionalReal`); `SQLRow` accessors `int/int64/double/text/bool/date/blob` |
-| `DarulIrfanApp/Core/Persistence/AppDatabase.swift` | Store owner + **schema v1 DDL** — column names are law; JSON-array columns end in `_json` |
+| `DarulIrfanApp/Core/Persistence/AppDatabase.swift` | Store owner + additive schema migrations (currently v2) — column names are law; JSON-array columns end in `_json` |
+| `DarulIrfanApp/Models/OfficialPlatformModels.swift` | Versioned bootstrap, normalized feed, live-source, remote schedule, push preference, and feature-flag contracts shared conceptually with `Server/src/contracts.ts` |
+| `DarulIrfanApp/Services/OfficialPlatformService.swift` | ETag/last-known-good client for the official Worker; anonymous APNs registration and consented diagnostics transport |
 | `DarulIrfanApp/Core/Persistence/RepositoryProtocols.swift` | All repository protocols + `DayKey` helper |
 | `DarulIrfanApp/Core/DesignSystem/Theme.swift` | `DIColor`, `DISpacing`, `DIRadius`, `DIFont` tokens |
 | `DarulIrfanApp/Core/DesignSystem/Components.swift` | `DICard`, `DISectionHeader`, `DIPrimaryButtonStyle`, `DISecondaryButtonStyle`, `DIEmptyState`, `DIPillBadge`, `.diScreenBackground()` |
@@ -46,17 +48,17 @@ Each feature exposes exactly one entry-point view with this signature:
 ```swift
 struct PrayerTabView: View  { init(dependencies: AppDependencies, appState: AppState) }
 struct QuranTabView: View   { init(dependencies: AppDependencies, appState: AppState) }
-struct LibraryTabView: View { init(dependencies: AppDependencies, appState: AppState) }
-struct MediaTabView: View   { init(dependencies: AppDependencies, appState: AppState) }
+struct ZikrHomeView: View   { init(dependencies: AppDependencies, appState: AppState) }
+struct ExploreTabView: View { init(dependencies: AppDependencies, appState: AppState) }
 struct MoreTabView: View    { init(dependencies: AppDependencies, appState: AppState) }
 ```
 
 plus `struct OnboardingFlowView: View { init(dependencies: AppDependencies, appState: AppState, onComplete: @escaping () -> Void) }`
 and `struct GlobalSearchView: View { init(dependencies: AppDependencies) }` (presented as a sheet; Prayer/Quran/Library/Media toolbars may offer it).
 
-Each tab root wraps itself in its own `NavigationStack`. `MoreTabView` hosts:
-Zikr, Events & Dar-ul-Irfan, Qibla, Companion (99 Names, Duas, Islamic days,
-tasbih), Settings, About.
+Each tab root wraps itself in its own `NavigationStack`. Explore hosts official
+updates, Library, Media, Events, and search. More hosts Qibla, Companion,
+settings, privacy, diagnostics consent, organization information, and About.
 
 - The mini audio player bar is overlaid by RootView above the tab bar whenever
   `dependencies.audioPlayer.nowPlaying != nil`; feature code never draws its own.

@@ -10,7 +10,10 @@ struct ZikrHomeView: View {
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
-        _viewModel = State(initialValue: ZikrHomeViewModel(notifications: dependencies.notifications))
+        _viewModel = State(initialValue: ZikrHomeViewModel(
+            notifications: dependencies.notifications,
+            platform: dependencies.officialPlatform
+        ))
     }
 
     var body: some View {
@@ -22,6 +25,10 @@ struct ZikrHomeView: View {
                 DISectionHeader(titleKey: "Method of Zikr", systemImage: "heart")
                 MethodOfZikrCard()
                     .diAppear(delay: 0.05)
+
+                DISectionHeader(titleKey: "Live Zikr", systemImage: "dot.radiowaves.left.and.right")
+                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer)
+                    .diAppear(delay: 0.08)
 
                 DISectionHeader(titleKey: "Online Zikr", systemImage: "clock")
                 if viewModel.isLoaded && viewModel.sessions.isEmpty {

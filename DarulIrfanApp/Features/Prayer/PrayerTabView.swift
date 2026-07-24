@@ -35,6 +35,7 @@ struct PrayerTabView: View {
                     .diAppear()
                     // Daily spiritual companion cards, below the hero.
                     TodayDailySection(appState: appState)
+                    TodayOfficialSection(dependencies: dependencies)
                     DISectionHeader(titleKey: "Prayer Times", systemImage: "sun.max")
                     if !viewModel.hasLoaded {
                         loadingView

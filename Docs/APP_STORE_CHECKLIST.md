@@ -10,17 +10,21 @@ before archiving.
 |---|---|
 | App | `us.naqshbaniaowaisiah` |
 | Widget extension | `us.naqshbaniaowaisiah.widgets` |
+| Watch app | `us.naqshbaniaowaisiah.watchkitapp` |
+| Watch complication extension | `us.naqshbaniaowaisiah.watchkitapp.widgets` |
 | Unit tests | `us.naqshbaniaowaisiah.tests` |
 | UI tests | `us.naqshbaniaowaisiah.uitests` |
 | **App Group** (app + widget entitlements) | `group.us.naqshbaniaowaisiah` |
 
-- [ ] **[blocker]** Register both app IDs and the App Group in the developer
-      portal; the App Group must be enabled on the app **and** the widget ID.
+- [ ] **[blocker]** Register the app, widget, Watch app, Watch complication,
+      APNs capability, and App Group in the developer portal; enable the App
+      Group on every target that declares it.
       If the group ID ever changes, change it in `project.yml` (both
       entitlements blocks) and `Core/Shared/PrayerWidgetSnapshot.swift`
       together — the widget reads its data through that group.
-- [ ] Signing style is Automatic (`CODE_SIGN_STYLE: Automatic`); set the team
-      on the `DarulIrfan` and `DarulIrfanWidgets` targets after `xcodegen generate`.
+- [ ] Signing style is Automatic (`CODE_SIGN_STYLE: Automatic`); verify the
+      team and provisioning profile on all four shipping targets after
+      `xcodegen generate`.
 - [ ] Version `1.0.0` (build `1`) — bump via `MARKETING_VERSION` /
       `CURRENT_PROJECT_VERSION` in `project.yml`, not in Xcode (the project is
       regenerated).
@@ -83,6 +87,9 @@ before archiving.
       controls.
 - [ ] **No account** is needed; reviewers can exercise every feature
       immediately after onboarding (no demo credentials).
+- [ ] Explain the official read-only social feed, non-persistent YouTube
+      embed, Paltalk handoff, opt-in APNs alerts, 30-day opt-in MetricKit
+      diagnostics, and Cloudflare-hosted public configuration.
 - [ ] Age rating: no objectionable content; unrestricted web access is *not*
       embedded (SFSafariViewController opens specific source pages only).
 
@@ -117,8 +124,8 @@ before archiving.
 - [ ] **[blocker]** Obtain and keep the owner's **written confirmation on
       file** before submission (the 2026-07-10 grant is recorded; archive the
       written record with the submission materials).
-- [ ] **AlMurshid TV stream** (`stream.darulirfan.org`) — confirm with the
-      owner that the URL is correct and intended for public app use.
+- [ ] **Owned live audio** — if an MP3/AAC/HLS endpoint is configured, keep
+      written confirmation that it is authorized for public app streaming.
 - [ ] **App icon / visual identity** — attributed to naqshbandiaowaisiah.org.
       Content permission was granted 2026-07-10; confirm the icon/visual
       identity is covered by that grant or obtain separate approval.
@@ -164,6 +171,20 @@ before archiving.
       circular/rectangular/inline) and Today's Times (medium) show real data
       (App Group wired correctly); placeholder shows before first snapshot.
 - [ ] Countdown text updates without stale timelines across a prayer boundary.
+- [ ] Opt-in next-prayer Live Activity starts, updates, and ends when disabled;
+      Dynamic Island and Lock Screen layouts do not clip.
+- [ ] Watch app receives a phone snapshot, remains useful while disconnected,
+      and the next-prayer complication advances across a prayer boundary.
+
+**Official platform**:
+- [ ] `/v1/bootstrap`, `/v1/feed`, and `/v1/live` return valid production data;
+      the app visibly falls back to cached data during an outage.
+- [ ] Facebook token expiry and YouTube quota errors alert operators without
+      deleting cached content; manual live override is respected.
+- [ ] Official alert opt-in registers an APNs token, topic changes update it,
+      opt-out deletes it, and duplicate event IDs do not redeliver.
+- [ ] YouTube stays foreground-only; owned HTTPS audio uses native background
+      playback; Paltalk opens externally.
 
 **Permissions & flows**:
 - [ ] Onboarding: deny location → manual city path works end-to-end.
@@ -176,5 +197,6 @@ before archiving.
 
 **Final**:
 - [ ] Archive a Release build; run once from TestFlight before submitting.
-- [ ] Re-read `Docs/PRIVACY.md` against any last-minute changes and fill the
-      App Privacy questionnaire with **Data Not Collected**.
+- [ ] Re-read `Docs/PRIVACY.md` and disclose optional Device ID/APNs app
+      functionality plus optional diagnostics. Do **not** use the obsolete
+      blanket “Data Not Collected” answer for this build.

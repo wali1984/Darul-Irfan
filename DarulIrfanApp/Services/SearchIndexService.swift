@@ -234,7 +234,7 @@ struct SearchIndexService: SearchIndexServicing {
         } catch {
             // A query the FTS parser rejects should read as "no results",
             // never as a failure surfaced to the person searching.
-            print("SearchIndexService: search failed — \(error)")
+            AppLog.search("Search query failed: \(error.localizedDescription)")
             return []
         }
 

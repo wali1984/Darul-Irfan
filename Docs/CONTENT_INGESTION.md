@@ -19,9 +19,8 @@ Tools/ContentIngest  (Python: ingest.py + parsers.py + schema.py)
         ├──► curated subset copied into DarulIrfanApp/Resources/SeedData/
         │       imported idempotently at launch by ContentSyncService
         │       (guarded by the seed.version row), then FTS-indexed
-        └──► future: hosted as-is at a static endpoint; the app polls
-                https://www.naqshbandiaowaisiah.org/app/content_manifest.json
-                and upserts changed media_items / events payloads
+        └──► published through the GitHub-hosted content manifest; the app
+                conditionally fetches and upserts changed content payloads
 ```
 
 Two hard rules follow from this design:
@@ -107,7 +106,7 @@ cheap monotonic counters you bump routinely.
 
 The seed bundle is a **curated subset** of pipeline output plus
 hand-maintained files. Since the 2026-07-10 full-text ingest (seed manifest
-v2) it carries the full library/media catalog — 291 library items and 199
+v2) it carries the full library/media catalog — 291 library items and 198
 media items, ~0.8 MB — but it is still text/metadata only: PDFs and MP3s are
 never bundled; they stay remote URLs on the site.
 

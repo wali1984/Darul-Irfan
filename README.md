@@ -60,10 +60,12 @@ Prayer times are computed entirely on-device by
 `PrayerCalculationService` (the only file that imports `Adhan`). Bundled seed
 JSON (`DarulIrfanApp/Resources/SeedData/`) is imported idempotently on first
 launch by `ContentSyncService`, guarded by a `seed.version` row, so the Quran
-index, the full library catalog (291 items), the lecture catalog (199 items),
-events, 99 Names, duas, and zikr schedule all work with no network. A remote content manifest endpoint is
-documented and polled (`/app/content_manifest.json`), but it is **future
-work** — until it exists every fetch quietly resolves to "nothing new."
+index, the full library catalog (291 items), the lecture catalog (198 items),
+events, 99 Names, duas, and the last-known zikr schedule all work with no
+network. The deployed GitHub content manifest is merged idempotently. The
+separate `Server/` Cloudflare platform supplies the official feed/live state,
+managed schedules, opt-in APNs alerts, and diagnostics; before that service is
+provisioned the app uses cached and bundled fallbacks.
 
 ### Rights model
 
@@ -119,7 +121,9 @@ DarulIrfan-iOS/
 │       ├── Audio/               # azan-short.caf, azan-full.mp3, azan-fajr-full.mp3, chime
 │       ├── Images/              # Asset catalog (AppIcon, AccentColor, launch color)
 │       └── SeedData/            # 15 JSON files, wire schema v1, seed v2
-├── Widgets/                     # Widget extension (Next Prayer, Today's Times)
+├── Widgets/                     # Widgets + next-prayer Live Activity
+├── WatchApp/ + WatchWidgets/    # Watch prayer app + complication
+├── Server/                      # Cloudflare Worker, D1, admin + tests
 └── Tools/ContentIngest/         # Python ingest pipeline + offline pytest suite
 ```
 
@@ -236,19 +240,20 @@ from this repo.
 | Widgets: Next Prayer (small + Lock Screen circular/rectangular/inline), Today's Times (medium), App Group snapshot bridge | Implemented |
 | Quran: 114-surah index, ayah reader, language-aware translation (Pickthall EN / Jalandhry UR), tafsir section, bookmarks, continue reading, reader font scale, Amiri Quran mushaf font | Implemented — **complete Quran bundled offline** (all 114 surahs / 6,236 ayat, Arabic triple-verified error-free — see Docs/QURAN_VERIFICATION.md). Native English tafseer (Asrar-at-Tanzil) OCR'd inline for 6 surahs so far; the rest run via Tools/OCR |
 | Library: category browser, filters, favorites, rights-aware reader, PDF download + native viewer, reading progress | Implemented — permission granted 2026-07-10: 291 seeded items; full verbatim text for About pages, Method of Zikr, zikr-joining instructions, and 10+ articles; 20 books + 249 Al-Murshid issues as metadata + PDF download links |
-| Media: AlMurshid TV live card, categories, year/month archive, background audio, Lock Screen controls, 0.75–2× speed, queue, lecture bookmarks, continue listening, MP3 downloads | Implemented — 199 seeded items incl. 2024–2026 audio lectures streaming from the site's own MP3 URLs; YouTube items open externally |
-| Zikr: verified Method of Zikr summary, online zikr schedule (Paltalk) with reminders, tasbih counters, daily habit strip | Implemented |
+| Media: official live hub, categories, year/month archive, background audio for owned streams, Lock Screen controls, 0.75–2× speed, queue, lecture bookmarks, continue listening, MP3 downloads | Implemented — 198 seeded items incl. 2024–2026 audio lectures from the organization's MP3 URLs; YouTube plays in the controlled foreground player with an external fallback |
+| Zikr: verified Method, managed schedules, live YouTube, owned-stream preference, Paltalk handoff, reminders, tasbih | Implemented; production API provisioning required |
 | Events & Dar-ul-Irfan: programs, detail + reminders, add-to-calendar, map/directions, contact actions, announcements | Implemented — add-to-calendar needs an Info.plist key (see APP_STORE_CHECKLIST) |
 | Companion: 99 Names of Allah, sourced duas, Islamic days | Implemented |
 | Global search (FTS5) across Quran/Library/Media/Events, Urdu/Arabic diacritic-insensitive | Implemented |
 | Onboarding (language → location → calculation → notifications) | Implemented |
 | Settings (location, calculation, offsets, notifications, appearance, Hijri, storage, privacy) | Implemented |
-| Content sync: idempotent seed import + remote manifest polling | Implemented — server endpoint not yet deployed |
+| Official updates: native read-only feed, caching, live state, and staff editor | Implemented in app + `Server/`; production provisioning required |
+| Content sync: idempotent seed import + deployed GitHub manifest polling | Implemented |
 | Urdu localization | Implemented — String Catalog (~665 keys) with en + ur units |
 | Swift unit/UI test suites | Written, never executed (no compiler on the authoring machine) — see Testing |
-| Live Activities (next prayer, Ramadan) | Future |
-| Apple Watch app | Future (architecture allows it) |
-| Server-hosted content manifest endpoint | Future |
+| Live Activities (next prayer) | Implemented; opt-in/device verification required |
+| Apple Watch app + complication | Implemented; signing/device verification required |
+| Official APNs alerts + MetricKit diagnostics | Implemented; credentials/disclosures required |
 
 ## Content permissions & remaining content work
 
@@ -279,11 +284,13 @@ submission. What this changed, and what still remains:
    `azan-fajr-full.mp3` (Wikimedia Commons, CC BY 3.0, attribution in-app);
    sources and licenses are recorded in
    `DarulIrfanApp/Resources/Audio/README.md`.
-6. **AlMurshid TV stream URL confirmation** — the prototype's
-   `stream.darulirfan.org` URL is treated as a default that may be
-   unavailable; playback failure is handled gracefully.
-7. **Server-hosted content manifest endpoint** — still future work; until it
-   exists the manifest poll quietly resolves to "nothing new."
+6. **Owned live audio** — no unverified stream is hard-coded. The app uses
+   foreground YouTube and Paltalk until staff publish an authorized HTTPS
+   MP3/AAC/HLS endpoint through the official platform.
+7. **Official platform deployment** — create D1, protect `/admin` with
+   Cloudflare Access, configure social/APNs secrets, and bind
+   `api.naqshbandiaowaisiah.org`; see `Server/README.md` and
+   `Docs/OPERATIONS.md`.
 
 For future content refreshes, re-run the ingest pipeline with
 `--full-text --rights-confirmed` (see `Docs/CONTENT_INGESTION.md`) and bump

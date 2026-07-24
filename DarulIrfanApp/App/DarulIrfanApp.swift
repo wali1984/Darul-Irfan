@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import UIKit
 
 /// App entry point. Builds the dependency graph once, bootstraps session
 /// state, then hands everything to `RootView`. Also owns app-lifecycle side
@@ -7,6 +8,7 @@ import Combine
 /// change handling, and persisting audio progress when backgrounded.
 @main
 struct DarulIrfanApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     /// Launch progression for the single window.
     enum LaunchState {
         case loading
@@ -69,6 +71,12 @@ struct DarulIrfanApp: App {
                 // Timezone moves must always reschedule, so bypass the throttle.
                 refreshAfterActivation(force: true)
             }
+            .onReceive(NotificationCenter.default.publisher(for: .didReceiveAPNSToken)) { notification in
+                guard case .ready(let dependencies, let appState) = launchState,
+                      let token = notification.object as? Data,
+                      appState.settings.push.isEnabled else { return }
+                Task { try? await dependencies.officialPlatform.registerForPush(token: token, preferences: appState.settings.push) }
+            }
         }
     }
 
@@ -80,6 +88,24 @@ struct DarulIrfanApp: App {
             let dependencies = try await AppDependencies.live()
             let appState = AppState(dependencies: dependencies)
             await appState.bootstrap()
+            #if DEBUG
+            let launchArguments = ProcessInfo.processInfo.arguments
+            if launchArguments.contains("--uitesting-complete-onboarding") {
+                await appState.updateSettings { settings in
+                    settings.hasCompletedOnboarding = true
+                    settings.locationMode = .manual
+                    settings.manualPlace = PlaceCoordinate(
+                        latitude: 33.5651,
+                        longitude: 73.0169,
+                        name: "Rawalpindi",
+                        timeZoneIdentifier: "Asia/Karachi"
+                    )
+                }
+            } else if launchArguments.contains("--uitesting-reset-onboarding") {
+                await appState.updateSettings { $0.hasCompletedOnboarding = false }
+            }
+            #endif
+            await dependencies.officialPlatform.setConsent(appState.settings.diagnosticsConsent)
 
             // Seed import and manifest refresh happen off the critical path so
             // first paint is never blocked on content work. Both are
@@ -101,6 +127,9 @@ struct DarulIrfanApp: App {
             if appState.settings.hasCompletedOnboarding {
                 await appState.refreshDevicePlaceIfNeeded()
                 await appState.refreshScheduledNotificationsAndWidgets()
+                if appState.settings.push.isEnabled {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
             }
         } catch {
             launchState = .failed(error.localizedDescription)

@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 1
+    static let schemaVersion = 2
 
     /// Production store, in Application Support (backed up, not user-visible).
     static func liveURL() throws -> URL {
@@ -41,6 +41,10 @@ final class AppDatabase: Sendable {
         if version < 1 {
             try await connection.executeScript(Self.migrationV1)
             try await connection.setSchemaVersion(1)
+        }
+        if version < 2 {
+            try await connection.executeScript(Self.migrationV2)
+            try await connection.setSchemaVersion(2)
         }
     }
 
@@ -280,6 +284,40 @@ final class AppDatabase: Sendable {
         author,
         language UNINDEXED,
         tokenize = 'unicode61 remove_diacritics 2'
+    );
+    """
+
+    // MARK: - Schema v2: official platform cache
+
+    static let migrationV2 = """
+    CREATE TABLE IF NOT EXISTS platform_cache (
+        key TEXT PRIMARY KEY,
+        payload_json TEXT NOT NULL,
+        etag TEXT,
+        updated_at REAL NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS official_feed_cache (
+        id TEXT PRIMARY KEY,
+        payload_json TEXT NOT NULL,
+        published_at REAL NOT NULL,
+        is_featured INTEGER NOT NULL DEFAULT 0,
+        updated_at REAL NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_official_feed_cache_date
+        ON official_feed_cache (is_featured DESC, published_at DESC);
+
+    CREATE TABLE IF NOT EXISTS remote_zikr_schedule_cache (
+        id TEXT PRIMARY KEY,
+        payload_json TEXT NOT NULL,
+        updated_at REAL NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS push_registration_state (
+        installation_id TEXT PRIMARY KEY,
+        token_hash TEXT,
+        topics_json TEXT NOT NULL DEFAULT '[]',
+        updated_at REAL NOT NULL
     );
     """
 }

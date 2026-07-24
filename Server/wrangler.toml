@@ -1,0 +1,27 @@
+name = "darul-irfan-platform"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+
+[vars]
+ENVIRONMENT = "production"
+PUBLIC_BASE_URL = "https://api.naqshbandiaowaisiah.org"
+YOUTUBE_CHANNEL_ID = "UCefP_tP1ROXmqu2miDVCtCg"
+FACEBOOK_PAGE_ID = "oursheikh.official"
+FACEBOOK_GRAPH_VERSION = "v25.0"
+APNS_TOPIC = "us.naqshbaniaowaisiah"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "darul-irfan"
+database_id = "REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[observability]
+enabled = true
+
+# Secrets configured with `wrangler secret put`:
+# YOUTUBE_API_KEY, FACEBOOK_PAGE_ACCESS_TOKEN,
+# APNS_KEY_ID, APNS_TEAM_ID, APNS_PRIVATE_KEY,
+# ADMIN_EDITOR_EMAILS, ADMIN_BROADCASTER_EMAILS

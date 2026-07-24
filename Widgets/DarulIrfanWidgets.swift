@@ -17,6 +17,7 @@ struct DarulIrfanWidgets: WidgetBundle {
     var body: some Widget {
         NextPrayerWidget()
         TodayTimesWidget()
+        PrayerActivityWidget()
     }
 }
 

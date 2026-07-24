@@ -1,6 +1,167 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Explore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Explore" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "دریافت کریں" } }
+      }
+    },
+    "Updates": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Updates" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "تازہ معلومات" } }
+      }
+    },
+    "Official Updates": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Official Updates" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "سرکاری تازہ معلومات" } }
+      }
+    },
+    "Live Zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Live Zikr" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست ذکر" } }
+      }
+    },
+    "Live & Upcoming": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Live & Upcoming" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست اور آئندہ" } }
+      }
+    },
+    "Official Update": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Official Update" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "سرکاری اطلاع" } }
+      }
+    },
+    "Showing saved updates": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Showing saved updates" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "محفوظ شدہ تازہ معلومات دکھائی جا رہی ہیں" } }
+      }
+    },
+    "No official updates yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No official updates yet" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ابھی کوئی سرکاری تازہ اطلاع نہیں" } }
+      }
+    },
+    "Official Alerts & Privacy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Official Alerts & Privacy" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "سرکاری اطلاعات اور رازداری" } }
+      }
+    },
+    "Official live and update alerts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Official live and update alerts" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست اور تازہ اطلاعات" } }
+      }
+    },
+    "Next-prayer Live Activity": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Next-prayer Live Activity" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اگلی نماز کی لائیو ایکٹیویٹی" } }
+      }
+    },
+    "Alert Topics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Alert Topics" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اطلاعات کے موضوعات" } }
+      }
+    },
+    "Live zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Live zikr" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست ذکر" } }
+      }
+    },
+    "Broadcasts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Broadcasts" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "نشریات" } }
+      }
+    },
+    "Diagnostics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Diagnostics" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "تشخیصی معلومات" } }
+      }
+    },
+    "Share diagnostics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Share diagnostics" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "تشخیصی معلومات شیئر کریں" } }
+      }
+    },
+    "Ask me later": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Ask me later" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "بعد میں پوچھیں" } }
+      }
+    },
+    "Do not share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Do not share" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "شیئر نہ کریں" } }
+      }
+    },
+    "Share anonymously": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Share anonymously" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "گمنام طور پر شیئر کریں" } }
+      }
+    },
+    "Watch on YouTube": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Watch on YouTube" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "یوٹیوب پر دیکھیں" } }
+      }
+    },
+    "Join OURSHEIKH on Paltalk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Join OURSHEIKH on Paltalk" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "پال ٹاک پر OURSHEIKH میں شامل ہوں" } }
+      }
+    },
+    "Listen live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Listen live" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست سنیں" } }
+      }
+    },
+    "Load more updates": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Load more updates" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "مزید تازہ معلومات لوڈ کریں" } }
+      }
+    },
     "%@ %@": {
       "extractionState": "manual",
       "localizations": {
@@ -8191,6 +8352,32 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ پر نشانی محفوظ کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "Allow notifications in iOS Settings to receive official live alerts.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Allow notifications in iOS Settings to receive official live alerts."}},"ur":{"stringUnit":{"state":"translated","value":"سرکاری لائیو اطلاعات حاصل کرنے کے لیے iOS Settings میں نوٹیفیکیشنز کی اجازت دیں۔"}}}},
+    "Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days."}},"ur":{"stringUnit":{"state":"translated","value":"گمنام Apple MetricKit تشخیصی معلومات صرف رضامندی کے بعد بھیجی جاتی ہیں۔ ان میں مقام، نشانات، نماز کی تاریخ، نام اور ای میل شامل نہیں ہوتے اور انہیں 30 دن تک رکھا جاتا ہے۔"}}}},
+    "Explore section": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Explore section"}},"ur":{"stringUnit":{"state":"translated","value":"دریافت کا حصہ"}}}},
+    "Loading official updates…": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Loading official updates…"}},"ur":{"stringUnit":{"state":"translated","value":"سرکاری اپ ڈیٹس لوڈ ہو رہی ہیں…"}}}},
+    "Official Alerts": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Official Alerts"}},"ur":{"stringUnit":{"state":"translated","value":"سرکاری اطلاعات"}}}},
+    "Open Settings": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Open Settings"}},"ur":{"stringUnit":{"state":"translated","value":"سیٹنگز کھولیں"}}}},
+    "Open in YouTube": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Open in YouTube"}},"ur":{"stringUnit":{"state":"translated","value":"YouTube میں کھولیں"}}}},
+    "The live broadcast is currently off air. Scheduled reminders remain available below.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The live broadcast is currently off air. Scheduled reminders remain available below."}},"ur":{"stringUnit":{"state":"translated","value":"لائیو نشریات فی الحال بند ہے۔ طے شدہ یاد دہانیاں نیچے دستیاب ہیں۔"}}}},
+    "When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent."}},"ur":{"stringUnit":{"state":"translated","value":"فعال کرنے پر ایک بے ترتیب تنصیب شناخت اور Apple پش ٹوکن رجسٹر ہوتے ہیں۔ کوئی اکاؤنٹ، درست مقام، نماز کی تاریخ یا مطالعے کی سرگرمی نہیں بھیجی جاتی۔"}}}},
+    "Offline fallback timing — verify the current schedule on naqshbandiaowaisiah.org before joining.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline fallback timing — verify the current schedule on naqshbandiaowaisiah.org before joining."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ آف لائن متبادل وقت ہے — شامل ہونے سے پہلے naqshbandiaowaisiah.org پر موجودہ شیڈول کی تصدیق کریں۔"
           }
         }
       }

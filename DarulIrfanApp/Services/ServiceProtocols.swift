@@ -204,3 +204,25 @@ protocol SettingsStoring: Sendable {
     func load() async -> AppSettings
     func save(_ settings: AppSettings) async
 }
+
+// MARK: - Official platform
+
+protocol OfficialFeedServicing: Sendable {
+    func bootstrap(forceRefresh: Bool) async -> AppBootstrap
+    func feed(after cursor: String?, forceRefresh: Bool) async throws -> OfficialFeedPage
+}
+
+protocol LiveBroadcastServicing: Sendable {
+    func currentLiveBroadcast(forceRefresh: Bool) async -> LiveBroadcast
+}
+
+protocol PushRegistrationServicing: Sendable {
+    func registerForPush(token: Data, preferences: PushPreferences) async throws
+    func unregisterFromPush() async
+}
+
+protocol DiagnosticsServicing: Sendable {
+    func setConsent(_ consent: DiagnosticsConsent) async
+    func uploadMetricPayload(_ data: Data) async
+    func uploadDiagnosticPayload(_ data: Data) async
+}

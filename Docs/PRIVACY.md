@@ -1,99 +1,72 @@
 # Privacy
 
-Darul Irfan is built privacy-first. This document states the commitments,
-verifies them against the code, and records the exact answers for the App
-Store's App Privacy ("nutrition label") questionnaire.
+Darul Irfan has no advertising, user account, community posting, or
+cross-app tracking. Prayer calculations, precise location, bookmarks, prayer
+history, reading/listening progress, tasbih activity, and downloads remain on
+the device.
 
-## Stance
+## Network and data inventory
 
-- **Location stays on-device.** Prayer times and Qibla bearing are computed
-  locally by adhan-swift; coordinates are never sent to any app server
-  (there is no app server).
-- **No ads. No trackers. No analytics. No accounts.** The only third-party
-  code is the adhan-swift calculation library, which performs math and makes
-  no network calls. There are no analytics/ad/crash SDKs and no sign-in.
-- **Local notifications only.** No push, no APNs registration, no tokens.
-- **Data is local and user-deletable.** Everything lives in the app's own
-  container and is removed when the app is deleted.
-
-`Features/Settings/PrivacySettingsView.swift` shows this summary to users
-inside the app; keep it in sync with this document.
-
-## Complete network surface (verified against code)
-
-The app makes network requests in exactly these cases. None of them carry
-user identifiers, device identifiers, location, or any analytics payload.
-
-| # | What | Where in code | Details |
-|---|---|---|---|
-| 1 | Content manifest poll | `Services/ContentSyncService.swift` | Plain GET of `https://www.naqshbandiaowaisiah.org/app/content_manifest.json` (plus the JSON files it lists) on launch, off the critical path. Uses an **ephemeral** `URLSession` (no persisted cookies/cache), 20 s timeout. The endpoint is not deployed yet; failures resolve silently to "nothing new." Nothing is sent beyond the standard HTTP request. |
-| 2 | Streaming public audio | `Services/AudioPlayerService.swift` | `AVPlayer` streams the public lecture MP3 URLs on naqshbandiaowaisiah.org and the AlMurshid TV stream (`stream.darulirfan.org`) when the user presses play. |
-| 3 | User-initiated downloads | `Services/DownloadManager.swift` | `URLSession.shared.download(from:)` for PDFs/MP3s the user explicitly downloads; files are stored in the app container. |
-| 4 | Apple geocoding | `Services/LocationService.swift` | `CLGeocoder` forward geocoding (manual city search) and reverse geocoding (naming the detected city). This is an **operating-system service operated by Apple**; the query/coordinates are handled under Apple's privacy policy. The app keeps only the resulting city name, coordinates, and timezone. |
-| 5 | In-app Safari | `Features/Library/SafariView.swift` | `SFSafariViewController` for "Read on naqshbandiaowaisiah.org" source pages. Runs in Safari's own sandboxed process with Safari's storage — the app cannot see the browsing. |
-| 6 | Hand-offs to other apps | `MediaViewModel`, `DarulIrfanCardView`, `AboutView`, `AcknowledgementsView`, `SurahReaderView` | External links opened by explicit user taps: YouTube watch URLs, Apple Maps directions, quran.com, github.com, `mailto:`/`tel:` contact actions. |
-
-There is no other networking. Notably absent: no telemetry endpoint, no
-remote logging, no A/B config service, no web views other than the isolated
-`SFSafariViewController`.
-
-## App Privacy questionnaire answers
-
-**Answer: Data Not Collected** — for every category.
-
-Justification, per App Store Connect's definitions ("collected" = transmitted
-off the device to the developer or partners):
-
-| Category | Answer | Why |
+| Purpose | Data sent | Retention and control |
 |---|---|---|
-| Contact info, Health, Financial, Sensitive info | Not collected | Never requested or stored. |
-| **Location** | **Not collected** | Used on-device only (When-In-Use). Never transmitted to the developer or any partner. The Apple geocoding call is an OS service, not developer collection. |
-| Contacts, Messages, Photos, Audio (user content) | Not collected | The app records nothing and reads no user content. |
-| Browsing / search history | Not collected | In-app search runs against the local SQLite FTS index. |
-| Identifiers (user ID, device ID) | Not collected | No accounts, no IDFA/IDFV use, no fingerprinting. |
-| Usage data / diagnostics | Not collected | No analytics or crash SDKs. |
-| Tracking (ATT) | **No tracking** | Nothing is shared with data brokers or used for cross-app tracking; no App Tracking Transparency prompt is needed. |
+| Official feed/live configuration | Normal HTTPS request metadata; no app identifier or location in the request body | Cloudflare edge access logs follow the configured account retention. Cached public content is stored locally and can be removed by deleting the app. |
+| Opt-in official alerts | Random installation UUID, APNs token, locale, timezone, app version, and selected alert topics | Stored in D1 until the user disables alerts, APNs reports the token invalid, or operations removes stale registrations. `DELETE /v1/devices/{installationID}` is called when alerts are disabled. |
+| Opt-in diagnostics | Hash of the random installation UUID, app/OS version, and Apple MetricKit payload | Stored for 30 days, then deleted by the Worker cron. Precise location, names, email, APNs token, prayer history, bookmarks, and reading activity are rejected/removed. |
+| Content catalog | GET requests to the GitHub-hosted content manifest and its JSON payloads | Public catalog data is cached in SQLite; no personal data is sent. |
+| YouTube playback | The selected video ID and normal web request metadata go to YouTube through a non-persistent `WKWebView` | The app does not receive YouTube cookies or account data and does not extract/download YouTube streams. Users can instead open YouTube externally. |
+| Audio/PDF use | Requested public media/document URL | Files explicitly downloaded by the user stay in the app container. Owned direct audio streams use `AVPlayer`. |
+| Apple geocoding | City query or coordinates handled by `CLGeocoder` | Apple operating-system service. The app stores one city-level place, rounded to two decimal coordinates, not location history. |
+| Source links and directions | User-selected URL handed to Safari, YouTube, Facebook, Paltalk, Maps, Mail, or Phone | The destination application controls its own data under its privacy policy. |
 
-If a server-side content manifest is later deployed, standard web server
-access logs (IP addresses) on naqshbandiaowaisiah.org would be the only
-byproduct; the requests still carry no identifying payload, and "Data Not
-Collected" remains accurate under Apple's definitions provided the logs are
-not used to identify users.
+Facebook and YouTube API credentials are stored only as encrypted Cloudflare
+Worker secrets. Social APIs are called by the Worker; secrets never ship in
+the Swift binary. Cloudflare Access protects all `/admin*` routes.
 
-## Permission purpose strings
+## App Store privacy answers
 
-| Permission | Info.plist key | Current string / status |
-|---|---|---|
-| Location (When In Use) | `NSLocationWhenInUseUsageDescription` | Present: *"Darul Irfan uses your location to calculate accurate prayer times and Qibla direction for your area. Your location never leaves your device."* |
-| Notifications | — (runtime authorization, no plist key) | Requested during onboarding and from Notification Settings with `.alert/.sound/.badge`; used only for local prayer/zikr/event reminders. |
-| Calendar (write-only) | `NSCalendarsWriteOnlyAccessUsageDescription` | Present: *"Darul Irfan adds community events such as the Monthly Ijtema to your calendar only when you ask it to."* Write-only access; the app never reads existing calendar entries. |
-| Background audio | `UIBackgroundModes: audio` | Lets user-initiated lecture audio continue with the screen off / app backgrounded; nothing runs in the background otherwise. |
+The release must declare the following when the corresponding opt-in features
+are enabled in the submitted binary, even though collection is optional:
 
-The compass (Qibla) uses `CLLocationManager` heading APIs under the same
-When-In-Use location permission; no motion permission is involved.
+- **Identifiers / Device ID — App Functionality, not linked to identity, not
+  used for tracking:** random installation UUID and APNs token for official
+  alert delivery.
+- **Diagnostics — App Functionality, not linked to identity, not used for
+  tracking:** consent-gated MetricKit diagnostic and performance payloads.
+- **Precise/Coarse Location — Not collected by the developer:** used locally
+  for prayer/Qibla; never sent to the Darul Irfan service.
+- **Usage Data — Not collected:** no product analytics or reading/prayer event
+  telemetry.
+- **Tracking — No:** no IDFA, ATT prompt, data broker sharing, advertising, or
+  cross-company tracking.
 
-## Data retention — what is stored, where, and how to delete it
+Recheck App Store Connect terminology at submission time. Optional collection
+still needs disclosure; do not select the older blanket “Data Not Collected”
+answer.
 
-All data is on-device. There is no cloud copy and no account to delete.
+## Permissions
 
-| Data | Where | Deletion |
-|---|---|---|
-| Settings, prayer preferences, manual offsets, notification choices, Hijri offset | `key_value` table in `Application Support/DarulIrfan/darul-irfan.sqlite` | Delete the app |
-| Last-known place (city name, coordinates, timezone) — kept so prayer times work offline at launch; **not a location history** (a single value, city-level) | Same settings row | Switch to manual mode or delete the app |
-| Quran bookmarks, reading positions, prayer/fasting logs, tasbih counters, zikr habit, favorites, playback progress, playlists | SQLite tables | Individual items are removable in the UI; delete the app for everything |
-| Content catalogs + FTS search index (seeded/synced, not personal) | SQLite tables | Delete the app |
-| Downloaded PDFs/MP3s | `Application Support/DarulIrfan/Downloads/` | **Settings → Content & Storage → clear all downloads**, per-file removal in item screens, or delete the app |
-| Event-reminder toggle flags | `UserDefaults` | Toggle off, or delete the app |
-| Prayer widget snapshot (today's times + place name as JSON) | App Group container `group.us.naqshbaniaowaisiah` | Delete the app |
+- Location When In Use: accurate local prayer times and Qibla. Manual city is
+  a complete fallback.
+- Notifications: local prayer/zikr/event reminders and, only when separately
+  enabled, official APNs live/update alerts.
+- Calendar write-only: requested only after “Add to Calendar.” Existing events
+  are never read.
+- Background audio: user-initiated owned/authorized direct audio only. YouTube
+  playback remains foreground and inside the official embed.
+- Live Activities: opt-in next-prayer countdown; disabling it ends activities.
 
-The SQLite store lives in Application Support and is therefore included in
-the user's own device/iCloud backup, as users expect; that is the user's
-backup, not developer collection.
+## On-device storage and deletion
 
-## Commitments for future changes
+- SQLite stores settings, city-level place, content caches, search index,
+  bookmarks, tracker records, progress, favorites, and remote last-known-good
+  feed/live data.
+- Downloads live under `Application Support/DarulIrfan/Downloads` and can be
+  removed in Content & Storage.
+- The App Group stores prayer snapshots for widgets and Watch synchronization.
+- Keychain stores only the random installation UUID and current APNs token.
+- Deleting the app removes local data. Disabling official alerts requests
+  deletion of the server registration before removing the local token.
 
-- Any analytics, if ever proposed, must be **opt-in**, privacy-preserving,
-  and reflected here and in the App Privacy answers first.
-- No third-party SDK may be added without re-auditing this document.
-- Precise location history must never be stored; the single last-known
-  city-level place is the maximum.
+No third-party analytics/crash SDK is included. Any future data category,
+vendor, retention change, or account feature requires updating this document,
+the in-app privacy screen, server validation, and App Store disclosures first.
