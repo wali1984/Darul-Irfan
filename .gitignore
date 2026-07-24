@@ -44,3 +44,6 @@ codemagic_private_key.pub
 cloudflare.md
 *.token
 *.secret
+*.p8
+AuthKey_*.p8
+c:\Users\WajidAli\Downloads\ApiKey_QGS1YOMNXGRW.p8

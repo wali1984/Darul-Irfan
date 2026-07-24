@@ -49,7 +49,7 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.us.naqshbaniaowaisiah
-        aps-environment: development
+        aps-environment: production
 
   DarulIrfanWidgets:
     type: app-extension
