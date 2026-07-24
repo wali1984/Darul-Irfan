@@ -36,6 +36,10 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- POC backend (Cloudflare Worker). Swap to https://api.naqshbandiaowaisiah.us
+	     once that subdomain is delegated to Cloudflare; the app reads this at launch. -->
+	<key>OfficialPlatformBaseURL</key>
+	<string>https://darul-irfan-platform.wajidmahmoodali1984-e23.workers.dev</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AmiriQuran-Regular.ttf</string>

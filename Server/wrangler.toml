@@ -13,7 +13,7 @@ APNS_TOPIC = "us.naqshbaniaowaisiah"
 [[d1_databases]]
 binding = "DB"
 database_name = "darul-irfan"
-database_id = "REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID"
+database_id = "0b4ba0a2-0e52-4cd0-a3f4-1d7e20fdf01a"
 
 [triggers]
 crons = ["*/5 * * * *"]

@@ -7,8 +7,16 @@ enum OfficialPlatformError: Error {
 }
 
 enum OfficialPlatformConfiguration {
-    static let baseURL = URL(string: "https://api.naqshbandiaowaisiah.org")
-        ?? URL(fileURLWithPath: "/")
+    /// Backend base URL. Read from the Info.plist key `OfficialPlatformBaseURL`
+    /// so the POC/staging host can be swapped for production without a code
+    /// change; falls back to the production host when the key is absent.
+    static let baseURL: URL = {
+        if let raw = Bundle.main.object(forInfoDictionaryKey: "OfficialPlatformBaseURL") as? String,
+           !raw.isEmpty, let url = URL(string: raw) {
+            return url
+        }
+        return URL(string: "https://api.naqshbandiaowaisiah.us") ?? URL(fileURLWithPath: "/")
+    }()
 }
 
 actor OfficialPlatformService:
