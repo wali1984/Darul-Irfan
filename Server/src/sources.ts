@@ -2,8 +2,9 @@ import type { Env } from "./contracts";
 import { cleanText, validHTTPURL } from "./util";
 import { sendTopicPush } from "./apns";
 
-interface YouTubeSearchResponse { items?: Array<{ id?: { videoId?: string }; snippet?: { title?: string; description?: string; publishedAt?: string; liveBroadcastContent?: string; thumbnails?: { high?: { url?: string } } } }> }
-interface YouTubeVideosResponse { items?: Array<{ id?: string; liveStreamingDetails?: { scheduledStartTime?: string; actualStartTime?: string; actualEndTime?: string } }> }
+interface YouTubeVideoItem { id?: string; snippet?: { title?: string; description?: string; publishedAt?: string; liveBroadcastContent?: string; thumbnails?: { high?: { url?: string } } }; liveStreamingDetails?: { scheduledStartTime?: string; actualStartTime?: string; actualEndTime?: string } }
+interface YouTubeVideosResponse { items?: YouTubeVideoItem[] }
+interface YouTubePlaylistResponse { items?: Array<{ contentDetails?: { videoId?: string } }> }
 interface FacebookResponse { data?: Array<{ id?: string; message?: string; created_time?: string; permalink_url?: string; full_picture?: string }> }
 interface CatalogContent { id?: string; title?: string; excerpt?: string; sourceUrl?: string; publishedAt?: string; updatedAt?: string; mediaUrls?: string[] }
 interface CatalogEvent { id?: string; title?: string; details?: string; sourceUrl?: string; startDate?: string; updatedAt?: string }
@@ -11,52 +12,65 @@ interface CatalogManifest { version?: number; files?: { articles?: string; event
 
 export async function refreshYouTube(env: Env): Promise<void> {
   if (!env.YOUTUBE_API_KEY) throw new Error("YOUTUBE_API_KEY is not configured");
-  const params = new URLSearchParams({ part: "snippet", channelId: env.YOUTUBE_CHANNEL_ID, order: "date", maxResults: "20", type: "video", key: env.YOUTUBE_API_KEY });
-  const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`);
-  if (!response.ok) throw new Error(`YouTube API ${response.status}`);
-  const payload = await response.json<YouTubeSearchResponse>();
+  // Quota-safe detection: read the channel's uploads playlist (1 unit) then
+  // hydrate those videos (1 unit) — ~2 units/run vs 100 for search.list, so a
+  // 5-minute cron stays far under YouTube's 10k/day quota while still catching
+  // a live broadcast within one tick. On videos.list, snippet.liveBroadcast
+  // Content is live/upcoming/none and liveStreamingDetails carries the timings.
+  const uploads = "UU" + env.YOUTUBE_CHANNEL_ID.slice(2);
+  const plParams = new URLSearchParams({ part: "contentDetails", playlistId: uploads, maxResults: "20", key: env.YOUTUBE_API_KEY });
+  const plResponse = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?${plParams}`);
+  if (!plResponse.ok) throw new Error(`YouTube playlistItems ${plResponse.status}`);
+  const plPayload = await plResponse.json<YouTubePlaylistResponse>();
+  const ids = (plPayload.items ?? []).map(item => item.contentDetails?.videoId).filter((value): value is string => Boolean(value));
+  if (!ids.length) return;
+
+  const vParams = new URLSearchParams({ part: "snippet,liveStreamingDetails", id: ids.slice(0, 50).join(","), key: env.YOUTUBE_API_KEY });
+  const vResponse = await fetch(`https://www.googleapis.com/youtube/v3/videos?${vParams}`);
+  if (!vResponse.ok) throw new Error(`YouTube videos ${vResponse.status}`);
+  const payload = await vResponse.json<YouTubeVideosResponse>();
+
   const prior = await env.DB.prepare("SELECT state,source_mode FROM live_broadcasts WHERE id='official-live'").first<{ state: string; source_mode: string }>();
   const automatic = prior?.source_mode !== "manual";
-  let detectedLive = false;
-  let detectedCandidate = false;
-  let candidate: { id: string; state: "live" | "scheduled"; title: string } | undefined;
+  let candidate: { id: string; state: "live" | "scheduled"; title: string; details?: YouTubeVideoItem["liveStreamingDetails"] } | undefined;
   const now = new Date().toISOString();
+
   for (const item of payload.items ?? []) {
-    const id = item.id?.videoId; const snippet = item.snippet;
+    const id = item.id; const snippet = item.snippet;
     if (!id || !snippet?.title || !snippet.publishedAt) continue;
     await env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,image_url,video_id,published_at,raw_json,updated_at)
       VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,updated_at=excluded.updated_at`)
       .bind(`youtube:${id}`, "youtube", "video", cleanText(snippet.title, 300), cleanText(snippet.description), `https://www.youtube.com/watch?v=${id}`,
         validHTTPURL(snippet.thumbnails?.high?.url) ?? null, id, snippet.publishedAt, JSON.stringify(item), now).run();
-    if (automatic && !detectedCandidate && (snippet.liveBroadcastContent === "live" || snippet.liveBroadcastContent === "upcoming")) {
-      const state = snippet.liveBroadcastContent === "live" ? "live" : "scheduled";
-      detectedCandidate = true;
-      detectedLive = state === "live";
-      candidate = { id, state, title: cleanText(snippet.title, 300) ?? "Live Zikr" };
+    if (automatic && !candidate && (snippet.liveBroadcastContent === "live" || snippet.liveBroadcastContent === "upcoming")) {
+      candidate = {
+        id,
+        state: snippet.liveBroadcastContent === "live" ? "live" : "scheduled",
+        title: cleanText(snippet.title, 300) ?? "Live Zikr",
+        details: item.liveStreamingDetails,
+      };
     }
   }
+
   if (automatic && candidate) {
-    const detailParams = new URLSearchParams({ part: "liveStreamingDetails", id: candidate.id, key: env.YOUTUBE_API_KEY });
-    const detailResponse = await fetch(`https://www.googleapis.com/youtube/v3/videos?${detailParams}`);
-    if (!detailResponse.ok) throw new Error(`YouTube live details API ${detailResponse.status}`);
-    const detailPayload = await detailResponse.json<YouTubeVideosResponse>();
-    const details = detailPayload.items?.[0]?.liveStreamingDetails;
+    const details = candidate.details;
     await env.DB.prepare(`UPDATE live_broadcasts SET state=?,title=?,youtube_video_id=?,scheduled_start=?,started_at=?,ended_at=?,updated_at=?,source_updated_at=? WHERE id='official-live'`)
       .bind(candidate.state, candidate.title, candidate.id, details?.scheduledStartTime ?? null,
         details?.actualStartTime ?? null, details?.actualEndTime ?? null, now, now).run();
-  }
-  if (automatic && !detectedCandidate && prior?.state === "live") {
+    // Alert once when the channel actually goes live (not for upcoming).
+    if (candidate.state === "live" && prior?.state !== "live") {
+      await sendTopicPush(
+        env, `youtube-live:${now.slice(0, 16)}`, "liveZikr",
+        "Live Zikr has started", "Join the official live zikr in Darul Irfan.",
+        "darulirfan://live/official-live"
+      );
+    }
+  } else if (automatic && prior?.state === "live") {
     await env.DB.prepare("UPDATE live_broadcasts SET state='ended',ended_at=?,updated_at=?,source_updated_at=? WHERE id='official-live'")
       .bind(now, now, now).run();
-  } else if (automatic && !detectedCandidate && prior?.state === "scheduled") {
+  } else if (automatic && prior?.state === "scheduled") {
     await env.DB.prepare("UPDATE live_broadcasts SET state='offline',youtube_video_id=NULL,updated_at=?,source_updated_at=? WHERE id='official-live'")
       .bind(now, now).run();
-  } else if (automatic && detectedLive && prior?.state !== "live") {
-    await sendTopicPush(
-      env, `youtube-live:${now.slice(0, 16)}`, "liveZikr",
-      "Live Zikr has started", "Join the official live zikr in Darul Irfan.",
-      "darulirfan://live/official-live"
-    );
   }
 }
 
