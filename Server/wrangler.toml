@@ -4,7 +4,7 @@ compatibility_date = "2026-07-01"
 
 [vars]
 ENVIRONMENT = "production"
-PUBLIC_BASE_URL = "https://api.naqshbandiaowaisiah.org"
+PUBLIC_BASE_URL = "https://api.naqshbandiaowaisiah.us"
 YOUTUBE_CHANNEL_ID = "UCefP_tP1ROXmqu2miDVCtCg"
 FACEBOOK_PAGE_ID = "oursheikh.official"
 FACEBOOK_GRAPH_VERSION = "v25.0"

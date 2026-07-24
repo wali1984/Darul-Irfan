@@ -1,7 +1,7 @@
 import type { DeviceRegistration, Env } from "./contracts";
 import { adminRequest } from "./admin";
 import { bootstrap, feed, liveBroadcast } from "./repository";
-import { refreshFacebook, refreshWebsiteCatalog, refreshYouTube } from "./sources";
+import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
 import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
@@ -92,9 +92,12 @@ export default {
   },
   async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
     const minute = new Date().getUTCMinutes();
+    // Facebook is intentionally NOT ingested: with only public (non-admin)
+    // access to the official Page, the Graph API cannot read its posts. The
+    // app deep-links to Facebook instead. Re-add refreshFacebook here once a
+    // Page access token is available.
     const jobs: Array<{ name: string; run: Promise<void> }> = [{ name: "youtube", run: refreshYouTube(env) }];
     if (minute % 15 === 0) jobs.push(
-      { name: "facebook", run: refreshFacebook(env) },
       { name: "website", run: refreshWebsiteCatalog(env) }
     );
     const results = await Promise.allSettled(jobs.map(job => job.run));

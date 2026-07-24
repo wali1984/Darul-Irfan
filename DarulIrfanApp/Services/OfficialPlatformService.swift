@@ -59,7 +59,7 @@ actor OfficialPlatformService:
         if let cursor { query.append(URLQueryItem(name: "cursor", value: cursor)) }
         components?.queryItems = query
         guard let url = components?.url else { throw OfficialPlatformError.invalidResponse }
-        let key = cursor == nil ? "feed:first" : "feed:\(cursor)"
+        let key = cursor == nil ? "feed:first" : "feed:\(cursor ?? "")"
         do {
             let data = try await fetch(url: url, cacheKey: key, forceRefresh: forceRefresh)
             let page = try decoder.decode(OfficialFeedPage.self, from: data)

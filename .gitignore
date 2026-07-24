@@ -40,3 +40,7 @@ Thumbs.db
 *.local.json
 codemagic_private_key
 codemagic_private_key.pub
+# Local credentials handed to the agent — NEVER commit
+cloudflare.md
+*.token
+*.secret
