@@ -187,7 +187,11 @@ enum PushTopic: String, Codable, Sendable, CaseIterable, Identifiable {
 }
 
 struct PushPreferences: Codable, Sendable, Equatable {
-    var isEnabled = false
+    // On by default: official alerts (live zikr, announcements, events) are a
+    // core reason to install the app. Registration still only happens once the
+    // user grants the system notification prompt, and it can be turned off in
+    // More → Official Alerts.
+    var isEnabled = true
     var topics: Set<PushTopic> = [.liveZikr, .announcements, .events]
 }
 
