@@ -88,7 +88,10 @@ final class OfficialPlatformTests: XCTestCase {
         XCTAssertEqual(settings.language, .urdu)
         XCTAssertEqual(settings.theme, .dark)
         XCTAssertTrue(settings.hasCompletedOnboarding)
-        XCTAssertFalse(settings.push.isEnabled)
+        // Official Alerts are on by default: settings that predate the `push`
+        // key adopt the current default (enabled). Actual push registration
+        // still requires the system notification grant.
+        XCTAssertTrue(settings.push.isEnabled)
         XCTAssertEqual(settings.diagnosticsConsent, .notAsked)
         XCTAssertFalse(settings.liveActivitiesEnabled)
     }
