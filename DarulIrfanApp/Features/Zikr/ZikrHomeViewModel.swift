@@ -15,6 +15,9 @@ final class ZikrHomeViewModel {
     private(set) var reminderEnabled: [String: Bool] = [:]
     private(set) var isLoaded = false
     private(set) var live: LiveBroadcast = .offline
+    /// Latest official videos, shown as in-app playable "Recent Bayans" so the
+    /// section is useful even when no live session is on air.
+    private(set) var recentBayans: [OfficialFeedItem] = []
     var showPermissionAlert = false
 
     /// Minutes before the session start that the reminder fires.
@@ -28,6 +31,9 @@ final class ZikrHomeViewModel {
     func load() async {
         let bootstrap = await platform.bootstrap(forceRefresh: false)
         live = await platform.currentLiveBroadcast(forceRefresh: false)
+        if let page = try? await platform.feed(after: nil, forceRefresh: false) {
+            recentBayans = Array(page.items.filter { $0.videoID != nil }.prefix(6))
+        }
         let remote = bootstrap.schedules.map { schedule in
             ZikrSession(
                 id: schedule.id,

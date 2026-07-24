@@ -6,6 +6,7 @@ import SwiftUI
 @MainActor
 struct ZikrHomeView: View {
     @State private var viewModel: ZikrHomeViewModel
+    @State private var presentedVideo: ZikrPresentedVideo?
     private let dependencies: AppDependencies
 
     init(dependencies: AppDependencies, appState: AppState) {
@@ -48,6 +49,22 @@ struct ZikrHomeView: View {
                     }
                 }
 
+                if !viewModel.recentBayans.isEmpty {
+                    DISectionHeader(titleKey: "Recent Bayans", systemImage: "play.rectangle.on.rectangle")
+                    ForEach(Array(viewModel.recentBayans.enumerated()), id: \.element.id) { index, item in
+                        Button {
+                            DIHaptics.light()
+                            if let videoID = item.videoID {
+                                presentedVideo = ZikrPresentedVideo(id: videoID, title: item.title)
+                            }
+                        } label: {
+                            BayanRow(item: item)
+                        }
+                        .buttonStyle(DIPressableStyle())
+                        .diAppear(delay: 0.12 + 0.04 * Double(index))
+                    }
+                }
+
                 DISectionHeader(titleKey: "Tasbih", systemImage: "hand.tap")
                 NavigationLink {
                     TasbihListView(trackerRepository: dependencies.trackerRepository)
@@ -66,6 +83,9 @@ struct ZikrHomeView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text("To receive zikr reminders, please allow notifications for Darul Irfan in iOS Settings.")
+        }
+        .sheet(item: $presentedVideo) { video in
+            YouTubePlayerSheet(videoID: video.id, title: video.title)
         }
     }
 
@@ -313,5 +333,54 @@ private struct ZikrSessionCard: View {
             .frame(width: 9, height: 9)
             .diBreathingGlow(color: DIColor.primary, maxRadius: 8)
             .accessibilityHidden(true)
+    }
+}
+
+// MARK: - Recent bayans
+
+private struct ZikrPresentedVideo: Identifiable {
+    let id: String
+    let title: String
+}
+
+/// A tappable video row — thumbnail with a play glyph + title. Opens the
+/// in-app YouTube player, so watching a bayan never leaves the app.
+private struct BayanRow: View {
+    let item: OfficialFeedItem
+
+    var body: some View {
+        DICard(padding: DISpacing.sm) {
+            HStack(spacing: DISpacing.md) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                        .fill(DIColor.primaryDeep.opacity(0.12))
+                    if let imageURL = item.imageURL {
+                        AsyncImage(url: imageURL) { image in
+                            image.resizable().aspectRatio(contentMode: .fill)
+                        } placeholder: {
+                            Color.clear
+                        }
+                        .frame(width: 104, height: 62)
+                        .clipped()
+                    }
+                    Image(systemName: "play.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.4), radius: 4)
+                }
+                .frame(width: 104, height: 62)
+                .clipShape(RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous))
+
+                Text(verbatim: item.title)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(DIColor.textPrimary)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(verbatim: item.title))
+        .accessibilityAddTraits(.isButton)
     }
 }
