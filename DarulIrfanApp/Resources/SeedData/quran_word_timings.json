@@ -1,0 +1,235 @@
+{
+ "reciter": "Mishari Rashid al-Afasy",
+ "reciterId": 7,
+ "surahs": {
+  "1": {
+   "audioUrl": "https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/1.mp3",
+   "durationMs": 46000,
+   "verses": [
+    {
+     "ayah": 1,
+     "fromMs": 0,
+     "toMs": 6090,
+     "words": [
+      {
+       "position": 1,
+       "text": "بِسْمِ",
+       "startMs": 0,
+       "endMs": 580
+      },
+      {
+       "position": 2,
+       "text": "ٱللَّهِ",
+       "startMs": 580,
+       "endMs": 1409
+      },
+      {
+       "position": 3,
+       "text": "ٱلرَّحْمَـٰنِ",
+       "startMs": 1409,
+       "endMs": 2502
+      },
+      {
+       "position": 4,
+       "text": "ٱلرَّحِيمِ",
+       "startMs": 2502,
+       "endMs": 5840
+      }
+     ]
+    },
+    {
+     "ayah": 2,
+     "fromMs": 6090,
+     "toMs": 11680,
+     "words": [
+      {
+       "position": 1,
+       "text": "ٱلْحَمْدُ",
+       "startMs": 6025,
+       "endMs": 7025
+      },
+      {
+       "position": 2,
+       "text": "لِلَّهِ",
+       "startMs": 7025,
+       "endMs": 7885
+      },
+      {
+       "position": 3,
+       "text": "رَبِّ",
+       "startMs": 7885,
+       "endMs": 8515
+      },
+      {
+       "position": 4,
+       "text": "ٱلْعَـٰلَمِينَ",
+       "startMs": 8515,
+       "endMs": 11550
+      }
+     ]
+    },
+    {
+     "ayah": 3,
+     "fromMs": 11680,
+     "toMs": 16300,
+     "words": [
+      {
+       "position": 1,
+       "text": "ٱلرَّحْمَـٰنِ",
+       "startMs": 11615,
+       "endMs": 12855
+      },
+      {
+       "position": 2,
+       "text": "ٱلرَّحِيمِ",
+       "startMs": 12855,
+       "endMs": 16180
+      }
+     ]
+    },
+    {
+     "ayah": 4,
+     "fromMs": 16300,
+     "toMs": 20950,
+     "words": [
+      {
+       "position": 1,
+       "text": "مَـٰلِكِ",
+       "startMs": 16245,
+       "endMs": 17065
+      },
+      {
+       "position": 2,
+       "text": "يَوْمِ",
+       "startMs": 17065,
+       "endMs": 17665
+      },
+      {
+       "position": 3,
+       "text": "ٱلدِّينِ",
+       "startMs": 17665,
+       "endMs": 20830
+      }
+     ]
+    },
+    {
+     "ayah": 5,
+     "fromMs": 20950,
+     "toMs": 27660,
+     "words": [
+      {
+       "position": 1,
+       "text": "إِيَّاكَ",
+       "startMs": 20885,
+       "endMs": 21875
+      },
+      {
+       "position": 2,
+       "text": "نَعْبُدُ",
+       "startMs": 21875,
+       "endMs": 22645
+      },
+      {
+       "position": 3,
+       "text": "وَإِيَّاكَ",
+       "startMs": 22645,
+       "endMs": 23765
+      },
+      {
+       "position": 4,
+       "text": "نَسْتَعِينُ",
+       "startMs": 23765,
+       "endMs": 27520
+      }
+     ]
+    },
+    {
+     "ayah": 6,
+     "fromMs": 27660,
+     "toMs": 33250,
+     "words": [
+      {
+       "position": 1,
+       "text": "ٱهْدِنَا",
+       "startMs": 27585,
+       "endMs": 28325
+      },
+      {
+       "position": 2,
+       "text": "ٱلصِّرَٰطَ",
+       "startMs": 28325,
+       "endMs": 29225
+      },
+      {
+       "position": 3,
+       "text": "ٱلْمُسْتَقِيمَ",
+       "startMs": 29225,
+       "endMs": 33110
+      }
+     ]
+    },
+    {
+     "ayah": 7,
+     "fromMs": 33250,
+     "toMs": 46490,
+     "words": [
+      {
+       "position": 1,
+       "text": "صِرَٰطَ",
+       "startMs": 33185,
+       "endMs": 33935
+      },
+      {
+       "position": 2,
+       "text": "ٱلَّذِينَ",
+       "startMs": 33935,
+       "endMs": 34855
+      },
+      {
+       "position": 3,
+       "text": "أَنْعَمْتَ",
+       "startMs": 34855,
+       "endMs": 35875
+      },
+      {
+       "position": 4,
+       "text": "عَلَيْهِمْ",
+       "startMs": 35875,
+       "endMs": 36805
+      },
+      {
+       "position": 5,
+       "text": "غَيْرِ",
+       "startMs": 36805,
+       "endMs": 37395
+      },
+      {
+       "position": 6,
+       "text": "ٱلْمَغْضُوبِ",
+       "startMs": 37395,
+       "endMs": 38565
+      },
+      {
+       "position": 7,
+       "text": "عَلَيْهِمْ",
+       "startMs": 38565,
+       "endMs": 39565
+      },
+      {
+       "position": 8,
+       "text": "وَلَا",
+       "startMs": 39565,
+       "endMs": 39855
+      },
+      {
+       "position": 9,
+       "text": "ٱلضَّآلِّينَ",
+       "startMs": 39855,
+       "endMs": 46360
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

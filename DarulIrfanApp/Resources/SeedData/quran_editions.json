@@ -27,7 +27,7 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tarajum",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": false
+  "isAvailableOffline": true
  },
  {
   "id": "asrar-at-tanzil-en",
@@ -37,7 +37,7 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": false
+  "isAvailableOffline": true
  },
  {
   "id": "akram-ut-tafaseer-ur",
@@ -47,6 +47,16 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tafaseer",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": false
+  "isAvailableOffline": true
+ },
+ {
+  "id": "asrar-at-tanzil-ur",
+  "title": "Asrar-at-Tanzil (اردو تفسیر)",
+  "kind": "tafsir",
+  "language": "ur",
+  "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
+  "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
+  "rightsStatus": "permissionConfirmed",
+  "isAvailableOffline": true
  }
 ]

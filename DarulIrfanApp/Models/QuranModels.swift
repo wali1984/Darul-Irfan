@@ -106,3 +106,42 @@ struct ReadingProgress: Codable, Sendable, Equatable {
     var ayahNumber: Int
     var updatedAt: Date
 }
+
+/// What the reader shows beneath each ayah's Arabic. The Akram-ut-Tarajum
+/// translation always shows; the two tafsir modes additionally reveal the
+/// relevant commentary, expandable under the translation.
+enum QuranContentMode: String, CaseIterable, Identifiable, Sendable {
+    case tarajum
+    case asrarTanzil
+    case akramTafaseer
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .tarajum: return "Akram-ut-Tarajum"
+        case .asrarTanzil: return "Asrar-at-Tanzil"
+        case .akramTafaseer: return "Akram-ut-Tafaseer"
+        }
+    }
+
+    /// Short label for the segmented selector.
+    var shortTitle: String {
+        switch self {
+        case .tarajum: return "Tarajum"
+        case .asrarTanzil: return "Asrar"
+        case .akramTafaseer: return "Tafaseer"
+        }
+    }
+
+    var isTafsir: Bool { self != .tarajum }
+
+    /// Edition-id prefix whose tafsir this mode displays (nil for translation).
+    var tafsirEditionPrefix: String? {
+        switch self {
+        case .tarajum: return nil
+        case .asrarTanzil: return "asrar-at-tanzil"
+        case .akramTafaseer: return "akram-ut-tafaseer"
+        }
+    }
+}

@@ -33,7 +33,11 @@ final class SurahReaderViewModel {
     private(set) var tafsirEditionPointers: [QuranEdition] = []
 
     var showTranslation = true
-    var showTafsir = false
+    /// Which edition drives what's shown under each ayah. Defaults to the
+    /// Akram-ut-Tarajum translation; the two tafsir modes reveal commentary.
+    var contentMode: QuranContentMode = .tarajum
+    /// Word-by-word recitation (audio + timings) for this surah, when bundled.
+    private(set) var recitation: SurahRecitation?
 
     private let repository: any QuranRepositoryProtocol
     /// Preferred translation language ("en"/"ur"); the reader defaults to the
@@ -74,12 +78,15 @@ final class SurahReaderViewModel {
             )
 
             availableTranslationEditions = allEditions.filter { $0.kind == .translation && $0.isAvailableOffline }
-            // Prefer the edition matching the user's language, else the first.
-            let preferred = availableTranslationEditions.first(where: { $0.language == preferredLanguageCode })
+            // Akram-ut-Tarajum is the Silsila's own translation and the reader's
+            // default; fall back to the user's language, then the first.
+            let preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-ur" })
+                ?? availableTranslationEditions.first(where: { $0.language == preferredLanguageCode })
                 ?? availableTranslationEditions.first
             if let preferred {
                 await loadTranslations(edition: preferred)
             }
+            recitation = RecitationProvider.shared.recitation(forSurah: surah.id)
 
             var entries: [QuranTafsir] = []
             var pointers: [QuranEdition] = []
@@ -141,6 +148,28 @@ final class SurahReaderViewModel {
 
     var hasAnyTafsir: Bool {
         !tafsirEntries.isEmpty || !tafsirEditionPointers.isEmpty
+    }
+
+    /// Recitation words for an ayah (nil when this surah has no bundled audio).
+    func words(forAyah ayahNumber: Int) -> [RecitationWord]? {
+        recitation?.verse(ayahNumber)?.words
+    }
+
+    /// The tafsir entry to show under `ayahNumber` for the current mode, if any.
+    /// A range entry is shown once, under its first ayah.
+    func tafsirEntry(startingAt ayahNumber: Int) -> QuranTafsir? {
+        guard let prefix = contentMode.tafsirEditionPrefix else { return nil }
+        let candidates = tafsirEntries.filter {
+            $0.ayahStart == ayahNumber && $0.editionID.hasPrefix(prefix)
+        }
+        return candidates.first(where: { edition(id: $0.editionID)?.language == preferredLanguageCode })
+            ?? candidates.first
+    }
+
+    /// Whether tafsir text exists for the current mode anywhere in this surah.
+    var hasTafsirForMode: Bool {
+        guard let prefix = contentMode.tafsirEditionPrefix else { return false }
+        return tafsirEntries.contains { $0.editionID.hasPrefix(prefix) }
     }
 
     /// Share text: the reference only, never the copyrighted body text.

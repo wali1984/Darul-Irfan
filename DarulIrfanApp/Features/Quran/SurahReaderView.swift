@@ -1,14 +1,13 @@
 import SwiftUI
 
-/// Ayah-by-ayah reader for one surah. Shows Arabic text with the user's
-/// reader font scale, an optional offline translation, and an optional tafsir
-/// section (stored entries plus link-only pointers to the website). Surahs
-/// whose text pack is not on device get a gentle explanation with a link to
-/// read on quran.com.
+/// Ayah-by-ayah reader for one surah. Shows Arabic with word-by-word recitation
+/// highlighting, the Akram-ut-Tarajum translation, and an expandable tafsir
+/// (Asrar-at-Tanzil / Akram-ut-Tafaseer) selected from a segmented control.
 struct SurahReaderView: View {
     private let appState: AppState
     private let focusAyah: Int?
     @State private var viewModel: SurahReaderViewModel
+    @State private var player = RecitationPlayer()
     @State private var hasScrolledToFocus = false
 
     init(surah: QuranSurah, focusAyah: Int?, dependencies: AppDependencies, appState: AppState) {
@@ -36,6 +35,7 @@ struct SurahReaderView: View {
             }
             .task { await viewModel.load() }
             .onDisappear {
+                player.stop()
                 let readerViewModel = viewModel
                 Task { await readerViewModel.flushLastRead() }
             }
@@ -97,13 +97,20 @@ struct SurahReaderView: View {
             ScrollView {
                 LazyVStack(spacing: DISpacing.md) {
                     surahHeader
-                    if viewModel.showTafsir && !viewModel.tafsirEditionPointers.isEmpty {
+                    if viewModel.recitation != nil {
+                        recitationBar
+                    }
+                    contentModeSelector
+                    if viewModel.contentMode.isTafsir
+                        && !viewModel.hasTafsirForMode
+                        && !viewModel.tafsirEditionPointers.isEmpty {
                         tafsirPointerCard
                     }
                     ForEach(viewModel.ayahs, id: \.ayahNumber) { ayah in
                         AyahCardView(
                             ayah: ayah,
                             viewModel: viewModel,
+                            player: player,
                             fontScale: appState.settings.readerFontScale.rawValue
                         )
                         .id(ayah.ayahNumber)
@@ -122,7 +129,6 @@ struct SurahReaderView: View {
         guard !hasScrolledToFocus else { return }
         hasScrolledToFocus = true
         guard let focusAyah, focusAyah > 1 else { return }
-        // Give the lazy stack one runloop tick to lay out before scrolling.
         DispatchQueue.main.async {
             proxy.scrollTo(focusAyah, anchor: .top)
         }
@@ -160,16 +166,64 @@ struct SurahReaderView: View {
         }
     }
 
-    /// Shown when tafsir is toggled on and editions exist whose full text is
-    /// not stored in the app — the website publishes it only as image-scan
-    /// PDF booklets, so the app links to the per-surah source pages.
+    /// Whole-surah recitation control + reciter credit.
+    private var recitationBar: some View {
+        let isThisSurah = player.currentSurah == viewModel.surah.id
+        let isPlaying = player.isPlaying && isThisSurah
+        return DICard(padding: DISpacing.sm) {
+            HStack(spacing: DISpacing.md) {
+                Button {
+                    guard let recitation = viewModel.recitation else { return }
+                    if isPlaying {
+                        player.pause()
+                    } else if isThisSurah {
+                        player.resume()
+                    } else {
+                        player.start(surah: viewModel.surah.id, recitation: recitation, fromAyah: 1)
+                    }
+                } label: {
+                    Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                        .font(.system(size: 34))
+                        .foregroundStyle(DIColor.primary)
+                }
+                .accessibilityLabel(isPlaying ? Text("Pause recitation") : Text("Play recitation"))
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Recitation")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(DIColor.textPrimary)
+                    Text(RecitationProvider.shared.reciterName)
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                }
+                Spacer(minLength: 0)
+                if isPlaying {
+                    Image(systemName: "waveform")
+                        .foregroundStyle(DIColor.accent)
+                        .symbolEffect(.variableColor.iterative, options: .repeating)
+                }
+            }
+        }
+    }
+
+    /// Segmented control choosing translation-only vs a tafsir edition.
+    private var contentModeSelector: some View {
+        Picker("View", selection: contentModeBinding) {
+            ForEach(QuranContentMode.allCases) { mode in
+                Text(mode.shortTitle).tag(mode)
+            }
+        }
+        .pickerStyle(.segmented)
+    }
+
+    /// Shown when a tafsir mode is selected but its text is not on device for
+    /// this surah — links to the source pages on the website.
     private var tafsirPointerCard: some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Tafsir on the website")
+                Text("Tafsir arriving")
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
-                Text("Full tafsir of this surah is published on naqshbandiaowaisiah.org and is not stored in the app yet.")
+                Text("This tafsir for this surah is being added to the app. Until then you can read it on naqshbandiaowaisiah.org.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                 ForEach(viewModel.tafsirEditionPointers) { edition in
@@ -198,18 +252,13 @@ struct SurahReaderView: View {
                     Text(LocalizedStringKey(scale.readerDisplayName)).tag(scale)
                 }
             }
-            if viewModel.translationEdition != nil {
-                Toggle("Show translation", isOn: showTranslationBinding)
-            }
+            Toggle("Show translation", isOn: showTranslationBinding)
             if viewModel.availableTranslationEditions.count > 1 {
                 Picker("Translation", selection: editionBinding) {
                     ForEach(viewModel.availableTranslationEditions) { edition in
                         Text(edition.title).tag(edition.id)
                     }
                 }
-            }
-            if viewModel.hasAnyTafsir {
-                Toggle("Show tafsir", isOn: showTafsirBinding)
             }
         } label: {
             Image(systemName: "textformat.size")
@@ -240,10 +289,10 @@ struct SurahReaderView: View {
         )
     }
 
-    private var showTafsirBinding: Binding<Bool> {
+    private var contentModeBinding: Binding<QuranContentMode> {
         Binding(
-            get: { viewModel.showTafsir },
-            set: { viewModel.showTafsir = $0 }
+            get: { viewModel.contentMode },
+            set: { viewModel.contentMode = $0 }
         )
     }
 }
@@ -253,11 +302,15 @@ struct SurahReaderView: View {
 private struct AyahCardView: View {
     let ayah: QuranAyah
     let viewModel: SurahReaderViewModel
+    let player: RecitationPlayer
     let fontScale: Double
 
-    /// Base size for English translation/tafsir body text; scales with
-    /// Dynamic Type on top of the reader's own font-scale setting.
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
+    @State private var tafsirExpanded = true
+
+    private var isSounding: Bool {
+        player.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
+    }
 
     var body: some View {
         DICard {
@@ -269,13 +322,21 @@ private struct AyahCardView: View {
                     Divider()
                     translationView(translation)
                 }
-                if viewModel.showTafsir {
-                    let entries = viewModel.tafsir(for: ayah.ayahNumber)
-                    if !entries.isEmpty {
-                        Divider()
-                        tafsirSection(entries)
-                    }
+                if viewModel.contentMode.isTafsir,
+                   let entry = viewModel.tafsirEntry(startingAt: ayah.ayahNumber) {
+                    Divider()
+                    tafsirDisclosure(entry)
                 }
+                Divider()
+                shellsRow
+            }
+        }
+        .overlay(alignment: .leading) {
+            if isSounding {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(DIColor.accent)
+                    .frame(width: 3)
+                    .padding(.vertical, 6)
             }
         }
     }
@@ -285,6 +346,7 @@ private struct AyahCardView: View {
     private var header: some View {
         HStack(spacing: DISpacing.md) {
             ayahNumberBadge
+            playButton
             Spacer(minLength: 0)
             Button {
                 Task { await viewModel.toggleBookmark(ayahNumber: ayah.ayahNumber) }
@@ -306,8 +368,23 @@ private struct AyahCardView: View {
         }
     }
 
-    /// A small gilded mushaf-style ayah medallion — a gold-sheen disc with a
-    /// hairline gold ring, in place of the plain "Ayah N" caption.
+    @ViewBuilder
+    private var playButton: some View {
+        if let recitation = viewModel.recitation {
+            Button {
+                if isSounding {
+                    player.pause()
+                } else {
+                    player.start(surah: ayah.surahNumber, recitation: recitation, fromAyah: ayah.ayahNumber)
+                }
+            } label: {
+                Image(systemName: isSounding ? "pause.circle.fill" : "play.circle")
+                    .foregroundStyle(isSounding ? DIColor.accent : DIColor.primary)
+            }
+            .accessibilityLabel(isSounding ? Text("Pause") : Text("Play Ayah \(ayah.ayahNumber)"))
+        }
+    }
+
     private var ayahNumberBadge: some View {
         Text("\(ayah.ayahNumber)")
             .font(.caption.weight(.bold).monospacedDigit())
@@ -322,17 +399,41 @@ private struct AyahCardView: View {
             .accessibilityLabel(Text("Ayah \(ayah.ayahNumber)"))
     }
 
-    // MARK: Arabic
+    // MARK: Arabic (word-by-word highlight)
 
     private var arabicText: some View {
-        Text(ayah.textArabic)
-            .font(DIFont.quranArabic(scale: fontScale * 1.15))
-            .lineSpacing(CGFloat(16 * fontScale))
-            .foregroundStyle(DIColor.textPrimary)
-            .diGoldGlow(radius: 5, opacity: 0.18)
-            .textSelection(.enabled)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .environment(\.layoutDirection, .rightToLeft)
+        Group {
+            if let words = viewModel.words(forAyah: ayah.ayahNumber), !words.isEmpty {
+                Text(highlightedArabic(words: words))
+            } else {
+                Text(ayah.textArabic)
+            }
+        }
+        .font(DIFont.quranArabic(scale: fontScale * 1.15))
+        .lineSpacing(CGFloat(16 * fontScale))
+        .foregroundStyle(DIColor.textPrimary)
+        .diGoldGlow(radius: 5, opacity: 0.18)
+        .textSelection(.enabled)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .environment(\.layoutDirection, .rightToLeft)
+    }
+
+    /// Joins the recitation words, tinting the one currently sounding.
+    private func highlightedArabic(words: [RecitationWord]) -> AttributedString {
+        let highlight = isSounding ? player.currentWordPosition : nil
+        var result = AttributedString()
+        for (index, word) in words.enumerated() {
+            var piece = AttributedString(word.text)
+            if word.position == highlight {
+                piece.backgroundColor = DIColor.accent.opacity(0.30)
+                piece.foregroundColor = DIColor.primaryDeep
+            }
+            result += piece
+            if index < words.count - 1 {
+                result += AttributedString(" ")
+            }
+        }
+        return result
     }
 
     // MARK: Translation
@@ -351,45 +452,56 @@ private struct AyahCardView: View {
         }
     }
 
-    // MARK: Tafsir
+    // MARK: Tafsir (expandable, expanded by default)
 
-    private func tafsirSection(_ entries: [QuranTafsir]) -> some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            Text("Tafsir")
-                .font(.caption.weight(.semibold))
-                .textCase(.uppercase)
-                .foregroundStyle(DIColor.textMuted)
-            ForEach(entries) { entry in
-                tafsirEntryView(entry)
+    private func tafsirDisclosure(_ entry: QuranTafsir) -> some View {
+        let edition = viewModel.edition(id: entry.editionID)
+        return DisclosureGroup(isExpanded: $tafsirExpanded) {
+            VStack(alignment: .leading, spacing: DISpacing.xs) {
+                if !entry.text.isEmpty {
+                    bodyText(entry.text, languageCode: edition?.language)
+                }
+                if let sourceUrl = entry.sourceUrl, let url = URL(string: sourceUrl) {
+                    Link(destination: url) {
+                        Label("Source on naqshbandiaowaisiah.org", systemImage: "safari")
+                            .font(.footnote)
+                    }
+                    .tint(DIColor.textMuted)
+                }
             }
+            .padding(.top, DISpacing.xs)
+        } label: {
+            Text(edition?.title ?? "Tafsir")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(DIColor.primary)
+        }
+        .tint(DIColor.primary)
+    }
+
+    // MARK: Shells (prepared for later)
+
+    private var shellsRow: some View {
+        VStack(alignment: .leading, spacing: DISpacing.xs) {
+            HStack(spacing: DISpacing.sm) {
+                shellChip("Translation audio", "speaker.wave.2")
+                shellChip("Video lectures", "play.rectangle")
+                shellChip("Sheikh audio", "person.wave.2")
+            }
+            Text("Coming soon — recitation of the translation & tafsir, Sheikh lectures per ayah, and your own recordings.")
+                .font(.caption2)
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
-    @ViewBuilder
-    private func tafsirEntryView(_ entry: QuranTafsir) -> some View {
-        let edition = viewModel.edition(id: entry.editionID)
-        VStack(alignment: .leading, spacing: DISpacing.xs) {
-            if let edition {
-                Text(edition.title)
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(DIColor.primary)
-            }
-            if entry.ayahStart != entry.ayahEnd {
-                Text("On Ayahs \(entry.ayahStart)–\(entry.ayahEnd)")
-                    .font(.caption)
-                    .foregroundStyle(DIColor.textMuted)
-            }
-            if !entry.text.isEmpty {
-                bodyText(entry.text, languageCode: edition?.language)
-            }
-            if let sourceUrl = entry.sourceUrl, let url = URL(string: sourceUrl) {
-                Link(destination: url) {
-                    Label("Read on naqshbandiaowaisiah.org", systemImage: "safari")
-                        .font(.footnote)
-                }
-                .tint(DIColor.primary)
-            }
-        }
+    private func shellChip(_ label: String, _ icon: String) -> some View {
+        Label(label, systemImage: icon)
+            .font(.caption2.weight(.medium))
+            .padding(.horizontal, DISpacing.sm)
+            .padding(.vertical, 5)
+            .background(Capsule().fill(DIColor.sandstone.opacity(0.45)))
+            .overlay(Capsule().stroke(DIColor.textMuted.opacity(0.25), lineWidth: 1))
+            .foregroundStyle(DIColor.textMuted)
+            .accessibilityHidden(true)
     }
 
     // MARK: Language-aware body text
@@ -418,8 +530,6 @@ private struct AyahCardView: View {
 // MARK: - Font scale display names
 
 private extension ReaderFontScale {
-    /// Natural-English display name; wrapped in `LocalizedStringKey` at the
-    /// call site so the String Catalog can translate it.
     var readerDisplayName: String {
         switch self {
         case .small: return "Small"
