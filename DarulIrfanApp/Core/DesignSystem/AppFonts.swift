@@ -14,7 +14,7 @@ enum AppFonts {
     /// already registered via UIAppFonts just reports an "already registered"
     /// error which we ignore.
     static func registerBundledFonts() {
-        for base in ["AmiriQuran-Regular", "NotoNastaliqUrdu-Regular"] {
+        for base in ["PDMSSaleemQuran", "AmiriQuran-Regular", "NotoNastaliqUrdu-Regular"] {
             guard let url = bundleURL(base) else {
                 AppLog.presentation("Font not found in bundle: \(base).ttf")
                 continue
@@ -28,10 +28,12 @@ enum AppFonts {
         _ = urduName
     }
 
-    /// The usable font name for Quran Arabic (Amiri Quran), or the system font
-    /// name if the bundled face could not be loaded.
+    /// The usable font name for Quran Arabic. Prefers the IndoPak PDMS Saleem
+    /// mushaf face (the script taught in Pakistan), falling back to Amiri Quran
+    /// then the system font if the bundled faces could not be loaded.
     static let quranArabicName: String = resolve(
-        ["AmiriQuran-Regular", "Amiri Quran", "AmiriQuran"]
+        ["_PDMS_Saleem_QuranFont", "PDMS_Saleem_QuranFont", "PDMSSaleemQuran",
+         "AmiriQuran-Regular", "Amiri Quran", "AmiriQuran"]
     )
 
     /// The usable font name for Urdu Nastaliq (Noto Nastaliq Urdu).

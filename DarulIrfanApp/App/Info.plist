@@ -42,6 +42,7 @@
 	<string>https://darul-irfan-platform.wajidmahmoodali1984-e23.workers.dev</string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>PDMSSaleemQuran.ttf</string>
 		<string>AmiriQuran-Regular.ttf</string>
 		<string>NotoNastaliqUrdu-Regular.ttf</string>
 	</array>

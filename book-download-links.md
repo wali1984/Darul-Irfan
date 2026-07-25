@@ -1,0 +1,607 @@
+# Darul Irfan — All book / Quran / tafsir PDF links
+
+586 unique PDFs from naqshbandiaowaisiah.org.
+
+## Asrar-at-Tanzil — Urdu tafsir  (114)
+
+- Asrar-at-Tanzil — Al-Faatiha (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1229/Asrar-ut-Tanzil_UrduTafseer_Surah-1.pdf
+- Asrar-at-Tanzil — Al-Baqara (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1230/Asrar-ut-Tanzil_UrduTafseer_Surah-2.pdf
+- Asrar-at-Tanzil — Aal-i-Imraan (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1231/Asrar-ut-Tanzil_UrduTafseer_Surah-3.pdf
+- Asrar-at-Tanzil — An-Nisaa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1232/Asrar-ut-Tanzil_UrduTafseer_Surah-4.pdf
+- Asrar-at-Tanzil — Al-Maaida (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1233/Asrar-ut-Tanzil_UrduTafseer_Surah-5.pdf
+- Asrar-at-Tanzil — Al-An'aam (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1234/Asrar-ut-Tanzil_UrduTafseer_Surah-6.pdf
+- Asrar-at-Tanzil — Al-A'raaf (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1235/Asrar-ut-Tanzil_UrduTafseer_Surah-7.pdf
+- Asrar-at-Tanzil — Al-Anfaal (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1236/Asrar-ut-Tanzil_UrduTafseer_Surah-8.pdf
+- Asrar-at-Tanzil — At-Tawba (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1237/Asrar-ut-Tanzil_UrduTafseer_Surah-9.pdf
+- Asrar-at-Tanzil — Yunus (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1238/Asrar-ut-Tanzil_UrduTafseer_Surah-10.pdf
+- Asrar-at-Tanzil — Hud (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1239/Asrar-ut-Tanzil_UrduTafseer_Surah-11.pdf
+- Asrar-at-Tanzil — Yusuf (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1240/Asrar-ut-Tanzil_UrduTafseer_Surah-12.pdf
+- Asrar-at-Tanzil — Ar-Ra'd (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1241/Asrar-ut-Tanzil_UrduTafseer_Surah-13.pdf
+- Asrar-at-Tanzil — Ibrahim (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1242/Asrar-ut-Tanzil_UrduTafseer_Surah-14.pdf
+- Asrar-at-Tanzil — Al-Hijr (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1243/Asrar-ut-Tanzil_UrduTafseer_Surah-15.pdf
+- Asrar-at-Tanzil — An-Nahl (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1244/Asrar-ut-Tanzil_UrduTafseer_Surah-16.pdf
+- Asrar-at-Tanzil — Al-Israa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1245/Asrar-ut-Tanzil_UrduTafseer_Surah-17.pdf
+- Asrar-at-Tanzil — Al-Kahf (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1246/Asrar-ut-Tanzil_UrduTafseer_Surah-18.pdf
+- Asrar-at-Tanzil — Maryam (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1247/Asrar-ut-Tanzil_UrduTafseer_Surah-19.pdf
+- Asrar-at-Tanzil — Taa-Haa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1248/Asrar-ut-Tanzil_UrduTafseer_Surah-20.pdf
+- Asrar-at-Tanzil — Al-Anbiyaa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1249/Asrar-ut-Tanzil_UrduTafseer_Surah-21.pdf
+- Asrar-at-Tanzil — Al-Hajj (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1250/Asrar-ut-Tanzil_UrduTafseer_Surah-22.pdf
+- Asrar-at-Tanzil — Al-Muminoon (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1251/Asrar-ut-Tanzil_UrduTafseer_Surah-23.pdf
+- Asrar-at-Tanzil — An-Noor (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1252/Asrar-ut-Tanzil_UrduTafseer_Surah-24.pdf
+- Asrar-at-Tanzil — Al-Furqaan (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1253/Asrar-ut-Tanzil_UrduTafseer_Surah-25.pdf
+- Asrar-at-Tanzil — Ash-Shu'araa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1254/Asrar-ut-Tanzil_UrduTafseer_Surah-26.pdf
+- Asrar-at-Tanzil — An-Naml (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1255/Asrar-ut-Tanzil_UrduTafseer_Surah-27.pdf
+- Asrar-at-Tanzil — Al-Qasas (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1256/Asrar-ut-Tanzil_UrduTafseer_Surah-28.pdf
+- Asrar-at-Tanzil — Al-Ankaboot (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1257/Asrar-ut-Tanzil_UrduTafseer_Surah-29.pdf
+- Asrar-at-Tanzil — Ar-Room (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1258/Asrar-ut-Tanzil_UrduTafseer_Surah-30.pdf
+- Asrar-at-Tanzil — Luqman (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1259/Asrar-ut-Tanzil_UrduTafseer_Surah-31.pdf
+- Asrar-at-Tanzil — As-Sajda (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1260/Asrar-ut-Tanzil_UrduTafseer_Surah-32.pdf
+- Asrar-at-Tanzil — Al-Ahzaab (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1261/Asrar-ut-Tanzil_UrduTafseer_Surah-33.pdf
+- Asrar-at-Tanzil — Saba (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1262/Asrar-ut-Tanzil_UrduTafseer_Surah-34.pdf
+- Asrar-at-Tanzil — Faatir (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1263/Asrar-ut-Tanzil_UrduTafseer_Surah-35.pdf
+- Asrar-at-Tanzil — Yaseen (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1264/Asrar-ut-Tanzil_UrduTafseer_Surah-36.pdf
+- Asrar-at-Tanzil — As-Saaffaat (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1265/Asrar-ut-Tanzil_UrduTafseer_Surah-37.pdf
+- Asrar-at-Tanzil — Saad (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1266/Asrar-ut-Tanzil_UrduTafseer_Surah-38.pdf
+- Asrar-at-Tanzil — Az-Zumar (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1267/Asrar-ut-Tanzil_UrduTafseer_Surah-39.pdf
+- Asrar-at-Tanzil — Ghafir (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1268/Asrar-ut-Tanzil_UrduTafseer_Surah-40.pdf
+- Asrar-at-Tanzil — Fussilat (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1269/Asrar-ut-Tanzil_UrduTafseer_Surah-41.pdf
+- Asrar-at-Tanzil — Ash-Shura (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1270/Asrar-ut-Tanzil_UrduTafseer_Surah-42.pdf
+- Asrar-at-Tanzil — Az-Zukhruf (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1271/Asrar-ut-Tanzil_UrduTafseer_Surah-43.pdf
+- Asrar-at-Tanzil — Ad-Dukhaan (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1272/Asrar-ut-Tanzil_UrduTafseer_Surah-44.pdf
+- Asrar-at-Tanzil — Al-Jaathiya (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1273/Asrar-ut-Tanzil_UrduTafseer_Surah-45.pdf
+- Asrar-at-Tanzil — Al-Ahqaf (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1274/Asrar-ut-Tanzil_UrduTafseer_Surah-46.pdf
+- Asrar-at-Tanzil — Muhammad (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1275/Asrar-ut-Tanzil_UrduTafseer_Surah-47.pdf
+- Asrar-at-Tanzil — Al-Fath (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1276/Asrar-ut-Tanzil_UrduTafseer_Surah-48.pdf
+- Asrar-at-Tanzil — Al-Hujuraat (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1277/Asrar-ut-Tanzil_UrduTafseer_Surah-49.pdf
+- Asrar-at-Tanzil — Qaaf (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1278/Asrar-ut-Tanzil_UrduTafseer_Surah-50.pdf
+- Asrar-at-Tanzil — Adh-Dhaariyat (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1279/Asrar-ut-Tanzil_UrduTafseer_Surah-51.pdf
+- Asrar-at-Tanzil — At-Tur (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1280/Asrar-ut-Tanzil_UrduTafseer_Surah-52.pdf
+- Asrar-at-Tanzil — An-Najm (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1281/Asrar-ut-Tanzil_UrduTafseer_Surah-53.pdf
+- Asrar-at-Tanzil — Al-Qamar (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1282/Asrar-ut-Tanzil_UrduTafseer_Surah-54.pdf
+- Asrar-at-Tanzil — Ar-Rahmaan (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1283/Asrar-ut-Tanzil_UrduTafseer_Surah-55.pdf
+- Asrar-at-Tanzil — Al-Waaqia (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1284/Asrar-ut-Tanzil_UrduTafseer_Surah-56.pdf
+- Asrar-at-Tanzil — Al-Hadid (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1285/Asrar-ut-Tanzil_UrduTafseer_Surah-57.pdf
+- Asrar-at-Tanzil — Al-Mujaadila (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1286/Asrar-ut-Tanzil_UrduTafseer_Surah-58.pdf
+- Asrar-at-Tanzil — Al-Hashr (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1287/Asrar-ut-Tanzil_UrduTafseer_Surah-59.pdf
+- Asrar-at-Tanzil — Al-Mumtahana (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1288/Asrar-ut-Tanzil_UrduTafseer_Surah-60.pdf
+- Asrar-at-Tanzil — As-Saff (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1289/Asrar-ut-Tanzil_UrduTafseer_Surah-61.pdf
+- Asrar-at-Tanzil — Al-Jumu'a (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1290/Asrar-ut-Tanzil_UrduTafseer_Surah-62.pdf
+- Asrar-at-Tanzil — Al-Munaafiqoon (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1291/Asrar-ut-Tanzil_UrduTafseer_Surah-63.pdf
+- Asrar-at-Tanzil — At-Taghaabun (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1292/Asrar-ut-Tanzil_UrduTafseer_Surah-64.pdf
+- Asrar-at-Tanzil — At-Talaaq (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1293/Asrar-ut-Tanzil_UrduTafseer_Surah-65.pdf
+- Asrar-at-Tanzil — At-Tahrim (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1294/Asrar-ut-Tanzil_UrduTafseer_Surah-66.pdf
+- Asrar-at-Tanzil — Al-Mulk (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1295/Asrar-ut-Tanzil_UrduTafseer_Surah-67.pdf
+- Asrar-at-Tanzil — Al-Qalam (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1296/Asrar-ut-Tanzil_UrduTafseer_Surah-68.pdf
+- Asrar-at-Tanzil — Al-Haaqqa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1297/Asrar-ut-Tanzil_UrduTafseer_Surah-69.pdf
+- Asrar-at-Tanzil — Al-Ma'aarij (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1298/Asrar-ut-Tanzil_UrduTafseer_Surah-70.pdf
+- Asrar-at-Tanzil — Nooh (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1299/Asrar-ut-Tanzil_UrduTafseer_Surah-71.pdf
+- Asrar-at-Tanzil — Al-Jinn (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1300/Asrar-ut-Tanzil_UrduTafseer_Surah-72.pdf
+- Asrar-at-Tanzil — Al-Muzzammil (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1301/Asrar-ut-Tanzil_UrduTafseer_Surah-73.pdf
+- Asrar-at-Tanzil — Al-Muddaththir (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1302/Asrar-ut-Tanzil_UrduTafseer_Surah-74.pdf
+- Asrar-at-Tanzil — Al-Qiyaama (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1303/Asrar-ut-Tanzil_UrduTafseer_Surah-75.pdf
+- Asrar-at-Tanzil — Al-Insaan (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1304/Asrar-ut-Tanzil_UrduTafseer_Surah-76.pdf
+- Asrar-at-Tanzil — Al-Mursalaat (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1305/Asrar-ut-Tanzil_UrduTafseer_Surah-77.pdf
+- Asrar-at-Tanzil — An-Naba (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1306/Asrar-ut-Tanzil_UrduTafseer_Surah-78.pdf
+- Asrar-at-Tanzil — An-Naazi'aat (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1307/Asrar-ut-Tanzil_UrduTafseer_Surah-79.pdf
+- Asrar-at-Tanzil — Abasa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1308/Asrar-ut-Tanzil_UrduTafseer_Surah-80.pdf
+- Asrar-at-Tanzil — At-Takwir (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1309/Asrar-ut-Tanzil_UrduTafseer_Surah-81.pdf
+- Asrar-at-Tanzil — Al-Infitaar (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1310/Asrar-ut-Tanzil_UrduTafseer_Surah-82.pdf
+- Asrar-at-Tanzil — Al-Mutaffifin (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1311/Asrar-ut-Tanzil_UrduTafseer_Surah-83.pdf
+- Asrar-at-Tanzil — Al-Inshiqaaq (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1312/Asrar-ut-Tanzil_UrduTafseer_Surah-84.pdf
+- Asrar-at-Tanzil — Al-Burooj (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1313/Asrar-ut-Tanzil_UrduTafseer_Surah-85.pdf
+- Asrar-at-Tanzil — At-Taariq (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1314/Asrar-ut-Tanzil_UrduTafseer_Surah-86.pdf
+- Asrar-at-Tanzil — Al-A'laa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1315/Asrar-ut-Tanzil_UrduTafseer_Surah-87.pdf
+- Asrar-at-Tanzil — Al-Ghaashiya (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1316/Asrar-ut-Tanzil_UrduTafseer_Surah-88.pdf
+- Asrar-at-Tanzil — Al-Fajr (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1317/Asrar-ut-Tanzil_UrduTafseer_Surah-89.pdf
+- Asrar-at-Tanzil — Al-Balad (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1318/Asrar-ut-Tanzil_UrduTafseer_Surah-90.pdf
+- Asrar-at-Tanzil — Ash-Shams (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1319/Asrar-ut-Tanzil_UrduTafseer_Surah-91.pdf
+- Asrar-at-Tanzil — Al-Lail (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1320/Asrar-ut-Tanzil_UrduTafseer_Surah-92.pdf
+- Asrar-at-Tanzil — Ad-Dhuhaa (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1321/Asrar-ut-Tanzil_UrduTafseer_Surah-93.pdf
+- Asrar-at-Tanzil — Ash-Sharh (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1322/Asrar-ut-Tanzil_UrduTafseer_Surah-94.pdf
+- Asrar-at-Tanzil — At-Tin (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1323/Asrar-ut-Tanzil_UrduTafseer_Surah-95.pdf
+- Asrar-at-Tanzil — Al-Alaq (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1324/Asrar-ut-Tanzil_UrduTafseer_Surah-96.pdf
+- Asrar-at-Tanzil — Al-Qadr (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1325/Asrar-ut-Tanzil_UrduTafseer_Surah-97.pdf
+- Asrar-at-Tanzil — Al-Bayyina (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1326/Asrar-ut-Tanzil_UrduTafseer_Surah-98.pdf
+- Asrar-at-Tanzil — Az-Zalzala (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1327/Asrar-ut-Tanzil_UrduTafseer_Surah-99.pdf
+- Asrar-at-Tanzil — Al-Aadiyaat (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1328/Asrar-ut-Tanzil_UrduTafseer_Surah-100.pdf
+- Asrar-at-Tanzil — Al-Qaari'a (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1329/Asrar-ut-Tanzil_UrduTafseer_Surah-101.pdf
+- Asrar-at-Tanzil — At-Takaathur (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1330/Asrar-ut-Tanzil_UrduTafseer_Surah-102.pdf
+- Asrar-at-Tanzil — Al-Asr (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1331/Asrar-ut-Tanzil_UrduTafseer_Surah-103.pdf
+- Asrar-at-Tanzil — Al-Humaza (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1332/Asrar-ut-Tanzil_UrduTafseer_Surah-104.pdf
+- Asrar-at-Tanzil — Al-Fil (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1333/Asrar-ut-Tanzil_UrduTafseer_Surah-105.pdf
+- Asrar-at-Tanzil — Quraish (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1334/Asrar-ut-Tanzil_UrduTafseer_Surah-106.pdf
+- Asrar-at-Tanzil — Al-Maa'un (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1335/Asrar-ut-Tanzil_UrduTafseer_Surah-107.pdf
+- Asrar-at-Tanzil — Al-Kawthar (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1336/Asrar-ut-Tanzil_UrduTafseer_Surah-108.pdf
+- Asrar-at-Tanzil — Al-Kaafiroon (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1337/Asrar-ut-Tanzil_UrduTafseer_Surah-109.pdf
+- Asrar-at-Tanzil — An-Nasr (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1338/Asrar-ut-Tanzil_UrduTafseer_Surah-110.pdf
+- Asrar-at-Tanzil — Al-Masad (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1339/Asrar-ut-Tanzil_UrduTafseer_Surah-111.pdf
+- Asrar-at-Tanzil — Al-Ikhlaas (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1340/Asrar-ut-Tanzil_UrduTafseer_Surah-112.pdf
+- Asrar-at-Tanzil — Al-Falaq (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1341/Asrar-ut-Tanzil_UrduTafseer_Surah-113.pdf
+- Asrar-at-Tanzil — An-Naas (Urdu Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1342/Asrar-ut-Tanzil_UrduTafseer_Surah-114.pdf
+
+## Asrar-at-Tanzil — English tafsir  (114)
+
+- Asrar-at-Tanzil — Al-Faatiha (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1229/Asrar-ut-Tanzil_EnglishTafseer_Chapter-1.pdf
+- Asrar-at-Tanzil — Al-Baqara (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1230/Asrar-ut-Tanzil_EnglishTafseer_Chapter-2.pdf
+- Asrar-at-Tanzil — Aal-i-Imraan (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1231/Asrar-ut-Tanzil_EnglishTafseer_Chapter-3.pdf
+- Asrar-at-Tanzil — An-Nisaa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1232/Asrar-ut-Tanzil_EnglishTafseer_Chapter-4.pdf
+- Asrar-at-Tanzil — Al-Maaida (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1233/Asrar-ut-Tanzil_EnglishTafseer_Chapter-5.pdf
+- Asrar-at-Tanzil — Al-An'aam (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1234/Asrar-ut-Tanzil_EnglishTafseer_Chapter-6.pdf
+- Asrar-at-Tanzil — Al-A'raaf (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1235/Asrar-ut-Tanzil_EnglishTafseer_Chapter-7.pdf
+- Asrar-at-Tanzil — Al-Anfaal (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1236/Asrar-ut-Tanzil_EnglishTafseer_Chapter-8.pdf
+- Asrar-at-Tanzil — At-Tawba (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1237/Asrar-ut-Tanzil_EnglishTafseer_Chapter-9.pdf
+- Asrar-at-Tanzil — Yunus (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1238/Asrar-ut-Tanzil_EnglishTafseer_Chapter-10.pdf
+- Asrar-at-Tanzil — Hud (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1239/Asrar-ut-Tanzil_EnglishTafseer_Chapter-11.pdf
+- Asrar-at-Tanzil — Yusuf (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1240/Asrar-ut-Tanzil_EnglishTafseer_Chapter-12.pdf
+- Asrar-at-Tanzil — Ar-Ra'd (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1241/Asrar-ut-Tanzil_EnglishTafseer_Chapter-13.pdf
+- Asrar-at-Tanzil — Ibrahim (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1242/Asrar-ut-Tanzil_EnglishTafseer_Chapter-14.pdf
+- Asrar-at-Tanzil — Al-Hijr (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1243/Asrar-ut-Tanzil_EnglishTafseer_Chapter-15.pdf
+- Asrar-at-Tanzil — An-Nahl (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1244/Asrar-ut-Tanzil_EnglishTafseer_Chapter-16.pdf
+- Asrar-at-Tanzil — Al-Israa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1245/Asrar-ut-Tanzil_EnglishTafseer_Chapter-17.pdf
+- Asrar-at-Tanzil — Al-Kahf (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1246/Asrar-ut-Tanzil_EnglishTafseer_Chapter-18.pdf
+- Asrar-at-Tanzil — Maryam (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1247/Asrar-ut-Tanzil_EnglishTafseer_Chapter-19.pdf
+- Asrar-at-Tanzil — Taa-Haa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1248/Asrar-ut-Tanzil_EnglishTafseer_Chapter-20.pdf
+- Asrar-at-Tanzil — Al-Anbiyaa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1249/Asrar-ut-Tanzil_EnglishTafseer_Chapter-21.pdf
+- Asrar-at-Tanzil — Al-Hajj (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1250/Asrar-ut-Tanzil_EnglishTafseer_Chapter-22.pdf
+- Asrar-at-Tanzil — Al-Muminoon (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1251/Asrar-ut-Tanzil_EnglishTafseer_Chapter-23.pdf
+- Asrar-at-Tanzil — An-Noor (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1252/Asrar-ut-Tanzil_EnglishTafseer_Chapter-24.pdf
+- Asrar-at-Tanzil — Al-Furqaan (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1253/Asrar-ut-Tanzil_EnglishTafseer_Chapter-25.pdf
+- Asrar-at-Tanzil — Ash-Shu'araa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1254/Asrar-ut-Tanzil_EnglishTafseer_Chapter-26.pdf
+- Asrar-at-Tanzil — An-Naml (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1255/Asrar-ut-Tanzil_EnglishTafseer_Chapter-27.pdf
+- Asrar-at-Tanzil — Al-Qasas (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1256/Asrar-ut-Tanzil_EnglishTafseer_Chapter-28.pdf
+- Asrar-at-Tanzil — Al-Ankaboot (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1257/Asrar-ut-Tanzil_EnglishTafseer_Chapter-29.pdf
+- Asrar-at-Tanzil — Ar-Room (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1258/Asrar-ut-Tanzil_EnglishTafseer_Chapter-30.pdf
+- Asrar-at-Tanzil — Luqman (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1259/Asrar-ut-Tanzil_EnglishTafseer_Chapter-31.pdf
+- Asrar-at-Tanzil — As-Sajda (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1260/Asrar-ut-Tanzil_EnglishTafseer_Chapter-32.pdf
+- Asrar-at-Tanzil — Al-Ahzaab (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1261/Asrar-ut-Tanzil_EnglishTafseer_Chapter-33.pdf
+- Asrar-at-Tanzil — Saba (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1262/Asrar-ut-Tanzil_EnglishTafseer_Chapter-34.pdf
+- Asrar-at-Tanzil — Faatir (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1263/Asrar-ut-Tanzil_EnglishTafseer_Chapter-35.pdf
+- Asrar-at-Tanzil — Yaseen (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1264/Asrar-ut-Tanzil_EnglishTafseer_Chapter-36.pdf
+- Asrar-at-Tanzil — As-Saaffaat (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1265/Asrar-ut-Tanzil_EnglishTafseer_Chapter-37.pdf
+- Asrar-at-Tanzil — Saad (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1266/Asrar-ut-Tanzil_EnglishTafseer_Chapter-38.pdf
+- Asrar-at-Tanzil — Az-Zumar (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1267/Asrar-ut-Tanzil_EnglishTafseer_Chapter-39.pdf
+- Asrar-at-Tanzil — Ghafir (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1268/Asrar-ut-Tanzil_EnglishTafseer_Chapter-40.pdf
+- Asrar-at-Tanzil — Fussilat (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1269/Asrar-ut-Tanzil_EnglishTafseer_Chapter-41.pdf
+- Asrar-at-Tanzil — Ash-Shura (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1270/Asrar-ut-Tanzil_EnglishTafseer_Chapter-42.pdf
+- Asrar-at-Tanzil — Az-Zukhruf (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1271/Asrar-ut-Tanzil_EnglishTafseer_Chapter-43.pdf
+- Asrar-at-Tanzil — Ad-Dukhaan (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1272/Asrar-ut-Tanzil_EnglishTafseer_Chapter-44.pdf
+- Asrar-at-Tanzil — Al-Jaathiya (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1273/Asrar-ut-Tanzil_EnglishTafseer_Chapter-45.pdf
+- Asrar-at-Tanzil — Al-Ahqaf (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1274/Asrar-ut-Tanzil_EnglishTafseer_Chapter-46.pdf
+- Asrar-at-Tanzil — Muhammad (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1275/Asrar-ut-Tanzil_EnglishTafseer_Chapter-47.pdf
+- Asrar-at-Tanzil — Al-Fath (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1276/Asrar-ut-Tanzil_EnglishTafseer_Chapter-48.pdf
+- Asrar-at-Tanzil — Al-Hujuraat (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1277/Asrar-ut-Tanzil_EnglishTafseer_Chapter-49.pdf
+- Asrar-at-Tanzil — Qaaf (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1278/Asrar-ut-Tanzil_EnglishTafseer_Chapter-50.pdf
+- Asrar-at-Tanzil — Adh-Dhaariyat (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1279/Asrar-ut-Tanzil_EnglishTafseer_Chapter-51.pdf
+- Asrar-at-Tanzil — At-Tur (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1280/Asrar-ut-Tanzil_EnglishTafseer_Chapter-52.pdf
+- Asrar-at-Tanzil — An-Najm (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1281/Asrar-ut-Tanzil_EnglishTafseer_Chapter-53.pdf
+- Asrar-at-Tanzil — Al-Qamar (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1282/Asrar-ut-Tanzil_EnglishTafseer_Chapter-54.pdf
+- Asrar-at-Tanzil — Ar-Rahmaan (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1283/Asrar-ut-Tanzil_EnglishTafseer_Chapter-55.pdf
+- Asrar-at-Tanzil — Al-Waaqia (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1284/Asrar-ut-Tanzil_EnglishTafseer_Chapter-56.pdf
+- Asrar-at-Tanzil — Al-Hadid (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1285/Asrar-ut-Tanzil_EnglishTafseer_Chapter-57.pdf
+- Asrar-at-Tanzil — Al-Mujaadila (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1286/Asrar-ut-Tanzil_EnglishTafseer_Chapter-58.pdf
+- Asrar-at-Tanzil — Al-Hashr (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1287/Asrar-ut-Tanzil_EnglishTafseer_Chapter-59.pdf
+- Asrar-at-Tanzil — Al-Mumtahana (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1288/Asrar-ut-Tanzil_EnglishTafseer_Chapter-60.pdf
+- Asrar-at-Tanzil — As-Saff (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1289/Asrar-ut-Tanzil_EnglishTafseer_Chapter-61.pdf
+- Asrar-at-Tanzil — Al-Jumu'a (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1290/Asrar-ut-Tanzil_EnglishTafseer_Chapter-62.pdf
+- Asrar-at-Tanzil — Al-Munaafiqoon (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1291/Asrar-ut-Tanzil_EnglishTafseer_Chapter-63.pdf
+- Asrar-at-Tanzil — At-Taghaabun (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1292/Asrar-ut-Tanzil_EnglishTafseer_Chapter-64.pdf
+- Asrar-at-Tanzil — At-Talaaq (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1293/Asrar-ut-Tanzil_EnglishTafseer_Chapter-65.pdf
+- Asrar-at-Tanzil — At-Tahrim (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1294/Asrar-ut-Tanzil_EnglishTafseer_Chapter-66.pdf
+- Asrar-at-Tanzil — Al-Mulk (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1295/Asrar-ut-Tanzil_EnglishTafseer_Chapter-67.pdf
+- Asrar-at-Tanzil — Al-Qalam (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1296/Asrar-ut-Tanzil_EnglishTafseer_Chapter-68.pdf
+- Asrar-at-Tanzil — Al-Haaqqa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1297/Asrar-ut-Tanzil_EnglishTafseer_Chapter-69.pdf
+- Asrar-at-Tanzil — Al-Ma'aarij (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1298/Asrar-ut-Tanzil_EnglishTafseer_Chapter-70.pdf
+- Asrar-at-Tanzil — Nooh (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1299/Asrar-ut-Tanzil_EnglishTafseer_Chapter-71.pdf
+- Asrar-at-Tanzil — Al-Jinn (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1300/Asrar-ut-Tanzil_EnglishTafseer_Chapter-72.pdf
+- Asrar-at-Tanzil — Al-Muzzammil (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1301/Asrar-ut-Tanzil_EnglishTafseer_Chapter-73.pdf
+- Asrar-at-Tanzil — Al-Muddaththir (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1302/Asrar-ut-Tanzil_EnglishTafseer_Chapter-74.pdf
+- Asrar-at-Tanzil — Al-Qiyaama (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1303/Asrar-ut-Tanzil_EnglishTafseer_Chapter-75.pdf
+- Asrar-at-Tanzil — Al-Insaan (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1304/Asrar-ut-Tanzil_EnglishTafseer_Chapter-76.pdf
+- Asrar-at-Tanzil — Al-Mursalaat (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1305/Asrar-ut-Tanzil_EnglishTafseer_Chapter-77.pdf
+- Asrar-at-Tanzil — An-Naba (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1306/Asrar-ut-Tanzil_EnglishTafseer_Chapter-78.pdf
+- Asrar-at-Tanzil — An-Naazi'aat (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1307/Asrar-ut-Tanzil_EnglishTafseer_Chapter-79.pdf
+- Asrar-at-Tanzil — Abasa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1308/Asrar-ut-Tanzil_EnglishTafseer_Chapter-80.pdf
+- Asrar-at-Tanzil — At-Takwir (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1309/Asrar-ut-Tanzil_EnglishTafseer_Chapter-81.pdf
+- Asrar-at-Tanzil — Al-Infitaar (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1310/Asrar-ut-Tanzil_EnglishTafseer_Chapter-82.pdf
+- Asrar-at-Tanzil — Al-Mutaffifin (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1311/Asrar-ut-Tanzil_EnglishTafseer_Chapter-83.pdf
+- Asrar-at-Tanzil — Al-Inshiqaaq (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1312/Asrar-ut-Tanzil_EnglishTafseer_Chapter-84.pdf
+- Asrar-at-Tanzil — Al-Burooj (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1313/Asrar-ut-Tanzil_EnglishTafseer_Chapter-85.pdf
+- Asrar-at-Tanzil — At-Taariq (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1314/Asrar-ut-Tanzil_EnglishTafseer_Chapter-86.pdf
+- Asrar-at-Tanzil — Al-A'laa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1315/Asrar-ut-Tanzil_EnglishTafseer_Chapter-87.pdf
+- Asrar-at-Tanzil — Al-Ghaashiya (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1316/Asrar-ut-Tanzil_EnglishTafseer_Chapter-88.pdf
+- Asrar-at-Tanzil — Al-Fajr (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1317/Asrar-ut-Tanzil_EnglishTafseer_Chapter-89.pdf
+- Asrar-at-Tanzil — Al-Balad (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1318/Asrar-ut-Tanzil_EnglishTafseer_Chapter-90.pdf
+- Asrar-at-Tanzil — Ash-Shams (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1319/Asrar-ut-Tanzil_EnglishTafseer_Chapter-91.pdf
+- Asrar-at-Tanzil — Al-Lail (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1320/Asrar-ut-Tanzil_EnglishTafseer_Chapter-92.pdf
+- Asrar-at-Tanzil — Ad-Dhuhaa (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1321/Asrar-ut-Tanzil_EnglishTafseer_Chapter-93.pdf
+- Asrar-at-Tanzil — Ash-Sharh (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1322/Asrar-ut-Tanzil_EnglishTafseer_Chapter-94.pdf
+- Asrar-at-Tanzil — At-Tin (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1323/Asrar-ut-Tanzil_EnglishTafseer_Chapter-95.pdf
+- Asrar-at-Tanzil — Al-Alaq (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1324/Asrar-ut-Tanzil_EnglishTafseer_Chapter-96.pdf
+- Asrar-at-Tanzil — Al-Qadr (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1325/Asrar-ut-Tanzil_EnglishTafseer_Chapter-97.pdf
+- Asrar-at-Tanzil — Al-Bayyina (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1326/Asrar-ut-Tanzil_EnglishTafseer_Chapter-98.pdf
+- Asrar-at-Tanzil — Az-Zalzala (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1327/Asrar-ut-Tanzil_EnglishTafseer_Chapter-99.pdf
+- Asrar-at-Tanzil — Al-Aadiyaat (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1328/Asrar-ut-Tanzil_EnglishTafseer_Chapter-100.pdf
+- Asrar-at-Tanzil — Al-Qaari'a (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1329/Asrar-ut-Tanzil_EnglishTafseer_Chapter-101.pdf
+- Asrar-at-Tanzil — At-Takaathur (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1330/Asrar-ut-Tanzil_EnglishTafseer_Chapter-102.pdf
+- Asrar-at-Tanzil — Al-Asr (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1331/Asrar-ut-Tanzil_EnglishTafseer_Chapter-103.pdf
+- Asrar-at-Tanzil — Al-Humaza (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1332/Asrar-ut-Tanzil_EnglishTafseer_Chapter-104.pdf
+- Asrar-at-Tanzil — Al-Fil (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1333/Asrar-ut-Tanzil_EnglishTafseer_Chapter-105.pdf
+- Asrar-at-Tanzil — Quraish (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1334/Asrar-ut-Tanzil_EnglishTafseer_Chapter-106.pdf
+- Asrar-at-Tanzil — Al-Maa'un (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1335/Asrar-ut-Tanzil_EnglishTafseer_Chapter-107.pdf
+- Asrar-at-Tanzil — Al-Kawthar (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1336/Asrar-ut-Tanzil_EnglishTafseer_Chapter-108.pdf
+- Asrar-at-Tanzil — Al-Kaafiroon (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1337/Asrar-ut-Tanzil_EnglishTafseer_Chapter-109.pdf
+- Asrar-at-Tanzil — An-Nasr (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1338/Asrar-ut-Tanzil_EnglishTafseer_Chapter-110.pdf
+- Asrar-at-Tanzil — Al-Masad (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1339/Asrar-ut-Tanzil_EnglishTafseer_Chapter-111.pdf
+- Asrar-at-Tanzil — Al-Ikhlaas (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1340/Asrar-ut-Tanzil_EnglishTafseer_Chapter-112.pdf
+- Asrar-at-Tanzil — Al-Falaq (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1341/Asrar-ut-Tanzil_EnglishTafseer_Chapter-113.pdf
+- Asrar-at-Tanzil — An-Naas (English Tafseer) — https://www.naqshbandiaowaisiah.org/uploads/1342/Asrar-ut-Tanzil_EnglishTafseer_Chapter-114.pdf
+
+## Akram-ut-Tafaseer — Quran Urdu tafsir  (30)
+
+- Akram-ut-Tafaseer — Parah 1 — https://www.naqshbandiaowaisiah.org/uploads/1195/QuranTafseer-Para-1.pdf
+- Akram-ut-Tafaseer — Parah 2 — https://www.naqshbandiaowaisiah.org/uploads/1196/QuranTafseer-Para-2.pdf
+- Akram-ut-Tafaseer — Parah 3 — https://www.naqshbandiaowaisiah.org/uploads/1197/QuranTafseer-Para-3.pdf
+- Akram-ut-Tafaseer — Parah 4 — https://www.naqshbandiaowaisiah.org/uploads/1198/QuranTafseer-Para-4.pdf
+- Akram-ut-Tafaseer — Parah 5 — https://www.naqshbandiaowaisiah.org/uploads/1202/QuranTafseer-Para-5.pdf
+- Akram-ut-Tafaseer — Parah 6 — https://www.naqshbandiaowaisiah.org/uploads/1203/QuranTafseer-Para-6.pdf
+- Akram-ut-Tafaseer — Parah 7 — https://www.naqshbandiaowaisiah.org/uploads/1204/QuranTafseer-Para-7.pdf
+- Akram-ut-Tafaseer — Parah 8 — https://www.naqshbandiaowaisiah.org/uploads/1205/QuranTafseer-Para-8.pdf
+- Akram-ut-Tafaseer — Parah 9 — https://www.naqshbandiaowaisiah.org/uploads/1206/QuranTafseer-Para-9.pdf
+- Akram-ut-Tafaseer — Parah 10 — https://www.naqshbandiaowaisiah.org/uploads/1207/QuranTafseer-Para-10.pdf
+- Akram-ut-Tafaseer — Parah 11 — https://www.naqshbandiaowaisiah.org/uploads/1208/QuranTafseer-Para-11.pdf
+- Akram-ut-Tafaseer — Parah 12 — https://www.naqshbandiaowaisiah.org/uploads/1209/QuranTafseer-Para-12.pdf
+- Akram-ut-Tafaseer — Parah 13 — https://www.naqshbandiaowaisiah.org/uploads/1210/QuranTafseer-Para-13.pdf
+- Akram-ut-Tafaseer — Parah 14 — https://www.naqshbandiaowaisiah.org/uploads/1211/QuranTafseer-Para-14.pdf
+- Akram-ut-Tafaseer — Parah 15 — https://www.naqshbandiaowaisiah.org/uploads/1212/QuranTafseer-Para-15.pdf
+- Akram-ut-Tafaseer — Parah 16 — https://www.naqshbandiaowaisiah.org/uploads/1213/QuranTafseer-Para-16.pdf
+- Akram-ut-Tafaseer — Parah 17 — https://www.naqshbandiaowaisiah.org/uploads/1214/QuranTafseer-Para-17.pdf
+- Akram-ut-Tafaseer — Parah 18 — https://www.naqshbandiaowaisiah.org/uploads/1215/QuranTafseer-Para-18.pdf
+- Akram-ut-Tafaseer — Parah 19 — https://www.naqshbandiaowaisiah.org/uploads/1216/QuranTafseer-Para-19.pdf
+- Akram-ut-Tafaseer — Parah 20 — https://www.naqshbandiaowaisiah.org/uploads/1217/QuranTafseer-Para-20.pdf
+- Akram-ut-Tafaseer — Parah 21 — https://www.naqshbandiaowaisiah.org/uploads/1218/QuranTafseer-Para-21.pdf
+- Akram-ut-Tafaseer — Parah 22 — https://www.naqshbandiaowaisiah.org/uploads/1219/QuranTafseer-Para-22.pdf
+- Akram-ut-Tafaseer — Parah 23 — https://www.naqshbandiaowaisiah.org/uploads/1220/QuranTafseer-Para-23.pdf
+- Akram-ut-Tafaseer — Parah 24 — https://www.naqshbandiaowaisiah.org/uploads/1221/QuranTafseer-Para-24.pdf
+- Akram-ut-Tafaseer — Parah 25 — https://www.naqshbandiaowaisiah.org/uploads/1222/QuranTafseer-Para-25.pdf
+- Akram-ut-Tafaseer — Parah 26 — https://www.naqshbandiaowaisiah.org/uploads/1223/QuranTafseer-Para-26.pdf
+- Akram-ut-Tafaseer — Parah 27 — https://www.naqshbandiaowaisiah.org/uploads/1224/QuranTafseer-Para-27.pdf
+- Akram-ut-Tafaseer — Parah 28 — https://www.naqshbandiaowaisiah.org/uploads/1225/QuranTafseer-Para-28.pdf
+- Akram-ut-Tafaseer — Parah 29 — https://www.naqshbandiaowaisiah.org/uploads/1226/QuranTafseer-Para-29.pdf
+- Akram-ut-Tafaseer — Parah 30 — https://www.naqshbandiaowaisiah.org/uploads/1227/QuranTafseer-Para-30-part1.pdf
+
+## Akram-ut-Tarajum — Quran Urdu translation  (33)
+
+- Akram-ut-Tarajum — Parah 1 — https://www.naqshbandiaowaisiah.org/uploads/262/Akram-ut-Tarajum-Parah01.pdf
+- Akram-ut-Tarajum — Parah 1 to 15 — https://www.naqshbandiaowaisiah.org/uploads/1139/Akram-ut-Tarajum-Parah-1-to-15.pdf
+- Akram-ut-Tarajum — Parah 1 to 30 — https://www.naqshbandiaowaisiah.org/uploads/1138/Akram-ut-Tarajum-Parah-1-to-30.pdf
+- Akram-ut-Tarajum — Parah 2 — https://www.naqshbandiaowaisiah.org/uploads/263/Akram-ut-Tarajum-Parah02.pdf
+- Akram-ut-Tarajum — Parah 3 — https://www.naqshbandiaowaisiah.org/uploads/264/Akram-ut-Tarajum-Parah03.pdf
+- Akram-ut-Tarajum — Parah 4 — https://www.naqshbandiaowaisiah.org/uploads/265/Akram-ut-Tarajum-Parah04.pdf
+- Akram-ut-Tarajum — Parah 5 — https://www.naqshbandiaowaisiah.org/uploads/266/Akram-ut-Tarajum-Parah05.pdf
+- Akram-ut-Tarajum — Parah 6 — https://www.naqshbandiaowaisiah.org/uploads/1113/Akram-ut-Tarajum-Parah06.pdf
+- Akram-ut-Tarajum — Parah 7 — https://www.naqshbandiaowaisiah.org/uploads/1114/Akram-ut-Tarajum-Parah07.pdf
+- Akram-ut-Tarajum — Parah 8 — https://www.naqshbandiaowaisiah.org/uploads/1115/Akram-ut-Tarajum-Parah08.pdf
+- Akram-ut-Tarajum — Parah 9 — https://www.naqshbandiaowaisiah.org/uploads/1116/Akram-ut-Tarajum-Parah09.pdf
+- Akram-ut-Tarajum — Parah 10 — https://www.naqshbandiaowaisiah.org/uploads/1117/Akram-ut-Tarajum-Parah10.pdf
+- Akram-ut-Tarajum — Parah 11 — https://www.naqshbandiaowaisiah.org/uploads/1118/Akram-ut-Tarajum-Parah11.pdf
+- Akram-ut-Tarajum — Parah 12 — https://www.naqshbandiaowaisiah.org/uploads/1119/Akram-ut-Tarajum-Parah12.pdf
+- Akram-ut-Tarajum — Parah 13 — https://www.naqshbandiaowaisiah.org/uploads/1120/Akram-ut-Tarajum-Parah13.pdf
+- Akram-ut-Tarajum — Parah 14 — https://www.naqshbandiaowaisiah.org/uploads/1121/Akram-ut-Tarajum-Parah14.pdf
+- Akram-ut-Tarajum — Parah 15 — https://www.naqshbandiaowaisiah.org/uploads/1122/Akram-ut-Tarajum-Parah15.pdf
+- Akram-ut-Tarajum — Parah 16 — https://www.naqshbandiaowaisiah.org/uploads/1123/Akram-ut-Tarajum-Parah16.pdf
+- Akram-ut-Tarajum — Parah 16 to 30 — https://www.naqshbandiaowaisiah.org/uploads/1140/Akram-ut-Tarajum-Parah-16-to-30.pdf
+- Akram-ut-Tarajum — Parah 17 — https://www.naqshbandiaowaisiah.org/uploads/1124/Akram-ut-Tarajum-Parah17.pdf
+- Akram-ut-Tarajum — Parah 18 — https://www.naqshbandiaowaisiah.org/uploads/1125/Akram-ut-Tarajum-Parah18.pdf
+- Akram-ut-Tarajum — Parah 19 — https://www.naqshbandiaowaisiah.org/uploads/1126/Akram-ut-Tarajum-Parah19.pdf
+- Akram-ut-Tarajum — Parah 20 — https://www.naqshbandiaowaisiah.org/uploads/1127/Akram-ut-Tarajum-Parah20.pdf
+- Akram-ut-Tarajum — Parah 21 — https://www.naqshbandiaowaisiah.org/uploads/1128/Akram-ut-Tarajum-Parah21.pdf
+- Akram-ut-Tarajum — Parah 22 — https://www.naqshbandiaowaisiah.org/uploads/1129/Akram-ut-Tarajum-Parah22.pdf
+- Akram-ut-Tarajum — Parah 23 — https://www.naqshbandiaowaisiah.org/uploads/1130/Akram-ut-Tarajum-Parah23.pdf
+- Akram-ut-Tarajum — Parah 24 — https://www.naqshbandiaowaisiah.org/uploads/1131/Akram-ut-Tarajum-Parah24.pdf
+- Akram-ut-Tarajum — Parah 25 — https://www.naqshbandiaowaisiah.org/uploads/1132/Akram-ut-Tarajum-Parah25.pdf
+- Akram-ut-Tarajum — Parah 26 — https://www.naqshbandiaowaisiah.org/uploads/1133/Akram-ut-Tarajum-Parah26.pdf
+- Akram-ut-Tarajum — Parah 27 — https://www.naqshbandiaowaisiah.org/uploads/1134/Akram-ut-Tarajum-Parah27.pdf
+- Akram-ut-Tarajum — Parah 28 — https://www.naqshbandiaowaisiah.org/uploads/1135/Akram-ut-Tarajum-Parah28.pdf
+- Akram-ut-Tarajum — Parah 29 — https://www.naqshbandiaowaisiah.org/uploads/1136/Akram-ut-Tarajum-Parah29.pdf
+- Akram-ut-Tarajum — Parah 30 — https://www.naqshbandiaowaisiah.org/uploads/1137/Akram-ut-Tarajum-Parah30.pdf
+
+## Books  (44)
+
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Introduction.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Haqiqat-e-Rooh.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Lataif-aur-Tazkiya-e-Nafs.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Rohaneyat-kay-matliq-50-swalat.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Deyar-e-Habib-S.A.W-mai-chand-roz.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Islah-e-Qalb-aur-Zarorat-e-Shaikh.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Zikr-Allah.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Bait-Kiya-hay.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Shajarah-e-Silsilah-e-Nisbaat-e-Owaisiah.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/zikr-pas-anfas.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Pardah.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Hamd-O-Naat.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Deeda-e-Tar.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Dil-Darwaza.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Aas-Jazeera.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Kon-Si-Aaisi-Baat-Hoi-Hai.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Mata-e-Faqeer.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Nishaan-e-Manzil.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Gard-e-Safar.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Laiha-Amal.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Hasht-Roza-Course.pdf
+- (untitled) — https://www.naqshbandiaowaisiah.org/uploads/books/Sai-Hafta-Course.pdf
+- Asaas Us Salook — https://www.naqshbandiaowaisiah.org/uploads/books/Asaas-Us-Salook.pdf
+- Dalael us Salook Urdu — https://www.naqshbandiaowaisiah.org/uploads/books/Dalael-us-Salook-Urdu.pdf
+- Ghubar e Rah 2 — https://www.naqshbandiaowaisiah.org/uploads/books/Ghubar-e-Rah-2.pdf
+- Hayyat e Tayyabah 2 — https://www.naqshbandiaowaisiah.org/uploads/books/Hayyat-e-Tayyabah-2.pdf
+- Hayyat e Tayyabah I — https://www.naqshbandiaowaisiah.org/uploads/books/Hayyat-e-Tayyabah-I.pdf
+- Irshaad Us Salikeen I — https://www.naqshbandiaowaisiah.org/uploads/books/Irshaad-Us-Salikeen-I.pdf
+- Irshaad Us Salikeen II — https://www.naqshbandiaowaisiah.org/uploads/books/Irshaad-Us-Salikeen-II.pdf
+- Islah e Qalb — https://www.naqshbandiaowaisiah.org/uploads/books/Islah-e-Qalb.pdf
+- israr ul harmain — https://www.naqshbandiaowaisiah.org/uploads/books/israr-ul-harmain.pdf
+- Kanooz e Dil Urdu — https://www.naqshbandiaowaisiah.org/uploads/books/Kanooz-e-Dil-Urdu.pdf
+- Kanz al Talibeen — https://www.naqshbandiaowaisiah.org/uploads/books/Kanz-al-Talibeen.pdf
+- Mahafil e Sheikh — https://www.naqshbandiaowaisiah.org/uploads/books/Mahafil-e-Sheikh.pdf
+- Maktobaat — https://www.naqshbandiaowaisiah.org/uploads/books/Maktobaat.pdf
+- Naqoosh e Haq — https://www.naqshbandiaowaisiah.org/uploads/books/Naqoosh-e-Haq.pdf
+- Rah Nawerd e Shauk 1 — https://www.naqshbandiaowaisiah.org/uploads/books/Rah-Nawerd-e-Shauk-1.pdf
+- Rah Nawerd e Shauk 2 — https://www.naqshbandiaowaisiah.org/uploads/books/Rah-Nawerd-e-Shauk-2.pdf
+- Ramooz e Dil Chinese — https://www.naqshbandiaowaisiah.org/uploads/books/Ramooz-e-Dil-Chinese.pdf
+- Ramooz e Dil Urdu — https://www.naqshbandiaowaisiah.org/uploads/books/Ramooz-e-Dil-Urdu.pdf
+- Talemaat O Barkaat e Nabuwat SAW — https://www.naqshbandiaowaisiah.org/uploads/books/Talemaat-O-Barkaat-e-Nabuwat-SAW.pdf
+- Tareeq e Saluk fi Adab e Shayuk — https://www.naqshbandiaowaisiah.org/uploads/books/Tareeq-e-Saluk-fi-Adab-e-Shayuk.pdf
+- Tareeq Nisbat Owaisiah — https://www.naqshbandiaowaisiah.org/uploads/books/Tareeq-Nisbat-Owaisiah.pdf
+- Tasawwuf Aur Tameer e Seraat — https://www.naqshbandiaowaisiah.org/uploads/books/Tasawwuf-Aur-Tameer-e-Seraat.pdf
+
+## Al-Murshid Magazine  (251)
+
+- Al-Murshid Magazine: February - March 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_march_1981.pdf
+- Al-Murshid Magazine: May 1983 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1983.pdf
+- April 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1981.pdf
+- April 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1982.pdf
+- April 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1986.pdf
+- April 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1988.pdf
+- April 1989 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1989.pdf
+- April 1991 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1991.pdf
+- April 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1993.pdf
+- April 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1994.pdf
+- April 1995 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1995.pdf
+- April 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1996.pdf
+- April 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1997.pdf
+- April 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1998.pdf
+- April 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_1999.pdf
+- April 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2000.pdf
+- April 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2001.pdf
+- April 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2002.pdf
+- April 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2003.pdf
+- April 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2004.pdf
+- April 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2005.pdf
+- April 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2006.pdf
+- April 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2007.pdf
+- April 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2008.pdf
+- April 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2009.pdf
+- April 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_april_2010.pdf
+- August 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1981.pdf
+- August 1983 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1983.pdf
+- August 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1986.pdf
+- August 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1987.pdf
+- August 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1988.pdf
+- August 1991 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1991.pdf
+- August 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1993.pdf
+- August 1995 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1995.pdf
+- August 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1996.pdf
+- August 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1997.pdf
+- August 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1998.pdf
+- August 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_1999.pdf
+- August 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2000.pdf
+- August 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2001.pdf
+- August 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2002.pdf
+- August 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2003.pdf
+- August 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2004.pdf
+- August 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2005.pdf
+- August 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2006.pdf
+- August 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2007.pdf
+- August 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2008.pdf
+- August 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2009.pdf
+- August 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_august_2010.pdf
+- December 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1981.pdf
+- December 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1986.pdf
+- December 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1987.pdf
+- December 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1988.pdf
+- December 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1994.pdf
+- December 1995 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1995.pdf
+- December 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1996.pdf
+- December 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1998.pdf
+- December 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_1999.pdf
+- December 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2001.pdf
+- December 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2002.pdf
+- December 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2003.pdf
+- December 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2004.pdf
+- December 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2005.pdf
+- December 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2006.pdf
+- December 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2007.pdf
+- December 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2008.pdf
+- December 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2009.pdf
+- December 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_december_2010.pdf
+- February 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1986.pdf
+- February 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1988.pdf
+- February 1991 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1991.pdf
+- February 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1994.pdf
+- February 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1996.pdf
+- February 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1997.pdf
+- February 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1998.pdf
+- February 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_1999.pdf
+- February 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2000.pdf
+- February 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2001.pdf
+- February 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2002.pdf
+- February 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2003.pdf
+- February 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2005.pdf
+- February 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2006.pdf
+- February 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2007.pdf
+- February 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2008.pdf
+- February 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2009.pdf
+- February 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_february_2010.pdf
+- Jan - February 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_february_1982.pdf
+- January 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1986.pdf
+- January 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1987.pdf
+- January 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1988.pdf
+- January 1991 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1991.pdf
+- January 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1993.pdf
+- January 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1994.pdf
+- January 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1996.pdf
+- January 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1997.pdf
+- January 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1998.pdf
+- January 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_1999.pdf
+- January 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2000.pdf
+- January 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2001.pdf
+- January 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2002.pdf
+- January 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2003.pdf
+- January 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2004.pdf
+- January 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2005.pdf
+- January 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2006.pdf
+- January 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2007.pdf
+- January 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2009.pdf
+- January 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2010.pdf
+- January 2011 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_january_2011.pdf
+- July - September 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_august_september_1982.pdf
+- July 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1981.pdf
+- July 1983 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1983.pdf
+- July 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1986.pdf
+- July 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1987.pdf
+- July 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1988.pdf
+- July 1991 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1991.pdf
+- July 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1993.pdf
+- July 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1994.pdf
+- July 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1996.pdf
+- July 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1998.pdf
+- July 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_1999.pdf
+- July 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2000.pdf
+- July 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2001.pdf
+- July 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2002.pdf
+- July 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2003.pdf
+- July 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2004.pdf
+- July 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2005.pdf
+- July 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2006.pdf
+- July 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2007.pdf
+- July 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2008.pdf
+- July 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2009.pdf
+- July 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_july_2010.pdf
+- June 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1981.pdf
+- June 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1982.pdf
+- June 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1987.pdf
+- June 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1988.pdf
+- June 1989 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1989.pdf
+- June 1991 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1991.pdf
+- June 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1993.pdf
+- June 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1994.pdf
+- June 1995 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1995.pdf
+- June 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1996.pdf
+- June 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1997.pdf
+- June 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1998.pdf
+- June 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_1999.pdf
+- June 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2000.pdf
+- June 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2001.pdf
+- June 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2002.pdf
+- June 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2004.pdf
+- June 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2005.pdf
+- June 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2006.pdf
+- June 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2007.pdf
+- June 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2008.pdf
+- June 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2009.pdf
+- June 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_june_2010.pdf
+- March 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1982.pdf
+- March 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1986.pdf
+- March 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1988.pdf
+- March 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1994.pdf
+- March 1995 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1995.pdf
+- March 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1996.pdf
+- March 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1997.pdf
+- March 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1998.pdf
+- March 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_1999.pdf
+- March 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2000.pdf
+- March 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2001.pdf
+- March 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2002.pdf
+- March 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2003.pdf
+- March 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2004.pdf
+- March 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2005.pdf
+- March 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2006.pdf
+- March 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2007.pdf
+- March 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2008.pdf
+- March 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2009.pdf
+- March 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_march_2010.pdf
+- May 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1981.pdf
+- May 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1982.pdf
+- May 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1986.pdf
+- May 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1988.pdf
+- May 1989 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1989.pdf
+- May 1990 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1990.pdf
+- May 1991 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1991.pdf
+- May 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1993.pdf
+- May 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1994.pdf
+- May 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1996.pdf
+- May 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1998.pdf
+- May 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_1999.pdf
+- May 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2000.pdf
+- May 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2001.pdf
+- May 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2004.pdf
+- May 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2005.pdf
+- May 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2006.pdf
+- May 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2007.pdf
+- May 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2008.pdf
+- May 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2009.pdf
+- May 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_may_2010.pdf
+- Nov - December 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_december.pdf
+- November 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1986.pdf
+- November 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1987.pdf
+- November 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1988.pdf
+- November 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1993.pdf
+- November 1994 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1994.pdf
+- November 1995 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1995.pdf
+- November 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1996.pdf
+- November 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1998.pdf
+- November 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_1999.pdf
+- November 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2000.pdf
+- November 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2001.pdf
+- November 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2004.pdf
+- November 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2005.pdf
+- November 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2006.pdf
+- November 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2007.pdf
+- November 2008 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2008.pdf
+- November 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2009.pdf
+- November 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2010.pdf
+- November 2011 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_2011.pdf
+- October 1982 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1982.pdf
+- October 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1986.pdf
+- October 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1987.pdf
+- October 1990 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1990.pdf
+- October 1993 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1993.pdf
+- October 1995 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1995.pdf
+- October 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1996.pdf
+- October 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1997.pdf
+- October 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_1999.pdf
+- October 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_2000.pdf
+- October 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_2001.pdf
+- October 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_2003.pdf
+- October 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_2004.pdf
+- October 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_2005.pdf
+- October 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_2006.pdf
+- October 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_2007.pdf
+- October November 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_october_november_2002.pdf
+- Sept - October 1981 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_october_1981.pdf
+- Sept - October 1983 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_october_1983.pdf
+- September 1986 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_1986.pdf
+- September 1987 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_1987.pdf
+- September 1988 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_1988.pdf
+- September 1996 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_1996.pdf
+- September 1997 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_1997.pdf
+- September 1998 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_1998.pdf
+- September 1999 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_1999.pdf
+- September 2000 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2000.pdf
+- September 2001 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2001.pdf
+- September 2002 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2002.pdf
+- September 2003 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2003.pdf
+- September 2004 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2004.pdf
+- September 2005 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2005.pdf
+- September 2006 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2006.pdf
+- September 2007 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2007.pdf
+- September 2009 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2009.pdf
+- September 2010 — https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_september_2010.pdf

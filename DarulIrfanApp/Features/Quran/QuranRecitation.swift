@@ -120,6 +120,30 @@ final class RecitationPlayer {
         isPlaying = true
     }
 
+    /// Plays a single per-ayah clip (a translation recitation) with no word
+    /// tracking. The ayah still gets its verse-rail highlight.
+    func playClip(surah: Int, ayah: Int, url: URL) {
+        stop()
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+        try? AVAudioSession.sharedInstance().setActive(true)
+
+        let item = AVPlayerItem(url: url)
+        let newPlayer = AVPlayer(playerItem: item)
+        player = newPlayer
+        currentSurah = surah
+        currentAyah = ayah
+        currentWordPosition = nil
+
+        endObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.stop() }
+        }
+
+        newPlayer.play()
+        isPlaying = true
+    }
+
     private func updateHighlight(ms: Int) {
         guard let recitation else { return }
         guard let verse = recitation.verses.first(where: { ms >= $0.fromMs && ms < $0.toMs }) else { return }
@@ -155,5 +179,35 @@ final class RecitationPlayer {
     /// True while this exact ayah is the one currently sounding.
     func isSounding(surah: Int, ayah: Int) -> Bool {
         isPlaying && currentSurah == surah && currentAyah == ayah
+    }
+}
+
+// MARK: - Translation audio
+
+/// Available human-recorded translation recitations (natural voice, not TTS).
+/// These are per-ayah clips; the Sheikh's own recitation of Akram-ut-Tarajum
+/// will slot in later as a custom voice.
+enum TranslationAudioSource: CaseIterable, Identifiable {
+    case englishSaheeh
+    case urduShamshad
+
+    var id: String { label }
+
+    var label: String {
+        switch self {
+        case .englishSaheeh: return "English — Saheeh International"
+        case .urduShamshad: return "اردو — شمشاد علی خان"
+        }
+    }
+
+    private var folder: String {
+        switch self {
+        case .englishSaheeh: return "English/Sahih_Intnl_Ibrahim_Walk_192kbps"
+        case .urduShamshad: return "translations/urdu_shamshad_ali_khan_46kbps"
+        }
+    }
+
+    func url(surah: Int, ayah: Int) -> URL? {
+        URL(string: "https://everyayah.com/data/\(folder)/\(String(format: "%03d%03d", surah, ayah)).mp3")
     }
 }

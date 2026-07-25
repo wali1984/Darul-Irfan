@@ -483,25 +483,35 @@ private struct AyahCardView: View {
     private var shellsRow: some View {
         VStack(alignment: .leading, spacing: DISpacing.xs) {
             HStack(spacing: DISpacing.sm) {
-                shellChip("Translation audio", "speaker.wave.2")
-                shellChip("Video lectures", "play.rectangle")
-                shellChip("Sheikh audio", "person.wave.2")
+                Menu {
+                    ForEach(TranslationAudioSource.allCases) { source in
+                        Button(source.label) { playTranslationAudio(source) }
+                    }
+                } label: {
+                    shellChip("Translation audio", "speaker.wave.2", enabled: true)
+                }
+                shellChip("Video lectures", "play.rectangle", enabled: false)
+                shellChip("Sheikh audio", "person.wave.2", enabled: false)
             }
-            Text("Coming soon — recitation of the translation & tafsir, Sheikh lectures per ayah, and your own recordings.")
+            Text("Video lectures and the Sheikh's own recitation of the translation & tafsir are coming — and you'll be able to add your own recordings.")
                 .font(.caption2)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
 
-    private func shellChip(_ label: String, _ icon: String) -> some View {
+    private func playTranslationAudio(_ source: TranslationAudioSource) {
+        guard let url = source.url(surah: ayah.surahNumber, ayah: ayah.ayahNumber) else { return }
+        player.playClip(surah: ayah.surahNumber, ayah: ayah.ayahNumber, url: url)
+    }
+
+    private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {
         Label(label, systemImage: icon)
             .font(.caption2.weight(.medium))
             .padding(.horizontal, DISpacing.sm)
             .padding(.vertical, 5)
-            .background(Capsule().fill(DIColor.sandstone.opacity(0.45)))
-            .overlay(Capsule().stroke(DIColor.textMuted.opacity(0.25), lineWidth: 1))
-            .foregroundStyle(DIColor.textMuted)
-            .accessibilityHidden(true)
+            .background(Capsule().fill(enabled ? DIColor.primary.opacity(0.12) : DIColor.sandstone.opacity(0.45)))
+            .overlay(Capsule().stroke(enabled ? DIColor.primary.opacity(0.4) : DIColor.textMuted.opacity(0.25), lineWidth: 1))
+            .foregroundStyle(enabled ? DIColor.primary : DIColor.textMuted)
     }
 
     // MARK: Language-aware body text
