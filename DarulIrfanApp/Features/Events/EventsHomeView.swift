@@ -73,7 +73,7 @@ struct EventsHomeView: View {
             }
             .padding(DISpacing.md)
         }
-        .navigationTitle("Events & Dar-ul-Irfan")
+        .diPageHeading("Events & Dar-ul-Irfan")
         .diScreenBackground()
         .task { await viewModel.load() }
     }

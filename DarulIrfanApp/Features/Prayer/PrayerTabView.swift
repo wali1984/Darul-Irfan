@@ -63,7 +63,7 @@ struct PrayerTabView: View {
                 .padding(DISpacing.md)
             }
             .diScreenBackground()
-            .diPageHeading("Today", language: appState.settings.language)
+            .diPageHeading("Today")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {

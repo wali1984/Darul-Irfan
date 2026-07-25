@@ -42,7 +42,7 @@ struct MoreTabView: View {
                 .padding(DISpacing.md)
             }
             .diScreenBackground()
-            .navigationTitle("More")
+            .diPageHeading("More")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {

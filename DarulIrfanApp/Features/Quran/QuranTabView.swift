@@ -29,7 +29,7 @@ struct QuranTabView: View {
         NavigationStack {
             content
                 .diScreenBackground()
-                .diPageHeading("Quran", language: appState.settings.language)
+                .diPageHeading("Quran")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink(value: QuranRoute.bookmarks) {

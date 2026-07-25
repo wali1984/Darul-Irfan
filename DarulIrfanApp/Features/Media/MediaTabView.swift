@@ -63,7 +63,7 @@ struct MediaTabView: View {
                 .padding(DISpacing.md)
             }
             .diScreenBackground()
-            .navigationTitle("Media")
+            .diPageHeading("Media")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {

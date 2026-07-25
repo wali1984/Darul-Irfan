@@ -76,7 +76,7 @@ struct ZikrHomeView: View {
             }
             .padding(DISpacing.md)
         }
-        .navigationTitle("Zikr")
+        .diPageHeading("Zikr")
         .diScreenBackground()
         .task { await viewModel.load() }
         .alert("Notifications are off", isPresented: $viewModel.showPermissionAlert) {

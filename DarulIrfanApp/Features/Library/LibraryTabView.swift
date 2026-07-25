@@ -43,7 +43,7 @@ struct LibraryTabView: View {
                 .padding(DISpacing.md)
             }
             .diScreenBackground()
-            .navigationTitle("Library")
+            .diPageHeading("Library")
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
