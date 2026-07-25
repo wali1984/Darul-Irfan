@@ -116,6 +116,10 @@ struct DarulIrfanApp: App {
                 try? await contentSync.refreshFromRemoteManifest()
             }
 
+            // Force the saved UI language at the bundle level before first paint
+            // so every localized string (Text and String(localized:)) follows it.
+            LanguageManager.apply(appState.settings.language)
+
             launchState = .ready(dependencies, appState)
             lastForegroundRefresh = Date()
 
@@ -187,6 +191,12 @@ private struct ReadyRootView: View {
         let language = appState.settings.language
         let root = RootView(dependencies: dependencies, appState: appState)
             .preferredColorScheme(appState.settings.theme.colorScheme)
+            // Re-apply the bundle-level language and rebuild the tree so every
+            // localized string re-resolves when the user switches language.
+            .onChange(of: language) { _, newValue in
+                LanguageManager.apply(newValue)
+            }
+            .id(language)
 
         if let localeIdentifier = language.forcedLocaleIdentifier {
             root

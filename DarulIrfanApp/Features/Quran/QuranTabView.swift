@@ -29,7 +29,7 @@ struct QuranTabView: View {
         NavigationStack {
             content
                 .diScreenBackground()
-                .navigationTitle("Quran")
+                .diPageHeading("Quran", language: appState.settings.language)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink(value: QuranRoute.bookmarks) {
@@ -114,7 +114,8 @@ struct QuranTabView: View {
                         NavigationLink(value: QuranRoute.reader(surah: surah, focusAyah: nil)) {
                             SurahRow(
                                 surah: surah,
-                                isAvailableOffline: viewModel.hasOfflineText(surah)
+                                isAvailableOffline: viewModel.hasOfflineText(surah),
+                                language: appState.settings.language
                             )
                         }
                         .buttonStyle(.plain)
@@ -199,6 +200,7 @@ struct QuranTabView: View {
 private struct SurahRow: View {
     let surah: QuranSurah
     let isAvailableOffline: Bool
+    let language: AppLanguage
 
     var body: some View {
         DICard(padding: DISpacing.md) {
@@ -211,12 +213,20 @@ private struct SurahRow: View {
                     .background(Circle().fill(DIColor.primary))
 
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text(surah.nameTransliterated)
-                        .font(.headline)
-                        .foregroundStyle(DIColor.textPrimary)
-                    Text(surah.nameEnglish)
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
+                    if language == .urdu {
+                        // Urdu: the Arabic name (trailing) + the Urdu meaning here.
+                        Text(surah.nameUrdu ?? surah.nameTransliterated)
+                            .font(DIFont.urduBody(scale: 1.05))
+                            .foregroundStyle(DIColor.textPrimary)
+                            .environment(\.layoutDirection, .rightToLeft)
+                    } else {
+                        Text(surah.nameTransliterated)
+                            .font(.headline)
+                            .foregroundStyle(DIColor.textPrimary)
+                        Text(surah.nameEnglish)
+                            .font(.subheadline)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
                     HStack(spacing: DISpacing.sm) {
                         DIPillBadge(
                             text: revelationPlaceName,
