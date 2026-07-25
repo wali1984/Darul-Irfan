@@ -204,7 +204,14 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
+        # Internal testing only: upload the build (it becomes available to
+        # internal testers once App Store Connect finishes processing) without
+        # submitting for external beta review. External review requires the
+        # one-time "Test Information" (feedback email + a review contact) and
+        # adds Apple's ~1-day review to every build. Flip this to true — and
+        # fill Test Information once in App Store Connect — when you want
+        # external/public testers.
+        submit_to_testflight: false
       email:
         recipients:
           - wajidali1984@hotmail.com
