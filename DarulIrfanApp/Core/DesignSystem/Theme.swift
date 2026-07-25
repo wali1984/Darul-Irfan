@@ -88,7 +88,7 @@ enum DIFont {
     /// authentic mushaf look, scaled with Dynamic Type. Uses the runtime-
     /// resolved font name (see AppFonts); falls back to system if unavailable.
     static func quranArabic(scale: Double = 1.0) -> Font {
-        .custom(AppFonts.quranArabicName, size: 26 * scale, relativeTo: .title2)
+        .custom(AppFonts.quranArabicName, size: 29 * scale, relativeTo: .title2)
     }
 
     /// Urdu body text in the bundled Noto Nastaliq Urdu face (OFL) for proper

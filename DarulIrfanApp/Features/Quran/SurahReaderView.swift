@@ -421,7 +421,7 @@ private struct AyahCardView: View {
             }
         }
         .font(DIFont.quranArabic(scale: fontScale * 1.15))
-        .lineSpacing(CGFloat(16 * fontScale))
+        .lineSpacing(CGFloat(28 * fontScale))
         .foregroundStyle(DIColor.textPrimary)
         .diGoldGlow(radius: 5, opacity: 0.18)
         .textSelection(.enabled)
