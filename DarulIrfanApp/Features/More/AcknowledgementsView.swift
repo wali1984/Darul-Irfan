@@ -57,9 +57,23 @@ struct AcknowledgementsView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 ackHeader("Typography", systemImage: "textformat")
 
-                Text("Qur'an Arabic text is set in Amiri Quran, and Urdu text in Noto Nastaliq Urdu. Both typefaces are bundled and used under the SIL Open Font License 1.1.")
+                Text("Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text is set in Noto Nastaliq Urdu, with Amiri Quran bundled as a fallback (both under the SIL Open Font License 1.1).")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
+
+                if let url = URL(string: "https://quranwbw.com") {
+                    Link(destination: url) {
+                        Label {
+                            Text(verbatim: "AlQuran IndoPak · QuranWBW.com")
+                        } icon: {
+                            Image(systemName: "character.book.closed")
+                                .accessibilityHidden(true)
+                        }
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.primary)
+                    .accessibilityLabel("View the AlQuran IndoPak font by QuranWBW")
+                }
 
                 if let url = URL(string: "https://fonts.google.com/specimen/Amiri+Quran") {
                     Link(destination: url) {
