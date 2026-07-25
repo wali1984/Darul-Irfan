@@ -8,6 +8,7 @@ struct SurahReaderView: View {
     private let focusAyah: Int?
     @State private var viewModel: SurahReaderViewModel
     @State private var player = RecitationPlayer()
+    @State private var speaker = TranslationSpeaker()
     @State private var hasScrolledToFocus = false
 
     init(surah: QuranSurah, focusAyah: Int?, dependencies: AppDependencies, appState: AppState) {
@@ -36,6 +37,7 @@ struct SurahReaderView: View {
             .task { await viewModel.load() }
             .onDisappear {
                 player.stop()
+                speaker.stop()
                 let readerViewModel = viewModel
                 Task { await readerViewModel.flushLastRead() }
             }
@@ -111,6 +113,7 @@ struct SurahReaderView: View {
                             ayah: ayah,
                             viewModel: viewModel,
                             player: player,
+                            speaker: speaker,
                             fontScale: appState.settings.readerFontScale.rawValue
                         )
                         .id(ayah.ayahNumber)
@@ -177,8 +180,10 @@ struct SurahReaderView: View {
                     if isPlaying {
                         player.pause()
                     } else if isThisSurah {
+                        speaker.stop()
                         player.resume()
                     } else {
+                        speaker.stop()
                         player.start(surah: viewModel.surah.id, recitation: recitation, fromAyah: 1)
                     }
                 } label: {
@@ -303,6 +308,7 @@ private struct AyahCardView: View {
     let ayah: QuranAyah
     let viewModel: SurahReaderViewModel
     let player: RecitationPlayer
+    let speaker: TranslationSpeaker
     let fontScale: Double
 
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
@@ -310,6 +316,10 @@ private struct AyahCardView: View {
 
     private var isSounding: Bool {
         player.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
+    }
+
+    private var isSpeaking: Bool {
+        speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
     }
 
     var body: some View {
@@ -332,7 +342,7 @@ private struct AyahCardView: View {
             }
         }
         .overlay(alignment: .leading) {
-            if isSounding {
+            if isSounding || isSpeaking {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(DIColor.accent)
                     .frame(width: 3)
@@ -375,6 +385,7 @@ private struct AyahCardView: View {
                 if isSounding {
                     player.pause()
                 } else {
+                    speaker.stop()
                     player.start(surah: ayah.surahNumber, recitation: recitation, fromAyah: ayah.ayahNumber)
                 }
             } label: {
@@ -483,25 +494,59 @@ private struct AyahCardView: View {
     private var shellsRow: some View {
         VStack(alignment: .leading, spacing: DISpacing.xs) {
             HStack(spacing: DISpacing.sm) {
-                Menu {
-                    ForEach(TranslationAudioSource.allCases) { source in
-                        Button(source.label) { playTranslationAudio(source) }
+                if let audio = translationAudio {
+                    Button {
+                        player.stop()
+                        speaker.toggle(
+                            text: audio.text,
+                            language: audio.language,
+                            surah: ayah.surahNumber,
+                            ayah: ayah.ayahNumber
+                        )
+                    } label: {
+                        shellChip(
+                            isSpeaking ? "Stop" : "Translation audio",
+                            isSpeaking ? "stop.fill" : "speaker.wave.2",
+                            enabled: true
+                        )
                     }
-                } label: {
-                    shellChip("Translation audio", "speaker.wave.2", enabled: true)
+                    .accessibilityLabel(
+                        isSpeaking
+                            ? Text("Stop translation audio")
+                            : Text("Play translation audio for Ayah \(ayah.ayahNumber)")
+                    )
+                } else {
+                    shellChip("Translation audio", "speaker.wave.2", enabled: false)
                 }
                 shellChip("Video lectures", "play.rectangle", enabled: false)
                 shellChip("Sheikh audio", "person.wave.2", enabled: false)
             }
-            Text("Video lectures and the Sheikh's own recitation of the translation & tafsir are coming — and you'll be able to add your own recordings.")
+            Text("Translation audio reads our own translation aloud in your device's voice. Video lectures and the Sheikh's own recitation are coming — and you'll be able to add your own recordings.")
                 .font(.caption2)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
 
-    private func playTranslationAudio(_ source: TranslationAudioSource) {
-        guard let url = source.url(surah: ayah.surahNumber, ayah: ayah.ayahNumber) else { return }
-        player.playClip(surah: ayah.surahNumber, ayah: ayah.ayahNumber, url: url)
+    /// The on-screen translation text + a device voice language, when both a
+    /// translation and a usable voice are available for this ayah.
+    private var translationAudio: (text: String, language: String)? {
+        guard viewModel.showTranslation,
+              let translation = viewModel.translation(for: ayah.ayahNumber),
+              !translation.text.isEmpty else { return nil }
+        let editionLanguage = viewModel.edition(id: translation.editionID)?.language
+        let voiceLanguage = Self.voiceLanguage(for: editionLanguage ?? "ur")
+        guard TranslationSpeaker.hasVoice(for: voiceLanguage) else { return nil }
+        return (translation.text, voiceLanguage)
+    }
+
+    /// Maps a content language code to a BCP-47 voice tag the synthesizer knows.
+    private static func voiceLanguage(for code: String) -> String {
+        switch code {
+        case "ur": return "ur-PK"
+        case "ar": return "ar-SA"
+        case "en": return "en-US"
+        default: return code
+        }
     }
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {

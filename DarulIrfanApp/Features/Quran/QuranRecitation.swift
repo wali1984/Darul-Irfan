@@ -182,32 +182,101 @@ final class RecitationPlayer {
     }
 }
 
-// MARK: - Translation audio
+// MARK: - Translation speaker (on-device text-to-speech)
 
-/// Available human-recorded translation recitations (natural voice, not TTS).
-/// These are per-ayah clips; the Sheikh's own recitation of Akram-ut-Tarajum
-/// will slot in later as a custom voice.
-enum TranslationAudioSource: CaseIterable, Identifiable {
-    case englishSaheeh
-    case urduShamshad
+/// Speaks the app's *own* translation text aloud with iOS's on-device speech
+/// synthesizer. Because it reads whatever string the reader is showing
+/// (Akram-ut-Tarajum), the audio always matches the words on screen — unlike a
+/// human recording of some other translation. It works for every ayah we have
+/// text for, fully offline, in the translation's own language. A recording of
+/// the Sheikh reading the translation will later slot in as a custom voice.
+@Observable
+@MainActor
+final class TranslationSpeaker {
+    private(set) var isSpeaking = false
+    private(set) var currentSurah: Int?
+    private(set) var currentAyah: Int?
 
-    var id: String { label }
+    @ObservationIgnored private let synthesizer = AVSpeechSynthesizer()
+    @ObservationIgnored private let speechDelegate = SpeechDelegate()
 
-    var label: String {
-        switch self {
-        case .englishSaheeh: return "English — Saheeh International"
-        case .urduShamshad: return "اردو — شمشاد علی خان"
+    init() {
+        synthesizer.delegate = speechDelegate
+        speechDelegate.onFinish = { [weak self] in
+            Task { @MainActor in self?.handleUtteranceEnd() }
         }
     }
 
-    private var folder: String {
-        switch self {
-        case .englishSaheeh: return "English/Sahih_Intnl_Ibrahim_Walk_192kbps"
-        case .urduShamshad: return "translations/urdu_shamshad_ali_khan_46kbps"
+    /// Called when any utterance finishes or is cancelled. When we interrupt the
+    /// current utterance to start a new one, the old utterance's cancel arrives
+    /// *after* the new one is already speaking — so only clear when the
+    /// synthesizer has genuinely gone quiet, otherwise we'd drop the new
+    /// highlight.
+    private func handleUtteranceEnd() {
+        guard !synthesizer.isSpeaking else { return }
+        clear()
+    }
+
+    /// Whether the device has a usable voice for this BCP-47 language tag
+    /// (e.g. "ur-PK"). When it doesn't, the reader hides the control.
+    static func hasVoice(for language: String) -> Bool {
+        AVSpeechSynthesisVoice(language: language) != nil
+    }
+
+    func toggle(text: String, language: String, surah: Int, ayah: Int) {
+        if isSounding(surah: surah, ayah: ayah) {
+            stop()
+        } else {
+            speak(text: text, language: language, surah: surah, ayah: ayah)
         }
     }
 
-    func url(surah: Int, ayah: Int) -> URL? {
-        URL(string: "https://everyayah.com/data/\(folder)/\(String(format: "%03d%03d", surah, ayah)).mp3")
+    func speak(text: String, language: String, surah: Int, ayah: Int) {
+        stop()
+        guard !text.isEmpty, let voice = AVSpeechSynthesisVoice(language: language) else { return }
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
+        try? AVAudioSession.sharedInstance().setActive(true)
+
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = voice
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
+
+        currentSurah = surah
+        currentAyah = ayah
+        isSpeaking = true
+        synthesizer.speak(utterance)
+    }
+
+    func stop() {
+        if synthesizer.isSpeaking {
+            _ = synthesizer.stopSpeaking(at: .immediate)
+        }
+        clear()
+    }
+
+    private func clear() {
+        isSpeaking = false
+        currentSurah = nil
+        currentAyah = nil
+    }
+
+    /// True while this exact ayah's translation is being spoken.
+    func isSounding(surah: Int, ayah: Int) -> Bool {
+        isSpeaking && currentSurah == surah && currentAyah == ayah
+    }
+}
+
+/// Bridges `AVSpeechSynthesizer`'s Obj-C delegate to a closure so
+/// `TranslationSpeaker` can stay a clean `@Observable`. The synthesizer holds
+/// its delegate weakly, so `TranslationSpeaker` keeps a strong reference here.
+private final class SpeechDelegate: NSObject, AVSpeechSynthesizerDelegate {
+    var onFinish: (() -> Void)?
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        onFinish?()
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        onFinish?()
     }
 }
