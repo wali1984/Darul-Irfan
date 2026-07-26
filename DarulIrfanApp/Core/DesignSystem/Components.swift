@@ -8,17 +8,20 @@ import SwiftUI
 /// Soft card surface used across all features.
 struct DICard<Content: View>: View {
     var padding: CGFloat = DISpacing.md
+    var background: Color = DIColor.surface
+    var borderColor: Color = DIColor.border
+    var borderWidth: CGFloat = 1
     @ViewBuilder var content: () -> Content
 
     var body: some View {
         content()
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(DIColor.surface)
+            .background(background)
             .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
-                    .stroke(DIColor.border, lineWidth: 1)
+                    .stroke(borderColor, lineWidth: borderWidth)
             )
             // Subtle depth so cards read as surfaces, not flat blocks.
             .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)

@@ -57,7 +57,7 @@ struct AcknowledgementsView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 ackHeader("Typography", systemImage: "textformat")
 
-                Text("Qur'an Arabic is set in the PDMS Saleem Quran typeface (traditional IndoPak Naskh) by Pakistan Data Management Services. Urdu text is set in Noto Nastaliq Urdu, with Amiri Quran bundled as a fallback (both under the SIL Open Font License 1.1).")
+                Text("Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text is set in Noto Nastaliq Urdu, with Amiri Quran bundled as a fallback (both under the SIL Open Font License 1.1).")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 

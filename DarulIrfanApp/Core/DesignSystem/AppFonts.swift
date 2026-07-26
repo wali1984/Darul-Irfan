@@ -14,7 +14,7 @@ enum AppFonts {
     /// already registered via UIAppFonts just reports an "already registered"
     /// error which we ignore.
     static func registerBundledFonts() {
-        for base in ["PDMSSaleemQuran", "AmiriQuran-Regular", "NotoNastaliqUrdu-Regular"] {
+        for base in ["AlQuran-IndoPak-QuranWBW", "AmiriQuran-Regular", "NotoNastaliqUrdu-Regular"] {
             guard let url = bundleURL(base) else {
                 AppLog.presentation("Font not found in bundle: \(base).ttf")
                 continue
@@ -28,13 +28,12 @@ enum AppFonts {
         _ = urduName
     }
 
-    /// The usable font name for Quran Arabic. Prefers the traditional IndoPak
-    /// Naskh mushaf face (PDMS Saleem) — the flat Taj-Company style used in
-    /// printed South-Asian Qur'ans, which matches the Silsila's reference
-    /// mushaf and renders the jazm as the traditional small hook rather than a
-    /// prominent hollow ring. Falls back to Amiri Quran, then the system font.
+    /// The usable font name for Quran Arabic — the IndoPak QuranWBW mushaf face.
+    /// The jazm is rendered via U+0652 (a hook) rather than U+06E1 (a ring) in
+    /// the bundled text, so it reads like a traditional mushaf, not a field of
+    /// circles. Falls back to Amiri Quran, then the system font.
     static let quranArabicName: String = resolve(
-        ["_PDMS_Saleem_QuranFont", "PDMS_Saleem_QuranFont", "PDMSSaleemQuran",
+        ["AlQuran-IndoPak-by-QuranWBW", "AlQuran IndoPak by QuranWBW",
          "AmiriQuran-Regular", "Amiri Quran", "AmiriQuran"]
     )
 

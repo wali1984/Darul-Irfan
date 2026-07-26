@@ -78,11 +78,20 @@ final class SurahReaderViewModel {
             )
 
             availableTranslationEditions = allEditions.filter { $0.kind == .translation && $0.isAvailableOffline }
-            // Akram-ut-Tarajum is the Silsila's own translation and the reader's
-            // default; fall back to the user's language, then the first.
-            let preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-ur" })
-                ?? availableTranslationEditions.first(where: { $0.language == preferredLanguageCode })
-                ?? availableTranslationEditions.first
+            // Default translation follows the app language: the Silsila's own
+            // Akram-ut-Tarajum (Urdu) when the app is in Urdu, an English edition
+            // when the app is in English. The reader's edition picker can still
+            // switch. (Previously it forced Urdu regardless of language.)
+            let preferred: QuranEdition?
+            if preferredLanguageCode == "ur" {
+                preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-ur" })
+                    ?? availableTranslationEditions.first(where: { $0.language == "ur" })
+                    ?? availableTranslationEditions.first
+            } else {
+                preferred = availableTranslationEditions.first(where: { $0.language == "en" })
+                    ?? availableTranslationEditions.first(where: { $0.language == preferredLanguageCode })
+                    ?? availableTranslationEditions.first
+            }
             if let preferred {
                 await loadTranslations(edition: preferred)
             }

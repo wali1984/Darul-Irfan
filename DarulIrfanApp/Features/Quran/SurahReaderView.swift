@@ -323,7 +323,11 @@ private struct AyahCardView: View {
     }
 
     var body: some View {
-        DICard {
+        DICard(
+            background: DIColor.primary.opacity(0.055),
+            borderColor: DIColor.primary.opacity(0.45),
+            borderWidth: 1.5
+        ) {
             VStack(alignment: .leading, spacing: DISpacing.md) {
                 header
                 arabicText
@@ -421,7 +425,7 @@ private struct AyahCardView: View {
             }
         }
         .font(DIFont.quranArabic(scale: fontScale * 1.15))
-        .lineSpacing(CGFloat(28 * fontScale))
+        .lineSpacing(CGFloat(18 * fontScale))
         .foregroundStyle(DIColor.textPrimary)
         .diGoldGlow(radius: 5, opacity: 0.18)
         .textSelection(.enabled)

@@ -214,10 +214,14 @@ private struct SurahRow: View {
 
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     if language == .urdu {
-                        // Urdu: the Arabic name (trailing) + the Urdu meaning here.
-                        Text(surah.nameUrdu ?? surah.nameTransliterated)
-                            .font(DIFont.urduBody(scale: 1.05))
+                        // Urdu: the Arabic name followed by its Urdu meaning —
+                        // mirrors the transliteration + English meaning below.
+                        Text(surah.nameArabic)
+                            .font(DIFont.quranArabic(scale: 0.72))
                             .foregroundStyle(DIColor.textPrimary)
+                        Text(surah.nameUrdu ?? surah.nameEnglish)
+                            .font(DIFont.urduBody(scale: 0.95))
+                            .foregroundStyle(DIColor.textMuted)
                             .environment(\.layoutDirection, .rightToLeft)
                     } else {
                         Text(surah.nameTransliterated)
@@ -241,9 +245,11 @@ private struct SurahRow: View {
                 Spacer(minLength: DISpacing.sm)
 
                 VStack(alignment: .trailing, spacing: DISpacing.sm) {
-                    Text(surah.nameArabic)
-                        .font(DIFont.quranArabic(scale: 0.62))
-                        .foregroundStyle(DIColor.textPrimary)
+                    if language != .urdu {
+                        Text(surah.nameArabic)
+                            .font(DIFont.quranArabic(scale: 0.62))
+                            .foregroundStyle(DIColor.textPrimary)
+                    }
                     if isAvailableOffline {
                         Image(systemName: "arrow.down.circle.fill")
                             .font(.caption)
