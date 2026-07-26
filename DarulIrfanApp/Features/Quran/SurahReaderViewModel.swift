@@ -32,7 +32,6 @@ final class SurahReaderViewModel {
     /// changing the reader's structure.
     private(set) var tafsirEditionPointers: [QuranEdition] = []
 
-    var showTranslation = true
     /// Which edition drives what's shown under each ayah. Defaults to the
     /// Akram-ut-Tarajum translation; the two tafsir modes reveal commentary.
     var contentMode: QuranContentMode = .tarajum
@@ -78,17 +77,17 @@ final class SurahReaderViewModel {
             )
 
             availableTranslationEditions = allEditions.filter { $0.kind == .translation && $0.isAvailableOffline }
-            // Default translation follows the app language: the Silsila's own
-            // Akram-ut-Tarajum (Urdu) when the app is in Urdu, an English edition
-            // when the app is in English. The reader's edition picker can still
-            // switch. (Previously it forced Urdu regardless of language.)
+            // Default translation follows the app language using the Silsila's
+            // own complete Akram-ut-Tarajum Urdu or English edition. The reader's
+            // edition picker can still switch to the other bundled translations.
             let preferred: QuranEdition?
             if preferredLanguageCode == "ur" {
                 preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-ur" })
                     ?? availableTranslationEditions.first(where: { $0.language == "ur" })
                     ?? availableTranslationEditions.first
             } else {
-                preferred = availableTranslationEditions.first(where: { $0.language == "en" })
+                preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-en" })
+                    ?? availableTranslationEditions.first(where: { $0.language == "en" })
                     ?? availableTranslationEditions.first(where: { $0.language == preferredLanguageCode })
                     ?? availableTranslationEditions.first
             }

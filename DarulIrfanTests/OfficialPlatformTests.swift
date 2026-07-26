@@ -92,6 +92,8 @@ final class OfficialPlatformTests: XCTestCase {
         XCTAssertEqual(settings.push.consentVersion, 0)
         XCTAssertEqual(settings.diagnosticsConsent, .notAsked)
         XCTAssertFalse(settings.liveActivitiesEnabled)
+        XCTAssertEqual(settings.quranReaderDisplayMode, .arabicAndTranslation)
+        XCTAssertFalse(settings.quranAutoAdvanceSurah)
     }
 
     func testLegacyImplicitPushValueRequiresFreshConsent() throws {

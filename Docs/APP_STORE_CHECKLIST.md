@@ -25,7 +25,7 @@ before archiving.
 - [ ] Signing style is Automatic (`CODE_SIGN_STYLE: Automatic`); verify the
       team and provisioning profile on all four shipping targets after
       `xcodegen generate`.
-- [x] Version `1.5.0` (local build `12`) — bump via `MARKETING_VERSION` /
+- [x] Version `1.6.0` (local build `13`) — bump via `MARKETING_VERSION` /
       `CURRENT_PROJECT_VERSION` in `project.yml`, not in Xcode (the project is
       regenerated). Codemagic replaces the archive build with `BUILD_NUMBER`.
 - [ ] Xcode 16+ required (adhan-swift 1.5.0 is swift-tools-version 6.0).
@@ -75,7 +75,9 @@ before archiving.
       spiritual content comes from naqshbandiaowaisiah.org (the order's
       official site) and is included **with the content owner's permission
       (granted 2026-07-10)**; that Quran Arabic text and the Pickthall
-      translation are public domain; that book/magazine/tafsir PDFs download
+      translation are public domain; that the complete Urdu and English
+      Akram-ut-Tarajum editions are included under that permission; that
+      book/magazine/tafsir PDFs download
       from the site's own URLs and audio lectures stream from the site's own
       public URLs (no re-hosting); and that religious text is preserved
       verbatim.
@@ -90,8 +92,8 @@ before archiving.
 - [ ] Explain the official read-only social feed, non-persistent YouTube
       embed, Paltalk handoff, opt-in APNs alerts, 30-day opt-in MetricKit
       diagnostics, and Cloudflare-hosted public configuration.
-- [ ] Age rating: no objectionable content; unrestricted web access is *not*
-      embedded (SFSafariViewController opens specific source pages only).
+- [ ] Age rating: no objectionable content and no unrestricted embedded web
+      browser. Official reading is native; the YouTube player is host-limited.
 
 ## 5. Licensing & rights checklist
 
@@ -101,6 +103,10 @@ before archiving.
       substantial portions of the software.
 - [ ] **Pickthall translation** — *The Meaning of the Glorious Koran* (1930),
       public domain; noted in Acknowledgements. No action needed.
+- [x] **Akram-ut-Tarajum** — complete Urdu and English editions, 6,236 ayat
+      each, copied verbatim from the official structured Quran reader under
+      the recorded content permission. Counts, alignment, and checksum are in
+      `Docs/AKRAM_UT_TARAJUM_VERIFICATION.md`.
 - [x] **Quran Arabic text** — complete Quran (all 114 surahs / 6,236 ayat)
       bundled, triple-verified error-free (Docs/QURAN_VERIFICATION.md). Tanzil
       Uthmani, public domain. When
@@ -118,7 +124,8 @@ before archiving.
       site may ship in the app; the 2026-07-10 ingest
       (`--full-text --rights-confirmed`, seed manifest v2) shipped full
       verbatim text for About pages, Method of Zikr, zikr-joining
-      instructions, and articles as `rightsStatus: permissionConfirmed`;
+      instructions, articles, and both Akram-ut-Tarajum editions as
+      `rightsStatus: permissionConfirmed`;
       books/magazines/tafsir PDFs and lecture MP3s remain remote URLs on the
       site (no re-hosting).
 - [ ] **[blocker]** Obtain and keep the owner's **written confirmation on

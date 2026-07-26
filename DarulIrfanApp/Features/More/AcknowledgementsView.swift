@@ -100,6 +100,10 @@ struct AcknowledgementsView: View {
                 Text("The English translation of the Qur'an included in this app is by Muhammad Marmaduke Pickthall (The Meaning of the Glorious Koran, 1930), which is in the public domain.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
+
+                Text("The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission.")
+                    .font(.subheadline)
+                    .foregroundStyle(DIColor.textPrimary)
             }
         }
     }

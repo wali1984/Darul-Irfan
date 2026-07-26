@@ -17,6 +17,7 @@ struct QuranTabView: View {
     private let dependencies: AppDependencies
     private let appState: AppState
     @State private var viewModel: QuranViewModel
+    @State private var navigationPath: [QuranRoute] = []
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
@@ -26,7 +27,7 @@ struct QuranTabView: View {
 
     var body: some View {
         @Bindable var viewModel = viewModel
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             content
                 .diScreenBackground()
                 .diPageHeading("Quran")
@@ -57,7 +58,11 @@ struct QuranTabView: View {
                 surah: surah,
                 focusAyah: focusAyah,
                 dependencies: dependencies,
-                appState: appState
+                appState: appState,
+                onRequestNextSurah: {
+                    guard let next = viewModel.surah(number: surah.id + 1) else { return }
+                    navigationPath.append(.reader(surah: next, focusAyah: nil))
+                }
             )
         case .bookmarks:
             BookmarksListView(viewModel: viewModel)

@@ -6,14 +6,23 @@ import SwiftUI
 struct SurahReaderView: View {
     private let appState: AppState
     private let focusAyah: Int?
+    private let onRequestNextSurah: () -> Void
     @State private var viewModel: SurahReaderViewModel
     @State private var player = RecitationPlayer()
     @State private var speaker = TranslationSpeaker()
     @State private var hasScrolledToFocus = false
+    @State private var hasAutoAdvanced = false
 
-    init(surah: QuranSurah, focusAyah: Int?, dependencies: AppDependencies, appState: AppState) {
+    init(
+        surah: QuranSurah,
+        focusAyah: Int?,
+        dependencies: AppDependencies,
+        appState: AppState,
+        onRequestNextSurah: @escaping () -> Void
+    ) {
         self.appState = appState
         self.focusAyah = focusAyah
+        self.onRequestNextSurah = onRequestNextSurah
         let langCode = appState.settings.language.forcedLocaleIdentifier ?? "en"
         _viewModel = State(initialValue: SurahReaderViewModel(
             surah: surah,
@@ -95,8 +104,11 @@ struct SurahReaderView: View {
                     if viewModel.recitation != nil {
                         recitationBar
                     }
-                    contentModeSelector
-                    if viewModel.contentMode.isTafsir
+                    if appState.settings.quranReaderDisplayMode.showsTranslation {
+                        contentModeSelector
+                    }
+                    if appState.settings.quranReaderDisplayMode.showsTranslation
+                        && viewModel.contentMode.isTafsir
                         && !viewModel.hasTafsirForMode
                         && !viewModel.tafsirEditionPointers.isEmpty {
                         tafsirPointerCard
@@ -107,11 +119,13 @@ struct SurahReaderView: View {
                             viewModel: viewModel,
                             player: player,
                             speaker: speaker,
-                            fontScale: appState.settings.readerFontScale.rawValue
+                            fontScale: appState.settings.readerFontScale.rawValue,
+                            displayMode: appState.settings.quranReaderDisplayMode
                         )
                         .id(ayah.ayahNumber)
                         .onAppear { viewModel.ayahBecameVisible(ayah.ayahNumber) }
                     }
+                    readerEndMarker
                 }
                 .padding(.horizontal, DISpacing.md)
                 .padding(.top, DISpacing.sm)
@@ -128,6 +142,37 @@ struct SurahReaderView: View {
         DispatchQueue.main.async {
             proxy.scrollTo(focusAyah, anchor: .top)
         }
+    }
+
+    @ViewBuilder
+    private var readerEndMarker: some View {
+        if viewModel.surah.id < 114 {
+            if appState.settings.quranAutoAdvanceSurah {
+                HStack(spacing: DISpacing.sm) {
+                    ProgressView()
+                    Text("Opening next surah…")
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, DISpacing.md)
+                .onAppear(perform: requestNextSurahIfNeeded)
+            }
+        } else {
+            Label("Quran reading complete", systemImage: "checkmark.seal.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(DIColor.primary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, DISpacing.md)
+        }
+    }
+
+    private func requestNextSurahIfNeeded() {
+        guard appState.settings.quranAutoAdvanceSurah,
+              viewModel.surah.id < 114,
+              !hasAutoAdvanced else { return }
+        hasAutoAdvanced = true
+        onRequestNextSurah()
     }
 
     private var surahHeader: some View {
@@ -242,8 +287,14 @@ struct SurahReaderView: View {
                     Text(LocalizedStringKey(scale.readerDisplayName)).tag(scale)
                 }
             }
-            Toggle("Show translation", isOn: showTranslationBinding)
-            if viewModel.availableTranslationEditions.count > 1 {
+            Picker("Reading display", selection: displayModeBinding) {
+                ForEach(QuranReaderDisplayMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            Toggle("Automatically open next surah", isOn: autoAdvanceBinding)
+            if appState.settings.quranReaderDisplayMode.showsTranslation,
+               viewModel.availableTranslationEditions.count > 1 {
                 Picker("Translation", selection: editionBinding) {
                     ForEach(viewModel.availableTranslationEditions) { edition in
                         Text(edition.title).tag(edition.id)
@@ -272,10 +323,21 @@ struct SurahReaderView: View {
         )
     }
 
-    private var showTranslationBinding: Binding<Bool> {
+    private var displayModeBinding: Binding<QuranReaderDisplayMode> {
         Binding(
-            get: { viewModel.showTranslation },
-            set: { viewModel.showTranslation = $0 }
+            get: { appState.settings.quranReaderDisplayMode },
+            set: { newValue in
+                Task { await appState.updateSettings { $0.quranReaderDisplayMode = newValue } }
+            }
+        )
+    }
+
+    private var autoAdvanceBinding: Binding<Bool> {
+        Binding(
+            get: { appState.settings.quranAutoAdvanceSurah },
+            set: { newValue in
+                Task { await appState.updateSettings { $0.quranAutoAdvanceSurah = newValue } }
+            }
         )
     }
 
@@ -295,6 +357,7 @@ private struct AyahCardView: View {
     let player: RecitationPlayer
     let speaker: TranslationSpeaker
     let fontScale: Double
+    let displayMode: QuranReaderDisplayMode
 
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
     @State private var tafsirExpanded = true
@@ -315,13 +378,16 @@ private struct AyahCardView: View {
         ) {
             VStack(alignment: .leading, spacing: DISpacing.md) {
                 header
-                arabicText
-                if viewModel.showTranslation,
+                if displayMode.showsArabic {
+                    arabicText
+                }
+                if displayMode.showsTranslation,
                    let translation = viewModel.translation(for: ayah.ayahNumber) {
-                    Divider()
+                    if displayMode.showsArabic { Divider() }
                     translationView(translation)
                 }
-                if viewModel.contentMode.isTafsir,
+                if displayMode.showsTranslation,
+                   viewModel.contentMode.isTafsir,
                    let entry = viewModel.tafsirEntry(startingAt: ayah.ayahNumber) {
                     Divider()
                     tafsirDisclosure(entry)
@@ -512,7 +578,7 @@ private struct AyahCardView: View {
     /// The on-screen translation text + a device voice language, when both a
     /// translation and a usable voice are available for this ayah.
     private var translationAudio: (text: String, language: String)? {
-        guard viewModel.showTranslation,
+        guard displayMode.showsTranslation,
               let translation = viewModel.translation(for: ayah.ayahNumber),
               !translation.text.isEmpty else { return nil }
         let editionLanguage = viewModel.edition(id: translation.editionID)?.language

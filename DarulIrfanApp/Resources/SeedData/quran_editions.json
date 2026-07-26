@@ -20,16 +20,6 @@
   "isAvailableOffline": true
  },
  {
-  "id": "akram-ut-tarajum-ur",
-  "title": "Akram-ut-Tarajum",
-  "kind": "translation",
-  "language": "ur",
-  "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
-  "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tarajum",
-  "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": true
- },
- {
   "id": "asrar-at-tanzil-en",
   "title": "Asrar-at-Tanzil (English Tafseer)",
   "kind": "tafsir",
@@ -56,6 +46,26 @@
   "language": "ur",
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
+  "rightsStatus": "permissionConfirmed",
+  "isAvailableOffline": true
+ },
+ {
+  "id": "akram-ut-tarajum-ur",
+  "title": "اکرم التراجم — اردو",
+  "language": "ur",
+  "kind": "translation",
+  "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
+  "sourceUrl": "https://www.naqshbandiaowaisiah.org/quran",
+  "rightsStatus": "permissionConfirmed",
+  "isAvailableOffline": true
+ },
+ {
+  "id": "akram-ut-tarajum-en",
+  "title": "Akram-ut-Tarajum — English",
+  "language": "en",
+  "kind": "translation",
+  "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
+  "sourceUrl": "https://www.naqshbandiaowaisiah.org/quran",
   "rightsStatus": "permissionConfirmed",
   "isAvailableOffline": true
  }

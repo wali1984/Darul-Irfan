@@ -106,10 +106,11 @@ tracks you.
 **The complete Holy Qur'an — offline**
 - All 114 surahs and 6,236 ayat, with the Arabic rendered in the elegant Amiri
   Quran mushaf typeface.
-- English (Pickthall) and Urdu (Jalandhry) translations, verified error-free
-  against multiple authoritative sources.
-- Bookmarks, continue-reading, adjustable reader text size, and a distraction-free
-  reading experience.
+- Complete Urdu and English Akram-ut-Tarajum editions by Hazrat Ameer Muhammad
+  Akram Awan (RA), alongside Pickthall English and Jalandhry Urdu.
+- Bookmarks, continue-reading, adjustable text size, Arabic-only,
+  translation-only, or combined reading modes, plus optional automatic
+  movement to the next surah.
 
 **Explore the Qur'an by topic**
 - Follow a theme — remembrance of Allah, patience, gratitude, love of the Prophet
@@ -248,7 +249,26 @@ cover both spellings.
 
 ---
 
-## What's New — v1.0
+## What's New — v1.6
+
+**English**
+
+> Akram-ut-Tarajum is now complete in Urdu and English across all 114 surahs
+> and 6,236 ayat. The Quran reader also adds Arabic-only, translation-only,
+> and combined display modes, with an optional setting to continue
+> automatically into the next surah. This update includes reader refinements
+> and expanded verification for reliable offline reading.
+
+**Urdu**
+
+> اکرم التراجم اب تمام 114 سورتوں اور 6,236 آیات کے لیے اردو اور انگریزی میں
+> مکمل دستیاب ہے۔ قرآن ریڈر میں صرف عربی، صرف ترجمہ، اور عربی مع ترجمہ کے
+> انداز شامل کیے گئے ہیں، نیز اگلی سورت خودکار طور پر کھولنے کا اختیاری انتظام
+> بھی موجود ہے۔
+
+---
+
+## Previous What's New — v1.0
 
 **English**
 

@@ -49,12 +49,35 @@ enum ReaderFontScale: Double, Codable, Sendable, CaseIterable, Identifiable {
     var id: Double { rawValue }
 }
 
+/// Controls which primary Quran text is visible in every surah reader.
+/// Kept in app settings so the reader opens in the user's last chosen mode.
+enum QuranReaderDisplayMode: String, Codable, Sendable, CaseIterable, Identifiable {
+    case arabicAndTranslation
+    case arabicOnly
+    case translationOnly
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .arabicAndTranslation: return String(localized: "Arabic and translation")
+        case .arabicOnly: return String(localized: "Arabic only")
+        case .translationOnly: return String(localized: "Translation only")
+        }
+    }
+
+    var showsArabic: Bool { self != .translationOnly }
+    var showsTranslation: Bool { self != .arabicOnly }
+}
+
 /// Root user settings persisted locally. Everything here is on-device only.
 struct AppSettings: Codable, Sendable, Equatable {
     // Identity & appearance
     var language: AppLanguage = .system
     var theme: AppTheme = .system
     var readerFontScale: ReaderFontScale = .standard
+    var quranReaderDisplayMode: QuranReaderDisplayMode = .arabicAndTranslation
+    var quranAutoAdvanceSurah = false
 
     // Location
     var locationMode: LocationMode = .device
@@ -88,7 +111,7 @@ struct AppSettings: Codable, Sendable, Equatable {
     static let `default` = AppSettings()
 
     private enum CodingKeys: String, CodingKey {
-        case language, theme, readerFontScale, locationMode, manualPlace
+        case language, theme, readerFontScale, quranReaderDisplayMode, quranAutoAdvanceSurah, locationMode, manualPlace
         case lastKnownPlace, calculation, prayerNotifications, hijri
         case hasCompletedOnboarding, autoDownloadOnWifi, push, diagnosticsConsent, liveActivitiesEnabled
     }
@@ -102,6 +125,8 @@ struct AppSettings: Codable, Sendable, Equatable {
         language = try values.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .system
         theme = try values.decodeIfPresent(AppTheme.self, forKey: .theme) ?? .system
         readerFontScale = try values.decodeIfPresent(ReaderFontScale.self, forKey: .readerFontScale) ?? .standard
+        quranReaderDisplayMode = try values.decodeIfPresent(QuranReaderDisplayMode.self, forKey: .quranReaderDisplayMode) ?? .arabicAndTranslation
+        quranAutoAdvanceSurah = try values.decodeIfPresent(Bool.self, forKey: .quranAutoAdvanceSurah) ?? false
         locationMode = try values.decodeIfPresent(LocationMode.self, forKey: .locationMode) ?? .device
         manualPlace = try values.decodeIfPresent(PlaceCoordinate.self, forKey: .manualPlace)
         lastKnownPlace = try values.decodeIfPresent(PlaceCoordinate.self, forKey: .lastKnownPlace)

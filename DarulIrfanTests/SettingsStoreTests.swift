@@ -29,6 +29,8 @@ final class SettingsStoreTests: XCTestCase {
         settings.language = .urdu
         settings.theme = .dark
         settings.readerFontScale = .large
+        settings.quranReaderDisplayMode = .translationOnly
+        settings.quranAutoAdvanceSurah = true
         settings.locationMode = .manual
         settings.manualPlace = TestPlaces.karachi
         settings.lastKnownPlace = TestPlaces.karachi

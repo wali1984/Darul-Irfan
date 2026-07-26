@@ -138,6 +138,32 @@ final class ContentSyncServiceTests: XCTestCase {
         XCTAssertGreaterThan(rowCount, 0, "Seed import must build the search index")
     }
 
+    func testBundledAkramUtTarajumIsCompleteInBothLanguages() throws {
+        try XCTSkipIf(
+            SeedBundle.manifest() == nil,
+            "SeedData resources are not visible to this test host; skipping bundle-dependent seed test"
+        )
+
+        let translations = SeedBundle.quranTranslations()
+        let surahs = SeedBundle.quranSurahs()
+        XCTAssertEqual(surahs.count, 114)
+        XCTAssertEqual(surahs.reduce(0) { $0 + $1.ayahCount }, 6_236)
+
+        for editionID in ["akram-ut-tarajum-ur", "akram-ut-tarajum-en"] {
+            let rows = translations.filter { $0.editionID == editionID }
+            XCTAssertEqual(rows.count, 6_236, "\(editionID) must contain every Quran ayah")
+            XCTAssertEqual(Set(rows.map(\.id)).count, 6_236, "\(editionID) must not contain duplicate ayahs")
+            XCTAssertTrue(rows.allSatisfy { !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+            for surah in surahs {
+                XCTAssertEqual(
+                    rows.filter { $0.surahNumber == surah.id }.count,
+                    surah.ayahCount,
+                    "\(editionID) has the wrong count for surah \(surah.id)"
+                )
+            }
+        }
+    }
+
     func testSeedImportedDataSurvivesReimportUnchanged() async throws {
         try XCTSkipIf(
             SeedBundle.manifest() == nil,

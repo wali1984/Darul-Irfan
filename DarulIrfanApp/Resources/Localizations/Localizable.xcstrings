@@ -1,6 +1,72 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Arabic and translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Arabic and translation" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "عربی اور ترجمہ" } }
+      }
+    },
+    "Arabic only": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Arabic only" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "صرف عربی" } }
+      }
+    },
+    "Automatically open next surah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Automatically open next surah" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اگلی سورت خودکار طور پر کھولیں" } }
+      }
+    },
+    "Opening next surah…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Opening next surah…" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اگلی سورت کھولی جا رہی ہے…" } }
+      }
+    },
+    "Quran reading complete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Quran reading complete" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "قرآن کا مطالعہ مکمل ہوا" } }
+      }
+    },
+    "Reading display": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Reading display" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "مطالعہ کا انداز" } }
+      }
+    },
+    "Translation only": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Translation only" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "صرف ترجمہ" } }
+      }
+    },
+    "The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اکرم التراجم کے مکمل اردو اور انگریزی تراجم حضرت امیر محمد اکرم اعوانؒ کے ہیں اور تنظیم کی اجازت سے ایپ میں شامل کیے گئے ہیں۔"
+          }
+        }
+      }
+    },
     "Videos": {
       "extractionState": "manual",
       "localizations": {
