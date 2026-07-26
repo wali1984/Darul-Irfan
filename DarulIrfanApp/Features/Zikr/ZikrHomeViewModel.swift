@@ -46,7 +46,7 @@ final class ZikrHomeViewModel {
                 joinUrl: schedule.joinURL?.absoluteString,
                 instructions: schedule.instructions,
                 availabilityNote: schedule.availabilityNote,
-                sourceUrl: bootstrap.officialLinks["website"]?.absoluteString
+                sourceUrl: nil
             )
         }
         // A reachable control plane with no active schedule is authoritative:
@@ -59,7 +59,7 @@ final class ZikrHomeViewModel {
         } else if bootstrap.generatedAt == .distantPast {
             loaded = SeedBundle.zikrSessions().map { session in
                 var fallback = session
-                fallback.availabilityNote = String(localized: "Offline fallback timing — verify the current schedule on naqshbandiaowaisiah.org before joining.")
+                fallback.availabilityNote = String(localized: "Offline fallback timing — pull down later to verify the current schedule before joining.")
                 return fallback
             }
         } else {

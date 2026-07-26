@@ -61,7 +61,7 @@ struct QuranTafsir: Codable, Sendable, Identifiable, Equatable {
     var ayahStart: Int
     var ayahEnd: Int
     var text: String
-    /// Link to the item on naqshbandiaowaisiah.org.
+    /// Internal provenance URL used by the content synchronizer.
     var sourceUrl: String?
 
     enum CodingKeys: String, CodingKey {

@@ -31,7 +31,7 @@ struct LibraryTabView: View {
                             DIEmptyState(
                                 systemImage: "books.vertical",
                                 titleKey: "The library is being prepared",
-                                messageKey: "Books, articles, and announcements will appear here after the first content update. Until then, the full collection is available at naqshbandiaowaisiah.org."
+                                messageKey: "Books, articles, and announcements will appear here after the first verified content update."
                             )
                             .diOctagramWatermark(size: 260, opacity: 0.05)
                             .diAppear(delay: 0.1)

@@ -36,6 +36,12 @@ workflows:
       - name: Generate Xcode project
         script: |
           xcodegen generate
+      - name: Enforce native content presentation
+        script: |
+          if grep -RInE --include='*.swift' --include='*.xcstrings' 'open on website|view on website|read on (naqshbandiaowaisiah\.org|quran\.com)|visit the source website|view source on' DarulIrfanApp; then
+            echo "User-facing external content handoff text must not ship."
+            exit 1
+          fi
       - name: Build app + widgets for simulator (no signing)
         script: |
           # Compact, readable output: raw log goes to an artifact, the console
@@ -156,6 +162,14 @@ workflows:
       - name: Generate Xcode project
         script: |
           xcodegen generate
+      - name: Run release preflight tests
+        script: |
+          if grep -RInE --include='*.swift' --include='*.xcstrings' 'open on website|view on website|read on (naqshbandiaowaisiah\.org|quran\.com)|visit the source website|view source on' DarulIrfanApp; then
+            echo "User-facing external content handoff text must not ship."
+            exit 1
+          fi
+          (cd Server && npm ci && npm run check && npm test)
+          (cd Tools/ContentIngest && pip3 install -r requirements.txt pytest && python3 -m pytest tests -q)
       - name: Set up code signing (create cert + profile if needed)
         script: |
           # set -e so a failure in fetch-signing-files aborts the step and

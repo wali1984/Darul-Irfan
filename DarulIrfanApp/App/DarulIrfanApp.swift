@@ -107,12 +107,11 @@ struct DarulIrfanApp: App {
             #endif
             await dependencies.officialPlatform.setConsent(appState.settings.diagnosticsConsent)
 
-            // Seed import and manifest refresh happen off the critical path so
-            // first paint is never blocked on content work. Both are
-            // idempotent; failures are silent and retried on next launch.
+            // Finish the idempotent bundled import before content screens can
+            // query the database; network refresh remains off the launch path.
             let contentSync = dependencies.contentSync
+            _ = try? await contentSync.importSeedDataIfNeeded()
             Task.detached(priority: .utility) {
-                _ = try? await contentSync.importSeedDataIfNeeded()
                 try? await contentSync.refreshFromRemoteManifest()
             }
 

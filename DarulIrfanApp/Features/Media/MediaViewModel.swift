@@ -60,16 +60,6 @@ enum MediaPlayback {
         return urls.allSatisfy { $0.lowercased().hasSuffix(".wma") }
     }
 
-    /// External YouTube watch URL when the item carries a YouTube ID.
-    static func youtubeURL(for item: MediaItem) -> URL? {
-        guard let youtubeId = item.youtubeId, !youtubeId.isEmpty else { return nil }
-        return URL(string: "https://www.youtube.com/watch?v=\(youtubeId)")
-    }
-
-    /// The item's source page on naqshbandiaowaisiah.org, when parseable.
-    static func sourceURL(for item: MediaItem) -> URL? {
-        URL(string: item.sourceUrl)
-    }
 }
 
 // MARK: - Time / month formatting

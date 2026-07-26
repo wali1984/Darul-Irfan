@@ -82,7 +82,7 @@ struct CategoryListView: View {
             DIEmptyState(
                 systemImage: category.librarySymbol,
                 titleKey: "Nothing here yet",
-                messageKey: "Items in this section will appear after the next content update. The full collection is always available at naqshbandiaowaisiah.org."
+                messageKey: "Items in this section will appear automatically after the next verified content update."
             )
             .diOctagramWatermark(size: 260, opacity: 0.05)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

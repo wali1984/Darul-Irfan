@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 /// Reader state for a single surah: ayah text, the chosen offline translation
-/// edition, tafsir entries (including link-only pointers to the website),
+/// edition, and native tafsir entries or availability placeholders,
 /// per-ayah bookmarks, and throttled last-read persistence.
 @Observable
 @MainActor
@@ -27,9 +27,9 @@ final class SurahReaderViewModel {
     private(set) var availableTranslationEditions: [QuranEdition] = []
     /// Stored tafsir entries for this surah across all tafsir editions.
     private(set) var tafsirEntries: [QuranTafsir] = []
-    /// Tafsir editions with no stored text for this surah but a website link
-    /// (the tafsir text is not machine-readable on naqshbandiaowaisiah.org —
-    /// only image-scan PDF booklets — so the app points to the source pages).
+    /// Tafsir editions whose verified native pages have not yet been imported.
+    /// Their placeholders remain visible so future content can arrive without
+    /// changing the reader's structure.
     private(set) var tafsirEditionPointers: [QuranEdition] = []
 
     var showTranslation = true

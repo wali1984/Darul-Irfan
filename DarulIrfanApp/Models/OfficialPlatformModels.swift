@@ -187,12 +187,39 @@ enum PushTopic: String, Codable, Sendable, CaseIterable, Identifiable {
 }
 
 struct PushPreferences: Codable, Sendable, Equatable {
-    // On by default: official alerts (live zikr, announcements, events) are a
-    // core reason to install the app. Registration still only happens once the
-    // user grants the system notification prompt, and it can be turned off in
-    // More → Official Alerts.
-    var isEnabled = true
-    var topics: Set<PushTopic> = [.liveZikr, .announcements, .events]
+    // Official server-managed alerts are separate from local prayer reminders
+    // and remain off until the user makes an explicit consented choice.
+    static let currentConsentVersion = 1
+
+    var isEnabled: Bool
+    var topics: Set<PushTopic>
+    var consentVersion: Int
+
+    init(
+        isEnabled: Bool = false,
+        topics: Set<PushTopic> = [.liveZikr, .announcements, .events],
+        consentVersion: Int = 0
+    ) {
+        self.isEnabled = isEnabled
+        self.topics = topics
+        self.consentVersion = consentVersion
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case isEnabled, topics, consentVersion
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        topics = try values.decodeIfPresent(Set<PushTopic>.self, forKey: .topics)
+            ?? [.liveZikr, .announcements, .events]
+        consentVersion = try values.decodeIfPresent(Int.self, forKey: .consentVersion) ?? 0
+        // Older builds stored an enabled value without recording a distinct
+        // official-alert choice. Require a fresh, explicit opt-in.
+        isEnabled = consentVersion > 0
+            ? (try values.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? false)
+            : false
+    }
 }
 
 enum DiagnosticsConsent: String, Codable, Sendable, CaseIterable, Identifiable {

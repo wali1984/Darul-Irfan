@@ -22,7 +22,7 @@ final class ContentItemDetailViewModel {
 
     private(set) var item: ContentItem?
     private(set) var isLoading = true
-    /// Plain-text paragraphs of the body; empty when the item is link-only.
+    /// Plain-text paragraphs of the body; empty when native text is unavailable.
     private(set) var bodyParagraphs: [String] = []
     /// Saved scroll fraction from a previous reading session (0...1).
     private(set) var initialReadingFraction: Double = 0
@@ -48,22 +48,11 @@ final class ContentItemDetailViewModel {
 
     // MARK: - Derived state
 
-    /// Whether the native reader may show the body. Link-only items must never
-    /// render stored text; they link to the official website instead.
+    /// Whether the native reader may show the body. Items without distribution
+    /// permission remain represented by their native metadata and placeholder.
     var showsBody: Bool {
         guard let item else { return false }
         return item.rightsStatus != .linkOnly && !bodyParagraphs.isEmpty
-    }
-
-    /// Validated source URL (http/https only, as SFSafariViewController requires).
-    var sourceURL: URL? {
-        guard
-            let item,
-            let url = URL(string: item.sourceUrl),
-            let scheme = url.scheme?.lowercased(),
-            scheme == "http" || scheme == "https"
-        else { return nil }
-        return url
     }
 
     // MARK: - Loading

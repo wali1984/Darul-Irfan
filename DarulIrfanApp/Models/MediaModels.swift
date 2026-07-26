@@ -8,7 +8,7 @@ enum MediaType: String, Codable, Sendable, CaseIterable {
     case youtube
 }
 
-/// Curated media sections mirroring the website's multimedia library.
+/// Curated media sections supplied by the official multimedia catalog.
 enum MediaCategory: String, Codable, Sendable, CaseIterable, Identifiable {
     case audioLectures
     case videoLectures
@@ -48,7 +48,7 @@ struct MediaItem: Codable, Sendable, Identifiable, Equatable {
     /// Duration in seconds where known.
     var durationSeconds: Double?
     var mediaType: MediaType
-    /// The website page this item came from.
+    /// Internal provenance address used for synchronization and verification.
     var sourceUrl: String
     /// Directly streamable URL (MP3 etc.). WMA URLs are excluded at ingest —
     /// iOS cannot play WMA.

@@ -28,13 +28,13 @@ struct LiveBroadcastCard: View {
                     Label(start.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
                         .font(.subheadline.weight(.semibold))
                 }
-                ForEach(broadcast.sources) { source in
+                ForEach(displaySources) { source in
                     Button { activate(source) } label: {
                         Label(label(for: source), systemImage: icon(for: source)).frame(maxWidth: .infinity, minHeight: 44)
                     }
                     .buttonStyle(DIPrimaryButtonStyle())
                 }
-                if broadcast.sources.isEmpty {
+                if displaySources.isEmpty {
                     Text("The live broadcast is currently off air. Scheduled reminders remain available below.")
                         .font(.footnote).foregroundStyle(DIColor.textMuted)
                 }
@@ -53,16 +53,22 @@ struct LiveBroadcastCard: View {
             let item = AudioPlayableItem(id: "official-live", title: broadcast.title, subtitle: "Darul Irfan", url: source.url)
             audioPlayer.play(item, queue: [item])
         case .youtube:
-            if let videoID = source.videoID { presentedVideo = PresentedVideo(id: videoID) } else { openURL(source.url) }
+            if let videoID = source.videoID { presentedVideo = PresentedVideo(id: videoID) }
         case .paltalk: openURL(source.url)
+        }
+    }
+
+    private var displaySources: [LiveSource] {
+        broadcast.sources.filter { source in
+            source.kind != .youtube || source.videoID != nil
         }
     }
 
     private var statusText: String {
         switch broadcast.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
     }
-    private func label(for source: LiveSource) -> String {
-        switch source.kind { case .ownedStream: return "Listen live"; case .youtube: return "Watch on YouTube"; case .paltalk: return "Join OURSHEIKH on Paltalk" }
+    private func label(for source: LiveSource) -> LocalizedStringKey {
+        switch source.kind { case .ownedStream: return "Listen live"; case .youtube: return "Watch live in Darul Irfan"; case .paltalk: return "Join OURSHEIKH on Paltalk" }
     }
     private func icon(for source: LiveSource) -> String {
         switch source.kind { case .ownedStream: return "headphones"; case .youtube: return "play.rectangle.fill"; case .paltalk: return "arrow.up.right.square" }

@@ -5,7 +5,6 @@ struct YouTubePlayerSheet: View {
     let videoID: String
     let title: String
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
 
     var body: some View {
         NavigationStack {
@@ -14,11 +13,6 @@ struct YouTubePlayerSheet: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            if let url = URL(string: "https://www.youtube.com/watch?v=\(videoID)") { openURL(url) }
-                        } label: { Label("Open in YouTube", systemImage: "arrow.up.right.square") }
-                    }
                 }
         }
     }

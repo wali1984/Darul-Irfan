@@ -52,11 +52,17 @@ export async function bootstrap(env: Env): Promise<AppBootstrap> {
 
 export async function feed(env: Env, limit: number, cursor?: string): Promise<{ items: OfficialFeedItem[]; nextCursor?: string }> {
   const bounded = Math.max(1, Math.min(50, limit));
-  const sql = cursor
-    ? "SELECT * FROM feed_items WHERE publication_status='published' AND is_hidden=0 AND (expires_at IS NULL OR expires_at>datetime('now')) AND (published_at < ? OR (published_at = ? AND id < ?)) ORDER BY published_at DESC,id DESC LIMIT ?"
-    : "SELECT * FROM feed_items WHERE publication_status='published' AND is_hidden=0 AND (expires_at IS NULL OR expires_at>datetime('now')) ORDER BY is_featured DESC,published_at DESC,id DESC LIMIT ?";
-  const statement = cursor
-    ? (() => { const [date, id] = cursor.split("|"); return env.DB.prepare(sql).bind(date, date, id, bounded + 1); })()
+  const position = cursor ? decodeFeedCursor(cursor) : undefined;
+  const sql = position
+    ? `SELECT * FROM feed_items WHERE publication_status='published' AND is_hidden=0
+       AND (expires_at IS NULL OR expires_at>datetime('now'))
+       AND (is_featured < ? OR (is_featured = ? AND (published_at < ? OR (published_at = ? AND id < ?))))
+       ORDER BY is_featured DESC,published_at DESC,id DESC LIMIT ?`
+    : `SELECT * FROM feed_items WHERE publication_status='published' AND is_hidden=0
+       AND (expires_at IS NULL OR expires_at>datetime('now'))
+       ORDER BY is_featured DESC,published_at DESC,id DESC LIMIT ?`;
+  const statement = position
+    ? env.DB.prepare(sql).bind(position.featured, position.featured, position.date, position.date, position.id, bounded + 1)
     : env.DB.prepare(sql).bind(bounded + 1);
   const rows = (await statement.all<Row>()).results;
   const visible = rows.slice(0, bounded);
@@ -67,5 +73,22 @@ export async function feed(env: Env, limit: number, cursor?: string): Promise<{ 
     publishedAt: String(row.published_at), isFeatured: Number(row.is_featured) === 1
   }));
   const last = rows.length > bounded ? visible.at(-1) : undefined;
-  return { items, nextCursor: last ? `${last.published_at}|${last.id}` : undefined };
+  return { items, nextCursor: last ? encodeFeedCursor(Number(last.is_featured) === 1, String(last.published_at), String(last.id)) : undefined };
+}
+
+export interface FeedCursor { featured: number; date: string; id: string }
+
+export function encodeFeedCursor(featured: boolean, date: string, id: string): string {
+  return `${featured ? 1 : 0}|${date}|${id}`;
+}
+
+export function decodeFeedCursor(cursor: string): FeedCursor | undefined {
+  const parts = cursor.split("|");
+  if (parts.length === 3 && (parts[0] === "0" || parts[0] === "1") && parts[1] && parts[2]) {
+    return { featured: Number(parts[0]), date: parts[1], id: parts[2] };
+  }
+  // Accept the v1 cursor shape during the app/backend rollout. Those pages
+  // contained unfeatured rows in normal operation.
+  if (parts.length === 2 && parts[0] && parts[1]) return { featured: 0, date: parts[0], id: parts[1] };
+  return undefined;
 }

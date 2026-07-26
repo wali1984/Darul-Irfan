@@ -109,11 +109,11 @@ struct AcknowledgementsView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 ackHeader("Content & Artwork", systemImage: "photo.artframe")
 
-                Text("Library articles, lectures, publications, tafsir, and organizational information are provided by naqshbandiaowaisiah.org, which retains all rights to its content. The app icon and visual identity are inspired by and attributed to naqshbandiaowaisiah.org.")
+                Text("Library articles, lectures, publications, tafsir, and organizational information are provided by Silsila Naqshbandia Owaisiah, which retains all rights to its content. The app icon and visual identity are used with the organization's permission.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
-                Text("Content from the website is included in the app with the owner's permission. Items without stored text link to the original page on naqshbandiaowaisiah.org.")
+                Text("Official archive content is included in the app with the owner's permission. Source addresses are retained privately for verification and synchronization, while reading and playback are presented natively.")
                     .font(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }

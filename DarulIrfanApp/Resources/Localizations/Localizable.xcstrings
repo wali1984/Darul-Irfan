@@ -1,6 +1,652 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Videos": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Videos"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیوز"
+          }
+        }
+      }
+    },
+    "Facebook": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Facebook"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فیس بک"
+          }
+        }
+      }
+    },
+    "Articles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Articles"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مضامین"
+          }
+        }
+      }
+    },
+    "Announcements": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Announcements"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اعلانات"
+          }
+        }
+      }
+    },
+    "Events": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Events"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تقریبات"
+          }
+        }
+      }
+    },
+    "Article": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Article"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مضمون"
+          }
+        }
+      }
+    },
+    "Event": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Event"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تقریب"
+          }
+        }
+      }
+    },
+    "YouTube": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یوٹیوب"
+          }
+        }
+      }
+    },
+    "Contact": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contact"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رابطہ"
+          }
+        }
+      }
+    },
+    "Watch in Darul Irfan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch in Darul Irfan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں دیکھیں"
+          }
+        }
+      }
+    },
+    "Read in Darul Irfan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read in Darul Irfan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں پڑھیں"
+          }
+        }
+      }
+    },
+    "Watch live in Darul Irfan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch live in Darul Irfan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں براہِ راست دیکھیں"
+          }
+        }
+      }
+    },
+    "Filter official updates": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter official updates"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری اپ ڈیٹس فلٹر کریں"
+          }
+        }
+      }
+    },
+    "No updates in this section": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No updates in this section"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حصے میں کوئی اپ ڈیٹ نہیں"
+          }
+        }
+      }
+    },
+    "Choose another filter or check again later.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose another filter or check again later."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دوسرا فلٹر منتخب کریں یا بعد میں دوبارہ دیکھیں۔"
+          }
+        }
+      }
+    },
+    "More saved updates may be available.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More saved updates may be available."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مزید محفوظ اپ ڈیٹس دستیاب ہو سکتی ہیں۔"
+          }
+        }
+      }
+    },
+    "Load More Updates": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Load More Updates"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مزید اپ ڈیٹس لوڈ کریں"
+          }
+        }
+      }
+    },
+    "Official updates are temporarily paused": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Official updates are temporarily paused"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری اپ ڈیٹس عارضی طور پر موقوف ہیں"
+          }
+        }
+      }
+    },
+    "Previously saved content remains available throughout the app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previously saved content remains available throughout the app."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پہلے سے محفوظ مواد ایپ میں دستیاب رہے گا۔"
+          }
+        }
+      }
+    },
+    "Pull down to check for new updates.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull down to check for new updates."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نئی اپ ڈیٹس کے لیے نیچے کھینچیں۔"
+          }
+        }
+      }
+    },
+    "Illustrations": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Illustrations"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصاویر"
+          }
+        }
+      }
+    },
+    "Illustration unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Illustration unavailable"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصویر دستیاب نہیں"
+          }
+        }
+      }
+    },
+    "Pull down later after the content archive refreshes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull down later after the content archive refreshes."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مواد کا ذخیرہ تازہ ہونے کے بعد دوبارہ نیچے کھینچیں۔"
+          }
+        }
+      }
+    },
+    "Native content is being prepared": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Native content is being prepared"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایپ کا مقامی مواد تیار کیا جا رہا ہے"
+          }
+        }
+      }
+    },
+    "This entry is already part of the Darul Irfan archive. Its complete native text or document will appear automatically after a verified content update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This entry is already part of the Darul Irfan archive. Its complete native text or document will appear automatically after a verified content update."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ اندراج دارالعرفان کے ذخیرے کا حصہ ہے۔ تصدیق شدہ اپ ڈیٹ کے بعد مکمل متن یا دستاویز خود بخود ظاہر ہو جائے گی۔"
+          }
+        }
+      }
+    },
+    "Books, articles, and announcements will appear here after the first verified content update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Books, articles, and announcements will appear here after the first verified content update."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پہلی تصدیق شدہ اپ ڈیٹ کے بعد کتابیں، مضامین اور اعلانات یہاں ظاہر ہوں گے۔"
+          }
+        }
+      }
+    },
+    "Items in this section will appear automatically after the next verified content update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Items in this section will appear automatically after the next verified content update."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی تصدیق شدہ اپ ڈیٹ کے بعد اس حصے کا مواد خود بخود ظاہر ہو گا۔"
+          }
+        }
+      }
+    },
+    "Programs at Dar-ul-Irfan will appear here automatically when they are announced.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programs at Dar-ul-Irfan will appear here automatically when they are announced."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان کے پروگراموں کا اعلان ہونے پر وہ خود بخود یہاں ظاہر ہوں گے۔"
+          }
+        }
+      }
+    },
+    "Offline text packs arrive automatically through verified content updates.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline text packs arrive automatically through verified content updates."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آف لائن قرآنی متن تصدیق شدہ مواد کی اپ ڈیٹس کے ذریعے خود بخود آتا ہے۔"
+          }
+        }
+      }
+    },
+    "This tafsir for this surah is being added to the native reader and will arrive through a verified content update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tafsir for this surah is being added to the native reader and will arrive through a verified content update."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس سورت کی تفسیر ایپ کے قاری میں شامل کی جا رہی ہے اور تصدیق شدہ اپ ڈیٹ کے ذریعے پہنچے گی۔"
+          }
+        }
+      }
+    },
+    "Open Illustrated Method": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Illustrated Method"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مصوّر طریقہ کھولیں"
+          }
+        }
+      }
+    },
+    "The complete illustrated method is available natively in Darul Irfan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The complete illustrated method is available natively in Darul Irfan."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کا مکمل مصوّر طریقہ دارالعرفان ایپ میں دستیاب ہے۔"
+          }
+        }
+      }
+    },
+    "The online zikr schedule could not be loaded. Pull down later to check for a verified update.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The online zikr schedule could not be loaded. Pull down later to check for a verified update."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آن لائن ذکر کا شیڈول لوڈ نہیں ہو سکا۔ تصدیق شدہ اپ ڈیٹ کے لیے بعد میں نیچے کھینچیں۔"
+          }
+        }
+      }
+    },
+    "This archived audio format is not supported on iOS yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This archived audio format is not supported on iOS yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ محفوظ شدہ آڈیو فارمیٹ ابھی iOS پر معاون نہیں ہے۔"
+          }
+        }
+      }
+    },
+    "Plays in Darul Irfan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plays in Darul Irfan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں چلتا ہے"
+          }
+        }
+      }
+    },
+    "Play video": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play video"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو چلائیں"
+          }
+        }
+      }
+    },
+    "Official updates could not be refreshed. Please check your connection and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Official updates could not be refreshed. Please check your connection and try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری اپ ڈیٹس تازہ نہیں ہو سکیں۔ اپنا انٹرنیٹ کنکشن دیکھ کر دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "More updates could not be loaded.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More updates could not be loaded."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مزید اپ ڈیٹس لوڈ نہیں ہو سکیں۔"
+          }
+        }
+      }
+    },
     "Explore": {
       "extractionState": "manual",
       "localizations": {
@@ -260,23 +906,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ – %@"
-          }
-        }
-      }
-    },
-    "%@ — Read on naqshbandiaowaisiah.org": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ — Read on naqshbandiaowaisiah.org"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ — naqshbandiaowaisiah.org پر پڑھیں"
           }
         }
       }
@@ -1488,23 +2117,6 @@
         }
       }
     },
-    "Audio format not supported on iOS — open on website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Audio format not supported on iOS — open on website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "یہ آڈیو فارمیٹ iOS پر معاون نہیں — ویب سائٹ پر کھولیں"
-          }
-        }
-      }
-    },
     "Auto-download new content on Wi-Fi": {
       "extractionState": "manual",
       "localizations": {
@@ -1552,23 +2164,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "آف لائن دستیاب"
-          }
-        }
-      }
-    },
-    "Available on the official website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available on the official website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "آفیشل ویب سائٹ پر دستیاب"
           }
         }
       }
@@ -1875,23 +2470,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "کتابیں"
-          }
-        }
-      }
-    },
-    "Books, articles, and announcements will appear here after the first content update. Until then, the full collection is available at naqshbandiaowaisiah.org.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Books, articles, and announcements will appear here after the first content update. Until then, the full collection is available at naqshbandiaowaisiah.org."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "کتابیں، مضامین اور اعلانات پہلی مواد اپ ڈیٹ کے بعد یہاں ظاہر ہوں گے۔ اس وقت تک مکمل ذخیرہ naqshbandiaowaisiah.org پر دستیاب ہے۔"
           }
         }
       }
@@ -3970,23 +4548,6 @@
         }
       }
     },
-    "Full tafsir of this surah is published on naqshbandiaowaisiah.org and is not stored in the app yet.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Full tafsir of this surah is published on naqshbandiaowaisiah.org and is not stored in the app yet."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس سورت کی مکمل تفسیر naqshbandiaowaisiah.org پر شائع شدہ ہے اور ابھی ایپ میں محفوظ نہیں۔"
-          }
-        }
-      }
-    },
     "Get Started": {
       "extractionState": "manual",
       "localizations": {
@@ -4514,40 +5075,6 @@
         }
       }
     },
-    "Items in this section will appear after the next content update. The full collection is always available at naqshbandiaowaisiah.org.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Items in this section will appear after the next content update. The full collection is always available at naqshbandiaowaisiah.org."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس حصے کی چیزیں اگلی مواد اپ ڈیٹ کے بعد ظاہر ہوں گی۔ مکمل ذخیرہ ہمیشہ naqshbandiaowaisiah.org پر دستیاب ہے۔"
-          }
-        }
-      }
-    },
-    "Content from the website is included in the app with the owner's permission. Items without stored text link to the original page on naqshbandiaowaisiah.org.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Content from the website is included in the app with the owner's permission. Items without stored text link to the original page on naqshbandiaowaisiah.org."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویب سائٹ کا مواد مالک کی اجازت سے ایپ میں شامل ہے۔ جن چیزوں کا متن ایپ میں محفوظ نہیں، ان کے لیے naqshbandiaowaisiah.org پر اصل صفحے کا لنک دیا گیا ہے۔"
-          }
-        }
-      }
-    },
     "Items will appear here after the next library sync. Pull down to refresh.": {
       "extractionState": "manual",
       "localizations": {
@@ -4816,23 +5343,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "کتب خانہ"
-          }
-        }
-      }
-    },
-    "Library articles, lectures, publications, tafsir, and organizational information are provided by naqshbandiaowaisiah.org, which retains all rights to its content. The app icon and visual identity are inspired by and attributed to naqshbandiaowaisiah.org.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Library articles, lectures, publications, tafsir, and organizational information are provided by naqshbandiaowaisiah.org, which retains all rights to its content. The app icon and visual identity are inspired by and attributed to naqshbandiaowaisiah.org."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "کتب خانے کے مضامین، خطابات، مطبوعات، تفسیر اور تنظیمی معلومات naqshbandiaowaisiah.org کی فراہم کردہ ہیں، جو اپنے مواد کے تمام حقوق محفوظ رکھتی ہے۔ ایپ کا آئیکن اور بصری شناخت naqshbandiaowaisiah.org سے ماخوذ اور اسی سے منسوب ہے۔"
           }
         }
       }
@@ -5649,23 +6159,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "نام دستیاب نہیں"
-          }
-        }
-      }
-    },
-    "Network access is used only to stream or download the content you request, such as lectures and publications from naqshbandiaowaisiah.org.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Network access is used only to stream or download the content you request, such as lectures and publications from naqshbandiaowaisiah.org."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "نیٹ ورک تک رسائی صرف آپ کے طلب کردہ مواد کو اسٹریم یا ڈاؤن لوڈ کرنے کے لیے استعمال ہوتی ہے، جیسے naqshbandiaowaisiah.org کے خطابات اور مطبوعات۔"
           }
         }
       }
@@ -6775,40 +7268,6 @@
         }
       }
     },
-    "Open on website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open on website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویب سائٹ پر کھولیں"
-          }
-        }
-      }
-    },
-    "Open source page": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open source page"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ماخذ صفحہ کھولیں"
-          }
-        }
-      }
-    },
     "Open-ended": {
       "extractionState": "manual",
       "localizations": {
@@ -7625,23 +8084,6 @@
         }
       }
     },
-    "Programs at Dar-ul-Irfan will appear here when they are announced. You can also check naqshbandiaowaisiah.org.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Programs at Dar-ul-Irfan will appear here when they are announced. You can also check naqshbandiaowaisiah.org."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "دارالعرفان کے پروگراموں کا اعلان ہونے پر وہ یہاں ظاہر ہوں گے۔ آپ naqshbandiaowaisiah.org بھی ملاحظہ کر سکتے ہیں۔"
-          }
-        }
-      }
-    },
     "Publications": {
       "extractionState": "manual",
       "localizations": {
@@ -7910,40 +8352,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "رمضان اعتکاف"
-          }
-        }
-      }
-    },
-    "Read on naqshbandiaowaisiah.org": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Read on naqshbandiaowaisiah.org"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "naqshbandiaowaisiah.org پر پڑھیں"
-          }
-        }
-      }
-    },
-    "Read on quran.com": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Read on quran.com"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "quran.com پر پڑھیں"
           }
         }
       }
@@ -8365,23 +8773,6 @@
     "Open in YouTube": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Open in YouTube"}},"ur":{"stringUnit":{"state":"translated","value":"YouTube میں کھولیں"}}}},
     "The live broadcast is currently off air. Scheduled reminders remain available below.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The live broadcast is currently off air. Scheduled reminders remain available below."}},"ur":{"stringUnit":{"state":"translated","value":"لائیو نشریات فی الحال بند ہے۔ طے شدہ یاد دہانیاں نیچے دستیاب ہیں۔"}}}},
     "When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent."}},"ur":{"stringUnit":{"state":"translated","value":"فعال کرنے پر ایک بے ترتیب تنصیب شناخت اور Apple پش ٹوکن رجسٹر ہوتے ہیں۔ کوئی اکاؤنٹ، درست مقام، نماز کی تاریخ یا مطالعے کی سرگرمی نہیں بھیجی جاتی۔"}}}},
-    "Offline fallback timing — verify the current schedule on naqshbandiaowaisiah.org before joining.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offline fallback timing — verify the current schedule on naqshbandiaowaisiah.org before joining."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "یہ آف لائن متبادل وقت ہے — شامل ہونے سے پہلے naqshbandiaowaisiah.org پر موجودہ شیڈول کی تصدیق کریں۔"
-          }
-        }
-      }
-    },
     "Schedule not available": {
       "extractionState": "manual",
       "localizations": {
@@ -8395,23 +8786,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "شیڈول دستیاب نہیں"
-          }
-        }
-      }
-    },
-    "Schedule source: naqshbandiaowaisiah.org": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Schedule source: naqshbandiaowaisiah.org"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "شیڈول کا ماخذ: naqshbandiaowaisiah.org"
           }
         }
       }
@@ -9776,23 +10150,6 @@
         }
       }
     },
-    "The complete illustrated method of zikr is taught on the official website.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The complete illustrated method of zikr is taught on the official website."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ذکر کا مکمل مصور طریقہ آفیشل ویب سائٹ پر سکھایا جاتا ہے۔"
-          }
-        }
-      }
-    },
     "The download could not be completed. Please check your connection and try again.": {
       "extractionState": "manual",
       "localizations": {
@@ -9976,23 +10333,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "سلسلہ نقشبندیہ اویسیہ میں ذکر کا طریقہ ذکرِ خفی قلبی ہے، جو پاسِ انفاس — یعنی \"ہر سانس کی نگہبانی\" — کے ساتھ کیا جاتا ہے۔"
-          }
-        }
-      }
-    },
-    "The online zikr schedule could not be loaded. Current timings are always announced on naqshbandiaowaisiah.org.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The online zikr schedule could not be loaded. Current timings are always announced on naqshbandiaowaisiah.org."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "آن لائن ذکر کا شیڈول لوڈ نہیں ہو سکا۔ موجودہ اوقات کا اعلان ہمیشہ naqshbandiaowaisiah.org پر کیا جاتا ہے۔"
           }
         }
       }
@@ -10847,40 +11187,6 @@
         }
       }
     },
-    "View on naqshbandiaowaisiah.org": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View on naqshbandiaowaisiah.org"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "naqshbandiaowaisiah.org پر دیکھیں"
-          }
-        }
-      }
-    },
-    "View on website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View on website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویب سائٹ پر دیکھیں"
-          }
-        }
-      }
-    },
     "View prayer history": {
       "extractionState": "manual",
       "localizations": {
@@ -10911,40 +11217,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ماخذ دیکھیں"
-          }
-        }
-      }
-    },
-    "View source on naqshbandiaowaisiah.org": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View source on naqshbandiaowaisiah.org"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "naqshbandiaowaisiah.org پر ماخذ دیکھیں"
-          }
-        }
-      }
-    },
-    "View source on the Naqshbandia Owaisiah website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View source on the Naqshbandia Owaisiah website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "نقشبندیہ اویسیہ کی ویب سائٹ پر ماخذ دیکھیں"
           }
         }
       }
@@ -10996,23 +11268,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "فجر اذان کی ریکارڈنگ Wikimedia Commons پر دیکھیں"
-          }
-        }
-      }
-    },
-    "Visit the source website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Visit the source website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ماخذ ویب سائٹ ملاحظہ کریں"
           }
         }
       }

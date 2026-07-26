@@ -5,6 +5,7 @@ struct ExploreTabView: View {
         case updates = "Updates"
         case library = "Library"
         case media = "Media"
+        case events = "Events"
         var id: String { rawValue }
     }
 
@@ -15,7 +16,7 @@ struct ExploreTabView: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("Explore section", selection: $section) {
-                ForEach(Section.allCases) { Text($0.rawValue).tag($0) }
+                ForEach(Section.allCases) { Text(LocalizedStringKey($0.rawValue)).tag($0) }
             }
             .pickerStyle(.segmented)
             .padding(.horizontal, DISpacing.md).padding(.vertical, DISpacing.sm)
@@ -26,14 +27,13 @@ struct ExploreTabView: View {
                 NavigationStack {
                     OfficialFeedView(dependencies: dependencies)
                         .navigationTitle("Official Updates")
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                NavigationLink { EventsHomeView(dependencies: dependencies, appState: appState) } label: { Image(systemName: "calendar") }
-                            }
-                        }
                 }
             case .library: LibraryTabView(dependencies: dependencies, appState: appState)
             case .media: MediaTabView(dependencies: dependencies, appState: appState)
+            case .events:
+                NavigationStack {
+                    EventsHomeView(dependencies: dependencies, appState: appState)
+                }
             }
         }
         .diScreenBackground()

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// About Darul Irfan: a premium brand moment (living emerald crest, seal,
 /// wordmark, anchor verse and version), followed by a short verified
-/// introduction to Silsila Naqshbandia Owaisiah, source website, contact
+/// introduction to Silsila Naqshbandia Owaisiah, contact
 /// details, and acknowledgements. All organizational facts come from
 /// Docs/RESEARCH_NOTES.md (verified against naqshbandiaowaisiah.org).
 @MainActor
@@ -147,21 +147,7 @@ struct AboutView: View {
     private var sourceAndContactCard: some View {
         DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                aboutHeader("Source & Contact", systemImage: "globe")
-
-                if let websiteURL = URL(string: "https://www.naqshbandiaowaisiah.org/") {
-                    Link(destination: websiteURL) {
-                        Label {
-                            Text(verbatim: "naqshbandiaowaisiah.org")
-                        } icon: {
-                            Image(systemName: "globe")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("Visit the source website")
-                }
+                aboutHeader("Contact", systemImage: "envelope")
 
                 if let emailURL = URL(string: "mailto:Darulirfan@gmail.com") {
                     Link(destination: emailURL) {

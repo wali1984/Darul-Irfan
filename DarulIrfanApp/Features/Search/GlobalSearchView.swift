@@ -303,7 +303,6 @@ struct GlobalSearchView: View {
                         ForEach(Array(group.results.enumerated()), id: \.element.id) { rowIndex, result in
                             SearchResultRow(
                                 result: result,
-                                sourceURL: viewModel.sourceURL(for: result),
                                 reference: viewModel.reference(for: result)
                             )
                             .diAppear(delay: min(Double(groupIndex) * 0.06 + Double(rowIndex) * 0.04, 0.5))

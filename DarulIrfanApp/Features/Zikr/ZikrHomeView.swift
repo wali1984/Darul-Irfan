@@ -24,7 +24,12 @@ struct ZikrHomeView: View {
                     .diAppear()
 
                 DISectionHeader(titleKey: "Method of Zikr", systemImage: "heart")
-                MethodOfZikrCard()
+                NavigationLink {
+                    NativeMethodOfZikrView(repository: dependencies.contentRepository)
+                } label: {
+                    MethodOfZikrCard()
+                }
+                .buttonStyle(DIPressableStyle())
                     .diAppear(delay: 0.05)
 
                 DISectionHeader(titleKey: "Live Zikr", systemImage: "dot.radiowaves.left.and.right")
@@ -37,7 +42,7 @@ struct ZikrHomeView: View {
                         DIEmptyState(
                             systemImage: "clock",
                             titleKey: "Schedule not available",
-                            messageKey: "The online zikr schedule could not be loaded. Current timings are always announced on naqshbandiaowaisiah.org."
+                            messageKey: "The online zikr schedule could not be loaded. Pull down later to check for a verified update."
                         )
                         .diOctagramWatermark(size: 200, opacity: 0.06)
                     }
@@ -184,10 +189,8 @@ private struct ZikrHeroHeader: View {
 
 /// Verified description only — see Docs/RESEARCH_NOTES.md. The full
 /// illustrated instructions are deliberately not reproduced here; they are
-/// taught on the official website.
+/// supplied through the verified content manifest.
 private struct MethodOfZikrCard: View {
-    private let methodOfZikrURL = URL(string: "https://www.naqshbandiaowaisiah.org/method-of-zikr.html")
-
     var body: some View {
         DIElevatedCard(tint: DIColor.sandstone) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
@@ -210,18 +213,14 @@ private struct MethodOfZikrCard: View {
                     .font(.body)
                     .foregroundStyle(DIColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
-                Text("The complete illustrated method of zikr is taught on the official website.")
+                Text("The complete illustrated method is available natively in Darul Irfan.")
                     .font(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
-                if let url = methodOfZikrURL {
-                    Link(destination: url) {
-                        Label("Read the Method of Zikr", systemImage: "safari")
-                    }
+                Label("Open Illustrated Method", systemImage: "book.pages")
                     .font(.subheadline.weight(.semibold))
-                    .tint(DIColor.primary)
+                    .foregroundStyle(DIColor.primary)
                     .padding(.top, DISpacing.xs)
-                }
             }
         }
     }
@@ -318,11 +317,6 @@ private struct ZikrSessionCard: View {
                 .tint(DIColor.primary)
                 .padding(.top, DISpacing.xs)
 
-                if let sourceString = session.sourceUrl, let sourceUrl = URL(string: sourceString) {
-                    Link("Schedule source: naqshbandiaowaisiah.org", destination: sourceUrl)
-                        .font(.footnote)
-                        .tint(DIColor.textMuted)
-                }
             }
         }
     }

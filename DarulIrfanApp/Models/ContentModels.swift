@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Rights
 
 /// Whether the app may store/display an item's full text or only link to it.
-/// The website's content is copyright-reserved; the owner granted content
+/// Official content is copyright-reserved; the owner granted content
 /// permission on 2026-07-10, so ingested items are `permissionConfirmed`.
 /// `linkOnly` remains valid for anything ingested without that grant.
 enum RightsStatus: String, Codable, Sendable {
@@ -17,7 +17,7 @@ enum RightsStatus: String, Codable, Sendable {
 
 // MARK: - Library content
 
-/// Kind of library item, mirroring the website's sections.
+/// Kind of library item in the verified content catalog.
 enum ContentType: String, Codable, Sendable, CaseIterable {
     case article
     case book

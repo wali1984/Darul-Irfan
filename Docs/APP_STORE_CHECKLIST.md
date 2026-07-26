@@ -19,15 +19,15 @@ before archiving.
 - [ ] **[blocker]** Register the app, widget, Watch app, Watch complication,
       APNs capability, and App Group in the developer portal; enable the App
       Group on every target that declares it.
-      If the group ID ever changes, change it in `project.yml` (both
-      entitlements blocks) and `Core/Shared/PrayerWidgetSnapshot.swift`
+      If the group ID ever changes, change it in `project.yml` (all shipping
+      target entitlement blocks) and `Core/Shared/PrayerWidgetSnapshot.swift`
       together — the widget reads its data through that group.
 - [ ] Signing style is Automatic (`CODE_SIGN_STYLE: Automatic`); verify the
       team and provisioning profile on all four shipping targets after
       `xcodegen generate`.
-- [ ] Version `1.0.0` (build `1`) — bump via `MARKETING_VERSION` /
+- [x] Version `1.5.0` (local build `12`) — bump via `MARKETING_VERSION` /
       `CURRENT_PROJECT_VERSION` in `project.yml`, not in Xcode (the project is
-      regenerated).
+      regenerated). Codemagic replaces the archive build with `BUILD_NUMBER`.
 - [ ] Xcode 16+ required (adhan-swift 1.5.0 is swift-tools-version 6.0).
 - [ ] `ITSAppUsesNonExemptEncryption` is already `false` in Info.plist — no
       export-compliance questionnaire on each build.
@@ -40,7 +40,7 @@ before archiving.
       "Add to Calendar" in `EventDetailViewModel` is active. Verify the
       permission flow on device.
 - [x] `CFBundleLocalizations` declares `en` and `ur`, and the String Catalog
-      (`Resources/Localizations/Localizable.xcstrings`, ~650 keys with Urdu
+      (`Resources/Localizations/Localizable.xcstrings`, ~700 keys with Urdu
       units) ships with the app. Spot-check Urdu rendering (Nastaliq, RTL) on
       device before claiming Urdu support in the store listing.
 
@@ -48,8 +48,8 @@ before archiving.
 
 - [ ] App icon: a single 1024 px universal icon exists
       (`AppIcon.appiconset/icon-1024.png`). Confirm final artwork — the visual
-      identity is *inspired by/attributed to naqshbandiaowaisiah.org*
-      (see AcknowledgementsView), so have the owner approve the icon.
+      identity requires organization approval (see AcknowledgementsView), so
+      retain that approval with the release records.
 - [ ] `AccentColor` and `LaunchBackground` color sets exist; verify dark-mode
       values on device.
 - [ ] Screenshots — required device classes given

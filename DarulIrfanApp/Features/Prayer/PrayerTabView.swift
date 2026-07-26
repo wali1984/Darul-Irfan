@@ -33,10 +33,6 @@ struct PrayerTabView: View {
                         dayTimes: viewModel.todaySchedule?.orderedTimes.map { $0.time } ?? []
                     )
                     .diAppear()
-                    // Daily spiritual companion cards, below the hero.
-                    TodayDailySection(appState: appState)
-                    TodayOfficialSection(dependencies: dependencies)
-                    DISectionHeader(titleKey: "Prayer Times", systemImage: "sun.max")
                     if !viewModel.hasLoaded {
                         loadingView
                     } else if appState.activePlace != nil {
@@ -59,6 +55,10 @@ struct PrayerTabView: View {
                     } else {
                         locationNeededSection
                     }
+                    TodayOfficialSection(dependencies: dependencies)
+                    // Daily spiritual companion cards follow the time-sensitive
+                    // prayer and official-live information.
+                    TodayDailySection(appState: appState)
                 }
                 .padding(DISpacing.md)
             }

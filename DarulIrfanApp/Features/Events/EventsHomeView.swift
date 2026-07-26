@@ -30,7 +30,7 @@ struct EventsHomeView: View {
                             DIEmptyState(
                                 systemImage: "calendar",
                                 titleKey: "No events right now",
-                                messageKey: "Programs at Dar-ul-Irfan will appear here when they are announced. You can also check naqshbandiaowaisiah.org."
+                                messageKey: "Programs at Dar-ul-Irfan will appear here automatically when they are announced."
                             )
                             .diOctagramWatermark(size: 200, opacity: 0.06)
                         }
@@ -239,11 +239,6 @@ private struct AnnouncementCard: View {
                         .font(.subheadline)
                         .foregroundStyle(DIColor.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
-                }
-                if let sourceString = announcement.sourceUrl, let sourceUrl = URL(string: sourceString) {
-                    Link("Read on naqshbandiaowaisiah.org", destination: sourceUrl)
-                        .font(.footnote.weight(.semibold))
-                        .tint(DIColor.primary)
                 }
             }
         }

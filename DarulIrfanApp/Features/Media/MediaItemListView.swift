@@ -266,10 +266,10 @@ struct MediaItemRow: View {
     let canPlay: Bool
     let onPlay: () -> Void
     let onDownload: () -> Void
+    @State private var presentedVideo: MediaPresentedVideo?
 
     private var isWMAOnly: Bool { MediaPlayback.isWMAOnly(item) }
-    private var sourceURL: URL? { MediaPlayback.sourceURL(for: item) }
-    private var youtubeURL: URL? { MediaPlayback.youtubeURL(for: item) }
+    private var youtubeVideoID: String? { item.youtubeId }
 
     var body: some View {
         HStack(alignment: .center, spacing: DISpacing.sm) {
@@ -289,6 +289,9 @@ struct MediaItemRow: View {
             trailingControls
         }
         .padding(.vertical, DISpacing.xs)
+        .sheet(item: $presentedVideo) { video in
+            YouTubePlayerSheet(videoID: video.id, title: video.title)
+        }
     }
 
     // MARK: Leading action
@@ -306,16 +309,14 @@ struct MediaItemRow: View {
             }
             .buttonStyle(DIPressableStyle())
             .accessibilityLabel(Text("Play \(item.title)"))
-        } else if let youtubeURL {
-            Link(destination: youtubeURL) {
+        } else if let youtubeVideoID {
+            Button {
+                presentedVideo = MediaPresentedVideo(id: youtubeVideoID, title: item.title)
+            } label: {
                 crimsonMedallion("play.rectangle.fill")
             }
-            .accessibilityLabel(Text("Open \(item.title) on YouTube"))
-        } else if let sourceURL {
-            Link(destination: sourceURL) {
-                gradientMedallion("safari")
-            }
-            .accessibilityLabel(Text("Open \(item.title) on the website"))
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Play \(item.title) in Darul Irfan"))
         } else {
             mutedMedallion("waveform")
         }
@@ -384,15 +385,10 @@ struct MediaItemRow: View {
     private var badgeLine: some View {
         if isWMAOnly {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                Text("Audio format not supported on iOS — open on website")
+                Text("This archived audio format is not supported on iOS yet.")
                     .font(.caption)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
-                if let sourceURL {
-                    Link("Open on website", destination: sourceURL)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
-                }
             }
         } else {
             HStack(spacing: DISpacing.xs) {
@@ -400,7 +396,7 @@ struct MediaItemRow: View {
                     DIPillBadge(text: "Offline", color: MediaStyle.accent(item.category))
                 }
                 if item.mediaType == .youtube {
-                    Text("Opens externally in YouTube")
+                    Text("Plays in Darul Irfan")
                         .font(.caption2)
                         .foregroundStyle(DIColor.textMuted)
                 }
@@ -445,17 +441,11 @@ struct MediaItemRow: View {
                     Label("Download for offline", systemImage: "arrow.down.circle")
                 }
             }
-            if let youtubeURL {
-                Link(destination: youtubeURL) {
-                    Label("Open on YouTube", systemImage: "arrow.up.right.square")
-                }
-            }
-            if let sourceURL {
-                ShareLink(item: sourceURL) {
-                    Label("Share source link", systemImage: "square.and.arrow.up")
-                }
-                Link(destination: sourceURL) {
-                    Label("View on website", systemImage: "safari")
+            if let youtubeVideoID {
+                Button {
+                    presentedVideo = MediaPresentedVideo(id: youtubeVideoID, title: item.title)
+                } label: {
+                    Label("Play video", systemImage: "play.rectangle.fill")
                 }
             }
         } label: {
@@ -465,4 +455,9 @@ struct MediaItemRow: View {
         }
         .accessibilityLabel(Text("More actions for \(item.title)"))
     }
+}
+
+private struct MediaPresentedVideo: Identifiable {
+    let id: String
+    let title: String
 }

@@ -38,14 +38,6 @@ struct EventDetailView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                if let sourceString = viewModel.event.sourceUrl, let sourceUrl = URL(string: sourceString) {
-                    Link(destination: sourceUrl) {
-                        Label("View on naqshbandiaowaisiah.org", systemImage: "safari")
-                    }
-                    .font(.subheadline.weight(.semibold))
-                    .tint(DIColor.primary)
-                    .padding(.horizontal, DISpacing.xs)
-                }
             }
             .padding(DISpacing.md)
         }

@@ -2,7 +2,7 @@ import MapKit
 import SwiftUI
 
 /// The Dar-ul-Irfan headquarters card: a gradient crest, address, an inset map
-/// with directions, and contact actions (call, email, website).
+/// with directions and direct contact actions (call and email).
 @MainActor
 struct DarulIrfanCardView: View {
     let place: DarulIrfanPlace
@@ -43,9 +43,6 @@ struct DarulIrfanCardView: View {
                         }
                         if let emailUrl {
                             contactChip(url: emailUrl, title: "Email", systemImage: "envelope.fill")
-                        }
-                        if let websiteUrl {
-                            contactChip(url: websiteUrl, title: "Website", systemImage: "safari.fill")
                         }
                     }
 
@@ -159,7 +156,4 @@ struct DarulIrfanCardView: View {
         return URL(string: "mailto:\(email)")
     }
 
-    private var websiteUrl: URL? {
-        URL(string: place.websiteUrl)
-    }
 }

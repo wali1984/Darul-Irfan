@@ -66,9 +66,8 @@ struct ContentSyncService: ContentSyncServicing {
     private static let remoteManifestURLString =
         "https://raw.githubusercontent.com/wali1984/Darul-Irfan/main/content/content_manifest.json"
 
-    /// Minimum interval between remote checks (14 days), per the product
-    /// requirement to refresh content roughly every two weeks.
-    private static let refreshInterval: TimeInterval = 14 * 86_400
+    /// The manifest is small; data files download only when its version rises.
+    private static let refreshInterval: TimeInterval = 6 * 3_600
 
     private static let session: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral

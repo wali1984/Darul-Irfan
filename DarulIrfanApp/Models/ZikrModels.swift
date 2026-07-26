@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Online Zikr
 
 /// One recurring online zikr session. The schedule is remotely configurable
-/// (fetched via the content manifest) because website timings change.
+/// (fetched via the content manifest) because published timings change.
 struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     var id: String
     /// e.g. "Daily Online Zikr".
@@ -18,7 +18,7 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     var timeZoneIdentifier: String
     /// Join link (e.g. Paltalk room URL) if published.
     var joinUrl: String?
-    /// Official joining instructions, verbatim from the website.
+    /// Official joining instructions supplied by the verified content feed.
     var instructions: String?
     /// Note such as "Room available only during session".
     var availabilityNote: String?

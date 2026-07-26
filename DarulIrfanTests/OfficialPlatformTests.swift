@@ -88,11 +88,29 @@ final class OfficialPlatformTests: XCTestCase {
         XCTAssertEqual(settings.language, .urdu)
         XCTAssertEqual(settings.theme, .dark)
         XCTAssertTrue(settings.hasCompletedOnboarding)
-        // Official Alerts are on by default: settings that predate the `push`
-        // key adopt the current default (enabled). Actual push registration
-        // still requires the system notification grant.
-        XCTAssertTrue(settings.push.isEnabled)
+        XCTAssertFalse(settings.push.isEnabled)
+        XCTAssertEqual(settings.push.consentVersion, 0)
         XCTAssertEqual(settings.diagnosticsConsent, .notAsked)
         XCTAssertFalse(settings.liveActivitiesEnabled)
+    }
+
+    func testLegacyImplicitPushValueRequiresFreshConsent() throws {
+        let json = """
+        {"isEnabled":true,"topics":["liveZikr","announcements"]}
+        """
+        let preferences = try JSONDecoder().decode(PushPreferences.self, from: Data(json.utf8))
+        XCTAssertFalse(preferences.isEnabled)
+        XCTAssertEqual(preferences.consentVersion, 0)
+        XCTAssertEqual(preferences.topics, [.liveZikr, .announcements])
+    }
+
+    func testExplicitPushConsentRoundTrips() throws {
+        let original = PushPreferences(
+            isEnabled: true,
+            topics: [.liveZikr, .events],
+            consentVersion: PushPreferences.currentConsentVersion
+        )
+        let decoded = try JSONDecoder().decode(PushPreferences.self, from: JSONEncoder().encode(original))
+        XCTAssertEqual(decoded, original)
     }
 }

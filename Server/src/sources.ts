@@ -8,7 +8,22 @@ interface YouTubePlaylistResponse { items?: Array<{ contentDetails?: { videoId?:
 interface FacebookResponse { data?: Array<{ id?: string; message?: string; created_time?: string; permalink_url?: string; full_picture?: string }> }
 interface CatalogContent { id?: string; title?: string; excerpt?: string; sourceUrl?: string; publishedAt?: string; updatedAt?: string; mediaUrls?: string[] }
 interface CatalogEvent { id?: string; title?: string; details?: string; sourceUrl?: string; startDate?: string; updatedAt?: string }
-interface CatalogManifest { version?: number; files?: { articles?: string; events?: string } }
+interface CatalogManifest { version?: number; generatedAt?: string; files?: { articles?: string; events?: string } }
+
+/**
+ * Website pages without an editorial publication/update date are evergreen
+ * library material, not news. Returning undefined keeps them out of the
+ * chronological official-updates feed instead of stamping them with every
+ * cron run and making them permanently look new.
+ */
+export function catalogTimestamp(item: Pick<CatalogContent, "publishedAt" | "updatedAt">): string | undefined {
+  for (const candidate of [item.publishedAt, item.updatedAt]) {
+    if (!candidate) continue;
+    const parsed = new Date(candidate);
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+  }
+  return undefined;
+}
 
 export async function refreshYouTube(env: Env): Promise<void> {
   if (!env.YOUTUBE_API_KEY) throw new Error("YOUTUBE_API_KEY is not configured");
@@ -106,13 +121,20 @@ export async function refreshWebsiteCatalog(env: Env): Promise<void> {
   const articles = await articlesResponse.json<CatalogContent[]>();
   const events = await eventsResponse.json<CatalogEvent[]>();
   const now = new Date().toISOString();
+
+  // Existing deployments may contain evergreen pages that older code marked
+  // as freshly published on every run. Hide website rows first; only genuinely
+  // dated news below is restored to the public feed. The native Library keeps
+  // carrying the complete evergreen catalog through the content manifest.
+  await env.DB.prepare("UPDATE feed_items SET is_hidden=1,updated_at=? WHERE source='website'").bind(now).run();
   for (const item of articles.slice(0, 100)) {
     const sourceURL = validHTTPURL(item.sourceUrl); const title = cleanText(item.title, 300);
-    if (!item.id || !sourceURL || !title) continue;
+    const publishedAt = catalogTimestamp(item);
+    if (!item.id || !sourceURL || !title || !publishedAt) continue;
     const image = (item.mediaUrls ?? []).map(validHTTPURL).find(Boolean);
-    await env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,image_url,published_at,updated_at)
-      VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,published_at=excluded.published_at,updated_at=excluded.updated_at`)
-      .bind(`website:${item.id}`, "website", "post", title, cleanText(item.excerpt) ?? null, sourceURL, image ?? null, item.publishedAt ?? item.updatedAt ?? now, now).run();
+    await env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,image_url,published_at,is_hidden,updated_at)
+      VALUES(?,?,?,?,?,?,?,?,0,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,published_at=excluded.published_at,is_hidden=0,updated_at=excluded.updated_at`)
+      .bind(`website:${item.id}`, "website", "post", title, cleanText(item.excerpt) ?? null, sourceURL, image ?? null, publishedAt, now).run();
   }
   for (const item of events.slice(0, 100)) {
     const sourceURL = validHTTPURL(item.sourceUrl); const title = cleanText(item.title, 300);

@@ -2,15 +2,10 @@ import SwiftUI
 import UIKit
 
 /// One informational search hit rendered as an elevated "live panel": a gilded
-/// domain crest, the title, a highlighted snippet, and — for library/media/events
-/// items with a known website page — a source link. Rows deliberately have no
-/// chevron: in-app navigation into matched items is wired by the owning feature
-/// teams as a follow-up. A press-and-hold context menu offers "Copy reference"
-/// and, when derivable, opening the source page — its lift is the row's press
-/// feedback.
+/// domain crest, the title, and a highlighted native snippet. A press-and-hold
+/// context menu offers a private, app-native reference for copying.
 struct SearchResultRow: View {
     let result: SearchResult
-    let sourceURL: URL?
     /// Plain-text reference placed on the pasteboard by "Copy reference".
     let reference: String
 
@@ -46,11 +41,6 @@ struct SearchResultRow: View {
                 DIHaptics.success()
             } label: {
                 Label("Copy reference", systemImage: "doc.on.doc")
-            }
-            if let sourceURL {
-                Link(destination: sourceURL) {
-                    Label("Open source page", systemImage: "safari")
-                }
             }
         }
     }
@@ -88,14 +78,6 @@ struct SearchResultRow: View {
                     .lineLimit(3)
             }
 
-            if let sourceURL {
-                Link(destination: sourceURL) {
-                    Label("View source", systemImage: "arrow.up.right.square")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
-                }
-                .accessibilityLabel("View source on the Naqshbandia Owaisiah website")
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

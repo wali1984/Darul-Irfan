@@ -78,15 +78,8 @@ struct SurahReaderView: View {
                 DIEmptyState(
                     systemImage: "arrow.down.circle",
                     titleKey: "This surah's text is not on your device yet",
-                    messageKey: "Offline text packs arrive through content updates. Until then, you can read this surah on quran.com."
+                    messageKey: "Offline text packs arrive automatically through verified content updates."
                 )
-                if let url = URL(string: "https://quran.com/\(viewModel.surah.id)") {
-                    Link(destination: url) {
-                        Label("Read on quran.com", systemImage: "safari")
-                    }
-                    .buttonStyle(DISecondaryButtonStyle())
-                    .padding(.horizontal, DISpacing.xl)
-                }
             }
             .padding(.vertical, DISpacing.xl)
         }
@@ -221,28 +214,20 @@ struct SurahReaderView: View {
     }
 
     /// Shown when a tafsir mode is selected but its text is not on device for
-    /// this surah — links to the source pages on the website.
+    /// this surah; native availability placeholders remain visible meanwhile.
     private var tafsirPointerCard: some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text("Tafsir arriving")
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
-                Text("This tafsir for this surah is being added to the app. Until then you can read it on naqshbandiaowaisiah.org.")
+                Text("This tafsir for this surah is being added to the native reader and will arrive through a verified content update.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                 ForEach(viewModel.tafsirEditionPointers) { edition in
-                    if let sourceUrl = edition.sourceUrl, let url = URL(string: sourceUrl) {
-                        Link(destination: url) {
-                            Label {
-                                Text("\(edition.title) — Read on naqshbandiaowaisiah.org")
-                            } icon: {
-                                Image(systemName: "safari")
-                            }
-                            .font(.footnote)
-                        }
-                        .tint(DIColor.primary)
-                    }
+                    Label(edition.title, systemImage: "clock.arrow.circlepath")
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.primary)
                 }
             }
         }
@@ -475,13 +460,6 @@ private struct AyahCardView: View {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 if !entry.text.isEmpty {
                     bodyText(entry.text, languageCode: edition?.language)
-                }
-                if let sourceUrl = entry.sourceUrl, let url = URL(string: sourceUrl) {
-                    Link(destination: url) {
-                        Label("Source on naqshbandiaowaisiah.org", systemImage: "safari")
-                            .font(.footnote)
-                    }
-                    .tint(DIColor.textMuted)
                 }
             }
             .padding(.top, DISpacing.xs)

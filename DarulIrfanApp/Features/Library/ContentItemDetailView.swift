@@ -1,15 +1,12 @@
 import SwiftUI
 
 /// Detail screen for one library item: metadata card, rights-aware native
-/// reader (or an official-website link for items without stored text, such
-/// as PDF publications and any link-only item), downloadable files, and the
-/// source link with last-updated date.
+/// reader, native image/PDF presentation, downloadable files, and dates.
 struct ContentItemDetailView: View {
     private let appState: AppState
     private let dependencies: AppDependencies
     private let libraryViewModel: LibraryViewModel
     @State private var viewModel: ContentItemDetailViewModel
-    @State private var isShowingSource = false
     @ScaledMetric(relativeTo: .body) private var baseBodySize: CGFloat = 17
 
     init(
@@ -53,12 +50,6 @@ struct ContentItemDetailView: View {
                 favoriteButton
             }
         }
-        .sheet(isPresented: $isShowingSource) {
-            if let url = viewModel.sourceURL {
-                SafariView(url: url)
-                    .ignoresSafeArea()
-            }
-        }
         .task {
             await viewModel.load()
         }
@@ -97,16 +88,17 @@ struct ContentItemDetailView: View {
                         if hasReadablePDF(item) {
                             readInAppButton(for: item).diAppear(delay: 0.06)
                         }
+                        nativeMediaSection(for: item)
                         if viewModel.showsBody {
                             readerCard(for: item)
                         } else {
                             excerptCard(for: item)
-                            if !hasReadablePDF(item) {
-                                officialSiteCard(for: item)
+                            if !hasReadablePDF(item) && item.mediaUrls.isEmpty {
+                                nativeAvailabilityCard
                             }
                         }
                         downloadsSection(for: item)
-                        sourceSection(for: item)
+                        dateSection(for: item)
                     }
                     .padding(DISpacing.md)
                     .background(scrollMetricsReader(viewportHeight: outer.size.height))
@@ -321,7 +313,42 @@ struct ContentItemDetailView: View {
         .environment(\.layoutDirection, isRightToLeft(item) ? .rightToLeft : .leftToRight)
     }
 
-    // MARK: - Link-only presentation
+    // MARK: - Native media and availability
+
+    @ViewBuilder
+    private func nativeMediaSection(for item: ContentItem) -> some View {
+        let urls = item.mediaUrls.compactMap { nativeURL($0) }
+        if !urls.isEmpty {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                DISectionHeader(titleKey: "Illustrations", systemImage: "photo.on.rectangle.angled")
+                ForEach(urls, id: \.absoluteString) { url in
+                    DICard(padding: DISpacing.sm) {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image.resizable().scaledToFit()
+                            case .failure:
+                                DIEmptyState(
+                                    systemImage: "photo",
+                                    titleKey: "Illustration unavailable",
+                                    messageKey: "Pull down later after the content archive refreshes."
+                                )
+                            default:
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, minHeight: 180)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
+                    }
+                }
+            }
+        }
+    }
+
+    private func nativeURL(_ raw: String) -> URL? {
+        URL(string: raw) ?? URL(string: raw.replacingOccurrences(of: " ", with: "%20"))
+    }
 
     @ViewBuilder
     private func excerptCard(for item: ContentItem) -> some View {
@@ -341,28 +368,19 @@ struct ContentItemDetailView: View {
         }
     }
 
-    private func officialSiteCard(for item: ContentItem) -> some View {
+    private var nativeAvailabilityCard: some View {
         DIElevatedCard(glow: DIColor.primary) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack(spacing: DISpacing.md) {
-                    LibraryMedallion(systemImage: "globe", diameter: 40, breathing: true)
-                    Text("Available on the official website")
+                    LibraryMedallion(systemImage: "arrow.triangle.2.circlepath", diameter: 40, breathing: true)
+                    Text("Native content is being prepared")
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                 }
-                Text("The full text of this item is available on the official Naqshbandia Owaisiah website.")
+                Text("This entry is already part of the Darul Irfan archive. Its complete native text or document will appear automatically after a verified content update.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
-                if viewModel.sourceURL != nil {
-                    Button {
-                        DIHaptics.light()
-                        isShowingSource = true
-                    } label: {
-                        Text("Read on naqshbandiaowaisiah.org")
-                    }
-                    .buttonStyle(DIPrimaryButtonStyle())
-                }
             }
         }
     }
@@ -388,23 +406,11 @@ struct ContentItemDetailView: View {
         }
     }
 
-    // MARK: - Source & last updated
+    // MARK: - Content date
 
-    private func sourceSection(for item: ContentItem) -> some View {
+    private func dateSection(for item: ContentItem) -> some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                if viewModel.sourceURL != nil {
-                    Button {
-                        DIHaptics.light()
-                        isShowingSource = true
-                    } label: {
-                        Label("View source on naqshbandiaowaisiah.org", systemImage: "safari")
-                            .font(.subheadline)
-                            .foregroundStyle(DIColor.primary)
-                            .multilineTextAlignment(.leading)
-                    }
-                    .buttonStyle(.plain)
-                }
                 if let updatedAt = item.updatedAt {
                     Text("Last updated \(updatedAt, format: .dateTime.day().month().year())")
                         .font(.footnote)

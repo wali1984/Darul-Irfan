@@ -54,10 +54,16 @@ struct OfficialServicesSettingsView: View {
                     if enabled {
                         let granted = await dependencies.notifications.requestPermission()
                         guard granted else { permissionDenied = true; return }
-                        await appState.updateSettings { $0.push.isEnabled = true }
+                        await appState.updateSettings {
+                            $0.push.isEnabled = true
+                            $0.push.consentVersion = PushPreferences.currentConsentVersion
+                        }
                         UIApplication.shared.registerForRemoteNotifications()
                     } else {
-                        await appState.updateSettings { $0.push.isEnabled = false }
+                        await appState.updateSettings {
+                            $0.push.isEnabled = false
+                            $0.push.consentVersion = PushPreferences.currentConsentVersion
+                        }
                         await dependencies.officialPlatform.unregisterFromPush()
                     }
                 }
@@ -97,6 +103,7 @@ struct OfficialServicesSettingsView: View {
                     await appState.updateSettings { settings in
                         if enabled { settings.push.topics.insert(topic) }
                         else { settings.push.topics.remove(topic) }
+                        settings.push.consentVersion = PushPreferences.currentConsentVersion
                     }
                     UIApplication.shared.registerForRemoteNotifications()
                 }
