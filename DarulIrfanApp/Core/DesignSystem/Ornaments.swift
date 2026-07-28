@@ -73,29 +73,15 @@ struct DISealEmblem: View {
     var glow: Bool = true
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [DIColor.primary, DIColor.primaryDeep],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: diameter / 2
-                    )
-                )
-            Circle()
-                .strokeBorder(DIColor.accent, lineWidth: max(1.5, diameter * 0.02))
-                .padding(diameter * 0.06)
-            DIOctagram(innerRatio: 0.44)
-                .stroke(DIColor.accent, lineWidth: max(1, diameter * 0.012))
-                .padding(diameter * 0.24)
-            DIOctagram(innerRatio: 0.44)
-                .fill(DIColor.accent.opacity(0.14))
-                .padding(diameter * 0.24)
-        }
-        .frame(width: diameter, height: diameter)
-        .modifier(SealGlow(active: glow))
-        .accessibilityHidden(true)
+        // The official Silsila emblem (green globe + محمد رسول الله seal),
+        // matching the organization's website and the app icon.
+        Image("BrandEmblem")
+            .resizable()
+            .interpolation(.high)
+            .scaledToFit()
+            .frame(width: diameter, height: diameter)
+            .modifier(SealGlow(active: glow))
+            .accessibilityHidden(true)
     }
 }
 

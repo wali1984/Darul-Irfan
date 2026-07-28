@@ -38,13 +38,13 @@ private extension UIColor {
 /// Semantic color tokens. Use these — never raw hex — in feature code.
 enum DIColor {
     /// Seal emerald; brand mark, primary actions, selected states.
-    static let primary = Color(light: 0x0B6E4F, dark: 0x1E9068)
+    static let primary = Color(light: 0x0B7250, dark: 0x1E9068)
     /// Forest emerald; seal ring, pressed states, gradients, hero fills.
-    static let primaryDeep = Color(light: 0x06432F, dark: 0x0B6E4F)
+    static let primaryDeep = Color(light: 0x064B34, dark: 0x0B6E4F)
     /// The site's true gold; highlights, dividers, current-prayer marker, accents.
     static let accent = Color(light: 0xC6A253, dark: 0xE0B75F)
     /// Warm cream app background (matches the site cream).
-    static let background = Color(light: 0xF6F4EF, dark: 0x141310)
+    static let background = Color(light: 0xF2EFE7, dark: 0x141310)
     /// Warm paper card surface.
     static let surface = Color(light: 0xFCFAF3, dark: 0x1F1D18)
     /// Sandstone surface, for hero panels and elevated devotional cards.
