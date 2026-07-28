@@ -7,6 +7,14 @@ struct ExploreTabView: View {
         case media = "Media"
         case events = "Events"
         var id: String { rawValue }
+        var icon: String {
+            switch self {
+            case .updates: return "newspaper.fill"
+            case .library: return "books.vertical.fill"
+            case .media: return "play.rectangle.fill"
+            case .events: return "calendar"
+            }
+        }
     }
 
     let dependencies: AppDependencies
@@ -15,27 +23,37 @@ struct ExploreTabView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Picker("Explore section", selection: $section) {
-                ForEach(Section.allCases) { Text(LocalizedStringKey($0.rawValue)).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, DISpacing.md).padding(.vertical, DISpacing.sm)
+            DISegmentedControl(
+                items: Section.allCases,
+                title: { LocalizedStringKey($0.rawValue) },
+                icon: { $0.icon },
+                selection: $section
+            )
+            .padding(.horizontal, DISpacing.md)
+            .padding(.vertical, DISpacing.sm)
             .background(DIColor.background)
 
-            switch section {
-            case .updates:
-                NavigationStack {
-                    OfficialFeedView(dependencies: dependencies)
-                        .navigationTitle("Official Updates")
-                }
-            case .library: LibraryTabView(dependencies: dependencies, appState: appState)
-            case .media: MediaTabView(dependencies: dependencies, appState: appState)
-            case .events:
-                NavigationStack {
-                    EventsHomeView(dependencies: dependencies, appState: appState)
-                }
-            }
+            content
         }
         .diScreenBackground()
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch section {
+        case .updates:
+            NavigationStack {
+                OfficialFeedView(dependencies: dependencies)
+                    .navigationTitle("Official Updates")
+            }
+        case .library:
+            LibraryTabView(dependencies: dependencies, appState: appState)
+        case .media:
+            MediaTabView(dependencies: dependencies, appState: appState)
+        case .events:
+            NavigationStack {
+                EventsHomeView(dependencies: dependencies, appState: appState)
+            }
+        }
     }
 }
