@@ -130,6 +130,7 @@ struct QuranTabView: View {
             .padding(.horizontal, DISpacing.md)
             .padding(.top, DISpacing.sm)
             .padding(.bottom, DISpacing.xl)
+            .diResponsiveWidth()
         }
     }
 

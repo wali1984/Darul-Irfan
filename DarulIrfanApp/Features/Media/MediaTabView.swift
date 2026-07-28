@@ -61,6 +61,7 @@ struct MediaTabView: View {
                     }
                 }
                 .padding(DISpacing.md)
+                .diResponsiveWidth()
             }
             .diScreenBackground()
             .diPageHeading("Media")

@@ -72,6 +72,7 @@ struct EventsHomeView: View {
                 }
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .diPageHeading("Events & Dar-ul-Irfan")
         .diScreenBackground()

@@ -41,6 +41,7 @@ struct LibraryTabView: View {
                     }
                 }
                 .padding(DISpacing.md)
+                .diResponsiveWidth()
             }
             .diScreenBackground()
             .diPageHeading("Library")
