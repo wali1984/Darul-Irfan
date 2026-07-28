@@ -87,11 +87,11 @@ struct PrayerTrackerDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                Picker("History window", selection: $viewModel.window) {
-                    Text("Last 7 Days").tag(PrayerTrackerDetailViewModel.Window.week)
-                    Text("Last 30 Days").tag(PrayerTrackerDetailViewModel.Window.month)
-                }
-                .pickerStyle(.segmented)
+                DISegmentedControl(
+                    items: PrayerTrackerDetailViewModel.Window.allCases,
+                    title: { $0 == .week ? "Last 7 Days" : "Last 30 Days" },
+                    selection: $viewModel.window
+                )
 
                 if let summary = viewModel.summary {
                     summaryCard(summary)

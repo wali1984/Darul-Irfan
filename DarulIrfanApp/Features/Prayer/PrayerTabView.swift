@@ -40,12 +40,16 @@ struct PrayerTabView: View {
                         if let schedule = viewModel.todaySchedule {
                             DISectionHeader(titleKey: "Today's Times", systemImage: "clock")
                             timesCard(schedule: schedule)
+                                .diScrollReveal()
                             if viewModel.isRamadan {
                                 ramadanCard(schedule: schedule)
+                                    .diScrollReveal()
                             }
                             DISectionHeader(titleKey: "Prayer Tracker", systemImage: "checkmark.seal")
                             trackerCard
+                                .diScrollReveal()
                             monthlyTimetableLink
+                                .diScrollReveal()
                         } else {
                             DIEmptyState(
                                 systemImage: "sun.horizon",
