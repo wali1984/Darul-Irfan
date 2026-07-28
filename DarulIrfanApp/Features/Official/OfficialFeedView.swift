@@ -137,6 +137,7 @@ struct OfficialFeedView: View {
         } else {
             ForEach(visibleItems) { item in
                 feedCard(item)
+                    .diScrollReveal()
                     .task {
                         if item.id == visibleItems.last?.id, viewModel.nextCursor != nil {
                             await viewModel.loadMore()
