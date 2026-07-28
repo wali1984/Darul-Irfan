@@ -59,3 +59,54 @@ extension View {
     /// inside a vertical `ScrollView`/`LazyVStack`.
     func diScrollReveal() -> some View { modifier(DIScrollReveal()) }
 }
+
+// MARK: - Parallax hero
+
+private struct DIParallaxHero: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        if reduceMotion {
+            content
+        } else {
+            content.visualEffect { view, proxy in
+                let y = proxy.frame(in: .scrollView).minY
+                let h = max(proxy.size.height, 1)
+                return view
+                    // Drift slower than the scroll (parallax depth) as it moves up.
+                    .offset(y: y < 0 ? -y * 0.32 : 0)
+                    // Soft fade as the hero scrolls away past the top.
+                    .opacity(y < 0 ? max(0.3, 1 + y / (h * 1.3)) : 1)
+            }
+        }
+    }
+}
+
+extension View {
+    /// A hero header that drifts slower than the scroll and fades as it leaves
+    /// the top (iOS 17 visual effect). Apply to the hero card at the top of a
+    /// vertical `ScrollView`. No-op under Reduce Motion.
+    func diParallaxHero() -> some View { modifier(DIParallaxHero()) }
+}
+
+// MARK: - Responsive width
+
+private struct DIResponsiveWidth: ViewModifier {
+    let maxWidth: CGFloat
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: sizeClass == .regular ? maxWidth : .infinity)
+            .frame(maxWidth: .infinity) // centre the capped column on wide screens
+    }
+}
+
+extension View {
+    /// Caps the content column width and centres it on wide screens (iPad,
+    /// large landscape) so layouts stay composed instead of stretching edge to
+    /// edge; full width on compact iPhone. Apply to a screen's content stack.
+    func diResponsiveWidth(_ maxWidth: CGFloat = 620) -> some View {
+        modifier(DIResponsiveWidth(maxWidth: maxWidth))
+    }
+}

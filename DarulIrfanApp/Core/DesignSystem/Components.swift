@@ -23,8 +23,9 @@ struct DICard<Content: View>: View {
                 RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
                     .stroke(borderColor, lineWidth: borderWidth)
             )
-            // Subtle depth so cards read as surfaces, not flat blocks.
-            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 4)
+            // Subtle depth so cards read as surfaces, not flat blocks — a warm
+            // emerald-tinted shadow rather than flat black reads more premium.
+            .shadow(color: DIColor.primaryDeep.opacity(0.10), radius: 10, x: 0, y: 5)
     }
 }
 

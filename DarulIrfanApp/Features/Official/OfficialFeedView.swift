@@ -61,6 +61,7 @@ struct OfficialFeedView: View {
                 feedContent
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .diScreenBackground()
         .refreshable { await viewModel.load(forceRefresh: true) }

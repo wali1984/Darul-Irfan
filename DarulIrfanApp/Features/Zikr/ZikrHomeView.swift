@@ -22,6 +22,7 @@ struct ZikrHomeView: View {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
                 ZikrHeroHeader()
                     .diAppear()
+                    .diParallaxHero()
 
                 DISectionHeader(titleKey: "Method of Zikr", systemImage: "heart")
                 NavigationLink {
@@ -80,6 +81,7 @@ struct ZikrHomeView: View {
                 .diAppear(delay: 0.2)
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .diPageHeading("Zikr")
         .diScreenBackground()

@@ -33,6 +33,7 @@ struct PrayerTabView: View {
                         dayTimes: viewModel.todaySchedule?.orderedTimes.map { $0.time } ?? []
                     )
                     .diAppear()
+                    .diParallaxHero()
                     if !viewModel.hasLoaded {
                         loadingView
                     } else if appState.activePlace != nil {
@@ -61,6 +62,7 @@ struct PrayerTabView: View {
                     TodayDailySection(appState: appState)
                 }
                 .padding(DISpacing.md)
+                .diResponsiveWidth()
             }
             .diScreenBackground()
             .diPageHeading("Today")
