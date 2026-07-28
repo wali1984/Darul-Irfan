@@ -250,12 +250,11 @@ struct SurahReaderView: View {
 
     /// Segmented control choosing translation-only vs a tafsir edition.
     private var contentModeSelector: some View {
-        Picker("View", selection: contentModeBinding) {
-            ForEach(QuranContentMode.allCases) { mode in
-                Text(mode.shortTitle).tag(mode)
-            }
-        }
-        .pickerStyle(.segmented)
+        DISegmentedControl(
+            items: QuranContentMode.allCases,
+            title: { LocalizedStringKey($0.shortTitle) },
+            selection: contentModeBinding
+        )
     }
 
     /// Shown when a tafsir mode is selected but its text is not on device for
