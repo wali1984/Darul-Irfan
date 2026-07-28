@@ -84,6 +84,7 @@ struct DarulIrfanApp: App {
 
     @MainActor
     private func launch() async {
+        let launchStart = Date()
         do {
             let dependencies = try await AppDependencies.live()
             let appState = AppState(dependencies: dependencies)
@@ -118,6 +119,18 @@ struct DarulIrfanApp: App {
             // Force the saved UI language at the bundle level before first paint
             // so every localized string (Text and String(localized:)) follows it.
             LanguageManager.apply(appState.settings.language)
+
+            // Hold the brand splash for a beat so the emblem reads, rather than
+            // flashing past when launch work finishes quickly. Skipped in UI tests.
+            #if DEBUG
+            let skipSplashHold = ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("--uitesting") }
+            #else
+            let skipSplashHold = false
+            #endif
+            let splashElapsed = Date().timeIntervalSince(launchStart)
+            if !skipSplashHold, splashElapsed < 2.5 {
+                try? await Task.sleep(for: .seconds(2.5 - splashElapsed))
+            }
 
             launchState = .ready(dependencies, appState)
             lastForegroundRefresh = Date()
