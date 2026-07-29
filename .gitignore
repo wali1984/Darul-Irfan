@@ -25,6 +25,16 @@ Tools/ContentIngest/__pycache__/
 **/__pycache__/
 *.pyc
 
+# Quran / tafsir OCR source material — large PDF scans + raw OCR JSON.
+# NEVER commit: the verified text is imported into
+# DarulIrfanApp/Resources/SeedData/*.json instead. Also keeps the machine-OCR
+# proofreading pack (sacred text) out of the repo.
+/Akram-u-Tarajum/
+/Asrar-ut-Tanzil/
+/Asrar-at-Tanzil — English tafsir/
+/OCR/
+Tools/OCR/
+
 # Cloudflare Worker
 Server/node_modules/
 Server/.wrangler/
