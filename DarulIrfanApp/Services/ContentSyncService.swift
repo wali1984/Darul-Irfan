@@ -118,6 +118,15 @@ struct ContentSyncService: ContentSyncServicing {
             try await quranRepository.upsertTranslations(translations)
             imported += translations.count
         }
+        // Self-correcting removal: if the seed no longer carries a tafsir
+        // edition, purge its rows so dropping it from the bundle also removes
+        // it from existing installs. (Asrar-at-Tanzil English was pulled in
+        // seed v12 for correction; re-adding it to the seed later repopulates
+        // automatically and this purge no-ops.)
+        for editionID in ["asrar-at-tanzil-en"]
+        where !tafsir.contains(where: { $0.editionID == editionID }) {
+            try await quranRepository.deleteTafsir(editionID: editionID)
+        }
         if !tafsir.isEmpty {
             try await quranRepository.upsertTafsir(tafsir)
             imported += tafsir.count

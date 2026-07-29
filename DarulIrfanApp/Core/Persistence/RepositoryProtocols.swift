@@ -28,6 +28,8 @@ protocol QuranRepositoryProtocol: Sendable {
     func upsertEditions(_ editions: [QuranEdition]) async throws
     func upsertTranslations(_ translations: [QuranTranslation]) async throws
     func upsertTafsir(_ tafsir: [QuranTafsir]) async throws
+    /// Removes every tafsir row for an edition (used when the seed drops one).
+    func deleteTafsir(editionID: String) async throws
 }
 
 // MARK: - Library content

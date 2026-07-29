@@ -167,17 +167,23 @@ final class SurahReaderViewModel {
     /// A range entry is shown once, under its first ayah.
     func tafsirEntry(startingAt ayahNumber: Int) -> QuranTafsir? {
         guard let prefix = contentMode.tafsirEditionPrefix else { return nil }
-        let candidates = tafsirEntries.filter {
-            $0.ayahStart == ayahNumber && $0.editionID.hasPrefix(prefix)
+        // Only show a tafsir in the reader's own language — never fall back
+        // across languages (e.g. an Urdu tafsir must not appear in English UI).
+        return tafsirEntries.first {
+            $0.ayahStart == ayahNumber
+                && $0.editionID.hasPrefix(prefix)
+                && edition(id: $0.editionID)?.language == preferredLanguageCode
         }
-        return candidates.first(where: { edition(id: $0.editionID)?.language == preferredLanguageCode })
-            ?? candidates.first
     }
 
-    /// Whether tafsir text exists for the current mode anywhere in this surah.
+    /// Whether tafsir text in the reader's language exists for the current mode
+    /// anywhere in this surah.
     var hasTafsirForMode: Bool {
         guard let prefix = contentMode.tafsirEditionPrefix else { return false }
-        return tafsirEntries.contains { $0.editionID.hasPrefix(prefix) }
+        return tafsirEntries.contains {
+            $0.editionID.hasPrefix(prefix)
+                && edition(id: $0.editionID)?.language == preferredLanguageCode
+        }
     }
 
     /// Share text: the reference only, never the copyrighted body text.

@@ -353,6 +353,13 @@ struct QuranRepository: QuranRepositoryProtocol {
         try await database.connection.executeBatch(statements)
     }
 
+    func deleteTafsir(editionID: String) async throws {
+        try await database.connection.execute(
+            "DELETE FROM quran_tafsir WHERE edition_id = ?",
+            [.text(editionID)]
+        )
+    }
+
     // MARK: - Row mapping
 
     private static func surah(from row: SQLRow) -> QuranSurah? {
