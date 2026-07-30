@@ -1,6 +1,20 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Zikr begins in": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Zikr begins in" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ذکر شروع ہونے میں" } }
+      }
+    },
+    "Zikr in progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Zikr in progress" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ذکر جاری ہے" } }
+      }
+    },
     "Arabic and translation": {
       "extractionState": "manual",
       "localizations": {

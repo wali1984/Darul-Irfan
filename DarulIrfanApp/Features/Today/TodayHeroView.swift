@@ -47,8 +47,7 @@ struct TodayHeroView: View {
                         }
                     }
                     Spacer()
-                    DISealEmblem(diameter: 48, glow: true)
-                        .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 16)
+                    DILivingSealMark(diameter: 60)
                 }
 
                 if let name = nextPrayerName, let time = nextPrayerTime {
@@ -79,8 +78,7 @@ struct TodayHeroView: View {
 
     private var fallbackCrest: some View {
         VStack(spacing: DISpacing.sm) {
-            DISealEmblem(diameter: 92, glow: true)
-                .diBreathingGlow()
+            DILivingSealMark(diameter: 92)
             Text("Set your location to see prayer times")
                 .font(.footnote)
                 .foregroundStyle(.white.opacity(0.85))

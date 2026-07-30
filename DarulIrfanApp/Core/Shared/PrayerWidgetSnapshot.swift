@@ -29,6 +29,20 @@ struct WidgetPrayerTime: Codable, Sendable, Equatable {
     var isObligatory: Bool
 }
 
+/// One concrete online-zikr occurrence sent to Apple Watch. Recurrence is
+/// resolved on iPhone so the Watch stays useful offline and never needs to
+/// duplicate timezone/schedule rules.
+struct WidgetZikrSession: Codable, Sendable, Equatable, Identifiable {
+    var id: String
+    var title: String
+    var startsAt: Date
+    var endsAt: Date
+
+    func isActive(at date: Date) -> Bool {
+        startsAt <= date && date < endsAt
+    }
+}
+
 /// Everything the widgets need, precomputed by the app. Covers several days
 /// so widgets stay correct even if the app is not opened daily.
 struct PrayerWidgetSnapshot: Codable, Sendable, Equatable {
@@ -44,6 +58,9 @@ struct PrayerWidgetSnapshot: Codable, Sendable, Equatable {
     /// Ramadan extras; nil outside Ramadan.
     var suhoorEndsAt: Date?
     var iftarAt: Date?
+    /// Upcoming concrete zikr occurrences. Optional for backward-compatible
+    /// decoding of snapshots written by pre-Watch-zikr app versions.
+    var zikrSessions: [WidgetZikrSession]? = nil
 
     /// The next prayer strictly after `date`, or nil if the snapshot is exhausted.
     func nextPrayer(after date: Date) -> WidgetPrayerTime? {
@@ -53,6 +70,19 @@ struct PrayerWidgetSnapshot: Codable, Sendable, Equatable {
     /// All times falling on the same civil day as `date` (widget "today" view).
     func times(onSameDayAs date: Date, calendar: Calendar = .current) -> [WidgetPrayerTime] {
         upcomingTimes.filter { calendar.isDate($0.time, inSameDayAs: date) }
+    }
+
+    /// Active occurrence first, otherwise the next future zikr session.
+    func currentOrNextZikr(at date: Date) -> WidgetZikrSession? {
+        zikrSessions?
+            .filter { $0.endsAt > date }
+            .sorted { lhs, rhs in
+                let lhsActive = lhs.isActive(at: date)
+                let rhsActive = rhs.isActive(at: date)
+                if lhsActive != rhsActive { return lhsActive }
+                return lhs.startsAt < rhs.startsAt
+            }
+            .first
     }
 
     static func load(from url: URL? = SharedAppGroup.prayerSnapshotURL) -> PrayerWidgetSnapshot? {

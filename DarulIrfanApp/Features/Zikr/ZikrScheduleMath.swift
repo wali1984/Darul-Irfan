@@ -6,6 +6,19 @@ import Foundation
 /// local time and for reminder scheduling.
 enum ZikrScheduleMath {
 
+    /// The occurrence currently in progress, or the next occurrence. Unlike
+    /// `nextOccurrence`, this can return a start in the recent past while its
+    /// configured duration is still active.
+    static func currentOrNextOccurrence(of session: ZikrSession, at reference: Date) -> Date? {
+        let lookback = reference.addingTimeInterval(-TimeInterval(max(session.durationMinutes, 0) * 60))
+        guard let candidate = nextOccurrence(of: session, after: lookback) else { return nil }
+        let end = candidate.addingTimeInterval(TimeInterval(max(session.durationMinutes, 0) * 60))
+        if candidate <= reference, end > reference {
+            return candidate
+        }
+        return nextOccurrence(of: session, after: reference)
+    }
+
     /// The next concrete start `Date` of a session at/after `reference`,
     /// computed in the session's announced timezone.
     static func nextOccurrence(of session: ZikrSession, after reference: Date) -> Date? {

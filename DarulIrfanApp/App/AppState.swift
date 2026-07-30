@@ -141,7 +141,8 @@ final class AppState {
             upcomingTimes: upcoming,
             hijriDateText: hijriText,
             suhoorEndsAt: suhoorEndsAt,
-            iftarAt: iftarAt
+            iftarAt: iftarAt,
+            zikrSessions: PrayerWidgetSnapshot.load()?.zikrSessions
         )
         snapshot.save()
         dependencies.watchSync.send(snapshot)

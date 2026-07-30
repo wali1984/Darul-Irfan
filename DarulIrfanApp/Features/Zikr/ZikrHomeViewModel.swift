@@ -9,6 +9,7 @@ import Observation
 final class ZikrHomeViewModel {
     private let notifications: any NotificationScheduling
     private let platform: OfficialPlatformService
+    private let watchSync: WatchSyncService
 
     private(set) var sessions: [ZikrSession] = []
     private(set) var nextOccurrences: [String: Date] = [:]
@@ -23,9 +24,10 @@ final class ZikrHomeViewModel {
     /// Minutes before the session start that the reminder fires.
     private let reminderLeadMinutes = 10
 
-    init(notifications: any NotificationScheduling, platform: OfficialPlatformService) {
+    init(notifications: any NotificationScheduling, platform: OfficialPlatformService, watchSync: WatchSyncService) {
         self.notifications = notifications
         self.platform = platform
+        self.watchSync = watchSync
     }
 
     func load() async {
@@ -66,6 +68,7 @@ final class ZikrHomeViewModel {
             loaded = []
         }
         sessions = loaded
+        watchSync.updateZikrSessions(loaded)
 
         var occurrences: [String: Date] = [:]
         let now = Date()

@@ -13,7 +13,8 @@ struct ZikrHomeView: View {
         self.dependencies = dependencies
         _viewModel = State(initialValue: ZikrHomeViewModel(
             notifications: dependencies.notifications,
-            platform: dependencies.officialPlatform
+            platform: dependencies.officialPlatform,
+            watchSync: dependencies.watchSync
         ))
     }
 
@@ -158,8 +159,7 @@ private struct ZikrHeroHeader: View {
                             .foregroundStyle(.white.opacity(0.85))
                     }
                     Spacer()
-                    DISealEmblem(diameter: 52, glow: true)
-                        .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 16)
+                    DILivingSealMark(diameter: 50)
                 }
 
                 VStack(alignment: .center, spacing: DISpacing.sm) {
@@ -256,24 +256,7 @@ private struct ZikrSessionCard: View {
                     }
                 }
 
-                if let next = viewModel.nextOccurrence(forSessionID: session.id) {
-                    HStack(spacing: DISpacing.sm) {
-                        Image(systemName: "calendar.badge.clock")
-                            .font(.subheadline)
-                            .foregroundStyle(DIColor.primary)
-                            .accessibilityHidden(true)
-                        Text("Next session: \(next.formatted(date: .abbreviated, time: .shortened))")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(DIColor.primary)
-                    }
-                    .padding(.horizontal, DISpacing.sm)
-                    .padding(.vertical, DISpacing.xs)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
-                            .fill(DIColor.primary.opacity(0.08))
-                    )
-                }
+                ZikrSessionCountdown(session: session)
 
                 Text("Announced time: \(ZikrScheduleMath.announcedTimeText(for: session))")
                     .font(.footnote)
@@ -329,6 +312,57 @@ private struct ZikrSessionCard: View {
             .frame(width: 9, height: 9)
             .diBreathingGlow(color: DIColor.primary, maxRadius: 8)
             .accessibilityHidden(true)
+    }
+}
+
+/// Battery-conscious live countdown: SwiftUI's timer text animates the digits
+/// while the timeline reevaluates session state only every thirty seconds.
+private struct ZikrSessionCountdown: View {
+    let session: ZikrSession
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 30)) { context in
+            if let start = ZikrScheduleMath.currentOrNextOccurrence(of: session, at: context.date) {
+                let end = start.addingTimeInterval(TimeInterval(max(session.durationMinutes, 1) * 60))
+                let active = start <= context.date && context.date < end
+
+                HStack(spacing: DISpacing.md) {
+                    ZStack {
+                        Circle()
+                            .fill(active ? DIColor.primary : DIColor.accent.opacity(0.18))
+                            .frame(width: 42, height: 42)
+                        Image(systemName: active ? "dot.radiowaves.left.and.right" : "timer")
+                            .foregroundStyle(active ? Color.white : DIColor.primary)
+                    }
+                    .accessibilityHidden(true)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(active ? "Zikr in progress" : "Zikr begins in")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(active ? DIColor.primary : DIColor.textMuted)
+                        Text(active ? end : start, style: .timer)
+                            .font(.title3.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(DIColor.textPrimary)
+                            .contentTransition(.numericText())
+                        Text(start.formatted(date: .abbreviated, time: .shortened))
+                            .font(.caption2)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(DISpacing.sm)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+                        .fill(active ? DIColor.primary.opacity(0.10) : DIColor.accent.opacity(0.08))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+                        .stroke(active ? DIColor.primary.opacity(0.42) : DIColor.accent.opacity(0.32), lineWidth: 1)
+                )
+                .accessibilityElement(children: .combine)
+            }
+        }
     }
 }
 

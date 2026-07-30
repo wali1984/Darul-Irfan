@@ -249,7 +249,26 @@ cover both spellings.
 
 ---
 
-## What's New — v1.6
+## What's New — v1.7
+
+**English**
+
+> A renewed Darul Irfan experience brings the official animated emblem and a
+> richer devotional home. The Apple Watch app now includes live azan and zikr
+> countdowns, today's prayer schedule, alert preferences, offline snapshots,
+> and dedicated prayer and zikr complications. Zikr schedules also stay in
+> sync from iPhone to Apple Watch.
+
+**Urdu**
+
+> دارالعرفان کے نئے تجربے میں سرکاری متحرک نشان اور زیادہ خوبصورت روحانی ہوم
+> شامل ہیں۔ ایپل واچ ایپ میں اب اذان اور ذکر کے براہ راست کاؤنٹ ڈاؤن، آج کے
+> اوقاتِ نماز، اطلاع کی ترجیحات، آف لائن معلومات، اور نماز و ذکر کی علیحدہ
+> کمپلیکیشنز شامل ہیں۔ ذکر کے اوقات آئی فون سے ایپل واچ پر بھی ہم آہنگ رہتے ہیں۔
+
+---
+
+## Previous What's New — v1.6
 
 **English**
 

@@ -180,8 +180,9 @@ before archiving.
 - [ ] Countdown text updates without stale timelines across a prayer boundary.
 - [ ] Opt-in next-prayer Live Activity starts, updates, and ends when disabled;
       Dynamic Island and Lock Screen layouts do not clip.
-- [ ] Watch app receives a phone snapshot, remains useful while disconnected,
-      and the next-prayer complication advances across a prayer boundary.
+- [ ] Watch app receives prayer and zikr snapshots, remains useful while
+      disconnected, and its azan/zikr timers plus both complications advance
+      correctly across prayer and session boundaries.
 
 **Official platform**:
 - [ ] `/v1/bootstrap`, `/v1/feed`, and `/v1/live` return valid production data;

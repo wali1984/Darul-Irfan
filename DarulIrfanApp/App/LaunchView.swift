@@ -11,8 +11,7 @@ struct LaunchView: View {
             DIGradient.auraGold.ignoresSafeArea()
 
             VStack(spacing: DISpacing.lg) {
-                DISealEmblem(diameter: 132, glow: true)
-                    .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 26)
+                DILivingSealMark(diameter: 132)
 
                 VStack(spacing: DISpacing.sm) {
                     Text(verbatim: "دارالعرفان")

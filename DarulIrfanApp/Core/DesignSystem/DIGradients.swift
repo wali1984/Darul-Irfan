@@ -28,17 +28,17 @@ enum DIGradient {
         let stops: [Color]
         switch DayPhase.current(date) {
         case .dawn:
-            stops = [Color(hex: 0x1B2A4A), Color(hex: 0x0B6E4F), Color(hex: 0x064330)]
+            stops = [Color(hex: 0x1B2A4A), Color(hex: 0x0B6E4F), Color(hex: 0x011D16)]
         case .morning:
-            stops = [Color(hex: 0x0E8A63), Color(hex: 0x0B6E4F), Color(hex: 0x064330)]
+            stops = [Color(hex: 0x0E8A63), Color(hex: 0x0B6E4F), Color(hex: 0x011D16)]
         case .midday:
-            stops = [Color(hex: 0x12946B), Color(hex: 0x0B6E4F), Color(hex: 0x06432F)]
+            stops = [Color(hex: 0x12946B), Color(hex: 0x0B6E4F), Color(hex: 0x011D16)]
         case .afternoon:
-            stops = [Color(hex: 0x0B6E4F), Color(hex: 0x1E5E48), Color(hex: 0x2A2417)]
+            stops = [Color(hex: 0x0B6E4F), Color(hex: 0x1E5E48), Color(hex: 0x011D16)]
         case .dusk:
-            stops = [Color(hex: 0x8A5A22), Color(hex: 0x0B5B40), Color(hex: 0x06301F)]
+            stops = [Color(hex: 0x8A5A22), Color(hex: 0x0B5B40), Color(hex: 0x011D16)]
         case .night:
-            stops = [Color(hex: 0x0B4635), Color(hex: 0x073021), Color(hex: 0x121012)]
+            stops = [Color(hex: 0x0B4635), Color(hex: 0x011D16), Color(hex: 0x0B0B09)]
         }
         return LinearGradient(colors: stops, startPoint: .topLeading, endPoint: .bottomTrailing)
     }

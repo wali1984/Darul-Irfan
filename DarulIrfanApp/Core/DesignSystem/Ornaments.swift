@@ -80,8 +80,73 @@ struct DISealEmblem: View {
             .interpolation(.high)
             .scaledToFit()
             .frame(width: diameter, height: diameter)
+            .clipShape(Circle())
             .modifier(SealGlow(active: glow))
             .accessibilityHidden(true)
+    }
+}
+
+/// A living presentation of the official website hero emblem: white circular
+/// plate, fine gold edge, broad radial halo, and one slow moving glint. The
+/// sacred emblem itself stays still and fully legible.
+struct DILivingSealMark: View {
+    var diameter: CGFloat = 120
+
+    @State private var rotating = false
+    @State private var breathing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [DIColor.goldGlow.opacity(breathing ? 0.30 : 0.16), .clear],
+                        center: .center,
+                        startRadius: diameter * 0.40,
+                        endRadius: diameter * 0.86
+                    )
+                )
+                .frame(width: diameter * 1.72, height: diameter * 1.72)
+
+            Circle()
+                .fill(Color.white.opacity(0.98))
+                .frame(width: diameter * 1.055, height: diameter * 1.055)
+                .overlay(
+                    Circle().stroke(DIColor.accent.opacity(0.75), lineWidth: max(1, diameter * 0.008))
+                )
+                .shadow(color: DIColor.accent.opacity(0.10), radius: 0, x: 0, y: 0)
+                .shadow(color: DIColor.accent.opacity(breathing ? 0.34 : 0.20), radius: diameter * 0.20)
+                .shadow(color: Color.black.opacity(0.28), radius: diameter * 0.20, y: diameter * 0.10)
+
+            DISealEmblem(diameter: diameter, glow: true)
+                .padding(diameter * 0.025)
+
+            Circle()
+                .trim(from: 0.02, to: 0.20)
+                .stroke(
+                    LinearGradient(
+                        colors: [.clear, Color.white.opacity(0.92), DIColor.goldGlow.opacity(0.85), .clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    style: StrokeStyle(lineWidth: max(1.5, diameter * 0.018), lineCap: .round)
+                )
+                .frame(width: diameter * 1.10, height: diameter * 1.10)
+                .rotationEffect(.degrees(reduceMotion ? -35 : (rotating ? 325 : -35)))
+        }
+        .frame(width: diameter * 1.22, height: diameter * 1.22)
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.linear(duration: 12).repeatForever(autoreverses: false)) {
+                rotating = true
+            }
+            withAnimation(.easeInOut(duration: 2.8).repeatForever(autoreverses: true)) {
+                breathing = true
+            }
+        }
+        .accessibilityElement()
+        .accessibilityLabel("Darul Irfan")
     }
 }
 

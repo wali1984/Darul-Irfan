@@ -122,7 +122,7 @@ DarulIrfan-iOS/
 │       ├── Images/              # Asset catalog (AppIcon, AccentColor, launch color)
 │       └── SeedData/            # 15 JSON files, wire schema v1, seed v2
 ├── Widgets/                     # Widgets + next-prayer Live Activity
-├── WatchApp/ + WatchWidgets/    # Watch prayer app + complication
+├── WatchApp/ + WatchWidgets/    # Watch azan/zikr timers + prayer/zikr complications
 ├── Server/                      # Cloudflare Worker, D1, admin + tests
 └── Tools/ContentIngest/         # Python ingest pipeline + offline pytest suite
 ```
@@ -252,7 +252,7 @@ from this repo.
 | Urdu localization | Implemented — String Catalog (~665 keys) with en + ur units |
 | Swift unit/UI test suites | Written, never executed (no compiler on the authoring machine) — see Testing |
 | Live Activities (next prayer) | Implemented; opt-in/device verification required |
-| Apple Watch app + complication | Implemented; signing/device verification required |
+| Apple Watch azan/zikr app + prayer/zikr complications | Implemented; signing/device verification required |
 | Official APNs alerts + MetricKit diagnostics | Implemented; credentials/disclosures required |
 
 ## Content permissions & remaining content work
