@@ -87,6 +87,7 @@ struct ZikrHomeView: View {
         .diPageHeading("Zikr")
         .diScreenBackground()
         .task { await viewModel.load() }
+        .refreshable { await viewModel.load(forceRefresh: true) }
         .alert("Notifications are off", isPresented: $viewModel.showPermissionAlert) {
             Button("OK", role: .cancel) {}
         } message: {

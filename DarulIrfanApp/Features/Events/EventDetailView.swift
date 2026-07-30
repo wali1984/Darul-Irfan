@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Detail screen for one community event: a gradient crest header, full
 /// details, add-to-calendar and reminder actions (only when concrete dates
-/// exist), and the source link.
+/// exist), with all event information presented natively.
 @MainActor
 struct EventDetailView: View {
     @State private var viewModel: EventDetailViewModel

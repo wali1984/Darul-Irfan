@@ -257,15 +257,15 @@ struct SurahReaderView: View {
         )
     }
 
-    /// Shown when a tafsir mode is selected but its text is not on device for
-    /// this surah; native availability placeholders remain visible meanwhile.
+    /// Native availability status for a tafsir edition not yet included for
+    /// this surah. The edition remains visible so content updates are seamless.
     private var tafsirPointerCard: some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("Tafsir arriving")
+                Text("Tafsir availability")
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
-                Text("This tafsir for this surah is being added to the native reader and will arrive through a verified content update.")
+                Text("This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                 ForEach(viewModel.tafsirEditionPointers) { edition in

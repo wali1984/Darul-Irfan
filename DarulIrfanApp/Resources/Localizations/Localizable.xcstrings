@@ -7212,23 +7212,6 @@
         }
       }
     },
-    "Open %@ on the website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open %@ on the website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ ویب سائٹ پر کھولیں"
-          }
-        }
-      }
-    },
     "Open Darul Irfan to keep prayer alerts fresh.": {
       "extractionState": "manual",
       "localizations": {
@@ -7395,23 +7378,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "مکمل پلیئر کھولتا ہے"
-          }
-        }
-      }
-    },
-    "The full text of this item is available on the official Naqshbandia Owaisiah website.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The full text of this item is available on the official Naqshbandia Owaisiah website."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس تحریر کا مکمل متن نقشبندیہ اویسیہ کی آفیشل ویب سائٹ پر موجود ہے۔"
           }
         }
       }
@@ -9805,23 +9771,6 @@
         }
       }
     },
-    "Tafsir on the website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tafsir on the website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویب سائٹ پر تفسیر"
-          }
-        }
-      }
-    },
     "Tap anywhere to count": {
       "extractionState": "manual",
       "localizations": {
@@ -11284,23 +11233,6 @@
         }
       }
     },
-    "View source": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View source"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ماخذ دیکھیں"
-          }
-        }
-      }
-    },
     "View the adhan-swift project on GitHub": {
       "extractionState": "manual",
       "localizations": {
@@ -11399,23 +11331,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ہم آپ کا مقام معلوم نہیں کر سکے۔ آپ iOS کی ترتیبات میں مقام کی اجازت دے سکتے ہیں، یا مزید ٹیب میں ترتیبات سے کوئی شہر منتخب کر سکتے ہیں۔"
-          }
-        }
-      }
-    },
-    "Website": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Website"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویب سائٹ"
           }
         }
       }
@@ -11809,6 +11724,76 @@
             "value": "اردو"
           }
         }
+      }
+    },
+    "30-day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "30-day" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "30 دن" } }
+      }
+    },
+    "Archive record": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Archive record" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "محفوظ شدہ ریکارڈ" } }
+      }
+    },
+    "Day streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Day streak" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "دن کا تسلسل" } }
+      }
+    },
+    "Next Zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Next Zikr" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اگلا ذکر" } }
+      }
+    },
+    "No zikr session scheduled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "No zikr session scheduled" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ذکر کی کوئی نشست مقرر نہیں" } }
+      }
+    },
+    "Prayers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Prayers" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "نمازیں" } }
+      }
+    },
+    "Tafsir availability": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Tafsir availability" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "تفسیر کی دستیابی" } }
+      }
+    },
+    "This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically." } },
+        "ur": { "stringUnit": { "state": "translated", "value": "یہ مواد دارالعرفان کے محفوظ ذخیرے میں شامل ہے۔ بعد میں شامل کیا جانے والا تصدیق شدہ متن، تصویر، آڈیو یا دستاویز یہاں خودکار طور پر ظاہر ہوگا۔" } }
+      }
+    },
+    "This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically." } },
+        "ur": { "stringUnit": { "state": "translated", "value": "موجودہ آف لائن نسخے میں اس سورت کی یہ تفسیر شامل نہیں۔ دارالعرفان تصدیق شدہ مقامی مواد کی تازہ کاری خودکار طور پر دیکھتا ہے۔" } }
+      }
+    },
+    "until session ends": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "until session ends" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "نشست ختم ہونے تک" } }
       }
     },
     "≈ %@": {

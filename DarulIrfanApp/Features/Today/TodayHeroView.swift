@@ -11,10 +11,13 @@ struct TodayHeroView: View {
     let nextPrayerTime: Date?
     /// Today's prayer instants (for computing ring progress).
     let dayTimes: [Date]
+    let completedPrayers: Int
+    let prayerGoal: Int
+    let streakDays: Int
+    let completionRate: Double
 
-    private var progress: Double {
+    private func progress(at now: Date) -> Double {
         guard let nextPrayerTime, !dayTimes.isEmpty else { return 0 }
-        let now = Date()
         let sorted = dayTimes.sorted()
         let prev = sorted.last(where: { $0 <= now }) ?? sorted.first ?? now
         let total = nextPrayerTime.timeIntervalSince(prev)
@@ -47,15 +50,23 @@ struct TodayHeroView: View {
                         }
                     }
                     Spacer()
-                    DILivingSealMark(diameter: 60)
+                    DILivingSealMark(diameter: 66)
                 }
 
                 if let name = nextPrayerName, let time = nextPrayerTime {
-                    PrayerCountdownRing(progress: progress, prayerName: name, target: time)
-                        .padding(.vertical, DISpacing.xs)
+                    TimelineView(.periodic(from: .now, by: 60)) { context in
+                        PrayerCountdownRing(
+                            progress: progress(at: context.date),
+                            prayerName: name,
+                            target: time
+                        )
+                    }
+                    .padding(.vertical, DISpacing.xs)
                 } else {
                     fallbackCrest
                 }
+
+                devotionalMetrics
 
                 HStack(spacing: DISpacing.md) {
                     dateChip(icon: "calendar", text: gregorian)
@@ -74,6 +85,63 @@ struct TodayHeroView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
         .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
+    }
+
+    private var devotionalMetrics: some View {
+        HStack(spacing: DISpacing.sm) {
+            homeMetric(
+                icon: "checkmark",
+                value: "\(completedPrayers)/\(prayerGoal)",
+                label: "Prayers",
+                progress: prayerGoal > 0 ? Double(completedPrayers) / Double(prayerGoal) : 0
+            )
+            homeMetric(
+                icon: "flame.fill",
+                value: "\(streakDays)",
+                label: "Day streak",
+                progress: min(Double(streakDays) / 7.0, 1)
+            )
+            homeMetric(
+                icon: "chart.line.uptrend.xyaxis",
+                value: "\(Int((min(max(completionRate, 0), 1) * 100).rounded()))%",
+                label: "30-day",
+                progress: completionRate
+            )
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    private func homeMetric(
+        icon: String,
+        value: String,
+        label: LocalizedStringKey,
+        progress: Double
+    ) -> some View {
+        VStack(spacing: 4) {
+            ZStack {
+                Circle().stroke(Color.white.opacity(0.16), lineWidth: 4)
+                Circle()
+                    .trim(from: 0, to: min(max(progress, 0), 1))
+                    .stroke(DIColor.goldGlow, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                Image(systemName: icon)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: 34, height: 34)
+            Text(verbatim: value)
+                .font(.caption.weight(.bold).monospacedDigit())
+                .foregroundStyle(.white)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.72))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.09)))
+        .accessibilityElement(children: .combine)
     }
 
     private var fallbackCrest: some View {

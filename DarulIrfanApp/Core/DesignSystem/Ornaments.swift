@@ -71,11 +71,10 @@ struct DIJaliDivider: View {
 struct DISealEmblem: View {
     var diameter: CGFloat = 120
     var glow: Bool = true
+    var assetName: String = "BrandEmblem"
 
     var body: some View {
-        // The official Silsila emblem (green globe + محمد رسول الله seal),
-        // matching the organization's website and the app icon.
-        Image("BrandEmblem")
+        Image(assetName)
             .resizable()
             .interpolation(.high)
             .scaledToFit()
@@ -86,11 +85,12 @@ struct DISealEmblem: View {
     }
 }
 
-/// A living presentation of the official website hero emblem: white circular
-/// plate, fine gold edge, broad radial halo, and one slow moving glint. The
-/// sacred emblem itself stays still and fully legible.
+/// A living presentation of the selected brand emblem: white circular plate,
+/// fine gold edge, broad radial halo, and one slow moving glint. The emblem
+/// itself stays still and fully legible.
 struct DILivingSealMark: View {
     var diameter: CGFloat = 120
+    var assetName: String = "BrandEmblem"
 
     @State private var rotating = false
     @State private var breathing = false
@@ -119,7 +119,7 @@ struct DILivingSealMark: View {
                 .shadow(color: DIColor.accent.opacity(breathing ? 0.34 : 0.20), radius: diameter * 0.20)
                 .shadow(color: Color.black.opacity(0.28), radius: diameter * 0.20, y: diameter * 0.10)
 
-            DISealEmblem(diameter: diameter, glow: true)
+            DISealEmblem(diameter: diameter, glow: true, assetName: assetName)
                 .padding(diameter * 0.025)
 
             Circle()

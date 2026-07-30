@@ -373,12 +373,12 @@ struct ContentItemDetailView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack(spacing: DISpacing.md) {
                     LibraryMedallion(systemImage: "arrow.triangle.2.circlepath", diameter: 40, breathing: true)
-                    Text("Native content is being prepared")
+                    Text("Archive record")
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                 }
-                Text("This entry is already part of the Darul Irfan archive. Its complete native text or document will appear automatically after a verified content update.")
+                Text("This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
             }

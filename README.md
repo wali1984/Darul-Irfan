@@ -121,7 +121,7 @@ DarulIrfan-iOS/
 │       ├── Audio/               # azan-short.caf, azan-full.mp3, azan-fajr-full.mp3, chime
 │       ├── Images/              # Asset catalog (AppIcon, AccentColor, launch color)
 │       └── SeedData/            # 15 JSON files, wire schema v1, seed v2
-├── Widgets/                     # Widgets + next-prayer Live Activity
+├── Widgets/                     # Prayer/zikr widgets + next-prayer Live Activity
 ├── WatchApp/ + WatchWidgets/    # Watch azan/zikr timers + prayer/zikr complications
 ├── Server/                      # Cloudflare Worker, D1, admin + tests
 └── Tools/ContentIngest/         # Python ingest pipeline + offline pytest suite
@@ -237,7 +237,7 @@ from this repo.
 | Prayer tracker history (7/30 days, streaks, no shame-based UX) | Implemented |
 | Qibla compass with calibration banner + absolute-bearing fallback | Implemented |
 | Hijri date (Umm al-Qura) with ±2 day offset + live preview | Implemented |
-| Widgets: Next Prayer (small + Lock Screen circular/rectangular/inline), Today's Times (medium), App Group snapshot bridge | Implemented |
+| Widgets: Next Prayer and Zikr (Home + Lock Screen), Today's Times, branded Live Activity, App Group snapshot bridge | Implemented |
 | Quran: 114-surah index, ayah reader, language-aware translation (Pickthall EN / Jalandhry UR), tafsir section, bookmarks, continue reading, reader font scale, Amiri Quran mushaf font | Implemented — **complete Quran bundled offline** (all 114 surahs / 6,236 ayat, Arabic triple-verified error-free — see Docs/QURAN_VERIFICATION.md). Native English tafseer (Asrar-at-Tanzil) OCR'd inline for 6 surahs so far; the rest run via Tools/OCR |
 | Library: category browser, filters, favorites, rights-aware reader, PDF download + native viewer, reading progress | Implemented — permission granted 2026-07-10: 291 seeded items; full verbatim text for About pages, Method of Zikr, zikr-joining instructions, and 10+ articles; 20 books + 249 Al-Murshid issues as metadata + PDF download links |
 | Media: official live hub, categories, year/month archive, background audio for owned streams, Lock Screen controls, 0.75–2× speed, queue, lecture bookmarks, continue listening, MP3 downloads | Implemented — 198 seeded items incl. 2024–2026 audio lectures from the organization's MP3 URLs; YouTube plays in the controlled foreground player with an external fallback |

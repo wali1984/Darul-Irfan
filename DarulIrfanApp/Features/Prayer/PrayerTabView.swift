@@ -30,7 +30,11 @@ struct PrayerTabView: View {
                             String(localized: String.LocalizationValue($0.prayer.englishName))
                         },
                         nextPrayerTime: viewModel.nextPrayer?.time,
-                        dayTimes: viewModel.todaySchedule?.orderedTimes.map { $0.time } ?? []
+                        dayTimes: viewModel.todaySchedule?.orderedTimes.map { $0.time } ?? [],
+                        completedPrayers: viewModel.completedPrayerCount,
+                        prayerGoal: Prayer.obligatory.count,
+                        streakDays: viewModel.streakSummary?.currentStreakDays ?? 0,
+                        completionRate: viewModel.streakSummary?.completionRate ?? 0
                     )
                     .diAppear()
                     .diParallaxHero()
@@ -84,6 +88,9 @@ struct PrayerTabView: View {
                 GlobalSearchView(dependencies: dependencies)
             }
             .task {
+                await viewModel.refresh()
+            }
+            .refreshable {
                 await viewModel.refresh()
             }
             .onChange(of: scenePhase) { _, newPhase in

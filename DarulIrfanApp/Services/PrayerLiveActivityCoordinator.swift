@@ -5,11 +5,11 @@ import Foundation
 final class PrayerLiveActivityCoordinator {
     func update(upcoming: [WidgetPrayerTime], placeName: String, enabled: Bool) async {
         guard enabled, ActivityAuthorizationInfo().areActivitiesEnabled,
-              let next = upcoming.first(where: { $0.time > Date() }) else {
+              let next = upcoming.first(where: { $0.isObligatory && $0.time > Date() }) else {
             await endAll()
             return
         }
-        let following = upcoming.first(where: { $0.time > next.time })
+        let following = upcoming.first(where: { $0.isObligatory && $0.time > next.time })
         let state = PrayerActivityAttributes.ContentState(
             prayerName: next.displayName,
             prayerTime: next.time,

@@ -172,6 +172,7 @@ struct NextPrayerWidgetView: View {
         .containerBackground(for: .widget) {
             WidgetPalette.background(for: colorScheme)
         }
+        .widgetURL(URL(string: "darulirfan://today"))
     }
 }
 
@@ -205,9 +206,16 @@ private struct NextPrayerSmallView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("Next Prayer")
-                .font(.caption2)
-                .foregroundStyle(WidgetPalette.mutedTone(for: colorScheme))
+            HStack(spacing: 5) {
+                Image("BrandEmblem")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .accessibilityHidden(true)
+                Text("Next Prayer")
+                    .font(.caption2)
+                    .foregroundStyle(WidgetPalette.mutedTone(for: colorScheme))
+            }
             Text(next.displayName)
                 .font(.system(.title3, design: .serif).weight(.semibold))
                 .foregroundStyle(WidgetPalette.emeraldTone(for: colorScheme))
@@ -244,9 +252,16 @@ private struct NextPrayerMediumView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Next Prayer")
-                        .font(.caption2)
-                        .foregroundStyle(WidgetPalette.mutedTone(for: colorScheme))
+                    HStack(spacing: 6) {
+                        Image("BrandEmblem")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28, height: 28)
+                            .accessibilityHidden(true)
+                        Text("Next Prayer")
+                            .font(.caption2)
+                            .foregroundStyle(WidgetPalette.mutedTone(for: colorScheme))
+                    }
                     Text(next.displayName)
                         .font(.system(.title2, design: .serif).weight(.semibold))
                         .foregroundStyle(WidgetPalette.emeraldTone(for: colorScheme))

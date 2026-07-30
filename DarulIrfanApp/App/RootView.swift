@@ -58,11 +58,13 @@ struct RootView: View {
             guard let path = notification.object as? String else { return }
             if path.contains("/live") || path.contains("/zikr") { selectedTab = .zikr }
             else if path.contains("/feed") || path.contains("/events") { selectedTab = .explore }
+            else if path.contains("/today") || path.contains("/prayer") { selectedTab = .today }
         }
         .onOpenURL { url in
             let path = ((url.host ?? "") + url.path).lowercased()
             if path.contains("live") || path.contains("zikr") { selectedTab = .zikr }
             else if path.contains("feed") || path.contains("event") { selectedTab = .explore }
+            else if path.contains("today") || path.contains("prayer") { selectedTab = .today }
         }
     }
 }

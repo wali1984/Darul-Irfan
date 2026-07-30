@@ -96,6 +96,7 @@ struct TodayTimesWidgetView: View {
         .containerBackground(for: .widget) {
             WidgetPalette.background(for: colorScheme)
         }
+        .widgetURL(URL(string: "darulirfan://today"))
     }
 
     private func content(snapshot: PrayerWidgetSnapshot, times: [WidgetPrayerTime]) -> some View {

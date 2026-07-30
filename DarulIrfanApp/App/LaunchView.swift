@@ -11,7 +11,7 @@ struct LaunchView: View {
             DIGradient.auraGold.ignoresSafeArea()
 
             VStack(spacing: DISpacing.lg) {
-                DILivingSealMark(diameter: 132)
+                DILivingSealMark(diameter: 132, assetName: "LaunchBrandEmblem")
 
                 VStack(spacing: DISpacing.sm) {
                     Text(verbatim: "دارالعرفان")

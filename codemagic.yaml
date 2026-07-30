@@ -42,6 +42,7 @@ workflows:
             echo "User-facing external content handoff text must not ship."
             exit 1
           fi
+          python Tools/validate_native_presentation.py
       - name: Build app + widgets for simulator (no signing)
         script: |
           # Compact, readable output: raw log goes to an artifact, the console

@@ -212,6 +212,15 @@ final class PrayerViewModel {
         todayCompletions[prayer] ?? .unmarked
     }
 
+    var completedPrayerCount: Int {
+        Prayer.obligatory.reduce(into: 0) { count, prayer in
+            switch completion(for: prayer) {
+            case .unmarked: break
+            case .prayed, .jamaat, .qaza: count += 1
+            }
+        }
+    }
+
     /// Cycles unmarked -> prayed -> jamaat -> qaza -> unmarked and persists.
     func cycleCompletion(for prayer: Prayer) async {
         let next: PrayerCompletion

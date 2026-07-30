@@ -30,10 +30,10 @@ final class ZikrHomeViewModel {
         self.watchSync = watchSync
     }
 
-    func load() async {
-        let bootstrap = await platform.bootstrap(forceRefresh: false)
-        live = await platform.currentLiveBroadcast(forceRefresh: false)
-        if let page = try? await platform.feed(after: nil, forceRefresh: false) {
+    func load(forceRefresh: Bool = false) async {
+        let bootstrap = await platform.bootstrap(forceRefresh: forceRefresh)
+        live = await platform.currentLiveBroadcast(forceRefresh: forceRefresh)
+        if let page = try? await platform.feed(after: nil, forceRefresh: forceRefresh) {
             recentBayans = Array(page.items.filter { $0.videoID != nil }.prefix(6))
         }
         let remote = bootstrap.schedules.map { schedule in

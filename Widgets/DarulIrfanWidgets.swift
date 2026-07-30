@@ -17,6 +17,7 @@ struct DarulIrfanWidgets: WidgetBundle {
     var body: some Widget {
         NextPrayerWidget()
         TodayTimesWidget()
+        ZikrCountdownWidget()
         PrayerActivityWidget()
     }
 }
@@ -135,7 +136,15 @@ extension PrayerWidgetSnapshot {
             upcomingTimes: times,
             hijriDateText: "15 Muharram 1448",
             suhoorEndsAt: nil,
-            iftarAt: nil
+            iftarAt: nil,
+            zikrSessions: [
+                WidgetZikrSession(
+                    id: "sample-zikr",
+                    title: "Online Zikr",
+                    startsAt: referenceDate.addingTimeInterval(35 * 60),
+                    endsAt: referenceDate.addingTimeInterval(65 * 60)
+                )
+            ]
         )
     }
 }

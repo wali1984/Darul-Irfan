@@ -249,7 +249,28 @@ cover both spellings.
 
 ---
 
-## What's New — v1.7
+## What's New — v1.8
+
+**English**
+
+> The Today screen is now a living devotional dashboard with the original
+> Darul Irfan internal mark, an animated prayer countdown, prayer progress,
+> streak, and 30-day consistency rings. New Home and Lock Screen zikr widgets
+> show the current or next session, while the branded next-prayer Live Activity
+> and Dynamic Island stay useful at a glance. All articles, schedules, event
+> details, and archive content are presented natively inside the app.
+
+**Urdu**
+
+> آج کی اسکرین اب ایک متحرک روحانی ڈیش بورڈ ہے جس میں دارالعرفان کا اصل اندرونی
+> نشان، نماز کا متحرک کاؤنٹ ڈاؤن، نماز کی پیش رفت، تسلسل اور 30 دن کی پابندی کے
+> حلقے شامل ہیں۔ نئے ہوم اور لاک اسکرین ذکر ویجٹس موجودہ یا اگلی نشست دکھاتے ہیں،
+> جبکہ نماز کی برانڈڈ لائیو ایکٹیویٹی اور ڈائنامک آئی لینڈ فوری معلومات فراہم کرتے
+> ہیں۔ تمام مضامین، اوقات، تقریبات اور محفوظ مواد ایپ کے اندر مقامی انداز میں دکھائے جاتے ہیں۔
+
+---
+
+## Previous What's New — v1.7
 
 **English**
 
