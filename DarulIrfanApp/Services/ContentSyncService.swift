@@ -114,18 +114,19 @@ struct ContentSyncService: ContentSyncServicing {
             try await quranRepository.upsertEditions(editions)
             imported += editions.count
         }
+        // Asrar-at-Tanzil English has been re-authored across versions
+        // (full-surah block -> per-ayah/range, and once removed entirely).
+        // Delete its rows wholesale BEFORE re-importing so: (a) no stale range
+        // can orphan under an ayah — a leftover 662 KB full-surah block once
+        // crashed large surahs, including when upgrading straight from an old
+        // build; (b) ayat dropped from the source truly go blank. Re-inserted
+        // just below from the seed when present; stays gone when the seed omits
+        // it (upsert adds nothing for a missing edition).
+        try await quranRepository.deleteTranslations(editionID: "asrar-at-tanzil-en")
+        try await quranRepository.deleteTafsir(editionID: "asrar-at-tanzil-en")
         if !translations.isEmpty {
             try await quranRepository.upsertTranslations(translations)
             imported += translations.count
-        }
-        // Self-correcting removal: if the seed no longer carries a tafsir
-        // edition, purge its rows so dropping it from the bundle also removes
-        // it from existing installs. (Asrar-at-Tanzil English was pulled in
-        // seed v12 for correction; re-adding it to the seed later repopulates
-        // automatically and this purge no-ops.)
-        for editionID in ["asrar-at-tanzil-en"]
-        where !tafsir.contains(where: { $0.editionID == editionID }) {
-            try await quranRepository.deleteTafsir(editionID: editionID)
         }
         if !tafsir.isEmpty {
             try await quranRepository.upsertTafsir(tafsir)

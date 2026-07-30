@@ -44,6 +44,9 @@ final class SurahReaderViewModel {
     private let preferredLanguageCode: String
 
     @ObservationIgnored private var translationsByAyah: [Int: QuranTranslation] = [:]
+    /// Asrar-at-Tanzil's OWN per-ayah translation (its dedicated tab shows this,
+    /// not Akram-ut-Tarajum; blank where the source has no verse).
+    @ObservationIgnored private var asrarTranslationsByAyah: [Int: QuranTranslation] = [:]
     @ObservationIgnored private var editionsByID: [String: QuranEdition] = [:]
     private(set) var bookmarksByAyah: [Int: QuranBookmark] = [:]
 
@@ -94,6 +97,15 @@ final class SurahReaderViewModel {
             if let preferred {
                 await loadTranslations(edition: preferred)
             }
+
+            // Asrar's own translation for its dedicated tab, in the reader's
+            // language (blank where the source has none — never backfilled).
+            let asrarRows = (try? await repository.translations(
+                editionID: "asrar-at-tanzil-\(preferredLanguageCode)", surahNumber: surah.id)) ?? []
+            asrarTranslationsByAyah = Dictionary(
+                asrarRows.map { ($0.ayahNumber, $0) }, uniquingKeysWith: { first, _ in first }
+            )
+
             recitation = RecitationProvider.shared.recitation(forSurah: surah.id)
 
             var entries: [QuranTafsir] = []
@@ -144,6 +156,12 @@ final class SurahReaderViewModel {
     /// Translation for an ayah in the chosen edition; nil (hidden gracefully)
     /// when the edition has no text for this ayah.
     func translation(for ayahNumber: Int) -> QuranTranslation? {
+        if contentMode == .asrarTanzil {
+            // Asrar tab is its own edition: show the book's own translation and
+            // stay blank where the source has none — never Akram-ut-Tarajum.
+            guard let t = asrarTranslationsByAyah[ayahNumber], !t.text.isEmpty else { return nil }
+            return t
+        }
         guard let translation = translationsByAyah[ayahNumber],
               !translation.text.isEmpty else { return nil }
         return translation
