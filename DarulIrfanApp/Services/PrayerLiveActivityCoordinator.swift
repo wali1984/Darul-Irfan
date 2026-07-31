@@ -16,7 +16,10 @@ final class PrayerLiveActivityCoordinator {
             followingPrayerName: following?.displayName,
             followingPrayerTime: following?.time
         )
-        let content = ActivityContent(state: state, staleDate: next.time.addingTimeInterval(900))
+        // iOS cannot schedule a local state mutation at the prayer boundary.
+        // Mark the activity stale exactly then so its UI stops presenting the
+        // old prayer as upcoming until the app or a future APNs update runs.
+        let content = ActivityContent(state: state, staleDate: next.time)
         if let activity = Activity<PrayerActivityAttributes>.activities.first {
             await activity.update(content)
         } else {

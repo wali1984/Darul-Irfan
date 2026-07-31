@@ -5,6 +5,17 @@ struct ZikrCountdownEntry: TimelineEntry {
     let date: Date
     let snapshot: PrayerWidgetSnapshot?
     let session: WidgetZikrSession?
+
+    var relevance: TimelineEntryRelevance? {
+        guard let session else { return nil }
+        if session.isActive(at: date) {
+            return TimelineEntryRelevance(score: 100, duration: max(session.endsAt.timeIntervalSince(date), 5 * 60))
+        }
+        let interval = session.startsAt.timeIntervalSince(date)
+        guard interval >= 0 else { return nil }
+        let score: Float = interval <= 60 * 60 ? 85 : 25
+        return TimelineEntryRelevance(score: score, duration: min(max(interval, 15 * 60), 2 * 60 * 60))
+    }
 }
 
 struct ZikrCountdownProvider: TimelineProvider {

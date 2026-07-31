@@ -19,13 +19,18 @@ struct ZikrHabitDayItem: Identifiable, Equatable {
 @MainActor
 final class TasbihListViewModel {
     private let trackerRepository: any TrackerRepositoryProtocol
+    private let devotionalMetrics: DevotionalMetricsSyncService
 
     private(set) var counters: [TasbihCounter] = []
     private(set) var habitDays: [ZikrHabitDayItem] = []
     private(set) var isLoaded = false
 
-    init(trackerRepository: any TrackerRepositoryProtocol) {
+    init(
+        trackerRepository: any TrackerRepositoryProtocol,
+        devotionalMetrics: DevotionalMetricsSyncService
+    ) {
         self.trackerRepository = trackerRepository
+        self.devotionalMetrics = devotionalMetrics
     }
 
     func load() async {
@@ -35,6 +40,7 @@ final class TasbihListViewModel {
             counters = []
         }
         await loadHabitStrip()
+        await devotionalMetrics.refresh()
         isLoaded = true
     }
 
@@ -91,6 +97,7 @@ final class TasbihListViewModel {
 @MainActor
 final class TasbihCounterViewModel {
     private let trackerRepository: any TrackerRepositoryProtocol
+    private let devotionalMetrics: DevotionalMetricsSyncService
 
     private(set) var counter: TasbihCounter
 
@@ -99,9 +106,14 @@ final class TasbihCounterViewModel {
     @ObservationIgnored private let tapFeedback = UIImpactFeedbackGenerator(style: .light)
     @ObservationIgnored private let targetFeedback = UINotificationFeedbackGenerator()
 
-    init(counter: TasbihCounter, trackerRepository: any TrackerRepositoryProtocol) {
+    init(
+        counter: TasbihCounter,
+        trackerRepository: any TrackerRepositoryProtocol,
+        devotionalMetrics: DevotionalMetricsSyncService
+    ) {
         self.counter = counter
         self.trackerRepository = trackerRepository
+        self.devotionalMetrics = devotionalMetrics
         // Counts at/above target on arrival should not re-record the habit.
         if let target = counter.target, target > 0, counter.count >= target {
             hasRecordedTargetThisSession = true
@@ -169,9 +181,11 @@ final class TasbihCounterViewModel {
         saveTask?.cancel()
         let snapshot = counter
         let repository = trackerRepository
+        let metrics = devotionalMetrics
         Task {
             do {
                 try await repository.saveTasbihCounter(snapshot)
+                await metrics.refresh(reference: snapshot.updatedAt)
             } catch {
                 // Local persistence failure; nothing actionable mid-dismissal.
             }
@@ -196,6 +210,7 @@ final class TasbihCounterViewModel {
         let snapshot = counter
         do {
             try await trackerRepository.saveTasbihCounter(snapshot)
+            await devotionalMetrics.refresh(reference: snapshot.updatedAt)
         } catch {
             // Local persistence failure; the next save attempt retries.
         }
@@ -210,6 +225,7 @@ final class TasbihCounterViewModel {
         let entry = ZikrHabitEntry(dayKey: key, completedCount: completed + 1, updatedAt: Date())
         do {
             try await trackerRepository.saveZikrHabit(entry)
+            await devotionalMetrics.refresh(reference: entry.updatedAt)
         } catch {
             // Habit record is best-effort; the counter itself is preserved.
         }

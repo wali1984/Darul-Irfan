@@ -12,10 +12,15 @@ struct TasbihCounterView: View {
     @State private var countBump: CGFloat = 1.0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(counter: TasbihCounter, trackerRepository: any TrackerRepositoryProtocol) {
+    init(
+        counter: TasbihCounter,
+        trackerRepository: any TrackerRepositoryProtocol,
+        devotionalMetrics: DevotionalMetricsSyncService
+    ) {
         _viewModel = State(initialValue: TasbihCounterViewModel(
             counter: counter,
-            trackerRepository: trackerRepository
+            trackerRepository: trackerRepository,
+            devotionalMetrics: devotionalMetrics
         ))
     }
 

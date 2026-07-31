@@ -27,6 +27,7 @@ struct SurahReaderView: View {
         _viewModel = State(initialValue: SurahReaderViewModel(
             surah: surah,
             repository: dependencies.quranRepository,
+            devotionalMetrics: dependencies.devotionalMetrics,
             preferredLanguageCode: langCode
         ))
     }

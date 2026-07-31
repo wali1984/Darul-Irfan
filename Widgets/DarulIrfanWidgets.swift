@@ -18,6 +18,7 @@ struct DarulIrfanWidgets: WidgetBundle {
         NextPrayerWidget()
         TodayTimesWidget()
         ZikrCountdownWidget()
+        DevotionalDashboardWidget()
         PrayerActivityWidget()
     }
 }
@@ -144,7 +145,20 @@ extension PrayerWidgetSnapshot {
                     startsAt: referenceDate.addingTimeInterval(35 * 60),
                     endsAt: referenceDate.addingTimeInterval(65 * 60)
                 )
-            ]
+            ],
+            devotionalMetrics: WidgetDevotionalMetrics(
+                prayersCompleted: 3,
+                prayerGoal: 5,
+                prayerStreakDays: 7,
+                prayerCompletionRate: 0.82,
+                quranSurahNumber: 36,
+                quranAyahNumber: 12,
+                tasbihTitle: "Darood Sharif",
+                tasbihCount: 72,
+                tasbihTarget: 100,
+                zikrCompletionsToday: 1,
+                updatedAt: referenceDate
+            )
         )
     }
 }

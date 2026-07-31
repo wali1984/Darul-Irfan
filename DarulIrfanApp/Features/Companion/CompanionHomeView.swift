@@ -59,7 +59,10 @@ struct CompanionHomeView: View {
                 .diAppear(delay: 0.15)
 
                 NavigationLink {
-                    TasbihListView(trackerRepository: dependencies.trackerRepository)
+                    TasbihListView(
+                        trackerRepository: dependencies.trackerRepository,
+                        devotionalMetrics: dependencies.devotionalMetrics
+                    )
                 } label: {
                     CompanionHubCard(
                         systemImage: "hand.tap",

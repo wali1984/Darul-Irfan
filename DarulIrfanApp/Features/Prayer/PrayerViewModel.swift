@@ -26,6 +26,7 @@ final class PrayerViewModel {
     private let hijriService: any HijriCalendarServicing
     private let trackerRepository: any TrackerRepositoryProtocol
     private let locationService: any LocationServicing
+    private let devotionalMetrics: DevotionalMetricsSyncService
     private let appState: AppState
 
     // MARK: - Published state
@@ -55,6 +56,7 @@ final class PrayerViewModel {
         self.hijriService = dependencies.hijri
         self.trackerRepository = dependencies.trackerRepository
         self.locationService = dependencies.location
+        self.devotionalMetrics = dependencies.devotionalMetrics
         self.appState = appState
     }
 
@@ -244,6 +246,7 @@ final class PrayerViewModel {
                 endingAt: entry.dayKey,
                 windowDays: 30
             )
+            await devotionalMetrics.refresh(reference: now)
         } catch {
             // Persistence hiccups must never interrupt worship; the in-memory
             // mark stays and will be retried on the next cycle/refresh.
@@ -263,6 +266,7 @@ final class PrayerViewModel {
                 endingAt: dayKey,
                 windowDays: 30
             )
+            await devotionalMetrics.refresh(reference: now)
         } catch {
             // Keep whatever was shown before; the tracker is non-critical.
         }

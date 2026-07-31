@@ -11796,6 +11796,118 @@
         "ur": { "stringUnit": { "state": "translated", "value": "نشست ختم ہونے تک" } }
       }
     },
+    "Ayah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Ayah" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "آیت" } }
+      }
+    },
+    "Choose the devotional activity highlighted by the widget.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Choose the devotional activity highlighted by the widget." } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ویجٹ میں نمایاں روحانی سرگرمی منتخب کریں۔" } }
+      }
+    },
+    "completed today": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "completed today" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "آج مکمل" } }
+      }
+    },
+    "Continue Quran": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Continue Quran" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "قرآن جاری رکھیں" } }
+      }
+    },
+    "Dashboard focus": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Dashboard focus" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ڈیش بورڈ کی ترجیح" } }
+      }
+    },
+    "day streak": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "day streak" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "دن کا تسلسل" } }
+      }
+    },
+    "Devotional Dashboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Devotional Dashboard" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "روحانی ڈیش بورڈ" } }
+      }
+    },
+    "Focus": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Focus" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ترجیح" } }
+      }
+    },
+    "Open Darul Irfan to continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Open Darul Irfan to continue" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "جاری رکھنے کے لیے دارالعرفان کھولیں" } }
+      }
+    },
+    "Open Quran to begin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Open Quran to begin" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "شروع کرنے کے لیے قرآن کھولیں" } }
+      }
+    },
+    "Overview": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Overview" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "خلاصہ" } }
+      }
+    },
+    "Prayer progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Prayer progress" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "نماز کی پیش رفت" } }
+      }
+    },
+    "Prayer time reached": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Prayer time reached" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "نماز کا وقت ہو گیا" } }
+      }
+    },
+    "Prayer, Quran and zikr progress in one configurable widget.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Prayer, Quran and zikr progress in one configurable widget." } },
+        "ur": { "stringUnit": { "state": "translated", "value": "نماز، قرآن اور ذکر کی پیش رفت ایک قابل ترتیب ویجٹ میں۔" } }
+      }
+    },
+    "Surah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Surah" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "سورت" } }
+      }
+    },
+    "Zikr & Tasbih": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Zikr & Tasbih" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "ذکر و تسبیح" } }
+      }
+    },
     "≈ %@": {
       "extractionState": "manual",
       "localizations": {

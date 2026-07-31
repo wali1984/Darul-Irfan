@@ -16,6 +16,37 @@ final class WatchDevotionalSnapshotTests: XCTestCase {
         decoder.dateDecodingStrategy = .iso8601
         let snapshot = try decoder.decode(PrayerWidgetSnapshot.self, from: Data(json.utf8))
         XCTAssertNil(snapshot.zikrSessions)
+        XCTAssertNil(snapshot.devotionalMetrics)
+    }
+
+    func testDevotionalMetricsRoundTripForWidgetsAndWatch() throws {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let metrics = WidgetDevotionalMetrics(
+            prayersCompleted: 4,
+            prayerGoal: 5,
+            prayerStreakDays: 9,
+            prayerCompletionRate: 0.84,
+            quranSurahNumber: 36,
+            quranAyahNumber: 12,
+            tasbihTitle: "Darood Sharif",
+            tasbihCount: 72,
+            tasbihTarget: 100,
+            zikrCompletionsToday: 1,
+            updatedAt: now
+        )
+        let snapshot = PrayerWidgetSnapshot(
+            generatedAt: now,
+            placeName: "Test City",
+            upcomingTimes: [],
+            hijriDateText: "15 Safar 1448",
+            suhoorEndsAt: nil,
+            iftarAt: nil,
+            devotionalMetrics: metrics
+        )
+
+        let data = try JSONEncoder().encode(snapshot)
+        let decoded = try JSONDecoder().decode(PrayerWidgetSnapshot.self, from: data)
+        XCTAssertEqual(decoded.devotionalMetrics, metrics)
     }
 
     func testCurrentZikrWinsOverLaterOccurrence() {

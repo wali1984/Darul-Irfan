@@ -43,6 +43,22 @@ struct WidgetZikrSession: Codable, Sendable, Equatable, Identifiable {
     }
 }
 
+/// Privacy-preserving devotional summary shared only through the App Group
+/// and WatchConnectivity. No worship history or location leaves the device.
+struct WidgetDevotionalMetrics: Codable, Sendable, Equatable {
+    var prayersCompleted: Int
+    var prayerGoal: Int
+    var prayerStreakDays: Int
+    var prayerCompletionRate: Double
+    var quranSurahNumber: Int?
+    var quranAyahNumber: Int?
+    var tasbihTitle: String?
+    var tasbihCount: Int
+    var tasbihTarget: Int?
+    var zikrCompletionsToday: Int
+    var updatedAt: Date
+}
+
 /// Everything the widgets need, precomputed by the app. Covers several days
 /// so widgets stay correct even if the app is not opened daily.
 struct PrayerWidgetSnapshot: Codable, Sendable, Equatable {
@@ -61,6 +77,8 @@ struct PrayerWidgetSnapshot: Codable, Sendable, Equatable {
     /// Upcoming concrete zikr occurrences. Optional for backward-compatible
     /// decoding of snapshots written by pre-Watch-zikr app versions.
     var zikrSessions: [WidgetZikrSession]? = nil
+    /// Optional for backward-compatible decoding of pre-dashboard snapshots.
+    var devotionalMetrics: WidgetDevotionalMetrics? = nil
 
     /// The next prayer strictly after `date`, or nil if the snapshot is exhausted.
     func nextPrayer(after date: Date) -> WidgetPrayerTime? {

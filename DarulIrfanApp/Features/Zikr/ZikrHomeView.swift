@@ -74,7 +74,10 @@ struct ZikrHomeView: View {
 
                 DISectionHeader(titleKey: "Tasbih", systemImage: "hand.tap")
                 NavigationLink {
-                    TasbihListView(trackerRepository: dependencies.trackerRepository)
+                    TasbihListView(
+                        trackerRepository: dependencies.trackerRepository,
+                        devotionalMetrics: dependencies.devotionalMetrics
+                    )
                 } label: {
                     tasbihEntryCard
                 }

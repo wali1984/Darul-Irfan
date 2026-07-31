@@ -39,6 +39,7 @@ final class SurahReaderViewModel {
     private(set) var recitation: SurahRecitation?
 
     private let repository: any QuranRepositoryProtocol
+    private let devotionalMetrics: DevotionalMetricsSyncService
     /// Preferred translation language ("en"/"ur"); the reader defaults to the
     /// matching offline edition when one exists.
     private let preferredLanguageCode: String
@@ -55,9 +56,15 @@ final class SurahReaderViewModel {
     @ObservationIgnored private var visibleAyahNumber: Int?
     @ObservationIgnored private var lastPersistedAyahNumber: Int?
 
-    init(surah: QuranSurah, repository: any QuranRepositoryProtocol, preferredLanguageCode: String = "en") {
+    init(
+        surah: QuranSurah,
+        repository: any QuranRepositoryProtocol,
+        devotionalMetrics: DevotionalMetricsSyncService,
+        preferredLanguageCode: String = "en"
+    ) {
         self.surah = surah
         self.repository = repository
+        self.devotionalMetrics = devotionalMetrics
         self.preferredLanguageCode = preferredLanguageCode
     }
 
@@ -285,5 +292,6 @@ final class SurahReaderViewModel {
             updatedAt: Date()
         )
         try? await repository.saveLastReadPosition(progress)
+        await devotionalMetrics.refresh(reference: progress.updatedAt)
     }
 }

@@ -14,6 +14,14 @@ struct NextPrayerEntry: TimelineEntry {
     let snapshot: PrayerWidgetSnapshot?
     /// The obligatory prayer this entry features, nil when no data is available.
     let nextPrayer: WidgetPrayerTime?
+
+    var relevance: TimelineEntryRelevance? {
+        guard let nextPrayer else { return nil }
+        let interval = nextPrayer.time.timeIntervalSince(date)
+        guard interval >= 0 else { return nil }
+        let score = Float(max(10, 90 - min(interval / 60, 80)))
+        return TimelineEntryRelevance(score: score, duration: min(max(interval, 15 * 60), 2 * 60 * 60))
+    }
 }
 
 /// A Ramadan moment ("Suhoor ends" / "Iftar") relevant to the featured prayer.

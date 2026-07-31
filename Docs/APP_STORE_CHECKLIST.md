@@ -25,7 +25,7 @@ before archiving.
 - [ ] Signing style is Automatic (`CODE_SIGN_STYLE: Automatic`); verify the
       team and provisioning profile on all four shipping targets after
       `xcodegen generate`.
-- [x] Version `1.8.0` (local build `31`) — bump via `MARKETING_VERSION` /
+- [x] Version `1.9.0` (local build `32`) — bump via `MARKETING_VERSION` /
       `CURRENT_PROJECT_VERSION` in `project.yml`, not in Xcode (the project is
       regenerated). Codemagic replaces the archive build with `BUILD_NUMBER`.
 - [ ] Xcode 16+ required (adhan-swift 1.5.0 is swift-tools-version 6.0).
@@ -179,12 +179,17 @@ before archiving.
       (App Group wired correctly); placeholder shows before first snapshot.
 - [ ] Zikr widgets on the Home and Lock Screens show upcoming/live/ended
       transitions, work from cached schedules, localize, and open the Zikr tab.
+- [ ] The configurable Devotional Dashboard renders overview/prayer/Quran/zikr
+      choices, reflects local progress, and deep-links to the selected area.
+- [ ] Next Prayer, Zikr, and Devotional Dashboard widgets receive appropriate
+      Smart Stack prominence near prayer and live-zikr boundaries.
 - [ ] Countdown text updates without stale timelines across a prayer boundary.
 - [ ] Opt-in next-prayer Live Activity starts, updates, and ends when disabled;
+      at the prayer boundary it shows the refresh state instead of counting up;
       Dynamic Island and Lock Screen layouts do not clip.
 - [ ] Watch app receives prayer and zikr snapshots, remains useful while
-      disconnected, and its azan/zikr timers plus both complications advance
-      correctly across prayer and session boundaries.
+      disconnected, shows local prayer/Quran/zikr progress, and its azan/zikr
+      timers plus both complications advance correctly across boundaries.
 
 **Official platform**:
 - [ ] `/v1/bootstrap`, `/v1/feed`, and `/v1/live` return valid production data;

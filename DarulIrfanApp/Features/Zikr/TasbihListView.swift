@@ -9,10 +9,18 @@ struct TasbihListView: View {
     @State private var editingCounter: TasbihCounter?
     @State private var counterPendingDeletion: TasbihCounter?
     private let trackerRepository: any TrackerRepositoryProtocol
+    private let devotionalMetrics: DevotionalMetricsSyncService
 
-    init(trackerRepository: any TrackerRepositoryProtocol) {
+    init(
+        trackerRepository: any TrackerRepositoryProtocol,
+        devotionalMetrics: DevotionalMetricsSyncService
+    ) {
         self.trackerRepository = trackerRepository
-        _viewModel = State(initialValue: TasbihListViewModel(trackerRepository: trackerRepository))
+        self.devotionalMetrics = devotionalMetrics
+        _viewModel = State(initialValue: TasbihListViewModel(
+            trackerRepository: trackerRepository,
+            devotionalMetrics: devotionalMetrics
+        ))
     }
 
     var body: some View {
@@ -36,7 +44,11 @@ struct TasbihListView: View {
                 } else {
                     ForEach(Array(viewModel.counters.enumerated()), id: \.element.id) { index, counter in
                         NavigationLink {
-                            TasbihCounterView(counter: counter, trackerRepository: trackerRepository)
+                            TasbihCounterView(
+                                counter: counter,
+                                trackerRepository: trackerRepository,
+                                devotionalMetrics: devotionalMetrics
+                            )
                         } label: {
                             TasbihCounterRow(counter: counter)
                         }

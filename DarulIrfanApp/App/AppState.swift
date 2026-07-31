@@ -135,6 +135,7 @@ final class AppState {
                 && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset)
         }?.time
 
+        let previousSnapshot = PrayerWidgetSnapshot.load()
         let snapshot = PrayerWidgetSnapshot(
             generatedAt: now,
             placeName: place.name,
@@ -142,10 +143,12 @@ final class AppState {
             hijriDateText: hijriText,
             suhoorEndsAt: suhoorEndsAt,
             iftarAt: iftarAt,
-            zikrSessions: PrayerWidgetSnapshot.load()?.zikrSessions
+            zikrSessions: previousSnapshot?.zikrSessions,
+            devotionalMetrics: previousSnapshot?.devotionalMetrics
         )
         snapshot.save()
         dependencies.watchSync.send(snapshot)
+        Task { await dependencies.devotionalMetrics.refresh(reference: now) }
         Task {
             await dependencies.prayerLiveActivity.update(
                 upcoming: upcoming,

@@ -249,7 +249,28 @@ cover both spellings.
 
 ---
 
-## What's New — v1.8
+## What's New — v1.9
+
+**English**
+
+> A new configurable Devotional Dashboard widget keeps prayer progress, your
+> Quran reading position, tasbih, and daily zikr visible on the Home and Lock
+> Screens. Timely Smart Stack suggestions bring prayer and live zikr forward
+> when they matter. Apple Watch now mirrors your private on-device devotional
+> progress, and the next-prayer Live Activity clearly asks you to refresh after
+> its prayer time instead of showing an outdated countdown.
+
+**Urdu**
+
+> نیا قابلِ ترتیب روحانی ڈیش بورڈ ویجٹ نماز کی پیش رفت، قرآن میں آپ کی آخری
+> مطالعہ کی جگہ، تسبیح اور روزانہ ذکر کو ہوم اور لاک اسکرین پر نمایاں رکھتا ہے۔
+> اسمارٹ اسٹیک نماز اور براہِ راست ذکر کو مناسب وقت پر سامنے لاتا ہے۔ ایپل واچ
+> اب آپ کی نجی، آلہ پر محفوظ روحانی پیش رفت بھی دکھاتی ہے، اور نماز کی لائیو
+> ایکٹیویٹی وقت گزرنے پر پرانا کاؤنٹ ڈاؤن دکھانے کے بجائے تازہ کرنے کی واضح ہدایت دیتی ہے۔
+
+---
+
+## Previous What's New — v1.8
 
 **English**
 

@@ -59,12 +59,14 @@ struct RootView: View {
             if path.contains("/live") || path.contains("/zikr") { selectedTab = .zikr }
             else if path.contains("/feed") || path.contains("/events") { selectedTab = .explore }
             else if path.contains("/today") || path.contains("/prayer") { selectedTab = .today }
+            else if path.contains("/quran") { selectedTab = .quran }
         }
         .onOpenURL { url in
             let path = ((url.host ?? "") + url.path).lowercased()
             if path.contains("live") || path.contains("zikr") { selectedTab = .zikr }
             else if path.contains("feed") || path.contains("event") { selectedTab = .explore }
             else if path.contains("today") || path.contains("prayer") { selectedTab = .today }
+            else if path.contains("quran") { selectedTab = .quran }
         }
     }
 }

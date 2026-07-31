@@ -17,14 +17,26 @@ struct PrayerActivityWidget: Widget {
                 .frame(width: 52, height: 52)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Next Prayer")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if context.isStale {
+                        Text("Prayer time reached")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Next Prayer")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Text(context.state.prayerName)
                         .font(.headline)
                         .foregroundStyle(WidgetPalette.emerald)
-                    PrayerActivityCountdown(target: context.state.prayerTime)
-                        .font(.title3.weight(.semibold).monospacedDigit())
+                    if context.isStale {
+                        Text("Open Darul Irfan to continue")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(WidgetPalette.gold)
+                    } else {
+                        PrayerActivityCountdown(target: context.state.prayerTime)
+                            .font(.title3.weight(.semibold).monospacedDigit())
+                    }
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 3) {
@@ -47,14 +59,24 @@ struct PrayerActivityWidget: Widget {
                         .foregroundStyle(WidgetPalette.gold)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    PrayerActivityCountdown(target: context.state.prayerTime)
-                        .monospacedDigit()
+                    if context.isStale {
+                        Image(systemName: "arrow.clockwise")
+                    } else {
+                        PrayerActivityCountdown(target: context.state.prayerTime)
+                            .monospacedDigit()
+                    }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     HStack {
-                        Text(context.attributes.placeName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        if context.isStale {
+                            Text("Open Darul Irfan to continue")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text(context.attributes.placeName)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                         Spacer()
                         if let following = context.state.followingPrayerName,
                            let time = context.state.followingPrayerTime {
@@ -66,8 +88,12 @@ struct PrayerActivityWidget: Widget {
             } compactLeading: {
                 Image(systemName: "moon.stars.fill")
             } compactTrailing: {
-                PrayerActivityCountdown(target: context.state.prayerTime)
-                    .monospacedDigit()
+                if context.isStale {
+                    Image(systemName: "arrow.clockwise")
+                } else {
+                    PrayerActivityCountdown(target: context.state.prayerTime)
+                        .monospacedDigit()
+                }
             } minimal: {
                 Image(systemName: "moon.stars.fill")
             }

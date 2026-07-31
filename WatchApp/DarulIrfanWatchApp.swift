@@ -126,6 +126,10 @@ private struct WatchHomeView: View {
                     WatchAzanCard(snapshot: snapshot, date: context.date)
                 }
 
+                if let metrics = snapshot.devotionalMetrics {
+                    WatchDevotionalMetricsView(metrics: metrics)
+                }
+
                 NavigationLink {
                     WatchZikrTimerView(snapshot: snapshot)
                 } label: {
@@ -154,6 +158,66 @@ private struct WatchHomeView: View {
         }
         .navigationTitle(snapshot.placeName)
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct WatchDevotionalMetricsView: View {
+    let metrics: WidgetDevotionalMetrics
+
+    var body: some View {
+        HStack(spacing: 7) {
+            metric(
+                label: "Prayer",
+                value: "\(metrics.prayersCompleted)/\(metrics.prayerGoal)",
+                progress: metrics.prayerGoal > 0
+                    ? Double(metrics.prayersCompleted) / Double(metrics.prayerGoal)
+                    : 0,
+                icon: "checkmark"
+            )
+            metric(
+                label: "Quran",
+                value: metrics.quranSurahNumber.map(String.init) ?? "—",
+                progress: metrics.quranSurahNumber.map { Double($0) / 114.0 } ?? 0,
+                icon: "book.fill"
+            )
+            metric(
+                label: "Zikr",
+                value: metrics.tasbihCount.formatted(),
+                progress: tasbihProgress,
+                icon: "sparkles"
+            )
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    private func metric(
+        label: LocalizedStringKey,
+        value: String,
+        progress: Double,
+        icon: String
+    ) -> some View {
+        VStack(spacing: 2) {
+            ZStack {
+                Circle().stroke(Color.white.opacity(0.13), lineWidth: 3)
+                Circle()
+                    .trim(from: 0, to: min(max(progress, 0), 1))
+                    .stroke(WatchTheme.gold, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                Image(systemName: icon).font(.system(size: 8, weight: .semibold))
+            }
+            .frame(width: 30, height: 30)
+            Text(verbatim: value).font(.caption2.weight(.bold).monospacedDigit())
+            Text(label).font(.system(size: 8)).foregroundStyle(.secondary).lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var tasbihProgress: Double {
+        guard let target = metrics.tasbihTarget, target > 0 else {
+            return metrics.zikrCompletionsToday > 0 ? 1 : 0
+        }
+        return Double(metrics.tasbihCount) / Double(target)
     }
 }
 

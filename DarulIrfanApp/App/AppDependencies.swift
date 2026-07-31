@@ -32,6 +32,7 @@ final class AppDependencies {
     let metricKitDiagnostics: MetricKitDiagnosticsBridge
     let prayerLiveActivity: PrayerLiveActivityCoordinator
     let watchSync: WatchSyncService
+    let devotionalMetrics: DevotionalMetricsSyncService
 
     init(
         database: AppDatabase,
@@ -54,7 +55,8 @@ final class AppDependencies {
         officialPlatform: OfficialPlatformService,
         metricKitDiagnostics: MetricKitDiagnosticsBridge,
         prayerLiveActivity: PrayerLiveActivityCoordinator,
-        watchSync: WatchSyncService
+        watchSync: WatchSyncService,
+        devotionalMetrics: DevotionalMetricsSyncService
     ) {
         self.database = database
         self.quranRepository = quranRepository
@@ -77,6 +79,7 @@ final class AppDependencies {
         self.metricKitDiagnostics = metricKitDiagnostics
         self.prayerLiveActivity = prayerLiveActivity
         self.watchSync = watchSync
+        self.devotionalMetrics = devotionalMetrics
     }
 
     /// Builds the full live graph. Called once from DarulIrfanApp at launch.
@@ -112,6 +115,11 @@ final class AppDependencies {
         let metricKitDiagnostics = MetricKitDiagnosticsBridge(uploader: officialPlatform)
         let prayerLiveActivity = PrayerLiveActivityCoordinator()
         let watchSync = WatchSyncService()
+        let devotionalMetrics = DevotionalMetricsSyncService(
+            quranRepository: quranRepository,
+            trackerRepository: trackerRepository,
+            watchSync: watchSync
+        )
 
         return AppDependencies(
             database: database,
@@ -134,7 +142,8 @@ final class AppDependencies {
             officialPlatform: officialPlatform,
             metricKitDiagnostics: metricKitDiagnostics,
             prayerLiveActivity: prayerLiveActivity,
-            watchSync: watchSync
+            watchSync: watchSync,
+            devotionalMetrics: devotionalMetrics
         )
     }
 }
