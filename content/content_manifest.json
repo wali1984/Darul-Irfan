@@ -4,7 +4,7 @@
     "documents": 273,
     "events": 0,
     "media": 780,
-    "quranTafsirPages": 114
+    "quranTafsirPages": 0
   },
   "files": {
     "articles": "articles.json",
@@ -13,6 +13,6 @@
     "media": "media.json",
     "tafsir": "quran_tafsir_manifest.json"
   },
-  "generatedAt": "2026-07-15T04:02:44Z",
+  "generatedAt": "2026-08-01T04:09:01Z",
   "version": 1
 }
