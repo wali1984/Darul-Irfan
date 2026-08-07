@@ -505,12 +505,9 @@ private struct AyahCardView: View {
     // MARK: Translation
 
     private func translationView(_ translation: QuranTranslation) -> some View {
+        // No per-ayah edition caption — the work is already named in the
+        // content-mode selector above, so repeating it under every ayah is noise.
         VStack(alignment: .leading, spacing: DISpacing.xs) {
-            if let edition = viewModel.edition(id: translation.editionID) {
-                Text(edition.title)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIColor.textMuted)
-            }
             bodyText(
                 translation.text,
                 languageCode: viewModel.edition(id: translation.editionID)?.language
@@ -567,11 +564,7 @@ private struct AyahCardView: View {
                     shellChip("Translation audio", "speaker.wave.2", enabled: false)
                 }
                 shellChip("Video lectures", "play.rectangle", enabled: false)
-                shellChip("Sheikh audio", "person.wave.2", enabled: false)
             }
-            Text("Translation audio reads our own translation aloud in your device's voice. Video lectures and the Sheikh's own recitation are coming — and you'll be able to add your own recordings.")
-                .font(.caption2)
-                .foregroundStyle(DIColor.textMuted)
         }
     }
 

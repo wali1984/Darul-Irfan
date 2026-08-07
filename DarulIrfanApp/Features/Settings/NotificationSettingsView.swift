@@ -355,6 +355,10 @@ final class NotificationSettingsViewModel {
             return
         }
         do {
+            // Same reason as the full azan: claim the playback session so the
+            // preview is audible with the ringer switch on and is not cut short.
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try? AVAudioSession.sharedInstance().setActive(true)
             let player = try AVAudioPlayer(contentsOf: url)
             player.prepareToPlay()
             if player.play() {
@@ -382,6 +386,13 @@ final class NotificationSettingsViewModel {
             return
         }
         do {
+            // The azan must own the audio session for its full duration. Without
+            // this the player runs in the default (ambient) session: it is
+            // silenced by the ringer switch and is cut short as soon as anything
+            // else touches the session — which truncated playback a few seconds
+            // in, right after "Allahu Akbar".
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try? AVAudioSession.sharedInstance().setActive(true)
             let player = try AVAudioPlayer(contentsOf: url)
             player.delegate = azanPlaybackDelegate
             player.prepareToPlay()
