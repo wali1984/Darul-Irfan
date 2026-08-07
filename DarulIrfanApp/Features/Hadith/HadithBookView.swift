@@ -13,10 +13,14 @@ struct HadithBookView: View {
     @State private var isLoadingMore = false
     @State private var reachedEnd = false
     @State private var showsArabic = true
+    @State private var searchText = ""
+    @State private var searchTask: Task<Void, Never>?
 
     private static let pageSize = 50
 
     private var languageCode: String { appState.settings.language.rawValue }
+    /// Same reader text-size setting the Quran uses, so both scale together.
+    private var fontScale: Double { appState.settings.readerFontScale.rawValue }
 
     var body: some View {
         ScrollView {
@@ -60,14 +64,35 @@ struct HadithBookView: View {
         .diScreenBackground()
         .navigationTitle(Text(verbatim: book.title(languageCode: languageCode)))
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: Text("Search in this collection"))
+        .onChange(of: searchText) { _, term in
+            searchTask?.cancel()
+            let query = term.trimmingCharacters(in: .whitespaces)
+            guard query.count >= 2 else {
+                // Back to the normal paged listing.
+                Task { await restorePagedListing() }
+                return
+            }
+            searchTask = Task {
+                try? await Task.sleep(for: .milliseconds(350))
+                guard !Task.isCancelled else { return }
+                let found = (try? await repository.search(
+                    query, bookID: book.id, limit: 200
+                )) ?? []
+                guard !Task.isCancelled else { return }
+                entries = found
+                reachedEnd = true          // results are not paged
+                isLoading = false
+            }
+        }
         .task { await loadFirstPage() }
     }
 
     private func hadithCard(_ entry: HadithEntry) -> some View {
         DICard(
-            background: DIColor.primary.opacity(0.045),
-            borderColor: DIColor.primary.opacity(0.35),
-            borderWidth: 1
+            background: DIColor.primary.opacity(0.055),
+            borderColor: DIColor.primary.opacity(0.45),
+            borderWidth: 1.5
         ) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack(spacing: DISpacing.sm) {
@@ -79,31 +104,35 @@ struct HadithBookView: View {
                 }
 
                 if showsArabic, let arabic = entry.textArabic, !arabic.isEmpty {
-                    // Deliberately NOT the Quran's mushaf face: that font is cut
-                    // for Quranic script, and hadith is a separate body of text.
-                    // The system Arabic face is the correct choice here.
+                    // Same IndoPak face and rhythm as the Quran reader so Arabic
+                    // looks identical across the app.
                     Text(verbatim: arabic)
-                        .font(.system(size: 21, weight: .regular, design: .serif))
-                        .lineSpacing(7)
+                        .font(DIFont.quranArabic(scale: fontScale * 1.15))
+                        .lineSpacing(CGFloat(18 * fontScale))
                         .foregroundStyle(DIColor.textPrimary)
+                        .diGoldGlow(radius: 5, opacity: 0.18)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .fixedSize(horizontal: false, vertical: true)
                     Divider().overlay(DIColor.border)
                 }
 
                 if let text = entry.text(languageCode: languageCode), !text.isEmpty {
                     if languageCode == "ur" {
                         Text(verbatim: text)
-                            .font(DIFont.urduBody())
+                            .font(DIFont.urduBody(scale: fontScale))
+                            .lineSpacing(CGFloat(6 * fontScale))
                             .foregroundStyle(DIColor.textPrimary)
                             .environment(\.layoutDirection, .rightToLeft)
                             .frame(maxWidth: .infinity, alignment: .trailing)
+                            .textSelection(.enabled)
                             .fixedSize(horizontal: false, vertical: true)
                     } else {
                         Text(verbatim: text)
-                            .font(.body)
+                            .font(.system(size: 17 * fontScale))
+                            .lineSpacing(CGFloat(5 * fontScale))
                             .foregroundStyle(DIColor.textPrimary)
+                            .textSelection(.enabled)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
@@ -113,6 +142,15 @@ struct HadithBookView: View {
 
     private func loadFirstPage() async {
         guard entries.isEmpty else { return }
+        entries = (try? await repository.entries(
+            bookID: book.id, limit: Self.pageSize, offset: 0
+        )) ?? []
+        reachedEnd = entries.count < Self.pageSize
+        isLoading = false
+    }
+
+    /// Clearing the search box returns to the ordinary paged listing.
+    private func restorePagedListing() async {
         entries = (try? await repository.entries(
             bookID: book.id, limit: Self.pageSize, offset: 0
         )) ?? []

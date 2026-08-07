@@ -7,6 +7,11 @@ struct HadithHomeView: View {
     private let appState: AppState
     @State private var books: [HadithBook] = []
     @State private var isLoading = true
+    @State private var searchText = ""
+    @State private var results: [HadithEntry] = []
+    @State private var isSearching = false
+    /// Debounces typing so a long corpus scan does not run on every keystroke.
+    @State private var searchTask: Task<Void, Never>?
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
@@ -18,7 +23,9 @@ struct HadithHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                if isLoading {
+                if !searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+                    searchSection
+                } else if isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                         .padding(DISpacing.xl)
@@ -50,7 +57,78 @@ struct HadithHomeView: View {
         }
         .diScreenBackground()
         .diPageHeading("Hadith")
+        .searchable(
+            text: $searchText,
+            prompt: Text("Search hadith by word or topic")
+        )
+        .onChange(of: searchText) { _, term in
+            searchTask?.cancel()
+            let query = term.trimmingCharacters(in: .whitespaces)
+            guard query.count >= 2 else {
+                results = []; isSearching = false; return
+            }
+            isSearching = true
+            searchTask = Task {
+                try? await Task.sleep(for: .milliseconds(350))
+                guard !Task.isCancelled else { return }
+                let found = (try? await dependencies.hadithRepository.search(
+                    query, bookID: nil, limit: 100
+                )) ?? []
+                guard !Task.isCancelled else { return }
+                results = found
+                isSearching = false
+            }
+        }
         .task { await load() }
+    }
+
+    /// Results across every collection, searched in all three scripts.
+    @ViewBuilder
+    private var searchSection: some View {
+        if isSearching {
+            ProgressView()
+                .frame(maxWidth: .infinity)
+                .padding(DISpacing.xl)
+        } else if results.isEmpty {
+            DIEmptyState(
+                systemImage: "magnifyingglass",
+                titleKey: "No hadith match that search",
+                messageKey: "Try a different word. Search looks through the Arabic, English and Urdu of every bundled collection."
+            )
+        } else {
+            DISectionHeader(titleKey: "Results", systemImage: "magnifyingglass")
+            Text("\(results.count) match\(results.count == 1 ? "" : "es")")
+                .font(.caption)
+                .foregroundStyle(DIColor.textMuted)
+            ForEach(results) { entry in
+                resultCard(entry)
+            }
+        }
+    }
+
+    private func resultCard(_ entry: HadithEntry) -> some View {
+        let bookTitle = books.first { $0.id == entry.bookID }?
+            .title(languageCode: languageCode) ?? entry.bookID
+        return DICard {
+            VStack(alignment: .leading, spacing: DISpacing.xs) {
+                HStack(spacing: DISpacing.sm) {
+                    DIPillBadge(text: bookTitle, color: DIColor.primary)
+                    Text("#\(entry.hadithNumber)")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(DIColor.textMuted)
+                    Spacer(minLength: 0)
+                }
+                if let text = entry.text(languageCode: languageCode), !text.isEmpty {
+                    Text(verbatim: text)
+                        .font(languageCode == "ur" ? DIFont.urduBody(scale: 0.95) : .subheadline)
+                        .foregroundStyle(DIColor.textPrimary)
+                        .lineLimit(4)
+                        .multilineTextAlignment(languageCode == "ur" ? .trailing : .leading)
+                        .environment(\.layoutDirection, languageCode == "ur" ? .rightToLeft : .leftToRight)
+                        .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
+                }
+            }
+        }
     }
 
     private func bookCard(_ book: HadithBook) -> some View {
