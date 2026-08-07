@@ -77,36 +77,6 @@
    "hasEnglish": true,
    "hasUrdu": true,
    "sectionCount": 61
-  },
-  {
-   "id": "nawawi",
-   "titleEnglish": "Forty Hadith of an-Nawawi",
-   "titleUrdu": "اربعین نووی",
-   "hadithCount": 42,
-   "hasArabic": true,
-   "hasEnglish": true,
-   "hasUrdu": false,
-   "sectionCount": 1
-  },
-  {
-   "id": "qudsi",
-   "titleEnglish": "Forty Hadith Qudsi",
-   "titleUrdu": "احادیث قدسیہ",
-   "hadithCount": 40,
-   "hasArabic": true,
-   "hasEnglish": true,
-   "hasUrdu": false,
-   "sectionCount": 1
-  },
-  {
-   "id": "dehlawi",
-   "titleEnglish": "Forty Hadith of Shah Waliullah Dehlawi",
-   "titleUrdu": "اربعین شاہ ولی اللہ",
-   "hadithCount": 40,
-   "hasArabic": true,
-   "hasEnglish": true,
-   "hasUrdu": false,
-   "sectionCount": 1
   }
  ]
 }
