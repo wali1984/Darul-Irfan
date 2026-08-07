@@ -1,9 +1,9 @@
 import SwiftUI
 
 /// Root shell shown once dependencies are ready: gates on onboarding, then
-/// hosts the five-tab navigation with the shared mini audio player bar.
+/// hosts the six-tab navigation with the shared mini audio player bar.
 struct RootView: View {
-    private enum AppTab: Hashable { case today, quran, zikr, explore, more }
+    private enum AppTab: Hashable { case today, quran, hadith, zikr, explore, more }
     let dependencies: AppDependencies
     let appState: AppState
     @State private var selectedTab: AppTab = .today
@@ -28,6 +28,14 @@ struct RootView: View {
             QuranTabView(dependencies: dependencies, appState: appState)
                 .tabItem { Label("Quran", systemImage: "book") }
                 .tag(AppTab.quran)
+
+            // Hadith stands on its own beside the Quran — the two are distinct
+            // bodies of knowledge and are never presented as one section.
+            NavigationStack {
+                HadithHomeView(dependencies: dependencies, appState: appState)
+            }
+            .tabItem { Label("Hadith", systemImage: "book.closed") }
+            .tag(AppTab.hadith)
 
             NavigationStack {
                 ZikrHomeView(dependencies: dependencies, appState: appState)

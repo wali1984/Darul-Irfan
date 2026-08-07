@@ -79,8 +79,12 @@ struct HadithBookView: View {
                 }
 
                 if showsArabic, let arabic = entry.textArabic, !arabic.isEmpty {
+                    // Deliberately NOT the Quran's mushaf face: that font is cut
+                    // for Quranic script, and hadith is a separate body of text.
+                    // The system Arabic face is the correct choice here.
                     Text(verbatim: arabic)
-                        .font(DIFont.quranArabic(scale: 0.62))
+                        .font(.system(size: 21, weight: .regular, design: .serif))
+                        .lineSpacing(7)
                         .foregroundStyle(DIColor.textPrimary)
                         .environment(\.layoutDirection, .rightToLeft)
                         .frame(maxWidth: .infinity, alignment: .trailing)

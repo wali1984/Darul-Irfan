@@ -4,7 +4,6 @@ struct ExploreTabView: View {
     enum Section: String, CaseIterable, Identifiable {
         case updates = "Updates"
         case library = "Library"
-        case hadith = "Hadith"
         case media = "Media"
         case events = "Events"
         var id: String { rawValue }
@@ -12,7 +11,6 @@ struct ExploreTabView: View {
             switch self {
             case .updates: return "newspaper.fill"
             case .library: return "books.vertical.fill"
-            case .hadith: return "book.closed.fill"
             case .media: return "play.rectangle.fill"
             case .events: return "calendar"
             }
@@ -50,10 +48,6 @@ struct ExploreTabView: View {
             }
         case .library:
             LibraryTabView(dependencies: dependencies, appState: appState)
-        case .hadith:
-            NavigationStack {
-                HadithHomeView(dependencies: dependencies, appState: appState)
-            }
         case .media:
             MediaTabView(dependencies: dependencies, appState: appState)
         case .events:
