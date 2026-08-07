@@ -18,6 +18,7 @@ final class ContentSyncServiceTests: XCTestCase {
 
     private var database: AppDatabase!
     private var quranRepository: QuranRepository!
+    private var hadithRepository: HadithRepository!
     private var contentRepository: ContentRepository!
     private var mediaRepository: MediaRepository!
     private var eventsRepository: EventsRepository!
@@ -27,6 +28,7 @@ final class ContentSyncServiceTests: XCTestCase {
     override func setUp() async throws {
         database = try await AppDatabase.inMemory()
         quranRepository = QuranRepository(database: database)
+        hadithRepository = HadithRepository(database: database)
         contentRepository = ContentRepository(database: database)
         mediaRepository = MediaRepository(database: database)
         eventsRepository = EventsRepository(database: database)
@@ -39,6 +41,7 @@ final class ContentSyncServiceTests: XCTestCase {
         )
         service = ContentSyncService(
             quranRepository: quranRepository,
+            hadithRepository: hadithRepository,
             contentRepository: contentRepository,
             mediaRepository: mediaRepository,
             eventsRepository: eventsRepository,
@@ -53,6 +56,7 @@ final class ContentSyncServiceTests: XCTestCase {
         eventsRepository = nil
         mediaRepository = nil
         contentRepository = nil
+        hadithRepository = nil
         quranRepository = nil
         database = nil
     }
@@ -109,11 +113,19 @@ final class ContentSyncServiceTests: XCTestCase {
 
         // The import count is exactly the sum of the bundle's record counts —
         // nothing dropped, nothing double-counted.
+        // Hadith imports the catalogue plus one pack per collection.
+        let hadithCatalog = SeedBundle.hadithCatalog()
+        let hadithTotal = (hadithCatalog?.books.count ?? 0)
+            + (hadithCatalog?.books.reduce(0) { partial, book in
+                partial + SeedBundle.hadithEntries(bookID: book.id).count
+            } ?? 0)
+
         let expectedTotal = SeedBundle.quranSurahs().count
             + SeedBundle.quranAyahs().count
             + SeedBundle.quranEditions().count
             + SeedBundle.quranTranslations().count
             + SeedBundle.quranTafsir().count
+            + hadithTotal
             + SeedBundle.libraryItems().count
             + SeedBundle.mediaItems().count
             + SeedBundle.events().count
