@@ -1,0 +1,112 @@
+{
+ "source": "fawazahmed0/hadith-api",
+ "license": "Unlicense (public domain dedication)",
+ "licenseUrl": "https://github.com/fawazahmed0/hadith-api/blob/1/LICENSE",
+ "languages": [
+  "ar",
+  "en",
+  "ur"
+ ],
+ "books": [
+  {
+   "id": "bukhari",
+   "titleEnglish": "Sahih al-Bukhari",
+   "titleUrdu": "صحیح بخاری",
+   "hadithCount": 7589,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 97
+  },
+  {
+   "id": "muslim",
+   "titleEnglish": "Sahih Muslim",
+   "titleUrdu": "صحیح مسلم",
+   "hadithCount": 7564,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 56
+  },
+  {
+   "id": "abudawud",
+   "titleEnglish": "Sunan Abu Dawud",
+   "titleUrdu": "سنن ابو داؤد",
+   "hadithCount": 5274,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 43
+  },
+  {
+   "id": "tirmidhi",
+   "titleEnglish": "Jami' at-Tirmidhi",
+   "titleUrdu": "جامع ترمذی",
+   "hadithCount": 3998,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 49
+  },
+  {
+   "id": "nasai",
+   "titleEnglish": "Sunan an-Nasa'i",
+   "titleUrdu": "سنن نسائی",
+   "hadithCount": 5765,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 51
+  },
+  {
+   "id": "ibnmajah",
+   "titleEnglish": "Sunan Ibn Majah",
+   "titleUrdu": "سنن ابن ماجہ",
+   "hadithCount": 4343,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 37
+  },
+  {
+   "id": "malik",
+   "titleEnglish": "Muwatta Malik",
+   "titleUrdu": "موطأ امام مالک",
+   "hadithCount": 1889,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 61
+  },
+  {
+   "id": "nawawi",
+   "titleEnglish": "Forty Hadith of an-Nawawi",
+   "titleUrdu": "اربعین نووی",
+   "hadithCount": 42,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 1
+  },
+  {
+   "id": "qudsi",
+   "titleEnglish": "Forty Hadith Qudsi",
+   "titleUrdu": "احادیث قدسیہ",
+   "hadithCount": 40,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 1
+  },
+  {
+   "id": "dehlawi",
+   "titleEnglish": "Forty Hadith of Shah Waliullah Dehlawi",
+   "titleUrdu": "اربعین شاہ ولی اللہ",
+   "hadithCount": 40,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 1
+  }
+ ]
+}
