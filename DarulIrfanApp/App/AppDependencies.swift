@@ -103,7 +103,6 @@ final class AppDependencies {
         let searchIndex = SearchIndexService(
             database: database,
             quranRepository: quranRepository,
-            hadithRepository: hadithRepository,
             contentRepository: contentRepository,
             mediaRepository: mediaRepository,
             eventsRepository: eventsRepository
@@ -130,6 +129,7 @@ final class AppDependencies {
         return AppDependencies(
             database: database,
             quranRepository: quranRepository,
+            hadithRepository: hadithRepository,
             contentRepository: contentRepository,
             mediaRepository: mediaRepository,
             downloadsRepository: downloadsRepository,
