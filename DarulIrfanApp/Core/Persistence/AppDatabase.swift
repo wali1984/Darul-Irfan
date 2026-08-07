@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 2
+    static let schemaVersion = 3
 
     /// Production store, in Application Support (backed up, not user-visible).
     static func liveURL() throws -> URL {
@@ -46,7 +46,43 @@ final class AppDatabase: Sendable {
             try await connection.executeScript(Self.migrationV2)
             try await connection.setSchemaVersion(2)
         }
+        if version < 3 {
+            try await connection.executeScript(Self.migrationV3)
+            try await connection.setSchemaVersion(3)
+        }
     }
+
+    // MARK: - Schema v3 (hadith)
+
+    /// Hadith collections and their entries. Each script lives in its own
+    /// column so the reader can show one, two or all three.
+    static let migrationV3 = """
+    CREATE TABLE IF NOT EXISTS hadith_books (
+        id TEXT PRIMARY KEY,
+        title_english TEXT NOT NULL,
+        title_urdu TEXT NOT NULL,
+        hadith_count INTEGER NOT NULL DEFAULT 0,
+        has_arabic INTEGER NOT NULL DEFAULT 0,
+        has_english INTEGER NOT NULL DEFAULT 0,
+        has_urdu INTEGER NOT NULL DEFAULT 0,
+        section_count INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS hadith_entries (
+        book_id TEXT NOT NULL,
+        hadith_number INTEGER NOT NULL,
+        text_ar TEXT,
+        text_en TEXT,
+        text_ur TEXT,
+        grades TEXT,
+        ref_book INTEGER,
+        ref_hadith INTEGER,
+        PRIMARY KEY (book_id, hadith_number)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_hadith_entries_book
+        ON hadith_entries (book_id, hadith_number);
+    """
 
     // MARK: - Schema v1
 

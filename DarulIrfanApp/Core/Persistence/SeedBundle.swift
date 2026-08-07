@@ -50,6 +50,19 @@ enum SeedBundle {
         decodeArray(QuranTafsir.self, fromFile: "quran_tafsir")
     }
 
+    // MARK: Hadith
+
+    /// The collection index (also carries the corpus licence/provenance).
+    static func hadithCatalog() -> HadithCatalog? {
+        decodeObject(HadithCatalog.self, fromFile: "hadith_books")
+    }
+
+    /// One collection's entries, e.g. `hadith_bukhari`. Packs are split per
+    /// book so a single oversized file never has to be parsed at once.
+    static func hadithEntries(bookID: String) -> [HadithEntry] {
+        decodeArray(HadithEntry.self, fromFile: "hadith_\(bookID)")
+    }
+
     // MARK: Library, media, community
 
     static func libraryItems() -> [ContentItem] {

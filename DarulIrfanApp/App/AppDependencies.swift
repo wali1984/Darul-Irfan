@@ -11,6 +11,7 @@ final class AppDependencies {
 
     // Repositories
     let quranRepository: any QuranRepositoryProtocol
+    let hadithRepository: any HadithRepositoryProtocol
     let contentRepository: any ContentRepositoryProtocol
     let mediaRepository: any MediaRepositoryProtocol
     let downloadsRepository: any DownloadsRepositoryProtocol
@@ -37,6 +38,7 @@ final class AppDependencies {
     init(
         database: AppDatabase,
         quranRepository: any QuranRepositoryProtocol,
+        hadithRepository: any HadithRepositoryProtocol,
         contentRepository: any ContentRepositoryProtocol,
         mediaRepository: any MediaRepositoryProtocol,
         downloadsRepository: any DownloadsRepositoryProtocol,
@@ -60,6 +62,7 @@ final class AppDependencies {
     ) {
         self.database = database
         self.quranRepository = quranRepository
+        self.hadithRepository = hadithRepository
         self.contentRepository = contentRepository
         self.mediaRepository = mediaRepository
         self.downloadsRepository = downloadsRepository
@@ -87,6 +90,7 @@ final class AppDependencies {
         let database = try await AppDatabase.live()
 
         let quranRepository = QuranRepository(database: database)
+        let hadithRepository = HadithRepository(database: database)
         let contentRepository = ContentRepository(database: database)
         let mediaRepository = MediaRepository(database: database)
         let downloadsRepository = DownloadsRepository(database: database)
@@ -99,12 +103,14 @@ final class AppDependencies {
         let searchIndex = SearchIndexService(
             database: database,
             quranRepository: quranRepository,
+            hadithRepository: hadithRepository,
             contentRepository: contentRepository,
             mediaRepository: mediaRepository,
             eventsRepository: eventsRepository
         )
         let contentSync = ContentSyncService(
             quranRepository: quranRepository,
+            hadithRepository: hadithRepository,
             contentRepository: contentRepository,
             mediaRepository: mediaRepository,
             eventsRepository: eventsRepository,

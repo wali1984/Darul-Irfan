@@ -34,6 +34,19 @@ protocol QuranRepositoryProtocol: Sendable {
     func deleteTranslations(editionID: String) async throws
 }
 
+// MARK: - Hadith
+
+protocol HadithRepositoryProtocol: Sendable {
+    func books() async throws -> [HadithBook]
+    func entries(bookID: String, limit: Int, offset: Int) async throws -> [HadithEntry]
+    func entryCount(bookID: String) async throws -> Int
+    func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry]
+
+    // Import (seed)
+    func upsertBooks(_ books: [HadithBook]) async throws
+    func upsertEntries(_ entries: [HadithEntry]) async throws
+}
+
 // MARK: - Library content
 
 protocol ContentRepositoryProtocol: Sendable {

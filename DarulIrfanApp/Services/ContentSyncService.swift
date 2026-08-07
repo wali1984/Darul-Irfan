@@ -25,6 +25,7 @@ struct ContentSyncService: ContentSyncServicing {
     // MARK: Stored dependencies (order matches AppDependencies.live())
 
     let quranRepository: any QuranRepositoryProtocol
+    let hadithRepository: any HadithRepositoryProtocol
     let contentRepository: any ContentRepositoryProtocol
     let mediaRepository: any MediaRepositoryProtocol
     let eventsRepository: any EventsRepositoryProtocol
@@ -33,6 +34,7 @@ struct ContentSyncService: ContentSyncServicing {
 
     init(
         quranRepository: any QuranRepositoryProtocol,
+        hadithRepository: any HadithRepositoryProtocol,
         contentRepository: any ContentRepositoryProtocol,
         mediaRepository: any MediaRepositoryProtocol,
         eventsRepository: any EventsRepositoryProtocol,
@@ -40,6 +42,7 @@ struct ContentSyncService: ContentSyncServicing {
         searchIndex: any SearchIndexServicing
     ) {
         self.quranRepository = quranRepository
+        self.hadithRepository = hadithRepository
         self.contentRepository = contentRepository
         self.mediaRepository = mediaRepository
         self.eventsRepository = eventsRepository
@@ -131,6 +134,21 @@ struct ContentSyncService: ContentSyncServicing {
         if !tafsir.isEmpty {
             try await quranRepository.upsertTafsir(tafsir)
             imported += tafsir.count
+        }
+
+        // Hadith: the catalogue plus one pack per collection. Packs are loaded
+        // and inserted one book at a time so a large corpus never has to be
+        // held in memory all at once.
+        if let catalog = SeedBundle.hadithCatalog(), !catalog.books.isEmpty {
+            try await hadithRepository.upsertBooks(catalog.books)
+            imported += catalog.books.count
+            for book in catalog.books {
+                let rows = SeedBundle.hadithEntries(bookID: book.id)
+                if !rows.isEmpty {
+                    try await hadithRepository.upsertEntries(rows)
+                    imported += rows.count
+                }
+            }
         }
         if !libraryItems.isEmpty {
             try await contentRepository.upsertItems(libraryItems)
