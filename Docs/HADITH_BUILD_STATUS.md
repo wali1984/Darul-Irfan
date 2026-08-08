@@ -74,6 +74,38 @@ judgment calls made under the sandbox's hard constraints. Internal (not shipped)
    (documented, not silently dropped). Arabic-only advanced collections ship with
    en/ur honestly absent.
 
+## Update 2026-08-08 (later) — schema v6 + reader UI landed
+
+Built in parallel with the data, against the ingester's output shape, in three
+safe commits (all additive; every call site checked; only one protocol
+implementer so no mocks broke):
+
+- `4132fd9` — tappable search results (bug fix) + ingestion tool + docs.
+- `849cbc6` — **schema v6 data layer**: `HadithEntry` gains typed
+  `arabicSegments` (isnad/matn/verse + narratorId + surah/ayah), `quranRefs`,
+  `urduSanad`/`urduText`, and bab chapter; new `HadithSegment`/`QuranRef`/
+  `HadithNarrator`/`NarratorAppraisal`; additive migration v6 (nullable columns
+  + `hadith_narrators`); repository read/write + narrator store; SeedBundle +
+  ContentSync import. Unit tests: enriched decode+round-trip, segment fallback,
+  narrator round-trip, readingIndex.
+- `9b2e406` — **reader UI**: Arabic rendered as one `AttributedString` `Text`
+  (shaping/RTL intact) with isnad + verse as green links (`.tint`) and matn
+  near-black; `openURL` routes narrator taps → native `NarratorBioSheet`
+  (Arabic + English/Urdu) and verse taps → our own Quran reader at surah:ayah
+  (`.openQuranAyah` → `ReadTabView`). Split Urdu (grey chain over the text).
+  All native, our IndoPak + Urdu faces, our theme; **no external branding or
+  runtime calls**. Everything degrades to plain text until the ingested data
+  lands, so it is safe to ship now.
+
+Known minor fidelity note: isnad and verse links share one green (`.tint`
+colours all links the same); a two-tone green would need per-run colour that
+`Text` links override — deferred as cosmetic.
+
+Remaining (data population + rollout), unchanged: run `ingest_sunnah.py` on a
+networked machine/CI to fill the enriched fields + narrator bios + verse refs
+for Bukhari, then all collections; ship core collections in-app and structure
+the rest for `DownloadManager` if bundle size requires.
+
 ## What still needs CI / the user
 
 - **CI (`ios-verify`)**: compiles the search-navigation change + runs unit/UI tests.
