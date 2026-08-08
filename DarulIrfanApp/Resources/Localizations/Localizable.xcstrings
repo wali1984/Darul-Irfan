@@ -1,6 +1,41 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "All 114 surahs with translation and tafsir": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "All 114 surahs with translation and tafsir" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "تمام ۱۱۴ سورتیں ترجمہ اور تفسیر کے ساتھ" } }
+      }
+    },
+    "Hadith": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Hadith" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "حدیث" } }
+      }
+    },
+    "Read": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Read" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "مطالعہ" } }
+      }
+    },
+    "Seven collections in Arabic, English and Urdu": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Seven collections in Arabic, English and Urdu" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "سات مجموعے عربی، انگریزی اور اردو میں" } }
+      }
+    },
+    "Show both readers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Show both readers" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "دونوں شعبے دکھائیں" } }
+      }
+    },
     "This narration has no Arabic text": {
       "extractionState": "manual",
       "localizations": {

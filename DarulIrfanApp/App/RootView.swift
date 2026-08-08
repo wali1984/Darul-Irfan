@@ -1,9 +1,15 @@
 import SwiftUI
 
 /// Root shell shown once dependencies are ready: gates on onboarding, then
-/// hosts the six-tab navigation with the shared mini audio player bar.
+/// hosts the five-tab navigation with the shared mini audio player bar.
+///
+/// Five is a hard ceiling, not a preference. iPhone shows at most five tab-bar
+/// items and folds everything after that into a system "More" list — with six
+/// tabs, Explore vanished from the bar and ended up inside a More within our
+/// own More. Quran and Hadith are therefore paired under Read as equals rather
+/// than given a tab each; see `ReadTabView`.
 struct RootView: View {
-    private enum AppTab: Hashable { case today, quran, hadith, zikr, explore, more }
+    private enum AppTab: Hashable { case today, read, zikr, explore, more }
     let dependencies: AppDependencies
     let appState: AppState
     @State private var selectedTab: AppTab = .today
@@ -25,17 +31,12 @@ struct RootView: View {
                 .tabItem { Label("Today", systemImage: "moon.stars") }
                 .tag(AppTab.today)
 
-            QuranTabView(dependencies: dependencies, appState: appState)
-                .tabItem { Label("Quran", systemImage: "book") }
-                .tag(AppTab.quran)
-
-            // Hadith stands on its own beside the Quran — the two are distinct
-            // bodies of knowledge and are never presented as one section.
-            NavigationStack {
-                HadithHomeView(dependencies: dependencies, appState: appState)
-            }
-            .tabItem { Label("Hadith", systemImage: "book.closed") }
-            .tag(AppTab.hadith)
+            // Quran and Hadith live here as peers: distinct bodies of
+            // knowledge, two equally weighted destinations, neither nested
+            // inside the other.
+            ReadTabView(dependencies: dependencies, appState: appState)
+                .tabItem { Label("Read", systemImage: "books.vertical") }
+                .tag(AppTab.read)
 
             NavigationStack {
                 ZikrHomeView(dependencies: dependencies, appState: appState)
@@ -64,17 +65,28 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.25), value: dependencies.audioPlayer.nowPlaying)
         .onReceive(NotificationCenter.default.publisher(for: .didReceiveAppDeepLink)) { notification in
             guard let path = notification.object as? String else { return }
-            if path.contains("/live") || path.contains("/zikr") { selectedTab = .zikr }
-            else if path.contains("/feed") || path.contains("/events") { selectedTab = .explore }
-            else if path.contains("/today") || path.contains("/prayer") { selectedTab = .today }
-            else if path.contains("/quran") { selectedTab = .quran }
+            selectTab(forDeepLinkPath: path)
         }
         .onOpenURL { url in
-            let path = ((url.host ?? "") + url.path).lowercased()
-            if path.contains("live") || path.contains("zikr") { selectedTab = .zikr }
-            else if path.contains("feed") || path.contains("event") { selectedTab = .explore }
-            else if path.contains("today") || path.contains("prayer") { selectedTab = .today }
-            else if path.contains("quran") { selectedTab = .quran }
+            let path = ((url.host ?? "") + url.path)
+            selectTab(forDeepLinkPath: path)
+            // Re-broadcast so the Read tab can pick the right reader. The
+            // AppDelegate route already posts this; a URL opened directly into
+            // a running scene does not.
+            NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: path)
+        }
+    }
+
+    /// Both readers are addressable directly: `…/hadith` opens Hadith without
+    /// travelling through the Quran, and vice versa. `ReadTabView` picks the
+    /// reader from the same path.
+    private func selectTab(forDeepLinkPath path: String) {
+        let lowered = path.lowercased()
+        if lowered.contains("live") || lowered.contains("zikr") { selectedTab = .zikr }
+        else if lowered.contains("feed") || lowered.contains("event") { selectedTab = .explore }
+        else if lowered.contains("today") || lowered.contains("prayer") { selectedTab = .today }
+        else if lowered.contains("quran") || lowered.contains("surah") || lowered.contains("hadith") {
+            selectedTab = .read
         }
     }
 }

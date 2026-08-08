@@ -7,7 +7,11 @@
 /// states without requesting simulator location or notification permissions.
 final class SmokeUITests: XCTestCase {
 
-    private let tabLabels = ["Today", "Quran", "Zikr", "Explore", "More"]
+    /// Exactly five, and no more: iPhone folds anything past the fifth into a
+    /// system "More" list, which is how Explore stopped being a tab button when
+    /// Hadith was briefly given a sixth tab. Quran and Hadith now sit together
+    /// under Read.
+    private let tabLabels = ["Today", "Read", "Zikr", "Explore", "More"]
 
     override func setUp() {
         continueAfterFailure = false
@@ -46,11 +50,41 @@ final class SmokeUITests: XCTestCase {
 
         assertAllTabsExist(in: app)
 
+        // No system-generated overflow tab: its presence would mean a real tab
+        // had been pushed off the bar.
+        XCTAssertEqual(app.tabBars.buttons.count, tabLabels.count,
+                       "Expected exactly \(tabLabels.count) tabs with no iOS overflow tab")
+
         for label in tabLabels {
             let button = app.tabBars.buttons[label]
             button.tap()
             XCTAssertTrue(button.isSelected, "Tapping the \(label) tab should select it")
         }
+    }
+
+    /// Read must offer both readers as equals: Hadith cannot be buried inside
+    /// the Quran, nor reachable only through it.
+    func testReadTabOffersQuranAndHadithAsEqualDestinations() {
+        let app = makeApp()
+        app.launch()
+
+        let readTab = app.tabBars.buttons["Read"]
+        XCTAssertTrue(readTab.waitForExistence(timeout: 20), "Expected a Read tab")
+        readTab.tap()
+
+        // Launching with a --uitesting argument clears the remembered reader,
+        // so Read always opens on its two cards here.
+        let quran = app.buttons["read.destination.quran"]
+        let hadith = app.buttons["read.destination.hadith"]
+        XCTAssertTrue(quran.waitForExistence(timeout: 10), "Read must offer Quran")
+        XCTAssertTrue(hadith.waitForExistence(timeout: 10), "Read must offer Hadith")
+
+        // Opening one must not hide the other: the switch keeps both reachable.
+        hadith.tap()
+        XCTAssertTrue(
+            app.navigationBars.buttons["Show both readers"].waitForExistence(timeout: 10),
+            "Entering a reader should keep a way back to both"
+        )
     }
 
     /// Launches under an RTL locale and ensures the app reaches a usable root.

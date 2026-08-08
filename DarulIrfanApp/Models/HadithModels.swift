@@ -4,7 +4,9 @@ import Foundation
 ///
 /// The corpus is the public-domain (Unlicense) `hadith-api` data set; every
 /// bundled collection carries Arabic, English and Urdu.
-struct HadithBook: Codable, Sendable, Identifiable, Equatable {
+/// `Hashable` (which implies `Equatable`) so it can address a `HadithRoute`
+/// in a navigation path.
+struct HadithBook: Codable, Sendable, Identifiable, Hashable {
     /// Stable slug, e.g. "bukhari" — also the seed pack file name.
     var id: String
     var titleEnglish: String

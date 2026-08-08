@@ -17,11 +17,24 @@ struct QuranTabView: View {
     private let dependencies: AppDependencies
     private let appState: AppState
     @State private var viewModel: QuranViewModel
-    @State private var navigationPath: [QuranRoute] = []
+    /// Held by the host (`ReadTabView`) so switching readers keeps this one's
+    /// place: three levels into a surah, over to Hadith, back, still there.
+    @Binding private var navigationPath: [QuranRoute]
+    private let readerSelection: Binding<ReadSection>?
+    private let onShowAllReaders: (() -> Void)?
 
-    init(dependencies: AppDependencies, appState: AppState) {
+    init(
+        dependencies: AppDependencies,
+        appState: AppState,
+        navigationPath: Binding<[QuranRoute]>,
+        readerSelection: Binding<ReadSection>? = nil,
+        onShowAllReaders: (() -> Void)? = nil
+    ) {
         self.dependencies = dependencies
         self.appState = appState
+        _navigationPath = navigationPath
+        self.readerSelection = readerSelection
+        self.onShowAllReaders = onShowAllReaders
         _viewModel = State(initialValue: QuranViewModel(repository: dependencies.quranRepository))
     }
 
@@ -39,6 +52,11 @@ struct QuranTabView: View {
                         .accessibilityLabel("Bookmarks")
                     }
                 }
+                // Inside the stack so it lands in this reader's navigation bar.
+                .modifier(OptionalReaderSwitch(
+                    selection: readerSelection,
+                    onShowAll: onShowAllReaders
+                ))
                 .navigationDestination(for: QuranRoute.self) { route in
                     destination(for: route)
                 }

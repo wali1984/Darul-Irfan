@@ -105,6 +105,12 @@ struct DarulIrfanApp: App {
             } else if launchArguments.contains("--uitesting-reset-onboarding") {
                 await appState.updateSettings { $0.hasCompletedOnboarding = false }
             }
+            if launchArguments.contains(where: { $0.hasPrefix("--uitesting") }) {
+                // The Read tab reopens on the reader last used, which would
+                // make "does Read offer both?" depend on whatever a previous
+                // run left behind. Clear it so each run starts at the cards.
+                UserDefaults.standard.removeObject(forKey: "read.lastSection")
+            }
             #endif
             await dependencies.officialPlatform.setConsent(appState.settings.diagnosticsConsent)
 

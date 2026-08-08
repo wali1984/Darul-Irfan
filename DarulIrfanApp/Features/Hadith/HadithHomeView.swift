@@ -38,13 +38,9 @@ struct HadithHomeView: View {
                 } else {
                     DISectionHeader(titleKey: "Collections", systemImage: "books.vertical.fill")
                     ForEach(Array(books.enumerated()), id: \.element.id) { index, book in
-                        NavigationLink {
-                            HadithBookView(
-                                book: book,
-                                repository: dependencies.hadithRepository,
-                                appState: appState
-                            )
-                        } label: {
+                        // Value-based so the Read tab can own this reader's
+                        // navigation history; see HadithTabView.
+                        NavigationLink(value: HadithRoute.collection(book)) {
                             bookCard(book)
                         }
                         .buttonStyle(DIPressableStyle())
