@@ -50,7 +50,11 @@ final class OfficialPlatformTests: XCTestCase {
     func testSchemaV2CreatesOfficialPlatformTables() async throws {
         let database = try await AppDatabase.inMemory()
         let version = try await database.connection.schemaVersion()
-        XCTAssertEqual(version, 2)
+        // Checked against the declared version rather than a literal, which
+        // went stale the moment a later migration landed: this asserted 2 while
+        // the app was already migrating to 3. What matters here is that a fully
+        // migrated database has the official-platform tables, not the number.
+        XCTAssertEqual(version, AppDatabase.schemaVersion)
         let tables = try await database.connection.query(
             "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('platform_cache','official_feed_cache','remote_zikr_schedule_cache','push_registration_state')"
         )

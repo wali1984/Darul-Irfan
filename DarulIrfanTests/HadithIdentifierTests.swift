@@ -211,9 +211,19 @@ final class HadithIdentifierTests: XCTestCase {
     // MARK: - Honest gaps
 
     func testMissingTranslationIsReportedAsMissingNotSubstituted() {
-        let entry = makeEntry(
-            book: "bukhari", number: "402", sequence: 402,
-            arabic: "عربی", english: "English narration", urdu: nil
+        // Built directly rather than through makeEntry: that helper fills any
+        // omitted script with generated text, which is what the other tests
+        // want and is exactly wrong here — this test is about a *missing* one.
+        let entry = HadithEntry(
+            canonicalID: "bukhari|402|402",
+            bookID: "bukhari",
+            displayNumber: "402",
+            numberMajor: 402,
+            numberMinor: nil,
+            sourceSequence: 402,
+            textArabic: "عربی",
+            textEnglish: "English narration",
+            textUrdu: nil
         )
 
         // No cross-language fallback: English prose returned for "ur" would be
