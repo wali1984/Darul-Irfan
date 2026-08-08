@@ -18,10 +18,40 @@ struct HadithBook: Codable, Sendable, Identifiable, Hashable {
     var hasEnglish: Bool
     var hasUrdu: Bool
     var sectionCount: Int
+    /// The collection's books (kutub) — e.g. the 97 books of Sahih al-Bukhari,
+    /// each with an English and Arabic title and the number of narrations it
+    /// holds. `nil` for a collection whose structure has not been sourced yet,
+    /// so the reader falls back to an unbroken listing.
+    var sections: [HadithSection]?
 
     /// Title for the reader's current language.
     func title(languageCode: String) -> String {
         languageCode == "ur" ? titleUrdu : titleEnglish
+    }
+
+    /// The book (kitab) a narration belongs to, looked up by its number.
+    func section(number: Int?) -> HadithSection? {
+        guard let number, let sections else { return nil }
+        return sections.first { $0.number == number }
+    }
+}
+
+/// One book (kitab) within a collection. Sahih al-Bukhari has 97 of these;
+/// the reader groups narrations under them.
+struct HadithSection: Codable, Sendable, Identifiable, Hashable {
+    /// Book number within the collection (1-based), matching the in-book
+    /// reference's "Book N".
+    var number: Int
+    var titleEnglish: String
+    var titleArabic: String
+    /// Narrations in this book, counted from the packaged records.
+    var hadithCount: Int
+
+    var id: Int { number }
+
+    /// Title for the reader's current language (Arabic shown alongside).
+    func title(languageCode: String) -> String {
+        languageCode == "ur" ? titleArabic : titleEnglish
     }
 }
 

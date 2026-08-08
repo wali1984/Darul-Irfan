@@ -20,7 +20,7 @@ struct HadithRepository: HadithRepositoryProtocol {
         let rows = try await database.connection.query(
             """
             SELECT id, title_english, title_urdu, hadith_count,
-                   has_arabic, has_english, has_urdu, section_count
+                   has_arabic, has_english, has_urdu, section_count, sections_json
             FROM hadith_books
             ORDER BY hadith_count DESC
             """,
@@ -38,9 +38,24 @@ struct HadithRepository: HadithRepositoryProtocol {
                 hasArabic: (row.int("has_arabic") ?? 0) == 1,
                 hasEnglish: (row.int("has_english") ?? 0) == 1,
                 hasUrdu: (row.int("has_urdu") ?? 0) == 1,
-                sectionCount: row.int("section_count") ?? 0
+                sectionCount: row.int("section_count") ?? 0,
+                sections: Self.decodeSections(row.text("sections_json"))
             )
         }
+    }
+
+    /// The book (kitab) list is stored as JSON on the catalogue row. A missing
+    /// or unreadable value is treated as "no sourced structure" (nil) rather
+    /// than an error, so a reader still lists the collection.
+    private static func decodeSections(_ json: String?) -> [HadithSection]? {
+        guard let json, let data = json.data(using: .utf8) else { return nil }
+        return try? JSONDecoder().decode([HadithSection].self, from: data)
+    }
+
+    private static func encodeSections(_ sections: [HadithSection]?) -> String? {
+        guard let sections, !sections.isEmpty,
+              let data = try? JSONEncoder().encode(sections) else { return nil }
+        return String(data: data, encoding: .utf8)
     }
 
     /// A page of hadith from one collection, in the source's printed order.
@@ -107,8 +122,8 @@ struct HadithRepository: HadithRepositoryProtocol {
             (
                 sql: """
                 INSERT INTO hadith_books (id, title_english, title_urdu, hadith_count,
-                    has_arabic, has_english, has_urdu, section_count)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    has_arabic, has_english, has_urdu, section_count, sections_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     title_english = excluded.title_english,
                     title_urdu = excluded.title_urdu,
@@ -116,7 +131,8 @@ struct HadithRepository: HadithRepositoryProtocol {
                     has_arabic = excluded.has_arabic,
                     has_english = excluded.has_english,
                     has_urdu = excluded.has_urdu,
-                    section_count = excluded.section_count
+                    section_count = excluded.section_count,
+                    sections_json = excluded.sections_json
                 """,
                 parameters: [
                     .text(book.id),
@@ -127,6 +143,7 @@ struct HadithRepository: HadithRepositoryProtocol {
                     .int(book.hasEnglish ? 1 : 0),
                     .int(book.hasUrdu ? 1 : 0),
                     .int(book.sectionCount),
+                    .optionalText(Self.encodeSections(book.sections)),
                 ]
             )
         }

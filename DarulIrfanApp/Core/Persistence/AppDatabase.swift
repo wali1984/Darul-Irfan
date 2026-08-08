@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 4
+    static let schemaVersion = 5
 
     /// User-owned tables that no content migration may ever disturb. Migration
     /// v4 asserts their row counts are identical before and after it runs; a
@@ -78,7 +78,26 @@ final class AppDatabase: Sendable {
                 cleanup: "DROP TABLE IF EXISTS _migration_v4_counts;"
             )
         }
+        if version < 5 {
+            try await connection.executeScript(Self.migrationV5)
+            try await connection.setSchemaVersion(5)
+        }
     }
+
+    // MARK: - Schema v5 (hadith book/kitab structure)
+
+    /// Adds the per-collection book (kitab) list to `hadith_books`.
+    ///
+    /// Each collection is divided into books (kutub) — Sahih al-Bukhari has 97,
+    /// each with an English and an Arabic title — and the reader groups
+    /// narrations under them. The list is stored as JSON on the catalogue row
+    /// (a handful of collections, ~97 short entries each) rather than as its own
+    /// table: it is read whole with the book and never queried piecewise.
+    /// Purely additive — no content table is touched, so no row-count guard is
+    /// needed; a nil column simply means the reader shows an unbroken listing.
+    static let migrationV5 = """
+    ALTER TABLE hadith_books ADD COLUMN sections_json TEXT;
+    """
 
     // MARK: - Schema v4 (hadith identifiers)
 

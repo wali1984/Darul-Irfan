@@ -17,7 +17,591 @@
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
-   "sectionCount": 97
+   "sectionCount": 97,
+   "sections": [
+    {
+     "number": 1,
+     "titleEnglish": "Revelation",
+     "titleArabic": "كتاب بدء الوحى",
+     "hadithCount": 7
+    },
+    {
+     "number": 2,
+     "titleEnglish": "Belief",
+     "titleArabic": "كتاب الإيمان",
+     "hadithCount": 51
+    },
+    {
+     "number": 3,
+     "titleEnglish": "Knowledge",
+     "titleArabic": "كتاب العلم",
+     "hadithCount": 76
+    },
+    {
+     "number": 4,
+     "titleEnglish": "Ablutions (Wudu')",
+     "titleArabic": "كتاب الوضوء",
+     "hadithCount": 113
+    },
+    {
+     "number": 5,
+     "titleEnglish": "Bathing (Ghusl)",
+     "titleArabic": "كتاب الغسل",
+     "hadithCount": 46
+    },
+    {
+     "number": 6,
+     "titleEnglish": "Menstrual Periods",
+     "titleArabic": "كتاب الحيض",
+     "hadithCount": 40
+    },
+    {
+     "number": 7,
+     "titleEnglish": "Rubbing hands and feet with dust (Tayammum)",
+     "titleArabic": "كتاب التيمم",
+     "hadithCount": 15
+    },
+    {
+     "number": 8,
+     "titleEnglish": "Prayers (Salat)",
+     "titleArabic": "كتاب الصلاة",
+     "hadithCount": 173
+    },
+    {
+     "number": 9,
+     "titleEnglish": "Times of the Prayers",
+     "titleArabic": "كتاب مواقيت الصلاة",
+     "hadithCount": 82
+    },
+    {
+     "number": 10,
+     "titleEnglish": "Call to Prayers (Adhaan)",
+     "titleArabic": "كتاب الأذان",
+     "hadithCount": 275
+    },
+    {
+     "number": 11,
+     "titleEnglish": "Friday Prayer",
+     "titleArabic": "كتاب الجمعة",
+     "hadithCount": 66
+    },
+    {
+     "number": 12,
+     "titleEnglish": "Fear Prayer",
+     "titleArabic": "كتاب صلاة الخوف",
+     "hadithCount": 6
+    },
+    {
+     "number": 13,
+     "titleEnglish": "The Two Festivals (Eids)",
+     "titleArabic": "كتاب العيدين",
+     "hadithCount": 42
+    },
+    {
+     "number": 14,
+     "titleEnglish": "Witr Prayer",
+     "titleArabic": "كتاب الوتر",
+     "hadithCount": 15
+    },
+    {
+     "number": 15,
+     "titleEnglish": "Invoking Allah for Rain (Istisqaa)",
+     "titleArabic": "كتاب الاستسقاء",
+     "hadithCount": 35
+    },
+    {
+     "number": 16,
+     "titleEnglish": "Eclipses",
+     "titleArabic": "كتاب الكسوف",
+     "hadithCount": 27
+    },
+    {
+     "number": 17,
+     "titleEnglish": "Prostration During Recital of Qur'an",
+     "titleArabic": "كتاب سجود القرآن",
+     "hadithCount": 13
+    },
+    {
+     "number": 18,
+     "titleEnglish": "Shortening the Prayers (At-Taqseer)",
+     "titleArabic": "كتاب التقصير",
+     "hadithCount": 40
+    },
+    {
+     "number": 19,
+     "titleEnglish": "Prayer at Night (Tahajjud)",
+     "titleArabic": "كتاب التهجد",
+     "hadithCount": 69
+    },
+    {
+     "number": 20,
+     "titleEnglish": "Virtues of Prayer at Masjid Makkah and Madinah",
+     "titleArabic": "كتاب فضل الصلاة فى مسجد مكة والمدينة",
+     "hadithCount": 10
+    },
+    {
+     "number": 21,
+     "titleEnglish": "Actions while Praying",
+     "titleArabic": "كتاب العمل فى الصلاة",
+     "hadithCount": 27
+    },
+    {
+     "number": 22,
+     "titleEnglish": "Forgetfulness in Prayer",
+     "titleArabic": "كتاب السهو",
+     "hadithCount": 14
+    },
+    {
+     "number": 23,
+     "titleEnglish": "Funerals (Al-Janaa'iz)",
+     "titleArabic": "كتاب الجنائز",
+     "hadithCount": 160
+    },
+    {
+     "number": 24,
+     "titleEnglish": "Obligatory Charity Tax (Zakat)",
+     "titleArabic": "كتاب الزكاة",
+     "hadithCount": 118
+    },
+    {
+     "number": 25,
+     "titleEnglish": "Hajj (Pilgrimage)",
+     "titleArabic": "كتاب الحج",
+     "hadithCount": 260
+    },
+    {
+     "number": 26,
+     "titleEnglish": "`Umrah (Minor pilgrimage)",
+     "titleArabic": "كتاب العمرة",
+     "hadithCount": 33
+    },
+    {
+     "number": 27,
+     "titleEnglish": "Pilgrims Prevented from Completing the Pilgrimage",
+     "titleArabic": "كتاب المحصر",
+     "hadithCount": 15
+    },
+    {
+     "number": 28,
+     "titleEnglish": "Penalty of Hunting while on Pilgrimage",
+     "titleArabic": "كتاب جزاء الصيد",
+     "hadithCount": 46
+    },
+    {
+     "number": 29,
+     "titleEnglish": "Virtues of Madinah",
+     "titleArabic": "كتاب فضائل المدينة",
+     "hadithCount": 24
+    },
+    {
+     "number": 30,
+     "titleEnglish": "Fasting",
+     "titleArabic": "كتاب الصوم",
+     "hadithCount": 117
+    },
+    {
+     "number": 31,
+     "titleEnglish": "Praying at Night in Ramadaan (Taraweeh)",
+     "titleArabic": "كتاب صلاة التراويح",
+     "hadithCount": 6
+    },
+    {
+     "number": 32,
+     "titleEnglish": "Virtues of the Night of Qadr",
+     "titleArabic": "كتاب فضل ليلة القدر",
+     "hadithCount": 11
+    },
+    {
+     "number": 33,
+     "titleEnglish": "Retiring to a Mosque for Remembrance of Allah (I'tikaf)",
+     "titleArabic": "كتاب الاعتكاف",
+     "hadithCount": 22
+    },
+    {
+     "number": 34,
+     "titleEnglish": "Sales and Trade",
+     "titleArabic": "كتاب البيوع",
+     "hadithCount": 193
+    },
+    {
+     "number": 35,
+     "titleEnglish": "Sales in which a Price is paid for Goods to be Delivered Later (As-Salam)",
+     "titleArabic": "كتاب السلم",
+     "hadithCount": 20
+    },
+    {
+     "number": 36,
+     "titleEnglish": "Shuf'a",
+     "titleArabic": "كتاب الشفعة",
+     "hadithCount": 3
+    },
+    {
+     "number": 37,
+     "titleEnglish": "Hiring",
+     "titleArabic": "كتاب الإجارة",
+     "hadithCount": 27
+    },
+    {
+     "number": 38,
+     "titleEnglish": "Transferance of a Debt from One Person to Another (Al-Hawaala)",
+     "titleArabic": "كتاب الحوالات",
+     "hadithCount": 3
+    },
+    {
+     "number": 39,
+     "titleEnglish": "Kafalah",
+     "titleArabic": "كتاب الكفالة",
+     "hadithCount": 9
+    },
+    {
+     "number": 40,
+     "titleEnglish": "Representation, Authorization, Business by Proxy",
+     "titleArabic": "كتاب الوكالة",
+     "hadithCount": 21
+    },
+    {
+     "number": 41,
+     "titleEnglish": "Agriculture",
+     "titleArabic": "كتاب المزارعة",
+     "hadithCount": 31
+    },
+    {
+     "number": 42,
+     "titleEnglish": "Distribution of Water",
+     "titleArabic": "كتاب المساقاة",
+     "hadithCount": 34
+    },
+    {
+     "number": 43,
+     "titleEnglish": "Loans, Payment of Loans, Freezing of Property, Bankruptcy",
+     "titleArabic": "كتاب فى الاستقراض",
+     "hadithCount": 25
+    },
+    {
+     "number": 44,
+     "titleEnglish": "Khusoomaat",
+     "titleArabic": "كتاب الخصومات",
+     "hadithCount": 16
+    },
+    {
+     "number": 45,
+     "titleEnglish": "Lost Things Picked up by Someone (Luqatah)",
+     "titleArabic": "كتاب فى اللقطة",
+     "hadithCount": 15
+    },
+    {
+     "number": 46,
+     "titleEnglish": "Oppressions",
+     "titleArabic": "كتاب المظالم",
+     "hadithCount": 43
+    },
+    {
+     "number": 47,
+     "titleEnglish": "Partnership",
+     "titleArabic": "كتاب الشركة",
+     "hadithCount": 25
+    },
+    {
+     "number": 48,
+     "titleEnglish": "Mortgaging",
+     "titleArabic": "كتاب الرهن",
+     "hadithCount": 9
+    },
+    {
+     "number": 49,
+     "titleEnglish": "Manumission of Slaves",
+     "titleArabic": "كتاب العتق",
+     "hadithCount": 43
+    },
+    {
+     "number": 50,
+     "titleEnglish": "Makaatib",
+     "titleArabic": "كتاب المكاتب",
+     "hadithCount": 6
+    },
+    {
+     "number": 51,
+     "titleEnglish": "Gifts",
+     "titleArabic": "كتاب الهبة وفضلها والتحريض عليها",
+     "hadithCount": 71
+    },
+    {
+     "number": 52,
+     "titleEnglish": "Witnesses",
+     "titleArabic": "كتاب الشهادات",
+     "hadithCount": 53
+    },
+    {
+     "number": 53,
+     "titleEnglish": "Peacemaking",
+     "titleArabic": "كتاب الصلح",
+     "hadithCount": 21
+    },
+    {
+     "number": 54,
+     "titleEnglish": "Conditions",
+     "titleArabic": "كتاب الشروط",
+     "hadithCount": 27
+    },
+    {
+     "number": 55,
+     "titleEnglish": "Wills and Testaments (Wasaayaa)",
+     "titleArabic": "كتاب الوصايا",
+     "hadithCount": 44
+    },
+    {
+     "number": 56,
+     "titleEnglish": "Fighting for the Cause of Allah (Jihaad)",
+     "titleArabic": "كتاب الجهاد والسير",
+     "hadithCount": 309
+    },
+    {
+     "number": 57,
+     "titleEnglish": "One-fifth of Booty to the Cause of Allah (Khumus)",
+     "titleArabic": "كتاب فرض الخمس",
+     "hadithCount": 65
+    },
+    {
+     "number": 58,
+     "titleEnglish": "Jizyah and Mawaada'ah",
+     "titleArabic": "كتاب الجزية والموادعة",
+     "hadithCount": 34
+    },
+    {
+     "number": 59,
+     "titleEnglish": "Beginning of Creation",
+     "titleArabic": "كتاب بدء الخلق",
+     "hadithCount": 136
+    },
+    {
+     "number": 60,
+     "titleEnglish": "Prophets",
+     "titleArabic": "كتاب أحاديث الأنبياء",
+     "hadithCount": 163
+    },
+    {
+     "number": 61,
+     "titleEnglish": "Virtues and Merits of the Prophet (pbuh) and his Companions",
+     "titleArabic": "كتاب المناقب",
+     "hadithCount": 162
+    },
+    {
+     "number": 62,
+     "titleEnglish": "Companions of the Prophet",
+     "titleArabic": "كتاب فضائل أصحاب النبى صلى الله عليه وسلم",
+     "hadithCount": 128
+    },
+    {
+     "number": 63,
+     "titleEnglish": "Merits of the Helpers in Madinah (Ansaar)",
+     "titleArabic": "كتاب مناقب الأنصار",
+     "hadithCount": 173
+    },
+    {
+     "number": 64,
+     "titleEnglish": "Military Expeditions led by the Prophet (pbuh) (Al-Maghaazi)",
+     "titleArabic": "كتاب المغازى",
+     "hadithCount": 526
+    },
+    {
+     "number": 65,
+     "titleEnglish": "Prophetic Commentary on the Qur'an (Tafseer of the Prophet (pbuh))",
+     "titleArabic": "كتاب التفسير",
+     "hadithCount": 506
+    },
+    {
+     "number": 66,
+     "titleEnglish": "Virtues of the Qur'an",
+     "titleArabic": "كتاب فضائل القرآن",
+     "hadithCount": 88
+    },
+    {
+     "number": 67,
+     "titleEnglish": "Wedlock, Marriage (Nikaah)",
+     "titleArabic": "كتاب النكاح",
+     "hadithCount": 188
+    },
+    {
+     "number": 68,
+     "titleEnglish": "Divorce",
+     "titleArabic": "كتاب الطلاق",
+     "hadithCount": 100
+    },
+    {
+     "number": 69,
+     "titleEnglish": "Supporting the Family",
+     "titleArabic": "كتاب النفقات",
+     "hadithCount": 22
+    },
+    {
+     "number": 70,
+     "titleEnglish": "Food, Meals",
+     "titleArabic": "كتاب الأطعمة",
+     "hadithCount": 95
+    },
+    {
+     "number": 71,
+     "titleEnglish": "Sacrifice on Occasion of Birth (`Aqiqa)",
+     "titleArabic": "كتاب العقيقة",
+     "hadithCount": 9
+    },
+    {
+     "number": 72,
+     "titleEnglish": "Hunting, Slaughtering",
+     "titleArabic": "كتاب الذبائح والصيد",
+     "hadithCount": 70
+    },
+    {
+     "number": 73,
+     "titleEnglish": "Al-Adha Festival Sacrifice (Adaahi)",
+     "titleArabic": "كتاب الأضاحي",
+     "hadithCount": 30
+    },
+    {
+     "number": 74,
+     "titleEnglish": "Drinks",
+     "titleArabic": "كتاب الأشربة",
+     "hadithCount": 65
+    },
+    {
+     "number": 75,
+     "titleEnglish": "Patients",
+     "titleArabic": "كتاب المرضى",
+     "hadithCount": 38
+    },
+    {
+     "number": 76,
+     "titleEnglish": "Medicine",
+     "titleArabic": "كتاب الطب",
+     "hadithCount": 101
+    },
+    {
+     "number": 77,
+     "titleEnglish": "Dress",
+     "titleArabic": "كتاب اللباس",
+     "hadithCount": 188
+    },
+    {
+     "number": 78,
+     "titleEnglish": "Good Manners and Form (Al-Adab)",
+     "titleArabic": "كتاب الأدب",
+     "hadithCount": 255
+    },
+    {
+     "number": 79,
+     "titleEnglish": "Asking Permission",
+     "titleArabic": "كتاب الاستئذان",
+     "hadithCount": 77
+    },
+    {
+     "number": 80,
+     "titleEnglish": "Invocations",
+     "titleArabic": "كتاب الدعوات",
+     "hadithCount": 108
+    },
+    {
+     "number": 81,
+     "titleEnglish": "To make the Heart Tender (Ar-Riqaq)",
+     "titleArabic": "كتاب الرقاق",
+     "hadithCount": 182
+    },
+    {
+     "number": 82,
+     "titleEnglish": "Divine Will (Al-Qadar)",
+     "titleArabic": "كتاب القدر",
+     "hadithCount": 27
+    },
+    {
+     "number": 83,
+     "titleEnglish": "Oaths and Vows",
+     "titleArabic": "كتاب الأيمان والنذور",
+     "hadithCount": 87
+    },
+    {
+     "number": 84,
+     "titleEnglish": "Expiation for Unfulfilled Oaths",
+     "titleArabic": "كتاب كفارات الأيمان",
+     "hadithCount": 15
+    },
+    {
+     "number": 85,
+     "titleEnglish": "Laws of Inheritance (Al-Faraa'id)",
+     "titleArabic": "كتاب الفرائض",
+     "hadithCount": 49
+    },
+    {
+     "number": 86,
+     "titleEnglish": "Limits and Punishments set by Allah (Hudood)",
+     "titleArabic": "كتاب الحدود",
+     "hadithCount": 89
+    },
+    {
+     "number": 87,
+     "titleEnglish": "Blood Money (Ad-Diyat)",
+     "titleArabic": "كتاب الديات",
+     "hadithCount": 59
+    },
+    {
+     "number": 88,
+     "titleEnglish": "Apostates",
+     "titleArabic": "كتاب استتابة المرتدين والمعاندين وقتالهم",
+     "hadithCount": 22
+    },
+    {
+     "number": 89,
+     "titleEnglish": "(Statements made under) Coercion",
+     "titleArabic": "كتاب الإكراه",
+     "hadithCount": 13
+    },
+    {
+     "number": 90,
+     "titleEnglish": "Tricks",
+     "titleArabic": "كتاب الحيل",
+     "hadithCount": 29
+    },
+    {
+     "number": 91,
+     "titleEnglish": "Interpretation of Dreams",
+     "titleArabic": "كتاب التعبير",
+     "hadithCount": 66
+    },
+    {
+     "number": 92,
+     "titleEnglish": "Afflictions and the End of the World",
+     "titleArabic": "كتاب الفتن",
+     "hadithCount": 89
+    },
+    {
+     "number": 93,
+     "titleEnglish": "Judgments (Ahkaam)",
+     "titleArabic": "كتاب الأحكام",
+     "hadithCount": 89
+    },
+    {
+     "number": 94,
+     "titleEnglish": "Wishes",
+     "titleArabic": "كتاب التمنى",
+     "hadithCount": 20
+    },
+    {
+     "number": 95,
+     "titleEnglish": "Accepting Information Given by a Truthful Person",
+     "titleArabic": "كتاب أخبار الآحاد",
+     "hadithCount": 22
+    },
+    {
+     "number": 96,
+     "titleEnglish": "Holding Fast to the Qur'an and Sunnah",
+     "titleArabic": "كتاب الاعتصام بالكتاب والسنة",
+     "hadithCount": 103
+    },
+    {
+     "number": 97,
+     "titleEnglish": "Oneness, Uniqueness of Allah (Tawheed)",
+     "titleArabic": "كتاب التوحيد",
+     "hadithCount": 193
+    }
+   ]
   },
   {
    "id": "muslim",

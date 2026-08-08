@@ -15,6 +15,9 @@ struct HadithBookView: View {
     @State private var showsArabic = true
     @State private var searchText = ""
     @State private var searchTask: Task<Void, Never>?
+    /// Search results mix books, so the book (kitab) headers that group the
+    /// ordinary listing are suppressed while showing them.
+    @State private var isSearchResults = false
 
     private static let pageSize = 50
 
@@ -44,11 +47,16 @@ struct HadithBookView: View {
                     .tint(DIColor.primary)
                     .padding(.horizontal, DISpacing.xs)
 
-                    ForEach(entries) { entry in
-                        hadithCard(entry)
-                            .onAppear {
-                                if entry.id == entries.last?.id { Task { await loadMore() } }
+                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                        VStack(alignment: .leading, spacing: DISpacing.sm) {
+                            if !isSearchResults, showsHeader(at: index) {
+                                sectionHeader(for: entry)
                             }
+                            hadithCard(entry)
+                        }
+                        .onAppear {
+                            if entry.id == entries.last?.id { Task { await loadMore() } }
+                        }
                     }
 
                     if isLoadingMore {
@@ -81,6 +89,7 @@ struct HadithBookView: View {
                 )) ?? []
                 guard !Task.isCancelled else { return }
                 entries = found
+                isSearchResults = true
                 reachedEnd = true          // results are not paged
                 isLoading = false
             }
@@ -145,7 +154,64 @@ struct HadithBookView: View {
                 } else {
                     missingTranslationNote
                 }
+
+                referenceBlock(entry)
             }
+        }
+    }
+
+    /// The citation block shown beneath each narration: the collection
+    /// reference (with its exact printed number, sub-numbers and all) and, when
+    /// the source carries it, the in-book "Book N, Hadith M".
+    @ViewBuilder
+    private func referenceBlock(_ entry: HadithEntry) -> some View {
+        Divider().overlay(DIColor.border)
+        VStack(alignment: .leading, spacing: 2) {
+            Text(verbatim: "\(book.title(languageCode: languageCode)) \(entry.displayNumber)")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIColor.textMuted)
+            if let refBook = entry.sourceBook, let refHadith = entry.sourceHadith {
+                Text("In-book reference: Book \(refBook), Hadith \(refHadith)")
+                    .font(.caption2)
+                    .foregroundStyle(DIColor.textMuted)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// True when `entries[index]` opens a new book (kitab) and so should carry a
+    /// heading. The listing is in source order, so a change of book is a change
+    /// of `sourceBook` from the previous row.
+    private func showsHeader(at index: Int) -> Bool {
+        guard index < entries.count else { return false }
+        guard index > 0 else { return true }
+        return entries[index].sourceBook != entries[index - 1].sourceBook
+    }
+
+    /// A book (kitab) heading: the book's number, its English name, and its
+    /// Arabic name in the Quran face.
+    @ViewBuilder
+    private func sectionHeader(for entry: HadithEntry) -> some View {
+        if let number = entry.sourceBook {
+            let section = book.section(number: number)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Book \(number)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIColor.accent)
+                Text(verbatim: section?.titleEnglish ?? "")
+                    .font(DIFont.subheading)
+                    .foregroundStyle(DIColor.textPrimary)
+                if let arabic = section?.titleArabic, !arabic.isEmpty {
+                    Text(verbatim: arabic)
+                        .font(DIFont.quranArabic(scale: fontScale * 0.7))
+                        .foregroundStyle(DIColor.textMuted)
+                        .environment(\.layoutDirection, .rightToLeft)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, DISpacing.sm)
+            .padding(.bottom, DISpacing.xs)
         }
     }
 
@@ -172,6 +238,7 @@ struct HadithBookView: View {
         entries = (try? await repository.entries(
             bookID: book.id, limit: Self.pageSize, offset: 0
         )) ?? []
+        isSearchResults = false
         reachedEnd = entries.count < Self.pageSize
         isLoading = false
     }
@@ -181,6 +248,7 @@ struct HadithBookView: View {
         entries = (try? await repository.entries(
             bookID: book.id, limit: Self.pageSize, offset: 0
         )) ?? []
+        isSearchResults = false
         reachedEnd = entries.count < Self.pageSize
         isLoading = false
     }

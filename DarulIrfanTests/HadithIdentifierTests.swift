@@ -61,6 +61,45 @@ final class HadithIdentifierTests: XCTestCase {
         )
     }
 
+    // MARK: - Book (kitab) structure round-trips
+
+    /// The sunnah.com book list is stored as JSON on the catalogue row (schema
+    /// v5) and must come back out intact, so the reader can group narrations and
+    /// show each book's English and Arabic name.
+    func testBookSectionsRoundTripThroughTheCatalogue() async throws {
+        let sections = [
+            HadithSection(number: 1, titleEnglish: "Revelation",
+                          titleArabic: "كتاب بدء الوحى", hadithCount: 7),
+            HadithSection(number: 8, titleEnglish: "Prayers (Salat)",
+                          titleArabic: "كتاب الصلاة", hadithCount: 172),
+        ]
+        let book = HadithBook(
+            id: "bukhari", titleEnglish: "Sahih al-Bukhari", titleUrdu: "صحیح بخاری",
+            hadithCount: 7583, hasArabic: true, hasEnglish: true, hasUrdu: true,
+            sectionCount: 97, sections: sections
+        )
+        try await repository.upsertBooks([book])
+
+        let loaded = try await repository.books().first { $0.id == "bukhari" }
+        XCTAssertEqual(loaded?.sections, sections)
+        // Lookup used by the reader's inline headers.
+        XCTAssertEqual(loaded?.section(number: 8)?.titleEnglish, "Prayers (Salat)")
+        XCTAssertEqual(loaded?.section(number: 999), nil)
+    }
+
+    /// A collection whose structure has not been sourced stores no sections and
+    /// reads back as nil, so the reader falls back to an unbroken listing.
+    func testBookWithoutSectionsRoundTripsAsNil() async throws {
+        let book = HadithBook(
+            id: "muslim", titleEnglish: "Sahih Muslim", titleUrdu: "صحیح مسلم",
+            hadithCount: 7482, hasArabic: true, hasEnglish: true, hasUrdu: true,
+            sectionCount: 57, sections: nil
+        )
+        try await repository.upsertBooks([book])
+        let loaded = try await repository.books().first { $0.id == "muslim" }
+        XCTAssertNil(loaded?.sections)
+    }
+
     // MARK: - Sub-numbered narrations survive
 
     func testSubNumberedNarrationsAreStoredSeparately() async throws {
