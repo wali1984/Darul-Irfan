@@ -47,12 +47,15 @@ protocol HadithRepositoryProtocol: Sendable {
     /// (e.g. a tapped search result) by computing which page holds it.
     func readingIndex(bookID: String, displayNumber: String) async throws -> Int?
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry]
+    /// A narrator's bundled biography for the reader's tap-to-open bio sheet.
+    func narrator(id: Int) async throws -> HadithNarrator?
 
     // Import (seed)
     func upsertBooks(_ books: [HadithBook]) async throws
     func upsertEntries(_ entries: [HadithEntry]) async throws
     /// Clears a collection before re-import, so narrations dropped upstream go.
     func deleteEntries(bookID: String) async throws
+    func upsertNarrators(_ narrators: [HadithNarrator]) async throws
 }
 
 // MARK: - Library content

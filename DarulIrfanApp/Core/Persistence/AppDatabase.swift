@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 5
+    static let schemaVersion = 6
 
     /// User-owned tables that no content migration may ever disturb. Migration
     /// v4 asserts their row counts are identical before and after it runs; a
@@ -82,7 +82,42 @@ final class AppDatabase: Sendable {
             try await connection.executeScript(Self.migrationV5)
             try await connection.setSchemaVersion(5)
         }
+        if version < 6 {
+            try await connection.executeScript(Self.migrationV6)
+            try await connection.setSchemaVersion(6)
+        }
     }
+
+    // MARK: - Schema v6 (enriched hadith presentation + narrators)
+
+    /// Adds the columns that hold a narration's typed Arabic segments, quoted
+    /// Qur'an refs, split Urdu (isnad/matn), and bab chapter, plus a bundled
+    /// narrator-biography table for the reader's tap-to-open bio.
+    ///
+    /// Purely additive: new nullable columns and a new table, no content table
+    /// rewritten and nothing user-owned touched, so — like v5 — it needs no
+    /// row-count guard. Packs without the enriched fields simply leave them
+    /// null and the reader falls back to the plain Arabic/translation it always
+    /// showed.
+    static let migrationV6 = """
+    ALTER TABLE hadith_entries ADD COLUMN arabic_segments_json TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN quran_refs_json TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN urdu_sanad TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN urdu_text TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN chapter_number INTEGER;
+    ALTER TABLE hadith_entries ADD COLUMN chapter_title_en TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN chapter_title_ar TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN chapter_title_ur TEXT;
+
+    -- One row per narrator referenced by the shipped collections. The whole
+    -- biography is stored as JSON (HadithNarrator) rather than spread over many
+    -- columns: it is always read whole for the bio sheet and never queried
+    -- field-by-field.
+    CREATE TABLE IF NOT EXISTS hadith_narrators (
+        id INTEGER PRIMARY KEY,
+        payload_json TEXT NOT NULL
+    );
+    """
 
     // MARK: - Schema v5 (hadith book/kitab structure)
 

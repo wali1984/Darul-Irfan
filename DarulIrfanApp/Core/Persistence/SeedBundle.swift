@@ -68,6 +68,13 @@ enum SeedBundle {
         decodeArray(HadithEntry.self, fromFile: "hadith_\(bookID)")
     }
 
+    /// Bundled narrator biographies (`hadith_narrators.json`) for the reader's
+    /// tap-to-open bio. Absent until the corpus is ingested with people data —
+    /// returns [] and the reader shows an unavailable-yet state.
+    static func hadithNarrators() -> [HadithNarrator] {
+        decodeArray(HadithNarrator.self, fromFile: "hadith_narrators")
+    }
+
     // MARK: Library, media, community
 
     static func libraryItems() -> [ContentItem] {

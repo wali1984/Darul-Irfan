@@ -104,6 +104,27 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
     var sourceBook: Int?
     var sourceHadith: Int?
 
+    // MARK: Enriched presentation (schema v6; all optional, all additive)
+
+    /// The Arabic split into ordered, typed spans so the reader can colour the
+    /// chain of narration (isnad) and quoted verses distinctly from the matn,
+    /// and make narrator names and verses tappable. `nil` until a collection is
+    /// ingested with segmentation — the reader then falls back to ``textArabic``.
+    var arabicSegments: [HadithSegment]?
+    /// Every Qur'an passage this narration quotes, as our own surah:ayah — used
+    /// to open the app's Quran reader. Redundant with the `.verse` segments but
+    /// kept flat for quick lookup. Never a link to any external site.
+    var quranRefs: [QuranRef]?
+    /// The Urdu isnad and matn kept apart (sunnah.com serves them split), so the
+    /// reader can style the chain and the text distinctly, mirroring the Arabic.
+    var urduSanad: String?
+    var urduText: String?
+    /// The chapter (bab) within the book, finer than ``sourceBook`` (the kitab).
+    var chapterNumber: Int?
+    var chapterTitleEnglish: String?
+    var chapterTitleArabic: String?
+    var chapterTitleUrdu: String?
+
     enum CodingKeys: String, CodingKey {
         case canonicalID
         case bookID
@@ -117,6 +138,32 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
         case grades
         case sourceBook
         case sourceHadith
+        case arabicSegments
+        case quranRefs
+        case urduSanad
+        case urduText
+        case chapterNumber
+        case chapterTitleEnglish
+        case chapterTitleArabic
+        case chapterTitleUrdu
+    }
+
+    /// The Arabic as segments, always. When the pack has no segmentation yet,
+    /// the whole Arabic body is returned as one matn span, so the reader has a
+    /// single rendering path and simply shows no colours until data lands.
+    func arabicDisplaySegments() -> [HadithSegment] {
+        if let arabicSegments, !arabicSegments.isEmpty { return arabicSegments }
+        guard let textArabic, !textArabic.isEmpty else { return [] }
+        return [HadithSegment(kind: .matn, text: textArabic)]
+    }
+
+    /// Chapter (bab) title for the reader's language, if the pack carries it.
+    func chapterTitle(languageCode: String) -> String? {
+        switch languageCode {
+        case "ur": return chapterTitleUrdu ?? chapterTitleEnglish
+        case "ar": return chapterTitleArabic
+        default: return chapterTitleEnglish
+        }
     }
 
     /// Text in exactly the language asked for, or nil.
@@ -155,4 +202,96 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
         }
         return nil
     }
+}
+
+/// What a span of Arabic hadith text *is*, so the reader can colour and link it
+/// the way the printed/classical presentation does: the chain of narration
+/// (isnad) and any quoted Qur'an distinct from the Prophet's words (matn).
+enum HadithSegmentKind: String, Codable, Sendable {
+    case isnad   // a narrator in the chain — tappable to their biography
+    case matn    // the body / the Prophet's words ﷺ
+    case verse   // a quoted Qur'an passage — tappable to our Quran reader
+}
+
+/// One typed span of the Arabic body. `.isnad` carries the narrator's id;
+/// `.verse` carries our own surah:ayah so tapping opens the bundled Quran —
+/// never an external link.
+struct HadithSegment: Codable, Sendable, Equatable, Hashable {
+    var kind: HadithSegmentKind
+    var text: String
+    var narratorId: Int?
+    var surah: Int?
+    var ayahStart: Int?
+    var ayahEnd: Int?
+
+    init(kind: HadithSegmentKind, text: String, narratorId: Int? = nil,
+         surah: Int? = nil, ayahStart: Int? = nil, ayahEnd: Int? = nil) {
+        self.kind = kind; self.text = text; self.narratorId = narratorId
+        self.surah = surah; self.ayahStart = ayahStart; self.ayahEnd = ayahEnd
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case kind = "type"
+        case text, narratorId, surah, ayahStart, ayahEnd
+    }
+}
+
+/// A Qur'an passage a hadith quotes, in our own scheme (surah 1-based). Built
+/// at ingest time from the source's `openquran(surahIndex,…)` (surahIndex + 1).
+struct QuranRef: Codable, Sendable, Equatable, Hashable {
+    var surah: Int
+    var ayahStart: Int
+    var ayahEnd: Int
+}
+
+/// A biography for a narrator in the chain, ingested from the source's people
+/// database and bundled natively so the reader's tap-to-open bio never calls out
+/// to any site. Carries an Arabic-English and an Arabic-Urdu pairing; where a
+/// language is not yet available it is `nil` and `needsUrdu`/`needsEnglish`
+/// flag it for a reviewed translation pass rather than being fabricated.
+struct HadithNarrator: Codable, Sendable, Identifiable, Equatable {
+    var id: Int
+    var nameEnglish: String?
+    var nameArabic: String?
+    var nameUrdu: String?
+    var kunya: String?
+    var kunyaArabic: String?
+    var generation: String?
+    var deathYear: String?
+    var gradeEnglish: String?
+    var gradeArabic: String?
+    var gradeUrdu: String?
+    var lineageEnglish: String?
+    var lineageArabic: String?
+    var cities: String?
+    var citiesArabic: String?
+    var affiliations: String?
+    var affiliationsArabic: String?
+    var hadithCount: Int?
+    var teacherIds: [Int]?
+    var studentIds: [Int]?
+    var appraisals: [NarratorAppraisal]?
+    /// Long-form biography prose, per language (may be nil).
+    var bioEnglish: String?
+    var bioUrdu: String?
+    var needsEnglish: Bool?
+    var needsUrdu: Bool?
+
+    func name(languageCode: String) -> String {
+        switch languageCode {
+        case "ar": return nameArabic ?? nameEnglish ?? "#\(id)"
+        case "ur": return nameUrdu ?? nameArabic ?? nameEnglish ?? "#\(id)"
+        default: return nameEnglish ?? nameArabic ?? "#\(id)"
+        }
+    }
+}
+
+/// One scholar's appraisal (jarḥ wa-taʿdīl) of a narrator, Arabic with an
+/// optional translation. Never machine-invented; a missing translation stays nil.
+struct NarratorAppraisal: Codable, Sendable, Equatable, Hashable {
+    var scholar: String?
+    var scholarArabic: String?
+    var textArabic: String?
+    var textEnglish: String?
+    var textUrdu: String?
 }

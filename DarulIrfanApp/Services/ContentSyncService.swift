@@ -199,6 +199,14 @@ struct ContentSyncService: ContentSyncServicing {
                     )
                 }
             }
+            // Narrator biographies referenced by the chains, bundled natively so
+            // the reader's tap-to-open bio never calls out. Optional: absent
+            // until the corpus is ingested with people data.
+            let narrators = SeedBundle.hadithNarrators()
+            if !narrators.isEmpty {
+                try await hadithRepository.upsertNarrators(narrators)
+                imported += narrators.count
+            }
         }
         if !libraryItems.isEmpty {
             try await contentRepository.upsertItems(libraryItems)

@@ -100,6 +100,87 @@ final class HadithIdentifierTests: XCTestCase {
         XCTAssertNil(loaded?.sections)
     }
 
+    // MARK: - Enriched presentation (schema v6)
+
+    /// The reader-facing enrichment — typed Arabic segments, quoted-verse refs,
+    /// split Urdu, and bab chapter — must decode from the ingester's JSON shape
+    /// and survive a round-trip through the store, so the coloured/tappable
+    /// reader has real data to render.
+    func testEnrichedNarrationDecodesAndRoundTrips() async throws {
+        let json = """
+        {"canonicalID":"bukhari|4|4","bookID":"bukhari","displayNumber":"4",
+         "numberMajor":4,"sourceSequence":4,
+         "text_ar":"whole arabic","text_en":"Narrated Jabir...","text_ur":"urdu",
+         "arabicSegments":[
+           {"type":"isnad","text":"قَالَ ابْنُ شِهَابٍ","narratorId":7272},
+           {"type":"matn","text":"بَيْنَا أَنَا أَمْشِي"},
+           {"type":"verse","text":"يَا أَيُّهَا الْمُدَّثِّرُ","surah":74,"ayahStart":1,"ayahEnd":5}],
+         "quranRefs":[{"surah":74,"ayahStart":1,"ayahEnd":5}],
+         "urduSanad":"ابن شہاب","urduText":"میں چل رہا تھا",
+         "chapterNumber":4,"chapterTitleEnglish":"Revelation","chapterTitleArabic":"باب","chapterTitleUrdu":"باب"}
+        """
+        let entry = try JSONDecoder().decode(HadithEntry.self, from: Data(json.utf8))
+        XCTAssertEqual(entry.arabicSegments?.count, 3)
+        XCTAssertEqual(entry.arabicSegments?[0].kind, .isnad)
+        XCTAssertEqual(entry.arabicSegments?[0].narratorId, 7272)
+        XCTAssertEqual(entry.arabicSegments?[2].kind, .verse)
+        XCTAssertEqual(entry.arabicSegments?[2].surah, 74)
+        XCTAssertEqual(entry.quranRefs?.first?.ayahEnd, 5)
+
+        try await repository.upsertEntries([entry])
+        let back = try await repository.entry(bookID: "bukhari", displayNumber: "4")
+        XCTAssertEqual(back?.arabicSegments?.count, 3)
+        XCTAssertEqual(back?.arabicSegments?[2].ayahStart, 1)
+        XCTAssertEqual(back?.quranRefs?.first?.surah, 74)
+        XCTAssertEqual(back?.urduSanad, "ابن شہاب")
+        XCTAssertEqual(back?.urduText, "میں چل رہا تھا")
+        XCTAssertEqual(back?.chapterTitleEnglish, "Revelation")
+    }
+
+    /// Un-enriched packs (no segments yet) still render: the whole Arabic body
+    /// comes back as a single matn span.
+    func testArabicDisplaySegmentsFallsBackToWholeBody() {
+        let e = makeEntry(book: "bukhari", number: "1", sequence: 1, arabic: "whole arabic body")
+        let segs = e.arabicDisplaySegments()
+        XCTAssertEqual(segs.count, 1)
+        XCTAssertEqual(segs.first?.kind, .matn)
+        XCTAssertEqual(segs.first?.text, "whole arabic body")
+    }
+
+    /// A narrator biography round-trips through the bundled store (backs the
+    /// reader's tap-to-open bio). Optionals mean only the set fields need giving.
+    func testNarratorBioRoundTrips() async throws {
+        let n = HadithNarrator(
+            id: 7272,
+            nameEnglish: "Muhammad ibn Shihab al-Zuhri",
+            nameArabic: "محمد بن شهاب الزهري",
+            gradeArabic: "ثقة",
+            hadithCount: 2200,
+            teacherIds: [4049],
+            appraisals: [NarratorAppraisal(scholar: "Ibn Hajar",
+                                           textArabic: "الفقيه الحافظ",
+                                           textEnglish: "The jurist, the hafiz")],
+            needsUrdu: true
+        )
+        try await repository.upsertNarrators([n])
+        let back = try await repository.narrator(id: 7272)
+        XCTAssertEqual(back?.nameArabic, "محمد بن شهاب الزهري")
+        XCTAssertEqual(back?.appraisals?.first?.textEnglish, "The jurist, the hafiz")
+        XCTAssertEqual(back?.needsUrdu, true)
+        let missing = try await repository.narrator(id: 999_999)
+        XCTAssertNil(missing)
+    }
+
+    /// `readingIndex` turns a hadith into its position so a tapped search result
+    /// opens straight to it. Three narrations sort before 1390.2.
+    func testReadingIndexLocatesHadith() async throws {
+        try await repository.upsertEntries(bukhariFixture())
+        let idx = try await repository.readingIndex(bookID: "bukhari", displayNumber: "1390.2")
+        XCTAssertEqual(idx, 3)
+        let none = try await repository.readingIndex(bookID: "bukhari", displayNumber: "9999")
+        XCTAssertNil(none)
+    }
+
     // MARK: - Sub-numbered narrations survive
 
     func testSubNumberedNarrationsAreStoredSeparately() async throws {
