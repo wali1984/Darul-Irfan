@@ -102,6 +102,9 @@ struct SurahReaderView: View {
             ScrollView {
                 LazyVStack(spacing: DISpacing.md) {
                     surahHeader
+                    if showsBismillahHeader {
+                        bismillahHeader
+                    }
                     if viewModel.recitation != nil {
                         recitationBar
                     }
@@ -199,6 +202,37 @@ struct SurahReaderView: View {
             .frame(maxWidth: .infinity)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    /// Whether to print the Basmala above the first ayah.
+    ///
+    /// Every surah opens with it except **at-Tawbah (9)**, which alone has no
+    /// Basmala. **Al-Fatihah (1)** is excluded for the opposite reason: there the
+    /// Basmala is ayah 1 itself in the Kufan numbering this mushaf follows, so a
+    /// header would print it twice. (An-Naml (27) also carries a Basmala inside
+    /// ayah 30, within Sulayman's letter — that is part of the verse text and is
+    /// unaffected by this header.)
+    private var showsBismillahHeader: Bool {
+        viewModel.surah.id != 1 && viewModel.surah.id != 9
+    }
+
+    /// The Basmala line. The text is not hardcoded: it is taken from the mushaf
+    /// the app ships (Al-Fatihah 1:1), so it always matches the bundled
+    /// orthography — IndoPak here — instead of drifting from it.
+    @ViewBuilder
+    private var bismillahHeader: some View {
+        if let text = viewModel.bismillahText {
+            DICard {
+                Text(verbatim: text)
+                    .font(DIFont.quranArabic(scale: appState.settings.readerFontScale.rawValue))
+                    .foregroundStyle(DIColor.primary)
+                    .diGoldGlow(radius: 6, opacity: 0.25)
+                    .multilineTextAlignment(.center)
+                    .environment(\.layoutDirection, .rightToLeft)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityLabel(Text("Bismillah ir-Rahman ir-Raheem"))
+            }
+        }
     }
 
     private var revelationPlaceName: String {

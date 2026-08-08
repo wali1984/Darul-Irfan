@@ -37,6 +37,10 @@ final class SurahReaderViewModel {
     var contentMode: QuranContentMode = .tarajum
     /// Word-by-word recitation (audio + timings) for this surah, when bundled.
     private(set) var recitation: SurahRecitation?
+    /// The Basmala, read from the bundled mushaf (Al-Fatihah 1:1) rather than
+    /// hardcoded, so it always matches the shipped orthography. Nil when the
+    /// Arabic pack is unavailable, in which case the header is simply omitted.
+    private(set) var bismillahText: String?
 
     private let repository: any QuranRepositoryProtocol
     private let devotionalMetrics: DevotionalMetricsSyncService
@@ -79,6 +83,16 @@ final class SurahReaderViewModel {
                 return
             }
             ayahs = loadedAyahs.sorted { $0.ayahNumber < $1.ayahNumber }
+
+            // Al-Fatihah 1:1 IS the Basmala, so it doubles as the source for the
+            // header shown above every other surah (except at-Tawbah). Reading it
+            // from the mushaf keeps the header in the same orthography as the
+            // text; a surah showing its own ayah 1 needs no lookup.
+            if surah.id != 1 && surah.id != 9 {
+                bismillahText = (try? await repository.ayahs(inSurah: 1))?
+                    .first { $0.ayahNumber == 1 }?
+                    .textArabic
+            }
 
             let allEditions = (try? await repository.editions()) ?? []
             editionsByID = Dictionary(
