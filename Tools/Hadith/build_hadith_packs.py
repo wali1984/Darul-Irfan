@@ -47,13 +47,16 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Iterable, NamedTuple
 
-# .../Darul Irfan/DarulIrfan-iOS/Tools/Hadith/this file -> .../Darul Irfan,
-# the workspace root that holds all four platform checkouts.
-REPO_ROOT = Path(__file__).resolve().parents[3]
+# Anchored on the iOS checkout (Tools/Hadith/<this file>), whose parent is the
+# workspace directory holding the other three platform checkouts. Only iOS is
+# under version control, so the others may be absent; missing ones are skipped
+# with a warning rather than failing the build.
+IOS_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = IOS_ROOT.parent
 
 # Every platform ships byte-identical seed files; see PLATFORM_RELEASE_MATRIX.md.
 SEED_DIRS = [
-    REPO_ROOT / "DarulIrfan-iOS/DarulIrfanApp/Resources/SeedData",
+    IOS_ROOT / "DarulIrfanApp/Resources/SeedData",
     REPO_ROOT / "DarulIrfanAndroid/app/src/main/assets/seed",
     REPO_ROOT / "DarulIrfanHarmony/entry/src/main/resources/rawfile/seed",
     REPO_ROOT / "DarulIrfanWeb/content",

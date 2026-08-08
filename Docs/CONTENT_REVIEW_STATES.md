@@ -94,3 +94,22 @@ python3 Tools/ContentIntegrity/check_content.py --report Docs/CONTENT_INTEGRITY.
 Exit code 0 means shippable. It runs in both Codemagic workflows — `ios-verify`
 on every push, and `ios-testflight` before a signed build is archived, so a
 release cannot get past a failing gate even if the tag is pushed directly.
+
+### Cross-platform parity has to be checked locally
+
+Only the iOS repository is under version control; the Android, HarmonyOS and
+Web checkouts live beside it in a workspace directory. CI therefore clones iOS
+alone and **cannot** compare the four seeds. The gate does not pretend
+otherwise: absent platforms are reported as *not verified*, the generated
+report names exactly which ones were compared, and nothing claims parity it did
+not establish.
+
+Before cutting a release, run it on a machine holding all four:
+
+```sh
+python3 Tools/ContentIntegrity/check_content.py --require-parity
+```
+
+That turns a missing platform into a failure rather than a note. The pack
+generator writes all four at once (`Tools/Hadith/build_hadith_packs.py`), so
+they should not drift in the first place — this is the check that proves it.

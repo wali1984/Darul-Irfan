@@ -28,15 +28,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-IOS_SEED = REPO_ROOT / "DarulIrfan-iOS/DarulIrfanApp/Resources/SeedData"
+# Anchored on the iOS checkout — Tools/ContentIntegrity/<this file> — because
+# that is the only layout guaranteed everywhere. CI clones this repository on
+# its own, so its root is the iOS checkout; on a dev machine the same checkout
+# sits inside a workspace directory alongside the other three platforms.
+IOS_ROOT = Path(__file__).resolve().parents[2]
+IOS_SEED = IOS_ROOT / "DarulIrfanApp/Resources/SeedData"
 
-# Every platform ships byte-identical seed files; see PLATFORM_RELEASE_MATRIX.md.
+# The sibling platform checkouts, when this is a full workspace. Only iOS is
+# under version control, so on CI these are absent and parity goes unchecked —
+# reported as a note, never silently. See PLATFORM_RELEASE_MATRIX.md.
+WORKSPACE_ROOT = IOS_ROOT.parent
 PLATFORM_SEEDS = {
     "iOS": IOS_SEED,
-    "Android": REPO_ROOT / "DarulIrfanAndroid/app/src/main/assets/seed",
-    "HarmonyOS": REPO_ROOT / "DarulIrfanHarmony/entry/src/main/resources/rawfile/seed",
-    "Web": REPO_ROOT / "DarulIrfanWeb/content",
+    "Android": WORKSPACE_ROOT / "DarulIrfanAndroid/app/src/main/assets/seed",
+    "HarmonyOS": WORKSPACE_ROOT / "DarulIrfanHarmony/entry/src/main/resources/rawfile/seed",
+    "Web": WORKSPACE_ROOT / "DarulIrfanWeb/content",
 }
 
 SURAH_COUNT = 114
@@ -425,7 +432,7 @@ def sha256_of(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def check_manifest_and_hashes(report: Report) -> dict[str, str]:
+def check_manifest_and_hashes(report: Report, require_parity: bool) -> dict[str, str]:
     manifest = load(IOS_SEED, "manifest")
     if not report.check(manifest is not None, "manifest.json is missing"):
         return {}
@@ -449,12 +456,26 @@ def check_manifest_and_hashes(report: Report) -> dict[str, str]:
     hashes = {path.name: sha256_of(path) for path in sorted(IOS_SEED.glob("*.json"))}
 
     # Every platform must ship the identical bytes, or the four apps disagree
-    # about what the sacred text says.
+    # about what the sacred text says. Only the iOS checkout is under version
+    # control, so on CI the others are simply absent: that is recorded as
+    # unverified rather than counted as a pass. `--require-parity` turns it
+    # into a failure, for a release run on a machine that has all four.
+    verified: list[str] = ["iOS"]
+    unchecked: list[str] = []
     for platform, directory in PLATFORM_SEEDS.items():
         if platform == "iOS":
             continue
         if not directory.exists():
-            report.note(f"{platform} seed directory not present in this checkout; parity unchecked")
+            unchecked.append(platform)
+            if require_parity:
+                report.failures.append(
+                    f"{platform} seed directory is missing and --require-parity was set"
+                )
+            else:
+                report.note(
+                    f"{platform} seed directory not in this checkout — "
+                    f"parity NOT verified in this run"
+                )
             continue
         mismatched = []
         for name, digest in hashes.items():
@@ -463,10 +484,13 @@ def check_manifest_and_hashes(report: Report) -> dict[str, str]:
                 mismatched.append(f"{name} missing")
             elif sha256_of(other) != digest:
                 mismatched.append(name)
-        report.check(not mismatched,
-                     f"{platform} seed differs from iOS: {mismatched[:6]}")
+        if report.check(not mismatched,
+                        f"{platform} seed differs from iOS: {mismatched[:6]}"):
+            verified.append(platform)
 
     report.facts["fileHashes"] = hashes
+    report.facts["parityVerified"] = verified
+    report.facts["parityUnchecked"] = unchecked
     return hashes
 
 
@@ -537,8 +561,15 @@ def render_report(report: Report, migration_status: str, passed: bool) -> str:
               f"{facts.get('inheritedDefectNarrations', 0)} narrations "
               f"(inventory: `Tools/ContentIntegrity/known_upstream_defects.json`)"]
 
-    lines += ["", "## Seed file hashes (SHA-256)", "",
-              "Identical on iOS, Android, HarmonyOS and Web.", "",
+    verified = facts.get("parityVerified", [])
+    unchecked = facts.get("parityUnchecked", [])
+    parity = f"Byte-identical across: {', '.join(verified)}."
+    if unchecked:
+        parity += (f" **NOT verified for {', '.join(unchecked)}** — those checkouts "
+                   f"were not present in this run. Only the iOS repository is under "
+                   f"version control, so cross-platform parity has to be confirmed on "
+                   f"a machine holding all four (`--require-parity`).")
+    lines += ["", "## Seed file hashes (SHA-256)", "", parity, "",
               "| File | SHA-256 |", "| --- | --- |"]
     for name, digest in facts.get("fileHashes", {}).items():
         lines.append(f"| {name} | `{digest}` |")
@@ -569,13 +600,19 @@ def main() -> int:
         choices=["passed", "failed", "not-run"],
         help="result of the Swift upgrade-migration test, supplied by CI",
     )
+    parser.add_argument(
+        "--require-parity",
+        action="store_true",
+        help="fail if any platform checkout is absent, instead of noting it "
+             "as unverified; use before a release tag",
+    )
     args = parser.parse_args()
 
     report = Report()
     check_encoding(IOS_SEED, report)
     check_quran(IOS_SEED, report)
     check_hadith(IOS_SEED, report)
-    check_manifest_and_hashes(report)
+    check_manifest_and_hashes(report, require_parity=args.require_parity)
 
     if args.migration_status == "failed":
         report.failures.append("the upgrade-migration test failed")
