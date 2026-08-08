@@ -139,16 +139,25 @@ struct ContentSyncService: ContentSyncServicing {
             try await quranRepository.upsertEditions(editions)
             imported += editions.count
         }
-        // Asrar-at-Tanzil English has been re-authored across versions
-        // (full-surah block -> per-ayah/range, and once removed entirely).
-        // Delete its rows wholesale BEFORE re-importing so: (a) no stale range
+        // Both Asrar-at-Tanzil editions have been re-authored across versions.
+        // Delete their rows wholesale BEFORE re-importing so: (a) no stale range
         // can orphan under an ayah — a leftover 662 KB full-surah block once
         // crashed large surahs, including when upgrading straight from an old
         // build; (b) ayat dropped from the source truly go blank. Re-inserted
         // just below from the seed when present; stays gone when the seed omits
         // it (upsert adds nothing for a missing edition).
-        try await quranRepository.deleteTranslations(editionID: "asrar-at-tanzil-en")
-        try await quranRepository.deleteTafsir(editionID: "asrar-at-tanzil-en")
+        //
+        // The Urdu edition relies on the "stays gone" half. Its 1,118 tafsir
+        // records were withdrawn from the seed because the OCR behind them is
+        // corrupt — see Docs/ASRAR_URDU_TRANSLATION_STATUS.md — so this purge is
+        // what actually removes them from devices that already imported them.
+        // The edition row itself is deliberately kept: it carries a sourceUrl,
+        // so with no rows the reader falls back to its "not yet imported"
+        // placeholder instead of showing damaged scripture commentary.
+        for editionID in ["asrar-at-tanzil-en", "asrar-at-tanzil-ur"] {
+            try await quranRepository.deleteTranslations(editionID: editionID)
+            try await quranRepository.deleteTafsir(editionID: editionID)
+        }
         if !translations.isEmpty {
             try await quranRepository.upsertTranslations(translations)
             imported += translations.count
