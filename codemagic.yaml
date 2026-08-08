@@ -273,3 +273,94 @@ workflows:
         notify:
           success: true
           failure: true
+
+  # ---------------------------------------------------------------------------
+  # hadith-ingest — data generation, NOT an app build.
+  #
+  # Runs the keyless sunnah.com ingester to (re)generate the enriched hadith
+  # corpus — Arabic split into isnad/matn/verse, full English, split Urdu,
+  # structured Qur'an verse refs, bab chapters, and a narrator-bio store with
+  # Urdu auto-translated from the existing bio — then vets it and either commits
+  # the regenerated seed back to the branch (if GITHUB_PAT is set) or publishes
+  # it as an artifact. The normal ios-verify / ios-testflight builds then just
+  # bundle the already-generated data; they never scrape.
+  #
+  # HOW TO RUN
+  #   * Manual:    Codemagic UI → Start new build → workflow "hadith-ingest",
+  #                branch feat/official-platform.
+  #   * Scheduled: Codemagic UI → this workflow → add a cron schedule
+  #                (Codemagic schedules are configured in the UI, not in YAML).
+  #   It is intentionally NOT push/PR triggered, so no app build ever scrapes.
+  #
+  # ENVIRONMENT (create these in the Codemagic UI as secure variable groups)
+  #   hadith_ingest:
+  #     GITHUB_PAT        fine-grained PAT with "contents: write" on this repo.
+  #                       If absent, the seed is published as an artifact instead
+  #                       of being committed — the run still succeeds.
+  #     DI_TRANSLATE_URL  OpenAI-compatible chat completions endpoint (for the
+  #     DI_TRANSLATE_KEY  Urdu bio auto-translation step). If absent, bios keep
+  #     DI_TRANSLATE_MODEL their source languages and Urdu is marked pending
+  #                       (needsUrdu) — never fabricated.
+  # Only the iOS checkout exists on CI, so the ingester writes the iOS seed and
+  # commits it; the other three platforms are synced from it by the packer where
+  # all four checkouts live (see Docs/HADITH_CI_INGEST.md). The content-integrity
+  # gate reports cross-platform parity as unverified on CI, exactly as today.
+  hadith-ingest:
+    name: Hadith corpus ingest (keyless sunnah.com → native seed)
+    instance_type: linux_x2
+    max_build_duration: 120
+    environment:
+      groups:
+        - hadith_ingest
+    cache:
+      cache_paths:
+        - $CM_BUILD_DIR/.hadith_cache
+    # No `triggering:` block → never runs on push/PR; manual or scheduled only.
+    scripts:
+      - name: Install Python dependencies
+        script: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests beautifulsoup4 lxml
+      - name: Ingest, enrich, pack, vet, bump manifest
+        script: |
+          set -e
+          python3 Tools/Hadith/ingest_sunnah.py \
+            --all --pack --vet --bump-manifest --translate \
+            --cache-dir "$CM_BUILD_DIR/.hadith_cache" \
+            --throttle 1.2 \
+            --out "$CM_BUILD_DIR/build/hadith"
+      - name: Content integrity gate
+        script: |
+          python3 Tools/ContentIntegrity/check_content.py \
+            --report "$CM_BUILD_DIR/build/CONTENT_INTEGRITY.md"
+      - name: Commit regenerated seed back (or fall back to an artifact)
+        script: |
+          set -e
+          if [ -n "$GITHUB_PAT" ]; then
+            git config user.email "ci@darulirfan.app"
+            git config user.name "Darul Irfan CI (hadith-ingest)"
+            git add DarulIrfanApp/Resources/SeedData
+            if git diff --cached --quiet; then
+              echo "No seed changes to commit."
+            else
+              git commit -m "Hadith: CI-ingested enriched corpus (auto) [skip ci]"
+              BRANCH="${CM_BRANCH:-feat/official-platform}"
+              git push "https://x-access-token:${GITHUB_PAT}@github.com/wali1984/Darul-Irfan.git" "HEAD:${BRANCH}"
+              echo "Pushed regenerated seed to ${BRANCH}."
+            fi
+          else
+            echo "GITHUB_PAT not set — publishing the seed as an artifact instead."
+            mkdir -p "$CM_BUILD_DIR/build"
+            tar czf "$CM_BUILD_DIR/build/hadith_seed.tgz" DarulIrfanApp/Resources/SeedData
+          fi
+    artifacts:
+      - build/hadith/ingest_report.json
+      - build/CONTENT_INTEGRITY.md
+      - build/hadith_seed.tgz
+    publishing:
+      email:
+        recipients:
+          - wajidali1984@hotmail.com
+        notify:
+          success: true
+          failure: true
