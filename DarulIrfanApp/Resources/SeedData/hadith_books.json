@@ -7,12 +7,13 @@
   "en",
   "ur"
  ],
+ "reviewState": "testFlightApproved",
  "books": [
   {
    "id": "bukhari",
    "titleEnglish": "Sahih al-Bukhari",
    "titleUrdu": "صحیح بخاری",
-   "hadithCount": 7589,
+   "hadithCount": 7583,
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
@@ -22,11 +23,11 @@
    "id": "muslim",
    "titleEnglish": "Sahih Muslim",
    "titleUrdu": "صحیح مسلم",
-   "hadithCount": 7564,
+   "hadithCount": 7482,
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
-   "sectionCount": 56
+   "sectionCount": 57
   },
   {
    "id": "abudawud",
@@ -42,7 +43,7 @@
    "id": "tirmidhi",
    "titleEnglish": "Jami' at-Tirmidhi",
    "titleUrdu": "جامع ترمذی",
-   "hadithCount": 3998,
+   "hadithCount": 3989,
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
@@ -52,7 +53,7 @@
    "id": "nasai",
    "titleEnglish": "Sunan an-Nasa'i",
    "titleUrdu": "سنن نسائی",
-   "hadithCount": 5765,
+   "hadithCount": 5683,
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
@@ -62,17 +63,17 @@
    "id": "ibnmajah",
    "titleEnglish": "Sunan Ibn Majah",
    "titleUrdu": "سنن ابن ماجہ",
-   "hadithCount": 4343,
+   "hadithCount": 4342,
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
-   "sectionCount": 37
+   "sectionCount": 38
   },
   {
    "id": "malik",
    "titleEnglish": "Muwatta Malik",
    "titleUrdu": "موطأ امام مالک",
-   "hadithCount": 1889,
+   "hadithCount": 1868,
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,

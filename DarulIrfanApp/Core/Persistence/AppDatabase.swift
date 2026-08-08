@@ -6,7 +6,27 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 3
+    static let schemaVersion = 4
+
+    /// User-owned tables that no content migration may ever disturb. Migration
+    /// v4 asserts their row counts are identical before and after it runs; a
+    /// test checks this list and that migration's SQL name the same tables, so
+    /// adding one here without covering it there fails the build.
+    static let userDataTables = [
+        "key_value",              // settings, prayer preferences, sync state
+        "quran_bookmarks",
+        "quran_reading_progress",
+        "content_reading_progress",
+        "playback_progress",
+        "media_bookmarks",
+        "playlists",
+        "downloaded_assets",
+        "favorites",
+        "prayer_log",
+        "fasting_log",
+        "tasbih_counters",
+        "zikr_habit",
+    ]
 
     /// Production store, in Application Support (backed up, not user-visible).
     static func liveURL() throws -> URL {
@@ -50,7 +70,134 @@ final class AppDatabase: Sendable {
             try await connection.executeScript(Self.migrationV3)
             try await connection.setSchemaVersion(3)
         }
+        if version < 4 {
+            try await connection.migrate(
+                to: 4,
+                script: Self.migrationV4,
+                checks: Self.migrationV4Checks,
+                cleanup: "DROP TABLE IF EXISTS _migration_v4_counts;"
+            )
+        }
     }
+
+    // MARK: - Schema v4 (hadith identifiers)
+
+    /// Re-keys `hadith_entries` on a textual canonical identifier.
+    ///
+    /// v3 keyed the table `(book_id, hadith_number INTEGER)`. Upstream prints
+    /// sub-numbered narrations such as `402.2`, which truncated to `402` and
+    /// collided with the real hadith 402 — the insert's `ON CONFLICT DO UPDATE`
+    /// then overwrote one narration with the other. That silently destroyed 103
+    /// narrations across 86 collision groups.
+    ///
+    /// `402.2` is an identifier, not a quantity, so the fix is textual: no
+    /// `REAL`, no `Double`. The old rows are dropped rather than converted —
+    /// the narrations they lost exist only in the regenerated seed packs, which
+    /// re-import on the same launch via the manifest bump. Nothing user-owned
+    /// lives in this table, and the checks below prove nothing else moved.
+    static let migrationV4 = """
+    -- Dropped first as well as last so a retry after a rolled-back attempt
+    -- cannot trip over a leftover scratch table.
+    DROP TABLE IF EXISTS _migration_v4_counts;
+
+    -- Row counts for every user-owned table, captured before the drop.
+    CREATE TEMP TABLE _migration_v4_counts AS
+        SELECT 'key_value' AS table_name, COUNT(*) AS row_count FROM key_value
+        UNION ALL SELECT 'quran_bookmarks', COUNT(*) FROM quran_bookmarks
+        UNION ALL SELECT 'quran_reading_progress', COUNT(*) FROM quran_reading_progress
+        UNION ALL SELECT 'content_reading_progress', COUNT(*) FROM content_reading_progress
+        UNION ALL SELECT 'playback_progress', COUNT(*) FROM playback_progress
+        UNION ALL SELECT 'media_bookmarks', COUNT(*) FROM media_bookmarks
+        UNION ALL SELECT 'playlists', COUNT(*) FROM playlists
+        UNION ALL SELECT 'downloaded_assets', COUNT(*) FROM downloaded_assets
+        UNION ALL SELECT 'favorites', COUNT(*) FROM favorites
+        UNION ALL SELECT 'prayer_log', COUNT(*) FROM prayer_log
+        UNION ALL SELECT 'fasting_log', COUNT(*) FROM fasting_log
+        UNION ALL SELECT 'tasbih_counters', COUNT(*) FROM tasbih_counters
+        UNION ALL SELECT 'zikr_habit', COUNT(*) FROM zikr_habit;
+
+    DROP INDEX IF EXISTS idx_hadith_entries_book;
+    DROP TABLE IF EXISTS hadith_entries;
+
+    CREATE TABLE hadith_entries (
+        canonical_id TEXT PRIMARY KEY,     -- "bukhari|402.2|403"
+        book_id TEXT NOT NULL,
+        display_number TEXT NOT NULL,      -- exactly as the source prints it
+        number_major INTEGER NOT NULL,
+        number_minor INTEGER,              -- lookup only, never a sort key
+        source_sequence INTEGER NOT NULL,  -- position in the source edition
+        text_ar TEXT,
+        text_en TEXT,
+        text_ur TEXT,
+        grades TEXT,
+        source_book INTEGER,
+        source_hadith INTEGER
+    );
+
+    -- Reading order is the source's own order: Tirmidhi prints 3604.02…3604.09
+    -- then 3604.1 (meaning ten), and Malik uses .25/.5/.75 as insertion points,
+    -- so neither the minor part nor a decimal reading sorts them correctly.
+    CREATE INDEX IF NOT EXISTS idx_hadith_entries_reading_order
+        ON hadith_entries (book_id, source_sequence);
+
+    -- Deep links and cross-references resolve by printed number.
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_hadith_entries_display_number
+        ON hadith_entries (book_id, display_number);
+
+    -- Review state travels with each edition so the model round-trips through
+    -- the store intact. Internal metadata only — never rendered in the reader.
+    ALTER TABLE quran_editions ADD COLUMN review_state TEXT;
+    """
+
+    /// Each query selects violations; the migration commits only if all are empty.
+    static let migrationV4Checks: [SQLiteDatabase.MigrationCheck] = [
+        .init(
+            sql: """
+            SELECT table_name FROM _migration_v4_counts c
+            WHERE c.row_count <> (
+                CASE c.table_name
+                    WHEN 'key_value' THEN (SELECT COUNT(*) FROM key_value)
+                    WHEN 'quran_bookmarks' THEN (SELECT COUNT(*) FROM quran_bookmarks)
+                    WHEN 'quran_reading_progress' THEN (SELECT COUNT(*) FROM quran_reading_progress)
+                    WHEN 'content_reading_progress' THEN (SELECT COUNT(*) FROM content_reading_progress)
+                    WHEN 'playback_progress' THEN (SELECT COUNT(*) FROM playback_progress)
+                    WHEN 'media_bookmarks' THEN (SELECT COUNT(*) FROM media_bookmarks)
+                    WHEN 'playlists' THEN (SELECT COUNT(*) FROM playlists)
+                    WHEN 'downloaded_assets' THEN (SELECT COUNT(*) FROM downloaded_assets)
+                    WHEN 'favorites' THEN (SELECT COUNT(*) FROM favorites)
+                    WHEN 'prayer_log' THEN (SELECT COUNT(*) FROM prayer_log)
+                    WHEN 'fasting_log' THEN (SELECT COUNT(*) FROM fasting_log)
+                    WHEN 'tasbih_counters' THEN (SELECT COUNT(*) FROM tasbih_counters)
+                    WHEN 'zikr_habit' THEN (SELECT COUNT(*) FROM zikr_habit)
+                END
+            )
+            """,
+            failure: "a user-data table lost or gained rows during the migration"
+        ),
+        .init(
+            sql: """
+            SELECT 1 WHERE NOT EXISTS (
+                SELECT 1 FROM pragma_table_info('hadith_entries')
+                WHERE name = 'canonical_id' AND pk = 1
+            )
+            """,
+            failure: "hadith_entries.canonical_id is not the primary key"
+        ),
+        .init(
+            sql: """
+            SELECT name FROM pragma_table_info('hadith_entries')
+            WHERE name = 'hadith_number'
+            """,
+            failure: "the old integer hadith_number column survived the migration"
+        ),
+        .init(
+            sql: """
+            SELECT canonical_id FROM hadith_entries
+            GROUP BY canonical_id HAVING COUNT(*) > 1
+            """,
+            failure: "duplicate canonical IDs in hadith_entries"
+        ),
+    ]
 
     // MARK: - Schema v3 (hadith)
 

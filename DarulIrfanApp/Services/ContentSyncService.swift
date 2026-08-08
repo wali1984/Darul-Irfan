@@ -13,6 +13,28 @@ struct RemoteManifest: Codable, Sendable, Equatable {
     var files: [String: String]
 }
 
+// MARK: - Content integrity
+
+/// Raised when what the seed shipped and what the database holds disagree.
+///
+/// The caller at launch uses `try?`, so this does not block startup: the seed
+/// version stays unstamped and the import is retried next launch rather than a
+/// short corpus being accepted as correct. Tests and the content build treat it
+/// as fatal, which is where a bad pack is meant to be caught.
+enum ContentIntegrityError: Error, CustomStringConvertible {
+    case hadithRowCountMismatch(bookID: String, expected: Int, stored: Int)
+    case hadithCatalogCountMismatch(bookID: String, claimed: Int, stored: Int)
+
+    var description: String {
+        switch self {
+        case .hadithRowCountMismatch(let bookID, let expected, let stored):
+            return "Hadith '\(bookID)': seed has \(expected) records, database stored \(stored)."
+        case .hadithCatalogCountMismatch(let bookID, let claimed, let stored):
+            return "Hadith '\(bookID)': catalogue claims \(claimed), database stored \(stored)."
+        }
+    }
+}
+
 // MARK: - Content sync service
 
 /// Imports the bundled seed JSON into the database on first launch (and
@@ -139,14 +161,42 @@ struct ContentSyncService: ContentSyncServicing {
         // Hadith: the catalogue plus one pack per collection. Packs are loaded
         // and inserted one book at a time so a large corpus never has to be
         // held in memory all at once.
+        //
+        // Every insert is counted back out of the database afterwards. Sacred
+        // text must never go missing quietly: the previous integer-keyed schema
+        // let sub-numbered narrations such as 402.2 collide with 402 and
+        // overwrite each other on insert, and nothing noticed because nobody
+        // compared what went in with what landed.
         if let catalog = SeedBundle.hadithCatalog(), !catalog.books.isEmpty {
             try await hadithRepository.upsertBooks(catalog.books)
             imported += catalog.books.count
             for book in catalog.books {
                 let rows = SeedBundle.hadithEntries(bookID: book.id)
-                if !rows.isEmpty {
-                    try await hadithRepository.upsertEntries(rows)
-                    imported += rows.count
+                guard !rows.isEmpty else { continue }
+                // Delete-then-insert: a narration dropped upstream must go,
+                // not linger as an orphan the pack no longer accounts for.
+                try await hadithRepository.deleteEntries(bookID: book.id)
+                try await hadithRepository.upsertEntries(rows)
+                imported += rows.count
+
+                let stored = try await hadithRepository.entryCount(bookID: book.id)
+                if stored != rows.count {
+                    AppLog.content(
+                        "Hadith pack '\(book.id)': \(rows.count) records in the seed "
+                        + "but \(stored) rows stored — narrations were lost on insert."
+                    )
+                    throw ContentIntegrityError.hadithRowCountMismatch(
+                        bookID: book.id, expected: rows.count, stored: stored
+                    )
+                }
+                if book.hadithCount != stored {
+                    AppLog.content(
+                        "Hadith catalogue claims \(book.hadithCount) for '\(book.id)' "
+                        + "but \(stored) rows shipped."
+                    )
+                    throw ContentIntegrityError.hadithCatalogCountMismatch(
+                        bookID: book.id, claimed: book.hadithCount, stored: stored
+                    )
                 }
             }
         }

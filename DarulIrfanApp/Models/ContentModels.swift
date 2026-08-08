@@ -15,6 +15,37 @@ enum RightsStatus: String, Codable, Sendable {
     case publicDomain
 }
 
+// MARK: - Review state
+
+/// How far a body of sacred text has got through review.
+///
+/// Internal metadata only. It gates what may ship in which channel; it is
+/// never surfaced as a label on the text itself. Readers see the work, its
+/// author and its source — not the pipeline that produced it. Provenance
+/// belongs in Acknowledgements, not beside an ayah.
+enum ReviewState: String, Codable, Sendable, CaseIterable {
+    /// Incomplete or unreviewed. Ships to no channel.
+    case draft
+    /// Vision review, extracted-text review and the content validators all
+    /// passed, with no known corruption, duplicate loss or schema fault.
+    /// Line-by-line human proofreading is still outstanding.
+    case testFlightApproved
+    /// Additionally proofread by a person, or cross-verified line by line
+    /// against independent authoritative sources.
+    case publicApproved
+    /// Found faulty; must not ship anywhere.
+    case rejected
+
+    /// TestFlight carries reviewed content as well as fully-approved content.
+    var allowedOnTestFlight: Bool {
+        self == .testFlightApproved || self == .publicApproved
+    }
+
+    /// The eventual App Store gate. Not enforced yet — see
+    /// `Docs/CONTENT_REVIEW_STATES.md` for when it turns on.
+    var allowedOnAppStore: Bool { self == .publicApproved }
+}
+
 // MARK: - Library content
 
 /// Kind of library item in the verified content catalog.

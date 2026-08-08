@@ -82,6 +82,10 @@ struct QuranEdition: Codable, Sendable, Identifiable, Equatable {
     var rightsStatus: RightsStatus
     /// Whether the edition's text is bundled/downloaded and readable offline.
     var isAvailableOffline: Bool
+    /// How far this edition has got through review. Internal metadata: it
+    /// decides what may ship in which channel and is never shown as a label
+    /// on the text. Absent in seeds written before review states existed.
+    var reviewState: ReviewState?
 
     enum Kind: String, Codable, Sendable {
         case translation

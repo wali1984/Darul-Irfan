@@ -113,21 +113,37 @@ struct HadithHomeView: View {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 HStack(spacing: DISpacing.sm) {
                     DIPillBadge(text: bookTitle, color: DIColor.primary)
-                    Text("#\(entry.hadithNumber)")
+                    Text(verbatim: "#\(entry.displayNumber)")
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(DIColor.textMuted)
                     Spacer(minLength: 0)
                 }
-                if let text = entry.text(languageCode: languageCode), !text.isEmpty {
-                    Text(verbatim: text)
-                        .font(languageCode == "ur" ? DIFont.urduBody(scale: 0.95) : .subheadline)
+                // A search can match a script the reader is not currently in, so
+                // the preview shows whatever text exists — but styled for the
+                // language it actually is, never the reader's. English set in
+                // Nastaliq and reversed would misrepresent it as the Urdu.
+                if let preview = entry.availableText(preferring: languageCode) {
+                    let style = Self.snippetStyle(for: preview.languageCode)
+                    Text(verbatim: preview.text)
+                        .font(style.font)
                         .foregroundStyle(DIColor.textPrimary)
                         .lineLimit(4)
-                        .multilineTextAlignment(languageCode == "ur" ? .trailing : .leading)
-                        .environment(\.layoutDirection, languageCode == "ur" ? .rightToLeft : .leftToRight)
-                        .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
+                        .multilineTextAlignment(style.isRTL ? .trailing : .leading)
+                        .environment(\.layoutDirection, style.isRTL ? .rightToLeft : .leftToRight)
+                        .frame(maxWidth: .infinity, alignment: style.isRTL ? .trailing : .leading)
                 }
             }
+        }
+    }
+
+    /// Typography for a snippet, chosen by the language the text actually is
+    /// rather than the reader's, so a match in one script is never dressed up
+    /// as another.
+    private static func snippetStyle(for languageCode: String) -> (font: Font, isRTL: Bool) {
+        switch languageCode {
+        case "ur": return (DIFont.urduBody(scale: 0.95), true)
+        case "ar": return (DIFont.quranArabic(scale: 0.62), true)
+        default: return (.subheadline, false)
         }
     }
 

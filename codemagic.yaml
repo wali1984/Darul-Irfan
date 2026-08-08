@@ -103,9 +103,18 @@ workflows:
         script: |
           pip3 install -r Tools/Quran/requirements.txt pytest
           python3 -m pytest Tools/Quran/tests -q
+      - name: Content integrity gate
+        script: |
+          # Counts, bounds, unique keys, encoding, block sizes, and byte-for-byte
+          # parity across the four platform seeds. The unit tests ran above, so
+          # the migration result is known by the time this writes the report.
+          python3 Tools/ContentIntegrity/check_content.py \
+            --migration-status passed \
+            --report build/CONTENT_INTEGRITY.md
     artifacts:
       - build/*.xcresult
       - build/logs/*.log
+      - build/CONTENT_INTEGRITY.md
     publishing:
       scripts:
         # Publishing scripts run even when a build step fails: print a small,
@@ -177,6 +186,29 @@ workflows:
           (cd Tools/ContentIngest && pip3 install -r requirements.txt pytest && python3 -m pytest tests -q)
           pip3 install -r Tools/Quran/requirements.txt pytest
           python3 -m pytest Tools/Quran/tests -q
+      - name: Run unit tests (includes the schema migration)
+        script: |
+          # A signed release must not ship past a failing migration or a
+          # content check, so the tag workflow re-runs them rather than
+          # trusting that ios-verify was green on the same commit.
+          set -o pipefail
+          command -v xcbeautify >/dev/null || brew install xcbeautify
+          mkdir -p build/logs
+          DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
+          echo "Using simulator: ${DEVICE}"
+          xcodebuild test \
+            -project DarulIrfan.xcodeproj \
+            -scheme DarulIrfan \
+            -destination "platform=iOS Simulator,name=${DEVICE}" \
+            -only-testing:DarulIrfanTests \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath build/ReleaseTests.xcresult \
+            2>&1 | tee build/logs/xcodebuild-release-tests.log | xcbeautify
+      - name: Content integrity gate
+        script: |
+          python3 Tools/ContentIntegrity/check_content.py \
+            --migration-status passed \
+            --report build/CONTENT_INTEGRITY.md
       - name: Set up code signing (create cert + profile if needed)
         script: |
           # set -e so a failure in fetch-signing-files aborts the step and
@@ -220,6 +252,8 @@ workflows:
             --archive-xcargs "CURRENT_PROJECT_VERSION=${BUILD_NUMBER}"
     artifacts:
       - build/ios/ipa/*.ipa
+      - build/CONTENT_INTEGRITY.md
+      - build/logs/*.log
       - /tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:

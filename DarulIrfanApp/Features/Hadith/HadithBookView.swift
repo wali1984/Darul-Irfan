@@ -96,7 +96,9 @@ struct HadithBookView: View {
         ) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack(spacing: DISpacing.sm) {
-                    DIPillBadge(text: "#\(entry.hadithNumber)", color: DIColor.primary)
+                    // The number exactly as the collection prints it, including
+                    // sub-numbers such as 402.2 — never rounded to an integer.
+                    DIPillBadge(text: "#\(entry.displayNumber)", color: DIColor.primary)
                     if let grades = entry.grades, let first = grades.first {
                         DIPillBadge(text: first, color: DIColor.accent)
                     }
@@ -117,7 +119,12 @@ struct HadithBookView: View {
                     Divider().overlay(DIColor.border)
                 }
 
-                if let text = entry.text(languageCode: languageCode), !text.isEmpty {
+                // Strictly the reader's own language. No cross-language
+                // fallback: English prose set in Nastaliq and laid out
+                // right-to-left would read as though it were the Urdu
+                // translation, and repeating the Arabic would present the
+                // source text as its own translation. A gap is shown as a gap.
+                if let text = entry.text(languageCode: languageCode) {
                     if languageCode == "ur" {
                         Text(verbatim: text)
                             .font(DIFont.urduBody(scale: fontScale))
@@ -135,9 +142,29 @@ struct HadithBookView: View {
                             .textSelection(.enabled)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+                } else {
+                    missingTranslationNote
                 }
             }
         }
+    }
+
+    /// Shown when this narration has no text in the reader's language. Says so
+    /// plainly rather than substituting another language's text.
+    private var missingTranslationKey: LocalizedStringKey {
+        switch languageCode {
+        case "ur": return "This narration has no Urdu translation"
+        case "ar": return "This narration has no Arabic text"
+        default: return "This narration has no English translation"
+        }
+    }
+
+    private var missingTranslationNote: some View {
+        Text(missingTranslationKey)
+            .font(.footnote)
+            .italic()
+            .foregroundStyle(DIColor.textMuted)
+            .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
 
     private func loadFirstPage() async {

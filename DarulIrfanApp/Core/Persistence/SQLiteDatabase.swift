@@ -13,6 +13,7 @@ enum SQLiteError: Error, CustomStringConvertible {
     case prepareFailed(sql: String, message: String)
     case stepFailed(sql: String, message: String)
     case bindFailed(index: Int, message: String)
+    case migrationFailed(version: Int, reason: String)
 
     var description: String {
         switch self {
@@ -20,6 +21,8 @@ enum SQLiteError: Error, CustomStringConvertible {
         case .prepareFailed(let sql, let message): return "SQLite prepare failed (\(message)): \(sql)"
         case .stepFailed(let sql, let message): return "SQLite step failed (\(message)): \(sql)"
         case .bindFailed(let index, let message): return "SQLite bind failed at index \(index): \(message)"
+        case .migrationFailed(let version, let reason):
+            return "SQLite migration to v\(version) rolled back: \(reason)"
         }
     }
 }
@@ -175,6 +178,51 @@ actor SQLiteDatabase {
             for statement in statements {
                 try execute(statement.sql, statement.parameters)
             }
+            try execute("COMMIT")
+        } catch {
+            try? execute("ROLLBACK")
+            throw error
+        }
+    }
+
+    /// A post-migration invariant, written as SQL that selects the *violations*.
+    /// The migration is sound only while every check returns no rows.
+    struct MigrationCheck: Sendable {
+        /// Returns one row per problem found. No rows means the check passed.
+        let sql: String
+        /// What it means when the query does return rows.
+        let failure: String
+    }
+
+    /// Applies a migration and its invariants inside a single transaction.
+    ///
+    /// The script, every check, and the `user_version` bump all commit together
+    /// or not at all: if any check finds a violation the transaction rolls back
+    /// and `user_version` is left untouched, so the next launch retries against
+    /// the original database rather than a half-migrated one.
+    ///
+    /// - Parameter cleanup: statements run after the checks (still inside the
+    ///   transaction), e.g. dropping scratch tables the checks needed.
+    func migrate(
+        to version: Int,
+        script: String,
+        checks: [MigrationCheck] = [],
+        cleanup: String? = nil
+    ) throws {
+        try execute("BEGIN IMMEDIATE TRANSACTION")
+        do {
+            try executeScript(script)
+            for check in checks {
+                let violations = try query(check.sql)
+                guard violations.isEmpty else {
+                    throw SQLiteError.migrationFailed(
+                        version: version,
+                        reason: "\(check.failure) (\(violations.count) violation(s))"
+                    )
+                }
+            }
+            if let cleanup { try executeScript(cleanup) }
+            try executeScript("PRAGMA user_version = \(version)")
             try execute("COMMIT")
         } catch {
             try? execute("ROLLBACK")

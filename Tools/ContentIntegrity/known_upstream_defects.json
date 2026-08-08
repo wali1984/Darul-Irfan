@@ -1,0 +1,237 @@
+{
+ "_comment": "Characters upstream (fawazahmed0/hadith-api) already lost to a bad decode before we ever saw the data: each U+FFFD stands where one Arabic character should be. Present in both the diacritic and diacritic-free editions, so it cannot be recovered from this source, and present in every build the app has shipped. Recorded exactly so check_content.py can tell a known upstream defect from a new regression: any U+FFFD not listed here, or a count higher than recorded, fails the content build.",
+ "_source": "fawazahmed0/hadith-api @1",
+ "_recordedAt": "2026-08-08",
+ "_totalReplacementCharacters": 154,
+ "_resolution": "Repair needs a second authoritative Arabic corpus; tracked as a public-release task, not a TestFlight blocker.",
+ "narrations": {
+  "bukhari|834|837": {
+   "ar": 2
+  },
+  "bukhari|1748|1756": {
+   "ar": 2
+  },
+  "bukhari|2898|2910": {
+   "ar": 2
+  },
+  "bukhari|3007|3019": {
+   "ar": 2
+  },
+  "bukhari|3304|3316": {
+   "ar": 3
+  },
+  "bukhari|3733|3747": {
+   "ar": 2
+  },
+  "bukhari|4214|4230": {
+   "ar": 2
+  },
+  "bukhari|4323|4339": {
+   "ar": 2
+  },
+  "bukhari|4569|4585": {
+   "ar": 2
+  },
+  "bukhari|4669|4685": {
+   "ar": 2
+  },
+  "bukhari|4913|4929": {
+   "ar": 2
+  },
+  "bukhari|5167|5188": {
+   "ar": 2
+  },
+  "bukhari|6522|6546": {
+   "ar": 2
+  },
+  "bukhari|7370|7396": {
+   "ar": 2
+  },
+  "bukhari|7555|7581": {
+   "ar": 2
+  },
+  "muslim|305|306": {
+   "ar": 2
+  },
+  "muslim|403|404": {
+   "ar": 2
+  },
+  "muslim|1522|1523": {
+   "ar": 2
+  },
+  "muslim|2363|2364": {
+   "ar": 2
+  },
+  "muslim|2626|2627": {
+   "ar": 2
+  },
+  "muslim|2990|2991": {
+   "ar": 2
+  },
+  "muslim|4087|4088": {
+   "ar": 2
+  },
+  "muslim|4607|4608": {
+   "ar": 2
+  },
+  "muslim|5519|5520": {
+   "ar": 2
+  },
+  "muslim|5520|5521": {
+   "ar": 2
+  },
+  "muslim|5770|5771": {
+   "ar": 2
+  },
+  "muslim|6165|6166": {
+   "ar": 2
+  },
+  "muslim|6270|6271": {
+   "ar": 2
+  },
+  "muslim|6364|6365": {
+   "ar": 2
+  },
+  "muslim|6459|6460": {
+   "ar": 2
+  },
+  "muslim|7512|7513": {
+   "ar": 2
+  },
+  "abudawud|615|615": {
+   "ar": 2
+  },
+  "abudawud|741|741": {
+   "ar": 2
+  },
+  "abudawud|975|975": {
+   "ar": 2
+  },
+  "abudawud|1840|1840": {
+   "ar": 2
+  },
+  "abudawud|2165|2165": {
+   "ar": 2
+  },
+  "abudawud|2440|2440": {
+   "ar": 2
+  },
+  "abudawud|2706|2706": {
+   "ar": 2
+  },
+  "abudawud|3014|3014": {
+   "ar": 2
+  },
+  "abudawud|3215|3215": {
+   "ar": 2
+  },
+  "abudawud|3561|3561": {
+   "ar": 2
+  },
+  "abudawud|4909|4909": {
+   "ar": 2
+  },
+  "tirmidhi|147|147": {
+   "ar": 2
+  },
+  "tirmidhi|302|302": {
+   "ar": 2
+  },
+  "tirmidhi|767|768": {
+   "ar": 2
+  },
+  "tirmidhi|1049|1051": {
+   "ar": 2
+  },
+  "tirmidhi|1284|1288": {
+   "ar": 2
+  },
+  "tirmidhi|2240|2252": {
+   "ar": 2
+  },
+  "tirmidhi|2498|2511": {
+   "ar": 2
+  },
+  "tirmidhi|3163|3196": {
+   "ar": 2
+  },
+  "tirmidhi|3301|3334": {
+   "ar": 2
+  },
+  "tirmidhi|3450|3483": {
+   "ar": 2
+  },
+  "tirmidhi|3538|3571": {
+   "ar": 2
+  },
+  "tirmidhi|3789|3831": {
+   "ar": 2
+  },
+  "tirmidhi|3893|3935": {
+   "ar": 2
+  },
+  "nasai|135|135": {
+   "ar": 2
+  },
+  "nasai|268|268": {
+   "ar": 2
+  },
+  "nasai|1298|1300": {
+   "ar": 2
+  },
+  "nasai|1944|1946": {
+   "ar": 2
+  },
+  "nasai|2069|2071": {
+   "ar": 3
+  },
+  "nasai|2218|2220": {
+   "ar": 2
+  },
+  "nasai|2746|2748": {
+   "ar": 2
+  },
+  "nasai|2882|2885": {
+   "ar": 2
+  },
+  "nasai|3183|3186": {
+   "ar": 2
+  },
+  "nasai|3317|3320": {
+   "ar": 2
+  },
+  "nasai|4600|4606": {
+   "ar": 2
+  },
+  "nasai|4805|4811": {
+   "ar": 2
+  },
+  "ibnmajah|407|407": {
+   "ar": 2
+  },
+  "ibnmajah|940|940": {
+   "ar": 2
+  },
+  "ibnmajah|1219|1219": {
+   "ar": 2
+  },
+  "ibnmajah|1344|1344": {
+   "ar": 2
+  },
+  "ibnmajah|1980|1980": {
+   "ar": 2
+  },
+  "ibnmajah|3013|3013": {
+   "ar": 2
+  },
+  "ibnmajah|3731|3731": {
+   "ar": 2
+  },
+  "ibnmajah|4030|4031": {
+   "ar": 2
+  },
+  "malik|835|837": {
+   "ar": 2
+  }
+ }
+}

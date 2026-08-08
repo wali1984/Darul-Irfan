@@ -1,6 +1,27 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "This narration has no Arabic text": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "This narration has no Arabic text" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اس روایت کا عربی متن دستیاب نہیں" } }
+      }
+    },
+    "This narration has no English translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "This narration has no English translation" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اس روایت کا انگریزی ترجمہ دستیاب نہیں" } }
+      }
+    },
+    "This narration has no Urdu translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "This narration has no Urdu translation" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "اس روایت کا اردو ترجمہ دستیاب نہیں" } }
+      }
+    },
     "Zikr begins in": {
       "extractionState": "manual",
       "localizations": {

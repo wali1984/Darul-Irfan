@@ -40,11 +40,15 @@ protocol HadithRepositoryProtocol: Sendable {
     func books() async throws -> [HadithBook]
     func entries(bookID: String, limit: Int, offset: Int) async throws -> [HadithEntry]
     func entryCount(bookID: String) async throws -> Int
+    /// One narration by its printed number ("402.2"); backs deep links.
+    func entry(bookID: String, displayNumber: String) async throws -> HadithEntry?
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry]
 
     // Import (seed)
     func upsertBooks(_ books: [HadithBook]) async throws
     func upsertEntries(_ entries: [HadithEntry]) async throws
+    /// Clears a collection before re-import, so narrations dropped upstream go.
+    func deleteEntries(bookID: String) async throws
 }
 
 // MARK: - Library content

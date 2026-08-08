@@ -7,7 +7,8 @@
   "author": "Marmaduke Pickthall",
   "sourceUrl": "https://alquran.cloud/",
   "rightsStatus": "publicDomain",
-  "isAvailableOffline": true
+  "isAvailableOffline": true,
+  "reviewState": "publicApproved"
  },
  {
   "id": "ur-jalandhry",
@@ -17,7 +18,8 @@
   "author": "Fateh Muhammad Jalandhry",
   "sourceUrl": "https://alquran.cloud/",
   "rightsStatus": "publicDomain",
-  "isAvailableOffline": true
+  "isAvailableOffline": true,
+  "reviewState": "publicApproved"
  },
  {
   "id": "asrar-at-tanzil-en",
@@ -27,7 +29,8 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": true
+  "isAvailableOffline": true,
+  "reviewState": "testFlightApproved"
  },
  {
   "id": "akram-ut-tafaseer-ur",
@@ -37,7 +40,8 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/akram-ut-tafaseer",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": true
+  "isAvailableOffline": true,
+  "reviewState": "draft"
  },
  {
   "id": "asrar-at-tanzil-ur",
@@ -47,7 +51,8 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": true
+  "isAvailableOffline": true,
+  "reviewState": "testFlightApproved"
  },
  {
   "id": "akram-ut-tarajum-ur",
@@ -57,7 +62,8 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/quran",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": true
+  "isAvailableOffline": true,
+  "reviewState": "testFlightApproved"
  },
  {
   "id": "akram-ut-tarajum-en",
@@ -67,6 +73,7 @@
   "author": "Hazrat Ameer Muhammad Akram Awan (RA)",
   "sourceUrl": "https://www.naqshbandiaowaisiah.org/quran",
   "rightsStatus": "permissionConfirmed",
-  "isAvailableOffline": true
+  "isAvailableOffline": true,
+  "reviewState": "testFlightApproved"
  }
 ]

@@ -9,6 +9,11 @@ import Foundation
 struct SeedManifest: Codable, Sendable, Equatable {
     var version: Int
     var generatedAt: Date?
+    /// Release the seed was cut for, e.g. "1.9.4". Reporting only.
+    var contentVersion: String?
+    /// The weakest review state anything in this seed carries, so one field
+    /// answers "may this seed ship to this channel?". Internal metadata.
+    var reviewState: ReviewState?
 }
 
 // MARK: - Seed bundle loaders
