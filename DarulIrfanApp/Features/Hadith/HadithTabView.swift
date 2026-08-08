@@ -9,6 +9,9 @@ import SwiftUI
 /// the view, so switching to the Quran and back returns to the same place.
 enum HadithRoute: Hashable {
     case collection(HadithBook)
+    /// Open a collection scrolled to a specific narration — e.g. a tapped
+    /// search result. Carries the printed number so the reader can jump to it.
+    case hadith(HadithBook, String)
 }
 
 // MARK: - Reader entry point
@@ -34,6 +37,13 @@ struct HadithTabView: View {
                             book: book,
                             repository: dependencies.hadithRepository,
                             appState: appState
+                        )
+                    case .hadith(let book, let displayNumber):
+                        HadithBookView(
+                            book: book,
+                            repository: dependencies.hadithRepository,
+                            appState: appState,
+                            initialHadith: displayNumber
                         )
                     }
                 }

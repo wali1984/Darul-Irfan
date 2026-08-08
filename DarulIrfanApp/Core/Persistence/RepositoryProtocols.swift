@@ -42,6 +42,10 @@ protocol HadithRepositoryProtocol: Sendable {
     func entryCount(bookID: String) async throws -> Int
     /// One narration by its printed number ("402.2"); backs deep links.
     func entry(bookID: String, displayNumber: String) async throws -> HadithEntry?
+    /// 0-based position of a narration within its collection's reading order,
+    /// or nil if it is not present. Lets the reader open straight to a hadith
+    /// (e.g. a tapped search result) by computing which page holds it.
+    func readingIndex(bookID: String, displayNumber: String) async throws -> Int?
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry]
 
     // Import (seed)

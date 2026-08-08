@@ -7,6 +7,9 @@ struct HadithBookView: View {
     let book: HadithBook
     let repository: any HadithRepositoryProtocol
     let appState: AppState
+    /// When set, the reader opens scrolled to this printed number (e.g. a
+    /// tapped search result) instead of at the top.
+    var initialHadith: String? = nil
 
     @State private var entries: [HadithEntry] = []
     @State private var isLoading = true
@@ -18,6 +21,13 @@ struct HadithBookView: View {
     /// Search results mix books, so the book (kitab) headers that group the
     /// ordinary listing are suppressed while showing them.
     @State private var isSearchResults = false
+    /// Offset the next page load starts at. Tracked explicitly (not derived
+    /// from `entries.count`) so paging is correct even when the first page
+    /// begins partway into the book — as it does when opening to a hadith.
+    @State private var nextOffset = 0
+    /// The row to scroll to once it is loaded, then briefly highlight.
+    @State private var pendingScrollTarget: String?
+    @State private var highlightedID: String?
 
     private static let pageSize = 50
 
@@ -26,48 +36,70 @@ struct HadithBookView: View {
     private var fontScale: Double { appState.settings.readerFontScale.rawValue }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: DISpacing.md) {
-                if isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                        .padding(DISpacing.xl)
-                } else if entries.isEmpty {
-                    DIEmptyState(
-                        systemImage: "book.closed",
-                        titleKey: "This collection is not on your device yet",
-                        messageKey: "It will arrive with the next content update."
-                    )
-                } else {
-                    Toggle(isOn: $showsArabic) {
-                        Text("Show Arabic")
-                            .font(.subheadline)
-                            .foregroundStyle(DIColor.textPrimary)
-                    }
-                    .tint(DIColor.primary)
-                    .padding(.horizontal, DISpacing.xs)
-
-                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                        VStack(alignment: .leading, spacing: DISpacing.sm) {
-                            if !isSearchResults, showsHeader(at: index) {
-                                sectionHeader(for: entry)
-                            }
-                            hadithCard(entry)
-                        }
-                        .onAppear {
-                            if entry.id == entries.last?.id { Task { await loadMore() } }
-                        }
-                    }
-
-                    if isLoadingMore {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: DISpacing.md) {
+                    if isLoading {
                         ProgressView()
                             .frame(maxWidth: .infinity)
-                            .padding(DISpacing.md)
+                            .padding(DISpacing.xl)
+                    } else if entries.isEmpty {
+                        DIEmptyState(
+                            systemImage: "book.closed",
+                            titleKey: "This collection is not on your device yet",
+                            messageKey: "It will arrive with the next content update."
+                        )
+                    } else {
+                        Toggle(isOn: $showsArabic) {
+                            Text("Show Arabic")
+                                .font(.subheadline)
+                                .foregroundStyle(DIColor.textPrimary)
+                        }
+                        .tint(DIColor.primary)
+                        .padding(.horizontal, DISpacing.xs)
+
+                        ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                                if !isSearchResults, showsHeader(at: index) {
+                                    sectionHeader(for: entry)
+                                }
+                                hadithCard(entry)
+                            }
+                            .id(entry.id)
+                            .padding(.vertical, highlightedID == entry.id ? DISpacing.xs : 0)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(DIColor.accent.opacity(highlightedID == entry.id ? 0.18 : 0))
+                            )
+                            .onAppear {
+                                if entry.id == entries.last?.id { Task { await loadMore() } }
+                            }
+                        }
+
+                        if isLoadingMore {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .padding(DISpacing.md)
+                        }
                     }
                 }
+                .padding(DISpacing.md)
+                .diResponsiveWidth()
             }
-            .padding(DISpacing.md)
-            .diResponsiveWidth()
+            .onChange(of: pendingScrollTarget) { _, target in
+                guard let target else { return }
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    proxy.scrollTo(target, anchor: .center)
+                    highlightedID = target
+                }
+                // Clear the target so a later change re-triggers, and fade the
+                // highlight after a moment.
+                Task {
+                    try? await Task.sleep(for: .seconds(2))
+                    withAnimation { highlightedID = nil }
+                    pendingScrollTarget = nil
+                }
+            }
         }
         .diScreenBackground()
         .navigationTitle(Text(verbatim: book.title(languageCode: languageCode)))
@@ -235,33 +267,45 @@ struct HadithBookView: View {
 
     private func loadFirstPage() async {
         guard entries.isEmpty else { return }
-        entries = (try? await repository.entries(
-            bookID: book.id, limit: Self.pageSize, offset: 0
+        // Opening to a specific narration (a tapped search result) starts the
+        // listing on the page that holds it and scrolls there.
+        if let target = initialHadith,
+           let index = try? await repository.readingIndex(bookID: book.id, displayNumber: target) {
+            await loadWindow(startingAt: max(0, index - 6))
+            pendingScrollTarget = target
+            return
+        }
+        await loadWindow(startingAt: 0)
+    }
+
+    /// Loads a page beginning at `offset` and sets paging to continue from its
+    /// end. Entries before `offset` are simply not loaded (fine for a jump).
+    private func loadWindow(startingAt offset: Int) async {
+        let page = (try? await repository.entries(
+            bookID: book.id, limit: Self.pageSize, offset: offset
         )) ?? []
+        entries = page
+        nextOffset = offset + page.count
         isSearchResults = false
-        reachedEnd = entries.count < Self.pageSize
+        reachedEnd = page.count < Self.pageSize
         isLoading = false
     }
 
     /// Clearing the search box returns to the ordinary paged listing.
     private func restorePagedListing() async {
-        entries = (try? await repository.entries(
-            bookID: book.id, limit: Self.pageSize, offset: 0
-        )) ?? []
-        isSearchResults = false
-        reachedEnd = entries.count < Self.pageSize
-        isLoading = false
+        await loadWindow(startingAt: 0)
     }
 
     private func loadMore() async {
-        guard !isLoadingMore, !reachedEnd else { return }
+        guard !isLoadingMore, !reachedEnd, !isSearchResults else { return }
         isLoadingMore = true
         let next = (try? await repository.entries(
-            bookID: book.id, limit: Self.pageSize, offset: entries.count
+            bookID: book.id, limit: Self.pageSize, offset: nextOffset
         )) ?? []
         if next.isEmpty || next.count < Self.pageSize { reachedEnd = true }
         let known = Set(entries.map(\.id))
         entries.append(contentsOf: next.filter { !known.contains($0.id) })
+        nextOffset += next.count
         isLoadingMore = false
     }
 }

@@ -95,6 +95,30 @@ struct HadithRepository: HadithRepositoryProtocol {
         return rows.compactMap(Self.entry(from:)).first
     }
 
+    /// 0-based position of a narration in its collection's reading order.
+    ///
+    /// Counts narrations that sort before it by `source_sequence` — the same
+    /// order the reader pages in — so the caller can turn a hadith into a page
+    /// offset and open directly to it. Nil when the number is not in the book.
+    func readingIndex(bookID: String, displayNumber: String) async throws -> Int? {
+        let rows = try await database.connection.query(
+            """
+            SELECT COUNT(*) AS n FROM hadith_entries
+            WHERE book_id = ? AND source_sequence < (
+                SELECT source_sequence FROM hadith_entries
+                WHERE book_id = ? AND display_number = ?
+            )
+            """,
+            [.text(bookID), .text(bookID), .text(displayNumber)]
+        )
+        // The subquery is empty when the display number is absent; COUNT then
+        // returns 0 spuriously, so confirm the row actually exists first.
+        guard try await entry(bookID: bookID, displayNumber: displayNumber) != nil else {
+            return nil
+        }
+        return rows.first?.int("n") ?? 0
+    }
+
     /// Substring search across whichever scripts are stored.
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry] {
         let needle = "%\(term)%"

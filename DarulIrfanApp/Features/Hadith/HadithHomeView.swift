@@ -97,7 +97,17 @@ struct HadithHomeView: View {
                 .font(.caption)
                 .foregroundStyle(DIColor.textMuted)
             ForEach(results) { entry in
-                resultCard(entry)
+                // A result must open the exact narration in its collection, not
+                // just sit there: wrap it in the same value-based link the
+                // collection list uses so tapping navigates within this stack.
+                if let book = books.first(where: { $0.id == entry.bookID }) {
+                    NavigationLink(value: HadithRoute.hadith(book, entry.displayNumber)) {
+                        resultCard(entry)
+                    }
+                    .buttonStyle(DIPressableStyle())
+                } else {
+                    resultCard(entry)
+                }
             }
         }
     }
