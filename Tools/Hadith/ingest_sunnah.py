@@ -269,6 +269,10 @@ def parse_book_page(html: str) -> dict[str, dict]:
         ch_ar = cont.find_previous(class_=re.compile("arabicchapter", re.I))
         segs, refs = segment_arabic(str(ar_el)) if ar_el else ([], [])
         out[num] = {
+            # The container's own id ("h119620") is the Arabic URN, which the
+            # Urdu records carry as matchingArabicURN. It is the reliable join
+            # key between the two — see the note in enrich_collection.
+            "urn": (cont.get("id") or "").lstrip("h") or None,
             "arabicSegments": segs or None,
             "quranRefs": refs or None,
             "text_en": clean(en_el.get_text()) if en_el else None,
@@ -323,7 +327,21 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
         urdu = fetcher.get(f"/ajax/urdu/{slug}/{bk}", expect_json=True)
         if urdu is None:
             report.setdefault("urdu_book_failed", []).append(f"{slug}/{bk}")
-            urdu = []  # TODO(resume): per-chapter fallback /ajax/urdu/<slug>/<bk>/<chapter>
+            # No per-chapter fallback exists: /ajax/urdu/<slug>/<bk>/<chapter>
+            # returns 404, and books that fail (e.g. bukhari 64, 65) return 500
+            # at the book level on every variant. Those narrations simply have
+            # no Urdu at source. See Docs/HADITH_INGEST_FINDINGS.md.
+            urdu = []
+        # Join Urdu to Arabic on the URN, not the hadith number. Measured over
+        # the cached Bukhari corpus: URN matches 6,265/6,290 = 99.6% of
+        # containers, the number join only 80.4%. The number join does not
+        # degrade gracefully either — it misses whole books at a time, because
+        # some send hadithNumber: 0 for every record (kitab 34 lost all 184
+        # that way, with ourHadithNumber being a within-book sequence rather
+        # than the global number). Number stays as a fallback for any record
+        # whose container carried no id.
+        urdu_by_urn = {str(u.get("matchingArabicURN")): u for u in urdu
+                       if u.get("matchingArabicURN") is not None}
         urdu_by_num = {str(u.get("hadithNumber")): u for u in urdu}
 
         for num, extra in parsed.items():
@@ -343,7 +361,8 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
             for k in ("chapterTitleEnglish", "chapterTitleArabic"):
                 if extra.get(k):
                     rec[k] = extra[k]
-            u = urdu_by_num.get(num)
+            urn = extra.get("urn")
+            u = (urdu_by_urn.get(urn) if urn else None) or urdu_by_num.get(num)
             if u:
                 rec["urduSanad"] = clean(u.get("hadithSanad"))
                 rec["urduText"] = clean(u.get("hadithText"))
