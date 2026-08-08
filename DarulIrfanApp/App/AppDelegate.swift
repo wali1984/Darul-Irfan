@@ -4,6 +4,17 @@ import UserNotifications
 extension Notification.Name {
     static let didReceiveAPNSToken = Notification.Name("DarulIrfan.didReceiveAPNSToken")
     static let didReceiveAppDeepLink = Notification.Name("DarulIrfan.didReceiveAppDeepLink")
+    /// Posted when a Qur'an verse quoted inside a hadith is tapped, so the Read
+    /// tab opens the app's own Quran reader at that ayah. Object is a
+    /// `QuranAyahLink`. Entirely in-app — never opens an external site.
+    static let openQuranAyah = Notification.Name("DarulIrfan.openQuranAyah")
+}
+
+/// Payload for `.openQuranAyah`: our own surah number (1-based) and the first
+/// ayah to focus. Built from a hadith's stored `QuranRef`.
+struct QuranAyahLink {
+    let surah: Int
+    let ayah: Int?
 }
 
 final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {

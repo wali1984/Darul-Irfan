@@ -69,6 +69,17 @@ struct ReadTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: .didReceiveAppDeepLink)) { notification in
             if let path = notification.object as? String { open(deepLinkPath: path) }
         }
+        // A Qur'an verse quoted inside a hadith was tapped: switch to the Quran
+        // reader and open it at that ayah — all in-app, no external site.
+        .onReceive(NotificationCenter.default.publisher(for: .openQuranAyah)) { notification in
+            guard let link = notification.object as? QuranAyahLink else { return }
+            Task { @MainActor in
+                let surahs = (try? await dependencies.quranRepository.allSurahs()) ?? []
+                guard let surah = surahs.first(where: { $0.id == link.surah }) else { return }
+                select(.quran)
+                quranPath = [.reader(surah: surah, focusAyah: link.ayah)]
+            }
+        }
     }
 
     // MARK: - Landing

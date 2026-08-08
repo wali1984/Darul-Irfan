@@ -28,6 +28,8 @@ struct HadithBookView: View {
     /// The row to scroll to once it is loaded, then briefly highlight.
     @State private var pendingScrollTarget: String?
     @State private var highlightedID: String?
+    /// A tapped isnad narrator, presented as a bio sheet (nil = none open).
+    @State private var selectedNarrator: NarratorRef?
 
     private static let pageSize = 50
 
@@ -102,6 +104,9 @@ struct HadithBookView: View {
             }
         }
         .diScreenBackground()
+        .sheet(item: $selectedNarrator) { ref in
+            NarratorBioSheet(narratorId: ref.id, repository: repository, appState: appState)
+        }
         .navigationTitle(Text(verbatim: book.title(languageCode: languageCode)))
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, prompt: Text("Search in this collection"))
@@ -146,18 +151,28 @@ struct HadithBookView: View {
                     Spacer(minLength: 0)
                 }
 
-                if showsArabic, let arabic = entry.textArabic, !arabic.isEmpty {
-                    // Same IndoPak face and rhythm as the Quran reader so Arabic
-                    // looks identical across the app.
-                    Text(verbatim: arabic)
-                        .font(DIFont.quranArabic(scale: fontScale * 1.15))
-                        .lineSpacing(CGFloat(18 * fontScale))
-                        .foregroundStyle(DIColor.textPrimary)
-                        .diGoldGlow(radius: 5, opacity: 0.18)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .environment(\.layoutDirection, .rightToLeft)
-                    Divider().overlay(DIColor.border)
+                if showsArabic {
+                    let segments = entry.arabicDisplaySegments()
+                    if !segments.isEmpty {
+                        // One Text so the Arabic stays connected and correctly
+                        // shaped; the isnad narrators and any quoted verse are
+                        // links (rendered in our green via `.tint`), the matn is
+                        // plain (near-black). Taps are routed by `openURL`.
+                        Text(arabicAttributed(from: segments))
+                            .font(DIFont.quranArabic(scale: fontScale * 1.15))
+                            .lineSpacing(CGFloat(18 * fontScale))
+                            .foregroundStyle(DIColor.textPrimary)
+                            .tint(DIColor.primary)
+                            .diGoldGlow(radius: 5, opacity: 0.18)
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .environment(\.layoutDirection, .rightToLeft)
+                            .environment(\.openURL, OpenURLAction { url in
+                                handleArabicTap(url)
+                                return .handled
+                            })
+                        Divider().overlay(DIColor.border)
+                    }
                 }
 
                 // Strictly the reader's own language. No cross-language
@@ -165,7 +180,9 @@ struct HadithBookView: View {
                 // right-to-left would read as though it were the Urdu
                 // translation, and repeating the Arabic would present the
                 // source text as its own translation. A gap is shown as a gap.
-                if let text = entry.text(languageCode: languageCode) {
+                if languageCode == "ur", entry.urduSanad != nil || entry.urduText != nil {
+                    urduSplitView(entry)
+                } else if let text = entry.text(languageCode: languageCode) {
                     if languageCode == "ur" {
                         Text(verbatim: text)
                             .font(DIFont.urduBody(scale: fontScale))
@@ -209,6 +226,82 @@ struct HadithBookView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Builds the Arabic as one attributed string: isnad narrators and quoted
+    /// verses become links (shown in our green via the Text's `.tint`), the matn
+    /// stays plain. Kept as a single Text so Arabic shaping and RTL are intact.
+    private func arabicAttributed(from segments: [HadithSegment]) -> AttributedString {
+        var out = AttributedString()
+        for (index, seg) in segments.enumerated() {
+            var run = AttributedString(seg.text)
+            switch seg.kind {
+            case .isnad:
+                if let nid = seg.narratorId, let url = URL(string: "narrator:\(nid)") {
+                    run.link = url
+                }
+            case .verse:
+                if let surah = seg.surah {
+                    let a = seg.ayahStart ?? 1
+                    let b = seg.ayahEnd ?? a
+                    if let url = URL(string: "diquran:\(surah)/\(a)/\(b)") { run.link = url }
+                }
+            case .matn:
+                break
+            }
+            out.append(run)
+            if index < segments.count - 1 { out.append(AttributedString(" ")) }
+        }
+        return out
+    }
+
+    /// Routes a tap on a coloured Arabic span. Narrator → native bio sheet;
+    /// verse → the app's own Quran reader (via notification). No external links.
+    private func handleArabicTap(_ url: URL) {
+        switch url.scheme {
+        case "narrator":
+            let raw = url.absoluteString.replacingOccurrences(of: "narrator:", with: "")
+            if let id = Int(raw) { selectedNarrator = NarratorRef(id: id) }
+        case "diquran":
+            let raw = url.absoluteString.replacingOccurrences(of: "diquran:", with: "")
+            let parts = raw.split(separator: "/").compactMap { Int($0) }
+            guard let surah = parts.first else { return }
+            let ayah = parts.count > 1 ? parts[1] : nil
+            NotificationCenter.default.post(
+                name: .openQuranAyah,
+                object: QuranAyahLink(surah: surah, ayah: ayah)
+            )
+        default:
+            break
+        }
+    }
+
+    /// The Urdu shown with its chain (isnad) in grey above the narration text,
+    /// mirroring the Arabic — both in the app's Urdu face, right-to-left.
+    @ViewBuilder
+    private func urduSplitView(_ entry: HadithEntry) -> some View {
+        VStack(alignment: .trailing, spacing: DISpacing.xs) {
+            if let sanad = entry.urduSanad, !sanad.isEmpty {
+                Text(verbatim: sanad)
+                    .font(DIFont.urduBody(scale: fontScale * 0.92))
+                    .lineSpacing(CGFloat(6 * fontScale))
+                    .foregroundStyle(DIColor.textMuted)
+                    .environment(\.layoutDirection, .rightToLeft)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            if let matn = entry.urduText, !matn.isEmpty {
+                Text(verbatim: matn)
+                    .font(DIFont.urduBody(scale: fontScale))
+                    .lineSpacing(CGFloat(6 * fontScale))
+                    .foregroundStyle(DIColor.textPrimary)
+                    .environment(\.layoutDirection, .rightToLeft)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 
     /// True when `entries[index]` opens a new book (kitab) and so should carry a
@@ -309,3 +402,6 @@ struct HadithBookView: View {
         isLoadingMore = false
     }
 }
+
+/// Identifiable wrapper so a tapped narrator id can drive a `.sheet(item:)`.
+private struct NarratorRef: Identifiable { let id: Int }
