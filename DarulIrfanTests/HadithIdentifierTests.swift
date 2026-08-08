@@ -190,7 +190,8 @@ final class HadithIdentifierTests: XCTestCase {
 
     func testDeleteThenInsertDropsNarrationsRemovedUpstream() async throws {
         try await repository.upsertEntries(bukhariFixture())
-        XCTAssertEqual(try await repository.entryCount(bookID: "bukhari"), 5)
+        let initialCount = try await repository.entryCount(bookID: "bukhari")
+        XCTAssertEqual(initialCount, 5)
 
         // A later content version drops 1390.2 and 1390.3. Re-importing without
         // clearing first would leave them behind, and the stored count would
@@ -199,9 +200,12 @@ final class HadithIdentifierTests: XCTestCase {
         try await repository.deleteEntries(bookID: "bukhari")
         try await repository.upsertEntries(revised)
 
-        XCTAssertEqual(try await repository.entryCount(bookID: "bukhari"), revised.count)
-        XCTAssertNil(try await repository.entry(bookID: "bukhari", displayNumber: "1390.2"))
-        XCTAssertNotNil(try await repository.entry(bookID: "bukhari", displayNumber: "402.2"))
+        let finalCount = try await repository.entryCount(bookID: "bukhari")
+        let dropped = try await repository.entry(bookID: "bukhari", displayNumber: "1390.2")
+        let kept = try await repository.entry(bookID: "bukhari", displayNumber: "402.2")
+        XCTAssertEqual(finalCount, revised.count)
+        XCTAssertNil(dropped)
+        XCTAssertNotNil(kept)
     }
 
     // MARK: - Honest gaps
@@ -233,9 +237,10 @@ final class HadithIdentifierTests: XCTestCase {
         let columns = try await database.connection.query(
             "SELECT name, type, pk FROM pragma_table_info('hadith_entries')"
         )
-        let byName = Dictionary(uniqueKeysWithValues: columns.compactMap { row in
-            row.text("name").map { ($0, row) }
-        })
+        var byName: [String: SQLRow] = [:]
+        for row in columns {
+            if let name = row.text("name") { byName[name] = row }
+        }
 
         XCTAssertEqual(byName["canonical_id"]?.text("type"), "TEXT")
         XCTAssertEqual(byName["canonical_id"]?.int("pk"), 1)
@@ -292,7 +297,8 @@ final class HadithIdentifierTests: XCTestCase {
             cleanup: "DROP TABLE IF EXISTS _migration_v4_counts;"
         )
 
-        XCTAssertEqual(try await legacy.schemaVersion(), 4)
+        let migratedVersion = try await legacy.schemaVersion()
+        XCTAssertEqual(migratedVersion, 4)
 
         // Settings, bookmarks, downloads and progress are all still there.
         for (table, expected) in [
@@ -360,7 +366,8 @@ final class HadithIdentifierTests: XCTestCase {
 
         // Rolled back whole: the old schema and the user's settings are intact,
         // and user_version still says 3 so the next launch retries cleanly.
-        XCTAssertEqual(try await legacy.schemaVersion(), 3)
+        let rolledBackVersion = try await legacy.schemaVersion()
+        XCTAssertEqual(rolledBackVersion, 3)
         let columns = try await legacy.query(
             "SELECT name FROM pragma_table_info('hadith_entries') WHERE name = 'hadith_number'"
         )
