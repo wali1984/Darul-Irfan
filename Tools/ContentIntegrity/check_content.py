@@ -28,16 +28,42 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-# Anchored on the iOS checkout — Tools/ContentIntegrity/<this file> — because
-# that is the only layout guaranteed everywhere. CI clones this repository on
-# its own, so its root is the iOS checkout; on a dev machine the same checkout
-# sits inside a workspace directory alongside the other three platforms.
-IOS_ROOT = Path(__file__).resolve().parents[2]
-IOS_SEED = IOS_ROOT / "DarulIrfanApp/Resources/SeedData"
+SEED_RELATIVE = Path("DarulIrfanApp/Resources/SeedData")
+# A file that only the real seed directory has, used to recognise it.
+SEED_MARKER = "quran_surahs.json"
+
+
+def locate_ios_seed() -> tuple[Path, Path]:
+    """Find the bundled seed directory and the iOS checkout that holds it.
+
+    Searched for rather than computed from a fixed depth. The checkout sits at
+    a different depth depending on where it is: CI clones this repository on
+    its own, so its root is the iOS checkout, while a dev machine keeps that
+    same checkout inside a workspace directory beside the other three
+    platforms. A hardcoded number of parents is right in one and silently wrong
+    in the other — which is exactly how this gate once reported "0 surahs"
+    instead of "I looked in the wrong place".
+    """
+    here = Path(__file__).resolve()
+    searched: list[Path] = []
+    for base in here.parents:
+        for candidate in (base / SEED_RELATIVE, base / "DarulIrfan-iOS" / SEED_RELATIVE):
+            searched.append(candidate)
+            if (candidate / SEED_MARKER).is_file():
+                # …/<iosRoot>/DarulIrfanApp/Resources/SeedData
+                return candidate, candidate.parents[2]
+    raise SystemExit(
+        "content integrity: FAIL — could not find the seed directory.\n"
+        f"  Looked for a directory containing {SEED_MARKER} at:\n"
+        + "\n".join(f"    {path}" for path in searched)
+    )
+
+
+IOS_SEED, IOS_ROOT = locate_ios_seed()
 
 # The sibling platform checkouts, when this is a full workspace. Only iOS is
 # under version control, so on CI these are absent and parity goes unchecked —
-# reported as a note, never silently. See PLATFORM_RELEASE_MATRIX.md.
+# reported explicitly, never silently. See PLATFORM_RELEASE_MATRIX.md.
 WORKSPACE_ROOT = IOS_ROOT.parent
 PLATFORM_SEEDS = {
     "iOS": IOS_SEED,
@@ -607,6 +633,9 @@ def main() -> int:
              "as unverified; use before a release tag",
     )
     args = parser.parse_args()
+
+    # Printed first so a log always records which tree was actually inspected.
+    print(f"seed directory: {IOS_SEED}")
 
     report = Report()
     check_encoding(IOS_SEED, report)

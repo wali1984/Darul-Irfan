@@ -344,15 +344,24 @@ def main() -> int:
         print("\n--dry-run: nothing written.")
         return 0
 
+    written = 0
     for seed_dir in SEED_DIRS:
         if not seed_dir.exists():
             print(f"! skipping missing seed dir {seed_dir}")
             continue
+        written += 1
         write_json(seed_dir / "hadith_books.json", catalog)
         for result in results:
             write_records(seed_dir / f"hadith_{result.book_id}.json", result.records)
-        print(f"wrote {len(results) + 1} files -> {seed_dir.relative_to(REPO_ROOT)}")
+        print(f"wrote {len(results) + 1} files -> {seed_dir}")
 
+    if written == 0:
+        print("! no seed directory was found — nothing was written.")
+        return 1
+    if written < len(SEED_DIRS):
+        print(f"! only {written} of {len(SEED_DIRS)} platform seeds updated. "
+              f"Run this where all four checkouts live, or the platforms will "
+              f"ship different sacred text.")
     return 0
 
 
