@@ -91,6 +91,9 @@ ALL_COLLECTIONS = CORE + SELECTIONS + ADVANCED
 NARRATOR_HREF = re.compile(r"/narrator/(\d+)")
 OPENQURAN = re.compile(r"openquran\((\d+),\s*(\d+),\s*(\d+)\)")
 MOJIBAKE = ["Ã¢", "Ã©", "Ã¨", "Ã¯", "Ã±", "Ã¼", "Â»", "Â«", "â€™", "â€œ"]
+# Byte values cp1252 does not define; Python decodes them to the equal-valued
+# control characters, which cannot then be re-encoded. See demojibake().
+_CP1252_UNDEFINED = {0x81, 0x8D, 0x8F, 0x90, 0x9D}
 
 
 # --------------------------------------------------------------------------- #
@@ -235,9 +238,46 @@ def segment_arabic(html_fragment: str) -> tuple[list[dict], list[dict]]:
     return segs, urefs
 
 
+def demojibake(t: str) -> str:
+    """Repair text that was UTF-8 but got decoded as cp1252.
+
+    "husbandâ€™s" -> "husband's": U+2019 is E2 80 99 in UTF-8, which cp1252
+    renders as the three characters "â€™". Re-encoding to cp1252 and decoding
+    as UTF-8 reverses it exactly.
+
+    Only attempted when a known marker is present and only kept when the whole
+    round-trip succeeds, so correctly-decoded text — including Arabic and Urdu,
+    which cp1252 cannot encode — is never touched.
+
+    Encoding is per character, because one string can need both maps. cp1252
+    leaves five bytes undefined (0x81/0x8D/0x8F/0x90/0x9D); those decode to the
+    same-valued control characters, which cp1252 cannot re-encode, so they are
+    written back as raw bytes. A curly double quote mangles to "…â€\x9d", which
+    needs cp1252 for the "â€" and the raw byte for the tail — neither codec
+    alone recovers it.
+    """
+    if not any(m in t for m in MOJIBAKE):
+        return t
+    raw = bytearray()
+    for ch in t:
+        code = ord(ch)
+        if code in _CP1252_UNDEFINED:
+            raw.append(code)
+            continue
+        try:
+            raw.extend(ch.encode("cp1252"))
+        except UnicodeEncodeError:
+            return t  # not cp1252-representable: not this kind of damage
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return t
+
+
 def clean(t: str | None) -> str | None:
     if not t:
         return None
+    t = demojibake(t)
     t = re.sub(r"\s+", " ", t).strip()
     return t or None
 
@@ -556,8 +596,19 @@ def vet(slug: str, records: list[dict], report: dict) -> None:
     dup_c = len(cids) - len(set(cids))
     dup_d = len(disp) - len(set(disp))
     subs = sum(1 for r in records if r.get("numberMinor") is not None)
-    moji = sum(1 for r in records for k in ("text_ar", "text_en", "text_ur", "urduText", "urduSanad")
-               for m in MOJIBAKE if m in (r.get(k) or ""))
+    # Every string field, not a hand-listed subset. The chapter titles this
+    # pipeline adds were missing from the old list, so 9 mojibake'd Bukhari
+    # titles vetted clean and only the content-integrity gate caught them.
+    def strings(o):
+        if isinstance(o, str):
+            yield o
+        elif isinstance(o, dict):
+            for v in o.values():
+                yield from strings(v)
+        elif isinstance(o, list):
+            for v in o:
+                yield from strings(v)
+    moji = sum(1 for r in records for s in strings(r) for m in MOJIBAKE if m in s)
     cov = {
         "ar": sum(1 for r in records if (r.get("text_ar") or r.get("arabicSegments"))),
         "en": sum(1 for r in records if r.get("text_en")),
