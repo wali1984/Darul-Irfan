@@ -321,6 +321,9 @@ workflows:
         script: |
           python3 -m pip install --upgrade pip
           python3 -m pip install requests beautifulsoup4 lxml
+      - name: Parser self-test (offline, fails fast before any scraping)
+        script: |
+          python3 Tools/Hadith/ingest_sunnah.py --selftest
       - name: Ingest, enrich, pack, vet, bump manifest
         script: |
           set -e

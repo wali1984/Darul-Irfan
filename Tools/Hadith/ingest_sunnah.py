@@ -243,14 +243,22 @@ def clean(t: str | None) -> str | None:
 
 
 def ref_number_from(cont) -> str | None:
+    """The collection reference number as our lossless displayNumber.
+
+    Verified against the live block (2026-08-08):
+    "Reference : Sahih al-Bukhari 402bIn-book reference : Book 8, Hadith 54…".
+    The collection number is the last number(+letter) before "In-book"; a letter
+    suffix is sunnah.com's sub-number (402b = 402.2, 402c = 402.3), matching our
+    existing lossless keys. The bare first narration has no letter (402 = 402)."""
     el = cont.select_one(".hadith_reference")
     if el is None:
         return None
-    m = re.search(r"([0-9]+)([a-z]?)", el.get_text())
+    head = el.get_text(" ", strip=True).split("In-book")[0]
+    m = re.search(r"(\d+)\s*([a-z]?)\s*$", head.strip()) or re.search(r"(\d+)([a-z]?)", head)
     if not m:
         return None
     base, letter = m.group(1), m.group(2)
-    if letter and letter != "a":  # 402b -> 402.2, 402c -> 402.3
+    if letter and letter != "a":       # 402b -> 402.2, 402c -> 402.3
         return f"{base}.{ord(letter) - ord('a') + 1}"
     return base
 
@@ -282,22 +290,101 @@ def parse_book_page(html: str) -> dict[str, dict]:
     return out
 
 
+def _narrator_ids_in(scope) -> list[int]:
+    ids = []
+    for a in (scope.select("a[href*='/narrator/']") if scope else []):
+        m = NARRATOR_HREF.search(a.get("href", ""))
+        if m:
+            ids.append(int(m.group(1)))
+    # de-dup, preserve order
+    seen, out = set(), []
+    for i in ids:
+        if i not in seen:
+            seen.add(i); out.append(i)
+    return out
+
+
 def parse_narrator(html: str, nid: int) -> dict | None:
+    """Full bio from a /narrator/{id} page, using the live class structure
+    (verified 2026-08-08): .hero-title[.arabic] names, .pill-grade/.pill-text
+    grade, .bio-row label/value rows, .lineage[.arabic], .verdict-scholar
+    appraisals, .panel--teachers/.panel--students, and the "N Hadith Narrated"
+    header. Returns None only if there is no identifiable person at all."""
     soup = BeautifulSoup(html, "lxml")
-    h1s = soup.select("h1")
-    name_en = clean(h1s[0].get_text()) if h1s else None
-    name_ar = clean(h1s[1].get_text()) if len(h1s) > 1 else None
+    def txt(sel, root=soup):
+        el = root.select_one(sel)
+        return clean(el.get_text()) if el else None
+
+    name_en = txt(".hero-title:not(.arabic)")
+    name_ar = txt(".hero-title.arabic")
     if not name_en and not name_ar:
         return None
-    related = sorted({int(m.group(1)) for a in soup.select("a[href*='/narrator/']")
-                      for m in [NARRATOR_HREF.search(a.get('href', ''))]
-                      if m and int(m.group(1)) != nid})
-    bio_en = clean(" ".join(p.get_text() for p in soup.select(".rijaal, .biography, p"))[:8000]) if soup else None
-    return {
-        "id": nid, "nameEnglish": name_en, "nameArabic": name_ar,
-        "relatedNarratorIds": related or None,
-        "bioEnglish": bio_en,  # refined selectors are set when run against the live page
+
+    # Grade pills: first non-arabic = English, .arabic = Arabic.
+    grades = soup.select(".pill-grade .pill-text, .pill-grade")
+    grade_en = clean(grades[0].get_text()) if grades else None
+    grade_ar = None
+    for g in grades:
+        cls = " ".join(g.get("class", []))
+        if "arabic" in cls:
+            grade_ar = clean(g.get_text()); break
+
+    # Label/value fact rows.
+    facts = {}
+    for row in soup.select(".bio-row"):
+        cells = [clean(c.get_text()) for c in row.find_all(recursive=False)]
+        cells = [c for c in cells if c]
+        if len(cells) >= 2:
+            facts[cells[0].lower()] = cells[1]
+
+    def fact(*keys):
+        for k in facts:
+            for want in keys:
+                if want in k:
+                    return facts[k]
+        return None
+
+    teachers = _narrator_ids_in(soup.select_one(".panel--teachers"))
+    students = _narrator_ids_in(soup.select_one(".panel--students"))
+
+    hcount = None
+    m = re.search(r"([\d,]+)\s+Hadith\s+Narrated", soup.get_text())
+    if m:
+        hcount = int(m.group(1).replace(",", ""))
+
+    # Appraisals (jarḥ wa-taʿdīl): scholar + text, English and Arabic columns.
+    appraisals = []
+    for sch in soup.select(".verdict-scholar, .tarjama-scholar"):
+        who = clean(sch.get_text())
+        body_el = sch.find_next_sibling()
+        body = clean(body_el.get_text()) if body_el else None
+        if not who and not body:
+            continue
+        is_ar = "arabic" in " ".join(sch.get("class", []))
+        appraisals.append({
+            "scholarArabic" if is_ar else "scholar": who,
+            "textArabic" if is_ar else "textEnglish": body,
+        })
+
+    bio = {
+        "id": nid,
+        "nameEnglish": name_en,
+        "nameArabic": name_ar,
+        "gradeEnglish": grade_en if grade_en and not re.search(r"[؀-ۿ]", grade_en) else None,
+        "gradeArabic": grade_ar,
+        "kunya": fact("kunya"),
+        "generation": fact("generation", "tabaqa"),
+        "deathYear": fact("died", "death"),
+        "cities": fact("cities", "region"),
+        "affiliations": fact("affiliation", "nisba"),
+        "lineageEnglish": txt(".lineage:not(.arabic)"),
+        "lineageArabic": txt(".lineage.arabic"),
+        "hadithCount": hcount,
+        "teacherIds": teachers or None,
+        "studentIds": students or None,
+        "appraisals": appraisals or None,
     }
+    return {k: v for k, v in bio.items() if v is not None}
 
 
 # --------------------------------------------------------------------------- #
@@ -377,6 +464,10 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
 
 def build_narrators(ids: set[int], fetcher: Fetcher, translator: Translator,
                     report: dict) -> list[dict]:
+    """Fetch + parse every referenced narrator, then auto-translate the EXISTING
+    biography into Urdu (per-appraisal English→Urdu or Arabic→Urdu, plus the
+    name). A narrator is flagged missing only when the page carries no biography
+    at all; an existing bio is never left untranslated and never fabricated."""
     out = []
     for nid in sorted(ids):
         html = fetcher.get(f"/narrator/{nid}", expect_json=False)
@@ -387,22 +478,44 @@ def build_narrators(ids: set[int], fetcher: Fetcher, translator: Translator,
         if not bio:
             report.setdefault("narrator_empty", []).append(nid)
             continue
-        # Auto-translate an EXISTING bio into Urdu (English preferred, else Arabic).
-        source_text = bio.get("bioEnglish") or bio.get("bioArabic")
-        source_lang = "English" if bio.get("bioEnglish") else "Arabic"
-        if source_text:
-            ur = translator.to_urdu(source_text, source_lang)
-            if ur:
-                bio["bioUrdu"] = ur
-                bio["needsUrdu"] = False
-            else:
-                bio["needsUrdu"] = True   # pending translation; not fabricated
-            if not bio.get("nameUrdu"):
-                bio["nameUrdu"] = translator.to_urdu(bio.get("nameEnglish") or "", "English")
+
+        has_content = any(bio.get(k) for k in
+                          ("appraisals", "lineageEnglish", "lineageArabic",
+                           "gradeEnglish", "gradeArabic", "kunya", "generation"))
+        produced_urdu = False
+
+        # Name in Urdu (translate the English/Arabic name so the sheet has one).
+        if not bio.get("nameUrdu"):
+            nm = translator.to_urdu(bio.get("nameEnglish") or bio.get("nameArabic") or "",
+                                    "English" if bio.get("nameEnglish") else "Arabic")
+            if nm:
+                bio["nameUrdu"] = nm; produced_urdu = True
+
+        # Grade in Urdu.
+        if bio.get("gradeEnglish") and not bio.get("gradeUrdu"):
+            gu = translator.to_urdu(bio["gradeEnglish"], "English")
+            if gu:
+                bio["gradeUrdu"] = gu; produced_urdu = True
+
+        # Each appraisal: fill textUrdu from its English (else Arabic) text.
+        for ap in bio.get("appraisals", []) or []:
+            if ap.get("textUrdu"):
+                produced_urdu = True; continue
+            src = ap.get("textEnglish") or ap.get("textArabic")
+            lang = "English" if ap.get("textEnglish") else "Arabic"
+            if src:
+                tu = translator.to_urdu(src, lang)
+                if tu:
+                    ap["textUrdu"] = tu; produced_urdu = True
+
+        if has_content:
+            bio["needsUrdu"] = not produced_urdu     # pending only if MT unavailable
         else:
-            # No bio in any language at all: honest missing state.
-            bio["needsUrdu"] = True
+            # No biography in any language: honest missing state, nothing invented.
             bio["needsEnglish"] = True
+            bio["needsUrdu"] = True
+            report.setdefault("narrator_no_bio", []).append(nid)
+
         out.append({k: v for k, v in bio.items() if v is not None})
     report["narrators_built"] = len(out)
     return out
@@ -469,8 +582,33 @@ def bump_manifest() -> None:
         mp.write_text(json.dumps(m, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
+def selftest() -> int:
+    """Offline check of the pure parsers (no network) — run first in CI so a
+    parser regression fails fast before any scraping. Mirrors the structures
+    verified live on 2026-08-08."""
+    frag = ('<div class="arabic_hadith_full arabic">حَدَّثَنَا '
+            '<a href="/narrator/8297">يَحْيَى بْنُ بُكَيْرٍ</a> قَالَ بَيْنَا '
+            '<a href="javascript:openquran(73,1,5)">يَا أَيُّهَا الْمُدَّثِّرُ</a> فَحَمِيَ</div>')
+    segs, refs = segment_arabic(frag)
+    assert any(s["type"] == "isnad" and s.get("narratorId") == 8297 for s in segs)
+    assert any(s["type"] == "verse" and s["surah"] == 74 and s["ayahStart"] == 1
+               and s["ayahEnd"] == 5 for s in segs)
+    assert refs == [{"surah": 74, "ayahStart": 1, "ayahEnd": 5}]
+    assert any(s["type"] == "matn" for s in segs)
+
+    def cont(html):
+        return BeautifulSoup(html, "lxml").select_one(".actualHadithContainer")
+    tpl = '<div class="actualHadithContainer"><div class="hadith_reference">{}</div></div>'
+    assert ref_number_from(cont(tpl.format("Reference : Sahih al-Bukhari 402In-book reference : Book 8, Hadith 53"))) == "402"
+    assert ref_number_from(cont(tpl.format("Reference : Sahih al-Bukhari 402bIn-book reference : Book 8, Hadith 54"))) == "402.2"
+    assert ref_number_from(cont(tpl.format("Reference : Sahih al-Bukhari 349In-book reference : Book 8, Hadith 1"))) == "349"
+    print("ingest_sunnah selftest: PASS (segmentation, verse surah+1, sub-number keys)")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--selftest", action="store_true", help="offline parser check; no network")
     ap.add_argument("--collections", nargs="*", default=[])
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--core", action="store_true", help="the seven core collections only")
@@ -482,6 +620,9 @@ def main() -> int:
     ap.add_argument("--bump-manifest", action="store_true")
     ap.add_argument("--out", type=Path, default=Path("build/hadith"))
     args = ap.parse_args()
+
+    if args.selftest:
+        return selftest()
 
     slugs = (ALL_COLLECTIONS if args.all else
              CORE if args.core else (args.collections or ["bukhari"]))
