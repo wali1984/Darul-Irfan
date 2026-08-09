@@ -303,6 +303,10 @@ def ref_number_from(cont) -> str | None:
     return base
 
 
+# "In-book reference : Book 1, Hadith 1" — the edition-stable join key.
+INBOOK_RE = re.compile(r"In-book reference\s*:\s*Book\s*(\d+)\s*,\s*Hadith\s*(\d+)", re.I)
+
+
 def parse_book_page(html: str) -> dict[str, dict]:
     """Map displayNumber -> {segments, quranRefs, text_en, chapter...} for a book page."""
     soup = BeautifulSoup(html, "lxml")
@@ -316,11 +320,19 @@ def parse_book_page(html: str) -> dict[str, dict]:
         ch_en = cont.find_previous(class_=re.compile("englishchapter", re.I))
         ch_ar = cont.find_previous(class_=re.compile("arabicchapter", re.I))
         segs, refs = segment_arabic(str(ar_el)) if ar_el else ([], [])
+        # The edition-stable in-book reference ("Book 1, Hadith 1"). Collections
+        # whose collection numbering diverges from our packs (Muslim prints
+        # "Sahih Muslim 8a" where our record is a different displayNumber) only
+        # merge on this key — see the by_inbook fallback in enrich_collection.
+        ref_el = cont.select_one(".hadith_reference")
+        im = INBOOK_RE.search(ref_el.get_text(" ", strip=True)) if ref_el else None
+        inbook = [int(im.group(1)), int(im.group(2))] if im else None
         out[num] = {
             # The container's own id ("h119620") is the Arabic URN, which the
             # Urdu records carry as matchingArabicURN. It is the reliable join
             # key between the two — see the note in enrich_collection.
             "urn": (cont.get("id") or "").lstrip("h") or None,
+            "inbook": inbook,
             "arabicSegments": segs or None,
             "quranRefs": refs or None,
             "text_en": clean(en_el.get_text()) if en_el else None,
@@ -437,12 +449,103 @@ def load_pack(slug: str) -> list[dict] | None:
     return json.loads(p.read_text(encoding="utf-8"))
 
 
+def split_number(display: str) -> tuple[int, int | None]:
+    major, _, minor = display.partition(".")
+    return int(major), (int(minor) if minor else None)
+
+
+def build_from_scratch(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[dict], set[int]]:
+    """Create a pack for a collection we do NOT already bundle, straight from the
+    book pages — so the ~20 collections that have no base pack can be produced.
+
+    Keys are lossless by construction: displayNumber is the printed collection
+    reference (letter sub-numbers already mapped, e.g. 8b -> 8.2), numberMajor/
+    Minor are split from it, sourceSequence is the 1-based reading position, and
+    canonicalID = slug|displayNumber|sourceSequence — the same shape the bundled
+    packs use, so the app and the integrity gate treat it identically.
+
+    NOTE (integration): this writes hadith_<slug>.json only. A collection also
+    needs a catalogue entry in hadith_books.json (title, sections, count) and to
+    be added to the integrity gate's HADITH_BOOKS list + the app's expectations
+    before it ships. That catalogue step is intentionally separate; see
+    Docs/HADITH_INGEST_FINDINGS.md.
+    """
+    landing = fetcher.get(f"/{slug}", expect_json=False)
+    if not landing:
+        report.setdefault("failures", []).append(f"{slug}: landing page")
+        return [], set()
+    books = sorted({int(m) for m in re.findall(rf"/{slug}/(\d+)\"", landing)})
+    records: list[dict] = []
+    narrator_ids: set[int] = set()
+    seq = 0
+    seen_display: set[str] = set()
+
+    for bk in books:
+        page = fetcher.get(f"/{slug}/{bk}", expect_json=False)
+        if not page:
+            report.setdefault("failures", []).append(f"{slug}/{bk}: book page")
+            continue
+        parsed = parse_book_page(page)
+        urdu = fetcher.get(f"/ajax/urdu/{slug}/{bk}", expect_json=True) or []
+        urdu_by_urn = {str(u.get("matchingArabicURN")): u for u in urdu
+                       if u.get("matchingArabicURN") is not None}
+        urdu_by_num = {str(u.get("hadithNumber")): u for u in urdu}
+
+        for num, extra in parsed.items():
+            if not num or num in seen_display:
+                continue                     # keep displayNumber unique per pack
+            seen_display.add(num)
+            seq += 1
+            major, minor = split_number(num)
+            rec: dict = {
+                "canonicalID": f"{slug}|{num}|{seq}",
+                "bookID": slug,
+                "displayNumber": num,
+                "numberMajor": major,
+                "sourceSequence": seq,
+                "text_ar": extra.get("text_ar"),
+                "text_en": extra.get("text_en"),
+            }
+            if minor is not None:
+                rec["numberMinor"] = minor
+            if extra.get("inbook"):
+                rec["sourceBook"], rec["sourceHadith"] = extra["inbook"][0], extra["inbook"][1]
+            if extra.get("arabicSegments"):
+                rec["arabicSegments"] = extra["arabicSegments"]
+                for s in extra["arabicSegments"]:
+                    if s["type"] == "isnad" and s.get("narratorId"):
+                        narrator_ids.add(s["narratorId"])
+            if extra.get("quranRefs"):
+                rec["quranRefs"] = extra["quranRefs"]
+            for k in ("chapterTitleEnglish", "chapterTitleArabic"):
+                if extra.get(k):
+                    rec[k] = extra[k]
+            urn = extra.get("urn")
+            u = (urdu_by_urn.get(urn) if urn else None) or urdu_by_num.get(num)
+            if u:
+                rec["urduSanad"] = clean(u.get("hadithSanad"))
+                rec["urduText"] = clean(u.get("hadithText"))
+                if u.get("babName"):
+                    rec["chapterTitleUrdu"] = clean(u.get("babName"))
+            records.append(rec)
+
+    report[slug] = {"records": len(records), "built_from_scratch": True,
+                    "narrators": len(narrator_ids)}
+    return records, narrator_ids
+
+
 def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[dict], set[int]]:
     records = load_pack(slug)
     if records is None:
-        report.setdefault("skipped_no_pack", []).append(slug)
-        return [], set()
+        # No bundled base pack (the ~20 collections we don't yet ship): build it
+        # from the book pages instead of skipping.
+        return build_from_scratch(slug, fetcher, report)
     by_num = {r["displayNumber"]: r for r in records}
+    # Edition-stable index for collections whose collection numbering diverges
+    # from our packs (Muslim especially): join the page's hadith to our record
+    # by (book, hadith) when the displayNumber does not line up.
+    by_inbook = {(r.get("sourceBook"), r.get("sourceHadith")): r for r in records
+                 if r.get("sourceBook") is not None and r.get("sourceHadith") is not None}
     landing = fetcher.get(f"/{slug}", expect_json=False)
     books = sorted({int(m) for m in re.findall(rf"/{slug}/(\d+)\"", landing)}) if landing else []
     narrator_ids: set[int] = set()
@@ -473,6 +576,8 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
 
         for num, extra in parsed.items():
             rec = by_num.get(num)
+            if rec is None and extra.get("inbook"):
+                rec = by_inbook.get((extra["inbook"][0], extra["inbook"][1]))
             if rec is None:
                 report.setdefault("unmatched_ref", []).append(f"{slug}:{num}")
                 continue
