@@ -59,6 +59,7 @@ import os
 import re
 import sys
 import time
+import unicodedata
 import hashlib
 from pathlib import Path
 
@@ -82,8 +83,15 @@ PRIMARY_SEED = SEED_DIRS[0]
 # Every collection sunnah.com publishes (slug == our slug). Arabic-only ones
 # still enrich (segments/bios); their EN/UR stay honestly absent.
 CORE = ["bukhari", "muslim", "nasai", "abudawud", "tirmidhi", "ibnmajah", "malik"]
+# "forty" is deliberately absent: https://sunnah.com/forty is an index page
+# listing the forty-hadith collections (nawawi40, qudsi40, …) and carries no
+# .actualHadithContainer of its own. Ingesting it yields an empty pack.
 SELECTIONS = ["nawawi40", "qudsi40", "riyadussalihin", "mishkat", "bulugh",
-              "adab", "shamail", "forty", "hisn", "virtues"]
+              "adab", "shamail", "hisn", "virtues"]
+# Collections whose narrations sit directly on the landing page rather than
+# under /<slug>/<book>: nawawi40 (42), qudsi40 (40), hisn (268), virtues (93).
+# build_from_scratch falls back to parsing the landing page for these.
+SINGLE_PAGE = {"nawawi40", "qudsi40", "hisn", "virtues"}
 ADVANCED = ["ahmad", "darimi", "ibnkhuzayma", "ibnhibban", "hakim",
             "abdurrazzaq", "ibnabishayba", "daraqutni", "bayhaqi", "nasaikubra"]
 ALL_COLLECTIONS = CORE + SELECTIONS + ADVANCED
@@ -94,6 +102,9 @@ MOJIBAKE = ["Ã¢", "Ã©", "Ã¨", "Ã¯", "Ã±", "Ã¼", "Â»", "Â«", "â�
 # Byte values cp1252 does not define; Python decodes them to the equal-valued
 # control characters, which cannot then be re-encoded. See demojibake().
 _CP1252_UNDEFINED = {0x81, 0x8D, 0x8F, 0x90, 0x9D}
+# Shortest Arabic run treated as identifying for the text-match join. Below
+# this, short narrations start colliding and a wrong merge is worse than none.
+ARABIC_KEY_MIN = 40
 
 
 # --------------------------------------------------------------------------- #
@@ -282,6 +293,21 @@ def clean(t: str | None) -> str | None:
     return t or None
 
 
+def arabic_key(t: str | None) -> str | None:
+    """Arabic letters only — the join key of last resort.
+
+    Strips vowel marks, punctuation, ayah symbols and whitespace, so the same
+    narration keys identically whether it came from our pack or a book page.
+    Returns None for anything too short to identify a narration safely.
+    """
+    if not t:
+        return None
+    t = unicodedata.normalize("NFD", t)
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn")
+    t = re.sub(r"[^ء-ي]", "", t)
+    return t if len(t) >= ARABIC_KEY_MIN else None
+
+
 def ref_number_from(cont) -> str | None:
     """The collection reference number as our lossless displayNumber.
 
@@ -333,6 +359,9 @@ def parse_book_page(html: str) -> dict[str, dict]:
             # key between the two — see the note in enrich_collection.
             "urn": (cont.get("id") or "").lstrip("h") or None,
             "inbook": inbook,
+            # Last-resort join key; see the by_arabic fallback in
+            # enrich_collection. Kept out of the emitted record.
+            "arabicKey": arabic_key(ar_el.get_text()) if ar_el else None,
             "arabicSegments": segs or None,
             "quranRefs": refs or None,
             "text_en": clean(en_el.get_text()) if en_el else None,
@@ -442,6 +471,23 @@ def parse_narrator(html: str, nid: int) -> dict | None:
 # --------------------------------------------------------------------------- #
 # Enrichment (merge onto existing lossless records)
 # --------------------------------------------------------------------------- #
+def discover_books(slug: str, landing: str) -> list[str]:
+    """Every book path a collection's landing page links to, in reading order.
+
+    Book slugs are NOT always numeric. Riyad as-Salihin opens with
+    /riyadussalihin/introduction — "The Book of Miscellany", hadith 1 to 679 —
+    and a `\\d+` pattern skips it silently, which cost 679 of that collection's
+    1,896 narrations (64.2% coverage) with nothing reporting a failure.
+
+    Numeric books sort numerically and keep their natural order; named books
+    sort first, which matches where the source places them.
+    """
+    found = set(re.findall(rf'href="/{slug}/([A-Za-z0-9_-]+)"', landing))
+    numeric = sorted((b for b in found if b.isdigit()), key=int)
+    named = sorted(b for b in found if not b.isdigit())
+    return named + numeric
+
+
 def load_pack(slug: str) -> list[dict] | None:
     p = PRIMARY_SEED / f"hadith_{slug}.json"
     if not p.exists():
@@ -474,19 +520,30 @@ def build_from_scratch(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[
     if not landing:
         report.setdefault("failures", []).append(f"{slug}: landing page")
         return [], set()
-    books = sorted({int(m) for m in re.findall(rf"/{slug}/(\d+)\"", landing)})
+    books = discover_books(slug, landing)
     records: list[dict] = []
     narrator_ids: set[int] = set()
     seq = 0
     seen_display: set[str] = set()
 
+    # Short collections publish their narrations on the landing page itself
+    # instead of under /<slug>/<book> — Nawawi's Forty, the Forty Qudsi, Hisn
+    # al-Muslim and Virtues. Iterating `books` finds nothing for them, so parse
+    # the landing page as the single book. `None` marks that case below.
+    if not books and slug in SINGLE_PAGE:
+        books = [None]
+
     for bk in books:
-        page = fetcher.get(f"/{slug}/{bk}", expect_json=False)
+        if bk is None:
+            page, urdu_path = landing, None
+        else:
+            page = fetcher.get(f"/{slug}/{bk}", expect_json=False)
+            urdu_path = f"/ajax/urdu/{slug}/{bk}"
         if not page:
             report.setdefault("failures", []).append(f"{slug}/{bk}: book page")
             continue
         parsed = parse_book_page(page)
-        urdu = fetcher.get(f"/ajax/urdu/{slug}/{bk}", expect_json=True) or []
+        urdu = (fetcher.get(urdu_path, expect_json=True) or []) if urdu_path else []
         urdu_by_urn = {str(u.get("matchingArabicURN")): u for u in urdu
                        if u.get("matchingArabicURN") is not None}
         urdu_by_num = {str(u.get("hadithNumber")): u for u in urdu}
@@ -546,10 +603,27 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
     # by (book, hadith) when the displayNumber does not line up.
     by_inbook = {(r.get("sourceBook"), r.get("sourceHadith")): r for r in records
                  if r.get("sourceBook") is not None and r.get("sourceHadith") is not None}
+    # Last resort: the Arabic itself. Neither key above reaches Muslim — its
+    # pack numbers its records 0..7563 as a synthetic index (displayNumber "0"
+    # exists) and carries no sourceBook/sourceHadith at all, so by_inbook is
+    # empty for exactly the collection it was written for, and the number join
+    # lands only 39.6%. Matching on the narration text is immune to numbering
+    # scheme: measured 97.8% for Muslim and 95-99.5% across all seven.
+    #
+    # Only UNIQUE keys are indexed. A repeated narration would otherwise attach
+    # one page's segments to an arbitrary one of its duplicates, and a silently
+    # wrong merge in sacred text is worse than leaving the record unenriched.
+    by_arabic: dict[str, dict] = {}
+    for r in records:
+        k = arabic_key(r.get("text_ar"))
+        if k:
+            by_arabic[k] = r if k not in by_arabic else None
+    by_arabic = {k: v for k, v in by_arabic.items() if v is not None}
     landing = fetcher.get(f"/{slug}", expect_json=False)
-    books = sorted({int(m) for m in re.findall(rf"/{slug}/(\d+)\"", landing)}) if landing else []
+    books = discover_books(slug, landing) if landing else []
     narrator_ids: set[int] = set()
     enriched = 0
+    matched_by_arabic = 0
 
     for bk in books:
         page = fetcher.get(f"/{slug}/{bk}", expect_json=False)
@@ -578,6 +652,10 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
             rec = by_num.get(num)
             if rec is None and extra.get("inbook"):
                 rec = by_inbook.get((extra["inbook"][0], extra["inbook"][1]))
+            if rec is None and extra.get("arabicKey"):
+                rec = by_arabic.get(extra["arabicKey"])
+                if rec is not None:
+                    matched_by_arabic += 1
             if rec is None:
                 report.setdefault("unmatched_ref", []).append(f"{slug}:{num}")
                 continue
@@ -603,6 +681,7 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
             enriched += 1
 
     report[slug] = {"records": len(records), "enriched": enriched,
+                    "matchedByArabic": matched_by_arabic,
                     "narrators": len(narrator_ids)}
     return records, narrator_ids
 
