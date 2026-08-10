@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 6
+    static let schemaVersion = 7
 
     /// User-owned tables that no content migration may ever disturb. Migration
     /// v4 asserts their row counts are identical before and after it runs; a
@@ -86,7 +86,33 @@ final class AppDatabase: Sendable {
             try await connection.executeScript(Self.migrationV6)
             try await connection.setSchemaVersion(6)
         }
+        if version < 7 {
+            try await connection.executeScript(Self.migrationV7)
+            try await connection.setSchemaVersion(7)
+        }
     }
+
+    // MARK: - Schema v7 (per-book numbering: display numbers may repeat)
+
+    /// Replaces the UNIQUE index on (book_id, display_number) with a plain one.
+    ///
+    /// The uniqueness assumption was true of the original seven collections but
+    /// not of their sources in general: Ibn Hibban, Bulugh al-Maram and Ibn
+    /// Khuzayma restart or repeat printed numbers across books (61/43/8
+    /// narrations respectively), and the exact printed number is the identity
+    /// the app promises to preserve. Import of those packs violated the unique
+    /// index and failed. `canonical_id` (book|display|sequence) remains the
+    /// primary key guarding every record; the plain index keeps the
+    /// number-lookup fast, and lookups order by source_sequence so the first
+    /// printed occurrence wins deterministically.
+    ///
+    /// Index-only change: no table rewritten, nothing user-owned touched, no
+    /// row-count guard needed.
+    static let migrationV7 = """
+    DROP INDEX IF EXISTS idx_hadith_entries_display_number;
+    CREATE INDEX IF NOT EXISTS idx_hadith_entries_display_number
+        ON hadith_entries (book_id, display_number);
+    """
 
     // MARK: - Schema v6 (enriched hadith presentation + narrators)
 
@@ -195,7 +221,7 @@ final class AppDatabase: Sendable {
         ON hadith_entries (book_id, source_sequence);
 
     -- Deep links and cross-references resolve by printed number.
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_hadith_entries_display_number
+    CREATE INDEX IF NOT EXISTS idx_hadith_entries_display_number
         ON hadith_entries (book_id, display_number);
 
     -- Review state travels with each edition so the model round-trips through

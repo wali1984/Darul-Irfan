@@ -138,6 +138,8 @@ struct HadithRepository: HadithRepositoryProtocol {
             SELECT \(Self.entryColumns)
             FROM hadith_entries
             WHERE book_id = ? AND display_number = ?
+            ORDER BY source_sequence
+            LIMIT 1
             """,
             [.text(bookID), .text(displayNumber)]
         )
@@ -154,7 +156,7 @@ struct HadithRepository: HadithRepositoryProtocol {
             """
             SELECT COUNT(*) AS n FROM hadith_entries
             WHERE book_id = ? AND source_sequence < (
-                SELECT source_sequence FROM hadith_entries
+                SELECT MIN(source_sequence) FROM hadith_entries
                 WHERE book_id = ? AND display_number = ?
             )
             """,
