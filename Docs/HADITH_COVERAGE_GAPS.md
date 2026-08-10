@@ -10,7 +10,9 @@ Companion to `HADITH_INGEST_FINDINGS.md`, which covers the ingester's mechanics.
 
 ## 1. Urdu — the largest gap, and it is a sourcing problem
 
-**Seven collections have Urdu. Nineteen do not, and no open source supplies it.**
+**Seven collections have Urdu. Nineteen do not, and no open *dataset* supplies
+it.** One further website does (see §1a) and is being ingested with a
+content-based join; the paragraphs below describe the dataset landscape.
 
 The Urdu on Bukhari, Muslim, Nasa'i, Abu Dawud, Tirmidhi, Ibn Majah and Malik
 comes from two places: the `urd-*` editions published by `fawazahmed0/hadith-api`
@@ -35,7 +37,36 @@ Darussalam, Maktaba, the Naeemi commentary on Mishkat — are **modern copyright
 books**. The PDFs circulating on scan sites are those same editions, not
 licensable data.
 
-### What would close it
+### 1a. ahlesunnatpak.com — a real Urdu source for four of the works
+
+Found by the owner after the dataset search above. `ahlesunnatpak.com` carries
+paired Arabic+Urdu for Bukhari, Muslim, Tirmidhi, Abu Dawud, Ibn Majah,
+Nasa'i, **Mishkat**, **Musnad Ahmad** (177 book sections against sunnah.com's
+8) and Al-Silsila as-Sahiha. `robots.txt` allows all crawling. Facts that
+shape how it is used:
+
+* **No edition attribution or copyright statement anywhere on the site**, and
+  at least one editorial artifact ("wrong same as 59") observed inside content
+  — so its text is treated as provisional, tagged
+  `urduSource: "ahlesunnatpak.com"` + `urduReviewState: "machine_provisional"`,
+  and gated on review like everything else unverified.
+* **Its numbering cannot be joined on.** Grouped labels — `(۵،۶)` printed on
+  two or three consecutive blocks — mean numbers neither align with ours nor
+  identify one narration. A naive parse of one 50-hadith page lost 5 records
+  and produced 1 duplicate.
+* **Its Arabic is typeset with Urdu code points** (measured on one Musnad page:
+  farsi yeh ×872, heh goal ×751, keheh ×277, teh marbuta goal ×100), so the
+  join key folds Urdu letter forms to Arabic before matching.
+
+`Tools/Hadith/asp_urdu_ingest.py` therefore joins **on the Arabic text itself**
+(same unique-key discipline as the sunnah.com enrichment: no key, no unique
+match → no fill), never replaces existing Urdu, and targets exactly the gaps:
+Mishkat, Musnad Ahmad, Nasa'i's missing ~1,800, Bukhari books 64–65.
+
+Al-Silsila as-Sahiha is deliberately not ingested — adding an entire new
+collection from a single unattributed source is a separate decision.
+
+### What would close the rest
 
 Machine translation, through the pipeline's existing `Translator`: set
 `DI_TRANSLATE_URL` and `DI_TRANSLATE_KEY` to an OpenAI-compatible endpoint and
@@ -70,15 +101,22 @@ far:
 |---|---:|---:|---:|---|
 | Forty Hadith of an-Nawawi | 42 | 42 | **100%** | |
 | Forty Hadith Qudsi | 40 | 40 | **100%** | |
-| Riyad as-Salihin | 1,217 → re-running | 1,896 | 64.2% → expected 100% | see §4, fixed |
-| Mishkat al-Masabih | 5,306 | 6,294 | 84.3% | 11 lost to duplicate display numbers, 1 with no number; remainder undiagnosed |
+| Riyad as-Salihin | 1,217 → re-running | 1,896 | 64.2% → expected ~100% | named `introduction` book skipped; see §4, fixed |
+| Mishkat al-Masabih | 5,306 → re-running | 6,294 | 84.3% → expected ~99% | **same named-book cause** — it too has an unfetched `introduction` book — plus 11 duplicate display numbers and 1 unnumbered |
 
 The remaining collections were still crawling when this was written; their
 figures belong in the vetting report the run emits.
 
-**Malik's Urdu is 1,614 of 1,868 (86.4%) and Nasa'i's 3,874 of 5,683 (68.2%)** —
-these predate the Arabic-text join fix and should improve; the re-run's numbers
-supersede them.
+**Malik's Urdu is 1,614 of 1,868 (86.4%) and Nasa'i's 3,874 of 5,683 (68.2%),
+and the Arabic-text join fix moved both by zero.** Measured after the re-run:
+their records were already matched — the Urdu is absent at source, the same
+class of gap as Bukhari books 64–65. (An earlier revision of this document
+predicted the join fix would improve them; that prediction was wrong.) Nasa'i's
+gap is a target of the §1a ingestion; Malik is not on that site.
+
+The join fix's real gain was **Muslim segmentation: 2,960 → 5,598 of 7,482**
+(+2,638). The remainder are ambiguous Arabic keys deliberately not guessed at,
+plus genuine non-matches.
 
 **Bukhari books 64 and 65 have no Urdu at all — 987 narrations.** Those two
 return 500 at the book level on every URL variant tried, and the per-chapter
@@ -157,9 +195,22 @@ gate public release on that, per the project's standing rule.
 
 | Gap | Size | Closable? |
 |---|---|---|
-| Urdu for 19 collections | ~25,000–40,000 narrations | Only by machine translation + review |
-| Musnad Ahmad chapters 8–30 | ~27,600 narrations | **No** — absent from every open source |
-| Bukhari books 64–65 Urdu | 987 narrations | **No** — source returns 500 |
-| Mishkat completeness | ~988 narrations | Undiagnosed; 12 explained |
-| Scholarly review of grade Urdu | 6,641 narrators | Human review |
+| Urdu overall: 40,209 of 143,294 (28.1%) | ~103,000 narrations | Only by machine translation + review; every open source is exhausted |
+| Musnad Ahmad beyond sunnah.com's subset | ~26,000 narrations | **No** open source; ahlesunnatpak carries 13,411 but as a **different edition** — 0 of 13,411 texts match ours (measured), so its Urdu cannot attach and its text would be a single-source new pack needing its own vetting |
+| Bukhari 64–65 Urdu residual | ~80 abbreviated repeat-narrations (نحوه) | **No** — genuinely different text on every source checked |
+| Mishkat vs canonical | 5,307 of 6,294 (84.3%) | **No** — sunnah.com prints only 5,318 containers; the shortfall is at source. Urdu now 94.8% via ahlesunnatpak |
+| Bulugh residual | 39 unnumbered containers (1,557 of 1,596) | Possibly — containers with no printed reference number |
+| Advanced collections vs canonical | Bayhaqi 61.8%, Hakim 70.4%, ʿAbd ar-Razzāq 71.7%, Ibn Abi Shayba 80.7% | **No** — capture measured at 100% of what sunnah.com prints; the rest is not digitised there |
+| Scholarly review of narrator Urdu | 12,643 narrators (glossary-mapped, `machine_provisional`) | Human review |
+| Scholarly review of ahlesunnatpak Urdu fills | 6,453 narrations (Nasa'i 1,423 + Mishkat 5,030) | Human review |
 | Catalogue licence accuracy | metadata | Owner decision |
+
+### Final shipped coverage (v1.9.5, measured from the packs)
+
+26 collections, **143,294 narrations** (was 36,221), all four platforms
+byte-identical, integrity gate PASS, 0 core canonical IDs lost. Fully recovered
+to 100.0% of source: Riyad as-Salihin (+679, its named `introduction` book) and
+Darimi (+649, same cause). Ibn Hibban 99.9% (+83), Nasa'i al-Kubra 96.7%,
+Hisn al-Muslim restored after the single-page/named-book fix collision.
+Urdu: core seven ~93–96%; Mishkat 94.8%; the other new collections 0% (no
+source exists — see above).

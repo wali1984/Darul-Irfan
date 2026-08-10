@@ -10,6 +10,50 @@
  "reviewState": "testFlightApproved",
  "books": [
   {
+   "id": "ibnabishayba",
+   "titleEnglish": "Musannaf Ibn Abi Shayba",
+   "titleUrdu": "مصنف ابن ابی شیبہ",
+   "hadithCount": 30630,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "abdurrazzaq",
+   "titleEnglish": "Musannaf `Abd ar-Razzaq",
+   "titleUrdu": "مصنف عبد الرزاق",
+   "hadithCount": 15088,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "bayhaqi",
+   "titleEnglish": "As-Sunan al-Kubra li al-Bayhaqi",
+   "titleUrdu": "السنن الکبریٰ للبیہقی",
+   "hadithCount": 13487,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "nasaikubra",
+   "titleEnglish": "Sunan an-Nasa'i al-Kubra",
+   "titleUrdu": "السنن الکبریٰ للنسائی",
+   "hadithCount": 11385,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
    "id": "bukhari",
    "titleEnglish": "Sahih al-Bukhari",
    "titleUrdu": "صحیح بخاری",
@@ -604,6 +648,17 @@
    ]
   },
   {
+   "id": "ibnhibban",
+   "titleEnglish": "Sahih Ibn Hibban",
+   "titleUrdu": "صحیح ابن حبان",
+   "hadithCount": 7482,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
    "id": "muslim",
    "titleEnglish": "Sahih Muslim",
    "titleUrdu": "صحیح مسلم",
@@ -611,27 +666,19 @@
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
-   "sectionCount": 57
+   "sectionCount": 56,
+   "sections": null
   },
   {
-   "id": "abudawud",
-   "titleEnglish": "Sunan Abu Dawud",
-   "titleUrdu": "سنن ابو داؤد",
-   "hadithCount": 5274,
+   "id": "hakim",
+   "titleEnglish": "Mustadrak al-Hakim",
+   "titleUrdu": "مستدرک حاکم",
+   "hadithCount": 6194,
    "hasArabic": true,
-   "hasEnglish": true,
-   "hasUrdu": true,
-   "sectionCount": 43
-  },
-  {
-   "id": "tirmidhi",
-   "titleEnglish": "Jami' at-Tirmidhi",
-   "titleUrdu": "جامع ترمذی",
-   "hadithCount": 3989,
-   "hasArabic": true,
-   "hasEnglish": true,
-   "hasUrdu": true,
-   "sectionCount": 49
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
   },
   {
    "id": "nasai",
@@ -641,7 +688,30 @@
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
-   "sectionCount": 51
+   "sectionCount": 51,
+   "sections": null
+  },
+  {
+   "id": "mishkat",
+   "titleEnglish": "Mishkat al-Masabih",
+   "titleUrdu": "مشکوٰۃ المصابیح",
+   "hadithCount": 5307,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 27,
+   "sections": null
+  },
+  {
+   "id": "abudawud",
+   "titleEnglish": "Sunan Abu Dawud",
+   "titleUrdu": "سنن ابو داؤد",
+   "hadithCount": 5274,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 43,
+   "sections": null
   },
   {
    "id": "ibnmajah",
@@ -651,7 +721,63 @@
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
-   "sectionCount": 38
+   "sectionCount": 37,
+   "sections": null
+  },
+  {
+   "id": "daraqutni",
+   "titleEnglish": "Sunan ad-Daraqutni",
+   "titleUrdu": "سنن دارقطنی",
+   "hadithCount": 4263,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "tirmidhi",
+   "titleEnglish": "Jami' at-Tirmidhi",
+   "titleUrdu": "جامع ترمذی",
+   "hadithCount": 3989,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": true,
+   "sectionCount": 49,
+   "sections": null
+  },
+  {
+   "id": "darimi",
+   "titleEnglish": "Sunan ad-Darimi",
+   "titleUrdu": "سنن دارمی",
+   "hadithCount": 3406,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "ibnkhuzayma",
+   "titleEnglish": "Sahih Ibn Khuzayma",
+   "titleUrdu": "صحیح ابن خزیمہ",
+   "hadithCount": 2835,
+   "hasArabic": true,
+   "hasEnglish": false,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "riyadussalihin",
+   "titleEnglish": "Riyad as-Salihin",
+   "titleUrdu": "ریاض الصالحین",
+   "hadithCount": 1896,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 19,
+   "sections": null
   },
   {
    "id": "malik",
@@ -661,7 +787,96 @@
    "hasArabic": true,
    "hasEnglish": true,
    "hasUrdu": true,
-   "sectionCount": 61
+   "sectionCount": 61,
+   "sections": null
+  },
+  {
+   "id": "bulugh",
+   "titleEnglish": "Bulugh al-Maram",
+   "titleUrdu": "بلوغ المرام",
+   "hadithCount": 1557,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 5,
+   "sections": null
+  },
+  {
+   "id": "ahmad",
+   "titleEnglish": "Musnad Ahmad",
+   "titleUrdu": "مسند احمد",
+   "hadithCount": 1374,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 7,
+   "sections": null
+  },
+  {
+   "id": "adab",
+   "titleEnglish": "Al-Adab Al-Mufrad",
+   "titleUrdu": "الادب المفرد",
+   "hadithCount": 1325,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 50,
+   "sections": null
+  },
+  {
+   "id": "shamail",
+   "titleEnglish": "Ash-Shama'il Al-Muhammadiyah",
+   "titleUrdu": "الشمائل المحمدیہ",
+   "hadithCount": 402,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 56,
+   "sections": null
+  },
+  {
+   "id": "hisn",
+   "titleEnglish": "Hisn al-Muslim",
+   "titleUrdu": "حصن المسلم",
+   "hadithCount": 267,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "virtues",
+   "titleEnglish": "Virtues of the Qur'an's Chapters and Verses",
+   "titleUrdu": "فضائل سور و آیاتِ قرآن",
+   "hadithCount": 93,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "nawawi40",
+   "titleEnglish": "Forty Hadith of an-Nawawi",
+   "titleUrdu": "اربعین نووی",
+   "hadithCount": 42,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
+  },
+  {
+   "id": "qudsi40",
+   "titleEnglish": "Forty Hadith Qudsi",
+   "titleUrdu": "چالیس حدیث قدسی",
+   "hadithCount": 40,
+   "hasArabic": true,
+   "hasEnglish": true,
+   "hasUrdu": false,
+   "sectionCount": 0,
+   "sections": null
   }
  ]
 }

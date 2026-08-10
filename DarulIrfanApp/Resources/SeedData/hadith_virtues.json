@@ -1,0 +1,1582 @@
+[
+ {
+  "canonicalID": "virtues|1|1",
+  "bookID": "virtues",
+  "displayNumber": "1",
+  "numberMajor": 1,
+  "sourceSequence": 1,
+  "text_ar": "عَنْ أَبِي سَعِيدِ بْنِ الْمُعَلَّى ـ رضى الله عنه ـ قَالَ كُنْتُ أُصَلِّي فَمَرَّ بِي رَسُولُ اللَّهِ صلى الله عليه وسلم فَدَعَانِي فَلَمْ آتِهِ حَتَّى صَلَّيْتُ، ثُمَّ أَتَيْتُهُ فَقَالَ ‏ \"‏ مَا مَنَعَكَ أَنْ تَأْتِيَ أَلَمْ يَقُلِ اللَّهُ (‏يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَجِيبُوا لِلَّهِ وَلِلرَّسُولِ إِذَا دَعَاكُمْ‏)‏ ثُمَّ قَالَ لأُعَلِّمَنَّكَ أَعْظَمَ سُورَةٍ فِي الْقُرْآنِ قَبْلَ أَنْ أَخْرُجَ ‏\"‏‏.‏ فَذَهَبَ رَسُولُ اللَّهِ صلى الله عليه وسلم لِيَخْرُجَ فَذَكَرْتُ لَهُ‏.‏ وَقَالَ مُعَاذٌ حَدَّثَنَا شُعْبَةُ، عَنْ خُبَيْبٍ، سَمِعَ حَفْصًا، سَمِعَ أَبَا سَعِيدٍ، رَجُلاً مِنْ أَصْحَابِ النَّبِيِّ صلى الله عليه وسلم بِهَذَا، وَقَالَ هِيَ (‏الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ‏)‏ السَّبْعُ الْمَثَانِي.",
+  "text_en": "Abu Sa’id bin al-Mu’alla (RA) reported, “I was praying when the Messenger of Allah ﷺ passed by me and called me. I didn’t come to him until I finished praying. Then I came to him and he said, “What prevented you from coming? Didn’t Allah say, ‘O you who believe, respond to Allah and to the Messenger when he calls you’?” Then he said, “I shall teach you the greatest sūrah in the Qur’an before I leave.” The Messenger of Allah ﷺ started to leave so I reminded him of it.” Mu’āth said, “Shu’bah narrated this to us from Khubayb, who heard from Hafs, who heard from Abu Sa’id, a man from the companions of the Prophet ﷺ, and he said, “It is ‘Alhamdu lillāhi Rabbil ‘Ālameen (i.e., Sūrah Al-Fātiḥah) which is As-Sab’ Al-Mathāni (i.e., the seven oft-repeated āyāt).” Reference: Sahih al-Bukhari 4474",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي سَعِيدِ بْنِ الْمُعَلَّى ـ رضى الله عنه ـ قَالَ كُنْتُ أُصَلِّي فَمَرَّ بِي رَسُولُ اللَّهِ صلى الله عليه وسلم فَدَعَانِي فَلَمْ آتِهِ حَتَّى صَلَّيْتُ، ثُمَّ أَتَيْتُهُ فَقَالَ ‏ \"‏ مَا مَنَعَكَ أَنْ تَأْتِيَ أَلَمْ يَقُلِ اللَّهُ (‏يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَجِيبُوا لِلَّهِ وَلِلرَّسُولِ إِذَا دَعَاكُمْ‏)‏ ثُمَّ قَالَ لأُعَلِّمَنَّكَ أَعْظَمَ سُورَةٍ فِي الْقُرْآنِ قَبْلَ أَنْ أَخْرُجَ ‏\"‏‏.‏ فَذَهَبَ رَسُولُ اللَّهِ صلى الله عليه وسلم لِيَخْرُجَ فَذَكَرْتُ لَهُ‏.‏ وَقَالَ مُعَاذٌ حَدَّثَنَا شُعْبَةُ، عَنْ خُبَيْبٍ، سَمِعَ حَفْصًا، سَمِعَ أَبَا سَعِيدٍ، رَجُلاً مِنْ أَصْحَابِ النَّبِيِّ صلى الله عليه وسلم بِهَذَا، وَقَالَ هِيَ (‏الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ‏)‏ السَّبْعُ الْمَثَانِي."
+   }
+  ],
+  "chapterTitleEnglish": "The Greatest Sūrah",
+  "chapterTitleArabic": "أَعْظَمُ سُورَةٍ"
+ },
+ {
+  "canonicalID": "virtues|2|2",
+  "bookID": "virtues",
+  "displayNumber": "2",
+  "numberMajor": 2,
+  "sourceSequence": 2,
+  "text_ar": "كان النَّبيُّ صلَّى اللهُ عليه وسلَّم في مسيرٍ فنزل ونزل رجلٌ إلى جانبِه قال فالتفت النَّبيُّ صلَّى اللهُ عليه وسلَّم فقال ألا أخبِرُك بأفضلِ القرآنِ قال بلى فتلا { الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ}.",
+  "text_en": "Anas bin Mālik reported that the Messenger of Allah ﷺ was heading somewhere and a man came to his side, so the Prophet ﷺ turned to him and said, “Shall I not inform you about the greatest (part) of the Quran? The man said, “Yes.” So he (the Prophet ﷺ) recited, Alhamdu lillāhi Rabbil ‘Ālameen (i.e., Sūrah Al-Fātiḥah). Reference: Sunan an-Nasāʾī al-Kubrā 8011, Ṣaḥīḥ Ibn Ḥibbān 774, and Mustadrak al-Ḥākim 2056 with slight variations",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "كان النَّبيُّ صلَّى اللهُ عليه وسلَّم في مسيرٍ فنزل ونزل رجلٌ إلى جانبِه قال فالتفت النَّبيُّ صلَّى اللهُ عليه وسلَّم فقال ألا أخبِرُك بأفضلِ القرآنِ قال بلى فتلا { الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ}."
+   }
+  ],
+  "chapterTitleEnglish": "The Greatest Sūrah",
+  "chapterTitleArabic": "أَعْظَمُ سُورَةٍ"
+ },
+ {
+  "canonicalID": "virtues|3|3",
+  "bookID": "virtues",
+  "displayNumber": "3",
+  "numberMajor": 3,
+  "sourceSequence": 3,
+  "text_ar": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ قَالَ النَّبِيُّ صلى الله عليه وسلم ‏ \"‏ مَا أَنْزَلَ اللَّهُ فِي التَّوْرَاةِ وَلاَ فِي الإِنْجِيلِ مِثْلَ أُمِّ الْقُرْآنِ وَهِيَ السَّبْعُ الْمَثَانِي وَهِيَ مَقْسُومَةٌ بَيْنِي وَبَيْنَ عَبْدِي وَلِعَبْدِي مَا سَأَلَ\"‏ .",
+  "text_en": "It was narrated that Ubayy bin Ka’b said, “The Messenger of Allah ﷺ said, Allah did not reveal in the Tawrāh or the Injīl anything like Umm al-Quran (al-Fātiḥah), which is the seven oft-recited (verses), and (Allah said) it is divided between Myself and My slave will have what he asked for.” Reference: Jami` at-Tirmidhi 3125",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ قَالَ النَّبِيُّ صلى الله عليه وسلم ‏ \"‏ مَا أَنْزَلَ اللَّهُ فِي التَّوْرَاةِ وَلاَ فِي الإِنْجِيلِ مِثْلَ أُمِّ الْقُرْآنِ وَهِيَ السَّبْعُ الْمَثَانِي وَهِيَ مَقْسُومَةٌ بَيْنِي وَبَيْنَ عَبْدِي وَلِعَبْدِي مَا سَأَلَ\"‏ ."
+   }
+  ],
+  "chapterTitleEnglish": "Nothing similar to Sūrah al-Fātiḥah was ever revealed in any of the previous scriptures or to the previous prophets and messengers.",
+  "chapterTitleArabic": "مَا أُنْزِلَ فِي الكُتُبِ السَّابِقَةِ ولَا إلى الرُّسُلِ والنَّبِيِّينَ مِنْ قَبْلُ مِثْلَ سُورَةِ الفَاتِحَةِ"
+ },
+ {
+  "canonicalID": "virtues|4|4",
+  "bookID": "virtues",
+  "displayNumber": "4",
+  "numberMajor": 4,
+  "sourceSequence": 4,
+  "text_ar": "عَنِ ابْنِ عَبَّاسٍ، قَالَ بَيْنَمَا جِبْرِيلُ قَاعِدٌ عِنْدَ النَّبِيِّ صلى الله عليه وسلم سَمِعَ نَقِيضًا مِنْ فَوْقِهِ فَرَفَعَ رَأْسَهُ فَقَالَ هَذَا بَابٌ مِنَ السَّمَاءِ فُتِحَ الْيَوْمَ لَمْ يُفْتَحْ قَطُّ إِلاَّ الْيَوْمَ فَنَزَلَ مِنْهُ مَلَكٌ فَقَالَ هَذَا مَلَكٌ نَزَلَ إِلَى الأَرْضِ لَمْ يَنْزِلْ قَطُّ إِلاَّ الْيَوْمَ فَسَلَّمَ وَقَالَ أَبْشِرْ بِنُورَيْنِ أُوتِيتَهُمَا لَمْ يُؤْتَهُمَا نَبِيٌّ قَبْلَكَ فَاتِحَةُ الْكِتَابِ وَخَوَاتِيمُ سُورَةِ الْبَقَرَةِ لَنْ تَقْرَأَ بِحَرْفٍ مِنْهُمَا إِلاَّ أُعْطِيتَهُ ‏.‏",
+  "text_en": "Abdullāh b. Abbās reported that while Angel Jibreel was sitting with the Messenger of Allah ﷺ, he heard a sound above him. He lifted his head, and said, “This is a gate which has been opened in heaven today. It was never opened before.” Then an Angel descended through it, he said, “This is an Angel who has come down to earth He never came down before.” He sent greetings and said, “Rejoice with two lights given to you. Such lights were not given to any Prophet before you. These (lights) are:Fātiḥatul-Kitāb (Sūrah al-Fātiḥah), and the concluding (Āyāt) of Sūrah Al-Baqarah. You will never recite a word from them without being granted (your du’ā).” Reference: Sahih Muslim 806",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنِ ابْنِ عَبَّاسٍ، قَالَ بَيْنَمَا جِبْرِيلُ قَاعِدٌ عِنْدَ النَّبِيِّ صلى الله عليه وسلم سَمِعَ نَقِيضًا مِنْ فَوْقِهِ فَرَفَعَ رَأْسَهُ فَقَالَ هَذَا بَابٌ مِنَ السَّمَاءِ فُتِحَ الْيَوْمَ لَمْ يُفْتَحْ قَطُّ إِلاَّ الْيَوْمَ فَنَزَلَ مِنْهُ مَلَكٌ فَقَالَ هَذَا مَلَكٌ نَزَلَ إِلَى الأَرْضِ لَمْ يَنْزِلْ قَطُّ إِلاَّ الْيَوْمَ فَسَلَّمَ وَقَالَ أَبْشِرْ بِنُورَيْنِ أُوتِيتَهُمَا لَمْ يُؤْتَهُمَا نَبِيٌّ قَبْلَكَ فَاتِحَةُ الْكِتَابِ وَخَوَاتِيمُ سُورَةِ الْبَقَرَةِ لَنْ تَقْرَأَ بِحَرْفٍ مِنْهُمَا إِلاَّ أُعْطِيتَهُ ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "Nothing similar to Sūrah al-Fātiḥah was ever revealed in any of the previous scriptures or to the previous prophets and messengers.",
+  "chapterTitleArabic": "مَا أُنْزِلَ فِي الكُتُبِ السَّابِقَةِ ولَا إلى الرُّسُلِ والنَّبِيِّينَ مِنْ قَبْلُ مِثْلَ سُورَةِ الفَاتِحَةِ"
+ },
+ {
+  "canonicalID": "virtues|5|5",
+  "bookID": "virtues",
+  "displayNumber": "5",
+  "numberMajor": 5,
+  "sourceSequence": 5,
+  "text_ar": "عَنْ عُبَادَةَ بْنِ الصَّامِتِ، يَبْلُغُ بِهِ النَّبِيَّ صلى الله عليه وسلم ‏ \"‏ لاَ صَلاَةَ لِمَنْ لَمْ يَقْرَأْ بِفَاتِحَةِ الْكِتَابِ ‏\" ‏.",
+  "text_en": "The Prophet is reported to have said, “The prayer is not valid for the one who does not recite the Fātiḥah (opening chapter) of the Book.” Reference: Sahih Muslim 394",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عُبَادَةَ بْنِ الصَّامِتِ، يَبْلُغُ بِهِ النَّبِيَّ صلى الله عليه وسلم ‏ \"‏ لاَ صَلاَةَ لِمَنْ لَمْ يَقْرَأْ بِفَاتِحَةِ الْكِتَابِ ‏\" ‏."
+   }
+  ],
+  "chapterTitleEnglish": "No Ṣalāh (prayer) is valid without reciting Sūrah al-Fātiḥah",
+  "chapterTitleArabic": "لَا صَلَاةَ لِمَن لَمْ يَقْرَأْ بِسُورَةِ الْفَاتِحَةِ"
+ },
+ {
+  "canonicalID": "virtues|6|6",
+  "bookID": "virtues",
+  "displayNumber": "6",
+  "numberMajor": 6,
+  "sourceSequence": 6,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏\"‏ مَنْ صَلَّى صَلاَةً لَمْ يَقْرَأْ فِيهَا بِأُمِّ الْقُرْآنِ فَهْىَ خِدَاجٌ – ثَلاَثًا – غَيْرُ تَمَامٍ ‏\"‏ ‏.‏ فَقِيلَ لأَبِي هُرَيْرَةَ إِنَّا نَكُونُ وَرَاءَ الإِمَامِ ‏.‏ فَقَالَ اقْرَأْ بِهَا فِي نَفْسِكَ فَإِنِّي سَمِعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَقُولُ ‏\"‏ قَالَ اللَّهُ تَعَالَى قَسَمْتُ الصَّلاَةَ بَيْنِي وَبَيْنَ عَبْدِي نِصْفَيْنِ وَلِعَبْدِي مَا سَأَلَ فَإِذَا قَالَ الْعَبْدُ (‏ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ‏)‏ ‏.‏ قَالَ اللَّهُ تَعَالَى حَمِدَنِي عَبْدِي وَإِذَا قَالَ (‏ الرَّحْمَنِ الرَّحِيمِ‏)‏ ‏.‏ قَالَ اللَّهُ تَعَالَى أَثْنَى عَلَىَّ عَبْدِي ‏.‏ وَإِذَا قَالَ (‏ مَالِكِ يَوْمِ الدِّينِ‏)‏ ‏.‏ قَالَ مَجَّدَنِي عَبْدِي – وَقَالَ مَرَّةً فَوَّضَ إِلَىَّ عَبْدِي – فَإِذَا قَالَ (‏ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ‏)‏ ‏.‏ قَالَ هَذَا بَيْنِي وَبَيْنَ عَبْدِي وَلِعَبْدِي مَا سَأَلَ ‏.‏ فَإِذَا قَالَ (‏ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ * صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلاَ الضَّالِّينَ‏)‏ ‏.‏ قَالَ هَذَا لِعَبْدِي وَلِعَبْدِي مَا سَأَلَ ‏\"‏ ‏.‏",
+  "text_en": "Abu Hurayrah reported:The Messenger of Allah (ﷺ) said: If anyone observes prayer in which he does not recite Umm al-Qur’an (i.e., Al-Fātiḥah), it is deficient [he said this three times] and incomplete. It was said to Abu Hurayraa: At times we are behind the Imam. He said: Recite it inwardly, for he had heard the Messenger of Allah (ﷺ) declare that Allah the Exalted had said: I have divided the prayer into two halves between Me and My servant, and My servant will receive what he asks. When the servant says: Praise be to Allah, the Lord of the universe, Allah the Most High says: My servant has praised Me. And when he (the servant) says: The Most Compassionate, the Merciful, Allah the Most High says: My servant has lauded Me. And when he (the servant) says: Master of the Day of judgment, He remarks: My servant has glorified Me. And sometimes He would say: My servant entrusted (his affairs) to Me. And when he (the worshipper) says: You do we worship and of You do we ask help, He (Allah) says: This is between Me and My servant, and My servant will receive what he asks for. Then, when he (the worshipper) says: Guide us along the straight path, the path of those to whom You have been Gracious, not of those who have incurred Your displeasure, nor of those who have gone astray, He (Allah) says: This is for My servant, and My servant will receive what he asks for. Reference: Sahih Muslim 395",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏\"‏ مَنْ صَلَّى صَلاَةً لَمْ يَقْرَأْ فِيهَا بِأُمِّ الْقُرْآنِ فَهْىَ خِدَاجٌ – ثَلاَثًا – غَيْرُ تَمَامٍ ‏\"‏ ‏.‏ فَقِيلَ لأَبِي هُرَيْرَةَ إِنَّا نَكُونُ وَرَاءَ الإِمَامِ ‏.‏ فَقَالَ اقْرَأْ بِهَا فِي نَفْسِكَ فَإِنِّي سَمِعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَقُولُ ‏\"‏ قَالَ اللَّهُ تَعَالَى قَسَمْتُ الصَّلاَةَ بَيْنِي وَبَيْنَ عَبْدِي نِصْفَيْنِ وَلِعَبْدِي مَا سَأَلَ فَإِذَا قَالَ الْعَبْدُ (‏ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ‏)‏ ‏.‏ قَالَ اللَّهُ تَعَالَى حَمِدَنِي عَبْدِي وَإِذَا قَالَ (‏ الرَّحْمَنِ الرَّحِيمِ‏)‏ ‏.‏ قَالَ اللَّهُ تَعَالَى أَثْنَى عَلَىَّ عَبْدِي ‏.‏ وَإِذَا قَالَ (‏ مَالِكِ يَوْمِ الدِّينِ‏)‏ ‏.‏ قَالَ مَجَّدَنِي عَبْدِي – وَقَالَ مَرَّةً فَوَّضَ إِلَىَّ عَبْدِي – فَإِذَا قَالَ (‏ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ‏)‏ ‏.‏ قَالَ هَذَا بَيْنِي وَبَيْنَ عَبْدِي وَلِعَبْدِي مَا سَأَلَ ‏.‏ فَإِذَا قَالَ (‏ اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ * صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلاَ الضَّالِّينَ‏)‏ ‏.‏ قَالَ هَذَا لِعَبْدِي وَلِعَبْدِي مَا سَأَلَ ‏\"‏ ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "No Ṣalāh (prayer) is valid without reciting Sūrah al-Fātiḥah",
+  "chapterTitleArabic": "لَا صَلَاةَ لِمَن لَمْ يَقْرَأْ بِسُورَةِ الْفَاتِحَةِ"
+ },
+ {
+  "canonicalID": "virtues|7|7",
+  "bookID": "virtues",
+  "displayNumber": "7",
+  "numberMajor": 7,
+  "sourceSequence": 7,
+  "text_ar": "عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ، قَالَ كُنَّا فِي مَسِيرٍ لَنَا فَنَزَلْنَا فَجَاءَتْ جَارِيَةٌ فَقَالَتْ إِنَّ سَيِّدَ الْحَىِّ سَلِيمٌ، وَإِنَّ نَفَرَنَا غُيَّبٌ فَهَلْ مِنْكُمْ رَاقٍ فَقَامَ مَعَهَا رَجُلٌ مَا كُنَّا نَأْبُنُهُ بِرُقْيَةٍ فَرَقَاهُ فَبَرَأَ فَأَمَرَ لَهُ بِثَلاَثِينَ شَاةً وَسَقَانَا لَبَنًا فَلَمَّا رَجَعَ قُلْنَا لَهُ أَكُنْتَ تُحْسِنُ رُقْيَةً أَوْ كُنْتَ تَرْقِي قَالَ لاَ مَا رَقَيْتُ إِلاَّ بِأُمِّ الْكِتَابِ‏.‏ قُلْنَا لاَ تُحْدِثُوا شَيْئًا حَتَّى نَأْتِيَ ـ أَوْ نَسْأَلَ ـ النَّبِيَّ صلى الله عليه وسلم فَلَمَّا قَدِمْنَا الْمَدِينَةَ ذَكَرْنَاهُ لِلنَّبِيِّ صلى الله عليه وسلم فَقَالَ ‏ \"‏ وَمَا كَانَ يُدْرِيهِ أَنَّهَا رُقْيَةٌ اقْسِمُوا وَاضْرِبُوا لِي بِسَهْمٍ ‏\"‏‏.‏",
+  "text_en": "Abu Sa’īd al-Khudrī said, “Some of the Companions of the Prophet ﷺ went on a journey. They alighted with a certain clan of the Arabs. Someone of them said, “Our chief has been stung by a scorpion or bitten by a snake. Has any of you something which gives relief to our chief?” A man of the people said, “Yes, I swear by Allah. I can recite an invocation, but we asked you for hospitality and you denied it to us. I shall not recite the invocation until you give me some payment.” So, they promised to give some sheep to him. He came to him and recited Sūrah al-Fātiḥah over him and blew (upon him) till he was cured, and he seemed as if he were set free from a bond. So, they gave him the payment that was agreed between them. They said, “Distribute it.” The man who applied the treatment said, “Do not do it until we approach the Messenger of Allah ﷺ.” And He ﷺ said, “From where did you learn that it was a treatment? You have done right. Apportion them, and give me a share along with you.” Reference: Sahih al-Bukhari 5007",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ، قَالَ كُنَّا فِي مَسِيرٍ لَنَا فَنَزَلْنَا فَجَاءَتْ جَارِيَةٌ فَقَالَتْ إِنَّ سَيِّدَ الْحَىِّ سَلِيمٌ، وَإِنَّ نَفَرَنَا غُيَّبٌ فَهَلْ مِنْكُمْ رَاقٍ فَقَامَ مَعَهَا رَجُلٌ مَا كُنَّا نَأْبُنُهُ بِرُقْيَةٍ فَرَقَاهُ فَبَرَأَ فَأَمَرَ لَهُ بِثَلاَثِينَ شَاةً وَسَقَانَا لَبَنًا فَلَمَّا رَجَعَ قُلْنَا لَهُ أَكُنْتَ تُحْسِنُ رُقْيَةً أَوْ كُنْتَ تَرْقِي قَالَ لاَ مَا رَقَيْتُ إِلاَّ بِأُمِّ الْكِتَابِ‏.‏ قُلْنَا لاَ تُحْدِثُوا شَيْئًا حَتَّى نَأْتِيَ ـ أَوْ نَسْأَلَ ـ النَّبِيَّ صلى الله عليه وسلم فَلَمَّا قَدِمْنَا الْمَدِينَةَ ذَكَرْنَاهُ لِلنَّبِيِّ صلى الله عليه وسلم فَقَالَ ‏ \"‏ وَمَا كَانَ يُدْرِيهِ أَنَّهَا رُقْيَةٌ اقْسِمُوا وَاضْرِبُوا لِي بِسَهْمٍ ‏\"‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "Sūrah al-Fātiḥah is a cure and treatment for illnesses",
+  "chapterTitleArabic": "سُورَةُ الْفَاتِحَةِ شِفَاءٌ ودَوَاءٌ لِلْأَمْرَاضِ"
+ },
+ {
+  "canonicalID": "virtues|8|8",
+  "bookID": "virtues",
+  "displayNumber": "8",
+  "numberMajor": 8,
+  "sourceSequence": 8,
+  "text_ar": "عَنْ زَيْدٍ، أَنَّهُ سَمِعَ أَبَا سَلاَّمٍ، يَقُولُ حَدَّثَنِي أَبُو أُمَامَةَ، الْبَاهِلِيُّ قَالَ سَمِعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَقُولُ ‏ \"‏ اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لأَصْحَابِهِ اقْرَءُوا الزَّهْرَاوَيْنِ الْبَقَرَةَ وَسُورَةَ آلِ عِمْرَانَ فَإِنَّهُمَا تَأْتِيَانِ يَوْمَ الْقِيَامَةِ كَأَنَّهُمَا غَمَامَتَانِ أَوْ كَأَنَّهُمَا غَيَايَتَانِ أَوْ كَأَنَّهُمَا فِرْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ أَصْحَابِهِمَا اقْرَءُوا سُورَةَ الْبَقَرَةِ فَإِنَّ أَخْذَهَا بَرَكَةٌ وَتَرْكَهَا حَسْرَةٌ وَلاَ تَسْتَطِيعُهَا الْبَطَلَةُ ‏\".‏ ‏.",
+  "text_en": "Abu Umāmah said he heard Allah’s Messenger ﷺ say, “Recite the Qur’an, for on the Day of Resurrection it will come as an intercessor for those who recite it. Recite the two bright ones, al-Baqarah and Sūrah ale-Imran, for on the Day of Resurrection they will come as two clouds or two shades, or two flocks of birds in ranks, pleading for those who recite them. Recite Sūrah al-Baqarah, for to take recourse to it is a blessing and to give it up is a cause of grief, and the magicians cannot confront it.” Reference: Sahih Muslim 804a",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ زَيْدٍ، أَنَّهُ سَمِعَ أَبَا سَلاَّمٍ، يَقُولُ حَدَّثَنِي أَبُو أُمَامَةَ، الْبَاهِلِيُّ قَالَ سَمِعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَقُولُ ‏ \"‏ اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لأَصْحَابِهِ اقْرَءُوا الزَّهْرَاوَيْنِ الْبَقَرَةَ وَسُورَةَ آلِ عِمْرَانَ فَإِنَّهُمَا تَأْتِيَانِ يَوْمَ الْقِيَامَةِ كَأَنَّهُمَا غَمَامَتَانِ أَوْ كَأَنَّهُمَا غَيَايَتَانِ أَوْ كَأَنَّهُمَا فِرْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ أَصْحَابِهِمَا اقْرَءُوا سُورَةَ الْبَقَرَةِ فَإِنَّ أَخْذَهَا بَرَكَةٌ وَتَرْكَهَا حَسْرَةٌ وَلاَ تَسْتَطِيعُهَا الْبَطَلَةُ ‏\".‏ ‏."
+   }
+  ],
+  "chapterTitleEnglish": "Protection and blessings in this life and the next",
+  "chapterTitleArabic": "الْحِفْظُ والْبَرَكَةُ فِي الدُّنْيَا والْآخِرَةِ"
+ },
+ {
+  "canonicalID": "virtues|9|9",
+  "bookID": "virtues",
+  "displayNumber": "9",
+  "numberMajor": 9,
+  "sourceSequence": 9,
+  "text_ar": "عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، قَالَ سَمِعْتُ النَّوَّاسَ، بْنَ سَمْعَانَ الْكِلاَبِيَّ يَقُولُ سَمِعْتُ النَّبِيَّ صلى الله عليه وسلم يَقُولُ ‏\"‏ يُؤْتَى بِالْقُرْآنِ يَوْمَ الْقِيَامَةِ وَأَهْلِهِ الَّذِينَ كَانُوا يَعْمَلُونَ بِهِ تَقْدُمُهُ سُورَةُ الْبَقَرَةِ وَآلُ عِمْرَانَ ‏\"‏ ‏.‏ وَضَرَبَ لَهُمَا رَسُولُ اللَّهِ صلى الله عليه وسلم ثَلاَثَةَ أَمْثَالٍ مَا نَسِيتُهُنَّ بَعْدُ قَالَ ‏\"‏ كَأَنَّهُمَا غَمَامَتَانِ أَوْ ظُلَّتَانِ سَوْدَاوَانِ بَيْنَهُمَا شَرْقٌ أَوْ كَأَنَّهُمَا حِزْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ صَاحِبِهِمَا.",
+  "text_en": "Al-Nawwās Ibn Sam’ān reported that the Messenger of Allah ﷺ said “The Qur’an will be brought on the Day of Resurrection, along with its companions who used to act by it, at the front being Sūrah al-Baqarah and Al ‘Imran. He (the Messenger ﷺ) likened them (the two suwar) to three things which I did not forget. He said they will be like two clouds, or two black canopies with light between them, or like two flocks of birds in ranks pleading for one who recited them. Reference: Sahih Muslim 805",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، قَالَ سَمِعْتُ النَّوَّاسَ، بْنَ سَمْعَانَ الْكِلاَبِيَّ يَقُولُ سَمِعْتُ النَّبِيَّ صلى الله عليه وسلم يَقُولُ ‏\"‏ يُؤْتَى بِالْقُرْآنِ يَوْمَ الْقِيَامَةِ وَأَهْلِهِ الَّذِينَ كَانُوا يَعْمَلُونَ بِهِ تَقْدُمُهُ سُورَةُ الْبَقَرَةِ وَآلُ عِمْرَانَ ‏\"‏ ‏.‏ وَضَرَبَ لَهُمَا رَسُولُ اللَّهِ صلى الله عليه وسلم ثَلاَثَةَ أَمْثَالٍ مَا نَسِيتُهُنَّ بَعْدُ قَالَ ‏\"‏ كَأَنَّهُمَا غَمَامَتَانِ أَوْ ظُلَّتَانِ سَوْدَاوَانِ بَيْنَهُمَا شَرْقٌ أَوْ كَأَنَّهُمَا حِزْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ صَاحِبِهِمَا."
+   }
+  ],
+  "chapterTitleEnglish": "Protection and blessings in this life and the next",
+  "chapterTitleArabic": "الْحِفْظُ والْبَرَكَةُ فِي الدُّنْيَا والْآخِرَةِ"
+ },
+ {
+  "canonicalID": "virtues|10|10",
+  "bookID": "virtues",
+  "displayNumber": "10",
+  "numberMajor": 10,
+  "sourceSequence": 10,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"‏ لاَ تَجْعَلُوا بُيُوتَكُمْ مَقَابِرَ إِنَّ الشَّيْطَانَ يَنْفِرُ مِنَ الْبَيْتِ الَّذِي تُقْرَأُ فِيهِ سُورَةُ الْبَقَرَةِ \".‏ ‏.",
+  "text_en": "Abu Hurayrah reported that the Prophet ﷺ said, “Do not turn your households into graveyards. Indeed, the devils flee from a household that has Sūrah al-Baqarah recited in it.” Reference: Sahih Muslim 780",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ ‏ \"‏ لاَ تَجْعَلُوا بُيُوتَكُمْ مَقَابِرَ إِنَّ الشَّيْطَانَ يَنْفِرُ مِنَ الْبَيْتِ الَّذِي تُقْرَأُ فِيهِ سُورَةُ الْبَقَرَةِ \".‏ ‏."
+   }
+  ],
+  "chapterTitleEnglish": "Protection and blessings in this life and the next",
+  "chapterTitleArabic": "الْحِفْظُ والْبَرَكَةُ فِي الدُّنْيَا والْآخِرَةِ"
+ },
+ {
+  "canonicalID": "virtues|11|11",
+  "bookID": "virtues",
+  "displayNumber": "11",
+  "numberMajor": 11,
+  "sourceSequence": 11,
+  "text_ar": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ يَا أَبَا الْمُنْذِرِ أَتَدْرِي أَىُّ آيَةٍ مِنْ كِتَابِ اللَّهِ مَعَكَ أَعْظَمُ ‏\"‏ ‏.‏ قَالَ قُلْتُ اللَّهُ وَرَسُولُهُ أَعْلَمُ ‏.‏ قَالَ ‏\"‏ يَا أَبَا الْمُنْذِرِ أَتَدْرِي أَىُّ آيَةٍ مِنْ كِتَابِ اللَّهِ مَعَكَ أَعْظَمُ ‏\"‏ ‏.‏ قَالَ قُلْتُ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَىُّ الْقَيُّومُ ‏.‏ قَالَ فَضَرَبَ فِي صَدْرِي وَقَالَ ‏\"‏ وَاللَّهِ لِيَهْنِكَ الْعِلْمُ أَبَا الْمُنْذِرِ‏\".‏",
+  "text_en": "Ubayy b. Ka’b said:Allah's Messenger (ﷺ) said: O Abu' al-Mundhir, do you know the verse from the Book of Allah which, according to you, is the greatest? I said: Allah and His Messenger (ﷺ) know best. He again said: Abu'l-Mundhir, do you know the verse from the Book of Allah which, according to you, is the greatest? I said: Allah, there is no god but He, the Living, the Eternal. Thereupon he touched me on my chest and said: May knowledge be pleasant for you, O Abu'l-Mundhir!” Reference: Sahih Muslim 810",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ يَا أَبَا الْمُنْذِرِ أَتَدْرِي أَىُّ آيَةٍ مِنْ كِتَابِ اللَّهِ مَعَكَ أَعْظَمُ ‏\"‏ ‏.‏ قَالَ قُلْتُ اللَّهُ وَرَسُولُهُ أَعْلَمُ ‏.‏ قَالَ ‏\"‏ يَا أَبَا الْمُنْذِرِ أَتَدْرِي أَىُّ آيَةٍ مِنْ كِتَابِ اللَّهِ مَعَكَ أَعْظَمُ ‏\"‏ ‏.‏ قَالَ قُلْتُ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَىُّ الْقَيُّومُ ‏.‏ قَالَ فَضَرَبَ فِي صَدْرِي وَقَالَ ‏\"‏ وَاللَّهِ لِيَهْنِكَ الْعِلْمُ أَبَا الْمُنْذِرِ‏\".‏"
+   }
+  ],
+  "chapterTitleEnglish": "Āyat al-Kursī (The Verse of the Footstool)",
+  "chapterTitleArabic": "آيَةُ الْكُرْسِيّ"
+ },
+ {
+  "canonicalID": "virtues|12|12",
+  "bookID": "virtues",
+  "displayNumber": "12",
+  "numberMajor": 12,
+  "sourceSequence": 12,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ ـ رضى الله عنه ـ قَالَ وَكَّلَنِي رَسُولُ اللَّهِ صلى الله عليه وسلم بِحِفْظِ زَكَاةِ رَمَضَانَ فَأَتَانِي آتٍ فَجَعَلَ يَحْثُو مِنَ الطَّعَامِ فَأَخَذْتُهُ فَقُلْتُ لأَرْفَعَنَّكَ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم فَقَصَّ الْحَدِيثَ فَقَالَ إِذَا أَوَيْتَ إِلَى فِرَاشِكَ فَاقْرَأْ آيَةَ الْكُرْسِيِّ لَنْ يَزَالَ مَعَكَ مِنَ اللَّهِ حَافِظٌ وَلاَ يَقْرَبُكَ شَيْطَانٌ حَتَّى تُصْبِحَ‏.‏ وَقَالَ النَّبِيُّ صلى الله عليه وسلم ‏ \"‏ صَدَقَكَ وَهْوَ كَذُوبٌ ذَاكَ شَيْطَانٌ ‏\"‏‏.‏",
+  "text_en": "Abu Hurayrah (RA) reported:Allah’s Messenger ﷺ ordered me to guard the Zakat revenue of Ramaḍān. Then somebody came to me and started stealing from the provisions. I caught him and said, \"I will take you to Allah’s Messenger!\" Then Abu Hurayrah described the whole incident and said: That person said (to me), \"Please don’t take me to Allah’s Messenger and I will tell you a few words by which Allah will benefit you. When you go to your bed, recite Āyat al-Kursī, for then there will be (with you) a guardian from Allah who will protect you all night long, and Satan will not be able to come near you till dawn.\" When the Prophet ﷺ heard about the incident he said (to me), \"He (who came to you at night) told you the truth although he is a liar; it was a devil.\" Reference: Sahih al-Bukhari 5010",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ ـ رضى الله عنه ـ قَالَ وَكَّلَنِي رَسُولُ اللَّهِ صلى الله عليه وسلم بِحِفْظِ زَكَاةِ رَمَضَانَ فَأَتَانِي آتٍ فَجَعَلَ يَحْثُو مِنَ الطَّعَامِ فَأَخَذْتُهُ فَقُلْتُ لأَرْفَعَنَّكَ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم فَقَصَّ الْحَدِيثَ فَقَالَ إِذَا أَوَيْتَ إِلَى فِرَاشِكَ فَاقْرَأْ آيَةَ الْكُرْسِيِّ لَنْ يَزَالَ مَعَكَ مِنَ اللَّهِ حَافِظٌ وَلاَ يَقْرَبُكَ شَيْطَانٌ حَتَّى تُصْبِحَ‏.‏ وَقَالَ النَّبِيُّ صلى الله عليه وسلم ‏ \"‏ صَدَقَكَ وَهْوَ كَذُوبٌ ذَاكَ شَيْطَانٌ ‏\"‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "Protection from the devils",
+  "chapterTitleArabic": "حِفْظٌ مِنَ الشَّيَاطِين"
+ },
+ {
+  "canonicalID": "virtues|13|13",
+  "bookID": "virtues",
+  "displayNumber": "13",
+  "numberMajor": 13,
+  "sourceSequence": 13,
+  "text_ar": "وَعَنْ أَبِي أُمَامَةَ ‏- رضى الله عنه ‏- قَالَ : قَالَ رَسُولُ اَللَّهِ ‏- صلى الله عليه وسلم ‏- مَنْ قَرَأَ آيَةَ اَلْكُرْسِيِّ دُبُرَ كُلِّ صَلَاةٍ مَكْتُوبَةٍ لَمْ يَمْنَعْهُ مِنْ دُخُولِ اَلْجَنَّةِ إِلَّا اَلْمَوْتُ.",
+  "text_en": "The Messenger of Allah ﷺ said:“Whoever reads Āyatul Kursī at the end of (after) each mandatory prayer, nothing prevents him from entering paradise except death.” Reference: Sunan an-Nasāʾī al-Kubrā, no. 9848, and al-Ṭabarānī, no. 7532.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "وَعَنْ أَبِي أُمَامَةَ ‏- رضى الله عنه ‏- قَالَ : قَالَ رَسُولُ اَللَّهِ ‏- صلى الله عليه وسلم ‏- مَنْ قَرَأَ آيَةَ اَلْكُرْسِيِّ دُبُرَ كُلِّ صَلَاةٍ مَكْتُوبَةٍ لَمْ يَمْنَعْهُ مِنْ دُخُولِ اَلْجَنَّةِ إِلَّا اَلْمَوْتُ."
+   }
+  ],
+  "chapterTitleEnglish": "A guarantee of paradise",
+  "chapterTitleArabic": "ضَمَانٌ بالْجَنَّةِ"
+ },
+ {
+  "canonicalID": "virtues|14|14",
+  "bookID": "virtues",
+  "displayNumber": "14",
+  "numberMajor": 14,
+  "sourceSequence": 14,
+  "text_ar": "عَنْ أَبِي مَسْعُودٍ ـ رضى الله عنه ـ قَالَ قَالَ النَّبِيُّ صلى الله عليه وسلم ‏ \"‏ مَنْ قَرَأَ بِالآيَتَيْنِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ فِي لَيْلَةٍ كَفَتَاهُ‏ \"‏‏.‏",
+  "text_en": "Abdullah b. Masʿūd (RA) reported that the Prophet ﷺ said:“Whoever reads the last two verses from Sūrat al-Baqarah at night, they will be sufficient for him.” Reference: Sahih al-Bukhari 5009 Regarding the word ‘sufficient’ in the hadith, Imam al-Nawawi (RA) says: It was said (by scholars) that it means it will suffice him from the night prayer, and others said it means as a protection against the devils, and yet others said it means protection against harmful animals, and it is likely encompassing of all these things (and more).” Ibn Ḥajar states: “[It] was explicitly reported by ʿĀsim from ʿAlqamah from Ibn Masʿūd, “Whoever recites (the two verses at) the end of Sūrat al-Baqarah, it will be sufficient for him instead of standing in prayer for one night.”",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي مَسْعُودٍ ـ رضى الله عنه ـ قَالَ قَالَ النَّبِيُّ صلى الله عليه وسلم ‏ \"‏ مَنْ قَرَأَ بِالآيَتَيْنِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ فِي لَيْلَةٍ كَفَتَاهُ‏ \"‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The last two verses of Sūrat al-Baqarah guarantee sufficiency",
+  "chapterTitleArabic": "آخِرُ آيَتَيْنِ مِنْ سُورَةِ الْبَقَرَةِ"
+ },
+ {
+  "canonicalID": "virtues|15|15",
+  "bookID": "virtues",
+  "displayNumber": "15",
+  "numberMajor": 15,
+  "sourceSequence": 15,
+  "text_ar": "عَنْ طَلْحَةَ، عَنْ مُرَّةَ، عَنْ عَبْدِ اللَّهِ، قَالَ لَمَّا أُسْرِيَ بِرَسُولِ اللَّهِ صلى الله عليه وسلم انْتُهِيَ بِهِ إِلَى سِدْرَةِ الْمُنْتَهَى وَهِيَ فِي السَّمَاءِ السَّادِسَةِ إِلَيْهَا يَنْتَهِي مَا يُعْرَجُ بِهِ مِنَ الأَرْضِ فَيُقْبَضُ مِنْهَا وَإِلَيْهَا يَنْتَهِي مَا يُهْبَطُ بِهِ مِنْ فَوْقِهَا فَيُقْبَضُ مِنْهَا قَالَ ‏{‏ إِذْ يَغْشَى السِّدْرَةَ مَا يَغْشَى‏}‏ قَالَ فَرَاشٌ مِنْ ذَهَبٍ ‏.‏ قَالَ فَأُعْطِيَ رَسُولُ اللَّهِ صلى الله عليه وسلم ثَلاَثًا أُعْطِيَ الصَّلَوَاتِ الْخَمْسَ وَأُعْطِيَ خَوَاتِيمَ سُورَةِ الْبَقَرَةِ وَغُفِرَ لِمَنْ لَمْ يُشْرِكْ بِاللَّهِ مِنْ أُمَّتِهِ شَيْئًا الْمُقْحِمَاتُ ‏.",
+  "text_en": "It is narrated on the authority of Abdullaah (b. Umar) that when the Messenger of Allah (ﷺ) was taken for the Night (mi’rāj) journey, he was taken to Sidrat al-Muntaha, which is situated on the sixth heaven, where terminates everything that ascends from the earth and is held there, and where terminates everything that descends from above it and is held there. (It is with reference to this that) Allah said (in the meaning of), “while the Lote Tree was overwhelmed with ˹heavenly˺ splendours” (53:16). The narrator said:(It was) gold moths. He also said: The Messenger of Allah (ﷺ) was given three things: “He was given the five daily prayers, he was given the concluding verses of Sūrah al-Baqarah (i.e., 285-286), and forgiveness of serious sins for those among his Ummah who do not associate partners with Allah.” Reference: Sahih Muslim 173",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ طَلْحَةَ، عَنْ مُرَّةَ، عَنْ عَبْدِ اللَّهِ، قَالَ لَمَّا أُسْرِيَ بِرَسُولِ اللَّهِ صلى الله عليه وسلم انْتُهِيَ بِهِ إِلَى سِدْرَةِ الْمُنْتَهَى وَهِيَ فِي السَّمَاءِ السَّادِسَةِ إِلَيْهَا يَنْتَهِي مَا يُعْرَجُ بِهِ مِنَ الأَرْضِ فَيُقْبَضُ مِنْهَا وَإِلَيْهَا يَنْتَهِي مَا يُهْبَطُ بِهِ مِنْ فَوْقِهَا فَيُقْبَضُ مِنْهَا قَالَ ‏{‏ إِذْ يَغْشَى السِّدْرَةَ مَا يَغْشَى‏}‏ قَالَ فَرَاشٌ مِنْ ذَهَبٍ ‏.‏ قَالَ فَأُعْطِيَ رَسُولُ اللَّهِ صلى الله عليه وسلم ثَلاَثًا أُعْطِيَ الصَّلَوَاتِ الْخَمْسَ وَأُعْطِيَ خَوَاتِيمَ سُورَةِ الْبَقَرَةِ وَغُفِرَ لِمَنْ لَمْ يُشْرِكْ بِاللَّهِ مِنْ أُمَّتِهِ شَيْئًا الْمُقْحِمَاتُ ‏."
+   }
+  ],
+  "chapterTitleEnglish": "A Gift During the Night Journey"
+ },
+ {
+  "canonicalID": "virtues|16|16",
+  "bookID": "virtues",
+  "displayNumber": "16",
+  "numberMajor": 16,
+  "sourceSequence": 16,
+  "text_ar": "عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏:‏ \"إِنَّ اللَّهَ كَتَبَ كِتَابًا قَبْلَ أَنْ يَخْلُقَ السَّمَاوَاتِ وَالأَرْضَ بِأَلْفَىْ عَامٍ أَنْزَلَ مِنْهُ آيَتَيْنِ خَتَمَ بِهِمَا سُورَةَ الْبَقَرَةِ وَلاَ يُقْرَآنِ فِي دَارٍ ثَلاَثَ لَيَالٍ فَيَقْرَبُهَا شَيْطَانٌ \".‏",
+  "text_en": "An-Nu’mān bin Basheer reported that the Prophet ﷺ said:“Allah inscribed a book two thousand years before He created the heavens and the earth, from which the last two verses of Sūrat al-Baqarah were revealed. If they are recited for three nights in a home, no devil will come near it.” Reference: Jami` at-Tirmidhi 2882",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏:‏ \"إِنَّ اللَّهَ كَتَبَ كِتَابًا قَبْلَ أَنْ يَخْلُقَ السَّمَاوَاتِ وَالأَرْضَ بِأَلْفَىْ عَامٍ أَنْزَلَ مِنْهُ آيَتَيْنِ خَتَمَ بِهِمَا سُورَةَ الْبَقَرَةِ وَلاَ يُقْرَآنِ فِي دَارٍ ثَلاَثَ لَيَالٍ فَيَقْرَبُهَا شَيْطَانٌ \".‏"
+   }
+  ],
+  "chapterTitleEnglish": "2000 years before the creation of the heavens and the earth",
+  "chapterTitleArabic": "أَلْفَا عَامٍ قَبْلَ خَلْقِ السَّمَاوَاتِ والْأَرْضِ"
+ },
+ {
+  "canonicalID": "virtues|17|17",
+  "bookID": "virtues",
+  "displayNumber": "17",
+  "numberMajor": 17,
+  "sourceSequence": 17,
+  "text_ar": "عَنْ أَبِي إِسْحَاق ، عَمَّنْ سَمِعَ عَلِيًّا ، يَقُولُ :\" مَا كُنْتُ أَرَى أَنَّ أَحَدًا يَعْقِلُ يَنَامُ، حَتَّى يَقْرَأَ هَؤُلَاءِ الْآيَاتِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ ، وَإِنَّهُنَّ لَمِنْ كَنْزٍ تَحْتَ الْعَرْشِ.",
+  "text_en": "It was narrated that ʿAlī said, “I did not think that any reasonable person could sleep without reciting the last verses of Sūrat al-Baqarah, and they are indeed treasures from beneath the Throne.” Reference: Sunan al-Dārimī 3289",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي إِسْحَاق ، عَمَّنْ سَمِعَ عَلِيًّا ، يَقُولُ :\" مَا كُنْتُ أَرَى أَنَّ أَحَدًا يَعْقِلُ يَنَامُ، حَتَّى يَقْرَأَ هَؤُلَاءِ الْآيَاتِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ ، وَإِنَّهُنَّ لَمِنْ كَنْزٍ تَحْتَ الْعَرْشِ."
+   }
+  ],
+  "chapterTitleEnglish": "2000 years before the creation of the heavens and the earth",
+  "chapterTitleArabic": "أَلْفَا عَامٍ قَبْلَ خَلْقِ السَّمَاوَاتِ والْأَرْضِ"
+ },
+ {
+  "canonicalID": "virtues|18|18",
+  "bookID": "virtues",
+  "displayNumber": "18",
+  "numberMajor": 18,
+  "sourceSequence": 18,
+  "text_ar": "اسْمُ اللهِ الأعْظَمُ الذي إذا دُعِيَ بهِ أجابَ ؛ في ثلاثِ سُوَرٍ من القُرآنِ : في ( البَقرةِ ) و( آلِ عِمْرانَ )، و( طه ).",
+  "text_en": "Abu Umāmah reported that the Prophet ﷺ said, “Allah’s Most Magnificent name, which when used to implore Him, He responds, is found in three suwar:Al-Baqarah, Āl-Imran, and Tāha (meaning Al-Hayy al-Qayyoom).” Reference: Sunan ibn Majah 3856. Al-Tabarāni 7925, Al-Silsilah al-Ṣaḥīḥah 746.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "اسْمُ اللهِ الأعْظَمُ الذي إذا دُعِيَ بهِ أجابَ ؛ في ثلاثِ سُوَرٍ من القُرآنِ : في ( البَقرةِ ) و( آلِ عِمْرانَ )، و( طه )."
+   }
+  ],
+  "chapterTitleEnglish": "The Greatest Name of Allah",
+  "chapterTitleArabic": "اسْمُ اللهِ الْأَعْظَمُ"
+ },
+ {
+  "canonicalID": "virtues|19|19",
+  "bookID": "virtues",
+  "displayNumber": "19",
+  "numberMajor": 19,
+  "sourceSequence": 19,
+  "text_ar": "وَعَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ أَنَّهُ قَالَ: إِنَّ لِكُلِّ شَيْءٍ سَنَامًا وَإِنَّ سَنَامَ الْقُرْآنِ سُورَةُ الْبَقَرَةِ.",
+  "text_en": "Abdullāh b. Masʿūd said, “Everything has a peak (i.e., pinnacle) and the peak of the Qur’an is al-Baqarah.” Reference: Sunan ad-Darimi 2179. Al-Silsilah al-Ṣaḥīḥah, 135/2.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "وَعَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ أَنَّهُ قَالَ: إِنَّ لِكُلِّ شَيْءٍ سَنَامًا وَإِنَّ سَنَامَ الْقُرْآنِ سُورَةُ الْبَقَرَةِ."
+   }
+  ],
+  "chapterTitleEnglish": "The sanām (peak) of the Qur’an",
+  "chapterTitleArabic": "سَنَامُ الْقُرْآنِ"
+ },
+ {
+  "canonicalID": "virtues|20|20",
+  "bookID": "virtues",
+  "displayNumber": "20",
+  "numberMajor": 20,
+  "sourceSequence": 20,
+  "text_ar": "أَخْبَرَنَا عَلِيُّ بْنُ حُجْرٍ، قَالَ حَدَّثَنَا إِسْمَاعِيلُ، قَالَ حَدَّثَنَا جَعْفَرُ بْنُ مُحَمَّدٍ، عَنْ أَبِيهِ، عَنْ جَابِرٍ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم طَافَ سَبْعًا رَمَلَ ثَلاَثًا وَمَشَى أَرْبَعًا ثُمَّ قَرَأَ (‏ وَاتَّخِذُوا مِنْ مَقَامِ إِبْرَاهِيمَ مُصَلًّى ‏)‏ فَصَلَّى سَجْدَتَيْنِ وَجَعَلَ الْمَقَامَ بَيْنَهُ وَبَيْنَ الْكَعْبَةِ ثُمَّ اسْتَلَمَ الرُّكْنَ ثُمَّ خَرَجَ فَقَالَ ‏ \"‏ إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ فَابْدَءُوا بِمَا بَدَأَ اللَّهُ بِهِ ‏\".‏",
+  "text_en": "It was narrated from Jābir that the Messenger of Allah performed Tawaf, walking rapidly (raml) for three circuits, and walking at a normal pace for four. Then he recited:\"And take you the Maqam (place) of Ibrahim as a place of prayer.\" And prayed two rakʿahs with the Maqam between him and the kaʿbah. Then he touched the Corner, then he went out and said: 'As-Safa and Al-Marwah are two of the symbols of Allah. We will start with that with which Allah started.'\" Reference: Sunan an-Nasa'i 2962",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "أَخْبَرَنَا عَلِيُّ بْنُ حُجْرٍ، قَالَ حَدَّثَنَا إِسْمَاعِيلُ، قَالَ حَدَّثَنَا جَعْفَرُ بْنُ مُحَمَّدٍ، عَنْ أَبِيهِ، عَنْ جَابِرٍ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم طَافَ سَبْعًا رَمَلَ ثَلاَثًا وَمَشَى أَرْبَعًا ثُمَّ قَرَأَ (‏ وَاتَّخِذُوا مِنْ مَقَامِ إِبْرَاهِيمَ مُصَلًّى ‏)‏ فَصَلَّى سَجْدَتَيْنِ وَجَعَلَ الْمَقَامَ بَيْنَهُ وَبَيْنَ الْكَعْبَةِ ثُمَّ اسْتَلَمَ الرُّكْنَ ثُمَّ خَرَجَ فَقَالَ ‏ \"‏ إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ فَابْدَءُوا بِمَا بَدَأَ اللَّهُ بِهِ ‏\".‏"
+   }
+  ],
+  "chapterTitleEnglish": "The verse to be recited after ṭawāf (circuits around the kaʿbah)",
+  "chapterTitleArabic": "الْآيَةُ الَّتِي تُتْلَى بَعْدَ الطَّوَافِ"
+ },
+ {
+  "canonicalID": "virtues|21|21",
+  "bookID": "virtues",
+  "displayNumber": "21",
+  "numberMajor": 21,
+  "sourceSequence": 21,
+  "text_ar": "عَنْ جَعْفَرِ بْنِ مُحَمَّدٍ، قَالَ حَدَّثَنِي أَبِي قَالَ، حَدَّثَنَا جَابِرٌ، قَالَ خَرَجَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِلَى الصَّفَا وَقَالَ ‏\"‏ نَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ ‏\"‏ ‏.‏ ثُمَّ قَرَأَ ‏\"‏ (‏ إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ ‏)‏ ‏\"‏.‏",
+  "text_en": "Jābir reported:“The Messenger of Allah ﷺ went out to aṣ-Ṣafā and said. We will start with that with which Allah started. Then he recited the verse: 'Verily, (the hills of) aṣ-Ṣafā and Al-Marwah are of the symbols of Allah… (Al-Baqarah, 2:158)'\" Reference: Sunan an-Nasa'i 2970",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جَعْفَرِ بْنِ مُحَمَّدٍ، قَالَ حَدَّثَنِي أَبِي قَالَ، حَدَّثَنَا جَابِرٌ، قَالَ خَرَجَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِلَى الصَّفَا وَقَالَ ‏\"‏ نَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ ‏\"‏ ‏.‏ ثُمَّ قَرَأَ ‏\"‏ (‏ إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ ‏)‏ ‏\"‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The verse to be recited after ṭawāf (circuits around the kaʿbah)",
+  "chapterTitleArabic": "الْآيَةُ الَّتِي تُتْلَى بَعْدَ الطَّوَافِ"
+ },
+ {
+  "canonicalID": "virtues|22|22",
+  "bookID": "virtues",
+  "displayNumber": "22",
+  "numberMajor": 22,
+  "sourceSequence": 22,
+  "text_ar": "عَنْ أُسَيْدِ بْنِ حُضَيْرٍ، قَالَ بَيْنَمَا هُوَ يَقْرَأُ مِنَ اللَّيْلِ سُورَةَ الْبَقَرَةِ وَفَرَسُهُ مَرْبُوطٌ عِنْدَهُ إِذْ جَالَتِ الْفَرَسُ فَسَكَتَ فَسَكَتَتْ فَقَرَأَ فَجَالَتِ الْفَرَسُ، فَسَكَتَ وَسَكَتَتِ الْفَرَسُ ثُمَّ قَرَأَ فَجَالَتِ الْفَرَسُ، فَانْصَرَفَ وَكَانَ ابْنُهُ يَحْيَى قَرِيبًا مِنْهَا فَأَشْفَقَ أَنْ تُصِيبَهُ فَلَمَّا اجْتَرَّهُ رَفَعَ رَأْسَهُ إِلَى السَّمَاءِ حَتَّى مَا يَرَاهَا فَلَمَّا أَصْبَحَ حَدَّثَ النَّبِيَّ صلى الله عليه وسلم فَقَالَ ‏\"‏ اقْرَأْ يَا ابْنَ حُضَيْرٍ اقْرَأْ يَا ابْنَ حُضَيْرٍ ‏\"‏‏.‏ قَالَ فَأَشْفَقْتُ يَا رَسُولَ اللَّهِ أَنْ تَطَأَ يَحْيَى وَكَانَ مِنْهَا قَرِيبًا فَرَفَعْتُ رَأْسِي فَانْصَرَفْتُ إِلَيْهِ فَرَفَعْتُ رَأْسِي إِلَى السَّمَاءِ فَإِذَا مِثْلُ الظُّلَّةِ فِيهَا أَمْثَالُ الْمَصَابِيحِ فَخَرَجَتْ حَتَّى لاَ أَرَاهَا‏.‏ قَالَ ‏\"‏ وَتَدْرِي مَا ذَاكَ ‏\"‏‏.‏ قَالَ لاَ‏.‏ قَالَ ‏\"‏ تِلْكَ الْمَلاَئِكَةُ دَنَتْ لِصَوْتِكَ وَلَوْ قَرَأْتَ لأَصْبَحَتْ يَنْظُرُ النَّاسُ إِلَيْهَا لاَ تَتَوَارَى مِنْهُمْ ‏\"‏‏.‏ قَالَ ابْنُ الْهَادِ وَحَدَّثَنِي هَذَا الْحَدِيثَ عَبْدُ اللَّهِ بْنُ خَبَّابٍ عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ عَنْ أُسَيْدِ بْنِ حُضَيْرٍ‏.‏",
+  "text_en": "Usayd bin Hudayr reported:While he was reciting Sūrat Al-Baqarah at night, and his horse was tied beside him, the horse was suddenly startled and troubled. When he stopped reciting, the horse became quiet, and when he started reciting again, the horse was startled again. Then he stopped reciting and the horse became quiet too. He started reciting again and the horse was startled and troubled once again. Then he stopped reciting and his son, Yahya was beside the horse (in potential danger from the horse). He was afraid that the horse might trample on him. When he took the boy away and looked towards the sky, he could not see it. The next morning, he informed the Prophet who said, \"Recite, O Ibn Hudayr! Recite, O Ibn Hudayr!\" Ibn Hudayr replied, \"O Allah's Messenger (ﷺ)! My son, Yahya was near the horse and I was afraid that it might trample on him, so I looked towards the sky, and went to him. When I looked at the sky, I saw something like a cloud containing what looked like lamps, so I went out in order not to see it.\" The Prophet (ﷺ) said, \"Do you know what that was?\" Ibn Hudayr replied, \"No.\" The Prophet (ﷺ) said, \"Those were Angels who came near to you for your voice and if you had kept on reciting till dawn, it would have remained there till morning when people would have seen it as it would not have disappeared. Reference: Sahih al-Bukhari 5018",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أُسَيْدِ بْنِ حُضَيْرٍ، قَالَ بَيْنَمَا هُوَ يَقْرَأُ مِنَ اللَّيْلِ سُورَةَ الْبَقَرَةِ وَفَرَسُهُ مَرْبُوطٌ عِنْدَهُ إِذْ جَالَتِ الْفَرَسُ فَسَكَتَ فَسَكَتَتْ فَقَرَأَ فَجَالَتِ الْفَرَسُ، فَسَكَتَ وَسَكَتَتِ الْفَرَسُ ثُمَّ قَرَأَ فَجَالَتِ الْفَرَسُ، فَانْصَرَفَ وَكَانَ ابْنُهُ يَحْيَى قَرِيبًا مِنْهَا فَأَشْفَقَ أَنْ تُصِيبَهُ فَلَمَّا اجْتَرَّهُ رَفَعَ رَأْسَهُ إِلَى السَّمَاءِ حَتَّى مَا يَرَاهَا فَلَمَّا أَصْبَحَ حَدَّثَ النَّبِيَّ صلى الله عليه وسلم فَقَالَ ‏\"‏ اقْرَأْ يَا ابْنَ حُضَيْرٍ اقْرَأْ يَا ابْنَ حُضَيْرٍ ‏\"‏‏.‏ قَالَ فَأَشْفَقْتُ يَا رَسُولَ اللَّهِ أَنْ تَطَأَ يَحْيَى وَكَانَ مِنْهَا قَرِيبًا فَرَفَعْتُ رَأْسِي فَانْصَرَفْتُ إِلَيْهِ فَرَفَعْتُ رَأْسِي إِلَى السَّمَاءِ فَإِذَا مِثْلُ الظُّلَّةِ فِيهَا أَمْثَالُ الْمَصَابِيحِ فَخَرَجَتْ حَتَّى لاَ أَرَاهَا‏.‏ قَالَ ‏\"‏ وَتَدْرِي مَا ذَاكَ ‏\"‏‏.‏ قَالَ لاَ‏.‏ قَالَ ‏\"‏ تِلْكَ الْمَلاَئِكَةُ دَنَتْ لِصَوْتِكَ وَلَوْ قَرَأْتَ لأَصْبَحَتْ يَنْظُرُ النَّاسُ إِلَيْهَا لاَ تَتَوَارَى مِنْهُمْ ‏\"‏‏.‏ قَالَ ابْنُ الْهَادِ وَحَدَّثَنِي هَذَا الْحَدِيثَ عَبْدُ اللَّهِ بْنُ خَبَّابٍ عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ عَنْ أُسَيْدِ بْنِ حُضَيْرٍ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "Tranquility descends upon its recitation",
+  "chapterTitleArabic": "تَنْزِلُ السَّكِينَةُ عِنْدَ قِرَاءَتِهَا"
+ },
+ {
+  "canonicalID": "virtues|23|23",
+  "bookID": "virtues",
+  "displayNumber": "23",
+  "numberMajor": 23,
+  "sourceSequence": 23,
+  "text_ar": "عَنْ زَيْدٍ، أَنَّهُ سَمِعَ أَبَا سَلاَّمٍ، يَقُولُ حَدَّثَنِي أَبُو أُمَامَةَ، الْبَاهِلِيُّ قَالَ سَمِعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَقُولُ ‏ \"‏ اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لأَصْحَابِهِ اقْرَءُوا الزَّهْرَاوَيْنِ الْبَقَرَةَ وَسُورَةَ آلِ عِمْرَانَ فَإِنَّهُمَا تَأْتِيَانِ يَوْمَ الْقِيَامَةِ كَأَنَّهُمَا غَمَامَتَانِ أَوْ كَأَنَّهُمَا غَيَايَتَانِ أَوْ كَأَنَّهُمَا فِرْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ أَصْحَابِهِمَا اقْرَءُوا سُورَةَ الْبَقَرَةِ فَإِنَّ أَخْذَهَا بَرَكَةٌ وَتَرْكَهَا حَسْرَةٌ وَلاَ تَسْتَطِيعُهَا الْبَطَلَةُ ‏\".‏ ‏.",
+  "text_en": "Abu Umāmah said he heard Allah’s Messenger ﷺ say, “Recite the Qur’an, for on the Day of Resurrection it will come as an intercessor for those who recite it. Recite the two bright ones, al-Baqarah and Sūrah ale-Imran, for on the Day of Resurrection they will come as two clouds or two shades, or two flocks of birds in ranks, pleading for those who recite them. Recite Sūrah al-Baqarah, for to take recourse to it is a blessing and to give it up is a cause of grief, and the magicians cannot confront it.” Reference: Sahih Muslim 804",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ زَيْدٍ، أَنَّهُ سَمِعَ أَبَا سَلاَّمٍ، يَقُولُ حَدَّثَنِي أَبُو أُمَامَةَ، الْبَاهِلِيُّ قَالَ سَمِعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَقُولُ ‏ \"‏ اقْرَءُوا الْقُرْآنَ فَإِنَّهُ يَأْتِي يَوْمَ الْقِيَامَةِ شَفِيعًا لأَصْحَابِهِ اقْرَءُوا الزَّهْرَاوَيْنِ الْبَقَرَةَ وَسُورَةَ آلِ عِمْرَانَ فَإِنَّهُمَا تَأْتِيَانِ يَوْمَ الْقِيَامَةِ كَأَنَّهُمَا غَمَامَتَانِ أَوْ كَأَنَّهُمَا غَيَايَتَانِ أَوْ كَأَنَّهُمَا فِرْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ أَصْحَابِهِمَا اقْرَءُوا سُورَةَ الْبَقَرَةِ فَإِنَّ أَخْذَهَا بَرَكَةٌ وَتَرْكَهَا حَسْرَةٌ وَلاَ تَسْتَطِيعُهَا الْبَطَلَةُ ‏\".‏ ‏."
+   }
+  ],
+  "chapterTitleEnglish": "Intercession and shade on the Day of Judgment",
+  "chapterTitleArabic": "شَفَاعَةٌ وَظِلٌّ يَوْمَ الْقِيَامَةِ"
+ },
+ {
+  "canonicalID": "virtues|24|24",
+  "bookID": "virtues",
+  "displayNumber": "24",
+  "numberMajor": 24,
+  "sourceSequence": 24,
+  "text_ar": "عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، قَالَ سَمِعْتُ النَّوَّاسَ، بْنَ سَمْعَانَ الْكِلاَبِيَّ يَقُولُ سَمِعْتُ النَّبِيَّ صلى الله عليه وسلم يَقُولُ ‏\"‏ يُؤْتَى بِالْقُرْآنِ يَوْمَ الْقِيَامَةِ وَأَهْلِهِ الَّذِينَ كَانُوا يَعْمَلُونَ بِهِ تَقْدُمُهُ سُورَةُ الْبَقَرَةِ وَآلُ عِمْرَانَ ‏\"‏ ‏.‏ وَضَرَبَ لَهُمَا رَسُولُ اللَّهِ صلى الله عليه وسلم ثَلاَثَةَ أَمْثَالٍ مَا نَسِيتُهُنَّ بَعْدُ قَالَ ‏\"‏ كَأَنَّهُمَا غَمَامَتَانِ أَوْ ظُلَّتَانِ سَوْدَاوَانِ بَيْنَهُمَا شَرْقٌ أَوْ كَأَنَّهُمَا حِزْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ صَاحِبِهِمَا.",
+  "text_en": "Al-Nawwās Ibn Sam’ān reported that the Messenger of Allah ﷺ said “The Qur’an will be brought on the Day of Resurrection, along with its companions who used to act by it, at the front being Sūrah al-Baqarah and Al ‘Imran. He (the Messenger ﷺ) likened them (the two suwar) to three things which I did not forget. He said they will be like two clouds, or two black canopies with light between them, or like two flocks of birds in ranks pleading for one who recited them. Reference: Sahih Muslim 805",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جُبَيْرِ بْنِ نُفَيْرٍ، قَالَ سَمِعْتُ النَّوَّاسَ، بْنَ سَمْعَانَ الْكِلاَبِيَّ يَقُولُ سَمِعْتُ النَّبِيَّ صلى الله عليه وسلم يَقُولُ ‏\"‏ يُؤْتَى بِالْقُرْآنِ يَوْمَ الْقِيَامَةِ وَأَهْلِهِ الَّذِينَ كَانُوا يَعْمَلُونَ بِهِ تَقْدُمُهُ سُورَةُ الْبَقَرَةِ وَآلُ عِمْرَانَ ‏\"‏ ‏.‏ وَضَرَبَ لَهُمَا رَسُولُ اللَّهِ صلى الله عليه وسلم ثَلاَثَةَ أَمْثَالٍ مَا نَسِيتُهُنَّ بَعْدُ قَالَ ‏\"‏ كَأَنَّهُمَا غَمَامَتَانِ أَوْ ظُلَّتَانِ سَوْدَاوَانِ بَيْنَهُمَا شَرْقٌ أَوْ كَأَنَّهُمَا حِزْقَانِ مِنْ طَيْرٍ صَوَافَّ تُحَاجَّانِ عَنْ صَاحِبِهِمَا."
+   }
+  ],
+  "chapterTitleEnglish": "Intercession and shade on the Day of Judgment",
+  "chapterTitleArabic": "شَفَاعَةٌ وَظِلٌّ يَوْمَ الْقِيَامَةِ"
+ },
+ {
+  "canonicalID": "virtues|25|25",
+  "bookID": "virtues",
+  "displayNumber": "25",
+  "numberMajor": 25,
+  "sourceSequence": 25,
+  "text_ar": "اسْمُ اللهِ الأعْظَمُ الذي إذا دُعِيَ بهِ أجابَ ؛ في ثلاثِ سُوَرٍ من القُرآنِ : في ( البَقرةِ ) و( آلِ عِمْرانَ )، و( طه ).",
+  "text_en": "Abu Umāmah reported that the Prophet ﷺ said, “Allah’s Most Magnificent name, which when used to implore Him, He responds, is found in three suwar:Al-Baqarah, Āl-Imran, and Tāha (meaning Al-Hayy al-Qayyoom).” Reference: Sunan Ibn Majah 3856; At-Tabarani 7925; As-Silsilah as-Sahihah 746.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "اسْمُ اللهِ الأعْظَمُ الذي إذا دُعِيَ بهِ أجابَ ؛ في ثلاثِ سُوَرٍ من القُرآنِ : في ( البَقرةِ ) و( آلِ عِمْرانَ )، و( طه )."
+   }
+  ],
+  "chapterTitleEnglish": "The Greatest Name of Allah",
+  "chapterTitleArabic": "اسْمُ اللهِ الْأَعْظَمُ"
+ },
+ {
+  "canonicalID": "virtues|26|26",
+  "bookID": "virtues",
+  "displayNumber": "26",
+  "numberMajor": 26,
+  "sourceSequence": 26,
+  "text_ar": "عن إبراهيم بن سويد النخعي حدثنا عبد الملك بن أبي سليمان عن عطاء، قال: دخَلْتُ أنا وعُبيدُ بنُ عُميرٍ على عائشةَ فقالت لِعُبيدِ بنِ عُميرٍ : قد آن لك أنْ تزورَنا فقال : أقولُ يا أمَّهْ كما قال الأوَّلُ : زُرْ غِبًّا تزدَدْ حُبًّا قال : فقالت : دعُونا مِن رَطانتِكم هذه قال ابنُ عُميرٍ : أخبِرينا بأعجَبِ شيءٍ رأَيْتِه مِن رسولِ اللهِ صلَّى اللهُ عليه وسلَّم قال : فسكَتَتْ ثمَّ قالت : لَمَّا كان ليلةٌ مِن اللَّيالي قال : ( يا عائشةُ ذَرِيني أتعبَّدِ اللَّيلةَ لربِّي ) قُلْتُ : واللهِ إنِّي لَأُحِبُّ قُرْبَك وأُحِبُّ ما سرَّك قالت : فقام فتطهَّر ثمَّ قام يُصَلِّي قالت : فلم يزَلْ يبكي حتَّى بَلَّ حجرَه قالت : ثمَّ بكى فلم يزَلْ يبكي حتَّى بَلَّ لِحيتَه قالت : ثمَّ بكى فلم يزَلْ يبكي حتَّى بَلَّ الأرضَ فجاء بلالٌ يُؤذِنُه بالصَّلاةِ فلمَّا رآه يبكي قال : يا رسولَ اللهِ لِمَ تَبكي وقد غفَر اللهُ لك ما تقدَّم وما تأخَّر ؟ قال : ( أفلا أكونُ عبدًا شكورًا لقد نزَلَتْ علَيَّ اللَّيلةَ آيةٌ، ويلٌ لِمَن قرَأها ولم يتفكَّرْ فيها {إِنَّ فِي خَلْقِ السَّمَوَاتِ وَالْأَرْضِ) [آل عمران: 190] ) الآيةَ كلَّها.",
+  "text_en": "“…Ibn Umayr said (to Aishah):Tell us about the most interesting (or “amazing”) thing you have seen from the Messenger of Allah ﷺ. He said, she remained silent and then said: “On one night, the Messenger (ﷺ) said to me: “O Aishah, excuse me to worship my Lord on this night. I (Aishah) said: “By Allah, I love your companionship and I love what makes you happy. She said, he (the messenger ﷺ) stood and purified himself, then stood in prayer. She said, he began crying until his cheeks became wet, and (she said) he cried after that until his beard was wet, and (she said) he continued crying until the tears started to fall to the ground. At that moment, Bilāl (RA) came to the Messenger of Allah ﷺ to announce the Fajr prayer and he saw him crying. He said, “O Messenger of Allah, why are you crying? Indeed, Allah has forgiven your previous and future sins.” The Messenger replied, “Shall I not be a grateful servant? A verse has been revealed to me on this night, woe to the one who reads it and does not reflect upon it. He then read: “Verily! In the creation of the heavens and the earth, and in the alternation of night and day, there are indeed signs for men of understanding” (3:190).” Reference: Sahih Ibn Hibban 620",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عن إبراهيم بن سويد النخعي حدثنا عبد الملك بن أبي سليمان عن عطاء، قال: دخَلْتُ أنا وعُبيدُ بنُ عُميرٍ على عائشةَ فقالت لِعُبيدِ بنِ عُميرٍ : قد آن لك أنْ تزورَنا فقال : أقولُ يا أمَّهْ كما قال الأوَّلُ : زُرْ غِبًّا تزدَدْ حُبًّا قال : فقالت : دعُونا مِن رَطانتِكم هذه قال ابنُ عُميرٍ : أخبِرينا بأعجَبِ شيءٍ رأَيْتِه مِن رسولِ اللهِ صلَّى اللهُ عليه وسلَّم قال : فسكَتَتْ ثمَّ قالت : لَمَّا كان ليلةٌ مِن اللَّيالي قال : ( يا عائشةُ ذَرِيني أتعبَّدِ اللَّيلةَ لربِّي ) قُلْتُ : واللهِ إنِّي لَأُحِبُّ قُرْبَك وأُحِبُّ ما سرَّك قالت : فقام فتطهَّر ثمَّ قام يُصَلِّي قالت : فلم يزَلْ يبكي حتَّى بَلَّ حجرَه قالت : ثمَّ بكى فلم يزَلْ يبكي حتَّى بَلَّ لِحيتَه قالت : ثمَّ بكى فلم يزَلْ يبكي حتَّى بَلَّ الأرضَ فجاء بلالٌ يُؤذِنُه بالصَّلاةِ فلمَّا رآه يبكي قال : يا رسولَ اللهِ لِمَ تَبكي وقد غفَر اللهُ لك ما تقدَّم وما تأخَّر ؟ قال : ( أفلا أكونُ عبدًا شكورًا لقد نزَلَتْ علَيَّ اللَّيلةَ آيةٌ، ويلٌ لِمَن قرَأها ولم يتفكَّرْ فيها {إِنَّ فِي خَلْقِ السَّمَوَاتِ وَالْأَرْضِ) [آل عمران: 190] ) الآيةَ كلَّها."
+   }
+  ],
+  "chapterTitleEnglish": "A Special Āyah to Reflect Upon",
+  "chapterTitleArabic": "آيَةٌ خَاصَّةٌ للتَّفَكُّرِ فِيهَا"
+ },
+ {
+  "canonicalID": "virtues|27|27",
+  "bookID": "virtues",
+  "displayNumber": "27",
+  "numberMajor": 27,
+  "sourceSequence": 27,
+  "text_ar": "عَنْ عَوْنِ، بْنِ أَبِي جُحَيْفَةَ عَنِ الْمُنْذِرِ بْنِ جَرِيرٍ، عَنْ أَبِيهِ، قَالَ كُنَّا عِنْدَ رَسُولِ اللَّهِ صلى الله عليه وسلم فِي صَدْرِ النَّهَارِ قَالَ فَجَاءَهُ قَوْمٌ حُفَاةٌ عُرَاةٌ مُجْتَابِي النِّمَارِ أَوِ الْعَبَاءِ مُتَقَلِّدِي السُّيُوفِ عَامَّتُهُمْ مِنْ مُضَرَ بَلْ كُلُّهُمْ مِنْ مُضَرَ فَتَمَعَّرَ وَجْهُ رَسُولِ اللَّهِ صلى الله عليه وسلم لِمَا رَأَى بِهِمْ مِنَ الْفَاقَةِ فَدَخَلَ ثُمَّ خَرَجَ فَأَمَرَ بِلاَلاً فَأَذَّنَ وَأَقَامَ فَصَلَّى ثُمَّ خَطَبَ فَقَالَ ‏\"‏ (‏ يَا أَيُّهَا النَّاسُ اتَّقُوا رَبَّكُمُ الَّذِي خَلَقَكُمْ مِنْ نَفْسٍ وَاحِدَةٍ‏)‏ إِلَى آخِرِ الآيَةِ (‏ إِنَّ اللَّهَ كَانَ عَلَيْكُمْ رَقِيبًا‏)‏ وَالآيَةَ الَّتِي فِي الْحَشْرِ (‏ اتَّقُوا اللَّهَ وَلْتَنْظُرْ نَفْسٌ مَا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ‏)‏ تَصَدَّقَ رَجُلٌ مِنْ دِينَارِهِ مِنْ دِرْهَمِهِ مِنْ ثَوْبِهِ مِنْ صَاعِ بُرِّهِ مِنْ صَاعِ تَمْرِهِ - حَتَّى قَالَ - وَلَوْ بِشِقِّ تَمْرَةٍ ‏\"‏ ‏.‏ قَالَ فَجَاءَ رَجُلٌ مِنَ الأَنْصَارِ بِصُرَّةٍ كَادَتْ كَفُّهُ تَعْجِزُ عَنْهَا بَلْ قَدْ عَجَزَتْ - قَالَ - ثُمَّ تَتَابَعَ النَّاسُ حَتَّى رَأَيْتُ كَوْمَيْنِ مِنْ طَعَامٍ وَثِيَابٍ حَتَّى رَأَيْتُ وَجْهَ رَسُولِ اللَّهِ صلى الله عليه وسلم يَتَهَلَّلُ كَأَنَّهُ مُذْهَبَةٌ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ مَنْ سَنَّ فِي الإِسْلاَمِ سُنَّةً حَسَنَةً فَلَهُ أَجْرُهَا وَأَجْرُ مَنْ عَمِلَ بِهَا بَعْدَهُ مِنْ غَيْرِ أَنْ يَنْقُصَ مِنْ أُجُورِهِمْ شَىْءٌ وَمَنْ سَنَّ فِي الإِسْلاَمِ سُنَّةً سَيِّئَةً كَانَ عَلَيْهِ وِزْرُهَا وَوِزْرُ مَنْ عَمِلَ بِهَا مِنْ بَعْدِهِ مِنْ غَيْرِ أَنْ يَنْقُصَ مِنْ أَوْزَارِهِمْ شَىْءٌ ‏\"‏ ‏.‏",
+  "text_en": "Mundhir b. Jareer reported on the authority of his father:While we were in the company of the Messenger of Allah (ﷺ) in the early hours of the morning, some people came there (who) were barefooted, naked, wearing striped woolen clothes, or cloaks, with their swords hung (around their necks). Most of them, nay, all of them, belonged to the tribe of Mudar. The color of the face of the Messenger of Allah (ﷺ) underwent a change when he saw them in poverty. He then entered (his house) and came out and commanded Bilal (to pronounce Adhan). He pronounced Adhān and Iqāma, and he (the Prophet) observed prayer (along with his Companion) and then addressed (them reciting verses of the Qur'an): “O people, fear your Lord, Who created you from a single being” to the end of the verse, “Allah is ever a Watcher over you” (4:1). (He then recited) a verse of Sura Hashr: “Fear Allah, and let every soul consider that which it sends forth for the afterlife, and fear Allah …” (18). (Then the audience began to vie with one another in giving charity.) Some donated a dinar, others a dirham, still others clothes, some donated a sā' of wheat, some a sā' of dates; till he (the Prophet) said: (Bring) even if it is half a date. Then a person from among the Ansar came there with a money bag which his hands could scarcely lift; in fact, they could not (lift). Then the people followed continuously, till I saw two heaps of eatables and clothes, and I saw the face of the Messenger (ﷺ) glistening, like gold (on account of joy). The Messenger of Allah (ﷺ) said: He who sets a good precedent in Islam, there is a reward for him for this (act of goodness) and reward of that also who acted according to it subsequently, without any deduction from their rewards; and he who sets in Islam an evil precedent, there is upon him the burden of that, and the burden of him also who acted upon it subsequently, without any deduction from their burden. Reference: Sahih Muslim 1017",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عَوْنِ، بْنِ أَبِي جُحَيْفَةَ عَنِ الْمُنْذِرِ بْنِ جَرِيرٍ، عَنْ أَبِيهِ، قَالَ كُنَّا عِنْدَ رَسُولِ اللَّهِ صلى الله عليه وسلم فِي صَدْرِ النَّهَارِ قَالَ فَجَاءَهُ قَوْمٌ حُفَاةٌ عُرَاةٌ مُجْتَابِي النِّمَارِ أَوِ الْعَبَاءِ مُتَقَلِّدِي السُّيُوفِ عَامَّتُهُمْ مِنْ مُضَرَ بَلْ كُلُّهُمْ مِنْ مُضَرَ فَتَمَعَّرَ وَجْهُ رَسُولِ اللَّهِ صلى الله عليه وسلم لِمَا رَأَى بِهِمْ مِنَ الْفَاقَةِ فَدَخَلَ ثُمَّ خَرَجَ فَأَمَرَ بِلاَلاً فَأَذَّنَ وَأَقَامَ فَصَلَّى ثُمَّ خَطَبَ فَقَالَ ‏\"‏ (‏ يَا أَيُّهَا النَّاسُ اتَّقُوا رَبَّكُمُ الَّذِي خَلَقَكُمْ مِنْ نَفْسٍ وَاحِدَةٍ‏)‏ إِلَى آخِرِ الآيَةِ (‏ إِنَّ اللَّهَ كَانَ عَلَيْكُمْ رَقِيبًا‏)‏ وَالآيَةَ الَّتِي فِي الْحَشْرِ (‏ اتَّقُوا اللَّهَ وَلْتَنْظُرْ نَفْسٌ مَا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ‏)‏ تَصَدَّقَ رَجُلٌ مِنْ دِينَارِهِ مِنْ دِرْهَمِهِ مِنْ ثَوْبِهِ مِنْ صَاعِ بُرِّهِ مِنْ صَاعِ تَمْرِهِ - حَتَّى قَالَ - وَلَوْ بِشِقِّ تَمْرَةٍ ‏\"‏ ‏.‏ قَالَ فَجَاءَ رَجُلٌ مِنَ الأَنْصَارِ بِصُرَّةٍ كَادَتْ كَفُّهُ تَعْجِزُ عَنْهَا بَلْ قَدْ عَجَزَتْ - قَالَ - ثُمَّ تَتَابَعَ النَّاسُ حَتَّى رَأَيْتُ كَوْمَيْنِ مِنْ طَعَامٍ وَثِيَابٍ حَتَّى رَأَيْتُ وَجْهَ رَسُولِ اللَّهِ صلى الله عليه وسلم يَتَهَلَّلُ كَأَنَّهُ مُذْهَبَةٌ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ مَنْ سَنَّ فِي الإِسْلاَمِ سُنَّةً حَسَنَةً فَلَهُ أَجْرُهَا وَأَجْرُ مَنْ عَمِلَ بِهَا بَعْدَهُ مِنْ غَيْرِ أَنْ يَنْقُصَ مِنْ أُجُورِهِمْ شَىْءٌ وَمَنْ سَنَّ فِي الإِسْلاَمِ سُنَّةً سَيِّئَةً كَانَ عَلَيْهِ وِزْرُهَا وَوِزْرُ مَنْ عَمِلَ بِهَا مِنْ بَعْدِهِ مِنْ غَيْرِ أَنْ يَنْقُصَ مِنْ أَوْزَارِهِمْ شَىْءٌ ‏\"‏ ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The āyāt the Prophet ﷺ recited as reminders for a great need",
+  "chapterTitleArabic": "آيَاتٌ قَرَأَهَا النَّبِيُّ ﷺ تَذْكِرَةً للنَّاسِ عِنْدَ الحَاجَةِ"
+ },
+ {
+  "canonicalID": "virtues|28|28",
+  "bookID": "virtues",
+  "displayNumber": "28",
+  "numberMajor": 28,
+  "sourceSequence": 28,
+  "text_ar": "عنِ ابنِ عبَّاسٍ ، قالَ : نزلتْ سورَةُ الأنعامِ بمَكَّةَ ليلًا جملةً ، حولَها سبعونَ ألفَ ملَكٍ يجأرونَ حولَها بالتَّسبيحِ.",
+  "text_en": "Ibn ‘Abbās said, “The entirety of Sūrah al-An’ām was revealed in Makkah at night, accompanied by seventy thousand angels, raising their voices around it in glorification of Allah.” Reference: At-Tabarani 12/215. There are many other variations of this hadith from different companions, including Abdullah b. Masʿūd, Abdullah b. Umar, Asmā’, Ali, Ubayy, but most of their chains contain weaknesses.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عنِ ابنِ عبَّاسٍ ، قالَ : نزلتْ سورَةُ الأنعامِ بمَكَّةَ ليلًا جملةً ، حولَها سبعونَ ألفَ ملَكٍ يجأرونَ حولَها بالتَّسبيحِ."
+   }
+  ],
+  "chapterTitleEnglish": "Accompanied by 70,000 angels upon revelation",
+  "chapterTitleArabic": "نَزَلَتْ مَعَ سَبْعِينَ أَلْفَ مَلَكٍ"
+ },
+ {
+  "canonicalID": "virtues|29|29",
+  "bookID": "virtues",
+  "displayNumber": "29",
+  "numberMajor": 29,
+  "sourceSequence": 29,
+  "text_ar": "لَمَّا نزلَتْ سورةُ الأنعامِ سبَّحَ رسولُ اللَّهِ صلَّى اللَّهُ عليهِ وسلَّمَ وقالَ : لقَد شيَّعَ هذِه السُّورةَ منَ الملائِكةِ ما سدَّ الأُفُقَ.",
+  "text_en": "Jābir reported that the Prophet ﷺ glorified Allah when Sūrat al-An’ām was revealed, and said, ‘So many Angels accompanied its revelation that the horizon was covered with them.’” Reference: Although it is reported by al-Hākim 2/314 and Bayhaqī 1/365, the report is classified by some scholars as weak. Shaykh Muhammad b. Rizq b. Tarhooni analyzes the arguments against the authenticity of the hadith and asserts that in fact it is ḥasan (sound). See: Muhammad Rizq Tarhooni, mawsū’at fadhā’il suwar wa āyāt al-Qur’an, vol. 1, p. 255.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "لَمَّا نزلَتْ سورةُ الأنعامِ سبَّحَ رسولُ اللَّهِ صلَّى اللَّهُ عليهِ وسلَّمَ وقالَ : لقَد شيَّعَ هذِه السُّورةَ منَ الملائِكةِ ما سدَّ الأُفُقَ."
+   }
+  ],
+  "chapterTitleEnglish": "Accompanied by 70,000 angels upon revelation",
+  "chapterTitleArabic": "نَزَلَتْ مَعَ سَبْعِينَ أَلْفَ مَلَكٍ"
+ },
+ {
+  "canonicalID": "virtues|30|30",
+  "bookID": "virtues",
+  "displayNumber": "30",
+  "numberMajor": 30,
+  "sourceSequence": 30,
+  "text_ar": "عَنْ أَبِي لُبَابَةَ، قَالَ قَالَتْ عَائِشَةُ رضى الله عنها كَانَ النَّبِيُّ صلى الله عليه وسلم لاَ يَنَامُ حَتَّى يَقْرَأَ الزُّمَرَ وَبَنِي إِسْرَائِيلَ‏.‏",
+  "text_en": "Aishah (RA) reported, “The Messenger of Allah ﷺ did not sleep until he recited (Sūrat) az-Zumar and Banī Isrā-īl (i.e., Al-Isrā).” Reference: Jami` at-Tirmidhi 3405",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي لُبَابَةَ، قَالَ قَالَتْ عَائِشَةُ رضى الله عنها كَانَ النَّبِيُّ صلى الله عليه وسلم لاَ يَنَامُ حَتَّى يَقْرَأَ الزُّمَرَ وَبَنِي إِسْرَائِيلَ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited it before he slept",
+  "chapterTitleArabic": "قَرَأَهَا رَسُولُ اللهِ ﷺ قَبْلَ النَّوْمِ"
+ },
+ {
+  "canonicalID": "virtues|31|31",
+  "bookID": "virtues",
+  "displayNumber": "31",
+  "numberMajor": 31,
+  "sourceSequence": 31,
+  "text_ar": "حَدَّثَنَا عَمْرُو بْنُ خَالِدٍ، حَدَّثَنَا زُهَيْرٌ، حَدَّثَنَا أَبُو إِسْحَاقَ، عَنِ الْبَرَاءِ، قَالَ كَانَ رَجُلٌ يَقْرَأُ سُورَةَ الْكَهْفِ وَإِلَى جَانِبِهِ حِصَانٌ مَرْبُوطٌ بِشَطَنَيْنِ فَتَغَشَّتْهُ سَحَابَةٌ فَجَعَلَتْ تَدْنُو وَتَدْنُو وَجَعَلَ فَرَسُهُ يَنْفِرُ فَلَمَّا أَصْبَحَ أَتَى النَّبِيَّ صلى الله عليه وسلم فَذَكَرَ ذَلِكَ لَهُ فَقَالَ ‏ \"‏ تِلْكَ السَّكِينَةُ تَنَزَّلَتْ بِالْقُرْآنِ ‏\"‏‏.‏",
+  "text_en": "Al-Barā' reported:A man was reciting Sūrat Al-Kahf and his horse was tied with two ropes beside him. A cloud came down and spread over that man, and it kept on coming closer and closer to him till his horse started jumping (as if afraid of something). When it was morning, the man came to the Prophet, and told him of that experience. The Prophet (ﷺ) said, \"That was tranquility which descended because of (the recitation of) the Qur'an.\" Reference: Sahih al-Bukhari 5011",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "حَدَّثَنَا عَمْرُو بْنُ خَالِدٍ، حَدَّثَنَا زُهَيْرٌ، حَدَّثَنَا أَبُو إِسْحَاقَ، عَنِ الْبَرَاءِ، قَالَ كَانَ رَجُلٌ يَقْرَأُ سُورَةَ الْكَهْفِ وَإِلَى جَانِبِهِ حِصَانٌ مَرْبُوطٌ بِشَطَنَيْنِ فَتَغَشَّتْهُ سَحَابَةٌ فَجَعَلَتْ تَدْنُو وَتَدْنُو وَجَعَلَ فَرَسُهُ يَنْفِرُ فَلَمَّا أَصْبَحَ أَتَى النَّبِيَّ صلى الله عليه وسلم فَذَكَرَ ذَلِكَ لَهُ فَقَالَ ‏ \"‏ تِلْكَ السَّكِينَةُ تَنَزَّلَتْ بِالْقُرْآنِ ‏\"‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "Tranquility descends",
+  "chapterTitleArabic": "السَّكِينَةُ"
+ },
+ {
+  "canonicalID": "virtues|32|32",
+  "bookID": "virtues",
+  "displayNumber": "32",
+  "numberMajor": 32,
+  "sourceSequence": 32,
+  "text_ar": "عَنْ أَبِي الدَّرْدَاءِ، أَنَّ النَّبِيَّ صلى الله عليه وسلم قَالَ ‏ \"‏ مَنْ حَفِظَ عَشْرَ آيَاتٍ مِنْ أَوَّلِ سُورَةِ الْكَهْفِ عُصِمَ مِنَ الدَّجَّالِ ‏\".‏",
+  "text_en": "Abu al-Dardā’ reported that the Messenger of Allah ﷺ said:“Whoever memorizes the first ten verses from Sūrat al-Kahf (The Cave) will be protected from the Dajjāl.” Reference: Sahih Muslim 809",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي الدَّرْدَاءِ، أَنَّ النَّبِيَّ صلى الله عليه وسلم قَالَ ‏ \"‏ مَنْ حَفِظَ عَشْرَ آيَاتٍ مِنْ أَوَّلِ سُورَةِ الْكَهْفِ عُصِمَ مِنَ الدَّجَّالِ ‏\".‏"
+   }
+  ],
+  "chapterTitleEnglish": "Protection from ad-Dajjāl",
+  "chapterTitleArabic": "حِفْظٌ مِنَ الدَّجَّالِ"
+ },
+ {
+  "canonicalID": "virtues|33|33",
+  "bookID": "virtues",
+  "displayNumber": "33",
+  "numberMajor": 33,
+  "sourceSequence": 33,
+  "text_ar": "قَالَ أَبُو دَاوُدَ وَكَذَا قَالَ هِشَامٌ الدَّسْتَوَائِيُّ عَنْ قَتَادَةَ إِلاَّ أَنَّهُ قَالَ ‏\"‏ مَنْ حَفِظَ مِنْ خَوَاتِيمِ سُورَةِ الْكَهْفِ ‏\"‏ ‏.‏ وَقَالَ شُعْبَةُ عَنْ قَتَادَةَ ‏\"‏ مِنْ آخِرِ الْكَهْفِ ‏\"‏.",
+  "text_en": "Abu Dāwūd mentioned that it was reported with a variation through Qatādah, “…whoever memorizes the concluding verses of Sūrat al-Kahf,” and from Shu’bah via Qatādah, “from the end of Al-Kahf…” Reference: Sunan ad-Darimi 4323",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "قَالَ أَبُو دَاوُدَ وَكَذَا قَالَ هِشَامٌ الدَّسْتَوَائِيُّ عَنْ قَتَادَةَ إِلاَّ أَنَّهُ قَالَ ‏\"‏ مَنْ حَفِظَ مِنْ خَوَاتِيمِ سُورَةِ الْكَهْفِ ‏\"‏ ‏.‏ وَقَالَ شُعْبَةُ عَنْ قَتَادَةَ ‏\"‏ مِنْ آخِرِ الْكَهْفِ ‏\"‏."
+   }
+  ],
+  "chapterTitleEnglish": "Protection from ad-Dajjāl",
+  "chapterTitleArabic": "حِفْظٌ مِنَ الدَّجَّالِ"
+ },
+ {
+  "canonicalID": "virtues|34|34",
+  "bookID": "virtues",
+  "displayNumber": "34",
+  "numberMajor": 34,
+  "sourceSequence": 34,
+  "text_ar": "حَدَّثَنَا أَبُو الْمُغِيرَةِ ، حَدَّثَتْنَا عَبْدَةُ ، عَنْ خَالِدِ بْنِ مَعْدَانَ ، قَالَ : \" مَنْ قَرَأَ عَشْرَ آيَاتٍ مِنْ الْكَهْفِ ، لَمْ يَخَفْ الدَّجَّالَ. \"",
+  "text_en": "It was also reported via Khalid b. Ma’dān:“Whoever recites ten verses from Sūrat al-Kahf, will not fear Al-Dajjāl.” Reference: Sunan ad-Darimi 3310",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "حَدَّثَنَا أَبُو الْمُغِيرَةِ ، حَدَّثَتْنَا عَبْدَةُ ، عَنْ خَالِدِ بْنِ مَعْدَانَ ، قَالَ : \" مَنْ قَرَأَ عَشْرَ آيَاتٍ مِنْ الْكَهْفِ ، لَمْ يَخَفْ الدَّجَّالَ. \""
+   }
+  ],
+  "chapterTitleEnglish": "Protection from ad-Dajjāl",
+  "chapterTitleArabic": "حِفْظٌ مِنَ الدَّجَّالِ"
+ },
+ {
+  "canonicalID": "virtues|35|35",
+  "bookID": "virtues",
+  "displayNumber": "35",
+  "numberMajor": 35,
+  "sourceSequence": 35,
+  "text_ar": "عَنِ النَّوَّاسِ بْنِ سَمْعَانَ الْكِلاَبِيِّ، قَالَ ذَكَرَ رَسُولُ اللَّهِ صلى الله عليه وسلم الدَّجَّالَ فَقَالَ ‏\"‏ إِنْ يَخْرُجْ وَأَنَا فِيكُمْ فَأَنَا حَجِيجُهُ دُونَكُمْ وَإِنْ يَخْرُجْ وَلَسْتُ فِيكُمْ فَامْرُؤٌ حَجِيجُ نَفْسِهِ وَاللَّهُ خَلِيفَتِي عَلَى كُلِّ مُسْلِمٍ فَمَنْ أَدْرَكَهُ مِنْكُمْ فَلْيَقْرَأْ عَلَيْهِ فَوَاتِحَ سُورَةِ الْكَهْفِ فَإِنَّهَا جِوَارُكُمْ مِنْ فِتْنَتِهِ ‏\"‏ ‏.‏ قُلْنَا وَمَا لُبْثُهُ فِي الأَرْضِ قَالَ ‏\"‏ أَرْبَعُونَ يَوْمًا يَوْمٌ كَسَنَةٍ وَيَوْمٌ كَشَهْرٍ وَيَوْمٌ كَجُمُعَةٍ وَسَائِرُ أَيَّامِهِ كَأَيَّامِكُمْ ‏\"‏ ‏.‏ فَقُلْنَا يَا رَسُولَ اللَّهِ هَذَا الْيَوْمُ الَّذِي كَسَنَةٍ أَتَكْفِينَا فِيهِ صَلاَةُ يَوْمٍ وَلَيْلَةٍ قَالَ ‏\"‏ لاَ اقْدُرُوا لَهُ قَدْرَهُ ثُمَّ يَنْزِلُ عِيسَى ابْنُ مَرْيَمَ عِنْدَ الْمَنَارَةِ الْبَيْضَاءِ شَرْقِيَّ دِمَشْقَ فَيُدْرِكُهُ عِنْدَ بَابِ لُدٍّ فَيَقْتُلُهُ.",
+  "text_en": "The Messenger of Allah ﷺ mentioned the Dajjal (Antichrist) saying, “If he comes forth while I am among you I shall be the one who will dispute with him on your behalf, but if he comes forth when I am not among you, a man must dispute on his own behalf, and Allah will take my place in looking after every Muslim. Those of you who live up to his time should recite over him the opening verses of Sūrah al-Kahf, for they are your protection from his trial.” We asked, “How long will he remain on the earth?” He replied, “Forty days, one like a year, one like a month, one like a week, and rest of his days like yours.” We asked, “Messenger of Allah ﷺ, will one day’s prayer suffice us in this day which will be like a year?” He replied, “No, you must make an estimate of its extent. Then Jesus son of Mary will descend at the white minaret to the east of Damascus. He will then catch him up at the gate of Ludd and kill him.” Reference: Sunan ad-Darimi 4321; A more detailed narration is found in Sahih Muslim 2937",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنِ النَّوَّاسِ بْنِ سَمْعَانَ الْكِلاَبِيِّ، قَالَ ذَكَرَ رَسُولُ اللَّهِ صلى الله عليه وسلم الدَّجَّالَ فَقَالَ ‏\"‏ إِنْ يَخْرُجْ وَأَنَا فِيكُمْ فَأَنَا حَجِيجُهُ دُونَكُمْ وَإِنْ يَخْرُجْ وَلَسْتُ فِيكُمْ فَامْرُؤٌ حَجِيجُ نَفْسِهِ وَاللَّهُ خَلِيفَتِي عَلَى كُلِّ مُسْلِمٍ فَمَنْ أَدْرَكَهُ مِنْكُمْ فَلْيَقْرَأْ عَلَيْهِ فَوَاتِحَ سُورَةِ الْكَهْفِ فَإِنَّهَا جِوَارُكُمْ مِنْ فِتْنَتِهِ ‏\"‏ ‏.‏ قُلْنَا وَمَا لُبْثُهُ فِي الأَرْضِ قَالَ ‏\"‏ أَرْبَعُونَ يَوْمًا يَوْمٌ كَسَنَةٍ وَيَوْمٌ كَشَهْرٍ وَيَوْمٌ كَجُمُعَةٍ وَسَائِرُ أَيَّامِهِ كَأَيَّامِكُمْ ‏\"‏ ‏.‏ فَقُلْنَا يَا رَسُولَ اللَّهِ هَذَا الْيَوْمُ الَّذِي كَسَنَةٍ أَتَكْفِينَا فِيهِ صَلاَةُ يَوْمٍ وَلَيْلَةٍ قَالَ ‏\"‏ لاَ اقْدُرُوا لَهُ قَدْرَهُ ثُمَّ يَنْزِلُ عِيسَى ابْنُ مَرْيَمَ عِنْدَ الْمَنَارَةِ الْبَيْضَاءِ شَرْقِيَّ دِمَشْقَ فَيُدْرِكُهُ عِنْدَ بَابِ لُدٍّ فَيَقْتُلُهُ."
+   }
+  ],
+  "chapterTitleEnglish": "Protection from ad-Dajjāl",
+  "chapterTitleArabic": "حِفْظٌ مِنَ الدَّجَّالِ"
+ },
+ {
+  "canonicalID": "virtues|36|36",
+  "bookID": "virtues",
+  "displayNumber": "36",
+  "numberMajor": 36,
+  "sourceSequence": 36,
+  "text_ar": "وَعَنْ أَبِي سَعِيدٍ رَضِيَ اللَّهُ عَنْهُ أَنَّ النَّبِيَّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ: من قَرَأَ سُورَة الْكَهْف فِي يَوْم الْجُمُعَة أَضَاء لَهُ النُّور مَا بَيْنَ الْجُمعَتَيْنِ.",
+  "text_en": "It was reported that the Messenger of Allah ﷺ said, “Whoever reads Sūrat al-Kahf on the day of Jumu’ah, a light will shine for him between the two Fridays.” Reference: Mustadrak al-Hakim; Sahih at-Targhib wa at-Tarhib 736",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "وَعَنْ أَبِي سَعِيدٍ رَضِيَ اللَّهُ عَنْهُ أَنَّ النَّبِيَّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ قَالَ: من قَرَأَ سُورَة الْكَهْف فِي يَوْم الْجُمُعَة أَضَاء لَهُ النُّور مَا بَيْنَ الْجُمعَتَيْنِ."
+   }
+  ],
+  "chapterTitleEnglish": "A light between two Fridays",
+  "chapterTitleArabic": "نُورٌ بَيْنَ الْجُمعَتَيْنِ"
+ },
+ {
+  "canonicalID": "virtues|37|37",
+  "bookID": "virtues",
+  "displayNumber": "37",
+  "numberMajor": 37,
+  "sourceSequence": 37,
+  "text_ar": "عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ ، قَالَ : \" مَنْ قَرَأَ سُورَةَ الْكَهْفِ لَيْلَةَ الْجُمُعَةِ، أَضَاءَ لَهُ مِنْ النُّورِ فِيمَا بَيْنَهُ وَبَيْنَ الْبَيْتِ الْعَتِيقِ \".",
+  "text_en": "It was reported that the Messenger of Allah ﷺ said, “Whoever reads Sūrat al-Kahf on the night of Jumu’ah, a light will shine for him which extends from him to the Ancient House (i.e., the Kaʿbah).” Reference: Sunan al-Darimi 3312; Sunan Al-Bayhaqi 5856; Sahīh al-Targhīb wa at-Tarhīb 736. Note: Jumu’ah is not equivalent to Friday, rather it begins at Maghrib/sunset of Thursday and ends as the maghrib/sunset time comes in on Friday.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ ، قَالَ : \" مَنْ قَرَأَ سُورَةَ الْكَهْفِ لَيْلَةَ الْجُمُعَةِ، أَضَاءَ لَهُ مِنْ النُّورِ فِيمَا بَيْنَهُ وَبَيْنَ الْبَيْتِ الْعَتِيقِ \"."
+   }
+  ],
+  "chapterTitleEnglish": "A light between two Fridays",
+  "chapterTitleArabic": "نُورٌ بَيْنَ الْجُمعَتَيْنِ"
+ },
+ {
+  "canonicalID": "virtues|38|38",
+  "bookID": "virtues",
+  "displayNumber": "38",
+  "numberMajor": 38,
+  "sourceSequence": 38,
+  "text_ar": "وقال صلى الله عليه وسلم : مَنْ قرَأ سورةَ الكهفِ كما أُنزلتْ كانتْ له نُورًا يومَ القيامةِ مِنْ مَقامِه إلى مكَّةَ ، ومَنْ قرَأ عشْرَ آياتٍ مِنْ آخِرِها ثم خرج الدجالُ لم يُسلَّطْ عليه ، ومَنْ توضَّأ ثم قال : سبحانَك اللهم وبحمدِك لا إلهَ إلا أنتَ أستغفرُك وأتوبُ إليك كُتِبَ بِرَقٍّ ثم طُبع بطابَع فلم يُكسرْ إلى يومِ القيامةِ.",
+  "text_en": "Abu Sa’īd al-Khudrī reported that the Messenger of Allah ﷺ said:“Whoever recites Sūrat al-Kahf as it was revealed will have a light on the Day of Resurrection, from his position to Makkah, and whoever recites the final ten verses of it (Al-Kahf) and then encounters Al-Dajjal, will not be harmed (by him). And whoever makes wudu’ and then says: “SubhānakAllahumma wa behamdika lā ilāha illā anta, astaghfiruka wa atoobu elayk” (Glory and praise be to You, O Allah, there is no deity worthy of worship except for You, I seek Your forgiveness and I repent to You),1 it will be written a scroll (of deeds), and then placed in a seal which will not be broken until the Day of Resurrection.” Reference: As-Silsilah as-Sahihah 2651.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "وقال صلى الله عليه وسلم : مَنْ قرَأ سورةَ الكهفِ كما أُنزلتْ كانتْ له نُورًا يومَ القيامةِ مِنْ مَقامِه إلى مكَّةَ ، ومَنْ قرَأ عشْرَ آياتٍ مِنْ آخِرِها ثم خرج الدجالُ لم يُسلَّطْ عليه ، ومَنْ توضَّأ ثم قال : سبحانَك اللهم وبحمدِك لا إلهَ إلا أنتَ أستغفرُك وأتوبُ إليك كُتِبَ بِرَقٍّ ثم طُبع بطابَع فلم يُكسرْ إلى يومِ القيامةِ."
+   }
+  ],
+  "chapterTitleEnglish": "A light between two Fridays",
+  "chapterTitleArabic": "نُورٌ بَيْنَ الْجُمعَتَيْنِ"
+ },
+ {
+  "canonicalID": "virtues|39|39",
+  "bookID": "virtues",
+  "displayNumber": "39",
+  "numberMajor": 39,
+  "sourceSequence": 39,
+  "text_ar": "اسْمُ اللهِ الأعْظَمُ الذي إذا دُعِيَ بهِ أجابَ ؛ في ثلاثِ سُوَرٍ من القُرآنِ : في ( البَقرةِ ) و( آلِ عِمْرانَ )، و( طه ).",
+  "text_en": "Abu Umāmah reported that the Prophet ﷺ said, “Allah’s Most Magnificent name, which when used to implore Him, He responds, is found in three suwar:Al-Baqarah, Āl-Imran, and Tāha (meaning Al-Hayy al-Qayyoom).” Reference: Sunan Ibn Majah 3856; Al-Tabarāni 7925; Al-Silsilah al-Ṣaḥīḥah 746.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "اسْمُ اللهِ الأعْظَمُ الذي إذا دُعِيَ بهِ أجابَ ؛ في ثلاثِ سُوَرٍ من القُرآنِ : في ( البَقرةِ ) و( آلِ عِمْرانَ )، و( طه )."
+   }
+  ],
+  "chapterTitleEnglish": "The Greatest Name of Allah",
+  "chapterTitleArabic": "اسْمُ اللهِ الْأَعْظَمُ"
+ },
+ {
+  "canonicalID": "virtues|40|40",
+  "bookID": "virtues",
+  "displayNumber": "40",
+  "numberMajor": 40,
+  "sourceSequence": 40,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، ‏.‏ أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي الصُّبْحِ يَوْمَ الْجُمُعَةِ بِـ (‏ الم * تَنْزِيلُ‏)‏ فِي الرَّكْعَةِ الأُولَى وَفِي الثَّانِيَةِ (‏ هَلْ أَتَى عَلَى الإِنْسَانِ حِينٌ مِنَ الدَّهْرِ لَمْ يَكُنْ شَيْئًا مَذْكُورًا‏).‏",
+  "text_en": "Abu Hurayrah reported that the Messenger of Allah ﷺ would recite, in the morning prayer of Jumu’ah (Friday), Sūrat as-Sajdah (32) in the first rakʿah, and Sūrat al-Insān (76) in the second rakʿah. Reference: Sahih Muslim 880",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، ‏.‏ أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي الصُّبْحِ يَوْمَ الْجُمُعَةِ بِـ (‏ الم * تَنْزِيلُ‏)‏ فِي الرَّكْعَةِ الأُولَى وَفِي الثَّانِيَةِ (‏ هَلْ أَتَى عَلَى الإِنْسَانِ حِينٌ مِنَ الدَّهْرِ لَمْ يَكُنْ شَيْئًا مَذْكُورًا‏).‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ would recite this sūrah in the fajr prayer of Jumu’ah",
+  "chapterTitleArabic": "قَرَأَ رَسُولُ اللهِ ﷺ بِهَذِهِ السُّورَةِ فِي صَلَاةِ الْفَجْرِ يَوْمَ الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|41|41",
+  "bookID": "virtues",
+  "displayNumber": "41",
+  "numberMajor": 41,
+  "sourceSequence": 41,
+  "text_ar": "عَنْ جَابِرٍ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ لاَ يَنَامُ حَتَّى يَقْرَأَ ‏:‏ ‏(‏الم * تَنْزِيلُ ‏)‏ وَ ‏(‏ تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ ‏).",
+  "text_en": "Jābir ibn Abdullāh reports that the Messenger of Allah ﷺ would not sleep until He had recited Sūrah as-Sajdah (32) and Sūrah al-Mulk (67). Reference: Jami` at-Tirmidhi 2892; ; Al-Adab al-Mufrad 1209; Sunan ad-Dārimī 3316.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جَابِرٍ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ لاَ يَنَامُ حَتَّى يَقْرَأَ ‏:‏ ‏(‏الم * تَنْزِيلُ ‏)‏ وَ ‏(‏ تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ ‏)."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ would not sleep until he recited this sūrah",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ لَا يَنَامُ حَتَّى يَقْرَأَ هَذِهِ السُّورَةَ"
+ },
+ {
+  "canonicalID": "virtues|42|42",
+  "bookID": "virtues",
+  "displayNumber": "42",
+  "numberMajor": 42,
+  "sourceSequence": 42,
+  "text_ar": "قَالَ أَحْمَدُ: ‏حَدَّثَنَا ‏أَبُو الْمُغِيرَةِ ‏حَدَّثَنَا ‏صَفْوَانُ‏ ‏حَدَّثَنِي‏ ‏الْمَشْيَخَةُ‏ ‏أَنَّهُمْ حَضَرُوا‏ ‏غُضَيْفَ بْنَ الْحَارِثِ الثُّمَالِيَّ ‏‏حِينَ اشْتَدَّ ‏سَوْقُهُ ‏قَالَ:‏ ‏هَلْ مِنْكُمْ أَحَدٌ يَقْرَأُ ‏يس؟ ‏قَالَ: فَقَرَأَهَا‏ ‏صَالِحُ بْنُ شُرَيْحٍ السَّكُونِيُّ‏ ‏فَلَمَّا بَلَغَ أَرْبَعِينَ مِنْهَا قُبِضَ, قَالَ: فَكَانَ ‏الْمَشْيَخَةُ ‏يَقُولُونَ: إِذَا قُرِئَتْ عِنْدَ الْمَيِّتِ خُفِّفَ عَنْهُ بِهَا ‏(قَالَ ‏ ‏صَفْوَانُ): ‏ ‏وَقَرَأَهَا ‏عِيسَى بْنُ الْمُعْتَمِرِ ‏ ‏عِنْدَ ‏‏ابْنِ مَعْبَدٍ.",
+  "text_en": "Aḥmad said:“Abū Al-Mughīrah narrated to us, that Ṣafwān narrated to us, that the seniors (possibly referring to the senior tābi‘īn) told me that they were present with Ghuḍayf bin Al-Ḥārith Al-Thumāliyy (a companion) when his death throes became intense. He said: ‘Is there anyone amongst you who can recite Yāsīn?’ He said: So Ṣāliḥ bin Shurayḥ Al-Sakūniyy recited it, and when he reached the fortieth verse, he passed away. He said: The seniors used to say: ‘If it is recited in the presence of the dying person, he finds relief thereby.’ Ṣafwān said: ‘‘And ‘Īsā bin Al-Mu‘tamir recited it in the presence of Ibn Ma‘bad.” Reference: Ahmad 4/105; Ibn Sa`d 7/443.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "قَالَ أَحْمَدُ: ‏حَدَّثَنَا ‏أَبُو الْمُغِيرَةِ ‏حَدَّثَنَا ‏صَفْوَانُ‏ ‏حَدَّثَنِي‏ ‏الْمَشْيَخَةُ‏ ‏أَنَّهُمْ حَضَرُوا‏ ‏غُضَيْفَ بْنَ الْحَارِثِ الثُّمَالِيَّ ‏‏حِينَ اشْتَدَّ ‏سَوْقُهُ ‏قَالَ:‏ ‏هَلْ مِنْكُمْ أَحَدٌ يَقْرَأُ ‏يس؟ ‏قَالَ: فَقَرَأَهَا‏ ‏صَالِحُ بْنُ شُرَيْحٍ السَّكُونِيُّ‏ ‏فَلَمَّا بَلَغَ أَرْبَعِينَ مِنْهَا قُبِضَ, قَالَ: فَكَانَ ‏الْمَشْيَخَةُ ‏يَقُولُونَ: إِذَا قُرِئَتْ عِنْدَ الْمَيِّتِ خُفِّفَ عَنْهُ بِهَا ‏(قَالَ ‏ ‏صَفْوَانُ): ‏ ‏وَقَرَأَهَا ‏عِيسَى بْنُ الْمُعْتَمِرِ ‏ ‏عِنْدَ ‏‏ابْنِ مَعْبَدٍ."
+   }
+  ],
+  "chapterTitleEnglish": "Recitation upon the dying believer",
+  "chapterTitleArabic": "قِرَاءَتُهَا عِنْدَ المُؤْمِنِ المُحْتَضِرِ"
+ },
+ {
+  "canonicalID": "virtues|43|43",
+  "bookID": "virtues",
+  "displayNumber": "43",
+  "numberMajor": 43,
+  "sourceSequence": 43,
+  "text_ar": "قَالَ مُحَمَّدُ بنُ إسْحَاقَ : حَدَّثَنِي يَزِيدُ بْنُ زِيَادٍ ، عَنْ مُحَمَّدِ بْنِ كَعْبٍ الْقُرَظِيِّ قَالَ : لَمَّا اجْتَمَعُوا لَهُ ، وَفِيهِمْ أَبُو جَهْلِ بْنُ هِشَامٍ، فَقَالَ وَهُمْ عَلَى بَابِهِ : إنَّ مُحَمَّدًا يَزْعُمُ أَنَّكُمْ إنْ تَابَعْتُمُوهُ عَلَى أَمْرِهِ ، كُنْتُمْ مُلُوكَ الْعَرَبِ وَالْعَجَمِ ، ثُمَّ بُعِثْتُمْ مِنْ بَعْدِ مَوْتِكُمْ ، فَجُعِلَتْ لَكُمْ جِنَانٌ كَجِنَانِ الْأُرْدُنِّ ، وَإِنْ لَمْ تَفْعَلُوا كَانَ لَهُ فِيكُمْ ذَبْحٌ ، ثُمَّ بُعِثْتُمْ مِنْ بَعْدِ مَوْتِكُمْ ، ثُمَّ جُعِلَتْ لَكُمْ نَارٌ تُحْرَقُونَ فِيهَا . قَالَ : وَخَرَجَ عَلَيْهِمْ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ، فَأَخَذَ حَفْنَةً مِنْ تُرَابٍ فِي يَدِهِ ، ثُمَّ قَالَ أَنَا أَقُولُ ذَلِكَ ، أَنْتَ أَحَدُهُمْ . وَأَخَذَ اللَّهُ تَعَالَى عَلَى أَبْصَارِهِمْ عَنْهُ ، فَلَا يَرَوْنَهُ ، فَجَعَلَ يَنْثُرُ ذَلِكَ التُّرَابَ عَلَى رُءُوسِهِمْ وَهُوَ يَتْلُو هَؤُلَاءِ الْآيَاتِ مِنْ يس: \"يسٓ(١) وَٱلْقُرْءَانِ ٱلْحَكِيمِ (٢) إِنَّكَ لَمِنَ ٱلْمُرْسَلِينَ (٣) عَلَىٰ صِرَٰطٍۢ مُّسْتَقِيمٍۢ (٤)\" إلَى قَوْلِهِ : \"فَأَغْشَيْنَـٰهُمْ فَهُمْ لَا يُبْصِرُونَ\" حَتَّى فَرَغَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ مِنْ هَؤُلَاءِ الْآيَاتِ وَلَمْ يَبْقَ مِنْهُمْ رَجُلٌ إلَّا وَقَدْ وَضَعَ عَلَى رَأْسِهِ تُرَابًا ، ثُمَّ انْصَرَفَ إلَى حَيْثُ أَرَادَ أَنْ يَذْهَبَ. …",
+  "text_en": "Muḥammad bin Isḥāq said:“Yazīd bin Ziyād narrated to me, from Muḥammad bin Ka‘b Al-Quraẓiyy who said: ‘When they gathered together (at his house to lay siege to it and murder him), and amongst them was Abū Jahl bin Hishām, he said when they were at his door: ‘Muḥammad claims that if you follow him regarding his matter that you will be the kings of the Arabs and the non-Arabs, and then you all will be resurrected after your deaths and you will be granted gardens like the gardens of Jordan. And if you don’t, amongst you will be those who are slaughtered (referring to those who insisted on attacking Islam and the Muslims), and then you all will be resurrected after your deaths, and a fire will be placed for you in which you will be burnt.’ He (the narrator) said: ‘And the Messenger came out to them and took a handful of dirt and then said, ‘I do say that, and you are one of them (those who would be killed and enter the fire).’ Allah veiled their sight so they were unable to see him, and he began to sprinkle that dirt on their heads while reciting the verses from Yāsīn: “(1) Yā Sīn (2) By the wise Quran, (3) you [Muḥammad] are truly one of the messengers sent (4) on a straight path” until (he reached) “blocking their vision: they cannot see.” By the time he finished reciting those verses there was no one except that he had put dirt on his head. Then he left in the direction he wanted to go…” Reference: Ibn Mundhir and Ibn Abi Hatim in Ad-Durr 5/258; al-Bayhaqi in Ad-Dala'il 2/470.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "قَالَ مُحَمَّدُ بنُ إسْحَاقَ : حَدَّثَنِي يَزِيدُ بْنُ زِيَادٍ ، عَنْ مُحَمَّدِ بْنِ كَعْبٍ الْقُرَظِيِّ قَالَ : لَمَّا اجْتَمَعُوا لَهُ ، وَفِيهِمْ أَبُو جَهْلِ بْنُ هِشَامٍ، فَقَالَ وَهُمْ عَلَى بَابِهِ : إنَّ مُحَمَّدًا يَزْعُمُ أَنَّكُمْ إنْ تَابَعْتُمُوهُ عَلَى أَمْرِهِ ، كُنْتُمْ مُلُوكَ الْعَرَبِ وَالْعَجَمِ ، ثُمَّ بُعِثْتُمْ مِنْ بَعْدِ مَوْتِكُمْ ، فَجُعِلَتْ لَكُمْ جِنَانٌ كَجِنَانِ الْأُرْدُنِّ ، وَإِنْ لَمْ تَفْعَلُوا كَانَ لَهُ فِيكُمْ ذَبْحٌ ، ثُمَّ بُعِثْتُمْ مِنْ بَعْدِ مَوْتِكُمْ ، ثُمَّ جُعِلَتْ لَكُمْ نَارٌ تُحْرَقُونَ فِيهَا . قَالَ : وَخَرَجَ عَلَيْهِمْ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ، فَأَخَذَ حَفْنَةً مِنْ تُرَابٍ فِي يَدِهِ ، ثُمَّ قَالَ أَنَا أَقُولُ ذَلِكَ ، أَنْتَ أَحَدُهُمْ . وَأَخَذَ اللَّهُ تَعَالَى عَلَى أَبْصَارِهِمْ عَنْهُ ، فَلَا يَرَوْنَهُ ، فَجَعَلَ يَنْثُرُ ذَلِكَ التُّرَابَ عَلَى رُءُوسِهِمْ وَهُوَ يَتْلُو هَؤُلَاءِ الْآيَاتِ مِنْ يس: \"يسٓ(١) وَٱلْقُرْءَانِ ٱلْحَكِيمِ (٢) إِنَّكَ لَمِنَ ٱلْمُرْسَلِينَ (٣) عَلَىٰ صِرَٰطٍۢ مُّسْتَقِيمٍۢ (٤)\" إلَى قَوْلِهِ : \"فَأَغْشَيْنَـٰهُمْ فَهُمْ لَا يُبْصِرُونَ\" حَتَّى فَرَغَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ مِنْ هَؤُلَاءِ الْآيَاتِ وَلَمْ يَبْقَ مِنْهُمْ رَجُلٌ إلَّا وَقَدْ وَضَعَ عَلَى رَأْسِهِ تُرَابًا ، ثُمَّ انْصَرَفَ إلَى حَيْثُ أَرَادَ أَنْ يَذْهَبَ. …"
+   }
+  ],
+  "chapterTitleEnglish": "Recitation upon the dying believer",
+  "chapterTitleArabic": "قِرَاءَتُهَا عِنْدَ المُؤْمِنِ المُحْتَضِرِ"
+ },
+ {
+  "canonicalID": "virtues|44|44",
+  "bookID": "virtues",
+  "displayNumber": "44",
+  "numberMajor": 44,
+  "sourceSequence": 44,
+  "text_ar": "قَالَ أَبُو عُمَرَ الدُّورِي: حَدَّثَنِي عَفَّانُ بنُ مُسْلِم ثنا حَمَّادُ بنُ زَيدٍ عَنْ أَيُّوب عَن عِكْرِمَةَ: أَنَّ رَهْطاً مِنَ المُشْرِكِينَ اجْتَمَعُوا فَقَالُوا: \"لَوْ قَدْ رَأَيْنَا مُحَمَّداً (ﷺ) بَطَشْنَا به\", قال: فَأَتَى عَلَيْهِم رَسُولُ اللهِ (ﷺ) وَهُم جَمِيع, فَأَخَذَ قَبْضَةً مِن تُرَابٍ فَجَعَلَ يَذرُّهَا عَلَى رُؤُوسِهِم فَقَرَأ: \"يسٓ(١) وَٱلْقُرْءَانِ ٱلْحَكِيمِ (٢)\" حَتَّى بَلَغَ \"وَجَعَلْنَا مِنۢ بَيْنِ أَيْدِيهِمْ سَدًّۭا وَمِنْ خَلْفِهِمْ سَدًّۭا فَأَغْشَيْنَـٰهُمْ فَهُمْ لَا يُبْصِرُونَ (٩)\" ثُمَّ انْصَرَفَ…\" الحَدِيث..",
+  "text_en": "Abū ‘Umar Al-Dūrī said:“‘Affān bin Muslim narrated to me, that Ḥammād bin Zayd narrated to us, from Ayyūb, from ʿIkrimah: that a group of polytheists gathered together and said: ‘If we see Muḥammad (ﷺ) we will assassinate him.’ He (the narrator) said: ‘So the Messenger of Allah (ﷺ) came to them while they were grouped together, and took a handful of dirt, and started sprinkling it on their heads and then recited: “(1) Yā Sīn (2) By the wise Quran” until he reached the verse “ (9) and set barriers before and behind them, blocking their vision: they cannot see.” Then he left…” Reference: Abu ‘Umar Al-Dūrī in Qirā’āt al-Nabi 61/a, ‘Abd bin Ḥamīd and Ibn Mundhir in Al-Durr, 5/259.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "قَالَ أَبُو عُمَرَ الدُّورِي: حَدَّثَنِي عَفَّانُ بنُ مُسْلِم ثنا حَمَّادُ بنُ زَيدٍ عَنْ أَيُّوب عَن عِكْرِمَةَ: أَنَّ رَهْطاً مِنَ المُشْرِكِينَ اجْتَمَعُوا فَقَالُوا: \"لَوْ قَدْ رَأَيْنَا مُحَمَّداً (ﷺ) بَطَشْنَا به\", قال: فَأَتَى عَلَيْهِم رَسُولُ اللهِ (ﷺ) وَهُم جَمِيع, فَأَخَذَ قَبْضَةً مِن تُرَابٍ فَجَعَلَ يَذرُّهَا عَلَى رُؤُوسِهِم فَقَرَأ: \"يسٓ(١) وَٱلْقُرْءَانِ ٱلْحَكِيمِ (٢)\" حَتَّى بَلَغَ \"وَجَعَلْنَا مِنۢ بَيْنِ أَيْدِيهِمْ سَدًّۭا وَمِنْ خَلْفِهِمْ سَدًّۭا فَأَغْشَيْنَـٰهُمْ فَهُمْ لَا يُبْصِرُونَ (٩)\" ثُمَّ انْصَرَفَ…\" الحَدِيث.."
+   }
+  ],
+  "chapterTitleEnglish": "Recitation upon the dying believer",
+  "chapterTitleArabic": "قِرَاءَتُهَا عِنْدَ المُؤْمِنِ المُحْتَضِرِ"
+ },
+ {
+  "canonicalID": "virtues|45|45",
+  "bookID": "virtues",
+  "displayNumber": "45",
+  "numberMajor": 45,
+  "sourceSequence": 45,
+  "text_ar": "حَدَّثَنَا إِسْمَاعِيلُ، قَالَ حَدَّثَنِي مَالِكٌ، عَنْ زَيْدِ بْنِ أَسْلَمَ، عَنْ أَبِيهِ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يَسِيرُ فِي بَعْضِ أَسْفَارِهِ وَعُمَرُ بْنُ الْخَطَّابِ يَسِيرُ مَعَهُ لَيْلاً فَسَأَلَهُ عُمَرُ عَنْ شَىْءٍ فَلَمْ يُجِبْهُ رَسُولُ اللَّهِ صلى الله عليه وسلم ثُمَّ سَأَلَهُ فَلَمْ يُجِبْهُ ثُمَّ سَأَلَهُ فَلَمْ يُجِبْهُ، فَقَالَ عُمَرُ ثَكِلَتْكَ أُمُّكَ نَزَرْتَ رَسُولَ اللَّهِ صلى الله عليه وسلم ثَلاَثَ مَرَّاتٍ كُلَّ ذَلِكَ لاَ يُجِيبُكَ، قَالَ عُمَرُ فَحَرَّكْتُ بَعِيرِي حَتَّى كُنْتُ أَمَامَ النَّاسِ وَخَشِيتُ أَنْ يَنْزِلَ فِيَّ قُرْآنٌ فَمَا نَشِبْتُ أَنْ سَمِعْتُ صَارِخًا يَصْرُخُ ـ قَالَ ـ فَقُلْتُ لَقَدْ خَشِيتُ أَنْ يَكُونَ نَزَلَ فِيَّ قُرْآنٌ ـ قَالَ ـ فَجِئْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم فَسَلَّمْتُ عَلَيْهِ فَقَالَ ‏ \"‏ لَقَدْ أُنْزِلَتْ عَلَىَّ اللَّيْلَةَ سُورَةٌ لَهِيَ أَحَبُّ إِلَىَّ مِمَّا طَلَعَتْ عَلَيْهِ الشَّمْسُ ‏\"‏‏.‏ ثُمَّ قَرَأَ (‏إِنَّا فَتَحْنَا لَكَ فَتْحًا مُبِينًا‏).",
+  "text_en": "Aslam reported:Allah's Messenger (ﷺ) was traveling on one of his journeys, and `Umar bin Al-Khattab was traveling along with him at night. `Umar asked him about something, but Allah's Messenger (ﷺ) did not answer him. He asked again, but he did not answer. He asked for the third time, but he did not answer. On that, `Umar said to himself, \"May your mother lose you! You have asked Allah's Messenger (ﷺ) three times, but he did not answer at all!\" `Umar said, \"So I made my camel go fast till I was ahead of the people, and I was afraid that something might be revealed about me. After a little while I heard a call maker calling me, I said, 'I was afraid that some Qur'anic Verse might be revealed about me.' So I went to Allah's Messenger and greeted him. He said, 'Tonight there has been revealed to me a Sūrah which is dearer to me than that on which the sun shines (i.e., the world).' Then he recited: 'Verily! We have given you (O Muhammad), a manifest victory.' \" (Sūrat al-Fatḥ). Reference: Sahih al-Bukhari 5012",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "حَدَّثَنَا إِسْمَاعِيلُ، قَالَ حَدَّثَنِي مَالِكٌ، عَنْ زَيْدِ بْنِ أَسْلَمَ، عَنْ أَبِيهِ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يَسِيرُ فِي بَعْضِ أَسْفَارِهِ وَعُمَرُ بْنُ الْخَطَّابِ يَسِيرُ مَعَهُ لَيْلاً فَسَأَلَهُ عُمَرُ عَنْ شَىْءٍ فَلَمْ يُجِبْهُ رَسُولُ اللَّهِ صلى الله عليه وسلم ثُمَّ سَأَلَهُ فَلَمْ يُجِبْهُ ثُمَّ سَأَلَهُ فَلَمْ يُجِبْهُ، فَقَالَ عُمَرُ ثَكِلَتْكَ أُمُّكَ نَزَرْتَ رَسُولَ اللَّهِ صلى الله عليه وسلم ثَلاَثَ مَرَّاتٍ كُلَّ ذَلِكَ لاَ يُجِيبُكَ، قَالَ عُمَرُ فَحَرَّكْتُ بَعِيرِي حَتَّى كُنْتُ أَمَامَ النَّاسِ وَخَشِيتُ أَنْ يَنْزِلَ فِيَّ قُرْآنٌ فَمَا نَشِبْتُ أَنْ سَمِعْتُ صَارِخًا يَصْرُخُ ـ قَالَ ـ فَقُلْتُ لَقَدْ خَشِيتُ أَنْ يَكُونَ نَزَلَ فِيَّ قُرْآنٌ ـ قَالَ ـ فَجِئْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم فَسَلَّمْتُ عَلَيْهِ فَقَالَ ‏ \"‏ لَقَدْ أُنْزِلَتْ عَلَىَّ اللَّيْلَةَ سُورَةٌ لَهِيَ أَحَبُّ إِلَىَّ مِمَّا طَلَعَتْ عَلَيْهِ الشَّمْسُ ‏\"‏‏.‏ ثُمَّ قَرَأَ (‏إِنَّا فَتَحْنَا لَكَ فَتْحًا مُبِينًا‏)."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ did not sleep until he recited this sūrah",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ لَا يَنَامُ حَتَّى يَقْرَأَ هَذِهِ السُّورَةَ"
+ },
+ {
+  "canonicalID": "virtues|46|46",
+  "bookID": "virtues",
+  "displayNumber": "46",
+  "numberMajor": 46,
+  "sourceSequence": 46,
+  "text_ar": "حَدَّثَنَا حَجَّاجُ بْنُ مِنْهَالٍ، حَدَّثَنَا شُعْبَةُ، قَالَ أَخْبَرَنِي أَبُو إِيَاسٍ، قَالَ سَمِعْتُ عَبْدَ اللَّهِ بْنَ مُغَفَّلٍ، قَالَ رَأَيْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَوْمَ فَتْحِ مَكَّةَ وَهْوَ يَقْرَأُ عَلَى رَاحِلَتِهِ سُورَةَ الْفَتْحِ‏.‏",
+  "text_en": "Narrated `Abdullāh bin Mughaffal:I saw Allah's Messenger (ﷺ) reciting Sūrat-al-Fatḥ on his she-camel on the day of the Conquest of Mecca. Reference: Sahih al-Bukhari 5034 In a similar report, Abdullah bin Mughaffal said: I saw the Prophet (ﷺ) reciting (Qur'an) while he was riding on his she camel or camel which was moving, carrying him. He was reciting Sūrat Fatḥ or part of Sūrat Fatḥ very softly and in an attractive, moving tone. Reference: Sahih al-Bukhari 5047",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "حَدَّثَنَا حَجَّاجُ بْنُ مِنْهَالٍ، حَدَّثَنَا شُعْبَةُ، قَالَ أَخْبَرَنِي أَبُو إِيَاسٍ، قَالَ سَمِعْتُ عَبْدَ اللَّهِ بْنَ مُغَفَّلٍ، قَالَ رَأَيْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم يَوْمَ فَتْحِ مَكَّةَ وَهْوَ يَقْرَأُ عَلَى رَاحِلَتِهِ سُورَةَ الْفَتْحِ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ did not sleep until he recited this sūrah",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ لَا يَنَامُ حَتَّى يَقْرَأَ هَذِهِ السُّورَةَ"
+ },
+ {
+  "canonicalID": "virtues|47|47",
+  "bookID": "virtues",
+  "displayNumber": "47",
+  "numberMajor": 47,
+  "sourceSequence": 47,
+  "text_ar": "عَنْ أَبِي لُبَابَةَ، قَالَ قَالَتْ عَائِشَةُ رضى الله عنها كَانَ النَّبِيُّ صلى الله عليه وسلم لاَ يَنَامُ حَتَّى يَقْرَأَ الزُّمَرَ وَبَنِي إِسْرَائِيلَ‏.‏",
+  "text_en": "‘Aishah (RA) reported, “The Messenger of Allah ﷺ did not sleep until he recited (Sūrat) az-Zumar and Banī Isrā-īl (i.e., Al-Isrā).” Reference: Jami` at-Tirmidhi 3405",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي لُبَابَةَ، قَالَ قَالَتْ عَائِشَةُ رضى الله عنها كَانَ النَّبِيُّ صلى الله عليه وسلم لاَ يَنَامُ حَتَّى يَقْرَأَ الزُّمَرَ وَبَنِي إِسْرَائِيلَ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "Dearer to the Messenger ﷺ than this world",
+  "chapterTitleArabic": "أَحَبُّ إِلَى الرَّسُول ﷺ مِنَ الدُّنْيَا وَمَا فِيهَا"
+ },
+ {
+  "canonicalID": "virtues|48|48",
+  "bookID": "virtues",
+  "displayNumber": "48",
+  "numberMajor": 48,
+  "sourceSequence": 48,
+  "text_ar": "عَنْ عُبَيْدِ اللَّهِ بْنِ عَبْدِ اللَّهِ، أَنَّ عُمَرَ بْنَ الْخَطَّابِ، سَأَلَ أَبَا وَاقِدٍ اللَّيْثِيَّ مَا كَانَ يَقْرَأُ بِهِ رَسُولُ اللَّهِ صلى الله عليه وسلم فِي الأَضْحَى وَالْفِطْرِ فَقَالَ كَانَ يَقْرَأُ فِيهِمَا بِـ (‏ق وَالْقُرْآنِ الْمَجِيدِ‏)‏ وَ (‏اقْتَرَبَتِ السَّاعَةُ وَانْشَقَّ الْقَمَرُ‏).‏‏",
+  "text_en": "It was reported from ‘Ubaydullāh ibn ‘Abdullāh that ‘Umar ibn al-Khaṭṭāb asked Abu Waqid al-Laythi what the Messenger of Allah ﷺ used to recite in the (Eid) prayers of al-Adhā and al-Fitr. He said, \"He used to recite Qāf wal-qur’ānil majeed (Sūrah Qāf) and Iqtarabat al-sā’atul wanshaqqal qamar (Sūrah al-Qamar).” Reference: Sahih Muslim 891a, Muwatta Malik.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عُبَيْدِ اللَّهِ بْنِ عَبْدِ اللَّهِ، أَنَّ عُمَرَ بْنَ الْخَطَّابِ، سَأَلَ أَبَا وَاقِدٍ اللَّيْثِيَّ مَا كَانَ يَقْرَأُ بِهِ رَسُولُ اللَّهِ صلى الله عليه وسلم فِي الأَضْحَى وَالْفِطْرِ فَقَالَ كَانَ يَقْرَأُ فِيهِمَا بِـ (‏ق وَالْقُرْآنِ الْمَجِيدِ‏)‏ وَ (‏اقْتَرَبَتِ السَّاعَةُ وَانْشَقَّ الْقَمَرُ‏).‏‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ used to recite it in Eid prayers.",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَا فِي صَلَاةِ الْعِيدَيْنِ"
+ },
+ {
+  "canonicalID": "virtues|49|49",
+  "bookID": "virtues",
+  "displayNumber": "49",
+  "numberMajor": 49,
+  "sourceSequence": 49,
+  "text_ar": "عَنْ أُمِّ هِشَامٍ بِنْتِ حَارِثَةَ بْنِ النُّعْمَانِ، قَالَتْ مَا أَخَذْتُ ‏{‏ ق وَالْقُرْآنِ الْمَجِيدِ ‏}‏ إِلاَّ مِنْ وَرَاءِ رَسُولِ اللَّهِ صلى الله عليه وسلم كَانَ يُصَلِّي بِهَا فِي الصُّبْحِ.",
+  "text_en": "Umm Hishām bint Ḥārithah reported:\"I only learned Qāf. By the Glorious Quran from praying behind the Messenger of Allah (ﷺ); he used to recite it in the morning prayer.” Reference: Sunan an-Nasa'i 949",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أُمِّ هِشَامٍ بِنْتِ حَارِثَةَ بْنِ النُّعْمَانِ، قَالَتْ مَا أَخَذْتُ ‏{‏ ق وَالْقُرْآنِ الْمَجِيدِ ‏}‏ إِلاَّ مِنْ وَرَاءِ رَسُولِ اللَّهِ صلى الله عليه وسلم كَانَ يُصَلِّي بِهَا فِي الصُّبْحِ."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ used to recite it in the morning prayer.",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَا فِي صَلَاةِ الْفَجْرِ"
+ },
+ {
+  "canonicalID": "virtues|50|50",
+  "bookID": "virtues",
+  "displayNumber": "50",
+  "numberMajor": 50,
+  "sourceSequence": 50,
+  "text_ar": "عَنْ عَمْرَةَ بِنْتِ عَبْدِ الرَّحْمَنِ، عَنْ أُخْتٍ، لِعَمْرَةَ قَالَتْ أَخَذْتُ ‏{‏ ق وَالْقُرْآنِ الْمَجِيدِ‏}‏ مِنْ فِي رَسُولِ اللَّهِ صلى الله عليه وسلم يَوْمَ الْجُمُعَةِ وَهُوَ يَقْرَأُ بِهَا عَلَى الْمِنْبَرِ فِي كُلِّ جُمُعَةٍ.",
+  "text_en": "'Amra daughter of ‘Abd al-Raḥmān reported on the authority of the sister of ‘Amra:“I memorized (surah) \"Qāf, by the glorious Qur'an\" from the mouth of the Messenger of Allah (ﷺ) on Friday as he recited it on the pulpit on every Jumu’ah (Friday).” Reference: Sahih Muslim 872a",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عَمْرَةَ بِنْتِ عَبْدِ الرَّحْمَنِ، عَنْ أُخْتٍ، لِعَمْرَةَ قَالَتْ أَخَذْتُ ‏{‏ ق وَالْقُرْآنِ الْمَجِيدِ‏}‏ مِنْ فِي رَسُولِ اللَّهِ صلى الله عليه وسلم يَوْمَ الْجُمُعَةِ وَهُوَ يَقْرَأُ بِهَا عَلَى الْمِنْبَرِ فِي كُلِّ جُمُعَةٍ."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ used to recite it on Jumu’ah.",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَا فِي الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|51|51",
+  "bookID": "virtues",
+  "displayNumber": "51",
+  "numberMajor": 51,
+  "sourceSequence": 51,
+  "text_ar": "عَنِ ابْنَةِ حَارِثَةَ بْنِ النُّعْمَانِ، قَالَتْ حَفِظْتُ ‏{‏ ق وَالْقُرْآنِ الْمَجِيدِ ‏}‏ مِنْ فِي رَسُولِ اللَّهِ صلى الله عليه وسلم وَهُوَ عَلَى الْمِنْبَرِ يَوْمَ الْجُمُعَةِ.",
+  "text_en": "The daughter of Ḥārithah bin An-Nu’mān said:\"I memorized 'Qaf. By the Glorious Qur'an,'\" from the mouth of the Messenger of Allah (ﷺ) when he was on the minbar (pulpit) on Friday.\" Reference: Sunan an-Nasa'i 1411",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنِ ابْنَةِ حَارِثَةَ بْنِ النُّعْمَانِ، قَالَتْ حَفِظْتُ ‏{‏ ق وَالْقُرْآنِ الْمَجِيدِ ‏}‏ مِنْ فِي رَسُولِ اللَّهِ صلى الله عليه وسلم وَهُوَ عَلَى الْمِنْبَرِ يَوْمَ الْجُمُعَةِ."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ used to recite it on Jumu’ah.",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَا فِي الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|52|52",
+  "bookID": "virtues",
+  "displayNumber": "52",
+  "numberMajor": 52,
+  "sourceSequence": 52,
+  "text_ar": "عَنْ عُبَيْدِ اللَّهِ بْنِ عَبْدِ اللَّهِ، أَنَّ عُمَرَ بْنَ الْخَطَّابِ، سَأَلَ أَبَا وَاقِدٍ اللَّيْثِيَّ مَا كَانَ يَقْرَأُ بِهِ رَسُولُ اللَّهِ صلى الله عليه وسلم فِي الأَضْحَى وَالْفِطْرِ فَقَالَ كَانَ يَقْرَأُ فِيهِمَا بِـ (‏ق وَالْقُرْآنِ الْمَجِيدِ‏)‏ وَ (‏اقْتَرَبَتِ السَّاعَةُ وَانْشَقَّ الْقَمَرُ‏).‏‏",
+  "text_en": "It was reported from ‘Ubaydullāh ibn ‘Abdullāh that ‘Umar ibn al-Khaṭṭāb asked Abu Waqid al-Laythi what the Messenger of Allah ﷺ used to recite in the (Eid) prayers of al-Adhā and al-Fitr. He said, \"He used to recite Qāf wal-qur’ānil majeed (Sūrah Qāf) and Iqtarabat al-sā’atul wanshaqqal qamar (Sūrah al-Qamar). Reference: Sahih Muslim 891a, Muwatta Malik.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عُبَيْدِ اللَّهِ بْنِ عَبْدِ اللَّهِ، أَنَّ عُمَرَ بْنَ الْخَطَّابِ، سَأَلَ أَبَا وَاقِدٍ اللَّيْثِيَّ مَا كَانَ يَقْرَأُ بِهِ رَسُولُ اللَّهِ صلى الله عليه وسلم فِي الأَضْحَى وَالْفِطْرِ فَقَالَ كَانَ يَقْرَأُ فِيهِمَا بِـ (‏ق وَالْقُرْآنِ الْمَجِيدِ‏)‏ وَ (‏اقْتَرَبَتِ السَّاعَةُ وَانْشَقَّ الْقَمَرُ‏).‏‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ used to recite it in Eid prayers",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَا فِي صَلَاةِ الْعِيدَيْنِ"
+ },
+ {
+  "canonicalID": "virtues|53|53",
+  "bookID": "virtues",
+  "displayNumber": "53",
+  "numberMajor": 53,
+  "sourceSequence": 53,
+  "text_ar": "عَنْ جَابِرٍ، رضى الله عنه قَالَ خَرَجَ رَسُولُ اللَّهِ صلى الله عليه وسلم عَلَى أَصْحَابِهِ فَقَرَأَ عَلَيْهِمْ سُورَةَ الرَّحْمَنِ مِنْ أَوَّلِهَا إِلَى آخِرِهَا فَسَكَتُوا فَقَالَ ‏ \"‏ لَقَدْ قَرَأْتُهَا عَلَى الْجِنِّ لَيْلَةَ الْجِنِّ فَكَانُوا أَحْسَنَ مَرْدُودًا مِنْكُمْ كُنْتُ كُلَّمَا أَتَيْتُ عَلَى قَوْلِهِ ‏:‏ ‏(‏ فبأَىِّ آلاَءِ رَبِّكُمَا تُكَذِّبَانِ ‏)‏ قَالُوا لاَ بِشَيْءٍ مِنْ نِعَمِكَ رَبَّنَا نُكَذِّبُ فَلَكَ الْحَمْدُ ‏\"‏. ‏.",
+  "text_en": "Jābir (RA) said, “The Messenger of Allah ﷺ came out to his Companions, and recited Sūrah ar-Raḥmān from its beginning to its end for them, and they were silent. Then he said, “I recited it to the jinn on the ‘night of the Jinn’ and they had a better response to it than you did. Each time I came to Allah’s saying:‘Which of your Lord’s favors do you deny.’ They said, “We do not deny any of Your favors our Lord! And to You is praise.” Reference: Jami` at-Tirmidhi 3291",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جَابِرٍ، رضى الله عنه قَالَ خَرَجَ رَسُولُ اللَّهِ صلى الله عليه وسلم عَلَى أَصْحَابِهِ فَقَرَأَ عَلَيْهِمْ سُورَةَ الرَّحْمَنِ مِنْ أَوَّلِهَا إِلَى آخِرِهَا فَسَكَتُوا فَقَالَ ‏ \"‏ لَقَدْ قَرَأْتُهَا عَلَى الْجِنِّ لَيْلَةَ الْجِنِّ فَكَانُوا أَحْسَنَ مَرْدُودًا مِنْكُمْ كُنْتُ كُلَّمَا أَتَيْتُ عَلَى قَوْلِهِ ‏:‏ ‏(‏ فبأَىِّ آلاَءِ رَبِّكُمَا تُكَذِّبَانِ ‏)‏ قَالُوا لاَ بِشَيْءٍ مِنْ نِعَمِكَ رَبَّنَا نُكَذِّبُ فَلَكَ الْحَمْدُ ‏\"‏. ‏."
+   }
+  ],
+  "chapterTitleEnglish": "Which of your Lord’s favors do you deny?",
+  "chapterTitleArabic": "فبأَىِّ آلاَءِ رَبِّكُمَا تُكَذِّبَانِ"
+ },
+ {
+  "canonicalID": "virtues|54|54",
+  "bookID": "virtues",
+  "displayNumber": "54",
+  "numberMajor": 54,
+  "sourceSequence": 54,
+  "text_ar": "عَنْ سَعِيدِ بْنِ جُبَيْرٍ، عَنِ ابْنِ عَبَّاسٍ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْفَجْرِ يَوْمَ الْجُمُعَةِ (‏ الم * تَنْزِيلُ‏)‏ السَّجْدَةُ وَ (‏ هَلْ أَتَى عَلَى الإِنْسَانِ حِينٌ مِنَ الدَّهْرِ‏)‏ وَأَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْجُمُعَةِ سُورَةَ الْجُمُعَةِ وَالْمُنَافِقِينَ ‏.‏",
+  "text_en": "Ibn Abbās reported that the Messenger of Allah ﷺ would recite, in the morning prayer of Jumu’ah (Friday), Sūrat as-Sajdah in the first rakʿah, and Sūrat al-Insān in the second rakʿah, and he used to recite in Jumu’ah prayer Sūrat al-Jumu’ah and al-Munāfiqūn.” Reference: Sahih Muslim 879a",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ سَعِيدِ بْنِ جُبَيْرٍ، عَنِ ابْنِ عَبَّاسٍ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْفَجْرِ يَوْمَ الْجُمُعَةِ (‏ الم * تَنْزِيلُ‏)‏ السَّجْدَةُ وَ (‏ هَلْ أَتَى عَلَى الإِنْسَانِ حِينٌ مِنَ الدَّهْرِ‏)‏ وَأَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْجُمُعَةِ سُورَةَ الْجُمُعَةِ وَالْمُنَافِقِينَ ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited this sūrah in Jumu’ah (Friday) prayer",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَا فِي صَلَاةِ الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|55|55",
+  "bookID": "virtues",
+  "displayNumber": "55",
+  "numberMajor": 55,
+  "sourceSequence": 55,
+  "text_ar": "خَيْرُ يَوْمٍ طَلَعَتْ عَلَيْهِ الشَّمْسُ يَوْمُ الْجُمُعَةِ فِيهِ خُلِقَ آدَمُ وَفِيهِ أُدْخِلَ الْجَنَّةَ وَفِيهِ أُخْرِجَ مِنْهَا وَلاَ تَقُومُ السَّاعَةُ إِلاَّ فِي يَوْمِ الْجُمُعَةِ.‏\"",
+  "text_en": "The Prophet ﷺ said, “The best day on which the sun has risen is Friday; on it, Adam was created. on it he was made to enter Paradise, on it he was expelled from it. And the last hour will take place on no day other than Friday.” Reference: Sahih Muslim 854b",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "خَيْرُ يَوْمٍ طَلَعَتْ عَلَيْهِ الشَّمْسُ يَوْمُ الْجُمُعَةِ فِيهِ خُلِقَ آدَمُ وَفِيهِ أُدْخِلَ الْجَنَّةَ وَفِيهِ أُخْرِجَ مِنْهَا وَلاَ تَقُومُ السَّاعَةُ إِلاَّ فِي يَوْمِ الْجُمُعَةِ.‏\""
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited this sūrah in Jumu’ah (Friday) prayer",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَا فِي صَلَاةِ الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|56|56",
+  "bookID": "virtues",
+  "displayNumber": "56",
+  "numberMajor": 56,
+  "sourceSequence": 56,
+  "text_ar": "عَنِ ابْنِ مَسْعُودٍ رَضِيَ اللهُ عَنهُ عَنِ النَّبيِّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ أَنَّهُ قَال: سُورَةُ تَبَارَكَ هِيَ المَانِعَةُ مِن عَذَابِ القَبر.",
+  "text_en": "ʿAbdullāh Ibn Masʿūd (RA) reports that the Prophet ﷺ said:“Sūrat Tabārak (Sūrat al-Mulk) prevents the punishment of the grave.” Reference: Ṣaḥīḥ al-Jāmi’ no. 1140, Ibn Mardawayh.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنِ ابْنِ مَسْعُودٍ رَضِيَ اللهُ عَنهُ عَنِ النَّبيِّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ أَنَّهُ قَال: سُورَةُ تَبَارَكَ هِيَ المَانِعَةُ مِن عَذَابِ القَبر."
+   }
+  ],
+  "chapterTitleEnglish": "Protection in the grave",
+  "chapterTitleArabic": "المَانِعَةُ مِن عَذَابِ القَبر"
+ },
+ {
+  "canonicalID": "virtues|57|57",
+  "bookID": "virtues",
+  "displayNumber": "57",
+  "numberMajor": 57,
+  "sourceSequence": 57,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"‏ إِنَّ سُورَةً مِنَ الْقُرْآنِ ثَلاَثُونَ آيَةً شَفَعَتْ لِرَجُلٍ حَتَّى غُفِرَ لَهُ وَهِيَ سُورَةُ تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ.‏\"",
+  "text_en": "Abu Hurayrah reported that the Prophet ﷺ said:“There is a sūrah in the Qur'ān of thirty verses; it intercedes for a man until he is forgiven, and it is Sūrat Tabārak (Blessed Be He in Whose Hand is the Dominion).” Reference: Jami` at-Tirmidhi 2891",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"‏ إِنَّ سُورَةً مِنَ الْقُرْآنِ ثَلاَثُونَ آيَةً شَفَعَتْ لِرَجُلٍ حَتَّى غُفِرَ لَهُ وَهِيَ سُورَةُ تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ.‏\""
+   }
+  ],
+  "chapterTitleEnglish": "This sūrah intercedes for its companion until he’s forgiven and enters paradise",
+  "chapterTitleArabic": "تَشْفَعُ هَذِهِ السُّورةُ لِصَاحِبِهَا حَتَّى يُغْفَرَ لَهُ ويَدْخُلَ الْجَنَّةَ"
+ },
+ {
+  "canonicalID": "virtues|58|58",
+  "bookID": "virtues",
+  "displayNumber": "58",
+  "numberMajor": 58,
+  "sourceSequence": 58,
+  "text_ar": "عَن أَنَسِ بْنِ مَالِكٍ رَضِيَ اللهُ عَنهُ أَنَّ النَّبيَّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ قَال: \" سُورَةٌ مِنَ القُرْآنِ مَا هِيَ إِلاَّ ثَلاَثُونَ آيَةً؛ خَاصَمَتْ عَنْ صَاحِبِهَا حَتىَّ أَدْخَلَتْهُ الجَنَّة وَهِيَ {تَبَارَك). \"",
+  "text_en": "Anas (RA) reported that the Prophet ﷺ said:“There is a sūrah in the Qur'ān not more than thirty verses, it argues on behalf of its companion until it enters him into paradise; and it is (Sūrah) Tabārak.” Reference: Al-Ṭabarānī in al-Ṣaghīr 1/176, al-Awsat 1/211, and Ibn Mardawayh 6/246, and it is ḥasan li-ghayrihi. Ṣaḥīḥ al-Jāmi’ no. 3644.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَن أَنَسِ بْنِ مَالِكٍ رَضِيَ اللهُ عَنهُ أَنَّ النَّبيَّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ قَال: \" سُورَةٌ مِنَ القُرْآنِ مَا هِيَ إِلاَّ ثَلاَثُونَ آيَةً؛ خَاصَمَتْ عَنْ صَاحِبِهَا حَتىَّ أَدْخَلَتْهُ الجَنَّة وَهِيَ {تَبَارَك). \""
+   }
+  ],
+  "chapterTitleEnglish": "This sūrah intercedes for its companion until he’s forgiven and enters paradise",
+  "chapterTitleArabic": "تَشْفَعُ هَذِهِ السُّورةُ لِصَاحِبِهَا حَتَّى يُغْفَرَ لَهُ ويَدْخُلَ الْجَنَّةَ"
+ },
+ {
+  "canonicalID": "virtues|59|59",
+  "bookID": "virtues",
+  "displayNumber": "59",
+  "numberMajor": 59,
+  "sourceSequence": 59,
+  "text_ar": "عَنْ جَابِرٍ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ لاَ يَنَامُ حَتَّى يَقْرَأَ ‏:‏ ‏(‏الم * تَنْزِيلُ ‏)‏ وَ ‏(‏ تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ ‏).",
+  "text_en": "Jābir ibn Abdullāh reports that the Messenger of Allah ﷺ would not sleep until He had recited Sūrah as-Sajdah (32) and Sūrah al-Mulk (67). Reference: Jami` at-Tirmidhi 2892, Al-Adab al-Mufrad 1209, Sunan ad-Dārimī 3316.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جَابِرٍ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ لاَ يَنَامُ حَتَّى يَقْرَأَ ‏:‏ ‏(‏الم * تَنْزِيلُ ‏)‏ وَ ‏(‏ تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ ‏)."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ would not sleep until he recited this sūrah",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ لَا يَنَامُ حَتَّى يَقَرَأَ هَذِهِ السُّورَةَ"
+ },
+ {
+  "canonicalID": "virtues|60|60",
+  "bookID": "virtues",
+  "displayNumber": "60",
+  "numberMajor": 60,
+  "sourceSequence": 60,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، ‏.‏ أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي الصُّبْحِ يَوْمَ الْجُمُعَةِ بِـ (‏ الم * تَنْزِيلُ‏)‏ فِي الرَّكْعَةِ الأُولَى وَفِي الثَّانِيَةِ (‏ هَلْ أَتَى عَلَى الإِنْسَانِ حِينٌ مِنَ الدَّهْرِ لَمْ يَكُنْ شَيْئًا مَذْكُورًا‏).‏",
+  "text_en": "Abu Hurayrah (RA) reported that the Messenger of Allah ﷺ would recite, in the morning prayer of Jumu’ah (Friday), Sūrat as-Sajdah (32) in the first rakʿah, and Sūrat al-Insān (76) in the second rakʿah. Reference: Sahih Muslim 880b",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، ‏.‏ أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي الصُّبْحِ يَوْمَ الْجُمُعَةِ بِـ (‏ الم * تَنْزِيلُ‏)‏ فِي الرَّكْعَةِ الأُولَى وَفِي الثَّانِيَةِ (‏ هَلْ أَتَى عَلَى الإِنْسَانِ حِينٌ مِنَ الدَّهْرِ لَمْ يَكُنْ شَيْئًا مَذْكُورًا‏).‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ would recite this sūrah in the fajr prayer of Jumu’ah",
+  "chapterTitleArabic": "كَانَ رَسُولُ اللهِ ﷺ يَقْرَأُ بِهَذِهِ السُّورَةِ فِي صَلَاةِ الْفَجْرِ يَوْمَ الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|61|61",
+  "bookID": "virtues",
+  "displayNumber": "61",
+  "numberMajor": 61,
+  "sourceSequence": 61,
+  "text_ar": "عَنْ عَبْدِ الرَّحْمَنِ، وَهُوَ ابْنُ يَزِيدَ الصَّنْعَانِيُّ قَالَ سَمِعْتُ ابْنَ عُمَرَ، يَقُولُ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ مَنْ سَرَّهُ أَنْ يَنْظُرَ إِلَى يَوْمِ الْقِيَامَةِ كَأَنَّهُ رَأْىُ عَيْنٍ فَلْيَقْرَأْ ‏(‏ إِذَا الشَّمْسُ كُوِّرَتْ ‏)‏ و ‏(‏إِذَا السَّمَاءُ انْفَطَرَتْ ‏)‏ وَ ‏(‏إذَا السَّمَاءُ انْشَقَّتْ ‏)‏ ‏\"‏ ‏.‏ هَذَا حَدِيثٌ حَسَنٌ غَرِيبٌ ‏.‏ وَرَوَى هِشَامُ بْنُ يُوسُفَ وَغَيْرُهُ هَذَا الْحَدِيثَ بِهَذَا الإِسْنَادِ وَقَالَ مَنْ سَرَّهُ أَنْ يَنْظُرَ إِلَى يَوْمِ الْقِيَامَةِ كَأَنَّهُ رَأْىُ عَيْنٍ فَلْيَقْرَأْ ‏(‏إذَا الشَّمْسُ كُوِّرَتْ ‏)‏ وَلَمْ يَذْكُرْ و ‏(‏إِذَا السَّمَاءُ انْفَطَرَتْ ‏)‏ وَ ‏(‏إذَا السَّمَاءُ انْشَقَّتْ ‏)‏‏.‏",
+  "text_en": "‘Abdullāh b. ‘Umar (RA) reported that the Messenger of Allah ﷺ said, “Whoever wishes to look at the Day of Resurrection, as if he is seeing it with this eye, then let him recite, “When the sun is wrapped up” (Sūrat al-Takwīr) and “When the heaven breaks apart.” (Sūrah al-Infiṭār) and “When the heaven has split” (Sūrat al-Inshiqāq). Reference: Jami` at-Tirmidhi 3333",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عَبْدِ الرَّحْمَنِ، وَهُوَ ابْنُ يَزِيدَ الصَّنْعَانِيُّ قَالَ سَمِعْتُ ابْنَ عُمَرَ، يَقُولُ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ مَنْ سَرَّهُ أَنْ يَنْظُرَ إِلَى يَوْمِ الْقِيَامَةِ كَأَنَّهُ رَأْىُ عَيْنٍ فَلْيَقْرَأْ ‏(‏ إِذَا الشَّمْسُ كُوِّرَتْ ‏)‏ و ‏(‏إِذَا السَّمَاءُ انْفَطَرَتْ ‏)‏ وَ ‏(‏إذَا السَّمَاءُ انْشَقَّتْ ‏)‏ ‏\"‏ ‏.‏ هَذَا حَدِيثٌ حَسَنٌ غَرِيبٌ ‏.‏ وَرَوَى هِشَامُ بْنُ يُوسُفَ وَغَيْرُهُ هَذَا الْحَدِيثَ بِهَذَا الإِسْنَادِ وَقَالَ مَنْ سَرَّهُ أَنْ يَنْظُرَ إِلَى يَوْمِ الْقِيَامَةِ كَأَنَّهُ رَأْىُ عَيْنٍ فَلْيَقْرَأْ ‏(‏إذَا الشَّمْسُ كُوِّرَتْ ‏)‏ وَلَمْ يَذْكُرْ و ‏(‏إِذَا السَّمَاءُ انْفَطَرَتْ ‏)‏ وَ ‏(‏إذَا السَّمَاءُ انْشَقَّتْ ‏)‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "These suwar have vivid descriptions of the Day of Resurrection",
+  "chapterTitleArabic": "فِي هَذِهِ السُّوَرِ تَصَوُّرٌ وَاضِحٌ لِيَوْمِ الْقِيَامَةِ"
+ },
+ {
+  "canonicalID": "virtues|62|62",
+  "bookID": "virtues",
+  "displayNumber": "62",
+  "numberMajor": 62,
+  "sourceSequence": 62,
+  "text_ar": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَةِ الأُولَى مِنَ الْوَتْرِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَفِي الثَّانِيَةِ بِـ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَفِي الثَّالِثَةِ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏).‏",
+  "text_en": "Ubayy (RA) reported:\"In the first rakʿah of witr (prayer), the Messenger of Allah ﷺ used to recite: “Sabbiḥ isma rabbikal-aʿlā (Sūrat al-Aʿlā), in the second, Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and in the third (rakʿah), Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ).” Reference: Sunan an-Nasa'i 1700",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَةِ الأُولَى مِنَ الْوَتْرِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَفِي الثَّانِيَةِ بِـ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَفِي الثَّالِثَةِ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏).‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ recited this sūrah in the witr prayer",
+  "chapterTitleArabic": "قَرَأَ الرَّسُولُ ﷺ بِهَذِهِ السُّورَةِ فِي صَلَاةِ الْوِتْرِ"
+ },
+ {
+  "canonicalID": "virtues|63|63",
+  "bookID": "virtues",
+  "displayNumber": "63",
+  "numberMajor": 63,
+  "sourceSequence": 63,
+  "text_ar": "عَنْ سَمُرَةَ بْنِ جُنْدُبٍ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْجُمُعَةِ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ ‏.‏",
+  "text_en": "Samurah bin Jundub reported:The Messenger of Allah (ﷺ) used to recite in the Friday prayer: Sabbiḥ isma rabbikal-aʿlā (Sūrat al-Aʿlā), and Hal attaka hadeethul ghāshiyah (Sūrat al-Ghāshiyah). Reference: Sunan Abi Dawud 1125, Sunan Ibn Majah 1120.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ سَمُرَةَ بْنِ جُنْدُبٍ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْجُمُعَةِ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited it in Jumu’ah prayer",
+  "chapterTitleArabic": "قَرَأَ بِهَا رَسُولُ اللهِ ﷺ فِي صَلَاةِ الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|64|64",
+  "bookID": "virtues",
+  "displayNumber": "64",
+  "numberMajor": 64,
+  "sourceSequence": 64,
+  "text_ar": "عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الْجُمُعَةِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ وَرُبَّمَا اجْتَمَعَ الْعِيدُ وَالْجُمُعَةُ فَيَقْرَأُ بِهِمَا فِيهِمَا جَمِيعًا.",
+  "text_en": "It was narrated that An-Nu'mān bin Bashir said:\"The Messenger of Allah (ﷺ) used to recite 'Glorify the name of your Lord, the Most High' (Al-A’lā) and 'Has there come to you the narration of the overwhelming (i.e. the Day of Resurrection)?' (Al-Ghāshiyah) in the Jumu'ah prayer, and sometimes 'Eid and Jumu'ah would fall on the same day, and he would recite them in both 'Eid and Jumu'ah prayer.\" Reference: Sunan an-Nasa'i 1424",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الْجُمُعَةِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ وَرُبَّمَا اجْتَمَعَ الْعِيدُ وَالْجُمُعَةُ فَيَقْرَأُ بِهِمَا فِيهِمَا جَمِيعًا."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited it in Jumu’ah prayer and Eid prayer",
+  "chapterTitleArabic": "قَرَأَ بِها رَسُولُ اللهِ ﷺ فِي صَلَاةِ الْجُمُعَةِ وَصَلَاةِ الْعِيدِ"
+ },
+ {
+  "canonicalID": "virtues|65|65",
+  "bookID": "virtues",
+  "displayNumber": "65",
+  "numberMajor": 65,
+  "sourceSequence": 65,
+  "text_ar": "عَنْ سَمُرَةَ بْنِ جُنْدُبٍ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْجُمُعَةِ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ ‏.‏",
+  "text_en": "Samurah bin Jundub reported:The Messenger of Allah (ﷺ) used to recite in the Friday prayer: Sabbiḥ isma rabbikal-aʿlā (Sūrat al-Aʿlā), and Hal attaka hadeethul ghāshiyah (Sūrat al-Ghāshiyah). Reference: Sunan Abi Dawud 1125, Sunan Ibn Majah 1120.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ سَمُرَةَ بْنِ جُنْدُبٍ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يَقْرَأُ فِي صَلاَةِ الْجُمُعَةِ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ recited it in Jumu’ah prayer",
+  "chapterTitleArabic": "قَرَأَ بِها رَسُولُ اللهِ ﷺ فِي صَلَاةِ الْجُمُعَةِ"
+ },
+ {
+  "canonicalID": "virtues|66|66",
+  "bookID": "virtues",
+  "displayNumber": "66",
+  "numberMajor": 66,
+  "sourceSequence": 66,
+  "text_ar": "عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الْجُمُعَةِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ وَرُبَّمَا اجْتَمَعَ الْعِيدُ وَالْجُمُعَةُ فَيَقْرَأُ بِهِمَا فِيهِمَا جَمِيعًا.",
+  "text_en": "It was narrated that An-Nu'mān bin Bashir said:\"The Messenger of Allah (ﷺ) used to recite 'Glorify the name of your Lord, the Most High' (Al-A’lā) and 'Has there come to you the narration of the overwhelming (i.e. the Day of Resurrection)?' (Al-Ghāshiyah) in the Jumu'ah prayer, and sometimes 'Eid and Jumu'ah would fall on the same day, and he would recite them in both 'Eid and Jumu'ah prayer.\" Reference: Sunan an-Nasa'i 1424.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنِ النُّعْمَانِ بْنِ بَشِيرٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الْجُمُعَةِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَ(‏ هَلْ أَتَاكَ حَدِيثُ الْغَاشِيَةِ ‏)‏ وَرُبَّمَا اجْتَمَعَ الْعِيدُ وَالْجُمُعَةُ فَيَقْرَأُ بِهِمَا فِيهِمَا جَمِيعًا."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited it in Jumu’ah prayer and Eid prayer",
+  "chapterTitleArabic": "قَرَأَ بِها رَسُولُ اللهِ ﷺ فِي صَلَاةِ الْجُمُعَةِ وَصَلَاةِ الْعِيدِ"
+ },
+ {
+  "canonicalID": "virtues|67|67",
+  "bookID": "virtues",
+  "displayNumber": "67",
+  "numberMajor": 67,
+  "sourceSequence": 67,
+  "text_ar": "كان رسولُ اللهِ صلَّى اللهُ عليه وسلم يصلِّي ركعتينِ بعد الوِترِ وهو جالسٌ يقرأُ فيهما ب { إِذَا زُلْزِلَتِ الْأَرْضُ . . . ) و{ قُلْ يَا أَيُّهَا الْكَافِرُونَ ).",
+  "text_en": "The Messenger of Allah ﷺ would pray two rakʿahs after witr while sitting, reciting in the two rakʿahs “Idhā zulzilat al-ardhu…” (Sūrah al-Zalzalah) and “Qul Ya Ayyuhal-Kafirun” (Sūrat al-Kāfirūn). Reference: Zad al-Ma`ad 1/322 Is Sūrat al-Zalzalah equivalent to one-fourth of the Qur’an? The reports about Sūrat Al-Zalzalah being equivalent to one-fourth of the Qur’an have some weakness in them, although they are strengthened by the different variations as well as the multiple mursal reports (which are weak standalone). Ibn Khuzaymah categorized one particular attributed to Anas (RA) as saḥiḥ and al-Tirmidhī classified one narration as ḥasan, while others relied on the report of Ibn Abbās.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "كان رسولُ اللهِ صلَّى اللهُ عليه وسلم يصلِّي ركعتينِ بعد الوِترِ وهو جالسٌ يقرأُ فيهما ب { إِذَا زُلْزِلَتِ الْأَرْضُ . . . ) و{ قُلْ يَا أَيُّهَا الْكَافِرُونَ )."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger would pray two rakʿahs after witr with this sūrah",
+  "chapterTitleArabic": "كَانَ الرَّسُولُ ﷺ يُصَلِّي رَكْعَتَيْنِ بَعْدَ الْوِتْرِ بهَذِهِ السُّورَةِ"
+ },
+ {
+  "canonicalID": "virtues|68|68",
+  "bookID": "virtues",
+  "displayNumber": "68",
+  "numberMajor": 68,
+  "sourceSequence": 68,
+  "text_ar": "عَنْ أَبِي مَدِينَةَ الدَّارِمِيِّ قَالَ: (كَانَ الرَّجُلانِ مِنْ أَصْحَابِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ إِذَا الْتَقَيَا لَمْ يَفْتَرِقَا حَتَّى يَقْرَأَ أَحَدُهُمَا عَلَى الآخَرِ: \" وَالْعَصْرِ إِنَّ الإِنْسَانَ لَفِي خُسْرٍ “، ثُمَّ يُسَلِّمَ أَحَدُهُمَا عَلَى الآخَرِ).",
+  "text_en": "Abu Madīnah al-Dārimī said:“When two Companions of the Prophet ﷺ would meet, they would not part until they had read Sūrah al-‘Aṣr (103), and then they would give salām (and leave).” Reference: Abū Dāwūd in Al-Zuhd, no. 417; Al-Ṭabarānī ’s al-Mu'jam al-Awsat, 5/215; Sunan al-Bayhaqī, 6/501.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي مَدِينَةَ الدَّارِمِيِّ قَالَ: (كَانَ الرَّجُلانِ مِنْ أَصْحَابِ النَّبِيِّ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ إِذَا الْتَقَيَا لَمْ يَفْتَرِقَا حَتَّى يَقْرَأَ أَحَدُهُمَا عَلَى الآخَرِ: \" وَالْعَصْرِ إِنَّ الإِنْسَانَ لَفِي خُسْرٍ “، ثُمَّ يُسَلِّمَ أَحَدُهُمَا عَلَى الآخَرِ)."
+   }
+  ],
+  "chapterTitleEnglish": "Recitation upon parting from one another",
+  "chapterTitleArabic": "قِرَاءَتُهَا عِنْدَ الافْتِرَاقِ"
+ },
+ {
+  "canonicalID": "virtues|69|69",
+  "bookID": "virtues",
+  "displayNumber": "69",
+  "numberMajor": 69,
+  "sourceSequence": 69,
+  "text_ar": "عَنْ فَرْوَةَ بْنِ نَوْفَلٍ، عَنْ أَبِيهِ، أَنَّ النَّبِيَّ صلى الله عليه وسلم قَالَ لِنَوْفَلٍ ‏ \"‏ اقْرَأْ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ ثُمَّ نَمْ عَلَى خَاتِمَتِهَا فَإِنَّهَا بَرَاءَةٌ مِنَ الشِّرْكِ ‏\".‏",
+  "text_en": "Farwah bin Nawfal narrated from his father that he went to the Prophet (ﷺ) and said:“O Messenger of Allah, teach me something that I may say when I go to my bed.” So he said: “Recite Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), for verily it is a disavowal from shirk. Reference: Jami` at-Tirmidhi 3403. In one report, the Prophet ﷺ said: Recite Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn) and then sleep upon completion [of its recitation], for it is a disavowal from shirk. Reference: Sunan Abi Dawud 5055.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ فَرْوَةَ بْنِ نَوْفَلٍ، عَنْ أَبِيهِ، أَنَّ النَّبِيَّ صلى الله عليه وسلم قَالَ لِنَوْفَلٍ ‏ \"‏ اقْرَأْ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ ثُمَّ نَمْ عَلَى خَاتِمَتِهَا فَإِنَّهَا بَرَاءَةٌ مِنَ الشِّرْكِ ‏\".‏"
+   }
+  ],
+  "chapterTitleEnglish": "Disavowal from Shirk (polytheism)",
+  "chapterTitleArabic": "البَرَاءَةُ مِنَ الشِّرْكِ"
+ },
+ {
+  "canonicalID": "virtues|70|70",
+  "bookID": "virtues",
+  "displayNumber": "70",
+  "numberMajor": 70,
+  "sourceSequence": 70,
+  "text_ar": "قال رسول الله صلى الله عليه وسلم: (قل يا أيها الكافرون تعدل ربع القرآن).",
+  "text_en": "Ibn ʿAbbās reported that the Prophet ﷺ said:“Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ) is equivalent to one-third of the Qur'ān, and Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn) is equivalent to one-fourth of the Qur'ān.” Reference: Al-Silsilah al-Ṣaḥīḥah 586.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "قال رسول الله صلى الله عليه وسلم: (قل يا أيها الكافرون تعدل ربع القرآن)."
+   }
+  ],
+  "chapterTitleEnglish": "It is equivalent to one-fourth of the Qur'ān",
+  "chapterTitleArabic": "تَعْدِلُ رُبُعَ الْقُرْآنِ"
+ },
+ {
+  "canonicalID": "virtues|71|71",
+  "bookID": "virtues",
+  "displayNumber": "71",
+  "numberMajor": 71,
+  "sourceSequence": 71,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي ركعتي الْفَجْرِ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ‏)‏ وَ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏).",
+  "text_en": "Abu Hurayrah reported that the Messenger of Allah ﷺ recited in the two (optional) rakʿahs of fajr:Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ). Reference: Sahih Muslim 726.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي ركعتي الْفَجْرِ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ‏)‏ وَ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏)."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited this sūrah in the two rakʿahs before fajr prayer and the two rakʿahs after maghrib prayer",
+  "chapterTitleArabic": "قَرَأَ رَسُولُ اللهِ ﷺ بِهَذِهِ السُّورَةِ فِي الرَّكعَتَيْنِ قَبْلَ الْفَجْرِ وَفِي الرَّكعَتَيْنِ بَعْدَ الْمَغْرِبِ"
+ },
+ {
+  "canonicalID": "virtues|72|72",
+  "bookID": "virtues",
+  "displayNumber": "72",
+  "numberMajor": 72,
+  "sourceSequence": 72,
+  "text_ar": "عَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ، أَنَّهُ قَالَ مَا أُحْصِي مَا سَمِعْتُ مِنْ، رَسُولِ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَتَيْنِ بَعْدَ الْمَغْرِبِ وَفِي الرَّكْعَتَيْنِ قَبْلَ صَلاَةِ الْفَجْرِ بِـ ‏:‏‏(‏قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَ ‏(‏قُلْ هُوَ اللَّهُ أَحَدٌ ‏).",
+  "text_en": "Abdullah bin Masʿūd narrated:\"I cannot count how many times I heard Allah's Messenger (ﷺ) reciting in the two rakʿahs after Maghrib and the two rakʿahs before Salat al-Fajr: Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ).” Reference: Jami` at-Tirmidhi 431.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ، أَنَّهُ قَالَ مَا أُحْصِي مَا سَمِعْتُ مِنْ، رَسُولِ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَتَيْنِ بَعْدَ الْمَغْرِبِ وَفِي الرَّكْعَتَيْنِ قَبْلَ صَلاَةِ الْفَجْرِ بِـ ‏:‏‏(‏قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَ ‏(‏قُلْ هُوَ اللَّهُ أَحَدٌ ‏)."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited this sūrah in the two rakʿahs before fajr prayer and the two rakʿahs after maghrib prayer",
+  "chapterTitleArabic": "قَرَأَ رَسُولُ اللهِ ﷺ بِهَذِهِ السُّورَةِ فِي الرَّكعَتَيْنِ قَبْلَ الْفَجْرِ وَفِي الرَّكعَتَيْنِ بَعْدَ الْمَغْرِبِ"
+ },
+ {
+  "canonicalID": "virtues|73|73",
+  "bookID": "virtues",
+  "displayNumber": "73",
+  "numberMajor": 73,
+  "sourceSequence": 73,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي رَكْعَتَىِ الْفَجْرِ (‏قُلْ يَا أَيُّهَا الْكَافِرُونَ‏)‏ وَ (‏قُلْ هُوَ اللَّهُ أَحَدٌ‏).",
+  "text_en": "Abu Hurayrah also reported that the Messenger of Allah ﷺ recited in the two rakʿahs before fajr prayer:Qul yā ayyuhal kāfiroon and Qul huwa Allāhu aḥad. Reference: Sunan an-Nasa'i 945.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي رَكْعَتَىِ الْفَجْرِ (‏قُلْ يَا أَيُّهَا الْكَافِرُونَ‏)‏ وَ (‏قُلْ هُوَ اللَّهُ أَحَدٌ‏)."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited this sūrah in the two rakʿahs before fajr prayer and the two rakʿahs after maghrib prayer",
+  "chapterTitleArabic": "قَرَأَ رَسُولُ اللهِ ﷺ بِهَذِهِ السُّورَةِ فِي الرَّكعَتَيْنِ قَبْلَ الْفَجْرِ وَفِي الرَّكعَتَيْنِ بَعْدَ الْمَغْرِبِ"
+ },
+ {
+  "canonicalID": "virtues|74|74",
+  "bookID": "virtues",
+  "displayNumber": "74",
+  "numberMajor": 74,
+  "sourceSequence": 74,
+  "text_ar": "عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي رَكْعَتَىِ الطَّوَافِ بِسُورَتَىِ الإِخْلاَصِ ‏:‏ ‏(‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَ ‏(‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏)‏‏.‏",
+  "text_en": "Jābir reported:“During the two rakʿahs of ṭawāf, the Messenger of Allah ﷺ recited the two suwar: Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ).” Reference: Jami` at-Tirmidhi 869.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي رَكْعَتَىِ الطَّوَافِ بِسُورَتَىِ الإِخْلاَصِ ‏:‏ ‏(‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَ ‏(‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏)‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ recited it in the prayer after completing ṭawāf (circumambulation of the Kaʿbah)",
+  "chapterTitleArabic": "قَرَأَ بِهَا الرَّسُولُ ﷺ فِي الرَّكْعَتَيْنِ بَعْدَ الطَّوَافِ"
+ },
+ {
+  "canonicalID": "virtues|75|75",
+  "bookID": "virtues",
+  "displayNumber": "75",
+  "numberMajor": 75,
+  "sourceSequence": 75,
+  "text_ar": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَةِ الأُولَى مِنَ الْوَتْرِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَفِي الثَّانِيَةِ بِـ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَفِي الثَّالِثَةِ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏).‏",
+  "text_en": "Ubayy reported:\"In the first rakʿah of witr (prayer), the Messenger of Allah ﷺ used to recite: “Sabbiḥ isma rabbikal-aʿlā (Sūrat al-Aʿlā), in the second, Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and in the third (rakʿah), Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ).” Reference: Sunan an-Nasa'i 1699.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَةِ الأُولَى مِنَ الْوَتْرِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَفِي الثَّانِيَةِ بِـ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَفِي الثَّالِثَةِ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏).‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ recited this sūrah in the witr prayer",
+  "chapterTitleArabic": "قَرَأَ رَسُولُ اللهِ ﷺ بِهَذِهِ السُّورَةِ فِي صَلَاةِ الْوِتْرِ"
+ },
+ {
+  "canonicalID": "virtues|76|76",
+  "bookID": "virtues",
+  "displayNumber": "76",
+  "numberMajor": 76,
+  "sourceSequence": 76,
+  "text_ar": "عَنْ أَبِي الدَّرْدَاءِ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏\"‏ أَيَعْجِزُ أَحَدُكُمْ أَنْ يَقْرَأَ فِي لَيْلَةٍ ثُلُثَ الْقُرْآنِ ‏\" قَالُوا : وَكَيْفَ يَقْرَأْ ثُلُثَ الْقُرْآنِ؟ قَالَ : \" قُلْ هُوَ اللَّهُ أَحَدٌ تَعْدِلُ ثُلُثَ الْقُرْآنِ \" ‏.‏",
+  "text_en": "The Prophet ﷺ asked:“Is any one of you unable to recite one-third of the Qur'ān in one night? They said: How could anyone read one-third of the Qur'ān (in one night)? He said: Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ) is equivalent to one-third of the Qur'ān.” Reference: Sahih Muslim 811a.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي الدَّرْدَاءِ، عَنِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏\"‏ أَيَعْجِزُ أَحَدُكُمْ أَنْ يَقْرَأَ فِي لَيْلَةٍ ثُلُثَ الْقُرْآنِ ‏\" قَالُوا : وَكَيْفَ يَقْرَأْ ثُلُثَ الْقُرْآنِ؟ قَالَ : \" قُلْ هُوَ اللَّهُ أَحَدٌ تَعْدِلُ ثُلُثَ الْقُرْآنِ \" ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "This sūrah is equivalent to one-third of the Qur'ān",
+  "chapterTitleArabic": "تَعْدِلُ هَذِهِ السُّورَةُ ثُلُثَ الْقُرْآنِ"
+ },
+ {
+  "canonicalID": "virtues|77|77",
+  "bookID": "virtues",
+  "displayNumber": "77",
+  "numberMajor": 77,
+  "sourceSequence": 77,
+  "text_ar": "عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ، أَنَّ رَجُلاً، سَمِعَ رَجُلاً، يَقْرَأُ (‏قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ يُرَدِّدُهَا فَلَمَّا أَصْبَحَ جَاءَ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم فَذَكَرَ ذَلِكَ لَهُ وَكَأَنَّ الرَّجُلَ يَتَقَالُّهَا فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ وَالَّذِي نَفْسِي بِيَدِهِ إِنَّهَا لَتَعْدِلُ ثُلُثَ الْقُرْآنِ ‏\".‏‏.",
+  "text_en": "Narrated Abu Sa’id Al-Khudrī, “A man heard another man reciting (Sūrah Al-Ikhlāṣ) ‘Say He is Allah, (the) One.’ repeatedly. The next morning, he came to Allah’s Messenger ﷺ and informed him about it as if he thought that it was not enough to recite. On that Allah’s Messenger ﷺ said, “By Him in Whose Hand my life is, this Sūrah is equal to one-third of the Qur’an!” Reference: Sahih al-Bukhari 5013.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي سَعِيدٍ الْخُدْرِيِّ، أَنَّ رَجُلاً، سَمِعَ رَجُلاً، يَقْرَأُ (‏قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ يُرَدِّدُهَا فَلَمَّا أَصْبَحَ جَاءَ إِلَى رَسُولِ اللَّهِ صلى الله عليه وسلم فَذَكَرَ ذَلِكَ لَهُ وَكَأَنَّ الرَّجُلَ يَتَقَالُّهَا فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ وَالَّذِي نَفْسِي بِيَدِهِ إِنَّهَا لَتَعْدِلُ ثُلُثَ الْقُرْآنِ ‏\".‏‏."
+   }
+  ],
+  "chapterTitleEnglish": "This sūrah is equivalent to one-third of the Qur'ān",
+  "chapterTitleArabic": "تَعْدِلُ هَذِهِ السُّورَةُ ثُلُثَ الْقُرْآنِ"
+ },
+ {
+  "canonicalID": "virtues|78|78",
+  "bookID": "virtues",
+  "displayNumber": "78",
+  "numberMajor": 78,
+  "sourceSequence": 78,
+  "text_ar": "وَحَدَّثَنَا أَبُو بَكْرِ بْنُ أَبِي شَيْبَةَ، حَدَّثَنَا عَفَّانُ، حَدَّثَنَا أَبَانٌ الْعَطَّارُ، جَمِيعًا عَنْ قَتَادَةَ، بِهَذَا الإِسْنَادِ ‏.‏ وَفِي حَدِيثِهِمَا مِنْ قَوْلِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"‏ إِنَّ اللَّهَ جَزَّأَ الْقُرْآنَ ثَلاَثَةَ أَجْزَاءٍ فَجَعَلَ قُلْ هُوَ اللَّهُ أَحَدٌ جُزْءًا مِنْ أَجْزَاءِ الْقُرْآنِ ‏\"‏.‏",
+  "text_en": "This hadith has been narrated by Qatada with the same chain of transmitters in these words:He (the Messenger of Allah) said: Allah divided the Qur'an into three parts, and he made:\" Say: He, Allah is One.\" one part out of the (three) parts of the Qur'an.” Reference: Sahih Muslim 811b.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "وَحَدَّثَنَا أَبُو بَكْرِ بْنُ أَبِي شَيْبَةَ، حَدَّثَنَا عَفَّانُ، حَدَّثَنَا أَبَانٌ الْعَطَّارُ، جَمِيعًا عَنْ قَتَادَةَ، بِهَذَا الإِسْنَادِ ‏.‏ وَفِي حَدِيثِهِمَا مِنْ قَوْلِ النَّبِيِّ صلى الله عليه وسلم قَالَ ‏ \"‏ إِنَّ اللَّهَ جَزَّأَ الْقُرْآنَ ثَلاَثَةَ أَجْزَاءٍ فَجَعَلَ قُلْ هُوَ اللَّهُ أَحَدٌ جُزْءًا مِنْ أَجْزَاءِ الْقُرْآنِ ‏\"‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "This sūrah is equivalent to one-third of the Qur'ān",
+  "chapterTitleArabic": "تَعْدِلُ هَذِهِ السُّورَةُ ثُلُثَ الْقُرْآنِ"
+ },
+ {
+  "canonicalID": "virtues|79|79",
+  "bookID": "virtues",
+  "displayNumber": "79",
+  "numberMajor": 79,
+  "sourceSequence": 79,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ احْشِدُوا فَإِنِّي سَأَقْرَأُ عَلَيْكُمْ ثُلُثَ الْقُرْآنِ ‏\"‏ ‏.‏ فَحَشَدَ مَنْ حَشَدَ ثُمَّ خَرَجَ نَبِيُّ اللَّهِ صلى الله عليه وسلم فَقَرَأَ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ ثُمَّ دَخَلَ فَقَالَ بَعْضُنَا لِبَعْضٍ إِنِّي أُرَى هَذَا خَبَرٌ جَاءَهُ مِنَ السَّمَاءِ فَذَاكَ الَّذِي أَدْخَلَهُ ‏.‏ ثُمَّ خَرَجَ نَبِيُّ اللَّهِ صلى الله عليه وسلم فَقَالَ ‏\"‏ إِنِّي قُلْتُ لَكُمْ سَأَقْرَأُ عَلَيْكُمْ ثُلُثَ الْقُرْآنِ أَلاَ إِنَّهَا تَعْدِلُ ثُلُثَ الْقُرْآنِ.",
+  "text_en": "It is reported on the authority of Abu Hurayrah that the Messenger of Allah (ﷺ) said:Gather, for I am going to recite one-third of the Qur'an before you. And those who could get together gathered there. Then the Messenger of Allah (ﷺ) came out and recited:\" Say: He, Allah, is One.\" He then entered (his house). Some of us said to the others: Perhaps there has been some news from the heaven on account of which he has gone Inside (the house). The Messenger of Allah (ﷺ) again came out and said: I told you that I was going to recite one-third of the Qur'in; keep in mind, this (Sūrah Ikhlāṣ) is equivalent to one-third of the Qur'an. Reference: Sahih Muslim 812a.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ احْشِدُوا فَإِنِّي سَأَقْرَأُ عَلَيْكُمْ ثُلُثَ الْقُرْآنِ ‏\"‏ ‏.‏ فَحَشَدَ مَنْ حَشَدَ ثُمَّ خَرَجَ نَبِيُّ اللَّهِ صلى الله عليه وسلم فَقَرَأَ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ ثُمَّ دَخَلَ فَقَالَ بَعْضُنَا لِبَعْضٍ إِنِّي أُرَى هَذَا خَبَرٌ جَاءَهُ مِنَ السَّمَاءِ فَذَاكَ الَّذِي أَدْخَلَهُ ‏.‏ ثُمَّ خَرَجَ نَبِيُّ اللَّهِ صلى الله عليه وسلم فَقَالَ ‏\"‏ إِنِّي قُلْتُ لَكُمْ سَأَقْرَأُ عَلَيْكُمْ ثُلُثَ الْقُرْآنِ أَلاَ إِنَّهَا تَعْدِلُ ثُلُثَ الْقُرْآنِ."
+   }
+  ],
+  "chapterTitleEnglish": "This sūrah is equivalent to one-third of the Qur'ān",
+  "chapterTitleArabic": "تَعْدِلُ هَذِهِ السُّورَةُ ثُلُثَ الْقُرْآنِ"
+ },
+ {
+  "canonicalID": "virtues|80|80",
+  "bookID": "virtues",
+  "displayNumber": "80",
+  "numberMajor": 80,
+  "sourceSequence": 80,
+  "text_ar": "عَنْ أَنَسٍ، أَنَّ رَجُلاً، قَالَ يَا رَسُولَ اللَّهِ إِنِّي أُحِبُّ هَذِهِ السُّورَةَ ‏(‏قُلْ هُوَ اللَّهُ أَحَدٌ ‏)‏ فَقَالَ ‏ \"‏ إِنَّ حُبَّكَ إِيَّاهَا يُدْخِلُكَ الْجَنَّةَ.‏\"",
+  "text_en": "Anas mentioned that a man said to the Prophet ﷺ, ‘I really love this sūrah’. The Prophet replied, ‘And your love for it will enable you to enter paradise’. Reference: Jami` at-Tirmidhi 2901.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَنَسٍ، أَنَّ رَجُلاً، قَالَ يَا رَسُولَ اللَّهِ إِنِّي أُحِبُّ هَذِهِ السُّورَةَ ‏(‏قُلْ هُوَ اللَّهُ أَحَدٌ ‏)‏ فَقَالَ ‏ \"‏ إِنَّ حُبَّكَ إِيَّاهَا يُدْخِلُكَ الْجَنَّةَ.‏\""
+   }
+  ],
+  "chapterTitleEnglish": "The love of this sūrah leads to paradise",
+  "chapterTitleArabic": "حُبَّكَ إِيَّاهَا يُدْخِلُكَ الْجَنَّةَ"
+ },
+ {
+  "canonicalID": "virtues|81|81",
+  "bookID": "virtues",
+  "displayNumber": "81",
+  "numberMajor": 81,
+  "sourceSequence": 81,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، قَالَ أَقْبَلْتُ مَعَ رَسُولِ اللَّهِ صلى الله عليه وسلم فَسَمِعَ رَجُلاً يَقْرَأُ ‏(‏قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ ‏)‏ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ وَجَبَتْ ‏\"‏ ‏.‏ قُلْتُ وَمَا وَجَبَتْ قَالَ ‏\"‏ الْجَنَّةُ ‏\"‏.‏",
+  "text_en": "Abu Hurayrah reported:\"I went out with the Messenger of Allah and heard a man reciting Qul Huwa Allahu Ahad [Sūrah Al-Ikhlāṣ] so the Messenger of Allah (ﷺ) said: 'It is obligatory.' I said: 'What is obligatory?' He said: 'Paradise (is obligatory as a reward for the man).'\" Reference: Jami` at-Tirmidhi 2897.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، قَالَ أَقْبَلْتُ مَعَ رَسُولِ اللَّهِ صلى الله عليه وسلم فَسَمِعَ رَجُلاً يَقْرَأُ ‏(‏قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ ‏)‏ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ وَجَبَتْ ‏\"‏ ‏.‏ قُلْتُ وَمَا وَجَبَتْ قَالَ ‏\"‏ الْجَنَّةُ ‏\"‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The love of this sūrah leads to paradise",
+  "chapterTitleArabic": "حُبَّكَ إِيَّاهَا يُدْخِلُكَ الْجَنَّةَ"
+ },
+ {
+  "canonicalID": "virtues|82|82",
+  "bookID": "virtues",
+  "displayNumber": "82",
+  "numberMajor": 82,
+  "sourceSequence": 82,
+  "text_ar": "عَنْ عَائِشَةَ أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم بَعَثَ رَجُلاً عَلَى سَرِيَّةٍ وَكَانَ يَقْرَأُ لأَصْحَابِهِ فِي صَلاَتِهِمْ فَيَخْتِمُ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ فَلَمَّا رَجَعُوا ذُكِرَ ذَلِكَ لِرَسُولِ اللَّهِ صلى الله عليه وسلم فَقَالَ ‏\"‏ سَلُوهُ لأَىِّ شَىْءٍ يَصْنَعُ ذَلِكَ ‏\"‏ ‏.‏ فَسَأَلُوهُ فَقَالَ لأَنَّهَا صِفَةُ الرَّحْمَنِ فَأَنَا أُحِبُّ أَنْ أَقْرَأَ بِهَا ‏.‏ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ أَخْبِرُوهُ أَنَّ اللَّهَ يُحِبُّهُ. \".",
+  "text_en": "'A'ishah reported:The Messenger of Allah (ﷺ) sent a man in charge of an expedition and he would recite for his Companions during their prayer, ending (recitation) with:\" Say, He is God, One.\" When they returned mention was made of it to the Messenger of Allah (ﷺ). He (the Prophet) told them to ask him why he had done like that. So they asked him and he said: Verily, it is an attribute of the Compassionate One, and (for this reason) I love to recite it. The Messenger of Allah (ﷺ) thereupon said: “Inform him that Allah loves him.” Reference: Sahih Muslim 813.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عَائِشَةَ أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم بَعَثَ رَجُلاً عَلَى سَرِيَّةٍ وَكَانَ يَقْرَأُ لأَصْحَابِهِ فِي صَلاَتِهِمْ فَيَخْتِمُ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ فَلَمَّا رَجَعُوا ذُكِرَ ذَلِكَ لِرَسُولِ اللَّهِ صلى الله عليه وسلم فَقَالَ ‏\"‏ سَلُوهُ لأَىِّ شَىْءٍ يَصْنَعُ ذَلِكَ ‏\"‏ ‏.‏ فَسَأَلُوهُ فَقَالَ لأَنَّهَا صِفَةُ الرَّحْمَنِ فَأَنَا أُحِبُّ أَنْ أَقْرَأَ بِهَا ‏.‏ فَقَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏\"‏ أَخْبِرُوهُ أَنَّ اللَّهَ يُحِبُّهُ. \"."
+   }
+  ],
+  "chapterTitleEnglish": "The love of this sūrah leads to paradise",
+  "chapterTitleArabic": "حُبَّكَ إِيَّاهَا يُدْخِلُكَ الْجَنَّةَ"
+ },
+ {
+  "canonicalID": "virtues|83|83",
+  "bookID": "virtues",
+  "displayNumber": "83",
+  "numberMajor": 83,
+  "sourceSequence": 83,
+  "text_ar": "عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي رَكْعَتَىِ الطَّوَافِ بِسُورَتَىِ الإِخْلاَصِ ‏:‏ ‏(‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَ ‏(‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏)‏‏.‏",
+  "text_en": "Jābir reported:“During the two rakʿahs of ṭawāf, the Messenger of Allah ﷺ recited the two suwar: Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ).” Reference: Jami` at-Tirmidhi 869.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ جَابِرِ بْنِ عَبْدِ اللَّهِ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي رَكْعَتَىِ الطَّوَافِ بِسُورَتَىِ الإِخْلاَصِ ‏:‏ ‏(‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَ ‏(‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏)‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ recited it in the prayer after completing ṭawāf (circumambulation of the Kaʿbah)",
+  "chapterTitleArabic": "قَرَأَ بِهَا الرَّسُولُ ﷺ فِي الرَّكْعَتَيْنِ بَعْدَ الطَّوَافِ"
+ },
+ {
+  "canonicalID": "virtues|84|84",
+  "bookID": "virtues",
+  "displayNumber": "84",
+  "numberMajor": 84,
+  "sourceSequence": 84,
+  "text_ar": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَةِ الأُولَى مِنَ الْوَتْرِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَفِي الثَّانِيَةِ بِـ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَفِي الثَّالِثَةِ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏).‏",
+  "text_en": "Ubayy reported:\"In the first rakʿah of witr (prayer), the Messenger of Allah ﷺ used to recite: “Sabbiḥ isma rabbikal-aʿlā (Sūrat al-Aʿlā), in the second, Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and in the third (rakʿah), Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ).” Reference: Sunan an-Nasa'i 1700.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أُبَىِّ بْنِ كَعْبٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَقْرَأُ فِي الرَّكْعَةِ الأُولَى مِنَ الْوَتْرِ بِـ (‏ سَبِّحِ اسْمَ رَبِّكَ الأَعْلَى ‏)‏ وَفِي الثَّانِيَةِ بِـ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ ‏)‏ وَفِي الثَّالِثَةِ بِـ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ ‏).‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ recited this sūrah in the witr prayer",
+  "chapterTitleArabic": "قَرَأَ الرَّسُولُ ﷺ بِهَذِهِ السُّورَةِ فِي الْوِتْرِ"
+ },
+ {
+  "canonicalID": "virtues|85|85",
+  "bookID": "virtues",
+  "displayNumber": "85",
+  "numberMajor": 85,
+  "sourceSequence": 85,
+  "text_ar": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي ركعتي الْفَجْرِ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ‏)‏ وَ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏).",
+  "text_en": "Abu Hurayrah reported that the Messenger of Allah ﷺ recited in the two (optional) rakʿahs of fajr:Qul yā ayyuhal kāfirūn (Sūrat al-Kāfirūn), and Qul huwa Allāhu aḥad (Sūrat al-Ikhlāṣ). Reference: Sahih Muslim 726.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي هُرَيْرَةَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَرَأَ فِي ركعتي الْفَجْرِ (‏ قُلْ يَا أَيُّهَا الْكَافِرُونَ‏)‏ وَ (‏ قُلْ هُوَ اللَّهُ أَحَدٌ‏)."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger of Allah ﷺ recited this sūrah in the two rakʿahs before fajr prayer and the two rakʿahs after maghrib prayer",
+  "chapterTitleArabic": "قَرَأَ رَسُولُ اللهِ ﷺ بِهَذِهِ السُّورَةِ فِي الرَّكعَتَيْنِ قَبْلَ الْفَجْرِ وَفِي الرَّكعَتَيْنِ بَعْدَ الْمَغْرِبِ"
+ },
+ {
+  "canonicalID": "virtues|86|86",
+  "bookID": "virtues",
+  "displayNumber": "86",
+  "numberMajor": 86,
+  "sourceSequence": 86,
+  "text_ar": "عَنْ عَائِشَةَ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا (‏قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ وَ(‏قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏)‏ وَ(‏قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏(‏ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ يَفْعَلُ ذَلِكَ ثَلاَثَ مَرَّاتٍ‏.‏",
+  "text_en": "It was narrated from ʿĀ’ishah that when the Prophet ﷺ went to bed every night, he would hold his hands together and blow into them, and recite into them (by cupping his hands together) the last three chapters of the Qur'ān. Then he would wipe them over whatever he could of his body, starting with his head and face and the front of his body, and he would do that three times. Reference: Sahih al-Bukhari 5017.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عَائِشَةَ، أَنَّ النَّبِيَّ صلى الله عليه وسلم كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا (‏قُلْ هُوَ اللَّهُ أَحَدٌ‏)‏ وَ(‏قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏)‏ وَ(‏قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏(‏ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ يَفْعَلُ ذَلِكَ ثَلاَثَ مَرَّاتٍ‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ recited the three chapters before sleeping",
+  "chapterTitleArabic": "السُّوَرُ الثَلَاثَةُ الَّتِي قَرَأَهَا الرَّسُولُ ﷺ قَبْلَ النَّوْمِ"
+ },
+ {
+  "canonicalID": "virtues|87|87",
+  "bookID": "virtues",
+  "displayNumber": "87",
+  "numberMajor": 87,
+  "sourceSequence": 87,
+  "text_ar": "عَنْ مُعَاذِ بْنِ عَبْدِ اللَّهِ بْنِ خُبَيْبٍ، عَنْ أَبِيهِ، قَالَ خَرَجْنَا فِي لَيْلَةٍ مَطِيرَةٍ وَظُلْمَةٍ شَدِيدَةٍ نَطْلُبُ رَسُولَ اللَّهِ صلى الله عليه وسلم يُصَلِّي لَنَا - قَالَ - فَأَدْرَكْتُهُ فَقَالَ ‏\"‏ قُلْ ‏\"‏ ‏.‏ فَلَمْ أَقُلْ شَيْئًا ثُمَّ قَالَ ‏\"‏ قُلْ ‏\"‏ ‏.‏ فَلَمْ أَقُلْ شَيْئًا ‏.‏ قَالَ ‏\"‏ قُلْ ‏\"‏ ‏.‏ قُلْتُ مَا أَقُولُ قَالَ ‏\"‏ قُلْ ‏:‏ ‏(‏ هوَ اللَّهُ أَحَدٌ ‏)‏ وَالْمُعَوِّذَتَيْنِ حِينَ تُمْسِي وَتُصْبِحُ ثَلاَثَ مَرَّاتٍ تَكْفِيكَ مِنْ كُلِّ شَيْءٍ ‏\".‏ ‏.",
+  "text_en": "Mu’ādh bin `Abdullah bin Khubayb narrated from his father, who said:“We went out on a rainy and extremely dark night, looking for the Messenger of Allah (ﷺ), so that he could lead us in Salat.” He said: “So I met him and he (ﷺ) said: ‘Speak’ but I did not say anything. Then he (ﷺ) said: ‘Speak.’ But I did not say anything. He (ﷺ) said: ‘Speak.’ So I said: ‘What should I say?’ He (ﷺ) said: ‘Say: “Say: He is Allah, the One (Sūrat al-Ikhlāṣ)” and Al-Mu`awwidhatayn (Al-Falaq, an-Nās), in the evening, and in the morning, three times, and they will suffice you against everything.’” Reference: Jami` at-Tirmidhi 3575.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ مُعَاذِ بْنِ عَبْدِ اللَّهِ بْنِ خُبَيْبٍ، عَنْ أَبِيهِ، قَالَ خَرَجْنَا فِي لَيْلَةٍ مَطِيرَةٍ وَظُلْمَةٍ شَدِيدَةٍ نَطْلُبُ رَسُولَ اللَّهِ صلى الله عليه وسلم يُصَلِّي لَنَا - قَالَ - فَأَدْرَكْتُهُ فَقَالَ ‏\"‏ قُلْ ‏\"‏ ‏.‏ فَلَمْ أَقُلْ شَيْئًا ثُمَّ قَالَ ‏\"‏ قُلْ ‏\"‏ ‏.‏ فَلَمْ أَقُلْ شَيْئًا ‏.‏ قَالَ ‏\"‏ قُلْ ‏\"‏ ‏.‏ قُلْتُ مَا أَقُولُ قَالَ ‏\"‏ قُلْ ‏:‏ ‏(‏ هوَ اللَّهُ أَحَدٌ ‏)‏ وَالْمُعَوِّذَتَيْنِ حِينَ تُمْسِي وَتُصْبِحُ ثَلاَثَ مَرَّاتٍ تَكْفِيكَ مِنْ كُلِّ شَيْءٍ ‏\".‏ ‏."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ commanded their recitation in the morning and evening",
+  "chapterTitleArabic": "أَمَرَ الرَّسُولُ ﷺ بِقِرَاءَتِهَا فِي الصَّبَاحِ والْمَسَاءِ"
+ },
+ {
+  "canonicalID": "virtues|88|88",
+  "bookID": "virtues",
+  "displayNumber": "88",
+  "numberMajor": 88,
+  "sourceSequence": 88,
+  "text_ar": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، أَخْبَرَنَا مَالِكٌ، عَنِ ابْنِ شِهَابٍ، عَنْ عُرْوَةَ، عَنْ عَائِشَةَ، رضى الله عنها أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ إِذَا اشْتَكَى يَقْرَأُ عَلَى نَفْسِهِ بِالْمُعَوِّذَاتِ وَيَنْفُثُ، فَلَمَّا اشْتَدَّ وَجَعُهُ كُنْتُ أَقْرَأُ عَلَيْهِ وَأَمْسَحُ بِيَدِهِ رَجَاءَ بَرَكَتِهَا‏.‏",
+  "text_en": "A’isha (RA) reported that whenever the Prophet ﷺ became sick, he would recite the Mu’awwidhāt (Sūrat Al-Falaq and Sūrat An-Nās) and then blow his breath over his body. When he became seriously ill, I used to recite (these two suwar) and rub his hands over his body hoping for its blessings. Reference: Sahih al-Bukhari 5016.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ يُوسُفَ، أَخْبَرَنَا مَالِكٌ، عَنِ ابْنِ شِهَابٍ، عَنْ عُرْوَةَ، عَنْ عَائِشَةَ، رضى الله عنها أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ إِذَا اشْتَكَى يَقْرَأُ عَلَى نَفْسِهِ بِالْمُعَوِّذَاتِ وَيَنْفُثُ، فَلَمَّا اشْتَدَّ وَجَعُهُ كُنْتُ أَقْرَأُ عَلَيْهِ وَأَمْسَحُ بِيَدِهِ رَجَاءَ بَرَكَتِهَا‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ would recite these suwar for healing from sickness",
+  "chapterTitleArabic": "كَانَ الرَّسُولُ ﷺ يَقْرَأُ هَاتَيْنِ السُّورَتَيْنِ للشِّفَاءِ مِنَ الْمَرَضِ"
+ },
+ {
+  "canonicalID": "virtues|89|89",
+  "bookID": "virtues",
+  "displayNumber": "89",
+  "numberMajor": 89,
+  "sourceSequence": 89,
+  "text_ar": "عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ أَمَرَنِي رَسُولُ اللَّهِ صلى الله عليه وسلم أَنْ أَقْرَأَ بِالْمُعَوِّذَاتِ دُبُرَ كُلِّ صَلاَةٍ ‏.",
+  "text_en": "Uqbah ibn Amir reported:“The Messenger of Allah (ﷺ) commanded me to recite the Mu'awwidhaat after every prayer.” Reference: Sunan Abi Dawud 1523, Sunan an-Nasa'i 1336.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ أَمَرَنِي رَسُولُ اللَّهِ صلى الله عليه وسلم أَنْ أَقْرَأَ بِالْمُعَوِّذَاتِ دُبُرَ كُلِّ صَلاَةٍ ‏."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ commanded their recitation after prayer",
+  "chapterTitleArabic": "أَمَرَ الرَّسُولُ ﷺ بِقِرَاءَتِهِمَا بَعْدَ الصَّلَاةِ"
+ },
+ {
+  "canonicalID": "virtues|90|90",
+  "bookID": "virtues",
+  "displayNumber": "90",
+  "numberMajor": 90,
+  "sourceSequence": 90,
+  "text_ar": "عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ أَلَمْ تَرَ آيَاتٍ أُنْزِلَتِ اللَّيْلَةَ لَمْ يُرَ مِثْلُهُنَّ قَطُّ (‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏)‏ وَ (‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏)‏ ‏\"‏.‏",
+  "text_en": "Uqbah bin Amir reported:The Messenger of Allah ﷺ said to me: There have been sent down to me verses the like of which had never been seen before. (They are): \"Qul a’oodhu birabbil Falaq (Surat al-Falaq)”, and “Qul a’oodhu birabbin-naas (Surat al-Nās).” Reference: Sahih Muslim 814a.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم ‏ \"‏ أَلَمْ تَرَ آيَاتٍ أُنْزِلَتِ اللَّيْلَةَ لَمْ يُرَ مِثْلُهُنَّ قَطُّ (‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ‏)‏ وَ (‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ‏)‏ ‏\"‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The likes of which had never been seen",
+  "chapterTitleArabic": "لَمْ يُرَ مِثْلُهُنَّ قَطُّ"
+ },
+ {
+  "canonicalID": "virtues|91|91",
+  "bookID": "virtues",
+  "displayNumber": "91",
+  "numberMajor": 91,
+  "sourceSequence": 91,
+  "text_ar": "عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ اتَّبَعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم وَهُوَ رَاكِبٌ فَوَضَعْتُ يَدِي عَلَى قَدَمِهِ فَقُلْتُ أَقْرِئْنِي يَا رَسُولَ اللَّهِ سُورَةَ هُودٍ وَسُورَةَ يُوسُفَ ‏.‏ فَقَالَ ‏ \"‏ لَنْ تَقْرَأَ شَيْئًا أَبْلَغَ عِنْدَ اللَّهِ مِنْ (‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ‏)‏ وَ (‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ ‏)‏ ‏\"‏‏.‏",
+  "text_en": "‘Uqbah Ibn ‘Amir reported:\"I followed the Messenger of Allah (ﷺ) when he was riding, and I placed my hand on his foot and said : O Messenger of Allah, teach me Sūrah Hud and Sūrah Yusuf. He said: 'You will never recite anything greater (for refuge) before Allah than: \"Qul a’oodhu birabbil falaq (Surat al-Falaq)”, and “Qul a’oodhu birabbin-naas (Surat al-Nās).” Reference: Sunan an-Nasa'i 953, also collected in Sunan Al-Dārimī, no. 3343.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ عُقْبَةَ بْنِ عَامِرٍ، قَالَ اتَّبَعْتُ رَسُولَ اللَّهِ صلى الله عليه وسلم وَهُوَ رَاكِبٌ فَوَضَعْتُ يَدِي عَلَى قَدَمِهِ فَقُلْتُ أَقْرِئْنِي يَا رَسُولَ اللَّهِ سُورَةَ هُودٍ وَسُورَةَ يُوسُفَ ‏.‏ فَقَالَ ‏ \"‏ لَنْ تَقْرَأَ شَيْئًا أَبْلَغَ عِنْدَ اللَّهِ مِنْ (‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ‏)‏ وَ (‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ ‏)‏ ‏\"‏‏.‏"
+   }
+  ],
+  "chapterTitleEnglish": "The likes of which had never been seen",
+  "chapterTitleArabic": "لَمْ يُرَ مِثْلُهُنَّ قَطُّ"
+ },
+ {
+  "canonicalID": "virtues|92|92",
+  "bookID": "virtues",
+  "displayNumber": "92",
+  "numberMajor": 92,
+  "sourceSequence": 92,
+  "text_ar": "عَنْ أَبِي سَعِيدٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَتَعَوَّذُ مِنَ الْجَانِّ وَعَيْنِ الإِنْسَانِ حَتَّى نَزَلَتِ الْمُعَوِّذَتَانِ فَلَمَّا نَزَلَتَا أَخَذَ بِهِمَا وَتَرَكَ مَا سِوَاهُمَا.",
+  "text_en": "Abu Sa’īd reported:“The Messenger of Allah ﷺ used to seek refuge from the jinn as well as from the evil eye until al-mu’awwidhataan (Sūrah al Falaq and Al-Nās) were revealed. When they were sent down, he utilized them and left other things.” Reference: Jami` at-Tirmidhi 2058.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "عَنْ أَبِي سَعِيدٍ، قَالَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَتَعَوَّذُ مِنَ الْجَانِّ وَعَيْنِ الإِنْسَانِ حَتَّى نَزَلَتِ الْمُعَوِّذَتَانِ فَلَمَّا نَزَلَتَا أَخَذَ بِهِمَا وَتَرَكَ مَا سِوَاهُمَا."
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ utilized them for protection",
+  "chapterTitleArabic": "قَرَأَ بِهِمَا الرَّسُولُ ﷺ لِلْحِفْظِ"
+ },
+ {
+  "canonicalID": "virtues|93|93",
+  "bookID": "virtues",
+  "displayNumber": "93",
+  "numberMajor": 93,
+  "sourceSequence": 93,
+  "text_ar": "أَخْبَرَنَا مَحْمُودُ بْنُ خَالِدٍ، قَالَ حَدَّثَنَا الْوَلِيدُ، قَالَ حَدَّثَنَا أَبُو عَمْرٍو، عَنْ يَحْيَى، عَنْ مُحَمَّدِ بْنِ إِبْرَاهِيمَ بْنِ الْحَارِثِ، أَخْبَرَنِي أَبُو عَبْدِ اللَّهِ، أَنَّ ابْنَ عَابِسٍ الْجُهَنِيَّ، أَخْبَرَهُ أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ لَهُ ‏\"‏ يَا ابْنَ عَابِسٍ أَلاَ أَدُلُّكَ - أَوْ قَالَ أَلاَ أُخْبِرُكَ - بِأَفْضَلِ مَا يَتَعَوَّذُ بِهِ الْمُتَعَوِّذُونَ ‏\"‏ ‏.‏ قَالَ بَلَى يَا رَسُولَ اللَّهِ ‏.‏ قَالَ ‏\"‏ ‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ‏‏ وَ ‏‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ ‏‏ هَاتَيْنِ السُّورَتَيْنِ.\"‏",
+  "text_en": "Abu 'Abdullah narrated that Ibn 'Aabis Al-Juhani told him that:The Messenger of Allah ﷺ said: \"O Ibn 'Aabis, shall I not tell you of the best thing with which those who seek refuge with Allah may do so?\" He said: \"Yes, O Messenger of Allah.\" He said: \"Say: I seek refuge with (Allah) the Lord of the daybreak.\", \"Say: I seek refuge with (Allah) the Lord of mankind.\" - these two Surahs.\" Reference: Sunan an-Nasa'i 5432.",
+  "arabicSegments": [
+   {
+    "type": "matn",
+    "text": "أَخْبَرَنَا مَحْمُودُ بْنُ خَالِدٍ، قَالَ حَدَّثَنَا الْوَلِيدُ، قَالَ حَدَّثَنَا أَبُو عَمْرٍو، عَنْ يَحْيَى، عَنْ مُحَمَّدِ بْنِ إِبْرَاهِيمَ بْنِ الْحَارِثِ، أَخْبَرَنِي أَبُو عَبْدِ اللَّهِ، أَنَّ ابْنَ عَابِسٍ الْجُهَنِيَّ، أَخْبَرَهُ أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ لَهُ ‏\"‏ يَا ابْنَ عَابِسٍ أَلاَ أَدُلُّكَ - أَوْ قَالَ أَلاَ أُخْبِرُكَ - بِأَفْضَلِ مَا يَتَعَوَّذُ بِهِ الْمُتَعَوِّذُونَ ‏\"‏ ‏.‏ قَالَ بَلَى يَا رَسُولَ اللَّهِ ‏.‏ قَالَ ‏\"‏ ‏ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ‏‏ وَ ‏‏ قُلْ أَعُوذُ بِرَبِّ النَّاسِ ‏‏ هَاتَيْنِ السُّورَتَيْنِ.\"‏"
+   }
+  ],
+  "chapterTitleEnglish": "The Messenger ﷺ utilized them for protection",
+  "chapterTitleArabic": "قَرَأَ بِهِمَا الرَّسُولُ ﷺ لِلْحِفْظِ"
+ }
+]

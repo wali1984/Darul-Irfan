@@ -293,16 +293,33 @@ def clean(t: str | None) -> str | None:
     return t or None
 
 
+# Urdu-script letter forms folded to their Arabic equivalents before keying.
+# Some sources typeset the Arabic matn with Urdu code points (measured on
+# ahlesunnatpak.com's Musnad Ahmad: farsi yeh x872, heh goal x751, keheh x277,
+# teh marbuta goal x100 on one page). Without folding, the same narration keys
+# differently on each site and a cross-site join silently matches nothing.
+URDU_TO_ARABIC = str.maketrans({
+    "ی": "ي",  # ی farsi yeh        -> ي
+    "ے": "ي",  # ے barree yeh       -> ي
+    "ہ": "ه",  # ہ heh goal         -> ه
+    "ھ": "ه",  # ھ heh doachashmee  -> ه
+    "ک": "ك",  # ک keheh            -> ك
+    "ۃ": "ة",  # ۃ teh marbuta goal -> ة
+    "ٱ": "ا",  # ٱ alef wasla       -> ا
+})
+
+
 def arabic_key(t: str | None) -> str | None:
     """Arabic letters only — the join key of last resort.
 
-    Strips vowel marks, punctuation, ayah symbols and whitespace, so the same
-    narration keys identically whether it came from our pack or a book page.
+    Folds Urdu-script letter forms to Arabic, strips vowel marks, punctuation,
+    ayah symbols and whitespace, so the same narration keys identically whether
+    it came from our pack, a sunnah.com book page, or an Urdu-typeset source.
     Returns None for anything too short to identify a narration safely.
     """
     if not t:
         return None
-    t = unicodedata.normalize("NFD", t)
+    t = unicodedata.normalize("NFD", t.translate(URDU_TO_ARABIC))
     t = "".join(c for c in t if unicodedata.category(c) != "Mn")
     t = re.sub(r"[^ء-ي]", "", t)
     return t if len(t) >= ARABIC_KEY_MIN else None
@@ -364,6 +381,11 @@ def parse_book_page(html: str) -> dict[str, dict]:
             "arabicKey": arabic_key(ar_el.get_text()) if ar_el else None,
             "arabicSegments": segs or None,
             "quranRefs": refs or None,
+            # Plain Arabic too, not only the typed segments: HadithEntry reads
+            # text_ar, and search matches on it — build_from_scratch consumed
+            # this key while nothing emitted it, so every from-scratch pack
+            # shipped 0 of N with plain Arabic (measured: mishkat 0/5,306).
+            "text_ar": clean(ar_el.get_text()) if ar_el else None,
             "text_en": clean(en_el.get_text()) if en_el else None,
             "chapterTitleEnglish": clean(ch_en.get_text()) if ch_en else None,
             "chapterTitleArabic": clean(ch_ar.get_text()) if ch_ar else None,
@@ -528,10 +550,16 @@ def build_from_scratch(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[
 
     # Short collections publish their narrations on the landing page itself
     # instead of under /<slug>/<book> — Nawawi's Forty, the Forty Qudsi, Hisn
-    # al-Muslim and Virtues. Iterating `books` finds nothing for them, so parse
-    # the landing page as the single book. `None` marks that case below.
-    if not books and slug in SINGLE_PAGE:
-        books = [None]
+    # al-Muslim and Virtues. `None` marks the landing page as a book below.
+    #
+    # The landing page is ALWAYS included for these, not only when no books
+    # were discovered: Hisn also links a named `introduction` book, so after
+    # discover_books learned to see named books, `books` came back non-empty,
+    # the old `if not books` guard never fired, and the landing's 268 du'as
+    # were skipped entirely — the pack came out empty and was silently not
+    # written.
+    if slug in SINGLE_PAGE:
+        books = [None] + books
 
     for bk in books:
         if bk is None:
@@ -549,8 +577,17 @@ def build_from_scratch(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[
         urdu_by_num = {str(u.get("hadithNumber")): u for u in urdu}
 
         for num, extra in parsed.items():
-            if not num or num in seen_display:
-                continue                     # keep displayNumber unique per pack
+            if not num:
+                continue
+            if num in seen_display:
+                # Collections whose printed numbering restarts or repeats
+                # across books (Bulugh: 253 narrations, Ibn Khuzayma: 52) used
+                # to be silently DROPPED here to keep displayNumber unique.
+                # Dropping sacred text for a lookup key is the wrong trade:
+                # canonicalID stays unique via the sequence, the duplicate is
+                # kept, and vet() reports the dupDisplay count.
+                report.setdefault("dupDisplayKept", {}).setdefault(slug, 0)
+                report["dupDisplayKept"][slug] += 1
             seen_display.add(num)
             seq += 1
             major, minor = split_number(num)
@@ -853,6 +890,10 @@ def main() -> int:
     ap.add_argument("--pack", action="store_true", help="write to the four seed dirs")
     ap.add_argument("--vet", action="store_true")
     ap.add_argument("--bump-manifest", action="store_true")
+    ap.add_argument("--skip-narrators", action="store_true",
+                    help="pack rebuild only: leave the narrator store untouched "
+                         "(so a concurrent run's narrator phase is not duplicated "
+                         "and its merge is not raced)")
     ap.add_argument("--out", type=Path, default=Path("build/hadith"))
     args = ap.parse_args()
 
@@ -881,6 +922,8 @@ def main() -> int:
         if args.pack:
             pack(slug, records, [])
 
+    if args.skip_narrators:
+        all_ids = set()
     narrators = build_narrators(all_ids, fetcher, translator, report) if all_ids else []
     if narrators:
         (args.out / "hadith_narrators.json").write_text(

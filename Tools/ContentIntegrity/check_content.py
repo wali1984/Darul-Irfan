@@ -84,7 +84,23 @@ MAX_TEXT_BLOCK_BYTES = 96 * 1024
 REVIEW_STATES = {"draft", "testFlightApproved", "publicApproved", "rejected"}
 SHIPPABLE_ON_TESTFLIGHT = {"testFlightApproved", "publicApproved"}
 
-HADITH_BOOKS = ["bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah", "malik"]
+# Seven core collections (fawazahmed0 base, trilingual) + eighteen built from
+# sunnah.com (Arabic/English; Urdu only where a source supplies it) + Nasa'i
+# al-Kubra when its crawl lands. Must match hadith_books.json exactly — the
+# catalogue, the packs and this list move together or the gate fails.
+# Collections whose SOURCE restarts printed numbering per book (kitab), so the
+# same displayNumber legitimately appears more than once. Everywhere else a
+# repeated printed number is treated as corruption. Measured 2026-08-10:
+# ibnhibban 61, bulugh 43, ibnkhuzayma 8 legitimate repeats.
+PER_BOOK_NUMBERED = {"ibnhibban", "bulugh", "ibnkhuzayma"}
+
+HADITH_BOOKS = [
+    "bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah", "malik",
+    "nawawi40", "qudsi40", "riyadussalihin", "mishkat", "bulugh", "adab",
+    "shamail", "hisn", "virtues",
+    "ahmad", "darimi", "ibnkhuzayma", "ibnhibban", "hakim", "abdurrazzaq",
+    "ibnabishayba", "daraqutni", "bayhaqi", "nasaikubra",
+]
 
 # Byte sequences that appear when UTF-8 has been decoded as Latin-1/CP1252 and
 # re-encoded. Any of these in sacred text means the pipeline mangled it.
@@ -358,7 +374,13 @@ def check_hadith(seed: Path, report: Report) -> None:
             canonical.add(cid)
 
             number = record.get("displayNumber")
-            if number in display:
+            if number in display and book_id not in PER_BOOK_NUMBERED:
+                # For the core collections a repeated printed number IS
+                # corruption — the integer-keyed schema once lost 103
+                # narrations to exactly that. But some sources restart their
+                # printed numbering per book (kitab), so for those a repeat is
+                # the source's own numbering, kept rather than dropped;
+                # canonicalID uniqueness above still guards every record.
                 duplicates.append(f"{book_id}|{number}")
             display.add(number)
 
