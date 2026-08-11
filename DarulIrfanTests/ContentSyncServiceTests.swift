@@ -126,6 +126,10 @@ final class ContentSyncServiceTests: XCTestCase {
             + SeedBundle.quranTranslations().count
             + SeedBundle.quranTafsir().count
             + hadithTotal
+            // The narrator store imports alongside the collections (schema v6)
+            // and the importer counts it; omitting it here failed the build by
+            // exactly the store's size (194,341 − 181,698 = 12,643 narrators).
+            + SeedBundle.hadithNarrators().count
             + SeedBundle.libraryItems().count
             + SeedBundle.mediaItems().count
             + SeedBundle.events().count
