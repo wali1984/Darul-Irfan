@@ -13,7 +13,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|2|2",
@@ -29,7 +30,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|3|3",
@@ -45,7 +47,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|4|4",
@@ -61,7 +64,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|5|5",
@@ -77,7 +81,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|6|6",
@@ -92,7 +97,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|7|7",
@@ -108,7 +114,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|8|8",
@@ -124,7 +131,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|9|9",
@@ -139,7 +147,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|10|10",
@@ -155,7 +164,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|11|11",
@@ -170,7 +180,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|12|12",
@@ -186,7 +197,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|13|13",
@@ -202,7 +214,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|14|14",
@@ -218,7 +231,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|15|15",
@@ -234,7 +248,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Agreed Upon"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|16|16",
@@ -250,7 +265,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|17|17",
@@ -266,7 +282,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|18|18",
@@ -281,7 +298,8 @@
    "Al-Albani: Sahih Hadith",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|19|19",
@@ -297,7 +315,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|20|20",
@@ -312,7 +331,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|21|21",
@@ -328,7 +348,8 @@
    "Muhammad Fouad Abd al-Baqi: Munkar",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|22|22",
@@ -344,7 +365,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|23|23",
@@ -360,7 +382,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|24|24",
@@ -376,7 +399,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|25|25",
@@ -392,7 +416,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|26|26",
@@ -408,7 +433,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|27|27",
@@ -424,7 +450,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|28|28",
@@ -439,7 +466,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|29|29",
@@ -455,7 +483,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|30|30",
@@ -471,7 +500,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|31|31",
@@ -486,7 +516,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|32|32",
@@ -502,7 +533,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|33|33",
@@ -518,7 +550,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|34|34",
@@ -534,7 +567,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|35|35",
@@ -550,7 +584,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|36|36",
@@ -566,7 +601,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|37|37",
@@ -582,7 +618,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|38|38",
@@ -598,7 +635,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|39|39",
@@ -613,7 +651,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|40|40",
@@ -629,7 +668,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|41|41",
@@ -645,7 +685,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|42|42",
@@ -661,7 +702,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|43|43",
@@ -677,7 +719,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|44|44",
@@ -692,7 +735,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|45|45",
@@ -708,7 +752,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|46|46",
@@ -723,7 +768,8 @@
    "Al-Albani: Daif",
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|47|47",
@@ -739,7 +785,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|48|48",
@@ -754,7 +801,8 @@
    "Al-Albani: Hasan Sahih",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|49|49",
@@ -770,7 +818,8 @@
    "Muhammad Fouad Abd al-Baqi: Mawdu",
    "Shuaib Al Arnaut: Mawdu",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|50|50",
@@ -786,7 +835,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|51|51",
@@ -801,7 +851,8 @@
    "Al-Albani: Sanad Daif",
    "Muhammad Fouad Abd al-Baqi: Sanad Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|52|52",
@@ -817,7 +868,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|53|53",
@@ -833,7 +885,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|54|54",
@@ -849,7 +902,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|55|55",
@@ -865,7 +919,8 @@
    "Muhammad Fouad Abd al-Baqi: Mawdu",
    "Shuaib Al Arnaut: Mawdu",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|56|56",
@@ -881,7 +936,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|57|57",
@@ -897,7 +953,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|58|58",
@@ -913,7 +970,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|59|59",
@@ -929,7 +987,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|60|60",
@@ -945,7 +1004,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|61|61",
@@ -961,7 +1021,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|62|62",
@@ -977,7 +1038,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|63|63",
@@ -992,7 +1054,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|64|64",
@@ -1008,7 +1071,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|65|65",
@@ -1024,7 +1088,8 @@
    "Muhammad Fouad Abd al-Baqi: Mawdu",
    "Shuaib Al Arnaut: Mawdu",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|66|66",
@@ -1040,7 +1105,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|67|67",
@@ -1056,7 +1122,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|68|68",
@@ -1072,7 +1139,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|69|69",
@@ -1088,7 +1156,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|70|70",
@@ -1104,7 +1173,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|71|71",
@@ -1119,7 +1189,8 @@
    "Al-Albani: Sahih Mutawatir",
    "Muhammad Fouad Abd al-Baqi: Sahih Mutawatir",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|72|72",
@@ -1134,7 +1205,8 @@
    "Al-Albani: Sahih Mutawatir",
    "Muhammad Fouad Abd al-Baqi: Sahih Mutawatir",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|73|73",
@@ -1150,7 +1222,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|74|74",
@@ -1165,7 +1238,8 @@
    "Al-Albani: Very Daif",
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|75|75",
@@ -1180,7 +1254,8 @@
    "Al-Albani: Daif",
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|76|76",
@@ -1195,7 +1270,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|77|77",
@@ -1210,7 +1286,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|78|78",
@@ -1225,7 +1302,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|79|79",
@@ -1241,7 +1319,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|80|80",
@@ -1256,7 +1335,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|81|81",
@@ -1272,7 +1352,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|82|82",
@@ -1287,7 +1368,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|83|83",
@@ -1302,7 +1384,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|84|84",
@@ -1318,7 +1401,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|85|85",
@@ -1334,7 +1418,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|86|86",
@@ -1350,7 +1435,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|87|87",
@@ -1366,7 +1452,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|88|88",
@@ -1382,7 +1469,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Muquf",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|89|89",
@@ -1398,7 +1486,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|90|90",
@@ -1414,7 +1503,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan Lighairihi",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|91|91",
@@ -1429,7 +1519,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|92|92",
@@ -1445,7 +1536,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|93|93",
@@ -1461,7 +1553,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|94|94",
@@ -1476,7 +1569,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|95|95",
@@ -1491,7 +1585,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|96|96",
@@ -1506,7 +1601,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|97|97",
@@ -1521,7 +1617,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|98|98",
@@ -1537,7 +1634,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|99|99",
@@ -1553,7 +1651,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|100|100",
@@ -1569,7 +1668,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|101|101",
@@ -1585,7 +1685,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|102|102",
@@ -1601,7 +1702,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|103|103",
@@ -1617,7 +1719,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|104|104",
@@ -1632,7 +1735,8 @@
    "Al-Albani: Daif",
    "Muhammad Fouad Abd al-Baqi: Munkar",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|105|105",
@@ -1648,7 +1752,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|106|106",
@@ -1663,7 +1768,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|107|107",
@@ -1679,7 +1785,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|108|108",
@@ -1695,7 +1802,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|109|109",
@@ -1711,7 +1819,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|110|110",
@@ -1727,7 +1836,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|111|111",
@@ -1743,7 +1853,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|112|112",
@@ -1758,7 +1869,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|113|113",
@@ -1774,7 +1886,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|114|114",
@@ -1790,7 +1903,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|115|115",
@@ -1806,7 +1920,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|116|116",
@@ -1822,7 +1937,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|117|117",
@@ -1837,7 +1953,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|118|118",
@@ -1852,7 +1969,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|119|119",
@@ -1867,7 +1985,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|120|120",
@@ -1883,7 +2002,8 @@
    "Muhammad Fouad Abd al-Baqi: Batil",
    "Shuaib Al Arnaut: Batil",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|121|121",
@@ -1899,7 +2019,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|122|122",
@@ -1915,7 +2036,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|123|123",
@@ -1931,7 +2053,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|124|124",
@@ -1947,7 +2070,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|125|125",
@@ -1963,7 +2087,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|126|126",
@@ -1978,7 +2103,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|127|127",
@@ -1993,7 +2119,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|128|128",
@@ -2009,7 +2136,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|129|129",
@@ -2025,7 +2153,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|130|130",
@@ -2041,7 +2170,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|131|131",
@@ -2057,7 +2187,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|132|132",
@@ -2072,7 +2203,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|133|133",
@@ -2088,7 +2220,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|134|134",
@@ -2104,7 +2237,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|135|135",
@@ -2120,7 +2254,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|136|136",
@@ -2136,7 +2271,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|137|137",
@@ -2152,7 +2288,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|138|138",
@@ -2168,7 +2305,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|139|139",
@@ -2183,7 +2321,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|140|140",
@@ -2199,7 +2338,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|141|141",
@@ -2215,7 +2355,8 @@
    "Muhammad Fouad Abd al-Baqi: Mawdu",
    "Shuaib Al Arnaut: Mawdu",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|142|142",
@@ -2231,7 +2372,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|143|143",
@@ -2247,7 +2389,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|144|144",
@@ -2263,7 +2406,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|145|145",
@@ -2279,7 +2423,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|146|146",
@@ -2295,7 +2440,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|147|147",
@@ -2310,7 +2456,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|148|148",
@@ -2325,7 +2472,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|149|149",
@@ -2341,7 +2489,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|150|150",
@@ -2357,7 +2506,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|151|151",
@@ -2373,7 +2523,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|152|152",
@@ -2389,7 +2540,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|153|153",
@@ -2405,7 +2557,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|154|154",
@@ -2421,7 +2574,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|155|155",
@@ -2436,7 +2590,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|156|156",
@@ -2452,7 +2607,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Lighairihi",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|157|157",
@@ -2468,7 +2624,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|158|158",
@@ -2483,7 +2640,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|159|159",
@@ -2499,7 +2657,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|160|160",
@@ -2515,7 +2674,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|161|161",
@@ -2531,7 +2691,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|162|162",
@@ -2546,7 +2707,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|163|163",
@@ -2562,7 +2724,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|164|164",
@@ -2577,7 +2740,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|165|165",
@@ -2592,7 +2756,8 @@
    "Al-Albani: Very Daif",
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|166|166",
@@ -2608,7 +2773,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|167|167",
@@ -2624,7 +2790,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|168|168",
@@ -2640,7 +2807,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|169|169",
@@ -2655,7 +2823,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|170|170",
@@ -2671,7 +2840,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|171|171",
@@ -2687,7 +2857,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|172|172",
@@ -2703,7 +2874,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|173|173",
@@ -2719,7 +2891,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|174|174",
@@ -2734,7 +2907,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|175|175",
@@ -2750,7 +2924,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|176|176",
@@ -2765,7 +2940,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|177|177",
@@ -2781,7 +2957,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|178|178",
@@ -2796,7 +2973,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|179|179",
@@ -2812,7 +2990,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|180|180",
@@ -2827,7 +3006,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|181|181",
@@ -2843,7 +3023,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|182|182",
@@ -2859,7 +3040,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|183|183",
@@ -2875,7 +3057,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|184|184",
@@ -2891,7 +3074,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|185|185",
@@ -2907,7 +3091,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|186|186",
@@ -2923,7 +3108,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|187|187",
@@ -2939,7 +3125,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|188|188",
@@ -2955,7 +3142,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|189|189",
@@ -2970,7 +3158,8 @@
    "Al-Albani: Hasan Sahih",
    "Muhammad Fouad Abd al-Baqi: Hasan Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|190|190",
@@ -2986,7 +3175,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|191|191",
@@ -3002,7 +3192,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|192|192",
@@ -3018,7 +3209,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih - Bukhari And Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|193|193",
@@ -3034,7 +3226,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|194|194",
@@ -3049,7 +3242,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|195|195",
@@ -3065,7 +3259,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|196|196",
@@ -3081,7 +3276,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|197|197",
@@ -3096,7 +3292,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|198|198",
@@ -3112,7 +3309,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|199|199",
@@ -3127,7 +3325,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|200|200",
@@ -3143,7 +3342,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|201|201",
@@ -3159,7 +3359,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|202|202",
@@ -3174,7 +3375,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|203|203",
@@ -3190,7 +3392,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|204|204",
@@ -3206,7 +3409,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|205|205",
@@ -3222,7 +3426,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih Lighairihi",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|206|206",
@@ -3238,7 +3443,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|207|207",
@@ -3253,7 +3459,8 @@
    "Al-Albani: Hasan Sahih",
    "Muhammad Fouad Abd al-Baqi: Hasan Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|208|208",
@@ -3269,7 +3476,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|209|209",
@@ -3285,7 +3493,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih Lighairihi",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|210|210",
@@ -3301,7 +3510,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|211|211",
@@ -3317,7 +3527,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|212|212",
@@ -3333,7 +3544,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|213|213",
@@ -3349,7 +3561,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan Sahih",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|214|214",
@@ -3365,7 +3578,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|215|215",
@@ -3381,7 +3595,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|216|216",
@@ -3397,7 +3612,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|217|217",
@@ -3413,7 +3629,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|218|218",
@@ -3429,7 +3646,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|219|219",
@@ -3445,7 +3663,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|220|220",
@@ -3461,7 +3680,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|221|221",
@@ -3477,7 +3697,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|222|222",
@@ -3493,7 +3714,8 @@
    "Muhammad Fouad Abd al-Baqi: Mawdu",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|223|223",
@@ -3509,7 +3731,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|224|224",
@@ -3525,7 +3748,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|225|225",
@@ -3541,7 +3765,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Muslim"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|226|226",
@@ -3557,7 +3782,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|227|227",
@@ -3572,7 +3798,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|228|228",
@@ -3588,7 +3815,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|229|229",
@@ -3604,7 +3832,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|230|230",
@@ -3619,7 +3848,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|231|231",
@@ -3635,7 +3865,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|232|232",
@@ -3651,7 +3882,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|233|233",
@@ -3667,7 +3899,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Isnaad Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|234|234",
@@ -3683,7 +3916,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|235|235",
@@ -3699,7 +3933,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|236|236",
@@ -3714,7 +3949,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|237|237",
@@ -3730,7 +3966,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|238|238",
@@ -3746,7 +3983,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|239|239",
@@ -3761,7 +3999,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|240|240",
@@ -3777,7 +4016,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|241|241",
@@ -3792,7 +4032,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|242|242",
@@ -3807,7 +4048,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|243|243",
@@ -3823,7 +4065,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|244|244",
@@ -3838,7 +4081,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|245|245",
@@ -3854,7 +4098,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|246|246",
@@ -3870,7 +4115,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|247|247",
@@ -3886,7 +4132,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|248|248",
@@ -3902,7 +4149,8 @@
    "Muhammad Fouad Abd al-Baqi: Mawdu",
    "Shuaib Al Arnaut: Mawdu",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|249|249",
@@ -3918,7 +4166,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|250|250",
@@ -3934,7 +4183,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih Lighairihi",
    "Zubair Ali Zai: Sahih"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|251|251",
@@ -3950,7 +4200,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|252|252",
@@ -3966,7 +4217,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Isnaad Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|253|253",
@@ -3982,7 +4234,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Hasan Lighairihi",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|254|254",
@@ -3997,7 +4250,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|255|255",
@@ -4013,7 +4267,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|256|256",
@@ -4029,7 +4284,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|257|257",
@@ -4045,7 +4301,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|258|258",
@@ -4061,7 +4318,8 @@
    "Muhammad Fouad Abd al-Baqi: Daif",
    "Shuaib Al Arnaut: Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|259|259",
@@ -4076,7 +4334,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|260|260",
@@ -4092,7 +4351,8 @@
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|261|261",
@@ -4107,7 +4367,8 @@
    "Al-Albani: Hasan",
    "Muhammad Fouad Abd al-Baqi: Hasan",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|262|262",
@@ -4123,7 +4384,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Sahih",
    "Zubair Ali Zai: Sahih Bukhari"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|263|263",
@@ -4139,7 +4401,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|264|264",
@@ -4154,7 +4417,8 @@
    "Al-Albani: Sahih",
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|265|265",
@@ -4170,7 +4434,8 @@
    "Muhammad Fouad Abd al-Baqi: Very Daif",
    "Shuaib Al Arnaut: Very Daif",
    "Zubair Ali Zai: Daif"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|266|266",
@@ -4186,7 +4451,8 @@
    "Muhammad Fouad Abd al-Baqi: Sahih",
    "Shuaib Al Arnaut: Hasan",
    "Zubair Ali Zai: Hasan"
-  ]
+  ],
+  "sourceBook": 0
  },
  {
   "canonicalID": "ibnmajah|267|267",
