@@ -7,9 +7,16 @@ struct HadithBookView: View {
     let book: HadithBook
     let repository: any HadithRepositoryProtocol
     let appState: AppState
-    /// When set, the reader opens scrolled to this printed number (e.g. a
-    /// tapped search result) instead of at the top.
+    /// When set, the reader opens scrolled to this narration (canonicalID —
+    /// printed numbers repeat in some collections) instead of at the top.
+    /// Also suppresses the cover page: a tapped search result should land on
+    /// the hadith, not on a splash.
     var initialHadith: String? = nil
+    /// The cover page shown briefly when a collection is opened normally.
+    @State private var showsCover = false
+    /// Guards against the cover re-appearing when the view's task re-runs
+    /// (e.g. returning from a pushed screen).
+    @State private var hasShownCover = false
 
     @State private var entries: [HadithEntry] = []
     @State private var isLoading = true
@@ -21,6 +28,10 @@ struct HadithBookView: View {
     /// Search results mix books, so the book (kitab) headers that group the
     /// ordinary listing are suppressed while showing them.
     @State private var isSearchResults = false
+    /// True while a tapped search result is clearing the search box and
+    /// loading its own window, so the cleared box's onChange must not stomp
+    /// the jump with a restore-to-top.
+    @State private var isJumpingToResult = false
     /// Offset the next page load starts at. Tracked explicitly (not derived
     /// from `entries.count`) so paging is correct even when the first page
     /// begins partway into the book — as it does when opening to a hadith.
@@ -65,7 +76,18 @@ struct HadithBookView: View {
                                 if !isSearchResults, showsHeader(at: index) {
                                     sectionHeader(for: entry)
                                 }
-                                hadithCard(entry)
+                                if isSearchResults {
+                                    // A result must land the reader ON the
+                                    // narration, in its reading context.
+                                    Button {
+                                        jump(to: entry)
+                                    } label: {
+                                        hadithCard(entry)
+                                    }
+                                    .buttonStyle(.plain)
+                                } else {
+                                    hadithCard(entry)
+                                }
                             }
                             .id(entry.id)
                             .padding(.vertical, highlightedID == entry.id ? DISpacing.xs : 0)
@@ -114,8 +136,11 @@ struct HadithBookView: View {
             searchTask?.cancel()
             let query = term.trimmingCharacters(in: .whitespaces)
             guard query.count >= 2 else {
-                // Back to the normal paged listing.
-                Task { await restorePagedListing() }
+                // Back to the normal paged listing — unless a tapped result is
+                // mid-jump, in which case the jump owns the listing.
+                if !isJumpingToResult {
+                    Task { await restorePagedListing() }
+                }
                 return
             }
             searchTask = Task {
@@ -131,7 +156,73 @@ struct HadithBookView: View {
                 isLoading = false
             }
         }
-        .task { await loadFirstPage() }
+        .task {
+            // The cover shows on a normal open only: a tapped search result
+            // must land on its hadith, not a splash. Content loads beneath it,
+            // so dismissal reveals a ready page.
+            if initialHadith == nil && !hasShownCover {
+                hasShownCover = true
+                showsCover = true
+            }
+            await loadFirstPage()
+        }
+        .overlay { if showsCover { coverPage } }
+    }
+
+    // MARK: - Cover page
+
+    /// A brief cover when a collection opens — the book's name as a title
+    /// page, in the tradition of printed hadith books — auto-advancing to the
+    /// narrations after three seconds, or on tap.
+    private var coverPage: some View {
+        ZStack {
+            LinearGradient(
+                colors: [DIColor.primary, DIColor.primary.opacity(0.82)],
+                startPoint: .top, endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            VStack(spacing: DISpacing.lg) {
+                Spacer()
+                Text(verbatim: "۞")
+                    .font(.system(size: 44))
+                    .foregroundStyle(DIColor.accent)
+                Text(verbatim: book.titleUrdu)
+                    .font(DIFont.quranArabic(scale: fontScale * 1.6))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .environment(\.layoutDirection, .rightToLeft)
+                Text(verbatim: book.titleEnglish)
+                    .font(DIFont.heading)
+                    .foregroundStyle(.white.opacity(0.92))
+                    .multilineTextAlignment(.center)
+                VStack(spacing: DISpacing.xs) {
+                    Text("\(book.hadithCount) narrations")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.75))
+                    if book.sectionCount > 0 {
+                        Text("\(book.sectionCount) books")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                }
+                Spacer()
+                Text("Tap to continue")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.45))
+                    .padding(.bottom, DISpacing.xl)
+            }
+            .padding(DISpacing.lg)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { withAnimation(.easeOut(duration: 0.35)) { showsCover = false } }
+        .task {
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation(.easeOut(duration: 0.5)) { showsCover = false }
+        }
+        .transition(.opacity)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(Text(verbatim: book.titleEnglish))
+        .accessibilityHint(Text("Opens the narrations"))
     }
 
     private func hadithCard(_ entry: HadithEntry) -> some View {
@@ -358,13 +449,31 @@ struct HadithBookView: View {
             .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
 
+    /// Leaves search mode and opens the reader at this narration, exactly as
+    /// a cross-collection search result does.
+    private func jump(to entry: HadithEntry) {
+        isJumpingToResult = true
+        searchTask?.cancel()
+        searchText = ""
+        Task {
+            let index = (try? await repository.readingIndex(
+                bookID: book.id, canonicalID: entry.canonicalID)) ?? 0
+            await loadWindow(startingAt: max(0, index - 6))
+            pendingScrollTarget = entry.canonicalID
+            isJumpingToResult = false
+        }
+    }
+
     private func loadFirstPage() async {
         guard entries.isEmpty else { return }
         // Opening to a specific narration (a tapped search result) starts the
         // listing on the page that holds it and scrolls there.
         if let target = initialHadith,
-           let index = try? await repository.readingIndex(bookID: book.id, displayNumber: target) {
+           let index = try? await repository.readingIndex(bookID: book.id, canonicalID: target) {
             await loadWindow(startingAt: max(0, index - 6))
+            // The target is a canonicalID, which is exactly what each row's
+            // scroll id is — scrollTo used to be handed the printed number
+            // here, which matches no row, so the jump silently did nothing.
             pendingScrollTarget = target
             return
         }

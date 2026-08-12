@@ -170,6 +170,29 @@ struct HadithRepository: HadithRepositoryProtocol {
         return rows.first?.int("n") ?? 0
     }
 
+    /// Reading position keyed by canonicalID — exact even where a collection
+    /// repeats printed numbers across its books (schema v7).
+    func readingIndex(bookID: String, canonicalID: String) async throws -> Int? {
+        let rows = try await database.connection.query(
+            """
+            SELECT COUNT(*) AS n FROM hadith_entries
+            WHERE book_id = ? AND source_sequence < (
+                SELECT source_sequence FROM hadith_entries
+                WHERE canonical_id = ?
+            )
+            """,
+            [.text(bookID), .text(canonicalID)]
+        )
+        // The subquery is empty when the id is absent; COUNT then returns 0
+        // spuriously, so confirm the row actually exists first.
+        let exists = try await database.connection.query(
+            "SELECT 1 AS one FROM hadith_entries WHERE canonical_id = ?",
+            [.text(canonicalID)]
+        )
+        guard !exists.isEmpty else { return nil }
+        return rows.first?.int("n") ?? 0
+    }
+
     /// Substring search across whichever scripts are stored.
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry] {
         let needle = "%\(term)%"

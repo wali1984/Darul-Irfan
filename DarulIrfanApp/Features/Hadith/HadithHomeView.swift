@@ -101,7 +101,7 @@ struct HadithHomeView: View {
                 // just sit there: wrap it in the same value-based link the
                 // collection list uses so tapping navigates within this stack.
                 if let book = books.first(where: { $0.id == entry.bookID }) {
-                    NavigationLink(value: HadithRoute.hadith(book, entry.displayNumber)) {
+                    NavigationLink(value: HadithRoute.hadith(book, entry.canonicalID)) {
                         resultCard(entry)
                     }
                     .buttonStyle(DIPressableStyle())

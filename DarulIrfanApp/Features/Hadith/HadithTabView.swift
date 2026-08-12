@@ -10,7 +10,10 @@ import SwiftUI
 enum HadithRoute: Hashable {
     case collection(HadithBook)
     /// Open a collection scrolled to a specific narration — e.g. a tapped
-    /// search result. Carries the printed number so the reader can jump to it.
+    /// search result. Carries the narration's canonicalID: the printed number
+    /// is not unique in collections whose sources restart numbering per book
+    /// (schema v7), and the reader's rows are identified by canonicalID, so
+    /// only this key both names one narration and matches a scroll target.
     case hadith(HadithBook, String)
 }
 
@@ -38,12 +41,12 @@ struct HadithTabView: View {
                             repository: dependencies.hadithRepository,
                             appState: appState
                         )
-                    case .hadith(let book, let displayNumber):
+                    case .hadith(let book, let canonicalID):
                         HadithBookView(
                             book: book,
                             repository: dependencies.hadithRepository,
                             appState: appState,
-                            initialHadith: displayNumber
+                            initialHadith: canonicalID
                         )
                     }
                 }

@@ -46,6 +46,11 @@ protocol HadithRepositoryProtocol: Sendable {
     /// or nil if it is not present. Lets the reader open straight to a hadith
     /// (e.g. a tapped search result) by computing which page holds it.
     func readingIndex(bookID: String, displayNumber: String) async throws -> Int?
+    /// Same, keyed by canonicalID — the identity a search result carries.
+    /// Display numbers repeat in collections whose sources restart numbering
+    /// per book (schema v7), so a deep link by number can land on the wrong
+    /// narration; the canonical key cannot.
+    func readingIndex(bookID: String, canonicalID: String) async throws -> Int?
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry]
     /// A narrator's bundled biography for the reader's tap-to-open bio sheet.
     func narrator(id: Int) async throws -> HadithNarrator?

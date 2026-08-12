@@ -95,10 +95,17 @@ struct NarratorBioSheet: View {
                 }
             }
 
-            // Long-form biography in the reader's language, if prepared.
+            // Long-form biography in the reader's language, if prepared; the
+            // source's short description fills in where no prose bio exists.
+            // The Urdu fallback is the Arabic description — Arabic script,
+            // which Urdu readers read natively — never the English.
             if let bio = isUrdu ? n.bioUrdu : n.bioEnglish, !bio.isEmpty {
                 sectionTitle("Biography")
                 localizedProse(bio)
+            } else if let desc = isUrdu ? n.descriptionArabic : n.descriptionEnglish,
+                      !desc.isEmpty {
+                sectionTitle("Description")
+                localizedProse(desc)
             } else if isUrdu, (n.needsUrdu ?? false) {
                 Text("An Urdu biography is being prepared.")
                     .font(.footnote).italic()
@@ -158,17 +165,39 @@ struct NarratorBioSheet: View {
         }
     }
 
+    /// Strictly per-language rows. In English UI every value is the page's own
+    /// English column; in Urdu UI the Urdu layer or the Arabic column — which
+    /// Urdu readers read natively — never the reverse. A fact the source lacks
+    /// in the reader's language is simply not shown, rather than padding the
+    /// sheet with the wrong script (the "bio is Arabic-only" defect).
     private func factRows(_ n: HadithNarrator) -> [(String, String)] {
         var rows: [(String, String)] = []
         func add(_ label: String, _ value: String?) {
             if let value, !value.isEmpty { rows.append((label, value)) }
         }
-        add(String(localized: "Grade"), isUrdu ? (n.gradeUrdu ?? n.gradeArabic) : (n.gradeEnglish ?? n.gradeArabic))
-        add(String(localized: "Kunya"), n.kunya ?? n.kunyaArabic)
-        add(String(localized: "Generation"), n.generation)
-        add(String(localized: "Died"), n.deathYear)
-        add(String(localized: "Cities"), isUrdu ? (n.citiesArabic ?? n.cities) : (n.cities ?? n.citiesArabic))
-        add(String(localized: "Affiliations"), n.affiliations ?? n.affiliationsArabic)
+        if isUrdu {
+            add(String(localized: "Grade"), n.gradeUrdu ?? n.gradeArabic)
+            add(String(localized: "Byname"), n.bynameArabic)
+            add(String(localized: "Kunya"), n.kunyaArabic)
+            add(String(localized: "Generation"), n.generationArabic)
+            add(String(localized: "Profession"), n.professionArabic)
+            add(String(localized: "School"), n.madhhabArabic)
+            add(String(localized: "Died"), n.deathYearArabic ?? n.deathYear)
+            add(String(localized: "Cities"), n.citiesArabic)
+            add(String(localized: "Affiliations"), n.affiliationsArabic)
+            add(String(localized: "Lineage"), n.lineageUrdu ?? n.lineageArabic)
+        } else {
+            add(String(localized: "Grade"), n.gradeEnglish)
+            add(String(localized: "Byname"), n.byname)
+            add(String(localized: "Kunya"), n.kunya)
+            add(String(localized: "Generation"), n.generation)
+            add(String(localized: "Profession"), n.profession)
+            add(String(localized: "School"), n.madhhab)
+            add(String(localized: "Died"), n.deathYear)
+            add(String(localized: "Cities"), n.cities)
+            add(String(localized: "Affiliations"), n.affiliations)
+            add(String(localized: "Lineage"), n.lineageEnglish)
+        }
         if let count = n.hadithCount { add(String(localized: "Narrations"), "\(count)") }
         return rows
     }

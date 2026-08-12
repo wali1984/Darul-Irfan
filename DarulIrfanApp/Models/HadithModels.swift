@@ -257,12 +257,26 @@ struct HadithNarrator: Codable, Sendable, Identifiable, Equatable {
     var kunya: String?
     var kunyaArabic: String?
     var generation: String?
+    var generationArabic: String?
     var deathYear: String?
+    var deathYearArabic: String?
+    /// The narrator's laqab (title/byname), profession, madhhab and the
+    /// source's short description — each language in its own key, extracted
+    /// from the bio page's labelled pairs. Never cross-filled.
+    var byname: String?
+    var bynameArabic: String?
+    var profession: String?
+    var professionArabic: String?
+    var madhhab: String?
+    var madhhabArabic: String?
+    var descriptionEnglish: String?
+    var descriptionArabic: String?
     var gradeEnglish: String?
     var gradeArabic: String?
     var gradeUrdu: String?
     var lineageEnglish: String?
     var lineageArabic: String?
+    var lineageUrdu: String?
     var cities: String?
     var citiesArabic: String?
     var affiliations: String?
