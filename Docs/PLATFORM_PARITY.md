@@ -17,6 +17,7 @@ by construction (hash-verified on every sync); this table is about the reader.
 | Colored inline isnad/matn/verse spans, tappable | ✔ | ✔ | ✔ ClickableSpan | ✔ Span.onClick |
 | Verse quote opens the Quran reader | ✔ | ✔ | ✔ | ✔ |
 | Kitab (book) section headers | ✔ | ✔ | ✔ | ✔ |
+| Searchable contents page, jumps to a kitab's first narration | ✔ sheet | ✔ overlay | ✔ dialog | ✔ overlay |
 
 Implementation notes:
 
@@ -30,17 +31,27 @@ Implementation notes:
 * **Harmony** parses a pack lazily per collection and caches it; the
   cross-collection search parses each pack transiently so the pass never
   accumulates the full corpus. Arabic renders as `Text`/`Span` runs with
-  `onClick` on isnad and verse spans. Structurally verified (braces/parens
-  balanced, all builders present) — **cannot be compiled on this machine; the
-  first DevEco build is the remaining verification.**
+  `onClick` on isnad and verse spans. **Builds green** — DevEco Studio is
+  installed on the build machine and `hvigor assembleHap` produces the entry
+  HAP (2026-08-12).
 * **Web** renders the typed segments as tappable spans, searches all 26 packs
   sequentially with progress and result caps, and shows kitab headers from
   `sourceBook` plus the catalogue's section titles where a collection has
   them (currently Bukhari). Verified end to end locally: syntax, build and
   content checks all pass; the tab bar was widened to six columns.
 
-Known data limits shared by all platforms (not UI gaps): only Bukhari's
-catalogue entry carries named sections, so other collections head their books
-as "Book N" without a title — same as iOS; `sourceBook` is absent on a
-minority of records in from-scratch collections (those simply do not break to
-a header). Coverage figures live in HADITH_COVERAGE_GAPS.md.
+Known data limits shared by all platforms (not UI gaps): all 22 multi-book
+collections now carry named sections — 909 in total, 906 with Arabic titles and
+584 with English, each count verified against the records that carry its
+`sourceBook`. The 325 sections without an English title and all 909 without an
+Urdu one are reviewed-translation gaps, held behind the gate in
+HADITH_TRANSLATION_GATE.md rather than machine-filled; those headers fall back
+to the Arabic title, which Urdu readers read natively. `sourceBook` is now
+absent only on 12 records across the enriched core packs plus the 442 entries
+of the four single-page works, which have no kutub at all. Coverage figures
+live in HADITH_COVERAGE_GAPS.md.
+
+Build verification (2026-08-12, all from `C:\Dev\Automation`): Android
+`gradlew assembleDebug` and Harmony `hvigor assembleHap` both succeed on this
+machine; Web passes `build.mjs` + `verify.mjs`; iOS type-checking remains
+Codemagic's `ios-verify`.
