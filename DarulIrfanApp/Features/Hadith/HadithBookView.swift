@@ -322,6 +322,10 @@ struct HadithBookView: View {
                     missingTranslationNote
                 }
 
+                if entry.isMachineTranslated(languageCode: languageCode) {
+                    machineDraftNote
+                }
+
                 referenceBlock(entry)
             }
         }
@@ -466,6 +470,17 @@ struct HadithBookView: View {
         case "ar": return "This narration has no Arabic text"
         default: return "This narration has no English translation"
         }
+    }
+
+    /// Shown beneath a translation that is still an unreviewed machine draft.
+    /// Sacred text carries its provenance visibly: a reader must be able to
+    /// tell a reviewed translation from one awaiting scholarly review without
+    /// leaving the page.
+    private var machineDraftNote: some View {
+        Label("Machine translation — pending scholarly review", systemImage: "exclamationmark.triangle")
+            .font(.caption2)
+            .foregroundStyle(DIColor.textMuted)
+            .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
 
     private var missingTranslationNote: some View {

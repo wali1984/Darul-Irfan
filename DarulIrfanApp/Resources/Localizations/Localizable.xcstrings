@@ -4,120 +4,290 @@
     "All 114 surahs with translation and tafsir": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "All 114 surahs with translation and tafsir" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "تمام ۱۱۴ سورتیں ترجمہ اور تفسیر کے ساتھ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All 114 surahs with translation and tafsir"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمام ۱۱۴ سورتیں ترجمہ اور تفسیر کے ساتھ"
+          }
+        }
       }
     },
     "Hadith": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Hadith" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "حدیث" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hadith"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حدیث"
+          }
+        }
       }
     },
     "Read": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Read" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "مطالعہ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطالعہ"
+          }
+        }
       }
     },
     "Seven collections in Arabic, English and Urdu": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Seven collections in Arabic, English and Urdu" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "سات مجموعے عربی، انگریزی اور اردو میں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seven collections in Arabic, English and Urdu"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سات مجموعے عربی، انگریزی اور اردو میں"
+          }
+        }
       }
     },
     "Show both readers": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Show both readers" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "دونوں شعبے دکھائیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show both readers"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دونوں شعبے دکھائیں"
+          }
+        }
       }
     },
     "This narration has no Arabic text": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "This narration has no Arabic text" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اس روایت کا عربی متن دستیاب نہیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This narration has no Arabic text"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس روایت کا عربی متن دستیاب نہیں"
+          }
+        }
       }
     },
     "This narration has no English translation": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "This narration has no English translation" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اس روایت کا انگریزی ترجمہ دستیاب نہیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This narration has no English translation"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس روایت کا انگریزی ترجمہ دستیاب نہیں"
+          }
+        }
       }
     },
     "This narration has no Urdu translation": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "This narration has no Urdu translation" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اس روایت کا اردو ترجمہ دستیاب نہیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This narration has no Urdu translation"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس روایت کا اردو ترجمہ دستیاب نہیں"
+          }
+        }
       }
     },
     "Zikr begins in": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Zikr begins in" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ذکر شروع ہونے میں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr begins in"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر شروع ہونے میں"
+          }
+        }
       }
     },
     "Zikr in progress": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Zikr in progress" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ذکر جاری ہے" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr in progress"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر جاری ہے"
+          }
+        }
       }
     },
     "Arabic and translation": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Arabic and translation" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "عربی اور ترجمہ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arabic and translation"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عربی اور ترجمہ"
+          }
+        }
       }
     },
     "Arabic only": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Arabic only" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "صرف عربی" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arabic only"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صرف عربی"
+          }
+        }
       }
     },
     "Automatically open next surah": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Automatically open next surah" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اگلی سورت خودکار طور پر کھولیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatically open next surah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی سورت خودکار طور پر کھولیں"
+          }
+        }
       }
     },
     "Opening next surah…": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Opening next surah…" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اگلی سورت کھولی جا رہی ہے…" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opening next surah…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی سورت کھولی جا رہی ہے…"
+          }
+        }
       }
     },
     "Quran reading complete": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Quran reading complete" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "قرآن کا مطالعہ مکمل ہوا" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quran reading complete"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن کا مطالعہ مکمل ہوا"
+          }
+        }
       }
     },
     "Reading display": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Reading display" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "مطالعہ کا انداز" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading display"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطالعہ کا انداز"
+          }
+        }
       }
     },
     "Translation only": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Translation only" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "صرف ترجمہ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translation only"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صرف ترجمہ"
+          }
+        }
       }
     },
     "The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission.": {
@@ -786,162 +956,392 @@
     "Explore": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Explore" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "دریافت کریں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دریافت کریں"
+          }
+        }
       }
     },
     "Updates": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Updates" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "تازہ معلومات" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updates"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تازہ معلومات"
+          }
+        }
       }
     },
     "Official Updates": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Official Updates" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "سرکاری تازہ معلومات" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Official Updates"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری تازہ معلومات"
+          }
+        }
       }
     },
     "Live Zikr": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Live Zikr" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست ذکر" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست ذکر"
+          }
+        }
       }
     },
     "Live & Upcoming": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Live & Upcoming" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست اور آئندہ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live & Upcoming"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست اور آئندہ"
+          }
+        }
       }
     },
     "Official Update": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Official Update" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "سرکاری اطلاع" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Official Update"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری اطلاع"
+          }
+        }
       }
     },
     "Showing saved updates": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Showing saved updates" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "محفوظ شدہ تازہ معلومات دکھائی جا رہی ہیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Showing saved updates"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محفوظ شدہ تازہ معلومات دکھائی جا رہی ہیں"
+          }
+        }
       }
     },
     "No official updates yet": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "No official updates yet" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ابھی کوئی سرکاری تازہ اطلاع نہیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No official updates yet"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی کوئی سرکاری تازہ اطلاع نہیں"
+          }
+        }
       }
     },
     "Official Alerts & Privacy": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Official Alerts & Privacy" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "سرکاری اطلاعات اور رازداری" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Official Alerts & Privacy"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری اطلاعات اور رازداری"
+          }
+        }
       }
     },
     "Official live and update alerts": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Official live and update alerts" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست اور تازہ اطلاعات" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Official live and update alerts"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست اور تازہ اطلاعات"
+          }
+        }
       }
     },
     "Next-prayer Live Activity": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Next-prayer Live Activity" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اگلی نماز کی لائیو ایکٹیویٹی" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next-prayer Live Activity"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی نماز کی لائیو ایکٹیویٹی"
+          }
+        }
       }
     },
     "Alert Topics": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Alert Topics" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اطلاعات کے موضوعات" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alert Topics"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اطلاعات کے موضوعات"
+          }
+        }
       }
     },
     "Live zikr": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Live zikr" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست ذکر" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست ذکر"
+          }
+        }
       }
     },
     "Broadcasts": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Broadcasts" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "نشریات" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Broadcasts"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشریات"
+          }
+        }
       }
     },
     "Diagnostics": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Diagnostics" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "تشخیصی معلومات" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diagnostics"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تشخیصی معلومات"
+          }
+        }
       }
     },
     "Share diagnostics": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Share diagnostics" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "تشخیصی معلومات شیئر کریں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share diagnostics"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تشخیصی معلومات شیئر کریں"
+          }
+        }
       }
     },
     "Ask me later": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Ask me later" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "بعد میں پوچھیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask me later"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بعد میں پوچھیں"
+          }
+        }
       }
     },
     "Do not share": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Do not share" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "شیئر نہ کریں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do not share"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شیئر نہ کریں"
+          }
+        }
       }
     },
     "Share anonymously": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Share anonymously" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "گمنام طور پر شیئر کریں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share anonymously"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گمنام طور پر شیئر کریں"
+          }
+        }
       }
     },
     "Watch on YouTube": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Watch on YouTube" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "یوٹیوب پر دیکھیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch on YouTube"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یوٹیوب پر دیکھیں"
+          }
+        }
       }
     },
     "Join OURSHEIKH on Paltalk": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Join OURSHEIKH on Paltalk" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "پال ٹاک پر OURSHEIKH میں شامل ہوں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join OURSHEIKH on Paltalk"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پال ٹاک پر OURSHEIKH میں شامل ہوں"
+          }
+        }
       }
     },
     "Listen live": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Listen live" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "براہِ راست سنیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen live"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست سنیں"
+          }
+        }
       }
     },
     "Load more updates": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Load more updates" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "مزید تازہ معلومات لوڈ کریں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Load more updates"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مزید تازہ معلومات لوڈ کریں"
+          }
+        }
       }
     },
     "%@ %@": {
@@ -1998,23 +2398,6 @@
         }
       }
     },
-    "Announcements": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Announcements"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اعلانات"
-          }
-        }
-      }
-    },
     "App": {
       "extractionState": "manual",
       "localizations": {
@@ -2113,40 +2496,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "عربی"
-          }
-        }
-      }
-    },
-    "Article": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Article"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مضمون"
-          }
-        }
-      }
-    },
-    "Articles": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Articles"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مضامین"
           }
         }
       }
@@ -2613,64 +2962,154 @@
     "Browse the books in this collection": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Browse the books in this collection" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u0627\u0633 \u0645\u062c\u0645\u0648\u0639\u06d2 \u06a9\u06cc \u06a9\u062a\u0627\u0628\u06cc\u06ba \u062f\u06cc\u06a9\u06be\u06cc\u06ba" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browse the books in this collection"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس مجموعے کی کتابیں دیکھیں"
+          }
+        }
       }
     },
     "Contents": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Contents" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u0641\u06c1\u0631\u0633\u062a" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contents"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فہرست"
+          }
+        }
       }
     },
     "Contents unavailable": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Contents unavailable" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u0641\u06c1\u0631\u0633\u062a \u062f\u0633\u062a\u06cc\u0627\u0628 \u0646\u06c1\u06cc\u06ba" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contents unavailable"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فہرست دستیاب نہیں"
+          }
+        }
       }
     },
     "Biography": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Biography" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u0633\u0648\u0627\u0646\u062d" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biography"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سوانح"
+          }
+        }
       }
     },
     "Description": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Description" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u062a\u0639\u0627\u0631\u0641" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Description"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعارف"
+          }
+        }
       }
     },
     "Scholarly appraisals": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Scholarly appraisals" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u0627\u0626\u0645\u06c1 \u0648 \u0645\u062d\u062f\u062b\u06cc\u0646 \u06a9\u06cc \u0622\u0631\u0627" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scholarly appraisals"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ائمہ و محدثین کی آرا"
+          }
+        }
       }
     },
     "Search books": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Search books" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u06a9\u062a\u0627\u0628\u06cc\u06ba \u062a\u0644\u0627\u0634 \u06a9\u0631\u06cc\u06ba" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search books"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتابیں تلاش کریں"
+          }
+        }
       }
     },
     "Start from the beginning": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Start from the beginning" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u0622\u063a\u0627\u0632 \u0633\u06d2 \u067e\u0691\u06be\u06cc\u06ba" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start from the beginning"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آغاز سے پڑھیں"
+          }
+        }
       }
     },
     "This collection does not contain sourced book divisions.": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "This collection does not contain sourced book divisions." } },
-        "ur": { "stringUnit": { "state": "translated", "value": "\u0627\u0633 \u0645\u062c\u0645\u0648\u0639\u06d2 \u0645\u06cc\u06ba \u0645\u0627\u062e\u0630 \u0633\u06d2 \u062a\u0635\u062f\u06cc\u0642 \u0634\u062f\u06c1 \u06a9\u062a\u0627\u0628\u06cc \u062a\u0642\u0633\u06cc\u0645 \u0645\u0648\u062c\u0648\u062f \u0646\u06c1\u06cc\u06ba \u06c1\u06d2\u06d4" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This collection does not contain sourced book divisions."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس مجموعے میں ماخذ سے تصدیق شدہ کتابی تقسیم موجود نہیں ہے۔"
+          }
+        }
       }
     },
     "Browse": {
@@ -4322,23 +4761,6 @@
         }
       }
     },
-    "Events": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Events"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تقریبات"
-          }
-        }
-      }
-    },
     "Events & Dar-ul-Irfan": {
       "extractionState": "manual",
       "localizations": {
@@ -5610,23 +6032,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "علمِ مقدس کی روشنی"
-          }
-        }
-      }
-    },
-    "Listen live": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Listen live"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "براہِ راست سنیں"
           }
         }
       }
@@ -8929,15 +9334,159 @@
         }
       }
     },
-    "Allow notifications in iOS Settings to receive official live alerts.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Allow notifications in iOS Settings to receive official live alerts."}},"ur":{"stringUnit":{"state":"translated","value":"سرکاری لائیو اطلاعات حاصل کرنے کے لیے iOS Settings میں نوٹیفیکیشنز کی اجازت دیں۔"}}}},
-    "Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days."}},"ur":{"stringUnit":{"state":"translated","value":"گمنام Apple MetricKit تشخیصی معلومات صرف رضامندی کے بعد بھیجی جاتی ہیں۔ ان میں مقام، نشانات، نماز کی تاریخ، نام اور ای میل شامل نہیں ہوتے اور انہیں 30 دن تک رکھا جاتا ہے۔"}}}},
-    "Explore section": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Explore section"}},"ur":{"stringUnit":{"state":"translated","value":"دریافت کا حصہ"}}}},
-    "Loading official updates…": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Loading official updates…"}},"ur":{"stringUnit":{"state":"translated","value":"سرکاری اپ ڈیٹس لوڈ ہو رہی ہیں…"}}}},
-    "Official Alerts": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Official Alerts"}},"ur":{"stringUnit":{"state":"translated","value":"سرکاری اطلاعات"}}}},
-    "Open Settings": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Open Settings"}},"ur":{"stringUnit":{"state":"translated","value":"سیٹنگز کھولیں"}}}},
-    "Open in YouTube": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Open in YouTube"}},"ur":{"stringUnit":{"state":"translated","value":"YouTube میں کھولیں"}}}},
-    "The live broadcast is currently off air. Scheduled reminders remain available below.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"The live broadcast is currently off air. Scheduled reminders remain available below."}},"ur":{"stringUnit":{"state":"translated","value":"لائیو نشریات فی الحال بند ہے۔ طے شدہ یاد دہانیاں نیچے دستیاب ہیں۔"}}}},
-    "When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent."}},"ur":{"stringUnit":{"state":"translated","value":"فعال کرنے پر ایک بے ترتیب تنصیب شناخت اور Apple پش ٹوکن رجسٹر ہوتے ہیں۔ کوئی اکاؤنٹ، درست مقام، نماز کی تاریخ یا مطالعے کی سرگرمی نہیں بھیجی جاتی۔"}}}},
+    "Allow notifications in iOS Settings to receive official live alerts.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow notifications in iOS Settings to receive official live alerts."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری لائیو اطلاعات حاصل کرنے کے لیے iOS Settings میں نوٹیفیکیشنز کی اجازت دیں۔"
+          }
+        }
+      }
+    },
+    "Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گمنام Apple MetricKit تشخیصی معلومات صرف رضامندی کے بعد بھیجی جاتی ہیں۔ ان میں مقام، نشانات، نماز کی تاریخ، نام اور ای میل شامل نہیں ہوتے اور انہیں 30 دن تک رکھا جاتا ہے۔"
+          }
+        }
+      }
+    },
+    "Explore section": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore section"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دریافت کا حصہ"
+          }
+        }
+      }
+    },
+    "Loading official updates…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading official updates…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری اپ ڈیٹس لوڈ ہو رہی ہیں…"
+          }
+        }
+      }
+    },
+    "Official Alerts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Official Alerts"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری اطلاعات"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سیٹنگز کھولیں"
+          }
+        }
+      }
+    },
+    "Open in YouTube": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in YouTube"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube میں کھولیں"
+          }
+        }
+      }
+    },
+    "The live broadcast is currently off air. Scheduled reminders remain available below.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The live broadcast is currently off air. Scheduled reminders remain available below."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لائیو نشریات فی الحال بند ہے۔ طے شدہ یاد دہانیاں نیچے دستیاب ہیں۔"
+          }
+        }
+      }
+    },
+    "When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فعال کرنے پر ایک بے ترتیب تنصیب شناخت اور Apple پش ٹوکن رجسٹر ہوتے ہیں۔ کوئی اکاؤنٹ، درست مقام، نماز کی تاریخ یا مطالعے کی سرگرمی نہیں بھیجی جاتی۔"
+          }
+        }
+      }
+    },
     "Schedule not available": {
       "extractionState": "manual",
       "localizations": {
@@ -11848,183 +12397,443 @@
     "30-day": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "30-day" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "30 دن" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30-day"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 دن"
+          }
+        }
       }
     },
     "Archive record": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Archive record" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "محفوظ شدہ ریکارڈ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archive record"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محفوظ شدہ ریکارڈ"
+          }
+        }
       }
     },
     "Day streak": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Day streak" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "دن کا تسلسل" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day streak"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دن کا تسلسل"
+          }
+        }
       }
     },
     "Next Zikr": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Next Zikr" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "اگلا ذکر" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلا ذکر"
+          }
+        }
       }
     },
     "No zikr session scheduled": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "No zikr session scheduled" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ذکر کی کوئی نشست مقرر نہیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No zikr session scheduled"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کی کوئی نشست مقرر نہیں"
+          }
+        }
       }
     },
     "Prayers": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Prayers" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "نمازیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayers"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نمازیں"
+          }
+        }
       }
     },
     "Tafsir availability": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Tafsir availability" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "تفسیر کی دستیابی" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tafsir availability"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفسیر کی دستیابی"
+          }
+        }
       }
     },
     "This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically.": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically." } },
-        "ur": { "stringUnit": { "state": "translated", "value": "یہ مواد دارالعرفان کے محفوظ ذخیرے میں شامل ہے۔ بعد میں شامل کیا جانے والا تصدیق شدہ متن، تصویر، آڈیو یا دستاویز یہاں خودکار طور پر ظاہر ہوگا۔" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ مواد دارالعرفان کے محفوظ ذخیرے میں شامل ہے۔ بعد میں شامل کیا جانے والا تصدیق شدہ متن، تصویر، آڈیو یا دستاویز یہاں خودکار طور پر ظاہر ہوگا۔"
+          }
+        }
       }
     },
     "This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically.": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically." } },
-        "ur": { "stringUnit": { "state": "translated", "value": "موجودہ آف لائن نسخے میں اس سورت کی یہ تفسیر شامل نہیں۔ دارالعرفان تصدیق شدہ مقامی مواد کی تازہ کاری خودکار طور پر دیکھتا ہے۔" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجودہ آف لائن نسخے میں اس سورت کی یہ تفسیر شامل نہیں۔ دارالعرفان تصدیق شدہ مقامی مواد کی تازہ کاری خودکار طور پر دیکھتا ہے۔"
+          }
+        }
       }
     },
     "until session ends": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "until session ends" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "نشست ختم ہونے تک" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "until session ends"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست ختم ہونے تک"
+          }
+        }
       }
     },
     "Ayah": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Ayah" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "آیت" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیت"
+          }
+        }
       }
     },
     "Choose the devotional activity highlighted by the widget.": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Choose the devotional activity highlighted by the widget." } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ویجٹ میں نمایاں روحانی سرگرمی منتخب کریں۔" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose the devotional activity highlighted by the widget."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویجٹ میں نمایاں روحانی سرگرمی منتخب کریں۔"
+          }
+        }
       }
     },
     "completed today": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "completed today" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "آج مکمل" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "completed today"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آج مکمل"
+          }
+        }
       }
     },
     "Continue Quran": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Continue Quran" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "قرآن جاری رکھیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue Quran"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن جاری رکھیں"
+          }
+        }
       }
     },
     "Dashboard focus": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Dashboard focus" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ڈیش بورڈ کی ترجیح" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dashboard focus"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ڈیش بورڈ کی ترجیح"
+          }
+        }
       }
     },
     "day streak": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "day streak" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "دن کا تسلسل" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "day streak"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دن کا تسلسل"
+          }
+        }
       }
     },
     "Devotional Dashboard": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Devotional Dashboard" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "روحانی ڈیش بورڈ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devotional Dashboard"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روحانی ڈیش بورڈ"
+          }
+        }
       }
     },
     "Focus": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Focus" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ترجیح" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ترجیح"
+          }
+        }
       }
     },
     "Open Darul Irfan to continue": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Open Darul Irfan to continue" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "جاری رکھنے کے لیے دارالعرفان کھولیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Darul Irfan to continue"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاری رکھنے کے لیے دارالعرفان کھولیں"
+          }
+        }
       }
     },
     "Open Quran to begin": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Open Quran to begin" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "شروع کرنے کے لیے قرآن کھولیں" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Quran to begin"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شروع کرنے کے لیے قرآن کھولیں"
+          }
+        }
       }
     },
     "Overview": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Overview" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "خلاصہ" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overview"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خلاصہ"
+          }
+        }
       }
     },
     "Prayer progress": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Prayer progress" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "نماز کی پیش رفت" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer progress"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کی پیش رفت"
+          }
+        }
       }
     },
     "Prayer time reached": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Prayer time reached" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "نماز کا وقت ہو گیا" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer time reached"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کا وقت ہو گیا"
+          }
+        }
       }
     },
     "Prayer, Quran and zikr progress in one configurable widget.": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Prayer, Quran and zikr progress in one configurable widget." } },
-        "ur": { "stringUnit": { "state": "translated", "value": "نماز، قرآن اور ذکر کی پیش رفت ایک قابل ترتیب ویجٹ میں۔" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer, Quran and zikr progress in one configurable widget."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز، قرآن اور ذکر کی پیش رفت ایک قابل ترتیب ویجٹ میں۔"
+          }
+        }
       }
     },
     "Surah": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Surah" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "سورت" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سورت"
+          }
+        }
       }
     },
     "Zikr & Tasbih": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Zikr & Tasbih" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "ذکر و تسبیح" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr & Tasbih"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر و تسبیح"
+          }
+        }
       }
     },
     "≈ %@": {
@@ -12040,6 +12849,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "≈ %@"
+          }
+        }
+      }
+    },
+    "Machine translation — pending scholarly review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Machine translation — pending scholarly review"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشینی ترجمہ — علمی نظرثانی باقی ہے"
           }
         }
       }

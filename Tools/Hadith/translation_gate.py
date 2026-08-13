@@ -32,6 +32,18 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
 SEED = ROOT / "DarulIrfanApp" / "Resources" / "SeedData"
+# Every platform ships the identical seed; promotion must write all four or the
+# parity check that guards each release fails on the next build.
+REPO_ROOT = ROOT.parent
+SEED_DIRS = [
+    SEED,
+    REPO_ROOT / "DarulIrfanAndroid/app/src/main/assets/seed",
+    REPO_ROOT / "DarulIrfanHarmony/entry/src/main/resources/rawfile/seed",
+    REPO_ROOT / "DarulIrfanWeb/content",
+]
+# The seed is written with one-space indent. Re-serialising at any other width
+# rewrites all 26 packs and buries the actual change in a whole-file diff.
+INDENT = 1
 HADITH_FILES = sorted(
     p for p in SEED.glob("hadith_*.json")
     if p.name not in {"hadith_books.json", "hadith_narrators.json"}
@@ -47,6 +59,13 @@ PLACEHOLDER = re.compile(
     re.IGNORECASE,
 )
 APPROVED = "humanVerified"
+# A machine draft may ship only while it says so in the data. Every reader
+# surfaces this state as a visible "machine translation, pending review" note,
+# and the review that clears it happens once the corpus is complete. Promotion
+# records whichever state the response actually carried — a row never claims a
+# human read it because a machine filled it.
+MACHINE = "machineTranslated"
+ACCEPTED_STATES = {APPROVED, MACHINE}
 
 
 def text(value: object) -> str:
@@ -193,8 +212,12 @@ def response_errors(item: dict, response: dict) -> list[str]:
         return [f"{prefix}: identifier mismatch"]
     if response.get("sourceHash") != item["sourceHash"]:
         errors.append(f"{prefix}: stale or incorrect sourceHash")
-    if response.get("reviewState") != APPROVED:
-        errors.append(f"{prefix}: reviewState must be {APPROVED}")
+    state = response.get("reviewState")
+    if state not in ACCEPTED_STATES:
+        errors.append(f"{prefix}: reviewState must be {APPROVED} or {MACHINE}")
+    # Both states are attributable: a human vouches under their own name, a
+    # machine draft names the model that produced it. Anonymous content cannot
+    # be re-checked later, which is the whole reason the review pass is possible.
     if not text(response.get("reviewer")) or not text(response.get("reviewedAt")):
         errors.append(f"{prefix}: reviewer and reviewedAt are required")
     for lang in item["needs"]:
@@ -283,6 +306,34 @@ SOURCE:
     }
 
 
+def write_seed(name: str, payload) -> None:
+    """Write one seed file to every platform, in the seed's own format.
+
+    All four platforms must stay byte-identical; the release parity check
+    compares their hashes. Indentation matches what the packs already use, so
+    a promotion diffs as the rows it changed rather than as a whole-file
+    reformat.
+    """
+    body = json.dumps(payload, ensure_ascii=False, indent=INDENT) + "\n"
+    for seed in SEED_DIRS:
+        target = seed / name
+        if target.parent.exists():
+            target.write_text(body, encoding="utf-8", newline="\n")
+
+
+def bump_manifest() -> None:
+    """Advance the seed version so installed apps re-import after a promotion."""
+    for seed in SEED_DIRS:
+        path = seed / "manifest.json"
+        if not path.exists():
+            continue
+        raw = path.read_text(encoding="utf-8", newline="")
+        current = int(re.search(r'"version"\s*:\s*(\d+)', raw).group(1))
+        path.write_text(
+            re.sub(r'("version"\s*:\s*)\d+', lambda m: m.group(1) + str(current + 1), raw, count=1),
+            encoding="utf-8", newline="")
+
+
 def promote(response_path: Path):
     queue, approved, errors = validate(response_path, require_complete=True)
     if errors:
@@ -299,15 +350,19 @@ def promote(response_path: Path):
             response = approved.get(("hadith", row["canonicalID"]))
             if not response:
                 continue
-            if not text(row.get("text_en")):
+            state = response.get("reviewState")
+            source = "reviewedTranslation" if state == APPROVED else "machineTranslation"
+            if not text(row.get("text_en")) and text(response.get("textEnglish")):
                 row["text_en"] = response["textEnglish"]
-                row["englishSource"] = "reviewedTranslation"
-                row["englishReviewState"] = APPROVED
-            if not text(row.get("text_ur")):
+                row["englishSource"] = source
+                row["englishReviewState"] = state
+                row["englishTranslator"] = response["reviewer"]
+            if not text(row.get("text_ur")) and text(response.get("textUrdu")):
                 row["text_ur"] = response["textUrdu"]
-                row["urduSource"] = "reviewedTranslation"
-                row["urduReviewState"] = APPROVED
-        path.write_text(json.dumps(rows, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                row["urduSource"] = source
+                row["urduReviewState"] = state
+                row["urduTranslator"] = response["reviewer"]
+        write_seed(path.name, rows)
 
     narrators = load(NARRATORS)
     for narrator in narrators:
@@ -315,13 +370,16 @@ def promote(response_path: Path):
             response = approved.get(("appraisal", f"{narrator['id']}:{index}"))
             if not response:
                 continue
-            if not text(appraisal.get("textEnglish")):
+            state = response.get("reviewState")
+            if not text(appraisal.get("textEnglish")) and text(response.get("textEnglish")):
                 appraisal["textEnglish"] = response["textEnglish"]
-            if not text(appraisal.get("textUrdu")):
+            if not text(appraisal.get("textUrdu")) and text(response.get("textUrdu")):
                 appraisal["textUrdu"] = response["textUrdu"]
-            appraisal["translationSource"] = "reviewedTranslation"
-            appraisal["translationReviewState"] = APPROVED
-    NARRATORS.write_text(json.dumps(narrators, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            appraisal["translationSource"] = (
+                "reviewedTranslation" if state == APPROVED else "machineTranslation")
+            appraisal["translationReviewState"] = state
+            appraisal["translator"] = response["reviewer"]
+    write_seed(NARRATORS.name, narrators)
 
     catalog = load(BOOKS)
     for book in catalog.get("books", []):
@@ -329,20 +387,29 @@ def promote(response_path: Path):
             response = approved.get(("section", f"{book['id']}:{section['number']}"))
             if not response:
                 continue
-            if not text(section.get("titleEnglish")):
+            state = response.get("reviewState")
+            if not text(section.get("titleEnglish")) and text(response.get("textEnglish")):
                 section["titleEnglish"] = response["textEnglish"]
-            if not text(section.get("titleUrdu")):
+            if not text(section.get("titleUrdu")) and text(response.get("textUrdu")):
                 section["titleUrdu"] = response["textUrdu"]
-            section["translationSource"] = "reviewedTranslation"
-            section["translationReviewState"] = APPROVED
-    BOOKS.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            section["translationSource"] = (
+                "reviewedTranslation" if state == APPROVED else "machineTranslation")
+            section["translationReviewState"] = state
+    write_seed(BOOKS.name, catalog)
 
     # Sacred-source invariant: promotion may fill translations only.
     for path in HADITH_FILES:
         for row in load(path):
             if row.get("text_ar") != original_arabic[row["canonicalID"]]:
                 raise SystemExit(f"Arabic mutation detected after promotion: {row['canonicalID']}")
-    print(f"promoted {len(approved):,} fully reviewed translation records")
+    bump_manifest()
+    human = sum(1 for r in approved.values() if r.get("reviewState") == APPROVED)
+    machine = len(approved) - human
+    print(f"promoted {len(approved):,} records "
+          f"({human:,} {APPROVED}, {machine:,} {MACHINE}) to {len(SEED_DIRS)} seed dirs")
+    if machine:
+        print(f"  {machine:,} rows are machine drafts and say so in the data; every "
+              f"reader labels them and public release stays gated on review.")
 
 
 def main() -> None:

@@ -162,25 +162,31 @@ between a machine draft and a reader who will treat it as scholarship. It also
 silently converts a documented gap into an undocumented error — the worst
 outcome available, because nobody downstream can tell which rows to re-check.
 
-You have three honest options. **Ask the repository owner which one applies
-before promoting a single row:**
+**The owner has chosen option 2 below** (2026-08-12): promote as
+`machineTranslated`, complete the corpus, then review it whole. The
+infrastructure for that now exists — set `reviewState: "machineTranslated"`,
+name the model that produced the row in `reviewer`, and stamp `reviewedAt`.
+`promote` records that state per row, every reader labels it, and the review
+pass later flips cleared rows to `humanVerified`. Do **not** write
+`humanVerified` yourself under any circumstance.
+
+The three options, for the record:
 
 1. **Human review.** Produce drafts, hand them to a qualified reviewer, and
    promote only what comes back approved with that reviewer's name. Correct,
    and slow at this scale.
-2. **Ship as machine-translated, labelled.** Extend the gate with a distinct
-   `machineTranslated` review state that promotes into fields carrying explicit
-   provenance — the pattern already used for the ahlesunnatpak Urdu fills
-   (`urduSource`, `urduReviewState: machine_provisional`), which the readers
-   surface and which gates public release while allowing TestFlight. This is
-   honest and it unblocks the content. It requires the owner's decision, a
-   reader-visible label, and a corresponding note in
-   `Docs/HADITH_TRANSLATION_GATE.md`.
+2. **Ship as machine-translated, labelled — CHOSEN, and already built.** The
+   gate accepts `machineTranslated`, writes `englishReviewState` /
+   `urduReviewState` and a `translator` naming what produced each row, syncs
+   all four platform seeds, and bumps the manifest. All four readers render
+   "Machine translation — pending scholarly review" beneath such a row, in
+   English and Urdu. Public release stays gated on the review; TestFlight does
+   not.
 3. **Do not promote.** Leave the drafts staged. Every reader already shows a
    plain "no translation" note, on all four platforms, and that is not a defect.
 
-Option 2 is the likely intent, but it is the owner's call, not yours, and it
-needs the label built before the data lands — not after.
+The label was built before this line was written, so a promoted draft cannot
+reach a reader unmarked.
 
 ## 6. What "done" looks like
 
