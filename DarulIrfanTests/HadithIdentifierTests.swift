@@ -194,7 +194,9 @@ final class HadithIdentifierTests: XCTestCase {
 
         let found = try await repository.firstEntry(bookID: "bukhari", sourceBook: 2)
         XCTAssertEqual(found?.canonicalID, later.canonicalID)
-        XCTAssertNil(try await repository.firstEntry(bookID: "bukhari", sourceBook: 99))
+        // Hoisted: XCTAssert* take autoclosures, which cannot contain `await`.
+        let absent = try await repository.firstEntry(bookID: "bukhari", sourceBook: 99)
+        XCTAssertNil(absent)
     }
 
     // MARK: - Sub-numbered narrations survive
