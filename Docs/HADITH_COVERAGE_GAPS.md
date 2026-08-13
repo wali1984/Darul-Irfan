@@ -174,10 +174,13 @@ to claim a public-domain dedication that no longer covers all of it.
 
 ## 6. Narrator bios — what is and is not translated
 
-6,641 narrators, each with name, grade, lineage, affiliations, teacher/student
+12,643 narrators, each with name, grade, lineage, affiliations, teacher/student
 graphs and the source's *jarḥ wa taʿdīl* appraisals.
 
-**Urdu coverage is 100%**, and none of it is machine-translated prose:
+Narrator identity and grade fields have an Urdu layer, but the scholarly
+appraisal prose does not. The current exact appraisal gaps are 72,108 English
+and 87,280 Urdu rows. They are now part of the same reviewed translation gate
+as Hadith text and kitab titles; see `HADITH_TRANSLATION_GATE.md`.
 
 * `nameUrdu` and `lineageUrdu` re-use the sourced Arabic verbatim — Urdu is
   written in Arabic script, so these need no conversion.
@@ -185,7 +188,14 @@ graphs and the source's *jarḥ wa taʿdīl* appraisals.
   table covering all 218 distinct grade tokens in the corpus. Grades are a closed
   technical vocabulary, not prose, so this is terminology mapping and every line
   is reviewable individually.
-* Appraisals stay in their sourced Arabic and are not counted as a gap.
+* Arabic appraisals remain the immutable source and are not presented as their
+  own English or Urdu translation. The bio sheet renders the Arabic body under
+  the scholar's name in the Quran face, right-to-left — visibly the source —
+  and adds a translation beneath it only where one has been reviewed. The only
+  rows withheld are the 1,250 that carry a scholar label and no body in any
+  language; withholding sourced Arabic instead would blank the section for
+  every Urdu reader, who reads that script natively, and for 65% of English
+  readers, while showing nothing truer in its place.
 
 Tagged `urduSource: arabicSource+glossary`, `urduReviewState: machine_provisional`.
 The terminology is accurate but has not been checked by a qualified reviewer;

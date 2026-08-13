@@ -44,6 +44,8 @@ struct HadithSection: Codable, Sendable, Identifiable, Hashable {
     var number: Int
     var titleEnglish: String
     var titleArabic: String
+    /// Reviewed Urdu kitab title. Older packs omit it and continue to decode.
+    var titleUrdu: String? = nil
     /// Narrations in this book, counted from the packaged records.
     var hadithCount: Int
 
@@ -51,7 +53,8 @@ struct HadithSection: Codable, Sendable, Identifiable, Hashable {
 
     /// Title for the reader's current language (Arabic shown alongside).
     func title(languageCode: String) -> String {
-        languageCode == "ur" ? titleArabic : titleEnglish
+        if languageCode == "ur", let titleUrdu, !titleUrdu.isEmpty { return titleUrdu }
+        return languageCode == "ur" ? titleArabic : titleEnglish
     }
 }
 

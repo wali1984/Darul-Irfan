@@ -51,6 +51,9 @@ protocol HadithRepositoryProtocol: Sendable {
     /// per book (schema v7), so a deep link by number can land on the wrong
     /// narration; the canonical key cannot.
     func readingIndex(bookID: String, canonicalID: String) async throws -> Int?
+    /// First narration in a kitab, used by the native contents page to jump
+    /// directly into that book without guessing from printed numbering.
+    func firstEntry(bookID: String, sourceBook: Int) async throws -> HadithEntry?
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry]
     /// A narrator's bundled biography for the reader's tap-to-open bio sheet.
     func narrator(id: Int) async throws -> HadithNarrator?

@@ -113,7 +113,8 @@ struct NarratorBioSheet: View {
             }
 
             // Scholarly appraisals (jarḥ wa-taʿdīl): Arabic + translation if any.
-            if let appraisals = n.appraisals, !appraisals.isEmpty {
+            let appraisals = publishedAppraisals(n)
+            if !appraisals.isEmpty {
                 sectionTitle("Scholarly appraisals")
                 ForEach(Array(appraisals.enumerated()), id: \.offset) { _, a in
                     DICard {
@@ -137,6 +138,28 @@ struct NarratorBioSheet: View {
                     }
                 }
             }
+        }
+    }
+
+    /// Appraisals worth rendering: those that actually carry the scholar's
+    /// words. The store holds 16,422 rows with a scholar name and no body at
+    /// all — they would draw an empty card — and those are what must go.
+    ///
+    /// The Arabic body itself is shown to every reader, because it is the
+    /// source rather than a claim of translation: it renders in the Quran face,
+    /// right-to-left, under the scholar's name, and a translation is added
+    /// beneath it only where one has been reviewed. Requiring a translation
+    /// instead would hide 65% of appraisals from English readers and *all* of
+    /// them from Urdu readers, who read Arabic script natively — the same
+    /// reason `HadithSection.title` and the narrator's name and lineage fall
+    /// back to Arabic for Urdu rather than showing nothing.
+    private func publishedAppraisals(_ narrator: HadithNarrator) -> [NarratorAppraisal] {
+        (narrator.appraisals ?? []).filter { appraisal in
+            let arabic = appraisal.textArabic?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let translated = (isUrdu ? appraisal.textUrdu : appraisal.textEnglish)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return !arabic.isEmpty || !translated.isEmpty
         }
     }
 

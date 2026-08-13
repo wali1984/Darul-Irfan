@@ -181,6 +181,22 @@ final class HadithIdentifierTests: XCTestCase {
         XCTAssertNil(none)
     }
 
+    /// The contents page resolves a kitab to its first canonical narration,
+    /// even when printed numbers restart or repeat in another kitab.
+    func testFirstEntryLocatesBeginningOfSourceBook() async throws {
+        var first = makeEntry(book: "bukhari", number: "1", sequence: 1)
+        first.sourceBook = 1
+        var later = makeEntry(book: "bukhari", number: "1", sequence: 20)
+        later.sourceBook = 2
+        var secondInBook = makeEntry(book: "bukhari", number: "2", sequence: 21)
+        secondInBook.sourceBook = 2
+        try await repository.upsertEntries([first, later, secondInBook])
+
+        let found = try await repository.firstEntry(bookID: "bukhari", sourceBook: 2)
+        XCTAssertEqual(found?.canonicalID, later.canonicalID)
+        XCTAssertNil(try await repository.firstEntry(bookID: "bukhari", sourceBook: 99))
+    }
+
     // MARK: - Sub-numbered narrations survive
 
     func testSubNumberedNarrationsAreStoredSeparately() async throws {

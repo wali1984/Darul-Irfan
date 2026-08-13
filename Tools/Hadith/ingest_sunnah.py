@@ -461,9 +461,21 @@ def parse_narrator(html: str, nid: int) -> dict | None:
         who = clean(sch.get_text())
         body_el = sch.find_next_sibling()
         body = clean(body_el.get_text()) if body_el else None
-        if not who and not body:
+        # Rijal-text citations put the scholar span *inside* the quote's <p>,
+        # so there is no element sibling. The old parser retained the scholar
+        # but silently dropped the words after the span on 1,250 citations.
+        # Preserve those following text nodes verbatim as the appraisal body.
+        if not body and "tarjama-scholar" in sch.get("class", []):
+            tail = "".join(str(node) for node in sch.next_siblings)
+            tail_soup = BeautifulSoup(tail, "lxml")
+            body = clean(tail_soup.get_text()) or None
+        # A scholar/citation label without a judgement is not an appraisal.
+        # Keeping it as an empty appraisal later tempts translation systems to
+        # invent the missing ruling, so omit it at ingestion time.
+        if not body:
             continue
-        is_ar = "arabic" in " ".join(sch.get("class", []))
+        parent_classes = " ".join(sch.parent.get("class", [])) if sch.parent else ""
+        is_ar = "arabic" in " ".join(sch.get("class", [])) or "arabic" in parent_classes
         appraisals.append({
             "scholarArabic" if is_ar else "scholar": who,
             "textArabic" if is_ar else "textEnglish": body,

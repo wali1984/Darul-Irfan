@@ -14,6 +14,9 @@ struct HadithBookView: View {
     var initialHadith: String? = nil
     /// The cover page shown briefly when a collection is opened normally.
     @State private var showsCover = false
+    /// Native table of contents. A normal collection open proceeds cover ->
+    /// contents -> selected kitab; deep links bypass both and land on the row.
+    @State private var showsContents = false
     /// Guards against the cover re-appearing when the view's task re-runs
     /// (e.g. returning from a pushed screen).
     @State private var hasShownCover = false
@@ -129,8 +132,31 @@ struct HadithBookView: View {
         .sheet(item: $selectedNarrator) { ref in
             NarratorBioSheet(narratorId: ref.id, repository: repository, appState: appState)
         }
+        .sheet(isPresented: $showsContents) {
+            HadithContentsView(book: book, languageCode: languageCode) { section in
+                showsContents = false
+                if let section {
+                    Task { await jumpToSection(section.number) }
+                } else {
+                    Task {
+                        await loadWindow(startingAt: 0)
+                        pendingScrollTarget = entries.first?.canonicalID
+                    }
+                }
+            }
+        }
         .navigationTitle(Text(verbatim: book.title(languageCode: languageCode)))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showsContents = true
+                } label: {
+                    Label("Contents", systemImage: "list.bullet.rectangle")
+                }
+                .accessibilityHint("Browse the books in this collection")
+            }
+        }
         .searchable(text: $searchText, prompt: Text("Search in this collection"))
         .onChange(of: searchText) { _, term in
             searchTask?.cancel()
@@ -214,10 +240,11 @@ struct HadithBookView: View {
             .padding(DISpacing.lg)
         }
         .contentShape(Rectangle())
-        .onTapGesture { withAnimation(.easeOut(duration: 0.35)) { showsCover = false } }
+        .onTapGesture { dismissCoverAndShowContents() }
         .task {
             try? await Task.sleep(for: .seconds(3))
-            withAnimation(.easeOut(duration: 0.5)) { showsCover = false }
+            guard showsCover else { return }
+            dismissCoverAndShowContents()
         }
         .transition(.opacity)
         .accessibilityAddTraits(.isButton)
@@ -464,6 +491,25 @@ struct HadithBookView: View {
         }
     }
 
+    /// Opens the first narration in the selected kitab. The repository lookup
+    /// uses collection id + source book and returns a canonical id, avoiding
+    /// repeated display-number collisions across books.
+    private func jumpToSection(_ sourceBook: Int) async {
+        guard let entry = try? await repository.firstEntry(
+            bookID: book.id, sourceBook: sourceBook
+        ) else { return }
+        jump(to: entry)
+    }
+
+    private func dismissCoverAndShowContents() {
+        withAnimation(.easeOut(duration: 0.35)) { showsCover = false }
+        guard initialHadith == nil else { return }
+        Task {
+            try? await Task.sleep(for: .milliseconds(380))
+            showsContents = true
+        }
+    }
+
     private func loadFirstPage() async {
         guard entries.isEmpty else { return }
         // Opening to a specific narration (a tapped search result) starts the
@@ -514,3 +560,89 @@ struct HadithBookView: View {
 
 /// Identifiable wrapper so a tapped narrator id can drive a `.sheet(item:)`.
 private struct NarratorRef: Identifiable { let id: Int }
+
+/// A native, searchable table of contents for every collection. Section titles
+/// come from the bundled catalogue; no website handoff or remote page is used.
+private struct HadithContentsView: View {
+    let book: HadithBook
+    let languageCode: String
+    let select: (HadithSection?) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var query = ""
+
+    private var sections: [HadithSection] {
+        let all = book.sections ?? []
+        let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !needle.isEmpty else { return all }
+        return all.filter {
+            String($0.number).localizedCaseInsensitiveContains(needle) ||
+            $0.titleEnglish.localizedCaseInsensitiveContains(needle) ||
+            $0.titleArabic.localizedCaseInsensitiveContains(needle)
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Button {
+                        select(nil)
+                    } label: {
+                        Label("Start from the beginning", systemImage: "text.book.closed")
+                    }
+                }
+
+                if sections.isEmpty, !(book.sections ?? []).isEmpty {
+                    ContentUnavailableView.search(text: query)
+                } else if (book.sections ?? []).isEmpty {
+                    ContentUnavailableView(
+                        "Contents unavailable",
+                        systemImage: "list.bullet.rectangle",
+                        description: Text("This collection does not contain sourced book divisions.")
+                    )
+                } else {
+                    Section("Books") {
+                        ForEach(sections) { section in
+                            Button {
+                                select(section)
+                            } label: {
+                                HStack(alignment: .top, spacing: DISpacing.sm) {
+                                    Text(verbatim: "\(section.number)")
+                                        .font(.caption.monospacedDigit().weight(.bold))
+                                        .foregroundStyle(DIColor.accent)
+                                        .frame(minWidth: 28, alignment: .leading)
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text(verbatim: section.title(languageCode: languageCode))
+                                            .font(.body.weight(.semibold))
+                                            .foregroundStyle(DIColor.textPrimary)
+                                            .multilineTextAlignment(.leading)
+                                        if languageCode != "ur", !section.titleArabic.isEmpty {
+                                            Text(verbatim: section.titleArabic)
+                                                .font(DIFont.quranArabic(scale: 0.65))
+                                                .foregroundStyle(DIColor.textMuted)
+                                                .environment(\.layoutDirection, .rightToLeft)
+                                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                        }
+                                        Text("\(section.hadithCount) narrations")
+                                            .font(.caption)
+                                            .foregroundStyle(DIColor.textMuted)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Contents")
+            .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $query, prompt: "Search books")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+    }
+}

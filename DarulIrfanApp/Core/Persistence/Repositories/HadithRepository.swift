@@ -193,6 +193,22 @@ struct HadithRepository: HadithRepositoryProtocol {
         return rows.first?.int("n") ?? 0
     }
 
+    /// The first narration assigned to a collection's kitab. Both predicates
+    /// are required: book numbers restart independently in every collection.
+    func firstEntry(bookID: String, sourceBook: Int) async throws -> HadithEntry? {
+        let rows = try await database.connection.query(
+            """
+            SELECT \(Self.entryColumns)
+            FROM hadith_entries
+            WHERE book_id = ? AND source_book = ?
+            ORDER BY source_sequence
+            LIMIT 1
+            """,
+            [.text(bookID), .int(sourceBook)]
+        )
+        return rows.compactMap(Self.entry(from:)).first
+    }
+
     /// Substring search across whichever scripts are stored.
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry] {
         let needle = "%\(term)%"
