@@ -3,8 +3,8 @@
     "articles": 36,
     "documents": 273,
     "events": 0,
-    "media": 780,
-    "quranTafsirPages": 0
+    "media": 795,
+    "quranTafsirPages": 114
   },
   "files": {
     "articles": "articles.json",
@@ -13,6 +13,6 @@
     "media": "media.json",
     "tafsir": "quran_tafsir_manifest.json"
   },
-  "generatedAt": "2026-08-15T03:16:00Z",
+  "generatedAt": "2026-09-01T03:12:12Z",
   "version": 1
 }
