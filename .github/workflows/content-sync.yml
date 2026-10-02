@@ -54,7 +54,7 @@ jobs:
           INGEST_CONTACT_EMAIL: ${{ vars.INGEST_CONTACT_EMAIL || 'wajidali1984@hotmail.com' }}
         run: |
           python ingest.py crawl \
-            --sections about,lectures,books,magazines,articles,tafsir \
+            --sections about,lectures,books,magazines,articles,tafsir,updates \
             --years "${{ github.event.inputs.years || '2015-2026' }}" \
             --full-text --rights-confirmed \
             --rate-limit 1.0 \
