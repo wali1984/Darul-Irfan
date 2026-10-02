@@ -13,6 +13,8 @@ final class LibraryViewModel {
     /// Item counts per category, filled progressively while the home loads.
     private(set) var categoryCounts: [ContentCategory: Int] = [:]
     private(set) var hasLoadedCounts = false
+    private(set) var isLoading = false
+    private(set) var loadFailed = false
 
     /// Favorites keyed by content item ID for O(1) star lookups.
     private(set) var favoritesByContentID: [String: Favorite] = [:]
@@ -62,17 +64,21 @@ final class LibraryViewModel {
     }
 
     func reloadHome() async {
+        guard !isLoading else { return }
+        isLoading = true
+        defer { isLoading = false }
         await loadFavorites()
-        for category in ContentCategory.allCases {
-            let items = (try? await contentRepository.items(
-                category: category,
-                type: nil,
-                language: nil,
-                limit: 5000
-            )) ?? []
-            categoryCounts[category] = items.count
+        do {
+            let counts = try await contentRepository.categoryCounts()
+            try Task.checkCancellation()
+            categoryCounts = counts
+            hasLoadedCounts = true
+            loadFailed = false
+        } catch is CancellationError {
+            return
+        } catch {
+            loadFailed = true
         }
-        hasLoadedCounts = true
     }
 
     func loadFavorites() async {

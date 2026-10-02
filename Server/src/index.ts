@@ -18,6 +18,7 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (request.method === "GET" && path === "/v1/live") return cachedJSON(await liveBroadcast(env), request, 60);
   if (request.method === "GET" && path === "/v1/feed") {
     const limit = Number(url.searchParams.get("limit") ?? 20); const cursor = url.searchParams.get("cursor") ?? undefined;
+    if (!Number.isInteger(limit) || limit < 1 || limit > 50) return json({ error: "Limit must be an integer from 1 to 50" }, { status: 400 });
     return cachedJSON(await feed(env, limit, cursor), request, 300);
   }
   if (request.method === "POST" && path === "/v1/devices") {
@@ -51,7 +52,7 @@ async function cachedJSON(value: unknown, request: Request, maxAge: number): Pro
 
 async function registerDevice(request: Request, env: Env): Promise<Response> {
   const input = await request.json<DeviceRegistration>();
-  if (!isUUID(input.installationID) || !/^[0-9a-f]{64,200}$/i.test(input.apnsToken) || !["sandbox", "production"].includes(input.environment)) return json({ error: "Invalid registration" }, { status: 400 });
+  if (!input || !isUUID(input.installationID) || !/^[0-9a-f]{64,200}$/i.test(input.apnsToken) || !["sandbox", "production"].includes(input.environment) || !Array.isArray(input.topics) || input.topics.some(topic => typeof topic !== "string")) return json({ error: "Invalid registration" }, { status: 400 });
   const topics = [...new Set(input.topics.filter(topic => allowedTopics.has(topic)))];
   const now = new Date().toISOString();
   // APNs may return the same token after a reinstall. Move it to the current
@@ -72,7 +73,7 @@ async function deleteDevice(request: Request, env: Env, installationID: string):
 }
 
 async function diagnostics(request: Request, env: Env): Promise<Response> {
-  const input = await request.json<Record<string, unknown>>(); const installationID = cleanText(input.installationID, 50);
+  const input = await request.json<Record<string, unknown>>(); const installationID = cleanText(input?.installationID, 50);
   if (!installationID || !isUUID(installationID)) return json({ error: "Invalid diagnostic payload" }, { status: 400 });
   const redacted = redactDiagnostics(input) as Record<string, unknown>;
   const encoded = JSON.stringify(redacted); if (encoded.length > 256_000) return json({ error: "Payload too large" }, { status: 413 });
@@ -84,8 +85,16 @@ async function diagnostics(request: Request, env: Env): Promise<Response> {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    try { return await route(request, env); }
+    try {
+      if (request.method === "POST" && Number(request.headers.get("content-length") ?? 0) > 256_000) return json({ error: "Payload too large" }, { status: 413 });
+      const response = await route(request, env);
+      // Public, read-only feeds are intentionally available to web companions.
+      // Administrative and device routes never receive browser CORS permission.
+      if (request.method === "GET" && ["/v1/live", "/v1/bootstrap", "/v1/feed"].includes(new URL(request.url).pathname)) response.headers.set("access-control-allow-origin", "*");
+      return response;
+    }
     catch (error) {
+      if (error instanceof SyntaxError) return json({ error: "Invalid JSON" }, { status: 400 });
       console.error("request failed", error instanceof Error ? error.message : "unknown error");
       return json({ error: "Request could not be completed" }, { status: 500 });
     }

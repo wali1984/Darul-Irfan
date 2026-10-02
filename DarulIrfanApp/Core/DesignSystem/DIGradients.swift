@@ -24,9 +24,11 @@ enum DIGradient {
 
     /// The hero background — a deep, layered, time-aware gradient. Emerald and
     /// forest anchor it; dawn/dusk warm it, night deepens it.
-    static func hero(for date: Date = Date()) -> LinearGradient {
+    static func hero(for date: Date = Date(), timeZone: TimeZone = .current) -> LinearGradient {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
         let stops: [Color]
-        switch DayPhase.current(date) {
+        switch DayPhase.current(date, calendar: calendar) {
         case .dawn:
             stops = [Color(hex: 0x1B2A4A), Color(hex: 0x0B6E4F), Color(hex: 0x011D16)]
         case .morning:
@@ -68,8 +70,10 @@ enum DIGradient {
     )
 
     /// A gentle greeting line for the phase of day.
-    static func greeting(for date: Date = Date()) -> String {
-        switch DayPhase.current(date) {
+    static func greeting(for date: Date = Date(), timeZone: TimeZone = .current) -> String {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+        switch DayPhase.current(date, calendar: calendar) {
         case .dawn, .morning: return "Good morning"
         case .midday: return "Good afternoon"
         case .afternoon: return "Good afternoon"

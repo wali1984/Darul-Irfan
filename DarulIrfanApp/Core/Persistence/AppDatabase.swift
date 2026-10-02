@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 7
+    static let schemaVersion = 8
 
     /// User-owned tables that no content migration may ever disturb. Migration
     /// v4 asserts their row counts are identical before and after it runs; a
@@ -90,7 +90,49 @@ final class AppDatabase: Sendable {
             try await connection.executeScript(Self.migrationV7)
             try await connection.setSchemaVersion(7)
         }
+        if version < 8 {
+            try await connection.executeScript(Self.migrationV8)
+            try await connection.setSchemaVersion(8)
+        }
     }
+
+    // MARK: - Schema v8 (page-structured book text)
+
+    /// Adds `book_pages`: the OCR'd text of the Silsila's books, one row per
+    /// printed page, keyed to a `library_items.json` id.
+    ///
+    /// Per page rather than per book deliberately. A whole book runs to
+    /// hundreds of kilobytes of Urdu — Naqoosh-e-Haq alone is ~1.6 MB — and
+    /// the library detail view renders paragraphs eagerly, which is the shape
+    /// that crashed large surahs in v1.6.9. At one row per page the largest
+    /// record is ~10 KB and the reader can page lazily.
+    ///
+    /// `(book_id, page)` is the identity. The generator verifies uniqueness on
+    /// that pair before writing, so an upsert updates in place and cannot
+    /// silently drop a page the way a colliding key would.
+    ///
+    /// `review_state` records provenance per row: every bundled page is
+    /// `machineProvisional` — OCR arbitration and a visual cross-check, no
+    /// human proofreading — and `unresolved_blocks` carries how many blocks
+    /// the validator could not settle, so the reader can mark the page instead
+    /// of presenting unverified text as checked.
+    ///
+    /// Purely additive: a new table only, nothing user-owned touched and no
+    /// content table rewritten, so no row-count guard is needed.
+    static let migrationV8 = """
+    CREATE TABLE IF NOT EXISTS book_pages (
+        book_id TEXT NOT NULL,
+        page INTEGER NOT NULL,
+        text TEXT NOT NULL,
+        blocks INTEGER NOT NULL DEFAULT 0,
+        unresolved_blocks INTEGER NOT NULL DEFAULT 0,
+        review_state TEXT NOT NULL DEFAULT 'machineProvisional',
+        validator TEXT,
+        PRIMARY KEY (book_id, page)
+    );
+    CREATE INDEX IF NOT EXISTS idx_book_pages_book
+        ON book_pages (book_id, page);
+    """
 
     // MARK: - Schema v7 (per-book numbering: display numbers may repeat)
 

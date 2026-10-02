@@ -124,10 +124,15 @@ struct PlayerSheetView: View {
                     )
                     .diOctagramWatermark(size: 280, opacity: 0.05)
                 } else {
-                    // Poll playback time twice a second so the elapsed time,
-                    // slider, and play/pause icon stay fresh regardless of
-                    // whether the player implementation is observable.
-                    TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+                    VStack(spacing: 0) {
+                        if let error = audioPlayer.playbackError {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(error).font(.callout)
+                                Button("Retry") { audioPlayer.togglePlayPause() }.buttonStyle(.borderedProminent)
+                            }.padding().frame(maxWidth: .infinity, alignment: .leading)
+                        } else if audioPlayer.isBuffering {
+                            ProgressView("Buffering…").padding()
+                        }
                         playerContent
                     }
                 }
@@ -337,7 +342,7 @@ struct PlayerSheetView: View {
                     .diBreathingGlow(color: accent.opacity(0.6), maxRadius: 12)
             }
             .buttonStyle(DIPressableStyle())
-            .accessibilityLabel(Text(audioPlayer.isPlaying ? "Pause" : "Play"))
+            .accessibilityLabel(Text(audioPlayer.playbackError != nil ? "Retry" : (audioPlayer.isPlaying || audioPlayer.isBuffering) ? "Pause" : "Play"))
             transportButton(
                 systemImage: "goforward.15",
                 label: "Forward 15 seconds"

@@ -1,6 +1,9 @@
 name = "darul-irfan-platform"
 main = "src/index.ts"
 compatibility_date = "2026-07-01"
+routes = [{ pattern = "api.naqshbandiaowaisiah.us", custom_domain = true }]
+workers_dev = true
+preview_urls = false
 
 [vars]
 ENVIRONMENT = "production"

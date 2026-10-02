@@ -13,14 +13,14 @@ struct HijriCalendarService: HijriCalendarServicing {
 
     // MARK: - HijriCalendarServicing
 
-    func hijriComponents(for date: Date, offsetDays: Int) -> DateComponents {
-        let calendar = Self.makeCalendar()
+    func hijriComponents(for date: Date, offsetDays: Int, timeZone: TimeZone) -> DateComponents {
+        let calendar = Self.makeCalendar(timeZone: timeZone)
         let adjusted = Self.adjusted(date, byDays: offsetDays, calendar: calendar)
         return calendar.dateComponents([.year, .month, .day], from: adjusted)
     }
 
-    func hijriDateText(for date: Date, offsetDays: Int, locale: Locale) -> String {
-        let calendar = Self.makeCalendar(locale: locale)
+    func hijriDateText(for date: Date, offsetDays: Int, locale: Locale, timeZone: TimeZone) -> String {
+        let calendar = Self.makeCalendar(locale: locale, timeZone: timeZone)
         let adjusted = Self.adjusted(date, byDays: offsetDays, calendar: calendar)
 
         let formatter = DateFormatter()
@@ -33,20 +33,22 @@ struct HijriCalendarService: HijriCalendarServicing {
         return formatter.string(from: adjusted)
     }
 
-    func isRamadan(_ date: Date, offsetDays: Int) -> Bool {
-        return hijriComponents(for: date, offsetDays: offsetDays).month == 9
+    func isRamadan(_ date: Date, offsetDays: Int, timeZone: TimeZone) -> Bool {
+        return hijriComponents(for: date, offsetDays: offsetDays, timeZone: timeZone).month == 9
     }
 
     func upcomingIslamicDays(
         from date: Date,
         within days: Int,
-        offsetDays: Int
+        offsetDays: Int,
+        timeZone: TimeZone
     ) -> [(day: IslamicDay, gregorianDate: Date)] {
         guard days > 0 else { return [] }
         let notableDays: [IslamicDay] = SeedBundle.islamicDays()
         guard !notableDays.isEmpty else { return [] }
 
-        let gregorian = Calendar(identifier: .gregorian)
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = timeZone
         var matches: [(day: IslamicDay, gregorianDate: Date)] = []
 
         // Scan each of the next `days` civil days (starting today), compute
@@ -56,7 +58,7 @@ struct HijriCalendarService: HijriCalendarServicing {
             guard let scanned = gregorian.date(byAdding: .day, value: dayOffset, to: date) else {
                 continue
             }
-            let components = hijriComponents(for: scanned, offsetDays: offsetDays)
+            let components = hijriComponents(for: scanned, offsetDays: offsetDays, timeZone: timeZone)
             guard let hijriMonth = components.month, let hijriDay = components.day else {
                 continue
             }
@@ -70,8 +72,9 @@ struct HijriCalendarService: HijriCalendarServicing {
 
     // MARK: - Helpers
 
-    private static func makeCalendar(locale: Locale? = nil) -> Calendar {
+    private static func makeCalendar(locale: Locale? = nil, timeZone: TimeZone) -> Calendar {
         var calendar = Calendar(identifier: .islamicUmmAlQura)
+        calendar.timeZone = timeZone
         if let locale = locale {
             calendar.locale = locale
         }

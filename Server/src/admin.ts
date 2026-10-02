@@ -1,10 +1,14 @@
 import type { Env } from "./contracts";
-import { actorEmail, cleanText, json, validHTTPURL, validISODate } from "./util";
+import { cleanText, json, validHTTPURL, validISODate } from "./util";
+import { authenticatedActor } from "./access";
 import { sendTopicPush } from "./apns";
 
 export async function adminRequest(request: Request, env: Env, path: string): Promise<Response> {
-  const actor = actorEmail(request);
+  const actor = await authenticatedActor(request, env);
   if (!actor) return json({ error: "Cloudflare Access authentication required" }, { status: 401 });
+  if (!hasRole(actor, env.ADMIN_EDITOR_EMAILS) && !hasRole(actor, env.ADMIN_BROADCASTER_EMAILS)) {
+    return json({ error: "Staff role required" }, { status: 403 });
+  }
   if (request.method === "GET" && path === "/admin") return adminHTML(actor);
   if (request.method === "GET" && path === "/admin/api/state") {
     const [live, schedules, drafts] = await Promise.all([

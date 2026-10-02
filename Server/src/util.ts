@@ -32,9 +32,6 @@ export const parseJSON = <T>(value: string | null, fallback: T): T => {
   try { return JSON.parse(value) as T; } catch { return fallback; }
 };
 
-export const actorEmail = (request: Request): string | null =>
-  request.headers.get("cf-access-authenticated-user-email");
-
 export const isUUID = (value: string): boolean =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 

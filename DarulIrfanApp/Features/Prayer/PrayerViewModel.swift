@@ -79,15 +79,17 @@ final class PrayerViewModel {
         // Format dates in the app's chosen language, not the device locale, so
         // the day/date read in Urdu when the app is set to Urdu.
         let appLocale = LanguageManager.locale(for: settings.language)
+        let placeTimeZone = appState.activePlace?.timeZone ?? .current
         hijriDateText = hijriService.hijriDateText(
             for: now,
             offsetDays: settings.hijri.dayOffset,
-            locale: appLocale
+            locale: appLocale,
+            timeZone: placeTimeZone
         )
         gregorianDateText = now.formatted(
-            Date.FormatStyle(date: .complete, time: .omitted).locale(appLocale)
+            Date.FormatStyle(date: .complete, time: .omitted, timeZone: placeTimeZone).locale(appLocale)
         )
-        isRamadan = hijriService.isRamadan(now, offsetDays: settings.hijri.dayOffset)
+        isRamadan = hijriService.isRamadan(now, offsetDays: settings.hijri.dayOffset, timeZone: placeTimeZone)
 
         guard let place = appState.activePlace else {
             todaySchedule = nil

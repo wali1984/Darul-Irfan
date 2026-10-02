@@ -87,6 +87,24 @@ protocol ContentRepositoryProtocol: Sendable {
 
     func upsertItems(_ items: [ContentItem]) async throws
     func upsertCollections(_ collections: [ContentCollection]) async throws
+
+    /// OCR'd page text for a book, ordered by printed page. Empty when the
+    /// book has no bundled text — the caller falls back to the PDF reader.
+    func bookPages(bookID: String) async throws -> [BookPage]
+
+    /// How many OCR'd pages a book has, without loading their text.
+    func bookPageCount(bookID: String) async throws -> Int
+
+    func upsertBookPages(_ pages: [BookPage]) async throws
+    func categoryCounts() async throws -> [ContentCategory: Int]
+}
+
+extension ContentRepositoryProtocol {
+    // Test doubles can derive counts; the live repository uses a single SQL query.
+    func categoryCounts() async throws -> [ContentCategory: Int] {
+        let all = try await items(category: nil, type: nil, language: nil, limit: Int.max)
+        return Dictionary(grouping: all, by: \.category).mapValues(\.count)
+    }
 }
 
 // MARK: - Media

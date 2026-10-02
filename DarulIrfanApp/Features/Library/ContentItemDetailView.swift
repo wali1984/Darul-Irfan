@@ -88,6 +88,9 @@ struct ContentItemDetailView: View {
                         if hasReadablePDF(item) {
                             readInAppButton(for: item).diAppear(delay: 0.06)
                         }
+                        if viewModel.bookPageCount > 0 {
+                            readTextButton(for: item).diAppear(delay: 0.09)
+                        }
                         nativeMediaSection(for: item)
                         if viewModel.showsBody {
                             readerCard(for: item)
@@ -182,6 +185,46 @@ struct ContentItemDetailView: View {
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
         .accessibilityElement(children: .combine)
         .accessibilityLabel(Text("Read in app"))
+    }
+
+    /// Secondary entry: the work's machine-read text layer. Shown only when
+    /// pages exist, so a PDF-only work is unchanged. Deliberately quieter than
+    /// "Read in App" — the PDF is the authoritative copy and this text has not
+    /// been proofread.
+    private func readTextButton(for item: ContentItem) -> some View {
+        NavigationLink {
+            BookTextReaderView(item: item, dependencies: dependencies)
+        } label: {
+            HStack(spacing: DISpacing.md) {
+                Image(systemName: "text.book.closed")
+                    .font(.title3)
+                    .foregroundStyle(DIColor.primary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Read the text")
+                        .font(DIFont.subheading)
+                        .foregroundStyle(DIColor.textPrimary)
+                    Text("\(viewModel.bookPageCount) pages — searchable, machine-read, not yet proofread")
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.forward")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(DIColor.textMuted)
+            }
+            .padding(DISpacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(DIColor.surface)
+            .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                    .stroke(DIColor.border, lineWidth: 1)
+            )
+        }
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages, machine-read and not yet proofread"))
     }
 
     // MARK: - Gradient header

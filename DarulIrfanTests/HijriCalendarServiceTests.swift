@@ -167,4 +167,18 @@ final class HijriCalendarServiceTests: XCTestCase {
         XCTAssertTrue(text.contains(String(day)), "Expected day \(day) in '\(text)'")
         XCTAssertTrue(text.contains(String(year)), "Expected year \(year) in '\(text)'")
     }
+
+    func testHijriDateUsesSelectedPlaceAcrossMidnight() throws {
+        let instant = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-10-02T01:00:00Z"))
+        let newYork = try XCTUnwrap(TimeZone(identifier: "America/New_York"))
+        let karachi = try XCTUnwrap(TimeZone(identifier: "Asia/Karachi"))
+        for zone in [newYork, karachi] {
+            var expected = Calendar(identifier: .islamicUmmAlQura)
+            expected.timeZone = zone
+            XCTAssertEqual(service.hijriComponents(for: instant, offsetDays: 0, timeZone: zone),
+                           expected.dateComponents([.year, .month, .day], from: instant))
+        }
+        XCTAssertNotEqual(service.hijriComponents(for: instant, offsetDays: 0, timeZone: newYork).day,
+                          service.hijriComponents(for: instant, offsetDays: 0, timeZone: karachi).day)
+    }
 }

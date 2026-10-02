@@ -72,6 +72,14 @@ final class ContentRepositoryTests: XCTestCase {
 
     // MARK: - Filtering
 
+    func testCategoryCountsMatchItemsWithoutLoadingBodies() async throws {
+        _ = try await seedThreeItems()
+        let counts = try await repository.categoryCounts()
+        XCTAssertEqual(counts[.books], 2)
+        XCTAssertEqual(counts[.articles], 1)
+        XCTAssertEqual(counts.values.reduce(0, +), 3)
+    }
+
     func testItemsFilterByCategory() async throws {
         let (bookEnglish, _, bookUrduUndated) = try await seedThreeItems()
 

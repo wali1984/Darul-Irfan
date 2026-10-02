@@ -38,12 +38,7 @@ struct MiniPlayerBar: View {
     }
 
     var body: some View {
-        // Poll twice a second so the play/pause icon and the progress line
-        // stay fresh regardless of whether the player implementation is
-        // observable.
-        TimelineView(.periodic(from: .now, by: 0.5)) { _ in
-            barContent
-        }
+        barContent
         .sheet(isPresented: $showsFullPlayer) {
             PlayerSheetView(audioPlayer: audioPlayer, mediaRepository: mediaRepository)
                 .presentationDragIndicator(.visible)
@@ -78,14 +73,14 @@ struct MiniPlayerBar: View {
                         DIHaptics.soft()
                         audioPlayer.togglePlayPause()
                     } label: {
-                        Image(systemName: audioPlayer.isPlaying ? "pause.fill" : "play.fill")
+                        Image(systemName: (audioPlayer.isPlaying || audioPlayer.isBuffering) ? "pause.fill" : "play.fill")
                             .font(.title3)
                             .foregroundStyle(accent)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 44, height: 44)
                             .contentTransition(.symbolEffect(.replace))
                     }
                     .buttonStyle(DIPressableStyle())
-                    .accessibilityLabel(Text(audioPlayer.isPlaying ? "Pause" : "Play"))
+                    .accessibilityLabel(Text(audioPlayer.playbackError != nil ? "Retry" : (audioPlayer.isPlaying || audioPlayer.isBuffering) ? "Pause" : "Play"))
                     controlButton(
                         systemImage: "xmark",
                         label: "Stop playback"
@@ -147,7 +142,11 @@ struct MiniPlayerBar: View {
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                if isLiveStream {
+                if audioPlayer.playbackError != nil {
+                    Text("Audio unavailable · Tap play to retry").font(.caption).foregroundStyle(DIColor.textMuted)
+                } else if audioPlayer.isBuffering {
+                    Text("Buffering…").font(.caption).foregroundStyle(DIColor.textMuted)
+                } else if isLiveStream {
                     MediaLivePill()
                 } else if let subtitle = nowPlaying.subtitle {
                     Text(subtitle)
@@ -174,7 +173,7 @@ struct MiniPlayerBar: View {
             Image(systemName: systemImage)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(DIColor.textPrimary)
-                .frame(width: 32, height: 32)
+                .frame(width: 44, height: 44)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(label))
