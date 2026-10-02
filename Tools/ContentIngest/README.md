@@ -42,9 +42,8 @@ python ingest.py crawl \
 
 The crawler checks `robots.txt` at startup (the site is fully permissive,
 but this is verified at runtime), identifies itself as
-`DarulIrfanContentIngest/1.0 (+mailto:contact-email-placeholder@example.org)`
-(replace the placeholder address with a real maintainer contact before
-running against the live site), and retries failed requests with
+`DarulIrfanContentIngest/1.0 (+https://naqshbandiaowaisiah.us)`
+and retries failed requests with
 exponential backoff.
 
 MP3 URLs are always harvested from the actual `href` attributes — lecture

@@ -308,12 +308,35 @@ def parse_article_page(html: str, page_url: str,
 
     body: Optional[str] = None
     if include_body:
-        node = (soup.find("main") or soup.find("article")
+        # The site renders article prose inside `div.c-layout-sidebar-content`
+        # (the sidebar navigation menu is a sibling, not a child, so it is
+        # excluded automatically). Fall back to older/other layouts.
+        node = (soup.find("div", class_="c-layout-sidebar-content")
+                or soup.find("main") or soup.find("article")
                 or soup.find(id="content")
                 or soup.find("div", class_="content")
                 or soup.body or soup)
-        for junk in node.find_all(["script", "style", "nav", "header", "footer"]):
+        for junk in node.find_all(["script", "style", "nav", "header", "footer", "form"]):
             junk.decompose()
+        # Defensive: strip any nested navigation/sidebar menus and the
+        # trailing "Highlights / Past Events" widget that some pages carry.
+        for junk in node.find_all("div", class_=["c-layout-sidebar-menu",
+                                                 "c-navbar", "c-navbar-wrapper",
+                                                 "mynavbar", "c-content-highlights"]):
+            junk.decompose()
+        # The current layout's Highlights carousel is a pair of sibling
+        # divs, not c-content-highlights. Strip only that identified widget.
+        for heading in list(node.select("div.c-content-title-1 > h3")):
+            if heading.get_text(" ", strip=True) != "Highlights":
+                continue
+            widget_title = heading.parent
+            widget = widget_title.find_next_sibling("div")
+            if widget is not None and widget.select_one(".c-content-media-2-slider"):
+                widget.decompose()
+                widget_title.decompose()
+        for hidden in list(node.find_all("div", style=True)):
+            if re.search(r"font-size\s*:\s*3px", hidden["style"]) and hidden.get_text(strip=True).startswith("External Links - References:"):
+                hidden.decompose()
         lines = [line.strip() for line in node.get_text("\n").splitlines()]
         body = "\n".join(line for line in lines if line) or None
 

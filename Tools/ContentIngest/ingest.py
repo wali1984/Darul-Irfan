@@ -40,7 +40,7 @@ for _stream in (sys.stdout, sys.stderr):
             pass
 
 DEFAULT_BASE_URL = "https://www.naqshbandiaowaisiah.org"
-USER_AGENT = "DarulIrfanContentIngest/1.0 (+mailto:contact-email-placeholder@example.org)"
+USER_AGENT = "DarulIrfanContentIngest/1.0 (+https://naqshbandiaowaisiah.us)"
 DEFAULT_RATE_LIMIT_SECONDS = 1.5
 DEFAULT_MAX_PAGES = 200
 REQUEST_TIMEOUT_SECONDS = 30
