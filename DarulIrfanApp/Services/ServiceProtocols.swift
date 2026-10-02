@@ -111,17 +111,25 @@ protocol NotificationScheduling: Sendable {
 // MARK: - Hijri calendar
 
 protocol HijriCalendarServicing: Sendable {
-    /// Hijri (Umm al-Qura) date components for `date` with the user's offset applied.
-    func hijriComponents(for date: Date, offsetDays: Int) -> DateComponents
+    func hijriComponents(for date: Date, offsetDays: Int, timeZone: TimeZone) -> DateComponents
+    func hijriDateText(for date: Date, offsetDays: Int, locale: Locale, timeZone: TimeZone) -> String
+    func isRamadan(_ date: Date, offsetDays: Int, timeZone: TimeZone) -> Bool
+    func upcomingIslamicDays(from date: Date, within days: Int, offsetDays: Int, timeZone: TimeZone) -> [(day: IslamicDay, gregorianDate: Date)]
+}
 
-    /// Localized display string, e.g. "١٥ محرم ١٤٤٨" / "15 Muharram 1448".
-    func hijriDateText(for date: Date, offsetDays: Int, locale: Locale) -> String
-
-    /// True when `date` (with offset) falls in Ramadan.
-    func isRamadan(_ date: Date, offsetDays: Int) -> Bool
-
-    /// Upcoming notable Islamic days within `days`, from the bundled list.
-    func upcomingIslamicDays(from date: Date, within days: Int, offsetDays: Int) -> [(day: IslamicDay, gregorianDate: Date)]
+extension HijriCalendarServicing {
+    func hijriComponents(for date: Date, offsetDays: Int) -> DateComponents {
+        hijriComponents(for: date, offsetDays: offsetDays, timeZone: .current)
+    }
+    func hijriDateText(for date: Date, offsetDays: Int, locale: Locale) -> String {
+        hijriDateText(for: date, offsetDays: offsetDays, locale: locale, timeZone: .current)
+    }
+    func isRamadan(_ date: Date, offsetDays: Int) -> Bool {
+        isRamadan(date, offsetDays: offsetDays, timeZone: .current)
+    }
+    func upcomingIslamicDays(from date: Date, within days: Int, offsetDays: Int) -> [(day: IslamicDay, gregorianDate: Date)] {
+        upcomingIslamicDays(from: date, within: days, offsetDays: offsetDays, timeZone: .current)
+    }
 }
 
 // MARK: - Audio playback

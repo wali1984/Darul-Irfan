@@ -121,6 +121,7 @@ struct ContentSyncService: ContentSyncServicing {
         let translations = SeedBundle.quranTranslations()
         let tafsir = SeedBundle.quranTafsir()
         let libraryItems = SeedBundle.libraryItems()
+        let bookPages = SeedBundle.bookPages()
         let mediaItems = SeedBundle.mediaItems()
         let events = SeedBundle.events()
         let announcements = SeedBundle.announcements()
@@ -221,6 +222,19 @@ struct ContentSyncService: ContentSyncServicing {
             try await contentRepository.upsertItems(libraryItems)
             imported += libraryItems.count
         }
+        // Book text: ~6,700 pages across 43 works, so insert in chunks rather
+        // than one transaction holding the whole corpus. Keyed on
+        // (book_id, page), which the generator verifies unique, so a re-import
+        // updates in place instead of dropping pages on a collision.
+        if !bookPages.isEmpty {
+            var offset = 0
+            while offset < bookPages.count {
+                let end = min(offset + 500, bookPages.count)
+                try await contentRepository.upsertBookPages(Array(bookPages[offset..<end]))
+                offset = end
+            }
+            imported += bookPages.count
+        }
         if !mediaItems.isEmpty {
             try await mediaRepository.upsertItems(mediaItems)
             imported += mediaItems.count
@@ -299,9 +313,9 @@ struct ContentSyncService: ContentSyncServicing {
         for name in ["articles", "documents"] {
             guard let path = manifest.files[name] else { continue }
             guard let url = Self.resolve(path, against: manifestURL) else { allFilesApplied = false; continue }
-            let items = await Self.fetchArray(ContentItem.self, from: url)
-                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
-            if items.isEmpty { allFilesApplied = false; continue }
+            guard let fetched = await Self.fetchArray(ContentItem.self, from: url) else { allFilesApplied = false; continue }
+            let items = fetched.filter { !$0.id.isEmpty && !$0.title.isEmpty }
+            if items.count != fetched.count { allFilesApplied = false }
             // Chunk large catalogs so each transaction stays bounded.
             for chunk in stride(from: 0, to: items.count, by: 500) {
                 try await contentRepository.upsertItems(Array(items[chunk..<min(chunk + 500, items.count)]))
@@ -311,30 +325,26 @@ struct ContentSyncService: ContentSyncServicing {
 
         if let mediaPath = manifest.files["media"],
            let mediaURL = Self.resolve(mediaPath, against: manifestURL) {
-            let items = await Self.fetchArray(MediaItem.self, from: mediaURL)
-                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
-            if items.isEmpty {
-                allFilesApplied = false
-            } else {
+            if let fetched = await Self.fetchArray(MediaItem.self, from: mediaURL) {
+                let items = fetched.filter { !$0.id.isEmpty && !$0.title.isEmpty }
+                if items.count != fetched.count { allFilesApplied = false }
                 for chunk in stride(from: 0, to: items.count, by: 500) {
                     try await mediaRepository.upsertItems(Array(items[chunk..<min(chunk + 500, items.count)]))
                 }
                 updatedDomains.append(.media)
-            }
+            } else { allFilesApplied = false }
         } else if manifest.files["media"] != nil {
             allFilesApplied = false
         }
 
         if let eventsPath = manifest.files["events"],
            let eventsURL = Self.resolve(eventsPath, against: manifestURL) {
-            let events = await Self.fetchArray(CommunityEvent.self, from: eventsURL)
-                .filter { !$0.id.isEmpty && !$0.title.isEmpty }
-            if events.isEmpty {
-                allFilesApplied = false
-            } else {
+            if let fetched = await Self.fetchArray(CommunityEvent.self, from: eventsURL) {
+                let events = fetched.filter { !$0.id.isEmpty && !$0.title.isEmpty }
+                if events.count != fetched.count { allFilesApplied = false }
                 try await eventsRepository.upsertEvents(events)
                 updatedDomains.append(.events)
-            }
+            } else { allFilesApplied = false }
         } else if manifest.files["events"] != nil {
             allFilesApplied = false
         }
@@ -351,29 +361,30 @@ struct ContentSyncService: ContentSyncServicing {
     }
 
     /// Downloads and decodes a JSON array; any failure (network, HTTP
-    /// status, malformed payload) yields [] so nothing is applied.
+    /// status, malformed payload) yields nil so a valid empty feed is distinct.
     private static func fetchArray<Element: Decodable>(
         _ element: Element.Type,
         from url: URL
-    ) async -> [Element] {
+    ) async -> [Element]? {
         do {
             let (data, response) = try await session.data(from: url)
             guard
                 let http = response as? HTTPURLResponse,
                 (200...299).contains(http.statusCode)
-            else { return [] }
+            else { return nil }
             return try makeDecoder().decode([Element].self, from: data)
         } catch {
             AppLog.content("Remote content fetch failed for \(url.host ?? "unknown host"): \(error.localizedDescription)")
-            return []
+            return nil
         }
     }
 
     private static func resolve(_ path: String, against base: URL) -> URL? {
-        if let absolute = URL(string: path), absolute.scheme != nil {
-            return absolute
-        }
-        return URL(string: path, relativeTo: base)?.absoluteURL
+        guard let url = URL(string: path, relativeTo: base)?.absoluteURL,
+              url.scheme == "https", url.host == base.host,
+              url.port == base.port, url.user == nil, url.password == nil,
+              url.path.hasPrefix(base.deletingLastPathComponent().path + "/") else { return nil }
+        return url
     }
 
     // MARK: - key_value helpers

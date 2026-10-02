@@ -81,6 +81,13 @@ enum SeedBundle {
         decodeArray(ContentItem.self, fromFile: "library_items")
     }
 
+    /// OCR'd page text for the Silsila's books (`book_pages.json`), one record
+    /// per printed page keyed to a `library_items.json` id. Absent until the
+    /// books are ingested — returns [] and each book falls back to its PDF.
+    static func bookPages() -> [BookPage] {
+        decodeArray(BookPage.self, fromFile: "book_pages")
+    }
+
     static func mediaItems() -> [MediaItem] {
         decodeArray(MediaItem.self, fromFile: "media_items")
     }

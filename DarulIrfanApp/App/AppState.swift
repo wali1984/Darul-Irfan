@@ -114,7 +114,8 @@ final class AppState {
         let hijriText = dependencies.hijri.hijriDateText(
             for: now,
             offsetDays: settings.hijri.dayOffset,
-            locale: Locale.current
+            locale: LanguageManager.locale(for: settings.language),
+            timeZone: place.timeZone
         )
 
         // Ramadan extras: the next upcoming fajr/maghrib (not day 0's, which
@@ -127,12 +128,12 @@ final class AppState {
         let suhoorEndsAt: Date? = upcoming.first { entry in
             entry.prayerKey == Prayer.fajr.rawValue
                 && entry.time > now
-                && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset)
+                && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset, timeZone: place.timeZone)
         }?.time
         let iftarAt: Date? = upcoming.first { entry in
             entry.prayerKey == Prayer.maghrib.rawValue
                 && entry.time > now
-                && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset)
+                && dependencies.hijri.isRamadan(entry.time, offsetDays: hijriOffset, timeZone: place.timeZone)
         }?.time
 
         let previousSnapshot = PrayerWidgetSnapshot.load()

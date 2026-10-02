@@ -30,7 +30,7 @@ struct PrayerTabView: View {
                             String(localized: String.LocalizationValue($0.prayer.englishName))
                         },
                         nextPrayerTime: viewModel.nextPrayer?.time,
-                        dayTimes: viewModel.todaySchedule?.orderedTimes.map { $0.time } ?? [],
+                        dayTimes: viewModel.todaySchedule?.orderedTimes.filter { $0.prayer.isObligatory }.map { $0.time } ?? [],
                         completedPrayers: viewModel.completedPrayerCount,
                         prayerGoal: Prayer.obligatory.count,
                         streakDays: viewModel.streakSummary?.currentStreakDays ?? 0,
@@ -169,7 +169,7 @@ struct PrayerTabView: View {
             Image(systemName: alertIconName(for: style))
                 .font(.subheadline)
                 .foregroundStyle(alertIconColor(for: style))
-                .frame(width: 34, height: 34)
+                .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

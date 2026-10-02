@@ -245,6 +245,63 @@ struct ContentRepository: ContentRepositoryProtocol {
         try await database.connection.executeBatch(statements)
     }
 
+    // MARK: - Book pages
+
+    /// Ordered by printed page so the reader pages forward naturally.
+    func bookPages(bookID: String) async throws -> [BookPage] {
+        let rows = try await database.connection.query(
+            """
+            SELECT book_id, page, text, blocks, unresolved_blocks,
+                   review_state, validator
+            FROM book_pages
+            WHERE book_id = ?
+            ORDER BY page
+            """,
+            [.text(bookID)]
+        )
+        return rows.compactMap { Self.bookPage(from: $0) }
+    }
+
+    func bookPageCount(bookID: String) async throws -> Int {
+        let rows = try await database.connection.query(
+            "SELECT COUNT(*) AS n FROM book_pages WHERE book_id = ?",
+            [.text(bookID)]
+        )
+        return rows.first?.int("n") ?? 0
+    }
+
+    /// Upsert on `(book_id, page)`. The generator verifies that pair is unique
+    /// before writing the seed, so a re-import updates in place rather than
+    /// dropping pages on a key collision.
+    func upsertBookPages(_ pages: [BookPage]) async throws {
+        guard !pages.isEmpty else { return }
+        let statements: [(sql: String, parameters: [SQLValue])] = pages.map { page in
+            (
+                sql: """
+                INSERT INTO book_pages (book_id, page, text, blocks,
+                    unresolved_blocks, review_state, validator)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(book_id, page) DO UPDATE SET
+                    text = excluded.text,
+                    blocks = excluded.blocks,
+                    unresolved_blocks = excluded.unresolved_blocks,
+                    review_state = excluded.review_state,
+                    validator = excluded.validator
+                """,
+                parameters: [
+                    .text(page.bookID),
+                    .int(page.page),
+                    .text(page.text),
+                    .int(page.blocks),
+                    .int(page.unresolvedBlocks),
+                    .text(page.reviewState),
+                    .text(page.validator),
+                ]
+            )
+        }
+        try await database.connection.executeBatch(statements)
+    }
+
     func upsertCollections(_ collections: [ContentCollection]) async throws {
         guard !collections.isEmpty else { return }
         let statements: [(sql: String, parameters: [SQLValue])] = collections.map { collection in
@@ -269,6 +326,20 @@ struct ContentRepository: ContentRepositoryProtocol {
     }
 
     // MARK: - Row mapping
+
+    private static func bookPage(from row: SQLRow) -> BookPage? {
+        guard let bookID = row.text("book_id"), let page = row.int("page"),
+              let text = row.text("text") else { return nil }
+        return BookPage(
+            bookID: bookID,
+            page: page,
+            text: text,
+            blocks: row.int("blocks") ?? 0,
+            unresolvedBlocks: row.int("unresolved_blocks") ?? 0,
+            reviewState: row.text("review_state") ?? "machineProvisional",
+            validator: row.text("validator") ?? "unknown"
+        )
+    }
 
     private static func contentItem(from row: SQLRow) -> ContentItem? {
         guard

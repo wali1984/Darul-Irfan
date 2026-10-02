@@ -188,3 +188,44 @@ struct ContentReadingProgress: Codable, Sendable, Equatable {
     var fraction: Double
     var updatedAt: Date
 }
+
+// MARK: - Book pages
+
+/// One printed page of a Silsila book, as OCR'd text.
+///
+/// Books ship two ways: a PDF that `BookReaderView` renders through PDFKit,
+/// and — for the works that have been OCR'd — this page-structured text, which
+/// is searchable, selectable and readable offline without the PDF.
+///
+/// Records are per page rather than per book on purpose. A whole book's text
+/// runs to hundreds of kilobytes; the largest single page here is ~10 KB, so
+/// the reader can render lazily and no record approaches the size that crashed
+/// the Quran reader in v1.6.9.
+///
+/// `reviewState` is `machineProvisional` for every bundled page: the text has
+/// been through OCR arbitration and a visual cross-check but no human
+/// proofreading. `unresolvedBlocks` carries how many of the page's blocks the
+/// validator could not settle, so the reader can mark a page rather than
+/// present unverified text as if it were checked. Arabic quotations inside the
+/// prose are the book's own and are NOT canonical scripture — they must never
+/// be rendered as Qur'an or hadith.
+struct BookPage: Codable, Sendable, Identifiable, Equatable {
+    /// `library_items.json` id of the book this page belongs to.
+    var bookID: String
+    /// Printed/PDF page number, 1-based.
+    var page: Int
+    var text: String
+    /// Blocks the OCR pipeline found on this page.
+    var blocks: Int
+    /// Blocks the validator left unresolved (subset of `blocks`).
+    var unresolvedBlocks: Int
+    /// Provenance: `machineProvisional` until a human has proofread it.
+    var reviewState: String
+    /// Model that produced the arbitrated text.
+    var validator: String
+
+    var id: String { "\(bookID)|\(page)" }
+
+    /// True when the validator could not settle any block on this page.
+    var isFullyResolved: Bool { unresolvedBlocks == 0 }
+}

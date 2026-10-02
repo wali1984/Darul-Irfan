@@ -86,4 +86,6 @@ export interface Env {
   APNS_PRIVATE_KEY?: string;
   ADMIN_EDITOR_EMAILS?: string;
   ADMIN_BROADCASTER_EMAILS?: string;
+  ACCESS_TEAM_DOMAIN?: string;
+  ACCESS_AUD?: string;
 }
