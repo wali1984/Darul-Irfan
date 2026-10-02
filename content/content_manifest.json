@@ -1,4 +1,5 @@
 {
+  "contentHash": "0d07adbf2e147db031a749376badf70026f0a7178f4c92d441a94dd09a1d4728",
   "counts": {
     "articles": 36,
     "documents": 273,
@@ -13,6 +14,7 @@
     "media": "media.json",
     "tafsir": "quran_tafsir_manifest.json"
   },
-  "generatedAt": "2026-09-15T03:11:33Z",
-  "version": 1
+  "generatedAt": "2026-10-02T20:58:39Z",
+  "schemaVersion": 1,
+  "version": 2
 }
