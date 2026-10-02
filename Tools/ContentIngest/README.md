@@ -164,3 +164,7 @@ Tests run entirely offline against saved HTML fixtures in
 `Docs/RESEARCH_NOTES.md`, including the irregular `%20` MP3 filename).
 They cover exact parser outputs, WMA exclusion, idempotent re-runs,
 curated-merge behavior, and output validation.
+
+## Current notices and event reports
+
+The `updates` section scans the latest three index pages of official press releases, announcements, seminars and TV interviews. It preserves exact titles, Urdu headings, author lines, visible prose and official image URLs. Categories follow the source URL section. Seminar dates are explicitly approximate because the source gives a civil date without a clock time. Unsupported or missing video embeds are recorded as warnings, never replaced by an invented stream. Existing archived records remain in the catalogue.

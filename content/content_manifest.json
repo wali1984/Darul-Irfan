@@ -1,10 +1,10 @@
 {
-  "contentHash": "0d07adbf2e147db031a749376badf70026f0a7178f4c92d441a94dd09a1d4728",
+  "contentHash": "6e3d4c53e7413bfe56094a3af3d817bf0547fb3b0a7a646391904bcfdffddc01",
   "counts": {
-    "articles": 36,
+    "articles": 96,
     "documents": 273,
-    "events": 0,
-    "media": 800,
+    "events": 31,
+    "media": 823,
     "quranTafsirPages": 114
   },
   "files": {
@@ -14,7 +14,7 @@
     "media": "media.json",
     "tafsir": "quran_tafsir_manifest.json"
   },
-  "generatedAt": "2026-10-02T20:58:39Z",
+  "generatedAt": "2026-10-02T21:32:19Z",
   "schemaVersion": 1,
-  "version": 2
+  "version": 3
 }

@@ -1,5 +1,514 @@
 [
   {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "0571fe357af7606420f2acb267c17858db174290d751fbe8c622cf058d9bc36d",
+    "downloadUrls": [],
+    "id": "announcement-2187-2023-01-01-itla-barae-mahana-ijtima",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2187/1-min.JPG"
+    ],
+    "publishedAt": "2023-01-01T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2187/2023-01-01-itla-barae-mahana-ijtima.html",
+    "title": "Itla Barae Mahana Ijtima",
+    "titleUrdu": "اطلاع برائے ماہانہ اجتماع",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "f9ded197105f1a8af5e6d07004884ac80b570b276cc0d5031299a94fbc00b38b",
+    "downloadUrls": [],
+    "id": "announcement-2247-2023-06-01-salana-england-tour-2023",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2247/ffa17764-a2d3-47de-a51c-880499a2b66d.jpg"
+    ],
+    "publishedAt": "2023-06-01T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2247/2023-06-01-salana-england-tour-2023.html",
+    "title": "Salana England Tour 2023",
+    "titleUrdu": "سالانہ برطانیہ وزٹ 2023",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "5c4741db80d6440761929a701f1a59a3bddc9e583d4e8830c145ea2388860fb3",
+    "downloadUrls": [],
+    "id": "announcement-2252-2023-07-06-40-roza-salana-rohani-ijtima",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2252/02.JPG"
+    ],
+    "publishedAt": "2023-07-06T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2252/2023-07-06-40-roza-salana-rohani-ijtima.html",
+    "title": "40 Roza Salana Rohani Ijtima",
+    "titleUrdu": "چالیس روزہ سالانہ روحانی اجتماع",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "30cf998723747bc79cec7c93e37922567d388e9bbf3c85d6fe5ad029d833b24a",
+    "downloadUrls": [],
+    "id": "announcement-2298-2023-09-02-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2298/1-min%20(4).JPG"
+    ],
+    "publishedAt": "2023-09-02T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2298/2023-09-02-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "092bb8bfcea86b1232b69860cd28e729737f11938951f1408aa31ee8223c86b6",
+    "downloadUrls": [],
+    "id": "announcement-2345-2023-11-01-adaigi-umrah-mubarak",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2345/36-min.JPG"
+    ],
+    "publishedAt": "2023-11-01T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2345/2023-11-01-adaigi-umrah-mubarak.html",
+    "title": "Adaigi Umrah Mubarak",
+    "titleUrdu": "ادائیگی عمرہ مبارک",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "8c70cf52054eef31c2ffb340c00b52385423b638b3cadd4b57b6b693ba1ff3e8",
+    "downloadUrls": [],
+    "id": "announcement-2382-2024-02-20-ameer-abdul-qadeer-awan-ki-walida-majida-intiqaal-farma-gai",
+    "language": "ur",
+    "mediaUrls": [],
+    "publishedAt": "2024-02-20T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2382/2024-02-20-ameer-abdul-qadeer-awan-ki-walida-majida-intiqaal-farma-gai.html",
+    "title": "Ameer Abdul Qadeer Awan Ki Walida Majida Intiqaal Farma Gai",
+    "titleUrdu": "امیر عبدالقدیر اعوان کی والدہ ماجدہ انتقال فرما گئیں",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "eeed49eea3a2958e7a8b0ce9e08a93964eaa0a79d7e8fea3a9b909f2046e0b8b",
+    "downloadUrls": [],
+    "id": "announcement-2403-2024-04-14-salana-sirajum-muneera-conferences-uk-2024",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2403/c3b86011-77ca-43a0-bfe1-d123b419159c.jpg"
+    ],
+    "publishedAt": "2024-04-14T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2403/2024-04-14-salana-sirajum-muneera-conferences-uk-2024.html",
+    "title": "Salana Sirajum Muneera Conferences Uk 2024",
+    "titleUrdu": "سالانہ سراجا منیرا کانفرنسز یوکے 2024",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "54c1c00f3e496b31fb5b7a66018f3d8c265b82d93c443e850c7db7e34db50322",
+    "downloadUrls": [],
+    "id": "announcement-2433-2024-05-05-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2433/may-min.JPG"
+    ],
+    "publishedAt": "2024-05-05T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2433/2024-05-05-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "fac9200fa9eb62b8fcb9fed34fc2c5bc7be3df4a88edf0f3822c04f7dfb71572",
+    "downloadUrls": [],
+    "id": "announcement-2458-2024-06-02-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2458/june-min.JPG"
+    ],
+    "publishedAt": "2024-06-02T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2458/2024-06-02-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "ان شاء اللہ سالانہ جلسہ بعثت رحمت عالم صلی اللہ علیہ وسلم و اجتماعی دعا\nخصوصی خطاب: شیخ المکرم حضرت امیر عبدالقدیر اعوان مد ظلہ العالی\nسلسلہ نقشبندیہ اویسیہ مرکز دارالعرفان منارہ ، چکوال",
+    "category": "announcements",
+    "checksum": "5a098450ff6367d80d7c809af3d805713f1a2225f93ae0caf6b8e09426f3ed42",
+    "downloadUrls": [],
+    "id": "announcement-2520-2024-09-08-salana-jalsa-baisat-rehmat-e-alam-saw",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2520/fainal-min.JPG"
+    ],
+    "publishedAt": "2024-09-08T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2520/2024-09-08-salana-jalsa-baisat-rehmat-e-alam-saw.html",
+    "title": "Salana Jalsa Baisat Rehmat-e-Alam SAW",
+    "titleUrdu": "سالانہ جلسہ بعثت رحمت عالم صلی اللہ علیہ وسلم",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "8ef38cfd420a6ba797f7f9b1d78ead4b99f69d6fd0719e78296d829c4626e776",
+    "downloadUrls": [],
+    "id": "announcement-2568-2024-12-07-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2568/1.JPG"
+    ],
+    "publishedAt": "2024-12-07T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2568/2024-12-07-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "8282497551ce740728cf0f8a3b9993e36132cb780de4899cdf8e863e2fac1e25",
+    "downloadUrls": [],
+    "id": "announcement-2831-2025-01-04-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2831/001.JPG"
+    ],
+    "publishedAt": "2025-01-04T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2831/2025-01-04-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "3f02c9c8aac23940acc5133619a393a57f7aba43e38a6b571c9012304e482e87",
+    "downloadUrls": [],
+    "id": "announcement-2832-2024-12-20-baisat-rehmat-alam-saw-conference",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2832/4-min.JPG"
+    ],
+    "publishedAt": "2024-12-20T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2832/2024-12-20-baisat-rehmat-alam-saw-conference.html",
+    "title": "Baisat Rehmat Alam SAW Conference",
+    "titleUrdu": "بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنس",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "8a69944259233257b97448900aa6385a70eeb5922ee142d8572695da50988b2b",
+    "downloadUrls": [],
+    "id": "announcement-2833-2024-12-22-baisat-rehmat-alam-saw-conference",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2833/001-min%20(1).JPG"
+    ],
+    "publishedAt": "2024-12-22T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2833/2024-12-22-baisat-rehmat-alam-saw-conference.html",
+    "title": "Baisat Rehmat Alam SAW Conference",
+    "titleUrdu": "بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنس",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "c9bf24ba912a42a1ea929ad93797d829f7c74d0fee1fe66126addb5e086bd2d5",
+    "downloadUrls": [],
+    "id": "announcement-2891-2025-02-02-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/2891/feb-min.JPG"
+    ],
+    "publishedAt": "2025-02-02T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/2891/2025-02-02-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "771f6c0f873282c36238ede7f7022beb5aada60ffe592f40caa24594246ae998",
+    "downloadUrls": [],
+    "id": "announcement-3136-2025-04-08-uk-europe-tour-2025",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3136/486164526_9237795642956325_2519145856693196428_n.jpg"
+    ],
+    "publishedAt": "2025-04-08T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3136/2025-04-08-uk-europe-tour-2025.html",
+    "title": "UK & EUROPE TOUR 2025",
+    "titleUrdu": "روحانی تربیتی دورہ برطانیہ اور یورپ 2025",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "0ef47f46c1da47193c047239146566173b9d7ea56f1b35f5b5387c964cd217fd",
+    "downloadUrls": [],
+    "id": "announcement-3342-2025-06-13-salana-rohani-tarbiati-ijtima-2025",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3342/2.JPG"
+    ],
+    "publishedAt": "2025-06-13T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3342/2025-06-13-salana-rohani-tarbiati-ijtima-2025.html",
+    "title": "Salana Rohani Tarbiati Ijtima 2025",
+    "titleUrdu": "سالانہ روحانی تربیتی اجتماع2025",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "4985607aac3210d25d59c86434c308cc1e8dcfb70e66f857dcd8f3a44368638d",
+    "downloadUrls": [],
+    "id": "announcement-3397-2025-08-19-baisat-rehmat-e-alam-saw-conferences-2025",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3397/fainal%20shedule.JPG"
+    ],
+    "publishedAt": "2025-08-19T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3397/2025-08-19-baisat-rehmat-e-alam-saw-conferences-2025.html",
+    "title": "Baisat Rehmat E Alam SAW Conferences 2025",
+    "titleUrdu": "بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنسز 2025",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "bfb59ef167b7523654bf22420ee85f511fb013d8a26a624030c4d350ab3b4f91",
+    "downloadUrls": [],
+    "id": "announcement-3398-2025-08-23-baisat-rehmat-alam-saw-conference",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3398/4.JPG"
+    ],
+    "publishedAt": "2025-08-23T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3398/2025-08-23-baisat-rehmat-alam-saw-conference.html",
+    "title": "Baisat Rehmat Alam SAW Conference",
+    "titleUrdu": "بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنس",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "27d6b38f5dba5bd064438e0bada7aa2120eaa80c3c5c32bf878af059cc43c6f8",
+    "downloadUrls": [],
+    "id": "announcement-3399-2025-08-24-baisat-rehmat-alam-saw-conference",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3399/6.JPG"
+    ],
+    "publishedAt": "2025-08-24T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3399/2025-08-24-baisat-rehmat-alam-saw-conference.html",
+    "title": "Baisat Rehmat Alam SAW Conference",
+    "titleUrdu": "بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنس",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "cb10d3a0bacb8e12adcdf5362534364e3c4fe58bf58425a6c546f17af2c448d3",
+    "downloadUrls": [],
+    "id": "announcement-3416-2025-09-13-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3416/2-min.JPG"
+    ],
+    "publishedAt": "2025-09-13T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3416/2025-09-13-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "2fc88e5251d2857cfc39c2997a323b1fef21c49d7528f505883916cda81485f6",
+    "downloadUrls": [],
+    "id": "announcement-3417-2025-09-18-baisat-rehmat-alam-saw-conference",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3417/3-min.jpg"
+    ],
+    "publishedAt": "2025-09-18T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3417/2025-09-18-baisat-rehmat-alam-saw-conference.html",
+    "title": "Baisat Rehmat Alam SAW Conference",
+    "titleUrdu": "بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنس",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "5971d6b27ac6247b24c8caea6c5b988159d02476602e273119cc9addd4ef587a",
+    "downloadUrls": [],
+    "id": "announcement-3418-2025-09-21-baisat-rehmat-alam-saw-conference",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3418/02-min.JPG"
+    ],
+    "publishedAt": "2025-09-21T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3418/2025-09-21-baisat-rehmat-alam-saw-conference.html",
+    "title": "Baisat Rehmat Alam SAW Conference",
+    "titleUrdu": "بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنس",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "a9e6616abd6ff1d3a2d8edef8584a30d462691b2e5e244090def2a9fd647d564",
+    "downloadUrls": [],
+    "id": "announcement-3602-2025-12-06-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3602/02.JPG"
+    ],
+    "publishedAt": "2025-12-06T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3602/2025-12-06-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "29f76c361af8c8909b00437dbf337fd15dd324e0b72f565bbb0a66372c38245b",
+    "downloadUrls": [],
+    "id": "announcement-3605-2025-12-11-karachi-visit-2025",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3605/fainal%20post.JPG"
+    ],
+    "publishedAt": "2025-12-11T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3605/2025-12-11-karachi-visit-2025.html",
+    "title": "Karachi Visit 2025",
+    "titleUrdu": "کراچی دورہ 2025",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "a0f8ccb143288cfa49e6e1bd62ee451db78290c5742be2c564a55c4e5b095b9d",
+    "downloadUrls": [],
+    "id": "announcement-3749-2026-01-03-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3749/01.jpg"
+    ],
+    "publishedAt": "2026-01-03T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3749/2026-01-03-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "dfc885103d7b77169e629a5632854a8f98ebc790f84e5e76a035d359779041c4",
+    "downloadUrls": [],
+    "id": "announcement-3992-2026-04-06-uk-visit-april-2026",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3992/001.jpg"
+    ],
+    "publishedAt": "2026-04-06T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/3992/2026-04-06-uk-visit-april-2026.html",
+    "title": "UK Visit April 2026",
+    "titleUrdu": "یو کے وزٹ اپریل 2026",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "46342509d26e5e4c57d9db99c28d4696ae41d4c532ab3c2dc189eff8f1d01f2c",
+    "downloadUrls": [],
+    "id": "announcement-4190-2026-06-06-40-roza-salana-ijtima-2026",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4190/02.jpg"
+    ],
+    "publishedAt": "2026-06-06T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/4190/2026-06-06-40-roza-salana-ijtima-2026.html",
+    "title": "40 Roza Salana Ijtima 2026",
+    "titleUrdu": "سالانہ روحانی تربیتی اجتماع",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "ca14d46801c64da16b04cb5f5f58471f2016960a2128a24f2140bc96bcf76f00",
+    "downloadUrls": [],
+    "id": "announcement-4268-2026-08-16-salana-baisat-e-rehmat-e-alam-saw-conferences-2026",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4268/1.JPG"
+    ],
+    "publishedAt": "2026-08-16T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/4268/2026-08-16-salana-baisat-e-rehmat-e-alam-saw-conferences-2026.html",
+    "title": "Salana Baisat E Rehmat E Alam SAW Conferences 2026",
+    "titleUrdu": "سالانہ بعثت رحمت عالم صلی اللہ علیہ وسلم کانفرنسز 2026",
+    "type": "announcement"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "category": "announcements",
+    "checksum": "2c02d11bab31554aa493f02078edcee4271e1e1b747d1adc04240e638e6bc5a3",
+    "downloadUrls": [],
+    "id": "announcement-4276-2026-09-05-mahana-ijtima-dar-ul-irfan-munarah",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4276/002.JPG"
+    ],
+    "publishedAt": "2026-09-05T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/announcement/4276/2026-09-05-mahana-ijtima-dar-ul-irfan-munarah.html",
+    "title": "Mahana Ijtima Dar Ul Irfan Munarah",
+    "titleUrdu": "دوروزہ ماہانہ روحانی اجتماع مرکز دارالعرفان منارہ",
+    "type": "announcement"
+  },
+  {
     "bodyPlainText": "Blessings of the Everlasting Prophet Hood\nTranslated Speech of\nHis Eminence Ameer Muhammad Akram Awan\nShaikh Silsilah Naqshbandiah Owaisiah\nThe Prophet hood of the holy Prophet Muhammad-saw remains as effective until the last day of this universe as it was on the first day of his appointment. The beneficence ema­nating from him consists of his teachings which form the basis of religious knowledge. This knowledge generates faith and is subsequently translated into conduct. Along with these teachings, he also radiated invisible blessings which cannot be described in words. These blessings charged the hearts of the believers with firm belief and enlightened them forever. Those who partook, both from these teachings and blessings were indeed perfect Muslims. They received this beneficence directly from the holy Prophet-saw and therefore occupy a unique status within the whole Ummah. His teachings and his blessings will be preserved in their pristine purity until the end of this world. Nobody has any right to change the code of permission or prohibition defined by him. Similarly, in the realm of Faith, his is the final word.\nNowadays people demand every reference from the Quran, without appreciating the source through which it has reached us. After all who told us that it was the Divine Word and who read it to us? In fact, the Quran is the perception of Divine Revelation by the holy Prophet-saw alone. Nobody else can claim that he ever heard Revelation or saw and recognised the angel Gabriel. The holy Prophet-saw is the only one to certify that the Quran is the Word of Allah and not his own. His explanation and interpretation of the Quran is known as Hadith. The Quran states:\nNor does he speak of (his own) desire. 53:3.\nIt asserts that the holy Prophet-saw did not speak a single word through the whisper of his soul. His conversation was always based on Divine Revelation. In the case of the Quran, both the words and meanings were revealed by Allah, while the meanings of Hadith were inspired by Allah and verbalised by the holy Prophet-saw. This explanation has the approval of the holy Prophet-saw himself. Therefore, it is not correct to demand the reference of everything from the Quran. On the other hand, it is equally improper to interpret the Quran without reference to the Hadith. Only that meaning of the Book would be considered authentic which was given by the holy Prophet-saw and adopted by his Companions. On this subject, he-saws is the final authority.\nJust as the teachings of the holy Prophet-saw still continue to benefit mankind, so do his blessings. In the past, when the blessings of earlier Prophets waned with the passage of time, the faith of their followers weakened and they renounced their religion. This neces­sitated the raising of a new Prophet to illuminate the hearts of people with his blessings once again. The blessings of the holy Prophet-saw would neither wane nor fade but will stay forever like his Prophethood, because no new Prophet will be raised after him. Therefore, when Prophet Jesus-as (who is a born Prophet), returns to this world, he will not preach his own Prophethood but will follow the holy Prophet Muhammad-saw and would also invite others to do the same. Till the return of Prophet Jesus-as, the responsi­bility of preaching and preservation of Islam in its pristine purity has been entrusted to the Aulia of this Ummah. Therefore, like his teachings, the blessings of the holy Prophet-saw must also be and, in fact, have been preserved, from bosom to bosom, under a Divine arrangement. Just as one has to go to an institution or a scholar to learn his teachings, one has to similarly seek an audience with a person carrying Prophetic blessings. But there ought to be a yardstick or a criterion to determine the authenticity of a particular institu­tion or person. The answer lies in the simple method of comparison of one's condition with those who received these blessings from the holy Prophet-saw directly. His company completely reformed their lives, illuminated their hearts and infused in them the love of virtue and hatred for vice.\nThese were the Companions, the most pious group in the entire Ummah; piety and companionship are synonymous. They stand at that acme of human excellence where all virtues of a non-Companion pale into insignificance. They transmitted his-saws blessings down the line and a chain of transmission is established in the Ummah until today, and will so continue until Doomsday. The company of any saint in that chain should produce a positive change within us. Not only should our outward practical life be reformed but our inner self (heart) should also experience hatred for vice and love for virtue. We should feel pleasure in doing good acts, and if due to any human weakness, we commit a sin, it should divest us of inner peace and tranquillity. Only that person, whose company initiates such transformation by Allah's grace, would be a true saint. This indeed is the difference between a true and a pseudo saint. If one discovers an accomplished Wali, one should stick to him like his shoe lace. Therefore, the criterion is neither the increase of wealth and status nor the acquisition of material benefits.\nThe universe and all of its systems have been designed by Allah since antiquity. The total providence of every human being, encompassing all of his worldly requirements, has also been divinely proportioned. No one can consume anyone else's portion, nor can he leave this world before completely consuming his own. Allah may increase someone's provisions to see if his wealth attenuates the clarity and strength of his relationship with his Provisioner. Similarly, He may straiten the provision of someone to see whether he returns to his Creator in adversity or seeks recourse to others. While He may alternate someone's condition between prosperity and adversity, His system is so perfect, smooth and flawless that it simply does not have any room for our suggestions. Human visitation to this world is ephemeral, whereas His system has been operating since time immemo­rial and only He knows how long it will continue to function. It is the permanent, perfect system which affects the temporary visitor, not vice versa.\nTherefore, it is incorrect to presume that we acquired wealth or health or worldly comforts in the company of Hadhrat (Rahmat Ullah Alaihi). These mundane benefits are of no consequence because Allah has given these to even those who do not believe in Him, His Prophet-saw and the Aulia. They also enjoy the fruits of this life. So, it is not justified to identify truth with material gains. A retired captain from a nearby village renounced Islam and converted to Shiaism. Once, a friend of ours asked him the rea­son for this absurdity at the fag end of his life. He replied: “I won the local election and became its chairman due to the blessings of my new religion.” An elderly lady, passing by, heard the dialogue and remarked: “Rather, you should have become a Hindu, to succeed Indira Gandhi. If the flower of this world is a fruit of religion, you should become Hindu to get greater benefits.” Wealth or comforts of this world are not the crite­ria of truth. The holy Prophet-saw is reported to have said: “If this world had weighed equal to the wing of a gnat, Allah wouldn't give a non-believer a drop of water to drink. It car­ries no value with Him.” All of its comforts and miseries are temporary and momentary. But the states that descend from Allah on the hearts and the blessings which are acquired through the holy Prophet-saw are everlasting and guarantee success both here and in the Hereafter. This should be viewed from two angles. First, we should identify the process of the reformation of the heart initiated as a result of our association with any person, institution or school of thought. Second, if someone belongs to a category of people who do not get easily influenced, he should see others associated with that institution or person and look for any positive changes resulting from that association. If he finds that they have been reformed but he himself remains unaffected, then he should critically analyse himself. Probably some of his failings preclude him from receiving those bless­ings. But if he finds no change in anyone, it is better to quit immediately. It will be a sheer waste of time to continue an association where sincerity of purpose, love of virtue and hatred for vice are missing. One has very little time, death is chasing everyone born in this world. To die in search of truth entitles one to Allah's mercy, because according to a Divine declaration, anyone who migrates towards Allah will receive his reward whether he reaches the destination or dies enroute.\nSo first of all, one should purify one's intention and purpose. He must then set out in the cause of Allah and in search of truth and piety. If received, worldly comforts are insignificant by-products of this journey and should not be taken note of. The real valu­able achievement is a firm belief in the Divine Unity, the Prophethood, and life of the Hereafter. A practical life increasingly influenced by these beliefs will be an indication of the acquisition of blessings and beneficence from the holy Prophet-saw. One should not waste one's time with an association which does not lead to this achievement.\nMay Allah accept our humble efforts and grant us the capacity to be good and to do good! Ameen!",
     "category": "articles",
     "checksum": "8c82ec5c6c986c75f0979e0d5bef34d38d25ac919f8c02f527ea4c9f975a05ac",
@@ -264,6 +773,546 @@
     "sourceUrl": "https://www.naqshbandiaowaisiah.org/parameters-of-the-silsila.html",
     "title": "Parameters of the Silsila",
     "type": "article"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "مرکز دارالعرفان منارہ میں 23 مارچ کے موقع پر یومِ پاکستان کی مناسبت سے ایک پروقار تقریب منعقد ہوئی۔ تقریب کے دوران حضرت امیر عبدالقدیر اعوان، شیخِ سلسلہ اور سربراہ تنظیم الاخوان پاکستان نے پرچم کشائی کی۔اس موقع پر اپنے مختصر خطاب میں انہوں نے آزادی کی اہمیت اور قراردادِ مقاصد کے بنیادی نکات پر روشنی ڈالی، جبکہ پاکستان کی سلامتی، استحکام اور ترقی کے لیے خصوصی دعا بھی کی حضرت امیر عبدالقدیر اعوان نے اپنے خطاب میں ملکی اداروں کی مضبوطی پر زور دیتے ہوئے تمام قومی اداروں کے ساتھ مکمل یکجہتی کے عزم کا اظہار کیا۔ انہوں نے کہا کہ ملک کی بقا اور ترقی کے لیے اداروں کے ساتھ کھڑا ہونا وقت کی اہم ضرورت ہے۔انہوں نے مزید کہا کہ پاکستان کی مختلف لسانی اکائیاں، جن میں سندھی، بلوچی، پشتو اور گلگتی زبانیں شامل ہیں، ہماری قومی طاقت ہیں۔ ان زبانوں اور ثقافتوں کو یکجا کر کے قومی اتحاد کو مزید مضبوط بنایا جا سکتا ہے۔اپنے خطاب میں انہوں نے موجودہ ملکی و عالمی حالات کا بھی ذکر کیا اور اس بات پر زور دیا کہ اتحاد و اتفاق کے ذریعے ہی پاکستان کو درپیش چیلنجز کا مقابلہ کیا جا سکتا ہے",
+    "category": "pressReleases",
+    "checksum": "14926850816ba227e7653534242b311faeba1af6cc1385e350c5d78bfac7ea5f",
+    "downloadUrls": [],
+    "id": "press-release-3985-2026-03-23-markaz-darul-irfan-mnarh-mein-23-march-ke-mauqa-par-yom-pakistan-ki-munasbat-se-aik-purwaqar-taqreeb-munaqqid-hui",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3985/news%20(2).jpg"
+    ],
+    "publishedAt": "2026-03-23T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/3985/2026-03-23-markaz-darul-irfan-mnarh-mein-23-march-ke-mauqa-par-yom-pakistan-ki-munasbat-se-aik-purwaqar-taqreeb-munaqqid-hui.html",
+    "title": "Markaz Darul Irfan Mnarh Mein 23 March Ke Mauqa Par Yom Pakistan Ki Munasbat Se Aik Purwaqar Taqreeb Munaqqid Hui",
+    "titleUrdu": "مرکز دارالعرفان منارہ میں 23 مارچ کے موقع پر یومِ پاکستان کی مناسبت سے ایک پروقار تقریب منعقد ہوئی",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "اسلام اس کرہ ارض پر تلوار کے زور سے نہیں پھیلا بلکہ لوگوں کے تحفظ اور ان پر ظلم کو روکتے ہوئے پھیلا  اُس وقت کے مظالم جس کی تاریخ گواہ ہے کہ مظلوم اپنی شکایت بھی نہیں کر سکتا تھا۔انسانیت کی بھلائی کوئی نہیں کر سکتا جب تک وہ خود دین اسلام کے اصولوں پر عمل پیرا نہ ہو۔\nامیر عبدالقدیر اعوان شیخ سلسلہ کا جمعتہ المبار ک کے روز خطاب۔\nانہوں نے مزید کہا کہ رمضان المبارک سے ابھی نکلے ہیں ان سب کے فضائل حاصل کیے ہیں اور ان کا حاصل میدان عمل میں یہ ہے کہ ہم نیک اعمال پر ثابت قدم رہیں۔اور تقوی کا حاصل بھی یہ ہے کہ بندہ عمل کرتے ہوئے اللہ کی حضوری کا احساس رکھے۔ہر چیز اللہ کے دست قدرت میں ہے،فتح و ناکامی اللہ کی طرف سے ہے۔سبب اختیار کرو لیکن بھروسہ اللہ پر کرو۔اہل بدر کو یہ الفاظ نصیب ہوئے کہ یہ سارے کا سارا اسلام ہے۔اللہ کریم ایمان کی یہ کیفیت عطا فرمائیں کہ اللہ کی رضا اللہ کے حکم کی تعمیل میں ہے۔اس دنیا میں یہ فرصت ہے کہ ہم اپنی آخرت تعمیر کر سکیں۔یہ دنیا کی زندگی اس لیے قیمتی ہے کہ اس پر آخرت کا انحصار ہے۔\nانہوں نے کہا کہ بخشش اللہ کی رحمت سے ہے ہمارے اعمال سے منسوب نہیں ہے۔ہم صرف تعمیل حکم کر رہے ہیں۔اللہ کریم ہمیں خالص عبادات ادا کرنے کی توفیق عطا فرمائیں۔دعوی ایمانی کے ساتھ اپنی عبادات کے ساتھ اپنی اغراض شامل کر لیں یہ درست نہیں ہے۔\nآج بھی فرشتے مسلمانوں کی مدد کو نازل ہو سکتے ہیں دیکھنا یہ ہے کہ ہم مسلمانی کے معیار پر پورا اتر رہے ہیں؟ کیا ہم اللہ کے حکم کے مطابق زندگی گزار رہے ہیں یا دین سے دور ہوتے جا رہے ہیں۔اللہ کریم سے حقیقی تعلق ہونا چاہیے۔\nانہوں نے مزید کہا کہ صبر یہ ہے کہ خود کو شریعت پر پوری قوت سے روکے رکھنا۔شیطان کے پیچھے نہ جانا،عمومی دنیا کی روش میں نہ بہہ جانا۔رمضان المبارک کا حاصل بھی صابر اور متقی کی کیفیت کو پانا ہے۔اللہ کریم دین اسلام کے مطابق زندگی بسر کرنے کی توفیق عطا فرمائیں۔آخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائ",
+    "category": "pressReleases",
+    "checksum": "d2fbd7ea5084427416847efb5842813a6585667021f25e533e2e422933db0473",
+    "downloadUrls": [],
+    "id": "press-release-3986-2026-03-27-bakhshish-allah-ki-rehmat-se-hai-hamaray-aamaal-se-mansoob-nahi-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3986/news%20(1).jpg"
+    ],
+    "publishedAt": "2026-03-27T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/3986/2026-03-27-bakhshish-allah-ki-rehmat-se-hai-hamaray-aamaal-se-mansoob-nahi-hai.html",
+    "title": "Bakhshish Allah Ki Rehmat Se Hai Hamaray Aamaal Se Mansoob Nahi Hai",
+    "titleUrdu": "بخشش اللہ کی رحمت سے ہے ہمارے اعمال سے منسوب نہیں ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "آج ہم غلط فیصلے کر کے سمجھتے ہیں کہ انسانیت کی فلاح کر رہے ہیں۔اپنی عقل و دانش اور ذاتی پسند سے قانون بناتے ہیں کچھ عرصے بعد خود ہی ان قوانین کا رد کر رہے ہوتے ہیں۔آنے والی اسمبلی اُن قوانین میں ترمیم کر رہی ہوتی ہے کہ یہ قوانین اب قابل عمل نہیں رہے۔ہم طرح طرح کے تجربات کر رہے ہوتے ہیں یہی اس بات کا ثبوت ہے کہ انسانی عقل کلی طور پر کسی چیز کا احاطہ نہیں کر سکتی،اس کے مقابل اسلامی اصول اور قوانین جہاں بھی نافذ ہوئے وہاں اعتدال رہا اور کوئی بھی ان قوانین کو رد نہیں کر سکا۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اولیسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبار ک کے روز خطاب۔\nانہوں نے کہا کہ صحابہ کرام ؓ وہ خوش بخت ہستیاں ہیں جنہیں معیت محمد الرسول اللہ ﷺ نصیب ہوئی۔آج بھی وہی اسلامی تعلیمات ہیں،قرآن کریم ہماری راہنمائی کے لیے موجود ہے سب کچھ محفوظ ہے اور قیامت تک رہے گا لیکن ایمان کا وہ درجہ جو صحابہ کرام ؓ کو نصیب تھا وہ آج کیوں نہیں ہے اس لیے کہ ان ہستیوں کو نبی کریم ﷺ کا ساتھ نصیب تھا۔پھر صحابہ ؓ  میں اہل بد ر کا اپنا مقام ہے،عشرہ مبشرہ کا اپنا ہے۔اقرار کے ساتھ پھر اس پر قائم رہنا یعنی خود کو دین پر قائم رکھنا یہ صبر ہے ہر ایک کو صبر اور تقوی کی ضرورت ہے۔\nاللہ کریم صحیح شعور عطا فرمائیں اور ہمیں دین اسلام کو سمجھنے اور اس پر عمل کی توفیق عطا فرمائیں۔آخر میں انہوں نے ملکی سلامتی اور امت مسلمہ کے لیے اتفاق و اتحاد کے لیے خصوصی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "766db9048aff479d7748700b72c5cdb4468db7c9b3f20993eb6fd57c67d6bf5f",
+    "downloadUrls": [],
+    "id": "press-release-3989-2026-04-03-falah-insaaniyat-ke-naam-par-insaaniyat-ko-dhoka-diya-ja-raha-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3989/NEWS%20(3).jpg"
+    ],
+    "publishedAt": "2026-04-03T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/3989/2026-04-03-falah-insaaniyat-ke-naam-par-insaaniyat-ko-dhoka-diya-ja-raha-hai.html",
+    "title": "Falah Insaaniyat Ke Naam Par Insaaniyat Ko Dhoka Diya Ja Raha Hai",
+    "titleUrdu": "فلاح انسانیت کے نام پر انسانیت کو دھوکہ دیا جا رہا ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "جیسے انسانی وجود کو روزانہ صفائی کی ضرورت ہوتی ہے بلکل اسی طرح روح بھی آلودہ ہوتی ہے اور دلوں پر زنگ لگ جاتا ہے اس کی صفائی کے لیے اللہ کا ذکر کرایا جا تا ہے۔جب قلب کے اندر کیفیات محمد الرسول اللہ ﷺ آتی ہیں تو قلب جسم کو صراط مستقیم پر لے آتا ہے اور نفس کو برائی سے روکتا ہے۔آج معاشرے کا سب سے بڑا نقص یہ ہے کہ گھر کی نشست ختم ہو گئی ہے اور بچوں کو تنہائی دے دی گئی ہے وہ کیا کر رہے ہیں کیا دیکھ رہے ہیں جو مغرب اور اغیار دکھانا چاہتے ہیں۔ہمارے بچے ہیں لیکن ہمارے نہیں رہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ کا دو روزہ ماہانہ روحانی اجتماع کے موقع پر خطاب۔\nانہوں نے کہا کہ اگر نماز پورے اہتمام کے ساتھ ادا کی جائے تو جتنی ہماری پریشانیاں ہیں بندہ ان سے نکل آتا ہے۔جو نمازی متوجہ الی اللہ ہوتا ہے اللہ کریم کی اسے خصوصی توجہ نصیب ہوتی ہے۔معاملات میں جائز وسائل کا استعمال کریں اللہ کریم سے عافیت مانگی جائے،شکر گزاری کی جائے توکل الی اللہ ہو تو اللہ کریم محروم نہیں فرماتے،حفاظت فرماتے ہیں۔\nانہوں نے مزید کہا کہ آج کے ہمارے قومی اور بحیثیت امت جو حالات ہیں یقینا ان کا سبب ہمارے اعمال ہیں۔جو جنگی حالات ہیں اور جو کچھ اس وقت ہو رہا ہے وہ ہماری بے عملی اور نالائقی کے سبب سے ہے جواقوام عالم میں ہمیں کمزور کرتی چلی گئی۔اگر ہم اسلامی اصولوں پر قائم رہتے تو ہم مظلوم نہیں بلکہ عادل ہوتے جو مظلوم ہیں ان کو بھی انصاف دلانے کا سبب بنتے۔آج جو ہماری صورت حال ہے بجائے اس کے کہ ایک دوسرے کے گریباں پکڑیں اپنے اعمال پر توجہ فرمائیں۔اللہ کریم صحیح شعور عطا فرمائیں۔آخر میں انہوں نے ملکی سلامتی اور امت مسلمہ کے اتحاد کے لیے خصوصی دعا بھی فرمائی۔\nیا درہے کہ امیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ رواں ماہ روحانی تربیت کے لیے برطانیہ کا دورہ کریں گے جس میں برطانیہ کے تمام بڑے شہروں میں سراجا منیرا کانفرنسز کا اہتمام ہو گا اس کے علاوہ پاکستانی کمیونٹی سے بھی ملاقاتیں طے ہیں۔یہ دورہ برطانیہ سالانہ ہوتا ہے جس میں حضرت کے برطانیہ کے مختلف شہروں میں لیکچر ہوتے ہیں۔",
+    "category": "pressReleases",
+    "checksum": "5e5dd746b59270bcb9af86dc3c4cc8a75efc73a4a876a49a9a217295575f1569",
+    "downloadUrls": [],
+    "id": "press-release-3990-2026-04-05-agar-hum-islami-osoolon-par-qaim-rehtay-to-hum-mazloom-nahi-balkay-adil-hotay",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3990/news%20(4).jpg"
+    ],
+    "publishedAt": "2026-04-05T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/3990/2026-04-05-agar-hum-islami-osoolon-par-qaim-rehtay-to-hum-mazloom-nahi-balkay-adil-hotay.html",
+    "title": "Agar Hum Islami Osoolon Par Qaim Rehtay To Hum Mazloom Nahi Balkay Adil Hotay",
+    "titleUrdu": "اگر ہم اسلامی اصولوں پر قائم رہتے تو ہم مظلوم نہیں بلکہ عادل ہوتے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "اسلام آباد: حضرت امیر عبدالقدیر اعوان، شیخ سلسلہ، روحانی و تربیتی دورے پر برطانیہ (یوکے) روانہ ہو گئے۔ وہ اسلام آباد انٹرنیشنل ایئرپورٹ سے اپنے تین ہفتوں پر مشتمل دورے کے لیے روانہ ہوئے۔\nاس موقع پر اسلام آباد انٹرنیشنل ایئرپورٹ پر سالکین کی ایک بڑی تعداد نے اپنے شیخ مکرم کو رخصت کیا۔ راولپنڈی اور اسلام آباد کے عہدے داران بھی خصوصی طور پر حضرت کو الوداع کرنے کے لیے موجود تھے۔ حضرت امیر عبدالقدیر اعوان نے روانگی سے قبل تمام احباب سے مصافحہ کیا اور دعاؤں سے نوازا۔\nدورۂ یوکے کے دوران حضرت لندن سمیت برطانیہ کے مختلف شہروں میں منعقد ہونے والی سراج منیر کانفرنسز سے خطاب کریں گے، جن میں خواتین و حضرات کی کثیر تعداد شرکت کرے گی۔ ان کانفرنسز میں روحانی تربیت، اصلاحِ نفس اور معاشرتی رہنمائی جیسے اہم موضوعات پر خصوصی خطابات کیے جائیں گے۔\nمزید برآں، حضرت امیر عبدالقدیر اعوان اپنے قیام کے دوران انفرادی ملاقاتیں بھی کریں گے، جن میں وہ احباب کو ذاتی طور پر روحانی رہنمائی اور تربیت فراہم کریں گے۔ اس کے علاوہ مختلف موضوعات پر خصوصی لیکچرز بھی دیے جائیں گے۔\nیہ دورہ روحانی تربیت اور اصلاحِ معاشرہ کے حوالے سے نہایت اہمیت کا حامل قرار دیا جا رہا ہے، جس سے یوکے میں مقیم پاکستانی و دیگر کمیونٹی بھرپور استفادہ کرے گ",
+    "category": "pressReleases",
+    "checksum": "9b2a94cedd3d158d141258091bbbf139a60192f818c72e48ceab2726eca035c9",
+    "downloadUrls": [],
+    "id": "press-release-3991-2026-04-06-ameer-abdul-qadeer-awan-mza-sheikh-silsila-rohani-tarbiati-dora-pr-bartania-rawana",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/3991/01.jpg"
+    ],
+    "publishedAt": "2026-04-06T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/3991/2026-04-06-ameer-abdul-qadeer-awan-mza-sheikh-silsila-rohani-tarbiati-dora-pr-bartania-rawana.html",
+    "title": "Ameer Abdul Qadeer Awan MZA Sheikh Silsila Rohani Tarbiati Dora Pr Bartania Rawana",
+    "titleUrdu": "حضرت امیر عبدالقدیر اعوان، شیخ سلسلہ، روحانی و تربیتی دورے پر برطانیہ (یوکے) روانہ ہو گئے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "جس نے بھی دین اسلام سے دنیا کے اصول لے کر ان پر عمل کیا وہ اس وقت دنیا میں ترقی کر رہے ہیں۔ہم جنہیں دین اسلام وراثت میں ملا ہم وہ اصول چھوڑ کر دین اور دنیا دونوں میں پیچھے رہ گئے۔ہمیں جو اقدار اور شفقت بڑوں سے ملی وہ ہمارے اندر کہیں نظر نہیں آرہی۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ کا  برطانیہ مانچسٹر دارالعرفان میں سراجا منیرا کانفرس سے خطاب۔\nانہوں نے کہا کہ موت کے مرحلے سے گزرنا کوئی عام بات نہیں ہے۔حدیث شریف کا مفہوم ہے کہ روح جب ایک ایک باڈی سیل سے نکلتی ہے جیسے کانٹے دار جھاڑی پر باریک کپڑا ڈال کر پھر اسے ایک طرف سے پکڑ کر کھینچا جائے تو وہ تار تار ہو جائے گا۔لیکن ہم نے یہ بھی مشاہدہ کیا ہے کہ لوگ وفات پا جاتے ہیں لیکن ان کے چہرے پر مسکراہٹ ہوتی ہے۔کئی بار یہ بھی دیکھا ہے کہ قیمتی کفن ہوتا ہے قیمتی چارپائی ہوتی ہے لیکن چہرے پر اضطراب ہوتا ہے۔حضرت جی ؒ کا تذکرہ کرتے ہوئے انہوں نے کہا کہ جب حضرت جی ؒ کا وصال ہوا تو ڈاکٹرز نے کہا کہ آپ کا جنازہ لیٹ ہوگا اس لیے یہاں سردے خانے کی سہولت موجود ہے آپ حضرت کو یہاں رہنے دیں۔تو میں نے ان سے کہا محترم آپ کل جنازے پر آنا اور اپنی آنکھوں سے خود دیکھ لینا کہ ان کا وجود حرکت دینے سے حرکت کرتا ہے کہ نہیں۔اس لیے کہ جب زندگی اللہ اور اللہ کے نبی ﷺ کے حکم پر بسر ہو پھر کسی سرد خانے کی ضرورت پیش نہیں آتی۔وہ سر کیوں حرکت نہ کرے جسے اللہ کریم نے رکوع و سجود کی توفیق عطا فرمائی ہو۔اللہ کریم صحیح شعور عطا فرمائیں۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی",
+    "category": "pressReleases",
+    "checksum": "8c5aa2e302bc67e3a7e155e763d3275f2f6c1e3263cdd8af2dd2ffd600c2c2c8",
+    "downloadUrls": [],
+    "id": "press-release-4049-2026-04-14-eechay-chalne-wala-kabhi-barabar-nahi-ho-sakta",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4049/news%20(6).jpg"
+    ],
+    "publishedAt": "2026-04-14T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4049/2026-04-14-eechay-chalne-wala-kabhi-barabar-nahi-ho-sakta.html",
+    "title": "ُeechay Chalne Wala Kabhi Barabar Nahi Ho Sakta",
+    "titleUrdu": "پیچھے چلنے والا کبھی برابر نہیں ہو سکتا",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "جس بندے کے اندر توقع اور خوف دونوں کیفیات ہوں اس کے اندر ایمان کی دولت موجود ہے۔ ذکر کثیر سے متعلق قرآن کریم سورہ اعراف کی آخری آیات میں جو حکم فرمایا گیا ہے وہ ذکر خفی اور ذکر قلبی اختیار کیے بغیر ممکن نہیں۔ یہ ذکر صبح شام جب کریں گے تو ایسی کیفیت بن جائے گی کہ ہمہ وقت کا ذکر نصیب ہوگا جیسے پنجابی میں کہتے ہیں کہ\" ہتھ کار ول دل یار ول \"کہ اگر آپ معاملات دنیا کی طرف بھی جا رہے ہیں تو آپ متوجہ الی اللہ رہیں گے۔جس سے ہمہ وقت کا ذکر،اللہ کی یاد نصیب ہوگی۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ کا  برطانیہ میں دارالعرفان برمنگھم میں خواتین و حضرات کی بڑی تعداد سے خطاب۔\nانہوں نے کہا کہ یاد الٰہی کے ساتھ وابستگی نیت سے لے کر عمل تک کو درست کر تی ہے۔ذکر الٰہی کی تین اقسام ہیں لثانی ذکر،عملی ذکر اور ذکر قلبی۔لثانی ذکر جب تک آپ کوئی تسبیح پڑھ رہے ہیں آپ کا ذکر ہو رہا ہے جب آپ نے کوئی گفتگو شروع کی آپ کا ذکر رک گیا  اسی طرح عملی ذکر بھی جب تک آپ کوئی نیک عمل کر رہے ہیں آپ کا ذکر ہو رہا ہے جونہی آپ نے وہ عمل چھوڑ دیا یا سو گئے تو آپ کا وہ ذکر رک گیا۔لیکن قرآن کریم میں ذکر کثیر کا حکم ہے جو صرف قلبی ذکر سے ممکن ہے جب اللہ کی یاد دل میں رچ بس جاتی ہے تو دل کی دھڑکن کے ساتھ اللہ کی یاد جاری رہتی ہے۔\nانہوں نے مزید کہا کہ درود شریف ایسی تسبیح ہے ایسا وظیفہ ہے جو دونوں جہانوں کے لیے کافی ہے۔حدیث شریف کے مطابق درود شریف کا وقت بڑھاتے بڑھاتے آپ ﷺ نے فرمایا کہ اگر سارا وقت درود شریف کو دیا جائے تو بہت افضل ہے۔لیکن اس زعم میں نہ پڑجائیں کہ میرے جیسا عبادات گزار کوئی نہیں میرے جیسا نیک کوئی نہیں عجز اور انکساری کا دامن کبھی ہاتھ سے چھوٹنے نہ پائے۔ہمیشہ خود کو عاجز سمجھیں تاکہ کبر قریب نہ آئے۔\nآخر میں انہوں نے امت مسلمہ کے اتحاد کے لیے خصوصی دعا بھی فرمائی",
+    "category": "pressReleases",
+    "checksum": "d85c383dc1a3a6ba97d29883e0a04b827812e4d3c200cce2834d23edaa52b3d1",
+    "downloadUrls": [],
+    "id": "press-release-4050-2026-04-12-yaad-ellahi-ke-sath-wabastagi-niyat-se-le-kar-amal-tak-ko-durust-kar-ti-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4050/news%20(7).jpg"
+    ],
+    "publishedAt": "2026-04-12T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4050/2026-04-12-yaad-ellahi-ke-sath-wabastagi-niyat-se-le-kar-amal-tak-ko-durust-kar-ti-hai.html",
+    "title": "Yaad Ellahi Ke Sath Wabastagi Niyat Se Le Kar Amal Tak Ko Durust Kar Ti Hai",
+    "titleUrdu": "یاد الٰہی کے ساتھ وابستگی نیت سے لے کر عمل تک کو درست کر تی ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "دنیا ایک باعمل مسلمان کی شہادت کو رد نہیں کر سکتی۔مسئلہ یہ ہے کہ ہمارے قول و فعل میں تضاد ہے۔دعوی ایمانی کے ساتھ ہمارے معاشروں اور حکومتوں کی معیشت کی بنیاد حرام یعنی سود پر رکھی گئی ہے۔اگر ہم قرآن وسنت پر عمل شروع کریں اور اپنے معاشرے کو عملی طورپر اس کے تحت لے آئیں تو دنیا کو بتانے کی ضرورت نہیں پڑے گی بلکہ یہ ایسی تبلیغ ہوگی کہ از خود دنیا اسلام کی طرف راغب ہونا شروع ہو جائے گی۔ آج ہمارے عہد میں کمزوری ہے اور اپنے فرائض کی ادائیگی جہاں ہم ڈیوٹی کر رہے ہوتے ہیں اس میں بھی خیانت ہے۔ہم نے قرآن کریم کے احکامات پر عمل کرنا ہے اپنی عقل و دانش کو اطاعت میں شامل نہیں کرنا۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبار ک کے روز خطاب۔\nانہوں نے کہا کہ خانقاہوں کی ذمہ داری ہے کہ مخلوق کو اپنی ذات کی طرف نہ لائیں بلکہ جتنی مخلوق خانقاہ پر آئے انہیں اصل کی طرف یعنی اللہ کی طرف لے کر جائیں اور بطریقہ نبی کریم ﷺ ان کی تربیت کی جائے۔آج لوگوں کا بہت بڑا حصہ ایسا ہے جو خواہشات نفسانی کی پیروی میں لگا ہے۔نفس کی خواہشات بہت بڑا امتحان ہے دیکھنا یہ ہے کہ وہ کون سا عمل ہے جس سے نفس کو طاقت ملتی ہے اور کو ن سے ایسے اعمال ہیں جن سے نفس کمزور ہوتا ہے۔دین کے مقابل اپنی سوچ رکھ کر چلنا یہ درست نہیں ہے۔اور یہ سارے معاملات قلوب کی بیماری کی وجہ سے ہیں۔قرآن کریم فرماتا ہے دلوں کا اطمینا ن اللہ کی یاد میں ہے۔ہمیں اپنے قلوب کی اصلاح کے لیے ذکر قلبی کی اشد ضرورت ہے۔ذکر قلبی کے بغیر قلوب کی اصلاح ممکن نہیں۔اللہ کریم صحیح شعور عطا فرمائیں۔\nیاد رہے کہ سلسلہ نقشبندیہ اویسیہ کے مرکز دارالعرفان منارہ میں 2،3 مئی بروز ہفتہ،اتوار دوروزہ ماہانہ روحانی اجتماع کا انعقاد کیا گیا جس میں ملک بھر سے سالکین سلسلہ عالیہ اپنی روحانی تربیت کے لیے تشریف لائیں گے اور حضرت شیخ المکرم مد ظلہ العالی اتوار دن گیارہ بجے خطاب فرمائیں گے اور اجتماعی دعا بھی بھی ہوگی دعوت عام ہے کہ اس بابرکت پروگرام میں شرکت فرما کر اپنے دلوں کو برکات نبوت ﷺ سے منور کیجیے۔",
+    "category": "pressReleases",
+    "checksum": "c1df3e3e6af7abd6a1aa24e710ee7d953fcff0bd527b0a903a00316dbbba003c",
+    "downloadUrls": [],
+    "id": "press-release-4143-2026-05-01-aik-ba-aml-musalman-khatam-nabuwat-ki-bohat-barri-shahadat-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4143/news%20(14).jpg"
+    ],
+    "publishedAt": "2026-05-01T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4143/2026-05-01-aik-ba-aml-musalman-khatam-nabuwat-ki-bohat-barri-shahadat-hai.html",
+    "title": "Aik Ba Aml Musalman Khatam Nabuwat Ki Bohat Barri Shahadat Hai",
+    "titleUrdu": "ایک باعمل مسلمان ختم نبوت کی بہت بڑی شہادت ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "ساری امت ایک طرف اور اہل بدر کے کسی بھی ایک صحابی کی رائے دوسری طرف ہوتو ان کی رائے مقدم ہوگی۔  صحابہ بدر کے بارے ارشاد پاک ہے کہ میں سارے کا سارا اسلام یہاں میدان کارزار میں لے آیا ہوں۔رہتی دنیا تک یہ واحد جماعت ہے جس کو یہ اعزاز حاصل ہے اور ساتھ ہی آپ کا یہ فرمانا کہ کسی مسئلے پر امت کا اتفاق اور بدری صحابی ؓ کی رائے اس کا برعکس ہو تو اصحاب بدر کی رائے مانی جائے گی ان کی رائے مقدم سمجھی جائے گی۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا دوروزہ ماہانہ روحانی اجتماع کے موقع پر خطاب۔\nانہوں نے کہا کہ بظاہراگر کفر طاقتوربھی نظرآئے لیکن ان کا نظریہ کبھی نافذ نہ ہو سکے گا۔یوم بدر یوم فرقان ہے۔حق و باطل کی تفریق کا دن ہے۔آج جو ایک سوال ہے کہ قرآن کریم تو مسلمانوں سے وعدہ فرماتا ہے کہ حکمرانی مسلمانوں کے پاس رہے گی،تو جو فرمایا جا رہا ہوتا ہے کیا ہم اس پر پورا اتر تے ہیں؟۔ آج ہم مومن کہلانے والوں کے اعمال کافروں سے بھی بدتر ہیں تو شکایت کرنے کی بجائے اپنے اعمال پر نظرثانی کرنی چاہیے۔\nانہوں نے مزید کہا کہ جو اسلوب زندگی کے نبی کریم ﷺ نے فرمائے ہیں اس سے ہمیشہ کی کامیابی اورفتح نصیب ہوگی۔اُس وقت دو جماعتیں تھیں ایک وہ جماعت جو مکہ واپس لوٹ رہی تھی اور سامان تجارت کو لے جا رہی تھی اور اس رقم کو اسلام کے خلاف استعمال کرنیکا ارادہ رکھتے تھے یہاں بھی اگر دیکھا جائے تو ان لوگوں کو سزا ملی جو کفر میں آگے بڑھ چکے تھے۔اللہ نے مخلوق صرف کھیل تماشہ کے لیے پیدا نہیں فرمائی بلکہ اللہ کریم دیکھنا چاہتے ہیں کہ تم کون سی راہ اختیار کرو گے۔\nماہانہ اجتماع پر آنے والے نئے احباب و خواتین کی ظاہری بیعت بھی لی گئی اور انہیں لائحہ عمل بھی دیا گیا کہ اپنے معمولات کو مرکزی ہدایات کے مطابق گزارنا ہے اور قلبی ذکر صبح اور شام اختیار کرنا ہوگا۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی",
+    "category": "pressReleases",
+    "checksum": "8dddb7e1d42a9459f81f633fd8a725350d1210bc44d3216ec9574fc664e1ceb8",
+    "downloadUrls": [],
+    "id": "press-release-4151-2026-05-03-bzahir-agar-kufar-taqatwar-b-nzr-aaye-lekin-un-ka-nazriya-kabhi-nafiz-nah-ho-sakay-ga",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4151/news%20(12).jpg"
+    ],
+    "publishedAt": "2026-05-03T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4151/2026-05-03-bzahir-agar-kufar-taqatwar-b-nzr-aaye-lekin-un-ka-nazriya-kabhi-nafiz-nah-ho-sakay-ga.html",
+    "title": "BZahir Agar Kufar Taqatwar B Nzr Aaye Lekin Un Ka Nazriya Kabhi Nafiz Nah Ho Sakay Ga",
+    "titleUrdu": "بظاہراگر کفر طاقتوربھی نظرآئے لیکن ان کا نظریہ کبھی نافذ نہ ہو سکے گا",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "نورِ ایمان بند ہ ٔ مومن کے قلب میںادراک اور بصیرت عطا فرماتا ہے .اللہ کے حکم کے مطابق زندگی بسر کرنے میں ہی ہماری فلاح ہے\n​ (پ۔ر)نورِ ایمان بند ہ ٔ مومن کے قلب میں وہ ادراک اور بصیرت عطا فرماتا ہے کہ بندہ ٔ مومن خلق کی ان وسعتوں سے نکل کر اللہ رب العالمین سے آشنا ہوجاتا ہے اور مقامِ نبوت اور رسالتﷺ کے طفیل امت تک یہ آشنائی اور نور پہنچا جس کا ہم جتنا شکر ادا کریں کم ہے۔ بعثت ِ رحمت اللعالمینﷺ سے پہلے عہدِ فطرت کا عہد500 سال پر محیط ہے۔ اس عہد میں جس نےبھی دل کی گہرائی سے سوچا کہ کوئی ہے جو عبادت کے لائق اور وحدہ‘ لاشریک ہے اور وہ اس جستجو میں رہا تو اس کی نجات ہو گئی۔ ان خیالات کا اظہار شَیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان حضرت امیر عبدالقدیر اعوان نے دارالعرفان میں سالکین کےبڑے اجتماع سے خطاب کرتے ہوئےکیا۔\n​ انہوں نے مزید کہا کہ آپﷺ کی 40 سالہ زندگی جو کفارِ مکہ کے درمیان بسر فرمائی وہ اتنی بڑی شہادت ہے کہ بڑے سے بڑے دشمن نے بھی آپﷺ کے صادق اور امین ہونے کی گواہی دی اور آج ہم مسلمان امتی دولت اور دنیا کی ہوس میں پڑے ہوئے ہیں اور یہ ذات باری سے دوری کی وجہ سے ہے۔ جتنی دوری اللہ سے ہوتی ہے اتنی انا بڑھتی ہے حالانکہ جو کچھ ہے وہ اللہ کا ہے۔\n​انھوں نے کہا کہ جب بندہ اس دنیا سے جاتا ہے تو اس کا جو کچھ ہوتا ہے وہ وارثوں کا ہو جاتا ہے اور غلط فہمی دور ہو جاتی ہے کہ یہ سب کچھ میرا ہے۔ حالانکہ یہ نعمتیں سب اللہ کی دی ہوئی ہیں اوراس بات کی سمجھ آ جائے تو حقیقت کھل جاتی ہے۔ دنیا کو ترک کرنے کا نہیں کہا جا رہابلکہ دنیا بھی اللہ کی ہے اور آخرت بھی اللہ کی ہے اصل میں جو حکم اللہ کا ہے اس کے مطابق رہنا ہے اور اس میں ہی ہماری فلاح ہے۔\nانھوں نے احکاماتِ دین پر عمل پیرا ہونے کی ضرورت پر زور دیتے ہوئے کہا کہ روزے میں ہماری جسمانی و روحانی بھلائی ہے، جبکہ نماز کی ادائیگی محض ورزش کے لیے نہیں بلکہ فرض سمجھ کر ہونی چاہیے۔ اللہ کریم نے زندگی کا جو نصاب مقرر فرمایا ہے وہ ہماری عین ضرورت ہے۔ انہوں نے اس بات کا احساس دلایا کہ موت کے بعد تلافی کا کوئی موقع نہیں ملے گا اگرچہ ہم کمزور اور گناہ گار ہیں، مگر اللہ کی شانِ کریمی اور رحمت بے پناہ ہے۔ اگر انسان اپنے گناہ پر نادم ہو کر معافی کا طلب گار ہو، تو وہ غفور الرحیم توبہ کی توفیق بھی عطا فرماتا ہے۔\nانہوں نے تلقین کی کہ تلاوتِ قرآن مجید کو روزمرہ کا معمول بنایا جائے اور ہر دن کا آغاز کلامِ الٰہی سے ہو۔ قرآن کو محض وظائف کے طور پر نہیں بلکہ اللہ کا پیغام سمجھ کر اول تا آخر پڑھنا چاہیے۔ انہوں نے \"اکرم التراجم\" کا حوالہ دیتے ہوئے کہا کہ یہ ترجمہ لفظی و محاوراتی لحاظ سے انتہائی سلیس اور عام فہم ہے، لہٰذا کوشش کریں کہ قرآن مجید کی تلاوت ترجمے کے ساتھ کریں تاکہ زندگی میں حقیقی تبدیلی آ سکے۔\n​آخر میں انہوں نے کہا کہ ہم دینِ اسلام کے احکام پر عمل کریں گےتو یہ ہمارے لیے ہر لحاظ سے بہتر ہو گا",
+    "category": "pressReleases",
+    "checksum": "a3539189398ea5b2422ff523de55c451012d0d8e94c8cffb3334b97e6d8eba07",
+    "downloadUrls": [],
+    "id": "press-release-4157-2026-05-08-noor-e-eman-bandah-momin-ke-qalb-mein-idraak-aur-baseerat-peda-farmata-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4157/news%20(13).jpg"
+    ],
+    "publishedAt": "2026-05-08T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4157/2026-05-08-noor-e-eman-bandah-momin-ke-qalb-mein-idraak-aur-baseerat-peda-farmata-hai.html",
+    "title": "Noor E Eman Bandah Momin Ke Qalb Mein Idraak Aur Baseerat Peda Farmata Hai",
+    "titleUrdu": "نورِایمان بندہ ٔمومن کے قلب میں ادراک اور بصیرت پیدا فرماتا ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "ایمان اور سود آپس میں بالمقابل ہیں۔اگر کوئی ایمان کا دعوی بھی کرے اور پھر سود کا لین دین بھی کرے تو انجام وہی ہوگا جو کفر کرنے والوں کا ہوا۔دوزخ کی آگ کفر کے لیے تیار کی گئی ہے۔اللہ کے حبیب کی اطاعت میں اللہ کی اطاعت ہے اور اگر تم یہ خیال کرومیرے رکوع و سجود سے مجھے جنت مل جائے گی بلکہ جنت تو اللہ کی رحمت سے عطا ہوگی۔ہم تو پہلے اتنا لے چکے ہیں کہ شکرانہ ادا نہیں ہو سکتا  چہ جائیکہ ہم اس گمان میں رہیں کہ میری عبادات اتنی ہو چکی ہیں کہ اب جنت واجب ہو گئی ہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبار ک کے روز خطاب\nانہوں نے کہا کہ ہمارا ایمان ہے کہ اس دنیا کی ہر شئے کو فنا ہے تو پھر دنیاوی کامیابی ہمیشہ کے لیے کیسے ہو سکتی ہے۔جب یہ دنیا عارضی ہے تو پھر اس کی کامیابی بھی عارضی ہے۔حقیقی فلاح کی بنیاد اتباع محمد الرسول اللہ ﷺ ہے۔حقیقی کامیابی کا انحصار بھی اسی زندگی پر ہے لیکن ان حدود میں جو اللہ کریم نے مقرر فرمائی ہیں۔حدود اللہ سے تجاوز کر کے حقیقی فلاح حاصل نہیں ہو سکتی۔ حقیقی کامیابی دائمی ہوتی ہے جس سے مراد دونوں جہانوں کی کامیابی ہے یہ دنیا آخرت کا سایہ ہے۔اس زندگی کو بسر کرنے کے لیے اعلٰی اصول درکار ہیں جو ہمیں دین اسلام دیتا ہے۔ذاتی پسند نا پسند سے صرف فساد پیدا ہوگا۔خواہشات اور نفس کا جہاں غلبہ ہو وہاں ٹھہراؤ نہیں ہوگا۔ٹھہراؤ اور سکون صرف دین اسلام کے احکامات کے مطابق زندگی بسر کرنے سے حاصل ہوتا ہے کیونکہ دین اسلام دین فطرت ہے۔\nانہوں نے مزید کہا کہ قرآن کریم حقیقی کامیابی جنت کو بیان فرماتا ہے یعنی وہ فلاح پاگیا جو جنت میں داخل ہو گیا۔ہمارے ماہ و سال اتنی تیز ی سے بسر ہو رہے ہیں،ہر شئے اپنے اختتام کی طرف چل رہی ہے لیکن ہمیں کوئی فکر نہیں،یہی وقت ہے جس میں ہم نے آخرت تعمیر کرنی ہے۔ہمارا اختیار کلی نہیں لیکن اپنی ذات پر تو ہے اس سے پہلے کہ موت آجائے آج کچھ کرنے کے قابل ہیں اپنی اصلاح کریں نیک اعمال کریں زندگی حسرت پر تو ختم نہ ہو،یاد رکھیں مومن کی زندگی میں حسرت نہیں رہتی۔نور ایمان وہ دولت ہے جس سے دنیا و آخرت کی کامیابی نصیب ہوتی ہے۔بخشش ہمارے رکوع و سجود سے نہیں بلکہ اللہ کی رحمت سے ہوگی لیکن ہمیں اپنے ایک ایک عمل کو نبی کریم ﷺ کے اتباع میں لانا ہوگا۔اللہ کریم کمی بیشی معاف فرمائیں اور ہمیں صحیح شعور عطا فرمائیں۔\nآخرت میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "0c324ceeaeed6238aae3125c3be4e159cdfcbb7df5af345e43150d325c6b7fed",
+    "downloadUrls": [],
+    "id": "press-release-4163-2026-05-22-bakhshish-hamaray-ruku-o-sajood-se-nahi-balkay-allah-ki-rehmat-se-ho-gi",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4163/news%20(16).jpg"
+    ],
+    "publishedAt": "2026-05-22T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4163/2026-05-22-bakhshish-hamaray-ruku-o-sajood-se-nahi-balkay-allah-ki-rehmat-se-ho-gi.html",
+    "title": "Bakhshish Hamaray Ruku O Sajood Se Nahi Balkay Allah Ki Rehmat Se Ho Gi",
+    "titleUrdu": "۔بخشش ہمارے رکوع و سجود سے نہیں بلکہ اللہ کی رحمت سے ہوگی",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "اسلامی معاشی نظام روپے کو ایک جگہ رکنے نہیں دیتا ۔اور زکوۃ کے نظام کی وجہ سے جمع شدہ پیسہ 40 سال میں سارا پیسہ واپس معاشرے میں لوٹ آتا ہے ، زکوۃ دینے والا اپنا پیسہ اپنے پاس جمع نہیں رکھے گا بلکہ اسے خرچ کرے گا جب خرچ کرے گا تو تجارت میں خرچ کرے گایا کوئی کاروبار میں لگائے گا تو اس سے مزید لوگوں کے لیے کام کرنے کے مواقع پیدا ہوں گے ۔ بے روزگار لوگوں کو روزگار ملے گا ۔جب پیسہ ایک جگہ جمع کر کے رکھ دیا جاتا ہے وہ پورے معاشرے کی معیشت کو لے ڈوبتا ہے ۔طاقتور طبقے نے پوری دنیا کو سودی معیشت میں ایسا جکڑ دیا ہے کہ آج ہم اپنے ملک کے حالات دیکھیں تو جتنا قرض لے رہے ہیں وہ جو پہلے سے سود لیا ہوا ہے اس کی ادائیگی میں چلا جاتا ہے ہماری اسلامی ریاست ہے پھر بھی ہم نے اسے سود میں جکڑ دیا ہے ۔ہمارے لیے سب سے بہتر رستہ وہ ہے جو اللہ کریم نے ہمارے لیے پسند فرمایا ہے جس کا طریقہ نبی کریم ﷺ نے ارشاد فرمایا ہے ۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبارک کے روز خطاب۔\nانہوں نے کہا کہ اگر واقعتا زکوۃ کا نظام جس میں عشر،صدقات ،فطرانہ اس کو جمع کیا جائے تو ہمارا قومی بجٹ جو ہے اس کا خسارہ نکل جاتا ہے . جو لوگ ٹیکس نہیں دیتے وہ بھی زکوۃ دیتے ہیں۔لوگ ٹیکس اس لیے نہیں دیتے کہ حکومت پر اعتماد نہیں ہوتا ۔جب ریاست زکوۃ جمع کرے گی تو جو یہ ٹیکس عوام کو لگائے جا رہے ہیں ان کی ضرورت ہی نہیں رہے گی ۔جب حکومت کمزور طبقے کی ضرورت پوری کرے گی تو اس کی عزت نفس مجروح نہیں ہو گی ۔قدم قدم پر عوام سے ٹیکس لیا جا رہا ہے پھر یہ بھی کہا جاتا ہے کہ ہماری قوم ٹیکس نہیں دیتی ۔آج بھی دنیا میں وہی معیشت بہتر ہے جہاں پیدا وار ہو رہی ہے اور پیدا وار میں جو فطرتی انڈسٹری ہوتی ہے اس کو زیادہ ترجیح دی جاتی ہے ۔جیسے ہمارے ہاں زراعت ہے ہمارا زرعی ملک ہے ۔اگر ہم زراعت کو ہی جدید سہولیات سے آراستہ کر لیں اور زراعت سے متعلق جو محکمے ہیں وہ اپنی ذمہ داری پوری کریں کسانوں کو سہولیات دی جائیں تو سال میں دو بار فصل لی جاتی ہے جس سے ہماری معیشت بہت تیز ی سے بہتر ہو سکتی ہے\nانہوں نے مزید کہا کہ کسی بھی غلطی کا حل مزید غلطی سے نہیں نکلتا بلکہ اس کا حل توبہ میں ہے ہم ایسے فیصلے کریں جو قرآن و سنت کے مطابق ہوں ۔یہ جو لوٹ مار سے ہم وقتی کامیابی حاصل کرتے ہیں اس سے تسکین نہیں ہوسکتی بلکہ مزید اضطراب بڑھے گا کیونکہ یہ صالح اعمال کا نتیجہ نہیں ہے ۔کامیابی تو یہ ہے کہ اگر ظاہری ضرورت پوری ہورہی ہے تو دل میں بھی سکون ہو ۔حقیقی کامیابی میں ہر طرف سے سلامتی ہی سلامتی ہوتی ہے ۔اللہ کریم ہمیں صحیح شعور عطا فرمائیں\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی",
+    "category": "pressReleases",
+    "checksum": "160a48cfb544a8ec015134fea6f16d48b77bfbbab6b4dc59777e455b338e2fd8",
+    "downloadUrls": [],
+    "id": "press-release-4165-2026-05-15-islami-muashi-nizaam-rupay-ko-aik-jagah-ruknay-nahi-deta",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4165/news%20(15).jpg"
+    ],
+    "publishedAt": "2026-05-15T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4165/2026-05-15-islami-muashi-nizaam-rupay-ko-aik-jagah-ruknay-nahi-deta.html",
+    "title": "ٰIslami Muashi Nizaam Rupay Ko Aik Jagah Ruknay Nahi Deta",
+    "titleUrdu": "اسلامی معاشی نظام روپے کو ایک جگہ رکنے نہیں دیتا",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "ہم ایمانی طورپر اس حد تک کمزور ہو گئے ہیں کہ غلطیاں ہمارے مزاج کا حصہ بن چکی ہیں۔ایسے جیسے کوئی مقابل کھڑا ہو جائے۔ہمیں اپنی ذات کی نفی کر کے بخشش کو طلب کرنا ہوگا۔اُس غفور الرحیم نے وعدہ فرمایا ہے کہ سچے دل کی توبہ کو قبول کرتا ہوں۔ایسے لوگ جو اپنی عبادات پر انحصار نہیں کرتے بلکہ وہ رب کریم کی ذات پر نگاہ رکھتے ہیں تو اُن کو جنت میں داخل کیا جائے گا۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبارک کے روز خطاب۔\nانہوں نے کہا کہ متقین کے لیے جو جنت تیار کی گئی ہے اس کی وسعت کو ہم سمجھ نہیں سکتے۔یہ جنت صرف صاحب ایمان لوگوں اور ان لوگوں کے لیے ہے جنہوں نے اللہ اور اللہ کے رسو ل ﷺ کی اطاعت کی۔بندہ مومن کا ظاہر اور باطن پاک ہو تا ہے۔اپنا ہر عمل اللہ کے لیے اختیار کریں۔آج ہمارا دعوی ایمانی اتنا کمزور ہو چکا ہے کہ ہم پر کوئی اعتماد کرنے کو تیار نہیں۔زندگی بڑی تیزی سے گزر رہی ہے ہمیں اپنا محاسبہ کرنے کی ضرورت ہے ہوش میں آنے کی ضرورت ہے ورنہ انہی پریشانیوں میں گزر جائے گی آج یہ رہ گیا آج وہ رہ گیا یہ سمجھ نہیں آئے گی کب سانسیں پوری ہوگئیں۔اصل کامیابی ذات کی نفی میں ہے۔کبر اللہ کو نہیں پسند کبر متقی کے مقابل آتا ہے۔اللہ کریم شکر کی توفیق عطا فرمائیں۔اللہ سب کے لیے آسانیاں فرمائیں۔اللہ میرا اور آپ کا حامی و ناصر ہو۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔۴",
+    "category": "pressReleases",
+    "checksum": "ebd0240fd08a6cbc4b86b82f91999f9c9099d08e42ef96cb5ee401359b938746",
+    "downloadUrls": [],
+    "id": "press-release-4187-2026-05-29-hum-imani-taur-par-is-had-tak-kamzor-ho-gaye-hain-ke-ghalatiyan-hamaray-mizaaj-ka-hissa-ban-chuki-hain",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4187/064e2045-642d-4c15-a3bf-f80785b506ca.jpg"
+    ],
+    "publishedAt": "2026-05-29T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4187/2026-05-29-hum-imani-taur-par-is-had-tak-kamzor-ho-gaye-hain-ke-ghalatiyan-hamaray-mizaaj-ka-hissa-ban-chuki-hain.html",
+    "title": "Hum Imani Taur Par Is Had Tak Kamzor Ho Gaye Hain Ke Ghalatiyan Hamaray Mizaaj Ka Hissa Ban Chuki Hain",
+    "titleUrdu": "ہم ایمانی طورپر اس حد تک کمزور ہو گئے ہیں کہ غلطیاں ہمارے مزاج کا حصہ بن چکی ہیں",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "اللہ کریم نے جو ہنر یا اوصاف کسی بھی بندہ مومن کو دئیے ہیں وہ انہیں صرف اللہ کی رضاکے لیے استعمال کرے گا تو یہ سب کچھ انفاق فی سبیل اللہ کہلائے گا۔ دین اسلام زندگی میں میانہ روی کی تعلیم دیتا ہے۔جب بھی بندہ مومن اللہ کی راہ میں خرچ کر رہا ہوتا ہے جس میں زکوۃ،صدقات،عشر تو اُسے یہ خیال ہوتا ہے اور وہ اس بات کا اقرار کر رہا ہوتا ہے کہ یہ مال میرا نہیں ہے بلکہ جو کچھ بھی میرے پاس ہے سب اللہ کا ہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ کا جمعتہ المبارک کے روز خطاب۔\nانہوں نے کہا کہ اسلام کے نام پر بہت سے ممالک ہیں لیکن ان میں اسلامی قوانین نہیں ہیں۔اگر کوئی انفرادی طور پر اُٹھ کھڑا ہو اور کہے کہ میں اسلام نافذ کرتا ہوں تو یہ فساد کا سبب بنے گا۔جن کے پاس اختیار ہے کیا وہ دعوی ایمانی نہیں رکھتے؟صاحب اختیار کی ذمہ داری ہے کہ انصاف کریں اور لوگوں کو سہولت دیں۔لوگوں کو تحفظ ملے ان کی زندگیاں آسان ہوں۔ہمیں تو غیر مسلم کے ساتھ بھی انصاف کرنا تھا ان کے ساتھ بھی زیادتی نہ ہو۔\nانہوں نے مزید کہا کہ تقوی ایک کیفیت ہے اور متقی اس کیفیت کے حامل شخص کو کہتے ہیں۔متقی کے اوصاف میں سے ہے کہ وہ ہر حالت میں اللہ کی راہ میں خرچ کرتا ہے فراوانی ہو یا تنگدستی وہ اللہ کی راہ میں خرچ کرتا رہتا ہے۔دوسرا وصف جب اسے غصہ آئے تو وہ ضبط کر لیتا ہے اور معاف کر دیتا ہے۔ہمیں دیکھنے کی ضرورت ہے کہ اگر ہمارے اندر کمی بیشی ہے تو اسے دور کیا جائے۔اللہ کریم صحیح شعور عطا فرمائیں۔ آخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔\nیاد رہے کہ مرکز دارالعرفان منارہ میں سلسلہ نقشبندیہ اویسیہ کے زیر اہتمام 40 روزہ سالانہ روحانی تربیتی اجتماع کا انعقاد کیا گیا ہے جس میں ملک کے طو ل و عرض اور بیرون ممالک سے بھی سالکین سلسلہ عالیہ اپنی روحانی تربیت کے لیے تشریف لائیں گے۔اس اجتماع میں سالک کو ایک باقاعدہ تربیتی پروگرام کے تحت گزارا جاتا ہے اور روزانہ دن گیارہ بجے حضرت امیر عبدالقدیر اعوان مد ظلہ العالی صحبت شیخ کے پریڈ میں خطاب فرماتے ہیں۔دعوت عام ہے اپنے دلوں کو برکات نبوت ﷺ سے منور کرنے کے لیے تشریف لائیے",
+    "category": "pressReleases",
+    "checksum": "2ca7f6a5b992b669698b7cb9bc328658cda3b4de37d310319d7df6a490456d08",
+    "downloadUrls": [],
+    "id": "press-release-4188-2026-06-05-islam-ke-naam-par-bohat-se-mumalik-hain-lekin-un-mein-islami-qawaneen-nahi-hain",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4188/news%20(17).jpg"
+    ],
+    "publishedAt": "2026-06-05T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4188/2026-06-05-islam-ke-naam-par-bohat-se-mumalik-hain-lekin-un-mein-islami-qawaneen-nahi-hain.html",
+    "title": "Islam Ke Naam Par Bohat Se Mumalik Hain Lekin Un Mein Islami Qawaneen Nahi Hain",
+    "titleUrdu": "اسلام کے نام پر بہت سے ممالک ہیں لیکن ان میں اسلامی قوانین نہیں ہیں",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "نبی کریم ﷺ کے ارشادات کو چھوڑ دینا آزمائش اور تکلیف کا سبب بنتا ہے۔ زندگی میدان ِ عمل ہے ہم سب اس میں موجود ہیں۔اللہ اور اللہ کے نبی کا فرمان موجود ہے۔اجماع امت موجود ہے قرآن کریم موجود ہے ہمارے پاس اختیار ہے اور ہم کیا کر رہے ہیں ساری بات سمجھ آجائے گی۔اگر ایمان کا دعوی ہے اور اس کے ساتھ صدق نہیں ہے تو بات منافقت تک چلی جائے گی۔اور اگر ایمان کے ساتھ صدق بھی ہے تو پھر مسلمان معاشرے میں نظر آنا چاہیے کہ مسلمان معاشرہ ایسا ہوتا ہے\nجن مسائل میں آج ہم گھرے ہیں ملکی طور پر،قومی طور پر اور خاندانی مسائل بھی جو ہیں ان کا سبب بداعمالیاں اور نفاق ہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبار ک کے روز خطاب۔\nانہوں نے کہا کہ قرآن کریم کا یہ اعجاز ہے کہ پڑھا لکھا ہو یا ان پڑھ دونوں کو برابر سمجھ آرہی ہوتی ہے۔رہتی دنیا تک جب بھی کوئی راہنمائی حاصل کرنا چاہے گا قرآن کریم اس کی راہنمائی فرمائے گا۔قیامت کے دن جب حساب ہو گا کسی کے پاس کوئی جواز نہیں ہوگا کوئی انکار نہیں کر سکے گا کہ میں نے ایسا نہیں کیا۔ہر چیز اس کے سامنے لائی جائے گی۔دنیا سبب سے ہے اسباب کل نہیں ہیں، ہوتا وہ ہے جو اللہ چاہتا ہے۔دنیا کا اصول اور ضابطہ یہ ہے کہ جائز کام ہو جائز اسباب اختیار کیے جائیں پھر نتیجہ اللہ کے سپرد کر دیا جائے یہ توکل ہے۔اللہ کریم دین اسلام کے مطابق زندگی بسر کرنے کی توفیق عطا فرمائیں۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "bfc3702d1b31f2407cd4cb3482d805a923b10f20d6e13eeee63343d2077f3c8c",
+    "downloadUrls": [],
+    "id": "press-release-4220-2026-07-17-nabi-kareem-saw-ke-arshadat-ko-chore-dena-azmaish-aur-takleef-ka-sabab-bantaa-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4220/news%20(18).jpg"
+    ],
+    "publishedAt": "2026-07-17T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4220/2026-07-17-nabi-kareem-saw-ke-arshadat-ko-chore-dena-azmaish-aur-takleef-ka-sabab-bantaa-hai.html",
+    "title": "Nabi Kareem SAW Ke Arshadat Ko Chore Dena Azmaish Aur Takleef Ka Sabab Bantaa Hai",
+    "titleUrdu": "نبی کریم ﷺ کے ارشادات کو چھوڑ دینا آزمائش اور تکلیف کا سبب بنتا ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "دین اسلام نے بندہ مومن کو غلامی کی زنجیروں سے نکال کر وہ خوبصورت زندگی عطا فرمائی ہے جو ذہنی غلامی سے آزاد کر کے ایک ذات وحدہ لا شریک کی اطاعت میں لے آتی ہے۔ جسے بھی  ایمان کی حالت میں نبی کریم ﷺ کی صحبت نصیب ہوئی وہ درجہ صحابیت کو پا گئے۔آپ ﷺ امام الانبیاء ہیں آپ جب بھی کسی معاملے میں یا نزول قرآن کے وقت پوچھتے کہ اس آیت کے بارے کیا جانتے ہو تو صحابہ عرض کرتے ہمارے ماں باپ آپ پر قربان۔اللہ اور اللہ کے رسو ل ﷺ بہتر جانتے ہیں پھر بھی آپ ﷺ اپنے صحابہ کرام سے امور دنیا میں مشورہ کیا کرتے تھے۔مشورہ کا ایک اصول ہے کہ مشورہ حکم نہیں ہوتا ایک رائے ہوتی ہے لینے والے کو بھلی لگے نہ لگے اس پر عمل کرے نہ کرے ہمارے ہاں اگر مشورے پر عمل نہ کیا جائے تو ناراضگی ظاہر کی جاتی ہے کہ میرے مشورے کو اہمیت نہیں دی گئی اس پر عمل نہیں کیا گیا۔مشورہ امانت ہوتا ہے اس میں خیانت نہ ہو۔اگر کسی سے کوئی مشورہ کرتا ہے تو اسے چاہیے کہ مشورہ دے اور اچھا مشورہ دے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبارک کے موقع پر خطاب۔\nانہوں نے کہا کہ دین اسلام کے اصول زندگی کے ہر پہلو میں ہماری راہنمائی فرماتے ہیں اور ہماری ضرورت ہیں۔یہی وہ اصول ہیں جن میں ہماری قوم کی حیات ہے۔آج کے حالات بہت مشکل ہیں روزانہ خبر آتی ہے کہ ہمارے اتنے جوان شہیدہو گئے ہیں۔اگر ہم یہ اصول اپنائیں جو اللہ کریم نے ہمیں عطا فرمائے ہیں جن کی حدود و قیود کا تعین محمد الرسول اللہ ﷺ نے فرمایا ہے اگر مسلمان معاشرے ان پر عمل پیرا ہوں تو ایسی صورت حال نہ پیش آئے۔اللہ کریم وطن عزیز کی حفاظت فرمائیں اور شہداء کی قربانیاں قبول فرمائیں۔\nیاد رہے کہ سلسلہ نقشبندیہ اویسیہ کے مرکز دارالعرفان منارہ میں چالیس روزہ سالانہ روحانی تربیتی اجتماع جاری ہے جس کا اختتامی بیان و اجتماعی دعا 12 جولائی بروز اتوار ہوگی۔جس میں ملک کے طول و عرض سے سالکین سلسلہ عالیہ تشریف لائیں گے۔دعوت عام ہے کہ اس بابرکت پروگرام میں شرکت فرما کر اپنے قلوب کو برکات نبوت ﷺ سے منوری کیجیے۔",
+    "category": "pressReleases",
+    "checksum": "b1e84f0201c5cc216e77876d9ec956cb1a5e4d5f053fc85550963aea2a09bcc9",
+    "downloadUrls": [],
+    "id": "press-release-4221-2026-07-10-jisay-bhi-imaan-ki-haalat-mein-nabi-kareem-saw-ki-sohbat-naseeb-hui-woh-darja-sahabiat-ko-pa-gaye",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4221/news%20(19).jpg"
+    ],
+    "publishedAt": "2026-07-10T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4221/2026-07-10-jisay-bhi-imaan-ki-haalat-mein-nabi-kareem-saw-ki-sohbat-naseeb-hui-woh-darja-sahabiat-ko-pa-gaye.html",
+    "title": "Jisay Bhi Imaan Ki Haalat Mein Nabi Kareem SAW Ki Sohbat Naseeb Hui Woh Darja Sahabiat Ko Pa Gaye",
+    "titleUrdu": "جسے بھی  ایمان کی حالت میں نبی کریم ﷺ کی صحبت نصیب ہوئی وہ درجہ صحابیت کو پا گئے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "آج ہمارے معاشرے میں بے چینی کی بڑی وجہ ہماری بداعمالیاں ہیں۔ہمارے بد اعمال ہی ہیں جن کا پرتاؤآخرت میں تپش کی صورت ہم یہاں محسوس کررہے ہیں۔زندگی کے ایک ایک لمحے کا اسلوب آپ ﷺ کے اسوہ حسنہ میں موجود ہے۔اللہ کریم ہمارے حکمرانوں کو بھی نظام مصطفے ﷺ کے نفاذ کی توفیق عطا فرمائیں۔قوانین جتنے بھی بنا لیں اگر ان کا اطلاق نہیں ہوگا تو ان کا کوئی فائدہ نہیں۔ہمیں تو سوچنے کی ضرورت ہی نہیں کیونکہ ہمارے پاس بنا بنایا نظام  موجودہے بس اسے نافذ کرنے کی ضرورت ہے۔صرف اسلامی نظام سے ہی ہم موجودہ مشکلات سے نکل سکتے ہیں۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا سالانہ اجتماع کے آخری روز خواتین و حضرات کی بڑی تعداد سے خطاب۔\nانہوں نے کہا کہ قلب انسانی احساسات کا گھر ہے۔اگر بندے کو یہ ادراک ہو جائے کہ میں ہر وقت اللہ کے روبرو ہوں تو نہاں خانہ دل میں اُٹھنے والی نیت صاف ہوتی چلی جاتی ہے۔تمام اعمال کا انحصار اسی نیت پر ہے۔آج ہمارے قلوب بے کیف ہو چکے ہیں ان میں احساس باقی نہیں رہا۔تمام طرح کی کیفیات کا گھر قلب انسانی ہے اسی میں دوستی کی کیفیت ہوتی ہے اسی میں دشمن بھی بستے ہیں۔ اگر اس دل میں اللہ کریم کی محبت پیدا ہو جائے تو بندہ مرضیات باری میں فنا ہو جاتا ہے اسے وہی پسند ہوتا ہے جو اللہ کریم کو پسند ہو۔\nیاد رہے کہ سلسلہ نقشبندیہ اویسیہ مرکز دارالعرفان منارہ میں چالیس روزہ سالانہ اجتماع جاری تھا جس کا آج آخری روز تھا جس میں تقابلی جائزہ بھی لیا گیا اورڈویژن کی سطح پر بہتر کارکردگی پر حضرت نے اپنے دست مبارک سے زمہ داران میں اعزازی شیلڈ پیش کیں۔  ملک کے طول و عرض کے علاوہ بیرون ممالک سے بھی سالکین سلسلہ عالیہ تشریف لائے اور اپنی روحانی تربیت کی۔اس کے علاوہ جناب فاروق ستار ایم این اے کراچی سے خصوصی طورپر تشریف لائے۔\nآخر میں حضرت نے خصوصی اجتماعی دعا فرمائی اور ملک و قوم کے لیے اور مسلم امہ کے لیے بھی خصوصی دعائیں کی گئیں",
+    "category": "pressReleases",
+    "checksum": "4a44116f9622d47e2475c01fd86ddc37034cfc10bc767bb915a213dc12213b28",
+    "downloadUrls": [],
+    "id": "press-release-4222-2026-07-12-aaj-hamaray-muashray-mein-be-cheeni-ki-barri-wajah-hamari-badamaliya-hain",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4222/news%20(20).jpg"
+    ],
+    "publishedAt": "2026-07-12T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4222/2026-07-12-aaj-hamaray-muashray-mein-be-cheeni-ki-barri-wajah-hamari-badamaliya-hain.html",
+    "title": "Aaj Hamaray Muashray Mein Be Cheeni Ki Barri Wajah Hamari Badamaliya Hain .",
+    "titleUrdu": "آج ہمارے معاشرے میں بے چینی کی بڑی وجہ ہماری بداعمالیاں ہیں۔",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "معاشرے میں غلطیاں اس حد تک بڑھ گئی ہیں جس سے معاشرے میں تکلیف کی صورت پیدا ہو گئی ہے۔گندگی کا ڈھیر جہاں بھی ہوتا ہے وہاں تعفن ہی پھیلتا ہے اور بدبو آتی ہے ایسی جگہ رہنا نا گزیر ہوجاتا ہے۔جب بھی اپنی عملی زندگی کے امور کو دیکھیں اگر خود کو امتحان میں دیکھیں تو اپنے قول و فعل کو ضرور جانچیں کہ ان کے پیچھے جو میری نیت ہے وہ کیا ہے؟کیا میرے اعمال صرف خود کو تسکین دینے کے لیے ہیں یا اللہ کی رضا کے لیے کر رہا ہوں۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبار ک کے روزخطاب۔\nانہوں نے کہا کہ خلوص اللہ کی بہت بڑی عطا ہے موجودہ حالات میں صفائے قلب کی اشد ضرورت ہے تا کہ ہمارا ہر عمل اور نہاں خانہ سے اُٹھنے والے خیالات اورنیت درست ہو سکے۔انسانی زندگی میں کئی طرح کے حالات آتے ہیں اپنے پرائے ہو جاتے ہیں بیگانے اپنے لگنے لگتے ہیں،خوشی دکھ میں بدل جاتی ہے اور تکلیف میں مسکراہٹیں بکھرنے لگتی ہیں،یہ زندگی ہے اسی سے ہر ایک نے گزرنا ہے۔زندگی کے ان جھمیلوں میں خود کو دیکھتے رہیے کہیں ایسا نہ ہو کہ حق سے پھر جاؤ۔حالات جیسے بھی ہوں حق کا ساتھ کبھی نہ چھوڑیں۔اپنے تعلقات لوگوں سے اس لیے نہ بناؤ کہ اس سے امیدیں لگا بیٹھو اپنی امیدوں کا مرکز صرف اللہ کریم کو بناؤ۔\nانہوں نے مزید کہا کہ اللہ کریم بندگی کو وہ تعلق عطا فرمائیں کہ بندے کو یہ یقین ہو کہ جو کچھ بھی ہے میرے اللہ کریم کے دست قدرت میں ہے۔اُمتی کا رشتہ نصیب ہو۔ یہ خواہشات اور ان کی حیثیت ہی کیا ہے؟کتنی ہی خواہشات ہوتی ہے جن کی تکمیل کے لیے ہم سرگرداں رہتے ہیں جب پوری ہوتی ہیں تو ہم کہتے اس کے لیے کتنا وقت ضائع کیا۔جب بندہ حق پر نہ ہو تو سہولت بھی تکلیف دیتی ہے۔اگر اللہ سے تعلق مضبوط ہو پھر ارشادات نبوی پر عمل کرنے کو جی چاہتا ہے چھوٹی چھوٹی باتوں میں نبی کریم ﷺ کی سنت پر عمل کرنے کو جی کرتا ہے۔ہر پہلو میں ڈھونڈتا پھر ے کہ میرے لیے میرے نبی کریم ﷺ نے کیا فرمایا۔آپ ﷺ نے فرمایا کہ میرے بعد ایک زمانہ آئے گا کہ مجھے بن دیکھے لوگ مجھ پر جانیں نچھاور کریں گے۔وہ مجھ سے محبت کریں گے۔ اللہ کریم امتی کا یہ رشتہ اور اس کی نزاکت سمجھنے کی توفیق عطا فرمائیں۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "577a7272a37fa03419a00164dc2d5cdfd3734b7b02cdbcfe09aa92633819e552",
+    "downloadUrls": [],
+    "id": "press-release-4223-2026-07-03-khuloos-allah-ki-bohat-barri-ataa-hai-mojooda-halaat-mein-safaye-qalb-ki-ashad-zaroorat-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4223/news%20(21).jpg"
+    ],
+    "publishedAt": "2026-07-03T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4223/2026-07-03-khuloos-allah-ki-bohat-barri-ataa-hai-mojooda-halaat-mein-safaye-qalb-ki-ashad-zaroorat-hai.html",
+    "title": "Khuloos Allah Ki Bohat Barri Ataa Hai Mojooda Halaat Mein Safaye Qalb Ki Ashad Zaroorat Hai",
+    "titleUrdu": "خلوص اللہ کی بہت بڑی عطا ہے موجودہ حالات میں صفائے قلب کی اشد ضرورت ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "صحابہ کرام ؓ وہ عظیم ہستیاں ہیں ان کے اُٹھائے ہوئے قدم مبارک آنے والے زمانوں کے لیے راہنمائی اور نشان ِ منزل ہیں۔اس کے باوجود وہ دعا فرماتے کہ رب کریم ہمارے اعمال میں اگر کہیں کمی بیشی ہو گئی ہو یا آپ کی شان کے مطابق نہ ہوں تو ہمیں بخش دیجیے گا۔اگر صحابہ کرام جیسی عظیم ہستیاں اپنے عمل کے بعد اللہ سے بخشش مانگ رہی ہیں تودوسرا کون ہے جو نیکی کر کے اس پر فخر کر سکتا ہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبارک کے روز خطاب۔\nانہوں نے کہا کہ اسلامی اصولوں میں ہر ایک کے لیے بھلائی ہے۔اپنی مرضیات کو اسلامی اصولوں پر قربان کر کے عمل پیرا ہوا جاتا ہے۔بندہ مومن کو اپنا آپ آئینہ کی صورت نظر آنا چاہیے کہ میں کیا کر رہا ہوں کہاں تجاوز ہو رہا ہے۔چہ جائیکہ کہ بندہ یہ کہے کہ میں نے اتنی عبادات بھی کیں پھر بھی میری ضروریات پوری نہیں ہو رہی۔عبادات کو عبادات کے درجے میں رہنے دیں انہیں سودوں میں نہ تولیں۔صاحب ایمان ہر دوپہلو میں کامیاب ہے اس لیے کہ اس کی بنیاد اس کی نیت اس کے عمل اللہ کی ذات کی طرف ہے رضائے باری تعالیٰ کے لیے ہے۔\nانہوں نے مزید کہا کہ قرآن و سنت جو ہمیں تربیت دے رہے ہیں اس میں ہمارے رشتے،خاندان بلکہ کل مخلوق کی بھلائی ہے اگر ہم قرآن و سنت کے مطابق چلیں گے تو تو عزت،لحاظ اور تقدس آپ کو ہر رشتے میں ملے گا۔ذات باری تعالیٰ کا دیدار یہ مخلوق برداشت نہیں کر سکتی اللہ کریم اور مخلوق کے درمیان بہت سے حجاب ہیں یہ اللہ کی مقرب ہستیاں انبیاء کرام ؑ کو شرف ہے کہ اللہ کریم سے ہم کلام بھی ہوئے معراج شریف بھی ہوئی۔اللہ کرے بندہ مومن کو ایسی بندگی نصیب ہوکہ وہ خود کو اللہ کے روبرو محسوس کرے یہ حجابات ختم ہو جائیں۔نور ایمان اتنا واضح کر دیتا ہے کہ یہ ہو نہیں سکتا کہ صاحب ایمان سے غلطی ہو رہی ہو اور وہ یہ کہے کہ نہیں میں غلطی پر نہیں ہوں۔درجہ احسان کو پانے کے لیے فرائض کی تکمیل کے بعد وہ مجاہدہ جو قرب الہی کے لیے ہے اسے اختیار کرنے کی ضرورت ہے۔اللہ کریم یہ کیفیات عطا فرمائیں اور ہمیں صحیح شعور عطا فرمائیں۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "89c98554e052f49c765ad15445cbabc6679830c0f4d95f27b7e2c6de422beffe",
+    "downloadUrls": [],
+    "id": "press-release-4224-2026-06-26-sahaba-karaam-woh-azeem-hastiyan-hain-un-ke-uthaiye-hue-qadam-mubarak-anay-walay-zamanoon-ke-liye-rahnumaiye-aur-nishaan-manzil-hain",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4224/news%20(22).jpg"
+    ],
+    "publishedAt": "2026-06-26T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4224/2026-06-26-sahaba-karaam-woh-azeem-hastiyan-hain-un-ke-uthaiye-hue-qadam-mubarak-anay-walay-zamanoon-ke-liye-rahnumaiye-aur-nishaan-manzil-hain.html",
+    "title": "Sahaba Karaam Woh Azeem Hastiyan Hain Un Ke Uthaiye Hue Qadam Mubarak Anay Walay Zamanoon Ke Liye Rahnumaiye Aur Nishaan Manzil Hain",
+    "titleUrdu": "صحابہ کرام ؓ وہ عظیم ہستیاں ہیں ان کے اُٹھائے ہوئے قدم مبارک آنے والے زمانوں کے لیے راہنمائی اور نشان ِ منزل ہیں",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "اللہ کی رضا کے لیے انصار مدینہ نے ایسی مہمان نوازی کی کہ غزوہ احد میں اپنی جانوں کا نذرانہ پیش کر دیا۔  غزوہ احد میں آپ ﷺ کے حکم کو سمجھنے کی غلطی سے آزمائش کی صورت بن گئی لیکن عین میدان کارزار میں اللہ کریم نے انہیں اپنی رضا اور معافی کا اعلان فرما کر سکھ اور سکینہ عطا فرمایا اور منافقین کو ظاہر کر دیا۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبا رک کے روز خطاب ۔\nانہوں نے کہا کہ موت بھی زندگی کی طرح ایک حقیقت ہے۔سب نے موت کا ذائقہ چکھنا ہے۔صاحب ایمان بھی اس میں سے گزرے گا اور بے ایمان بھی گزریں گے لیکن ان دونوں میں فرق بہت ہے۔اس لیے ہمیشہ حق کا ساتھ دینا چاہیے حق سے بھاگنے سے کیا ہوگا کیا زندگی لمبی ہو جائے گی؟شہید ہونے کے لیے قتل ہونا پڑتا ہے جان دینی پڑتی ہے اللہ کے لیے اس کی رضا کے لیے،احیائے دین کے لیے،حق او رسچ کے لیے جو قتل ہوتے ہیں ان کا معاملہ اور ہے اللہ کریم فرماتے ہیں جو میری راہ میں جان دیتے ہیں انہیں مردہ نہ کہو وہ زندہ ہیں۔کئی مثالیں ہیں شہداء کی جب قبریں کھولیں گئیں تو ان کا وجود بلکہ ان کے لباس بھی سلامت تھے۔شہید کو موت کے وقت صرف اتنا احساس ہوتا ہے جیسے کسی چیونٹی نے کاٹ لیا ہو۔ویسے اگر موت کے بارے پڑھیں تو بندے کے رونگھٹے کھڑے ہوجاتے ہیں کہ میں کیسے اس عمل سے گزروں گا اتنا سخت وقت ہو گا۔ اللہ کریم معاف فرمائیں لیکن شہید کے لیے ایسا نہیں ہے۔\nانہوں نے مزید کہا کہ جو لوگ ایمان اور صدق کے ساتھ تادم واپسی اطاعت الہی میں لگے رہے ان کے وجود بھی اللہ کریم نے قبروں میں سلامت رکھے۔برزرگان دین اور عالم دین کے کئی واقعات ملتے ہیں جب ان کی قبرمبارک کھولی گئی تو ان کے وجود سلامت ملے۔ دن رات دین کی تبلیغ ہو رہی ہے لوگ واعظ بھی کر رہے ہیں درس و تدریس بھی ہو رہی ہے تفاسیر بھی بیان فرمائی جا رہی ہیں لیکن مقصد کیا ہے َ؟ صرف ان باتوں سے شناسائی ہے یا یہ مقصود ہو  کہ سارا حق میرے لیے بیان فرمایا گیا ہے تا کہ میں اس پر عمل کر سکوں تا کہ میری راہنمائی ہو سکے۔اگر ہم شہید ہونے کا جذبہ رکھتے ہیں تو ہماری فرض نماز کیوں چھوٹ جاتی ہے ہمارے لین دین میں کمی بیشی کیوں ہے،ہم سچ کیوں نہیں بول پاتے۔یہ وہ حقائق ہیں جن کو سمجھنے کی ضرورت ہے اللہ کریم ہمیں صحیح شعور عطا فرمائیں۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "67b51f432030ad1d2fa256d1f1c4577e36bd81f328b16bbc9af0e59c85631e7a",
+    "downloadUrls": [],
+    "id": "press-release-4237-2026-07-24-mout-bhi-zindagi-ki-terha-aik-haqeeqat-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4237/news%20(23).jpg"
+    ],
+    "publishedAt": "2026-07-24T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4237/2026-07-24-mout-bhi-zindagi-ki-terha-aik-haqeeqat-hai.html",
+    "title": "Mout Bhi Zindagi Ki Terha Aik Haqeeqat Hai",
+    "titleUrdu": "موت بھی زندگی کی طرح ایک حقیقت ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "پریس ریلیز\nایسی نشست یا محفل جس میں اللہ اور اللہ کے رسول ﷺ یا دین کا ذکر نہ ہو ایسی محفل سے متعلق رو زآخرت سوال ہو گا اور پچھتائیں گے کہ کاش ہم ایسی محفل نہ کرتے۔اگر ایک محفل کے متعلق اتنی سخت وعید ہے تو ہماری زندگی کے شب و روز جو اللہ اور اللہ کے رسول ﷺ کی یاد سے خالی ہیں اگر غور کریں تو سمجھ آئے گی کہ کتنے دین پر ہیں اور کتنے دین سے دور لایعنی اعمال میں وقت کا ضیاع کر رہے ہیں۔ہم اپنی ساری زندگی اصول تجویز پر گزار دیتے ہیں جبکہ دین اسلام اصول تفویض پر زندگی بسر کرنے کی راہنمائی عطا فرماتا ہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پا کستان کا جمعتہ المبارک کے موقع پر خطاب۔\nانہوں نے کہا کہ اگر ہم اپنے کمالات پر بھروسہ کریں گے اللہ کے تفویض کردہ اصولوں پر نہیں چلیں گے پھر برکت جاتی رہے گی۔اور آخرت میں ان تمام وسائل کا جواب دینا پڑے گا۔دین اسلام ایک مکمل ضابطہ حیات ہے۔دین اسلام ہر طرح کی راہنمائی فرماتا ہے کہ ذرائع آمدن کیسے ہونے چاہیے؟معاشی زندگی،معاشرتی زندگی،اپنے ذاتی وجود سے لے کر ہر ایک لمحے کے بارے راہنمائی ہے حتی کہ عبادات بھی حد سے زیادہ کرنے پر سوال ہو گا۔بندہ یہ اقرار کرے کہ جو کچھ ہے میرے اللہ کا ہے اور میرے حصے کا میرے اللہ کریم نے مجھے عطا فرمایا ہے۔اس طرح اللہ کریم نے جو تفویض فرمائی ہے اس کے مطابق زندگی بسر کی جائے۔\nانہوں نے مزید کہا کہ جس پر اللہ کا فضل ہوتا ہے اس کو قلبی سکون نصیب ہوتا ہے۔اور جو شیطان کا پیروکار ہو وہ بے سکون اور خوفزدہ رہے گا۔اس لیے کہ شیطان انسان کا ازل سے دشمن ہے چاہے مسلمان ہو یا کافر دونو ں کا دشمن ہے۔جو بھی اس کی پیروی کرے گا وہ اللہ کے فضل سے دور ہوتا چلا جائے گا۔حق یہ ہے کہ بندہ اللہ سے ڈرے پھر کسی کا ڈر نہیں رہتا اور اللہ سے ڈرنے سے مراد ہے کہ کوئی ایسا عمل نہ ہو جائے جس سے میرے اللہ کریم مجھ سے ناراض ہو جائیں اسی کیفیت کو تقوی بھی کہتے ہیں۔ اللہ کریم صحیح شعور عطا فرمائیں۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "c08763185e21e542249d5b57e0a63531bd1f8b410c65a885206eabbb7ba550d9",
+    "downloadUrls": [],
+    "id": "press-release-4255-2026-08-07-jis-par-allah-ka-fazl-hota-hai-is-ko-qalbi-sukoon-naseeb-hota-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4255/news%20(24).jpg"
+    ],
+    "publishedAt": "2026-08-07T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4255/2026-08-07-jis-par-allah-ka-fazl-hota-hai-is-ko-qalbi-sukoon-naseeb-hota-hai.html",
+    "title": "Jis Par Allah Ka Fazl Hota Hai Is Ko Qalbi Sukoon Naseeb Hota Hai",
+    "titleUrdu": "جس پر اللہ کا فضل ہوتا ہے اس کو قلبی سکون نصیب ہوتا ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "اناسیواں یوم ِ آزادیِ پاکستان کے موقع پر ایک پُروقار تقریب منعقد ہوئی، جس میں بڑی تعداد میں سالکین نے شرکت کی۔ تقریب کا آغازتلاوتِ کلامِ پاک سے ہوا، جس کے بعد قومی ترانہ پیش کیا گیا اور حضرت امیر عبد القدیر اعوان صاحب کے دستِ مبارک سے پرچم کشائی کی گئی۔ اس موقع پر خطاب کرتے ہوئے حضرت امیر عبد القدیر اعوان صاحب نے فرمایا کہ پاکستان اللہ تعالیٰ کی عطا کردہ ایک عظیم نعمت اور ایک پاک سرزمین ہے۔ اس وطن کی آزادی، سلامتی، استحکام اور ترقی کا تحفظ ہر پاکستانی کی قومی ذمہ داری ہے۔ انہوں نے فرمایا کہ یومِ آزادی صرف 14 اگست کو منانے کا نام نہیں، بلکہ ہر فرد کو اپنی عملی زندگی میں دیانت، امانت، محنت، قانون کی پاسداری اور اعلیٰ کردار کا مظاہرہ کرنا چاہیے۔ حقیقی حب الوطنی یہ ہے کہ ہر شہری اپنے حصے کی ذمہ داری پوری ایمانداری سے ادا کرے اور وطنِ عزیز کی تعمیر و ترقی میں اپنا مثبت کردار ادا کرے۔ حضرت امیر عبد القدیر اعوان صاحب نے مزید فرمایا کہ مضبوط کردار، قومی اتحاد، باہمی احترام اور خدمتِ خلق ہی ایک مضبوط، پُرامن اور خوشحال پاکستان کی بنیاد ہیں۔ تقریب کے اختتام پر پاکستان کی سلامتی، ترقی، خوشحالی، افواجِ پاکستان اور امتِ مسلمہ کے لیے خصوصی دعا کی گئی۔ اس موقع پر شرکاء نے اس عزم کا اظہار کیا کہ وہ وطنِ عزیز کی خدمت، قومی یکجہتی کے فروغ اور ایک مضبوط پاکستان کی تعمیر کے لیے ہمیشہ اپنا بھرپور کردار ادا کرتے رہیں گے۔ یہ پیغام قومی جذبے، یکجہتی اور ذمہ دارانہ کردار کی بھرپور عکاسی کرتا ہے۔",
+    "category": "pressReleases",
+    "checksum": "d6c3827a98c19d75b23f3c898f7a1c32dd2188b1a2f8a39c21f8340768e0f861",
+    "downloadUrls": [],
+    "id": "press-release-4260-2026-08-14-watan-aziz-ki-khidmat-qaumi-yakjahti-ke-farogh-aur-aik-mazboot-pakistan-ki-taamer-ke-liye-hamesha-apna-bharpoor-kirdaar-ada-karte-rahen-ge",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4260/news.jpg"
+    ],
+    "publishedAt": "2026-08-14T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4260/2026-08-14-watan-aziz-ki-khidmat-qaumi-yakjahti-ke-farogh-aur-aik-mazboot-pakistan-ki-taamer-ke-liye-hamesha-apna-bharpoor-kirdaar-ada-karte-rahen-ge.html",
+    "title": "Watanِ Aziz Ki Khidmat, Qaumi Yakjahti Ke Farogh Aur Aik Mazboot Pakistan Ki Taamer Ke Liye Hamesha Apna Bharpoor Kirdaar Ada Karte Rahen Ge",
+    "titleUrdu": "وطنِ عزیز کی خدمت، قومی یکجہتی کے فروغ اور ایک مضبوط پاکستان کی تعمیر کے لیے ہمیشہ اپنا بھرپور کردار ادا کرتے رہیں گے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "دین اسلام وہ ہے جو اللہ کا حکم ہے۔مخلوق کی آراء اسلام نہیں ہو سکتی۔کسی کی ذاتی رائے قرآن وسنت کے نام پر دین میں داخل کی جائے تو وہ بدعت ہو گی۔دین اسلام کے ساتھ ظلم ہے دین نہیں ہے۔مسلمان کے ذمہ کلی اطاعت ہے رائے کا عمل دخل نہیں ہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان جمعتہ المبارک کے موقع پر خطاب۔\nانہوں نے کہا کہ اسلامی حکم پر عمل کرنے سے ہر ایک کو فائدہ ہوتا ہے۔اور اس میں ہر ایک کی بہتری ہوتی ہے۔ایسا نہیں ہوتا کہ کوئی ایک تو خوش ہو جائے اور دوسرے کا نقصان ہو۔اسلامی حکم ہماری ضرورت ہے اسلام کو ہماری ضرورت نہیں ہے۔یہ اس کا احسان ہے کہ اس نے ہمیں ایمان عطا فرمایا۔جو لوگ اللہ کی مخالفت میں لگے ہیں وہ اللہ کا کچھ نہیں بگاڑ سکتے وہ پھر دین اسلام کو نقصان پہنچانے کی کوشش کرتے ہیں نبی کریم ﷺ کو نقصان پہنچانے کی کوشش کرتے ہیں۔\nانہوں نے مزید کہا کہ دینی باتوں میں لوگوں کا رجحان بہت کم ہے،دینی پروگرامز ہوں،دینی محافل ہوں ان میں بہت کم لوگ آتے ہیں اور اگر کہیں کوئی تماشہ لگا ہو تو وہاں آپ کو بہت رش نظر آئے گا اپنا وقت بھی ضائع کریں گے پیسوں کا ضیاع بھی کریں گے لیکن وہاں ضرور جائیں گے۔یہ اس وجہ سے ہے کہ لوگ اپنے نفس کی پیروی کرتے ہیں اور اسی کی تسکین میں لگے رہتے ہیں۔جو بھی اللہ سے خالص استقامت فی الدین کی توفیق مانگے گا اللہ اس کی حفاظت فرماتا ہے۔نیکی ہمیشہ اللہ کے لیے کرنی چاہیے۔جو بھی دین پر عمل کرتا ہے وہ دین کی حفاظت کر تا ہے اور اللہ اس کی حفاظت فرماتے ہیں۔ اللہ کریم صحیح شعور عطا فرمائیں۔",
+    "category": "pressReleases",
+    "checksum": "16771eb0533649555cb2f6fa29e291b0f29ea2c632ac61ee04449b8c21f197f4",
+    "downloadUrls": [],
+    "id": "press-release-4261-2026-08-14-deen-islam-woh-hai-jo-allah-ka-hukum-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4261/news%20(1).jpg"
+    ],
+    "publishedAt": "2026-08-14T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4261/2026-08-14-deen-islam-woh-hai-jo-allah-ka-hukum-hai.html",
+    "title": "Deen Islam Woh Hai Jo Allah Ka Hukum Hai",
+    "titleUrdu": "دین اسلام وہ ہے جو اللہ کا حکم ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "نبی کریم ﷺ کو رحمۃ اللعالمین بنا کر بھیجا گیا۔جسے جو نصیب ہو رہا ہے آپ ﷺ کی رحمت سے نصیب ہو رہا ہے۔ہمارے پاس ایسے الفاظ نہیں کہ نبی کریم ﷺ کی شان بیان کر سکیں۔اللہ کریم جانتے ہیں کہ اپنے حبیب ﷺ کو کیا بلندیاں عطا فرمائیں۔ربیع الاول میں کوشش کریں کہ آپ ﷺ کی سیرت پاک کا مطالعہ کیا جائے آپ ﷺ کی ولادت سے لے کر زندگی کا ایک ایک پل جو آپ ﷺ نے بسر فرمایا اس سے ہماری نسلوں کوراہنمائی ملے گی اور بھلائی نصیب ہو گی۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان جمعتہ المبارک کے روز خطاب۔\nانہوں نے کہا کہ ایمان کی مضبوطی عمل صالح تک لے جاتی ہے۔جو کچھ بھی ہم کر رہے ہیں اس کے پیچھے ہماری نیت ہوتی ہے ہمارے تمام اعمال کا انحصار ہماری نیت پر ہوتا ہے۔احکامات دین پر عمل کرنے سے پرہیزگاری نصیب ہوتی ہے اور اللہ کی طرف سے اجرعظیم عطا ہوتا ہے۔یہ جو مبارک مہینہ ہے اس میں بنیاد یہی ہے کہ دین جانیں اور صدق دل سے اس پر عمل کریں اپنے اللہ کریم سے تعلق پیدا کریں اپنے اللہ سے مانگیں۔یہ دنیا امتحان گاہ ہے اس کی تیاری کے لیے جو ضرورت ہے وہ عطا کر دیا گیا ہے۔احکامات دین پرعمل کرنے سے ہمارا ہی فائدہ ہوتا ہے۔قلب میں ایمان ہو تو ایک حد تک بندہ اللہ کریم کو پہچان سکتا ہے۔\nیاد رہے کہ سلسلہ نقشبندیہ اویسیہ کے تحت ملک بھر میں بعثت رحمت عالم ﷺ کانفرنسز کا انعقاد ہو رہا ہے اس میں فیصل آباد بہاولپور،وہاڑی،مظفر گڑھ،گوجرانوالا،مرکز دارالعرفان منارہ شامل ہیں۔ جس میں شیخ المکرم حضرت امیر عبدالقدیر اعوان مد ظلہ العالی خصوصی خطاب فرمائیں گے۔دعوت عام ہے کہ اپنے دلوں کو برکات نبوت ﷺ سے منور کرنے کے لیے تشریف لائیے۔",
+    "category": "pressReleases",
+    "checksum": "9ae8401a5f193b414650a54eee681c2d6578be1fb81e4376c716ef1a3e7c8bc9",
+    "downloadUrls": [],
+    "id": "press-release-4262-2026-08-21-nabi-kareem-saw-ko-rehmat-allaalmin-bana-kar-bheja-gaya",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4262/news%20(2).jpg"
+    ],
+    "publishedAt": "2026-08-21T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4262/2026-08-21-nabi-kareem-saw-ko-rehmat-allaalmin-bana-kar-bheja-gaya.html",
+    "title": "Nabi Kareem SAW Ko Rehmat  Allaalmin Bana Kar Bheja Gaya .",
+    "titleUrdu": "نبی کریم ﷺ کو رحمۃ اللعالمین بنا کر بھیجا گیا۔",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "پریس ریلیز\nماہ ربیع الاول تجدید عہد کا دن ہے اس دن کو ہمیں یہ عہد کرنا ہوگا کہ ہم  اپنی زندگی کو اسوہ رسول ﷺ کے مطابق گزاریں گے۔آپ ﷺ سے اظہار محبت ہماری زندگی کا اثاثہ ہے۔آپ ﷺ سے محبت ہی ہمیں زندگی سے آشنائی عطا کرتی ہے۔یہ وہ راستہ ہے جس میں اپنی جان  نچھاور کرنے کو کامیابی اور فخر سمجھا جاتاہے۔\nسیماب ایسی موت کی ہے جستجو مجھے،لپٹا ہو جس میں تہہ بہ تہہ محبوب کا وصال\nامیر عبدالقدیرا عوان شیخ سلسلہ عالیہ و سربراہ تنظیم الاخوان پا کستان کا بہاولپور میں بعثت رحمت عالم ﷺ کانفرنس میں خواتین و حضرات کی بڑی تعداد سے خطاب۔\nانہوں نے کہا کہ صحابہ کرام ؓ  کی جوتیوں کی خاک بھی ہم سے اعلی ہے۔ ان ہستیوں کا مقام یہ ہے کہ اگر وہ کیفیات جو آپ ﷺ کی صحبت میں رہتے ہوئے انہیں نصیب ہوتی تھیں اگر اسی کیفیت میں رہتے تو چوکو ں اور چوراہوں میں فرشتے ان سے مصافحہ کرتے۔قرآن کریم کی باتیں حکمت سے بھری پڑی ہیں۔قرآن کریم کو دیکھنا عبادت،چھونا عبادت،پڑھنا عبادت اور عمل کرنا تو مقصد حیات ہے۔کیونکہ یہ ذات باری تعالی کا ذاتی کلام ہے ہر لحاظ سے اس میں برکت ہے۔اللہ کا کلام ہے بے شمار برکات ہیں۔قرآن کریم کی حکمتیں سمجھنے کے لیے ضروریات دین کا جاننا ضروری ہے۔\nانہوں نے مزید کہا کہ صرف ماہ مبارک ربیع الاول کی ساعتیں مبارک نہیں ہیں بلکہ اس کے صدقے تمام ہفتے،مہینے اور سال سب مبارک ہو جاتے ہیں۔دن مبارک ہو جائیں گے راتیں مبارک ہو جائیں گی اگر ہم اتباع محمد الرسول اللہ ﷺ پر خود کو لے آئیں۔وگرنہ ہم ضد اور انا کی بھینٹ چڑھے جا رہے ہیں۔پھر قومیں انتشار کا شکار ہو جاتی ہیں،ترقی کی منازل طے نہیں کرتی۔مسلمان معاشرہ ہے لیکن یقین نہیں،انصاف نہیں ہے۔حقوق و فرائض کی تمیز نہیں رہی۔ان حالات کے ہم سب ذمہ دار ہیں ہم کہتے ہیں میں تو ٹھیک ہوں دوسرا اپنی ذمہ داری ادا نہیں کر رہا۔اس ماہ مبارک ربیع الاول میں خود کو دیکھیں اپنے کردار کو دیکھیں اپنا جائزہ لیں اور خود کو صراط مستقیم پر لے آئیں۔\nیاد رہے کہ بعثت رحمت عالم ﷺ کانفرنسز کا اگلا پروگرام 24 اگست بروز سوموار وہاڑی بار کونسل میں ہو گا۔\nآخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "3e8db5fdede123eeff47b741e3472c7e28a7a1476826f96e6e6b4477c43fa929",
+    "downloadUrls": [],
+    "id": "press-release-4263-2026-08-23-mah-e-rabi-ul-awal-tajdeed-e-ehad-ka-din-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4263/news%20(4).jpg"
+    ],
+    "publishedAt": "2026-08-23T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4263/2026-08-23-mah-e-rabi-ul-awal-tajdeed-e-ehad-ka-din-hai.html",
+    "title": "Mah E Rabi Ul Awal Tajdeed E Ehad Ka Din Hai",
+    "titleUrdu": "ماہ ربیع الاول تجدید عہد کا دن ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "پریس ریلیز\nآپ صلی اللہ علیہ وسلم تکمیل عمارت نبوت ہیں۔قران مجید کو اپنی دانست پر سمجھنا درست نہیں قران کو ھم آپ صلی اللہ علیہ وسلم اور اجماع امت کے مطابق رہنمائی لیکر سمجھیں گے تو ٹھوکر نہ کھائیں گے۔ ماہ ربیع الاول میں اظہار محبت میں فرائض کی ادائیگی رہ جائے تو ھمارا دعویٰ محبت کمزور پڑ جائے گا مکلف مخلوق کی بات حیات کی ہے شجر وحجر میں حیات ہے اور جب اس خشک تنا حنانہ مسجد نبوی آپ صلی اللہ علیہ وسلم کے فراق میں بلک بلک کر رویا اور صحابہ نے سنا اور آپ نے اس کو دلاسہ دیا۔ ابو جہل کے ہاتھ میں پتھروں کی کنکریاں خود بول اٹھیں کلمہ اور صلا ۃ وسلام پڑھنے لگیں۔ جب تک ھم محبت کی حقیقت کو نہ پائیں گے تو ہمارا ربیع الاول کو منانا بھی بے معنی ہو گا۔ اگر اس ماہ مبار ک کی محنت مجھے یہ سکھا دے کہ میر ا عمل اللہ کی رضا کے لئے ہو تو مقصد پورا ہو گیا۔\nامیر عبدالقدیر اعوان شیخ سلسلہ عالیہ و سربراہ تنظیم الاخوان پاکستان کو ڈسٹرکٹ بار کونسل وہاڑی میں بعثت رحمت عالم ﷺ کانفرنس میں وکلاء\nسے خطاب۔\nانہوں نے کہا کہ ہمارا مطمع نظراللہ کی رضا ہونی چاہیے۔اگر اللہ کی رضا ہو گی تو یہی عقید ت و محبت اس امت کو اتفاق و اتحاد پر لے آئے گی۔قومیں تعداد سے نہیں اتفاق سے ترقی کرتی ہیں۔ورنہ یہی تعداد ہجوم ہو جاتی ہے اور ہجوم کے رویے تکلیف دہ صورت پیدا کرتے ہیں تعمیر نہیں کرتے۔چاہے صاحب اختیار کی بات ہو یا ہم جیسے عام آدمی کی۔ہم مخلوق ہیں ہم محتاج ہیں بس ایک سچی طلب ہو وہ معاف فرما دیتا ہے۔اللہ کریم صحیح شعور عطا فرمائیں۔\nآخر میں حضرت نے بار کونسل کے صدر اور انتظامیہ کا شکریہ ادا کیا اور صدر بار کو شیلڈ پیش کی اور صدر بار نے حضرت کو شیلڈ پیش کی۔پروگرام کے اختتام پر اجتماعی دعا کی گئی۔",
+    "category": "pressReleases",
+    "checksum": "2e98e8183033b20257e8e4b696dcd9a714910efb9ed5ef5576a61940a01bceb0",
+    "downloadUrls": [],
+    "id": "press-release-4264-2026-08-24-ap-saw-takmeel-e-imart-e-nabuwat-hain",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4264/news%20(5).jpg"
+    ],
+    "publishedAt": "2026-08-24T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4264/2026-08-24-ap-saw-takmeel-e-imart-e-nabuwat-hain.html",
+    "title": "Ap SAW Takmeel E Imart E Nabuwat Hain",
+    "titleUrdu": "آپ صلی اللہ علیہ وسلم تکمیل عمارت نبوت ہیں",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "پریس ریلیز\nماہ ربیع الاول کی خوشیاں ضرور منائیں لیکن اس کا طریقہ اور سلیقہ وہ اپنایا جائے جو آپ ﷺ نے فرمایا اور سمجھایا۔اس اظہار محبت میں حلال حرام نہیں ہو سکتا اور حرام حلال نہیں ہو سکتا۔اپنی زندگیوں میں سے شرک کو نکال دیں اور اپنی تمام امیدیں اللہ کریم سے وابستہ رکھیں۔اپنے والدین کے سامنے سرنگوں رہیں اور افلاس کے ڈر سے اپنی اولاد کو قتل نہ کرو۔\nامیر عبدالقدیر اعوان شیخ سلسلہ عالیہ و سربراہ تنظیم الاخوان پاکستان کا جلسہ بعثت رحمت عالم ﷺ  سنانواں کوٹ ادو میں دڑہ ملک غلام محمد نور ربانی کھر مرحوم پر خواتین و حضرات کی بڑی تعداد سے خطاب۔\nانہوں نے کہا کہ بہترین طرز حیات اسوہ حسنہ میں ہے۔جب امتی کی بات آئے گی تو امتی ماننے والے کو کہتے ہیں رائے رکھنے والے کو نہیں کہتے۔امتی کی عظمت اتباع سے منسلک ہے اس کی عظمت دعووں سے منسلک نہیں ہے۔کوئی دعوی ثابت نہیں ہو سکتا جب تک اس کے ساتھ شہادت نہ ہو۔ایمان ایک دعوی ہے اور ہمارے اعمال اس کے گواہ ہیں کہ ہمارا دعوی کتنا سچا اور کھرا ہے۔\nانہوں نے مزید کہا کہ کیا ہم نے کبھی محسوس کیا کہ میرا اللہ مجھے دیکھ رہا ہے میرا خواتین و حضرات سے ایک سوال ہے کہ کبھی یہ کیفیت بنی کہ میں اپنے اللہ کے روبرو ہوں۔اور یہ ممکن ہے تم دیکھ نہیں سکتے چھو نہیں سکتے لیکن نبی کریم ﷺ فرماتے ہیں اللہ کی عبادت ایسے کرو جیسے تم اللہ کو دیکھ رہے ہو۔یہ درجہ احسان ہے۔تعلیمات محمد الرسول اللہ ﷺ پر عمل کرتے ہوئے کیفیات محمد الرسول اللہ ﷺ سے سینے مزین کریں۔اپنے قلوب کو انوارات ِ محمد الرسول اللہ ﷺ سے دھوئیں۔جو قلب اطہر سے آ رہے ہیں۔اپنے اعمال اپنے افکار ان کو سامنے رکھیں اور معیت باری تعالی کی کیفت کو سامنے رکھیں تو یہ جتنے فتنے ہیں معاشرے کے یہ جو مسائل ہیں درست ہوتے چلے جائیں گے۔\nانہوں نے مزید کہا کہ قرآن کی باتیں لوگوں کو آج سمجھ نہیں آ رہی لیکن جب موت کا وقت آئے گا سب سمجھ آ جائے گی۔لیکن پھر فرصت نہ ہو گی۔ملک غلام محمد نور ربانی کھر مرحوم کا یہ صدقہ جاری اللہ کریم قبول فرمائیں۔اللہ ملک رضا ربانی کھر ان کو ان کے خاندان کو ان کے عزیز و اقارب کو اس کا اجر اور ثواب عطا فرمائے۔اللہ کرے ان کے ہونے سے مخلوق خدا کو سکھ ملے۔",
+    "category": "pressReleases",
+    "checksum": "14c15b6b07d17cfcf44ae492642f86fedc62e67f16e301d9faf48d20c5fb30df",
+    "downloadUrls": [],
+    "id": "press-release-4265-2026-08-26-behtreen-tarz-e-hayat-aswa-e-hasna-mein-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4265/news%20(6).jpg"
+    ],
+    "publishedAt": "2026-08-26T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4265/2026-08-26-behtreen-tarz-e-hayat-aswa-e-hasna-mein-hai.html",
+    "title": "Behtreen Tarz E Hayat Aswa E Hasna Mein Hai",
+    "titleUrdu": "بہترین طرز حیات اسوہ حسنہ میں ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "معاشرے میں حق کی تشکیل بندہ مومن کی ذمہ داری ہے۔مسلمان نے ظلم کو روکا لیکن یہ غلط فہمی ہے کہ مسلمانوں نے تلوار سے اسلام کو پھیلایا بلکہ دین اسلام نے جہاں بھی جس خطے کو بھی فتح کیا وہاں ایسی معاشرتی مساوات قائم کی کہ وہاں کے لوگوں نے ناصرف خود اسلام قبول کیا بلکہ اور لوگوں تک بھی پہنچایا۔نبی کریم ﷺ سے اہل مکہ نے کہا کہ آپ جو بھی دین اپنانا چاہیں اسے اختیار کریں اس پر عمل کریں لیکن ہمارے مذاہب کے بارے میں بات مت کریں۔عبادات اپنی مرضی سے کریں لیکن معاشرتی زندگی پر بات نہ کریں جیسے ہمارا معاشرہ چل رہا ہے اسے ایسے ہی چلنے دیں۔معاشرہ اگر دینی اصولوں پر کاربند ہو اس کا کہنا اور سننا قرآن وسنت کے مطابق ہوتا ہے۔اور اگر معاشرے کو مخلوق اپنے مزاج کے مطابق ڈھال لے پھر خواہشات نفس کا اظہار ہوتا ہے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبارک کے روز خطاب۔\nانہوں نے کہا کہ باعمل مسلمان کے سامنے کوئی کھڑا نہیں ہو سکتا۔یہ مسلمانوں کے خلاف سازشیں ہو رہی ہیں کہ انہیں دین سے دور رکھا جائے ان کے درمیان فحاشی کو عام کیا جا رہا ہے۔اس سارے کا مقصد یہ ہے کہ یہ باعمل نہ ہوں۔اپنے وطن عزیز کو دیکھیں کہ اسے آزاد ہوئے دہائیاں ہو گئی ہیں۔اسلام کے نام پر وجود میں آیا لیکن اپنا قانون دیکھ لیں اپنے معاشرے کے رواجات دیکھ لیں،اپنے آج کے حالات دیکھ لیں آئے روز جو واقعات پیش آتے ہیں انہیں دیکھیں اور جائزہ لیں کہ ہم کتنے قرآن وسنت سے مطابقت رکھتے ہیں۔\nانہوں نے مزید کہا کہ دنیا کی زندگی کا انحصارکچھ  دینے میں ہے۔ایک بیج کو زمین نے اگنے کے لیے جگہ دی تو وہ ایک درخت یا پودہ بنا ایسے ہی آپ کسی چیز کو بھی دیکھ لیں زندگی آگے چلتی تب ہے جب آپ کچھ دیں گے۔سورج اگر اپنی توانائیاں روک لے تو زندگی آگے نہیں چل سکتی وہ بھی دے رہا ہے۔\nحق کو جانتے ہوئے حق مخلوق تک نہ پہنچایا جائے یہ بھی بخل ہے۔اگر کوئی عالم ہے اور وہ حق کی بات کو روک لیتا ہے لوگوں تک نہیں پہنچاتا تو اسے ہی بخیل کہتے ہیں۔ماہ مبارک ربیع الاول وہ تجدید عہد ہے جہاں امتی کو آپ ﷺ کی ولادت باسعادت پر تقویت نصیب ہوئی اللہ کی رحمت نصیب ہوئی۔امتی کا جو خصوصی رشتہ ہے وہ ہمیں بعثت کے موقع پر نصیب ہوتا ہے۔کیا امتی کا رشتہ ان 12 دنوں کے ساتھ مخصوص رہتا ہے۔امتی کے لیے تو تاحیات حکم ہے کہ ساری زندگی نبی کریم ﷺ سے محبت اور اتباع میں گزر جائے۔اللہ کریم ہمیں صحیح شعور عطا فرمائیں۔آخر میں انہوں نے ملکی سلامتی اور بقا کی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "131018335643aa96e5ff8fa53bcbd9c82cc203b69dcf2925fc65867e7f9ec8c8",
+    "downloadUrls": [],
+    "id": "press-release-4266-2026-08-28-muashray-mein-haq-ki-tashkeel-bandah-momin-ki-zimma-daari-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4266/news%20(7).jpg"
+    ],
+    "publishedAt": "2026-08-28T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4266/2026-08-28-muashray-mein-haq-ki-tashkeel-bandah-momin-ki-zimma-daari-hai.html",
+    "title": "Muashray Mein Haq Ki Tashkeel Bandah Momin Ki Zimma Daari Hai",
+    "titleUrdu": "معاشرے میں حق کی تشکیل بندہ مومن کی ذمہ داری ہے",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "حضرت محمد ﷺ کی ذات بے مثل و مثال ہیں۔آپ ﷺ رحمۃ اللعالمین ہیں۔ماہ ربیع الاول وہ مبارک ماہ ہے جس میں آپ ﷺ اس دنیا میں جلوہ افروز ہوئے او ر آپ ﷺ کی ذات سے تمام مخلوقات مستفید ہوئیں۔اظہار محبت اور ولادت باسعادت کی خوشی منانے میں بھی حدودو قیود کا خیال رکھا جائے۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا بعثت رحمت عالم ﷺ کانفرنس گوجرانوالا میں خواتین و حضرات کی بڑی تعداد سے خطاب۔\nانہوں نے کہا کہ دین میں رواجات کو داخل نہ کیا جائے کیونکہ جب بات درِ مصطفے کی آتی ہے  تویہاں محبت بھی اصول و ضوابط کی پابند ہے۔جب بات معجزات نبوی ﷺ کی آتی ہے تو آپ مخلوق کے لیے باعث رحمت ہیں مخلوق میں ہی مثالیں اٹھا کے لیے دیکھ لیں آپ آسمان کی وسعتوں کی بات کرو تو شق قمر کی شہادت قرآن مجید دے رہا ہے۔ابوجہل نے آپ ﷺ سے کہا کہ بتائیں میرے ہا تھ میں کیا ہے تو آپ ﷺ نے فرمایا کہ میں بتاؤں یا جو ہاتھ میں ہے وہ بتائے تو ابوجہل کے ہاتھ میں کنکر تھے انہوں نے کلمہ پڑھا جس کی آواز مطلق کافر نے بھی سنی۔\nانہوں نے مزید کہا کہ اس ماہ مبارک میں آپ ﷺ کی شان میں پروگرامز کا انعقا د ضرور کیا جائے جس میں سیر ت پاک کے واقعات سنائیں جائیں،صدقہ خیرات کریں،منظم طریقے ایسے اجتماعات کا انعقاد کیا جائے جس میں تعلیم و تعلم کا اہتمام ہو ایسی کوئی بات یا ایسا کوئی تجاوز جس میں طوفانِ بدتمیزی ہو اس سے اجتناب کیا جائے۔اللہ کریم نے فرمایا ہے کہ اپنے آپ کو اسلام کی حدود کے اندر پابند رکھیں ہم اپنے آپ کو جانچیں کیا ہماری سوچیں ہمارا کردار ہمارا عمل اسلامی حدود کے اندر ہے کہیں تجاوز تو نہیں کر رہے کہا ں کہاں تجاوز ہے اپنے آپ کو دیکھنے کی ضرورت ہے۔\nانہوں نے مزید کہا کہ اس وقت حج  اور عمرہ بھی کیے جا رہے ہیں مساجد میں بھی جائیں تو جگہ نہیں ملتی انفرادی طور پر تسبیحا ت بھی پڑھی جا رہی ہیں لیکن معاشرے میں ان عبادات کا اثر دکھائی نہیں دے رہا اس کی بڑی وجہ یہ ہے کہ ہماری محنت قلوب پر نہیں ہو رہی اس کے لیے شعبہ تصوف میں ذکر قلبی کو اختیار کرنے کی ضرورت ہے۔جو بندے کے نہاں خانہ دل سے تبدیلی کا آغاز کرتا ہے اور اسے اس کیفیت میں لے جاتا ہے کہ بندہ اکیلے ہوتے ہوئے بھی اپنے آپ کو اپنے رب کے روبرو محسوس کرتا ہے۔حضرت امیر عبدالقدیر اعوان شیخ سلسلہ عالیہ کا یہ پانچواں پروگرام ہے جہاں پر ایک بہت بڑی کثیر تعداد موجود تھی جن سے حضرت نے سلسلہ عالیہ میں ظاہری بیعت لی اور انہیں طریقہ ذکر بتایا۔اور آخر میں ملکی سلامتی اور بقا کی خصوصی اجتماعی دعا بھی فرمائی۔",
+    "category": "pressReleases",
+    "checksum": "287767d4d0f608ce09c0af97babeb4fa448764b797be4b88b4e2fd39d07ee4fd",
+    "downloadUrls": [],
+    "id": "press-release-4267-2026-08-30-hazrat-mohammad-saw-ki-zaat-bay-misl-o-bay-misaal-hain",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4267/news%20(8).jpg"
+    ],
+    "publishedAt": "2026-08-30T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4267/2026-08-30-hazrat-mohammad-saw-ki-zaat-bay-misl-o-bay-misaal-hain.html",
+    "title": "Hazrat Mohammad SAW Ki Zaat Bay Misl O Bay Misaal Hain",
+    "titleUrdu": "حضرت محمد ﷺ کی ذات بے مثل وبے مثال ہیں",
+    "type": "pressRelease"
+  },
+  {
+    "author": "Sheikh-e-Silsila Naqshbandia Owaisiah Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "bodyPlainText": "آج کے مسائل کا حل اسلامی نظام معیشت میں ہے۔غیر اسلامی نظام معیشت میں دولت ایک جگہ اکٹھی ہونا شروع ہو جاتی ہے باقی جگہ پر مفلسی اور غربت آجاتی ہے۔اسلامی نظام معیشت دولت کو ایک جگہ رکنے نہیں دیتا۔کیونکہ جو سال بھر پیسہ استعمال نہیں ہوا اس پر زکوۃ لاگو ہو جاتی ہے۔جس میں مستحق کا حصہ اس کو ملتا ہے۔اسی طرح عشر ہے،صدقہ و خیرات،قربانی کی کھالیں وغیرہ شامل ہیں جس سے مستحق لوگوں تک ان کا حصہ پہنچتا رہتا ہے۔ان امور کو اگر معاشرے پر نافذ کیا جائے تو پیسہ ایک جگہ نہیں رکتا۔حقدار تک اس کا حق پہنچ جاتا ہے۔جب بندہ پیسہ جمع نہیں کرے گا تو کاروبار کرے گا جس سے لوگوں کو روزگار ملے گا اور معاشرے میں خوشحالی آئے گی۔\nامیر عبدالقدیر اعوان شیخ سلسلہ نقشبندیہ اویسیہ و سربراہ تنظیم الاخوان پاکستان کا جمعتہ المبارک کے روز خطاب۔\nانہوں نے کہا کہ سود نے آج معیشت کو اس قدر جکڑا ہوا ہے کہ سارے معاشرے سے پیسے کو صرف ایک طرف کھینچ کر جمع کیا جاتا ہے۔دنیا کے جو مقتدر حلقے ہوتے ہیں جب دنیا ہی ان کا مقصد ہو جاتا ہے پھر وہ ایسے نظام کو پسند کرتے ہیں جس سے ان کے پاس ہر طرف سے پیسہ آئے لیکن ان سے جائے نہیں۔انسانی وجود مٹی سے بنا ہے لیکن اسے جو حیات عطا فرمائی گئی وہ امر سے ہے۔اللہ کریم نے انسان کو عبادات کے لیے پیدا فرمایا لیکن اسے پابند نہیں فرمایا بلکہ اختیار دیا کہ چاہے تو شکر ادا کرے چاہے تو نا شکری کرے دونوں راستے کھول کر بیان فرما دئیے۔راہنمائی کے لیے انبیاء مبعوث فرمائے کتابیں نازل فرمائیں۔ارض و سماں کا وہ اکیلا خالق و مالک ہے انسان کو عارضی اختیار دیا ہے امانت کے طور پر اور فرمایا جو حدود و قیو د میں تمہیں دے رہا ہوں اس کے مطابق زندگی بسر کرو۔\nانہوں نے مزید کہا کہ اگر ایمان کا یہ درجہ نصیب ہو کہ میرا اللہ مجھے ہر لمحہ دیکھ رہا ہے،سن رہا ہے تو بندہ کس کیفیت میں ہو گا اور اس کے شب و روز کیسے ہوں گے جب اسے یہ احساس ہو جائے کہ میں نے اللہ کے حضور اپنے ایک ایک عمل کا حساب دینا ہے۔تو کیا جو کچھ ہم بول رہے ہیں بول سکتے ہیں جو کچھ ہم کر رہے ہیں کر سکتے ہیں۔اللہ کریم سب کو یہ حضوری کی کیفیت عطا فرمائے۔\nیاد رہے کہ مرکز دارالعرفان منارہ میں سلسلہ نقشبندیہ اویسیہ کے تحت5،6 ستمبر کو  ماہانہ اجتماع کے موقع پر بعثت رحمت عالم ﷺ کانفرنس کا انعقاد کیا جا رہا ہے جس میں اتوار دن گیارہ بجے حضرت شیخ المکرم مد ظلہ العالی خطاب فرمائیں گے اور اجتماعی دعا بھی ہوگی۔اس بابرکت پروگرام میں شرکت فرما کر اپنے دلوں کو برکات نبوی ﷺ سے منورہ کیجیے دعوت عام ہے۔",
+    "category": "pressReleases",
+    "checksum": "4de37d46315f79bc90ed8d676f64ca594f2cef54da32192bd8169f6c4c71728d",
+    "downloadUrls": [],
+    "id": "press-release-4282-2026-09-04-aj-ky-masail-ka-hal-islami-nizam-e-moeeshat-mein-hai",
+    "language": "ur",
+    "mediaUrls": [
+      "https://www.naqshbandiaowaisiah.org/uploads/4282/news%20(4).jpg"
+    ],
+    "publishedAt": "2026-09-04T00:00:00Z",
+    "rightsStatus": "permissionConfirmed",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/press-release/4282/2026-09-04-aj-ky-masail-ka-hal-islami-nizam-e-moeeshat-mein-hai.html",
+    "title": "Aj Ky Masail Ka Hal Islami Nizam E Moeeshat Mein Hai",
+    "titleUrdu": "آج کے مسائل کا حل اسلامی نظام معیشت میں ہے۔",
+    "type": "pressRelease"
   },
   {
     "bodyPlainText": "Reformation of the Heart\nTranslated Speech of\nHis Eminence Ameer Muhammad Akram Awan\nShaikh Silsilah Naqshbandiah Owaisiah\nThe holy Quran invariably associates guidance with illumination and reformation of the heart. It always ascribes the delusion of previous nations to the gloom of their hearts and also indicates the factors that contribute towards this malady. Similarly, it attributes guidance to heart's reformation and also suggests the methods of its attainment. This point has not just been mentioned casually but this is the fundamental and focal point of all its teachings.\nDifferent exercises are prescribed to keep each body organ healthy and fit. These exercises are practically taught in special schools of physical education. The patients who cannot do any other exercise are advised to stroll in their rooms to keep their organs agile and active. But it is amazing that we devote whole attention to our bodies and do not care about the health of our hearts. On the other hand, this important point has been repeatedly stressed in the Quran and it forms the basis of salvation in the Hereafter. The Muslim masses in general and the religious scholars in particular, ignore this important aspect as if it would come automatically. In our practical lives we never expect anything to happen by itself. No body leaves his children at large, hoping that they would be automatically educated by the society. On the contrary, he spends a lot of time and money to select a good school for them and despite best efforts, always remains concerned about the standard of their education. If you want to learn any profession, you would certainly have to devote a lot of time and effort. To learn a simple profession like masonry, driving, tailoring or shoe making, you would have to look for an expert and get his instructions. No body has ever argued that he can learn it on his own because all these professions are already being practised in the society. Had that been a correct contention, we would have learned to stitch our clothes, make our shoes or construct our houses, all by ourselves. No body believes this theory in his practical life. When we don't expect even the smallest event to happen by itself, how can we ignore the most important task, which is the key to eternal bliss, and expect to acquire it without any effort.\nThe holy Prophet (Sall Allah-o Alaihi wa Sallam) has stated that there is a lump of flesh in the human body whose health reforms the entire body and its malady disturbs the whole physical balance. \"Hearken\", he said \"that is the Qalb\" (heart). It is a miracle of the Prophets that the heart of every believer who attends their august company, attains to the acme of human excellence in a single moment. Even then, we find many Companions who specifically requested the holy Prophet-saw to give special attention to their hearts for greater reformation. Some requested him to move his blessed hand over their chest. In the words of Quran, every cell of a Companion's body resonated with Allah's Zikr. On their part, however, they didn't feel satisfied about their achievement and remained worried about their shortfalls. Once the holy Prophet-saw praised Hadhrat Abu Bakr Siddiq-rau and said, \"He is not superior to you because he excels you in worship but because of what I have poured from my heart into his. No other heart can acquire what his heart has acquired from mine.\"\nThe indifference shown to this most important aspect is the malady of our modern times only. During the yesteryears even the common Muslims tried to require this blessing. If you read the biography of previous scholars, you would discover that each one of them, without exception, after completing his education, remained in the company of some Shaikh for a definite period of time. It had been a regular practice of the religious institutions and scholars to dispatch their students to some Shaikh for spiritual enlightenment and self reformation.\nSome people object to our method of Zikr. We uphold their objection and concede that our method may not be necessarily correct. They should however, not stop us from Zikr but tell us the correct method and the number of people reformed by their way. Otherwise, we would be justified to conclude that they are only trying to undermine the efforts of those who are serving this cause. Actually, Allah and His Prophet-saw have not forbidden any particular method of Zikr. There is only one restriction; the form of Zikr should not cross the bounds of Shari‘ah. No one can adopt a method of Zikr which is evil or prejudices the rights of others or violates any injunction of the Shari‘ah. All forms of Zikr which remain within these prescribed limits are permissible. You can perform Zikr sitting, standing, walking or reclining. When Allah has given the permission, how can anyone else impose any restrictions? The form and frequency of Salah (prayers), Zakat (poor due) and Hajj have been defined by the Shari‘ah but no form has been prescribed for Zikr. The Divine Command enjoins the believers to perform Zikr continuously. It should be done at every moment and under all conditions, standing, sitting, reclining, sleeping and while awake. There is only one restriction. You cannot violate the limits defined by the holy Prophet-saw.\nWe are neither authorised to compel others to adopt our method nor declare a particular form as wrong. Similarly, no body has the right to ask us to leave our method. It is not the method of Zikr which really matters, but the spiritual attention of the Shaikh received by the seekers during Zikr. That is the real blessing. Without this attention, continuous Zikr of a whole lifetime cannot illuminate even the first Latifah (subtlety) Qalb. It simply cannot happen by itself. If someone has the land, water for irrigation, fertilisers and cultivation equipment, he still cannot grow any crop unless he sows the seed. Without the seed, his efforts would bring no fruit. The spiritual attention is akin to this seed. Even with the best of efforts, no spiritual growth can even be imagined without this attention. Reformation of the soul is one of the duties of Prophethood. The Taba’in reformed themselves in the company of the Companions and the Tab’a Taba’in acquired it from them. Just as a person has to go to a scholar to acquire knowledge, one has to similarly remain in the company of an accomplished Shaikh and strive earnestly to acquire spiritual blessings.\nAllah has mentioned that these people are not the first ones to inhabit the earth. Many generations have passed before them. Their predecessors also governed mighty empires and possessed huge property. Where have they all perished? If their forefathers could not perpetuate their existence, can these people live for ever? If they are following in the footsteps of their elders then have they prepared themselves for their onward journey? This single example is sufficient to teach a lesson. An infant spends his childhood in a family, becomes a father one day and ultimately a grandfather. His children know nothing about his grandparents, who had died much before the birth of his children. He doesn't realise that after a couple of generations no body will remember him. Only those, who are in his own lap, know him, but he would cease to exist in the memory of his grandchildren.\nAllah has warned mankind that He can grasp them instantly, if He so desires. Allah's grasp is always instant but people do not perceive. Apparently, the heavens do not fall and the earth is not torn asunder, but actually, an extremely important change takes place unnoticeably: hearts of the evil doers are sealed; they do not perceive and cannot differentiate between right and wrong. It is not necessary that the Divine wrath should descend in the form of a visible calamity, as for the previous generations. The sealing of hearts and the loss of sense of discrimination is an equally grave punishment, because no amount of good advice can ever reform such a person. This deprivation, when accompanied by worldly affluence, has been graded as the greatest curse by the Quran. These townships, whose fables are included in the folk lore, similarly sailed to their ultimate perdition. A darkened heart cannot perceive. Although a person retains his outwardly human form, but inwardly, he turns more beastly than an animal. By Allah's grace we are Muslims. Despite being delinquent, we still retain some honour and shame. But these human values are almost totally extinct in the non-Muslim societies. Their habits and relationships are not based on mutual human respect and consideration, but are driven by the animal instincts of selfishness, oppression, immodesty and the like. Apparently they are healthy, wealthy and strong people but their hearts are unclean. Like animals, they possess no sense of shame.\nThe Divine Book informs us that Allah never destroyed the earlier people before sending them guidance. His Messengers brought clear proofs to them but they refused to believe. Allah's Book and words of the Prophets do not impress a heart that has lost its faculty of perception. How can that heart be affected by any other preaching, advice or book? Such people with ruined hearts do not remain trustworthy. Their loyalty keeps swaying between Faith and Kufr (disbelief), and they are blinded by the frenzy to satisfy their vain desires. Their hearts take to vice. Perversion of thought and practice completely shrouds their lives.\nWe know that the symptoms of physical diseases are similar throughout the world. No disease is restricted to a particular area but would definitely develop at every conducive place. AIDS is not restricted to UK or USA alone; if we don't protect ourselves, it can invade our society also. The diseases are not related to colour, area or religion. They have the same effect everywhere. Similarly, when the hearts are ruined, they produce the same spiritual maladies at every place. We feel secure by presuming that only those nations whose heats are ruined will ultimately face their consequences. That is not a correct concept. If we fear the spread of physical epidemics and apprehend similar disaster as in other countries, why don't we realise that this spiritual epidemic can also engulf us? The maladies of hearts can import the same disaster from other countries.\nWe have seen the effect of Tabligh (preaching) day and night. Although preaching is a religious obligation, whose importance cannot be undermined, but actually it is the vehicle to acquire the reformation of heart. If you keep preaching about food but don't give someone a morsel throughout life, what good is your preaching for? I feel greatly surprised about the religious scholars. They accept the importance of heart reformation in their books and lectures but out rightly deny it in their practical lives.\nWhen the Tartars ransacked Baghdad, it was a seat of great religious learning. Every street resounded with religious discussions and meetings. Its libraries stocked the most valuable religious books. But despite all religious preaching what was the end result? The entire city along with its people, libraries and civilisation was completely destroyed. The whole Ummah still laments the destruction of its literary treasure. Why did all this happen? It happened because their hearts had been completely ruined. They rendered only lip service to religion, without absorbing its blessings in their hearts, least realising that it is the heart and not the tongue which generates effect.\nThe same principle has been recounted here. Earlier generations and civilisations were destroyed as a sequel to the ruination of their hearts. Human beings of today should also examine their own hearts. Are their hearts alive? A live heart would try to obey Allah; that is actually its food, without which it cannot survive. If it does not demand this food, then it would at least be unconscious or sick, if not totally dead. No one can really succeed unless he devotes proper attention to the reformation of his heart. That is what I have understood by Allah's grace. May Allah make it easy for us! Ameen!",
