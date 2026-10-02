@@ -131,6 +131,7 @@ final class ContentSyncServiceTests: XCTestCase {
             // exactly the store's size (194,341 − 181,698 = 12,643 narrators).
             + SeedBundle.hadithNarrators().count
             + SeedBundle.libraryItems().count
+            + SeedBundle.bookPages().count
             + SeedBundle.mediaItems().count
             + SeedBundle.events().count
             + SeedBundle.announcements().count
@@ -144,6 +145,12 @@ final class ContentSyncServiceTests: XCTestCase {
             category: nil, year: nil, month: nil, limit: 100_000
         )
         XCTAssertEqual(mediaItems.count, SeedBundle.mediaItems().count)
+
+        let pageRows = try await database.connection.query(
+            "SELECT COUNT(*) AS row_count FROM book_pages"
+        )
+        XCTAssertEqual(pageRows.first?.int("row_count"), SeedBundle.bookPages().count,
+                       "Every bundled book page must survive import")
 
         // Import triggers a full reindex, so the FTS table must have rows
         // whenever anything was imported.
