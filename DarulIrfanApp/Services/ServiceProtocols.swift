@@ -148,6 +148,8 @@ struct AudioPlayableItem: Sendable, Equatable, Identifiable {
 protocol AudioPlayerServicing: AnyObject {
     var nowPlaying: AudioPlayableItem? { get }
     var isPlaying: Bool { get }
+    var isBuffering: Bool { get }
+    var playbackError: String? { get }
     var currentTime: Double { get }
     var duration: Double { get }
     var playbackSpeed: PlaybackSpeed { get set }

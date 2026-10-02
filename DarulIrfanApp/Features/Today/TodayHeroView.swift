@@ -1,167 +1,129 @@
 import SwiftUI
 
-/// The living home hero: a time-of-day gradient with a glowing seal, the
-/// animated next-prayer countdown ring, dates, and the anchor verse. The
-/// centerpiece that makes the app feel alive and premium.
+/// Prayer, dates and personal progress, with the original Darul Irfan seal.
+/// The hierarchy adapts to accessibility text sizes without shrinking labels.
 struct TodayHeroView: View {
     let placeName: String?
+    let timeZone: TimeZone
     let gregorian: String
     let hijri: String
     let nextPrayerName: String?
     let nextPrayerTime: Date?
-    /// Today's prayer instants (for computing ring progress).
-    let dayTimes: [Date]
     let completedPrayers: Int
     let prayerGoal: Int
     let streakDays: Int
     let completionRate: Double
-
-    private func progress(at now: Date) -> Double {
-        guard let nextPrayerTime, !dayTimes.isEmpty else { return 0 }
-        let sorted = dayTimes.sorted()
-        let prev = sorted.last(where: { $0 <= now }) ?? sorted.first ?? now
-        let total = nextPrayerTime.timeIntervalSince(prev)
-        guard total > 0 else { return 0 }
-        return now.timeIntervalSince(prev) / total
-    }
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        ZStack {
-            DIGradient.hero()
-            DIPatternTexture(tint: .white, opacity: 0.07)
-            DIOctagram(innerRatio: 0.5)
-                .stroke(Color.white, lineWidth: 1.5)
-                .frame(width: 300, height: 300)
-                .opacity(0.06)
-                .offset(x: 90, y: -70)
-
-            VStack(spacing: DISpacing.md) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(DIGradient.greeting())
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.85))
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            VStack(alignment: .leading, spacing: DISpacing.lg) {
+                HStack(alignment: .top, spacing: DISpacing.md) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("DARUL IRFAN")
+                            .font(.caption.weight(.bold)).tracking(2)
+                            .foregroundStyle(DIColor.goldGlow)
+                        Text(DIGradient.greeting(for: context.date, timeZone: timeZone))
+                            .font(.title2.weight(.semibold)).foregroundStyle(.white)
+                            .fixedSize(horizontal: false, vertical: true)
                         if let placeName {
-                            HStack(spacing: DISpacing.xs) {
-                                Image(systemName: "location.fill").font(.caption2)
-                                Text(placeName).font(.subheadline.weight(.semibold))
-                            }
-                            .foregroundStyle(.white)
+                            Label(placeName, systemImage: "location.fill")
+                                .font(.subheadline).foregroundStyle(.white.opacity(0.9))
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
-                    Spacer()
-                    DILivingSealMark(diameter: 66)
+                    Spacer(minLength: 0)
+                    DISealEmblem(diameter: dynamicTypeSize.isAccessibilitySize ? 44 : 64, glow: false)
+                        .accessibilityHidden(true)
                 }
 
                 if let name = nextPrayerName, let time = nextPrayerTime {
-                    TimelineView(.periodic(from: .now, by: 60)) { context in
-                        PrayerCountdownRing(
-                            progress: progress(at: context.date),
-                            prayerName: name,
-                            target: time
-                        )
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        Text("Next prayer").font(.subheadline).foregroundStyle(.white.opacity(0.9))
+                        ViewThatFits(in: .horizontal) {
+                            HStack(alignment: .firstTextBaseline) {
+                                prayerName(name)
+                                Spacer(minLength: DISpacing.md)
+                                prayerTime(time)
+                            }
+                            VStack(alignment: .leading, spacing: 4) {
+                                prayerName(name)
+                                prayerTime(time)
+                            }
+                        }
+                        .accessibilityElement(children: .combine)
+                        HStack(spacing: DISpacing.sm) {
+                            Image(systemName: "hourglass").accessibilityHidden(true)
+                            if scenePhase == .active && time > context.date {
+                                Text(timerInterval: context.date...time, countsDown: true)
+                                    .monospacedDigit().fixedSize()
+                            } else {
+                                Text("Prayer time").fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .font(.headline).foregroundStyle(DIColor.goldGlow)
+                        // VoiceOver reads the stable prayer/time pair; a changing
+                        // second counter otherwise interrupts navigation.
+                        .accessibilityHidden(true)
                     }
-                    .padding(.vertical, DISpacing.xs)
+                    .padding(DISpacing.md)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 18))
                 } else {
-                    fallbackCrest
+                    Label("Set your location to see prayer times", systemImage: "location.circle")
+                        .font(.body).foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
-                devotionalMetrics
+                VStack(alignment: .leading, spacing: 6) {
+                    Label(gregorian, systemImage: "calendar")
+                    Label(hijri, systemImage: "moon")
+                }
+                .font(.subheadline).foregroundStyle(.white.opacity(0.92))
+                .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: DISpacing.md) {
-                    dateChip(icon: "calendar", text: gregorian)
-                    dateChip(icon: "moon", text: hijri)
+                Rectangle().fill(.white.opacity(0.2)).frame(height: 1).accessibilityHidden(true)
+                let layout = dynamicTypeSize.isAccessibilitySize
+                    ? AnyLayout(VStackLayout(alignment: .leading, spacing: DISpacing.md))
+                    : AnyLayout(HStackLayout(alignment: .top, spacing: DISpacing.md))
+                layout {
+                    metric("\(completedPrayers)/\(prayerGoal)", label: "Prayers today", icon: "checkmark.circle")
+                    metric("\(streakDays)", label: "Day streak", icon: "flame")
+                    metric("\(Int((min(max(completionRate.isFinite ? completionRate : 0, 0), 1) * 100).rounded()))%", label: "Last 30 days", icon: "chart.bar")
                 }
 
                 Text(DIBrand.anchorVerseArabic)
-                    .font(DIFont.quranArabic(scale: 0.72))
-                    .foregroundStyle(.white)
-                    .diGoldGlow(radius: 12, opacity: 0.5)
+                    .font(DIFont.quranArabic(scale: 0.72)).foregroundStyle(.white)
                     .environment(\.layoutDirection, .rightToLeft)
                     .multilineTextAlignment(.center)
-                    .padding(.top, DISpacing.xs)
+                    .frame(maxWidth: .infinity)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(DISpacing.lg)
+            .background(DIGradient.hero(for: context.date, timeZone: timeZone))
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         }
-        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
-        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
     }
 
-    private var devotionalMetrics: some View {
-        HStack(spacing: DISpacing.sm) {
-            homeMetric(
-                icon: "checkmark",
-                value: "\(completedPrayers)/\(prayerGoal)",
-                label: "Prayers",
-                progress: prayerGoal > 0 ? Double(completedPrayers) / Double(prayerGoal) : 0
-            )
-            homeMetric(
-                icon: "flame.fill",
-                value: "\(streakDays)",
-                label: "Day streak",
-                progress: min(Double(streakDays) / 7.0, 1)
-            )
-            homeMetric(
-                icon: "chart.line.uptrend.xyaxis",
-                value: "\(Int((min(max(completionRate, 0), 1) * 100).rounded()))%",
-                label: "30-day",
-                progress: completionRate
-            )
-        }
-        .accessibilityElement(children: .contain)
+    private func prayerName(_ name: String) -> some View {
+        Text(name).font(.largeTitle.weight(.semibold))
+            .foregroundStyle(.white).fixedSize(horizontal: false, vertical: true)
     }
 
-    private func homeMetric(
-        icon: String,
-        value: String,
-        label: LocalizedStringKey,
-        progress: Double
-    ) -> some View {
-        VStack(spacing: 4) {
-            ZStack {
-                Circle().stroke(Color.white.opacity(0.16), lineWidth: 4)
-                Circle()
-                    .trim(from: 0, to: min(max(progress, 0), 1))
-                    .stroke(DIColor.goldGlow, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                Image(systemName: icon)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: 34, height: 34)
-            Text(verbatim: value)
-                .font(.caption.weight(.bold).monospacedDigit())
-                .foregroundStyle(.white)
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.white.opacity(0.72))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
+    private func prayerTime(_ time: Date) -> some View {
+        Text(time, style: .time).environment(\.timeZone, timeZone)
+            .font(.title2.weight(.medium).monospacedDigit()).foregroundStyle(.white)
+            .fixedSize(horizontal: true, vertical: false)
+    }
+
+    private func metric(_ value: String, label: LocalizedStringKey, icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(value, systemImage: icon).font(.headline).foregroundStyle(.white)
+            Text(label).font(.caption).foregroundStyle(.white.opacity(0.92))
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.09)))
+        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
-    }
-
-    private var fallbackCrest: some View {
-        VStack(spacing: DISpacing.sm) {
-            DILivingSealMark(diameter: 92)
-            Text("Set your location to see prayer times")
-                .font(.footnote)
-                .foregroundStyle(.white.opacity(0.85))
-        }
-        .padding(.vertical, DISpacing.sm)
-    }
-
-    private func dateChip(icon: String, text: String) -> some View {
-        HStack(spacing: DISpacing.xs) {
-            Image(systemName: icon).font(.caption2)
-            Text(text).font(.caption.weight(.medium)).lineLimit(1).minimumScaleFactor(0.8)
-        }
-        .foregroundStyle(.white.opacity(0.92))
-        .padding(.horizontal, DISpacing.sm)
-        .padding(.vertical, 6)
-        .background(Capsule().fill(Color.white.opacity(0.14)))
     }
 }

@@ -20,24 +20,22 @@ struct PrayerTabView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.md) {
-                    // Living hero — time-of-day gradient, glowing seal, animated
-                    // next-prayer countdown ring, dates, and the anchor verse.
+                    // A readable prayer overview using the selected place's clock.
                     TodayHeroView(
                         placeName: appState.activePlace?.name,
+                        timeZone: appState.activePlace?.timeZone ?? .current,
                         gregorian: viewModel.gregorianDateText,
                         hijri: viewModel.hijriDateText,
                         nextPrayerName: viewModel.nextPrayer.map {
                             String(localized: String.LocalizationValue($0.prayer.englishName))
                         },
                         nextPrayerTime: viewModel.nextPrayer?.time,
-                        dayTimes: viewModel.todaySchedule?.orderedTimes.filter { $0.prayer.isObligatory }.map { $0.time } ?? [],
                         completedPrayers: viewModel.completedPrayerCount,
                         prayerGoal: Prayer.obligatory.count,
                         streakDays: viewModel.streakSummary?.currentStreakDays ?? 0,
                         completionRate: viewModel.streakSummary?.completionRate ?? 0
                     )
                     .diAppear()
-                    .diParallaxHero()
                     if !viewModel.hasLoaded {
                         loadingView
                     } else if appState.activePlace != nil {

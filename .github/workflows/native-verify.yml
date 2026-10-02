@@ -1,0 +1,41 @@
+name: iOS native verification
+on:
+  pull_request:
+    paths:
+      - 'DarulIrfanApp/**'
+      - 'DarulIrfanTests/**'
+      - 'DarulIrfanUITests/**'
+      - 'Widgets/**'
+      - 'WatchApp/**'
+      - 'project.yml'
+      - '.github/workflows/native-verify.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+      - name: Check native content presentation
+        run: python3 Tools/validate_native_presentation.py
+      - name: Build all simulator targets
+        run: xcodebuild build -project DarulIrfan.xcodeproj -scheme DarulIrfan -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO -resultBundlePath build/Build.xcresult
+      - name: Run tests on an available iPhone
+        shell: bash
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(v["udid"] for group in d["devices"].values() for v in group if v["name"].startswith("iPhone")))')
+          xcodebuild test -project DarulIrfan.xcodeproj -scheme DarulIrfan -destination "platform=iOS Simulator,id=$DEVICE_ID" CODE_SIGNING_ALLOWED=NO -resultBundlePath build/Tests.xcresult
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-verification
+          path: build/*.xcresult

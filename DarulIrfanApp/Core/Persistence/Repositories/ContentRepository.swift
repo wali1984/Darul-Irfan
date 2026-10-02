@@ -16,6 +16,19 @@ struct ContentRepository: ContentRepositoryProtocol {
 
     // MARK: - Items
 
+    func categoryCounts() async throws -> [ContentCategory: Int] {
+        let rows = try await database.connection.query(
+            "SELECT category, COUNT(*) AS item_count FROM content_items GROUP BY category"
+        )
+        var counts: [ContentCategory: Int] = [:]
+        for row in rows {
+            if let raw = row.text("category"), let category = ContentCategory(rawValue: raw) {
+                counts[category] = row.int("item_count") ?? 0
+            }
+        }
+        return counts
+    }
+
     func items(
         category: ContentCategory?,
         type: ContentType?,

@@ -23,6 +23,15 @@ struct LibraryTabView: View {
                     libraryHero
                         .diAppear()
                     featuredSection
+                    if viewModel.loadFailed {
+                        VStack(alignment: .leading, spacing: DISpacing.sm) {
+                            Text("The library could not be refreshed. Your saved items are still available.")
+                                .font(.callout)
+                            Button("Retry") { Task { await viewModel.reloadHome() } }
+                                .buttonStyle(.bordered)
+                                .disabled(viewModel.isLoading)
+                        }
+                    }
                     if viewModel.hasLoadedCounts {
                         if viewModel.totalItemCount > 0 {
                             categorySections
@@ -36,7 +45,7 @@ struct LibraryTabView: View {
                             .diOctagramWatermark(size: 260, opacity: 0.05)
                             .diAppear(delay: 0.1)
                         }
-                    } else {
+                    } else if !viewModel.loadFailed {
                         loadingSection
                     }
                 }

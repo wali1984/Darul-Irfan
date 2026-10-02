@@ -20,6 +20,8 @@ final class AudioPlayerService: AudioPlayerServicing {
 
     private(set) var nowPlaying: AudioPlayableItem?
     private(set) var isPlaying: Bool = false
+    private(set) var isBuffering: Bool = false
+    private(set) var playbackError: String?
     private(set) var currentTime: Double = 0
     private(set) var duration: Double = 0
     private(set) var queue: [AudioPlayableItem] = []
@@ -48,6 +50,8 @@ final class AudioPlayerService: AudioPlayerServicing {
     @ObservationIgnored private var interruptionObserver: NSObjectProtocol?
     @ObservationIgnored private var routeChangeObserver: NSObjectProtocol?
     @ObservationIgnored private var resumeTask: Task<Void, Never>?
+    @ObservationIgnored private var playerStateObserver: NSKeyValueObservation?
+    @ObservationIgnored private var itemStateObserver: NSKeyValueObservation?
     @ObservationIgnored private var lastProgressSaveDate: Date = .distantPast
     @ObservationIgnored private var wasPlayingBeforeInterruption: Bool = false
 
@@ -82,7 +86,7 @@ final class AudioPlayerService: AudioPlayerServicing {
 
         // Tapping the item that is already loaded just updates the queue and
         // resumes if paused, instead of restarting from the top.
-        if let current = nowPlaying, current.id == item.id, player != nil {
+        if let current = nowPlaying, current.id == item.id, player != nil, playbackError == nil {
             queue = resolvedQueue
             if !isPlaying {
                 resumePlayback()
@@ -100,20 +104,24 @@ final class AudioPlayerService: AudioPlayerServicing {
         queue = resolvedQueue
         currentTime = 0
         duration = 0
+        playbackError = nil
+        isPlaying = false
+        isBuffering = false
 
-        activateAudioSession()
+        guard activateAudioSession() else { return }
 
         let playerItem = AVPlayerItem(url: item.url)
         let newPlayer = AVPlayer(playerItem: playerItem)
         newPlayer.defaultRate = Float(playbackSpeed.rawValue)
         player = newPlayer
+        installStateObservers(on: newPlayer, item: playerItem)
 
         installTimeObserver(on: newPlayer)
         installItemEndObserver(for: playerItem)
 
         newPlayer.play()
         newPlayer.rate = Float(playbackSpeed.rawValue)
-        isPlaying = true
+        isBuffering = true
         lastProgressSaveDate = Date()
 
         updateNowPlayingInfo()
@@ -121,8 +129,10 @@ final class AudioPlayerService: AudioPlayerServicing {
     }
 
     func togglePlayPause() {
-        guard nowPlaying != nil else { return }
-        if isPlaying {
+        guard let item = nowPlaying else { return }
+        if playbackError != nil {
+            play(item, queue: queue)
+        } else if isPlaying || isBuffering {
             pausePlayback()
         } else {
             resumePlayback()
@@ -131,6 +141,8 @@ final class AudioPlayerService: AudioPlayerServicing {
 
     func seek(to seconds: Double) {
         guard let player else { return }
+        resumeTask?.cancel()
+        resumeTask = nil
         var target = seconds.isFinite ? seconds : 0
         target = max(0, target)
         if duration > 0 {
@@ -189,6 +201,8 @@ final class AudioPlayerService: AudioPlayerServicing {
 
         nowPlaying = nil
         isPlaying = false
+        isBuffering = false
+        playbackError = nil
         currentTime = 0
         duration = 0
         queue = []
@@ -220,16 +234,17 @@ final class AudioPlayerService: AudioPlayerServicing {
     private func pausePlayback() {
         player?.pause()
         isPlaying = false
+        isBuffering = false
         persistProgressNow()
         updateNowPlayingInfo()
     }
 
     private func resumePlayback() {
         guard nowPlaying != nil, let player else { return }
-        activateAudioSession()
+        guard activateAudioSession() else { return }
         player.play()
         player.rate = Float(playbackSpeed.rawValue)
-        isPlaying = true
+        isBuffering = true
         lastProgressSaveDate = Date()
         updateNowPlayingInfo()
     }
@@ -302,6 +317,7 @@ final class AudioPlayerService: AudioPlayerServicing {
     // MARK: - Player wiring
 
     private func installTimeObserver(on player: AVPlayer) {
+        let identity = ObjectIdentifier(player)
         let interval = CMTime(seconds: 0.5, preferredTimescale: 600)
         timeObserverToken = player.addPeriodicTimeObserver(
             forInterval: interval,
@@ -309,24 +325,31 @@ final class AudioPlayerService: AudioPlayerServicing {
         ) { [weak self] time in
             let seconds = time.seconds
             Task { @MainActor in
+                guard let active = self?.player, ObjectIdentifier(active) == identity else { return }
                 self?.handlePeriodicTick(playheadSeconds: seconds)
             }
         }
     }
 
     private func installItemEndObserver(for item: AVPlayerItem) {
+        let identity = ObjectIdentifier(item)
         itemEndObserver = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,
             object: item,
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
+                guard let active = self?.player?.currentItem, ObjectIdentifier(active) == identity else { return }
                 self?.handleItemDidEnd()
             }
         }
     }
 
     private func teardownPlayer() {
+        playerStateObserver?.invalidate()
+        itemStateObserver?.invalidate()
+        playerStateObserver = nil
+        itemStateObserver = nil
         if let token = timeObserverToken, let player {
             player.removeTimeObserver(token)
         }
@@ -339,6 +362,30 @@ final class AudioPlayerService: AudioPlayerServicing {
 
         player?.pause()
         player = nil
+    }
+
+    private func installStateObservers(on player: AVPlayer, item: AVPlayerItem) {
+        let identity = ObjectIdentifier(player)
+        playerStateObserver = player.observe(\.timeControlStatus, options: [.initial, .new]) { [weak self] _, _ in
+            Task { @MainActor in self?.synchronizePlaybackState(identity: identity) }
+        }
+        itemStateObserver = item.observe(\.status, options: [.initial, .new]) { [weak self] _, _ in
+            Task { @MainActor in self?.synchronizePlaybackState(identity: identity) }
+        }
+    }
+
+    private func synchronizePlaybackState(identity: ObjectIdentifier) {
+        guard let player, ObjectIdentifier(player) == identity else { return }
+        if player.currentItem?.status == .failed {
+            isPlaying = false
+            isBuffering = false
+            playbackError = "Audio could not be loaded. Check your connection and tap Retry."
+            persistProgressNow()
+        } else {
+            isPlaying = player.timeControlStatus == .playing
+            isBuffering = player.timeControlStatus == .waitingToPlayAtSpecifiedRate
+        }
+        updateNowPlayingInfo()
     }
 
     // MARK: - Audio session
@@ -355,12 +402,16 @@ final class AudioPlayerService: AudioPlayerServicing {
         }
     }
 
-    private func activateAudioSession() {
+    private func activateAudioSession() -> Bool {
         do {
             try AVAudioSession.sharedInstance().setActive(true)
+            playbackError = nil
+            return true
         } catch {
-            // Activation can fail during a phone call; playback will simply
-            // not start and the user can retry.
+            isPlaying = false
+            isBuffering = false
+            playbackError = "Audio is unavailable right now. Finish your call or other audio session, then tap Retry."
+            return false
         }
     }
 
@@ -387,8 +438,8 @@ final class AudioPlayerService: AudioPlayerServicing {
         }
         switch type {
         case .began:
-            wasPlayingBeforeInterruption = isPlaying
-            if isPlaying {
+            wasPlayingBeforeInterruption = isPlaying || isBuffering
+            if isPlaying || isBuffering {
                 pausePlayback()
             }
         case .ended:
@@ -416,7 +467,7 @@ final class AudioPlayerService: AudioPlayerServicing {
             }
             // Headphones unplugged: pause instead of blasting the speaker.
             Task { @MainActor in
-                guard let self, self.isPlaying else { return }
+                guard let self, self.isPlaying || self.isBuffering else { return }
                 self.pausePlayback()
             }
         }
@@ -451,8 +502,9 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.playCommand.isEnabled = true
         center.playCommand.addTarget { [weak self] _ in
             Task { @MainActor in
-                guard let self, self.nowPlaying != nil, !self.isPlaying else { return }
-                self.resumePlayback()
+                guard let self, let item = self.nowPlaying, !self.isPlaying else { return }
+                if self.playbackError != nil { self.play(item, queue: self.queue) }
+                else { self.resumePlayback() }
             }
             return .success
         }
@@ -460,7 +512,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.pauseCommand.isEnabled = true
         center.pauseCommand.addTarget { [weak self] _ in
             Task { @MainActor in
-                guard let self, self.isPlaying else { return }
+                guard let self, self.isPlaying || self.isBuffering else { return }
                 self.pausePlayback()
             }
             return .success
