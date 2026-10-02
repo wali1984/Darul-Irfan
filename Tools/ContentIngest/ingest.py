@@ -17,6 +17,7 @@ Dependencies: requests, beautifulsoup4 (see requirements.txt).
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -468,6 +469,17 @@ def write_outputs(out_dir: Path, payload: Dict[str, Any],
 
 
 def _write_manifest(out_dir: Path, generated_at: Optional[str] = None) -> None:
+    previous = load_json(out_dir / MANIFEST_FILE) or {}
+    fingerprint = hashlib.sha256()
+    for filename in ["articles.json", "documents.json", "media.json", "events.json", TAFSIR_FILE]:
+        fingerprint.update(filename.encode("utf-8"))
+        fingerprint.update(schema.json_dumps_stable(load_json(out_dir / filename)).encode("utf-8"))
+    content_hash = fingerprint.hexdigest()
+    # Installed apps compare `version` numerically. A constant schema version
+    # prevented every later catalogue from being applied after the first sync.
+    if previous.get("contentHash") == content_hash:
+        return
+    version = max(0, int(previous.get("version", 0))) + 1
     counts: Dict[str, int] = {}
     for file_name, count_key in (("articles.json", "articles"),
                                  ("documents.json", "documents"),
@@ -487,7 +499,9 @@ def _write_manifest(out_dir: Path, generated_at: Optional[str] = None) -> None:
     # payload names (ContentSyncService.understoodNames): articles, documents,
     # media, events. Filenames resolve relative to the manifest's own URL.
     manifest = {
-        "version": schema.SCHEMA_VERSION,
+        "version": version,
+        "schemaVersion": schema.SCHEMA_VERSION,
+        "contentHash": content_hash,
         "generatedAt": generated_at,
         "counts": counts,
         "files": {
