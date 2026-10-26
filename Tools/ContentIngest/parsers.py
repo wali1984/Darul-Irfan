@@ -324,6 +324,19 @@ def parse_article_page(html: str, page_url: str,
                                                  "c-navbar", "c-navbar-wrapper",
                                                  "mynavbar", "c-content-highlights"]):
             junk.decompose()
+        # The current layout's Highlights carousel is a pair of sibling
+        # divs, not c-content-highlights. Strip only that identified widget.
+        for heading in list(node.select("div.c-content-title-1 > h3")):
+            if heading.get_text(" ", strip=True) != "Highlights":
+                continue
+            widget_title = heading.parent
+            widget = widget_title.find_next_sibling("div")
+            if widget is not None and widget.select_one(".c-content-media-2-slider"):
+                widget.decompose()
+                widget_title.decompose()
+        for hidden in list(node.find_all("div", style=True)):
+            if re.search(r"font-size\s*:\s*3px", hidden["style"]) and hidden.get_text(strip=True).startswith("External Links - References:"):
+                hidden.decompose()
         lines = [line.strip() for line in node.get_text("\n").splitlines()]
         body = "\n".join(line for line in lines if line) or None
 

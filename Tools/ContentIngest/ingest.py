@@ -17,6 +17,7 @@ Dependencies: requests, beautifulsoup4 (see requirements.txt).
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -29,6 +30,7 @@ import requests
 
 import parsers
 import schema
+import updates
 
 # Make console output safe on Windows code pages (warnings may reference
 # URLs only, but be defensive).
@@ -40,14 +42,14 @@ for _stream in (sys.stdout, sys.stderr):
             pass
 
 DEFAULT_BASE_URL = "https://www.naqshbandiaowaisiah.org"
-USER_AGENT = "DarulIrfanContentIngest/1.0 (+mailto:contact-email-placeholder@example.org)"
+USER_AGENT = "DarulIrfanContentIngest/1.0 (+https://naqshbandiaowaisiah.us)"
 DEFAULT_RATE_LIMIT_SECONDS = 1.5
 DEFAULT_MAX_PAGES = 200
 REQUEST_TIMEOUT_SECONDS = 30
 RETRY_ATTEMPTS = 3
 RETRY_BACKOFF_SECONDS = 2.0
 
-ALL_SECTIONS = ("about", "lectures", "books", "magazines", "articles", "tafsir")
+ALL_SECTIONS = ("about", "lectures", "books", "magazines", "articles", "tafsir", "updates")
 
 # Verified about pages (Docs/RESEARCH_NOTES.md) → ContentCategory rawValue.
 ABOUT_PAGES = (
@@ -468,6 +470,17 @@ def write_outputs(out_dir: Path, payload: Dict[str, Any],
 
 
 def _write_manifest(out_dir: Path, generated_at: Optional[str] = None) -> None:
+    previous = load_json(out_dir / MANIFEST_FILE) or {}
+    fingerprint = hashlib.sha256()
+    for filename in ["articles.json", "documents.json", "media.json", "events.json", TAFSIR_FILE]:
+        fingerprint.update(filename.encode("utf-8"))
+        fingerprint.update(schema.json_dumps_stable(load_json(out_dir / filename)).encode("utf-8"))
+    content_hash = fingerprint.hexdigest()
+    # Installed apps compare `version` numerically. A constant schema version
+    # prevented every later catalogue from being applied after the first sync.
+    if previous.get("contentHash") == content_hash:
+        return
+    version = max(0, int(previous.get("version", 0))) + 1
     counts: Dict[str, int] = {}
     for file_name, count_key in (("articles.json", "articles"),
                                  ("documents.json", "documents"),
@@ -487,7 +500,9 @@ def _write_manifest(out_dir: Path, generated_at: Optional[str] = None) -> None:
     # payload names (ContentSyncService.understoodNames): articles, documents,
     # media, events. Filenames resolve relative to the manifest's own URL.
     manifest = {
-        "version": schema.SCHEMA_VERSION,
+        "version": version,
+        "schemaVersion": schema.SCHEMA_VERSION,
+        "contentHash": content_hash,
         "generatedAt": generated_at,
         "counts": counts,
         "files": {
@@ -777,6 +792,14 @@ def cmd_crawl(args: argparse.Namespace) -> int:
                             article_html, link["url"], include_body=True)
                 payload["articles"].append(content_item_from_article_link(
                     link, rights_status, meta=meta, include_body=include_body))
+
+    # -- latest source notices, event reports and supported interviews -------
+    if "updates" in sections and not fetcher.cap_reached:
+        recent, recent_warnings = updates.crawl_updates(fetcher, base_url, rights_status, include_body)
+        for group, rows in recent.items():
+            if payload[group] is None: payload[group] = []
+            payload[group].extend(rows)
+        warnings.extend(recent_warnings)
 
     # -- tafsir index ---------------------------------------------------------
     if "tafsir" in sections and not fetcher.cap_reached:

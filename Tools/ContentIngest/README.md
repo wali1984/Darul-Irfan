@@ -42,9 +42,8 @@ python ingest.py crawl \
 
 The crawler checks `robots.txt` at startup (the site is fully permissive,
 but this is verified at runtime), identifies itself as
-`DarulIrfanContentIngest/1.0 (+mailto:contact-email-placeholder@example.org)`
-(replace the placeholder address with a real maintainer contact before
-running against the live site), and retries failed requests with
+`DarulIrfanContentIngest/1.0 (+https://naqshbandiaowaisiah.us)`
+and retries failed requests with
 exponential backoff.
 
 MP3 URLs are always harvested from the actual `href` attributes — lecture
@@ -108,8 +107,10 @@ Item IDs are slugs of the item's most specific source URL path (lecture
 detail page, book/magazine PDF, article page), so re-runs are stable.
 `checksum` is a sha256 over the item's normalized fields (excluding
 `checksum` and `curated`), letting the app's sync detect changes cheaply.
-Re-running an unchanged crawl produces byte-identical files; only the
-manifest's `generatedAt` moves.
+Re-running an unchanged crawl produces byte-identical files, including the
+manifest. Its `version` increases only when payload content changes;
+`schemaVersion` identifies the JSON contract. Installed apps use the increasing
+revision to apply later catalogues. `contentHash` fingerprints the exact payloads.
 
 ## Rights policy
 
@@ -163,3 +164,7 @@ Tests run entirely offline against saved HTML fixtures in
 `Docs/RESEARCH_NOTES.md`, including the irregular `%20` MP3 filename).
 They cover exact parser outputs, WMA exclusion, idempotent re-runs,
 curated-merge behavior, and output validation.
+
+## Current notices and event reports
+
+The `updates` section scans the latest three index pages of official press releases, announcements, seminars and TV interviews. It preserves exact titles, Urdu headings, author lines, visible prose and official image URLs. Categories follow the source URL section. Seminar dates are explicitly approximate because the source gives a civil date without a clock time. Unsupported or missing video embeds are recorded as warnings, never replaced by an invented stream. Existing archived records remain in the catalogue.
