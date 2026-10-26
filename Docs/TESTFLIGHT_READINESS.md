@@ -79,15 +79,16 @@ Everything here was run and passed on this machine:
 
 ## Blocking testers
 
-1. **[blocker] Apple Developer portal registration.** `project.yml` builds four
-   signed bundles: `us.naqshbaniaowaisiah`, `.widgets`, `.watchkitapp` and
-   `.watchkitapp.widgets`. All four need identifiers; the app and the iOS
-   widget need the App Group `group.us.naqshbaniaowaisiah`; the app needs the
-   push capability (`aps-environment: production`). A missing identifier,
-   group or capability fails `ios-testflight` at the signing step, not at
-   compile, so the failure arrives late. An earlier release shipped with the
-   widget and App Group removed precisely to get past this; they are back in
-   `project.yml` now, so this must be right before a tag.
+1. ~~**[blocker] Apple Developer portal registration.**~~ **Already proven.**
+   `project.yml` builds four signed bundles: `us.naqshbaniaowaisiah`,
+   `.widgets`, `.watchkitapp` and `.watchkitapp.widgets`, needing all four
+   identifiers, the App Group `group.us.naqshbaniaowaisiah` on the app and the
+   iOS widget, and the push capability. `ios-testflight` is the workflow that
+   signs all of them, and it **succeeded** on `e1ee654` — which it could not
+   have done with a missing identifier, group or capability. The portal is
+   therefore in order, and the earlier release that dropped the widget and App
+   Group to get past signing is history. Nothing to do here unless the
+   identifiers change.
 2. **[blocker] Written content permission on file.** The owner granted content
    rights verbally on 2026-07-10 and the seed ships
    `rightsStatus: permissionConfirmed`. Keep the written confirmation with the
