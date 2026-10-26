@@ -95,6 +95,15 @@ struct MoreTabView: View {
             ) {
                 EventsHomeView(dependencies: dependencies, appState: appState)
             }
+
+            MoreNavLink(
+                titleKey: "Private groups",
+                subtitleKey: "Members only — your region's announcements and zikr",
+                systemImage: "lock.shield",
+                delay: 0.22
+            ) {
+                GroupsHomeView()
+            }
         }
     }
 

@@ -91,8 +91,19 @@ before archiving.
 - [ ] **Background audio**: the `audio` background mode is used solely to
       continue user-initiated lecture/recitation playback with Lock Screen
       controls.
-- [ ] **No account** is needed; reviewers can exercise every feature
-      immediately after onboarding (no demo credentials).
+- [ ] **No account** is needed for prayer times, Quran, hadith, books or
+      lectures; a reviewer can exercise all of that immediately after
+      onboarding with no credentials.
+- [ ] **Private groups do create an account** via Sign in with Apple, so:
+      in-app account deletion is mandatory (5.1.1(v)) and lives on the groups
+      screen; the privacy manifest declares User ID and Name as linked; and the
+      Sign in with Apple capability must be enabled on the App ID in the
+      developer portal or signing fails even though the build compiles.
+- [ ] Tell review that a reviewer who signs in will correctly see **no groups**:
+      membership is granted by an administrator, so an empty state is the
+      expected result and not a broken feature. Members cannot post — admins
+      publish and members read — so the user-generated-content obligations of
+      guideline 1.2 do not apply to member-to-member content.
 - [ ] Explain the official read-only social feed, non-persistent YouTube
       embed, Paltalk handoff, opt-in APNs alerts, 30-day opt-in MetricKit
       diagnostics, and Cloudflare-hosted public configuration.

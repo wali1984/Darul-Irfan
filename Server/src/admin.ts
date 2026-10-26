@@ -2,6 +2,7 @@ import type { Env } from "./contracts";
 import { cleanText, json, validHTTPURL, validISODate } from "./util";
 import { authenticatedActor } from "./access";
 import { sendTopicPush } from "./apns";
+import { publishGroupPost, setGroupMembership } from "./members";
 
 export async function adminRequest(request: Request, env: Env, path: string): Promise<Response> {
   const actor = await authenticatedActor(request, env);
@@ -22,6 +23,21 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
     const id = entityID(path); if (!id) return json({ error: "Invalid announcement ID" }, { status: 400 });
     const item = await env.DB.prepare("SELECT id,source,kind,title,body,source_url,image_url,published_at,is_featured,publication_status,expires_at FROM feed_items WHERE id=? AND source='announcement'").bind(id).first();
     return item ? json({ preview: item }) : json({ error: "Announcement not found" }, { status: 404 });
+  }
+  if (request.method === "GET" && path === "/admin/api/groups") {
+    const [groups, members] = await Promise.all([
+      env.DB.prepare("SELECT id,name,description,meeting_url,meeting_note,is_active FROM member_groups ORDER BY name").all(),
+      env.DB.prepare(`SELECT g.group_id,g.member_id,g.added_at,m.display_name,m.email
+        FROM member_group_members g JOIN members m ON m.id=g.member_id ORDER BY g.group_id,g.added_at`).all(),
+    ]);
+    return json({ groups: groups.results, memberships: members.results });
+  }
+  // Members who have signed in but belong to no group yet: the queue an admin
+  // works through, since signing in grants nothing on its own.
+  if (request.method === "GET" && path === "/admin/api/groups/pending") {
+    const pending = await env.DB.prepare(`SELECT id,display_name,email,created_at FROM members
+      WHERE id NOT IN (SELECT member_id FROM member_group_members) ORDER BY created_at DESC LIMIT 200`).all();
+    return json({ pending: pending.results });
   }
   if (request.method !== "GET" && path !== "/admin/api/push" && !hasRole(actor, env.ADMIN_EDITOR_EMAILS)) {
     return json({ error: "Editor role required" }, { status: 403 });
@@ -84,6 +100,37 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
     const after = await env.DB.prepare("SELECT * FROM feed_items WHERE id=?").bind(id).first();
     await audit(env, actor, "moderate", "feedItem", id, before, after, now);
     return json({ ok: true, item: after });
+  }
+  // /admin/api/groups/{group}                       -> meeting link and state
+  // /admin/api/groups/{group}/posts/{post}           -> publish or edit a post
+  // /admin/api/groups/{group}/members/{member}       -> grant or revoke access
+  const groupRoute = /^\/admin\/api\/groups\/([a-z0-9-]{1,40})(?:\/(posts|members)\/([A-Za-z0-9:_-]{1,150}))?$/.exec(path);
+  if (request.method === "PUT" && groupRoute) {
+    const groupID = groupRoute[1] as string;
+    const kind = groupRoute[2];
+    const entity = groupRoute[3];
+    const input = await request.json<Record<string, unknown>>();
+    const now = new Date().toISOString();
+    if (!kind) {
+      const before = await env.DB.prepare("SELECT * FROM member_groups WHERE id=?").bind(groupID).first();
+      if (!before) return json({ error: "Unknown group" }, { status: 404 });
+      await env.DB.prepare("UPDATE member_groups SET meeting_url=?,meeting_note=?,is_active=?,updated_at=? WHERE id=?")
+        .bind(validHTTPURL(input.meetingURL) ?? null, cleanText(input.meetingNote, 500) ?? null,
+          input.isActive === false ? 0 : 1, now, groupID).run();
+      const after = await env.DB.prepare("SELECT * FROM member_groups WHERE id=?").bind(groupID).first();
+      await audit(env, actor, "update", "member_group", groupID, before, after, now);
+      return json({ ok: true, group: after });
+    }
+    if (kind === "posts" && entity) {
+      const response = await publishGroupPost(env, actor, groupID, entity, input);
+      if (response.ok) await audit(env, actor, "publish", "member_group_post", `${groupID}:${entity}`, null, input, now);
+      return response;
+    }
+    if (kind === "members" && entity) {
+      const response = await setGroupMembership(env, actor, groupID, entity, input.member !== false);
+      if (response.ok) await audit(env, actor, "membership", "member_group_member", `${groupID}:${entity}`, null, { member: input.member !== false }, now);
+      return response;
+    }
   }
   if (request.method === "POST" && path === "/admin/api/push") {
     if (!hasRole(actor, env.ADMIN_BROADCASTER_EMAILS)) return json({ error: "Broadcaster role required" }, { status: 403 });

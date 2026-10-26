@@ -92,4 +92,29 @@ export interface Env {
   WHATSAPP_APP_SECRET?: string;
   WHATSAPP_ALLOWED_SENDERS?: string;
   WHATSAPP_CHANNEL_URL?: string;
+  /** Audience of an Apple identity token: the app's bundle id. Falls back to
+   *  APNS_TOPIC, which is the same value. */
+  APPLE_CLIENT_ID?: string;
+}
+
+/** A private regional group as its members see it. The catalogue of groups is
+ *  itself private, so a member is only ever told about their own. */
+export interface MemberGroup {
+  id: string;
+  name: string;
+  description?: string;
+  meetingURL?: string;
+  meetingNote?: string;
+}
+
+export type MemberGroupPostKind = "announcement" | "zikr";
+
+export interface MemberGroupPost {
+  id: string;
+  kind: MemberGroupPostKind;
+  title: string;
+  body?: string;
+  youtubeVideoID?: string;
+  linkURL?: string;
+  publishedAt: string;
 }

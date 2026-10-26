@@ -4,6 +4,7 @@ import { bootstrap, feed, liveBroadcast } from "./repository";
 import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
 import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
 import { whatsappSubscription, whatsappWebhook } from "./whatsapp";
+import { authenticatedMember, createSession, deleteMember, groupPosts, listGroups } from "./members";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -28,6 +29,26 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path === "/v1/whatsapp") {
     if (request.method === "GET") return whatsappSubscription(env, url);
     if (request.method === "POST") return whatsappWebhook(request, env, await request.text());
+    return json({ error: "Not found" }, { status: 404 });
+  }
+  // Private regional groups. Everything past the session exchange requires a
+  // member bearer token, and none of it is reachable from the public feed.
+  if (request.method === "POST" && path === "/v1/members/session") {
+    if (!await withinWriteLimit(request, env, "member-session", 20)) return json({ error: "Too many requests" }, { status: 429 });
+    return createSession(request, env);
+  }
+  if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
+    const member = await authenticatedMember(request, env);
+    if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
+    if (request.method === "GET" && path === "/v1/groups") return listGroups(env, member);
+    // Apple requires an account made in the app to be deletable from inside it.
+    if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
+    const posts = /^\/v1\/groups\/([a-z0-9-]{1,40})\/posts$/.exec(path);
+    if (request.method === "GET" && posts) {
+      const limit = Number(url.searchParams.get("limit") ?? 30);
+      if (!Number.isInteger(limit) || limit < 1 || limit > 100) return json({ error: "Limit must be an integer from 1 to 100" }, { status: 400 });
+      return groupPosts(env, member, posts[1] as string, limit);
+    }
     return json({ error: "Not found" }, { status: 404 });
   }
   if (request.method === "POST" && path === "/v1/devices") {

@@ -50,6 +50,11 @@ targets:
         com.apple.security.application-groups:
           - group.us.naqshbaniaowaisiah
         aps-environment: production
+        # Private regional groups identify members through Sign in with Apple.
+        # This capability must also be enabled on the App ID in the developer
+        # portal, or signing fails even though the build compiles.
+        com.apple.developer.applesignin:
+          - Default
 
   DarulIrfanWidgets:
     type: app-extension

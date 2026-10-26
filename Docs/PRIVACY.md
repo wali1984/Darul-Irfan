@@ -36,8 +36,29 @@ are enabled in the submitted binary, even though collection is optional:
   for prayer/Qibla; never sent to the Darul Irfan service.
 - **Usage Data — Not collected:** no product analytics or reading/prayer event
   telemetry.
+- **Identifiers / User ID and Name — App Functionality, LINKED to identity,
+  not used for tracking:** only for members of the private regional groups.
+  Signing in with Apple stores Apple's stable subject for this app as the
+  member id, plus the name Apple discloses on first authorisation so an
+  administrator can recognise who to add. The email scope is deliberately not
+  requested. These are the app's only linked data.
 - **Tracking — No:** no IDFA, ATT prompt, data broker sharing, advertising, or
   cross-company tracking.
+
+### Accounts
+
+Nothing outside the private groups needs an account: prayer times, the Quran,
+hadith, books and lectures all work without signing in, and a reviewer can
+exercise them untouched. **Private groups do create an account**, through Sign
+in with Apple, and Apple requires such an account to be deletable from inside
+the app — "Delete my account" sits on the groups screen and removes the
+sign-in, the session and every group membership in one call.
+
+Signing in grants nothing by itself. A new member belongs to no group until an
+administrator adds them, and a group the member does not belong to answers
+exactly as a group that does not exist, so one region cannot discover another's
+existence, let alone read it. Members never post: administrators publish and
+members read, so no member's words are ever shown to another member.
 
 Recheck App Store Connect terminology at submission time. Optional collection
 still needs disclosure; do not select the older blanket “Data Not Collected”
