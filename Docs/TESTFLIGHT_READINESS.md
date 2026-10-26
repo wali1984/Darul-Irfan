@@ -2,7 +2,7 @@
 
 State of the iOS app as a release candidate, what has actually been verified
 and by what, and what is left before testers can install it. Written
-2026-10-26 for build **1.9.7 (43)**.
+2026-10-26 for build **1.10.0 (44)**.
 
 `Docs/APP_STORE_CHECKLIST.md` remains the line-by-line pre-submission list.
 This document is narrower: it answers "can testers have it yet".
@@ -32,10 +32,14 @@ So the app compiles, its unit tests pass, and it signs and uploads a release
 build. Codemagic *does* post status back to GitHub as check runs, contrary to
 an earlier note in this project's history.
 
-`e1ee654` is an ancestor of what is on `main` now, and **since that green build
-no Swift has changed at all.** The only build inputs added are
-`PrivacyInfo.xcprivacy` and the version bump in `project.yml`. That is the
-whole compile risk in this release candidate.
+`e1ee654` is an ancestor of `main`, and `7a67ef5` was then verified green by
+`ios-verify` directly (build 26, 2026-10-26: Build Succeeded, unit and UI tests
+passed, content gate clean).
+
+**1.10.0 does add new Swift** — the private regional groups: four new files,
+plus the Sign in with Apple entitlement and the privacy manifest. That has not
+been through `ios-verify` yet, so run it on `main` before tagging. Everything
+else in the build is already verified.
 
 | Pipeline | Trigger | What it proves |
 |---|---|---|
@@ -101,6 +105,16 @@ Everything here was run and passed on this machine:
    builds it, but it keeps the fortnightly content refresh dead and removes the
    second opinion `native-verify` used to give. Content in the app is bundled,
    so testers are unaffected; the catalogue simply stops getting fresher.
+5. **[blocker for 1.10.0] Enable Sign in with Apple on the App ID.** The
+   private groups identify members through it and the entitlement is in
+   `project.yml`, but a capability missing from the developer portal fails
+   *signing*, not compiling — so it surfaces late, in `ios-testflight`, after
+   `ios-verify` has already passed. Turn it on before tagging.
+6. **Apply migration `0003`** (`npm run db:migrate:remote` in `Server/`) or the
+   groups screen will error for every member. See `Docs/PRIVATE_GROUPS.md`.
+7. **The Codemagic webhook is not delivering.** Builds must be started by hand
+   from the Codemagic UI; a pushed tag will not start `ios-testflight` on its
+   own. Builds themselves are fine — build 26 ran green when started manually.
 
 ## Known content gaps to tell testers about
 

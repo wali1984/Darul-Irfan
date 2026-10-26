@@ -1,4 +1,4 @@
-# TestFlight tester notes — 1.9.7 (43)
+# TestFlight tester notes — 1.10.0 (44)
 
 Paste-ready text for App Store Connect, plus the briefing testers should get.
 Keep the "already known" list current: a tester reporting a known gap costs
@@ -31,7 +31,12 @@ Ask testers to spend time on these, in this order:
    hadith and book text should all still work.
 6. **Urdu and right-to-left.** If you read Urdu, check that Urdu text is
    right-aligned, in the Nastaliq face, and never clipped.
-7. **Reinstall.** Delete and reinstall; your content should come back and the
+7. **Private groups.** More -> Private groups, then sign in with Apple. You
+   should see "Waiting to be added" with an identifier — send it to an
+   administrator. Once added, open your group and check the announcements and
+   any recorded zikr play. Try "Delete my account" last, since it undoes the
+   sign-in and an administrator would have to add you again.
+8. **Reinstall.** Delete and reinstall; your content should come back and the
    app should not be slow to start.
 
 ## Already known — please do not report these
@@ -53,6 +58,11 @@ Ask testers to spend time on these, in this order:
   repaired from it.
 - **The azan does not play in the web version unless the site is open**, which
   is a browser limitation, not a bug. The iPhone app is unaffected.
+- **Signing in to private groups shows no groups at first.** That is correct:
+  an administrator places you in your region's group, so an empty list means
+  you are signed in and waiting, not that something failed.
+- **There is no group chat.** Administrators publish and members read, by
+  design; there is no member-to-member messaging to look for.
 
 ## Worth reporting
 
