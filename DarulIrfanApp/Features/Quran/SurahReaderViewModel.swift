@@ -164,6 +164,18 @@ final class SurahReaderViewModel {
         )
     }
 
+    /// The sheikh's bayans on this surah, each labelled with the verses it
+    /// expounds. Empty for most surahs: only part of the lecture catalogue is
+    /// verse-addressed, and a lecture is never attached to a verse by guesswork.
+    var bayans: [AyahBayanLink] {
+        AyahBayanLinkProvider.shared.links(surah: surah.id)
+    }
+
+    /// Bayans covering one ayah, narrowest range first.
+    func bayans(forAyah ayahNumber: Int) -> [AyahBayanLink] {
+        AyahBayanLinkProvider.shared.links(surah: surah.id, ayah: ayahNumber)
+    }
+
     /// Languages this surah can actually be read in, worked out from the
     /// editions that have text rather than from a fixed list, so a language
     /// never appears for a surah that has nothing in it.

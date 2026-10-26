@@ -7,11 +7,17 @@ struct SurahReaderView: View {
     private let appState: AppState
     private let focusAyah: Int?
     private let onRequestNextSurah: () -> Void
+    /// Needed to turn a linked bayan into something playable: the index stores
+    /// only the media id, so the catalogue stays the one description of a
+    /// lecture.
+    private let mediaRepository: any MediaRepositoryProtocol
+    private let audioPlayer: any AudioPlayerServicing
     @State private var viewModel: SurahReaderViewModel
     @State private var player = RecitationPlayer()
     @State private var speaker = TranslationSpeaker()
     @State private var hasScrolledToFocus = false
     @State private var hasAutoAdvanced = false
+    @State private var bayanError: String?
 
     init(
         surah: QuranSurah,
@@ -23,6 +29,8 @@ struct SurahReaderView: View {
         self.appState = appState
         self.focusAyah = focusAyah
         self.onRequestNextSurah = onRequestNextSurah
+        self.mediaRepository = dependencies.mediaRepository
+        self.audioPlayer = dependencies.audioPlayer
         let langCode = appState.settings.language.forcedLocaleIdentifier ?? "en"
         _viewModel = State(initialValue: SurahReaderViewModel(
             surah: surah,
@@ -119,6 +127,9 @@ struct SurahReaderView: View {
                     }
                     if appState.settings.quranReaderDisplayMode.showsTranslation {
                         contentModeSelector
+                    }
+                    if !viewModel.bayans.isEmpty {
+                        bayanCard
                     }
                     if appState.settings.quranReaderDisplayMode.showsTranslation
                         && viewModel.contentMode.isTafsir
@@ -304,6 +315,73 @@ struct SurahReaderView: View {
             title: { LocalizedStringKey($0.shortTitle) },
             selection: contentModeBinding
         )
+    }
+
+    /// The sheikh's bayans on this surah, each labelled with the verses it
+    /// expounds so a reader can go straight to the one covering what they are
+    /// reading. Only part of the catalogue is verse-addressed, so this appears
+    /// for the surahs that have such lectures and is absent elsewhere rather
+    /// than showing an empty shelf.
+    private var bayanCard: some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                DISectionHeader(titleKey: "Bayan on these verses", systemImage: "waveform")
+                ForEach(viewModel.bayans) { link in
+                    Button {
+                        DIHaptics.light()
+                        play(link)
+                    } label: {
+                        HStack(spacing: DISpacing.sm) {
+                            Image(systemName: "play.circle.fill")
+                                .foregroundStyle(DIColor.primary)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(link.title)
+                                    .font(.subheadline.weight(.medium))
+                                    .multilineTextAlignment(.leading)
+                                Text(LocalizedStringKey("Ayat \(link.ayahStart)-\(link.ayahEnd)"))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .buttonStyle(.plain)
+                }
+                if let error = bayanError {
+                    Text(error).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    /// Resolves the linked lecture in the media catalogue and hands it to the
+    /// shared player, so it keeps playing with the mini player and Lock Screen
+    /// controls the rest of the app already uses.
+    private func play(_ link: AyahBayanLink) {
+        let repository = mediaRepository
+        let player = audioPlayer
+        Task {
+            guard let item = try? await repository.item(id: link.mediaID) else {
+                bayanError = "This bayan is not in the offline catalogue yet."
+                return
+            }
+            guard let stream = item.streamUrl, let url = URL(string: stream) else {
+                bayanError = "This bayan has no playable audio source."
+                return
+            }
+            bayanError = nil
+            player.play(
+                AudioPlayableItem(
+                    id: item.id,
+                    title: item.title,
+                    subtitle: item.speaker,
+                    url: url,
+                    mediaItemID: item.id
+                ),
+                queue: []
+            )
+        }
     }
 
     /// Shown when this commentary exists for the surah, but not in the language
