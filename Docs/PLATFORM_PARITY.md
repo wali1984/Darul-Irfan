@@ -31,9 +31,11 @@ Implementation notes:
 * **Harmony** parses a pack lazily per collection and caches it; the
   cross-collection search parses each pack transiently so the pass never
   accumulates the full corpus. Arabic renders as `Text`/`Span` runs with
-  `onClick` on isnad and verse spans. **Builds green** — DevEco Studio is
-  installed on the build machine and `hvigor assembleHap` produces the entry
-  HAP (2026-08-12).
+  `onClick` on isnad and verse spans. Built green on 2026-08-12, when DevEco
+  Studio was installed on the build machine. **No longer verifiable here:** as
+  of 2026-10-26 DevEco is absent and `Build-Debug.ps1` points at a path that
+  no longer exists, so Harmony changes since then are unbuilt. See
+  `Docs/ANDROID_NEXT.md`.
 * **Web** renders the typed segments as tappable spans, searches all 26 packs
   sequentially with progress and result caps, and shows kitab headers from
   `sourceBook` plus the catalogue's section titles where a collection has
@@ -51,7 +53,12 @@ absent only on 12 records across the enriched core packs plus the 442 entries
 of the four single-page works, which have no kutub at all. Coverage figures
 live in HADITH_COVERAGE_GAPS.md.
 
-Build verification (2026-08-12, all from `C:\Dev\Automation`): Android
-`gradlew assembleDebug` and Harmony `hvigor assembleHap` both succeed on this
-machine; Web passes `build.mjs` + `verify.mjs`; iOS type-checking remains
+Build verification (2026-08-12, from the then-current `C:\Dev\Automation`):
+Android `gradlew assembleDebug` and Harmony `hvigor assembleHap` both
+succeeded; Web passed `build.mjs` + `verify.mjs`; iOS type-checking remains
 Codemagic's `ios-verify`.
+
+Re-verified 2026-10-26 from `C:\Users\wajid.ali\Desktop\Automation` (the `C:\Dev` path no
+longer exists): Android `assembleDebug` + unit tests green, Web `npm test`
+16/16 and `build.mjs` green, Harmony **unbuilt** (no DevEco), iOS still
+Codemagic only.

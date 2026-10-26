@@ -25,12 +25,16 @@ before archiving.
 - [ ] Signing style is Automatic (`CODE_SIGN_STYLE: Automatic`); verify the
       team and provisioning profile on all four shipping targets after
       `xcodegen generate`.
-- [x] Version `1.9.0` (local build `32`) — bump via `MARKETING_VERSION` /
+- [x] Version `1.9.7` (local build `43`) — bump via `MARKETING_VERSION` /
       `CURRENT_PROJECT_VERSION` in `project.yml`, not in Xcode (the project is
       regenerated). Codemagic replaces the archive build with `BUILD_NUMBER`.
 - [ ] Xcode 16+ required (adhan-swift 1.5.0 is swift-tools-version 6.0).
 - [ ] `ITSAppUsesNonExemptEncryption` is already `false` in Info.plist — no
       export-compliance questionnaire on each build.
+- [x] **[blocker]** `DarulIrfanApp/Resources/PrivacyInfo.xcprivacy` exists and
+      declares `CA92.1` for `UserDefaults`, which the app calls in nine places.
+      Without it an upload draws Apple's ITMS-91053 notice and can be refused.
+      It must keep matching `Docs/PRIVACY.md`; change the two together.
 
 ## 2. Info.plist
 
