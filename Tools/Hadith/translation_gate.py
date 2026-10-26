@@ -24,11 +24,13 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import hashlib
+import concurrent.futures as cf
 import json
 import os
 from pathlib import Path
 import re
 import sys
+import threading
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -430,6 +432,16 @@ def main() -> None:
     translate.add_argument("--queue", type=Path, required=True)
     translate.add_argument("--output", type=Path, required=True)
     translate.add_argument("--limit", type=int)
+    translate.add_argument(
+        "--kind", action="append", choices=["hadith", "appraisal", "section"],
+        help="only this kind; repeatable. The appraisals are short and finish in "
+             "a fraction of the time the narrations take, so they can go first",
+    )
+    translate.add_argument(
+        "--concurrency", type=int, default=1,
+        help="requests in flight at once (default 1). A local endpoint must be "
+             "allowed the same number of parallel slots or they queue anyway",
+    )
     check = sub.add_parser("validate")
     check.add_argument("--responses", type=Path, required=True)
     check.add_argument("--allow-partial", action="store_true")
@@ -459,15 +471,51 @@ def main() -> None:
         existing = read_jsonl(args.output) if args.output.exists() else []
         done = {(r.get("kind"), str(r.get("id"))) for r in existing}
         pending = [r for r in read_jsonl(args.queue) if (r["kind"], str(r["id"])) not in done]
+        if args.kind:
+            pending = [r for r in pending if r["kind"] in set(args.kind)]
         if args.limit is not None:
             pending = pending[:args.limit]
         args.output.parent.mkdir(parents=True, exist_ok=True)
+        total = len(pending)
+        print(f"{total:,} to translate with {model}, {args.concurrency} in flight")
+        failures: list[str] = []
+        written = 0
+        # One writer however many requests are in flight. The output stays one
+        # JSON object per line, appended and flushed as each result lands, so a
+        # run of any length can be killed and resumed without losing or
+        # repeating work: resuming is keyed by (kind, id), not by position.
+        lock = threading.Lock()
         with args.output.open("a", encoding="utf-8", newline="\n") as handle:
-            for number, item in enumerate(pending, 1):
-                result = endpoint_translate(item, url, key, model)
-                handle.write(json.dumps(result, ensure_ascii=False, separators=(",", ":")) + "\n")
-                handle.flush()
-                print(f"{number}/{len(pending)} {item['kind']} {item['id']}")
+            def run(item: dict) -> None:
+                nonlocal written
+                try:
+                    result = endpoint_translate(item, url, key, model)
+                except Exception as error:  # one bad item must not end the run
+                    # A job this size will meet transient failures. Record the
+                    # item and carry on; `validate` is what refuses an
+                    # incomplete batch, so a skipped item cannot reach the seed
+                    # unnoticed, and re-running retries only what failed.
+                    with lock:
+                        failures.append(f"{item['kind']}:{item['id']}: {error}")
+                    return
+                line = json.dumps(result, ensure_ascii=False, separators=(",", ":")) + "\n"
+                with lock:
+                    handle.write(line)
+                    handle.flush()
+                    written += 1
+                    if written % 100 == 0 or written == total:
+                        print(f"  {written:,}/{total:,} written, {len(failures):,} failed")
+            if args.concurrency > 1:
+                with cf.ThreadPoolExecutor(max_workers=args.concurrency) as pool:
+                    list(pool.map(run, pending))
+            else:
+                for item in pending:
+                    run(item)
+        print(f"wrote {written:,} of {total:,}; {len(failures):,} failed")
+        for failure in failures[:20]:
+            print("-", failure)
+        if failures:
+            print("re-run the same command to retry only the failures")
     elif args.command == "validate":
         queue, approved, errors = validate(args.responses, not args.allow_partial)
         print(json.dumps({"required": len(queue), "approved": len(approved), "errors": len(errors)}, indent=2))
