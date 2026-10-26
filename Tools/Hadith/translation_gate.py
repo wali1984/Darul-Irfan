@@ -282,7 +282,12 @@ def endpoint_translate(item: dict, url: str, key: str, model: str) -> dict:
     }[item["kind"]]
     prompt = f"""Translate the following {item['sourceLanguage']} Islamic source text into {targets}.
 It is {content_kind}.
-Preserve names, honorifics, technical grading terminology, negation, and meaning exactly.
+Preserve honorifics, technical grading terminology, negation, and meaning exactly.
+Transliterate every personal name, byname (laqab) and kunya; never translate what a
+name means. "Abi al-Lahm" stays "Abi al-Lahm" and never becomes "Father of Meat".
+Translate the whole source: no clause, phrase or citation may be left in the source
+script. When the target is Urdu, write Urdu - not Arabic carried across unchanged -
+and use the respectful plural register for Companions and scholars.
 Do not summarize, explain, add a ruling, add citations, or output the source text.
 Return only a JSON object with exactly the requested keys: {', '.join('text' + x for x in item['needs'])}.
 
