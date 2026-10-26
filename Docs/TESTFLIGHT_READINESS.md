@@ -9,20 +9,43 @@ This document is narrower: it answers "can testers have it yet".
 
 ## The one thing to understand first
 
-**No iOS build has been compiled on this machine, and none can be.** There is
-no Mac and no Xcode here. Every Swift change since the last confirmed-green
-Codemagic run is unverified at the compiler level. The only authorities are:
+**GitHub Actions is dead on this account: "the job was not started because
+your account is locked due to a billing issue."** That one fact explains three
+separate things that looked like code failures:
+
+- `iOS native verification` never ran on 2026-10-02 — it was never started.
+- `Content validation` never ran either.
+- **The fortnightly content sync has not run since 2026-09-15.** The 10-01 and
+  10-15 schedules both fired and were refused for billing. It is not a broken
+  crawler; nothing started. Settle the GitHub billing and it resumes.
+
+**Codemagic is unaffected, and the iOS app is in good shape.** On commit
+`e1ee654` (2026-10-02) both Codemagic workflows reported success to GitHub:
+
+| Check | Result on `e1ee654` |
+|---|---|
+| `iOS verify (build + unit tests, unsigned)` | **success** |
+| `iOS TestFlight release (signed)` | **success** |
+| `verify` (GitHub `native-verify`) | failure — billing, never started |
+
+So the app compiles, its unit tests pass, and it signs and uploads a release
+build. Codemagic *does* post status back to GitHub as check runs, contrary to
+an earlier note in this project's history.
+
+`e1ee654` is an ancestor of what is on `main` now, and **since that green build
+no Swift has changed at all.** The only build inputs added are
+`PrivacyInfo.xcprivacy` and the version bump in `project.yml`. That is the
+whole compile risk in this release candidate.
 
 | Pipeline | Trigger | What it proves |
 |---|---|---|
 | Codemagic `ios-verify` | push to any branch | unsigned build + tests compile |
-| GitHub `native-verify` | pull request touching app sources | build + simulator tests |
 | Codemagic `ios-testflight` | pushing a `v*` tag | signed release build, uploads to TestFlight |
+| GitHub `native-verify` | pull request touching app sources | blocked by billing |
 
-Codemagic does not report status back to GitHub, so its result must be read in
-the Codemagic UI. **Push and read `ios-verify` before tagging.** A tag that
-fails to build wastes a build number, because App Store Connect refuses a
-repeated `CFBundleVersion`.
+**Push and read `ios-verify` before tagging.** A tag that fails to build wastes
+a build number, because App Store Connect refuses a repeated
+`CFBundleVersion`.
 
 ## Verified on 2026-10-26
 
@@ -73,6 +96,10 @@ Everything here was run and passed on this machine:
 3. **Beta App Review** applies to *external* testers only, and needs the beta
    description, contact details and the "what to test" notes. Internal testers
    (App Store Connect users on the team) need no review.
+4. **GitHub billing.** Not a blocker for shipping the app, since Codemagic
+   builds it, but it keeps the fortnightly content refresh dead and removes the
+   second opinion `native-verify` used to give. Content in the app is bundled,
+   so testers are unaffected; the catalogue simply stops getting fresher.
 
 ## Known content gaps to tell testers about
 
