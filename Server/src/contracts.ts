@@ -1,6 +1,6 @@
 export const schemaVersion = 1;
 
-export type FeedSource = "youtube" | "facebook" | "website" | "announcement" | "event";
+export type FeedSource = "youtube" | "facebook" | "website" | "announcement" | "event" | "whatsapp";
 export type FeedKind = "post" | "video" | "announcement" | "event";
 export type LiveState = "offline" | "scheduled" | "live" | "ended";
 export type PushTopic = "liveZikr" | "broadcasts" | "announcements" | "events";
@@ -88,4 +88,8 @@ export interface Env {
   ADMIN_BROADCASTER_EMAILS?: string;
   ACCESS_TEAM_DOMAIN?: string;
   ACCESS_AUD?: string;
+  WHATSAPP_VERIFY_TOKEN?: string;
+  WHATSAPP_APP_SECRET?: string;
+  WHATSAPP_ALLOWED_SENDERS?: string;
+  WHATSAPP_CHANNEL_URL?: string;
 }

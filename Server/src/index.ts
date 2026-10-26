@@ -3,6 +3,7 @@ import { adminRequest } from "./admin";
 import { bootstrap, feed, liveBroadcast } from "./repository";
 import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
 import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
+import { whatsappSubscription, whatsappWebhook } from "./whatsapp";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -20,6 +21,14 @@ async function route(request: Request, env: Env): Promise<Response> {
     const limit = Number(url.searchParams.get("limit") ?? 20); const cursor = url.searchParams.get("cursor") ?? undefined;
     if (!Number.isInteger(limit) || limit < 1 || limit > 50) return json({ error: "Limit must be an integer from 1 to 50" }, { status: 400 });
     return cachedJSON(await feed(env, limit, cursor), request, 300);
+  }
+  // Authenticated by Meta's HMAC over the raw body, so it needs the body text
+  // rather than a parsed object, and it is deliberately not rate limited: a
+  // throttled 429 would make Meta retry the same payload.
+  if (path === "/v1/whatsapp") {
+    if (request.method === "GET") return whatsappSubscription(env, url);
+    if (request.method === "POST") return whatsappWebhook(request, env, await request.text());
+    return json({ error: "Not found" }, { status: 404 });
   }
   if (request.method === "POST" && path === "/v1/devices") {
     if (!await withinWriteLimit(request, env, "devices", 30)) return json({ error: "Too many requests" }, { status: 429 });
