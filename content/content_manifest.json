@@ -1,0 +1,20 @@
+{
+  "contentHash": "6e3d4c53e7413bfe56094a3af3d817bf0547fb3b0a7a646391904bcfdffddc01",
+  "counts": {
+    "articles": 96,
+    "documents": 273,
+    "events": 31,
+    "media": 823,
+    "quranTafsirPages": 114
+  },
+  "files": {
+    "articles": "articles.json",
+    "documents": "documents.json",
+    "events": "events.json",
+    "media": "media.json",
+    "tafsir": "quran_tafsir_manifest.json"
+  },
+  "generatedAt": "2026-10-02T21:32:19Z",
+  "schemaVersion": 1,
+  "version": 3
+}
