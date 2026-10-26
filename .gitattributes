@@ -1,0 +1,6 @@
+# The four platforms ship the same seed content, and the content integrity
+# gate compares those files byte for byte. Each app also bundles them exactly
+# as they sit in the working tree. Git's autocrlf conversion on Windows
+# rewrites them on checkout, which breaks that parity and changes what ships,
+# so every JSON payload is pinned to LF on every platform.
+*.json text eol=lf
