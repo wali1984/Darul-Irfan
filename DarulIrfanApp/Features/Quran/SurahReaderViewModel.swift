@@ -44,9 +44,12 @@ final class SurahReaderViewModel {
 
     private let repository: any QuranRepositoryProtocol
     private let devotionalMetrics: DevotionalMetricsSyncService
-    /// Preferred translation language ("en"/"ur"); the reader defaults to the
-    /// matching offline edition when one exists.
-    private let preferredLanguageCode: String
+    /// The language the reader is currently showing translation and tafsir in.
+    ///
+    /// Mutable on purpose. It starts from the app language, but a reader must be
+    /// able to change it in the middle of a surah without leaving the page, so
+    /// this is state rather than a constructor constant.
+    private(set) var readingLanguage: String
 
     @ObservationIgnored private var translationsByAyah: [Int: QuranTranslation] = [:]
     /// Asrar-at-Tanzil's OWN per-ayah translation (its dedicated tab shows this,
@@ -69,7 +72,7 @@ final class SurahReaderViewModel {
         self.surah = surah
         self.repository = repository
         self.devotionalMetrics = devotionalMetrics
-        self.preferredLanguageCode = preferredLanguageCode
+        self.readingLanguage = preferredLanguageCode
     }
 
     // MARK: - Loading
@@ -105,14 +108,14 @@ final class SurahReaderViewModel {
             // own complete Akram-ut-Tarajum Urdu or English edition. The reader's
             // edition picker can still switch to the other bundled translations.
             let preferred: QuranEdition?
-            if preferredLanguageCode == "ur" {
+            if readingLanguage == "ur" {
                 preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-ur" })
                     ?? availableTranslationEditions.first(where: { $0.language == "ur" })
                     ?? availableTranslationEditions.first
             } else {
                 preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-en" })
                     ?? availableTranslationEditions.first(where: { $0.language == "en" })
-                    ?? availableTranslationEditions.first(where: { $0.language == preferredLanguageCode })
+                    ?? availableTranslationEditions.first(where: { $0.language == readingLanguage })
                     ?? availableTranslationEditions.first
             }
             if let preferred {
@@ -122,7 +125,7 @@ final class SurahReaderViewModel {
             // Asrar's own translation for its dedicated tab, in the reader's
             // language (blank where the source has none — never backfilled).
             let asrarRows = (try? await repository.translations(
-                editionID: "asrar-at-tanzil-\(preferredLanguageCode)", surahNumber: surah.id)) ?? []
+                editionID: "asrar-at-tanzil-\(readingLanguage)", surahNumber: surah.id)) ?? []
             asrarTranslationsByAyah = Dictionary(
                 asrarRows.map { ($0.ayahNumber, $0) }, uniquingKeysWith: { first, _ in first }
             )
@@ -161,6 +164,54 @@ final class SurahReaderViewModel {
         )
     }
 
+    /// Languages this surah can actually be read in, worked out from the
+    /// editions that have text rather than from a fixed list, so a language
+    /// never appears for a surah that has nothing in it.
+    var availableReadingLanguages: [String] {
+        var codes = Set(availableTranslationEditions.map(\.language))
+        for entry in tafsirEntries {
+            if let language = editionsByID[entry.editionID]?.language { codes.insert(language) }
+        }
+        // A settled order rather than whichever edition happened to load first.
+        let known = ["en", "ur"].filter { codes.contains($0) }
+        return known + codes.subtracting(known).sorted()
+    }
+
+    /// Languages in which the current mode's commentary exists for this surah.
+    ///
+    /// This is what lets an empty tafsir offer the language that does have it,
+    /// rather than silently substituting the other language or showing nothing
+    /// and leaving the reader to guess.
+    var readingLanguagesWithTafsirForMode: [String] {
+        guard let prefix = contentMode.tafsirEditionPrefix else { return [] }
+        var codes = Set<String>()
+        for entry in tafsirEntries where entry.editionID.hasPrefix(prefix) {
+            if let language = editionsByID[entry.editionID]?.language { codes.insert(language) }
+        }
+        let known = ["en", "ur"].filter { codes.contains($0) }
+        return known + codes.subtracting(known).sorted()
+    }
+
+    /// Moves the whole reading surface — translation and commentary — into
+    /// another language, without leaving the surah or losing the scroll.
+    func setReadingLanguage(_ code: String) async {
+        guard code != readingLanguage else { return }
+        readingLanguage = code
+        // Follow the Silsila's own complete translation where it exists, then
+        // any edition in the chosen language.
+        if let preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-\(code)" })
+            ?? availableTranslationEditions.first(where: { $0.language == code }) {
+            await loadTranslations(edition: preferred)
+        }
+        // Asrar's own per-ayah translation is a separate edition per language,
+        // and stays blank where that language's source has no verse.
+        let asrarRows = (try? await repository.translations(
+            editionID: "asrar-at-tanzil-\(code)", surahNumber: surah.id)) ?? []
+        asrarTranslationsByAyah = Dictionary(
+            asrarRows.map { ($0.ayahNumber, $0) }, uniquingKeysWith: { first, _ in first }
+        )
+    }
+
     /// Switches the visible translation to another offline edition.
     func selectEdition(_ id: String) async {
         guard let edition = availableTranslationEditions.first(where: { $0.id == id }),
@@ -188,9 +239,19 @@ final class SurahReaderViewModel {
         return translation
     }
 
-    /// Stored tafsir entries whose ayah range covers `ayahNumber`.
+    /// Stored tafsir entries whose ayah range covers `ayahNumber`, in the
+    /// language being read.
+    ///
+    /// Language-strict, as the rest of the reader is: a reader who asked for
+    /// Urdu is never handed English commentary, and vice versa. Where the
+    /// chosen language has nothing, the reader says so and offers the language
+    /// that does — it does not quietly substitute the other one.
     func tafsir(for ayahNumber: Int) -> [QuranTafsir] {
-        tafsirEntries.filter { $0.ayahStart <= ayahNumber && ayahNumber <= $0.ayahEnd }
+        tafsirEntries.filter { entry in
+            guard entry.ayahStart <= ayahNumber, ayahNumber <= entry.ayahEnd else { return false }
+            guard let language = editionsByID[entry.editionID]?.language else { return true }
+            return language == readingLanguage
+        }
     }
 
     var hasAnyTafsir: Bool {
@@ -211,7 +272,7 @@ final class SurahReaderViewModel {
         return tafsirEntries.first {
             $0.ayahStart == ayahNumber
                 && $0.editionID.hasPrefix(prefix)
-                && edition(id: $0.editionID)?.language == preferredLanguageCode
+                && edition(id: $0.editionID)?.language == readingLanguage
         }
     }
 
@@ -221,7 +282,7 @@ final class SurahReaderViewModel {
         guard let prefix = contentMode.tafsirEditionPrefix else { return false }
         return tafsirEntries.contains {
             $0.editionID.hasPrefix(prefix)
-                && edition(id: $0.editionID)?.language == preferredLanguageCode
+                && edition(id: $0.editionID)?.language == readingLanguage
         }
     }
 

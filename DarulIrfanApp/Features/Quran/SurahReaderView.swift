@@ -39,6 +39,15 @@ struct SurahReaderView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if viewModel.phase == .ready {
+                    // Deliberately its own toolbar item rather than a row in the
+                    // scroll view or a line inside the options menu: the header
+                    // selectors scroll away, and a reader has to be able to
+                    // change language at any point without hunting for it.
+                    if viewModel.availableReadingLanguages.count > 1 {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            readingLanguageMenu
+                        }
+                    }
                     ToolbarItem(placement: .topBarTrailing) {
                         readerOptionsMenu
                     }
@@ -112,6 +121,11 @@ struct SurahReaderView: View {
                         contentModeSelector
                     }
                     if appState.settings.quranReaderDisplayMode.showsTranslation
+                        && viewModel.contentMode.isTafsir
+                        && !viewModel.hasTafsirForMode
+                        && !viewModel.readingLanguagesWithTafsirForMode.isEmpty {
+                        otherLanguageTafsirCard
+                    } else if appState.settings.quranReaderDisplayMode.showsTranslation
                         && viewModel.contentMode.isTafsir
                         && !viewModel.hasTafsirForMode
                         && !viewModel.tafsirEditionPointers.isEmpty {
@@ -292,6 +306,31 @@ struct SurahReaderView: View {
         )
     }
 
+    /// Shown when this commentary exists for the surah, but not in the language
+    /// being read. It offers the switch rather than substituting the other
+    /// language, which would hand an Urdu reader English prose or the reverse.
+    private var otherLanguageTafsirCard: some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text("\(viewModel.contentMode.title) is not in this language")
+                    .font(.headline)
+                Text("This commentary has not been prepared in the language you are reading. It is available in:")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                HStack(spacing: DISpacing.sm) {
+                    ForEach(viewModel.readingLanguagesWithTafsirForMode, id: \.self) { code in
+                        Button(Self.readingLanguageName(code)) {
+                            DIHaptics.light()
+                            let readerViewModel = viewModel
+                            Task { await readerViewModel.setReadingLanguage(code) }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+            }
+        }
+    }
+
     /// Native availability status for a tafsir edition not yet included for
     /// this surah. The edition remains visible so content updates are seamless.
     private var tafsirPointerCard: some View {
@@ -313,6 +352,57 @@ struct SurahReaderView: View {
     }
 
     // MARK: - Toolbar
+
+    /// Always-visible language switch. Shows the language being read and moves
+    /// both the translation and the commentary when it changes, so the two never
+    /// disagree about which language the reader asked for.
+    private var readingLanguageMenu: some View {
+        Menu {
+            Picker("Reading language", selection: readingLanguageBinding) {
+                ForEach(viewModel.availableReadingLanguages, id: \.self) { code in
+                    Text(Self.readingLanguageName(code)).tag(code)
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "character.book.closed")
+                Text(Self.readingLanguageShortName(viewModel.readingLanguage))
+                    .font(.footnote.weight(.semibold))
+            }
+        }
+        .accessibilityLabel("Reading language")
+        .accessibilityValue(Self.readingLanguageName(viewModel.readingLanguage))
+    }
+
+    private var readingLanguageBinding: Binding<String> {
+        Binding(
+            get: { viewModel.readingLanguage },
+            set: { code in
+                DIHaptics.light()
+                let readerViewModel = viewModel
+                Task { await readerViewModel.setReadingLanguage(code) }
+            }
+        )
+    }
+
+    /// Each language in its own script, which is how a reader recognises it.
+    static func readingLanguageName(_ code: String) -> String {
+        switch code {
+        case "en": "English"
+        case "ur": "اردو"
+        case "ar": "العربية"
+        default: code.uppercased()
+        }
+    }
+
+    static func readingLanguageShortName(_ code: String) -> String {
+        switch code {
+        case "en": "EN"
+        case "ur": "اردو"
+        case "ar": "ع"
+        default: code.uppercased()
+        }
+    }
 
     private var readerOptionsMenu: some View {
         Menu {
