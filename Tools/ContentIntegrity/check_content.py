@@ -480,7 +480,7 @@ def sha256_of(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def check_manifest_and_hashes(report: Report, require_parity: bool) -> dict[str, str]:
+def check_manifest_and_hashes(report: Report, require_parity: bool, excluded_platforms: set[str] | None = None) -> dict[str, str]:
     manifest = load(IOS_SEED, "manifest")
     if not report.check(manifest is not None, "manifest.json is missing"):
         return {}
@@ -511,6 +511,9 @@ def check_manifest_and_hashes(report: Report, require_parity: bool) -> dict[str,
     verified: list[str] = ["iOS"]
     unchecked: list[str] = []
     for platform, directory in PLATFORM_SEEDS.items():
+        if platform in (excluded_platforms or set()):
+            report.notes.append(f"{platform} excluded from this release scope by explicit configuration; parity not checked.")
+            continue
         if platform == "iOS":
             continue
         if not directory.exists():
@@ -639,6 +642,93 @@ def render_report(report: Report, migration_status: str, passed: bool) -> str:
     return "\n".join(lines)
 
 
+def check_library(seed: Path, report: Report) -> None:
+    """Library items and, where a work has been OCR'd, its page text.
+
+    The page ceiling is the point of this check. A whole book's text runs to
+    hundreds of kilobytes and the library detail view builds its paragraphs
+    eagerly, which is the shape that crashed the Quran reader on large tafsir
+    blocks in v1.6.9. Storing one row per printed page keeps every record
+    small; this check is what stops that invariant being quietly broken.
+    """
+    items = load(seed, "library_items")
+    if not report.check(items is not None, "library_items.json is missing"):
+        return
+
+    item_ids = {i["id"] for i in items}
+    report.check(len(item_ids) == len(items),
+                 f"{len(items) - len(item_ids)} duplicate library item ids")
+
+    oversized_bodies = [
+        f"{i['id']}: {len((i.get('bodyPlainText') or i.get('bodyHtml') or '').encode('utf-8'))} bytes"
+        for i in items
+        if len((i.get("bodyPlainText") or i.get("bodyHtml") or "").encode("utf-8")) > MAX_TEXT_BLOCK_BYTES
+    ]
+    report.check(not oversized_bodies,
+                 f"{len(oversized_bodies)} library bodies over {MAX_TEXT_BLOCK_BYTES} bytes: "
+                 f"{oversized_bodies[:3]}")
+
+    pages = load(seed, "book_pages")
+    if pages is None:
+        report.facts["bookPages"] = {"books": 0, "pages": 0}
+        return
+
+    seen: set[tuple[str, int]] = set()
+    dupes = 0
+    orphans: set[str] = set()
+    oversized: list[str] = []
+    bad_page_numbers: list[str] = []
+    empty: list[str] = []
+    per_book: dict[str, int] = {}
+    unresolved_blocks = 0
+    total_blocks = 0
+    states: dict[str, int] = {}
+
+    for row in pages:
+        book_id, page = row["bookID"], row["page"]
+        key = (book_id, page)
+        if key in seen:
+            dupes += 1
+        seen.add(key)
+        if book_id not in item_ids:
+            orphans.add(book_id)
+        if not isinstance(page, int) or page < 1:
+            bad_page_numbers.append(f"{book_id}:{page}")
+        text = row.get("text") or ""
+        if not text.strip():
+            empty.append(f"{book_id}:{page}")
+        size = len(text.encode("utf-8"))
+        if size > MAX_TEXT_BLOCK_BYTES:
+            oversized.append(f"{book_id}:{page} {size} bytes")
+        per_book[book_id] = per_book.get(book_id, 0) + 1
+        total_blocks += row.get("blocks") or 0
+        unresolved_blocks += row.get("unresolvedBlocks") or 0
+        state = row.get("reviewState") or "unknown"
+        states[state] = states.get(state, 0) + 1
+
+    report.check(dupes == 0, f"{dupes} duplicate (bookID, page) keys in book_pages.json")
+    report.check(not orphans,
+                 f"book_pages references {len(orphans)} unknown library ids: {sorted(orphans)[:5]}")
+    report.check(not oversized,
+                 f"{len(oversized)} book pages over {MAX_TEXT_BLOCK_BYTES} bytes: {oversized[:3]}")
+    report.check(not bad_page_numbers,
+                 f"{len(bad_page_numbers)} book pages with invalid page numbers: "
+                 f"{bad_page_numbers[:5]}")
+    report.check(not empty, f"{len(empty)} book pages with empty text: {empty[:5]}")
+    report.check(set(states) <= {"machineProvisional", "humanVerified"},
+                 f"unknown book page reviewState values: {sorted(set(states))}")
+
+    report.facts["bookPages"] = {
+        "books": len(per_book),
+        "pages": len(pages),
+        "largestPageBytes": max((len((r.get("text") or "").encode("utf-8")) for r in pages),
+                                default=0),
+        "blocks": total_blocks,
+        "unresolvedBlocks": unresolved_blocks,
+        "reviewStates": states,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report", type=Path, help="write the markdown report here")
@@ -654,6 +744,11 @@ def main() -> int:
         help="fail if any platform checkout is absent, instead of noting it "
              "as unverified; use before a release tag",
     )
+    parser.add_argument(
+        "--exclude-platform", action="append", default=[],
+        choices=[name for name in PLATFORM_SEEDS if name != "iOS"],
+        help="explicitly exclude an out-of-scope platform from this release; recorded in the report",
+    )
     args = parser.parse_args()
 
     # Printed first so a log always records which tree was actually inspected.
@@ -663,7 +758,8 @@ def main() -> int:
     check_encoding(IOS_SEED, report)
     check_quran(IOS_SEED, report)
     check_hadith(IOS_SEED, report)
-    check_manifest_and_hashes(report, require_parity=args.require_parity)
+    check_library(IOS_SEED, report)
+    check_manifest_and_hashes(report, require_parity=args.require_parity, excluded_platforms=set(args.exclude_platform))
 
     if args.migration_status == "failed":
         report.failures.append("the upgrade-migration test failed")

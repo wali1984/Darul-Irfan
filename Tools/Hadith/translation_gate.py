@@ -2,10 +2,11 @@
 """Export, translate, validate, and promote Hadith translations safely.
 
 The seed corpus is never edited by ``export`` or ``translate``. Machine output
-lives in a JSONL staging file with ``machineProvisional`` review state. Only
-``promote`` can modify seed JSON, and it refuses every row that is incomplete,
-stale, malformed, or not explicitly marked ``humanVerified`` with reviewer and
-review timestamp. Arabic source text is hash-bound and is never overwritten.
+lives in a JSONL staging file with ``machineTranslated`` review state and the
+producing model named as reviewer. Only ``promote`` can modify seed JSON, and
+it refuses every row that is incomplete, stale, malformed, unattributed, or in
+an unsupported review state. Arabic source text is hash-bound and is never
+overwritten.
 
 An OpenAI-compatible endpoint may be used for the first translation pass:
 
@@ -218,8 +219,13 @@ def response_errors(item: dict, response: dict) -> list[str]:
     # Both states are attributable: a human vouches under their own name, a
     # machine draft names the model that produced it. Anonymous content cannot
     # be re-checked later, which is the whole reason the review pass is possible.
-    if not text(response.get("reviewer")) or not text(response.get("reviewedAt")):
+    reviewer = text(response.get("reviewer"))
+    if not reviewer or not text(response.get("reviewedAt")):
         errors.append(f"{prefix}: reviewer and reviewedAt are required")
+    if state == MACHINE:
+        model = text(response.get("translationModel"))
+        if model and reviewer != model:
+            errors.append(f"{prefix}: machineTranslated reviewer must name translationModel")
     for lang in item["needs"]:
         key = f"text{lang}"
         value = text(response.get(key))
@@ -300,7 +306,9 @@ SOURCE:
     return {
         "kind": item["kind"], "id": item["id"], "sourceHash": item["sourceHash"],
         **translated,
-        "reviewState": "machineProvisional",
+        "reviewState": MACHINE,
+        "reviewer": model,
+        "reviewedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
         "translationModel": model,
         "translatedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
     }

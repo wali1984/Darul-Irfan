@@ -24,9 +24,11 @@ gaps.
 2. `export` writes a stable JSONL queue. Every item includes its native id,
    context, source language, source text, and SHA-256 source hash.
 3. `translate` can create a resumable first pass through an OpenAI-compatible
-   translation endpoint. Its output is always `machineProvisional`.
-4. A reviewer corrects each row and marks it `humanVerified`, adding their name
-   and an ISO-8601 review timestamp.
+   translation endpoint. Its output is `machineTranslated`, names the producing
+   model in `reviewer`, and includes an ISO-8601 timestamp.
+4. Machine-translated rows may be promoted for TestFlight and remain visibly
+   labelled pending scholarly review. A later qualified reviewer may correct a
+   row and change it to `humanVerified` under their own name.
 5. `validate` checks identifiers, completeness, source hashes, script, controls,
    markup, placeholders, duplicates, and review metadata.
 6. `promote` refuses the entire batch unless every required item passes. It
@@ -49,7 +51,7 @@ python Tools/Hadith/translation_gate.py promote `
   --responses C:\HadithReview\reviewed.jsonl
 ```
 
-Machine translation can accelerate drafting, but automated structural checks
-cannot certify the meaning of sacred text. Promotion therefore requires an
-explicit human verification record. Until that review file is complete, the
-existing Arabic and sourced translations remain unchanged in the app.
+Machine translation can accelerate corpus completion, but automated structural
+checks cannot certify the meaning of sacred text. Machine rows therefore retain
+their model attribution and visible pending-review label after promotion. Never
+mark machine output `humanVerified`.
