@@ -120,10 +120,29 @@ Everything here was run and passed on this machine:
 
 These are honest gaps, not bugs. Do not let a tester report them as defects.
 
-- **Urdu tafsir is effectively empty.** `asrar-at-tanzil-ur` has 0 rows and
-  `akram-ut-tafaseer-ur` covers 1 surah of 114. English is complete: 6,234 of
-  6,236 Asrar translations and 640 tafsir blocks across all 114 surahs. For an
-  Urdu-first audience this is the most visible hole in the app.
+- **Urdu tafsir now ships as readable text, not as per-ayah tafsir.** Both
+  Urdu works were ingested on 2026-10-26 from the owner's OCR drops as
+  page-structured library text: Asrar-at-Tanzil Urdu, all 114 surahs, 2,415
+  pages; and Akram-ut-Tafaseer, 30 parahs, 7,838 pages — 10,253 pages and
+  34.3 MB in total. They open through the library's "Read the text" reader on
+  every platform.
+
+  What they are **not** is per-ayah commentary in the Quran reader's Asrar tab,
+  which stays English-only. The OCR pipeline's own `verse_refs` are 8%
+  populated for Asrar and 2% for Akram, and the populated ones are wrong: the
+  Surah-100 document's first page claims verse 88:8, Surah-102 claims 1:3, and
+  Akram's Para 10 — which covers roughly 8:41 to 9:93 — claims 2:244. All of
+  them were matched against OCR'd Arabic that is itself corrupted. Attaching a
+  guessed verse number to scripture commentary is worse than not offering it,
+  so `quran_tafsir.json` was left alone. The per-ayah editions
+  `asrar-at-tanzil-ur` and `akram-ut-tafaseer-ur` therefore still read 0 and 1
+  rows, and that is deliberate.
+- **Akram-ut-Tafaseer parah 30 is part 1 only.** The drop contains
+  `QuranTafseer-Para-30-part1` and no part 2 exists anywhere in it; the source
+  PDF is itself named that way. Its 232 pages are genuine and ship, but the
+  juz is incomplete.
+- **English Asrar is complete**: 6,234 of 6,236 translations and 640 tafsir
+  blocks across all 114 surahs.
 - **Asrar English commentary covers about 80.7%** of the source's sentences.
   Worst surahs: 73, 31, 53 and a cluster near 67%. The repair route is to
   re-run the per-ayah indexer over the clean source. Do **not** attempt

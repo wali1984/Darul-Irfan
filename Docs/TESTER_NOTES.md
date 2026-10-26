@@ -41,10 +41,14 @@ Ask testers to spend time on these, in this order:
 
 ## Already known — please do not report these
 
-- **Urdu tafsir is largely missing.** Asrar-at-Tanzil Urdu and
-  Akram-ut-Tafaseer Urdu are not yet in the app; the English Asrar tafsir is
-  complete for all 114 surahs. This is being worked on and is a content task,
-  not a bug.
+- **Urdu tafsir reads as a book, not verse by verse.** Asrar-at-Tanzil Urdu
+  (all 114 surahs) and Akram-ut-Tafaseer (30 parahs) are now in the app and
+  open from the library with "Read the text". They do **not** appear verse by
+  verse beside the Quran the way the English Asrar tafsir does, because the
+  scanned Urdu does not say which verse each passage belongs to and we will not
+  guess at it. Please do report pages that are unreadable or out of order.
+- **Akram-ut-Tafaseer parah 30 is part 1 only** — the rest was not in the
+  material provided, so the parah ends early. Known, not a bug.
 - **Two verses have no Asrar English translation** (23:38 and 80:41). The
   authoritative source's own text is wrong at those two places, so they are
   deliberately left blank rather than guessed at.
