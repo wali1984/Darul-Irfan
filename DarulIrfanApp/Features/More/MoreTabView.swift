@@ -96,13 +96,17 @@ struct MoreTabView: View {
                 EventsHomeView(dependencies: dependencies, appState: appState)
             }
 
-            MoreNavLink(
-                titleKey: "Private groups",
-                subtitleKey: "Members only — your region's announcements and zikr",
-                systemImage: "lock.shield",
-                delay: 0.22
-            ) {
-                GroupsHomeView()
+            // Hidden until Sign in with Apple is enabled on the App ID; see
+            // MemberGroupsFeature.
+            if MemberGroupsFeature.isEnabled {
+                MoreNavLink(
+                    titleKey: "Private groups",
+                    subtitleKey: "Members only — your region's announcements and zikr",
+                    systemImage: "lock.shield",
+                    delay: 0.22
+                ) {
+                    GroupsHomeView()
+                }
             }
         }
     }

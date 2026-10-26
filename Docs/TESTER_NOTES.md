@@ -1,4 +1,4 @@
-# TestFlight tester notes — 1.10.0 (44)
+# TestFlight tester notes — 1.10.1 (45)
 
 Paste-ready text for App Store Connect, plus the briefing testers should get.
 Keep the "already known" list current: a tester reporting a known gap costs
@@ -31,11 +31,10 @@ Ask testers to spend time on these, in this order:
    hadith and book text should all still work.
 6. **Urdu and right-to-left.** If you read Urdu, check that Urdu text is
    right-aligned, in the Nastaliq face, and never clipped.
-7. **Private groups.** More -> Private groups, then sign in with Apple. You
-   should see "Waiting to be added" with an identifier — send it to an
-   administrator. Once added, open your group and check the announcements and
-   any recorded zikr play. Try "Delete my account" last, since it undoes the
-   sign-in and an administrator would have to add you again.
+7. **The library.** Open More -> Events & Dar-ul-Irfan and the library, and
+   check that a book or tafsir you pick opens its text with "Read the text".
+   Every one of the 258 tafsir volumes should now open: Asrar-at-Tanzil in both
+   English and Urdu, and all 30 Akram-ut-Tafaseer parahs.
 8. **Reinstall.** Delete and reinstall; your content should come back and the
    app should not be slow to start.
 
@@ -62,11 +61,15 @@ Ask testers to spend time on these, in this order:
   repaired from it.
 - **The azan does not play in the web version unless the site is open**, which
   is a browser limitation, not a bug. The iPhone app is unaffected.
-- **Signing in to private groups shows no groups at first.** That is correct:
-  an administrator places you in your region's group, so an empty list means
-  you are signed in and waiting, not that something failed.
-- **There is no group chat.** Administrators publish and members read, by
-  design; there is no member-to-member messaging to look for.
+- **Private groups are not in this build.** They are finished and the server
+  is live, but they are switched off until Sign in with Apple is enabled on the
+  Apple account. Nothing to look for in More.
+- **The 251 Al-Murshid magazine issues have no text yet** and still open on the
+  website. They have never been scanned, so there is nothing to put in the app
+  until they are. Every book and every tafsir volume does open in the app.
+- **The 33 Akram-ut-Tarajum entries in the library have no separate text.** The
+  translation itself is complete in the app - read it in the Quran, where every
+  verse carries it in English and Urdu.
 
 ## Worth reporting
 

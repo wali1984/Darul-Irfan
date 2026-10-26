@@ -16,8 +16,8 @@ settings:
   base:
     SWIFT_VERSION: "5.9"
     DEVELOPMENT_LANGUAGE: en
-    MARKETING_VERSION: "1.10.0"
-    CURRENT_PROJECT_VERSION: "44"
+    MARKETING_VERSION: "1.10.1"
+    CURRENT_PROJECT_VERSION: "45"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: "2SGPX6K5YB"
 
@@ -50,11 +50,24 @@ targets:
         com.apple.security.application-groups:
           - group.us.naqshbaniaowaisiah
         aps-environment: production
-        # Private regional groups identify members through Sign in with Apple.
-        # This capability must also be enabled on the App ID in the developer
-        # portal, or signing fails even though the build compiles.
-        com.apple.developer.applesignin:
-          - Default
+        # com.apple.developer.applesignin is deliberately ABSENT. Build 47
+        # (ios-testflight, 1.10.0) failed at "Build signed archive" in 12
+        # seconds: with CODE_SIGN_STYLE=Manual the distribution profile must
+        # already carry every entitlement, and it cannot carry this one until
+        # Sign in with Apple is enabled on the App ID in the developer portal.
+        # ios-verify never catches it, because an unsigned build does not need
+        # a profile.
+        #
+        # TO TURN THE PRIVATE GROUPS ON:
+        #   1. Enable Sign in with Apple for us.naqshbaniaowaisiah in the
+        #      Apple Developer portal (Certificates, Identifiers & Profiles).
+        #   2. Restore the two lines below.
+        #   3. Set MemberGroupsFeature.isEnabled to true.
+        # Codemagic recreates the profile on the next run, so nothing else is
+        # needed.
+        #
+        # com.apple.developer.applesignin:
+        #   - Default
 
   DarulIrfanWidgets:
     type: app-extension

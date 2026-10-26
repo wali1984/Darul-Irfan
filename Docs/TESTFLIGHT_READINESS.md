@@ -2,7 +2,28 @@
 
 State of the iOS app as a release candidate, what has actually been verified
 and by what, and what is left before testers can install it. Written
-2026-10-26 for build **1.10.0 (44)**.
+2026-10-26 for build **1.10.1 (45)**.
+
+## Why 1.10.0 did not ship
+
+`ios-testflight` build 47 failed at **Build signed archive**, exit 65, after 12
+seconds. Everything before it passed: release preflight, the unit tests
+including the schema migration (4m16s), the content integrity gate, and code
+signing setup.
+
+Twelve seconds is far too fast for a compile failure, and `ios-verify` had
+already built the same tree. The cause is the entitlement added for the private
+groups: with `CODE_SIGN_STYLE=Manual` the distribution profile must already
+carry every entitlement in the target, and it cannot carry
+`com.apple.developer.applesignin` until Sign in with Apple is enabled on the
+App ID in the developer portal. **`ios-verify` can never catch this**, because
+an unsigned build needs no profile at all.
+
+1.10.1 removes that entitlement and holds the groups screen behind
+`MemberGroupsFeature.isEnabled`, so the release builds and everything else is
+testable. The groups code and its backend are untouched and tested. To turn it
+on: enable the capability on the App ID, restore the two commented lines in
+`project.yml`, and set the flag to `true` - all three together.
 
 `Docs/APP_STORE_CHECKLIST.md` remains the line-by-line pre-submission list.
 This document is narrower: it answers "can testers have it yet".

@@ -60,6 +60,16 @@ WORKS = [
         "max_index": 114,
     },
     {
+        "name": "Asrar-at-Tanzil (English)",
+        # Its own tree, not the shared OCR drop.
+        "root": ROOT / "Asrar-at-Tanzil — English tafsir" / "OCR",
+        "glob": "*/final/*.final.json",
+        "pattern": re.compile(r"^Asrar-ut-Tanzil_EnglishTafseer_Chapter-(\d{1,3})$"),
+        "library_id": lambda n: f"asrar-{n}-en",
+        "expected": 114,
+        "max_index": 114,
+    },
+    {
         "name": "Akram-ut-Tafaseer",
         "glob": "akram-ut-tafaseer-raw-v1/documents/urdu/*/final/*.final.json",
         "pattern": re.compile(r"^QuranTafseer-Para-(\d{1,2})$"),
@@ -96,7 +106,8 @@ def canonical_documents(drop: Path, work: dict) -> dict[int, Path]:
     a parah's pages, so the unsuffixed directory always wins.
     """
     chosen: dict[int, tuple[bool, Path]] = {}
-    for path in sorted(drop.glob(work["glob"])):
+    base = work.get("root") or drop
+    for path in sorted(base.glob(work["glob"])):
         raw = document_name(path)
         stripped = DUPLICATE_SUFFIX.sub("", raw)
         if stripped in ALIASES:
