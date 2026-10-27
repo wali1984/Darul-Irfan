@@ -83,6 +83,12 @@ enum ContentCategory: String, Codable, Sendable, CaseIterable, Identifiable {
     case announcements
     case featureArticles
     case aqwalESheikh
+    /// The Quran's own translation and commentary collections. The catalogue has
+    /// always carried these; without the cases, `ContentCategory(rawValue:)`
+    /// returned nil and ContentRepository dropped all 291 rows on read, so every
+    /// Asrar-at-Tanzil and Akram-ut-Tafaseer volume was invisible in the app.
+    case quranTranslation
+    case quranTafsir
 
     var id: String { rawValue }
     var localizationKey: String { "library.category.\(rawValue)" }
@@ -109,6 +115,8 @@ enum ContentCategory: String, Codable, Sendable, CaseIterable, Identifiable {
         case .announcements: return "Announcements"
         case .featureArticles: return "Feature Articles"
         case .aqwalESheikh: return "Aqwal-e-Sheikh"
+        case .quranTranslation: return "Quran Translation"
+        case .quranTafsir: return "Quran Tafsir"
         }
     }
 }

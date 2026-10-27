@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -642,6 +643,69 @@ def render_report(report: Report, migration_status: str, passed: bool) -> str:
     return "\n".join(lines)
 
 
+def check_app_enum_parity(seed: Path, report: Report) -> None:
+    """Every category and type in the catalogue must be one the iOS app knows.
+
+    This exists because of a real, silent, months-long outage. ContentItem
+    declares `category: ContentCategory`, a non-optional Swift enum, and
+    SeedBundle decodes the whole file in one call: one row whose category is not
+    a case throws, the catch returns [], and the ENTIRE library is discarded.
+    Nothing surfaces an error - the app simply shows an empty library, every
+    category hidden because every count is zero.
+
+    `quranTafsir` and `quranTranslation` entered the catalogue in July with the
+    Akram Awan works and were never added to the enum, so all 675 items were
+    dropped on every build until 2026-10-26. The byte-parity and page-ceiling
+    checks could not see it: the data was perfectly valid, just unreadable by
+    the client.
+
+    So the gate now reads the enum cases out of the Swift source and fails when
+    the catalogue uses a value the app cannot decode.
+    """
+    models = IOS_ROOT / "DarulIrfanApp" / "Models" / "ContentModels.swift"
+    if not models.exists():
+        report.notes.append("ContentModels.swift not found; app enum parity not checked.")
+        return
+
+    source = models.read_text(encoding="utf-8")
+
+    def enum_cases(name: str) -> set[str]:
+        match = re.search(r"enum " + name + r"[^{]*\{(.*?)\n\}", source, re.S)
+        return set(re.findall(r"case (\w+)", match.group(1))) if match else set()
+
+    categories, types = enum_cases("ContentCategory"), enum_cases("ContentType")
+    if not categories or not types:
+        report.notes.append("Could not parse ContentCategory/ContentType; enum parity not checked.")
+        return
+
+    items = load(seed, "library_items")
+    if items is None:
+        return
+
+    unknown_categories = sorted({i.get("category") for i in items} - categories)
+    unknown_types = sorted({i.get("type") for i in items} - types)
+    affected = sum(1 for i in items
+                   if i.get("category") not in categories or i.get("type") not in types)
+
+    report.check(
+        not unknown_categories,
+        f"library_items uses {len(unknown_categories)} category value(s) absent from "
+        f"ContentCategory: {unknown_categories} - the iOS app discards the WHOLE "
+        f"library file when any row fails to decode ({affected} rows affected)",
+    )
+    report.check(
+        not unknown_types,
+        f"library_items uses {len(unknown_types)} type value(s) absent from "
+        f"ContentType: {unknown_types} - same whole-file failure ({affected} rows affected)",
+    )
+    report.facts["appEnumParity"] = {
+        "categoriesInApp": len(categories),
+        "typesInApp": len(types),
+        "unknownCategories": unknown_categories,
+        "unknownTypes": unknown_types,
+    }
+
+
 def check_library(seed: Path, report: Report) -> None:
     """Library items and, where a work has been OCR'd, its page text.
 
@@ -759,6 +823,7 @@ def main() -> int:
     check_quran(IOS_SEED, report)
     check_hadith(IOS_SEED, report)
     check_library(IOS_SEED, report)
+    check_app_enum_parity(IOS_SEED, report)
     check_manifest_and_hashes(report, require_parity=args.require_parity, excluded_platforms=set(args.exclude_platform))
 
     if args.migration_status == "failed":

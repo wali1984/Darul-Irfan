@@ -32,6 +32,12 @@ struct LibraryCategoryGroup: Identifiable, Sendable {
             categories: [.aboutSilsila, .sheikhAbdulQadeerAwan, .sheikhMuhammadAkramAwan, .shajra]
         ),
         LibraryCategoryGroup(
+            id: "quran",
+            title: "Quran",
+            systemImage: "book.closed",
+            categories: [.quranTafsir, .quranTranslation]
+        ),
+        LibraryCategoryGroup(
             id: "teachings",
             title: "Teachings",
             systemImage: "text.book.closed",
@@ -101,6 +107,8 @@ extension ContentCategory {
         case .announcements: return "megaphone"
         case .featureArticles: return "doc.richtext"
         case .aqwalESheikh: return "quote.bubble"
+        case .quranTranslation: return "character.book.closed"
+        case .quranTafsir: return "text.book.closed"
         }
     }
 }
@@ -144,7 +152,8 @@ extension ContentCategory {
     /// teachings and about-pages keep the emerald brand tone.
     var isPublicationCategory: Bool {
         switch self {
-        case .books, .booklets, .alMurshidMagazine, .importantDocuments, .trainingCourses, .sufiPoetry:
+        case .books, .booklets, .alMurshidMagazine, .importantDocuments, .trainingCourses, .sufiPoetry,
+             .quranTranslation, .quranTafsir:
             return true
         default:
             return false
