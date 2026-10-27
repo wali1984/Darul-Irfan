@@ -265,6 +265,23 @@ final class ReleaseFixesTests: XCTestCase {
 
     /// 9:15 PM in Pakistan is 12:15 PM in New York in daylight time and
     /// 11:15 AM in standard time; Pakistan has no daylight saving.
+    /// The day's cards follow the local day where the phone is: a new pick
+    /// after local midnight, and the same day in Karachi and New York can be
+    /// different days.
+    func testDailyCardsChangeWithTheLocalDay() throws {
+        let newYork = try XCTUnwrap(TimeZone(identifier: "America/New_York"))
+        let karachi = try XCTUnwrap(TimeZone(identifier: "Asia/Karachi"))
+        let lateEvening = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-10-28T03:30:00Z")) // 23:30 in New York
+        let afterMidnight = lateEvening.addingTimeInterval(3_600)
+        XCTAssertEqual(DailySelector.epochDay(for: afterMidnight, timeZone: newYork),
+                       DailySelector.epochDay(for: lateEvening, timeZone: newYork) + 1)
+        XCTAssertNotEqual(DailySelector.nameNumber(for: lateEvening, timeZone: newYork),
+                          DailySelector.nameNumber(for: afterMidnight, timeZone: newYork))
+        // 08:30 in Karachi is already the next day there.
+        XCTAssertEqual(DailySelector.epochDay(for: lateEvening, timeZone: karachi),
+                       DailySelector.epochDay(for: lateEvening, timeZone: newYork) + 1)
+    }
+
     func testDailyZikrInNewYork() throws {
         let daily = session(anchor: nil)
         let newYork = try XCTUnwrap(TimeZone(identifier: "America/New_York"))

@@ -45,10 +45,8 @@ struct DuasView: View {
     }
 
     private var featuredDua: Dua? {
-        guard !viewModel.duas.isEmpty else { return nil }
-        let day = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
-        let index = ((day - 1) % viewModel.duas.count + viewModel.duas.count) % viewModel.duas.count
-        return viewModel.duas[index]
+        // The same pick as the Today page's dua, for the phone's local day.
+        DailySelector.pick(viewModel.duas, for: Date(), stream: .dua)
     }
 
     var body: some View {

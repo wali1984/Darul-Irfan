@@ -25,8 +25,9 @@ enum DailySelector {
     }
 
     /// Whole civil days since the Unix epoch for `date` in `timeZone`
-    /// (defaults to the user's current zone). Pure function of the date.
-    static func epochDay(for date: Date, timeZone: TimeZone = .current) -> Int {
+    /// (defaults to the phone's zone, which follows where it is and is read
+    /// fresh each time, so a phone that has travelled changes day there).
+    static func epochDay(for date: Date, timeZone: TimeZone = .autoupdatingCurrent) -> Int {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
         let startOfDay = calendar.startOfDay(for: date)
@@ -35,20 +36,20 @@ enum DailySelector {
 
     /// A stable index into a list of length `count` for `date` and `stream`.
     /// Double-mod guards negative epoch days (pre-1970 test dates).
-    static func index(count: Int, for date: Date, stream: Stream, timeZone: TimeZone = .current) -> Int {
+    static func index(count: Int, for date: Date, stream: Stream, timeZone: TimeZone = .autoupdatingCurrent) -> Int {
         guard count > 0 else { return 0 }
         let seed = epochDay(for: date, timeZone: timeZone) + stream.rawValue
         return ((seed % count) + count) % count
     }
 
     /// Picks the element of `items` for `date` and `stream`, or nil if empty.
-    static func pick<T>(_ items: [T], for date: Date, stream: Stream, timeZone: TimeZone = .current) -> T? {
+    static func pick<T>(_ items: [T], for date: Date, stream: Stream, timeZone: TimeZone = .autoupdatingCurrent) -> T? {
         guard !items.isEmpty else { return nil }
         return items[index(count: items.count, for: date, stream: stream, timeZone: timeZone)]
     }
 
     /// Name of Allah number (1...99) for the day.
-    static func nameNumber(for date: Date, timeZone: TimeZone = .current) -> Int {
+    static func nameNumber(for date: Date, timeZone: TimeZone = .autoupdatingCurrent) -> Int {
         (index(count: 99, for: date, stream: .name, timeZone: timeZone)) + 1
     }
 }

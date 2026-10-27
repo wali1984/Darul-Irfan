@@ -10,6 +10,7 @@ struct TodayDailySection: View {
     private let dependencies: AppDependencies?
     @State private var viewModel: TodayDailyViewModel
     @State private var shareItem: ShareImageItem?
+    @Environment(\.scenePhase) private var scenePhase
 
     init(appState: AppState, dependencies: AppDependencies? = nil) {
         self.appState = appState
@@ -36,6 +37,26 @@ struct TodayDailySection: View {
         }
         .onChange(of: appState.settings.language) {
             Task { await viewModel.loadSilsilaAyah() }
+        }
+        // A new day where the phone is: back in the app, local midnight
+        // (iOS announces it), or a new time zone after travel.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await viewModel.refreshIfNewDay() } }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            Task { await viewModel.refreshIfNewDay() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in
+            NSTimeZone.resetSystemTimeZone()
+            Task { await viewModel.refreshIfNewDay() }
+        }
+        // While the page stays open across midnight.
+        .task(id: viewModel.loadedDay) {
+            guard let next = Calendar.autoupdatingCurrent.nextDate(
+                after: Date(), matching: DateComponents(hour: 0, minute: 0, second: 5), matchingPolicy: .nextTime
+            ) else { return }
+            try? await Task.sleep(for: .seconds(max(1, next.timeIntervalSinceNow)))
+            if !Task.isCancelled { await viewModel.refreshIfNewDay() }
         }
         .sheet(item: $shareItem) { item in
             ShareSheet(items: [item.image])

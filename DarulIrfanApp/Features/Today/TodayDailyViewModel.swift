@@ -35,6 +35,8 @@ final class TodayDailyViewModel {
     private(set) var aqwal: DailyInspiration?
     private(set) var dhikr: DailyDhikr?
     private(set) var isLoaded = false
+    /// The local day the cards were chosen for.
+    private(set) var loadedDay: Int?
 
     init(appState: AppState, quranRepository: (any QuranRepositoryProtocol)? = nil) {
         self.appState = appState
@@ -55,7 +57,17 @@ final class TodayDailyViewModel {
         name = names.first { $0.id == nameNumber } ?? names.first
         aqwal = DailySelector.pick(quotes, for: date, stream: .aqwal)
         dhikr = DailySelector.pick(DailyDhikr.all, for: date, stream: .dhikr)
+        loadedDay = DailySelector.epochDay(for: date)
         isLoaded = true
+    }
+
+    /// Chooses the day's cards again once the phone's local day has moved on:
+    /// past midnight where the phone is, or into another time zone. The tab
+    /// stays alive in memory, so this is what makes the cards change daily.
+    func refreshIfNewDay(_ date: Date = Date()) async {
+        guard DailySelector.epochDay(for: date) != loadedDay else { return }
+        load(on: date)
+        await loadSilsilaAyah()
     }
 
     /// Replaces the bundled list's generic translation with the Silsila's

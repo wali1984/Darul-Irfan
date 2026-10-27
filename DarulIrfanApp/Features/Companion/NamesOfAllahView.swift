@@ -35,10 +35,9 @@ struct NamesOfAllahView: View {
     /// A gently rotating pick so the "Name of the Day" changes each day but is
     /// stable within a day. Purely presentational; the full list is unchanged.
     private var featuredName: NameOfAllah? {
-        guard !viewModel.names.isEmpty else { return nil }
-        let day = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
-        let index = ((day - 1) % viewModel.names.count + viewModel.names.count) % viewModel.names.count
-        return viewModel.names[index]
+        // The same Name as the Today page's, for the phone's local day.
+        let number = DailySelector.nameNumber(for: Date())
+        return viewModel.names.first { $0.id == number } ?? viewModel.names.first
     }
 
     var body: some View {

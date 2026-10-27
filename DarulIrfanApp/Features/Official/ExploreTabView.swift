@@ -25,13 +25,13 @@ struct ExploreTabView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            DISegmentedControl(
+            // Chips sized to their names, so none is cut short.
+            DIChipTabs(
                 items: Section.allCases,
                 title: { LocalizedStringKey($0.rawValue) },
                 icon: { $0.icon },
                 selection: $section
             )
-            .padding(.horizontal, DISpacing.md)
             .padding(.vertical, DISpacing.sm)
             .background(DIColor.background)
 
