@@ -89,6 +89,22 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertNil(sessions[0].zikrAnchor)
     }
 
+    // MARK: - Ayah of the Day
+
+    /// The excerpt is the commentary's own first prose, never the section's
+    /// opening Arabic or its numbered translation.
+    @MainActor
+    func testTafsirExcerptSkipsTheOpeningBlock() throws {
+        let entry = [
+            "سورۃ البقرہ رکوع 18 آیات 148 تا 152",
+            "وَلِكُلٍّ وِّجْهَةٌ هُوَ مُوَلِّيْهَا فَاسْتَبِقُوا الْخَيْرٰتِ ؕ اَيْنَ مَا تَكُوْنُوْا يَاْتِ بِكُمُ اللّٰهُ جَمِيْعًا",
+            "اور ہر ایک کے واسطے ایک قبلہ رہا ہے جس کی طرف وہ رخ کرتا رہا پس نیکیوں میں بڑھ چڑھ کر کوشش کرو ﴿۱۴۸﴾",
+            "ہرگروہ، ہر طبقے، ہر قوم اور ہر مذہب میں کوئی نہ کوئی نقطہ اتحاد ہے۔ عبادات و اعمال ہوں، افکار و خیال ہو، رنگ و نسل کی حد بندی ہو۔",
+        ].joined(separator: "\n")
+        let excerpt = try XCTUnwrap(TodayDailyViewModel.commentaryOpening(entry))
+        XCTAssertTrue(excerpt.hasPrefix("ہرگروہ"))
+    }
+
     // MARK: - Reading direction
 
     func testScriptDirectionFollowsTheText() {

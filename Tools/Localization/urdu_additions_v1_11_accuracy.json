@@ -1,0 +1,12 @@
+{
+ "Bayan": "بیان",
+ "Check your calculation method": "اپنا حسابی طریقہ دیکھ لیں",
+ "Hanafi Asr": "حنفی عصر",
+ "Shafi Asr": "شافعی عصر",
+ "Keep %@": "%@ برقرار رکھیں",
+ "Use %@": "%@ استعمال کریں",
+ "Open in the Quran": "قرآن میں کھولیں",
+ "Surah %@ (%lld), Ayah %@": "سورۃ %1$@ (%2$lld)، آیت %3$@",
+ "Surah %@ (%lld), Ayat %@": "سورۃ %1$@ (%2$lld)، آیات %3$@",
+ "Times are calculated with %@. Around %@, %@ is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes.": "اوقات %1$@ کے طریقے سے نکالے جا رہے ہیں۔ %2$@ کے علاقے میں عموماً %3$@ رائج ہے، اور دونوں میں فجر اور عشاء کا فرق 15 سے 30 منٹ تک ہو سکتا ہے۔"
+}

@@ -7,12 +7,17 @@ import UIKit
 /// scroll above the prayer content.
 struct TodayDailySection: View {
     let appState: AppState
+    private let dependencies: AppDependencies?
     @State private var viewModel: TodayDailyViewModel
     @State private var shareItem: ShareImageItem?
 
-    init(appState: AppState) {
+    init(appState: AppState, dependencies: AppDependencies? = nil) {
         self.appState = appState
-        _viewModel = State(initialValue: TodayDailyViewModel(appState: appState))
+        self.dependencies = dependencies
+        _viewModel = State(initialValue: TodayDailyViewModel(
+            appState: appState,
+            quranRepository: dependencies?.quranRepository
+        ))
     }
 
     var body: some View {
@@ -25,7 +30,13 @@ struct TodayDailySection: View {
                 nameCard.diAppear(delay: 0.25)
             }
         }
-        .task { viewModel.load() }
+        .task {
+            viewModel.load()
+            await viewModel.loadSilsilaAyah()
+        }
+        .onChange(of: appState.settings.language) {
+            Task { await viewModel.loadSilsilaAyah() }
+        }
         .sheet(item: $shareItem) { item in
             ShareSheet(items: [item.image])
         }
@@ -44,22 +55,101 @@ struct TodayDailySection: View {
                     }
                 }
                 if let ayah = viewModel.ayah {
-                    Text(ayah.arabic)
+                    let silsila = viewModel.silsilaAyah
+                    Text(verbatim: silsila?.arabic ?? ayah.arabic)
                         .font(DIFont.quranArabic(scale: 1.05))
                         .foregroundStyle(DIColor.textPrimary)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .lineSpacing(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
                     Rectangle().fill(DIColor.accent).frame(height: 1).opacity(0.5)
-                    if let translation = viewModel.ayahTranslation() {
-                        Text(translation)
-                            .font(.body)
-                            .foregroundStyle(DIColor.textPrimary)
+                    if let translation = silsila?.translation ?? viewModel.ayahTranslation() {
+                        translationText(translation, urdu: silsila?.isUrdu ?? (viewModel.language == .urdu))
                     }
-                    Text(ayah.reference)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
+                    // Whose translation it is, and exactly where it is from.
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(verbatim: silsila?.reference ?? ayah.reference)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIColor.primary)
+                        if let silsila {
+                            Text(verbatim: [silsila.surahNameArabic, silsila.translationEdition]
+                                .filter { !$0.isEmpty }.joined(separator: " · "))
+                                .font(.caption2)
+                                .foregroundStyle(DIColor.textMuted)
+                        }
+                    }
+                    if let excerpt = silsila?.tafsirExcerpt, let title = silsila?.tafsirTitle {
+                        Divider()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Label {
+                                Text(verbatim: title)
+                            } icon: {
+                                Image(systemName: "text.book.closed")
+                            }
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIColor.accent)
+                            translationText(excerpt, urdu: silsila?.isUrdu ?? false, small: true)
+                        }
+                    }
+                    HStack(spacing: DISpacing.sm) {
+                        Button {
+                            DIHaptics.soft()
+                            NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: "quran")
+                            NotificationCenter.default.post(
+                                name: .openQuranAyah,
+                                object: QuranAyahLink(surah: ayah.surah, ayah: ayah.ayahStart)
+                            )
+                        } label: {
+                            Label("Open in the Quran", systemImage: "book.closed")
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .buttonStyle(.bordered)
+                        if let bayan = silsila?.bayan, let dependencies {
+                            Button {
+                                DIHaptics.soft()
+                                play(bayan, dependencies: dependencies)
+                            } label: {
+                                Label("Bayan", systemImage: "play.circle")
+                                    .font(.subheadline.weight(.semibold))
+                            }
+                            .buttonStyle(.bordered)
+                            .accessibilityLabel(Text(verbatim: bayan.title))
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    /// Urdu in Nastaliq right to left, English left to right, whatever the
+    /// app's own layout is.
+    @ViewBuilder
+    private func translationText(_ text: String, urdu: Bool, small: Bool = false) -> some View {
+        if urdu {
+            Text(verbatim: text)
+                .font(DIFont.urduBody(scale: small ? 0.85 : 1.0))
+                .foregroundStyle(DIColor.textPrimary)
+                .lineSpacing(6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .rightToLeft)
+        } else {
+            Text(verbatim: text)
+                .font(small ? .subheadline : .body)
+                .foregroundStyle(DIColor.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .leftToRight)
+        }
+    }
+
+    /// Plays the bayan on these verses through the shared player.
+    private func play(_ link: AyahBayanLink, dependencies: AppDependencies) {
+        Task {
+            guard let item = try? await dependencies.mediaRepository.item(id: link.mediaID),
+                  let url = item.streamUrl.flatMap({ URL(string: $0) }) else { return }
+            dependencies.audioPlayer.play(
+                AudioPlayableItem(id: item.id, title: item.title, subtitle: item.speaker, url: url, mediaItemID: item.id),
+                queue: []
+            )
         }
     }
 

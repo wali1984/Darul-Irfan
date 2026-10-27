@@ -35,13 +35,21 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 
 | Item | Status |
 |---|---|
-| Reproduce the app's exact calculation (adhan engine, same parameters) for a city/date grid across every continent, both hemispheres, DST transitions, high latitudes, equator, date line | todo |
-| Compare against an independent implementation and published official timetables (Karachi/Pakistan, ISNA/MWL/Moonsighting for North America, Umm al-Qura, Egypt, UK high-latitude) | todo |
-| Time zone of the computed place: device location -> correct IANA zone (not the phone's zone when they differ), manual cities, travel | todo |
-| Default method/Asr by region (not Karachi for everyone), high-latitude rule, elevation, rounding, manual offsets | todo |
-| Stale location: refresh on significant move / timezone change; show which place and method the times are for | todo |
-| Widget, Watch, notifications and Today all use the same computed times | todo |
-| Regression tests pinning verified times per region | todo |
+| Reproduce the app's exact calculation (adhan engine, same parameters) for a city/date grid across every continent, both hemispheres, DST transitions, high latitudes, equator, date line | done: 16 cities x 6 dates; engine within 0.5 min of a VSOP87 ephemeris for Fajr/sunrise/Maghrib/Isha, ~1 min Asr |
+| Compare against an independent implementation (Aladhan) and a high-precision ephemeris | done; found Umm al-Qura Ramadan Isha 30 min early (fixed) and the high-latitude clamp moving real twilight by up to 84 min (fixed: astronomy wherever the angle is reached) |
+| Time zone of the computed place | done: geocoder zone; manual cities without a zone no longer offered |
+| Default method by region (not Karachi for everyone) | done: chosen from the place's country at onboarding; Today suggests it to existing users; method/Asr/place shown under the times |
+| Stale location; show which place and method the times are for | done: refresh on activation (existing) + method/Asr/place line under the times |
+| Widget, Watch, notifications and Today all use the same computed times | done: all call PrayerCalculationService.schedule |
+| Regression tests pinning verified times per region | done: PrayerAccuracyTests |
+
+## A3. Added 2026-10-27: Ayah of the Day
+
+| Item | Status |
+|---|---|
+| Translation from the Silsila's own Akram-ut-Tarajum, in the reader's language | done (from the Quran database, mushaf Arabic) |
+| Full reference (surah name, number, ayah) and open-in-reader | done |
+| Tafsir excerpt / bayan link where the ayah has one; share with reference | done (verbatim opening of Akram-ut-Tafaseer / Asrar-at-Tanzil, labelled) |
 
 ## C. "Useful companion" plan — first increment (iOS)
 

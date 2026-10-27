@@ -135,8 +135,17 @@ final class OnboardingViewModel {
                 $0.locationMode = .device
             }
             locationPhase = .resolved(place)
+            suggestMethod(for: place)
         } catch {
             locationPhase = .failed
+        }
+    }
+
+    /// Pre-selects the method used where the person is. The picker remains
+    /// theirs to change; nothing is saved until they continue.
+    private func suggestMethod(for place: PlaceCoordinate) {
+        if let recommended = CalculationMethodChoice.recommended(forCountryCode: place.countryCode) {
+            selectedMethod = recommended
         }
     }
 
@@ -161,6 +170,7 @@ final class OnboardingViewModel {
             $0.locationMode = .manual
         }
         locationPhase = .resolved(place)
+        suggestMethod(for: place)
     }
 
     // MARK: - Calculation
@@ -174,6 +184,7 @@ final class OnboardingViewModel {
         await appState.updateSettings {
             $0.calculation.method = selectedMethod
             $0.calculation.asrMethod = selectedAsrMethod
+            $0.calculation.methodConfirmed = true
         }
         advance()
     }

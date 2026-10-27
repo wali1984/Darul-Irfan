@@ -396,3 +396,66 @@ struct TodayReminderStatus: View {
         Prayer.obligatory.filter { appState.settings.prayerNotifications.style(for: $0) != .off }.count
     }
 }
+
+// MARK: - Calculation method
+
+/// Which convention today's times follow, and where - stated plainly under
+/// the times so nobody has to guess why they differ from a mosque's sheet.
+@MainActor
+struct TodayMethodLine: View {
+    let appState: AppState
+
+    var body: some View {
+        let calculation = appState.settings.calculation
+        let method = String(localized: String.LocalizationValue(calculation.method.englishName))
+        let asr = calculation.asrMethod == .hanafi ? String(localized: "Hanafi Asr") : String(localized: "Shafi Asr")
+        let place = appState.activePlace?.name ?? ""
+        Text(verbatim: [method, asr, place].filter { !$0.isEmpty }.joined(separator: " · "))
+            .font(.caption)
+            .foregroundStyle(DIColor.textMuted)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, DISpacing.sm)
+    }
+}
+
+/// Offered once, when the method in use is not the one used where the
+/// person is and they have never chosen one themselves.
+@MainActor
+struct TodayMethodSuggestion: View {
+    let appState: AppState
+
+    var body: some View {
+        let calculation = appState.settings.calculation
+        if calculation.methodConfirmed != true,
+           let place = appState.activePlace,
+           let recommended = CalculationMethodChoice.recommended(forCountryCode: place.countryCode),
+           recommended != calculation.method {
+            let current = String(localized: String.LocalizationValue(calculation.method.englishName))
+            let suggested = String(localized: String.LocalizationValue(recommended.englishName))
+            DICard {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Label("Check your calculation method", systemImage: "exclamationmark.circle")
+                        .font(.headline)
+                    Text("Times are calculated with \(current). Around \(place.name), \(suggested) is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes.")
+                        .font(.subheadline)
+                        .foregroundStyle(DIColor.textMuted)
+                    HStack(spacing: DISpacing.sm) {
+                        Button("Use \(suggested)") {
+                            Task {
+                                await appState.updateSettings {
+                                    $0.calculation.method = recommended
+                                    $0.calculation.methodConfirmed = true
+                                }
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        Button("Keep \(current)") {
+                            Task { await appState.updateSettings { $0.calculation.methodConfirmed = true } }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+            }
+        }
+    }
+}

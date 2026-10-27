@@ -74,6 +74,9 @@ struct PlaceCoordinate: Codable, Sendable, Equatable, Hashable {
     var name: String
     /// IANA timezone identifier, e.g. "Asia/Karachi".
     var timeZoneIdentifier: String
+    /// ISO 3166 country code from the geocoder, e.g. "PK". Optional: places
+    /// saved before it existed, or resolved offline, have none.
+    var countryCode: String? = nil
 
     var timeZone: TimeZone {
         TimeZone(identifier: timeZoneIdentifier) ?? .current
@@ -205,8 +208,40 @@ struct PrayerMinuteAdjustments: Codable, Sendable, Equatable {
 }
 
 /// Everything `PrayerCalculationService` needs to compute times.
+extension CalculationMethodChoice {
+    /// The method in common use where a place is, by country.
+    ///
+    /// Prayer times are only "right" against the convention a community
+    /// follows: Karachi's 18 degrees in Pakistan, ISNA's 15 degrees across
+    /// North America, the Moonsighting Committee in the UK, Umm al-Qura in
+    /// Saudi Arabia, and each Gulf state's own authority. Fajr and Isha differ
+    /// by 15-30 minutes between them, so one default for everyone is wrong
+    /// for most of the world. Unknown countries fall back to the Muslim World
+    /// League, the most widely used international standard.
+    static func recommended(forCountryCode code: String?) -> CalculationMethodChoice? {
+        guard let code = code?.uppercased(), !code.isEmpty else { return nil }
+        switch code {
+        case "PK", "IN", "BD", "AF": return .karachi
+        case "US", "CA": return .northAmerica
+        case "GB", "IE": return .moonsightingCommittee
+        case "SA": return .ummAlQura
+        case "AE": return .dubai
+        case "KW": return .kuwait
+        case "QA": return .qatar
+        case "EG", "SD", "LY": return .egyptian
+        case "SG", "MY", "BN", "ID": return .singapore
+        case "IR": return .tehran
+        case "TR": return .turkey
+        default: return .muslimWorldLeague
+        }
+    }
+}
+
 struct PrayerCalculationPreferences: Codable, Sendable, Equatable {
     var method: CalculationMethodChoice = .karachi
+    /// True once the person has chosen or confirmed the method themselves.
+    /// Until then the app may suggest the method used where they are.
+    var methodConfirmed: Bool? = nil
     var customAngles = CustomCalculationAngles()
     var asrMethod: AsrMethodChoice = .hanafi
     var highLatitudeRule: HighLatitudeRuleChoice = .automatic

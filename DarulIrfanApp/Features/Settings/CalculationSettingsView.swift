@@ -52,7 +52,10 @@ struct CalculationSettingsView: View {
         SettingsBinding.value(
             in: appState,
             get: { $0.calculation.method },
-            set: { settings, method in settings.calculation.method = method }
+            set: { settings, method in
+                settings.calculation.method = method
+                settings.calculation.methodConfirmed = true
+            }
         )
     }
 

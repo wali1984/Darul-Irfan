@@ -8,6 +8,26 @@ import Observation
 @MainActor
 final class TodayDailyViewModel {
     private let appState: AppState
+    private let quranRepository: (any QuranRepositoryProtocol)?
+
+    /// The day's ayah as the reader shows it: the mushaf's own Arabic, the
+    /// Silsila's Akram-ut-Tarajum in the reading language, a full reference,
+    /// a short verbatim tafsir excerpt and any bayan on the verses.
+    struct SilsilaAyah: Equatable {
+        var arabic: String
+        var translation: String?
+        /// "Akram-ut-Tarajum" in the app language.
+        var translationEdition: String
+        /// e.g. "Surah Al-Baqarah (2), Ayat 255" in the app language.
+        var reference: String
+        var surahNameArabic: String
+        var tafsirExcerpt: String?
+        var tafsirTitle: String?
+        var isUrdu: Bool
+        var bayan: AyahBayanLink?
+    }
+
+    private(set) var silsilaAyah: SilsilaAyah?
 
     private(set) var ayah: DailyAyah?
     private(set) var dua: Dua?
@@ -16,8 +36,9 @@ final class TodayDailyViewModel {
     private(set) var dhikr: DailyDhikr?
     private(set) var isLoaded = false
 
-    init(appState: AppState) {
+    init(appState: AppState, quranRepository: (any QuranRepositoryProtocol)? = nil) {
         self.appState = appState
+        self.quranRepository = quranRepository
     }
 
     var language: AppLanguage { appState.settings.language }
@@ -36,6 +57,77 @@ final class TodayDailyViewModel {
         dhikr = DailySelector.pick(DailyDhikr.all, for: date, stream: .dhikr)
         isLoaded = true
     }
+
+    /// Replaces the bundled list's generic translation with the Silsila's
+    /// own, read from the Quran database exactly as the reader shows it.
+    func loadSilsilaAyah() async {
+        guard let ayah, let repository = quranRepository else { return }
+        let language = appState.settings.language.contentLanguageCode
+        let range = ayah.ayahStart...max(ayah.ayahStart, ayah.ayahEnd)
+
+        let surah = (try? await repository.allSurahs())?.first { $0.id == ayah.surah }
+        let mushaf = ((try? await repository.ayahs(inSurah: ayah.surah)) ?? [])
+            .filter { range.contains($0.ayahNumber) }
+            .sorted { $0.ayahNumber < $1.ayahNumber }
+        let arabic = mushaf.isEmpty ? ayah.arabic : mushaf.map(\.textArabic).joined(separator: " ")
+
+        let rows = ((try? await repository.translations(editionID: "akram-ut-tarajum-\(language)", surahNumber: ayah.surah)) ?? [])
+            .filter { range.contains($0.ayahNumber) }
+            .sorted { $0.ayahNumber < $1.ayahNumber }
+        let translation = rows.isEmpty ? nil : rows.map { row in
+            range.count > 1 ? "\(row.text) (\(row.ayahNumber))" : row.text
+        }.joined(separator: " ")
+
+        let name = surah?.nameTransliterated ?? ""
+        let verses = range.count > 1 ? "\(range.lowerBound)-\(range.upperBound)" : "\(range.lowerBound)"
+        let reference = range.count > 1
+            ? String(localized: "Surah \(name) (\(ayah.surah)), Ayat \(verses)")
+            : String(localized: "Surah \(name) (\(ayah.surah)), Ayah \(verses)")
+
+        // A short, verbatim opening of the commentary, labelled with its
+        // work: the Silsila's Akram-ut-Tafaseer in Urdu, Asrar-at-Tanzil in
+        // English. Never summarised or rewritten.
+        let tafsirEdition = language == "ur" ? "akram-ut-tafaseer-ur" : "asrar-at-tanzil-en"
+        let tafsirRows = (try? await repository.tafsir(editionID: tafsirEdition, surahNumber: ayah.surah)) ?? []
+        let entry = tafsirRows.first { $0.ayahStart <= range.lowerBound && range.lowerBound <= $0.ayahEnd }
+        let excerpt = entry.flatMap { Self.commentaryOpening($0.text) }
+        let tafsirTitle = language == "ur"
+            ? QuranContentMode.akramTafaseer.localizedTitle
+            : QuranContentMode.asrarTanzil.localizedTitle
+
+        silsilaAyah = SilsilaAyah(
+            arabic: arabic,
+            translation: translation ?? ayah.translation(for: language == "ur" ? .urdu : .english),
+            translationEdition: QuranContentMode.tarajum.localizedTitle,
+            reference: reference,
+            surahNameArabic: surah?.nameArabic ?? "",
+            tafsirExcerpt: excerpt,
+            tafsirTitle: excerpt == nil ? nil : tafsirTitle,
+            isUrdu: language == "ur",
+            bayan: AyahBayanLinkProvider.shared.links(surah: ayah.surah, ayah: range.lowerBound).first
+        )
+    }
+
+    /// The first paragraph of prose in a tafsir entry, cut at a sentence
+    /// near 320 characters. Skips the section's opening Arabic and numbered
+    /// translation, which the card already shows.
+    static func commentaryOpening(_ text: String) -> String? {
+        let harakat = CharacterSet(charactersIn: "\u{064B}\u{064C}\u{064D}\u{064E}\u{064F}\u{0650}\u{0651}\u{0652}\u{0670}")
+        for paragraph in text.components(separatedBy: "\n") {
+            let line = paragraph.trimmingCharacters(in: .whitespaces)
+            guard line.count >= 80, !line.contains("\u{FD3F}") else { continue }
+            let marks = line.unicodeScalars.filter { harakat.contains($0) }.count
+            guard Double(marks) < Double(line.count) * 0.05 else { continue }
+            guard line.count > 340 else { return line }
+            let head = String(line.prefix(340))
+            if let stop = head.lastIndex(where: { "۔.!?؟".contains($0) }), head.distance(from: head.startIndex, to: stop) > 120 {
+                return String(head[...stop])
+            }
+            return head + "…"
+        }
+        return nil
+    }
+
 
     // MARK: - Display helpers
 
@@ -57,6 +149,11 @@ final class TodayDailyViewModel {
 
     func ayahShare() -> ShareableContent? {
         guard let ayah else { return nil }
+        if let silsila = silsilaAyah {
+            return ShareableContent(badge: "Ayah of the Day", arabic: silsila.arabic,
+                                    translation: silsila.translation,
+                                    attribution: "\(silsila.reference) · \(silsila.translationEdition)")
+        }
         return ShareableContent(badge: "Ayah of the Day", arabic: ayah.arabic,
                                 translation: ayahTranslation(), attribution: ayah.reference)
     }

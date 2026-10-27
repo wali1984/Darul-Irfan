@@ -86,14 +86,17 @@ final class LocationService: NSObject, LocationServicing, CLLocationManagerDeleg
         do {
             let placemarks = try await geocoder.geocodeAddressString(trimmed)
             return placemarks.compactMap { placemark -> PlaceCoordinate? in
-                guard let location = placemark.location else { return nil }
+                // A city's times are shown on its own clock; without its time
+                // zone they would be shown on this phone's, which is wrong for
+                // any city elsewhere. Such a result is left out.
+                guard let location = placemark.location, let timeZone = placemark.timeZone else { return nil }
                 let coordinate = location.coordinate
-                let timeZone: TimeZone = placemark.timeZone ?? TimeZone.current
                 return PlaceCoordinate(
                     latitude: coordinate.latitude,
                     longitude: coordinate.longitude,
                     name: displayName(for: placemark, coordinate: coordinate),
-                    timeZoneIdentifier: timeZone.identifier
+                    timeZoneIdentifier: timeZone.identifier,
+                    countryCode: placemark.isoCountryCode
                 )
             }
         } catch {
@@ -161,7 +164,10 @@ final class LocationService: NSObject, LocationServicing, CLLocationManagerDeleg
     private func place(for location: CLLocation) async -> PlaceCoordinate {
         let coordinate = location.coordinate
         var name = coordinatesText(for: coordinate)
+        // The phone's own zone is right for where the phone is (iOS sets it
+        // from the network); the geocoder's is preferred when it answers.
         var timeZoneIdentifier = TimeZone.current.identifier
+        var countryCode: String?
 
         let geocoder = CLGeocoder()
         if let placemarks = try? await geocoder.reverseGeocodeLocation(location),
@@ -170,13 +176,15 @@ final class LocationService: NSObject, LocationServicing, CLLocationManagerDeleg
             if let placemarkTimeZone = placemark.timeZone {
                 timeZoneIdentifier = placemarkTimeZone.identifier
             }
+            countryCode = placemark.isoCountryCode
         }
 
         return PlaceCoordinate(
             latitude: coordinate.latitude,
             longitude: coordinate.longitude,
             name: name,
-            timeZoneIdentifier: timeZoneIdentifier
+            timeZoneIdentifier: timeZoneIdentifier,
+            countryCode: countryCode
         )
     }
 

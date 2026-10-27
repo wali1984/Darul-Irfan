@@ -44,6 +44,8 @@ struct PrayerTabView: View {
                             DISectionHeader(titleKey: "Today's Times", systemImage: "clock")
                             timesCard(schedule: schedule)
                                 .diScrollReveal()
+                            TodayMethodLine(appState: appState)
+                            TodayMethodSuggestion(appState: appState)
                             TodayReminderStatus(dependencies: dependencies, appState: appState)
                             if viewModel.isRamadan {
                                 ramadanCard(schedule: schedule)
@@ -71,7 +73,7 @@ struct PrayerTabView: View {
                     TodayOfficialSection(dependencies: dependencies)
                     // Daily spiritual companion cards follow the time-sensitive
                     // prayer and official-live information.
-                    TodayDailySection(appState: appState)
+                    TodayDailySection(appState: appState, dependencies: dependencies)
                 }
                 .padding(DISpacing.md)
                 .diResponsiveWidth()

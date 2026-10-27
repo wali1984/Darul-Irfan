@@ -18632,6 +18632,176 @@
           }
         }
       }
+    },
+    "Bayan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bayan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بیان"
+          }
+        }
+      }
+    },
+    "Check your calculation method": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your calculation method"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنا حسابی طریقہ دیکھ لیں"
+          }
+        }
+      }
+    },
+    "Hanafi Asr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hanafi Asr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حنفی عصر"
+          }
+        }
+      }
+    },
+    "Shafi Asr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shafi Asr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شافعی عصر"
+          }
+        }
+      }
+    },
+    "Keep %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ برقرار رکھیں"
+          }
+        }
+      }
+    },
+    "Use %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ استعمال کریں"
+          }
+        }
+      }
+    },
+    "Open in the Quran": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in the Quran"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن میں کھولیں"
+          }
+        }
+      }
+    },
+    "Surah %@ (%lld), Ayah %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surah %@ (%lld), Ayah %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سورۃ %1$@ (%2$lld)، آیت %3$@"
+          }
+        }
+      }
+    },
+    "Surah %@ (%lld), Ayat %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surah %@ (%lld), Ayat %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سورۃ %1$@ (%2$lld)، آیات %3$@"
+          }
+        }
+      }
+    },
+    "Times are calculated with %@. Around %@, %@ is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Times are calculated with %@. Around %@, %@ is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اوقات %1$@ کے طریقے سے نکالے جا رہے ہیں۔ %2$@ کے علاقے میں عموماً %3$@ رائج ہے، اور دونوں میں فجر اور عشاء کا فرق 15 سے 30 منٹ تک ہو سکتا ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
