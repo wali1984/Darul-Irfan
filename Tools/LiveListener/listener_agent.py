@@ -156,31 +156,68 @@ def try_join(room: str) -> bool:
     return False
 
 
+ROOM_TOPIC = "naqsh bandia"
+
+
 def joined_room_title(room: str) -> str | None:
-    """The title of the joined room (its own window, or a pane or tab in the
-    main window), or None when not in the room. Search results and tiles
-    carry the name too, so only window-like elements count."""
-    try:
-        from pywinauto import Desktop
-    except ImportError:
+    """The joined room's topic line, or None when not in the room.
+
+    Paltalk shows a joined room as a panel inside its main window
+    (ui::rooms::RoomWidget). The room's name is drawn as a picture and is not
+    readable, but the topic line under it is: "Hazrat Ameer Abdul Qadeer Awan
+    (MZA), Sheikh Silsila Naqsh Bandia Owaisia". So the room counts as joined
+    when that panel is open and its topic carries ROOM_TOPIC, or the room's
+    name for a room that writes it in its topic."""
+    window = paltalk_window()
+    if window is None:
         return None
-    wanted = room.lower()
-    pids = {proc.pid for proc in psutil.process_iter(["name"]) if (proc.info.get("name") or "").lower() == "paltalk.exe"}
-    for window in Desktop(backend="uia").windows():
-        try:
-            if window.element_info.process_id not in pids:
-                continue
-            name = window.element_info.name or ""
-            if wanted in name.lower():
-                return name
-            for kind in ("Pane", "Window", "TabItem", "Document"):
-                for element in window.descendants(control_type=kind):
-                    name = element.element_info.name or ""
-                    if wanted in name.lower():
-                        return name
-        except Exception:  # noqa: BLE001 - the UI changes under us; try again next tick
-            continue
+    wanted = {room.lower(), ROOM_TOPIC}
+    try:
+        panel = next((element for element in window.descendants(control_type="Group")
+                      if (element.element_info.automation_id or "").endswith("ui::rooms::RoomWidget")), None)
+        if panel is None:
+            return None
+        for label in panel.descendants(control_type="Text"):
+            text = label.element_info.name or ""
+            if any(word in text.lower() for word in wanted):
+                return text
+    except Exception:  # noqa: BLE001 - the UI changes under us; try again next tick
+        return None
     return None
+
+
+def room_panel(window):
+    return next((element for element in window.descendants(control_type="Group")
+                 if (element.element_info.automation_id or "").endswith("ui::rooms::RoomWidget")), None)
+
+
+def someone_talking() -> bool:
+    """Whether the room shows anyone under Talking Now."""
+    window = paltalk_window()
+    try:
+        panel = room_panel(window) if window else None
+        return panel is not None and any(
+            (element.element_info.automation_id or "").endswith("ui::rooms::TalkerWidget")
+            for element in panel.descendants(control_type="Group"))
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def toggle_room_speaker() -> bool:
+    """Presses the room's speaker button through accessibility (no mouse,
+    no keys). Paltalk does not expose whether the speaker is on, so the
+    caller decides from what the loopback hears while someone is talking."""
+    window = paltalk_window()
+    try:
+        panel = room_panel(window) if window else None
+        button = next((element for element in panel.descendants(control_type="Button")
+                       if (element.element_info.name or "") == "Toggle Speaker"), None) if panel else None
+        if button is None:
+            return False
+        button.invoke()
+        return True
+    except Exception:  # noqa: BLE001
+        return False
 
 
 # MARK: - Audio
@@ -291,6 +328,8 @@ class Encoder:
         self.running = False
         self.thread: threading.Thread | None = None
         self.peak = 0
+        # When the loopback last carried sound, so a muted room is noticed.
+        self.last_sound = time.time()
         self.reported = time.time()
 
     def start(self) -> None:
@@ -324,7 +363,10 @@ class Encoder:
         """Logs the loudest sample once a minute, so silence is visible."""
         samples = array.array("h", chunk[: len(chunk) - len(chunk) % 2])
         if samples:
-            self.peak = max(self.peak, max(abs(value) for value in samples[::16]))
+            loudest = max(abs(value) for value in samples[::16])
+            self.peak = max(self.peak, loudest)
+            if loudest >= 50:
+                self.last_sound = time.time()
         if time.time() - self.reported >= 60:
             log(f"audio peak over the last minute: {self.peak} of 32767{' (silent)' if self.peak < 50 else ''}")
             self.peak, self.reported = 0, time.time()
@@ -395,6 +437,12 @@ def main() -> int:
         parser.error("--output is required outside --once-test")
     encoder: Encoder | None = None
     last_search = 0.0
+    # A room whose speaker is off plays nothing, so nothing is captured.
+    # Someone under Talking Now with silence on the loopback means the
+    # speaker is off: press it, and press again if that made it worse.
+    talker_since: float | None = None
+    last_toggle = 0.0
+    toggles_without_sound = 0
     try:
         while True:
             problem = ensure_paltalk()
@@ -412,6 +460,20 @@ def main() -> int:
                 log("room closed or left; stopping")
                 encoder.stop()
                 encoder = None
+            if title and encoder is not None:
+                now = time.time()
+                if someone_talking():
+                    talker_since = talker_since or now
+                    if now - encoder.last_sound < 45:
+                        toggles_without_sound = 0
+                    elif now - talker_since >= 45 and now - last_toggle >= 45 and toggle_room_speaker():
+                        last_toggle = now
+                        toggles_without_sound += 1
+                        log("someone is talking but nothing is heard; pressed the room speaker")
+                else:
+                    talker_since = None
+                if toggles_without_sound >= 3:
+                    problem = "Someone is talking in the room but no sound reaches the stream"
             if title and encoder is not None and encoder.process and encoder.process.poll() is not None:
                 problem = "In the room but the stream keeps stopping"
             heartbeat(args.heartbeat_url, args.heartbeat_token,
