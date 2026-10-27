@@ -10,6 +10,7 @@ final class ZikrHomeViewModel {
     private let notifications: any NotificationScheduling
     private let platform: OfficialPlatformService
     private let watchSync: WatchSyncService
+    private let prayerCalculation: any PrayerCalculationServicing
 
     private(set) var sessions: [ZikrSession] = []
     private(set) var nextOccurrences: [String: Date] = [:]
@@ -24,10 +25,16 @@ final class ZikrHomeViewModel {
     /// Minutes before the session start that the reminder fires.
     private let reminderLeadMinutes = 10
 
-    init(notifications: any NotificationScheduling, platform: OfficialPlatformService, watchSync: WatchSyncService) {
+    init(
+        notifications: any NotificationScheduling,
+        platform: OfficialPlatformService,
+        watchSync: WatchSyncService,
+        prayerCalculation: any PrayerCalculationServicing
+    ) {
         self.notifications = notifications
         self.platform = platform
         self.watchSync = watchSync
+        self.prayerCalculation = prayerCalculation
     }
 
     func load(forceRefresh: Bool = false) async {
@@ -51,27 +58,19 @@ final class ZikrHomeViewModel {
                 sourceUrl: nil
             )
         }
-        // A reachable control plane with no active schedule is authoritative:
-        // do not resurrect the old approximate timings that conflicted with
-        // the official site. Bundled sessions are used only for a true
-        // first-launch/offline fallback and are labelled for verification.
-        let loaded: [ZikrSession]
-        if !remote.isEmpty {
-            loaded = remote
-        } else if bootstrap.generatedAt == .distantPast {
-            loaded = SeedBundle.zikrSessions().map { session in
-                var fallback = session
-                fallback.availabilityNote = String(localized: "Offline fallback timing — pull down later to verify the current schedule before joining.")
-                return fallback
-            }
-        } else {
-            loaded = []
-        }
+        // A schedule the administrators publish wins. Without one, the
+        // bundled sessions are the official schedule itself - "After Isha and
+        // Tahajjud (Pakistan Time)", from naqshbandiaowaisiah.org - computed
+        // at Dar-ul-Irfan for today rather than a fixed guess. (A reachable
+        // control plane with no schedule used to blank the section; it has
+        // published none, so every tester saw "Schedule not available".)
+        let now = Date()
+        let source = remote.isEmpty ? SeedBundle.zikrSessions() : remote
+        let loaded = source.map { ZikrAnchorResolver.resolved($0, at: now, calculator: prayerCalculation) }
         sessions = loaded
         watchSync.updateZikrSessions(loaded)
 
         var occurrences: [String: Date] = [:]
-        let now = Date()
         for session in loaded {
             occurrences[session.id] = ZikrScheduleMath.nextOccurrence(of: session, after: now)
         }
@@ -127,7 +126,8 @@ final class ZikrHomeViewModel {
         // while the screen stayed open. nextOccurrence(after:) is strictly
         // in the future, so a valid fire date always exists.
         let now = Date()
-        guard let next = ZikrScheduleMath.nextOccurrence(of: session, after: now) else { return }
+        let current = ZikrAnchorResolver.resolved(session, at: now, calculator: prayerCalculation)
+        guard let next = ZikrScheduleMath.nextOccurrence(of: current, after: now) else { return }
         nextOccurrences[session.id] = next
 
         var fireDate = next.addingTimeInterval(TimeInterval(-reminderLeadMinutes * 60))

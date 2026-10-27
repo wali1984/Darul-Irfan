@@ -81,6 +81,14 @@ enum SeedBundle {
         decodeArray(ContentItem.self, fromFile: "library_items")
     }
 
+    /// One library item straight from the bundle, for screens that must never
+    /// be empty: the content database is the normal source, but if its import
+    /// has not landed (or failed and is waiting to retry) the bundled copy is
+    /// the same verified text.
+    static func libraryItem(id: String) -> ContentItem? {
+        libraryItems().first { $0.id == id }
+    }
+
     /// OCR'd page text for the Silsila's books (`book_pages.json`), one record
     /// per printed page keyed to a `library_items.json` id. Absent until the
     /// books are ingested — returns [] and each book falls back to its PDF.
@@ -144,8 +152,9 @@ enum SeedBundle {
 
     /// Locates a seed file whether the SeedData folder was copied as a
     /// folder reference (subdirectory preserved) or flattened into the
-    /// bundle root by the project generator.
-    private static func url(forFile fileName: String) -> URL? {
+    /// bundle root by the project generator. Internal so the reader-only
+    /// lookups (bayan links, tafsir volumes) find files the same way.
+    static func url(forFile fileName: String) -> URL? {
         let bundle = Bundle.main
         if let url = bundle.url(forResource: fileName, withExtension: "json", subdirectory: "SeedData") {
             return url

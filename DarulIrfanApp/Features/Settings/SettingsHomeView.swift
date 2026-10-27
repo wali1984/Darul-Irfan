@@ -127,6 +127,19 @@ struct SettingsHomeView: View {
             ) {
                 PrivacySettingsView(appState: appState)
             }
+
+            // Moved here from About, which no longer carries it. The notices
+            // are not optional: adhan-swift is MIT, the fonts are OFL and the
+            // Fajr azan recording is CC BY 3.0, and each requires its
+            // attribution to ship in the app.
+            SettingsNavLink(
+                titleKey: "Licences",
+                systemImage: "doc.text.fill",
+                value: nil,
+                delay: 0.61
+            ) {
+                AcknowledgementsView()
+            }
         }
     }
 

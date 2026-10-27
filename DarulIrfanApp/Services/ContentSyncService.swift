@@ -115,151 +115,197 @@ struct ContentSyncService: ContentSyncServicing {
         let installedVersion = try await readIntValue(forKey: Keys.seedVersion) ?? 0
         guard installedVersion < targetVersion else { return 0 }
 
-        let surahs = SeedBundle.quranSurahs()
-        let ayahs = SeedBundle.quranAyahs()
-        let editions = SeedBundle.quranEditions()
-        let translations = SeedBundle.quranTranslations()
-        let tafsir = SeedBundle.quranTafsir()
-        let libraryItems = SeedBundle.libraryItems()
-        let bookPages = SeedBundle.bookPages()
-        let mediaItems = SeedBundle.mediaItems()
-        let events = SeedBundle.events()
-        let announcements = SeedBundle.announcements()
+        // The import runs as independent stages, each stamped on its own.
+        //
+        // It used to be one sequence: everything decoded up front (the 57 MB
+        // book-page seed included) and hadith imported before the library, so
+        // a single failure anywhere - a hadith count check, memory pressure
+        // mid-way - left every later stage empty. Method of Zikr, the topics
+        // and the whole library sat behind the hadith corpus. Now the small,
+        // user-facing content lands first, each stage holds only its own data
+        // in memory, and a failed stage is retried on the next launch without
+        // redoing the ones that succeeded.
+        let stages: [(name: String, run: () async throws -> Int)] = [
+            ("quran", { try await self.importQuranSeed() }),
+            ("library", { try await self.importLibrarySeed() }),
+            ("media", { try await self.importMediaSeed() }),
+            ("events", { try await self.importEventsSeed() }),
+            ("bookPages", { try await self.importBookPagesSeed() }),
+            ("hadith", { try await self.importHadithSeed() }),
+        ]
 
         var imported = 0
+        var firstError: Error?
+        var failedStages: [String] = []
+        for stage in stages {
+            let key = Keys.seedVersion + "." + stage.name
+            if let done = try await readIntValue(forKey: key), done >= targetVersion { continue }
+            do {
+                imported += try await stage.run()
+                try await writeValue(String(targetVersion), forKey: key)
+            } catch {
+                AppLog.content("Seed stage '\(stage.name)' failed: \(error)")
+                failedStages.append(stage.name)
+                if firstError == nil { firstError = error }
+            }
+        }
 
+        // Search covers whatever did land, so a failed stage never hides the
+        // content that imported.
+        try await searchIndex.reindex(domains: SearchDomain.allCases)
+
+        if let firstError {
+            // The overall stamp stays absent, so the next launch retries the
+            // failed stages only.
+            AppLog.content("Seed import incomplete; will retry: \(failedStages.joined(separator: ", "))")
+            throw firstError
+        }
+        try await writeValue(String(targetVersion), forKey: Keys.seedVersion)
+        return imported
+    }
+
+    private func importQuranSeed() async throws -> Int {
+        var imported = 0
+        let surahs = SeedBundle.quranSurahs()
         if !surahs.isEmpty {
             try await quranRepository.upsertSurahs(surahs)
             imported += surahs.count
         }
+        let ayahs = SeedBundle.quranAyahs()
         if !ayahs.isEmpty {
             try await quranRepository.upsertAyahs(ayahs)
             imported += ayahs.count
         }
+        let editions = SeedBundle.quranEditions()
         if !editions.isEmpty {
             try await quranRepository.upsertEditions(editions)
             imported += editions.count
         }
-        // Both Asrar-at-Tanzil editions have been re-authored across versions.
-        // Delete their rows wholesale BEFORE re-importing so: (a) no stale range
-        // can orphan under an ayah — a leftover 662 KB full-surah block once
-        // crashed large surahs, including when upgrading straight from an old
-        // build; (b) ayat dropped from the source truly go blank. Re-inserted
-        // just below from the seed when present; stays gone when the seed omits
-        // it (upsert adds nothing for a missing edition).
+        // Editions whose rows have been re-authored across versions are
+        // deleted wholesale BEFORE re-importing, so (a) no stale range can
+        // orphan under an ayah - a leftover 662 KB full-surah block once
+        // crashed large surahs - and (b) ayat dropped from the source truly go
+        // blank. Akram-ut-Tafaseer joins them now that it is segmented per
+        // ayah: the single draft row of earlier builds must not survive beside
+        // the new ones.
         //
-        // The Urdu edition relies on the "stays gone" half. Its 1,118 tafsir
-        // records were withdrawn from the seed because the OCR behind them is
-        // corrupt — see Docs/ASRAR_URDU_TRANSLATION_STATUS.md — so this purge is
-        // what actually removes them from devices that already imported them.
-        // The edition row itself is deliberately kept: it carries a sourceUrl,
-        // so with no rows the reader falls back to its "not yet imported"
-        // placeholder instead of showing damaged scripture commentary.
-        for editionID in ["asrar-at-tanzil-en", "asrar-at-tanzil-ur"] {
+        // The Urdu Asrar edition relies on the "stays gone" half: its tafsir
+        // records were withdrawn because the OCR behind them is corrupt (see
+        // Docs/ASRAR_URDU_TRANSLATION_STATUS.md), and this purge is what
+        // removes them from devices that imported them. Its edition row is
+        // kept, so the reader offers the full printed volume instead.
+        for editionID in ["asrar-at-tanzil-en", "asrar-at-tanzil-ur", "akram-ut-tafaseer-ur"] {
             try await quranRepository.deleteTranslations(editionID: editionID)
             try await quranRepository.deleteTafsir(editionID: editionID)
         }
+        let translations = SeedBundle.quranTranslations()
         if !translations.isEmpty {
             try await quranRepository.upsertTranslations(translations)
             imported += translations.count
         }
+        let tafsir = SeedBundle.quranTafsir()
         if !tafsir.isEmpty {
             try await quranRepository.upsertTafsir(tafsir)
             imported += tafsir.count
         }
+        return imported
+    }
 
-        // Hadith: the catalogue plus one pack per collection. Packs are loaded
-        // and inserted one book at a time so a large corpus never has to be
-        // held in memory all at once.
-        //
-        // Every insert is counted back out of the database afterwards. Sacred
-        // text must never go missing quietly: the previous integer-keyed schema
-        // let sub-numbered narrations such as 402.2 collide with 402 and
-        // overwrite each other on insert, and nothing noticed because nobody
-        // compared what went in with what landed.
-        if let catalog = SeedBundle.hadithCatalog(), !catalog.books.isEmpty {
-            try await hadithRepository.upsertBooks(catalog.books)
-            imported += catalog.books.count
-            for book in catalog.books {
-                let rows = SeedBundle.hadithEntries(bookID: book.id)
-                guard !rows.isEmpty else { continue }
-                // Delete-then-insert: a narration dropped upstream must go,
-                // not linger as an orphan the pack no longer accounts for.
-                try await hadithRepository.deleteEntries(bookID: book.id)
-                try await hadithRepository.upsertEntries(rows)
-                imported += rows.count
+    private func importLibrarySeed() async throws -> Int {
+        let libraryItems = SeedBundle.libraryItems()
+        guard !libraryItems.isEmpty else { return 0 }
+        try await contentRepository.upsertItems(libraryItems)
+        return libraryItems.count
+    }
 
-                let stored = try await hadithRepository.entryCount(bookID: book.id)
-                if stored != rows.count {
-                    AppLog.content(
-                        "Hadith pack '\(book.id)': \(rows.count) records in the seed "
-                        + "but \(stored) rows stored — narrations were lost on insert."
-                    )
-                    throw ContentIntegrityError.hadithRowCountMismatch(
-                        bookID: book.id, expected: rows.count, stored: stored
-                    )
-                }
-                if book.hadithCount != stored {
-                    AppLog.content(
-                        "Hadith catalogue claims \(book.hadithCount) for '\(book.id)' "
-                        + "but \(stored) rows shipped."
-                    )
-                    throw ContentIntegrityError.hadithCatalogCountMismatch(
-                        bookID: book.id, claimed: book.hadithCount, stored: stored
-                    )
-                }
-            }
-            // Narrator biographies referenced by the chains, bundled natively so
-            // the reader's tap-to-open bio never calls out. Optional: absent
-            // until the corpus is ingested with people data.
-            let narrators = SeedBundle.hadithNarrators()
-            if !narrators.isEmpty {
-                try await hadithRepository.upsertNarrators(narrators)
-                imported += narrators.count
-            }
-        }
-        if !libraryItems.isEmpty {
-            try await contentRepository.upsertItems(libraryItems)
-            imported += libraryItems.count
-        }
-        // Book text: ~6,700 pages across 43 works, so insert in chunks rather
-        // than one transaction holding the whole corpus. Keyed on
-        // (book_id, page), which the generator verifies unique, so a re-import
-        // updates in place instead of dropping pages on a collision.
-        if !bookPages.isEmpty {
-            var offset = 0
-            while offset < bookPages.count {
-                let end = min(offset + 500, bookPages.count)
-                try await contentRepository.upsertBookPages(Array(bookPages[offset..<end]))
-                offset = end
-            }
-            imported += bookPages.count
-        }
-        if !mediaItems.isEmpty {
-            try await mediaRepository.upsertItems(mediaItems)
-            imported += mediaItems.count
-        }
+    private func importMediaSeed() async throws -> Int {
+        let mediaItems = SeedBundle.mediaItems()
+        guard !mediaItems.isEmpty else { return 0 }
+        try await mediaRepository.upsertItems(mediaItems)
+        return mediaItems.count
+    }
+
+    private func importEventsSeed() async throws -> Int {
+        var imported = 0
+        let events = SeedBundle.events()
         if !events.isEmpty {
             try await eventsRepository.upsertEvents(events)
             imported += events.count
         }
+        let announcements = SeedBundle.announcements()
         if !announcements.isEmpty {
             try await eventsRepository.upsertAnnouncements(announcements)
             imported += announcements.count
         }
+        return imported
+    }
 
-        guard imported > 0 else {
-            // A completely empty bundle means the seed files did not ship.
-            // Leave seed.version unchanged so a corrected build imports.
-            AppLog.content("Seed bundle contained no records; skipping version stamp.")
-            return 0
+    /// Book text: ~22,000 pages across the books and both tafsirs, inserted in
+    /// chunks rather than one transaction holding the whole corpus. Keyed on
+    /// (book_id, page), which the generator verifies unique, so a re-import
+    /// updates in place instead of dropping pages on a collision.
+    private func importBookPagesSeed() async throws -> Int {
+        let bookPages = SeedBundle.bookPages()
+        guard !bookPages.isEmpty else { return 0 }
+        var offset = 0
+        while offset < bookPages.count {
+            let end = min(offset + 500, bookPages.count)
+            try await contentRepository.upsertBookPages(Array(bookPages[offset..<end]))
+            offset = end
         }
+        return bookPages.count
+    }
 
-        // Reindex BEFORE stamping the version: if reindexing throws, the
-        // stamp stays absent and the next launch retries the whole import
-        // (repository upserts are idempotent).
-        try await searchIndex.reindex(domains: SearchDomain.allCases)
-        try await writeValue(String(targetVersion), forKey: Keys.seedVersion)
+    /// The catalogue plus one pack per collection. Packs are loaded and
+    /// inserted one book at a time so a large corpus never has to be held in
+    /// memory all at once.
+    ///
+    /// Every insert is counted back out of the database afterwards. Sacred
+    /// text must never go missing quietly: the previous integer-keyed schema
+    /// let sub-numbered narrations such as 402.2 collide with 402 and
+    /// overwrite each other on insert, and nothing noticed because nobody
+    /// compared what went in with what landed.
+    private func importHadithSeed() async throws -> Int {
+        guard let catalog = SeedBundle.hadithCatalog(), !catalog.books.isEmpty else { return 0 }
+        var imported = 0
+        try await hadithRepository.upsertBooks(catalog.books)
+        imported += catalog.books.count
+        for book in catalog.books {
+            let rows = SeedBundle.hadithEntries(bookID: book.id)
+            guard !rows.isEmpty else { continue }
+            // Delete-then-insert: a narration dropped upstream must go, not
+            // linger as an orphan the pack no longer accounts for.
+            try await hadithRepository.deleteEntries(bookID: book.id)
+            try await hadithRepository.upsertEntries(rows)
+            imported += rows.count
+
+            let stored = try await hadithRepository.entryCount(bookID: book.id)
+            if stored != rows.count {
+                AppLog.content(
+                    "Hadith pack '\(book.id)': \(rows.count) records in the seed "
+                    + "but \(stored) rows stored — narrations were lost on insert."
+                )
+                throw ContentIntegrityError.hadithRowCountMismatch(
+                    bookID: book.id, expected: rows.count, stored: stored
+                )
+            }
+            if book.hadithCount != stored {
+                AppLog.content(
+                    "Hadith catalogue claims \(book.hadithCount) for '\(book.id)' "
+                    + "but \(stored) rows shipped."
+                )
+                throw ContentIntegrityError.hadithCatalogCountMismatch(
+                    bookID: book.id, claimed: book.hadithCount, stored: stored
+                )
+            }
+        }
+        // Narrator biographies referenced by the chains, bundled natively so
+        // the reader's tap-to-open bio never calls out.
+        let narrators = SeedBundle.hadithNarrators()
+        if !narrators.isEmpty {
+            try await hadithRepository.upsertNarrators(narrators)
+            imported += narrators.count
+        }
         return imported
     }
 

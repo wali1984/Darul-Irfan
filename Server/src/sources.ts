@@ -61,7 +61,7 @@ export async function refreshYouTube(env: Env): Promise<void> {
       candidate = {
         id,
         state: snippet.liveBroadcastContent === "live" ? "live" : "scheduled",
-        title: cleanText(snippet.title, 300) ?? "Live Zikr",
+        title: cleanText(snippet.title, 300) ?? "Daily Zikr",
         details: item.liveStreamingDetails,
       };
     }
@@ -76,7 +76,7 @@ export async function refreshYouTube(env: Env): Promise<void> {
     if (candidate.state === "live" && prior?.state !== "live") {
       await sendTopicPush(
         env, `youtube-live:${now.slice(0, 16)}`, "liveZikr",
-        "Live Zikr has started", "Join the official live zikr in Darul Irfan.",
+        "Daily Zikr has started", "Join the official daily zikr in Darul Irfan.",
         "darulirfan://live/official-live"
       );
     }

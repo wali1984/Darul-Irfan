@@ -149,7 +149,7 @@ final class TopicDetailViewModel {
 
         // Choose an offline translation edition matching the language.
         let editions = (try? await quranRepository.editions()) ?? []
-        let langCode = language.forcedLocaleIdentifier ?? "en"
+        let langCode = language.contentLanguageCode
         let edition = editions.first { $0.kind == .translation && $0.isAvailableOffline && $0.language == langCode }
             ?? editions.first { $0.kind == .translation && $0.isAvailableOffline }
 

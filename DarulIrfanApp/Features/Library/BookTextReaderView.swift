@@ -19,9 +19,13 @@ import SwiftUI
 struct BookTextReaderView: View {
     let item: ContentItem
     let dependencies: AppDependencies
+    /// Page to open at, e.g. where a surah begins inside a parah volume when
+    /// the Quran reader sends someone here. Nil opens at the start.
+    var startPage: Int?
 
     @State private var pages: [BookPage] = []
     @State private var isLoading = true
+    @State private var hasScrolledToStart = false
 
     private var unresolvedPageCount: Int {
         pages.filter { !$0.isFullyResolved }.count
@@ -40,14 +44,17 @@ struct BookTextReaderView: View {
                     messageKey: "This work is available as a PDF. Its text has not been added yet."
                 )
             } else {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: DISpacing.lg) {
-                        provenanceNote
-                        ForEach(pages) { page in
-                            pageView(page)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: DISpacing.lg) {
+                            provenanceNote
+                            ForEach(pages) { page in
+                                pageView(page)
+                            }
                         }
+                        .padding(DISpacing.md)
                     }
-                    .padding(DISpacing.md)
+                    .onAppear { scrollToStartIfNeeded(proxy) }
                 }
             }
         }
@@ -101,22 +108,77 @@ struct BookTextReaderView: View {
                 }
                 Spacer()
             }
-            Text(verbatim: page.text)
-                .font(DIFont.urduBody())
-                .foregroundStyle(DIColor.textPrimary)
-                .lineSpacing(10)
-                .multilineTextAlignment(.trailing)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .environment(\.layoutDirection, .rightToLeft)
-                .textSelection(.enabled)
+            pageText(page.text)
             Divider().overlay(DIColor.border)
         }
         .id("book-page-\(page.page)")
+    }
+
+    /// Direction and face follow the page's own script, not a fixed Urdu
+    /// layout: the English Asrar-at-Tanzil volumes used to open right-aligned
+    /// in Nastaliq. Deciding per page (with the book's language as the tie
+    /// breaker) also keeps an English book's Urdu quotation pages readable.
+    @ViewBuilder
+    private func pageText(_ text: String) -> some View {
+        if ScriptDirection.isRightToLeft(text, fallbackLanguage: item.language) {
+            Text(verbatim: text)
+                .font(DIFont.urduBody())
+                .foregroundStyle(DIColor.textPrimary)
+                .lineSpacing(10)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .rightToLeft)
+                .textSelection(.enabled)
+        } else {
+            Text(verbatim: text)
+                .font(.body)
+                .foregroundStyle(DIColor.textPrimary)
+                .lineSpacing(5)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .leftToRight)
+                .textSelection(.enabled)
+        }
+    }
+
+    private func scrollToStartIfNeeded(_ proxy: ScrollViewProxy) {
+        guard !hasScrolledToStart, let startPage, !pages.isEmpty else { return }
+        hasScrolledToStart = true
+        // The nearest page at or after the requested one: scans skip blank
+        // pages, so the exact number is not always present.
+        guard let target = pages.first(where: { $0.page >= startPage }) ?? pages.last else { return }
+        DispatchQueue.main.async {
+            proxy.scrollTo("book-page-\(target.page)", anchor: .top)
+        }
     }
 
     private func load() async {
         isLoading = true
         pages = (try? await dependencies.contentRepository.bookPages(bookID: item.id)) ?? []
         isLoading = false
+    }
+}
+
+/// Decides reading direction from the text itself.
+enum ScriptDirection {
+    /// True when Arabic-script letters outnumber Latin ones. Ties and
+    /// letterless text fall back to the language the content is labelled with.
+    static func isRightToLeft(_ text: String, fallbackLanguage: String?) -> Bool {
+        var arabic = 0
+        var latin = 0
+        for scalar in text.unicodeScalars.prefix(4000) {
+            switch scalar.value {
+            case 0x0600...0x06FF, 0x0750...0x077F, 0x08A0...0x08FF, 0xFB50...0xFDFF, 0xFE70...0xFEFF:
+                arabic += 1
+            case 0x41...0x5A, 0x61...0x7A, 0xC0...0x24F:
+                latin += 1
+            default:
+                break
+            }
+        }
+        if arabic == latin {
+            return fallbackLanguage == "ur" || fallbackLanguage == "ar"
+        }
+        return arabic > latin
     }
 }

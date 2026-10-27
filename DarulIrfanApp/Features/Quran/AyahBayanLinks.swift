@@ -40,7 +40,7 @@ final class AyahBayanLinkProvider: @unchecked Sendable {
     private let bySurah: [Int: [AyahBayanLink]]
 
     private init() {
-        guard let url = Bundle.main.url(forResource: "ayah_bayan_links", withExtension: "json"),
+        guard let url = SeedBundle.url(forFile: "ayah_bayan_links"),
               let raw = try? Data(contentsOf: url),
               let file = try? JSONDecoder().decode(AyahBayanLinkFile.self, from: raw) else {
             bySurah = [:]

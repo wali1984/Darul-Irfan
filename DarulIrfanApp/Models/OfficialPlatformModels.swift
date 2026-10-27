@@ -98,7 +98,7 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
     static let offline = LiveBroadcast(
         id: "official-live",
         state: .offline,
-        title: "Live Zikr",
+        title: "Daily Zikr",
         sources: [
             LiveSource(
                 kind: .paltalk,

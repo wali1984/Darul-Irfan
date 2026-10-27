@@ -107,7 +107,7 @@ private struct DuaGroupHeader: View {
                 Image(systemName: "hands.sparkles")
                     .foregroundStyle(DIColor.accent)
                     .accessibilityHidden(true)
-                Text(verbatim: title)
+                Text(LocalizedStringKey(title))
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
                 Spacer(minLength: 0)

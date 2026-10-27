@@ -2,8 +2,9 @@ import SwiftUI
 
 /// About Darul Irfan: a premium brand moment (living emerald crest, seal,
 /// wordmark, anchor verse and version), followed by a short verified
-/// introduction to Silsila Naqshbandia Owaisiah, contact
-/// details, and acknowledgements. All organizational facts come from
+/// introduction to Silsila Naqshbandia Owaisiah and contact
+/// details. (Open-source licences live in Settings -> Licences.) All
+/// organizational facts come from
 /// Docs/RESEARCH_NOTES.md (verified against naqshbandiaowaisiah.org).
 @MainActor
 struct AboutView: View {
@@ -18,8 +19,6 @@ struct AboutView: View {
                     .diAppear(delay: 0.14)
                 sourceAndContactCard
                     .diAppear(delay: 0.20)
-                acknowledgementsLink
-                    .diAppear(delay: 0.26)
             }
             .padding(DISpacing.md)
         }
@@ -178,39 +177,6 @@ struct AboutView: View {
                 }
             }
         }
-    }
-
-    // MARK: - Acknowledgements
-
-    private var acknowledgementsLink: some View {
-        NavigationLink {
-            AcknowledgementsView()
-        } label: {
-            DIElevatedCard {
-                HStack(spacing: DISpacing.md) {
-                    ZStack {
-                        Circle().fill(DIGradient.emerald)
-                        Circle().strokeBorder(DIColor.accent.opacity(0.5), lineWidth: 1)
-                        Image(systemName: "text.book.closed.fill")
-                            .font(.callout.weight(.semibold))
-                            .foregroundStyle(.white)
-                    }
-                    .frame(width: 40, height: 40)
-                    .accessibilityHidden(true)
-
-                    Text("Acknowledgements")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(DIColor.textPrimary)
-                    Spacer(minLength: DISpacing.sm)
-                    Image(systemName: "chevron.forward")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(DIColor.textMuted)
-                        .accessibilityHidden(true)
-                }
-            }
-        }
-        .buttonStyle(DIPressableStyle())
-        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
     }
 
     // MARK: - Shared

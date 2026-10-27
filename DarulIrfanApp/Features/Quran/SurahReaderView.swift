@@ -33,7 +33,9 @@ struct SurahReaderView: View {
         self.mediaRepository = dependencies.mediaRepository
         self.audioPlayer = dependencies.audioPlayer
         self.dependencies = dependencies
-        let langCode = appState.settings.language.forcedLocaleIdentifier ?? "en"
+        let langCode = SurahReaderViewModel.initialReadingLanguage(
+            appLanguage: appState.settings.language.contentLanguageCode
+        )
         _viewModel = State(initialValue: SurahReaderViewModel(
             surah: surah,
             repository: dependencies.quranRepository,
@@ -145,14 +147,18 @@ struct SurahReaderView: View {
                     }
                     if appState.settings.quranReaderDisplayMode.showsTranslation
                         && viewModel.contentMode.isTafsir
-                        && !viewModel.hasTafsirForMode
-                        && !viewModel.readingLanguagesWithTafsirForMode.isEmpty {
-                        otherLanguageTafsirCard
-                    } else if appState.settings.quranReaderDisplayMode.showsTranslation
-                        && viewModel.contentMode.isTafsir
-                        && !viewModel.hasTafsirForMode
-                        && !viewModel.tafsirEditionPointers.isEmpty {
-                        tafsirPointerCard
+                        && !viewModel.hasTafsirForMode {
+                        // No verse-by-verse commentary in this language: the
+                        // full printed volume comes first, then the other
+                        // language if it has the per-verse text.
+                        if !viewModel.fullVolumes.isEmpty {
+                            tafsirVolumesCard(isPrimary: true)
+                        }
+                        if !viewModel.readingLanguagesWithTafsirForMode.isEmpty {
+                            otherLanguageTafsirCard
+                        } else if viewModel.fullVolumes.isEmpty && !viewModel.tafsirEditionPointers.isEmpty {
+                            tafsirPointerCard
+                        }
                     }
                     ForEach(viewModel.ayahs, id: \.ayahNumber) { ayah in
                         AyahCardView(
@@ -165,6 +171,12 @@ struct SurahReaderView: View {
                         )
                         .id(ayah.ayahNumber)
                         .onAppear { viewModel.ayahBecameVisible(ayah.ayahNumber) }
+                    }
+                    if appState.settings.quranReaderDisplayMode.showsTranslation
+                        && viewModel.contentMode.isTafsir
+                        && viewModel.hasTafsirForMode
+                        && !viewModel.fullVolumes.isEmpty {
+                        tafsirVolumesCard(isPrimary: false)
                     }
                     readerEndMarker
                 }
@@ -402,11 +414,17 @@ struct SurahReaderView: View {
     private var otherLanguageTafsirCard: some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text("\(viewModel.contentMode.title) is not in this language")
-                    .font(.headline)
-                Text("This commentary has not been prepared in the language you are reading. It is available in:")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                if viewModel.fullVolumes.isEmpty {
+                    Text("\(viewModel.contentMode.localizedTitle) is not in this language")
+                        .font(.headline)
+                    Text("This commentary has not been prepared in the language you are reading. It is available in:")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Verse by verse, this commentary is available in:")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
                 HStack(spacing: DISpacing.sm) {
                     ForEach(viewModel.readingLanguagesWithTafsirForMode, id: \.self) { code in
                         Button(Self.readingLanguageName(code)) {
@@ -419,6 +437,50 @@ struct SurahReaderView: View {
                 }
             }
         }
+    }
+
+    /// The whole printed commentary on this surah, opened at the page where
+    /// the surah begins. Primary when there is no verse-by-verse text in the
+    /// language being read (Asrar-at-Tanzil in Urdu); otherwise offered at the
+    /// end for anyone who wants to keep reading the book itself.
+    private func tafsirVolumesCard(isPrimary: Bool) -> some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text(isPrimary ? "Read the full commentary" : "Continue in the full volume")
+                    .font(.headline)
+                Text(isPrimary
+                     ? "Verse-by-verse commentary is not available for this surah in this language. The complete printed text is available below, opened where this surah begins."
+                     : "The complete printed commentary, opened where this surah begins.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                ForEach(viewModel.fullVolumes) { volume in
+                    NavigationLink {
+                        TafsirVolumeDestination(volume: volume, dependencies: dependencies)
+                    } label: {
+                        Label {
+                            Text(volumeTitle(volume))
+                                .font(.subheadline.weight(.medium))
+                                .multilineTextAlignment(.leading)
+                        } icon: {
+                            Image(systemName: "text.book.closed")
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .buttonStyle(.bordered)
+                }
+                Text("Machine-read from the printed book and not yet proofread.")
+                    .font(.caption)
+                    .foregroundStyle(DIColor.textMuted)
+            }
+        }
+    }
+
+    private func volumeTitle(_ volume: TafsirVolume) -> String {
+        if volume.bookID.hasPrefix("tafaseer-parah-"),
+           let parah = Int(volume.bookID.dropFirst("tafaseer-parah-".count)) {
+            return String(localized: "\(viewModel.contentMode.localizedTitle), Parah \(parah), from page \(volume.page)")
+        }
+        return String(localized: "\(viewModel.contentMode.localizedTitle): Surah \(viewModel.surah.nameTransliterated)")
     }
 
     /// Native availability status for a tafsir edition not yet included for
@@ -560,6 +622,49 @@ struct SurahReaderView: View {
             get: { viewModel.contentMode },
             set: { viewModel.contentMode = $0 }
         )
+    }
+}
+
+// MARK: - Tafsir volume
+
+/// Opens a tafsir volume's text at a page. The library row gives the title;
+/// if the library has not imported it, a minimal item still opens the pages,
+/// which is all the text reader needs.
+private struct TafsirVolumeDestination: View {
+    let volume: TafsirVolume
+    let dependencies: AppDependencies
+    @State private var item: ContentItem?
+
+    var body: some View {
+        Group {
+            if let item {
+                BookTextReaderView(item: item, dependencies: dependencies, startPage: volume.page)
+            } else {
+                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .task {
+            let stored = try? await dependencies.contentRepository.item(id: volume.bookID)
+            item = stored ?? ContentItem(
+                id: volume.bookID,
+                sourceUrl: "",
+                type: .book,
+                title: volume.bookID,
+                titleUrdu: nil,
+                language: volume.language,
+                author: nil,
+                category: .quranTafsir,
+                bodyHtml: nil,
+                bodyPlainText: nil,
+                excerpt: nil,
+                publishedAt: nil,
+                updatedAt: nil,
+                mediaUrls: [],
+                downloadUrls: [],
+                checksum: nil,
+                rightsStatus: .permissionConfirmed
+            )
+        }
     }
 }
 
@@ -816,23 +921,30 @@ private struct AyahCardView: View {
 
     // MARK: Language-aware body text
 
+    /// Direction comes from the text's own language, never from the app's
+    /// layout. Without the explicit left-to-right, English inherited the
+    /// right-to-left environment whenever the app was in Urdu and read
+    /// right-aligned like Urdu.
     @ViewBuilder
     private func bodyText(_ text: String, languageCode: String?) -> some View {
         if languageCode == "ur" || languageCode == "ar" {
-            Text(text)
+            Text(verbatim: text)
                 .font(DIFont.urduBody(scale: fontScale))
                 .lineSpacing(CGFloat(8 * fontScale))
                 .foregroundStyle(DIColor.textPrimary)
+                .multilineTextAlignment(.leading)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .environment(\.layoutDirection, .rightToLeft)
         } else {
-            Text(text)
+            Text(verbatim: text)
                 .font(.system(size: bodyBaseSize * CGFloat(fontScale)))
                 .lineSpacing(CGFloat(4 * fontScale))
                 .foregroundStyle(DIColor.textPrimary)
+                .multilineTextAlignment(.leading)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .leftToRight)
         }
     }
 }

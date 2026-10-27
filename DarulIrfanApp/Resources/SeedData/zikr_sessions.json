@@ -16,9 +16,10 @@
     "durationMinutes": 30,
     "timeZoneIdentifier": "Asia/Karachi",
     "joinUrl": "https://www.paltalk.com",
-    "instructions": "Open Paltalk and choose All Rooms, then Religion & Spirituality, then Islam, and join the room named \"OURSHEIKH\". The evening session begins after the Isha prayer in Pakistan; 9:15 pm Pakistan time and the 30-minute duration shown here are approximate and vary through the year.",
-    "availabilityNote": "Room is visible only while a session is in progress. The start time follows the Isha prayer in Pakistan and may vary.",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html"
+    "instructions": "Download and install the latest version of PALTALK Messenger from the website www.paltalk.com\nOnce the installation is complete it will give you 2 options, New Users or Existing Users. Either signup for a new account by clicking on the link \"Get a Paltalk Nickname\" or if you already have an account, login using your 'Nickname' and 'Password'.\nAfter you login with your registered ID, notice the PalTalk Messenger window that opens up with the following tabs showing: Discover / Recent / All Rooms / MY ROOM.\nClose any other \"advertising\" windows that pop up.\nClick on the tab \"ALL ROOMS\" and select \"RELIGION & SPIRTUALITY\" then select \"ISLAM\".\nFind \"OURSHEIKH\" room from the list and join by double clicking on it. This opens a new window with the other listeners also shown in the list and you will be able to do Zikr.\nMobile User: Paltalk application is available for android and iPhone users",
+    "availabilityNote": "Please Note: the group \"Oursheikh\" will not be listed all the time. It will only be shown when the zikr session is in progress.",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html",
+    "anchor": "afterIsha"
   },
   {
     "id": "zikr-tahajjud",
@@ -37,8 +38,9 @@
     "durationMinutes": 30,
     "timeZoneIdentifier": "Asia/Karachi",
     "joinUrl": "https://www.paltalk.com",
-    "instructions": "Open Paltalk and choose All Rooms, then Religion & Spirituality, then Islam, and join the room named \"OURSHEIKH\". The Tahajjud session time varies; 3:30 am Pakistan time and the 30-minute duration shown here are approximate. Updated timings appear automatically in Darul Irfan when confirmed.",
-    "availabilityNote": "Room is visible only while a session is in progress.",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html"
+    "instructions": "Download and install the latest version of PALTALK Messenger from the website www.paltalk.com\nOnce the installation is complete it will give you 2 options, New Users or Existing Users. Either signup for a new account by clicking on the link \"Get a Paltalk Nickname\" or if you already have an account, login using your 'Nickname' and 'Password'.\nAfter you login with your registered ID, notice the PalTalk Messenger window that opens up with the following tabs showing: Discover / Recent / All Rooms / MY ROOM.\nClose any other \"advertising\" windows that pop up.\nClick on the tab \"ALL ROOMS\" and select \"RELIGION & SPIRTUALITY\" then select \"ISLAM\".\nFind \"OURSHEIKH\" room from the list and join by double clicking on it. This opens a new window with the other listeners also shown in the list and you will be able to do Zikr.\nMobile User: Paltalk application is available for android and iPhone users",
+    "availabilityNote": "Please Note: the group \"Oursheikh\" will not be listed all the time. It will only be shown when the zikr session is in progress.",
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html",
+    "anchor": "tahajjud"
   }
 ]

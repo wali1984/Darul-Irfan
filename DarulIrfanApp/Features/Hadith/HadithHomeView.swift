@@ -93,7 +93,7 @@ struct HadithHomeView: View {
             )
         } else {
             DISectionHeader(titleKey: "Results", systemImage: "magnifyingglass")
-            Text("\(results.count) match\(results.count == 1 ? "" : "es")")
+            Text("Matches: \(results.count)")
                 .font(.caption)
                 .foregroundStyle(DIColor.textMuted)
             ForEach(results) { entry in

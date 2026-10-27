@@ -151,7 +151,7 @@ private struct NameOfAllahCell: View {
     var body: some View {
         DIElevatedCard {
             VStack(spacing: DISpacing.xs) {
-                Text("\(name.id)")
+                Text(verbatim: "\(name.id)")
                     .font(.caption2.weight(.bold).monospacedDigit())
                     .foregroundStyle(DIColor.accent)
                     .frame(maxWidth: .infinity, alignment: .trailing)

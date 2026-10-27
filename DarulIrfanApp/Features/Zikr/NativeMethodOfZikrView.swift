@@ -63,10 +63,21 @@ struct NativeMethodOfZikrView: View {
         .navigationBarTitleDisplayMode(.inline)
         .diScreenBackground()
         .task {
-            item = try? await repository.item(id: "page-method-of-zikr")
+            let stored = try? await repository.item(id: Self.itemID)
+            if let stored {
+                item = stored
+            } else {
+                // Never "being prepared" while the verified text is in the
+                // app: read the bundled copy when the database lacks it.
+                item = await Task.detached(priority: .userInitiated) {
+                    SeedBundle.libraryItem(id: Self.itemID)
+                }.value
+            }
             isLoading = false
         }
     }
+
+    private static let itemID = "page-method-of-zikr"
 
     private func nativeURL(_ raw: String) -> URL? {
         URL(string: raw) ?? URL(string: raw.replacingOccurrences(of: " ", with: "%20"))

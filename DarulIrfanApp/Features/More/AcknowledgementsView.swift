@@ -22,7 +22,7 @@ struct AcknowledgementsView: View {
             .padding(DISpacing.md)
         }
         .diScreenBackground()
-        .navigationTitle("Acknowledgements")
+        .navigationTitle("Licences")
         .navigationBarTitleDisplayMode(.inline)
     }
 

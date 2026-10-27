@@ -51,11 +51,15 @@ final class SurahReaderViewModel {
     /// this is state rather than a constructor constant.
     private(set) var readingLanguage: String
 
-    @ObservationIgnored private var translationsByAyah: [Int: QuranTranslation] = [:]
+    // These three are deliberately *observed*. The ayah cards read them, and
+    // they change when the reader switches language: ignored, the cards kept
+    // drawing the old language's translation while the commentary had already
+    // moved, which is how Urdu came to show English and English Urdu.
+    private var translationsByAyah: [Int: QuranTranslation] = [:]
     /// Asrar-at-Tanzil's OWN per-ayah translation (its dedicated tab shows this,
     /// not Akram-ut-Tarajum; blank where the source has no verse).
-    @ObservationIgnored private var asrarTranslationsByAyah: [Int: QuranTranslation] = [:]
-    @ObservationIgnored private var editionsByID: [String: QuranEdition] = [:]
+    private var asrarTranslationsByAyah: [Int: QuranTranslation] = [:]
+    private var editionsByID: [String: QuranEdition] = [:]
     private(set) var bookmarksByAyah: [Int: QuranBookmark] = [:]
 
     // Last-read throttling
@@ -73,6 +77,21 @@ final class SurahReaderViewModel {
         self.repository = repository
         self.devotionalMetrics = devotionalMetrics
         self.readingLanguage = preferredLanguageCode
+    }
+
+    // MARK: - Reading language across surahs
+
+    /// The reader's own language choice, kept for the rest of the session so
+    /// moving to the next surah does not throw it away. It is tied to the app
+    /// language it was made under: changing the app language starts afresh
+    /// from the new one rather than holding on to an older choice.
+    private static var sessionChoice: (appLanguage: String, reading: String)?
+    private static var currentAppLanguage = "en"
+
+    static func initialReadingLanguage(appLanguage: String) -> String {
+        currentAppLanguage = appLanguage
+        if let choice = sessionChoice, choice.appLanguage == appLanguage { return choice.reading }
+        return appLanguage
     }
 
     // MARK: - Loading
@@ -209,6 +228,7 @@ final class SurahReaderViewModel {
     func setReadingLanguage(_ code: String) async {
         guard code != readingLanguage else { return }
         readingLanguage = code
+        Self.sessionChoice = (appLanguage: Self.currentAppLanguage, reading: code)
         // Follow the Silsila's own complete translation where it exists, then
         // any edition in the chosen language.
         if let preferred = availableTranslationEditions.first(where: { $0.id == "akram-ut-tarajum-\(code)" })
@@ -261,9 +281,17 @@ final class SurahReaderViewModel {
     func tafsir(for ayahNumber: Int) -> [QuranTafsir] {
         tafsirEntries.filter { entry in
             guard entry.ayahStart <= ayahNumber, ayahNumber <= entry.ayahEnd else { return false }
-            guard let language = editionsByID[entry.editionID]?.language else { return true }
-            return language == readingLanguage
+            // An entry whose edition is unknown is not shown: its language
+            // cannot be confirmed, and guessing is what mixed the two.
+            return editionsByID[entry.editionID]?.language == readingLanguage
         }
+    }
+
+    /// The full printed volumes of the current mode's tafsir in the language
+    /// being read, where this surah's commentary begins in each.
+    var fullVolumes: [TafsirVolume] {
+        guard let prefix = contentMode.tafsirEditionPrefix else { return [] }
+        return TafsirVolumeProvider.shared.volumes(surah: surah.id, editionPrefix: prefix, language: readingLanguage)
     }
 
     var hasAnyTafsir: Bool {

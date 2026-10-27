@@ -18,7 +18,10 @@ struct LiveBroadcastCard: View {
                 } else {
                     Image(systemName: "moon.stars").foregroundStyle(DIColor.primary)
                 }
-                Text(broadcast.title)
+                // Looked up as a key so the default title ("Daily Zikr")
+                // follows the app language; a title the server sends that is
+                // not in the catalogue shows exactly as sent.
+                Text(LocalizedStringKey(broadcast.title))
                     .font(DIFont.subheading)
                     .foregroundStyle(fg)
                 Spacer(minLength: DISpacing.sm)
@@ -83,7 +86,7 @@ struct LiveBroadcastCard: View {
     }
 
     private var statusBadge: some View {
-        Text(statusText)
+        Text(LocalizedStringKey(statusText))
             .font(.caption2.weight(.bold))
             .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.textMuted)
             .padding(.horizontal, DISpacing.sm)
@@ -112,7 +115,7 @@ struct LiveBroadcastCard: View {
         switch broadcast.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
     }
     private func label(for source: LiveSource) -> LocalizedStringKey {
-        switch source.kind { case .ownedStream: return "Listen live"; case .youtube: return "Watch live in Darul Irfan"; case .paltalk: return "Join OURSHEIKH on Paltalk" }
+        switch source.kind { case .ownedStream: return "Listen live"; case .youtube: return "Watch Daily Zikr"; case .paltalk: return "Join OURSHEIKH on Paltalk" }
     }
     private func icon(for source: LiveSource) -> String {
         switch source.kind { case .ownedStream: return "headphones"; case .youtube: return "play.rectangle.fill"; case .paltalk: return "arrow.up.right.square" }

@@ -14,7 +14,8 @@ struct ZikrHomeView: View {
         _viewModel = State(initialValue: ZikrHomeViewModel(
             notifications: dependencies.notifications,
             platform: dependencies.officialPlatform,
-            watchSync: dependencies.watchSync
+            watchSync: dependencies.watchSync,
+            prayerCalculation: dependencies.prayerCalculation
         ))
     }
 
@@ -34,7 +35,7 @@ struct ZikrHomeView: View {
                 .buttonStyle(DIPressableStyle())
                     .diAppear(delay: 0.05)
 
-                DISectionHeader(titleKey: "Live Zikr", systemImage: "dot.radiowaves.left.and.right")
+                DISectionHeader(titleKey: "Daily Zikr", systemImage: "dot.radiowaves.left.and.right")
                 LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer)
                     .diAppear(delay: 0.08)
 
@@ -262,9 +263,18 @@ private struct ZikrSessionCard: View {
 
                 ZikrSessionCountdown(session: session)
 
-                Text("Announced time: \(ZikrScheduleMath.announcedTimeText(for: session))")
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.textMuted)
+                // Pakistan time is the reference the silsila announces in; the
+                // countdown above is already in this phone's own time.
+                VStack(alignment: .leading, spacing: 2) {
+                    if let announcement = ZikrAnchorResolver.announcement(for: session) {
+                        Text(verbatim: announcement)
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(DIColor.textPrimary)
+                    }
+                    Text("In Pakistan: about \(ZikrScheduleMath.announcedTimeText(for: session))")
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                }
 
                 if let note = session.availabilityNote {
                     Text(verbatim: note)
@@ -348,9 +358,9 @@ private struct ZikrSessionCountdown: View {
                             .font(.title3.weight(.semibold).monospacedDigit())
                             .foregroundStyle(DIColor.textPrimary)
                             .contentTransition(.numericText())
-                        Text(start.formatted(date: .abbreviated, time: .shortened))
-                            .font(.caption2)
-                            .foregroundStyle(DIColor.textMuted)
+                        Text("Your time: \(ZikrScheduleMath.localTimeText(start))")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(DIColor.primary)
                     }
                     Spacer(minLength: 0)
                 }

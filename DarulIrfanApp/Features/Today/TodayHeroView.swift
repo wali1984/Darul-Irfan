@@ -24,7 +24,7 @@ struct TodayHeroView: View {
                         Text("DARUL IRFAN")
                             .font(.caption.weight(.bold)).tracking(2)
                             .foregroundStyle(DIColor.goldGlow)
-                        Text(DIGradient.greeting(for: context.date, timeZone: timeZone))
+                        Text(LocalizedStringKey(DIGradient.greeting(for: context.date, timeZone: timeZone)))
                             .font(.title2.weight(.semibold)).foregroundStyle(.white)
                             .fixedSize(horizontal: false, vertical: true)
                         if let placeName {

@@ -14,7 +14,13 @@ enum AppFonts {
     /// already registered via UIAppFonts just reports an "already registered"
     /// error which we ignore.
     static func registerBundledFonts() {
-        for base in ["AlQuran-IndoPak-QuranWBW", "AmiriQuran-Regular", "NotoNastaliqUrdu-Regular"] {
+        // The bundled Noto Nastaliq is registered only on a system that lacks
+        // its own copy. See `urduName` for why the system one must win.
+        var bundled = ["AlQuran-IndoPak-QuranWBW", "AmiriQuran-Regular"]
+        if UIFont(name: systemUrduName, size: 16) == nil {
+            bundled.append("NotoNastaliqUrdu-Regular")
+        }
+        for base in bundled {
             guard let url = bundleURL(base) else {
                 AppLog.presentation("Font not found in bundle: \(base).ttf")
                 continue
@@ -38,9 +44,20 @@ enum AppFonts {
     )
 
     /// The usable font name for Urdu Nastaliq (Noto Nastaliq Urdu).
+    ///
+    /// iOS's own copy comes first. The bundled file is Google's variable
+    /// OpenType build, whose Nastaliq relies on cursive-attachment and
+    /// contextual lookups that Core Text does not apply as the font expects:
+    /// letters lose their joins and long passages read as runs of detached
+    /// bowls ("noon noon"). Apple ships the same design converted for its own
+    /// shaper, so the system face renders correctly; the bundled one is kept
+    /// only as a fallback for a system without it.
     static let urduName: String = resolve(
-        ["NotoNastaliqUrdu-Regular", "Noto Nastaliq Urdu", "NotoNastaliqUrdu"]
+        [systemUrduName, "NotoNastaliqUrdu-Regular", "Noto Nastaliq Urdu"]
     )
+
+    /// PostScript name of the Noto Nastaliq Urdu that ships with iOS.
+    private static let systemUrduName = "NotoNastaliqUrdu"
 
     // MARK: - Internals
 

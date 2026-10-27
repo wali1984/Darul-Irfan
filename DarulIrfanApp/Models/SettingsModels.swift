@@ -28,6 +28,22 @@ enum AppLanguage: String, Codable, Sendable, CaseIterable, Identifiable {
     }
 
     var isRightToLeft: Bool { self == .urdu }
+
+    /// The language content (translation, tafsir, books) should open in.
+    ///
+    /// "System" follows the device's own preferred languages rather than
+    /// defaulting to English, so a phone set to Urdu opens the Quran in Urdu
+    /// even when the in-app setting was never touched. Only the two languages
+    /// the content exists in are ever returned.
+    var contentLanguageCode: String {
+        if let forced = forcedLocaleIdentifier { return forced }
+        for preferred in Locale.preferredLanguages {
+            let code = Locale(identifier: preferred).language.languageCode?.identifier ?? preferred
+            if code == "ur" { return "ur" }
+            if code == "en" { return "en" }
+        }
+        return "en"
+    }
 }
 
 enum AppTheme: String, Codable, Sendable, CaseIterable, Identifiable {

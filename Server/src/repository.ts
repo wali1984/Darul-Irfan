@@ -7,7 +7,7 @@ type Row = Record<string, string | number | null>;
 export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
   const row = await env.DB.prepare("SELECT * FROM live_broadcasts WHERE id = ?").bind("official-live").first<Row>();
   if (!row) {
-    return { id: "official-live", state: "offline", title: "Live Zikr", sources: [], updatedAt: new Date().toISOString() };
+    return { id: "official-live", state: "offline", title: "Daily Zikr", sources: [], updatedAt: new Date().toISOString() };
   }
   const sources: LiveBroadcast["sources"] = [];
   const owned = validHTTPURL(row.owned_stream_url);

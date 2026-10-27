@@ -23,6 +23,22 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     /// Note such as "Room available only during session".
     var availabilityNote: String?
     var sourceUrl: String?
+    /// When set, the start follows a prayer time at Dar-ul-Irfan instead of a
+    /// fixed clock time: `afterIsha`, or `tahajjud` (the last third of the
+    /// night). The official schedule is stated exactly this way - "After Isha
+    /// and Tahajjud (Pakistan Time)" - and Isha in Chakwal moves by about two
+    /// hours across the year, so any fixed time would be wrong most of it.
+    /// `startHour`/`startMinute` stay as the fallback. A string rather than an
+    /// enum so a value this build does not know never fails the whole decode.
+    var anchor: String? = nil
+
+    var zikrAnchor: ZikrAnchor? { anchor.flatMap(ZikrAnchor.init(rawValue:)) }
+}
+
+/// Prayer-time events an online zikr session is announced against.
+enum ZikrAnchor: String, Sendable {
+    case afterIsha
+    case tahajjud
 }
 
 /// User's reminder preference for a zikr session.

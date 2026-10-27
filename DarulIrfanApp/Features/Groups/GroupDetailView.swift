@@ -23,6 +23,12 @@ struct GroupDetailView: View {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
                 if let meetingURL = group.meetingURL {
                     meetingCard(meetingURL)
+                } else {
+                    DICard {
+                        Label("When the administrators arrange a meeting, its link appears here.", systemImage: "person.2.wave.2")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 if isLoading {
                     ProgressView()

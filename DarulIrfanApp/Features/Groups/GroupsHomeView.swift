@@ -126,6 +126,7 @@ struct GroupsHomeView: View {
     @State private var model = GroupsModel()
     @State private var isConfirmingDelete = false
     @State private var inviteCode = ""
+    @State private var isShowingHowItWorks = true
     @FocusState private var isCodeFocused: Bool
 
     var body: some View {
@@ -145,6 +146,7 @@ struct GroupsHomeView: View {
                     failureCard(message)
                     accountCard
                 }
+                howItWorksCard
             }
             .padding(DISpacing.md)
         }
@@ -204,6 +206,59 @@ struct GroupsHomeView: View {
                 }
             }
         }
+    }
+
+    /// How the groups work, in the order a member meets it. Open by default
+    /// until the member is in a group, then folded away.
+    private var howItWorksCard: some View {
+        DICard {
+            DisclosureGroup(isExpanded: $isShowingHowItWorks) {
+                VStack(alignment: .leading, spacing: DISpacing.md) {
+                    howStep(1, "Get your invitation code",
+                            "Ask the administrator of your region's group - Darul Irfan, United States or Canada - for an invitation code. Each code admits one person to one group and expires after 30 days.")
+                    howStep(2, "Join with the code",
+                            "Type the code in the box above and tap Join. You are added to your group straight away; there is nothing else to wait for.")
+                    howStep(3, "Read and watch",
+                            "Open your group to read its announcements and to watch recorded zikr inside the app. Pull down to check for new posts.")
+                    howStep(4, "Join a meeting",
+                            "When a group has a meeting, its link appears at the top of the group. Tap it to join in the app the administrators use, such as Paltalk or Zoom.")
+                    howStep(5, "Private by design",
+                            "Only members of a group can see it, and one region cannot see another's. Members read; administrators publish. Nothing you do here is shown to other members.")
+                    howStep(6, "Leaving",
+                            "Delete my account removes your sign-in and your place in every group. To come back, ask for a new code.")
+                }
+                .padding(.top, DISpacing.sm)
+            } label: {
+                Label("How private groups work", systemImage: "questionmark.circle")
+                    .font(.headline)
+                    .foregroundStyle(DIColor.textPrimary)
+            }
+            .tint(DIColor.primary)
+        }
+        .onChange(of: model.groups.isEmpty) { _, isEmpty in
+            if !isEmpty { isShowingHowItWorks = false }
+        }
+    }
+
+    private func howStep(_ number: Int, _ title: LocalizedStringKey, _ detail: LocalizedStringKey) -> some View {
+        HStack(alignment: .top, spacing: DISpacing.sm) {
+            Text(verbatim: "\(number)")
+                .font(.caption.weight(.bold).monospacedDigit())
+                .foregroundStyle(DIColor.onPrimary)
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(DIColor.primary))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(DIColor.textPrimary)
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(DIColor.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 
     private func redeem() {

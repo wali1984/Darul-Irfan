@@ -138,6 +138,10 @@ enum QuranContentMode: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// The work's name in the app language, for use inside a sentence; the
+    /// catalog carries the Urdu script names.
+    var localizedTitle: String { String(localized: String.LocalizationValue(title)) }
+
     var isTafsir: Bool { self != .tarajum }
 
     /// Edition-id prefix whose tafsir this mode displays (nil for translation).

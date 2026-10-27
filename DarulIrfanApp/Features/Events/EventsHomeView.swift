@@ -116,7 +116,7 @@ private struct EventsHeroHeader: View {
                 if let eventCount, eventCount > 0 {
                     HStack(spacing: DISpacing.xs) {
                         Image(systemName: "calendar.badge.clock").font(.caption2)
-                        Text("\(eventCount) upcoming \(eventCount == 1 ? "program" : "programs")")
+                        Text("Upcoming programs: \(eventCount)")
                             .font(.caption.weight(.medium))
                     }
                     .foregroundStyle(.white.opacity(0.92))
