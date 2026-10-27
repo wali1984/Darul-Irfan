@@ -12,6 +12,7 @@ struct SurahReaderView: View {
     /// lecture.
     private let mediaRepository: any MediaRepositoryProtocol
     private let audioPlayer: any AudioPlayerServicing
+    private let dependencies: AppDependencies
     @State private var viewModel: SurahReaderViewModel
     @State private var player = RecitationPlayer()
     @State private var speaker = TranslationSpeaker()
@@ -31,6 +32,7 @@ struct SurahReaderView: View {
         self.onRequestNextSurah = onRequestNextSurah
         self.mediaRepository = dependencies.mediaRepository
         self.audioPlayer = dependencies.audioPlayer
+        self.dependencies = dependencies
         let langCode = appState.settings.language.forcedLocaleIdentifier ?? "en"
         _viewModel = State(initialValue: SurahReaderViewModel(
             surah: surah,
@@ -54,6 +56,16 @@ struct SurahReaderView: View {
                     if viewModel.availableReadingLanguages.count > 1 {
                         ToolbarItem(placement: .topBarTrailing) {
                             readingLanguageMenu
+                        }
+                    }
+                    if viewModel.recitation != nil {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            NavigationLink {
+                                HifzView(surah: viewModel.surah, dependencies: dependencies)
+                            } label: {
+                                Image(systemName: "brain.head.profile")
+                            }
+                            .accessibilityLabel("Memorise this surah")
                         }
                     }
                     ToolbarItem(placement: .topBarTrailing) {
