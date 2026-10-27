@@ -76,7 +76,7 @@ struct MediaTabView: View {
                 }
             }
             .sheet(isPresented: $showsSearch) {
-                GlobalSearchView(dependencies: dependencies)
+                GlobalSearchView(dependencies: dependencies, appState: appState)
             }
             .task {
                 async let media: Void = viewModel.load()

@@ -66,7 +66,7 @@ struct MoreTabView: View {
                 }
             }
             .sheet(isPresented: $isSearchPresented) {
-                GlobalSearchView(dependencies: dependencies)
+                GlobalSearchView(dependencies: dependencies, appState: appState)
             }
         }
     }

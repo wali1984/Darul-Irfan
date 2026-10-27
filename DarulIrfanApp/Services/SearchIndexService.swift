@@ -258,8 +258,10 @@ struct SearchIndexService: SearchIndexServicing {
     /// Turns free text into a safe FTS5 expression: each whitespace-separated
     /// term is stripped of double quotes, wrapped in double quotes (which
     /// neutralizes every FTS5 operator), and given a trailing `*` for prefix
-    /// matching. Terms are implicitly ANDed. Empty input yields "".
-    private static func ftsMatchExpression(from query: String) -> String {
+    /// matching. Terms are implicitly ANDed. Empty input yields "". A word
+    /// typed in Roman Urdu also matches its Urdu spellings: "namaz" searches
+    /// ("namaz"* OR "نماز"* OR "صلوٰۃ"*).
+    static func ftsMatchExpression(from query: String) -> String {
         let terms = query
             .components(separatedBy: .whitespacesAndNewlines)
             .map { term -> String in
@@ -271,6 +273,12 @@ struct SearchIndexService: SearchIndexServicing {
             }
             .filter { !$0.isEmpty }
         guard !terms.isEmpty else { return "" }
-        return terms.map { "\"\($0)\"*" }.joined(separator: " ")
+        return terms.map { term in
+            let spellings = RomanUrdu.spellings(for: term)
+            guard !spellings.isEmpty else { return "\"\(term)\"*" }
+            return "(" + ([term] + spellings).map { "\"\($0)\"*" }.joined(separator: " OR ") + ")"
+        }
+        // Explicit AND: FTS5 rejects a bracketed group followed by a bare term.
+        .joined(separator: " AND ")
     }
 }

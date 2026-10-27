@@ -151,6 +151,18 @@ final class SearchIndexServiceTests: XCTestCase {
         XCTAssertEqual(results.first?.itemID, "lecture-3725")
     }
 
+    /// Typed in Roman Urdu, the word still finds the Urdu title.
+    func testRomanUrduFindsUrduTitle() async throws {
+        try await seedAllDomains()
+
+        let results = try await service.search("Tableegh", domains: [.media], limit: 20)
+        XCTAssertEqual(results.first?.itemID, "lecture-3725")
+        XCTAssertEqual(
+            SearchIndexService.ftsMatchExpression(from: "namaz breath"),
+            "(\"namaz\"* OR \"نماز\"* OR \"صلوٰۃ\"*) AND \"breath\"*"
+        )
+    }
+
     func testEmptyAndWhitespaceQueriesReturnNothing() async throws {
         try await seedAllDomains()
 

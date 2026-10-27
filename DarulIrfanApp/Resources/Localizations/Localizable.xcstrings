@@ -21386,6 +21386,40 @@
           }
         }
       }
+    },
+    "Event not found": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Event not found"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تقریب نہیں ملی"
+          }
+        }
+      }
+    },
+    "It may have ended or been removed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It may have ended or been removed."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہو سکتا ہے یہ ختم ہو چکی ہو یا ہٹا دی گئی ہو۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

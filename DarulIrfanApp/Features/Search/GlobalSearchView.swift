@@ -10,6 +10,8 @@ import SwiftUI
 @MainActor
 struct GlobalSearchView: View {
     @State private var viewModel: SearchViewModel
+    private let dependencies: AppDependencies
+    private let appState: AppState
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isSearchFieldFocused: Bool
 
@@ -17,7 +19,9 @@ struct GlobalSearchView: View {
     /// search — the same path as typing it.
     private let suggestions = ["Zikr", "Tasawwuf", "Tazkiyah", "Ramadan", "Salah", "Naqshbandia"]
 
-    init(dependencies: AppDependencies) {
+    init(dependencies: AppDependencies, appState: AppState) {
+        self.dependencies = dependencies
+        self.appState = appState
         _viewModel = State(initialValue: SearchViewModel(
             searchIndex: dependencies.searchIndex,
             contentRepository: dependencies.contentRepository,
@@ -301,10 +305,13 @@ struct GlobalSearchView: View {
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
                         groupHeader(group)
                         ForEach(Array(group.results.enumerated()), id: \.element.id) { rowIndex, result in
-                            SearchResultRow(
-                                result: result,
-                                reference: viewModel.reference(for: result)
-                            )
+                            SearchResultLink(result: result, dependencies: dependencies, appState: appState,
+                                             close: { dismiss() }) {
+                                SearchResultRow(
+                                    result: result,
+                                    reference: viewModel.reference(for: result)
+                                )
+                            }
                             .diAppear(delay: min(Double(groupIndex) * 0.06 + Double(rowIndex) * 0.04, 0.5))
                         }
                     }

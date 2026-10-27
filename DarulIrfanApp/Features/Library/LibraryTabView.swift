@@ -74,7 +74,7 @@ struct LibraryTabView: View {
                 destination(for: route)
             }
             .sheet(isPresented: $isShowingSearch) {
-                GlobalSearchView(dependencies: dependencies)
+                GlobalSearchView(dependencies: dependencies, appState: appState)
             }
             .task {
                 await viewModel.loadHomeIfNeeded()

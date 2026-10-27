@@ -105,7 +105,7 @@ struct PrayerTabView: View {
                 }
             }
             .sheet(isPresented: $isSearchPresented) {
-                GlobalSearchView(dependencies: dependencies)
+                GlobalSearchView(dependencies: dependencies, appState: appState)
             }
             .task {
                 await viewModel.refresh()
