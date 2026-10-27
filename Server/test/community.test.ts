@@ -69,6 +69,17 @@ describe("community groups", () => {
     expect((await call(member, "GET", "/v1/groups/canada")).status).toBe(200);
   });
 
+  it("tells the app which integrations are connected, so it can say what is still in progress", async () => {
+    const pending = await setup();
+    const status = async (call: typeof pending.call, token: string) =>
+      ((await (await call(token, "GET", "/v1/groups/usa")).json()) as { integrations: Record<string, boolean> }).integrations;
+    expect(await status(pending.call, pending.member)).toEqual({ meetings: false, whatsappForwarding: false, liveBroadcast: false });
+    const connected = await setup({
+      REALTIME_ACCOUNT_ID: "acct", REALTIME_APP_ID: "app", REALTIME_API_TOKEN: "token", WHATSAPP_ACCESS_TOKEN: "wa",
+    } as Partial<Env>);
+    expect(await status(connected.call, connected.member)).toEqual({ meetings: true, whatsappForwarding: true, liveBroadcast: false });
+  });
+
   it("lets admins publish and members only read", async () => {
     const { call, member, admin } = await setup();
     expect((await call(member, "POST", "/v1/groups/usa/posts", { title: "Hello" })).status).toBe(403);

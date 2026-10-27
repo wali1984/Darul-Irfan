@@ -88,6 +88,8 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
     var endedAt: Date?
     var sources: [LiveSource]
     var updatedAt: Date
+    /// False until the automatic broadcast is connected; nil from an older server.
+    var automaticBroadcast: Bool? = nil
 
     /// Only sources the app plays itself. An external chat room (the
     /// `.paltalk` kind the server may still send) is never offered: zikr is

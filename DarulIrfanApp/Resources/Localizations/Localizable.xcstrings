@@ -19958,6 +19958,108 @@
           }
         }
       }
+    },
+    "Video meetings: integration in progress. The time is kept, and the room opens here once it is complete.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video meetings: integration in progress. The time is kept, and the room opens here once it is complete."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو میٹنگز: انضمام جاری ہے۔ وقت محفوظ ہے، اور مکمل ہونے پر کمرہ یہیں کھلے گا۔"
+          }
+        }
+      }
+    },
+    "Video meetings and joining the zikr together: integration in progress. Meetings can be scheduled now; their rooms open once it is complete.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video meetings and joining the zikr together: integration in progress. Meetings can be scheduled now; their rooms open once it is complete."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو میٹنگز اور مل کر ذکر میں شامل ہونا: انضمام جاری ہے۔ میٹنگز ابھی طے کی جا سکتی ہیں؛ ان کے کمرے مکمل ہونے پر کھلیں گے۔"
+          }
+        }
+      }
+    },
+    "Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واٹس ایپ سے آنے والی پوسٹس: انضمام جاری ہے۔ تب تک براہِ راست یہاں پوسٹ کریں۔"
+          }
+        }
+      }
+    },
+    "Joining together: integration in progress. Share a live video link meanwhile.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joining together: integration in progress. Share a live video link meanwhile."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مل کر شامل ہونا: انضمام جاری ہے۔ تب تک براہِ راست ویڈیو لنک شیئر کریں۔"
+          }
+        }
+      }
+    },
+    "Video meetings: integration in progress. They open here once it is complete.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video meetings: integration in progress. They open here once it is complete."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو میٹنگز: انضمام جاری ہے۔ مکمل ہونے پر یہیں کھلیں گی۔"
+          }
+        }
+      }
+    },
+    "Starting Daily Zikr here automatically: integration in progress.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting Daily Zikr here automatically: integration in progress."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر کا یہاں خودکار آغاز: انضمام جاری ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

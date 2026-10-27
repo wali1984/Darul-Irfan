@@ -129,6 +129,8 @@ struct GroupPostComposer: View {
 struct GroupLiveStarter: View {
     let groupID: String
     let service: MemberGroupService
+    /// False while video meetings await their integration: no room can open.
+    var meetingsReady = true
 
     private enum Kind: String, CaseIterable, Identifiable {
         case zikr = "Community Zikr"
@@ -159,17 +161,27 @@ struct GroupLiveStarter: View {
             if kind == .zikr {
                 Section {
                     Toggle("Members join the zikr together", isOn: $joinTogether)
+                        .disabled(!meetingsReady)
                     TextField("Live video link (optional)", text: $videoLink)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .keyboardType(.URL)
                 } footer: {
-                    Text("Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both.")
+                    if meetingsReady {
+                        Text("Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both.")
+                    } else {
+                        Text("Joining together: integration in progress. Share a live video link meanwhile.")
+                    }
                 }
             } else {
                 Section {
-                    Text("Members join with audio and video from the group page.")
-                        .foregroundStyle(DIColor.textMuted)
+                    if meetingsReady {
+                        Text("Members join with audio and video from the group page.")
+                            .foregroundStyle(DIColor.textMuted)
+                    } else {
+                        Text("Video meetings: integration in progress. They open here once it is complete.")
+                            .foregroundStyle(DIColor.textMuted)
+                    }
                 }
             }
             if let error {
@@ -192,9 +204,10 @@ struct GroupLiveStarter: View {
     }
 
     private var canStart: Bool {
-        if kind == .meeting { return true }
+        if kind == .meeting { return meetingsReady }
         let video = VideoLink.id(from: videoLink)
-        return (joinTogether || video != nil) && (videoLink.isEmpty || video != nil)
+        let room = joinTogether && meetingsReady
+        return (room || video != nil) && (videoLink.isEmpty || video != nil)
     }
 
     private func start() async {
@@ -206,7 +219,7 @@ struct GroupLiveStarter: View {
                 kind: kind == .zikr ? "zikr" : "meeting",
                 title: title.trimmingCharacters(in: .whitespaces),
                 videoID: kind == .zikr ? VideoLink.id(from: videoLink) : nil,
-                room: kind == .meeting || joinTogether
+                room: kind == .meeting || (joinTogether && meetingsReady)
             )
             dismiss()
         } catch {

@@ -35,6 +35,8 @@ export interface LiveBroadcast {
   endedAt?: string;
   sources: LiveSource[];
   updatedAt: string;
+  /** False until the automatic broadcast (listeners + hub) is connected. */
+  automaticBroadcast?: boolean;
 }
 
 export interface RemoteZikrSchedule {

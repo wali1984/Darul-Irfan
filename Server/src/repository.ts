@@ -1,6 +1,7 @@
 import type { AppBootstrap, Env, LiveBroadcast, OfficialFeedItem, RemoteZikrSchedule } from "./contracts";
 import { parseJSON, validHTTPURL } from "./util";
 import { schemaVersion } from "./contracts";
+import { integrationStatus } from "./community";
 
 type Row = Record<string, string | number | null>;
 
@@ -26,7 +27,8 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
     scheduledStart: typeof row.scheduled_start === "string" ? row.scheduled_start : undefined,
     startedAt: typeof row.started_at === "string" ? row.started_at : undefined,
     endedAt: typeof row.ended_at === "string" ? row.ended_at : undefined,
-    sources, updatedAt: String(row.updated_at)
+    sources, updatedAt: String(row.updated_at),
+    automaticBroadcast: integrationStatus(env).liveBroadcast,
   };
 }
 

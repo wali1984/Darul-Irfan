@@ -53,6 +53,10 @@ struct LiveBroadcastCard: View {
             if displaySources.isEmpty {
                 Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
                     .font(.footnote).foregroundStyle(fgMuted)
+                if broadcast.automaticBroadcast == false {
+                    Label("Starting Daily Zikr here automatically: integration in progress.", systemImage: "hourglass")
+                        .font(.caption).foregroundStyle(fgMuted)
+                }
             }
             if broadcast.updatedAt != .distantPast {
                 Text("Updated \(broadcast.updatedAt.formatted(.relative(presentation: .named)))")

@@ -1,4 +1,4 @@
-# TestFlight tester notes — 1.10.1 (45)
+# TestFlight tester notes — 1.11.0
 
 Paste-ready text for App Store Connect, plus the briefing testers should get.
 Keep the "already known" list current: a tester reporting a known gap costs
@@ -12,6 +12,50 @@ everyone time, and it reads as though the app is less finished than it is.
 > and lectures. Everything core works offline, and prayer times are calculated
 > on your own device — your location is never sent anywhere.
 
+## Owner's checklist for 1.11.0
+
+Everything this release changes, in the order it is easiest to check.
+
+**The ten reported issues**
+1. Urdu tafsir: open a surah, Tafsir, Urdu - Akram-ut-Tafaseer shows verse by
+   verse, and "Read the full commentary" opens the printed volume at the surah.
+2. Akram 1:1: Urdu reads cleanly in Nastaliq (no "noon noon", no OCR notes).
+3. English Asrar translation and tafsir are left-aligned.
+4. EN/UR switch in the reader changes the text straight away, and stays
+   chosen when you move to the next surah.
+5. Urdu shows Urdu and English shows English, across the app.
+6. Zikr -> Method of Zikr opens the text (never "being prepared").
+7. The live section is called "Daily Zikr" everywhere.
+8. Zikr schedule: After Isha and Tahajjud show "Your time" in the phone's own
+   time zone, with Pakistan time beside it.
+9. Community -> Private groups explains how groups work.
+10. About has no Acknowledgements (licences are in Settings -> Licences).
+
+**Also in this release**
+- Prayer times: check your city against your masjid; the method suggested at
+  onboarding matches your country; the place and method show under the times;
+  iqamah reminders and "Send a test reminder" in notification settings.
+- Ayah of the Day (Today): Silsila translation (Akram-ut-Tarajum) in your
+  language, full reference, tafsir excerpt, and "Open in the Quran".
+- Today: quick tools, My Day (tasks with prayer-relative reminders, notes,
+  focus timer, fasting), Continue reading, Understand something today.
+- Daily Zikr is watched inside the app; no outside app or platform is named.
+- Sign-in appears only in Community -> Private groups; nothing else asks.
+
+**Community groups**
+- Community -> Private groups -> Sign in with Apple -> **Share My Email**
+  (wajidmahmood@hotmail.com): you should see "Super admin" and every group.
+- In a group: post an announcement (paste works), save as draft and publish,
+  add a zikr time (shown in your time zone, with a reminder), schedule a
+  meeting, start community zikr with a live video link.
+- Group notifications: with notifications on, a published post arrives as a
+  push to that group's members only.
+- Items that wait on an outside service say **"integration in progress"**
+  instead of failing (video meetings and joining the zikr together, posts
+  forwarded from WhatsApp, Daily Zikr starting here automatically). Each label
+  disappears by itself once that service is connected on the server - no app
+  update needed.
+
 ## What to test
 
 Ask testers to spend time on these, in this order:
@@ -19,57 +63,40 @@ Ask testers to spend time on these, in this order:
 1. **Prayer times and the azan.** Are the times right for your city? Turn on
    reminders, and turn on the full azan. Does it arrive at the right moment,
    at a sensible volume, and can you stop it? Fajr should use its own call.
-2. **The Quran.** Open several surahs, including long ones (2, 4, 7) and short
-   ones (112, 114). Try the recitation and check the highlighted word keeps up
-   with the reciter. Switch between translation and tafsir views.
-3. **Hadith.** Open a few collections, search inside one and across all of
-   them, tap a narrator's name for the biography, and tap a verse quotation to
-   see whether it opens the Quran at the right place.
-4. **Books and lectures.** Open a book's text and read a few pages. Play a
-   lecture, then lock the phone — audio should continue.
-5. **Offline.** Turn on aeroplane mode and use the app. Prayer times, Quran,
-   hadith and book text should all still work.
-6. **Urdu and right-to-left.** If you read Urdu, check that Urdu text is
-   right-aligned, in the Nastaliq face, and never clipped.
-7. **The library.** Open More -> Events & Dar-ul-Irfan and the library, and
-   check that a book or tafsir you pick opens its text with "Read the text".
-   Every one of the 258 tafsir volumes should now open: Asrar-at-Tanzil in both
-   English and Urdu, and all 30 Akram-ut-Tafaseer parahs.
-8. **Reinstall.** Delete and reinstall; your content should come back and the
-   app should not be slow to start.
+2. **The Quran and tafsir.** Open several surahs, long (2, 4, 7) and short
+   (112, 114). Switch between English and Urdu, translation and tafsir. Urdu
+   tafsir (Akram-ut-Tafaseer) now appears verse by verse.
+3. **Today.** Ayah of the Day, My Day tasks and reminders, the focus timer.
+4. **Daily Zikr.** The schedule should be in your own time; during a session
+   it plays inside the app.
+5. **Hadith, books and lectures.** Search, open a narrator, read a book's
+   text, play a lecture and lock the phone - audio should continue.
+6. **Offline.** Aeroplane mode: prayer times, Quran, hadith and book text
+   should all still work.
+7. **Urdu and right-to-left.** Urdu text right-aligned, in Nastaliq, never
+   clipped; English text left-aligned.
+8. **Private groups** (members with an invitation code only).
 
 ## Already known — please do not report these
 
-- **Urdu tafsir reads as a book, not verse by verse.** Asrar-at-Tanzil Urdu
-  (all 114 surahs) and Akram-ut-Tafaseer (30 parahs) are now in the app and
-  open from the library with "Read the text". They do **not** appear verse by
-  verse beside the Quran the way the English Asrar tafsir does, because the
-  scanned Urdu does not say which verse each passage belongs to and we will not
-  guess at it. Please do report pages that are unreadable or out of order.
-- **Akram-ut-Tafaseer parah 30 is part 1 only** — the rest was not in the
-  material provided, so the parah ends early. Known, not a bug.
-- **Two verses have no Asrar English translation** (23:38 and 80:41). The
-  authoritative source's own text is wrong at those two places, so they are
-  deliberately left blank rather than guessed at.
-- **Some Asrar commentary is shorter than the printed original.** About a fifth
-  of it is not in yet.
-- **Book text is machine-read from scans and is not proofread.** Quality varies
-  by book; some pages are rough and some embedded Arabic quotations are
-  garbled. Never treat text inside a book as a reliable Quran or hadith quote.
-- **A small number of hadith have a missing Arabic character**, shown as a
-  replacement mark. This came from the source corpus we received and cannot be
-  repaired from it.
-- **The azan does not play in the web version unless the site is open**, which
-  is a browser limitation, not a bug. The iPhone app is unaffected.
-- **Private groups are not in this build.** They are finished and the server
-  is live, but they are switched off until Sign in with Apple is enabled on the
-  Apple account. Nothing to look for in More.
-- **The 251 Al-Murshid magazine issues have no text yet** and still open on the
-  website. They have never been scanned, so there is nothing to put in the app
-  until they are. Every book and every tafsir volume does open in the app.
-- **The 33 Akram-ut-Tarajum entries in the library have no separate text.** The
-  translation itself is complete in the app - read it in the Quran, where every
-  verse carries it in English and Urdu.
+- **"Integration in progress"** next to video meetings, joining the zikr
+  together, WhatsApp-forwarded posts and the automatic Daily Zikr broadcast:
+  those services are being connected and the labels go away when they are.
+- **Akram-ut-Tafaseer stops at surah 91** (Ash-Shams). Parah 30 part 2
+  (surahs 92-114) is still being converted from the scan.
+- **Asrar-at-Tanzil Urdu opens as the printed volume, not verse by verse**:
+  its scan corrupts the Quranic Arabic, so we will not split it by verse.
+- **Two verses have no Asrar English translation** (23:38 and 80:41); the
+  source text is wrong there, so they are left blank rather than guessed.
+- **Some Asrar commentary is shorter than the printed original.**
+- **Book text is machine-read from scans and is not proofread.** Never treat
+  text inside a book as a reliable Quran or hadith quote.
+- **A small number of hadith have a missing Arabic character**, from the
+  source corpus.
+- **The 251 Al-Murshid magazine issues have no text yet**; they have never
+  been scanned.
+- **The 33 Akram-ut-Tarajum library entries have no separate text**; the
+  translation itself is complete in the Quran reader.
 
 ## Worth reporting
 

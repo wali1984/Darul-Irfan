@@ -93,6 +93,17 @@ struct GroupDetail: Codable, Sendable {
     /// so the same countdown, local-time and reminder code serves both.
     var zikrSessions: [ZikrSession]
     var meetings: [GroupMeeting]
+    /// Which outside services are connected yet; absent from an older server.
+    var integrations: GroupIntegrations?
+}
+
+/// Services a group feature depends on. Until one is connected the app says
+/// "integration in progress" rather than offering something that cannot work;
+/// the server flips these as each service's keys are set, with no app update.
+struct GroupIntegrations: Codable, Sendable, Equatable {
+    var meetings: Bool
+    var whatsappForwarding: Bool
+    var liveBroadcast: Bool
 }
 
 /// A participant's place in a room, and the in-app page that holds it.

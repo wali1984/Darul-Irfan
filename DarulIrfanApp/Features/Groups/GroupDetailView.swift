@@ -66,13 +66,17 @@ struct GroupDetailView: View {
             NavigationStack {
                 switch sheet {
                 case .post: GroupPostComposer(groupID: group.id, service: service)
-                case .live: GroupLiveStarter(groupID: group.id, service: service)
+                case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady)
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
                 case .zikr: GroupZikrEditor(groupID: group.id, service: service)
                 }
             }
         }
     }
+
+    /// Connected services; an older server that does not say is taken as ready.
+    private var meetingsReady: Bool { detail?.integrations?.meetings ?? true }
+    private var whatsappReady: Bool { detail?.integrations?.whatsappForwarding ?? true }
 
     // MARK: Live
 
@@ -173,7 +177,7 @@ struct GroupDetailView: View {
                                     Label("Join the meeting", systemImage: "video.fill")
                                 }
                                 .buttonStyle(.borderedProminent)
-                                .disabled(joining || !(meeting.isOpen() || detail?.canManage == true))
+                                .disabled(joining || !meetingsReady || !(meeting.isOpen() || detail?.canManage == true))
                                 if detail?.canManage == true {
                                     Button("Cancel meeting", role: .destructive) {
                                         Task {
@@ -184,7 +188,9 @@ struct GroupDetailView: View {
                                     .buttonStyle(.bordered)
                                 }
                             }
-                            if !meeting.isOpen() {
+                            if !meetingsReady {
+                                IntegrationPendingNote("Video meetings: integration in progress. The time is kept, and the room opens here once it is complete.")
+                            } else if !meeting.isOpen() {
                                 Text("The room opens ten minutes before the meeting starts.")
                                     .font(.caption)
                                     .foregroundStyle(DIColor.textMuted)
@@ -207,6 +213,12 @@ struct GroupDetailView: View {
                     adminButton("Start community zikr or meeting now", "dot.radiowaves.left.and.right", .live)
                     adminButton("Schedule a meeting", "calendar.badge.plus", .meeting)
                     adminButton("Add a zikr time", "clock.badge", .zikr)
+                    if !meetingsReady {
+                        IntegrationPendingNote("Video meetings and joining the zikr together: integration in progress. Meetings can be scheduled now; their rooms open once it is complete.")
+                    }
+                    if !whatsappReady {
+                        IntegrationPendingNote("Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.")
+                    }
                 }
             }
             if !drafts.isEmpty {
@@ -481,5 +493,18 @@ private struct GroupPostImage: View {
         .frame(maxWidth: .infinity)
         .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
         .accessibilityLabel(Text("Picture"))
+    }
+}
+
+/// A feature that waits on an outside service: said plainly, never a broken button.
+struct IntegrationPendingNote: View {
+    let text: LocalizedStringKey
+    init(_ text: LocalizedStringKey) { self.text = text }
+
+    var body: some View {
+        Label(text, systemImage: "hourglass")
+            .font(.caption)
+            .foregroundStyle(DIColor.textMuted)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }

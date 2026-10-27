@@ -121,6 +121,7 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
     meetings: (meetings.results ?? []).map(row => ({
       id: row.id, title: row.title, startsAt: row.starts_at, durationMinutes: row.duration_minutes,
     })),
+    integrations: integrationStatus(env),
   });
 }
 
@@ -342,6 +343,17 @@ export async function joinRoom(env: Env, memberID: string, groupID: string, inpu
   return json({ authToken: token, pageURL: `${env.PUBLIC_BASE_URL}/v1/meet` });
 }
 
+/** Which outside services are connected yet. The app marks the rest
+ *  "integration in progress" instead of offering something that cannot work,
+ *  and the label goes away by itself once the service's keys are set. */
+export function integrationStatus(env: Env): { meetings: boolean; whatsappForwarding: boolean; liveBroadcast: boolean } {
+  return {
+    meetings: realtimeBase(env) !== null,
+    whatsappForwarding: !!(env.WHATSAPP_APP_SECRET && env.WHATSAPP_CHANNEL_URL && env.WHATSAPP_ACCESS_TOKEN && env.WHATSAPP_ALLOWED_SENDERS),
+    liveBroadcast: !!(env.STREAM_INPUTS && env.STREAM_CUSTOMER_HOST && env.LISTENER_TOKEN),
+  };
+}
+
 // MARK: - The meeting service (Cloudflare RealtimeKit)
 
 function realtimeBase(env: Env): string | null {
@@ -349,7 +361,7 @@ function realtimeBase(env: Env): string | null {
   return `https://api.cloudflare.com/client/v4/accounts/${env.REALTIME_ACCOUNT_ID}/realtime/kit/${env.REALTIME_APP_ID}`;
 }
 
-const notConfigured = () => json({ error: "In-app meetings are not set up yet." }, { status: 503 });
+const notConfigured = () => json({ error: "Video meetings: integration in progress. They open here once it is complete." }, { status: 503 });
 
 async function createRoom(env: Env, title: string): Promise<string | Response> {
   const base = realtimeBase(env);
