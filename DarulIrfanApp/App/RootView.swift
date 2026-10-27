@@ -49,7 +49,7 @@ struct RootView: View {
                 .tag(AppTab.explore)
 
             MoreTabView(dependencies: dependencies, appState: appState)
-                .tabItem { Label("Community", systemImage: "person.3") }
+                .tabItem { Label("Halqah", systemImage: "person.3") }
                 .tag(AppTab.more)
         }
         .tint(DIColor.primary)

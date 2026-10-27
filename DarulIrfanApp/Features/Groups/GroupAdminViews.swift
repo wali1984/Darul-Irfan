@@ -133,14 +133,14 @@ struct GroupLiveStarter: View {
     var meetingsReady = true
 
     private enum Kind: String, CaseIterable, Identifiable {
-        case zikr = "Community Zikr"
+        case zikr = "Halqah Zikr"
         case meeting = "Meeting"
         var id: String { rawValue }
     }
 
     @Environment(\.dismiss) private var dismiss
     @State private var kind: Kind = .zikr
-    @State private var title = String(localized: "Community Zikr")
+    @State private var title = String(localized: "Halqah Zikr")
     @State private var videoLink = ""
     @State private var joinTogether = true
     @State private var working = false
@@ -154,7 +154,7 @@ struct GroupLiveStarter: View {
                 }
                 .pickerStyle(.segmented)
                 .onChange(of: kind) { _, value in
-                    title = value == .zikr ? String(localized: "Community Zikr") : String(localized: "Group meeting")
+                    title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
                 }
                 TextField("Title", text: $title)
             }
@@ -296,7 +296,7 @@ struct GroupZikrEditor: View {
     }
 
     @Environment(\.dismiss) private var dismiss
-    @State private var title = String(localized: "Community Zikr")
+    @State private var title = String(localized: "Halqah Zikr")
     @State private var timing: Timing = .clock
     @State private var time = Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var weekdays: Set<Int> = Set(1...7)

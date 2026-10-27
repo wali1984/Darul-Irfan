@@ -88,7 +88,7 @@ struct GroupDetailView: View {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     HStack(spacing: DISpacing.sm) {
                         DILivePulse(color: DIColor.primary, size: 9)
-                        Text(verbatim: live.title ?? (live.isMeeting ? String(localized: "Group meeting") : String(localized: "Community Zikr")))
+                        Text(verbatim: live.title ?? (live.isMeeting ? String(localized: "Group meeting") : String(localized: "Halqah Zikr")))
                             .font(.headline)
                         Spacer(minLength: 0)
                         Text("LIVE")
@@ -140,7 +140,7 @@ struct GroupDetailView: View {
     private var zikrSection: some View {
         if let sessions = detail?.zikrSessions, !sessions.isEmpty {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                DISectionHeader(titleKey: "Community Zikr", systemImage: "sparkles")
+                DISectionHeader(titleKey: "Halqah Zikr", systemImage: "sparkles")
                 ForEach(sessions) { session in
                     GroupZikrRow(session: session, groupID: group.id, dependencies: dependencies,
                                  canManage: detail?.canManage == true) {
@@ -212,7 +212,7 @@ struct GroupDetailView: View {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     adminButton("Members, admins and invitations", "person.2.badge.gearshape", .people)
                     adminButton("New post", "square.and.pencil", .post)
-                    adminButton("Start community zikr or meeting now", "dot.radiowaves.left.and.right", .live)
+                    adminButton("Start Halqah zikr or meeting now", "dot.radiowaves.left.and.right", .live)
                     adminButton("Schedule a meeting", "calendar.badge.plus", .meeting)
                     adminButton("Add a zikr time", "clock.badge", .zikr)
                     if !meetingsReady {
@@ -409,7 +409,7 @@ private struct GroupZikrRow: View {
             await notifications.scheduleReminder(
                 id: reminderKey,
                 title: session.title,
-                body: String(localized: "Community zikr begins soon. Open Darul Irfan to join it."),
+                body: String(localized: "Halqah zikr begins soon. Open Darul Irfan to join it."),
                 at: max(next.addingTimeInterval(-600), Date().addingTimeInterval(5))
             )
         } else {

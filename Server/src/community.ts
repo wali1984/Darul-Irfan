@@ -268,7 +268,7 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
     return json({ ok: true, state: "offline" });
   }
   const kind = input.kind === "meeting" ? "meeting" : "zikr";
-  const title = cleanText(input.title, 200) ?? (kind === "zikr" ? "Community Zikr" : "Group meeting");
+  const title = cleanText(input.title, 200) ?? (kind === "zikr" ? "Halqah Zikr" : "Group meeting");
   const video = typeof input.videoID === "string" && /^[\w-]{11}$/.test(input.videoID) ? input.videoID : null;
   const wantsRoom = input.room === true || kind === "meeting";
   if (!video && !wantsRoom) return json({ error: "A live session needs a video, a room, or both" }, { status: 400 });
@@ -284,7 +284,7 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
       room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at`)
     .bind(groupID, kind, title, video, roomID, now, memberID, now).run();
   await notifyGroup(env, groupID, `live:${groupID}:${now}`, title,
-    kind === "zikr" ? "Community zikr has started. Join now in Darul Irfan." : "The group meeting has started. Join now in Darul Irfan.",
+    kind === "zikr" ? "Halqah zikr has started. Join now in Darul Irfan." : "The group meeting has started. Join now in Darul Irfan.",
     `darulirfan://groups/${groupID}`);
   return json({ ok: true, state: "live", kind, hasRoom: !!roomID });
 }

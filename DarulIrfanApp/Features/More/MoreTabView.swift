@@ -42,7 +42,7 @@ struct MoreTabView: View {
                 .padding(DISpacing.md)
             }
             .diScreenBackground()
-            .diPageHeading("Community")
+            .diPageHeading("Halqah")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
@@ -77,7 +77,7 @@ struct MoreTabView: View {
     /// Dar-ul-Irfan programmes, and official updates.
     private var communitySection: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Community", systemImage: "person.3")
+            DISectionHeader(titleKey: "Halqah", systemImage: "person.3")
                 .diAppear(delay: 0.05)
 
             if MemberGroupsFeature.isEnabled {

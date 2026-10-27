@@ -13,6 +13,11 @@ struct Topic: Codable, Sendable, Identifiable, Equatable {
     var searchTerms: [String]
     /// Anchor Quran references, "surah:ayah" or "surah:start-end".
     var ayahRefs: [String]
+    /// Narrations on the topic, by canonical id ("bukhari|52|52"), built by
+    /// Tools/Library/build_topic_references.py from the chapters Imam
+    /// an-Nawawi arranged by theme in Riyad as-Salihin and from the books of
+    /// Sahih al-Bukhari. Absent from an older topics file.
+    var hadithRefs: [String]? = nil
 
     /// The FTS query for related content (OR of the terms).
     var searchQuery: String { searchTerms.joined(separator: " ") }

@@ -146,6 +146,24 @@ struct HadithRepository: HadithRepositoryProtocol {
         return rows.compactMap(Self.entry(from:)).first
     }
 
+    /// Narrations by canonical id, in the order asked for. Queried in batches
+    /// to stay well under SQLite's bound-parameter limit.
+    func entries(canonicalIDs: [String]) async throws -> [HadithEntry] {
+        var found: [String: HadithEntry] = [:]
+        var start = 0
+        while start < canonicalIDs.count {
+            let batch = Array(canonicalIDs[start..<min(start + 200, canonicalIDs.count)])
+            let marks = Array(repeating: "?", count: batch.count).joined(separator: ",")
+            let rows = try await database.connection.query(
+                "SELECT \(Self.entryColumns) FROM hadith_entries WHERE canonical_id IN (\(marks))",
+                batch.map { .text($0) }
+            )
+            for entry in rows.compactMap(Self.entry(from:)) { found[entry.canonicalID] = entry }
+            start += batch.count
+        }
+        return canonicalIDs.compactMap { found[$0] }
+    }
+
     /// 0-based position of a narration in its collection's reading order.
     ///
     /// Counts narrations that sort before it by `source_sequence` — the same

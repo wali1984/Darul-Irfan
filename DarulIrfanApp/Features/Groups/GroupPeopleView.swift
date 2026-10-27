@@ -350,7 +350,7 @@ struct AddGroupPersonView: View {
                     Image(systemName: "clock.badge.checkmark").foregroundStyle(DIColor.primary)
                 }
             } footer: {
-                Text("Nothing to send: they open Community in the app and sign in. If they hide their email from apps, send them a code instead.")
+                Text("Nothing to send: they open Halqah in the app and sign in. If they hide their email from apps, send them a code instead.")
             }
         default:
             if let code = result.code {
@@ -413,7 +413,7 @@ struct AddGroupPersonView: View {
 
     private func invitationMessage(code: String, expires: Date?) -> String {
         let until = expires?.formatted(date: .abbreviated, time: .omitted) ?? ""
-        return String(localized: "Assalamu alaikum. You are invited to the \(groupName) group in the Darul Irfan app. Open the app, go to Community, and enter this code: \(code). It works once, until \(until).")
+        return String(localized: "Assalamu alaikum. You are invited to the \(groupName) group in the Darul Irfan app. Open the app, go to Halqah, and enter this code: \(code). It works once, until \(until).")
     }
 
     private func smsURL(phone: String, message: String) -> URL? {

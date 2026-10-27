@@ -12,7 +12,7 @@ final class SmokeUITests: XCTestCase {
     /// when Hadith was briefly given a sixth tab. Quran and Hadith now sit
     /// together under Read. Must match RootView's tab labels (v1.11 renamed
     /// Explore to Discover and More to Community).
-    private let tabLabels = ["Today", "Read", "Zikr", "Discover", "Community"]
+    private let tabLabels = ["Today", "Read", "Zikr", "Discover", "Halqah"]
 
     override func setUp() {
         continueAfterFailure = false

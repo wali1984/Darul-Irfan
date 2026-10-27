@@ -21165,6 +21165,227 @@
           }
         }
       }
+    },
+    "Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقہ"
+          }
+        }
+      }
+    },
+    "Halqah Zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halqah Zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقۂ ذکر"
+          }
+        }
+      }
+    },
+    "Halqah zikr begins soon. Open Darul Irfan to join it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halqah zikr begins soon. Open Darul Irfan to join it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقۂ ذکر جلد شروع ہو رہا ہے۔ شامل ہونے کے لیے دارالعرفان کھولیں۔"
+          }
+        }
+      }
+    },
+    "Start Halqah zikr or meeting now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Halqah zikr or meeting now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی حلقۂ ذکر یا میٹنگ شروع کریں"
+          }
+        }
+      }
+    },
+    "Nothing to send: they open Halqah in the app and sign in. If they hide their email from apps, send them a code instead.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to send: they open Halqah in the app and sign in. If they hide their email from apps, send them a code instead."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کچھ بھیجنے کی ضرورت نہیں: وہ ایپ میں حلقہ کھول کر سائن اِن کریں۔ اگر وہ ایپس سے اپنی ای میل چھپاتے ہیں تو اس کے بجائے انہیں کوڈ بھیجیں۔"
+          }
+        }
+      }
+    },
+    "Assalamu alaikum. You are invited to the %@ group in the Darul Irfan app. Open the app, go to Halqah, and enter this code: %@. It works once, until %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assalamu alaikum. You are invited to the %@ group in the Darul Irfan app. Open the app, go to Halqah, and enter this code: %@. It works once, until %@."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "السلام علیکم۔ آپ کو دارالعرفان ایپ میں %@ گروپ میں مدعو کیا گیا ہے۔ ایپ کھولیں، حلقہ میں جائیں، اور یہ کوڈ درج کریں: %@۔ یہ ایک بار، %@ تک کام کرے گا۔"
+          }
+        }
+      }
+    },
+    "From the Hadith": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From the Hadith"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "احادیث سے"
+          }
+        }
+      }
+    },
+    "Show all %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show all %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمام %lld دکھائیں"
+          }
+        }
+      }
+    },
+    "Show fewer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show fewer"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کم دکھائیں"
+          }
+        }
+      }
+    },
+    "Read more": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read more"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مزید پڑھیں"
+          }
+        }
+      }
+    },
+    "Show less": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show less"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کم دکھائیں"
+          }
+        }
+      }
+    },
+    "Open": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کھولیں"
+          }
+        }
+      }
+    },
+    "This collection has no Urdu translation; English is shown.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This collection has no Urdu translation; English is shown."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس مجموعے کا اردو ترجمہ موجود نہیں؛ انگریزی دکھائی گئی ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

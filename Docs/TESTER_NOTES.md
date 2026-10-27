@@ -37,6 +37,12 @@ What changed after the first 1.11.0 build, then the full 1.11.0 list.
    it), add by phone (a code you send by text or WhatsApp), code only, member
    or admin of that group; make or unmake admins; remove people; withdraw
    unused codes. Admins are now admins of their own groups only.
+7. Topics (Read -> Topics, or Today): every topic shows 7-12 ayat and its
+   hadith (from Riyad as-Salihin's chapters and Sahih al-Bukhari's books, in
+   Urdu where the collection has it), each opening in the Quran or in its
+   collection. Related library works open and bayans play; in Urdu, Urdu
+   works come first with their Urdu titles. (In the build after 1.11.1.)
+8. "Community" is now "Halqah" (Urdu: حلقہ) on the tab and throughout.
 
 **From 1.11.0**
 
