@@ -46,11 +46,18 @@ def call(method: str, path: str, body: dict | None = None, raw: bool = False):
         method=method,
         headers={"x-auth-token": token(), "Content-Type": "application/json"},
     )
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            data = response.read()
-    except urllib.error.HTTPError as error:
-        sys.exit(f"HTTP {error.code}: {error.read()[:300].decode(errors='replace')}")
+    for attempt in range(6):
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                data = response.read()
+            break
+        except urllib.error.HTTPError as error:
+            sys.exit(f"HTTP {error.code}: {error.read()[:300].decode(errors='replace')}")
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            # A dropped connection or DNS hiccup should not end a long watch.
+            if attempt == 5:
+                raise
+            time.sleep(10 * (attempt + 1))
     return data.decode("utf-8", errors="replace") if raw else json.loads(data or b"{}")
 
 
