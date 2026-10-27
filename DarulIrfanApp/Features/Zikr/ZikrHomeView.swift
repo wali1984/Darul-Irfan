@@ -271,9 +271,15 @@ private struct ZikrSessionCard: View {
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(DIColor.textPrimary)
                     }
-                    Text("In Pakistan: about \(ZikrScheduleMath.announcedTimeText(for: session))")
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
+                    Group {
+                        if session.zikrAnchor == nil {
+                            Text("In Pakistan: \(ZikrScheduleMath.announcedTimeText(for: session))")
+                        } else {
+                            Text("In Pakistan: about \(ZikrScheduleMath.announcedTimeText(for: session))")
+                        }
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
                 }
 
                 if let note = session.availabilityNote {

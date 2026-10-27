@@ -169,6 +169,7 @@ struct SurahReaderView: View {
                         AyahCardView(
                             ayah: ayah,
                             viewModel: viewModel,
+                            dependencies: dependencies,
                             player: player,
                             speaker: speaker,
                             fontScale: appState.settings.readerFontScale.rawValue,
@@ -635,7 +636,7 @@ struct SurahReaderView: View {
 /// Opens a tafsir volume's text at a page. The library row gives the title;
 /// if the library has not imported it, a minimal item still opens the pages,
 /// which is all the text reader needs.
-private struct TafsirVolumeDestination: View {
+struct TafsirVolumeDestination: View {
     let volume: TafsirVolume
     let dependencies: AppDependencies
     @State private var item: ContentItem?
@@ -678,6 +679,7 @@ private struct TafsirVolumeDestination: View {
 private struct AyahCardView: View {
     let ayah: QuranAyah
     let viewModel: SurahReaderViewModel
+    let dependencies: AppDependencies
     let player: RecitationPlayer
     let speaker: TranslationSpeaker
     let fontScale: Double
@@ -686,6 +688,7 @@ private struct AyahCardView: View {
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
     @State private var tafsirExpanded = true
     @State private var isWritingNote = false
+    @State private var showsTafsir = false
 
     private var isSounding: Bool {
         player.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
@@ -721,6 +724,11 @@ private struct AyahCardView: View {
                 shellsRow
             }
         }
+        .sheet(isPresented: $showsTafsir) {
+            NavigationStack {
+                AyahTafsirSheet(ayah: ayah, viewModel: viewModel, dependencies: dependencies, fontScale: fontScale)
+            }
+        }
         .overlay(alignment: .leading) {
             if isSounding || isSpeaking {
                 RoundedRectangle(cornerRadius: 2)
@@ -738,6 +746,19 @@ private struct AyahCardView: View {
             ayahNumberBadge
             playButton
             Spacer(minLength: 0)
+            // Either tafsir, in either language, for this ayah alone.
+            Button {
+                showsTafsir = true
+            } label: {
+                Label("Tafsir", systemImage: "text.book.closed")
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, DISpacing.sm)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(DIColor.primary.opacity(0.12)))
+                    .foregroundStyle(DIColor.primary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Tafsir of Ayah \(ayah.ayahNumber)"))
             Button {
                 Task { await viewModel.toggleBookmark(ayahNumber: ayah.ayahNumber) }
             } label: {
@@ -846,7 +867,11 @@ private struct AyahCardView: View {
         let edition = viewModel.edition(id: entry.editionID)
         return DisclosureGroup(isExpanded: $tafsirExpanded) {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                if !entry.text.isEmpty {
+                if edition?.language == "ur" && !entry.text.isEmpty {
+                    // Urdu tafsir quotes the Qur'an inside its prose; set
+                    // the quotations apart as the book pages do.
+                    FormattedBookPage(page: BookPageFormatter.format(entry.text), scale: fontScale)
+                } else if !entry.text.isEmpty {
                     bodyText(entry.text, languageCode: edition?.language)
                 }
             }

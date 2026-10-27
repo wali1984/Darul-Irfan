@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 struct AppearanceSettingsView: View {
     private let appState: AppState
+    @AppStorage(AppFonts.nastaliqPreferenceKey) private var urduNastaliq = false
 
     init(appState: AppState) {
         self.appState = appState
@@ -14,6 +15,9 @@ struct AppearanceSettingsView: View {
             themeSection
             languageSection
             readerScaleSection
+            if AppFonts.appleNastaliqName != nil {
+                urduLetteringSection
+            }
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
@@ -93,6 +97,22 @@ struct AppearanceSettingsView: View {
             SettingsSectionHeader(titleKey: "Reading", systemImage: "textformat.size")
         } footer: {
             Text("Applies to the Quran and Library reading screens, on top of your system text size.")
+        }
+    }
+
+    // MARK: - Urdu lettering
+
+    /// Offered only where Apple's own Nastaliq is on the device.
+    private var urduLetteringSection: some View {
+        Section {
+            Toggle(isOn: $urduNastaliq) {
+                Text("Urdu in Nastaliq")
+                    .foregroundStyle(DIColor.textPrimary)
+            }
+            .tint(DIColor.primary)
+            .listRowBackground(DIColor.surface)
+        } footer: {
+            Text("Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change.")
         }
     }
 

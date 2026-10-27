@@ -155,7 +155,8 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
     const rows = await env.DB.prepare("SELECT sender,group_id,label,updated_at FROM whatsapp_sender_groups ORDER BY group_id,sender").all();
     return json({ senders: rows.results });
   }
-  // A member's role in the app: member, admin (of their groups) or superadmin.
+  // A member's role in the app: member, admin (of every group they are in)
+  // or superadmin. Admin of one group only is set from the app.
   const roleRoute = /^\/admin\/api\/members\/([0-9a-f]{32})\/role$/.exec(path);
   if (roleRoute && request.method === "PUT") {
     const input = await request.json<Record<string, unknown>>();
@@ -163,8 +164,11 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
     if (role === "superadmin" && !hasRole(actor, env.SUPER_ADMIN_EMAILS)) {
       return json({ error: "Only a super admin can make another super admin" }, { status: 403 });
     }
-    const result = await env.DB.prepare("UPDATE members SET role=? WHERE id=?").bind(role, roleRoute[1]).run();
+    const result = await env.DB.prepare("UPDATE members SET role=? WHERE id=?")
+      .bind(role === "superadmin" ? "superadmin" : "member", roleRoute[1]).run();
     if ((result.meta?.changes ?? 0) === 0) return json({ error: "Unknown member" }, { status: 404 });
+    await env.DB.prepare("UPDATE member_group_members SET role=? WHERE member_id=?")
+      .bind(role === "admin" ? "admin" : "member", roleRoute[1]).run();
     await audit(env, actor, "role", "member", roleRoute[1] as string, null, { role }, new Date().toISOString());
     return json({ ok: true, memberID: roleRoute[1], role });
   }

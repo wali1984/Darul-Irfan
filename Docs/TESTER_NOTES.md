@@ -1,4 +1,4 @@
-# TestFlight tester notes — 1.11.0
+# TestFlight tester notes — 1.11.1
 
 Paste-ready text for App Store Connect, plus the briefing testers should get.
 Keep the "already known" list current: a tester reporting a known gap costs
@@ -12,9 +12,33 @@ everyone time, and it reads as though the app is less finished than it is.
 > and lectures. Everything core works offline, and prayer times are calculated
 > on your own device — your location is never sent anywhere.
 
-## Owner's checklist for 1.11.0
+## Owner's checklist for 1.11.1
 
-Everything this release changes, in the order it is easiest to check.
+What changed after the first 1.11.0 build, then the full 1.11.0 list.
+
+**From your 1.11.0 feedback**
+1. Urdu letters join everywhere (Quran tafsir, books, hadith). Urdu now uses
+   the iPhone's standard lettering. If your phone has Apple's Nastaliq,
+   Settings -> Appearance shows "Urdu in Nastaliq" - try it, and tell us if
+   the letters still break with it on.
+2. Full para tafseer (Library or "Read the full commentary"): lines joined
+   into paragraphs, headings in green, Quranic quotations set apart in the
+   Quran font, contents pages folded ("Contents page"), a sentence cut by the
+   page continues on the same page. Asrar Urdu two-column pages show the
+   Arabic first, then its Urdu.
+3. Tafsir button on every ayah: opens Akram-ut-Tafaseer or Asrar-ut-Tanzil,
+   in Urdu or English, for that ayah alone; the printed volume is one tap away.
+4. Daily Zikr is 9:15 PM Pakistan time: 12:15 PM in New York until 1 November,
+   11:15 AM after. The button reads "Join Daily Zikr".
+5. Tahajjud Zikr shows one hour before Fajr at Dar-ul-Irfan (Pakistan time),
+   marked as to be confirmed. The exact time is one number to change.
+6. Community admins: in a group, Group admin -> "Members, admins and
+   invitations": add by email (they join when they sign in with Apple under
+   it), add by phone (a code you send by text or WhatsApp), code only, member
+   or admin of that group; make or unmake admins; remove people; withdraw
+   unused codes. Admins are now admins of their own groups only.
+
+**From 1.11.0**
 
 **The ten reported issues**
 1. Urdu tafsir: open a surah, Tafsir, Urdu - Akram-ut-Tafaseer shows verse by
@@ -73,9 +97,10 @@ Ask testers to spend time on these, in this order:
    text, play a lecture and lock the phone - audio should continue.
 6. **Offline.** Aeroplane mode: prayer times, Quran, hadith and book text
    should all still work.
-7. **Urdu and right-to-left.** Urdu text right-aligned, in Nastaliq, never
+7. **Urdu and right-to-left.** Urdu text right-aligned, letters joined, never
    clipped; English text left-aligned.
-8. **Private groups** (members with an invitation code only).
+8. **Private groups** (members with an invitation code only). Admins: add
+   someone by email and by phone, and make a second admin.
 
 ## Already known — please do not report these
 

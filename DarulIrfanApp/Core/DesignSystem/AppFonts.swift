@@ -14,13 +14,7 @@ enum AppFonts {
     /// already registered via UIAppFonts just reports an "already registered"
     /// error which we ignore.
     static func registerBundledFonts() {
-        // The bundled Noto Nastaliq is registered only on a system that lacks
-        // its own copy. See `urduName` for why the system one must win.
-        var bundled = ["AlQuran-IndoPak-QuranWBW", "AmiriQuran-Regular"]
-        if UIFont(name: systemUrduName, size: 16) == nil {
-            bundled.append("NotoNastaliqUrdu-Regular")
-        }
-        for base in bundled {
+        for base in ["AlQuran-IndoPak-QuranWBW", "AmiriQuran-Regular"] {
             guard let url = bundleURL(base) else {
                 AppLog.presentation("Font not found in bundle: \(base).ttf")
                 continue
@@ -31,7 +25,7 @@ enum AppFonts {
         }
         // Force name resolution now that registration has run.
         _ = quranArabicName
-        _ = urduName
+        AppLog.presentation("Apple Nastaliq: \(appleNastaliqName ?? "not on this device")")
     }
 
     /// The usable font name for Quran Arabic — the IndoPak QuranWBW mushaf face.
@@ -43,21 +37,26 @@ enum AppFonts {
          "AmiriQuran-Regular", "Amiri Quran", "AmiriQuran"]
     )
 
-    /// The usable font name for Urdu Nastaliq (Noto Nastaliq Urdu).
+    /// Apple's own Noto Nastaliq Urdu, when this device has it; nil otherwise.
     ///
-    /// iOS's own copy comes first. The bundled file is Google's variable
-    /// OpenType build, whose Nastaliq relies on cursive-attachment and
-    /// contextual lookups that Core Text does not apply as the font expects:
-    /// letters lose their joins and long passages read as runs of detached
-    /// bowls ("noon noon"). Apple ships the same design converted for its own
-    /// shaper, so the system face renders correctly; the bundled one is kept
-    /// only as a fallback for a system without it.
-    static let urduName: String = resolve(
-        [systemUrduName, "NotoNastaliqUrdu-Regular", "Noto Nastaliq Urdu"]
-    )
+    /// Google's OpenType Nastaliq (which this app used to bundle) relies on
+    /// cursive-attachment and contextual lookups that Core Text does not
+    /// apply as the font expects: on device the letters did not join. Only
+    /// Apple's copy, converted for its own shaper, is ever used now, and only
+    /// when the reader chooses it.
+    static let appleNastaliqName: String? = UIFont.fontNames(forFamilyName: "Noto Nastaliq Urdu")
+        .sorted()
+        .first { !$0.localizedCaseInsensitiveContains("bold") }
 
-    /// PostScript name of the Noto Nastaliq Urdu that ships with iOS.
-    private static let systemUrduName = "NotoNastaliqUrdu"
+    /// Settings key: true when the reader chose Nastaliq for Urdu text.
+    static let nastaliqPreferenceKey = "reader.urduNastaliq"
+
+    /// The Nastaliq face to use for Urdu, or nil for the system face, whose
+    /// Naskh letters always join.
+    static var urduNastaliqName: String? {
+        guard UserDefaults.standard.bool(forKey: nastaliqPreferenceKey) else { return nil }
+        return appleNastaliqName
+    }
 
     // MARK: - Internals
 

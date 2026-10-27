@@ -67,12 +67,46 @@ def paltalk_window():
 def ensure_paltalk() -> str | None:
     """Starts Paltalk if it is not running. Returns a problem, or None."""
     if any((proc.info.get("name") or "").lower() == "paltalk.exe" for proc in psutil.process_iter(["name"])):
-        return None if paltalk_window() else "Paltalk is running but its window is not available"
+        if paltalk_window():
+            return None
+        # Closed to the tray: starting it again brings the running copy's
+        # window back. It comes to the front, so only at a quiet moment.
+        if PALTALK.exists() and seconds_since_input() >= IDLE_BEFORE_SEARCH:
+            subprocess.Popen([str(PALTALK)], close_fds=True)
+            log("Paltalk window was hidden; reopened it")
+        return "Paltalk is running but its window is not available"
     if not PALTALK.exists():
         return "Paltalk is not installed"
     subprocess.Popen([str(PALTALK)], close_fds=True)
     log("Paltalk was not running; started it")
     return "Paltalk was not running (started again)"
+
+
+IDLE_BEFORE_SEARCH = 20
+
+
+def seconds_since_input() -> float:
+    """How long since anyone touched this PC's keyboard or mouse."""
+    import ctypes
+
+    class LastInput(ctypes.Structure):
+        _fields_ = [("cbSize", ctypes.c_uint), ("dwTime", ctypes.c_uint)]
+
+    info = LastInput(ctypes.sizeof(LastInput), 0)
+    if not ctypes.windll.user32.GetLastInputInfo(ctypes.byref(info)):
+        return 0.0
+    return ((ctypes.windll.kernel32.GetTickCount() - info.dwTime) & 0xFFFFFFFF) / 1000
+
+
+def paltalk_has_focus(window) -> bool:
+    """True only when the foreground window belongs to Paltalk, so a key
+    sent now cannot land in whatever else someone is using on this PC."""
+    import ctypes
+    from ctypes import wintypes
+    user32 = ctypes.windll.user32
+    pid = wintypes.DWORD()
+    user32.GetWindowThreadProcessId(user32.GetForegroundWindow(), ctypes.byref(pid))
+    return pid.value == window.process_id()
 
 
 def try_join(room: str) -> bool:
@@ -89,18 +123,33 @@ def try_join(room: str) -> bool:
                     if (e.element_info.name or "") == "Search Room"), None)
         if box is None:
             return False
+        # The search needs Paltalk in front for one key press. Someone using
+        # this PC would lose their window and maybe a keystroke, so wait for
+        # a quiet moment, then give their window back.
+        if seconds_since_input() < IDLE_BEFORE_SEARCH:
+            return False
+        import ctypes
+        previous = ctypes.windll.user32.GetForegroundWindow()
         box.set_edit_text(room)
-        box.type_keys("{ENTER}", set_foreground=True)
+        try:
+            box.set_focus()
+        except Exception:  # noqa: BLE001 - Windows may refuse to change focus
+            pass
+        if not paltalk_has_focus(window):
+            log("Paltalk is not the active window; search left for the next round")
+            return False
+        box.type_keys("{ENTER}", set_foreground=False)
+        if previous:
+            ctypes.windll.user32.SetForegroundWindow(previous)
         time.sleep(4)
         wanted = room.strip().lower()
         for tile in window.descendants(control_type="Button"):
             ident = tile.element_info.automation_id or ""
             if ident.endswith("RoomTiles") and (tile.element_info.name or "").strip().lower() == wanted:
                 log(f"room listed: {tile.element_info.name}; opening it")
-                try:
-                    tile.invoke()
-                except Exception:  # noqa: BLE001 - some builds expose no invoke pattern
-                    tile.click_input(double=True)
+                # Invoke only: a click would move the mouse of whoever is
+                # using this PC.
+                tile.invoke()
                 return True
     except Exception as error:  # noqa: BLE001 - the UI changes under us; try again next round
         log(f"room search failed: {error}")
@@ -171,12 +220,38 @@ class LoopbackAudio:
 
 # MARK: - Encoder
 
+def find_ffmpeg() -> str | None:
+    """ffmpeg on this process's PATH, else on the user's saved PATH (a task
+    started before ffmpeg was installed has a stale one), else where winget
+    puts it."""
+    found = shutil.which("ffmpeg")
+    if found:
+        return found
+    if sys.platform == "win32":
+        import winreg
+        try:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+                saved = os.path.expandvars(winreg.QueryValueEx(key, "Path")[0])
+            found = shutil.which("ffmpeg", path=saved)
+            if found:
+                return found
+        except OSError:
+            pass
+        packages = Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft" / "WinGet" / "Packages"
+        for candidate in sorted(packages.glob("Gyan.FFmpeg*/*/bin/ffmpeg.exe"), reverse=True):
+            return str(candidate)
+    return None
+
+
+FFMPEG = find_ffmpeg() or "ffmpeg"
+
+
 def ensure_frame() -> None:
     """A plain branded frame. Text only, no platform names."""
     if FRAME.exists():
         return
     subprocess.run([
-        "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+        FFMPEG, "-hide_banner", "-loglevel", "error", "-y",
         "-f", "lavfi", "-i", "color=c=0x0B3B2C:s=1280x720",
         "-vf", ("drawtext=fontfile='C\\:/Windows/Fonts/segoeuib.ttf':text='Daily Zikr':fontcolor=white:fontsize=96:"
                 "x=(w-text_w)/2:y=(h-text_h)/2-50,"
@@ -190,7 +265,7 @@ def encoder_command(audio: LoopbackAudio, output: str) -> list[str]:
     """Still frame + live audio, as a stream YouTube and Facebook accept:
     H.264 keyframes every 2 s, AAC 128 kb/s, constant frame rate."""
     command = [
-        "ffmpeg", "-hide_banner", "-loglevel", "warning", "-nostats", "-y",
+        FFMPEG, "-hide_banner", "-loglevel", "warning", "-nostats", "-y",
         "-re", "-loop", "1", "-framerate", "15", "-i", str(FRAME),
         "-f", "s16le", "-ar", str(audio.rate), "-ch_layout", "stereo" if audio.channels == 2 else "mono", "-i", "pipe:0",
         "-map", "0:v", "-map", "1:a",
@@ -300,7 +375,7 @@ def main() -> int:
                         help="stream SECONDS of whatever is playing to a local test file, then stop")
     args = parser.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
-    if not shutil.which("ffmpeg"):
+    if find_ffmpeg() is None:
         log("ffmpeg is not installed")
         return 2
     ensure_frame()

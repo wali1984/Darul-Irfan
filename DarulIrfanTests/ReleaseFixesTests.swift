@@ -58,18 +58,22 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertGreaterThan(summerMinutes - winterMinutes, 60, "Summer Isha should be over an hour later")
     }
 
-    /// Tahajjud falls in the last third of the night: after midnight, before Fajr.
-    func testTahajjudIsInTheLastThirdOfTheNight() throws {
+    /// The Tahajjud zikr starts the set number of minutes before Fajr at
+    /// Dar-ul-Irfan; the 1.11.0 "tahajjud" anchor now means the same.
+    func testTahajjudZikrStartsBeforeFajr() throws {
         let evening = TestDates.make(year: 2026, month: 3, day: 10, hour: 20, minute: 0, timeZone: TestDates.karachi)
-        let start = try XCTUnwrap(ZikrAnchorResolver.nextStart(for: session(anchor: "tahajjud"), after: evening, calculator: calculator))
         let nextDay = try XCTUnwrap(calculator.schedule(
             for: DateComponents(year: 2026, month: 3, day: 11),
             at: ZikrAnchorResolver.darulIrfan,
             preferences: PrayerCalculationPreferences()
         ))
         let fajr = try XCTUnwrap(nextDay.time(for: .fajr))
-        XCTAssertLessThan(start, fajr)
-        XCTAssertGreaterThan(start, fajr.addingTimeInterval(-5 * 3600))
+        var beforeFajr = session(anchor: "beforeFajr")
+        beforeFajr.anchorOffsetMinutes = 45
+        let start = try XCTUnwrap(ZikrAnchorResolver.nextStart(for: beforeFajr, after: evening, calculator: calculator))
+        XCTAssertEqual(start, fajr.addingTimeInterval(-45 * 60))
+        let legacy = try XCTUnwrap(ZikrAnchorResolver.nextStart(for: session(anchor: "tahajjud"), after: evening, calculator: calculator))
+        XCTAssertEqual(legacy, fajr.addingTimeInterval(-60 * 60))
     }
 
     /// A session at a fixed time is left exactly as announced.
@@ -193,11 +197,32 @@ final class ReleaseFixesTests: XCTestCase {
         }
     }
 
-    /// The official schedule ships with its anchors, so the section is never
-    /// empty and never a fixed guess.
-    func testBundledZikrSessionsAreAnchored() throws {
+    /// Daily Zikr is at a fixed 9:15 PM Pakistan time; the Tahajjud zikr
+    /// follows Fajr at Dar-ul-Irfan.
+    func testBundledZikrSessionsMatchTheOfficialTimes() throws {
         try XCTSkipIf(SeedBundle.manifest() == nil, "SeedData resources are not visible to this test host")
-        let anchors = Set(SeedBundle.zikrSessions().compactMap(\.zikrAnchor))
-        XCTAssertEqual(anchors, [.afterIsha, .tahajjud])
+        let sessions = SeedBundle.zikrSessions()
+        let daily = try XCTUnwrap(sessions.first { $0.id == "zikr-after-isha" })
+        XCTAssertNil(daily.zikrAnchor)
+        XCTAssertEqual([daily.startHour, daily.startMinute], [21, 15])
+        XCTAssertEqual(daily.timeZoneIdentifier, "Asia/Karachi")
+        let resolved = ZikrAnchorResolver.resolved(daily, at: Date(), calculator: calculator)
+        XCTAssertEqual([resolved.startHour, resolved.startMinute], [21, 15])
+        XCTAssertEqual(sessions.first { $0.id == "zikr-tahajjud" }?.zikrAnchor, .beforeFajr)
+    }
+
+    /// 9:15 PM in Pakistan is 12:15 PM in New York in daylight time and
+    /// 11:15 AM in standard time; Pakistan has no daylight saving.
+    func testDailyZikrInNewYork() throws {
+        let daily = session(anchor: nil)
+        let newYork = try XCTUnwrap(TimeZone(identifier: "America/New_York"))
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = newYork
+        let october = TestDates.make(year: 2026, month: 10, day: 27, hour: 8, minute: 0, timeZone: newYork)
+        let december = TestDates.make(year: 2026, month: 12, day: 1, hour: 8, minute: 0, timeZone: newYork)
+        let summer = try XCTUnwrap(ZikrScheduleMath.nextOccurrence(of: daily, after: october))
+        let winter = try XCTUnwrap(ZikrScheduleMath.nextOccurrence(of: daily, after: december))
+        XCTAssertEqual(calendar.dateComponents([.hour, .minute], from: summer), DateComponents(hour: 12, minute: 15))
+        XCTAssertEqual(calendar.dateComponents([.hour, .minute], from: winter), DateComponents(hour: 11, minute: 15))
     }
 }

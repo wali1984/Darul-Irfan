@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 import type { Env } from "../src/contracts";
 import { sqliteD1 } from "./sqlite-d1";
+import { claimEmailGrants } from "../src/members";
 
 const SECRET = "test-app-secret";
 
@@ -27,8 +28,8 @@ async function setup(overrides: Partial<Env> = {}) {
     raw.prepare("INSERT INTO member_sessions(token_hash,member_id,created_at,expires_at,last_seen_at) VALUES(?,?,?,?,?)")
       .run(await sha256(person.token), person.id, now, later, now);
     for (const group of person.groups) {
-      raw.prepare("INSERT INTO member_group_members(group_id,member_id,added_at,added_by) VALUES(?,?,?,?)")
-        .run(group, person.id, now, "test");
+      raw.prepare("INSERT INTO member_group_members(group_id,member_id,added_at,added_by,role) VALUES(?,?,?,?,?)")
+        .run(group, person.id, now, "test", person.role === "admin" ? "admin" : "member");
     }
   }
   const env = {
@@ -184,8 +185,9 @@ describe("community groups", () => {
     expect(((await redeemed.json()) as { memberID: string }).memberID).toBe("a".repeat(32));
     const me = (await (await call(member, "GET", "/v1/members/me")).json()) as { role: string };
     expect(me.role).toBe("admin");
+    // Admin of the group the code was for, and of no other.
     const groups = (await (await call(member, "GET", "/v1/groups")).json()) as { groups: { id: string; canManage: boolean }[] };
-    expect(groups.groups.map(g => [g.id, g.canManage])).toEqual([["canada", true], ["usa", true]]);
+    expect(groups.groups.map(g => [g.id, g.canManage])).toEqual([["canada", true], ["usa", false]]);
   });
 
   it("stores a forwarded picture, routes it to its group, and serves it by signed link only", async () => {
@@ -229,5 +231,98 @@ describe("community groups", () => {
     expect(html).toContain("@cloudflare/realtimekit@2.0.2");
     expect(html).toContain("location.hash");
     expect(page.headers.get("cache-control")).toBe("no-store");
+  });
+});
+
+describe("group admins manage their group's people", () => {
+  type People = {
+    members: { id: string; role: string; isYou: boolean }[];
+    invitations: { id: string; kind: string; label?: string; role: string }[];
+  };
+  type Call = Awaited<ReturnType<typeof setup>>["call"];
+  const people = async (call: Call, token: string) =>
+    (await (await call(token, "GET", "/v1/groups/usa/people")).json()) as People;
+  const manages = async (call: Call, token: string, group: string) =>
+    ((await (await call(token, "GET", "/v1/groups")).json()) as { groups: { id: string; canManage: boolean }[] })
+      .groups.find(g => g.id === group)?.canManage ?? false;
+  const redeem = (env: Env, code: string, ip: string) => worker.fetch(new Request("https://api.example.com/v1/members/invite", {
+    method: "POST", body: JSON.stringify({ code }),
+    headers: { "content-type": "application/json", "cf-connecting-ip": ip },
+  }), env);
+
+  it("adds someone by email at once, or when they first sign in with it", async () => {
+    const { env, raw, call, member, admin } = await setup();
+    raw.prepare("UPDATE members SET email=? WHERE id=?").run("existing@example.com", "a".repeat(32));
+    const now = await call(admin, "POST", "/v1/groups/usa/people", { email: "Existing@Example.com", role: "admin" });
+    expect(now.status).toBe(201);
+    expect(((await now.json()) as { result: string }).result).toBe("added");
+    expect(await manages(call, member, "usa")).toBe(true);
+
+    const later = await call(admin, "POST", "/v1/groups/usa/people", { email: "new@example.com" });
+    expect(((await later.json()) as { result: string }).result).toBe("pending");
+    expect((await people(call, admin)).invitations).toMatchObject([{ kind: "email", label: "new@example.com", role: "member" }]);
+    const stamp = new Date().toISOString();
+    raw.prepare("INSERT INTO members(id,apple_subject,email,created_at,last_seen_at) VALUES(?,?,?,?,?)")
+      .run("d".repeat(32), "apple-d", "new@example.com", stamp, stamp);
+    await claimEmailGrants(env, "d".repeat(32), "NEW@example.com");
+    expect((await people(call, admin)).members.map(m => m.id)).toContain("d".repeat(32));
+    expect((await people(call, admin)).invitations).toEqual([]);
+  });
+
+  it("makes a code for a phone number, and withdraws an unused one", async () => {
+    const { env, call, admin } = await setup();
+    const made = await call(admin, "POST", "/v1/groups/usa/people", { phone: "+1 (508) 502-8015", role: "admin" });
+    expect(made.status).toBe(201);
+    const body = (await made.json()) as { result: string; code: string; phone: string };
+    expect(body).toMatchObject({ result: "code", phone: "15085028015" });
+    expect(body.code).toMatch(/^[A-Z0-9]{5}-[A-Z0-9]{5}$/);
+    const [invitation] = (await people(call, admin)).invitations;
+    expect(invitation).toMatchObject({ kind: "code", label: "+15085028015", role: "admin" });
+    expect((await call(admin, "DELETE", `/v1/groups/usa/invitations/${invitation!.id}`)).status).toBe(204);
+    expect((await people(call, admin)).invitations).toEqual([]);
+    expect((await redeem(env, body.code, "1.1.1.2")).status).toBe(403);
+    expect((await call(admin, "POST", "/v1/groups/usa/people", { phone: "12" })).status).toBe(400);
+  });
+
+  it("an admin code makes its holder admin of that group only", async () => {
+    const { env, call, admin } = await setup();
+    const { code } = (await (await call(admin, "POST", "/v1/groups/usa/people", { role: "admin" })).json()) as { code: string };
+    const { token } = (await (await redeem(env, code, "1.1.1.3")).json()) as { token: string };
+    expect(await manages(call, token, "usa")).toBe(true);
+    expect((await call(token, "GET", "/v1/groups/canada")).status).toBe(404);
+  });
+
+  it("promotes, demotes and removes, but never the caller or a super admin", async () => {
+    const { raw, call, member, admin, superAdmin } = await setup();
+    raw.prepare("INSERT INTO member_group_members(group_id,member_id,added_at,added_by) VALUES(?,?,?,?)")
+      .run("usa", "c".repeat(32), new Date().toISOString(), "test");
+    expect((await call(admin, "PUT", `/v1/groups/usa/people/${"a".repeat(32)}`, { role: "admin" })).status).toBe(200);
+    expect(await manages(call, member, "usa")).toBe(true);
+    expect((await people(call, admin)).members.find(m => m.id === "c".repeat(32))?.role).toBe("superadmin");
+    expect((await call(admin, "PUT", `/v1/groups/usa/people/${"b".repeat(32)}`, { role: "member" })).status).toBe(400);
+    expect((await call(admin, "PUT", `/v1/groups/usa/people/${"c".repeat(32)}`, { role: "member" })).status).toBe(403);
+    expect((await call(admin, "DELETE", `/v1/groups/usa/people/${"c".repeat(32)}`)).status).toBe(403);
+    expect((await call(superAdmin, "PUT", `/v1/groups/usa/people/${"a".repeat(32)}`, { role: "member" })).status).toBe(200);
+    expect(await manages(call, member, "usa")).toBe(false);
+    expect((await call(admin, "DELETE", `/v1/groups/usa/people/${"a".repeat(32)}`)).status).toBe(204);
+    expect((await call(member, "GET", "/v1/groups/usa")).status).toBe(404);
+  });
+
+  it("refuses members, and admins outside their own group", async () => {
+    const { call, member, admin } = await setup();
+    expect((await call(member, "GET", "/v1/groups/usa/people")).status).toBe(403);
+    expect((await call(member, "POST", "/v1/groups/usa/people", { email: "x@example.com" })).status).toBe(403);
+    expect((await call(admin, "GET", "/v1/groups/canada/people")).status).toBe(404);
+    expect((await call(admin, "POST", "/v1/groups/canada/people", { email: "x@example.com" })).status).toBe(404);
+  });
+
+  it("keeps a before-Fajr group zikr time", async () => {
+    const { call, admin, member } = await setup();
+    const saved = await call(admin, "PUT", "/v1/groups/usa/zikr/tahajjud", {
+      title: "Tahajjud Zikr", startHour: 4, startMinute: 0, timeZoneIdentifier: "Asia/Karachi", anchor: "beforeFajr",
+    });
+    expect(saved.status).toBe(200);
+    const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as { zikrSessions: { anchor?: string }[] };
+    expect(detail.zikrSessions[0]?.anchor).toBe("tahajjud");
   });
 });

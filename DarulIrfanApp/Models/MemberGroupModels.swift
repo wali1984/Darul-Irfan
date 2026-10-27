@@ -158,3 +158,57 @@ struct MemberSession: Codable, Sendable {
     var expiresAt: Date
     var memberID: String
 }
+
+// MARK: - A group's people (admins only)
+
+/// A member's place in a group. A role this build does not know reads as
+/// member, so a new server role never fails the whole list.
+enum GroupRole: String, Codable, Sendable {
+    case member, admin, superadmin
+
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = GroupRole(rawValue: raw) ?? .member
+    }
+}
+
+struct GroupPeople: Decodable, Sendable, Equatable {
+    var members: [GroupPerson]
+    var invitations: [GroupInvitation]
+}
+
+struct GroupPerson: Decodable, Sendable, Identifiable, Equatable {
+    var id: String
+    var name: String?
+    var email: String?
+    var role: GroupRole
+    var addedAt: Date?
+    var isYou: Bool
+
+    var displayName: String { name ?? email ?? String(localized: "Member") }
+    /// Admins cannot change themselves or a super admin; the server enforces
+    /// the same rule.
+    var isChangeable: Bool { !isYou && role != .superadmin }
+}
+
+/// An email added ahead of sign-in, or a code not yet used.
+struct GroupInvitation: Decodable, Sendable, Identifiable, Equatable {
+    var id: String
+    /// "email" or "code".
+    var kind: String
+    var label: String?
+    var role: GroupRole
+    var createdAt: Date?
+    var expiresAt: Date?
+}
+
+/// What adding someone did: "added" at once, "pending" until they sign in
+/// with that email, or "code" made to be sent.
+struct AddPersonResult: Decodable, Sendable, Equatable {
+    var result: String
+    var name: String?
+    var code: String?
+    var expiresAt: Date?
+    var phone: String?
+    var role: GroupRole
+}

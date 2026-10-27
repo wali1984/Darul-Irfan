@@ -192,6 +192,35 @@ actor MemberGroupService {
         try await send("DELETE", path: "v1/groups/\(groupID)/zikr/\(sessionID)", payload: nil, expecting: [204])
     }
 
+    // MARK: Group people (admins)
+
+    func people(in groupID: String) async throws -> GroupPeople {
+        try await authorized(GroupPeople.self, path: "v1/groups/\(groupID)/people")
+    }
+
+    /// Adds someone by email, or makes a single-use code to send to their
+    /// phone (or to hand over) when there is no email.
+    func addPerson(to groupID: String, email: String?, phone: String?, role: GroupRole, codeDays: Int) async throws -> AddPersonResult {
+        var payload: [String: Any] = ["role": role.rawValue, "expiresInDays": codeDays]
+        if let email { payload["email"] = email }
+        if let phone { payload["phone"] = phone }
+        let data = try await send("POST", path: "v1/groups/\(groupID)/people", payload: payload, expecting: [201])
+        guard let result = try? decoder.decode(AddPersonResult.self, from: data) else { throw MemberGroupError.requestFailed }
+        return result
+    }
+
+    func setRole(_ role: GroupRole, of personID: String, in groupID: String) async throws {
+        try await send("PUT", path: "v1/groups/\(groupID)/people/\(personID)", payload: ["role": role.rawValue], expecting: [200])
+    }
+
+    func remove(_ personID: String, from groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/people/\(personID)", payload: nil, expecting: [204])
+    }
+
+    func revokeInvitation(_ invitationID: String, in groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/invitations/\(invitationID)", payload: nil, expecting: [204])
+    }
+
     /// A place in the group's live room, or in a scheduled meeting's.
     func join(groupID: String, meetingID: String?) async throws -> GroupRoomPass {
         var payload: [String: Any] = [:]

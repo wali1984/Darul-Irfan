@@ -1,7 +1,7 @@
 [
   {
     "id": "zikr-after-isha",
-    "title": "Daily Zikr (After Isha)",
+    "title": "Daily Zikr",
     "weekdays": [
       1,
       2,
@@ -16,12 +16,11 @@
     "durationMinutes": 30,
     "timeZoneIdentifier": "Asia/Karachi",
     "availabilityNote": "Daily Zikr is shown live here in Darul Irfan while the session is in progress.",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html",
-    "anchor": "afterIsha"
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html"
   },
   {
     "id": "zikr-tahajjud",
-    "title": "Daily Zikr (Tahajjud)",
+    "title": "Tahajjud Zikr",
     "weekdays": [
       1,
       2,
@@ -31,12 +30,13 @@
       6,
       7
     ],
-    "startHour": 3,
-    "startMinute": 30,
+    "startHour": 4,
+    "startMinute": 0,
     "durationMinutes": 30,
     "timeZoneIdentifier": "Asia/Karachi",
-    "availabilityNote": "Daily Zikr is shown live here in Darul Irfan while the session is in progress.",
+    "availabilityNote": "Before Fajr, Pakistan time. The exact time will be confirmed.",
     "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html",
-    "anchor": "tahajjud"
+    "anchor": "beforeFajr",
+    "anchorOffsetMinutes": 60
   }
 ]

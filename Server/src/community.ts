@@ -8,8 +8,9 @@ import { signedMediaURL } from "./media";
 //
 // Roles
 //   member      reads its own groups, watches and joins their sessions
-//   admin       also publishes, approves drafts, runs zikr and meetings in the
-//               groups it belongs to
+//   admin       also publishes, approves drafts, runs zikr and meetings, and
+//               adds and removes people, in the groups it is admin of (the
+//               role belongs to the place in a group, not to the person)
 //   superadmin  does all of that in every group
 //
 // The isolation rule from the first version still holds for members and
@@ -21,19 +22,28 @@ export type Role = "member" | "admin" | "superadmin";
 const notFound = () => json({ error: "Not found" }, { status: 404 });
 const forbidden = () => json({ error: "Group admin role required" }, { status: 403 });
 
+/** The member's highest role: super admin, admin of at least one group, or
+ *  member. What they may do in a particular group is `canManage`. */
 export async function memberRole(env: Env, memberID: string): Promise<Role> {
   const row = await env.DB.prepare("SELECT role,email FROM members WHERE id=?").bind(memberID)
     .first<{ role: string; email: string | null }>();
-  // The email comes only from a verified Apple identity token, never from input.
-  if (row?.email && superAdminEmails(env).includes(row.email.trim().toLowerCase())) return "superadmin";
-  return row?.role === "admin" || row?.role === "superadmin" ? row.role : "member";
+  if (isSuperAdmin(env, row)) return "superadmin";
+  const admin = await env.DB.prepare("SELECT 1 AS ok FROM member_group_members WHERE member_id=? AND role='admin' LIMIT 1")
+    .bind(memberID).first();
+  return admin ? "admin" : "member";
+}
+
+/** The email comes only from a verified Apple identity token, never from input. */
+export function isSuperAdmin(env: Env, row: { role?: unknown; email?: unknown } | null | undefined): boolean {
+  if (row?.role === "superadmin") return true;
+  return typeof row?.email === "string" && superAdminEmails(env).includes(row.email.trim().toLowerCase());
 }
 
 function superAdminEmails(env: Env): string[] {
   return (env.SUPER_ADMIN_EMAILS ?? "").split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 }
 
-async function groupExists(env: Env, groupID: string): Promise<boolean> {
+export async function groupExists(env: Env, groupID: string): Promise<boolean> {
   return !!await env.DB.prepare("SELECT 1 AS ok FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
 }
 
@@ -43,15 +53,16 @@ async function isMember(env: Env, memberID: string, groupID: string): Promise<bo
 }
 
 /** Whether the caller may see this group at all. */
-async function canSee(env: Env, memberID: string, role: Role, groupID: string): Promise<boolean> {
+export async function canSee(env: Env, memberID: string, role: Role, groupID: string): Promise<boolean> {
   if (role === "superadmin") return groupExists(env, groupID);
   return isMember(env, memberID, groupID);
 }
 
-/** Whether the caller may publish and run sessions in this group. */
-async function canManage(env: Env, memberID: string, role: Role, groupID: string): Promise<boolean> {
+/** Whether the caller may publish, run sessions and manage people in this group. */
+export async function canManage(env: Env, memberID: string, role: Role, groupID: string): Promise<boolean> {
   if (role === "superadmin") return groupExists(env, groupID);
-  return role === "admin" && isMember(env, memberID, groupID);
+  return !!await env.DB.prepare("SELECT 1 AS ok FROM member_group_members WHERE group_id=? AND member_id=? AND role='admin'")
+    .bind(groupID, memberID).first();
 }
 
 const newID = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 12)}`;
@@ -208,7 +219,10 @@ export async function saveZikrSession(env: Env, memberID: string, groupID: strin
   const hour = Number(input.startHour), minute = Number(input.startMinute);
   const zone = typeof input.timeZoneIdentifier === "string" ? input.timeZoneIdentifier : "";
   const weekdays = Array.isArray(input.weekdays) ? input.weekdays.map(Number).filter(d => Number.isInteger(d) && d >= 1 && d <= 7) : [1, 2, 3, 4, 5, 6, 7];
-  const anchor = input.anchor === "afterIsha" || input.anchor === "tahajjud" ? input.anchor : null;
+  // "beforeFajr" is the Tahajjud zikr; it is stored under the column's
+  // original name, which the app reads the same way.
+  const anchor = input.anchor === "afterIsha" ? "afterIsha"
+    : input.anchor === "beforeFajr" || input.anchor === "tahajjud" ? "tahajjud" : null;
   const duration = Number(input.durationMinutes ?? 30);
   if (!title || !Number.isInteger(hour) || hour < 0 || hour > 23 || !Number.isInteger(minute) || minute < 0 || minute > 59
     || !validTimeZone(zone) || !Number.isInteger(duration) || duration < 5 || duration > 240) {

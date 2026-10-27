@@ -57,7 +57,7 @@ struct AcknowledgementsView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 ackHeader("Typography", systemImage: "textformat")
 
-                Text("Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text is set in Noto Nastaliq Urdu, with Amiri Quran bundled as a fallback (both under the SIL Open Font License 1.1).")
+                Text("Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text uses the iPhone's own typefaces. Amiri Quran is bundled as a fallback for the Qur'an (SIL Open Font License 1.1).")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
@@ -75,19 +75,6 @@ struct AcknowledgementsView: View {
                     .accessibilityLabel("View the Amiri Quran font project")
                 }
 
-                if let url = URL(string: "https://fonts.google.com/noto/specimen/Noto+Nastaliq+Urdu") {
-                    Link(destination: url) {
-                        Label {
-                            Text(verbatim: "Noto Nastaliq Urdu · SIL OFL 1.1")
-                        } icon: {
-                            Image(systemName: "character.book.closed")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("View the Noto Nastaliq Urdu font project")
-                }
             }
         }
     }

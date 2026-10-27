@@ -291,7 +291,7 @@ struct GroupZikrEditor: View {
     private enum Timing: String, CaseIterable, Identifiable {
         case clock = "At a time"
         case afterIsha = "After Isha at Dar-ul-Irfan"
-        case tahajjud = "At Tahajjud at Dar-ul-Irfan"
+        case beforeFajr = "Before Fajr at Dar-ul-Irfan"
         var id: String { rawValue }
     }
 
@@ -356,15 +356,15 @@ struct GroupZikrEditor: View {
             id: "zikr-\(UUID().uuidString.prefix(8).lowercased())",
             title: title.trimmingCharacters(in: .whitespaces),
             weekdays: weekdays.sorted(),
-            startHour: timing == .clock ? (parts.hour ?? 20) : (timing == .afterIsha ? 21 : 3),
-            startMinute: timing == .clock ? (parts.minute ?? 0) : (timing == .afterIsha ? 15 : 30),
+            startHour: timing == .clock ? (parts.hour ?? 20) : (timing == .afterIsha ? 21 : 4),
+            startMinute: timing == .clock ? (parts.minute ?? 0) : (timing == .afterIsha ? 15 : 0),
             durationMinutes: duration,
             timeZoneIdentifier: timing == .clock ? TimeZone.current.identifier : "Asia/Karachi",
             joinUrl: nil,
             instructions: nil,
             availabilityNote: nil,
             sourceUrl: nil,
-            anchor: timing == .clock ? nil : (timing == .afterIsha ? "afterIsha" : "tahajjud")
+            anchor: timing == .clock ? nil : (timing == .afterIsha ? "afterIsha" : "beforeFajr")
         )
         do {
             try await service.saveZikrSession(session, in: groupID)

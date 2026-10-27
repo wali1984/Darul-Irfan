@@ -1,0 +1,13 @@
+{
+ "Tafsir": "تفسیر",
+ "Tafsir of Ayah %lld": "آیت %lld کی تفسیر",
+ "Language": "زبان",
+ "This tafsir has no commentary on this ayah in this language.": "اس زبان میں اس تفسیر میں اس آیت کی تفسیر موجود نہیں۔",
+ "This tafsir has no verse-by-verse commentary on this ayah in this language. The printed volume is below, opened where the surah begins.": "اس زبان میں اس تفسیر میں اس آیت کی الگ تفسیر موجود نہیں۔ مکمل مطبوعہ جلد نیچے ہے، جہاں سے سورت شروع ہوتی ہے وہیں سے کھلے گی۔",
+ "Read it in Urdu": "اردو میں پڑھیں",
+ "Read it in English": "انگریزی میں پڑھیں",
+ "The full printed volume": "مکمل مطبوعہ جلد",
+ "Tafsir of %lld:%lld": "تفسیر %lld:%lld",
+ "Commentary on ayat %lld–%lld": "آیات %lld–%lld کی تفسیر",
+ "Open at page %lld": "صفحہ %lld پر کھولیں"
+}

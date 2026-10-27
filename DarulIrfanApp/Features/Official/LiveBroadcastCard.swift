@@ -125,7 +125,7 @@ struct LiveBroadcastCard: View {
         switch broadcast.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
     }
     private func label(for source: LiveSource) -> LocalizedStringKey {
-        switch source.kind { case .ownedStream: return "Listen live"; case .youtube: return "Watch Daily Zikr"; case .paltalk: return "Watch Daily Zikr" }
+        switch source.kind { case .ownedStream, .youtube, .paltalk: return "Join Daily Zikr" }
     }
     private func icon(for source: LiveSource) -> String {
         switch source.kind { case .ownedStream: return "headphones"; case .youtube: return "play.rectangle.fill"; case .paltalk: return "arrow.up.right.square" }

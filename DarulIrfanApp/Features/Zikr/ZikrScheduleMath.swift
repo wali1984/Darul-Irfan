@@ -124,7 +124,7 @@ enum ZikrScheduleMath {
 }
 
 /// Turns a session announced against a prayer time ("after Isha",
-/// "Tahajjud") into a concrete time, computed at Dar-ul-Irfan with the
+/// "before Fajr") into a concrete time, computed at Dar-ul-Irfan with the
 /// Pakistan convention (Karachi method, Hanafi Asr). The result is written
 /// back into `startHour`/`startMinute` in Pakistan time, so the countdown,
 /// reminders, widgets and Watch all keep using one schedule path. Isha moves
@@ -176,17 +176,15 @@ enum ZikrAnchorResolver {
         )
         let validDays = Set(session.weekdays.filter { (1...7).contains($0) })
         var candidates: [Date] = []
-        for (index, day) in days.enumerated() {
+        for day in days {
             switch anchor {
             case .afterIsha:
                 if let isha = day.time(for: .isha) { candidates.append(isha) }
-            case .tahajjud:
-                // The last third of the night, Maghrib to the next Fajr.
-                guard index + 1 < days.count,
-                      let maghrib = day.time(for: .maghrib),
-                      let fajr = days[index + 1].time(for: .fajr) else { continue }
-                let night = fajr.timeIntervalSince(maghrib)
-                candidates.append(fajr.addingTimeInterval(-night / 3))
+            case .beforeFajr, .tahajjud:
+                // The Tahajjud zikr starts a set time before Fajr at Dar-ul-Irfan.
+                guard let fajr = day.time(for: .fajr) else { continue }
+                let lead = max(session.anchorOffsetMinutes ?? 60, 0)
+                candidates.append(fajr.addingTimeInterval(-TimeInterval(lead * 60)))
             }
         }
         return candidates
@@ -200,7 +198,7 @@ enum ZikrAnchorResolver {
     static func announcement(for session: ZikrSession) -> String? {
         switch session.zikrAnchor {
         case .afterIsha: return String(localized: "After Isha at Dar-ul-Irfan")
-        case .tahajjud: return String(localized: "At Tahajjud at Dar-ul-Irfan")
+        case .beforeFajr, .tahajjud: return String(localized: "Before Fajr at Dar-ul-Irfan")
         case nil: return nil
         }
     }

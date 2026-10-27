@@ -20060,6 +20060,1111 @@
           }
         }
       }
+    },
+    "Join Daily Zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Daily Zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "Before Fajr at Dar-ul-Irfan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before Fajr at Dar-ul-Irfan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں فجر سے پہلے"
+          }
+        }
+      }
+    },
+    "In Pakistan: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Pakistan: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پاکستان میں: %@"
+          }
+        }
+      }
+    },
+    "Urdu in Nastaliq": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urdu in Nastaliq"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اردو نستعلیق میں"
+          }
+        }
+      }
+    },
+    "Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بند ہو تو اردو معیاری رسم الخط میں دکھائی جاتی ہے، جس میں حروف ہمیشہ جڑے رہتے ہیں۔ نستعلیق کے لیے اسے آن کریں؛ تبدیلی دیکھنے کے لیے صفحہ دوبارہ کھولیں۔"
+          }
+        }
+      }
+    },
+    "Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text uses the iPhone's own typefaces. Amiri Quran is bundled as a fallback for the Qur'an (SIL Open Font License 1.1).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text uses the iPhone's own typefaces. Amiri Quran is bundled as a fallback for the Qur'an (SIL Open Font License 1.1)."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن کا عربی متن AlQuran IndoPak ٹائپ فیس میں ہے، جسے ایمن صدیقی اور آر صدیقہ نے QuranWBW.com اور Quran.com کے لیے بنایا، اور یہاں صدقۂ جاریہ کے طور پر حوالے کے ساتھ استعمال کیا گیا ہے۔ اردو متن آئی فون کے اپنے ٹائپ فیس میں ہے۔ قرآن کے لیے Amiri Quran متبادل کے طور پر شامل ہے (SIL Open Font License 1.1)۔"
+          }
+        }
+      }
+    },
+    "Contents page": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contents page"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فہرست کا صفحہ"
+          }
+        }
+      }
+    },
+    "%@ is now in %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is now in %@."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ اب %@ میں شامل ہیں۔"
+          }
+        }
+      }
+    },
+    "%@ will be added to %@ when they sign in with Apple using this email.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ will be added to %@ when they sign in with Apple using this email."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کو %@ میں اس وقت شامل کر دیا جائے گا جب وہ اسی ای میل کے ساتھ ایپل سے سائن اِن کریں گے۔"
+          }
+        }
+      }
+    },
+    "(you)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(you)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(آپ)"
+          }
+        }
+      }
+    },
+    "A single-use code is made for them, and you send it from your phone by text message or another app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A single-use code is made for them, and you send it from your phone by text message or another app."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ان کے لیے ایک بار استعمال ہونے والا کوڈ بنایا جاتا ہے، جسے آپ اپنے فون سے ٹیکسٹ میسج یا کسی اور ایپ کے ذریعے بھیجتے ہیں۔"
+          }
+        }
+      }
+    },
+    "A single-use code to hand over however you like.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A single-use code to hand over however you like."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایک بار استعمال ہونے والا کوڈ، جیسے چاہیں دے دیں۔"
+          }
+        }
+      }
+    },
+    "Add by": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add by"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شامل کرنے کا طریقہ"
+          }
+        }
+      }
+    },
+    "Add people": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add people"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "افراد شامل کریں"
+          }
+        }
+      }
+    },
+    "Add someone by email, or send an invitation code to their phone, as a member or as an admin of this group.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add someone by email, or send an invitation code to their phone, as a member or as an admin of this group."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی کو ای میل کے ذریعے شامل کریں، یا ان کے فون پر دعوتی کوڈ بھیجیں، بطور رکن یا اس گروپ کے منتظم کے طور پر۔"
+          }
+        }
+      }
+    },
+    "Add someone else": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add someone else"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی اور کو شامل کریں"
+          }
+        }
+      }
+    },
+    "Add to the group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add to the group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروپ میں شامل کریں"
+          }
+        }
+      }
+    },
+    "Added when they sign in with Apple": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added when they sign in with Apple"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایپل سے سائن اِن کرتے ہی شامل ہو جائیں گے"
+          }
+        }
+      }
+    },
+    "Admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admin"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتظم"
+          }
+        }
+      }
+    },
+    "Admin of this group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admin of this group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس گروپ کے منتظم"
+          }
+        }
+      }
+    },
+    "Admins": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admins"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتظمین"
+          }
+        }
+      }
+    },
+    "Admins post, approve drafts, run zikr and meetings, and add or remove people, in this group only.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admins post, approve drafts, run zikr and meetings, and add or remove people, in this group only."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتظمین صرف اسی گروپ میں پوسٹ کرتے ہیں، مسودے منظور کرتے ہیں، ذکر اور میٹنگز چلاتے ہیں، اور افراد کو شامل یا خارج کرتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Assalamu alaikum. You are invited to the %@ group in the Darul Irfan app. Open the app, go to Community, and enter this code: %@. It works once, until %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assalamu alaikum. You are invited to the %@ group in the Darul Irfan app. Open the app, go to Community, and enter this code: %@. It works once, until %@."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "السلام علیکم۔ آپ کو دارالعرفان ایپ میں %@ گروپ میں مدعو کیا گیا ہے۔ ایپ کھولیں، کمیونٹی میں جائیں، اور یہ کوڈ درج کریں: %@۔ یہ ایک بار، %@ تک کام کرے گا۔"
+          }
+        }
+      }
+    },
+    "Change %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ میں تبدیلی"
+          }
+        }
+      }
+    },
+    "Code only": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code only"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صرف کوڈ"
+          }
+        }
+      }
+    },
+    "Code without a note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code without a note"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بغیر نوٹ کا کوڈ"
+          }
+        }
+      }
+    },
+    "Code, until %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code, until %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوڈ، %@ تک"
+          }
+        }
+      }
+    },
+    "Copied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاپی ہو گیا"
+          }
+        }
+      }
+    },
+    "Copy the code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy the code"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوڈ کاپی کریں"
+          }
+        }
+      }
+    },
+    "Email address": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email address"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ای میل ایڈریس"
+          }
+        }
+      }
+    },
+    "Invitations not used yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invitations not used yet"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوت نامے جو ابھی استعمال نہیں ہوئے"
+          }
+        }
+      }
+    },
+    "Make a member": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make a member"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رکن بنائیں"
+          }
+        }
+      }
+    },
+    "Make an admin of this group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make an admin of this group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس گروپ کا منتظم بنائیں"
+          }
+        }
+      }
+    },
+    "Make the code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make the code"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوڈ بنائیں"
+          }
+        }
+      }
+    },
+    "Member": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Member"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رکن"
+          }
+        }
+      }
+    },
+    "Members": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین"
+          }
+        }
+      }
+    },
+    "Members, admins and invitations": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members, admins and invitations"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین، منتظمین اور دعوت نامے"
+          }
+        }
+      }
+    },
+    "No members yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No members yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی کوئی رکن نہیں۔"
+          }
+        }
+      }
+    },
+    "Nothing to send: they open Community in the app and sign in. If they hide their email from apps, send them a code instead.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to send: they open Community in the app and sign in. If they hide their email from apps, send them a code instead."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کچھ بھیجنے کی ضرورت نہیں: وہ ایپ میں کمیونٹی کھول کر سائن اِن کریں۔ اگر وہ ایپس سے اپنی ای میل چھپاتے ہیں تو اس کے بجائے انہیں کوڈ بھیجیں۔"
+          }
+        }
+      }
+    },
+    "Phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phone"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فون"
+          }
+        }
+      }
+    },
+    "Phone number, with country code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phone number, with country code"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فون نمبر، ملک کے کوڈ کے ساتھ"
+          }
+        }
+      }
+    },
+    "Remove %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کو خارج کریں"
+          }
+        }
+      }
+    },
+    "Remove from the group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from the group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروپ سے خارج کریں"
+          }
+        }
+      }
+    },
+    "Remove from the group?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from the group?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروپ سے خارج کریں؟"
+          }
+        }
+      }
+    },
+    "Role": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Role"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حیثیت"
+          }
+        }
+      }
+    },
+    "Send another way": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send another way"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی اور طریقے سے بھیجیں"
+          }
+        }
+      }
+    },
+    "Send by text message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send by text message"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ٹیکسٹ میسج سے بھیجیں"
+          }
+        }
+      }
+    },
+    "Send on WhatsApp": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send on WhatsApp"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واٹس ایپ پر بھیجیں"
+          }
+        }
+      }
+    },
+    "Super admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Super admin"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سپر منتظم"
+          }
+        }
+      }
+    },
+    "The code lasts %lld days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The code lasts %lld days"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوڈ %lld دن تک کارآمد رہے گا"
+          }
+        }
+      }
+    },
+    "They are added as soon as they sign in with Apple using this email, or at once if they already have. If they hide their email from apps, send a code instead.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "They are added as soon as they sign in with Apple using this email, or at once if they already have. If they hide their email from apps, send a code instead."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وہ اسی ای میل کے ساتھ ایپل سے سائن اِن کرتے ہی شامل ہو جائیں گے، یا اگر پہلے سے سائن اِن ہیں تو فوراً۔ اگر وہ ایپس سے اپنی ای میل چھپاتے ہیں تو اس کے بجائے کوڈ بھیجیں۔"
+          }
+        }
+      }
+    },
+    "They keep their account and any other groups, and can be added again later.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "They keep their account and any other groups, and can be added again later."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ان کا اکاؤنٹ اور دوسرے گروپ برقرار رہیں گے، اور انہیں بعد میں دوبارہ شامل کیا جا سکتا ہے۔"
+          }
+        }
+      }
+    },
+    "This is the only time the code is shown. Send it now; it is listed under the group's invitations until it is used.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is the only time the code is shown. Send it now; it is listed under the group's invitations until it is used."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ کوڈ صرف اسی وقت دکھایا جاتا ہے۔ ابھی بھیج دیں؛ استعمال ہونے تک یہ گروپ کے دعوت ناموں میں درج رہے گا۔"
+          }
+        }
+      }
+    },
+    "Withdraw": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Withdraw"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واپس لیں"
+          }
+        }
+      }
+    },
+    "Withdraw one to stop it admitting anyone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Withdraw one to stop it admitting anyone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی دعوت نامے کو واپس لیں تاکہ اس سے کوئی شامل نہ ہو سکے۔"
+          }
+        }
+      }
+    },
+    "Works once, until %@.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Works once, until %@."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایک بار، %@ تک کام کرے گا۔"
+          }
+        }
+      }
+    },
+    "Tafsir of Ayah %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tafsir of Ayah %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیت %lld کی تفسیر"
+          }
+        }
+      }
+    },
+    "This tafsir has no commentary on this ayah in this language.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tafsir has no commentary on this ayah in this language."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس زبان میں اس تفسیر میں اس آیت کی تفسیر موجود نہیں۔"
+          }
+        }
+      }
+    },
+    "This tafsir has no verse-by-verse commentary on this ayah in this language. The printed volume is below, opened where the surah begins.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tafsir has no verse-by-verse commentary on this ayah in this language. The printed volume is below, opened where the surah begins."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس زبان میں اس تفسیر میں اس آیت کی الگ تفسیر موجود نہیں۔ مکمل مطبوعہ جلد نیچے ہے، جہاں سے سورت شروع ہوتی ہے وہیں سے کھلے گی۔"
+          }
+        }
+      }
+    },
+    "Read it in Urdu": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read it in Urdu"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اردو میں پڑھیں"
+          }
+        }
+      }
+    },
+    "Read it in English": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read it in English"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انگریزی میں پڑھیں"
+          }
+        }
+      }
+    },
+    "The full printed volume": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The full printed volume"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مکمل مطبوعہ جلد"
+          }
+        }
+      }
+    },
+    "Tafsir of %lld:%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tafsir of %lld:%lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفسیر %lld:%lld"
+          }
+        }
+      }
+    },
+    "Commentary on ayat %lld–%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commentary on ayat %lld–%lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیات %lld–%lld کی تفسیر"
+          }
+        }
+      }
+    },
+    "Open at page %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open at page %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صفحہ %lld پر کھولیں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

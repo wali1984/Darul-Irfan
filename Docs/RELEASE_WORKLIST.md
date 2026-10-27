@@ -130,3 +130,16 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 - On the iPhone: in Darul Irfan -> More -> Private groups, Sign in with Apple
   and choose **Share My Email** (wajidmahmood@hotmail.com) to be super admin.
 - Run `ios-verify`; tag on green; run `ios-testflight` (owner runs these).
+
+## 1.11.1 - owner feedback on the first 1.11.0 build (2026-10-27)
+
+| Item | Cause | Change | State |
+|---|---|---|---|
+| Urdu tafsir shows letters, not words | Nastaliq still shaped by the bundled Google OpenType font on device (Apple's copy not used or not present) | Bundled Nastaliq removed; Urdu uses the system face (Naskh, always joined). "Urdu in Nastaliq" in Appearance only where Apple's own Nastaliq exists | done - confirm on device |
+| Full para tafseer formatting | Page text is raw OCR layout | `BookPageFormatter`: joined lines, headings, Quranic quotations set apart, contents pages folded, two-column Asrar pages split, sentences carried over page breaks; same layout for per-ayah Urdu tafsir | done |
+| Tafsir per ayah | Only the mode's tafsir, in the reading language | "Tafsir" on every ayah: either work, either language, volume link | done |
+| Zikr time wrong | Daily Zikr was computed as Isha at Dar-ul-Irfan | Fixed 21:15 Asia/Karachi on all four platforms (seed v39) | done |
+| Tahajjud zikr | Was the last third of the night | Fajr at Dar-ul-Irfan minus `anchorOffsetMinutes` (60 until the time is confirmed) | TBD: exact time |
+| "Join Daily Zikr" | | Button label | done |
+| Community admin controls | Codes only from the staff page; admin role was global | Members screen; add by email (claimed at Apple sign-in) or by phone (code sent by text/WhatsApp); per-group admins (migration 0007); revoke; 6 server tests | done in code; needs D1 migration 0007 + deploy |
+| Listener rehearsal | ffmpeg not on the scheduled task's PATH; Enter could land in another window | ffmpeg found via the saved PATH or winget; search only after 20 s idle, focus checked and handed back; no mouse clicks | rehearsing |

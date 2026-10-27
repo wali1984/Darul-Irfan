@@ -85,6 +85,8 @@ export async function createSession(request: Request, env: Env, resolveKey?: JWT
   const row = await env.DB.prepare("SELECT id FROM members WHERE apple_subject=?")
     .bind(verified.subject).first<{ id: string }>();
   const id = row?.id ?? memberID;
+  // Groups an admin added this email to before the person signed in.
+  if (verified.email) await claimEmailGrants(env, id, verified.email);
 
   const token = hexOf(crypto.getRandomValues(new Uint8Array(32)));
   await env.DB.prepare("INSERT INTO member_sessions(token_hash,member_id,created_at,expires_at,last_seen_at) VALUES(?,?,?,?,?)")
@@ -183,6 +185,32 @@ export async function publishGroupPost(
   return json({ ok: true, id: postID, groupID });
 }
 
+/** Gives a member a place in a group, or changes the role of the place they
+ *  have. `promoteOnly` never lowers an admin to member (a member code handed
+ *  to an admin must not demote them). */
+export async function upsertMembership(
+  env: Env, groupID: string, memberID: string, role: "member" | "admin", addedBy: string, promoteOnly: boolean,
+): Promise<void> {
+  const update = promoteOnly
+    ? "role=CASE WHEN excluded.role='admin' THEN 'admin' ELSE member_group_members.role END"
+    : "role=excluded.role";
+  await env.DB.prepare(`INSERT INTO member_group_members(group_id,member_id,added_at,added_by,role) VALUES(?,?,?,?,?)
+    ON CONFLICT(group_id,member_id) DO UPDATE SET ${update}`)
+    .bind(groupID, memberID, new Date().toISOString(), addedBy, role).run();
+}
+
+/** Admits a member to every group an admin added their email to. */
+export async function claimEmailGrants(env: Env, memberID: string, email: string): Promise<void> {
+  const address = email.trim().toLowerCase();
+  const grants = await env.DB.prepare("SELECT id,group_id,role,created_by FROM member_group_grants WHERE email=? AND claimed_at IS NULL")
+    .bind(address).all<{ id: string; group_id: string; role: string; created_by: string }>();
+  for (const grant of grants.results ?? []) {
+    await upsertMembership(env, grant.group_id, memberID, grant.role === "admin" ? "admin" : "member", grant.created_by, true);
+    await env.DB.prepare("UPDATE member_group_grants SET claimed_by=?,claimed_at=? WHERE id=?")
+      .bind(memberID, new Date().toISOString(), grant.id).run();
+  }
+}
+
 /** Admin: add or remove one member's place in a group. */
 export async function setGroupMembership(
   env: Env, actor: string, groupID: string, memberID: string, isMember: boolean,
@@ -224,9 +252,22 @@ export function generateInviteCode(): string {
   return [...bytes].map(byte => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join("");
 }
 
-/** Admin: mint a single-use code admitting one person to one group. The code is
- *  returned once and never stored - only its hash is kept, so a leaked database
- *  cannot admit anyone. */
+/** Mints a single-use code admitting one person to one group, optionally as
+ *  its admin. The code is returned once and never stored - only its hash is
+ *  kept, so a leaked database cannot admit anyone. */
+export async function mintInvite(
+  env: Env, actor: string, groupID: string, days: number, label: string | null, grantsRole: "admin" | "superadmin" | null,
+): Promise<{ code: string; expiresAt: string }> {
+  const code = generateInviteCode();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + days * 86_400_000).toISOString();
+  await env.DB.prepare(`INSERT INTO member_invites(code_hash,group_id,label,created_by,created_at,expires_at,grants_role)
+    VALUES(?,?,?,?,?,?,?)`)
+    .bind(await sha256(code), groupID, label, actor, now.toISOString(), expiresAt, grantsRole).run();
+  return { code: formatCode(code), expiresAt };
+}
+
+/** Staff admin page: mint a code for a group. */
 export async function createInvite(
   env: Env, actor: string, groupID: string, input: Record<string, unknown>,
 ): Promise<Response> {
@@ -239,14 +280,9 @@ export async function createInvite(
     return json({ error: "expiresInDays must be a whole number from 1 to 365" }, { status: 400 });
   }
   const grantsRole = input.grantsRole === "admin" || input.grantsRole === "superadmin" ? input.grantsRole : null;
-  const code = generateInviteCode();
-  const now = new Date();
-  await env.DB.prepare(`INSERT INTO member_invites(code_hash,group_id,label,created_by,created_at,expires_at,grants_role)
-    VALUES(?,?,?,?,?,?,?)`)
-    .bind(await sha256(code), groupID, cleanText(input.label, 120) ?? null, actor,
-      now.toISOString(), new Date(now.getTime() + days * 86_400_000).toISOString(), grantsRole).run();
+  const { code } = await mintInvite(env, actor, groupID, days, cleanText(input.label, 120) ?? null, grantsRole);
   // Shown to the admin once, to pass to the person it is for.
-  return json({ ok: true, groupID, code: formatCode(code), expiresInDays: days, grantsRole: grantsRole ?? undefined }, { status: 201 });
+  return json({ ok: true, groupID, code, expiresInDays: days, grantsRole: grantsRole ?? undefined }, { status: 201 });
 }
 
 /** Redeems a code: creates the member if needed, starts a session, and admits
@@ -292,16 +328,12 @@ export async function redeemInvite(request: Request, env: Env): Promise<Response
     if (!existing) await env.DB.prepare("DELETE FROM members WHERE id=?").bind(memberID).run();
     return refusal;
   }
-  // A role only ever goes up through a code: a member code given to an admin
-  // does not demote them.
-  if (row.grants_role === "admin") {
-    await env.DB.prepare("UPDATE members SET role='admin' WHERE id=? AND role='member'").bind(memberID).run();
-  } else if (row.grants_role === "superadmin") {
+  // An admin code makes them admin of this group only. A role only ever goes
+  // up through a code: a member code given to an admin does not demote them.
+  if (row.grants_role === "superadmin") {
     await env.DB.prepare("UPDATE members SET role='superadmin' WHERE id=?").bind(memberID).run();
   }
-
-  await env.DB.prepare("INSERT OR IGNORE INTO member_group_members(group_id,member_id,added_at,added_by) VALUES(?,?,?,?)")
-    .bind(row.group_id, memberID, nowISO, "invite").run();
+  await upsertMembership(env, row.group_id, memberID, row.grants_role === "admin" ? "admin" : "member", "invite", true);
 
   const token = hexOf(crypto.getRandomValues(new Uint8Array(32)));
   const expires = new Date(now.getTime() + SESSION_DAYS * 86_400_000).toISOString();

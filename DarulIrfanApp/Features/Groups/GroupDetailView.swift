@@ -28,7 +28,7 @@ struct GroupDetailView: View {
     @State private var sheet: AdminSheet?
 
     enum AdminSheet: String, Identifiable {
-        case post, live, meeting, zikr
+        case people, post, live, meeting, zikr
         var id: String { rawValue }
     }
 
@@ -65,6 +65,7 @@ struct GroupDetailView: View {
         .sheet(item: $sheet, onDismiss: { Task { await load() } }) { sheet in
             NavigationStack {
                 switch sheet {
+                case .people: GroupPeopleView(groupID: group.id, groupName: group.name, service: service)
                 case .post: GroupPostComposer(groupID: group.id, service: service)
                 case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady)
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
@@ -209,6 +210,7 @@ struct GroupDetailView: View {
             DISectionHeader(titleKey: "Group admin", systemImage: "person.badge.key")
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    adminButton("Members, admins and invitations", "person.2.badge.gearshape", .people)
                     adminButton("New post", "square.and.pencil", .post)
                     adminButton("Start community zikr or meeting now", "dot.radiowaves.left.and.right", .live)
                     adminButton("Schedule a meeting", "calendar.badge.plus", .meeting)

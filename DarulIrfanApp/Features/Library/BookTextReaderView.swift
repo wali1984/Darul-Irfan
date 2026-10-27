@@ -24,6 +24,8 @@ struct BookTextReaderView: View {
     var startPage: Int?
 
     @State private var pages: [BookPage] = []
+    /// Urdu pages laid out into headings, paragraphs and quotations.
+    @State private var formatted: [String: BookPageFormatter.Page] = [:]
     @State private var isLoading = true
     @State private var hasScrolledToStart = false
 
@@ -108,7 +110,11 @@ struct BookTextReaderView: View {
                 }
                 Spacer()
             }
-            pageText(page.text)
+            if let layout = formatted[page.id] {
+                FormattedBookPage(page: layout)
+            } else {
+                pageText(page.text)
+            }
             Divider().overlay(DIColor.border)
         }
         .id("book-page-\(page.page)")
@@ -154,8 +160,106 @@ struct BookTextReaderView: View {
 
     private func load() async {
         isLoading = true
-        pages = (try? await dependencies.contentRepository.bookPages(bookID: item.id)) ?? []
+        let loaded = (try? await dependencies.contentRepository.bookPages(bookID: item.id)) ?? []
+        let language = item.language
+        formatted = await Task.detached(priority: .userInitiated) {
+            BookPageFormatter.format(pages: loaded.filter {
+                ScriptDirection.isRightToLeft($0.text, fallbackLanguage: language)
+            })
+        }.value
+        pages = loaded
         isLoading = false
+    }
+}
+
+/// Urdu text as `BookPageFormatter` laid it out: a book page, or the
+/// tafsir under an ayah.
+struct FormattedBookPage: View {
+    let page: BookPageFormatter.Page
+    /// The reader's text size.
+    var scale: Double = 1
+    @State private var showsContents = false
+
+    var body: some View {
+        Group {
+            if page.isContents {
+                DisclosureGroup(isExpanded: $showsContents) {
+                    Text(verbatim: contentsText)
+                        .font(DIFont.urduBody(scale: 0.85 * scale))
+                        .foregroundStyle(DIColor.textMuted)
+                        .lineSpacing(6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                } label: {
+                    Label("Contents page", systemImage: "list.bullet")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(DIColor.textMuted)
+                }
+                .tint(DIColor.primary)
+            } else {
+                VStack(alignment: .leading, spacing: DISpacing.md) {
+                    ForEach(Array(page.blocks.enumerated()), id: \.offset) { _, block in
+                        blockView(block)
+                    }
+                }
+            }
+        }
+        .environment(\.layoutDirection, .rightToLeft)
+    }
+
+    private var contentsText: String {
+        guard case .paragraph(let runs)? = page.blocks.first else { return "" }
+        return runs.map(\.text).joined(separator: " ")
+    }
+
+    @ViewBuilder
+    private func blockView(_ block: BookPageFormatter.Block) -> some View {
+        switch block {
+        case .heading(let text):
+            Text(verbatim: text)
+                .font(DIFont.urduBody(scale: 1.1 * scale).weight(.semibold))
+                .foregroundStyle(DIColor.primary)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, DISpacing.xs)
+        case .paragraph(let runs):
+            prose(runs)
+                .font(DIFont.urduBody(scale: scale))
+                .foregroundStyle(DIColor.textPrimary)
+                .lineSpacing(CGFloat(10 * scale))
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .textSelection(.enabled)
+        case .quran(let text):
+            Text(verbatim: text)
+                .font(DIFont.quranArabic(scale: 0.8 * scale))
+                .foregroundStyle(DIColor.primaryDeep)
+                .lineSpacing(8)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+                .padding(DISpacing.md)
+                .background(
+                    RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+                        .fill(DIColor.primary.opacity(0.07))
+                )
+                .textSelection(.enabled)
+        }
+    }
+
+    /// Prose, with a short Qur'anic quotation kept inline in the Qur'an face.
+    private func prose(_ runs: [BookPageFormatter.Run]) -> Text {
+        var text = Text(verbatim: "")
+        for (index, run) in runs.enumerated() {
+            if index > 0 { text = text + Text(verbatim: " ") }
+            if run.isQuranic {
+                text = text + Text(verbatim: run.text)
+                    .font(DIFont.quranArabic(scale: 0.72 * scale))
+                    .foregroundStyle(DIColor.primary)
+            } else {
+                text = text + Text(verbatim: run.text)
+            }
+        }
+        return text
     }
 }
 

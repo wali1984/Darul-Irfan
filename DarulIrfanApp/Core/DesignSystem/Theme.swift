@@ -91,10 +91,14 @@ enum DIFont {
         .custom(AppFonts.quranArabicName, size: 27 * scale, relativeTo: .title2)
     }
 
-    /// Urdu body text in the bundled Noto Nastaliq Urdu face (OFL) for proper
-    /// Nastaliq rendering, scaled with Dynamic Type.
+    /// Urdu body text, scaled with Dynamic Type. The system face by default:
+    /// its letters always join. Apple's Nastaliq when the reader chose it in
+    /// Settings (see `AppFonts.urduNastaliqName`).
     static func urduBody(scale: Double = 1.0) -> Font {
-        .custom(AppFonts.urduName, size: 17 * scale, relativeTo: .body)
+        if let nastaliq = AppFonts.urduNastaliqName {
+            return .custom(nastaliq, size: 17 * scale, relativeTo: .body)
+        }
+        return .system(size: UIFontMetrics(forTextStyle: .body).scaledValue(for: 19 * scale))
     }
 
     /// Section headings with a slightly bookish feel.

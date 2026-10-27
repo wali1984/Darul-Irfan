@@ -287,6 +287,12 @@ final class SurahReaderViewModel {
         }
     }
 
+    /// Every stored commentary covering `ayahNumber`, in both works and both
+    /// languages: the ayah's own tafsir sheet lets the reader choose.
+    func allTafsir(for ayahNumber: Int) -> [QuranTafsir] {
+        tafsirEntries.filter { $0.ayahStart <= ayahNumber && ayahNumber <= $0.ayahEnd }
+    }
+
     /// The full printed volumes of the current mode's tafsir in the language
     /// being read, where this surah's commentary begins in each.
     var fullVolumes: [TafsirVolume] {

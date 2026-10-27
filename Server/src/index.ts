@@ -10,6 +10,7 @@ import {
   publishDraft, registerMemberDevice, removeZikrSession, saveZikrSession, scheduleMeeting, setLive,
 } from "./community";
 import { serveMedia } from "./media";
+import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
@@ -71,7 +72,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (!section && request.method === "GET") return groupDetail(env, member, groupID);
@@ -89,6 +90,11 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (section === "meetings" && !entity && request.method === "POST") return scheduleMeeting(env, member, groupID, await body());
     if (section === "meetings" && entity && request.method === "DELETE") return cancelMeeting(env, member, groupID, entity);
     if (section === "join" && !entity && request.method === "POST") return joinRoom(env, member, groupID, await body());
+    if (section === "people" && !entity && request.method === "GET") return groupPeople(env, member, groupID);
+    if (section === "people" && !entity && request.method === "POST") return addPerson(env, member, groupID, await body());
+    if (section === "people" && entity && request.method === "PUT") return setPersonRole(env, member, groupID, entity, await body());
+    if (section === "people" && entity && request.method === "DELETE") return removePerson(env, member, groupID, entity);
+    if (section === "invitations" && entity && request.method === "DELETE") return revokeInvitation(env, member, groupID, entity);
     return json({ error: "Not found" }, { status: 404 });
   }
   if (request.method === "POST" && path === "/v1/devices") {
