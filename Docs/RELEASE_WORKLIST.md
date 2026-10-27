@@ -104,24 +104,22 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 
 ## E. Operator actions (yours)
 
-- **Private groups do not work yet: the backend with the group routes is not
-  deployed.** On 2026-10-27 the live D1 had only migration 0001 (0002-0006
-  pending) and `/v1/groups` answered 404. wrangler is logged in on this PC and
-  a full backup was exported first (`d1-backup-2026-10-27.sql`, 371 rows). In
-  `Server/`, in this order:
-  1. Enable R2 in the Cloudflare dashboard (R2 -> enable; free tier), then
-     `npx wrangler r2 bucket create darul-irfan-media`. Deploy fails while
-     wrangler.toml binds a bucket that does not exist.
-  2. `npm run db:migrate:remote` (applies 0002-0006).
-  3. Secrets (`npx wrangler secret put NAME`): `MEDIA_URL_SECRET` (any long
-     random string), `LISTENER_TOKEN` (long random; the listener agent's
-     `--heartbeat-token`), and when ready `WHATSAPP_APP_SECRET`,
-     `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`,
-     `WHATSAPP_ALLOWED_SENDERS`, `REALTIME_ACCOUNT_ID`, `REALTIME_APP_ID`,
-     `REALTIME_API_TOKEN`, `STREAM_WEBHOOK_SECRET`, `ALERT_WHATSAPP_NUMBERS`.
-  4. `npm run deploy`.
-- The two Cloudflare API tokens in `cloudflare.md` have an IP filter that
-  refuses this PC (108.27.186.148); add the IP or use `wrangler login`.
+- **Backend deployed 2026-10-27** (version 3711026e): R2 enabled and bucket
+  `darul-irfan-media` created; D1 migrations 0002-0006 applied after a full
+  export (`d1-backup-2026-10-27.sql`, 371 rows); `MEDIA_URL_SECRET` and
+  `LISTENER_TOKEN` set (the listener's copy is in the git-ignored
+  `Tools/LiveListener/listener.env`). On the workers.dev host the app uses:
+  `/health` 200 (all sources healthy), `/v1/live` 200, `/v1/groups` 401
+  (sign-in required, was 404). The custom domain answers Cloudflare's 403
+  page to scripted requests; the app does not use it.
+- Still to set when available (`npx wrangler secret put NAME` in `Server/`):
+  `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_ACCESS_TOKEN`,
+  `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ALLOWED_SENDERS`, `REALTIME_ACCOUNT_ID`,
+  `REALTIME_APP_ID`, `REALTIME_API_TOKEN`, `STREAM_WEBHOOK_SECRET`,
+  `ALERT_WHATSAPP_NUMBERS`.
+- Both Cloudflare tokens in `cloudflare.md` now allow 108.27.186.148
+  (vpn.wajidali.us, a dynamic address: re-add it if it changes). Neither has
+  Stream permission yet (Account -> Stream -> Edit) - needed for the hub.
 - Cloudflare Stream: enable it, create two live inputs (recording off), set
   `STREAM_INPUTS` = "<input A id>,<input B id>" and `STREAM_CUSTOMER_HOST` in
   wrangler.toml, add YouTube and Facebook (primary on A, backup on B) as
