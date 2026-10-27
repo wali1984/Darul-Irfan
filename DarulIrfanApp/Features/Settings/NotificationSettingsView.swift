@@ -24,6 +24,8 @@ struct NotificationSettingsView: View {
             permissionSection
             alertStylesSection
             preReminderSection
+            iqamahSection
+            testReminderSection
             soundSection
         }
         .listStyle(.insetGrouped)
@@ -207,6 +209,70 @@ struct NotificationSettingsView: View {
         )
     }
 
+    // MARK: - Iqamah
+
+    private var iqamahSection: some View {
+        Section {
+            ForEach(Prayer.obligatory, id: \.self) { prayer in
+                Picker(selection: iqamahBinding(for: prayer)) {
+                    ForEach(PrayerNotificationPreferences.iqamahGapChoices, id: \.self) { minutes in
+                        iqamahLabel(minutes).tag(minutes)
+                    }
+                } label: {
+                    Text(LocalizedStringKey(prayer.englishName))
+                        .foregroundStyle(DIColor.textPrimary)
+                }
+                .listRowBackground(DIColor.surface)
+            }
+        } header: {
+            SettingsSectionHeader(titleKey: "Iqamah Reminders", systemImage: "person.2.fill")
+        } footer: {
+            Text("Set how long after the azan your iqamah usually is. You are reminded five minutes before it, whatever the azan alert is set to.")
+        }
+    }
+
+    private func iqamahLabel(_ minutes: Int) -> Text {
+        minutes == 0 ? Text("Off") : Text("\(minutes) minutes after azan")
+    }
+
+    private func iqamahBinding(for prayer: Prayer) -> Binding<Int> {
+        SettingsBinding.value(
+            in: appState,
+            get: { $0.prayerNotifications.iqamahGap(for: prayer) },
+            set: { settings, minutes in
+                var gaps = settings.prayerNotifications.iqamahGaps ?? [:]
+                gaps[prayer] = minutes == 0 ? nil : minutes
+                settings.prayerNotifications.iqamahGaps = gaps.isEmpty ? nil : gaps
+            }
+        )
+    }
+
+    // MARK: - Test reminder
+
+    /// Proves the whole path - permission, delivery, sound - in a few
+    /// seconds, rather than leaving someone to wait for the next prayer to
+    /// find out alerts were never going to arrive.
+    private var testReminderSection: some View {
+        Section {
+            Button {
+                Task { await viewModel.sendTestReminder() }
+            } label: {
+                Label("Send a test reminder", systemImage: "bell.and.waves.left.and.right")
+            }
+            .disabled(viewModel.permission != .authorized)
+            .foregroundStyle(DIColor.primary)
+            .listRowBackground(DIColor.surface)
+            if viewModel.testReminderSent {
+                Text("A test reminder will arrive in about five seconds. Lock the phone or leave the app to see it as you would a prayer alert.")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .listRowBackground(DIColor.surface)
+            }
+        } header: {
+            SettingsSectionHeader(titleKey: "Check Alerts", systemImage: "checkmark.bubble.fill")
+        }
+    }
+
     // MARK: - Sound
 
     private var soundSection: some View {
@@ -297,6 +363,7 @@ final class NotificationSettingsViewModel {
     private(set) var azanUnavailable = false
     /// Resource name of the full azan currently playing, if any.
     private(set) var playingAzanResource: String?
+    private(set) var testReminderSent = false
 
     /// Whether the bundled full azan recordings are present; the playback
     /// rows are hidden when the assets are missing.
@@ -339,6 +406,17 @@ final class NotificationSettingsViewModel {
         isRequestingPermission = true
         _ = await notifications.requestPermission()
         isRequestingPermission = false
+        await refresh()
+    }
+
+    func sendTestReminder() async {
+        await notifications.scheduleReminder(
+            id: "test-reminder",
+            title: String(localized: "Test reminder"),
+            body: String(localized: "Prayer alerts from Darul Irfan will arrive like this."),
+            at: Date().addingTimeInterval(5)
+        )
+        testReminderSent = true
         await refresh()
     }
 

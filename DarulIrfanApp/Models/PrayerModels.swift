@@ -253,6 +253,10 @@ enum PrePrayerReminder: Int, Codable, Sendable, CaseIterable, Identifiable {
 struct PrayerNotificationPreferences: Codable, Sendable, Equatable {
     var styles: [Prayer: PrayerAlertStyle]
     var preReminders: [Prayer: PrePrayerReminder]
+    /// Minutes from azan to the iqamah the person keeps, per prayer, for a
+    /// heads-up before it. Optional so settings saved before it existed still
+    /// decode; nil or 0 means no iqamah reminder.
+    var iqamahGaps: [Prayer: Int]? = nil
 
     static let `default` = PrayerNotificationPreferences(
         styles: [
@@ -273,6 +277,13 @@ struct PrayerNotificationPreferences: Codable, Sendable, Equatable {
     func preReminder(for prayer: Prayer) -> PrePrayerReminder {
         preReminders[prayer] ?? .off
     }
+
+    func iqamahGap(for prayer: Prayer) -> Int {
+        max(0, iqamahGaps?[prayer] ?? 0)
+    }
+
+    /// The iqamah gaps offered in Settings, in minutes after the azan.
+    static let iqamahGapChoices = [0, 5, 10, 15, 20, 25, 30, 45]
 }
 
 // MARK: - Prayer tracker

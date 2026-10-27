@@ -36,6 +36,7 @@ struct PrayerTabView: View {
                         completionRate: viewModel.streakSummary?.completionRate ?? 0
                     )
                     .diAppear()
+                    TodayQuickTools(dependencies: dependencies, appState: appState)
                     if !viewModel.hasLoaded {
                         loadingView
                     } else if appState.activePlace != nil {
@@ -43,6 +44,7 @@ struct PrayerTabView: View {
                             DISectionHeader(titleKey: "Today's Times", systemImage: "clock")
                             timesCard(schedule: schedule)
                                 .diScrollReveal()
+                            TodayReminderStatus(dependencies: dependencies, appState: appState)
                             if viewModel.isRamadan {
                                 ramadanCard(schedule: schedule)
                                     .diScrollReveal()
@@ -62,6 +64,10 @@ struct PrayerTabView: View {
                     } else {
                         locationNeededSection
                     }
+                    TodayMyDayCard(dependencies: dependencies, appState: appState)
+                    TodayContinueCard(dependencies: dependencies)
+                    TodayUnderstandCard(dependencies: dependencies, appState: appState)
+                    TodayUpcomingCard(dependencies: dependencies, appState: appState)
                     TodayOfficialSection(dependencies: dependencies)
                     // Daily spiritual companion cards follow the time-sensitive
                     // prayer and official-live information.
@@ -73,6 +79,20 @@ struct PrayerTabView: View {
             .diScreenBackground()
             .diPageHeading("Today")
             .toolbar {
+                // The app language is one tap from the first screen, not
+                // three screens into Settings.
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        Picker("Language", selection: languageBinding) {
+                            ForEach(AppLanguage.allCases) { language in
+                                Text(LocalizedStringKey(language.displayName)).tag(language)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "character.bubble")
+                    }
+                    .accessibilityLabel("Change app language")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isSearchPresented = true
@@ -100,6 +120,13 @@ struct PrayerTabView: View {
                 Task { await viewModel.refresh() }
             }
         }
+    }
+
+    private var languageBinding: Binding<AppLanguage> {
+        Binding(
+            get: { appState.settings.language },
+            set: { language in Task { await appState.updateSettings { $0.language = language } } }
+        )
     }
 
     // MARK: - Loading

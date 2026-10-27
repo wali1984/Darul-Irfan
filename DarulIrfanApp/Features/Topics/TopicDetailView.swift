@@ -65,9 +65,21 @@ struct TopicDetailView: View {
                     .environment(\.layoutDirection, .rightToLeft)
                 if let translation = verse.translation, !translation.isEmpty {
                     Rectangle().fill(DIColor.accent).frame(height: 1).opacity(0.4)
-                    Text(translation)
-                        .font(.body)
-                        .foregroundStyle(DIColor.textPrimary)
+                    // Urdu in Nastaliq and right to left, English left to
+                    // right, whichever the app's own layout direction is.
+                    if ScriptDirection.isRightToLeft(translation, fallbackLanguage: nil) {
+                        Text(verbatim: translation)
+                            .font(DIFont.urduBody())
+                            .foregroundStyle(DIColor.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .environment(\.layoutDirection, .rightToLeft)
+                    } else {
+                        Text(verbatim: translation)
+                            .font(.body)
+                            .foregroundStyle(DIColor.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .environment(\.layoutDirection, .leftToRight)
+                    }
                 }
                 Text(verse.reference)
                     .font(.caption.weight(.semibold))
@@ -150,7 +162,9 @@ final class TopicDetailViewModel {
         // Choose an offline translation edition matching the language.
         let editions = (try? await quranRepository.editions()) ?? []
         let langCode = language.contentLanguageCode
-        let edition = editions.first { $0.kind == .translation && $0.isAvailableOffline && $0.language == langCode }
+        // The Silsila's own Akram-ut-Tarajum first, as in the reader.
+        let edition = editions.first { $0.id == "akram-ut-tarajum-\(langCode)" }
+            ?? editions.first { $0.kind == .translation && $0.isAvailableOffline && $0.language == langCode }
             ?? editions.first { $0.kind == .translation && $0.isAvailableOffline }
 
         // Cache per-surah data to avoid refetching a surah for adjacent refs.
@@ -178,10 +192,20 @@ final class TopicDetailViewModel {
         verses = items
     }
 
+    /// Each search term on its own, merged in order. The terms used to go in
+    /// as one query, which full-text search reads as "all of these words" -
+    /// "tawhid oneness unity of Allah" - so almost every topic came back
+    /// empty and showed "Nothing linked yet".
     private func findRelated() async {
-        let query = topic.searchQuery
-        guard !query.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        let results = (try? await searchIndex.search(query, domains: [.library, .media, .events], limit: 25)) ?? []
-        related = results
+        var seen = Set<String>()
+        var merged: [SearchResult] = []
+        for term in topic.searchTerms where !term.trimmingCharacters(in: .whitespaces).isEmpty {
+            let results = (try? await searchIndex.search(term, domains: [.library, .media, .events], limit: 12)) ?? []
+            for result in results where seen.insert(result.id).inserted {
+                merged.append(result)
+            }
+            if merged.count >= 30 { break }
+        }
+        related = Array(merged.prefix(30))
     }
 }

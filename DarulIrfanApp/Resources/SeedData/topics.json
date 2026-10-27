@@ -7,7 +7,9 @@
   "searchTerms": [
    "tawhid",
    "oneness",
-   "unity of Allah"
+   "unity of Allah",
+   "توحید",
+   "وحدانیت"
   ],
   "ayahRefs": [
    "2:255",
@@ -27,7 +29,10 @@
    "remembrance",
    "dhikr",
    "qalbi",
-   "pas anfas"
+   "pas anfas",
+   "ذکر",
+   "ذکر قلبی",
+   "پاس انفاس"
   ],
   "ayahRefs": [
    "13:28",
@@ -45,7 +50,9 @@
    "patience",
    "sabr",
    "perseverance",
-   "steadfast"
+   "steadfast",
+   "صبر",
+   "استقامت"
   ],
   "ayahRefs": [
    "2:153",
@@ -63,7 +70,8 @@
   "searchTerms": [
    "gratitude",
    "thankfulness",
-   "shukr"
+   "shukr",
+   "شکر"
   ],
   "ayahRefs": [
    "2:152",
@@ -79,7 +87,8 @@
   "searchTerms": [
    "trust",
    "reliance",
-   "tawakkul"
+   "tawakkul",
+   "توکل"
   ],
   "ayahRefs": [
    "3:173",
@@ -97,7 +106,9 @@
    "repentance",
    "forgiveness",
    "tawbah",
-   "istighfar"
+   "istighfar",
+   "توبہ",
+   "استغفار"
   ],
   "ayahRefs": [
    "21:87",
@@ -113,7 +124,8 @@
   "systemIcon": "hands.sparkles",
   "searchTerms": [
    "dua",
-   "supplication"
+   "supplication",
+   "دعا"
   ],
   "ayahRefs": [
    "2:186",
@@ -130,7 +142,8 @@
   "searchTerms": [
    "salah",
    "prayer",
-   "namaz"
+   "namaz",
+   "نماز"
   ],
   "ayahRefs": [
    "4:103",
@@ -147,7 +160,10 @@
    "muhammad",
    "love of the holy prophet",
    "salawat",
-   "durood"
+   "durood",
+   "درود",
+   "محبت رسول",
+   "عشق رسول"
   ],
   "ayahRefs": [
    "33:56"
@@ -164,7 +180,10 @@
    "purification",
    "nafs",
    "sufism",
-   "reformation of the heart"
+   "reformation of the heart",
+   "تصوف",
+   "تزکیہ",
+   "اصلاح قلب"
   ],
   "ayahRefs": [
    "87:14-15"
@@ -179,7 +198,8 @@
    "mercy",
    "rahmah",
    "compassion",
-   "forgiveness"
+   "forgiveness",
+   "رحمت"
   ],
   "ayahRefs": [
    "2:286",
@@ -196,7 +216,8 @@
    "hope",
    "ease",
    "relief",
-   "do not despair"
+   "do not despair",
+   "امید"
   ],
   "ayahRefs": [
    "3:139",
@@ -215,7 +236,9 @@
   "searchTerms": [
    "guidance",
    "hidayah",
-   "straight path"
+   "straight path",
+   "ہدایت",
+   "صراط مستقیم"
   ],
   "ayahRefs": [
    "18:10",
@@ -231,7 +254,9 @@
   "searchTerms": [
    "reflection",
    "contemplation",
-   "signs"
+   "signs",
+   "تفکر",
+   "غور و فکر"
   ],
   "ayahRefs": [
    "3:185",
@@ -249,7 +274,8 @@
    "knowledge",
    "ilm",
    "learning",
-   "wisdom"
+   "wisdom",
+   "علم"
   ],
   "ayahRefs": [
    "6:59",
@@ -265,7 +291,8 @@
    "decree",
    "qadar",
    "destiny",
-   "will of Allah"
+   "will of Allah",
+   "تقدیر"
   ],
   "ayahRefs": [
    "9:51",
@@ -284,7 +311,9 @@
    "silsila",
    "murshid",
    "naqshbandia",
-   "owaisiah"
+   "owaisiah",
+   "بیعت",
+   "سلسلہ عالیہ"
   ],
   "ayahRefs": [
    "48:10",
@@ -298,7 +327,8 @@
   "nameUrdu": "قربِ الٰہی",
   "systemIcon": "sparkles",
   "searchTerms": [
-   "nearness to allah"
+   "nearness to allah",
+   "قرب الٰہی"
   ],
   "ayahRefs": [
    "50:16",
@@ -317,7 +347,9 @@
    "companions",
    "sohbat",
    "association",
-   "blessed company"
+   "blessed company",
+   "صحبت",
+   "صحابہ"
   ],
   "ayahRefs": [
    "9:119",
@@ -334,7 +366,9 @@
    "parents",
    "family",
    "children",
-   "rights"
+   "rights",
+   "والدین",
+   "اولاد"
   ],
   "ayahRefs": [
    "46:15",

@@ -75,7 +75,12 @@ struct SurahReaderView: View {
                     }
                 }
             }
-            .task { await viewModel.load() }
+            .task {
+                // Notes are counted on each ayah card; read them once here
+                // rather than during a card's render.
+                MyDayStore.shared.loadIfNeeded()
+                await viewModel.load()
+            }
             .onDisappear {
                 player.stop()
                 speaker.stop()
@@ -680,6 +685,7 @@ private struct AyahCardView: View {
 
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
     @State private var tafsirExpanded = true
+    @State private var isWritingNote = false
 
     private var isSounding: Bool {
         player.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
@@ -879,12 +885,33 @@ private struct AyahCardView: View {
                             ? Text("Stop translation audio")
                             : Text("Play translation audio for Ayah \(ayah.ayahNumber)")
                     )
-                } else {
-                    shellChip("Translation audio", "speaker.wave.2", enabled: false)
                 }
-                shellChip("Video lectures", "play.rectangle", enabled: false)
+                // A private note on this ayah, kept in My Day on this phone.
+                Button {
+                    isWritingNote = true
+                } label: {
+                    shellChip(noteCount > 0 ? String(localized: "Notes (\(noteCount))") : String(localized: "Note"), "square.and.pencil", enabled: true)
+                }
+                .accessibilityLabel(Text("Write a note on Ayah \(ayah.ayahNumber)"))
             }
         }
+        .sheet(isPresented: $isWritingNote) {
+            NavigationStack {
+                NoteEditorView(note: nil, reference: noteReference)
+            }
+        }
+    }
+
+    private var noteReference: NoteReference {
+        NoteReference(
+            kind: .ayah,
+            itemID: "\(ayah.surahNumber):\(ayah.ayahNumber)",
+            label: "\(viewModel.surah.nameTransliterated) \(ayah.surahNumber):\(ayah.ayahNumber)"
+        )
+    }
+
+    private var noteCount: Int {
+        MyDayStore.shared.notes(about: noteReference).count
     }
 
     /// The on-screen translation text + a device voice language, when both a
@@ -910,7 +937,7 @@ private struct AyahCardView: View {
     }
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {
-        Label(label, systemImage: icon)
+        Label(LocalizedStringKey(label), systemImage: icon)
             .font(.caption2.weight(.medium))
             .padding(.horizontal, DISpacing.sm)
             .padding(.vertical, 5)

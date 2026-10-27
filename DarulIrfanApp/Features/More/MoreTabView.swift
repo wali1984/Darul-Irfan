@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Root of the "More" tab: a branded hub that hosts Zikr, Events &
-/// Dar-ul-Irfan, Qibla, the daily Companion, Settings, and About, plus the
-/// global search sheet. Owns its own NavigationStack per the app navigation
+/// Root of the Community tab: the private groups, Dar-ul-Irfan programmes
+/// and official updates, then the tools and the app's Settings and About,
+/// plus the global search sheet. Owns its own NavigationStack per the app navigation
 /// contract. Elevated to match the living "Today" language: a gradient brand
 /// header with a breathing seal, and premium card rows grouped by intent.
 @MainActor
@@ -35,20 +35,20 @@ struct MoreTabView: View {
                     MoreBrandHeader()
                         .diAppear()
 
-                    exploreSection
-                    spiritualSection
+                    communitySection
+                    toolsSection
                     settingsSection
                 }
                 .padding(DISpacing.md)
             }
             .diScreenBackground()
-            .diPageHeading("More")
+            .diPageHeading("Community")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
                         Picker("Language", selection: languageBinding) {
                             ForEach(AppLanguage.allCases) { lang in
-                                Text(lang.displayName).tag(lang)
+                                Text(LocalizedStringKey(lang.displayName)).tag(lang)
                             }
                         }
                     } label: {
@@ -73,18 +73,22 @@ struct MoreTabView: View {
 
     // MARK: - Sections
 
-    private var exploreSection: some View {
+    /// The silsila's people and gatherings: private regional groups, the
+    /// Dar-ul-Irfan programmes, and official updates.
+    private var communitySection: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Explore", systemImage: "safari")
+            DISectionHeader(titleKey: "Community", systemImage: "person.3")
                 .diAppear(delay: 0.05)
 
-            MoreNavLink(
-                titleKey: "Daily Companion",
-                subtitleKey: "99 Names, duas, Islamic days and tasbih",
-                systemImage: "heart.text.square.fill",
-                delay: 0.10
-            ) {
-                CompanionHomeView(dependencies: dependencies, appState: appState)
+            if MemberGroupsFeature.isEnabled {
+                MoreNavLink(
+                    titleKey: "Private groups",
+                    subtitleKey: "Members only — your region's announcements and zikr",
+                    systemImage: "lock.shield",
+                    delay: 0.10
+                ) {
+                    GroupsHomeView()
+                }
             }
 
             MoreNavLink(
@@ -96,33 +100,39 @@ struct MoreTabView: View {
                 EventsHomeView(dependencies: dependencies, appState: appState)
             }
 
-            // Hidden until Sign in with Apple is enabled on the App ID; see
-            // MemberGroupsFeature.
-            if MemberGroupsFeature.isEnabled {
-                MoreNavLink(
-                    titleKey: "Private groups",
-                    subtitleKey: "Members only — your region's announcements and zikr",
-                    systemImage: "lock.shield",
-                    delay: 0.22
-                ) {
-                    GroupsHomeView()
-                }
+            MoreNavLink(
+                titleKey: "Official Updates",
+                subtitleKey: "News and posts from the silsila",
+                systemImage: "newspaper.fill",
+                delay: 0.22
+            ) {
+                OfficialFeedView(dependencies: dependencies)
+                    .navigationTitle("Official Updates")
             }
         }
     }
 
-    private var spiritualSection: some View {
+    private var toolsSection: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Spiritual", systemImage: "moon.stars")
-                .diAppear(delay: 0.22)
+            DISectionHeader(titleKey: "Tools", systemImage: "square.grid.2x2")
+                .diAppear(delay: 0.28)
 
             MoreNavLink(
-                titleKey: "Zikr",
-                subtitleKey: "Method of Zikr and online sessions",
-                systemImage: "sparkles",
-                delay: 0.28
+                titleKey: "All tools",
+                subtitleKey: "Qibla, tasbih, duas, My Day, focus and fasting",
+                systemImage: "square.grid.2x2.fill",
+                delay: 0.32
             ) {
-                ZikrHomeView(dependencies: dependencies, appState: appState)
+                ToolsView(dependencies: dependencies, appState: appState)
+            }
+
+            MoreNavLink(
+                titleKey: "Daily Companion",
+                subtitleKey: "99 Names, duas, Islamic days and tasbih",
+                systemImage: "heart.text.square.fill",
+                delay: 0.36
+            ) {
+                CompanionHomeView(dependencies: dependencies, appState: appState)
             }
 
             MoreNavLink(
@@ -130,7 +140,7 @@ struct MoreTabView: View {
                 subtitleKey: "Direction to the Kaaba",
                 systemImage: "location.north.circle.fill",
                 accent: true,
-                delay: 0.34
+                delay: 0.40
             ) {
                 QiblaCompassView(dependencies: dependencies, appState: appState)
             }

@@ -31,6 +31,18 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 | Book reader opened every book RTL/Nastaliq | Per-page direction | done |
 | Dua group headers, greeting, broadcast status rendered verbatim (never localized) | Looked up in the catalog | done |
 
+## A2. Added 2026-10-27: prayer-time accuracy, no exceptions
+
+| Item | Status |
+|---|---|
+| Reproduce the app's exact calculation (adhan engine, same parameters) for a city/date grid across every continent, both hemispheres, DST transitions, high latitudes, equator, date line | todo |
+| Compare against an independent implementation and published official timetables (Karachi/Pakistan, ISNA/MWL/Moonsighting for North America, Umm al-Qura, Egypt, UK high-latitude) | todo |
+| Time zone of the computed place: device location -> correct IANA zone (not the phone's zone when they differ), manual cities, travel | todo |
+| Default method/Asr by region (not Karachi for everyone), high-latitude rule, elevation, rounding, manual offsets | todo |
+| Stale location: refresh on significant move / timezone change; show which place and method the times are for | todo |
+| Widget, Watch, notifications and Today all use the same computed times | todo |
+| Regression tests pinning verified times per region | todo |
+
 ## C. "Useful companion" plan — first increment (iOS)
 
 | Item | Status |

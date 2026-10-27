@@ -53,6 +53,8 @@ enum PrayerNotificationPlan {
     static let prayerIdentifierPrefix = "prayer|"
     /// Identifier prefix for pre-prayer reminders: "prayer-pre|<dayKey>|<prayerRaw>".
     static let preReminderIdentifierPrefix = "prayer-pre|"
+    /// Identifier prefix for personal iqamah reminders: "prayer-iqamah|<dayKey>|<prayerRaw>".
+    static let iqamahIdentifierPrefix = "prayer-iqamah|"
     /// Identifier of the single trailing "keep alerts fresh" reminder.
     static let refreshReminderIdentifier = "prayer-refresh"
 
@@ -65,6 +67,7 @@ enum PrayerNotificationPlan {
     static func isPrayerIdentifier(_ identifier: String) -> Bool {
         identifier.hasPrefix(prayerIdentifierPrefix)
             || identifier.hasPrefix(preReminderIdentifierPrefix)
+            || identifier.hasPrefix(iqamahIdentifierPrefix)
             || identifier == refreshReminderIdentifier
     }
 
@@ -126,6 +129,28 @@ enum PrayerNotificationPlan {
                                 soundKind: style == .silent ? .silent : .defaultSound,
                                 fireDate: preFireDate,
                                 dateComponents: triggerComponents(for: preFireDate, timeZone: timeZone)
+                            )
+                        )
+                    }
+                }
+
+                // A personal iqamah: a heads-up five minutes before the time
+                // the person keeps after the azan (or at it, for short gaps).
+                // Independent of the azan alert style, since someone may keep
+                // the azan silent and still want to be ready for jamaat.
+                let gap = preferences.iqamahGap(for: prayer)
+                if gap > 0, prayer != .sunrise {
+                    let lead = gap > 5 ? 5 : 0
+                    let iqamahFireDate = fireDate.addingTimeInterval(TimeInterval((gap - lead) * 60))
+                    if iqamahFireDate > now {
+                        candidates.append(
+                            PlannedNotification(
+                                identifier: "\(iqamahIdentifierPrefix)\(dayKey)|\(prayer.rawValue)",
+                                title: String(localized: "Iqamah reminder"),
+                                body: iqamahBody(for: prayer, minutes: lead),
+                                soundKind: .defaultSound,
+                                fireDate: iqamahFireDate,
+                                dateComponents: triggerComponents(for: iqamahFireDate, timeZone: timeZone)
                             )
                         )
                     }
@@ -209,6 +234,27 @@ enum PrayerNotificationPlan {
         case .asr: return String(localized: "Asr in \(minutes) minutes")
         case .maghrib: return String(localized: "Maghrib in \(minutes) minutes")
         case .isha: return String(localized: "Isha in \(minutes) minutes")
+        }
+    }
+
+    static func iqamahBody(for prayer: Prayer, minutes: Int) -> String {
+        if minutes == 0 {
+            switch prayer {
+            case .fajr: return String(localized: "It is time for your Fajr iqamah.")
+            case .sunrise: return String(localized: "The sun is rising.")
+            case .dhuhr: return String(localized: "It is time for your Dhuhr iqamah.")
+            case .asr: return String(localized: "It is time for your Asr iqamah.")
+            case .maghrib: return String(localized: "It is time for your Maghrib iqamah.")
+            case .isha: return String(localized: "It is time for your Isha iqamah.")
+            }
+        }
+        switch prayer {
+        case .fajr: return String(localized: "Fajr iqamah in \(minutes) minutes")
+        case .sunrise: return String(localized: "Sunrise in \(minutes) minutes")
+        case .dhuhr: return String(localized: "Dhuhr iqamah in \(minutes) minutes")
+        case .asr: return String(localized: "Asr iqamah in \(minutes) minutes")
+        case .maghrib: return String(localized: "Maghrib iqamah in \(minutes) minutes")
+        case .isha: return String(localized: "Isha iqamah in \(minutes) minutes")
         }
     }
 
@@ -316,8 +362,17 @@ final class NotificationScheduler: NotificationScheduling {
         content.body = body
         content.sound = .default
 
-        let components = PrayerNotificationPlan.triggerComponents(for: date, timeZone: .current)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        // Calendar triggers carry minute precision, so anything due within
+        // the minute (the "send a test reminder" check) would land in the
+        // past and never fire; those use an interval instead.
+        let interval = date.timeIntervalSinceNow
+        let trigger: UNNotificationTrigger
+        if interval < 60 {
+            trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, interval), repeats: false)
+        } else {
+            let components = PrayerNotificationPlan.triggerComponents(for: date, timeZone: .current)
+            trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        }
         let request = UNNotificationRequest(
             identifier: "reminder|\(id)",
             content: content,

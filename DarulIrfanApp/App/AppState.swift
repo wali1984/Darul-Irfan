@@ -89,6 +89,13 @@ final class AppState {
             at: place,
             preferences: settings.calculation
         )
+        // My Day reminders first: the prayer plan sizes itself to the room
+        // other reminders leave in the 64-alert budget, so it must see them.
+        await MyDayReminders.refresh(
+            store: .shared,
+            notifications: dependencies.notifications,
+            schedules: schedules
+        )
         await dependencies.notifications.reschedulePrayerNotifications(
             schedules: schedules,
             preferences: settings.prayerNotifications

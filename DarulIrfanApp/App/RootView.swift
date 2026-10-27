@@ -45,11 +45,11 @@ struct RootView: View {
             .tag(AppTab.zikr)
 
             ExploreTabView(dependencies: dependencies, appState: appState)
-                .tabItem { Label("Explore", systemImage: "safari") }
+                .tabItem { Label("Discover", systemImage: "safari") }
                 .tag(AppTab.explore)
 
             MoreTabView(dependencies: dependencies, appState: appState)
-                .tabItem { Label("More", systemImage: "ellipsis.circle") }
+                .tabItem { Label("Community", systemImage: "person.3") }
                 .tag(AppTab.more)
         }
         .tint(DIColor.primary)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ExploreTabView: View {
     enum Section: String, CaseIterable, Identifiable {
+        case topics = "Topics"
         case updates = "Updates"
         case library = "Library"
         case media = "Media"
@@ -9,6 +10,7 @@ struct ExploreTabView: View {
         var id: String { rawValue }
         var icon: String {
             switch self {
+            case .topics: return "square.grid.2x2.fill"
             case .updates: return "newspaper.fill"
             case .library: return "books.vertical.fill"
             case .media: return "play.rectangle.fill"
@@ -19,7 +21,7 @@ struct ExploreTabView: View {
 
     let dependencies: AppDependencies
     let appState: AppState
-    @State private var section: Section = .updates
+    @State private var section: Section = .topics
 
     var body: some View {
         VStack(spacing: 0) {
@@ -41,6 +43,10 @@ struct ExploreTabView: View {
     @ViewBuilder
     private var content: some View {
         switch section {
+        case .topics:
+            NavigationStack {
+                TopicsBrowseView(dependencies: dependencies, appState: appState)
+            }
         case .updates:
             NavigationStack {
                 OfficialFeedView(dependencies: dependencies)
