@@ -17,7 +17,9 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
   if (hub) sources.push({ kind: "ownedStream", url: hub, supportsBackgroundAudio: true });
   const owned = validHTTPURL(row.owned_stream_url);
   const videoID = typeof row.youtube_video_id === "string" ? row.youtube_video_id : undefined;
-  const paltalk = validHTTPURL(row.paltalk_url);
+  // Only a link to the room itself; the bare site would join nothing.
+  const paltalkLink = validHTTPURL(row.paltalk_url);
+  const paltalk = paltalkLink && new URL(paltalkLink).pathname.replace(/\/+$/, "") ? paltalkLink : undefined;
   if (owned) sources.push({ kind: "ownedStream", url: owned, supportsBackgroundAudio: true });
   if (videoID) sources.push({ kind: "youtube", url: `https://www.youtube.com/watch?v=${encodeURIComponent(videoID)}`, videoID, supportsBackgroundAudio: false });
   if (paltalk) sources.push({ kind: "paltalk", url: paltalk, supportsBackgroundAudio: false });

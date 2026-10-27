@@ -137,6 +137,23 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertEqual(list.posts.first?.publishedAt, formatter.date(from: "2026-10-27T10:15:00.000Z"))
     }
 
+    /// The Administrator role reaches the app, each Halqah carries the
+    /// member's own role there, and a role this build does not know never
+    /// breaks the list.
+    func testHalqahRolesDecode() throws {
+        let json = #"{"role":"administrator","groups":[{"id":"usa","name":"United States","myRole":"administrator","canManage":true},"#
+            + #"{"id":"canada","name":"Canada","myRole":"admin"}]}"#
+        let list = try JSONDecoder().decode(MemberGroupList.self, from: Data(json.utf8))
+        XCTAssertEqual(list.role, .administrator)
+        XCTAssertEqual(list.groups.map(\.myRole), [.administrator, .admin])
+        let future = try JSONDecoder().decode(MemberGroupList.self, from: Data(#"{"role":"elder","groups":[]}"#.utf8))
+        XCTAssertEqual(future.role, .member)
+
+        let person = GroupPerson(id: "p", name: "A", email: nil, role: .administrator, addedAt: nil, isYou: false)
+        XCTAssertFalse(person.isChangeable(byAppointer: false))
+        XCTAssertTrue(person.isChangeable(byAppointer: true))
+    }
+
     /// A session's recordings play from one clock: where the group is, not
     /// the beginning, and standing still while the admin has paused. An older
     /// server without these fields still decodes.

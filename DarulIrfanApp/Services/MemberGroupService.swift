@@ -296,6 +296,32 @@ actor MemberGroupService {
         return result
     }
 
+    /// The Super admin places someone from the directory.
+    func place(_ memberID: String, in groupID: String, role: GroupRole) async throws {
+        try await send("POST", path: "v1/groups/\(groupID)/people", payload: ["memberID": memberID, "role": role.rawValue], expecting: [201])
+    }
+
+    // MARK: Halqahs (Super admin)
+
+    func createHalqah(name: String, description: String?) async throws {
+        var payload: [String: Any] = ["name": name]
+        if let description, !description.isEmpty { payload["description"] = description }
+        try await send("POST", path: "v1/groups", payload: payload, expecting: [201])
+    }
+
+    func updateHalqah(_ groupID: String, name: String, description: String?) async throws {
+        try await send("PUT", path: "v1/groups/\(groupID)", payload: ["name": name, "description": description ?? ""], expecting: [200])
+    }
+
+    /// Hides the Halqah from everyone; its people and history are kept.
+    func retireHalqah(_ groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)", payload: nil, expecting: [204])
+    }
+
+    func directory() async throws -> [DirectoryPerson] {
+        try await authorized(MemberDirectory.self, path: "v1/members").members
+    }
+
     func setRole(_ role: GroupRole, of personID: String, in groupID: String) async throws {
         try await send("PUT", path: "v1/groups/\(groupID)/people/\(personID)", payload: ["role": role.rawValue], expecting: [200])
     }

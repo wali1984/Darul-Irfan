@@ -20,26 +20,47 @@ import { recordingConfig, trackRoom } from "./roomRecordings";
 // admins: a group they are not in answers 404, exactly like a group that does
 // not exist. Only the super admin sees across groups.
 
-export type Role = "member" | "admin" | "superadmin";
+export type Role = "member" | "admin" | "administrator" | "superadmin";
+/** A role inside one Halqah, lowest first. */
+export type HalqahRole = "member" | "admin" | "administrator";
+export const HALQAH_ROLES: HalqahRole[] = ["member", "admin", "administrator"];
+export const halqahRole = (value: unknown): HalqahRole =>
+  value === "administrator" ? "administrator" : value === "admin" ? "admin" : "member";
 
 const notFound = () => json({ error: "Not found" }, { status: 404 });
 const forbidden = () => json({ error: "Group admin role required" }, { status: 403 });
 
-/** The member's highest role: super admin, admin of at least one group, or
- *  member. What they may do in a particular group is `canManage`. */
+/** The member's highest role: Super admin, Administrator or Admin of at
+ *  least one Halqah, or member. What they may do in a particular Halqah is
+ *  `canManage` and `canAppointAdministrators`. */
 export async function memberRole(env: Env, memberID: string): Promise<Role> {
-  const row = await env.DB.prepare("SELECT role,email FROM members WHERE id=?").bind(memberID)
-    .first<{ role: string; email: string | null }>();
+  const row = await env.DB.prepare("SELECT email FROM members WHERE id=?").bind(memberID)
+    .first<{ email: string | null }>();
   if (isSuperAdmin(env, row)) return "superadmin";
-  const admin = await env.DB.prepare("SELECT 1 AS ok FROM member_group_members WHERE member_id=? AND role='admin' LIMIT 1")
-    .bind(memberID).first();
-  return admin ? "admin" : "member";
+  const top = await env.DB.prepare(`SELECT role FROM member_group_members WHERE member_id=?
+    ORDER BY CASE role WHEN 'administrator' THEN 2 WHEN 'admin' THEN 1 ELSE 0 END DESC LIMIT 1`)
+    .bind(memberID).first<{ role: string }>();
+  return top ? halqahRole(top.role) : "member";
 }
 
-/** The email comes only from a verified Apple identity token, never from input. */
-export function isSuperAdmin(env: Env, row: { role?: unknown; email?: unknown } | null | undefined): boolean {
-  if (row?.role === "superadmin") return true;
+/** Super admin is the configured address list and nothing else. The email
+ *  comes only from a verified Apple identity token, never from input. */
+export function isSuperAdmin(env: Env, row: { email?: unknown } | null | undefined): boolean {
   return typeof row?.email === "string" && superAdminEmails(env).includes(row.email.trim().toLowerCase());
+}
+
+/** The member's role in one Halqah, or null when not in it. */
+export async function roleIn(env: Env, memberID: string, groupID: string): Promise<HalqahRole | null> {
+  const row = await env.DB.prepare("SELECT role FROM member_group_members WHERE group_id=? AND member_id=?")
+    .bind(groupID, memberID).first<{ role: string }>();
+  return row ? halqahRole(row.role) : null;
+}
+
+/** Only a Halqah's Administrators, and the Super admin, make or unmake its
+ *  Administrators. */
+export async function canAppointAdministrators(env: Env, memberID: string, role: Role, groupID: string): Promise<boolean> {
+  if (role === "superadmin") return groupExists(env, groupID);
+  return await roleIn(env, memberID, groupID) === "administrator";
 }
 
 function superAdminEmails(env: Env): string[] {
@@ -61,11 +82,12 @@ export async function canSee(env: Env, memberID: string, role: Role, groupID: st
   return isMember(env, memberID, groupID);
 }
 
-/** Whether the caller may publish, run sessions and manage people in this group. */
+/** Whether the caller may publish, run sessions and manage people in this
+ *  Halqah: its Admins and Administrators, and the Super admin. */
 export async function canManage(env: Env, memberID: string, role: Role, groupID: string): Promise<boolean> {
   if (role === "superadmin") return groupExists(env, groupID);
-  return !!await env.DB.prepare("SELECT 1 AS ok FROM member_group_members WHERE group_id=? AND member_id=? AND role='admin'")
-    .bind(groupID, memberID).first();
+  const mine = await roleIn(env, memberID, groupID);
+  return mine === "admin" || mine === "administrator";
 }
 
 const newID = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 12)}`;
@@ -94,7 +116,9 @@ export async function communityGroups(env: Env, memberID: string): Promise<Respo
   const result = await (role === "superadmin" ? statement : statement.bind(memberID)).all();
   const groups = [];
   for (const row of result.results ?? []) {
+    const mine = role === "superadmin" ? "superadmin" : await roleIn(env, memberID, String(row.id)) ?? "member";
     groups.push({
+      myRole: mine,
       id: row.id, name: row.name, description: row.description ?? undefined,
       meetingURL: row.meeting_url ?? undefined, meetingNote: row.meeting_note ?? undefined,
       isLive: row.live_state === "live", liveKind: row.live_state === "live" ? row.live_kind : undefined,

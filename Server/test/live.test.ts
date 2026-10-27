@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 import type { Env } from "../src/contracts";
-import { reconcileLive } from "../src/live";
+import { reconcileLive, zikrTitle } from "../src/live";
 import { sqliteD1 } from "./sqlite-d1";
 
 const INPUT_A = "a".repeat(32);
@@ -55,6 +55,26 @@ describe("live zikr pipeline", () => {
     expect(off.state).toBe("ended");
     expect(off.sources.filter(s => s.kind === "ownedStream")).toEqual([]);
     expect(sent.filter(s => s.url.includes("graph.facebook.com"))).toEqual([]);
+  });
+
+  it("offers the room itself to join while it is open and nothing streams yet", async () => {
+    const { raw, heartbeat, live } = setup();
+    raw.prepare("UPDATE live_broadcasts SET paltalk_url='https://www.paltalk.com' WHERE id='official-live'").run();
+    await heartbeat({ listener: "listener-a", inRoom: true, streaming: false });
+    let on = await live();
+    expect(on.state).toBe("live");
+    // The bare site joins nothing, so it is not offered.
+    expect(on.sources).toEqual([]);
+    raw.prepare("UPDATE live_broadcasts SET paltalk_url='https://www.paltalk.com/room/zikr' WHERE id='official-live'").run();
+    on = await live();
+    expect(on.sources).toEqual([expect.objectContaining({ kind: "paltalk", url: "https://www.paltalk.com/room/zikr" })]);
+    await heartbeat({ listener: "listener-a", inRoom: false, streaming: false });
+    expect((await live()).state).toBe("ended");
+  });
+
+  it("names the session by Pakistan time: Tahajjud before dawn, Daily Zikr otherwise", () => {
+    expect(zikrTitle(new Date("2026-10-27T23:30:00Z"))).toBe("Tahajjud Zikr"); // 04:30 in Pakistan
+    expect(zikrTitle(new Date("2026-10-27T16:15:00Z"))).toBe("Daily Zikr"); // 21:15
   });
 
   it("fails over to input B when Stream reports input A disconnected", async () => {

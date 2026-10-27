@@ -22797,6 +22797,669 @@
           }
         }
       }
+    },
+    "Add someone by email, or send an invitation code to their phone, as a member, an Admin or - if you may appoint them - an Administrator of this Halqah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add someone by email, or send an invitation code to their phone, as a member, an Admin or - if you may appoint them - an Administrator of this Halqah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی کو ای میل سے شامل کریں، یا ان کے فون پر دعوتی کوڈ بھیجیں: رکن، ایڈمن، یا اگر آپ مقرر کر سکتے ہیں تو اس حلقے کے ایڈمنسٹریٹر کے طور پر۔"
+          }
+        }
+      }
+    },
+    "Add to a Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add to a Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے میں شامل کریں"
+          }
+        }
+      }
+    },
+    "Admin of this Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admin of this Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حلقے کے ایڈمن"
+          }
+        }
+      }
+    },
+    "Administrator of this Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Administrator of this Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حلقے کے ایڈمنسٹریٹر"
+          }
+        }
+      }
+    },
+    "Administrators": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Administrators"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایڈمنسٹریٹرز"
+          }
+        }
+      }
+    },
+    "Administrator": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Administrator"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایڈمنسٹریٹر"
+          }
+        }
+      }
+    },
+    "Admins run everything in this Halqah: posts, zikr, meetings and people, and they can make other Admins. Administrators can do all of that and also appoint Administrators.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admins run everything in this Halqah: posts, zikr, meetings and people, and they can make other Admins. Administrators can do all of that and also appoint Administrators."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایڈمن اس حلقے کا سب کچھ چلاتے ہیں: پوسٹس، ذکر، میٹنگز اور افراد، اور دوسرے ایڈمن بنا سکتے ہیں۔ ایڈمنسٹریٹر یہ سب کرنے کے ساتھ ایڈمنسٹریٹر بھی مقرر کر سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Choose": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتخب کریں"
+          }
+        }
+      }
+    },
+    "Description (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Description (optional)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفصیل (اختیاری)"
+          }
+        }
+      }
+    },
+    "Everyone who has signed in": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everyone who has signed in"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سائن اِن کرنے والے سب افراد"
+          }
+        }
+      }
+    },
+    "Halqahs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halqahs"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے"
+          }
+        }
+      }
+    },
+    "It disappears for everyone. Its people, posts and history are kept.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It disappears for everyone. Its people, posts and history are kept."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ سب کے لیے غائب ہو جائے گا۔ اس کے افراد، پوسٹس اور ریکارڈ محفوظ رہیں گے۔"
+          }
+        }
+      }
+    },
+    "Join Zikr when it begins.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Zikr when it begins."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر شروع ہونے پر اس میں شامل ہوں۔"
+          }
+        }
+      }
+    },
+    "Join Zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "Name, email or Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name, email or Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نام، ای میل یا حلقہ"
+          }
+        }
+      }
+    },
+    "Name, for example New York": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name, for example New York"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نام، مثلاً نیویارک"
+          }
+        }
+      }
+    },
+    "New Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نیا حلقہ"
+          }
+        }
+      }
+    },
+    "Edit Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے میں ترمیم"
+          }
+        }
+      }
+    },
+    "Make the Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make the Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقہ بنائیں"
+          }
+        }
+      }
+    },
+    "A new Halqah starts empty. Add its first Administrator from its Members screen, or from Everyone who has signed in.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A new Halqah starts empty. Add its first Administrator from its Members screen, or from Everyone who has signed in."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نیا حلقہ خالی شروع ہوتا ہے۔ اس کا پہلا ایڈمنسٹریٹر اس کی اراکین کی اسکرین سے، یا سائن اِن کرنے والے سب افراد میں سے شامل کریں۔"
+          }
+        }
+      }
+    },
+    "Members see the new name straight away.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members see the new name straight away."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین کو نیا نام فوراً نظر آئے گا۔"
+          }
+        }
+      }
+    },
+    "No one matches.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No one matches."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی نہیں ملا۔"
+          }
+        }
+      }
+    },
+    "Not in a Halqah yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not in a Halqah yet"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی کسی حلقے میں نہیں"
+          }
+        }
+      }
+    },
+    "Press and hold a Halqah to rename or retire it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press and hold a Halqah to rename or retire it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نام بدلنے یا ختم کرنے کے لیے حلقے کو دبا کر رکھیں۔"
+          }
+        }
+      }
+    },
+    "Remove from the Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from the Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے سے نکالیں"
+          }
+        }
+      }
+    },
+    "Rename or describe": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename or describe"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نام یا تفصیل بدلیں"
+          }
+        }
+      }
+    },
+    "Retire %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retire %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ختم کریں"
+          }
+        }
+      }
+    },
+    "Retire this Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retire this Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ حلقہ ختم کریں"
+          }
+        }
+      }
+    },
+    "Retire this Halqah?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retire this Halqah?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ حلقہ ختم کریں؟"
+          }
+        }
+      }
+    },
+    "Super admin: everything, in every Halqah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Super admin: everything, in every Halqah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سپر ایڈمن: ہر حلقے میں سب کچھ۔"
+          }
+        }
+      }
+    },
+    "Super admin: everything, in every Halqah. You make Halqahs and place anyone in any of them.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Super admin: everything, in every Halqah. You make Halqahs and place anyone in any of them."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سپر ایڈمن: ہر حلقے میں سب کچھ۔ آپ حلقے بناتے ہیں اور کسی کو بھی کسی حلقے میں شامل کر سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Administrator: you run your Halqah, its people and its Admins, and appoint Administrators.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Administrator: you run your Halqah, its people and its Admins, and appoint Administrators."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایڈمنسٹریٹر: آپ اپنا حلقہ، اس کے افراد اور ایڈمنز چلاتے ہیں، اور ایڈمنسٹریٹر مقرر کرتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Admin: you run your Halqah - posts, zikr, meetings and people - and can make other Admins.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admin: you run your Halqah - posts, zikr, meetings and people - and can make other Admins."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایڈمن: آپ اپنا حلقہ چلاتے ہیں: پوسٹس، ذکر، میٹنگز اور افراد، اور دوسرے ایڈمن بنا سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "You are an Admin of this Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are an Admin of this Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ اس حلقے کے ایڈمن ہیں"
+          }
+        }
+      }
+    },
+    "You are an Administrator of this Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are an Administrator of this Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ اس حلقے کے ایڈمنسٹریٹر ہیں"
+          }
+        }
+      }
+    },
+    "Make an Administrator of this Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make an Administrator of this Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حلقے کا ایڈمنسٹریٹر بنائیں"
+          }
+        }
+      }
+    },
+    "Make an Admin of this Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make an Admin of this Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حلقے کا ایڈمن بنائیں"
+          }
+        }
+      }
+    },
+    "Last seen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last seen"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آخری بار دیکھے گئے"
+          }
+        }
+      }
+    },
+    "Super admin: everything, in every Halqah, including making Halqahs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Super admin: everything, in every Halqah, including making Halqahs"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سپر ایڈمن: حلقے بنانے سمیت ہر حلقے میں سب کچھ"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

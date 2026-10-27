@@ -1,10 +1,10 @@
 import SwiftUI
 import UIKit
 
-// A group's people, run by its admins from the phone: who is in the group,
-// adding someone by email or by a code sent to their phone, making and
-// unmaking the group's admins, removing people, and withdrawing invitations
-// nobody has used yet.
+// A Halqah's people, run from the phone: who is in it, adding someone by
+// email or by a code sent to their phone, setting roles, removing people, and
+// withdrawing invitations nobody has used yet. Admins hand out Admin and
+// member; only Administrators and the Super admin deal with Administrators.
 
 @MainActor
 struct GroupPeopleView: View {
@@ -19,6 +19,8 @@ struct GroupPeopleView: View {
     @State private var working = false
     @State private var removing: GroupPerson?
 
+    private var appointer: Bool { people?.canAppointAdministrators == true }
+
     var body: some View {
         List {
             Section {
@@ -28,14 +30,18 @@ struct GroupPeopleView: View {
                     Label("Add people", systemImage: "person.badge.plus")
                 }
             } footer: {
-                Text("Add someone by email, or send an invitation code to their phone, as a member or as an admin of this group.")
+                Text("Add someone by email, or send an invitation code to their phone, as a member, an Admin or - if you may appoint them - an Administrator of this Halqah.")
             }
             if let error {
                 Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
             }
             if let people {
-                let admins = people.members.filter { $0.role != .member }
+                let seniors = people.members.filter { $0.role == .administrator || $0.role == .superadmin }
+                let admins = people.members.filter { $0.role == .admin }
                 let members = people.members.filter { $0.role == .member }
+                if !seniors.isEmpty {
+                    Section("Administrators") { ForEach(seniors) { personRow($0) } }
+                }
                 if !admins.isEmpty {
                     Section("Admins") { ForEach(admins) { personRow($0) } }
                 }
@@ -67,7 +73,9 @@ struct GroupPeopleView: View {
         .refreshable { await load() }
         .disabled(working)
         .sheet(isPresented: $adding, onDismiss: { Task { await load() } }) {
-            NavigationStack { AddGroupPersonView(groupID: groupID, groupName: groupName, service: service) }
+            NavigationStack {
+                AddGroupPersonView(groupID: groupID, groupName: groupName, service: service, canAppointAdministrators: appointer)
+            }
         }
         .confirmationDialog(
             "Remove from the group?",
@@ -96,25 +104,19 @@ struct GroupPeopleView: View {
                 }
             }
             Spacer(minLength: DISpacing.sm)
-            if person.role == .superadmin {
-                roleBadge("Super admin")
-            } else if person.role == .admin {
-                roleBadge("Admin")
+            if person.role != .member {
+                roleBadge(person.role.title)
             }
-            if person.isChangeable {
+            if person.isChangeable(byAppointer: appointer) {
                 Menu {
-                    if person.role == .admin {
-                        Button {
-                            Task { await act { try await service.setRole(.member, of: person.id, in: groupID) } }
-                        } label: {
-                            Label("Make a member", systemImage: "person")
-                        }
-                    } else {
-                        Button {
-                            Task { await act { try await service.setRole(.admin, of: person.id, in: groupID) } }
-                        } label: {
-                            Label("Make an admin of this group", systemImage: "person.badge.key")
-                        }
+                    if appointer && person.role != .administrator {
+                        roleButton("Make an Administrator of this Halqah", "person.badge.shield.checkmark", .administrator, person)
+                    }
+                    if person.role != .admin {
+                        roleButton("Make an Admin of this Halqah", "person.badge.key", .admin, person)
+                    }
+                    if person.role != .member {
+                        roleButton("Make a member", "person", .member, person)
                     }
                     Button(role: .destructive) {
                         removing = person
@@ -127,6 +129,14 @@ struct GroupPeopleView: View {
                         .accessibilityLabel(Text("Change \(person.displayName)"))
                 }
             }
+        }
+    }
+
+    private func roleButton(_ title: LocalizedStringKey, _ icon: String, _ role: GroupRole, _ person: GroupPerson) -> some View {
+        Button {
+            Task { await act { try await service.setRole(role, of: person.id, in: groupID) } }
+        } label: {
+            Label(title, systemImage: icon)
         }
     }
 
@@ -160,13 +170,15 @@ struct GroupPeopleView: View {
                 .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: DISpacing.sm)
-            if invitation.role == .admin { roleBadge("Admin") }
-            Button(role: .destructive) {
-                Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
-            } label: {
-                Text("Withdraw")
+            if invitation.role != .member { roleBadge(invitation.role.title) }
+            if invitation.role != .administrator || appointer {
+                Button(role: .destructive) {
+                    Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
+                } label: {
+                    Text("Withdraw")
+                }
+                .buttonStyle(.borderless)
             }
-            .buttonStyle(.borderless)
         }
     }
 
@@ -199,6 +211,8 @@ struct AddGroupPersonView: View {
     let groupID: String
     let groupName: String
     let service: MemberGroupService
+    /// Administrators and the Super admin may also add Administrators.
+    var canAppointAdministrators = false
 
     private enum Method: String, CaseIterable, Identifiable {
         case email = "Email"
@@ -274,10 +288,13 @@ struct AddGroupPersonView: View {
         Section {
             Picker("Role", selection: $role) {
                 Text("Member").tag(GroupRole.member)
-                Text("Admin of this group").tag(GroupRole.admin)
+                Text("Admin of this Halqah").tag(GroupRole.admin)
+                if canAppointAdministrators {
+                    Text("Administrator of this Halqah").tag(GroupRole.administrator)
+                }
             }
         } footer: {
-            Text("Admins post, approve drafts, run zikr and meetings, and add or remove people, in this group only.")
+            Text("Admins run everything in this Halqah: posts, zikr, meetings and people, and they can make other Admins. Administrators can do all of that and also appoint Administrators.")
         }
         if method != .email {
             Section {

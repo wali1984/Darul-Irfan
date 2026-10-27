@@ -94,28 +94,49 @@ export async function reconcileLive(env: Env, now = new Date()): Promise<void> {
     .filter(row => row.streaming === 1 && row.input_id && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS)
     .map(row => String(row.input_id)));
   const liveInput = streamInputs(env).find(id => streamingInputs.has(id) && reported.get(id) !== false);
-  await settleBroadcast(env, liveInput ? playbackURL(env, liveInput) : null, now);
+  // A fresh listener in the room means the room is open, stream or not.
+  const roomOpen = listeners.some(row => row.in_room === 1 && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS);
+  await settleBroadcast(env, liveInput ? playbackURL(env, liveInput) : null, roomOpen, now);
 
   for (const listener of listeners) await checkListener(env, listener, now);
 }
 
-async function settleBroadcast(env: Env, hubURL: string | null, now: Date): Promise<void> {
-  const row = await env.DB.prepare("SELECT state,source_mode,hub_stream_url FROM live_broadcasts WHERE id='official-live'")
-    .first<{ state: string; source_mode: string; hub_stream_url: string | null }>();
-  if (!row || row.source_mode === "manual" || row.hub_stream_url === hubURL) return;
+/** The room carries Daily Zikr in the evening and the Tahajjud zikr before
+ *  dawn, Pakistan time. */
+export function zikrTitle(now: Date): string {
+  const hour = (now.getUTCHours() + 5) % 24;
+  return hour < 7 ? "Tahajjud Zikr" : "Daily Zikr";
+}
+
+async function settleBroadcast(env: Env, hubURL: string | null, roomOpen: boolean, now: Date): Promise<void> {
+  const row = await env.DB.prepare("SELECT state,source_mode,hub_stream_url,room_open FROM live_broadcasts WHERE id='official-live'")
+    .first<{ state: string; source_mode: string; hub_stream_url: string | null; room_open: number }>();
+  if (!row || row.source_mode === "manual") return;
+  if (row.hub_stream_url === hubURL && (row.room_open === 1) === roomOpen) return;
   const at = now.toISOString();
+  const title = zikrTitle(now);
   if (hubURL) {
-    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=?,state='live',title='Daily Zikr',
+    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=?,room_open=?,state='live',title=?,
       started_at=CASE WHEN state='live' THEN started_at ELSE ? END,ended_at=NULL,updated_at=? WHERE id='official-live'`)
-      .bind(hubURL, at, at).run();
+      .bind(hubURL, roomOpen ? 1 : 0, title, at, at).run();
     // Whichever source goes live first announces it; the other sees "live".
     if (row.state !== "live") {
       await sendTopicPush(env, `hub-live:${at.slice(0, 16)}`, "liveZikr", "Daily Zikr has started",
         "Join the official daily zikr in Darul Irfan.", "darulirfan://live/official-live").catch(() => 0);
     }
+  } else if (roomOpen) {
+    // No stream to play in the app yet: the room itself is offered to join.
+    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=1,state='live',
+      title=CASE WHEN youtube_live=1 THEN title ELSE ? END,
+      started_at=CASE WHEN state='live' THEN started_at ELSE ? END,ended_at=NULL,updated_at=? WHERE id='official-live'`)
+      .bind(title, at, at).run();
+    if (row.state !== "live") {
+      await sendTopicPush(env, `room-open:${at.slice(0, 16)}`, "liveZikr", `${title} has started`,
+        "Join the zikr from Darul Irfan.", "darulirfan://live/official-live").catch(() => 0);
+    }
   } else {
     // The channel's live video, if it is on, keeps the broadcast live.
-    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=NULL,
+    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=0,
       state=CASE WHEN youtube_live=1 THEN state ELSE 'ended' END,
       ended_at=CASE WHEN youtube_live=1 THEN ended_at ELSE ? END,updated_at=? WHERE id='official-live'`)
       .bind(at, at).run();

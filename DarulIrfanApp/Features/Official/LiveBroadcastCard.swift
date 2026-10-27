@@ -3,6 +3,9 @@ import SwiftUI
 struct LiveBroadcastCard: View {
     let broadcast: LiveBroadcast
     let audioPlayer: any AudioPlayerServicing
+    /// A zikr session's time has come. With no stream to play here yet, the
+    /// zikr room itself is offered to join.
+    var sessionOpen = false
     @State private var presentedVideo: PresentedVideo?
     @Environment(\.openURL) private var openURL
 
@@ -105,18 +108,20 @@ struct LiveBroadcastCard: View {
             audioPlayer.play(item, queue: [item])
         case .youtube:
             if let videoID = source.videoID { presentedVideo = PresentedVideo(id: videoID) }
-        case .paltalk: break
+        case .paltalk: openURL(source.url)
         }
     }
 
-    /// What the app can play inside itself: its own audio stream, or the
-    /// live video. External rooms are not offered.
+    /// What the app plays inside itself - its own audio stream, or the live
+    /// video - and, only when neither is there, the zikr room while it is
+    /// open.
     private var displaySources: [LiveSource] {
-        broadcast.sources.filter { source in
+        let inApp = broadcast.sources.filter { $0.kind == .ownedStream || ($0.kind == .youtube && $0.videoID != nil) }
+        if !inApp.isEmpty || !(isLive || sessionOpen) { return inApp }
+        return broadcast.sources.filter { source in
             switch source.kind {
-            case .ownedStream: return true
-            case .youtube: return source.videoID != nil
-            case .paltalk: return false
+            case .ownedStream, .youtube: return false
+            case .paltalk: return !source.url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/")).isEmpty
             }
         }
     }
@@ -125,10 +130,10 @@ struct LiveBroadcastCard: View {
         switch broadcast.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
     }
     private func label(for source: LiveSource) -> LocalizedStringKey {
-        switch source.kind { case .ownedStream, .youtube, .paltalk: return "Join Daily Zikr" }
+        switch source.kind { case .ownedStream, .youtube: return "Join Daily Zikr"; case .paltalk: return "Join Zikr" }
     }
     private func icon(for source: LiveSource) -> String {
-        switch source.kind { case .ownedStream: return "headphones"; case .youtube: return "play.rectangle.fill"; case .paltalk: return "arrow.up.right.square" }
+        switch source.kind { case .ownedStream: return "headphones"; case .youtube: return "play.rectangle.fill"; case .paltalk: return "person.3.fill" }
     }
 }
 

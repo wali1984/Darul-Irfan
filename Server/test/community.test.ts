@@ -25,8 +25,9 @@ async function setup(overrides: Partial<Env> = {}) {
     { id: "c".repeat(32), role: "superadmin", token: "3".repeat(64), groups: [] as string[] },
   ];
   for (const person of people) {
-    raw.prepare("INSERT INTO members(id,apple_subject,display_name,created_at,last_seen_at,role) VALUES(?,?,?,?,?,?)")
-      .run(person.id, `invite:${person.id}`, person.role, now, now, person.role);
+    // Super admin comes from the address list alone, as it does live.
+    raw.prepare("INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at) VALUES(?,?,?,?,?,?)")
+      .run(person.id, `invite:${person.id}`, person.role, person.role === "superadmin" ? "owner@example.com" : null, now, now);
     raw.prepare("INSERT INTO member_sessions(token_hash,member_id,created_at,expires_at,last_seen_at) VALUES(?,?,?,?,?)")
       .run(await sha256(person.token), person.id, now, later, now);
     for (const group of person.groups) {
@@ -35,7 +36,7 @@ async function setup(overrides: Partial<Env> = {}) {
     }
   }
   const env = {
-    DB: db, APNS_TOPIC: "us.naqshbaniaowaisiah", PUBLIC_BASE_URL: "https://api.example.com",
+    DB: db, APNS_TOPIC: "us.naqshbaniaowaisiah", PUBLIC_BASE_URL: "https://api.example.com", SUPER_ADMIN_EMAILS: "owner@example.com",
     WHATSAPP_APP_SECRET: SECRET, WHATSAPP_CHANNEL_URL: "https://whatsapp.com/channel/x",
     WHATSAPP_ALLOWED_SENDERS: "923001111111,923002222222",
     ...overrides,
@@ -579,5 +580,90 @@ describe("recorded rooms", () => {
 
     await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
     expect(calls).toContain("PUT /recordings/r-2");
+  });
+});
+
+describe("administrators and Halqahs", () => {
+  const A = "a".repeat(32), B = "b".repeat(32), C = "c".repeat(32);
+  const roleOf = async (call: (t: string, m: string, p: string, b?: unknown) => Promise<Response>, token: string, id: string) =>
+    ((await (await call(token, "GET", "/v1/groups/usa/people")).json()) as { members: { id: string; role: string }[] })
+      .members.find(person => person.id === id)?.role;
+
+  it("lets only Administrators and the Super admin make, change or remove Administrators", async () => {
+    const { raw, call, member, admin, superAdmin } = await setup();
+    // An Admin makes Admins, not Administrators.
+    expect((await call(admin, "PUT", `/v1/groups/usa/people/${A}`, { role: "administrator" })).status).toBe(403);
+    expect((await call(admin, "POST", "/v1/groups/usa/people", { role: "administrator" })).status).toBe(403);
+    expect((await call(admin, "PUT", `/v1/groups/usa/people/${A}`, { role: "admin" })).status).toBe(200);
+    // The Super admin makes the first Administrator.
+    expect((await call(superAdmin, "PUT", `/v1/groups/usa/people/${B}`, { role: "administrator" })).status).toBe(200);
+    expect(await roleOf(call, superAdmin, B)).toBe("administrator");
+    const people = (await (await call(admin, "GET", "/v1/groups/usa/people")).json()) as { canAppointAdministrators: boolean; members: { id: string }[] };
+    expect(people.canAppointAdministrators).toBe(true);
+    expect(people.members[0]?.id).toBe(B);
+    // The Administrator (b) now appoints another; an Admin (a) cannot undo it.
+    expect((await call(admin, "PUT", `/v1/groups/usa/people/${A}`, { role: "administrator" })).status).toBe(200);
+    raw.prepare("UPDATE member_group_members SET role='admin' WHERE member_id=?").run(B);
+    expect((await call(admin, "PUT", `/v1/groups/usa/people/${A}`, { role: "member" })).status).toBe(403);
+    expect((await call(admin, "DELETE", `/v1/groups/usa/people/${A}`)).status).toBe(403);
+    expect(((await (await call(admin, "GET", "/v1/groups/usa/people")).json()) as { canAppointAdministrators: boolean }).canAppointAdministrators).toBe(false);
+    // An Administrator of one Halqah has nothing in another.
+    expect((await call(member, "GET", "/v1/groups/canada/people")).status).toBe(404);
+    // Roles reach the app: the highest one, and each Halqah's own.
+    const me = (await (await call(member, "GET", "/v1/members/me")).json()) as { role: string };
+    expect(me.role).toBe("administrator");
+    const groups = (await (await call(member, "GET", "/v1/groups")).json()) as { groups: { id: string; myRole: string; canManage: boolean }[] };
+    expect(groups.groups).toMatchObject([{ id: "usa", myRole: "administrator", canManage: true }]);
+  });
+
+  it("makes Administrators by code, and never makes a Super admin from a stored role or a code", async () => {
+    const { env, raw, call, member, superAdmin } = await setup();
+    const { code } = (await (await call(superAdmin, "POST", "/v1/groups/usa/people", { role: "administrator" })).json()) as { code: string };
+    const redeemed = await worker.fetch(new Request("https://api.example.com/v1/members/invite", {
+      method: "POST", headers: { authorization: `Bearer ${member}`, "content-type": "application/json" }, body: JSON.stringify({ code }),
+    }), env);
+    expect(redeemed.status).toBe(201);
+    expect(await roleOf(call, superAdmin, A)).toBe("administrator");
+    // A later member code does not demote.
+    const second = (await (await call(superAdmin, "POST", "/v1/groups/usa/people", { role: "member" })).json()) as { code: string };
+    await worker.fetch(new Request("https://api.example.com/v1/members/invite", {
+      method: "POST", headers: { authorization: `Bearer ${member}`, "content-type": "application/json" }, body: JSON.stringify({ code: second.code }),
+    }), env);
+    expect(await roleOf(call, superAdmin, A)).toBe("administrator");
+    // A stored 'superadmin' is nothing without a listed address.
+    raw.prepare("UPDATE members SET role='superadmin' WHERE id=?").run(A);
+    expect(((await (await call(member, "GET", "/v1/members/me")).json()) as { role: string }).role).toBe("administrator");
+    expect((await call(member, "GET", "/v1/groups/canada")).status).toBe(404);
+  });
+
+  it("lets the Super admin make, rename and retire Halqahs and place anyone in any of them", async () => {
+    const { raw, call, member, admin, superAdmin } = await setup();
+    expect((await call(admin, "POST", "/v1/groups", { name: "New York" })).status).toBe(403);
+    const made = await call(superAdmin, "POST", "/v1/groups", { name: "New York", description: "Halqah of New York" });
+    expect(made.status).toBe(201);
+    const { id } = (await made.json()) as { id: string };
+    expect(id).toBe("new-york");
+    expect((await call(superAdmin, "POST", "/v1/groups", { name: "new york" })).status).toBe(409);
+    expect((await call(superAdmin, "PUT", `/v1/groups/${id}`, { name: "New York City" })).status).toBe(200);
+
+    // Everyone who has signed in, with their Halqahs; only for the Super admin.
+    expect((await call(admin, "GET", "/v1/members")).status).toBe(403);
+    const directory = (await (await call(superAdmin, "GET", "/v1/members")).json()) as {
+      members: { id: string; isSuperAdmin: boolean; halqahs: { groupID: string; role: string }[] }[];
+    };
+    expect(directory.members.find(person => person.id === B)?.halqahs).toEqual([{ groupID: "usa", groupName: "United States", role: "admin" }]);
+    expect(directory.members.find(person => person.id === C)?.isSuperAdmin).toBe(true);
+    // Placed from the directory, as an Administrator of the new Halqah.
+    expect((await call(admin, "POST", `/v1/groups/usa/people`, { memberID: A })).status).toBe(403);
+    expect((await call(superAdmin, "POST", `/v1/groups/${id}/people`, { memberID: A, role: "administrator" })).status).toBe(201);
+    const groups = (await (await call(member, "GET", "/v1/groups")).json()) as { groups: { id: string; name: string; myRole: string }[] };
+    expect(groups.groups.find(group => group.id === id)).toMatchObject({ name: "New York City", myRole: "administrator" });
+
+    expect((await call(member, "DELETE", `/v1/groups/${id}`)).status).toBe(403);
+    expect((await call(superAdmin, "DELETE", `/v1/groups/${id}`)).status).toBe(204);
+    const after = (await (await call(member, "GET", "/v1/groups")).json()) as { groups: { id: string }[] };
+    expect(after.groups.map(group => group.id)).toEqual(["usa"]);
+    // Retired, not deleted: its people are kept.
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM member_group_members WHERE group_id=?").get(id)).toEqual({ n: 1 });
   });
 });

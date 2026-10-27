@@ -1,3 +1,4 @@
+import { halqahRole, type HalqahRole } from "./community";
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from "jose";
 import type { Env } from "./contracts";
 import { cleanText, json, sha256, validHTTPURL } from "./util";
@@ -189,10 +190,12 @@ export async function publishGroupPost(
  *  have. `promoteOnly` never lowers an admin to member (a member code handed
  *  to an admin must not demote them). */
 export async function upsertMembership(
-  env: Env, groupID: string, memberID: string, role: "member" | "admin", addedBy: string, promoteOnly: boolean,
+  env: Env, groupID: string, memberID: string, role: HalqahRole, addedBy: string, promoteOnly: boolean,
 ): Promise<void> {
+  // promoteOnly keeps the higher of the two roles: a code never demotes.
+  const rank = (column: string) => `CASE ${column} WHEN 'administrator' THEN 2 WHEN 'admin' THEN 1 ELSE 0 END`;
   const update = promoteOnly
-    ? "role=CASE WHEN excluded.role='admin' THEN 'admin' ELSE member_group_members.role END"
+    ? `role=CASE WHEN ${rank("excluded.role")} > ${rank("member_group_members.role")} THEN excluded.role ELSE member_group_members.role END`
     : "role=excluded.role";
   await env.DB.prepare(`INSERT INTO member_group_members(group_id,member_id,added_at,added_by,role) VALUES(?,?,?,?,?)
     ON CONFLICT(group_id,member_id) DO UPDATE SET ${update}`)
@@ -205,7 +208,7 @@ export async function claimEmailGrants(env: Env, memberID: string, email: string
   const grants = await env.DB.prepare("SELECT id,group_id,role,created_by FROM member_group_grants WHERE email=? AND claimed_at IS NULL")
     .bind(address).all<{ id: string; group_id: string; role: string; created_by: string }>();
   for (const grant of grants.results ?? []) {
-    await upsertMembership(env, grant.group_id, memberID, grant.role === "admin" ? "admin" : "member", grant.created_by, true);
+    await upsertMembership(env, grant.group_id, memberID, halqahRole(grant.role), grant.created_by, true);
     await env.DB.prepare("UPDATE member_group_grants SET claimed_by=?,claimed_at=? WHERE id=?")
       .bind(memberID, new Date().toISOString(), grant.id).run();
   }
@@ -256,7 +259,7 @@ export function generateInviteCode(): string {
  *  its admin. The code is returned once and never stored - only its hash is
  *  kept, so a leaked database cannot admit anyone. */
 export async function mintInvite(
-  env: Env, actor: string, groupID: string, days: number, label: string | null, grantsRole: "admin" | "superadmin" | null,
+  env: Env, actor: string, groupID: string, days: number, label: string | null, grantsRole: "admin" | "administrator" | null,
 ): Promise<{ code: string; expiresAt: string }> {
   const code = generateInviteCode();
   const now = new Date();
@@ -279,7 +282,7 @@ export async function createInvite(
   if (!Number.isInteger(days) || days < 1 || days > 365) {
     return json({ error: "expiresInDays must be a whole number from 1 to 365" }, { status: 400 });
   }
-  const grantsRole = input.grantsRole === "admin" || input.grantsRole === "superadmin" ? input.grantsRole : null;
+  const grantsRole = input.grantsRole === "admin" || input.grantsRole === "administrator" ? input.grantsRole : null;
   const { code } = await mintInvite(env, actor, groupID, days, cleanText(input.label, 120) ?? null, grantsRole);
   // Shown to the admin once, to pass to the person it is for.
   return json({ ok: true, groupID, code, expiresInDays: days, grantsRole: grantsRole ?? undefined }, { status: 201 });
@@ -328,12 +331,9 @@ export async function redeemInvite(request: Request, env: Env): Promise<Response
     if (!existing) await env.DB.prepare("DELETE FROM members WHERE id=?").bind(memberID).run();
     return refusal;
   }
-  // An admin code makes them admin of this group only. A role only ever goes
-  // up through a code: a member code given to an admin does not demote them.
-  if (row.grants_role === "superadmin") {
-    await env.DB.prepare("UPDATE members SET role='superadmin' WHERE id=?").bind(memberID).run();
-  }
-  await upsertMembership(env, row.group_id, memberID, row.grants_role === "admin" ? "admin" : "member", "invite", true);
+  // A code gives its role in this Halqah only. A role only ever goes up
+  // through a code: a member code given to an Admin does not demote them.
+  await upsertMembership(env, row.group_id, memberID, halqahRole(row.grants_role), "invite", true);
 
   const token = hexOf(crypto.getRandomValues(new Uint8Array(32)));
   const expires = new Date(now.getTime() + SESSION_DAYS * 86_400_000).toISOString();

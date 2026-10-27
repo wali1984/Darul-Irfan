@@ -15,6 +15,7 @@ import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from ".
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
 import { autoplayDue, checkIn, controlSession, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
 import { collectRoomRecordings } from "./roomRecordings";
+import { createHalqah, memberDirectory, retireHalqah, updateHalqah } from "./halqahs";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -72,6 +73,9 @@ async function route(request: Request, env: Env): Promise<Response> {
     const body = async () => (request.headers.get("content-type") ?? "").includes("json")
       ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
     if (request.method === "GET" && path === "/v1/groups") return communityGroups(env, member);
+    // The Super admin's: make a Halqah, and everyone who has signed in.
+    if (request.method === "POST" && path === "/v1/groups") return createHalqah(env, member, await body());
+    if (request.method === "GET" && path === "/v1/members") return memberDirectory(env, member);
     if (request.method === "GET" && path === "/v1/members/me") return me(env, member);
     if (request.method === "POST" && path === "/v1/members/devices") return registerMemberDevice(env, member, await body());
     // Apple requires an account made in the app to be deletable from inside it.
@@ -81,6 +85,8 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (!section && request.method === "GET") return groupDetail(env, member, groupID);
+    if (!section && request.method === "PUT") return updateHalqah(env, member, groupID, await body());
+    if (!section && request.method === "DELETE") return retireHalqah(env, member, groupID);
     if (section === "posts" && !entity && request.method === "GET") {
       const limit = Number(url.searchParams.get("limit") ?? 30);
       if (!Number.isInteger(limit) || limit < 1 || limit > 100) return json({ error: "Limit must be an integer from 1 to 100" }, { status: 400 });

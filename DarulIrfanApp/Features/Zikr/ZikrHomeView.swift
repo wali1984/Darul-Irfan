@@ -36,7 +36,7 @@ struct ZikrHomeView: View {
                     .diAppear(delay: 0.05)
 
                 DISectionHeader(titleKey: "Daily Zikr", systemImage: "dot.radiowaves.left.and.right")
-                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer)
+                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer, sessionOpen: sessionOpen)
                     .diAppear(delay: 0.08)
 
                 DISectionHeader(titleKey: "Online Zikr", systemImage: "clock")
@@ -140,6 +140,18 @@ struct ZikrHomeView: View {
 
 /// A living gradient header carrying Qur'an 13:28 — the verse of remembrance
 /// that anchors the whole app and this section in particular.
+extension ZikrHomeView {
+    /// From ten minutes before a session until half an hour after its end.
+    var sessionOpen: Bool {
+        let now = Date()
+        return viewModel.sessions.contains { session in
+            guard let start = ZikrScheduleMath.currentOrNextOccurrence(of: session, at: now.addingTimeInterval(-1_800)) else { return false }
+            let end = start.addingTimeInterval(TimeInterval(session.durationMinutes * 60 + 1_800))
+            return now >= start.addingTimeInterval(-600) && now <= end
+        }
+    }
+}
+
 private struct ZikrHeroHeader: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -293,7 +305,7 @@ private struct ZikrSessionCard: View {
                 // Joining happens in the app: the live zikr plays above, in
                 // the Daily Zikr card. Joining steps and links for an outside
                 // service, which older schedules carried, are not shown.
-                Label("Watch it live here in Darul Irfan when it begins.", systemImage: "play.rectangle")
+                Label("Join Zikr when it begins.", systemImage: "person.3.fill")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)

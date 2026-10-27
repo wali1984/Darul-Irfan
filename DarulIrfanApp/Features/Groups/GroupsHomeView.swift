@@ -128,7 +128,16 @@ struct GroupsHomeView: View {
     @State private var isConfirmingDelete = false
     @State private var inviteCode = ""
     @State private var isShowingHowItWorks = true
+    @State private var editing: HalqahEdit?
+    @State private var retiring: MemberGroup?
+    @State private var retireError: String?
     @FocusState private var isCodeFocused: Bool
+
+    /// A Halqah being made (nil group) or edited, by the Super admin.
+    private struct HalqahEdit: Identifiable {
+        var group: MemberGroup?
+        var id: String { group?.id ?? "new" }
+    }
 
     var body: some View {
         ScrollView {
@@ -142,6 +151,7 @@ struct GroupsHomeView: View {
                         .padding(.top, DISpacing.lg)
                 case .ready:
                     if model.role != .member { roleCard }
+                    if model.role == .superadmin { superAdminCard }
                     if model.groups.isEmpty { awaitingApprovalCard } else { groupList }
                     // Another code (a second group, or an admin role) adds to
                     // this same account.
@@ -159,6 +169,59 @@ struct GroupsHomeView: View {
         .diPageHeading("Private groups")
         .task { await model.start() }
         .refreshable { await model.refresh() }
+        .sheet(item: $editing, onDismiss: { Task { await model.refresh() } }) { edit in
+            NavigationStack { HalqahEditor(service: model.service, halqah: edit.group) }
+        }
+        .confirmationDialog(
+            "Retire this Halqah?",
+            isPresented: Binding(get: { retiring != nil }, set: { if !$0 { retiring = nil } }),
+            titleVisibility: .visible,
+            presenting: retiring
+        ) { group in
+            Button("Retire \(group.name)", role: .destructive) {
+                Task {
+                    do {
+                        try await model.service.retireHalqah(group.id)
+                        retireError = nil
+                    } catch {
+                        retireError = error.localizedDescription
+                    }
+                    await model.refresh()
+                }
+            }
+        } message: { _ in
+            Text("It disappears for everyone. Its people, posts and history are kept.")
+        }
+    }
+
+    /// The Super admin's own tools.
+    private var superAdminCard: some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Label("Super admin", systemImage: "crown")
+                    .font(.headline)
+                Button {
+                    editing = HalqahEdit(group: nil)
+                } label: {
+                    Label("New Halqah", systemImage: "plus.circle")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.bordered)
+                NavigationLink {
+                    MemberDirectoryView(service: model.service, halqahs: model.groups)
+                } label: {
+                    Label("Everyone who has signed in", systemImage: "person.3.sequence")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.bordered)
+                Text("Press and hold a Halqah to rename or retire it.")
+                    .font(.caption)
+                    .foregroundStyle(DIColor.textMuted)
+                if let retireError {
+                    Text(verbatim: retireError).font(.footnote).foregroundStyle(DIColor.danger)
+                }
+            }
+        }
     }
 
     private var signInCard: some View {
@@ -320,8 +383,12 @@ struct GroupsHomeView: View {
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
-                                if group.canManage == true {
-                                    Label("You are an admin of this group", systemImage: "person.badge.key")
+                                if group.myRole == .administrator {
+                                    Label("You are an Administrator of this Halqah", systemImage: "person.badge.shield.checkmark")
+                                        .font(.caption)
+                                        .foregroundStyle(DIColor.accent)
+                                } else if group.myRole == .admin || (group.myRole == nil && group.canManage == true) {
+                                    Label("You are an Admin of this Halqah", systemImage: "person.badge.key")
                                         .font(.caption)
                                         .foregroundStyle(DIColor.accent)
                                 }
@@ -336,18 +403,29 @@ struct GroupsHomeView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .contextMenu {
+                    if model.role == .superadmin {
+                        Button("Rename or describe", systemImage: "pencil") { editing = HalqahEdit(group: group) }
+                        Button("Retire this Halqah", systemImage: "archivebox", role: .destructive) { retiring = group }
+                    }
+                }
             }
         }
     }
 
     private var roleCard: some View {
         DICard {
-            Label(model.role == .superadmin
-                  ? "Super admin: you can post, approve and run zikr and meetings in every group."
-                  : "Group admin: you can post, approve and run zikr and meetings in your groups.",
-                  systemImage: "person.badge.key.fill")
+            Label(roleSummary, systemImage: "person.badge.key.fill")
                 .font(.subheadline)
                 .foregroundStyle(DIColor.textPrimary)
+        }
+    }
+
+    private var roleSummary: LocalizedStringKey {
+        switch model.role {
+        case .superadmin: "Super admin: everything, in every Halqah. You make Halqahs and place anyone in any of them."
+        case .administrator: "Administrator: you run your Halqah, its people and its Admins, and appoint Administrators."
+        case .admin, .member: "Admin: you run your Halqah - posts, zikr, meetings and people - and can make other Admins."
         }
     }
 

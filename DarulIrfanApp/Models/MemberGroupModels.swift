@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 /// Whether the private regional groups are reachable in this build.
 ///
@@ -40,14 +41,25 @@ struct MemberGroup: Codable, Sendable, Identifiable, Equatable, Hashable {
     /// Whether a zikr or meeting is live in this group right now.
     var isLive: Bool? = nil
     var liveKind: String? = nil
+    /// The signed-in member's role here; absent from an older server.
+    var myRole: GroupRole? = nil
 }
 
 /// A member's role in the groups. Admins run their own groups; the super
 /// admin runs every group.
+/// The member's highest role. Super admin is only the configured addresses.
 enum MemberRole: String, Codable, Sendable {
     case member
     case admin
+    case administrator
     case superadmin
+
+    /// A role this build does not know reads as member rather than failing
+    /// the whole list.
+    init(from decoder: Decoder) throws {
+        let raw = try decoder.singleValueContainer().decode(String.self)
+        self = MemberRole(rawValue: raw) ?? .member
+    }
 }
 
 /// What is live in a group: a zikr or a meeting, watched and joined in the app.
@@ -304,8 +316,18 @@ struct MemberSession: Codable, Sendable {
 
 /// A member's place in a group. A role this build does not know reads as
 /// member, so a new server role never fails the whole list.
-enum GroupRole: String, Codable, Sendable {
-    case member, admin, superadmin
+/// A role in one Halqah, lowest first; `superadmin` marks the Super admin.
+enum GroupRole: String, Codable, Sendable, Hashable {
+    case member, admin, administrator, superadmin
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .member: "Member"
+        case .admin: "Admin"
+        case .administrator: "Administrator"
+        case .superadmin: "Super admin"
+        }
+    }
 
     init(from decoder: Decoder) throws {
         let raw = try decoder.singleValueContainer().decode(String.self)
@@ -314,8 +336,33 @@ enum GroupRole: String, Codable, Sendable {
 }
 
 struct GroupPeople: Decodable, Sendable, Equatable {
+    /// Whether the viewer may make, change or remove Administrators.
+    var canAppointAdministrators: Bool?
     var members: [GroupPerson]
     var invitations: [GroupInvitation]
+}
+
+/// Everyone who has signed in, for the Super admin.
+struct MemberDirectory: Decodable, Sendable {
+    var members: [DirectoryPerson]
+}
+
+struct DirectoryPerson: Decodable, Sendable, Identifiable, Equatable, Hashable {
+    struct Place: Decodable, Sendable, Equatable, Hashable {
+        var groupID: String
+        var groupName: String
+        var role: GroupRole
+    }
+
+    var id: String
+    var name: String?
+    var email: String?
+    var lastSeenAt: Date?
+    var isSuperAdmin: Bool
+    var isYou: Bool
+    var halqahs: [Place]
+
+    var displayName: String { name ?? email ?? String(localized: "Member") }
 }
 
 struct GroupPerson: Decodable, Sendable, Identifiable, Equatable {
@@ -327,9 +374,11 @@ struct GroupPerson: Decodable, Sendable, Identifiable, Equatable {
     var isYou: Bool
 
     var displayName: String { name ?? email ?? String(localized: "Member") }
-    /// Admins cannot change themselves or a super admin; the server enforces
-    /// the same rule.
-    var isChangeable: Bool { !isYou && role != .superadmin }
+    /// Nobody changes themselves or a Super admin, and only those who may
+    /// appoint Administrators change one; the server enforces the same rule.
+    func isChangeable(byAppointer appointer: Bool) -> Bool {
+        !isYou && role != .superadmin && (role != .administrator || appointer)
+    }
 }
 
 /// An email added ahead of sign-in, or a code not yet used.
