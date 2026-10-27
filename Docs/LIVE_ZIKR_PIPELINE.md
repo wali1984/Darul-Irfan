@@ -1,113 +1,122 @@
 # Live zikr: one source, every destination, nothing manual
 
-Proposal for decision, 2026-10-27.
+Revised 2026-10-27 after the owner's constraints:
 
-## Today
-
-Hazrat Ji leads the zikr in the Paltalk room "OURSHEIKH". Separately, someone
-starts a YouTube Live and a Facebook Live by hand. If that person is late or
-something fails, viewers outside Paltalk get nothing, and nobody is told.
+- **Nothing can be installed where the zikr is led.** Hazrat Ji may lead from
+  a PC, a laptop or a phone, any of them, at any time.
+- **Live only.** Nothing is recorded or replayed.
+- **No dependence on any one device.** The system joins, captures and
+  delivers on its own.
+- **Approved:** Cloudflare Stream at $5 a month.
 
 ## The constraint that shapes everything
 
-Paltalk publishes no API, and its support is limited. Nothing outside Paltalk
-can start, read or receive a Paltalk room programmatically. The only way to
-take a Paltalk session's sound elsewhere is to capture it from a computer
-running the Paltalk app: either the computer the zikr is led from, or a
-second computer that joins as a listener.
+Paltalk publishes no API and has no browser version: it is an app for
+Windows, Mac, iOS and Android only (checked on paltalk.com, 2026-10-27).
+Nothing can read a Paltalk room except a Paltalk app that has joined it. With
+nothing installable on Hazrat Ji's side, the only device-independent source
+is **our own Paltalk listener, running in the cloud**, that joins the room
+like any member and carries its sound on.
 
-## Recommendation: capture at the source, fan out through one hub
+## Design: two independent cloud listeners, one hub
 
 ```
- Hazrat Ji's mic ─┬─► Paltalk (unchanged, room OURSHEIKH)
-                  │
-                  └─► Encoder on the same PC (OBS) ──SRT──► Cloudflare Stream (hub)
-                          │                                     ├──► YouTube Live   (automatic)
-                          │                                     ├──► Facebook Live  (automatic)
-                          │                                     └──► App (in-app player, fallback)
-                          └──RTMP backup──────────────────────► YouTube (direct, if the hub fails)
+ Hazrat Ji (any device) ──► Paltalk room "OURSHEIKH"
+                               │            │
+                 listener A ◄──┘            └──► listener B
+         (cloud Windows server,                (second cloud Windows server,
+          provider 1, Paltalk                   provider 2, own Paltalk
+          listener account 1)                   listener account 2)
+                 │                                    │
+            SRT, live only                       SRT, live only
+                 ▼                                    ▼
+     Cloudflare Stream input A            Cloudflare Stream input B
+       (recording off)                      (recording off)
+          ├─► YouTube  primary ingest          ├─► YouTube  backup ingest
+          ├─► Facebook primary                 ├─► Facebook backup
+          └─► app (fallback player)            └─► app (fallback player)
 
- Live Agent (small program on the same PC)
-   - knows the zikr times from our server
-   - sees the Paltalk room open (window "OURSHEIKH") and sound on the mic
-   - starts the encoder, restarts it if it crashes, stops it after the room closes
-   - reports a heartbeat to our server every 30 s
-
- Our server (Cloudflare Worker)
-   - hears "stream connected" from the hub -> marks Daily Zikr live everywhere,
-     pushes "Daily Zikr has started" to the app
-   - 3 minutes into a zikr window with nothing live -> alerts the admins
-     (app notification and a WhatsApp message from the Business number)
+ Our server (Cloudflare Worker): zikr times, health of both listeners, live
+ state for the app and every group, "Daily Zikr has started" notifications,
+ alerts to admins when something fails.
 ```
 
-Why this, and not a Paltalk bot on a server:
+Each listener is a small Windows server running:
 
-| | Capture at the source (recommended) | Paltalk listener bot on a VPS |
-|---|---|---|
-| Sound quality | Original microphone, encoded once | Paltalk's compressed audio, re-encoded |
-| Moving parts | One PC that is already on for the zikr | A second, unattended Windows machine logging in to Paltalk |
-| Breaks when | The zikr PC loses internet (Paltalk breaks too) | Paltalk changes its app, asks for a login or captcha, shows a popup, or flags the account |
-| Paltalk terms | Not involved | Automating a client account is at risk of a ban |
-| Cost | Nothing extra on the PC | A Windows VPS, about $30-60 a month |
+1. **Paltalk** signed in with its own listener account.
+2. **The Darul Irfan listener agent**, which:
+   - fetches the zikr times from our server;
+   - from a few minutes before each window, looks for the room - Paltalk
+     lists OURSHEIKH only while a session is running - and joins it the moment
+     it appears, muted;
+   - captures the room's sound (and the speaker's camera if one is on), puts
+     it over a Daily Zikr frame for the video platforms, and streams it live;
+   - stops when the room closes;
+   - restarts Paltalk or the stream if either stalls, dismisses Paltalk's
+     popups, and reports a heartbeat to our server every 30 seconds.
 
-The bot stays as the fallback for a session led from a machine where nothing
-can be installed.
+YouTube and Facebook both accept a primary and a backup stream for the same
+broadcast. Listener A feeds the primary ingest and listener B the backup, so
+either can fail without the broadcast ending. The app plays the YouTube stream
+in its own player (free at any number of viewers, no platform named) and
+falls back to whichever Cloudflare input is live.
 
 ## Failure handling, layer by layer
 
 | What fails | What happens |
 |---|---|
-| Nobody starts it | The Live Agent starts it when the room opens in a zikr window |
-| Encoder crashes | The agent restarts it within seconds |
-| Cloudflare hub unreachable | The encoder's direct backup keeps YouTube live; the app plays YouTube |
-| YouTube rejects the stream | Facebook and the app still receive it from the hub |
-| The zikr PC's internet drops | A phone at Dar-ul-Irfan on mobile data, with a broadcast app preset to the hub's backup input, takes over with one tap; the server switches to whichever input is connected |
-| Nothing is live 3 min into a window | Admins are alerted on the app and by WhatsApp |
-| Everything above fails | The app says Daily Zikr has not started yet, never a broken player; the recording is posted when it arrives |
+| Nobody does anything | Nothing needs doing: the listeners join when the room opens |
+| Hazrat Ji switches device mid-session | The room continues; the listeners stay in it |
+| One listener server, its provider or its account fails | The other carries the broadcast; admins are told |
+| Paltalk's app freezes or shows a popup | The agent restarts or dismisses it within seconds |
+| Cloudflare Stream is down | The listeners switch to streaming straight to YouTube and Facebook |
+| YouTube is down | The app plays the Cloudflare stream; Facebook continues |
+| Both listeners are down | Admins are alerted within 2 minutes of the room opening, on the app and on WhatsApp |
+| The room never opens | The app says Daily Zikr has not started yet, never a broken player |
 
-## How the app plays it
+## What it cannot guarantee
 
-The app plays the YouTube live stream in its own player at any number of
-viewers for free, and names no platform. It switches to the hub's own stream
-automatically if the YouTube stream is unavailable, so viewers keep watching.
-Members who want to join the zikr together use the group room built in phase 1.
+As long as the source is Paltalk, one thing stays outside our control:
+Paltalk itself. A Paltalk update can change its app, and Paltalk may object
+to listener accounts that run unattended. Two listeners on different
+providers, constant health checks and alerts make a failure rare and
+immediately visible, but no design can promise a Paltalk session that
+Paltalk does not let us see. The only fully independent path is the one in
+"Later" below.
 
-## Cost (Cloudflare Stream)
+## Cost
 
-- Sending the stream in and fanning it out: free ingest, up to 50
-  destinations per input (simulcast pricing is not published; confirm before
-  committing).
-- Recording: $5 per 1,000 minutes stored. Two 45-minute sessions a day is
-  about 2,700 minutes a month: about $14 a month, less if recordings older
-  than 30 days are deleted (they stay on YouTube).
-- Viewers on the hub's own stream: $1 per 1,000 minutes watched, but only
-  while YouTube is down, because the app plays YouTube first.
-
-## Later: lead the zikr in the app
-
-Once members are used to the app, Hazrat Ji could lead in the app's own room,
-which can push the same stream to the hub, making Paltalk optional. Paltalk
-cannot receive an outside stream, so it would continue only in parallel.
+| Item | Monthly |
+|---|---|
+| Cloudflare Stream (recording off; viewers on the hub only while YouTube is down) | $5 (approved) |
+| Two small cloud Windows servers, different providers (2 vCPU, 4 GB; audio only, no GPU needed) | about $15-35 each |
+| Two Paltalk listener accounts | free |
 
 ## Decisions needed
 
-1. Which computer is the zikr led from, and is it Windows or Mac? Who can
-   install the encoder and the Live Agent on it?
-2. Access to the YouTube channel and Facebook page to create persistent stream
-   keys (a key that never changes, so nothing has to be set up per session).
-3. Approval of the Cloudflare Stream subscription (from $5 a month).
-4. Who should receive the "nothing is live" alert, by WhatsApp number.
+1. Approval of the two listener servers (about $30-70 a month together), or
+   one to start with and the second once the first is proven.
+2. Two Paltalk accounts for the listeners (ordinary free accounts).
+3. Access to create persistent stream keys on the YouTube channel and the
+   Facebook page, with backup ingest enabled.
+4. The WhatsApp numbers that receive failure alerts.
 
 ## Building it
 
-1. Hub: a Cloudflare Stream live input with primary and backup, simulcast to
-   YouTube and Facebook, recording on; Worker webhook for connected and
-   disconnected events; live state wired to the app and the groups.
-2. Monitoring: zikr-window watch in the Worker's existing 5-minute cron,
-   tightened to every minute inside windows; alerts.
-3. Live Agent: a small Windows program (and a Mac version if needed) using
-   OBS's built-in websocket control; it runs at login, watches for the room
-   and the mic, and keeps the encoder alive.
+1. Hub: two Cloudflare Stream live inputs, recording off, simulcast to
+   YouTube and Facebook (primary and backup), webhooks for connected and
+   disconnected; live state wired to the app and the groups.
+2. Listener agent (Windows): room watch and join, capture, stream, self-heal,
+   heartbeat; installed as a service so it survives reboots.
+3. Monitoring in the Worker: heartbeats, input status, zikr windows; alerts.
 4. App: in-app player with automatic fallback between the YouTube stream and
-   the hub's own.
-5. A full rehearsal at a real zikr time before anyone relies on it.
+   the hub's inputs.
+5. A rehearsal at real zikr times for a week, with one listener deliberately
+   switched off, before anyone relies on it.
+
+## Later: no outside dependency at all
+
+If Hazrat Ji ever leads in the app's own room (built in phase 1), the stream
+starts from Darul Irfan itself and Paltalk becomes one more audience. Paltalk
+cannot receive an outside stream, so Paltalk listeners would still need
+Paltalk in parallel.
