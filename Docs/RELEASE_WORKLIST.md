@@ -55,28 +55,28 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 
 | Item | Status |
 |---|---|
-| Today: one header (Gregorian + Hijri date, city, search, language) | todo |
-| Today: prayer panel — next prayer, countdown, all five times, reminder status, link to timetable | todo |
-| Today: quick tools row — Quran, Duas, Qibla, Tasbih, My Day, Focus | todo |
-| Today: My Day — next 3 tasks, Add, View all | todo |
-| Today: Continue reading / listening | todo |
-| Today: "Understand something today" (approved content only) | todo |
-| Today: upcoming zikr session / event | todo |
-| Azan: per-prayer muadhin, pre-azan reminder, iqamah-gap reminder | todo |
-| Notification status + "send a test reminder" | todo |
-| Monthly timetable + manual city | todo (verify existing) |
+| Today: one header (Gregorian + Hijri date, city, search, language) | done |
+| Today: prayer panel — next prayer, countdown, all five times, reminder status, link to timetable | done |
+| Today: quick tools row — Quran, Duas, Qibla, Tasbih, My Day, Focus | done |
+| Today: My Day — next 3 tasks, Add, View all | done |
+| Today: Continue reading / listening | done |
+| Today: "Understand something today" (approved content only) | done (topic of the day) |
+| Today: upcoming zikr session / event | done |
+| Azan: per-prayer muadhin, pre-azan reminder, iqamah-gap reminder | iqamah done; pre-azan existed; muadhin choice deferred - only two licensed recordings (general + Fajr), both playable |
+| Notification status + "send a test reminder" | done |
+| Monthly timetable + manual city | done (existed; manual cities now require a time zone) |
 | Hifz practice | done (v1.10.1) |
-| Situational duas, morning/evening collections | todo (verify sources) |
+| Situational duas, morning/evening collections | existing: morning/evening adhkar, masnoon, rabbana; situational set not added (needs a verified source) |
 | Tasbih | done (existing) |
-| Fasting record + Ramadan timings | todo |
-| My Day: tasks with date/time/repeat, prayer-relative reminders ("after Fajr") | todo |
-| My Day: private notes, optionally attached to a passage | todo |
-| My Day: focus timer that warns before the next prayer | todo |
-| My Day: weekly view, calendar export | todo |
-| Tools sheet | todo |
-| Reader-language model app-wide | todo |
-| Discover: topics, glossary, Roman-Urdu search | todo (verify) |
-| Five destinations Today/Read/Zikr/Discover/Community | todo (assess against current tabs) |
+| Fasting record + Ramadan timings | done |
+| My Day: tasks with date/time/repeat, prayer-relative reminders ("after Fajr") | done |
+| My Day: private notes, optionally attached to a passage | done (ayah notes) |
+| My Day: focus timer that warns before the next prayer | done |
+| My Day: weekly view, calendar export | done |
+| Tools sheet | done |
+| Reader-language model app-wide | done for Quran, topics, Ayah of the Day; hadith keeps its own language tabs |
+| Discover: topics, glossary, Roman-Urdu search | topics done; glossary and Roman-Urdu search not built |
+| Five destinations Today/Read/Zikr/Discover/Community | done |
 
 ## D. Constraints carried forward
 
@@ -86,6 +86,11 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 - Seed changes mirrored to all four platforms, manifest bumped, parity gate green.
 
 ## E. Operator actions (yours)
+
+- **Private groups do not work yet: the backend with the group routes is not
+  deployed** (`/v1/groups` and `/v1/members/invite` answer 404 on 2026-10-27).
+  In `Server/`: `npx wrangler login`, then `npm run db:migrate:remote`, then
+  `npm run deploy`. Until then the app's Join button cannot succeed.
 
 - Apply D1 migrations 0003 and 0004: `npm run db:migrate:remote` in `Server/`.
 - Run `ios-verify` after this pass; tag on green; run `ios-testflight`.
