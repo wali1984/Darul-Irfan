@@ -199,9 +199,10 @@ struct GroupsHomeView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     SignInWithAppleButton(.signIn) { request in
-                        // Only the name is requested. A group needs to know who
-                        // you are to an administrator, not how to contact you.
-                        request.requestedScopes = [.fullName]
+                        // The name tells an administrator who you are; the
+                        // email is how the server recognises its own admins.
+                        // Nothing is sent to anyone at that address.
+                        request.requestedScopes = [.fullName, .email]
                     } onCompletion: { result in
                         Task { await model.completeSignIn(result) }
                     }

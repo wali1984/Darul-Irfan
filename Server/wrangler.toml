@@ -13,8 +13,9 @@ FACEBOOK_PAGE_ID = "oursheikh.official"
 FACEBOOK_GRAPH_VERSION = "v25.0"
 APNS_TOPIC = "us.naqshbaniaowaisiah"
 # Holds every staff role on /admin (also needs to be allowed by the Cloudflare
-# Access policy in front of it).
-SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com"
+# Access policy in front of it), and is super admin in the app for a member
+# whose Apple sign-in carries one of these emails.
+SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com,wajidmahmood@hotmail.com"
 
 [[d1_databases]]
 binding = "DB"

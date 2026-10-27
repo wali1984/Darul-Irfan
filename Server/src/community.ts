@@ -22,8 +22,15 @@ const notFound = () => json({ error: "Not found" }, { status: 404 });
 const forbidden = () => json({ error: "Group admin role required" }, { status: 403 });
 
 export async function memberRole(env: Env, memberID: string): Promise<Role> {
-  const row = await env.DB.prepare("SELECT role FROM members WHERE id=?").bind(memberID).first<{ role: string }>();
+  const row = await env.DB.prepare("SELECT role,email FROM members WHERE id=?").bind(memberID)
+    .first<{ role: string; email: string | null }>();
+  // The email comes only from a verified Apple identity token, never from input.
+  if (row?.email && superAdminEmails(env).includes(row.email.trim().toLowerCase())) return "superadmin";
   return row?.role === "admin" || row?.role === "superadmin" ? row.role : "member";
+}
+
+function superAdminEmails(env: Env): string[] {
+  return (env.SUPER_ADMIN_EMAILS ?? "").split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
 }
 
 async function groupExists(env: Env, groupID: string): Promise<boolean> {

@@ -60,6 +60,15 @@ describe("community groups", () => {
     expect((await call(superAdmin, "GET", "/v1/groups/canada")).status).toBe(200);
   });
 
+  it("makes a member whose Apple email is a listed super admin a super admin", async () => {
+    const { call, raw, member } = await setup({ SUPER_ADMIN_EMAILS: "owner@example.com, Second@Example.com" } as Partial<Env>);
+    const role = async () => ((await (await call(member, "GET", "/v1/members/me")).json()) as { role: string }).role;
+    expect(await role()).toBe("member");
+    raw.prepare("UPDATE members SET email=? WHERE id=?").run("second@example.com", "a".repeat(32));
+    expect(await role()).toBe("superadmin");
+    expect((await call(member, "GET", "/v1/groups/canada")).status).toBe(200);
+  });
+
   it("lets admins publish and members only read", async () => {
     const { call, member, admin } = await setup();
     expect((await call(member, "POST", "/v1/groups/usa/posts", { title: "Hello" })).status).toBe(403);

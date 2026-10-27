@@ -16,7 +16,7 @@ settings:
   base:
     SWIFT_VERSION: "5.9"
     DEVELOPMENT_LANGUAGE: en
-    MARKETING_VERSION: "1.10.1"
+    MARKETING_VERSION: "1.11.0"
     CURRENT_PROJECT_VERSION: "45"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: "2SGPX6K5YB"
@@ -50,24 +50,13 @@ targets:
         com.apple.security.application-groups:
           - group.us.naqshbaniaowaisiah
         aps-environment: production
-        # com.apple.developer.applesignin is deliberately ABSENT. Build 47
-        # (ios-testflight, 1.10.0) failed at "Build signed archive" in 12
-        # seconds: with CODE_SIGN_STYLE=Manual the distribution profile must
-        # already carry every entitlement, and it cannot carry this one until
-        # Sign in with Apple is enabled on the App ID in the developer portal.
-        # ios-verify never catches it, because an unsigned build does not need
-        # a profile.
-        #
-        # TO TURN THE PRIVATE GROUPS ON:
-        #   1. Enable Sign in with Apple for us.naqshbaniaowaisiah in the
-        #      Apple Developer portal (Certificates, Identifiers & Profiles).
-        #   2. Restore the two lines below.
-        #   3. Set MemberGroupsFeature.isEnabled to true.
-        # Codemagic recreates the profile on the next run, so nothing else is
-        # needed.
-        #
-        # com.apple.developer.applesignin:
-        #   - Default
+        # Sign in with Apple was enabled on the App ID (877LXKBTYT) through the
+        # App Store Connect API on 2026-10-27. Build 47 failed when this
+        # entitlement was present without that capability: a manual-signing
+        # profile must carry every entitlement, and ios-verify (unsigned)
+        # cannot catch it. Codemagic recreates the profile on the next run.
+        com.apple.developer.applesignin:
+          - Default
 
   DarulIrfanWidgets:
     type: app-extension

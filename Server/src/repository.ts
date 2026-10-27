@@ -10,6 +10,10 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
     return { id: "official-live", state: "offline", title: "Daily Zikr", sources: [], updatedAt: new Date().toISOString() };
   }
   const sources: LiveBroadcast["sources"] = [];
+  // The hub is offered only while the channel's own live video is not on:
+  // the video is free to watch, the hub is paid per minute delivered.
+  const hub = row.youtube_live === 1 ? undefined : validHTTPURL(row.hub_stream_url);
+  if (hub) sources.push({ kind: "ownedStream", url: hub, supportsBackgroundAudio: true });
   const owned = validHTTPURL(row.owned_stream_url);
   const videoID = typeof row.youtube_video_id === "string" ? row.youtube_video_id : undefined;
   const paltalk = validHTTPURL(row.paltalk_url);

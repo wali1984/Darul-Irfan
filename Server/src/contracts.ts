@@ -109,6 +109,20 @@ export interface Env {
   REALTIME_API_TOKEN?: string;
   REALTIME_PRESET_HOST?: string;
   REALTIME_PRESET_MEMBER?: string;
+  /** Live zikr pipeline: the listeners' shared bearer token. */
+  LISTENER_TOKEN?: string;
+  /** Cloudflare Stream live input ids, in failover order ("A,B"). */
+  STREAM_INPUTS?: string;
+  /** Stream playback host, customer-<code>.cloudflarestream.com. */
+  STREAM_CUSTOMER_HOST?: string;
+  /** Secret Cloudflare sends with live input notifications. */
+  STREAM_WEBHOOK_SECRET?: string;
+  /** WhatsApp numbers told when part of the live pipeline fails. */
+  ALERT_WHATSAPP_NUMBERS?: string;
+  /** The WhatsApp Business number's id, to send those alerts from. */
+  WHATSAPP_PHONE_NUMBER_ID?: string;
+  /** Approved template (one body parameter) for alerts outside 24 hours. */
+  ALERT_WHATSAPP_TEMPLATE?: string;
 }
 
 /** A private regional group as its members see it. The catalogue of groups is

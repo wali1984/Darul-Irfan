@@ -14,8 +14,9 @@ Windows servers) where Paltalk Desktop is signed in with a listener account.
 
 Nothing is recorded here: the stream is live only.
 
-Joining the room automatically (the paltalk:// link with the room's id, or
-the room search) is added once the room has been observed during a session.
+Joining: Paltalk's room search finds a room only while it is open, so the
+agent repeats the search every 30 seconds and opens the room's tile the moment
+it appears. A listener account never talks; it only listens.
 
 Usage:
   listener_agent.py --once-test 20           # 20 s test to a local file
@@ -25,7 +26,9 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import array
 import json
+import os
 import queue
 import shutil
 import subprocess
@@ -36,11 +39,14 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+import psutil
 import pyaudiowpatch as pyaudio
 
 HERE = Path(__file__).resolve().parent
 FRAME = HERE / "daily_zikr_frame.png"
 RATE, CHANNELS, CHUNK = 48_000, 2, 1_024
+PALTALK = Path(os.environ.get("LOCALAPPDATA", "")) / "Paltalk" / "Paltalk.exe"
+SEARCH_EVERY = 30
 
 
 def log(message: str) -> None:
@@ -49,21 +55,80 @@ def log(message: str) -> None:
 
 # MARK: - Room detection
 
+def paltalk_window():
+    """Paltalk's main window, or None when Paltalk is not running."""
+    from pywinauto import Desktop
+    for window in Desktop(backend="uia").windows():
+        if (window.element_info.name or "") == "Paltalk":
+            return window
+    return None
+
+
+def ensure_paltalk() -> str | None:
+    """Starts Paltalk if it is not running. Returns a problem, or None."""
+    if any((proc.info.get("name") or "").lower() == "paltalk.exe" for proc in psutil.process_iter(["name"])):
+        return None if paltalk_window() else "Paltalk is running but its window is not available"
+    if not PALTALK.exists():
+        return "Paltalk is not installed"
+    subprocess.Popen([str(PALTALK)], close_fds=True)
+    log("Paltalk was not running; started it")
+    return "Paltalk was not running (started again)"
+
+
+def try_join(room: str) -> bool:
+    """Searches the room and opens its tile if it is listed (only while the
+    room is open). The text goes in through accessibility, not typed keys, so
+    nothing lands in another window."""
+    window = paltalk_window()
+    if window is None:
+        return False
+    try:
+        if window.is_minimized():
+            window.restore()
+        box = next((e for e in window.descendants(control_type="Edit")
+                    if (e.element_info.name or "") == "Search Room"), None)
+        if box is None:
+            return False
+        box.set_edit_text(room)
+        box.type_keys("{ENTER}", set_foreground=True)
+        time.sleep(4)
+        wanted = room.strip().lower()
+        for tile in window.descendants(control_type="Button"):
+            ident = tile.element_info.automation_id or ""
+            if ident.endswith("RoomTiles") and (tile.element_info.name or "").strip().lower() == wanted:
+                log(f"room listed: {tile.element_info.name}; opening it")
+                try:
+                    tile.invoke()
+                except Exception:  # noqa: BLE001 - some builds expose no invoke pattern
+                    tile.click_input(double=True)
+                return True
+    except Exception as error:  # noqa: BLE001 - the UI changes under us; try again next round
+        log(f"room search failed: {error}")
+    return False
+
+
 def joined_room_title(room: str) -> str | None:
-    """The title of the joined room's pane, or None when not in the room."""
+    """The title of the joined room (its own window, or a pane or tab in the
+    main window), or None when not in the room. Search results and tiles
+    carry the name too, so only window-like elements count."""
     try:
         from pywinauto import Desktop
     except ImportError:
         return None
     wanted = room.lower()
+    pids = {proc.pid for proc in psutil.process_iter(["name"]) if (proc.info.get("name") or "").lower() == "paltalk.exe"}
     for window in Desktop(backend="uia").windows():
         try:
-            if (window.element_info.name or "").lower() != "paltalk":
+            if window.element_info.process_id not in pids:
                 continue
-            for pane in window.descendants(control_type="Pane"):
-                name = (pane.element_info.name or "")
-                if wanted in name.lower() and name.lower().endswith("- paltalk"):
-                    return name
+            name = window.element_info.name or ""
+            if wanted in name.lower():
+                return name
+            for kind in ("Pane", "Window", "TabItem", "Document"):
+                for element in window.descendants(control_type=kind):
+                    name = element.element_info.name or ""
+                    if wanted in name.lower():
+                        return name
         except Exception:  # noqa: BLE001 - the UI changes under us; try again next tick
             continue
     return None
@@ -125,7 +190,7 @@ def encoder_command(audio: LoopbackAudio, output: str) -> list[str]:
     """Still frame + live audio, as a stream YouTube and Facebook accept:
     H.264 keyframes every 2 s, AAC 128 kb/s, constant frame rate."""
     command = [
-        "ffmpeg", "-hide_banner", "-loglevel", "warning", "-nostats",
+        "ffmpeg", "-hide_banner", "-loglevel", "warning", "-nostats", "-y",
         "-re", "-loop", "1", "-framerate", "15", "-i", str(FRAME),
         "-f", "s16le", "-ar", str(audio.rate), "-ch_layout", "stereo" if audio.channels == 2 else "mono", "-i", "pipe:0",
         "-map", "0:v", "-map", "1:a",
@@ -150,6 +215,8 @@ class Encoder:
         self.process: subprocess.Popen | None = None
         self.running = False
         self.thread: threading.Thread | None = None
+        self.peak = 0
+        self.reported = time.time()
 
     def start(self) -> None:
         self.running = True
@@ -165,6 +232,7 @@ class Encoder:
                 while self.running and self.process.poll() is None:
                     try:
                         chunk = self.audio.chunks.get(timeout=0.5)
+                        self._measure(chunk)
                     except queue.Empty:
                         # Keep the stream alive through a pause in the room.
                         chunk = self.audio.silence(0.5)
@@ -176,6 +244,15 @@ class Encoder:
                 log(f"encoder stopped (code {code}); restarting")
                 # Back off a little if it fails straight away (bad key, no network).
                 time.sleep(2 if time.time() - started > 30 else 10)
+
+    def _measure(self, chunk: bytes) -> None:
+        """Logs the loudest sample once a minute, so silence is visible."""
+        samples = array.array("h", chunk[: len(chunk) - len(chunk) % 2])
+        if samples:
+            self.peak = max(self.peak, max(abs(value) for value in samples[::16]))
+        if time.time() - self.reported >= 60:
+            log(f"audio peak over the last minute: {self.peak} of 32767{' (silent)' if self.peak < 50 else ''}")
+            self.peak, self.reported = 0, time.time()
 
     def stop(self) -> None:
         self.running = False
@@ -218,6 +295,7 @@ def main() -> int:
     parser.add_argument("--heartbeat-url")
     parser.add_argument("--heartbeat-token")
     parser.add_argument("--listener-id", default="listener-a")
+    parser.add_argument("--input-id", help="the Cloudflare Stream live input this listener feeds")
     parser.add_argument("--once-test", type=int, metavar="SECONDS",
                         help="stream SECONDS of whatever is playing to a local test file, then stop")
     args = parser.parse_args()
@@ -241,9 +319,16 @@ def main() -> int:
     if not args.output:
         parser.error("--output is required outside --once-test")
     encoder: Encoder | None = None
+    last_search = 0.0
     try:
         while True:
-            title = joined_room_title(args.room)
+            problem = ensure_paltalk()
+            title = joined_room_title(args.room) if problem is None else None
+            if title is None and problem is None and time.time() - last_search >= SEARCH_EVERY:
+                last_search = time.time()
+                if try_join(args.room):
+                    time.sleep(5)
+                    title = joined_room_title(args.room)
             if title and encoder is None:
                 log(f"in the room ({title}); going live")
                 encoder = Encoder(audio, args.output)
@@ -252,8 +337,11 @@ def main() -> int:
                 log("room closed or left; stopping")
                 encoder.stop()
                 encoder = None
+            if title and encoder is not None and encoder.process and encoder.process.poll() is not None:
+                problem = "In the room but the stream keeps stopping"
             heartbeat(args.heartbeat_url, args.heartbeat_token,
-                      {"listener": args.listener_id, "inRoom": bool(title), "streaming": encoder is not None})
+                      {"listener": args.listener_id, "inRoom": bool(title), "streaming": encoder is not None,
+                       "input": args.input_id, "problem": problem})
             time.sleep(10)
     except KeyboardInterrupt:
         pass

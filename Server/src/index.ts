@@ -10,6 +10,7 @@ import {
   publishDraft, registerMemberDevice, removeZikrSession, saveZikrSession, scheduleMeeting, setLive,
 } from "./community";
 import { serveMedia } from "./media";
+import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -18,7 +19,8 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path === "/health") {
     const health = await env.DB.prepare("SELECT * FROM source_health ORDER BY source").all();
     const degraded = health.results.some(row => row.status === "degraded");
-    return json({ ok: !degraded, environment: env.ENVIRONMENT, sources: health.results }, { status: degraded ? 503 : 200 });
+    return json({ ok: !degraded, environment: env.ENVIRONMENT, sources: health.results, listeners: await listenerHealth(env) },
+      { status: degraded ? 503 : 200 });
   }
   if (path.startsWith("/admin")) return adminRequest(request, env, path);
   if (request.method === "GET" && path === "/v1/bootstrap") return cachedJSON(await bootstrap(env), request, 300);
@@ -48,6 +50,11 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (!await withinWriteLimit(request, env, "member-invite", 10)) return json({ error: "Too many requests" }, { status: 429 });
     return redeemInvite(request, env);
   }
+  // The live zikr pipeline: listener heartbeats and Stream's input events,
+  // each authenticated by its own secret and not rate limited, since both
+  // arrive every few seconds while a session runs.
+  if (request.method === "POST" && path === "/v1/live/listener") return listenerHeartbeat(request, env);
+  if (request.method === "POST" && path === "/v1/live/stream-events") return streamEvent(request, env);
   // The in-app meeting screen. It holds no secret: the participant token
   // travels in the URL fragment, which browsers never send.
   if (request.method === "GET" && path === "/v1/meet") return meetingPage();
@@ -168,7 +175,11 @@ export default {
     // access to the official Page, the Graph API cannot read its posts. The
     // app deep-links to Facebook instead. Re-add refreshFacebook here once a
     // Page access token is available.
-    const jobs: Array<{ name: string; run: Promise<void> }> = [{ name: "youtube", run: refreshYouTube(env) }];
+    const jobs: Array<{ name: string; run: Promise<void> }> = [
+      { name: "youtube", run: refreshYouTube(env) },
+      // Catches a listener that has gone silent, which no heartbeat reports.
+      { name: "live-listeners", run: reconcileLive(env) },
+    ];
     if (minute % 15 === 0) jobs.push(
       { name: "website", run: refreshWebsiteCatalog(env) }
     );

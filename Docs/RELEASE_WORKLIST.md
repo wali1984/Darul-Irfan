@@ -55,13 +55,13 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 
 | Item | Status |
 |---|---|
-| Group feeds: WhatsApp forwards routed by sender number or #tag, as drafts approved in the app or admin page; feed items shareable into a group | doing |
-| WhatsApp Business number +1 929 240 5561: pictures (with caption) as well as text | doing |
-| Super admin wajidali1984@hotmail.com (admin page) + in-app admin/superadmin roles granted by code | doing |
-| In-app meetings (Cloudflare RealtimeKit; scheduled, room opens 10 min before) | doing |
-| Community zikr per group: own times in local time, live in the app, join together | doing |
-| Group-only notifications | doing |
-| Live zikr pipeline: one source (Paltalk session) -> app + YouTube + Facebook automatically, auto-start, failover | design for decision |
+| Group feeds: WhatsApp forwards routed by sender number or #tag, as drafts approved in the app or admin page; feed items shareable into a group | done in code + tests; live once deployed (E) and the Meta webhook is set |
+| WhatsApp Business number +1 929 240 5561: pictures (with caption) as well as text | done in code + tests; pictures need R2 enabled (E) |
+| Super admin wajidali1984@hotmail.com and wajidmahmood@hotmail.com: admin page, and in the app by Apple sign-in email (no code needed); admin/superadmin roles also granted by code | done; Sign in with Apple enabled on the App ID via API 2026-10-27, entitlement restored, email declared in the privacy manifest |
+| In-app meetings (Cloudflare RealtimeKit; scheduled, room opens 10 min before) | done in code + tests; needs REALTIME_* secrets (E) |
+| Community zikr per group: own times in local time, live in the app, join together | done in code + tests |
+| Group-only notifications | done in code + tests |
+| Live zikr pipeline: one source (Paltalk session) -> app + YouTube + Facebook automatically, auto-start, failover | doing: listener agent (capture, encode, self-restart, room search + join, heartbeat) and server (heartbeats, Stream events, hub source in the app, failover A->B, admin alerts by push + WhatsApp; 6 tests) built; first live rehearsal at the 2026-10-27 session on the Windows PC; hub needs Stream keys (E) |
 | Share-sheet entry from WhatsApp into the app | todo (after phase 1) |
 
 ## C. "Useful companion" plan — first increment (iOS)
@@ -95,15 +95,40 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 
 - No generated religious answers; no review badges beside scripture.
 - Private devotional data stays on the device; My Day needs no account.
+- **Sign-in exists only in Community -> Private groups** (owner, 2026-10-27).
+  Everything else - Today, Read, Zikr and the live Daily Zikr, Discover,
+  Events, Official Updates - is free to use with no account, and the public
+  API routes (`/v1/bootstrap`, `/v1/live`, `/v1/feed`) never ask for one.
 - GMS-free Android, invite-based bearer sessions.
 - Seed changes mirrored to all four platforms, manifest bumped, parity gate green.
 
 ## E. Operator actions (yours)
 
 - **Private groups do not work yet: the backend with the group routes is not
-  deployed** (`/v1/groups` and `/v1/members/invite` answer 404 on 2026-10-27).
-  In `Server/`: `npx wrangler login`, then `npm run db:migrate:remote`, then
-  `npm run deploy`. Until then the app's Join button cannot succeed.
-
-- Apply D1 migrations 0003 and 0004: `npm run db:migrate:remote` in `Server/`.
-- Run `ios-verify` after this pass; tag on green; run `ios-testflight`.
+  deployed.** On 2026-10-27 the live D1 had only migration 0001 (0002-0006
+  pending) and `/v1/groups` answered 404. wrangler is logged in on this PC and
+  a full backup was exported first (`d1-backup-2026-10-27.sql`, 371 rows). In
+  `Server/`, in this order:
+  1. Enable R2 in the Cloudflare dashboard (R2 -> enable; free tier), then
+     `npx wrangler r2 bucket create darul-irfan-media`. Deploy fails while
+     wrangler.toml binds a bucket that does not exist.
+  2. `npm run db:migrate:remote` (applies 0002-0006).
+  3. Secrets (`npx wrangler secret put NAME`): `MEDIA_URL_SECRET` (any long
+     random string), `LISTENER_TOKEN` (long random; the listener agent's
+     `--heartbeat-token`), and when ready `WHATSAPP_APP_SECRET`,
+     `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`,
+     `WHATSAPP_ALLOWED_SENDERS`, `REALTIME_ACCOUNT_ID`, `REALTIME_APP_ID`,
+     `REALTIME_API_TOKEN`, `STREAM_WEBHOOK_SECRET`, `ALERT_WHATSAPP_NUMBERS`.
+  4. `npm run deploy`.
+- The two Cloudflare API tokens in `cloudflare.md` have an IP filter that
+  refuses this PC (108.27.186.148); add the IP or use `wrangler login`.
+- Cloudflare Stream: enable it, create two live inputs (recording off), set
+  `STREAM_INPUTS` = "<input A id>,<input B id>" and `STREAM_CUSTOMER_HOST` in
+  wrangler.toml, add YouTube and Facebook (primary on A, backup on B) as
+  simulcast outputs, and point a "Stream Live Input" notification webhook at
+  `https://api.naqshbandiaowaisiah.us/v1/live/stream-events` with the secret.
+- App Store Connect privacy answers: add **Email Address** (linked, App
+  Functionality), matching PrivacyInfo.xcprivacy.
+- On the iPhone: in Darul Irfan -> More -> Private groups, Sign in with Apple
+  and choose **Share My Email** (wajidmahmood@hotmail.com) to be super admin.
+- Run `ios-verify`; tag on green; run `ios-testflight` (owner runs these).

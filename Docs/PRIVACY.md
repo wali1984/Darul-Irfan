@@ -36,12 +36,16 @@ are enabled in the submitted binary, even though collection is optional:
   for prayer/Qibla; never sent to the Darul Irfan service.
 - **Usage Data — Not collected:** no product analytics or reading/prayer event
   telemetry.
-- **Identifiers / User ID and Name — App Functionality, LINKED to identity,
-  not used for tracking:** only for members of the private regional groups.
-  Signing in with Apple stores Apple's stable subject for this app as the
-  member id, plus the name Apple discloses on first authorisation so an
-  administrator can recognise who to add. The email scope is deliberately not
-  requested. These are the app's only linked data.
+- **Identifiers / User ID, Name and Email Address — App Functionality,
+  LINKED to identity, not used for tracking:** only for members of the private
+  regional groups who sign in with Apple. Apple's stable subject for this app
+  is the member id; the name Apple discloses on first authorisation lets an
+  administrator recognise who to add; the email (which the member may replace
+  with Apple's relay address) is used only to recognise the silsila's own
+  administrators, and nothing is ever sent to it. Members who join with an
+  invitation code give none of these. These are the app's only linked data.
+  (Changed 2026-10-27: the email scope is now requested. App Store Connect's
+  privacy answers must list Email Address the same way.)
 - **Tracking — No:** no IDFA, ATT prompt, data broker sharing, advertising, or
   cross-company tracking.
 

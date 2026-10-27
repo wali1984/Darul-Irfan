@@ -4,15 +4,11 @@ import Foundation
 ///
 /// Signing in needs the `com.apple.developer.applesignin` entitlement, and
 /// under manual signing the distribution profile must already carry it, which
-/// it cannot until Sign in with Apple is enabled on the App ID. Build 47 of
+/// it can only once Sign in with Apple is enabled on the App ID. Build 47 of
 /// `ios-testflight` failed at the archive step for exactly that reason, while
 /// `ios-verify` passed - an unsigned build needs no profile, so it can never
-/// catch this.
-///
-/// Until the portal is updated the entitlement stays out of `project.yml` and
-/// this stays `false`, so no tester is offered a sign-in button that cannot
-/// work. The server side is deployed and tested either way. Flip this and the
-/// entitlement together; `project.yml` carries the same note.
+/// catch this. The capability was enabled on 2026-10-27 and the entitlement
+/// restored with it; `project.yml` carries the same note.
 enum MemberGroupsFeature {
     /// On, because joining no longer depends on Apple. An administrator issues
     /// a single-use invitation code and the member redeems it, which needs no
@@ -20,11 +16,10 @@ enum MemberGroupsFeature {
     /// things that failed build 47.
     static let isEnabled = true
 
-    /// Sign in with Apple stays off until `com.apple.developer.applesignin` is
-    /// restored in project.yml AND the capability is enabled on the App ID.
-    /// Showing the button without both would offer a member a sign-in that
-    /// cannot succeed, so the invitation code is the only route meanwhile.
-    static let appleSignInAvailable = false
+    /// Sign in with Apple: the entitlement is in project.yml and the
+    /// capability is on the App ID (enabled 2026-10-27). A member whose Apple
+    /// email is one of the server's super-admin emails becomes super admin.
+    static let appleSignInAvailable = true
 }
 
 /// A private regional group of the silsila, as its own members see it.

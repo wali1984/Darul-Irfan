@@ -45,7 +45,8 @@ export async function refreshYouTube(env: Env): Promise<void> {
   if (!vResponse.ok) throw new Error(`YouTube videos ${vResponse.status}`);
   const payload = await vResponse.json<YouTubeVideosResponse>();
 
-  const prior = await env.DB.prepare("SELECT state,source_mode FROM live_broadcasts WHERE id='official-live'").first<{ state: string; source_mode: string }>();
+  const prior = await env.DB.prepare("SELECT state,source_mode,hub_stream_url FROM live_broadcasts WHERE id='official-live'")
+    .first<{ state: string; source_mode: string; hub_stream_url: string | null }>();
   const automatic = prior?.source_mode !== "manual";
   let candidate: { id: string; state: "live" | "scheduled"; title: string; details?: YouTubeVideoItem["liveStreamingDetails"] } | undefined;
   const now = new Date().toISOString();
@@ -69,22 +70,28 @@ export async function refreshYouTube(env: Env): Promise<void> {
 
   if (automatic && candidate) {
     const details = candidate.details;
-    await env.DB.prepare(`UPDATE live_broadcasts SET state=?,title=?,youtube_video_id=?,scheduled_start=?,started_at=?,ended_at=?,updated_at=?,source_updated_at=? WHERE id='official-live'`)
-      .bind(candidate.state, candidate.title, candidate.id, details?.scheduledStartTime ?? null,
+    // A scheduled video does not end a session the hub has already made live.
+    await env.DB.prepare(`UPDATE live_broadcasts SET state=CASE WHEN hub_stream_url IS NOT NULL THEN 'live' ELSE ? END,
+      title=?,youtube_video_id=?,youtube_live=?,scheduled_start=?,started_at=COALESCE(?,started_at),ended_at=?,updated_at=?,source_updated_at=? WHERE id='official-live'`)
+      .bind(candidate.state, candidate.title, candidate.id, candidate.state === "live" ? 1 : 0, details?.scheduledStartTime ?? null,
         details?.actualStartTime ?? null, details?.actualEndTime ?? null, now, now).run();
     // Alert once when the channel actually goes live (not for upcoming).
-    if (candidate.state === "live" && prior?.state !== "live") {
+    if (candidate.state === "live" && prior?.state !== "live" && !prior?.hub_stream_url) {
       await sendTopicPush(
         env, `youtube-live:${now.slice(0, 16)}`, "liveZikr",
         "Daily Zikr has started", "Join the official daily zikr in Darul Irfan.",
         "darulirfan://live/official-live"
       );
     }
+  } else if (automatic && prior?.hub_stream_url) {
+    // The hub is still carrying the session; only the video has stopped.
+    await env.DB.prepare("UPDATE live_broadcasts SET youtube_live=0,updated_at=?,source_updated_at=? WHERE id='official-live'")
+      .bind(now, now).run();
   } else if (automatic && prior?.state === "live") {
-    await env.DB.prepare("UPDATE live_broadcasts SET state='ended',ended_at=?,updated_at=?,source_updated_at=? WHERE id='official-live'")
+    await env.DB.prepare("UPDATE live_broadcasts SET state='ended',youtube_live=0,ended_at=?,updated_at=?,source_updated_at=? WHERE id='official-live'")
       .bind(now, now, now).run();
   } else if (automatic && prior?.state === "scheduled") {
-    await env.DB.prepare("UPDATE live_broadcasts SET state='offline',youtube_video_id=NULL,updated_at=?,source_updated_at=? WHERE id='official-live'")
+    await env.DB.prepare("UPDATE live_broadcasts SET state='offline',youtube_video_id=NULL,youtube_live=0,updated_at=?,source_updated_at=? WHERE id='official-live'")
       .bind(now, now).run();
   }
 }

@@ -108,10 +108,14 @@ Properties worth preserving:
 - Redeeming is rate limited harder than the session exchange, since it takes a
   secret that could otherwise be guessed.
 
-Sign in with Apple remains implemented and tested. To offer it as well: enable
-the capability on the App ID, restore the two commented lines in `project.yml`,
-and set `MemberGroupsFeature.appleSignInAvailable` to `true`. Only the name
-scope is ever requested, never email.
+**Sign in with Apple is on as well (2026-10-27).** The capability was enabled
+on the App ID through the App Store Connect API, the entitlement restored in
+`project.yml`, and `MemberGroupsFeature.appleSignInAvailable` set to `true`.
+The name and email scopes are requested: a member whose Apple email is listed
+in `SUPER_ADMIN_EMAILS` (wajidali1984@hotmail.com, wajidmahmood@hotmail.com) is
+super admin in the app with no code at all. Choose **Share My Email** when
+Apple asks; a relay address cannot be recognised. Anyone else who signs in
+sees nothing until an admin adds them or they redeem a code.
 
 ## Administration
 
