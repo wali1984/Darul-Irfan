@@ -26,7 +26,7 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 | Finding | Fix | Status |
 |---|---|---|
 | Asrar English 2:215 carried the OCR checker's own note ("Note: The OCR is correct... the image") inside the ayah | Leak removed, verse text intact | done |
-| Akram-ut-Tafaseer parah 30 OCR ends at Ash-Shams (91); 92-114 absent from the drop ("Para-30-part1") | Reader offers Asrar for 92-114; find part 2 on amd SATA | todo |
+| Akram-ut-Tafaseer parah 30 OCR ends at Ash-Shams (91); 92-114 absent from the drop ("Para-30-part1") | Part 2 found on the site (250 pages) and downloaded to amd; OCR with the urdu-ocr pipeline once the GPU is free (appraisal translation running), then re-run segment_akram_tafaseer.py and drop VOLUME_END[30] | blocked: GPU busy |
 | Shell heredocs turn `\b`/`\n` into control bytes in written files | All touched files scanned clean; scripts now written as files | done |
 | Book reader opened every book RTL/Nastaliq | Per-page direction | done |
 | Dua group headers, greeting, broadcast status rendered verbatim (never localized) | Looked up in the catalog | done |
