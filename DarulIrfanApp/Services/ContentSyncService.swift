@@ -211,7 +211,14 @@ struct ContentSyncService: ContentSyncServicing {
         return imported
     }
 
+    /// Library pages withdrawn from the bundle. Zikr is joined inside the
+    /// app, so the external chat-room instructions and the social-media page
+    /// are no longer offered; deleting them here removes the copies earlier
+    /// builds imported.
+    static let withdrawnLibraryItemIDs = ["page-online-zikr-joining-instructions", "follow-us"]
+
     private func importLibrarySeed() async throws -> Int {
+        try await contentRepository.deleteItems(ids: Self.withdrawnLibraryItemIDs)
         let libraryItems = SeedBundle.libraryItems()
         guard !libraryItems.isEmpty else { return 0 }
         try await contentRepository.upsertItems(libraryItems)

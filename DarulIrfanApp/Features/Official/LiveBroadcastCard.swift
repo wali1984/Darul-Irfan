@@ -51,7 +51,7 @@ struct LiveBroadcastCard: View {
                 .buttonStyle(DIPressableStyle())
             }
             if displaySources.isEmpty {
-                Text("The live broadcast is currently off air. Scheduled reminders remain available below.")
+                Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
                     .font(.footnote).foregroundStyle(fgMuted)
             }
             if broadcast.updatedAt != .distantPast {
@@ -101,13 +101,19 @@ struct LiveBroadcastCard: View {
             audioPlayer.play(item, queue: [item])
         case .youtube:
             if let videoID = source.videoID { presentedVideo = PresentedVideo(id: videoID) }
-        case .paltalk: openURL(source.url)
+        case .paltalk: break
         }
     }
 
+    /// What the app can play inside itself: its own audio stream, or the
+    /// live video. External rooms are not offered.
     private var displaySources: [LiveSource] {
         broadcast.sources.filter { source in
-            source.kind != .youtube || source.videoID != nil
+            switch source.kind {
+            case .ownedStream: return true
+            case .youtube: return source.videoID != nil
+            case .paltalk: return false
+            }
         }
     }
 
@@ -115,7 +121,7 @@ struct LiveBroadcastCard: View {
         switch broadcast.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
     }
     private func label(for source: LiveSource) -> LocalizedStringKey {
-        switch source.kind { case .ownedStream: return "Listen live"; case .youtube: return "Watch Daily Zikr"; case .paltalk: return "Join OURSHEIKH on Paltalk" }
+        switch source.kind { case .ownedStream: return "Listen live"; case .youtube: return "Watch Daily Zikr"; case .paltalk: return "Watch Daily Zikr" }
     }
     private func icon(for source: LiveSource) -> String {
         switch source.kind { case .ownedStream: return "headphones"; case .youtube: return "play.rectangle.fill"; case .paltalk: return "arrow.up.right.square" }

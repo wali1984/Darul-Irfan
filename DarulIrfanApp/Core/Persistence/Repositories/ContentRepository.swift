@@ -258,6 +258,13 @@ struct ContentRepository: ContentRepositoryProtocol {
         try await database.connection.executeBatch(statements)
     }
 
+    func deleteItems(ids: [String]) async throws {
+        guard !ids.isEmpty else { return }
+        try await database.connection.executeBatch(
+            ids.map { (sql: "DELETE FROM content_items WHERE id = ?", parameters: [SQLValue.text($0)]) }
+        )
+    }
+
     // MARK: - Book pages
 
     /// Ordered by printed page so the reader pages forward naturally.

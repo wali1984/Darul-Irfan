@@ -47,6 +47,16 @@ final class OfficialPlatformTests: XCTestCase {
         XCTAssertTrue(live.preferredSource?.supportsBackgroundAudio ?? false)
     }
 
+    /// Zikr is watched inside the app: an outside room is never offered,
+    /// even when it is the only source the server sends.
+    func testExternalRoomIsNeverOffered() {
+        let https = URL(string: "https://example.com/room") ?? URL(fileURLWithPath: "/")
+        var live = LiveBroadcast.offline
+        XCTAssertTrue(live.sources.isEmpty)
+        live.sources = [LiveSource(kind: .paltalk, url: https, supportsBackgroundAudio: false)]
+        XCTAssertNil(live.preferredSource)
+    }
+
     func testSchemaV2CreatesOfficialPlatformTables() async throws {
         let database = try await AppDatabase.inMemory()
         let version = try await database.connection.schemaVersion()

@@ -221,7 +221,7 @@ struct GroupsHomeView: View {
                     howStep(3, "Read and watch",
                             "Open your group to read its announcements and to watch recorded zikr inside the app. Pull down to check for new posts.")
                     howStep(4, "Join a meeting",
-                            "When a group has a meeting, its link appears at the top of the group. Tap it to join in the app the administrators use, such as Paltalk or Zoom.")
+                            "When a group has a meeting, its link appears at the top of the group. Tap it to join the meeting.")
                     howStep(5, "Private by design",
                             "Only members of a group can see it, and one region cannot see another's. Members read; administrators publish. Nothing you do here is shown to other members.")
                     howStep(6, "Leaving",

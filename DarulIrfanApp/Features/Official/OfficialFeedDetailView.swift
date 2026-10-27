@@ -69,8 +69,8 @@ struct OfficialFeedDetailView: View {
 
     private var sourceName: LocalizedStringKey {
         switch item.source {
-        case .youtube: return "YouTube"
-        case .facebook: return "Facebook"
+        case .youtube: return "Video"
+        case .facebook: return "Post"
         case .website: return "Article"
         case .announcement: return "Announcement"
         case .event: return "Event"

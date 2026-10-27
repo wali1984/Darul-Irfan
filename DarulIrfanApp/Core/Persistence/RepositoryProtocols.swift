@@ -86,6 +86,9 @@ protocol ContentRepositoryProtocol: Sendable {
     func saveReadingProgress(_ progress: ContentReadingProgress) async throws
 
     func upsertItems(_ items: [ContentItem]) async throws
+    /// Removes items withdrawn from the bundle, so they leave devices that
+    /// imported them in an earlier build.
+    func deleteItems(ids: [String]) async throws
     func upsertCollections(_ collections: [ContentCollection]) async throws
 
     /// OCR'd page text for a book, ordered by printed page. Empty when the

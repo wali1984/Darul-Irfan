@@ -89,23 +89,19 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
     var sources: [LiveSource]
     var updatedAt: Date
 
+    /// Only sources the app plays itself. An external chat room (the
+    /// `.paltalk` kind the server may still send) is never offered: zikr is
+    /// watched inside Darul Irfan.
     var preferredSource: LiveSource? {
         sources.first(where: { $0.kind == .ownedStream })
-            ?? sources.first(where: { $0.kind == .youtube })
-            ?? sources.first(where: { $0.kind == .paltalk })
+            ?? sources.first(where: { $0.kind == .youtube && $0.videoID != nil })
     }
 
     static let offline = LiveBroadcast(
         id: "official-live",
         state: .offline,
         title: "Daily Zikr",
-        sources: [
-            LiveSource(
-                kind: .paltalk,
-                url: URL(string: "https://www.paltalk.com") ?? URL(fileURLWithPath: "/"),
-                supportsBackgroundAudio: false
-            )
-        ],
+        sources: [],
         updatedAt: .distantPast
     )
 }
@@ -169,7 +165,6 @@ struct AppBootstrap: Codable, Sendable, Equatable {
             "website": URL(string: "https://www.naqshbandiaowaisiah.org/") ?? URL(fileURLWithPath: "/"),
             "youtube": URL(string: "https://www.youtube.com/channel/UCefP_tP1ROXmqu2miDVCtCg") ?? URL(fileURLWithPath: "/"),
             "facebook": URL(string: "https://www.facebook.com/oursheikh.official") ?? URL(fileURLWithPath: "/"),
-            "paltalk": URL(string: "https://www.paltalk.com") ?? URL(fileURLWithPath: "/"),
         ],
         schedules: [],
         live: .offline,

@@ -138,7 +138,7 @@ final class ZikrHomeViewModel {
         await notifications.scheduleReminder(
             id: reminderKey(session.id),
             title: session.title,
-            body: String(localized: "The online zikr session begins soon. The Paltalk room opens while the session is in progress."),
+            body: String(localized: "Daily Zikr begins soon. Open Darul Irfan to join it live."),
             at: fireDate
         )
     }

@@ -31,7 +31,7 @@ struct YouTubePlayerView: UIViewRepresentable {
         webView.scrollView.isScrollEnabled = false
         webView.isOpaque = false
         webView.backgroundColor = .black
-        webView.accessibilityLabel = "Official YouTube video player"
+        webView.accessibilityLabel = String(localized: "Video player")
         return webView
     }
 

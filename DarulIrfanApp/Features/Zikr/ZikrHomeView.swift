@@ -284,24 +284,13 @@ private struct ZikrSessionCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                if let instructions = session.instructions {
-                    Text("How to join")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DIColor.textPrimary)
-                        .padding(.top, DISpacing.xs)
-                    Text(verbatim: instructions)
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textPrimary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                if let joinUrlString = session.joinUrl, let joinUrl = URL(string: joinUrlString) {
-                    Link(destination: joinUrl) {
-                        Label("Join Online Zikr", systemImage: "link")
-                    }
-                    .buttonStyle(DIPrimaryButtonStyle())
-                    .padding(.top, DISpacing.xs)
-                }
+                // Joining happens in the app: the live zikr plays above, in
+                // the Daily Zikr card. Joining steps and links for an outside
+                // service, which older schedules carried, are not shown.
+                Label("Watch it live here in Darul Irfan when it begins.", systemImage: "play.rectangle")
+                    .font(.subheadline)
+                    .foregroundStyle(DIColor.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Toggle(isOn: Binding(
                     get: { viewModel.isReminderEnabled(session.id) },

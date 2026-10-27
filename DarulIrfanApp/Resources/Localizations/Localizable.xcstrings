@@ -18802,6 +18802,125 @@
           }
         }
       }
+    },
+    "Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر سیشن شروع ہوتے ہی یہیں براہِ راست نظر آئے گا۔ اطلاع کے لیے نیچے یاد دہانی آن کر لیں۔"
+          }
+        }
+      }
+    },
+    "Daily Zikr begins soon. Open Darul Irfan to join it live.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily Zikr begins soon. Open Darul Irfan to join it live."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر جلد شروع ہو رہا ہے۔ براہِ راست شامل ہونے کے لیے دارالعرفان کھولیں۔"
+          }
+        }
+      }
+    },
+    "Video player": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video player"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو پلیئر"
+          }
+        }
+      }
+    },
+    "Watch it live here in Darul Irfan when it begins.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch it live here in Darul Irfan when it begins."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شروع ہونے پر اسے یہیں دارالعرفان میں براہِ راست دیکھیں۔"
+          }
+        }
+      }
+    },
+    "Post": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Post"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پوسٹ"
+          }
+        }
+      }
+    },
+    "Video": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو"
+          }
+        }
+      }
+    },
+    "When a group has a meeting, its link appears at the top of the group. Tap it to join the meeting.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When a group has a meeting, its link appears at the top of the group. Tap it to join the meeting."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب گروپ کی کوئی میٹنگ ہو تو اس کا لنک گروپ کے اوپر نظر آتا ہے۔ میٹنگ میں شامل ہونے کے لیے اس پر ٹیپ کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
