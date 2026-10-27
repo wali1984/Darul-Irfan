@@ -113,17 +113,20 @@ struct LiveBroadcastCard: View {
     }
 
     /// What the app plays inside itself - its own audio stream, or the live
-    /// video - and, only when neither is there, the zikr room while it is
-    /// open.
+    /// video - while it is live; otherwise, while the zikr room is open, the
+    /// room itself. A video left over from the last stream never stands in
+    /// for the room.
     private var displaySources: [LiveSource] {
         let inApp = broadcast.sources.filter { $0.kind == .ownedStream || ($0.kind == .youtube && $0.videoID != nil) }
-        if !inApp.isEmpty || !(isLive || sessionOpen) { return inApp }
-        return broadcast.sources.filter { source in
+        if isLive && !inApp.isEmpty { return inApp }
+        guard isLive || sessionOpen else { return inApp }
+        let room = broadcast.sources.filter { source in
             switch source.kind {
             case .ownedStream, .youtube: return false
             case .paltalk: return !source.url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/")).isEmpty
             }
         }
+        return room.isEmpty ? inApp : room
     }
 
     private var statusText: String {
