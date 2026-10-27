@@ -4,7 +4,7 @@ import { bootstrap, feed, liveBroadcast } from "./repository";
 import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
 import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
 import { whatsappSubscription, whatsappWebhook } from "./whatsapp";
-import { authenticatedMember, createSession, deleteMember, groupPosts, listGroups } from "./members";
+import { authenticatedMember, createSession, deleteMember, groupPosts, listGroups, redeemInvite } from "./members";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -36,6 +36,12 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (request.method === "POST" && path === "/v1/members/session") {
     if (!await withinWriteLimit(request, env, "member-session", 20)) return json({ error: "Too many requests" }, { status: 429 });
     return createSession(request, env);
+  }
+  if (request.method === "POST" && path === "/v1/members/invite") {
+    // Rate limited harder than the session exchange: this one takes a secret
+    // that could otherwise be guessed at.
+    if (!await withinWriteLimit(request, env, "member-invite", 10)) return json({ error: "Too many requests" }, { status: 429 });
+    return redeemInvite(request, env);
   }
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
     const member = await authenticatedMember(request, env);

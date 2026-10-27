@@ -22,6 +22,10 @@ final class GroupsModel {
     var groups: [MemberGroup] = []
     var memberID: String?
     var isDeleting = false
+    var isRedeeming = false
+    /// Shown under the code field only; a failed code is not a screen-level
+    /// failure, and must not throw the member out of the sign-in card.
+    var inviteError: String?
 
     func start() async {
         guard await service.isSignedIn else {
@@ -72,6 +76,22 @@ final class GroupsModel {
         }
     }
 
+    /// Redeems an administrator's invitation code. On success the member is
+    /// already in their group, so the list is simply reloaded.
+    func redeemInvite(_ rawCode: String) async {
+        let code = rawCode.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !code.isEmpty else { return }
+        isRedeeming = true
+        inviteError = nil
+        defer { isRedeeming = false }
+        do {
+            memberID = try await service.redeemInvite(code: code, displayName: nil)
+            await refresh()
+        } catch {
+            inviteError = error.localizedDescription
+        }
+    }
+
     func signOut() async {
         await service.signOut()
         groups = []
@@ -105,6 +125,8 @@ final class GroupsModel {
 struct GroupsHomeView: View {
     @State private var model = GroupsModel()
     @State private var isConfirmingDelete = false
+    @State private var inviteCode = ""
+    @FocusState private var isCodeFocused: Bool
 
     var body: some View {
         ScrollView {
@@ -137,20 +159,60 @@ struct GroupsHomeView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text("Members only")
                     .font(.headline)
-                Text("These groups are for members of Silsila Naqshbandia Owaisiah. Sign in, then ask an administrator to add you to your region's group.")
+                Text("These groups are for members of Silsila Naqshbandia Owaisiah. Enter the invitation code an administrator gave you.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                SignInWithAppleButton(.signIn) { request in
-                    // Only the name is requested. A group needs to know who you
-                    // are to an administrator, not how to contact you.
-                    request.requestedScopes = [.fullName]
-                } onCompletion: { result in
-                    Task { await model.completeSignIn(result) }
+
+                // The code is the primary way in: it needs nothing from Apple
+                // or Google, so it works the same on every platform, and
+                // admission stays an administrator's decision.
+                HStack(spacing: DISpacing.sm) {
+                    TextField("Invitation code", text: $inviteCode)
+                        .textFieldStyle(.roundedBorder)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                        .focused($isCodeFocused)
+                        .submitLabel(.join)
+                        .onSubmit { redeem() }
+                        .accessibilityLabel("Invitation code")
+                    Button(action: redeem) {
+                        if model.isRedeeming { ProgressView() } else { Text("Join") }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.isRedeeming)
                 }
-                .signInWithAppleButtonStyle(.black)
-                .frame(height: 48)
-                .accessibilityLabel("Sign in with Apple to see your private group")
+                if let inviteError = model.inviteError {
+                    Text(inviteError)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
+                if MemberGroupsFeature.appleSignInAvailable {
+                    Text("Or sign in, then ask an administrator to add you.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    SignInWithAppleButton(.signIn) { request in
+                        // Only the name is requested. A group needs to know who
+                        // you are to an administrator, not how to contact you.
+                        request.requestedScopes = [.fullName]
+                    } onCompletion: { result in
+                        Task { await model.completeSignIn(result) }
+                    }
+                    .signInWithAppleButtonStyle(.black)
+                    .frame(height: 48)
+                    .accessibilityLabel("Sign in with Apple to see your private group")
+                }
             }
+        }
+    }
+
+    private func redeem() {
+        isCodeFocused = false
+        DIHaptics.light()
+        let code = inviteCode
+        Task {
+            await model.redeemInvite(code)
+            if model.inviteError == nil { inviteCode = "" }
         }
     }
 

@@ -201,3 +201,98 @@ export async function setGroupMembership(
     .bind(groupID, memberID, new Date().toISOString(), actor).run();
   return json({ ok: true, groupID, memberID, member: true });
 }
+
+// MARK: - Invite codes
+
+/** Codes read aloud or typed by hand, so the alphabet omits the characters
+ *  people confuse: no 0/O, no 1/I/L, no 8/B. Ten symbols from this 26-letter
+ *  alphabet is about 47 bits, which a rate-limited endpoint makes unguessable. */
+const CODE_ALPHABET = "ACDEFGHJKMNPQRSTUVWXYZ2345679";
+
+/** Accepts what a member actually types: lower case, spaces, dashes. */
+function normaliseCode(raw: string): string {
+  return raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+function formatCode(code: string): string {
+  return `${code.slice(0, 5)}-${code.slice(5)}`;
+}
+
+export function generateInviteCode(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(10));
+  return [...bytes].map(byte => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join("");
+}
+
+/** Admin: mint a single-use code admitting one person to one group. The code is
+ *  returned once and never stored - only its hash is kept, so a leaked database
+ *  cannot admit anyone. */
+export async function createInvite(
+  env: Env, actor: string, groupID: string, input: Record<string, unknown>,
+): Promise<Response> {
+  const group = await env.DB.prepare("SELECT 1 AS ok FROM member_groups WHERE id=?")
+    .bind(groupID).first<{ ok: number }>();
+  if (!group) return json({ error: "Unknown group" }, { status: 404 });
+
+  const days = Number(input.expiresInDays ?? 30);
+  if (!Number.isInteger(days) || days < 1 || days > 365) {
+    return json({ error: "expiresInDays must be a whole number from 1 to 365" }, { status: 400 });
+  }
+  const code = generateInviteCode();
+  const now = new Date();
+  await env.DB.prepare(`INSERT INTO member_invites(code_hash,group_id,label,created_by,created_at,expires_at)
+    VALUES(?,?,?,?,?,?)`)
+    .bind(await sha256(code), groupID, cleanText(input.label, 120) ?? null, actor,
+      now.toISOString(), new Date(now.getTime() + days * 86_400_000).toISOString()).run();
+  // Shown to the admin once, to pass to the person it is for.
+  return json({ ok: true, groupID, code: formatCode(code), expiresInDays: days }, { status: 201 });
+}
+
+/** Redeems a code: creates the member if needed, starts a session, and admits
+ *  them to exactly the group the code was minted for.
+ *
+ *  Unlike signing in, redeeming IS admission - an administrator already decided
+ *  that by issuing the code. It stays single-use so a forwarded code cannot let
+ *  a second person in. */
+export async function redeemInvite(request: Request, env: Env): Promise<Response> {
+  const input = await request.json<{ code?: string; displayName?: string }>();
+  const code = normaliseCode(String(input?.code ?? ""));
+  if (code.length < 8 || code.length > 20) return json({ error: "That invitation code is not valid." }, { status: 400 });
+
+  const row = await env.DB.prepare(`SELECT group_id,expires_at,redeemed_at FROM member_invites WHERE code_hash=?`)
+    .bind(await sha256(code)).first<{ group_id: string; expires_at: string; redeemed_at: string | null }>();
+  // One message for every failure: a wrong code must not be distinguishable
+  // from a used or expired one, or the endpoint becomes an oracle.
+  const refusal = json({ error: "That invitation code is not valid, or has already been used." }, { status: 403 });
+  if (!row || row.redeemed_at || Date.parse(row.expires_at) <= Date.now()) return refusal;
+
+  const now = new Date();
+  const nowISO = now.toISOString();
+  // Invite members have no platform identity, so the external-identity column
+  // carries a random one of ours. It stays unique and non-null without needing
+  // the members table rebuilt.
+  const subject = `invite:${crypto.randomUUID()}`;
+  const memberID = (await sha256(`member:${subject}`)).slice(0, 32);
+  await env.DB.prepare(`INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at)
+    VALUES(?,?,?,NULL,?,?)`)
+    .bind(memberID, subject, cleanText(input?.displayName, 80) ?? null, nowISO, nowISO).run();
+
+  // Mark redeemed only if still open, so two simultaneous redemptions cannot
+  // both succeed on one code.
+  const claim = await env.DB.prepare(`UPDATE member_invites SET redeemed_by=?,redeemed_at=?
+    WHERE code_hash=? AND redeemed_at IS NULL`)
+    .bind(memberID, nowISO, await sha256(code)).run();
+  if ((claim.meta?.changes ?? 0) === 0) {
+    await env.DB.prepare("DELETE FROM members WHERE id=?").bind(memberID).run();
+    return refusal;
+  }
+
+  await env.DB.prepare("INSERT OR IGNORE INTO member_group_members(group_id,member_id,added_at,added_by) VALUES(?,?,?,?)")
+    .bind(row.group_id, memberID, nowISO, "invite").run();
+
+  const token = hexOf(crypto.getRandomValues(new Uint8Array(32)));
+  const expires = new Date(now.getTime() + SESSION_DAYS * 86_400_000).toISOString();
+  await env.DB.prepare("INSERT INTO member_sessions(token_hash,member_id,created_at,expires_at,last_seen_at) VALUES(?,?,?,?,?)")
+    .bind(await sha256(token), memberID, nowISO, expires, nowISO).run();
+
+  return json({ token, expiresAt: expires, memberID, groupID: row.group_id }, { status: 201 });
+}

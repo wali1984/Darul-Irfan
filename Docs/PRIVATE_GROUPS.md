@@ -32,14 +32,38 @@ Both are covered by tests in `Server/test/members.test.ts`.
 
 ## How a member joins
 
-1. The member opens **More → Private groups** and signs in with Apple.
-2. They see "Waiting to be added" and a member identifier, with a copy button.
-   That identifier exists so they can send it to an administrator — it is the
-   only thing an admin needs.
-3. The admin adds them to a group (below). On next refresh the group appears.
+**An invitation code, not a platform sign-in.** Sign in with Apple needs the
+`com.apple.developer.applesignin` entitlement, and under manual signing the
+distribution profile must already carry it, which it cannot until the capability
+is enabled on the App ID. That is what failed `ios-testflight` build 47 and kept
+the whole feature switched off. A code needs nothing from Apple, behaves
+identically on Android, HarmonyOS and the web, and keeps admission an
+administrator's decision rather than a platform's.
 
-Only the **name** scope is requested from Apple, never email: a group needs to
-know who you are to an administrator, not how to contact you.
+1. An admin mints a single-use code for one group and gives it to the person.
+2. The member opens **More → Private groups**, types the code and taps Join.
+3. They are in that group immediately: redeeming *is* admission, because an
+   administrator already decided it by issuing the code.
+
+Properties worth preserving:
+
+- **The code is never stored**, only its SHA-256. A leaked database cannot admit
+  anyone.
+- **Single use**, claimed by a conditional `UPDATE ... WHERE redeemed_at IS NULL`,
+  so two simultaneous redemptions cannot both succeed and a forwarded code
+  cannot admit a second person.
+- **Expires**, 30 days by default.
+- **One refusal message** for a wrong, used or expired code, on the server and
+  in the app. Anything finer turns the endpoint into an oracle for guessing.
+- The alphabet omits characters people confuse `0`/`O`, `1`/`I`/`L`, `8`/`B`,
+  because these are read aloud and typed by hand.
+- Redeeming is rate limited harder than the session exchange, since it takes a
+  secret that could otherwise be guessed.
+
+Sign in with Apple remains implemented and tested. To offer it as well: enable
+the capability on the App ID, restore the two commented lines in `project.yml`,
+and set `MemberGroupsFeature.appleSignInAvailable` to `true`. Only the name
+scope is ever requested, never email.
 
 ## Administration
 
@@ -53,6 +77,7 @@ like the rest of `/admin`. Every write is recorded in the immutable audit log.
 | `PUT /admin/api/groups/{group}` | set the meeting link, note, active state |
 | `PUT /admin/api/groups/{group}/members/{member}` | `{"member": true}` grants, `{"member": false}` revokes |
 | `PUT /admin/api/groups/{group}/posts/{post}` | publish or edit a post |
+| `POST /admin/api/groups/{group}/invites` | mint a single-use code; returns it **once** |
 
 Publishing a recorded zikr:
 
@@ -65,20 +90,33 @@ PUT /admin/api/groups/usa/posts/zikr-2026-10-26
 one, so a zikr post can never render as an empty player. An announcement takes
 `title`, optional `body` and an optional `linkURL`.
 
+Minting a code, with an optional note for your own records:
+
+```json
+POST /admin/api/groups/usa/invites
+{ "label": "Br. Imran, Houston", "expiresInDays": 30 }
+-> { "ok": true, "groupID": "usa", "code": "KMQ7R-TDVHX", "expiresInDays": 30 }
+```
+
+The code appears in that response and nowhere else: not in the audit log, which
+records only that one was issued, and not in the database, which holds the hash.
+If it is lost before it reaches the member, mint another and let the first
+expire.
+
 Revoking membership takes effect on the member's next request; it does not need
 their device to cooperate.
 
 ## Deploying it
 
-1. Apply the migration: `npm run db:migrate:remote` in `Server/`. Migration
-   `0003` creates the tables and seeds the three groups.
-2. No new secrets are needed. The Apple audience defaults to `APNS_TOPIC`,
-   which is already the bundle id; set `APPLE_CLIENT_ID` only if that ever
-   stops being true.
-3. **Enable Sign in with Apple on the App ID in the developer portal.** The
-   entitlement is in `project.yml`, but a capability missing from the portal
-   fails signing while the build still compiles — so it surfaces late, in
-   `ios-testflight`, not in `ios-verify`.
+1. Apply the migrations: `npm run db:migrate:remote` in `Server/`. `0003`
+   creates the group tables and seeds the three groups; `0004` creates the
+   invite store.
+2. No secrets are needed for invitations. `APPLE_CLIENT_ID` matters only if
+   Sign in with Apple is turned on later, and defaults to `APNS_TOPIC`, which
+   is already the bundle id.
+3. **Nothing in the Apple Developer portal is required for the invitation
+   path.** That is the point of it: the capability that blocked build 47 is not
+   on this route at all.
 
 ## Privacy consequences
 

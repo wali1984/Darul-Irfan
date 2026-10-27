@@ -14,7 +14,17 @@ import Foundation
 /// work. The server side is deployed and tested either way. Flip this and the
 /// entitlement together; `project.yml` carries the same note.
 enum MemberGroupsFeature {
-    static let isEnabled = false
+    /// On, because joining no longer depends on Apple. An administrator issues
+    /// a single-use invitation code and the member redeems it, which needs no
+    /// entitlement, no App ID capability and no change to signing - the three
+    /// things that failed build 47.
+    static let isEnabled = true
+
+    /// Sign in with Apple stays off until `com.apple.developer.applesignin` is
+    /// restored in project.yml AND the capability is enabled on the App ID.
+    /// Showing the button without both would offer a member a sign-in that
+    /// cannot succeed, so the invitation code is the only route meanwhile.
+    static let appleSignInAvailable = false
 }
 
 /// A private regional group of the silsila, as its own members see it.

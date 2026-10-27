@@ -2,7 +2,7 @@ import type { Env } from "./contracts";
 import { cleanText, json, validHTTPURL, validISODate } from "./util";
 import { authenticatedActor } from "./access";
 import { sendTopicPush } from "./apns";
-import { publishGroupPost, setGroupMembership } from "./members";
+import { createInvite, publishGroupPost, setGroupMembership } from "./members";
 
 export async function adminRequest(request: Request, env: Env, path: string): Promise<Response> {
   const actor = await authenticatedActor(request, env);
@@ -131,6 +131,19 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
       if (response.ok) await audit(env, actor, "membership", "member_group_member", `${groupID}:${entity}`, null, { member: input.member !== false }, now);
       return response;
     }
+  }
+  // /admin/api/groups/{group}/invites -> mint a single-use code
+  const inviteRoute = /^\/admin\/api\/groups\/([a-z0-9-]{1,40})\/invites$/.exec(path);
+  if (request.method === "POST" && inviteRoute) {
+    const groupID = inviteRoute[1] as string;
+    const input = await request.json<Record<string, unknown>>();
+    const response = await createInvite(env, actor, groupID, input);
+    if (response.ok) {
+      // The code never enters the audit log; only that one was issued.
+      await audit(env, actor, "invite", "member_group_invite", groupID, null,
+        { label: cleanText(input.label, 120) ?? null }, new Date().toISOString());
+    }
+    return response;
   }
   if (request.method === "POST" && path === "/admin/api/push") {
     if (!hasRole(actor, env.ADMIN_BROADCASTER_EMAILS)) return json({ error: "Broadcaster role required" }, { status: 403 });

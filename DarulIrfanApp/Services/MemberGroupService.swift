@@ -5,12 +5,19 @@ enum MemberGroupError: LocalizedError {
     case signInRejected
     case notSignedIn
     case requestFailed
+    case inviteRejected
+    case tooManyAttempts
 
     var errorDescription: String? {
         switch self {
         case .signInRejected: "Your Apple sign-in could not be verified. Please try again."
-        case .notSignedIn: "Sign in to see your group."
+        case .notSignedIn: "Enter your invitation code to see your group."
         case .requestFailed: "Your group could not be loaded. Check your connection and try again."
+        // Deliberately one message for every refusal. The server does not say
+        // whether a code was wrong, already used or expired, and neither does
+        // this: anything finer would help someone guess at codes.
+        case .inviteRejected: "That invitation code is not valid, or it has already been used. Please check it with the administrator who gave it to you."
+        case .tooManyAttempts: "Too many attempts. Please wait a few minutes and try again."
         }
     }
 }
@@ -57,6 +64,28 @@ actor MemberGroupService {
         guard (response as? HTTPURLResponse)?.statusCode == 201,
               let value = try? decoder.decode(MemberSession.self, from: data) else {
             throw MemberGroupError.signInRejected
+        }
+        SecureMemberSession.save(value)
+        return value.memberID
+    }
+
+    /// Redeems an administrator's invitation code.
+    ///
+    /// Unlike signing in, redeeming is admission: an administrator already
+    /// decided it by issuing the code, so this both identifies the member and
+    /// places them in the one group the code was minted for. Single-use, so a
+    /// forwarded code cannot let a second person in.
+    func redeemInvite(code: String, displayName: String?) async throws -> String {
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/members/invite"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        var payload: [String: String] = ["code": code]
+        if let displayName, !displayName.isEmpty { payload["displayName"] = displayName }
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let (data, response) = try await session.data(for: request)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status == 201, let value = try? decoder.decode(MemberSession.self, from: data) else {
+            throw status == 429 ? MemberGroupError.tooManyAttempts : MemberGroupError.inviteRejected
         }
         SecureMemberSession.save(value)
         return value.memberID
