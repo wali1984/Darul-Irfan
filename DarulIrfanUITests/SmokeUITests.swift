@@ -8,10 +8,11 @@
 final class SmokeUITests: XCTestCase {
 
     /// Exactly five, and no more: iPhone folds anything past the fifth into a
-    /// system "More" list, which is how Explore stopped being a tab button when
-    /// Hadith was briefly given a sixth tab. Quran and Hadith now sit together
-    /// under Read.
-    private let tabLabels = ["Today", "Read", "Zikr", "Explore", "More"]
+    /// system "More" list, which is how a tab once stopped being a tab button
+    /// when Hadith was briefly given a sixth tab. Quran and Hadith now sit
+    /// together under Read. Must match RootView's tab labels (v1.11 renamed
+    /// Explore to Discover and More to Community).
+    private let tabLabels = ["Today", "Read", "Zikr", "Discover", "Community"]
 
     override func setUp() {
         continueAfterFailure = false
