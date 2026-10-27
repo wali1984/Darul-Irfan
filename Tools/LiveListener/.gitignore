@@ -2,3 +2,4 @@ test_stream.ts
 *.wav
 __pycache__/
 listener.env
+listener.log*

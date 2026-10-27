@@ -255,6 +255,17 @@ class LoopbackAudio:
         self.audio.terminate()
 
 
+def env_file(path: Path) -> dict[str, str]:
+    """KEY=VALUE lines; blank lines and # comments ignored."""
+    values: dict[str, str] = {}
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            key, sep, value = line.strip().partition("=")
+            if sep and key and not key.startswith("#"):
+                values[key.strip()] = value.strip()
+    return values
+
+
 # MARK: - Encoder
 
 def find_ffmpeg() -> str | None:
@@ -407,12 +418,15 @@ def heartbeat(endpoint: str | None, token: str | None, state: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--room", default="oursheikh")
-    parser.add_argument("--output", help="srt:// (hub) or rtmps:// (direct) destination")
-    parser.add_argument("--heartbeat-url")
-    parser.add_argument("--heartbeat-token")
-    parser.add_argument("--listener-id", default="listener-a")
-    parser.add_argument("--input-id", help="the Cloudflare Stream live input this listener feeds")
+    # Each setting can also come from listener.env beside this script, so the
+    # stream key and token never sit on a command line others can list.
+    settings = env_file(HERE / "listener.env")
+    parser.add_argument("--room", default=settings.get("ROOM", "oursheikh"))
+    parser.add_argument("--output", default=settings.get("OUTPUT"), help="srt:// (hub) or rtmps:// (direct) destination")
+    parser.add_argument("--heartbeat-url", default=settings.get("HEARTBEAT_URL"))
+    parser.add_argument("--heartbeat-token", default=settings.get("LISTENER_TOKEN"))
+    parser.add_argument("--listener-id", default=settings.get("LISTENER_ID", "listener-a"))
+    parser.add_argument("--input-id", default=settings.get("INPUT_ID"), help="the Cloudflare Stream live input this listener feeds")
     parser.add_argument("--once-test", type=int, metavar="SECONDS",
                         help="stream SECONDS of whatever is playing to a local test file, then stop")
     args = parser.parse_args()
