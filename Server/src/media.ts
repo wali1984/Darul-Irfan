@@ -1,7 +1,8 @@
 import type { Env } from "./contracts";
 import { json } from "./util";
 
-// Pictures forwarded to the WhatsApp Business number.
+// Pictures forwarded to the WhatsApp Business number, and zikr recordings
+// uploaded to a group (see recordings.ts).
 //
 // Meta hands a webhook only a media id. The picture itself is fetched with the
 // Business account's access token - first the id resolves to a short-lived
@@ -47,7 +48,7 @@ async function signature(env: Env, key: string, expires: number): Promise<string
   return [...new Uint8Array(signed)].map(byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-/** A link to a stored picture, valid for `seconds`. */
+/** A link to a stored picture or recording, valid for `seconds`. */
 export async function signedMediaURL(env: Env, key: string, seconds = 86_400): Promise<string | undefined> {
   const expires = Math.floor(Date.now() / 1000) + seconds;
   const sig = await signature(env, key, expires);
@@ -55,12 +56,16 @@ export async function signedMediaURL(env: Env, key: string, seconds = 86_400): P
   return `${env.PUBLIC_BASE_URL}/v1/media/${encodeURIComponent(key)}?exp=${expires}&sig=${sig}`;
 }
 
-/** Serves a stored picture to a holder of a valid, unexpired link. */
-export async function serveMedia(env: Env, rawKey: string, url: URL): Promise<Response> {
+const SERVABLE = /^(whatsapp\/[A-Za-z0-9._-]{1,120}|recordings\/[a-z0-9-]{1,40}\/[A-Za-z0-9._-]{1,120})$/;
+
+/** Serves a stored picture or recording to a holder of a valid, unexpired
+ *  link. Byte ranges are honoured: the player streams a recording in parts
+ *  and seeks to where the group is listening. */
+export async function serveMedia(request: Request, env: Env, rawKey: string, url: URL): Promise<Response> {
   const key = decodeURIComponent(rawKey);
   const expires = Number(url.searchParams.get("exp"));
   const given = url.searchParams.get("sig") ?? "";
-  if (!env.MEDIA || !/^whatsapp\/[A-Za-z0-9._-]{1,120}$/.test(key) || !Number.isInteger(expires) || expires * 1000 < Date.now()) {
+  if (!env.MEDIA || !SERVABLE.test(key) || !Number.isInteger(expires) || expires * 1000 < Date.now()) {
     return json({ error: "Not found" }, { status: 404 });
   }
   const expected = await signature(env, key, expires);
@@ -68,14 +73,27 @@ export async function serveMedia(env: Env, rawKey: string, url: URL): Promise<Re
   let difference = 0;
   for (let i = 0; i < expected.length; i += 1) difference |= expected.charCodeAt(i) ^ given.charCodeAt(i);
   if (difference !== 0) return json({ error: "Not found" }, { status: 404 });
-  const object = await env.MEDIA.get(key);
+  const ranged = request.headers.has("range");
+  const object = request.method === "HEAD"
+    ? await env.MEDIA.head(key)
+    : await env.MEDIA.get(key, ranged ? { range: request.headers } : undefined).catch(() => null);
   if (!object) return json({ error: "Not found" }, { status: 404 });
-  return new Response(object.body, {
-    headers: {
-      "content-type": object.httpMetadata?.contentType ?? "application/octet-stream",
-      // Private to the device that asked; the link itself expires.
-      "cache-control": "private, max-age=3600",
-      "x-content-type-options": "nosniff",
-    },
+  const headers = new Headers({
+    "content-type": object.httpMetadata?.contentType ?? "application/octet-stream",
+    "accept-ranges": "bytes",
+    // Private to the device that asked; the link itself expires.
+    "cache-control": "private, max-age=3600",
+    "x-content-type-options": "nosniff",
   });
+  const range = object.range as { offset?: number; length?: number; suffix?: number } | undefined;
+  const body = request.method === "HEAD" ? null : (object as R2ObjectBody).body;
+  if (ranged && range && body) {
+    const offset = range.suffix !== undefined ? object.size - range.suffix : range.offset ?? 0;
+    const length = range.suffix ?? range.length ?? object.size - offset;
+    headers.set("content-range", `bytes ${offset}-${offset + length - 1}/${object.size}`);
+    headers.set("content-length", String(length));
+    return new Response(body, { status: 206, headers });
+  }
+  if (Number.isFinite(object.size)) headers.set("content-length", String(object.size));
+  return new Response(body, { headers });
 }

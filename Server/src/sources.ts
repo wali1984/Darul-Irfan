@@ -55,7 +55,7 @@ export async function refreshYouTube(env: Env): Promise<void> {
     const id = item.id; const snippet = item.snippet;
     if (!id || !snippet?.title || !snippet.publishedAt) continue;
     await env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,image_url,video_id,published_at,raw_json,updated_at)
-      VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,updated_at=excluded.updated_at`)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,raw_json=excluded.raw_json,updated_at=excluded.updated_at`)
       .bind(`youtube:${id}`, "youtube", "video", cleanText(snippet.title, 300), cleanText(snippet.description), `https://www.youtube.com/watch?v=${id}`,
         validHTTPURL(snippet.thumbnails?.high?.url) ?? null, id, snippet.publishedAt, JSON.stringify(item), now).run();
     if (automatic && !candidate && (snippet.liveBroadcastContent === "live" || snippet.liveBroadcastContent === "upcoming")) {

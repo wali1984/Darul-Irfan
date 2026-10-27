@@ -12,6 +12,7 @@ import {
 import { serveMedia } from "./media";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
+import { deleteRecording, endFinishedRecordings, listRecordings, uploadRecording } from "./recordings";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -59,8 +60,10 @@ async function route(request: Request, env: Env): Promise<Response> {
   // The in-app meeting screen. It holds no secret: the participant token
   // travels in the URL fragment, which browsers never send.
   if (request.method === "GET" && path === "/v1/meet") return meetingPage();
-  // Pictures, by signed and expiring link only.
-  if (request.method === "GET" && path.startsWith("/v1/media/")) return serveMedia(env, path.slice("/v1/media/".length), url);
+  // Pictures and recordings, by signed and expiring link only.
+  if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/media/")) {
+    return serveMedia(request, env, path.slice("/v1/media/".length), url);
+  }
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
     const member = await authenticatedMember(request, env);
     if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
@@ -72,7 +75,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (!section && request.method === "GET") return groupDetail(env, member, groupID);
@@ -95,6 +98,12 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (section === "people" && entity && request.method === "PUT") return setPersonRole(env, member, groupID, entity, await body());
     if (section === "people" && entity && request.method === "DELETE") return removePerson(env, member, groupID, entity);
     if (section === "invitations" && entity && request.method === "DELETE") return revokeInvitation(env, member, groupID, entity);
+    if (section === "recordings" && !entity && request.method === "GET") return listRecordings(env, member, groupID);
+    if (section === "recordings" && !entity && request.method === "POST") {
+      if (!await withinWriteLimit(request, env, "recording-upload", 20)) return json({ error: "Too many requests" }, { status: 429 });
+      return uploadRecording(request, env, member, groupID, url);
+    }
+    if (section === "recordings" && entity && request.method === "DELETE") return deleteRecording(env, member, groupID, entity);
     return json({ error: "Not found" }, { status: 404 });
   }
   if (request.method === "POST" && path === "/v1/devices") {
@@ -185,6 +194,8 @@ export default {
       { name: "youtube", run: refreshYouTube(env) },
       // Catches a listener that has gone silent, which no heartbeat reports.
       { name: "live-listeners", run: reconcileLive(env) },
+      // Ends a group's recorded zikr when the recording has finished.
+      { name: "group-recordings", run: endFinishedRecordings(env) },
     ];
     if (minute % 15 === 0) jobs.push(
       { name: "website", run: refreshWebsiteCatalog(env) }

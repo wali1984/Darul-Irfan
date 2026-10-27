@@ -21420,6 +21420,397 @@
           }
         }
       }
+    },
+    "A past zikr plays to everyone from the start together, and the session ends when the video does.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A past zikr plays to everyone from the start together, and the session ends when the video does."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گزشتہ ذکر سب کے لیے ایک ساتھ شروع سے چلتا ہے، اور ویڈیو ختم ہونے پر نشست بھی ختم ہو جاتی ہے۔"
+          }
+        }
+      }
+    },
+    "A recording is playing to the group. It starts where the group is now, so everyone hears the same part.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A recording is playing to the group. It starts where the group is now, so everyone hears the same part."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے میں ایک ریکارڈنگ چل رہی ہے۔ یہ وہیں سے شروع ہوتی ہے جہاں حلقہ اس وقت ہے، تاکہ سب ایک ہی حصہ سنیں۔"
+          }
+        }
+      }
+    },
+    "Catch up with the group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catch up with the group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کے ساتھ شامل ہوں"
+          }
+        }
+      }
+    },
+    "Choose an MP3, M4A, AAC, WAV, MP4 or MOV file.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an MP3, M4A, AAC, WAV, MP4 or MOV file."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MP3، M4A، AAC، WAV، MP4 یا MOV فائل منتخب کریں۔"
+          }
+        }
+      }
+    },
+    "How the group joins": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How the group joins"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقہ کیسے شامل ہو"
+          }
+        }
+      }
+    },
+    "Leading live in a room: integration in progress. Meanwhile share a live YouTube link here, or play a past zikr or a recording.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leading live in a room: integration in progress. Meanwhile share a live YouTube link here, or play a past zikr or a recording."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روم میں براہِ راست ذکر کروانا: انضمام جاری ہے۔ اس دوران یہاں یوٹیوب کا براہِ راست لنک دیں، یا گزشتہ ذکر یا کوئی ریکارڈنگ چلائیں۔"
+          }
+        }
+      }
+    },
+    "MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together from the moment you start, and the session ends when the recording does.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together from the moment you start, and the session ends when the recording does."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MP3، M4A، AAC، WAV، MP4 یا MOV، زیادہ سے زیادہ 95 MB۔ آپ کے شروع کرتے ہی اراکین ایک ساتھ سنتے ہیں، اور ریکارڈنگ ختم ہونے پر نشست بھی ختم ہو جاتی ہے۔"
+          }
+        }
+      }
+    },
+    "No past zikr videos yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No past zikr videos yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی گزشتہ ذکر کی کوئی ویڈیو نہیں۔"
+          }
+        }
+      }
+    },
+    "No recordings yet. Upload one from your phone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No recordings yet. Upload one from your phone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی کوئی ریکارڈنگ نہیں۔ اپنے فون سے ایک اپ لوڈ کریں۔"
+          }
+        }
+      }
+    },
+    "Past zikr from the channel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past zikr from the channel"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چینل سے گزشتہ ذکر"
+          }
+        }
+      }
+    },
+    "The file is larger than 95 MB. Choose a shorter recording, or one saved at a lower quality.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The file is larger than 95 MB. Choose a shorter recording, or one saved at a lower quality."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فائل 95 MB سے بڑی ہے۔ مختصر ریکارڈنگ منتخب کریں، یا کم معیار پر محفوظ کی گئی۔"
+          }
+        }
+      }
+    },
+    "The group is at %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The group is at %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقہ اس وقت %@ پر ہے"
+          }
+        }
+      }
+    },
+    "The group is at %@ of %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The group is at %@ of %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقہ اس وقت %2$@ میں سے %1$@ پر ہے"
+          }
+        }
+      }
+    },
+    "The group's recordings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The group's recordings"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کی ریکارڈنگز"
+          }
+        }
+      }
+    },
+    "The recording has finished.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The recording has finished."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ ختم ہو گئی ہے۔"
+          }
+        }
+      }
+    },
+    "Upload a recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upload a recording"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ اپ لوڈ کریں"
+          }
+        }
+      }
+    },
+    "Uploading...": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploading..."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپ لوڈ ہو رہا ہے..."
+          }
+        }
+      }
+    },
+    "YouTube link, live or recorded": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube link, live or recorded"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یوٹیوب لنک، براہِ راست یا ریکارڈ شدہ"
+          }
+        }
+      }
+    },
+    "Lead live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lead live"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست"
+          }
+        }
+      }
+    },
+    "Recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ"
+          }
+        }
+      }
+    },
+    "Watch together": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch together"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایک ساتھ دیکھیں"
+          }
+        }
+      }
+    },
+    "Listen together": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen together"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایک ساتھ سنیں"
+          }
+        }
+      }
+    },
+    "Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو میٹنگز اور روم میں براہِ راست ذکر: انضمام جاری ہے۔ اس دوران یوٹیوب سے ذکر شروع کریں یا کوئی ریکارڈنگ چلائیں۔ میٹنگز ابھی طے کی جا سکتی ہیں؛ ان کے روم انضمام مکمل ہونے پر کھلیں گے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

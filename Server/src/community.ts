@@ -2,6 +2,7 @@ import type { Env } from "./contracts";
 import { cleanText, json, validHTTPURL, validISODate } from "./util";
 import { sendPushToInstallations } from "./apns";
 import { signedMediaURL } from "./media";
+import { endFinishedRecordings, groupRecording, liveRecording, youtubeVideos } from "./recordings";
 
 // Community groups: what members see and do inside their group, and what the
 // group's admins can run from the app itself.
@@ -79,6 +80,7 @@ export async function me(env: Env, memberID: string): Promise<Response> {
 /** The caller's groups - every group for the super admin - each with whether
  *  they manage it and whether something is live in it now. */
 export async function communityGroups(env: Env, memberID: string): Promise<Response> {
+  await endFinishedRecordings(env);
   const role = await memberRole(env, memberID);
   const sql = role === "superadmin"
     ? `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind
@@ -106,9 +108,11 @@ export async function communityGroups(env: Env, memberID: string): Promise<Respo
 export async function groupDetail(env: Env, memberID: string, groupID: string): Promise<Response> {
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
+  await endFinishedRecordings(env);
   const [group, live, zikr, meetings] = await Promise.all([
     env.DB.prepare("SELECT id,name,description FROM member_groups WHERE id=?").bind(groupID).first(),
-    env.DB.prepare("SELECT state,kind,title,video_id,room_id,started_at FROM group_live WHERE group_id=?").bind(groupID).first(),
+    env.DB.prepare("SELECT state,kind,title,video_id,room_id,started_at,recording_id,recorded,ends_at FROM group_live WHERE group_id=?")
+      .bind(groupID).first<Record<string, string | number | null>>(),
     env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes
       FROM group_zikr_sessions WHERE group_id=? AND is_active=1 ORDER BY start_hour,start_minute`).bind(groupID).all(),
     env.DB.prepare(`SELECT id,title,starts_at,duration_minutes FROM group_meetings
@@ -116,6 +120,8 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
       .bind(groupID, new Date(Date.now() - 6 * 3_600_000).toISOString()).all(),
   ]);
   const isLive = live?.state === "live";
+  const recording = isLive && live?.recording_id
+    ? await liveRecording(env, groupID, String(live.recording_id), live.ends_at ? String(live.ends_at) : null) : undefined;
   return json({
     group: { id: group?.id, name: group?.name, description: group?.description ?? undefined },
     canManage: await canManage(env, memberID, role, groupID),
@@ -123,6 +129,9 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
       kind: live?.kind, title: live?.title ?? undefined,
       // The video plays in the app; the room is joined through /join.
       videoID: live?.video_id ?? undefined, hasRoom: !!live?.room_id, startedAt: live?.started_at ?? undefined,
+      // A recording plays to everyone from startedAt, so the group hears the
+      // same part together; it ends by itself at endsAt.
+      recorded: !!live?.recorded || !!recording, recording, endsAt: live?.ends_at ?? undefined,
     } : undefined,
     zikrSessions: (zikr.results ?? []).map(row => ({
       id: row.id, title: row.title, weekdays: JSON.parse(String(row.weekdays_json)),
@@ -255,7 +264,8 @@ function validTimeZone(zone: string): boolean {
 // MARK: - Live sessions and meetings
 
 /** Starts or ends what is live in a group: a zikr (watched as a stream, joined
- *  together in a room, or both) or a meeting. Members are told when it starts. */
+ *  together in a room, or both; or a recording played to the group) or a
+ *  meeting. Members are told when it starts. */
 export async function setLive(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
@@ -263,7 +273,8 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
   const now = new Date().toISOString();
   if (input.state !== "live") {
     await env.DB.prepare(`INSERT INTO group_live(group_id,state,updated_at) VALUES(?,'offline',?)
-      ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,updated_at=excluded.updated_at`)
+      ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,recording_id=NULL,recorded=0,ends_at=NULL,
+        updated_at=excluded.updated_at`)
       .bind(groupID, now).run();
     return json({ ok: true, state: "offline" });
   }
@@ -271,22 +282,39 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
   const title = cleanText(input.title, 200) ?? (kind === "zikr" ? "Halqah Zikr" : "Group meeting");
   const video = typeof input.videoID === "string" && /^[\w-]{11}$/.test(input.videoID) ? input.videoID : null;
   const wantsRoom = input.room === true || kind === "meeting";
-  if (!video && !wantsRoom) return json({ error: "A live session needs a video, a room, or both" }, { status: 400 });
+  const recording = kind === "zikr" && typeof input.recordingID === "string"
+    ? await groupRecording(env, groupID, input.recordingID) : null;
+  if (typeof input.recordingID === "string" && !recording) return notFound();
+  if (!video && !wantsRoom && !recording) return json({ error: "A live session needs a video, a room, or a recording" }, { status: 400 });
+  // A past video plays as a recording: from the start for everyone together,
+  // ending when it does. YouTube says which it is; without it, the app does.
+  let recorded = !!recording;
+  let length = recording?.duration_seconds ?? null;
+  if (video && !recording) {
+    const info = (await youtubeVideos(env, [video]))?.get(video);
+    recorded = info ? !info.live : input.recorded === true;
+    length = recorded ? info?.durationSeconds ?? null : null;
+  }
+  // A minute of grace, so a late start on a phone still hears the end.
+  const endsAt = length ? new Date(Date.parse(now) + (length + 60) * 1000).toISOString() : null;
   let roomID: string | null = null;
   if (wantsRoom) {
     const room = await createRoom(env, `${groupID}: ${title}`);
     if (room instanceof Response) return room;
     roomID = room;
   }
-  await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at)
-    VALUES(?,'live',?,?,?,?,?,?,?)
+  await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,recording_id,recorded,ends_at)
+    VALUES(?,'live',?,?,?,?,?,?,?,?,?,?)
     ON CONFLICT(group_id) DO UPDATE SET state='live',kind=excluded.kind,title=excluded.title,video_id=excluded.video_id,
-      room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at`)
-    .bind(groupID, kind, title, video, roomID, now, memberID, now).run();
+      room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at,
+      recording_id=excluded.recording_id,recorded=excluded.recorded,ends_at=excluded.ends_at`)
+    .bind(groupID, kind, title, recording ? null : video, roomID, now, memberID, now, recording?.id ?? null, recorded ? 1 : 0, endsAt).run();
   await notifyGroup(env, groupID, `live:${groupID}:${now}`, title,
-    kind === "zikr" ? "Halqah zikr has started. Join now in Darul Irfan." : "The group meeting has started. Join now in Darul Irfan.",
+    kind === "meeting" ? "The group meeting has started. Join now in Darul Irfan."
+      : recorded ? "A recorded Halqah zikr is playing. Listen together in Darul Irfan."
+      : "Halqah zikr has started. Join now in Darul Irfan.",
     `darulirfan://groups/${groupID}`);
-  return json({ ok: true, state: "live", kind, hasRoom: !!roomID });
+  return json({ ok: true, state: "live", kind, hasRoom: !!roomID, recorded, endsAt: endsAt ?? undefined });
 }
 
 export async function scheduleMeeting(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {

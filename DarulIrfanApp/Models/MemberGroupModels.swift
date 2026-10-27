@@ -54,13 +54,63 @@ enum MemberRole: String, Codable, Sendable {
 struct GroupLive: Codable, Sendable, Equatable {
     var kind: String
     var title: String?
-    /// A live video of the session, played in the app.
+    /// A live video of the session, or a past one played as a recording.
     var videoID: String?
     /// Whether there is a room to join together.
     var hasRoom: Bool
     var startedAt: Date?
+    /// A recording played to the group: it plays to everyone from `startedAt`,
+    /// so the group hears the same part together. Absent from an older server.
+    var recorded: Bool?
+    /// An uploaded recording; a past video comes as `videoID` instead.
+    var recording: GroupLiveRecording?
+    /// When a recording ends, and the session with it.
+    var endsAt: Date?
 
     var isMeeting: Bool { kind == "meeting" }
+    var isRecorded: Bool { recorded == true }
+
+    /// How far into the recording the group is now.
+    func playbackOffset(at date: Date = Date()) -> TimeInterval {
+        guard isRecorded, let startedAt else { return 0 }
+        return max(0, date.timeIntervalSince(startedAt))
+    }
+}
+
+/// A recording uploaded to the group and playing in it now.
+struct GroupLiveRecording: Codable, Sendable, Equatable {
+    var url: URL
+    var title: String
+    var contentType: String
+    var durationSeconds: Int?
+
+    var isVideo: Bool { contentType.hasPrefix("video/") }
+}
+
+/// What a group admin can play to the group instead of leading the zikr live.
+struct GroupRecordingLibrary: Codable, Sendable {
+    var recordings: [GroupRecording]
+    /// Past zikr from the official channel, newest first.
+    var pastVideos: [PastZikrVideo]
+    var maxUploadBytes: Int
+}
+
+struct GroupRecording: Codable, Sendable, Identifiable, Equatable {
+    var id: String
+    var title: String
+    var contentType: String
+    var byteSize: Int
+    var durationSeconds: Int?
+    var createdAt: Date
+}
+
+struct PastZikrVideo: Codable, Sendable, Identifiable, Equatable {
+    var videoID: String
+    var title: String
+    var publishedAt: Date
+    var durationSeconds: Int?
+
+    var id: String { videoID }
 }
 
 /// A scheduled group meeting, joined in the app.

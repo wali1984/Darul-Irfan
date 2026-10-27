@@ -35,6 +35,8 @@ enum MemberGroupError: LocalizedError {
 actor MemberGroupService {
     private let baseURL: URL
     private let session: URLSession
+    /// Recordings can take minutes to send; everything else stays short.
+    private let uploads: URLSession
     private let decoder: JSONDecoder
 
     init(baseURL: URL = OfficialPlatformConfiguration.baseURL) {
@@ -43,6 +45,10 @@ actor MemberGroupService {
         configuration.timeoutIntervalForRequest = 15
         configuration.timeoutIntervalForResource = 30
         session = URLSession(configuration: configuration)
+        let uploading = URLSessionConfiguration.ephemeral
+        uploading.timeoutIntervalForRequest = 60
+        uploading.timeoutIntervalForResource = 3_600
+        uploads = URLSession(configuration: uploading)
         let decoder = JSONDecoder()
         // The server writes JavaScript's toISOString(), which carries
         // milliseconds ("2026-10-27T10:15:00.000Z"). The stock .iso8601
@@ -156,12 +162,51 @@ actor MemberGroupService {
         try await send("DELETE", path: "v1/groups/\(groupID)/posts/\(postID)", payload: nil, expecting: [204])
     }
 
-    /// Starts a live zikr or meeting in the group. `videoID` streams it; `room`
-    /// lets members join it together.
-    func startLive(in groupID: String, kind: String, title: String, videoID: String?, room: Bool) async throws {
-        var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room]
+    /// Starts a live zikr or meeting in the group. `videoID` streams it, or
+    /// plays a past zikr; `room` lets members join it together; `recordingID`
+    /// plays one of the group's recordings.
+    func startLive(
+        in groupID: String, kind: String, title: String, videoID: String?, room: Bool,
+        recordingID: String? = nil, recorded: Bool = false
+    ) async throws {
+        var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room, "recorded": recorded]
         if let videoID { payload["videoID"] = videoID }
+        if let recordingID { payload["recordingID"] = recordingID }
         try await send("POST", path: "v1/groups/\(groupID)/live", payload: payload, expecting: [200])
+    }
+
+    func recordings(in groupID: String) async throws -> GroupRecordingLibrary {
+        try await authorized(GroupRecordingLibrary.self, path: "v1/groups/\(groupID)/recordings")
+    }
+
+    /// Sends a recording file to the group. The file stays where it is; it is
+    /// read as it is sent.
+    func uploadRecording(
+        from file: URL, contentType: String, title: String, durationSeconds: Int?, in groupID: String
+    ) async throws {
+        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        var components = URLComponents(url: baseURL.appendingPathComponent("v1/groups/\(groupID)/recordings"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [URLQueryItem(name: "title", value: title)]
+            + (durationSeconds.map { [URLQueryItem(name: "durationSeconds", value: String($0))] } ?? [])
+        guard let url = components?.url else { throw MemberGroupError.requestFailed }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
+        request.setValue(contentType, forHTTPHeaderField: "content-type")
+        let (data, response) = try await uploads.upload(for: request, fromFile: file)
+        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if code == 401 {
+            SecureMemberSession.delete()
+            throw MemberGroupError.notSignedIn
+        }
+        guard code == 201 else {
+            let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? String
+            throw message.map(MemberGroupError.server) ?? MemberGroupError.requestFailed
+        }
+    }
+
+    func deleteRecording(_ recordingID: String, in groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/recordings/\(recordingID)", payload: nil, expecting: [204])
     }
 
     func endLive(in groupID: String) async throws {

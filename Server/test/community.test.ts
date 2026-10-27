@@ -326,3 +326,122 @@ describe("group admins manage their group's people", () => {
     expect(detail.zikrSessions[0]?.anchor).toBe("tahajjud");
   });
 });
+
+describe("recorded zikr", () => {
+  /** An R2 stand-in that keeps bytes and answers byte ranges like R2 does. */
+  function memoryBucket() {
+    const stored = new Map<string, { bytes: Uint8Array; type: string }>();
+    const bucket = {
+      async put(key: string, value: ReadableStream | ArrayBuffer, options: { httpMetadata: { contentType: string } }) {
+        const bytes = new Uint8Array(value instanceof ArrayBuffer ? value : await new Response(value).arrayBuffer());
+        stored.set(key, { bytes, type: options.httpMetadata.contentType });
+      },
+      async head(key: string) {
+        const item = stored.get(key);
+        return item ? { size: item.bytes.length, httpMetadata: { contentType: item.type } } : null;
+      },
+      async get(key: string, options?: { range?: Headers }) {
+        const item = stored.get(key);
+        if (!item) return null;
+        const match = /bytes=(\d+)-(\d*)/.exec(options?.range?.get("range") ?? "");
+        const offset = match ? Number(match[1]) : 0;
+        const end = match && match[2] ? Number(match[2]) : item.bytes.length - 1;
+        return {
+          size: item.bytes.length, httpMetadata: { contentType: item.type },
+          range: match ? { offset, length: end - offset + 1 } : undefined,
+          body: item.bytes.slice(offset, end + 1),
+        };
+      },
+      async delete(key: string) { stored.delete(key); },
+    };
+    return { bucket, stored };
+  }
+
+  const upload = (env: Env, token: string, bytes: Uint8Array, type = "audio/mpeg", query = "title=Friday%20zikr&durationSeconds=1800") =>
+    worker.fetch(new Request(`https://api.example.com/v1/groups/usa/recordings?${query}`, {
+      method: "POST", body: bytes as unknown as BodyInit,
+      headers: { authorization: `Bearer ${token}`, "content-type": type, "content-length": String(bytes.length) },
+    }), env);
+
+  it("lets a group admin upload a recording and play it to the group, served in byte ranges", async () => {
+    const { bucket, stored } = memoryBucket();
+    const { env, call, member, admin } = await setup({ MEDIA: bucket, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
+    const bytes = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect((await upload(env, member, bytes)).status).toBe(403);
+    expect((await upload(env, admin, bytes, "application/pdf")).status).toBe(415);
+    const created = await upload(env, admin, bytes);
+    expect(created.status).toBe(201);
+    const { id } = (await created.json()) as { id: string };
+    expect([...stored.keys()]).toEqual([`recordings/usa/${id}.mp3`]);
+
+    const listed = (await (await call(admin, "GET", "/v1/groups/usa/recordings")).json()) as { recordings: { id: string; title: string; durationSeconds: number }[] };
+    expect(listed.recordings).toMatchObject([{ id, title: "Friday zikr", durationSeconds: 1800 }]);
+    expect((await call(member, "GET", "/v1/groups/usa/recordings")).status).toBe(403);
+
+    const started = (await (await call(admin, "POST", "/v1/groups/usa/live", { state: "live", recordingID: id })).json()) as { recorded: boolean; endsAt: string };
+    expect(started.recorded).toBe(true);
+    expect(Date.parse(started.endsAt) - Date.now()).toBeGreaterThan(1_800_000);
+    const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as {
+      live: { recorded: boolean; recording: { url: string; contentType: string; durationSeconds: number } };
+    };
+    expect(detail.live).toMatchObject({ recorded: true, recording: { contentType: "audio/mpeg", durationSeconds: 1800 } });
+
+    const url = new URL(detail.live.recording.url);
+    const part = await worker.fetch(new Request(`https://api.example.com${url.pathname}${url.search}`, { headers: { range: "bytes=2-5" } }), env);
+    expect(part.status).toBe(206);
+    expect(part.headers.get("content-range")).toBe("bytes 2-5/10");
+    expect([...new Uint8Array(await part.arrayBuffer())]).toEqual([2, 3, 4, 5]);
+    // The signature covers the key: another group's file cannot be reached by editing the link.
+    const forged = url.pathname.replace("usa", "canada");
+    expect((await worker.fetch(new Request(`https://api.example.com${forged}${url.search}`), env)).status).toBe(404);
+
+    // Not deleted while it plays; deleted once the session ends.
+    expect((await call(admin, "DELETE", `/v1/groups/usa/recordings/${id}`)).status).toBe(409);
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+    expect((await call(admin, "DELETE", `/v1/groups/usa/recordings/${id}`)).status).toBe(204);
+    expect(stored.size).toBe(0);
+  });
+
+  it("ends a recorded session by itself when the recording has finished", async () => {
+    const { bucket } = memoryBucket();
+    const { env, raw, call, member, admin } = await setup({ MEDIA: bucket, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
+    const { id } = (await (await upload(env, admin, new Uint8Array([1, 2]))).json()) as { id: string };
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", recordingID: id });
+    raw.prepare("UPDATE group_live SET ends_at=? WHERE group_id='usa'").run(new Date(Date.now() - 1000).toISOString());
+    const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as { live?: unknown };
+    expect(detail.live).toBeUndefined();
+    const groups = (await (await call(member, "GET", "/v1/groups")).json()) as { groups: { isLive: boolean }[] };
+    expect(groups.groups[0]?.isLive).toBe(false);
+  });
+
+  it("offers the channel's past zikr and plays one as a recording, but a live video as live", async () => {
+    vi.stubGlobal("fetch", async (url: string) => {
+      const ids = new URL(url).searchParams.get("id")?.split(",") ?? [];
+      return new Response(JSON.stringify({ items: ids.map(id => ({
+        id,
+        snippet: { liveBroadcastContent: id === "liveliveliv" ? "live" : "none" },
+        contentDetails: { duration: id === "liveliveliv" ? "P0D" : "PT1H5M" },
+      })) }), { status: 200 });
+    });
+    const { raw, call, member, admin } = await setup({ YOUTUBE_API_KEY: "k" } as Partial<Env>);
+    const now = new Date().toISOString();
+    const video = (id: string, title: string, published: string) =>
+      raw.prepare(`INSERT INTO feed_items(id,source,kind,title,source_url,video_id,published_at,updated_at)
+        VALUES(?,'youtube','video',?,?,?,?,?)`).run(`youtube:${id}`, title, `https://www.youtube.com/watch?v=${id}`, id, published, now);
+    video("pastzikr001", "Online Zikr with Sheikh", "2026-10-20T16:00:00Z");
+    video("bayanbayan1", "Surah Al Imran Ayat 185", "2026-10-21T06:00:00Z");
+    video("liveliveliv", "Online Zikr with Sheikh", "2026-10-27T16:00:00Z");
+    const listed = (await (await call(admin, "GET", "/v1/groups/usa/recordings")).json()) as { pastVideos: { videoID: string; durationSeconds: number }[] };
+    expect(listed.pastVideos).toEqual([expect.objectContaining({ videoID: "pastzikr001", durationSeconds: 3900 })]);
+
+    const past = (await (await call(admin, "POST", "/v1/groups/usa/live", { state: "live", videoID: "pastzikr001" })).json()) as { recorded: boolean; endsAt: string };
+    expect(past.recorded).toBe(true);
+    expect(Date.parse(past.endsAt) - Date.now()).toBeGreaterThan(3_900_000);
+    const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as { live: { videoID: string; recorded: boolean } };
+    expect(detail.live).toMatchObject({ videoID: "pastzikr001", recorded: true });
+
+    const live = (await (await call(admin, "POST", "/v1/groups/usa/live", { state: "live", videoID: "liveliveliv" })).json()) as { recorded: boolean; endsAt?: string };
+    expect(live).toMatchObject({ recorded: false });
+    expect(live.endsAt).toBeUndefined();
+  });
+});

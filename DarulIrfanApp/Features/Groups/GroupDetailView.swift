@@ -97,10 +97,18 @@ struct GroupDetailView: View {
                             .background(Capsule().fill(DIColor.primary))
                             .foregroundStyle(DIColor.onPrimary)
                     }
+                    if live.isRecorded {
+                        Text("A recording is playing to the group. It starts where the group is now, so everyone hears the same part.")
+                            .font(.caption)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
                     if let video = live.videoID {
-                        YouTubePlayerView(videoID: video)
+                        YouTubePlayerView(videoID: video, playsTogetherFrom: live.isRecorded ? live.startedAt : nil)
                             .frame(height: 210)
                             .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
+                    }
+                    if let recording = live.recording {
+                        GroupRecordingPlayer(live: live, recording: recording, groupName: group.name, audioPlayer: dependencies?.audioPlayer)
                     }
                     if live.hasRoom {
                         Button {
@@ -216,7 +224,7 @@ struct GroupDetailView: View {
                     adminButton("Schedule a meeting", "calendar.badge.plus", .meeting)
                     adminButton("Add a zikr time", "clock.badge", .zikr)
                     if !meetingsReady {
-                        IntegrationPendingNote("Video meetings and joining the zikr together: integration in progress. Meetings can be scheduled now; their rooms open once it is complete.")
+                        IntegrationPendingNote("Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete.")
                     }
                     if !whatsappReady {
                         IntegrationPendingNote("Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.")

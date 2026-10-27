@@ -1,8 +1,11 @@
+import AVFoundation
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
-// What a group admin does from the phone: post, start a community zikr or a
-// meeting, schedule a meeting, and keep the group's zikr times.
+// What a group admin does from the phone: post, start a community zikr (led
+// live, or a past zikr or recording played to the group) or a meeting,
+// schedule a meeting, and keep the group's zikr times.
 
 /// Reads a video's id from whatever an admin pastes: a share link, a watch
 /// link, a live link, or the bare id.
@@ -138,11 +141,26 @@ struct GroupLiveStarter: View {
         var id: String { rawValue }
     }
 
+    /// How the zikr reaches the group.
+    private enum Source: String, CaseIterable, Identifiable {
+        case room = "Lead live"
+        case youtube = "YouTube"
+        case recording = "Recording"
+        var id: String { rawValue }
+    }
+
     @Environment(\.dismiss) private var dismiss
     @State private var kind: Kind = .zikr
+    @State private var source: Source = .room
     @State private var title = String(localized: "Halqah Zikr")
     @State private var videoLink = ""
     @State private var joinTogether = true
+    @State private var library: GroupRecordingLibrary?
+    @State private var libraryFailed = false
+    @State private var pastVideoID: String?
+    @State private var recordingID: String?
+    @State private var choosingFile = false
+    @State private var uploading = false
     @State private var working = false
     @State private var error: String?
 
@@ -160,18 +178,15 @@ struct GroupLiveStarter: View {
             }
             if kind == .zikr {
                 Section {
-                    Toggle("Members join the zikr together", isOn: $joinTogether)
-                        .disabled(!meetingsReady)
-                    TextField("Live video link (optional)", text: $videoLink)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .keyboardType(.URL)
-                } footer: {
-                    if meetingsReady {
-                        Text("Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both.")
-                    } else {
-                        Text("Joining together: integration in progress. Share a live video link meanwhile.")
+                    Picker("How the group joins", selection: $source) {
+                        ForEach(Source.allCases) { source in Text(LocalizedStringKey(source.rawValue)).tag(source) }
                     }
+                    .pickerStyle(.segmented)
+                }
+                switch source {
+                case .room: roomSection
+                case .youtube: youtubeSections
+                case .recording: recordingSections
                 }
             } else {
                 Section {
@@ -193,7 +208,7 @@ struct GroupLiveStarter: View {
                 } label: {
                     Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
                 }
-                .disabled(working || !canStart)
+                .disabled(working || uploading || !canStart)
             }
         }
         .scrollContentBackground(.hidden)
@@ -201,27 +216,238 @@ struct GroupLiveStarter: View {
         .navigationTitle("Go live")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.audio, .movie]) { result in
+            if case .success(let file) = result { Task { await upload(file) } }
+        }
+        .task {
+            // Until the room service is connected, start where a zikr can play.
+            if !meetingsReady { source = .youtube }
+            await loadLibrary()
+        }
     }
+
+    // MARK: Sources
+
+    private var roomSection: some View {
+        Section {
+            Toggle("Members join the zikr together", isOn: $joinTogether)
+                .disabled(!meetingsReady)
+            TextField("Live video link (optional)", text: $videoLink)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .keyboardType(.URL)
+        } footer: {
+            if meetingsReady {
+                Text("Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both.")
+            } else {
+                Text("Leading live in a room: integration in progress. Meanwhile share a live YouTube link here, or play a past zikr or a recording.")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var youtubeSections: some View {
+        Section {
+            TextField("YouTube link, live or recorded", text: $videoLink)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .keyboardType(.URL)
+                .onChange(of: videoLink) { _, value in if !value.isEmpty { pastVideoID = nil } }
+        } footer: {
+            Text("A past zikr plays to everyone from the start together, and the session ends when the video does.")
+        }
+        Section("Past zikr from the channel") {
+            if let videos = library?.pastVideos {
+                if videos.isEmpty {
+                    Text("No past zikr videos yet.").foregroundStyle(DIColor.textMuted)
+                }
+                ForEach(videos.prefix(30)) { video in
+                    choiceRow(
+                        title: video.title,
+                        detail: [video.publishedAt.formatted(date: .abbreviated, time: .omitted), length(video.durationSeconds)],
+                        selected: pastVideoID == video.videoID
+                    ) {
+                        pastVideoID = video.videoID
+                        videoLink = ""
+                    }
+                }
+            } else {
+                libraryStatus
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var recordingSections: some View {
+        Section {
+            if let recordings = library?.recordings {
+                if recordings.isEmpty {
+                    Text("No recordings yet. Upload one from your phone.").foregroundStyle(DIColor.textMuted)
+                }
+                ForEach(recordings) { recording in
+                    choiceRow(
+                        title: recording.title,
+                        detail: [length(recording.durationSeconds), ByteCountFormatter.string(fromByteCount: Int64(recording.byteSize), countStyle: .file)],
+                        selected: recordingID == recording.id
+                    ) {
+                        recordingID = recording.id
+                    }
+                    .swipeActions {
+                        Button("Delete", role: .destructive) { Task { await delete(recording) } }
+                    }
+                }
+            } else {
+                libraryStatus
+            }
+            Button {
+                choosingFile = true
+            } label: {
+                if uploading {
+                    HStack(spacing: DISpacing.sm) {
+                        ProgressView()
+                        Text("Uploading...")
+                    }
+                } else {
+                    Label("Upload a recording", systemImage: "square.and.arrow.up")
+                }
+            }
+            .disabled(uploading || library == nil)
+        } header: {
+            Text("The group's recordings")
+        } footer: {
+            Text("MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together from the moment you start, and the session ends when the recording does.")
+        }
+    }
+
+    @ViewBuilder
+    private var libraryStatus: some View {
+        if libraryFailed {
+            Button("Try again") { Task { await loadLibrary() } }
+        } else {
+            ProgressView()
+        }
+    }
+
+    private func choiceRow(title: String, detail: [String?], selected: Bool, choose: @escaping () -> Void) -> some View {
+        Button(action: choose) {
+            HStack(spacing: DISpacing.sm) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: title).foregroundStyle(DIColor.textPrimary).lineLimit(2)
+                    Text(verbatim: detail.compactMap { $0 }.joined(separator: " · "))
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                }
+                Spacer(minLength: 0)
+                if selected {
+                    Image(systemName: "checkmark").foregroundStyle(DIColor.primary)
+                }
+            }
+        }
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private func length(_ seconds: Int?) -> String? {
+        guard let seconds, seconds > 0 else { return nil }
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = seconds >= 3_600 ? [.hour, .minute] : [.minute, .second]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: TimeInterval(seconds))
+    }
+
+    // MARK: Starting
 
     private var canStart: Bool {
         if kind == .meeting { return meetingsReady }
         let video = VideoLink.id(from: videoLink)
-        let room = joinTogether && meetingsReady
-        return (room || video != nil) && (videoLink.isEmpty || video != nil)
+        switch source {
+        case .room:
+            let room = joinTogether && meetingsReady
+            return (room || video != nil) && (videoLink.isEmpty || video != nil)
+        case .youtube:
+            return pastVideoID != nil || video != nil
+        case .recording:
+            return recordingID != nil
+        }
     }
 
     private func start() async {
         working = true
         defer { working = false }
         do {
-            try await service.startLive(
-                in: groupID,
-                kind: kind == .zikr ? "zikr" : "meeting",
-                title: title.trimmingCharacters(in: .whitespaces),
-                videoID: kind == .zikr ? VideoLink.id(from: videoLink) : nil,
-                room: kind == .meeting || (joinTogether && meetingsReady)
-            )
+            let title = title.trimmingCharacters(in: .whitespaces)
+            if kind == .meeting {
+                try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true)
+            } else {
+                switch source {
+                case .room:
+                    try await service.startLive(in: groupID, kind: "zikr", title: title,
+                                                videoID: VideoLink.id(from: videoLink), room: joinTogether && meetingsReady)
+                case .youtube:
+                    // A video picked from the past zikr is a recording; for a
+                    // pasted link the server asks YouTube which it is.
+                    try await service.startLive(in: groupID, kind: "zikr", title: title,
+                                                videoID: pastVideoID ?? VideoLink.id(from: videoLink), room: false,
+                                                recorded: pastVideoID != nil)
+                case .recording:
+                    try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: nil, room: false,
+                                                recordingID: recordingID)
+                }
+            }
             dismiss()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    // MARK: Recordings
+
+    private func loadLibrary() async {
+        libraryFailed = false
+        do {
+            library = try await service.recordings(in: groupID)
+        } catch {
+            libraryFailed = true
+        }
+    }
+
+    private func upload(_ file: URL) async {
+        error = nil
+        let types = ["mp3": "audio/mpeg", "m4a": "audio/mp4", "aac": "audio/aac", "wav": "audio/wav",
+                     "mp4": "video/mp4", "m4v": "video/mp4", "mov": "video/quicktime"]
+        guard let contentType = types[file.pathExtension.lowercased()] else {
+            error = String(localized: "Choose an MP3, M4A, AAC, WAV, MP4 or MOV file.")
+            return
+        }
+        let scoped = file.startAccessingSecurityScopedResource()
+        defer { if scoped { file.stopAccessingSecurityScopedResource() } }
+        let size = (try? file.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        if size > library?.maxUploadBytes ?? Int.max {
+            error = String(localized: "The file is larger than 95 MB. Choose a shorter recording, or one saved at a lower quality.")
+            return
+        }
+        uploading = true
+        defer { uploading = false }
+        do {
+            let duration = try? await AVURLAsset(url: file).load(.duration).seconds
+            let name = file.deletingPathExtension().lastPathComponent
+            try await service.uploadRecording(
+                from: file, contentType: contentType, title: name,
+                durationSeconds: duration.flatMap { $0.isFinite && $0 > 0 ? Int($0.rounded()) : nil }, in: groupID
+            )
+            let before = Set(library?.recordings.map(\.id) ?? [])
+            await loadLibrary()
+            // Select what was just uploaded.
+            recordingID = library?.recordings.first { !before.contains($0.id) }?.id ?? recordingID
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    private func delete(_ recording: GroupRecording) async {
+        do {
+            try await service.deleteRecording(recording.id, in: groupID)
+            if recordingID == recording.id { recordingID = nil }
+            await loadLibrary()
         } catch {
             self.error = error.localizedDescription
         }
