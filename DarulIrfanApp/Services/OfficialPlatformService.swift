@@ -262,7 +262,7 @@ actor OfficialPlatformService:
 
 }
 
-private enum SecureInstallationIdentity {
+enum SecureInstallationIdentity {
     private static let service = "us.naqshbaniaowaisiah.installation"
     private static let account = "anonymous-installation-id"
 

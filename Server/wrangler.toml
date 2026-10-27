@@ -12,11 +12,20 @@ YOUTUBE_CHANNEL_ID = "UCefP_tP1ROXmqu2miDVCtCg"
 FACEBOOK_PAGE_ID = "oursheikh.official"
 FACEBOOK_GRAPH_VERSION = "v25.0"
 APNS_TOPIC = "us.naqshbaniaowaisiah"
+# Holds every staff role on /admin (also needs to be allowed by the Cloudflare
+# Access policy in front of it).
+SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "darul-irfan"
 database_id = "0b4ba0a2-0e52-4cd0-a3f4-1d7e20fdf01a"
+
+# Pictures forwarded to the WhatsApp Business number. Create the bucket once:
+#   npx wrangler r2 bucket create darul-irfan-media
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "darul-irfan-media"
 
 [triggers]
 crons = ["*/5 * * * *"]

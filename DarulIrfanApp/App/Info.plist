@@ -47,6 +47,10 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Darul Irfan uses the microphone only when you join a group meeting or community zikr and choose to speak.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Darul Irfan uses the camera only when you join a group meeting and turn your video on.</string>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>Darul Irfan adds community events such as the Monthly Ijtema to your calendar only when you ask it to.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

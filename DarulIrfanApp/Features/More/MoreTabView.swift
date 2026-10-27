@@ -87,7 +87,7 @@ struct MoreTabView: View {
                     systemImage: "lock.shield",
                     delay: 0.10
                 ) {
-                    GroupsHomeView()
+                    GroupsHomeView(dependencies: dependencies)
                 }
             }
 

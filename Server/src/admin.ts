@@ -3,11 +3,12 @@ import { cleanText, json, validHTTPURL, validISODate } from "./util";
 import { authenticatedActor } from "./access";
 import { sendTopicPush } from "./apns";
 import { createInvite, publishGroupPost, setGroupMembership } from "./members";
+import { notifyGroup, shareFeedItemToGroup } from "./community";
 
 export async function adminRequest(request: Request, env: Env, path: string): Promise<Response> {
   const actor = await authenticatedActor(request, env);
   if (!actor) return json({ error: "Cloudflare Access authentication required" }, { status: 401 });
-  if (!hasRole(actor, env.ADMIN_EDITOR_EMAILS) && !hasRole(actor, env.ADMIN_BROADCASTER_EMAILS)) {
+  if (!isEditor(actor, env) && !isBroadcaster(actor, env)) {
     return json({ error: "Staff role required" }, { status: 403 });
   }
   if (request.method === "GET" && path === "/admin") return adminHTML(actor);
@@ -132,6 +133,68 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
       return response;
     }
   }
+  // WhatsApp numbers whose forwards go to a group by default.
+  const senderRoute = /^\/admin\/api\/whatsapp\/senders\/([0-9]{6,20})$/.exec(path);
+  if (senderRoute && request.method === "PUT") {
+    const input = await request.json<Record<string, unknown>>();
+    const groupID = typeof input.groupID === "string" ? input.groupID : "";
+    const group = await env.DB.prepare("SELECT 1 AS ok FROM member_groups WHERE id=?").bind(groupID).first();
+    if (!group) return json({ error: "Unknown group" }, { status: 404 });
+    const now = new Date().toISOString();
+    await env.DB.prepare(`INSERT INTO whatsapp_sender_groups(sender,group_id,label,updated_at,updated_by) VALUES(?,?,?,?,?)
+      ON CONFLICT(sender) DO UPDATE SET group_id=excluded.group_id,label=excluded.label,updated_at=excluded.updated_at,updated_by=excluded.updated_by`)
+      .bind(senderRoute[1], groupID, cleanText(input.label, 120) ?? null, now, actor).run();
+    await audit(env, actor, "route", "whatsapp_sender", senderRoute[1] as string, null, { groupID }, now);
+    return json({ ok: true, sender: senderRoute[1], groupID });
+  }
+  if (senderRoute && request.method === "DELETE") {
+    await env.DB.prepare("DELETE FROM whatsapp_sender_groups WHERE sender=?").bind(senderRoute[1]).run();
+    return new Response(null, { status: 204 });
+  }
+  if (request.method === "GET" && path === "/admin/api/whatsapp/senders") {
+    const rows = await env.DB.prepare("SELECT sender,group_id,label,updated_at FROM whatsapp_sender_groups ORDER BY group_id,sender").all();
+    return json({ senders: rows.results });
+  }
+  // A member's role in the app: member, admin (of their groups) or superadmin.
+  const roleRoute = /^\/admin\/api\/members\/([0-9a-f]{32})\/role$/.exec(path);
+  if (roleRoute && request.method === "PUT") {
+    const input = await request.json<Record<string, unknown>>();
+    const role = input.role === "admin" || input.role === "superadmin" ? input.role : "member";
+    if (role === "superadmin" && !hasRole(actor, env.SUPER_ADMIN_EMAILS)) {
+      return json({ error: "Only a super admin can make another super admin" }, { status: 403 });
+    }
+    const result = await env.DB.prepare("UPDATE members SET role=? WHERE id=?").bind(role, roleRoute[1]).run();
+    if ((result.meta?.changes ?? 0) === 0) return json({ error: "Unknown member" }, { status: 404 });
+    await audit(env, actor, "role", "member", roleRoute[1] as string, null, { role }, new Date().toISOString());
+    return json({ ok: true, memberID: roleRoute[1], role });
+  }
+  // A public feed item (post, video) sent into a group as a draft.
+  const shareRoute = /^\/admin\/api\/groups\/([a-z0-9-]{1,40})\/share\/([A-Za-z0-9:_.-]{1,200})$/.exec(path);
+  if (shareRoute && request.method === "POST") {
+    const response = await shareFeedItemToGroup(env, shareRoute[1] as string, decodeURIComponent(shareRoute[2] as string));
+    if (response.ok) await audit(env, actor, "share", "member_group_post", `${shareRoute[1]}:${shareRoute[2]}`, null, null, new Date().toISOString());
+    return response;
+  }
+  // Drafts waiting in a group (forwarded from WhatsApp, or shared from the feed).
+  const draftsRoute = /^\/admin\/api\/groups\/([a-z0-9-]{1,40})\/drafts$/.exec(path);
+  if (draftsRoute && request.method === "GET") {
+    const rows = await env.DB.prepare(`SELECT id,title,body,source,published_at FROM member_group_posts
+      WHERE group_id=? AND status='draft' AND is_hidden=0 ORDER BY published_at DESC LIMIT 100`).bind(draftsRoute[1]).all();
+    return json({ drafts: rows.results });
+  }
+  const approveRoute = /^\/admin\/api\/groups\/([a-z0-9-]{1,40})\/drafts\/([A-Za-z0-9:_-]{1,80})\/publish$/.exec(path);
+  if (approveRoute && request.method === "POST") {
+    const now = new Date().toISOString();
+    const draft = await env.DB.prepare("SELECT title,body FROM member_group_posts WHERE group_id=? AND id=? AND status='draft'")
+      .bind(approveRoute[1], approveRoute[2]).first<{ title: string; body: string | null }>();
+    if (!draft) return json({ error: "Unknown draft" }, { status: 404 });
+    await env.DB.prepare("UPDATE member_group_posts SET status='published',published_at=?,updated_at=? WHERE group_id=? AND id=?")
+      .bind(now, now, approveRoute[1], approveRoute[2]).run();
+    await audit(env, actor, "publish", "member_group_post", `${approveRoute[1]}:${approveRoute[2]}`, null, null, now);
+    await notifyGroup(env, approveRoute[1] as string, `post:${approveRoute[2]}`, draft.title, (draft.body ?? "").slice(0, 140),
+      `darulirfan://groups/${approveRoute[1]}`);
+    return json({ ok: true });
+  }
   // /admin/api/groups/{group}/invites -> mint a single-use code
   const inviteRoute = /^\/admin\/api\/groups\/([a-z0-9-]{1,40})\/invites$/.exec(path);
   if (request.method === "POST" && inviteRoute) {
@@ -146,7 +209,7 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
     return response;
   }
   if (request.method === "POST" && path === "/admin/api/push") {
-    if (!hasRole(actor, env.ADMIN_BROADCASTER_EMAILS)) return json({ error: "Broadcaster role required" }, { status: 403 });
+    if (!isBroadcaster(actor, env)) return json({ error: "Broadcaster role required" }, { status: 403 });
     const input = await request.json<Record<string, unknown>>();
     if (input.confirm !== true) return json({ error: "Explicit confirmation is required" }, { status: 400 });
     const topic = String(input.topic); if (!["liveZikr", "broadcasts", "announcements", "events"].includes(topic)) return json({ error: "Invalid topic" }, { status: 400 });
@@ -157,6 +220,15 @@ export async function adminRequest(request: Request, env: Env, path: string): Pr
     return json({ ok: true, accepted });
   }
   return json({ error: "Not found" }, { status: 404 });
+}
+
+/** The super admin holds every staff role. */
+function isEditor(actor: string, env: Env): boolean {
+  return hasRole(actor, env.ADMIN_EDITOR_EMAILS) || hasRole(actor, env.SUPER_ADMIN_EMAILS);
+}
+
+function isBroadcaster(actor: string, env: Env): boolean {
+  return hasRole(actor, env.ADMIN_BROADCASTER_EMAILS) || hasRole(actor, env.SUPER_ADMIN_EMAILS);
 }
 
 function hasRole(actor: string, configured: string | undefined): boolean {
@@ -186,10 +258,11 @@ function adminHTML(actor: string): Response {
   <button>Save live state</button><output id="result"></output></form>
   <form id="schedule"><h2>Zikr schedule</h2><label>ID<input name="id" value="daily-evening" required pattern="[A-Za-z0-9:_-]+"></label><label>Title<input name="title" value="Daily Online Zikr" required></label><label>Weekdays (1–7)<input name="weekdays" value="1,2,3,4,5,6,7"></label><label>Start hour PKT<input name="startHour" type="number" min="0" max="23" value="21"></label><label>Minute<input name="startMinute" type="number" min="0" max="59" value="15"></label><label>Duration<input name="durationMinutes" type="number" min="1" value="30"></label><label>Join URL<input name="joinURL" type="url" value="https://www.paltalk.com"></label><button>Save schedule</button><output></output></form>
   <form id="announcement"><h2>Announcement</h2><label>ID<input name="id" required placeholder="announcement-2026-07"></label><label>Title<input name="title" required></label><label>Body<textarea name="body"></textarea></label><label>Official source URL<input type="url" name="sourceURL" value="https://www.naqshbandiaowaisiah.org/" required></label><label>Expires at (ISO 8601, optional)<input name="expiresAt" placeholder="2026-08-01T00:00:00Z"></label><label>Status<select name="publicationStatus"><option>draft</option><option>published</option></select></label><label><input type="checkbox" name="isFeatured"> Pin on Today</label><button>Save announcement</button><button type="button" id="preview">Preview saved draft</button><output></output><pre id="preview-output"></pre></form>
-  <form id="invite"><h2>Private groups: invitation code</h2><small>A code admits one person to one group, once, and expires. It is shown here once and stored only as a hash, so copy it before leaving the page.</small><label>Group<select name="group"><option value="darul-irfan">Darul Irfan</option><option value="usa">United States</option><option value="canada">Canada</option></select></label><label>Note for your records (optional)<input name="label" maxlength="120" placeholder="Br. Imran, Houston"></label><label>Expires after (days)<input name="expiresInDays" type="number" min="1" max="90" value="30"></label><button>Create code</button><output id="invite-code" style="font:700 28px ui-monospace,monospace;letter-spacing:2px"></output></form>
+  <form id="invite"><h2>Private groups: invitation code</h2><small>A code admits one person to one group, once, and expires. It is shown here once and stored only as a hash, so copy it before leaving the page.</small><label>Group<select name="group"><option value="darul-irfan">Darul Irfan</option><option value="usa">United States</option><option value="canada">Canada</option></select></label><label>Note for your records (optional)<input name="label" maxlength="120" placeholder="Br. Imran, Houston"></label><label>Expires after (days)<input name="expiresInDays" type="number" min="1" max="90" value="30"></label><label>Role<select name="grantsRole"><option value="">Member</option><option value="admin">Group admin (posts, approves, runs zikr and meetings)</option><option value="superadmin">Super admin (every group)</option></select></label><button>Create code</button><output id="invite-code" style="font:700 28px ui-monospace,monospace;letter-spacing:2px"></output></form>
+  <form id="sender"><h2>WhatsApp forwarding: sender to group</h2><small>Messages this number forwards to the WhatsApp Business number arrive as drafts in this group. A #usa, #canada or #darulirfan tag at the start of a message overrides it.</small><label>WhatsApp number (with country code)<input name="sender" required placeholder="923001234567"></label><label>Group<select name="group"><option value="darul-irfan">Darul Irfan</option><option value="usa">United States</option><option value="canada">Canada</option></select></label><label>Note<input name="label" maxlength="120"></label><button>Save routing</button><output></output></form>
   <form id="group"><h2>Private groups: meeting link</h2><label>Group<select name="group"><option value="darul-irfan">Darul Irfan</option><option value="usa">United States</option><option value="canada">Canada</option></select></label><label>Meeting URL<input name="meetingURL" type="url" placeholder="https://www.paltalk.com"></label><label>Meeting note<input name="meetingNote" maxlength="500" placeholder="Fridays after Isha, local time"></label><label><input type="checkbox" name="isActive" checked> Group active</label><button>Save group</button><output></output></form>
   <form id="grouppost"><h2>Private groups: post</h2><label>Group<select name="group"><option value="darul-irfan">Darul Irfan</option><option value="usa">United States</option><option value="canada">Canada</option></select></label><label>Post ID<input name="id" required pattern="[A-Za-z0-9:_-]+" placeholder="zikr-2026-10-31"></label><label>Kind<select name="kind"><option value="announcement">Announcement</option><option value="zikr">Recorded zikr (YouTube)</option></select></label><label>Title<input name="title" required maxlength="300"></label><label>Body<textarea name="body" maxlength="8000"></textarea></label><label>YouTube video ID (recorded zikr)<input name="youtubeVideoID" pattern="[A-Za-z0-9_-]{11}"></label><label>Link URL (optional)<input name="linkURL" type="url"></label><button>Publish post</button><output></output></form>
   <small>All changes are audited. Push sending uses the confirmed JSON API and remains separate from editing.</small></main>
-  <script>const submit=(selector,url,transform=x=>x)=>document.querySelector(selector).addEventListener('submit',async e=>{e.preventDefault();let data=transform(Object.fromEntries(new FormData(e.target)));const r=await fetch(url.replace(':id',encodeURIComponent(data.id||'')),{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(data)});e.target.querySelector('output').textContent=r.ok?'Saved':await r.text()});submit('#live','/admin/api/live');submit('#schedule','/admin/api/schedules/:id',d=>({...d,weekdays:d.weekdays.split(',').map(Number),startHour:Number(d.startHour),startMinute:Number(d.startMinute),durationMinutes:Number(d.durationMinutes)}));submit('#announcement','/admin/api/announcements/:id',d=>({...d,isFeatured:d.isFeatured==='on'}));const groupCall=(selector,method,url,transform)=>document.querySelector(selector).addEventListener('submit',async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.target));const r=await fetch(url(data),{method,headers:{'content-type':'application/json'},body:JSON.stringify(transform(data))});const out=e.target.querySelector('output');if(!r.ok){out.textContent=await r.text();return}const body=await r.json();out.textContent=body.code??'Saved'});groupCall('#invite','POST',d=>'/admin/api/groups/'+encodeURIComponent(d.group)+'/invites',d=>({label:d.label||undefined,expiresInDays:Number(d.expiresInDays)}));groupCall('#group','PUT',d=>'/admin/api/groups/'+encodeURIComponent(d.group),d=>({meetingURL:d.meetingURL||null,meetingNote:d.meetingNote||null,isActive:d.isActive==='on'}));groupCall('#grouppost','PUT',d=>'/admin/api/groups/'+encodeURIComponent(d.group)+'/posts/'+encodeURIComponent(d.id),d=>({kind:d.kind,title:d.title,body:d.body||undefined,youtubeVideoID:d.youtubeVideoID||undefined,linkURL:d.linkURL||undefined}));document.querySelector('#preview').addEventListener('click',async()=>{const id=document.querySelector('#announcement [name=id]').value;const r=await fetch('/admin/api/preview/announcements/'+encodeURIComponent(id));document.querySelector('#preview-output').textContent=JSON.stringify(await r.json(),null,2)});</script></body></html>`;
+  <script>const submit=(selector,url,transform=x=>x)=>document.querySelector(selector).addEventListener('submit',async e=>{e.preventDefault();let data=transform(Object.fromEntries(new FormData(e.target)));const r=await fetch(url.replace(':id',encodeURIComponent(data.id||'')),{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(data)});e.target.querySelector('output').textContent=r.ok?'Saved':await r.text()});submit('#live','/admin/api/live');submit('#schedule','/admin/api/schedules/:id',d=>({...d,weekdays:d.weekdays.split(',').map(Number),startHour:Number(d.startHour),startMinute:Number(d.startMinute),durationMinutes:Number(d.durationMinutes)}));submit('#announcement','/admin/api/announcements/:id',d=>({...d,isFeatured:d.isFeatured==='on'}));const groupCall=(selector,method,url,transform)=>document.querySelector(selector).addEventListener('submit',async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.target));const r=await fetch(url(data),{method,headers:{'content-type':'application/json'},body:JSON.stringify(transform(data))});const out=e.target.querySelector('output');if(!r.ok){out.textContent=await r.text();return}const body=await r.json();out.textContent=body.code??'Saved'});groupCall('#invite','POST',d=>'/admin/api/groups/'+encodeURIComponent(d.group)+'/invites',d=>({label:d.label||undefined,expiresInDays:Number(d.expiresInDays),grantsRole:d.grantsRole||undefined}));groupCall('#sender','PUT',d=>'/admin/api/whatsapp/senders/'+encodeURIComponent(d.sender.replace(/[^0-9]/g,'')),d=>({groupID:d.group,label:d.label||undefined}));groupCall('#group','PUT',d=>'/admin/api/groups/'+encodeURIComponent(d.group),d=>({meetingURL:d.meetingURL||null,meetingNote:d.meetingNote||null,isActive:d.isActive==='on'}));groupCall('#grouppost','PUT',d=>'/admin/api/groups/'+encodeURIComponent(d.group)+'/posts/'+encodeURIComponent(d.id),d=>({kind:d.kind,title:d.title,body:d.body||undefined,youtubeVideoID:d.youtubeVideoID||undefined,linkURL:d.linkURL||undefined}));document.querySelector('#preview').addEventListener('click',async()=>{const id=document.querySelector('#announcement [name=id]').value;const r=await fetch('/admin/api/preview/announcements/'+encodeURIComponent(id));document.querySelector('#preview-output').textContent=JSON.stringify(await r.json(),null,2)});</script></body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-security-policy": "default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; frame-ancestors 'none'", "x-frame-options": "DENY" } });
 }

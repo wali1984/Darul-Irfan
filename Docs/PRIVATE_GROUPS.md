@@ -1,5 +1,53 @@
 # Private regional groups
 
+## Phase 1 community features (2026-10-27)
+
+- **Roles.** `member` reads and joins; `admin` also posts, approves drafts and
+  runs zikr and meetings in its own groups; `superadmin` does so in every
+  group. Granted by an invitation code minted with a role (admin page), or set
+  with `PUT /admin/api/members/{id}/role`. A second code redeemed while signed
+  in adds to the same account.
+- **Feeds into groups.** Messages forwarded to the WhatsApp Business number
+  (+1 929 240 5561) from an allowed sender become drafts in a group: a
+  `#usa` / `#canada` / `#darulirfan` tag at the start decides, otherwise the
+  sender's mapped group (`PUT /admin/api/whatsapp/senders/{number}`), otherwise
+  the public feed's drafts as before. **Pictures** (with or without a caption)
+  are fetched from Meta, kept in R2 and shown by signed, expiring link; text
+  works as before. Admins approve drafts in the app or on the admin page. Any
+  public feed item can be sent into a group:
+  `POST /admin/api/groups/{group}/share/{feedItemID}`.
+- **Community zikr.** Each group keeps its own zikr times (clock time in the
+  admin's zone, or after Isha / Tahajjud at Dar-ul-Irfan), shown in each
+  member's own time with reminders. An admin starts it live from the app: a
+  live video, a room to join together, or both.
+- **Meetings.** In-app audio/video rooms (Cloudflare RealtimeKit), scheduled
+  ahead; members can join from ten minutes before.
+- **Notifications** go to that group's members only (`member_devices`).
+
+### Setup (once, in `Server/`)
+
+1. `npx wrangler login`
+2. `npx wrangler r2 bucket create darul-irfan-media`
+3. Secrets (`npx wrangler secret put NAME`): `MEDIA_URL_SECRET` (any long
+   random string); `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_APP_SECRET`,
+   `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_ALLOWED_SENDERS` (the admins' own
+   numbers, comma separated), `WHATSAPP_CHANNEL_URL`; for meetings
+   `REALTIME_ACCOUNT_ID`, `REALTIME_APP_ID`, `REALTIME_API_TOKEN`.
+4. In the RealtimeKit app, create presets `group_call_host` (moderator) and
+   `group_call_participant` (joins muted).
+5. `npm run db:migrate:remote`, then `npm run deploy`.
+6. Cloudflare Access: allow wajidali1984@hotmail.com on the `/admin`
+   application (`SUPER_ADMIN_EMAILS` grants every staff role once Access lets
+   the address through).
+7. Meta: point the WhatsApp Business number's webhook at
+   `https://<worker>/v1/whatsapp` with the verify token, subscribed to
+   `messages`.
+8. On the admin page, mint a code with role **Super admin** and redeem it in
+   the app.
+
+---
+
+
 Members-only spaces for the silsila: Darul Irfan, United States and Canada.
 Administrators publish; members read. Added 2026-10-26.
 

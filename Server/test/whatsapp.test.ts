@@ -6,14 +6,19 @@ const SECRET = "test-app-secret";
 const CHANNEL = "https://whatsapp.com/channel/official";
 
 function envWith(recorded: unknown[], overrides: Partial<Env> = {}): Env {
-  const statement = {
-    bind: (...values: unknown[]) => { recorded.push(values); return statement; },
-    first: async () => null,
-    all: async () => ({ results: [] }),
-    run: async () => ({}),
+  // Only writes are recorded; the group-routing lookups find nothing, so these
+  // messages fall through to the public feed's drafts as before.
+  const prepare = (sql: string) => {
+    const statement = {
+      bind: (...values: unknown[]) => { if (sql.trimStart().startsWith("INSERT")) recorded.push(values); return statement; },
+      first: async () => null,
+      all: async () => ({ results: [] }),
+      run: async () => ({}),
+    };
+    return statement;
   };
   return {
-    DB: { prepare: () => statement },
+    DB: { prepare },
     WHATSAPP_APP_SECRET: SECRET,
     WHATSAPP_VERIFY_TOKEN: "verify-me",
     WHATSAPP_ALLOWED_SENDERS: "923001234567, +923009999999",

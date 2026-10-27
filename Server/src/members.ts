@@ -149,6 +149,7 @@ export async function groupPosts(env: Env, memberID: string, groupID: string, li
  * lost; the cascades remove everything that is about this person. */
 export async function deleteMember(env: Env, memberID: string): Promise<Response> {
   await env.DB.prepare("DELETE FROM member_sessions WHERE member_id=?").bind(memberID).run();
+  await env.DB.prepare("DELETE FROM member_devices WHERE member_id=?").bind(memberID).run();
   await env.DB.prepare("DELETE FROM member_group_members WHERE member_id=?").bind(memberID).run();
   await env.DB.prepare("DELETE FROM members WHERE id=?").bind(memberID).run();
   return new Response(null, { status: 204 });
@@ -237,14 +238,15 @@ export async function createInvite(
   if (!Number.isInteger(days) || days < 1 || days > 365) {
     return json({ error: "expiresInDays must be a whole number from 1 to 365" }, { status: 400 });
   }
+  const grantsRole = input.grantsRole === "admin" || input.grantsRole === "superadmin" ? input.grantsRole : null;
   const code = generateInviteCode();
   const now = new Date();
-  await env.DB.prepare(`INSERT INTO member_invites(code_hash,group_id,label,created_by,created_at,expires_at)
-    VALUES(?,?,?,?,?,?)`)
+  await env.DB.prepare(`INSERT INTO member_invites(code_hash,group_id,label,created_by,created_at,expires_at,grants_role)
+    VALUES(?,?,?,?,?,?,?)`)
     .bind(await sha256(code), groupID, cleanText(input.label, 120) ?? null, actor,
-      now.toISOString(), new Date(now.getTime() + days * 86_400_000).toISOString()).run();
+      now.toISOString(), new Date(now.getTime() + days * 86_400_000).toISOString(), grantsRole).run();
   // Shown to the admin once, to pass to the person it is for.
-  return json({ ok: true, groupID, code: formatCode(code), expiresInDays: days }, { status: 201 });
+  return json({ ok: true, groupID, code: formatCode(code), expiresInDays: days, grantsRole: grantsRole ?? undefined }, { status: 201 });
 }
 
 /** Redeems a code: creates the member if needed, starts a session, and admits
@@ -258,8 +260,8 @@ export async function redeemInvite(request: Request, env: Env): Promise<Response
   const code = normaliseCode(String(input?.code ?? ""));
   if (code.length < 8 || code.length > 20) return json({ error: "That invitation code is not valid." }, { status: 400 });
 
-  const row = await env.DB.prepare(`SELECT group_id,expires_at,redeemed_at FROM member_invites WHERE code_hash=?`)
-    .bind(await sha256(code)).first<{ group_id: string; expires_at: string; redeemed_at: string | null }>();
+  const row = await env.DB.prepare(`SELECT group_id,expires_at,redeemed_at,grants_role FROM member_invites WHERE code_hash=?`)
+    .bind(await sha256(code)).first<{ group_id: string; expires_at: string; redeemed_at: string | null; grants_role?: string | null }>();
   // One message for every failure: a wrong code must not be distinguishable
   // from a used or expired one, or the endpoint becomes an oracle.
   const refusal = json({ error: "That invitation code is not valid, or has already been used." }, { status: 403 });
@@ -267,14 +269,19 @@ export async function redeemInvite(request: Request, env: Env): Promise<Response
 
   const now = new Date();
   const nowISO = now.toISOString();
+  // Someone already signed in who is given a second code (another group, or
+  // an admin role) stays one member rather than becoming two.
+  const existing = await authenticatedMember(request, env);
   // Invite members have no platform identity, so the external-identity column
   // carries a random one of ours. It stays unique and non-null without needing
   // the members table rebuilt.
   const subject = `invite:${crypto.randomUUID()}`;
-  const memberID = (await sha256(`member:${subject}`)).slice(0, 32);
-  await env.DB.prepare(`INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at)
-    VALUES(?,?,?,NULL,?,?)`)
-    .bind(memberID, subject, cleanText(input?.displayName, 80) ?? null, nowISO, nowISO).run();
+  const memberID = existing ?? (await sha256(`member:${subject}`)).slice(0, 32);
+  if (!existing) {
+    await env.DB.prepare(`INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at)
+      VALUES(?,?,?,NULL,?,?)`)
+      .bind(memberID, subject, cleanText(input?.displayName, 80) ?? null, nowISO, nowISO).run();
+  }
 
   // Mark redeemed only if still open, so two simultaneous redemptions cannot
   // both succeed on one code.
@@ -282,8 +289,15 @@ export async function redeemInvite(request: Request, env: Env): Promise<Response
     WHERE code_hash=? AND redeemed_at IS NULL`)
     .bind(memberID, nowISO, await sha256(code)).run();
   if ((claim.meta?.changes ?? 0) === 0) {
-    await env.DB.prepare("DELETE FROM members WHERE id=?").bind(memberID).run();
+    if (!existing) await env.DB.prepare("DELETE FROM members WHERE id=?").bind(memberID).run();
     return refusal;
+  }
+  // A role only ever goes up through a code: a member code given to an admin
+  // does not demote them.
+  if (row.grants_role === "admin") {
+    await env.DB.prepare("UPDATE members SET role='admin' WHERE id=? AND role='member'").bind(memberID).run();
+  } else if (row.grants_role === "superadmin") {
+    await env.DB.prepare("UPDATE members SET role='superadmin' WHERE id=?").bind(memberID).run();
   }
 
   await env.DB.prepare("INSERT OR IGNORE INTO member_group_members(group_id,member_id,added_at,added_by) VALUES(?,?,?,?)")

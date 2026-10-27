@@ -32,14 +32,84 @@ enum MemberGroupsFeature {
 /// The catalogue of groups is itself private: the backend only ever returns the
 /// groups the signed-in member belongs to, so this is never a directory of
 /// every group that exists.
-struct MemberGroup: Codable, Sendable, Identifiable, Equatable {
+struct MemberGroup: Codable, Sendable, Identifiable, Equatable, Hashable {
     var id: String
     var name: String
     var description: String?
-    /// Meetings are hosted on the platform the silsila already uses rather than
-    /// inside the app, so a group carries a join link instead of a call.
+    /// An optional outside link an administrator may still set. Meetings and
+    /// community zikr are joined inside the app; this is only a fallback.
     var meetingURL: URL?
     var meetingNote: String?
+    /// Whether the signed-in member may publish and run sessions here.
+    var canManage: Bool? = nil
+    /// Whether a zikr or meeting is live in this group right now.
+    var isLive: Bool? = nil
+    var liveKind: String? = nil
+}
+
+/// A member's role in the groups. Admins run their own groups; the super
+/// admin runs every group.
+enum MemberRole: String, Codable, Sendable {
+    case member
+    case admin
+    case superadmin
+}
+
+/// What is live in a group: a zikr or a meeting, watched and joined in the app.
+struct GroupLive: Codable, Sendable, Equatable {
+    var kind: String
+    var title: String?
+    /// A live video of the session, played in the app.
+    var videoID: String?
+    /// Whether there is a room to join together.
+    var hasRoom: Bool
+    var startedAt: Date?
+
+    var isMeeting: Bool { kind == "meeting" }
+}
+
+/// A scheduled group meeting, joined in the app.
+struct GroupMeeting: Codable, Sendable, Identifiable, Equatable {
+    var id: String
+    var title: String
+    var startsAt: Date
+    var durationMinutes: Int
+
+    /// The room opens ten minutes before the start and stays open half an
+    /// hour past the planned end.
+    func isOpen(at date: Date = Date()) -> Bool {
+        date >= startsAt.addingTimeInterval(-600)
+            && date <= startsAt.addingTimeInterval(TimeInterval(durationMinutes * 60 + 1_800))
+    }
+}
+
+/// One group's page: its live session, zikr times and meetings.
+struct GroupDetail: Codable, Sendable {
+    struct Summary: Codable, Sendable {
+        var id: String?
+        var name: String?
+        var description: String?
+    }
+
+    var group: Summary
+    var canManage: Bool
+    var live: GroupLive?
+    /// The group's own zikr times, in the same shape as the public schedule,
+    /// so the same countdown, local-time and reminder code serves both.
+    var zikrSessions: [ZikrSession]
+    var meetings: [GroupMeeting]
+}
+
+/// A participant's place in a room, and the in-app page that holds it.
+struct GroupRoomPass: Codable, Sendable {
+    var authToken: String
+    var pageURL: URL
+}
+
+struct MemberProfile: Codable, Sendable {
+    var memberID: String
+    var role: MemberRole
+    var displayName: String?
 }
 
 enum MemberGroupPostKind: String, Codable, Sendable {
@@ -48,8 +118,9 @@ enum MemberGroupPostKind: String, Codable, Sendable {
     case zikr
 }
 
-/// Something an admin published to one group. Members read; they never post,
-/// so nothing here was written by another member.
+/// Something a group admin published to one group - written in the app,
+/// forwarded from WhatsApp, or shared from the official feed. Members read;
+/// nothing here was written by another member.
 struct MemberGroupPost: Codable, Sendable, Identifiable, Equatable {
     var id: String
     var kind: MemberGroupPostKind
@@ -57,10 +128,17 @@ struct MemberGroupPost: Codable, Sendable, Identifiable, Equatable {
     var body: String?
     var youtubeVideoID: String?
     var linkURL: URL?
+    /// A picture forwarded with the post, by an expiring private link.
+    var imageURL: URL? = nil
     var publishedAt: Date
+    /// Drafts are visible to the group's admins only, until published.
+    var isDraft: Bool? = nil
+    /// "admin", "whatsapp" or "feed": where a draft came from.
+    var source: String? = nil
 }
 
 struct MemberGroupList: Codable, Sendable {
+    var role: MemberRole? = nil
     var groups: [MemberGroup]
 }
 

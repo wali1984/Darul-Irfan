@@ -20,7 +20,26 @@ async function apnsJWT(env: Env): Promise<string> {
 
 export async function sendTopicPush(env: Env, eventID: string, topic: PushTopic, title: string, body: string, path: string): Promise<number> {
   const devices = await env.DB.prepare("SELECT * FROM devices WHERE topics_json LIKE ?").bind(`%\"${topic}\"%`).all<Record<string, string>>();
-  if (!devices.results.length) return 0;
+  return deliver(env, eventID, topic, devices.results ?? [], title, body, path);
+}
+
+/** Pushes to named installations only - a group's members, never a topic. */
+export async function sendPushToInstallations(
+  env: Env, eventID: string, thread: string, installationIDs: string[], title: string, body: string, path: string,
+): Promise<number> {
+  if (!installationIDs.length) return 0;
+  const devices: Record<string, string>[] = [];
+  for (const id of installationIDs) {
+    const device = await env.DB.prepare("SELECT * FROM devices WHERE installation_id=?").bind(id).first<Record<string, string>>();
+    if (device) devices.push(device);
+  }
+  return deliver(env, eventID, thread, devices, title, body, path);
+}
+
+async function deliver(
+  env: Env, eventID: string, topic: string, devices: Record<string, string>[], title: string, body: string, path: string,
+): Promise<number> {
+  if (!devices.length) return 0;
   let jwt: string;
   try { jwt = await apnsJWT(env); }
   catch (error) {
@@ -28,7 +47,7 @@ export async function sendTopicPush(env: Env, eventID: string, topic: PushTopic,
     throw error;
   }
   let accepted = 0; let failed = 0;
-  for (const device of devices.results) {
+  for (const device of devices) {
     const prior = await env.DB.prepare("SELECT status FROM notification_deliveries WHERE event_id=? AND installation_id=?").bind(eventID, device.installation_id).first<{ status: string }>();
     if (prior?.status === "accepted") continue;
     const host = device.environment === "sandbox" ? "api.sandbox.push.apple.com" : "api.push.apple.com";

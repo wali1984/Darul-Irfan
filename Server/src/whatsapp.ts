@@ -1,5 +1,7 @@
 import type { Env } from "./contracts";
 import { cleanText, json, validHTTPURL } from "./util";
+import { recordGroupDraft, routeToGroup } from "./community";
+import { signedMediaURL, storeWhatsAppImage } from "./media";
 
 interface WhatsAppMessage {
   from?: string;
@@ -7,6 +9,7 @@ interface WhatsAppMessage {
   timestamp?: string;
   type?: string;
   text?: { body?: string };
+  image?: { id?: string; mime_type?: string; caption?: string };
 }
 
 interface WhatsAppWebhook {
@@ -79,24 +82,40 @@ export async function whatsappWebhook(request: Request, env: Env, rawBody: strin
     for (const change of entry.changes ?? []) {
       for (const message of change.value?.messages ?? []) {
         const from = (message.from ?? "").replace(/^\+/, "");
-        const body = cleanText(message.text?.body, 4_000);
-        // Only text, and only from an admin we already trust. Images and audio
-        // need a second authenticated fetch from Meta's media endpoint, which
-        // this does not yet do, so they are left for the admin page.
-        if (!message.id || message.type !== "text" || !body || !senders.has(from)) continue;
+        // Text, and pictures with or without a caption - most of what is
+        // shared is pictures - and only from an admin we already trust.
+        const isImage = message.type === "image" && !!message.image?.id;
+        if (!message.id || !senders.has(from) || (message.type !== "text" && !isImage)) continue;
+        const caption = cleanText(isImage ? message.image?.caption : message.text?.body, 4_000);
+        if (!isImage && !caption) continue;
+        const imageKey = isImage ? await storeWhatsAppImage(env, String(message.image?.id), message.id) : null;
+        // A picture whose download failed and that has no caption carries
+        // nothing to show; it is not recorded as an empty post.
+        if (isImage && !imageKey && !caption) continue;
+        const body = caption ?? "Photo";
         const seconds = Number(message.timestamp);
         const publishedAt = Number.isFinite(seconds) && seconds > 0
           ? new Date(seconds * 1000).toISOString()
           : now;
+        // A #tag at the start, or the sender's own group, sends it to that
+        // group's drafts, where its admins approve it in the app.
+        const routed = await routeToGroup(env, from, body);
+        if (routed) {
+          await recordGroupDraft(env, routed.groupID, `whatsapp:${message.id}`, routed.text || body, publishedAt, imageKey);
+          recorded += 1;
+          continue;
+        }
         // Drafts, never published: a person approves it in the admin page
         // before it carries the silsila's name. Meta retries webhooks, so the
         // message id keeps a redelivery from duplicating the post, and an
         // approval already given is not silently revoked by a retry.
-        await env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,published_at,publication_status,raw_json,updated_at)
-          VALUES(?,'whatsapp','post',?,?,?,?,'draft',?,?)
-          ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,updated_at=excluded.updated_at`)
-          .bind(`whatsapp:${message.id}`, body.slice(0, 120), body, channelURL, publishedAt,
-            JSON.stringify({ from, id: message.id, timestamp: message.timestamp }), now)
+        // The public feed is public, so its picture link is long-lived.
+        const imageURL = imageKey ? await signedMediaURL(env, imageKey, 10 * 365 * 86_400) ?? null : null;
+        await env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,image_url,published_at,publication_status,raw_json,updated_at)
+          VALUES(?,'whatsapp','post',?,?,?,?,?,'draft',?,?)
+          ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,updated_at=excluded.updated_at`)
+          .bind(`whatsapp:${message.id}`, body.slice(0, 120), body, channelURL, imageURL, publishedAt,
+            JSON.stringify({ from, id: message.id, timestamp: message.timestamp, image: imageKey ?? undefined }), now)
           .run();
         recorded += 1;
       }

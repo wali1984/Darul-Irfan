@@ -176,7 +176,7 @@ describe("private regional groups", () => {
       method: "DELETE", headers: { authorization: `Bearer ${TOKEN_A}` },
     }), env);
     expect(response.status).toBe(204);
-    expect(deletes).toEqual(["member_sessions", "member_group_members", "members"]);
+    expect(deletes).toEqual(["member_sessions", "member_devices", "member_group_members", "members"]);
   });
 
   it("rejects an unusable post limit", async () => {

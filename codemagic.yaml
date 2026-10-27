@@ -21,6 +21,8 @@ workflows:
     max_build_duration: 60
     environment:
       xcode: latest
+      # The server tests use Node's built-in SQLite (unflagged from 22.13).
+      node: 22.13.0
     cache:
       cache_paths:
         - ~/Library/Caches/org.swift.swiftpm
@@ -154,6 +156,7 @@ workflows:
     max_build_duration: 90
     environment:
       xcode: latest
+      node: 22.13.0
       groups:
         # Codemagic env-var group holding CERTIFICATE_PRIVATE_KEY (a PEM RSA
         # private key). Used to create/reuse the iOS Distribution certificate.

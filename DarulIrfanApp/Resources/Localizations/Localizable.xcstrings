@@ -18921,6 +18921,1043 @@
           }
         }
       }
+    },
+    "%lld minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld minutes"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld منٹ"
+          }
+        }
+      }
+    },
+    "Cancel meeting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel meeting"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگ منسوخ کریں"
+          }
+        }
+      }
+    },
+    "Community Zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Community Zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اجتماعی ذکر"
+          }
+        }
+      }
+    },
+    "Community zikr begins soon. Open Darul Irfan to join it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Community zikr begins soon. Open Darul Irfan to join it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اجتماعی ذکر جلد شروع ہو رہا ہے۔ شامل ہونے کے لیے دارالعرفان کھولیں۔"
+          }
+        }
+      }
+    },
+    "Copy a message in WhatsApp or anywhere else, then paste it here. The first line becomes the title.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy a message in WhatsApp or anywhere else, then paste it here. The first line becomes the title."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واٹس ایپ یا کہیں سے بھی پیغام کاپی کریں، پھر یہاں پیسٹ کریں۔ پہلی سطر عنوان بن جائے گی۔"
+          }
+        }
+      }
+    },
+    "Days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Days"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دن"
+          }
+        }
+      }
+    },
+    "Discard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رد کریں"
+          }
+        }
+      }
+    },
+    "End live session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End live session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست سیشن ختم کریں"
+          }
+        }
+      }
+    },
+    "Enter your invitation code to see your group.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter your invitation code to see your group."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنا گروپ دیکھنے کے لیے دعوتی کوڈ درج کریں۔"
+          }
+        }
+      }
+    },
+    "Go live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go live"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست شروع کریں"
+          }
+        }
+      }
+    },
+    "Group admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Group admin"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروپ منتظم"
+          }
+        }
+      }
+    },
+    "Group meeting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Group meeting"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروپ میٹنگ"
+          }
+        }
+      }
+    },
+    "Have another invitation code?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Have another invitation code?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی اور دعوتی کوڈ ہے؟"
+          }
+        }
+      }
+    },
+    "Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ساتھ شامل ہونے سے ایک کمرہ کھلتا ہے جہاں اراکین آپ کی قیادت میں ذکر سنتے ہیں۔ براہِ راست ویڈیو لنک سے وہ اسے دیکھ بھی سکتے ہیں۔ دونوں میں سے کوئی ایک یا دونوں استعمال کریں۔"
+          }
+        }
+      }
+    },
+    "Leave": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "باہر جائیں"
+          }
+        }
+      }
+    },
+    "Live video link (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live video link (optional)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست ویڈیو لنک (اختیاری)"
+          }
+        }
+      }
+    },
+    "Meeting room": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meeting room"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگ روم"
+          }
+        }
+      }
+    },
+    "Meetings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meetings"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگز"
+          }
+        }
+      }
+    },
+    "Members join the zikr together": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members join the zikr together"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین مل کر ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "Members join with audio and video from the group page.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members join with audio and video from the group page."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین گروپ کے صفحے سے آواز اور ویڈیو کے ساتھ شامل ہوتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین وقت اپنے ٹائم زون میں دیکھتے ہیں، طے ہونے پر انہیں اطلاع ملتی ہے، اور وہ دس منٹ پہلے سے شامل ہو سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Message"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیغام"
+          }
+        }
+      }
+    },
+    "New post": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New post"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نئی پوسٹ"
+          }
+        }
+      }
+    },
+    "Paste a copied message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste a copied message"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاپی کیا ہوا پیغام پیسٹ کریں"
+          }
+        }
+      }
+    },
+    "Picture": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picture"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصویر"
+          }
+        }
+      }
+    },
+    "Publish to the group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publish to the group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروپ میں شائع کریں"
+          }
+        }
+      }
+    },
+    "Publishing notifies the group's members who have notifications on.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Publishing notifies the group's members who have notifications on."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شائع کرنے پر گروپ کے ان اراکین کو اطلاع ملتی ہے جن کی اطلاعات آن ہیں۔"
+          }
+        }
+      }
+    },
+    "Remove": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہٹائیں"
+          }
+        }
+      }
+    },
+    "Remove this time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove this time"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ وقت ہٹائیں"
+          }
+        }
+      }
+    },
+    "Save as draft": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save as draft"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مسودے کے طور پر محفوظ کریں"
+          }
+        }
+      }
+    },
+    "Save zikr time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save zikr time"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کا وقت محفوظ کریں"
+          }
+        }
+      }
+    },
+    "Schedule a meeting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedule a meeting"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگ طے کریں"
+          }
+        }
+      }
+    },
+    "Schedule the meeting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schedule the meeting"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگ طے کریں"
+          }
+        }
+      }
+    },
+    "Start now and notify the group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start now and notify the group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی شروع کریں اور گروپ کو اطلاع دیں"
+          }
+        }
+      }
+    },
+    "That invitation code is not valid, or it has already been used. Please check it with the administrator who gave it to you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That invitation code is not valid, or it has already been used. Please check it with the administrator who gave it to you."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ دعوتی کوڈ درست نہیں، یا پہلے استعمال ہو چکا ہے۔ براہِ کرم کوڈ دینے والے منتظم سے تصدیق کریں۔"
+          }
+        }
+      }
+    },
+    "That video link was not recognised.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That video link was not recognised."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ ویڈیو لنک پہچانا نہیں جا سکا۔"
+          }
+        }
+      }
+    },
+    "The picture could not be loaded. Pull down to refresh.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The picture could not be loaded. Pull down to refresh."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصویر لوڈ نہیں ہو سکی۔ تازہ کرنے کے لیے نیچے کھینچیں۔"
+          }
+        }
+      }
+    },
+    "The room opens ten minutes before the meeting starts.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The room opens ten minutes before the meeting starts."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کمرہ میٹنگ شروع ہونے سے دس منٹ پہلے کھلتا ہے۔"
+          }
+        }
+      }
+    },
+    "Too many attempts. Please wait a few minutes and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many attempts. Please wait a few minutes and try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بہت زیادہ کوششیں ہو گئیں۔ چند منٹ انتظار کر کے دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "Video link (optional)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video link (optional)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو لنک (اختیاری)"
+          }
+        }
+      }
+    },
+    "Waiting for approval": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for approval"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منظوری کے منتظر"
+          }
+        }
+      }
+    },
+    "What is starting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What is starting"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کیا شروع ہو رہا ہے"
+          }
+        }
+      }
+    },
+    "You are an admin of this group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are an admin of this group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ اس گروپ کے منتظم ہیں"
+          }
+        }
+      }
+    },
+    "Your Apple sign-in could not be verified. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Apple sign-in could not be verified. Please try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کے ایپل سائن اِن کی تصدیق نہیں ہو سکی۔ دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "Your group could not be loaded. Check your connection and try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your group could not be loaded. Check your connection and try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کا گروپ لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "Zikr time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr time"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کا وقت"
+          }
+        }
+      }
+    },
+    "Start community zikr or meeting now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start community zikr or meeting now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی اجتماعی ذکر یا میٹنگ شروع کریں"
+          }
+        }
+      }
+    },
+    "Add a zikr time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a zikr time"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کا وقت شامل کریں"
+          }
+        }
+      }
+    },
+    "Meeting live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meeting live"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگ جاری"
+          }
+        }
+      }
+    },
+    "Zikr live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr live"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر جاری"
+          }
+        }
+      }
+    },
+    "Super admin: you can post, approve and run zikr and meetings in every group.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Super admin: you can post, approve and run zikr and meetings in every group."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سپر ایڈمن: آپ ہر گروپ میں پوسٹ، منظوری، ذکر اور میٹنگز چلا سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Group admin: you can post, approve and run zikr and meetings in your groups.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Group admin: you can post, approve and run zikr and meetings in your groups."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروپ منتظم: آپ اپنے گروپوں میں پوسٹ، منظوری، ذکر اور میٹنگز چلا سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Join the zikr together": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join the zikr together"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مل کر ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "You join with your microphone and camera off; turn them on when you want to speak.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You join with your microphone and camera off; turn them on when you want to speak."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ مائیکروفون اور کیمرا بند کر کے شامل ہوتے ہیں؛ بولنا ہو تو انہیں آن کر لیں۔"
+          }
+        }
+      }
+    },
+    "You join with your microphone off and listen as the zikr is led.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You join with your microphone off and listen as the zikr is led."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ مائیکروفون بند کر کے شامل ہوتے ہیں اور ذکر کی قیادت کے ساتھ سنتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Play the video": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play the video"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو چلائیں"
+          }
+        }
+      }
+    },
+    "Forwarded from WhatsApp": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forwarded from WhatsApp"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واٹس ایپ سے آیا"
+          }
+        }
+      }
+    },
+    "From the official feed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From the official feed"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرکاری فیڈ سے"
+          }
+        }
+      }
+    },
+    "Saved draft": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved draft"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محفوظ مسودہ"
+          }
+        }
+      }
+    },
+    "The time is in your own time zone; members see it in theirs.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The time is in your own time zone; members see it in theirs."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وقت آپ کے اپنے ٹائم زون میں ہے؛ اراکین اسے اپنے ٹائم زون میں دیکھتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Follows the prayer time at Dar-ul-Irfan each day.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Follows the prayer time at Dar-ul-Irfan each day."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر روز دارالعرفان کے وقتِ نماز کے مطابق۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

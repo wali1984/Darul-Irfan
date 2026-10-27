@@ -4,7 +4,12 @@ import { bootstrap, feed, liveBroadcast } from "./repository";
 import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
 import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
 import { whatsappSubscription, whatsappWebhook } from "./whatsapp";
-import { authenticatedMember, createSession, deleteMember, groupPosts, listGroups, redeemInvite } from "./members";
+import { authenticatedMember, createSession, deleteMember, redeemInvite } from "./members";
+import {
+  cancelMeeting, communityGroups, communityPosts, createPost, groupDetail, hidePost, joinRoom, me, meetingPage,
+  publishDraft, registerMemberDevice, removeZikrSession, saveZikrSession, scheduleMeeting, setLive,
+} from "./community";
+import { serveMedia } from "./media";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -43,18 +48,40 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (!await withinWriteLimit(request, env, "member-invite", 10)) return json({ error: "Too many requests" }, { status: 429 });
     return redeemInvite(request, env);
   }
+  // The in-app meeting screen. It holds no secret: the participant token
+  // travels in the URL fragment, which browsers never send.
+  if (request.method === "GET" && path === "/v1/meet") return meetingPage();
+  // Pictures, by signed and expiring link only.
+  if (request.method === "GET" && path.startsWith("/v1/media/")) return serveMedia(env, path.slice("/v1/media/".length), url);
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
     const member = await authenticatedMember(request, env);
     if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
-    if (request.method === "GET" && path === "/v1/groups") return listGroups(env, member);
+    const body = async () => (request.headers.get("content-type") ?? "").includes("json")
+      ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
+    if (request.method === "GET" && path === "/v1/groups") return communityGroups(env, member);
+    if (request.method === "GET" && path === "/v1/members/me") return me(env, member);
+    if (request.method === "POST" && path === "/v1/members/devices") return registerMemberDevice(env, member, await body());
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
-    const posts = /^\/v1\/groups\/([a-z0-9-]{1,40})\/posts$/.exec(path);
-    if (request.method === "GET" && posts) {
+
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish))?)?)?$/.exec(path);
+    if (!route) return json({ error: "Not found" }, { status: 404 });
+    const [, groupID = "", section, entity, action] = route;
+    if (!section && request.method === "GET") return groupDetail(env, member, groupID);
+    if (section === "posts" && !entity && request.method === "GET") {
       const limit = Number(url.searchParams.get("limit") ?? 30);
       if (!Number.isInteger(limit) || limit < 1 || limit > 100) return json({ error: "Limit must be an integer from 1 to 100" }, { status: 400 });
-      return groupPosts(env, member, posts[1] as string, limit);
+      return communityPosts(env, member, groupID, limit, url.searchParams.get("drafts") === "1");
     }
+    if (section === "posts" && !entity && request.method === "POST") return createPost(env, member, groupID, await body());
+    if (section === "posts" && entity && action === "publish" && request.method === "POST") return publishDraft(env, member, groupID, entity, await body());
+    if (section === "posts" && entity && !action && request.method === "DELETE") return hidePost(env, member, groupID, entity);
+    if (section === "zikr" && entity && request.method === "PUT") return saveZikrSession(env, member, groupID, entity, await body());
+    if (section === "zikr" && entity && request.method === "DELETE") return removeZikrSession(env, member, groupID, entity);
+    if (section === "live" && !entity && request.method === "POST") return setLive(env, member, groupID, await body());
+    if (section === "meetings" && !entity && request.method === "POST") return scheduleMeeting(env, member, groupID, await body());
+    if (section === "meetings" && entity && request.method === "DELETE") return cancelMeeting(env, member, groupID, entity);
+    if (section === "join" && !entity && request.method === "POST") return joinRoom(env, member, groupID, await body());
     return json({ error: "Not found" }, { status: 404 });
   }
   if (request.method === "POST" && path === "/v1/devices") {

@@ -7,17 +7,20 @@ enum MemberGroupError: LocalizedError {
     case requestFailed
     case inviteRejected
     case tooManyAttempts
+    /// A refusal the server explained in words meant for the person.
+    case server(String)
 
     var errorDescription: String? {
         switch self {
-        case .signInRejected: "Your Apple sign-in could not be verified. Please try again."
-        case .notSignedIn: "Enter your invitation code to see your group."
-        case .requestFailed: "Your group could not be loaded. Check your connection and try again."
+        case .signInRejected: String(localized: "Your Apple sign-in could not be verified. Please try again.")
+        case .notSignedIn: String(localized: "Enter your invitation code to see your group.")
+        case .requestFailed: String(localized: "Your group could not be loaded. Check your connection and try again.")
         // Deliberately one message for every refusal. The server does not say
         // whether a code was wrong, already used or expired, and neither does
         // this: anything finer would help someone guess at codes.
-        case .inviteRejected: "That invitation code is not valid, or it has already been used. Please check it with the administrator who gave it to you."
-        case .tooManyAttempts: "Too many attempts. Please wait a few minutes and try again."
+        case .inviteRejected: String(localized: "That invitation code is not valid, or it has already been used. Please check it with the administrator who gave it to you.")
+        case .tooManyAttempts: String(localized: "Too many attempts. Please wait a few minutes and try again.")
+        case .server(let message): message
         }
     }
 }
@@ -41,9 +44,29 @@ actor MemberGroupService {
         configuration.timeoutIntervalForResource = 30
         session = URLSession(configuration: configuration)
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        // The server writes JavaScript's toISOString(), which carries
+        // milliseconds ("2026-10-27T10:15:00.000Z"). The stock .iso8601
+        // strategy rejects fractional seconds, which made every post and
+        // meeting fail to decode; both forms are accepted.
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let text = try decoder.singleValueContainer().decode(String.self)
+            if let date = Self.fractional.date(from: text) ?? Self.whole.date(from: text) { return date }
+            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unreadable date \(text)"))
+        }
         self.decoder = decoder
     }
+
+    private nonisolated(unsafe) static let fractional: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private nonisolated(unsafe) static let whole: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
 
     var isSignedIn: Bool { SecureMemberSession.load() != nil }
     var memberID: String? { SecureMemberSession.load()?.memberID }
@@ -96,14 +119,118 @@ actor MemberGroupService {
         SecureMemberSession.delete()
     }
 
-    func groups() async throws -> [MemberGroup] {
-        try await authorized(MemberGroupList.self, path: "v1/groups").groups
+    func groups() async throws -> MemberGroupList {
+        try await authorized(MemberGroupList.self, path: "v1/groups")
     }
 
-    func posts(in groupID: String) async throws -> [MemberGroupPost] {
+    func posts(in groupID: String, drafts: Bool = false) async throws -> [MemberGroupPost] {
         // A group this member does not belong to answers exactly as a group that
         // does not exist, so nothing here can discover another region.
-        try await authorized(MemberGroupPostList.self, path: "v1/groups/\(groupID)/posts").posts
+        try await authorized(MemberGroupPostList.self, path: "v1/groups/\(groupID)/posts", query: drafts ? "drafts=1" : nil).posts
+    }
+
+    func detail(of groupID: String) async throws -> GroupDetail {
+        try await authorized(GroupDetail.self, path: "v1/groups/\(groupID)")
+    }
+
+    func profile() async throws -> MemberProfile {
+        try await authorized(MemberProfile.self, path: "v1/members/me")
+    }
+
+    // MARK: Group admin actions
+
+    func createPost(in groupID: String, title: String, body: String?, videoID: String?, publish: Bool) async throws {
+        var payload: [String: Any] = ["title": title, "kind": "announcement", "publish": publish]
+        if let body, !body.isEmpty { payload["body"] = body }
+        if let videoID { payload["youtubeVideoID"] = videoID }
+        try await send("POST", path: "v1/groups/\(groupID)/posts", payload: payload, expecting: [201])
+    }
+
+    func publishDraft(_ postID: String, in groupID: String, title: String, body: String?) async throws {
+        var payload: [String: Any] = ["title": title]
+        if let body { payload["body"] = body }
+        try await send("POST", path: "v1/groups/\(groupID)/posts/\(postID)/publish", payload: payload, expecting: [200])
+    }
+
+    func removePost(_ postID: String, in groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/posts/\(postID)", payload: nil, expecting: [204])
+    }
+
+    /// Starts a live zikr or meeting in the group. `videoID` streams it; `room`
+    /// lets members join it together.
+    func startLive(in groupID: String, kind: String, title: String, videoID: String?, room: Bool) async throws {
+        var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room]
+        if let videoID { payload["videoID"] = videoID }
+        try await send("POST", path: "v1/groups/\(groupID)/live", payload: payload, expecting: [200])
+    }
+
+    func endLive(in groupID: String) async throws {
+        try await send("POST", path: "v1/groups/\(groupID)/live", payload: ["state": "offline"], expecting: [200])
+    }
+
+    func scheduleMeeting(in groupID: String, title: String, startsAt: Date, durationMinutes: Int) async throws {
+        try await send("POST", path: "v1/groups/\(groupID)/meetings", payload: [
+            "title": title, "startsAt": Self.whole.string(from: startsAt), "durationMinutes": durationMinutes,
+        ], expecting: [201])
+    }
+
+    func cancelMeeting(_ meetingID: String, in groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/meetings/\(meetingID)", payload: nil, expecting: [204])
+    }
+
+    func saveZikrSession(_ session: ZikrSession, in groupID: String) async throws {
+        var payload: [String: Any] = [
+            "title": session.title, "weekdays": session.weekdays, "startHour": session.startHour,
+            "startMinute": session.startMinute, "timeZoneIdentifier": session.timeZoneIdentifier,
+            "durationMinutes": session.durationMinutes,
+        ]
+        if let anchor = session.anchor { payload["anchor"] = anchor }
+        try await send("PUT", path: "v1/groups/\(groupID)/zikr/\(session.id)", payload: payload, expecting: [200])
+    }
+
+    func removeZikrSession(_ sessionID: String, in groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/zikr/\(sessionID)", payload: nil, expecting: [204])
+    }
+
+    /// A place in the group's live room, or in a scheduled meeting's.
+    func join(groupID: String, meetingID: String?) async throws -> GroupRoomPass {
+        var payload: [String: Any] = [:]
+        if let meetingID { payload["meetingID"] = meetingID }
+        let data = try await send("POST", path: "v1/groups/\(groupID)/join", payload: payload, expecting: [200])
+        guard let pass = try? decoder.decode(GroupRoomPass.self, from: data) else { throw MemberGroupError.requestFailed }
+        return pass
+    }
+
+    /// Links this phone's notification registration to the member, so a group's
+    /// notices reach it. Harmless before notifications are turned on: there is
+    /// simply nothing registered to send to yet.
+    func linkNotifications(installationID: UUID) async {
+        _ = try? await send("POST", path: "v1/members/devices", payload: ["installationID": installationID.uuidString], expecting: [204])
+    }
+
+    @discardableResult
+    private func send(_ method: String, path: String, payload: [String: Any]?, expecting codes: Set<Int>) async throws -> Data {
+        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = method
+        request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
+        if let payload {
+            request.setValue("application/json", forHTTPHeaderField: "content-type")
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        }
+        let (data, response) = try await session.data(for: request)
+        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if code == 401 {
+            SecureMemberSession.delete()
+            throw MemberGroupError.notSignedIn
+        }
+        guard codes.contains(code) else {
+            // The server's own plain message ("The meeting room opens ten
+            // minutes before it starts.") is what the person should read.
+            let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? String
+            throw message.map(MemberGroupError.server) ?? MemberGroupError.requestFailed
+        }
+        return data
     }
 
     /// Deletes the account, its sessions and its group memberships.
@@ -124,9 +251,14 @@ actor MemberGroupService {
         SecureMemberSession.delete()
     }
 
-    private func authorized<T: Decodable>(_ type: T.Type, path: String) async throws -> T {
+    private func authorized<T: Decodable>(_ type: T.Type, path: String, query: String? = nil) async throws -> T {
         guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        var url = baseURL.appendingPathComponent(path)
+        if let query, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            components.percentEncodedQuery = query
+            url = components.url ?? url
+        }
+        var request = URLRequest(url: url)
         request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
         let (data, response) = try await session.data(for: request)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0

@@ -105,6 +105,34 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertTrue(excerpt.hasPrefix("ہرگروہ"))
     }
 
+    // MARK: - Group admin
+
+    /// Whatever an admin pastes - share link, watch link, live link or bare
+    /// id - becomes the same video id; anything else is refused.
+    func testVideoLinkReading() {
+        XCTAssertEqual(VideoLink.id(from: "https://youtu.be/abcdefghijk"), "abcdefghijk")
+        XCTAssertEqual(VideoLink.id(from: "https://www.youtube.com/watch?v=abcdefghijk&t=10"), "abcdefghijk")
+        XCTAssertEqual(VideoLink.id(from: "https://www.youtube.com/live/abcdefghijk?si=x"), "abcdefghijk")
+        XCTAssertEqual(VideoLink.id(from: " abcdefghijk "), "abcdefghijk")
+        XCTAssertNil(VideoLink.id(from: "https://example.com/watch?v=short"))
+        XCTAssertNil(VideoLink.id(from: "hello"))
+    }
+
+    /// The server writes timestamps with milliseconds; the group screens must
+    /// read them (the stock ISO-8601 decoder does not).
+    func testGroupPostsDecodeServerTimestamps() throws {
+        let json = #"{"groupID":"usa","posts":[{"id":"p","kind":"announcement","title":"T","publishedAt":"2026-10-27T10:15:00.000Z","isDraft":false}]}"#
+        let decoder = JSONDecoder()
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let text = try decoder.singleValueContainer().decode(String.self)
+            return formatter.date(from: text) ?? Date.distantPast
+        }
+        let list = try decoder.decode(MemberGroupPostList.self, from: Data(json.utf8))
+        XCTAssertEqual(list.posts.first?.publishedAt, formatter.date(from: "2026-10-27T10:15:00.000Z"))
+    }
+
     // MARK: - Reading direction
 
     func testScriptDirectionFollowsTheText() {

@@ -17,9 +17,10 @@ final class GroupsModel {
         case failed(String)
     }
 
-    private let service = MemberGroupService()
+    let service = MemberGroupService()
     var phase: Phase = .loading
     var groups: [MemberGroup] = []
+    var role: MemberRole = .member
     var memberID: String?
     var isDeleting = false
     var isRedeeming = false
@@ -39,8 +40,15 @@ final class GroupsModel {
         phase = .loading
         memberID = await service.memberID
         do {
-            groups = try await service.groups()
+            let list = try await service.groups()
+            groups = list.groups
+            role = list.role ?? .member
             phase = .ready
+            // Group notices reach this phone once its notifications are
+            // registered; linking is quiet and harmless before then.
+            if let installation = SecureInstallationIdentity.load() {
+                await service.linkNotifications(installationID: installation)
+            }
         } catch MemberGroupError.notSignedIn {
             groups = []
             phase = .signedOut
@@ -111,18 +119,11 @@ final class GroupsModel {
             phase = .failed(error.localizedDescription)
         }
     }
-
-    /// Hands the detail screen a way to read one group without handing it the
-    /// service, so a screen can only ever ask for the group it was opened for.
-    func postsLoader(for group: MemberGroup) -> @Sendable () async throws -> [MemberGroupPost] {
-        let service = service
-        let id = group.id
-        return { try await service.posts(in: id) }
-    }
 }
 
 @MainActor
 struct GroupsHomeView: View {
+    var dependencies: AppDependencies? = nil
     @State private var model = GroupsModel()
     @State private var isConfirmingDelete = false
     @State private var inviteCode = ""
@@ -140,7 +141,11 @@ struct GroupsHomeView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, DISpacing.lg)
                 case .ready:
+                    if model.role != .member { roleCard }
                     if model.groups.isEmpty { awaitingApprovalCard } else { groupList }
+                    // Another code (a second group, or an admin role) adds to
+                    // this same account.
+                    addCodeCard
                     accountCard
                 case .failed(let message):
                     failureCard(message)
@@ -302,21 +307,72 @@ struct GroupsHomeView: View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             ForEach(model.groups) { group in
                 NavigationLink {
-                    GroupDetailView(group: group, loadPosts: model.postsLoader(for: group))
+                    GroupDetailView(group: group, service: model.service, dependencies: dependencies)
                 } label: {
                     DICard {
-                        VStack(alignment: .leading, spacing: DISpacing.xs) {
-                            Text(group.name)
-                                .font(.headline)
-                            if let description = group.description {
-                                Text(description)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                        HStack(alignment: .top, spacing: DISpacing.sm) {
+                            VStack(alignment: .leading, spacing: DISpacing.xs) {
+                                Text(LocalizedStringKey(group.name))
+                                    .font(.headline)
+                                if let description = group.description {
+                                    Text(verbatim: description)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                if group.canManage == true {
+                                    Label("You are an admin of this group", systemImage: "person.badge.key")
+                                        .font(.caption)
+                                        .foregroundStyle(DIColor.accent)
+                                }
+                            }
+                            Spacer(minLength: 0)
+                            if group.isLive == true {
+                                Label(group.liveKind == "meeting" ? "Meeting live" : "Zikr live", systemImage: "dot.radiowaves.left.and.right")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(DIColor.primary)
                             }
                         }
                     }
                 }
                 .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var roleCard: some View {
+        DICard {
+            Label(model.role == .superadmin
+                  ? "Super admin: you can post, approve and run zikr and meetings in every group."
+                  : "Group admin: you can post, approve and run zikr and meetings in your groups.",
+                  systemImage: "person.badge.key.fill")
+                .font(.subheadline)
+                .foregroundStyle(DIColor.textPrimary)
+        }
+    }
+
+    private var addCodeCard: some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text("Have another invitation code?")
+                    .font(.subheadline.weight(.semibold))
+                HStack(spacing: DISpacing.sm) {
+                    TextField("Invitation code", text: $inviteCode)
+                        .textFieldStyle(.roundedBorder)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                        .submitLabel(.join)
+                        .onSubmit { redeem() }
+                    Button(action: redeem) {
+                        if model.isRedeeming { ProgressView() } else { Text("Join") }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.isRedeeming)
+                }
+                if let inviteError = model.inviteError {
+                    Text(verbatim: inviteError)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }

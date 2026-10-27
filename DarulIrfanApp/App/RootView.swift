@@ -83,6 +83,7 @@ struct RootView: View {
     private func selectTab(forDeepLinkPath path: String) {
         let lowered = path.lowercased()
         if lowered.contains("live") || lowered.contains("zikr") { selectedTab = .zikr }
+        else if lowered.contains("group") { selectedTab = .more }
         else if lowered.contains("feed") || lowered.contains("event") { selectedTab = .explore }
         else if lowered.contains("today") || lowered.contains("prayer") { selectedTab = .today }
         else if lowered.contains("quran") || lowered.contains("surah") || lowered.contains("hadith") {

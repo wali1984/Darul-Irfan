@@ -83,6 +83,7 @@ KNOWN_KEYS = {
     "Resume %@, %lf percent played": "Resume %@, %lld percent played",
     "Step %@ of %lld": "Step %lld of %lld",
     "Surah %@ (%@), Ayah %@": "Surah %@ (%lld), Ayah %@",
+    "%@ minutes": "%lld minutes",
     "Surah %@ (%@), Ayat %@": "Surah %@ (%lld), Ayat %@",
     "Surah %@, Ayah %lld — Quran %@:%lld": "Surah %@, Ayah %lld — Quran %lld:%lld",
     "Updated \\(broadcast.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",

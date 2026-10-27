@@ -51,6 +51,19 @@ Status: `todo` · `doing` · `done` · `deferred` · `blocked`
 | Full reference (surah name, number, ayah) and open-in-reader | done |
 | Tafsir excerpt / bayan link where the ayah has one; share with reference | done (verbatim opening of Akram-ut-Tafaseer / Asrar-at-Tanzil, labelled) |
 
+## A4. Added 2026-10-27: community groups, phase 1
+
+| Item | Status |
+|---|---|
+| Group feeds: WhatsApp forwards routed by sender number or #tag, as drafts approved in the app or admin page; feed items shareable into a group | doing |
+| WhatsApp Business number +1 929 240 5561: pictures (with caption) as well as text | doing |
+| Super admin wajidali1984@hotmail.com (admin page) + in-app admin/superadmin roles granted by code | doing |
+| In-app meetings (Cloudflare RealtimeKit; scheduled, room opens 10 min before) | doing |
+| Community zikr per group: own times in local time, live in the app, join together | doing |
+| Group-only notifications | doing |
+| Live zikr pipeline: one source (Paltalk session) -> app + YouTube + Facebook automatically, auto-start, failover | design for decision |
+| Share-sheet entry from WhatsApp into the app | todo (after phase 1) |
+
 ## C. "Useful companion" plan — first increment (iOS)
 
 | Item | Status |

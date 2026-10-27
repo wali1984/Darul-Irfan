@@ -95,6 +95,20 @@ export interface Env {
   /** Audience of an Apple identity token: the app's bundle id. Falls back to
    *  APNS_TOPIC, which is the same value. */
   APPLE_CLIENT_ID?: string;
+  /** Pictures forwarded to the WhatsApp Business number. */
+  MEDIA?: R2Bucket;
+  /** Graph API token of the WhatsApp Business account, to fetch pictures. */
+  WHATSAPP_ACCESS_TOKEN?: string;
+  /** Signs the expiring links members open pictures with. */
+  MEDIA_URL_SECRET?: string;
+  /** Staff emails with every admin role (editor and broadcaster). */
+  SUPER_ADMIN_EMAILS?: string;
+  /** Cloudflare RealtimeKit, for in-app meetings and joined zikr. */
+  REALTIME_ACCOUNT_ID?: string;
+  REALTIME_APP_ID?: string;
+  REALTIME_API_TOKEN?: string;
+  REALTIME_PRESET_HOST?: string;
+  REALTIME_PRESET_MEMBER?: string;
 }
 
 /** A private regional group as its members see it. The catalogue of groups is
