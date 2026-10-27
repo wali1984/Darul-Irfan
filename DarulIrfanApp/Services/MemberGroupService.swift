@@ -165,10 +165,13 @@ actor MemberGroupService {
     /// Starts a live zikr or meeting in the group. `videoID` streams it (a
     /// past video plays as a recording); `room` lets members join it
     /// together; `queue` plays recordings and past zikr one after another.
+    /// `record` records the room; the recording is kept in the group's
+    /// recordings afterwards.
     func startLive(
-        in groupID: String, kind: String, title: String, videoID: String?, room: Bool, queue: [GroupQueueEntry] = []
+        in groupID: String, kind: String, title: String, videoID: String?, room: Bool,
+        queue: [GroupQueueEntry] = [], record: Bool = false
     ) async throws {
-        var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room]
+        var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room, "record": record && room]
         if let videoID { payload["videoID"] = videoID }
         if !queue.isEmpty { payload["queue"] = queue.map(\.payload) }
         try await send("POST", path: "v1/groups/\(groupID)/live", payload: payload, expecting: [200])

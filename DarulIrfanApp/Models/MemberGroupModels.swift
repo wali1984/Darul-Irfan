@@ -72,6 +72,8 @@ struct GroupLive: Codable, Sendable, Equatable {
     var listeners: Int?
     /// Who has joined this session; admins only.
     var attendance: [GroupAttendee]?
+    /// The room is being recorded; everyone in the session is told.
+    var roomRecording: Bool?
 
     var isMeeting: Bool { kind == "meeting" }
     var isRecorded: Bool { recorded == true && !(queue ?? []).isEmpty }

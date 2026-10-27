@@ -4,6 +4,7 @@ import { sendPushToInstallations } from "./apns";
 import { signedMediaURL } from "./media";
 import { youtubeVideos } from "./recordings";
 import { beginSession, endSession, liveRow, queueOf, resolveQueue, sessionPayload, unreadDuaCount } from "./session";
+import { recordingConfig, trackRoom } from "./roomRecordings";
 
 // Community groups: what members see and do inside their group, and what the
 // group's admins can run from the app itself.
@@ -302,13 +303,17 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
   const queue = await resolveQueue(env, groupID, entries);
   if (queue instanceof Response) return queue;
   if (!video && !wantsRoom && !queue.length) return json({ error: "A live session needs a video, a room, or something to play" }, { status: 400 });
+  // A room can be recorded from the moment the first person joins; the
+  // recording is kept in the group's recordings afterwards.
+  const record = wantsRoom && input.record === true;
   let roomID: string | null = null;
   if (wantsRoom) {
-    const room = await createRoom(env, `${groupID}: ${title}`);
+    const room = await createRoom(env, `${groupID}: ${title}`, record ? groupID : null);
     if (room instanceof Response) return room;
     roomID = room;
   }
-  const sessionID = await beginSession(env, groupID, memberID, { kind, title, videoID: video, roomID, queue });
+  const sessionID = await beginSession(env, groupID, memberID, { kind, title, videoID: video, roomID, queue, roomRecording: record });
+  if (roomID) await trackRoom(env, { roomID, groupID, sessionID, kind, title, record });
   const recorded = queue.length > 0;
   await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title,
     kind === "meeting" ? "The group meeting has started. Join now in Darul Irfan."
@@ -364,9 +369,10 @@ export async function joinRoom(env: Env, memberID: string, groupID: string, inpu
     }
     roomID = meeting.room_id;
     if (!roomID) {
-      const room = await createRoom(env, `${groupID}: ${meeting.title}`);
+      const room = await createRoom(env, `${groupID}: ${meeting.title}`, null);
       if (room instanceof Response) return room;
       roomID = room;
+      await trackRoom(env, { roomID, groupID, sessionID: null, kind: "meeting", title: meeting.title, record: false });
       await env.DB.prepare("UPDATE group_meetings SET room_id=?,updated_at=? WHERE group_id=? AND id=? AND room_id IS NULL")
         .bind(roomID, new Date().toISOString(), groupID, input.meetingID).run();
       const stored = await env.DB.prepare("SELECT room_id FROM group_meetings WHERE group_id=? AND id=?")
@@ -399,20 +405,25 @@ export function integrationStatus(env: Env): { meetings: boolean; whatsappForwar
 
 // MARK: - The meeting service (Cloudflare RealtimeKit)
 
-function realtimeBase(env: Env): string | null {
+export function realtimeBase(env: Env): string | null {
   if (!env.REALTIME_ACCOUNT_ID || !env.REALTIME_APP_ID || !env.REALTIME_API_TOKEN) return null;
   return `https://api.cloudflare.com/client/v4/accounts/${env.REALTIME_ACCOUNT_ID}/realtime/kit/${env.REALTIME_APP_ID}`;
 }
 
 const notConfigured = () => json({ error: "Video meetings: integration in progress. They open here once it is complete." }, { status: 503 });
 
-async function createRoom(env: Env, title: string): Promise<string | Response> {
+/** Opens a room. With `recordFor` (the group), the room records itself from
+ *  when the first person joins. */
+async function createRoom(env: Env, title: string, recordFor: string | null): Promise<string | Response> {
   const base = realtimeBase(env);
   if (!base) return notConfigured();
   const response = await fetch(`${base}/meetings`, {
     method: "POST",
     headers: { authorization: `Bearer ${env.REALTIME_API_TOKEN}`, "content-type": "application/json" },
-    body: JSON.stringify({ title: title.slice(0, 120) }),
+    body: JSON.stringify({
+      title: title.slice(0, 120),
+      ...(recordFor ? { record_on_start: true, recording_config: recordingConfig(recordFor) } : {}),
+    }),
   });
   const body = await response.json<{ data?: { id?: string }; result?: { id?: string } }>().catch(() => ({}) as Record<string, never>);
   const id = (body as { data?: { id?: string } }).data?.id ?? (body as { result?: { id?: string } }).result?.id;

@@ -4,6 +4,7 @@ import type { Env } from "../src/contracts";
 import { sqliteD1 } from "./sqlite-d1";
 import { claimEmailGrants } from "../src/members";
 import { autoplayDue } from "../src/session";
+import { collectRoomRecordings } from "../src/roomRecordings";
 
 const SECRET = "test-app-secret";
 
@@ -540,5 +541,43 @@ describe("recorded zikr", () => {
     expect(live).toMatchObject({ recorded: false, videoID: "liveliveliv", queue: [] });
     // A live video cannot be queued as a recording.
     expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ videoID: "liveliveliv" }] })).status).toBe(400);
+  });
+});
+
+describe("recorded rooms", () => {
+  it("records a room, copies the finished recording into the group's recordings, and stops with the session", async () => {
+    const calls: string[] = [];
+    let meetingBody: Record<string, unknown> = {};
+    vi.stubGlobal("fetch", async (url: string, init?: RequestInit) => {
+      const target = String(url);
+      calls.push(`${init?.method ?? "GET"} ${target.replace("https://api.cloudflare.com/client/v4/accounts/a/realtime/kit/b", "")}`);
+      const reply = (body: unknown) => new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+      if (target.endsWith("/meetings")) { meetingBody = JSON.parse(String(init?.body)); return reply({ data: { id: "room-1" } }); }
+      if (target.includes("/recordings?meeting_id=room-1")) return reply({ data: [{ id: "r-1", status: "UPLOADED", started_time: "2026-10-27T16:00:00Z" }] });
+      if (target.endsWith("/recordings/r-1")) return reply({ data: { id: "r-1", status: "UPLOADED", recording_duration: 1795.4, audio_download_url: "https://files.example/r-1.m4a", download_url: "https://files.example/r-1.mp4" } });
+      if (target === "https://files.example/r-1.m4a") return new Response(new Uint8Array([9, 9, 9]), { headers: { "content-type": "audio/mp4", "content-length": "3" } });
+      if (target.endsWith("/recordings/active-recording/room-1")) return reply({ data: { id: "r-2" } });
+      return reply({ data: {} });
+    });
+    const stored = new Map<string, unknown>();
+    const media = { async put(key: string, value: unknown) { stored.set(key, value); } };
+    const { env, raw, call, member, admin } = await setup({
+      REALTIME_ACCOUNT_ID: "a", REALTIME_APP_ID: "b", REALTIME_API_TOKEN: "c", MEDIA: media,
+    } as unknown as Partial<Env>);
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", title: "Thursday zikr", room: true, record: true });
+    expect(meetingBody).toMatchObject({ record_on_start: true, recording_config: { file_name_prefix: "usa", audio_config: { export_file: true } } });
+    const live = ((await (await call(member, "GET", "/v1/groups/usa")).json()) as { live: { roomRecording: boolean } }).live;
+    expect(live.roomRecording).toBe(true);
+
+    await collectRoomRecordings(env);
+    const kept = raw.prepare("SELECT title,media_key,content_type,duration_seconds,created_by FROM group_recordings").get();
+    expect(kept).toEqual({ title: "Thursday zikr · 2026-10-27", media_key: "recordings/usa/r-1.m4a", content_type: "audio/mp4", duration_seconds: 1795, created_by: "room" });
+    expect([...stored.keys()]).toEqual(["recordings/usa/r-1.m4a"]);
+    // Copied once only.
+    await collectRoomRecordings(env);
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM group_recordings").get()).toEqual({ n: 1 });
+
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+    expect(calls).toContain("PUT /recordings/r-2");
   });
 });

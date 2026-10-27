@@ -2,6 +2,7 @@ import type { Env } from "./contracts";
 import { canManage, canSee, memberRole, notifyGroup } from "./community";
 import { signedMediaURL } from "./media";
 import { groupRecording, youtubeVideos } from "./recordings";
+import { startRoomRecording, stopRoomRecording } from "./roomRecordings";
 import { cleanText, json } from "./util";
 
 // A Halqah session that plays recordings and past zikr to the group.
@@ -20,7 +21,7 @@ type LiveRow = {
   state: string; kind: string; title: string | null; video_id: string | null; room_id: string | null;
   started_at: string | null; started_by: string | null; session_id: string | null; queue_json: string;
   queue_index: number; position_seconds: number; position_at: string | null; paused: number;
-  notice: string | null; notice_at: string | null;
+  notice: string | null; notice_at: string | null; room_recording: number;
 };
 
 const notFound = () => json({ error: "Not found" }, { status: 404 });
@@ -50,7 +51,7 @@ export function playbackAt(queue: QueueItem[], index: number, position: number, 
 
 export async function liveRow(env: Env, groupID: string): Promise<LiveRow | null> {
   return env.DB.prepare(`SELECT state,kind,title,video_id,room_id,started_at,started_by,session_id,queue_json,queue_index,
-    position_seconds,position_at,paused,notice,notice_at FROM group_live WHERE group_id=?`).bind(groupID).first<LiveRow>();
+    position_seconds,position_at,paused,notice,notice_at,room_recording FROM group_live WHERE group_id=?`).bind(groupID).first<LiveRow>();
 }
 
 export function queueOf(row: Pick<LiveRow, "queue_json"> | null): QueueItem[] {
@@ -100,21 +101,23 @@ export async function resolveQueue(env: Env, groupID: string, raw: unknown): Pro
 /** Starts a session, ending any session already live. */
 export async function beginSession(
   env: Env, groupID: string, startedBy: string,
-  session: { kind: "zikr" | "meeting"; title: string; videoID: string | null; roomID: string | null; queue: QueueItem[] },
+  session: {
+    kind: "zikr" | "meeting"; title: string; videoID: string | null; roomID: string | null; queue: QueueItem[]; roomRecording?: boolean;
+  },
 ): Promise<string> {
   const current = await liveRow(env, groupID);
   if (current?.state === "live") await endSession(env, groupID, startedBy);
   const now = new Date().toISOString();
   const sessionID = `session-${crypto.randomUUID().slice(0, 12)}`;
   await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,
-      session_id,queue_json,queue_index,position_seconds,position_at,paused,notice,notice_at)
-    VALUES(?,'live',?,?,?,?,?,?,?,?,?,0,0,?,0,NULL,NULL)
+      session_id,queue_json,queue_index,position_seconds,position_at,paused,notice,notice_at,room_recording)
+    VALUES(?,'live',?,?,?,?,?,?,?,?,?,0,0,?,0,NULL,NULL,?)
     ON CONFLICT(group_id) DO UPDATE SET state='live',kind=excluded.kind,title=excluded.title,video_id=excluded.video_id,
       room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at,
       session_id=excluded.session_id,queue_json=excluded.queue_json,queue_index=0,position_seconds=0,
-      position_at=excluded.position_at,paused=0,notice=NULL,notice_at=NULL`)
+      position_at=excluded.position_at,paused=0,notice=NULL,notice_at=NULL,room_recording=excluded.room_recording`)
     .bind(groupID, session.kind, session.title, session.videoID, session.roomID, now, startedBy, now, sessionID,
-      JSON.stringify(session.queue), now).run();
+      JSON.stringify(session.queue), now, session.roomRecording ? 1 : 0).run();
   return sessionID;
 }
 
@@ -122,6 +125,8 @@ export async function beginSession(
 export async function endSession(env: Env, groupID: string, endedBy: string): Promise<void> {
   const live = await liveRow(env, groupID);
   const now = new Date().toISOString();
+  // The recording closes with the session, and is then kept.
+  if (live?.state === "live" && live.room_id && live.room_recording) await stopRoomRecording(env, groupID, live.room_id);
   if (live?.state === "live" && live.session_id) {
     const attended = await env.DB.prepare("SELECT COUNT(*) AS n FROM group_live_presence WHERE session_id=?")
       .bind(live.session_id).first<{ n: number }>();
@@ -131,7 +136,7 @@ export async function endSession(env: Env, groupID: string, endedBy: string): Pr
   }
   await env.DB.prepare(`INSERT INTO group_live(group_id,state,updated_at) VALUES(?,'offline',?)
     ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,session_id=NULL,queue_json='[]',
-      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,updated_at=excluded.updated_at`)
+      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,updated_at=excluded.updated_at`)
     .bind(groupID, now).run();
 }
 
@@ -165,6 +170,8 @@ export async function sessionPayload(env: Env, groupID: string, live: LiveRow, m
     playback: queue.length ? { ...playback, at: now.toISOString() } : undefined,
     notice: live.notice ? { text: live.notice, postedAt: live.notice_at ?? undefined } : undefined,
     listeners: listening?.n ?? 0,
+    // Everyone in the session is told when its room is being recorded.
+    roomRecording: !!live.room_id && !!live.room_recording,
   };
   if (managing && live.session_id) {
     const attendance = await env.DB.prepare(`SELECT p.member_id,m.display_name,p.first_seen_at,p.last_seen_at
@@ -261,6 +268,15 @@ export async function controlSession(env: Env, memberID: string, groupID: string
       }
       break;
     }
+    case "record": {
+      if (!live.room_id) return json({ error: "This session has no room to record." }, { status: 400 });
+      const refused = await startRoomRecording(env, groupID, live.room_id);
+      if (refused) return refused;
+      break;
+    }
+    case "stopRecording":
+      if (live.room_id) await stopRoomRecording(env, groupID, live.room_id);
+      break;
     default:
       return json({ error: "Unknown action" }, { status: 400 });
   }

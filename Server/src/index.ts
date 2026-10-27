@@ -14,6 +14,7 @@ import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole }
 import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
 import { autoplayDue, checkIn, controlSession, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
+import { collectRoomRecordings } from "./roomRecordings";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -203,6 +204,8 @@ export default {
       { name: "live-listeners", run: reconcileLive(env) },
       // Starts a group's zikr that plays a recording by itself at its time.
       { name: "group-autoplay", run: autoplayDue(env) },
+      // Copies finished room recordings into our storage and the group's recordings.
+      { name: "room-recordings", run: collectRoomRecordings(env) },
     ];
     if (minute % 15 === 0) jobs.push(
       { name: "website", run: refreshWebsiteCatalog(env) }

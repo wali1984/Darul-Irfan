@@ -22712,6 +22712,91 @@
           }
         }
       }
+    },
+    "Record the zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record the zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر ریکارڈ کریں"
+          }
+        }
+      }
+    },
+    "Record the meeting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record the meeting"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگ ریکارڈ کریں"
+          }
+        }
+      }
+    },
+    "Record the session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record the session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست ریکارڈ کریں"
+          }
+        }
+      }
+    },
+    "Stop recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop recording"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ بند کریں"
+          }
+        }
+      }
+    },
+    "Recording. The session is kept in the group's recordings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording. The session is kept in the group's recordings."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ جاری ہے۔ یہ نشست حلقے کی ریکارڈنگز میں محفوظ کی جائے گی۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

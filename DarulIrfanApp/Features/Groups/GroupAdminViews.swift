@@ -157,6 +157,8 @@ struct GroupLiveStarter: View {
     @State private var title = String(localized: "Halqah Zikr")
     @State private var videoLink = ""
     @State private var joinTogether = true
+    /// Records the room into the group's recordings.
+    @State private var recordRoom = true
     @State private var library: GroupRecordingLibrary?
     @State private var libraryFailed = false
     /// What plays, in order: recordings and past zikr, picked from either list.
@@ -200,6 +202,7 @@ struct GroupLiveStarter: View {
                     if meetingsReady {
                         Text("Members join with audio and video from the group page.")
                             .foregroundStyle(DIColor.textMuted)
+                        Toggle("Record the meeting", isOn: $recordRoom)
                     } else {
                         Text("Video meetings: integration in progress. They open here once it is complete.")
                             .foregroundStyle(DIColor.textMuted)
@@ -243,6 +246,9 @@ struct GroupLiveStarter: View {
         Section {
             Toggle("Members join the zikr together", isOn: $joinTogether)
                 .disabled(!meetingsReady)
+            if meetingsReady && joinTogether {
+                Toggle("Record the zikr", isOn: $recordRoom)
+            }
             TextField("Live video link (optional)", text: $videoLink)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -423,9 +429,10 @@ struct GroupLiveStarter: View {
                 if source == .youtube, let video { entries.insert(.video(video), at: 0) }
                 try await service.addToSession(entries, in: groupID)
             } else if kind == .meeting {
-                try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true)
+                try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true, record: recordRoom)
             } else if source == .room {
-                try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: video, room: joinTogether && meetingsReady)
+                try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: video,
+                                            room: joinTogether && meetingsReady, record: recordRoom)
             } else {
                 // The server asks YouTube whether a pasted link is live or past:
                 // live is watched live, past joins the queue at the front.

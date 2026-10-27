@@ -51,6 +51,11 @@ struct GroupSessionCard: View {
                 if live.isRecorded, let playback = live.playback {
                     recordedSection(playback)
                 }
+                if live.roomRecording == true {
+                    Label("Recording. The session is kept in the group's recordings.", systemImage: "record.circle")
+                        .font(.caption)
+                        .foregroundStyle(DIColor.danger)
+                }
                 if live.hasRoom {
                     Button(action: onJoinRoom) {
                         Label(live.isMeeting ? "Join the meeting" : "Join the zikr together", systemImage: "person.3.fill")
@@ -197,6 +202,13 @@ struct GroupSessionCard: View {
         }
         if !live.isMeeting {
             adminRow("Add to the session", "text.badge.plus") { sheet = .add }
+        }
+        if live.hasRoom {
+            if live.roomRecording == true {
+                adminRow("Stop recording", "stop.circle") { Task { await control("stopRecording") } }
+            } else {
+                adminRow("Record the session", "record.circle") { Task { await control("record") } }
+            }
         }
         adminRow(live.notice == nil ? "Message the group" : "Change the message", "megaphone") { sheet = .notice }
         adminRow("Who is listening (\(live.attendance?.filter { $0.isHere == true }.count ?? 0))", "person.2.wave.2") { sheet = .listeners }
