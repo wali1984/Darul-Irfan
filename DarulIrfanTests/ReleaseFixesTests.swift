@@ -137,12 +137,16 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertEqual(list.posts.first?.publishedAt, formatter.date(from: "2026-10-27T10:15:00.000Z"))
     }
 
-    /// A recording played to a group starts where the group is, not at the
-    /// beginning, and an older server without the new fields still decodes.
-    func testRecordedGroupSessionPlaysFromWhereTheGroupIs() throws {
-        let json = #"{"kind":"zikr","hasRoom":false,"startedAt":"2026-10-27T20:00:00.000Z","recorded":true,"#
-            + #""recording":{"url":"https://api.example.com/v1/media/recordings%2Fusa%2Frec-1.mp3?exp=1&sig=a","title":"Friday","contentType":"audio/mpeg","durationSeconds":1800},"#
-            + #""endsAt":"2026-10-27T20:31:00.000Z"}"#
+    /// A session's recordings play from one clock: where the group is, not
+    /// the beginning, and standing still while the admin has paused. An older
+    /// server without these fields still decodes.
+    func testGroupSessionPlaysFromWhereTheGroupIs() throws {
+        let json = #"{"kind":"zikr","hasRoom":false,"sessionID":"session-1","recorded":true,"listeners":3,"#
+            + #""queue":[{"kind":"recording","id":"rec-1","title":"Friday","durationSeconds":1800,"#
+            + #""url":"https://api.example.com/v1/media/recordings%2Fusa%2Frec-1.mp3?exp=1&sig=a","contentType":"audio/mpeg"},"#
+            + #"{"kind":"video","id":"pastzikr001","title":"Online Zikr","videoID":"pastzikr001"}],"#
+            + #""playback":{"index":1,"positionSeconds":120.5,"paused":false,"finished":false,"at":"2026-10-27T20:00:00.000Z"},"#
+            + #""notice":{"text":"Dua in five minutes"}}"#
         let decoder = JSONDecoder()
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -152,13 +156,20 @@ final class ReleaseFixesTests: XCTestCase {
         }
         let live = try decoder.decode(GroupLive.self, from: Data(json.utf8))
         XCTAssertTrue(live.isRecorded)
-        XCTAssertEqual(live.recording?.isVideo, false)
-        let tenMinutesIn = try XCTUnwrap(formatter.date(from: "2026-10-27T20:10:00.000Z"))
-        XCTAssertEqual(live.playbackOffset(at: tenMinutesIn), 600, accuracy: 0.001)
+        XCTAssertEqual(live.currentItem?.id, "pastzikr001")
+        XCTAssertEqual(live.currentItem?.isYouTube, true)
+        XCTAssertEqual(live.queue?.first?.isVideoFile, false)
+        XCTAssertEqual(live.notice?.text, "Dua in five minutes")
+        let playback = try XCTUnwrap(live.playback)
+        let tenMinutesLater = playback.at.addingTimeInterval(600)
+        XCTAssertEqual(playback.position(at: tenMinutesLater), 720.5, accuracy: 0.001)
+        var paused = playback
+        paused.paused = true
+        XCTAssertEqual(paused.position(at: tenMinutesLater), 120.5, accuracy: 0.001)
 
         let older = try decoder.decode(GroupLive.self, from: Data(#"{"kind":"zikr","hasRoom":true,"videoID":"abcdefghijk"}"#.utf8))
         XCTAssertFalse(older.isRecorded)
-        XCTAssertEqual(older.playbackOffset(at: tenMinutesIn), 0)
+        XCTAssertNil(older.currentItem)
     }
 
     // MARK: - Reading direction

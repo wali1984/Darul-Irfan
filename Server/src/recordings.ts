@@ -1,13 +1,10 @@
 import type { Env } from "./contracts";
 import { canManage, canSee, memberRole } from "./community";
-import { signedMediaURL } from "./media";
 import { cleanText, json } from "./util";
 
-// Recorded zikr. An admin who cannot lead the zikr live plays a recording to
-// the group instead: a file uploaded to the group, or a past zikr from the
-// official YouTube channel. It plays to everyone from the moment it started,
-// so the group hears the same part together, and the session ends by itself
-// when the recording does.
+// Recorded zikr. An admin who cannot lead the zikr live plays recordings to
+// the group instead: files uploaded to the group, or past zikr from the
+// official YouTube channel. How they play together is session.ts.
 
 const TYPES = new Map([
   ["audio/mpeg", "mp3"], ["audio/mp4", "m4a"], ["audio/x-m4a", "m4a"], ["audio/aac", "aac"],
@@ -84,9 +81,14 @@ export async function uploadRecording(request: Request, env: Env, memberID: stri
 export async function deleteRecording(env: Env, memberID: string, groupID: string, recordingID: string): Promise<Response> {
   const refused = await managerCheck(env, memberID, groupID);
   if (refused) return refused;
-  const playing = await env.DB.prepare("SELECT 1 AS ok FROM group_live WHERE group_id=? AND state='live' AND recording_id=?")
-    .bind(groupID, recordingID).first();
-  if (playing) return json({ error: "This recording is playing now. End the session first." }, { status: 409 });
+  // The id is "rec-" and twelve hex digits, so a text match is exact.
+  const needle = `%"id":"${recordingID}"%`;
+  const playing = await env.DB.prepare("SELECT 1 AS ok FROM group_live WHERE group_id=? AND state='live' AND queue_json LIKE ?")
+    .bind(groupID, needle).first();
+  if (playing) return json({ error: "This recording is in the session now. End the session first." }, { status: 409 });
+  const scheduled = await env.DB.prepare("SELECT title FROM group_zikr_sessions WHERE group_id=? AND is_active=1 AND autoplay_json LIKE ?")
+    .bind(groupID, needle).first<{ title: string }>();
+  if (scheduled) return json({ error: `"${scheduled.title}" plays this recording. Change that zikr time first.` }, { status: 409 });
   const row = await env.DB.prepare("SELECT media_key FROM group_recordings WHERE group_id=? AND id=?")
     .bind(groupID, recordingID).first<{ media_key: string }>();
   if (!row) return notFound();
@@ -95,28 +97,12 @@ export async function deleteRecording(env: Env, memberID: string, groupID: strin
   return new Response(null, { status: 204 });
 }
 
-// MARK: - Used when a session starts and while it plays
+// MARK: - Used by sessions
 
 export async function groupRecording(env: Env, groupID: string, recordingID: string) {
   return env.DB.prepare("SELECT id,title,media_key,content_type,duration_seconds FROM group_recordings WHERE group_id=? AND id=?")
     .bind(groupID, recordingID)
     .first<{ id: string; title: string; media_key: string; content_type: string; duration_seconds: number | null }>();
-}
-
-/** The recording a member plays, by a link that outlasts the session. */
-export async function liveRecording(env: Env, groupID: string, recordingID: string, endsAt: string | null) {
-  const recording = await groupRecording(env, groupID, recordingID);
-  if (!recording) return undefined;
-  const until = endsAt ? Math.max(3_600, Math.ceil((Date.parse(endsAt) - Date.now()) / 1000) + 3_600) : 12 * 3_600;
-  const url = await signedMediaURL(env, recording.media_key, until);
-  if (!url) return undefined;
-  return { url, title: recording.title, contentType: recording.content_type, durationSeconds: recording.duration_seconds ?? undefined };
-}
-
-/** Ends sessions whose recording has finished. */
-export async function endFinishedRecordings(env: Env, now = new Date()): Promise<void> {
-  await env.DB.prepare(`UPDATE group_live SET state='offline',video_id=NULL,room_id=NULL,recording_id=NULL,recorded=0,ends_at=NULL,updated_at=?
-    WHERE state='live' AND ends_at IS NOT NULL AND ends_at <= ?`).bind(now.toISOString(), now.toISOString()).run();
 }
 
 type VideoInfo = { live: boolean; durationSeconds: number | null };

@@ -134,6 +134,8 @@ struct GroupLiveStarter: View {
     let service: MemberGroupService
     /// False while video meetings await their integration: no room can open.
     var meetingsReady = true
+    /// Adds recordings and past zikr to the session already live.
+    var addingToSession = false
 
     private enum Kind: String, CaseIterable, Identifiable {
         case zikr = "Halqah Zikr"
@@ -157,29 +159,33 @@ struct GroupLiveStarter: View {
     @State private var joinTogether = true
     @State private var library: GroupRecordingLibrary?
     @State private var libraryFailed = false
-    @State private var pastVideoID: String?
-    @State private var recordingID: String?
+    /// What plays, in order: recordings and past zikr, picked from either list.
+    @State private var picked: [GroupQueueEntry] = []
     @State private var choosingFile = false
     @State private var uploading = false
     @State private var working = false
     @State private var error: String?
 
+    private var sources: [Source] { addingToSession ? [.youtube, .recording] : Source.allCases }
+
     var body: some View {
         Form {
-            Section {
-                Picker("What is starting", selection: $kind) {
-                    ForEach(Kind.allCases) { kind in Text(LocalizedStringKey(kind.rawValue)).tag(kind) }
+            if !addingToSession {
+                Section {
+                    Picker("What is starting", selection: $kind) {
+                        ForEach(Kind.allCases) { kind in Text(LocalizedStringKey(kind.rawValue)).tag(kind) }
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: kind) { _, value in
+                        title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
+                    }
+                    TextField("Title", text: $title)
                 }
-                .pickerStyle(.segmented)
-                .onChange(of: kind) { _, value in
-                    title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
-                }
-                TextField("Title", text: $title)
             }
-            if kind == .zikr {
+            if kind == .zikr || addingToSession {
                 Section {
                     Picker("How the group joins", selection: $source) {
-                        ForEach(Source.allCases) { source in Text(LocalizedStringKey(source.rawValue)).tag(source) }
+                        ForEach(sources) { source in Text(LocalizedStringKey(source.rawValue)).tag(source) }
                     }
                     .pickerStyle(.segmented)
                 }
@@ -188,6 +194,7 @@ struct GroupLiveStarter: View {
                 case .youtube: youtubeSections
                 case .recording: recordingSections
                 }
+                if !picked.isEmpty && source != .room { orderSection }
             } else {
                 Section {
                     if meetingsReady {
@@ -206,14 +213,18 @@ struct GroupLiveStarter: View {
                 Button {
                     Task { await start() }
                 } label: {
-                    Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
+                    if addingToSession {
+                        Label("Add to the session", systemImage: "text.badge.plus")
+                    } else {
+                        Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
+                    }
                 }
                 .disabled(working || uploading || !canStart)
             }
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
-        .navigationTitle("Go live")
+        .navigationTitle(addingToSession ? "Add to the session" : "Go live")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.audio, .movie]) { result in
@@ -221,7 +232,7 @@ struct GroupLiveStarter: View {
         }
         .task {
             // Until the room service is connected, start where a zikr can play.
-            if !meetingsReady { source = .youtube }
+            if addingToSession || !meetingsReady { source = .youtube }
             await loadLibrary()
         }
     }
@@ -252,28 +263,28 @@ struct GroupLiveStarter: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
-                .onChange(of: videoLink) { _, value in if !value.isEmpty { pastVideoID = nil } }
         } footer: {
-            Text("A past zikr plays to everyone from the start together, and the session ends when the video does.")
+            Text("A live link is watched live. A past zikr plays to everyone together, from one place you control: pause, move back or forward, or go to the next for the whole group.")
         }
-        Section("Past zikr from the channel") {
+        Section {
             if let videos = library?.pastVideos {
                 if videos.isEmpty {
                     Text("No past zikr videos yet.").foregroundStyle(DIColor.textMuted)
                 }
-                ForEach(videos.prefix(30)) { video in
+                ForEach(videos.prefix(40)) { video in
                     choiceRow(
+                        entry: .video(video.videoID),
                         title: video.title,
-                        detail: [video.publishedAt.formatted(date: .abbreviated, time: .omitted), length(video.durationSeconds)],
-                        selected: pastVideoID == video.videoID
-                    ) {
-                        pastVideoID = video.videoID
-                        videoLink = ""
-                    }
+                        detail: [video.publishedAt.formatted(date: .abbreviated, time: .omitted), length(video.durationSeconds)]
+                    )
                 }
             } else {
                 libraryStatus
             }
+        } header: {
+            Text("Past zikr from the channel")
+        } footer: {
+            Text("Tap to add in the order they should play.")
         }
     }
 
@@ -286,12 +297,10 @@ struct GroupLiveStarter: View {
                 }
                 ForEach(recordings) { recording in
                     choiceRow(
+                        entry: .recording(recording.id),
                         title: recording.title,
-                        detail: [length(recording.durationSeconds), ByteCountFormatter.string(fromByteCount: Int64(recording.byteSize), countStyle: .file)],
-                        selected: recordingID == recording.id
-                    ) {
-                        recordingID = recording.id
-                    }
+                        detail: [length(recording.durationSeconds), ByteCountFormatter.string(fromByteCount: Int64(recording.byteSize), countStyle: .file)]
+                    )
                     .swipeActions {
                         Button("Delete", role: .destructive) { Task { await delete(recording) } }
                     }
@@ -315,7 +324,26 @@ struct GroupLiveStarter: View {
         } header: {
             Text("The group's recordings")
         } footer: {
-            Text("MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together from the moment you start, and the session ends when the recording does.")
+            Text("MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together, from one place you control. The session stays open until you end it.")
+        }
+    }
+
+    private var orderSection: some View {
+        Section("Plays in this order") {
+            ForEach(Array(picked.enumerated()), id: \.element) { index, entry in
+                HStack {
+                    Text(verbatim: "\(index + 1). \(titleOf(entry))").lineLimit(1)
+                    Spacer(minLength: 0)
+                    Button {
+                        picked.removeAll { $0 == entry }
+                    } label: {
+                        Image(systemName: "minus.circle.fill").foregroundStyle(DIColor.danger)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Remove"))
+                }
+            }
+            .onMove { from, to in picked.move(fromOffsets: from, toOffset: to) }
         }
     }
 
@@ -328,8 +356,11 @@ struct GroupLiveStarter: View {
         }
     }
 
-    private func choiceRow(title: String, detail: [String?], selected: Bool, choose: @escaping () -> Void) -> some View {
-        Button(action: choose) {
+    private func choiceRow(entry: GroupQueueEntry, title: String, detail: [String?]) -> some View {
+        let position = picked.firstIndex(of: entry)
+        return Button {
+            if let position { picked.remove(at: position) } else { picked.append(entry) }
+        } label: {
             HStack(spacing: DISpacing.sm) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(verbatim: title).foregroundStyle(DIColor.textPrimary).lineLimit(2)
@@ -338,12 +369,23 @@ struct GroupLiveStarter: View {
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)
-                if selected {
-                    Image(systemName: "checkmark").foregroundStyle(DIColor.primary)
+                if let position {
+                    Text(verbatim: "\(position + 1)")
+                        .font(.caption.weight(.bold))
+                        .frame(width: 24, height: 24)
+                        .background(Circle().fill(DIColor.primary))
+                        .foregroundStyle(DIColor.onPrimary)
                 }
             }
         }
-        .accessibilityAddTraits(selected ? .isSelected : [])
+        .accessibilityAddTraits(position != nil ? .isSelected : [])
+    }
+
+    private func titleOf(_ entry: GroupQueueEntry) -> String {
+        switch entry {
+        case .recording(let id): library?.recordings.first { $0.id == id }?.title ?? id
+        case .video(let id): library?.pastVideos.first { $0.videoID == id }?.title ?? id
+        }
     }
 
     private func length(_ seconds: Int?) -> String? {
@@ -357,41 +399,38 @@ struct GroupLiveStarter: View {
     // MARK: Starting
 
     private var canStart: Bool {
-        if kind == .meeting { return meetingsReady }
         let video = VideoLink.id(from: videoLink)
+        if !videoLink.isEmpty && video == nil && source != .recording { return false }
+        if addingToSession { return !picked.isEmpty || (source == .youtube && video != nil) }
+        if kind == .meeting { return meetingsReady }
         switch source {
         case .room:
-            let room = joinTogether && meetingsReady
-            return (room || video != nil) && (videoLink.isEmpty || video != nil)
-        case .youtube:
-            return pastVideoID != nil || video != nil
-        case .recording:
-            return recordingID != nil
+            return (joinTogether && meetingsReady) || video != nil
+        case .youtube, .recording:
+            return !picked.isEmpty || (source == .youtube && video != nil)
         }
     }
 
     private func start() async {
         working = true
         defer { working = false }
+        let title = title.trimmingCharacters(in: .whitespaces)
+        let video = VideoLink.id(from: videoLink)
         do {
-            let title = title.trimmingCharacters(in: .whitespaces)
-            if kind == .meeting {
+            if addingToSession {
+                // A pasted link here is a past video; a live one is refused.
+                var entries = picked
+                if source == .youtube, let video { entries.insert(.video(video), at: 0) }
+                try await service.addToSession(entries, in: groupID)
+            } else if kind == .meeting {
                 try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true)
+            } else if source == .room {
+                try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: video, room: joinTogether && meetingsReady)
             } else {
-                switch source {
-                case .room:
-                    try await service.startLive(in: groupID, kind: "zikr", title: title,
-                                                videoID: VideoLink.id(from: videoLink), room: joinTogether && meetingsReady)
-                case .youtube:
-                    // A video picked from the past zikr is a recording; for a
-                    // pasted link the server asks YouTube which it is.
-                    try await service.startLive(in: groupID, kind: "zikr", title: title,
-                                                videoID: pastVideoID ?? VideoLink.id(from: videoLink), room: false,
-                                                recorded: pastVideoID != nil)
-                case .recording:
-                    try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: nil, room: false,
-                                                recordingID: recordingID)
-                }
+                // The server asks YouTube whether a pasted link is live or past:
+                // live is watched live, past joins the queue at the front.
+                try await service.startLive(in: groupID, kind: "zikr", title: title,
+                                            videoID: source == .youtube ? video : nil, room: false, queue: picked)
             }
             dismiss()
         } catch {
@@ -436,8 +475,10 @@ struct GroupLiveStarter: View {
             )
             let before = Set(library?.recordings.map(\.id) ?? [])
             await loadLibrary()
-            // Select what was just uploaded.
-            recordingID = library?.recordings.first { !before.contains($0.id) }?.id ?? recordingID
+            // What was just uploaded joins the order.
+            if let added = library?.recordings.first(where: { !before.contains($0.id) }) {
+                picked.append(.recording(added.id))
+            }
         } catch {
             self.error = error.localizedDescription
         }
@@ -446,7 +487,7 @@ struct GroupLiveStarter: View {
     private func delete(_ recording: GroupRecording) async {
         do {
             try await service.deleteRecording(recording.id, in: groupID)
-            if recordingID == recording.id { recordingID = nil }
+            picked.removeAll { $0 == .recording(recording.id) }
             await loadLibrary()
         } catch {
             self.error = error.localizedDescription
@@ -527,6 +568,9 @@ struct GroupZikrEditor: View {
     @State private var time = Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: Date()) ?? Date()
     @State private var weekdays: Set<Int> = Set(1...7)
     @State private var duration = 30
+    /// A recording or past zikr this time plays by itself.
+    @State private var autoplay: GroupQueueEntry?
+    @State private var library: GroupRecordingLibrary?
     @State private var working = false
     @State private var error: String?
 
@@ -547,6 +591,23 @@ struct GroupZikrEditor: View {
                 Text(timing == .clock
                      ? "The time is in your own time zone; members see it in theirs."
                      : "Follows the prayer time at Dar-ul-Irfan each day.")
+            }
+            if timing == .clock, let library, !(library.recordings.isEmpty && library.pastVideos.isEmpty) {
+                Section {
+                    Picker("Plays by itself", selection: $autoplay) {
+                        Text("Nothing: an admin starts it").tag(GroupQueueEntry?.none)
+                        ForEach(library.recordings) { recording in
+                            Text(verbatim: recording.title).tag(GroupQueueEntry?.some(.recording(recording.id)))
+                        }
+                        ForEach(library.pastVideos.prefix(20)) { video in
+                            Text(verbatim: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
+                                .tag(GroupQueueEntry?.some(.video(video.videoID)))
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+                } footer: {
+                    Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.")
+                }
             }
             Section("Days") {
                 let symbols = Calendar.current.weekdaySymbols
@@ -572,6 +633,7 @@ struct GroupZikrEditor: View {
         .navigationTitle("Zikr time")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .task { library = try? await service.recordings(in: groupID) }
     }
 
     private func save() async {
@@ -593,7 +655,7 @@ struct GroupZikrEditor: View {
             anchor: timing == .clock ? nil : (timing == .afterIsha ? "afterIsha" : "beforeFajr")
         )
         do {
-            try await service.saveZikrSession(session, in: groupID)
+            try await service.saveZikrSession(session, autoplay: timing == .clock ? [autoplay].compactMap { $0 } : [], in: groupID)
             dismiss()
         } catch {
             self.error = error.localizedDescription

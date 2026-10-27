@@ -3,6 +3,7 @@ import worker from "../src/index";
 import type { Env } from "../src/contracts";
 import { sqliteD1 } from "./sqlite-d1";
 import { claimEmailGrants } from "../src/members";
+import { autoplayDue } from "../src/session";
 
 const SECRET = "test-app-secret";
 
@@ -363,6 +364,15 @@ describe("recorded zikr", () => {
       headers: { authorization: `Bearer ${token}`, "content-type": type, "content-length": String(bytes.length) },
     }), env);
 
+  type Live = {
+    sessionID: string; recorded: boolean; listeners: number;
+    queue: { kind: string; id: string; title: string; url?: string; contentType?: string; durationSeconds?: number }[];
+    playback: { index: number; positionSeconds: number; paused: boolean; finished: boolean };
+    notice?: { text: string }; attendance?: { name: string; isHere: boolean }[];
+  };
+  const liveOf = async (call: (t: string, m: string, p: string, b?: unknown) => Promise<Response>, token: string) =>
+    ((await (await call(token, "GET", "/v1/groups/usa")).json()) as { live?: Live }).live;
+
   it("lets a group admin upload a recording and play it to the group, served in byte ranges", async () => {
     const { bucket, stored } = memoryBucket();
     const { env, call, member, admin } = await setup({ MEDIA: bucket, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
@@ -378,15 +388,13 @@ describe("recorded zikr", () => {
     expect(listed.recordings).toMatchObject([{ id, title: "Friday zikr", durationSeconds: 1800 }]);
     expect((await call(member, "GET", "/v1/groups/usa/recordings")).status).toBe(403);
 
-    const started = (await (await call(admin, "POST", "/v1/groups/usa/live", { state: "live", recordingID: id })).json()) as { recorded: boolean; endsAt: string };
+    const started = (await (await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ recordingID: id }] })).json()) as { recorded: boolean };
     expect(started.recorded).toBe(true);
-    expect(Date.parse(started.endsAt) - Date.now()).toBeGreaterThan(1_800_000);
-    const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as {
-      live: { recorded: boolean; recording: { url: string; contentType: string; durationSeconds: number } };
-    };
-    expect(detail.live).toMatchObject({ recorded: true, recording: { contentType: "audio/mpeg", durationSeconds: 1800 } });
+    const live = await liveOf(call, member);
+    expect(live).toMatchObject({ recorded: true, queue: [{ kind: "recording", id, contentType: "audio/mpeg", durationSeconds: 1800 }] });
+    expect(live?.playback).toMatchObject({ index: 0, paused: false, finished: false });
 
-    const url = new URL(detail.live.recording.url);
+    const url = new URL(live!.queue[0]!.url!);
     const part = await worker.fetch(new Request(`https://api.example.com${url.pathname}${url.search}`, { headers: { range: "bytes=2-5" } }), env);
     expect(part.status).toBe(206);
     expect(part.headers.get("content-range")).toBe("bytes 2-5/10");
@@ -402,16 +410,103 @@ describe("recorded zikr", () => {
     expect(stored.size).toBe(0);
   });
 
-  it("ends a recorded session by itself when the recording has finished", async () => {
+  it("keeps everyone on one clock the admin controls, and stays open after the recording ends", async () => {
     const { bucket } = memoryBucket();
     const { env, raw, call, member, admin } = await setup({ MEDIA: bucket, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
-    const { id } = (await (await upload(env, admin, new Uint8Array([1, 2]))).json()) as { id: string };
-    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", recordingID: id });
-    raw.prepare("UPDATE group_live SET ends_at=? WHERE group_id='usa'").run(new Date(Date.now() - 1000).toISOString());
-    const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as { live?: unknown };
-    expect(detail.live).toBeUndefined();
+    const first = ((await (await upload(env, admin, new Uint8Array([1]), "audio/mpeg", "title=One&durationSeconds=600")).json()) as { id: string }).id;
+    const second = ((await (await upload(env, admin, new Uint8Array([2]), "audio/mpeg", "title=Two&durationSeconds=300")).json()) as { id: string }).id;
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ recordingID: first }, { recordingID: second }] });
+    const control = (body: unknown) => call(admin, "POST", "/v1/groups/usa/control", body);
+    expect((await call(member, "POST", "/v1/groups/usa/control", { action: "pause" })).status).toBe(403);
+
+    // Twelve minutes in: the first (ten minutes) is over, two minutes into the second.
+    raw.prepare("UPDATE group_live SET position_at=? WHERE group_id='usa'").run(new Date(Date.now() - 720_000).toISOString());
+    let live = await liveOf(call, member);
+    expect(live?.playback.index).toBe(1);
+    expect(live?.playback.positionSeconds).toBeGreaterThan(119);
+
+    await control({ action: "pause" });
+    live = await liveOf(call, member);
+    expect(live?.playback).toMatchObject({ index: 1, paused: true });
+    await control({ action: "seek", seconds: 30 });
+    live = await liveOf(call, member);
+    expect(live?.playback.positionSeconds).toBe(30);
+    await control({ action: "previous" });
+    expect((await liveOf(call, member))?.playback).toMatchObject({ index: 1, positionSeconds: 0 });
+    await control({ action: "previous" });
+    expect((await liveOf(call, member))?.playback).toMatchObject({ index: 0, positionSeconds: 0 });
+    await control({ action: "resume" });
+
+    // Long past the end: finished, but still live until an admin ends it.
+    raw.prepare("UPDATE group_live SET position_at=? WHERE group_id='usa'").run(new Date(Date.now() - 3 * 3_600_000).toISOString());
+    live = await liveOf(call, member);
+    expect(live?.playback.finished).toBe(true);
     const groups = (await (await call(member, "GET", "/v1/groups")).json()) as { groups: { isLive: boolean }[] };
-    expect(groups.groups[0]?.isLive).toBe(false);
+    expect(groups.groups[0]?.isLive).toBe(true);
+
+    // Adding to a finished session plays the addition straight away.
+    await control({ action: "add", items: [{ recordingID: first }] });
+    expect((await liveOf(call, member))?.playback).toMatchObject({ index: 2, finished: false, paused: false });
+
+    await control({ action: "notice", text: "Dua in five minutes" });
+    expect((await liveOf(call, member))?.notice?.text).toBe("Dua in five minutes");
+    expect((await control({ action: "jump", index: 9 })).status).toBe(400);
+  });
+
+  it("counts who is listening, takes dua requests for the admins, and keeps a record of the session", async () => {
+    const { bucket } = memoryBucket();
+    const { env, call, member, admin } = await setup({ MEDIA: bucket, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
+    const id = ((await (await upload(env, admin, new Uint8Array([1]))).json()) as { id: string }).id;
+    expect((await call(member, "POST", "/v1/groups/usa/presence")).status).toBe(409);
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ recordingID: id }] });
+    const checked = (await (await call(member, "POST", "/v1/groups/usa/presence")).json()) as { listeners: number };
+    expect(checked.listeners).toBe(1);
+    await call(admin, "POST", "/v1/groups/usa/presence");
+    const seen = await liveOf(call, admin);
+    expect(seen?.listeners).toBe(2);
+    expect(seen?.attendance?.map(person => person.name).sort()).toEqual(["admin", "member"]);
+    // Members see the count, not the names.
+    expect((await liveOf(call, member))?.attendance).toBeUndefined();
+
+    expect((await call(member, "POST", "/v1/groups/usa/duas", { text: "For my mother's health" })).status).toBe(201);
+    expect((await call(member, "POST", "/v1/groups/usa/duas", { text: "Privately", showName: false })).status).toBe(201);
+    expect((await call(member, "GET", "/v1/groups/usa/duas")).status).toBe(403);
+    const duas = (await (await call(admin, "GET", "/v1/groups/usa/duas")).json()) as { requests: { id: string; text: string; name?: string; isRead: boolean }[] };
+    expect(duas.requests.map(dua => [dua.text, dua.name ?? null]).sort()).toEqual([["For my mother's health", "member"], ["Privately", null]]);
+    const detail = (await (await call(admin, "GET", "/v1/groups/usa")).json()) as { unreadDuaRequests: number };
+    expect(detail.unreadDuaRequests).toBe(2);
+    expect((await call(admin, "POST", `/v1/groups/usa/duas/${duas.requests[0]!.id}/read`)).status).toBe(204);
+    expect(((await (await call(admin, "GET", "/v1/groups/usa")).json()) as { unreadDuaRequests: number }).unreadDuaRequests).toBe(1);
+
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+    const history = (await (await call(admin, "GET", "/v1/groups/usa/history")).json()) as { sessions: { id: string; attendees: number }[] };
+    expect(history.sessions).toMatchObject([{ attendees: 2 }]);
+    const attendees = (await (await call(admin, "GET", `/v1/groups/usa/history/${history.sessions[0]!.id}`)).json()) as { attendees: { name: string }[] };
+    expect(attendees.attendees).toHaveLength(2);
+    expect((await call(member, "GET", "/v1/groups/usa/history")).status).toBe(403);
+  });
+
+  it("starts a clock-time zikr by itself with its recording, once, when no session is live", async () => {
+    const { bucket } = memoryBucket();
+    const { env, raw, call, member, admin } = await setup({ MEDIA: bucket, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
+    const id = ((await (await upload(env, admin, new Uint8Array([1]))).json()) as { id: string }).id;
+    const now = new Date("2026-10-30T01:02:00Z"); // Thursday 21:02 in New York
+    const saved = await call(admin, "PUT", "/v1/groups/usa/zikr/thursday", {
+      title: "Thursday zikr", startHour: 21, startMinute: 0, timeZoneIdentifier: "America/New_York", weekdays: [5],
+      autoplay: [{ recordingID: id }],
+    });
+    expect(saved.status).toBe(200);
+    expect(((await (await call(member, "GET", "/v1/groups/usa")).json()) as { zikrSessions: { autoplayTitle?: string }[] })
+      .zikrSessions[0]?.autoplayTitle).toBe("Friday zikr");
+    await autoplayDue(env, new Date("2026-10-30T00:50:00Z")); // ten minutes early
+    expect(await liveOf(call, member)).toBeUndefined();
+    await autoplayDue(env, now);
+    expect((await liveOf(call, member))?.queue.map(item => item.id)).toEqual([id]);
+    // Ended by the admin, it does not start again in the same window.
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+    await autoplayDue(env, new Date(now.getTime() + 120_000));
+    expect(await liveOf(call, member)).toBeUndefined();
+    expect(raw.prepare("SELECT started_by FROM group_live_history").get()).toMatchObject({ started_by: "schedule" });
   });
 
   it("offers the channel's past zikr and plays one as a recording, but a live video as live", async () => {
@@ -434,14 +529,16 @@ describe("recorded zikr", () => {
     const listed = (await (await call(admin, "GET", "/v1/groups/usa/recordings")).json()) as { pastVideos: { videoID: string; durationSeconds: number }[] };
     expect(listed.pastVideos).toEqual([expect.objectContaining({ videoID: "pastzikr001", durationSeconds: 3900 })]);
 
-    const past = (await (await call(admin, "POST", "/v1/groups/usa/live", { state: "live", videoID: "pastzikr001" })).json()) as { recorded: boolean; endsAt: string };
-    expect(past.recorded).toBe(true);
-    expect(Date.parse(past.endsAt) - Date.now()).toBeGreaterThan(3_900_000);
-    const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as { live: { videoID: string; recorded: boolean } };
-    expect(detail.live).toMatchObject({ videoID: "pastzikr001", recorded: true });
+    // A pasted past video becomes a recording in the queue.
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", videoID: "pastzikr001" });
+    let live = await liveOf(call, member) as Live & { videoID?: string };
+    expect(live).toMatchObject({ recorded: true, queue: [{ kind: "video", id: "pastzikr001", title: "Online Zikr with Sheikh", durationSeconds: 3900 }] });
+    expect(live.videoID).toBeUndefined();
 
-    const live = (await (await call(admin, "POST", "/v1/groups/usa/live", { state: "live", videoID: "liveliveliv" })).json()) as { recorded: boolean; endsAt?: string };
-    expect(live).toMatchObject({ recorded: false });
-    expect(live.endsAt).toBeUndefined();
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", videoID: "liveliveliv" });
+    live = await liveOf(call, member) as Live & { videoID?: string };
+    expect(live).toMatchObject({ recorded: false, videoID: "liveliveliv", queue: [] });
+    // A live video cannot be queued as a recording.
+    expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ videoID: "liveliveliv" }] })).status).toBe(400);
   });
 });

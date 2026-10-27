@@ -162,17 +162,54 @@ actor MemberGroupService {
         try await send("DELETE", path: "v1/groups/\(groupID)/posts/\(postID)", payload: nil, expecting: [204])
     }
 
-    /// Starts a live zikr or meeting in the group. `videoID` streams it, or
-    /// plays a past zikr; `room` lets members join it together; `recordingID`
-    /// plays one of the group's recordings.
+    /// Starts a live zikr or meeting in the group. `videoID` streams it (a
+    /// past video plays as a recording); `room` lets members join it
+    /// together; `queue` plays recordings and past zikr one after another.
     func startLive(
-        in groupID: String, kind: String, title: String, videoID: String?, room: Bool,
-        recordingID: String? = nil, recorded: Bool = false
+        in groupID: String, kind: String, title: String, videoID: String?, room: Bool, queue: [GroupQueueEntry] = []
     ) async throws {
-        var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room, "recorded": recorded]
+        var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room]
         if let videoID { payload["videoID"] = videoID }
-        if let recordingID { payload["recordingID"] = recordingID }
+        if !queue.isEmpty { payload["queue"] = queue.map(\.payload) }
         try await send("POST", path: "v1/groups/\(groupID)/live", payload: payload, expecting: [200])
+    }
+
+    /// A playback control applied for everyone: pause, resume, skip (by
+    /// seconds), seek (to seconds), next, previous, jump (to index), add
+    /// (items), remove (index) or notice (text).
+    func control(_ action: String, _ extra: [String: Any] = [:], in groupID: String) async throws {
+        var payload = extra
+        payload["action"] = action
+        try await send("POST", path: "v1/groups/\(groupID)/control", payload: payload, expecting: [200])
+    }
+
+    func addToSession(_ entries: [GroupQueueEntry], in groupID: String) async throws {
+        try await control("add", ["items": entries.map(\.payload)], in: groupID)
+    }
+
+    /// Tells the group's admins this member has the session open.
+    func checkIn(in groupID: String) async {
+        _ = try? await send("POST", path: "v1/groups/\(groupID)/presence", payload: [:], expecting: [200])
+    }
+
+    func requestDua(_ text: String, showName: Bool, in groupID: String) async throws {
+        try await send("POST", path: "v1/groups/\(groupID)/duas", payload: ["text": text, "showName": showName], expecting: [201])
+    }
+
+    func duaRequests(in groupID: String) async throws -> [GroupDuaRequest] {
+        try await authorized(GroupDuaRequestList.self, path: "v1/groups/\(groupID)/duas").requests
+    }
+
+    func markDuaRead(_ duaID: String, in groupID: String) async throws {
+        try await send("POST", path: "v1/groups/\(groupID)/duas/\(duaID)/read", payload: [:], expecting: [204])
+    }
+
+    func sessionHistory(in groupID: String) async throws -> [GroupSessionRecord] {
+        try await authorized(GroupSessionHistory.self, path: "v1/groups/\(groupID)/history").sessions
+    }
+
+    func attendees(of sessionID: String, in groupID: String) async throws -> [GroupAttendee] {
+        try await authorized(GroupSessionAttendees.self, path: "v1/groups/\(groupID)/history/\(sessionID)").attendees
     }
 
     func recordings(in groupID: String) async throws -> GroupRecordingLibrary {
@@ -223,13 +260,15 @@ actor MemberGroupService {
         try await send("DELETE", path: "v1/groups/\(groupID)/meetings/\(meetingID)", payload: nil, expecting: [204])
     }
 
-    func saveZikrSession(_ session: ZikrSession, in groupID: String) async throws {
+    /// `autoplay` is what a clock-time zikr plays by itself.
+    func saveZikrSession(_ session: ZikrSession, autoplay: [GroupQueueEntry] = [], in groupID: String) async throws {
         var payload: [String: Any] = [
             "title": session.title, "weekdays": session.weekdays, "startHour": session.startHour,
             "startMinute": session.startMinute, "timeZoneIdentifier": session.timeZoneIdentifier,
             "durationMinutes": session.durationMinutes,
         ]
         if let anchor = session.anchor { payload["anchor"] = anchor }
+        if !autoplay.isEmpty { payload["autoplay"] = autoplay.map(\.payload) }
         try await send("PUT", path: "v1/groups/\(groupID)/zikr/\(session.id)", payload: payload, expecting: [200])
     }
 

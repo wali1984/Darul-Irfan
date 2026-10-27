@@ -32,6 +32,8 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     var anchor: String? = nil
     /// Minutes before a `beforeFajr` start (60 when absent).
     var anchorOffsetMinutes: Int? = nil
+    /// A group's zikr time that plays a recording by itself: what it plays.
+    var autoplayTitle: String? = nil
 
     var zikrAnchor: ZikrAnchor? { anchor.flatMap(ZikrAnchor.init(rawValue:)) }
 }

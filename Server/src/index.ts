@@ -12,7 +12,8 @@ import {
 import { serveMedia } from "./media";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
-import { deleteRecording, endFinishedRecordings, listRecordings, uploadRecording } from "./recordings";
+import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
+import { autoplayDue, checkIn, controlSession, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -75,7 +76,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (!section && request.method === "GET") return groupDetail(env, member, groupID);
@@ -104,6 +105,12 @@ async function route(request: Request, env: Env): Promise<Response> {
       return uploadRecording(request, env, member, groupID, url);
     }
     if (section === "recordings" && entity && request.method === "DELETE") return deleteRecording(env, member, groupID, entity);
+    if (section === "control" && !entity && request.method === "POST") return controlSession(env, member, groupID, await body());
+    if (section === "presence" && !entity && request.method === "POST") return checkIn(env, member, groupID);
+    if (section === "duas" && !entity && request.method === "GET") return duaRequests(env, member, groupID);
+    if (section === "duas" && !entity && request.method === "POST") return requestDua(env, member, groupID, await body());
+    if (section === "duas" && entity && action === "read" && request.method === "POST") return markDuaRead(env, member, groupID, entity);
+    if (section === "history" && request.method === "GET") return sessionHistory(env, member, groupID, entity);
     return json({ error: "Not found" }, { status: 404 });
   }
   if (request.method === "POST" && path === "/v1/devices") {
@@ -194,8 +201,8 @@ export default {
       { name: "youtube", run: refreshYouTube(env) },
       // Catches a listener that has gone silent, which no heartbeat reports.
       { name: "live-listeners", run: reconcileLive(env) },
-      // Ends a group's recorded zikr when the recording has finished.
-      { name: "group-recordings", run: endFinishedRecordings(env) },
+      // Starts a group's zikr that plays a recording by itself at its time.
+      { name: "group-autoplay", run: autoplayDue(env) },
     ];
     if (minute % 15 === 0) jobs.push(
       { name: "website", run: refreshWebsiteCatalog(env) }

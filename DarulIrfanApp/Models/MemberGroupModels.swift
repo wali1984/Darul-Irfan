@@ -54,37 +54,124 @@ enum MemberRole: String, Codable, Sendable {
 struct GroupLive: Codable, Sendable, Equatable {
     var kind: String
     var title: String?
-    /// A live video of the session, or a past one played as a recording.
+    /// A live video of the session.
     var videoID: String?
     /// Whether there is a room to join together.
     var hasRoom: Bool
     var startedAt: Date?
-    /// A recording played to the group: it plays to everyone from `startedAt`,
-    /// so the group hears the same part together. Absent from an older server.
+    /// The rest is absent from an older server.
+    var sessionID: String?
+    /// Recordings and past videos played to the group, one after another.
     var recorded: Bool?
-    /// An uploaded recording; a past video comes as `videoID` instead.
-    var recording: GroupLiveRecording?
-    /// When a recording ends, and the session with it.
-    var endsAt: Date?
+    var queue: [GroupQueueItem]?
+    /// One clock for everyone: the same item at the same place.
+    var playback: GroupPlayback?
+    /// A short message from the admin.
+    var notice: GroupNotice?
+    /// How many have the session open now.
+    var listeners: Int?
+    /// Who has joined this session; admins only.
+    var attendance: [GroupAttendee]?
 
     var isMeeting: Bool { kind == "meeting" }
-    var isRecorded: Bool { recorded == true }
+    var isRecorded: Bool { recorded == true && !(queue ?? []).isEmpty }
 
-    /// How far into the recording the group is now.
-    func playbackOffset(at date: Date = Date()) -> TimeInterval {
-        guard isRecorded, let startedAt else { return 0 }
-        return max(0, date.timeIntervalSince(startedAt))
+    /// What the group is playing now.
+    var currentItem: GroupQueueItem? {
+        guard let playback, let queue, queue.indices.contains(playback.index) else { return nil }
+        return queue[playback.index]
     }
 }
 
-/// A recording uploaded to the group and playing in it now.
-struct GroupLiveRecording: Codable, Sendable, Equatable {
-    var url: URL
+/// One recording or past video in a session.
+struct GroupQueueItem: Codable, Sendable, Equatable, Identifiable {
+    /// "recording" (uploaded to the group) or "video" (a past YouTube zikr).
+    var kind: String
+    var id: String
     var title: String
-    var contentType: String
     var durationSeconds: Int?
+    /// A recording's private link and type.
+    var url: URL?
+    var contentType: String?
+    var videoID: String?
 
-    var isVideo: Bool { contentType.hasPrefix("video/") }
+    var isYouTube: Bool { kind == "video" }
+    var isVideoFile: Bool { contentType?.hasPrefix("video/") == true }
+}
+
+/// Where the group is: item `index`, `positionSeconds` into it at `at`.
+struct GroupPlayback: Codable, Sendable, Equatable {
+    var index: Int
+    var positionSeconds: Double
+    var paused: Bool
+    /// Everything has played; the session stays open until an admin ends it.
+    var finished: Bool
+    /// The server's moment. The app replaces it with the moment the answer
+    /// arrived, so a phone whose clock is wrong still plays in step.
+    var at: Date
+
+    func position(at date: Date = Date()) -> Double {
+        paused || finished ? positionSeconds : positionSeconds + max(0, date.timeIntervalSince(at))
+    }
+}
+
+struct GroupNotice: Codable, Sendable, Equatable {
+    var text: String
+    var postedAt: Date?
+}
+
+struct GroupAttendee: Codable, Sendable, Equatable, Identifiable {
+    var name: String
+    var firstSeenAt: Date
+    var lastSeenAt: Date
+    /// Has the session open now (checked in within the last few minutes).
+    var isHere: Bool?
+
+    var id: String { "\(name)|\(firstSeenAt.timeIntervalSince1970)" }
+}
+
+/// Something to play in a session, as the admin picks it.
+enum GroupQueueEntry: Hashable, Sendable {
+    case recording(String)
+    case video(String)
+
+    var payload: [String: String] {
+        switch self {
+        case .recording(let id): ["recordingID": id]
+        case .video(let id): ["videoID": id]
+        }
+    }
+}
+
+struct GroupDuaRequest: Codable, Sendable, Identifiable, Equatable {
+    var id: String
+    var text: String
+    var createdAt: Date
+    var isRead: Bool
+    /// Absent when the member asked without their name.
+    var name: String?
+}
+
+struct GroupDuaRequestList: Codable, Sendable {
+    var requests: [GroupDuaRequest]
+}
+
+/// A session that has ended.
+struct GroupSessionRecord: Codable, Sendable, Identifiable, Equatable {
+    var id: String
+    var kind: String
+    var title: String?
+    var startedAt: Date
+    var endedAt: Date
+    var attendees: Int
+}
+
+struct GroupSessionHistory: Codable, Sendable {
+    var sessions: [GroupSessionRecord]
+}
+
+struct GroupSessionAttendees: Codable, Sendable {
+    var attendees: [GroupAttendee]
 }
 
 /// What a group admin can play to the group instead of leading the zikr live.
@@ -145,6 +232,8 @@ struct GroupDetail: Codable, Sendable {
     var meetings: [GroupMeeting]
     /// Which outside services are connected yet; absent from an older server.
     var integrations: GroupIntegrations?
+    /// Dua requests no admin has read yet; admins only.
+    var unreadDuaRequests: Int?
 }
 
 /// Services a group feature depends on. Until one is connected the app says

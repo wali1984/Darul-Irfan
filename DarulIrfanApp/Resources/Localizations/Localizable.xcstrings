@@ -21811,6 +21811,907 @@
           }
         }
       }
+    },
+    "%lld attended": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld attended"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld شریک ہوئے"
+          }
+        }
+      }
+    },
+    "%lld listening": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld listening"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld سن رہے ہیں"
+          }
+        }
+      }
+    },
+    "A live link is watched live. A past zikr plays to everyone together, from one place you control: pause, move back or forward, or go to the next for the whole group.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A live link is watched live. A past zikr plays to everyone together, from one place you control: pause, move back or forward, or go to the next for the whole group."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست لنک براہِ راست دیکھا جاتا ہے۔ گزشتہ ذکر سب کے لیے ایک ساتھ، ایک ہی جگہ سے چلتا ہے جسے آپ قابو میں رکھتے ہیں: پورے حلقے کے لیے روکیں، آگے یا پیچھے کریں، یا اگلے پر جائیں۔"
+          }
+        }
+      }
+    },
+    "A recording is playing to the group. It plays from where the group is now, so everyone hears the same part.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A recording is playing to the group. It plays from where the group is now, so everyone hears the same part."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے میں ایک ریکارڈنگ چل رہی ہے۔ یہ وہیں سے چلتی ہے جہاں حلقہ اس وقت ہے، تاکہ سب ایک ہی حصہ سنیں۔"
+          }
+        }
+      }
+    },
+    "Add to the session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add to the session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست میں شامل کریں"
+          }
+        }
+      }
+    },
+    "Also send it as a notification": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Also send it as a notification"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسے اطلاع کے طور پر بھی بھیجیں"
+          }
+        }
+      }
+    },
+    "At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس وقت اگر کسی منتظم نے نشست شروع نہ کی ہو تو یہ خود شروع ہو جاتی ہے، حلقے کے لیے اسے چلاتی ہے اور سب کو اطلاع دیتی ہے۔ نشست کوئی منتظم ہی ختم کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "Dua request": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dua request"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعا کی درخواست"
+          }
+        }
+      }
+    },
+    "Dua requests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dua requests"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعا کی درخواستیں"
+          }
+        }
+      }
+    },
+    "Dua requests (%lld new)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dua requests (%lld new)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعا کی درخواستیں (%lld نئی)"
+          }
+        }
+      }
+    },
+    "End session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست ختم کریں"
+          }
+        }
+      }
+    },
+    "End the session for everyone?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End the session for everyone?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سب کے لیے نشست ختم کریں؟"
+          }
+        }
+      }
+    },
+    "For example: Dua in five minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For example: Dua in five minutes"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مثلاً: پانچ منٹ میں دعا"
+          }
+        }
+      }
+    },
+    "Here now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Here now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی موجود"
+          }
+        }
+      }
+    },
+    "In this session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In this session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس نشست میں"
+          }
+        }
+      }
+    },
+    "Include my name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Include my name"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میرا نام شامل کریں"
+          }
+        }
+      }
+    },
+    "Joined %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joined %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ پر شامل ہوئے"
+          }
+        }
+      }
+    },
+    "MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together, from one place you control. The session stays open until you end it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together, from one place you control. The session stays open until you end it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MP3، M4A، AAC، WAV، MP4 یا MOV، زیادہ سے زیادہ 95 MB۔ اراکین ایک ساتھ، ایک ہی جگہ سے سنتے ہیں جسے آپ قابو میں رکھتے ہیں۔ نشست اس وقت تک کھلی رہتی ہے جب تک آپ اسے ختم نہ کریں۔"
+          }
+        }
+      }
+    },
+    "Mark as read": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as read"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پڑھ لیا"
+          }
+        }
+      }
+    },
+    "Message the group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Message the group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کو پیغام دیں"
+          }
+        }
+      }
+    },
+    "Change the message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change the message"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیغام بدلیں"
+          }
+        }
+      }
+    },
+    "No dua requests.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No dua requests."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعا کی کوئی درخواست نہیں۔"
+          }
+        }
+      }
+    },
+    "No one has joined yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No one has joined yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی کوئی شامل نہیں ہوا۔"
+          }
+        }
+      }
+    },
+    "No one joined in the app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No one joined in the app."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایپ میں کوئی شامل نہیں ہوا۔"
+          }
+        }
+      }
+    },
+    "No sessions yet. Each one appears here when it ends.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No sessions yet. Each one appears here when it ends."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی کوئی نشست نہیں۔ ہر نشست ختم ہونے پر یہاں نظر آئے گی۔"
+          }
+        }
+      }
+    },
+    "Nothing: an admin starts it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing: an admin starts it"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کچھ نہیں: منتظم شروع کرے گا"
+          }
+        }
+      }
+    },
+    "Only the group's admins see it, and remember it in the dua at the end of the zikr.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the group's admins see it, and remember it in the dua at the end of the zikr."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسے صرف حلقے کے منتظمین دیکھتے ہیں، اور ذکر کے آخر میں دعا میں یاد رکھتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Past sessions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past sessions"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گزشتہ نشستیں"
+          }
+        }
+      }
+    },
+    "Past sessions and attendance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past sessions and attendance"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گزشتہ نشستیں اور حاضری"
+          }
+        }
+      }
+    },
+    "Paused by the admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paused by the admin"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتظم نے روک دیا ہے"
+          }
+        }
+      }
+    },
+    "Paused for everyone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paused for everyone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سب کے لیے رکا ہوا ہے۔"
+          }
+        }
+      }
+    },
+    "These controls move playback for everyone listening.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These controls move playback for everyone listening."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ کنٹرول سننے والے سب کے لیے چلاتے اور روکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Play this now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play this now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسے ابھی چلائیں"
+          }
+        }
+      }
+    },
+    "Plays by itself": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plays by itself"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خود بخود چلتا ہے"
+          }
+        }
+      }
+    },
+    "Plays by itself: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plays by itself: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خود بخود چلتا ہے: %@"
+          }
+        }
+      }
+    },
+    "Plays in this order": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plays in this order"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس ترتیب سے چلے گا"
+          }
+        }
+      }
+    },
+    "Remove from the session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from the session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست سے ہٹائیں"
+          }
+        }
+      }
+    },
+    "Remove the message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove the message"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیغام ہٹائیں"
+          }
+        }
+      }
+    },
+    "Send": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بھیجیں"
+          }
+        }
+      }
+    },
+    "Send a dua request": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send a dua request"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعا کی درخواست بھیجیں"
+          }
+        }
+      }
+    },
+    "Show to the group": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show to the group"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کو دکھائیں"
+          }
+        }
+      }
+    },
+    "Shown on the session to everyone in the group.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shown on the session to everyone in the group."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست پر حلقے کے سب افراد کو دکھایا جاتا ہے۔"
+          }
+        }
+      }
+    },
+    "Tap to add in the order they should play.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap to add in the order they should play."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جس ترتیب سے چلانا ہو، اسی ترتیب سے تھپتھپا کر شامل کریں۔"
+          }
+        }
+      }
+    },
+    "Who is listening": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Who is listening"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کون سن رہا ہے"
+          }
+        }
+      }
+    },
+    "Who is listening (%lld)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Who is listening (%lld)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کون سن رہا ہے (%lld)"
+          }
+        }
+      }
+    },
+    "Without a name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Without a name"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نام کے بغیر"
+          }
+        }
+      }
+    },
+    "Your dua request": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your dua request"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کی دعا کی درخواست"
+          }
+        }
+      }
+    },
+    "Your request was sent to the group's admins.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your request was sent to the group's admins."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کی درخواست حلقے کے منتظمین کو بھیج دی گئی ہے۔"
+          }
+        }
+      }
+    },
+    "Everything has played. Add more, or end the session when the zikr is over.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything has played. Add more, or end the session when the zikr is over."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سب کچھ چل چکا ہے۔ مزید شامل کریں، یا ذکر مکمل ہونے پر نشست ختم کریں۔"
+          }
+        }
+      }
+    },
+    "The recording has finished. The session stays open until the admin closes it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The recording has finished. The session stays open until the admin closes it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ ختم ہو گئی ہے۔ نشست اس وقت تک کھلی رہے گی جب تک منتظم اسے بند نہ کرے۔"
+          }
+        }
+      }
+    },
+    "Previous": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پچھلا"
+          }
+        }
+      }
+    },
+    "Pause for everyone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause for everyone"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سب کے لیے روکیں"
+          }
+        }
+      }
+    },
+    "Resume for everyone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume for everyone"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سب کے لیے دوبارہ چلائیں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

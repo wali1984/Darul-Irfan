@@ -2,7 +2,8 @@ import type { Env } from "./contracts";
 import { cleanText, json, validHTTPURL, validISODate } from "./util";
 import { sendPushToInstallations } from "./apns";
 import { signedMediaURL } from "./media";
-import { endFinishedRecordings, groupRecording, liveRecording, youtubeVideos } from "./recordings";
+import { youtubeVideos } from "./recordings";
+import { beginSession, endSession, liveRow, queueOf, resolveQueue, sessionPayload, unreadDuaCount } from "./session";
 
 // Community groups: what members see and do inside their group, and what the
 // group's admins can run from the app itself.
@@ -80,7 +81,6 @@ export async function me(env: Env, memberID: string): Promise<Response> {
 /** The caller's groups - every group for the super admin - each with whether
  *  they manage it and whether something is live in it now. */
 export async function communityGroups(env: Env, memberID: string): Promise<Response> {
-  await endFinishedRecordings(env);
   const role = await memberRole(env, memberID);
   const sql = role === "superadmin"
     ? `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind
@@ -108,35 +108,35 @@ export async function communityGroups(env: Env, memberID: string): Promise<Respo
 export async function groupDetail(env: Env, memberID: string, groupID: string): Promise<Response> {
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
-  await endFinishedRecordings(env);
   const [group, live, zikr, meetings] = await Promise.all([
     env.DB.prepare("SELECT id,name,description FROM member_groups WHERE id=?").bind(groupID).first(),
-    env.DB.prepare("SELECT state,kind,title,video_id,room_id,started_at,recording_id,recorded,ends_at FROM group_live WHERE group_id=?")
-      .bind(groupID).first<Record<string, string | number | null>>(),
-    env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes
+    liveRow(env, groupID),
+    env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,autoplay_json
       FROM group_zikr_sessions WHERE group_id=? AND is_active=1 ORDER BY start_hour,start_minute`).bind(groupID).all(),
     env.DB.prepare(`SELECT id,title,starts_at,duration_minutes FROM group_meetings
       WHERE group_id=? AND is_cancelled=0 AND starts_at >= ? ORDER BY starts_at LIMIT 20`)
       .bind(groupID, new Date(Date.now() - 6 * 3_600_000).toISOString()).all(),
   ]);
   const isLive = live?.state === "live";
-  const recording = isLive && live?.recording_id
-    ? await liveRecording(env, groupID, String(live.recording_id), live.ends_at ? String(live.ends_at) : null) : undefined;
+  const managing = await canManage(env, memberID, role, groupID);
   return json({
     group: { id: group?.id, name: group?.name, description: group?.description ?? undefined },
-    canManage: await canManage(env, memberID, role, groupID),
-    live: isLive ? {
+    canManage: managing,
+    live: isLive && live ? {
       kind: live?.kind, title: live?.title ?? undefined,
       // The video plays in the app; the room is joined through /join.
       videoID: live?.video_id ?? undefined, hasRoom: !!live?.room_id, startedAt: live?.started_at ?? undefined,
-      // A recording plays to everyone from startedAt, so the group hears the
-      // same part together; it ends by itself at endsAt.
-      recorded: !!live?.recorded || !!recording, recording, endsAt: live?.ends_at ?? undefined,
+      // Recordings and past videos played to the group, the shared playback
+      // clock, the admin's notice and who is listening.
+      ...await sessionPayload(env, groupID, live, managing),
     } : undefined,
+    unreadDuaRequests: managing ? await unreadDuaCount(env, groupID) : undefined,
     zikrSessions: (zikr.results ?? []).map(row => ({
       id: row.id, title: row.title, weekdays: JSON.parse(String(row.weekdays_json)),
       startHour: row.start_hour, startMinute: row.start_minute, timeZoneIdentifier: row.time_zone,
       anchor: row.anchor ?? undefined, durationMinutes: row.duration_minutes,
+      // What this time plays by itself when no admin starts a session.
+      autoplayTitle: queueOf({ queue_json: String(row.autoplay_json ?? "[]") }).map(item => item.title).join(" · ") || undefined,
     })),
     meetings: (meetings.results ?? []).map(row => ({
       id: row.id, title: row.title, startsAt: row.starts_at, durationMinutes: row.duration_minutes,
@@ -233,17 +233,24 @@ export async function saveZikrSession(env: Env, memberID: string, groupID: strin
   const anchor = input.anchor === "afterIsha" ? "afterIsha"
     : input.anchor === "beforeFajr" || input.anchor === "tahajjud" ? "tahajjud" : null;
   const duration = Number(input.durationMinutes ?? 30);
+  // Played by itself at a clock time; a prayer-anchored time moves each day.
+  let autoplay: string | null = null;
+  if (Array.isArray(input.autoplay) && input.autoplay.length && !anchor) {
+    const queue = await resolveQueue(env, groupID, input.autoplay);
+    if (queue instanceof Response) return queue;
+    autoplay = JSON.stringify(queue);
+  }
   if (!title || !Number.isInteger(hour) || hour < 0 || hour > 23 || !Number.isInteger(minute) || minute < 0 || minute > 59
     || !validTimeZone(zone) || !Number.isInteger(duration) || duration < 5 || duration > 240) {
     return json({ error: "Title, a valid time, a time zone and a duration of 5-240 minutes are required" }, { status: 400 });
   }
-  await env.DB.prepare(`INSERT INTO group_zikr_sessions(id,group_id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,is_active,updated_at)
-    VALUES(?,?,?,?,?,?,?,?,?,1,?)
+  await env.DB.prepare(`INSERT INTO group_zikr_sessions(id,group_id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,is_active,updated_at,autoplay_json)
+    VALUES(?,?,?,?,?,?,?,?,?,1,?,?)
     ON CONFLICT(group_id,id) DO UPDATE SET title=excluded.title,weekdays_json=excluded.weekdays_json,start_hour=excluded.start_hour,
       start_minute=excluded.start_minute,time_zone=excluded.time_zone,anchor=excluded.anchor,
-      duration_minutes=excluded.duration_minutes,is_active=1,updated_at=excluded.updated_at`)
+      duration_minutes=excluded.duration_minutes,is_active=1,updated_at=excluded.updated_at,autoplay_json=excluded.autoplay_json`)
     .bind(sessionID, groupID, title, JSON.stringify(weekdays.length ? weekdays : [1, 2, 3, 4, 5, 6, 7]), hour, minute, zone, anchor, duration,
-      new Date().toISOString()).run();
+      new Date().toISOString(), autoplay).run();
   return json({ ok: true, id: sessionID });
 }
 
@@ -270,51 +277,45 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
   if (!await canManage(env, memberID, role, groupID)) return forbidden();
-  const now = new Date().toISOString();
   if (input.state !== "live") {
-    await env.DB.prepare(`INSERT INTO group_live(group_id,state,updated_at) VALUES(?,'offline',?)
-      ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,recording_id=NULL,recorded=0,ends_at=NULL,
-        updated_at=excluded.updated_at`)
-      .bind(groupID, now).run();
+    // Only an admin ends a session; a finished recording leaves it open.
+    await endSession(env, groupID, memberID);
     return json({ ok: true, state: "offline" });
   }
   const kind = input.kind === "meeting" ? "meeting" : "zikr";
   const title = cleanText(input.title, 200) ?? (kind === "zikr" ? "Halqah Zikr" : "Group meeting");
-  const video = typeof input.videoID === "string" && /^[\w-]{11}$/.test(input.videoID) ? input.videoID : null;
+  let video = typeof input.videoID === "string" && /^[\w-]{11}$/.test(input.videoID) ? input.videoID : null;
   const wantsRoom = input.room === true || kind === "meeting";
-  const recording = kind === "zikr" && typeof input.recordingID === "string"
-    ? await groupRecording(env, groupID, input.recordingID) : null;
-  if (typeof input.recordingID === "string" && !recording) return notFound();
-  if (!video && !wantsRoom && !recording) return json({ error: "A live session needs a video, a room, or a recording" }, { status: 400 });
-  // A past video plays as a recording: from the start for everyone together,
-  // ending when it does. YouTube says which it is; without it, the app does.
-  let recorded = !!recording;
-  let length = recording?.duration_seconds ?? null;
-  if (video && !recording) {
+  // What plays to the group: recordings and past videos, one after another.
+  // The older single forms (recordingID, a recorded videoID) still work.
+  let entries: unknown[] = kind === "zikr" && Array.isArray(input.queue) ? input.queue : [];
+  if (kind === "zikr" && typeof input.recordingID === "string") entries = [{ recordingID: input.recordingID }, ...entries];
+  if (kind === "zikr" && video && !wantsRoom) {
+    // A past video plays as a recording, together; a live one is watched live.
+    // YouTube says which it is; without it, the app does.
     const info = (await youtubeVideos(env, [video]))?.get(video);
-    recorded = info ? !info.live : input.recorded === true;
-    length = recorded ? info?.durationSeconds ?? null : null;
+    if (info ? !info.live : input.recorded === true) {
+      entries = [{ videoID: video }, ...entries];
+      video = null;
+    }
   }
-  // A minute of grace, so a late start on a phone still hears the end.
-  const endsAt = length ? new Date(Date.parse(now) + (length + 60) * 1000).toISOString() : null;
+  const queue = await resolveQueue(env, groupID, entries);
+  if (queue instanceof Response) return queue;
+  if (!video && !wantsRoom && !queue.length) return json({ error: "A live session needs a video, a room, or something to play" }, { status: 400 });
   let roomID: string | null = null;
   if (wantsRoom) {
     const room = await createRoom(env, `${groupID}: ${title}`);
     if (room instanceof Response) return room;
     roomID = room;
   }
-  await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,recording_id,recorded,ends_at)
-    VALUES(?,'live',?,?,?,?,?,?,?,?,?,?)
-    ON CONFLICT(group_id) DO UPDATE SET state='live',kind=excluded.kind,title=excluded.title,video_id=excluded.video_id,
-      room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at,
-      recording_id=excluded.recording_id,recorded=excluded.recorded,ends_at=excluded.ends_at`)
-    .bind(groupID, kind, title, recording ? null : video, roomID, now, memberID, now, recording?.id ?? null, recorded ? 1 : 0, endsAt).run();
-  await notifyGroup(env, groupID, `live:${groupID}:${now}`, title,
+  const sessionID = await beginSession(env, groupID, memberID, { kind, title, videoID: video, roomID, queue });
+  const recorded = queue.length > 0;
+  await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title,
     kind === "meeting" ? "The group meeting has started. Join now in Darul Irfan."
-      : recorded ? "A recorded Halqah zikr is playing. Listen together in Darul Irfan."
+      : recorded && !roomID ? "The Halqah zikr has started. Listen together in Darul Irfan."
       : "Halqah zikr has started. Join now in Darul Irfan.",
     `darulirfan://groups/${groupID}`);
-  return json({ ok: true, state: "live", kind, hasRoom: !!roomID, recorded, endsAt: endsAt ?? undefined });
+  return json({ ok: true, state: "live", kind, hasRoom: !!roomID, recorded, sessionID });
 }
 
 export async function scheduleMeeting(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {

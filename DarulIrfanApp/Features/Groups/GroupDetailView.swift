@@ -28,7 +28,7 @@ struct GroupDetailView: View {
     @State private var sheet: AdminSheet?
 
     enum AdminSheet: String, Identifiable {
-        case people, post, live, meeting, zikr
+        case people, post, live, meeting, zikr, duas, history
         var id: String { rawValue }
     }
 
@@ -58,6 +58,7 @@ struct GroupDetailView: View {
         .diScreenBackground()
         .diPageHeading(LocalizedStringKey(group.name))
         .task { await load() }
+        .task(id: detail?.live?.sessionID) { await followSession() }
         .refreshable { await load() }
         .fullScreenCover(item: $room) { pass in
             MeetingRoomView(pass: pass)
@@ -70,6 +71,8 @@ struct GroupDetailView: View {
                 case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady)
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
                 case .zikr: GroupZikrEditor(groupID: group.id, service: service)
+                case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
+                case .history: GroupSessionHistoryView(groupID: group.id, service: service)
                 }
             }
         }
@@ -84,61 +87,28 @@ struct GroupDetailView: View {
     @ViewBuilder
     private var liveSection: some View {
         if let live = detail?.live {
-            DICard {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    HStack(spacing: DISpacing.sm) {
-                        DILivePulse(color: DIColor.primary, size: 9)
-                        Text(verbatim: live.title ?? (live.isMeeting ? String(localized: "Group meeting") : String(localized: "Halqah Zikr")))
-                            .font(.headline)
-                        Spacer(minLength: 0)
-                        Text("LIVE")
-                            .font(.caption2.weight(.bold))
-                            .padding(.horizontal, DISpacing.sm).padding(.vertical, 2)
-                            .background(Capsule().fill(DIColor.primary))
-                            .foregroundStyle(DIColor.onPrimary)
-                    }
-                    if live.isRecorded {
-                        Text("A recording is playing to the group. It starts where the group is now, so everyone hears the same part.")
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
-                    }
-                    if let video = live.videoID {
-                        YouTubePlayerView(videoID: video, playsTogetherFrom: live.isRecorded ? live.startedAt : nil)
-                            .frame(height: 210)
-                            .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-                    }
-                    if let recording = live.recording {
-                        GroupRecordingPlayer(live: live, recording: recording, groupName: group.name, audioPlayer: dependencies?.audioPlayer)
-                    }
-                    if live.hasRoom {
-                        Button {
-                            Task { await join(meetingID: nil) }
-                        } label: {
-                            Label(live.isMeeting ? "Join the meeting" : "Join the zikr together", systemImage: "person.3.fill")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(DIPrimaryButtonStyle())
-                        .disabled(joining)
-                        Text(live.isMeeting
-                             ? "You join with your microphone and camera off; turn them on when you want to speak."
-                             : "You join with your microphone off and listen as the zikr is led.")
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
-                    }
-                    if let joinError {
-                        Text(verbatim: joinError).font(.footnote).foregroundStyle(DIColor.danger)
-                    }
-                    if detail?.canManage == true {
-                        Button("End live session", role: .destructive) {
-                            Task {
-                                try? await service.endLive(in: group.id)
-                                await load()
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                    }
-                }
-            }
+            GroupSessionCard(
+                live: live, group: group, service: service, canManage: detail?.canManage == true,
+                meetingsReady: meetingsReady, audioPlayer: dependencies?.audioPlayer,
+                joining: joining, joinError: joinError,
+                onJoinRoom: { Task { await join(meetingID: nil) } },
+                onChange: { await refreshQuietly() }
+            )
+        }
+    }
+
+    /// While a session is live: follow the group's clock and the admin's
+    /// changes every 15 seconds, and check in each minute so the admins see
+    /// who is listening.
+    private func followSession() async {
+        guard detail?.live?.sessionID != nil else { return }
+        var tick = 0
+        while !Task.isCancelled {
+            if tick % 4 == 0 { await service.checkIn(in: group.id) }
+            try? await Task.sleep(for: .seconds(15))
+            if Task.isCancelled { break }
+            await refreshQuietly()
+            tick += 1
         }
     }
 
@@ -223,6 +193,12 @@ struct GroupDetailView: View {
                     adminButton("Start Halqah zikr or meeting now", "dot.radiowaves.left.and.right", .live)
                     adminButton("Schedule a meeting", "calendar.badge.plus", .meeting)
                     adminButton("Add a zikr time", "clock.badge", .zikr)
+                    if let unread = detail?.unreadDuaRequests, unread > 0 {
+                        adminButton("Dua requests (\(unread) new)", "hands.sparkles", .duas)
+                    } else {
+                        adminButton("Dua requests", "hands.sparkles", .duas)
+                    }
+                    adminButton("Past sessions and attendance", "list.bullet.clipboard", .history)
                     if !meetingsReady {
                         IntegrationPendingNote("Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete.")
                     }
@@ -335,7 +311,10 @@ struct GroupDetailView: View {
         isLoading = true
         failure = nil
         do {
-            let loaded = try await service.detail(of: group.id)
+            var loaded = try await service.detail(of: group.id)
+            // The group's clock counts from when the answer arrived here, so a
+            // phone whose clock is wrong still plays in step.
+            loaded.live?.playback?.at = Date()
             detail = loaded
             posts = try await service.posts(in: group.id)
             drafts = loaded.canManage ? ((try? await service.posts(in: group.id, drafts: true)) ?? []) : []
@@ -343,6 +322,14 @@ struct GroupDetailView: View {
             failure = error.localizedDescription
         }
         isLoading = false
+    }
+
+    /// A refresh that never replaces the page with an error, for the
+    /// session's own updates.
+    private func refreshQuietly() async {
+        guard var loaded = try? await service.detail(of: group.id) else { return }
+        loaded.live?.playback?.at = Date()
+        detail = loaded
     }
 
     private func join(meetingID: String?) async {
@@ -397,6 +384,11 @@ private struct GroupZikrRow: View {
                 } else {
                     Text(verbatim: ZikrScheduleMath.shortWeekdaySymbols(for: session.weekdays).joined(separator: " · "))
                         .font(.caption).foregroundStyle(DIColor.textMuted)
+                }
+                if let autoplay = session.autoplayTitle {
+                    Label("Plays by itself: \(autoplay)", systemImage: "play.circle")
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
                 }
                 Toggle("Remind me", isOn: $reminderOn)
                     .onChange(of: reminderOn) { _, on in Task { await setReminder(on, for: current) } }

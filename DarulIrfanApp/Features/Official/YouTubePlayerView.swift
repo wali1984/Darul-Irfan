@@ -18,11 +18,19 @@ struct YouTubePlayerSheet: View {
     }
 }
 
+/// Where a group's shared playback stands, for a past video played to the
+/// group: `position` seconds in at `at`, unless paused.
+struct YouTubeSync: Equatable {
+    var position: Double
+    var paused: Bool
+    var at: Date
+}
+
 struct YouTubePlayerView: UIViewRepresentable {
     let videoID: String
-    /// For a recording played to a group: when it started. Playback begins
-    /// where the group is, even if the member presses play minutes later.
-    var playsTogetherFrom: Date? = nil
+    /// For a past video played to a group: the group's place. Playback joins
+    /// the group there, and follows the admin's pauses and moves.
+    var sync: YouTubeSync? = nil
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -39,29 +47,53 @@ struct YouTubePlayerView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        guard context.coordinator.loadedVideoID != videoID else { return }
+        guard context.coordinator.loadedVideoID != videoID else {
+            // Same video: pass on a pause, resume or move by the admin.
+            if let sync, sync != context.coordinator.sync {
+                context.coordinator.sync = sync
+                webView.evaluateJavaScript("window.setSync && window.setSync(\(Self.script(sync)))")
+            }
+            return
+        }
         context.coordinator.loadedVideoID = videoID
+        context.coordinator.sync = sync
         let safeID = videoID.filter { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }
         let html: String
-        if let playsTogetherFrom {
-            // Starts near the group's place, then on first play jumps to where
-            // the group is at that moment. Without the player script it still
-            // starts near the right place.
-            let started = Int(playsTogetherFrom.timeIntervalSince1970)
-            let start = max(0, Int(Date().timeIntervalSince(playsTogetherFrom)))
+        if let sync {
+            // Opens near the group's place; on play it moves to exactly where
+            // the group is then. Without the player script it still opens
+            // near the right place.
+            let start = max(0, Int(sync.paused ? sync.position : sync.position + Date().timeIntervalSince(sync.at)))
             html = """
             <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
             <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#000;overflow:hidden}</style></head>
             <body><iframe id="player" title="YouTube player" src="https://www.youtube-nocookie.com/embed/\(safeID)?playsinline=1&rel=0&enablejsapi=1&start=\(start)&origin=https://www.youtube-nocookie.com" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
             <script>
-            var joined = false;
+            var player = null, ready = false, joined = false;
+            var group = { pos: \(sync.position), paused: \(sync.paused), at: \(sync.at.timeIntervalSince1970) };
+            function place() { return group.paused ? group.pos : group.pos + (Date.now() / 1000 - group.at); }
+            function follow() {
+              if (!ready) return;
+              var state = player.getPlayerState();
+              if (group.paused) { if (state === YT.PlayerState.PLAYING) player.pauseVideo(); return; }
+              if (state === YT.PlayerState.PLAYING && Math.abs(player.getCurrentTime() - place()) > 5) player.seekTo(place(), true);
+            }
+            window.setSync = function (pos, paused, at) {
+              var wasPaused = group.paused;
+              group = { pos: pos, paused: paused, at: at };
+              follow();
+              if (wasPaused && !paused && joined && ready) { player.seekTo(place(), true); player.playVideo(); }
+            };
             function onYouTubeIframeAPIReady() {
-              new YT.Player("player", { events: { onStateChange: function (e) {
-                if (joined || e.data !== YT.PlayerState.PLAYING) return;
-                joined = true;
-                var at = Date.now() / 1000 - \(started);
-                if (Math.abs(e.target.getCurrentTime() - at) > 5) e.target.seekTo(at, true);
-              } } });
+              player = new YT.Player("player", { events: {
+                onReady: function () { ready = true; },
+                onStateChange: function (e) {
+                  if (e.data !== YT.PlayerState.PLAYING) return;
+                  joined = true;
+                  if (group.paused) { player.pauseVideo(); return; }
+                  if (Math.abs(player.getCurrentTime() - place()) > 5) player.seekTo(place(), true);
+                }
+              } });
             }
             </script><script src="https://www.youtube.com/iframe_api"></script></body></html>
             """
@@ -75,10 +107,15 @@ struct YouTubePlayerView: UIViewRepresentable {
         webView.loadHTMLString(html, baseURL: URL(string: "https://www.youtube-nocookie.com"))
     }
 
+    private static func script(_ sync: YouTubeSync) -> String {
+        "\(sync.position), \(sync.paused), \(sync.at.timeIntervalSince1970)"
+    }
+
     func makeCoordinator() -> Coordinator { Coordinator() }
 
     final class Coordinator: NSObject, WKNavigationDelegate {
         var loadedVideoID: String?
+        var sync: YouTubeSync?
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             guard let url = navigationAction.request.url else { decisionHandler(.cancel); return }
             if url.scheme == "about" || url.scheme == "data" { decisionHandler(.allow); return }

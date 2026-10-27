@@ -86,6 +86,9 @@ KNOWN_KEYS = {
     "%@ minutes": "%lld minutes",
     "Surah %@ (%@), Ayat %@": "Surah %@ (%lld), Ayat %@",
     "Surah %@, Ayah %lld — Quran %@:%lld": "Surah %@, Ayah %lld — Quran %lld:%lld",
+    "%@ attended": "%lld attended",
+    "%@ listening": "%lld listening",
+    "The group is at %@ of %lld": "The group is at %@ of %@",
     "Updated \\(broadcast.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",
 }
 
