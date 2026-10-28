@@ -180,6 +180,13 @@ struct ContentSyncService: ContentSyncServicing {
         if !editions.isEmpty {
             try await quranRepository.upsertEditions(editions)
             imported += editions.count
+            // Only the Silsila's own translations are offered. Pickthall and
+            // Jalandhry shipped in the first builds; an upsert alone would
+            // leave them on devices that already imported them.
+            let current = Set(editions.map(\.id))
+            for stale in ((try? await quranRepository.editions()) ?? []) where !current.contains(stale.id) {
+                try await quranRepository.deleteEdition(id: stale.id)
+            }
         }
         // Editions whose rows have been re-authored across versions are
         // deleted wholesale BEFORE re-importing, so (a) no stale range can

@@ -336,6 +336,12 @@ struct QuranRepository: QuranRepositoryProtocol {
         )
     }
 
+    func deleteEdition(id: String) async throws {
+        try await deleteTranslations(editionID: id)
+        try await deleteTafsir(editionID: id)
+        try await database.connection.execute("DELETE FROM quran_editions WHERE id = ?", [.text(id)])
+    }
+
     func upsertTafsir(_ tafsir: [QuranTafsir]) async throws {
         guard !tafsir.isEmpty else { return }
         let statements: [(sql: String, parameters: [SQLValue])] = tafsir.map { entry in

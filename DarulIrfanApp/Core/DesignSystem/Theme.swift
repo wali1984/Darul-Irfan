@@ -134,8 +134,8 @@ extension View {
 enum DIBrand {
     /// اَلَا بِذِکْرِ اللّٰہِ تَطْمَئِنُّ الْقُلُوْبُ — used on splash/home headers.
     static let anchorVerseArabic = "اَلَا بِذِكْرِ اللّٰهِ تَطْمَئِنُّ الْقُلُوْبُ"
-    /// English rendering of 13:28 (Pickthall, public domain).
-    static let anchorVerseEnglish = "Verily, in the remembrance of Allah do hearts find peace."
+    /// 13:28 in the Silsila's Akram-ut-Tarajum (English), the app's only translation source.
+    static let anchorVerseEnglish = "Remember! Only in Allah’s Zikr do hearts find satisfaction."
     static let anchorVerseReference = "Qur'an 13:28"
     /// Site tagline, used as an onboarding/subtitle line.
     static let tagline = "Exploring the Treasures of the Heart"

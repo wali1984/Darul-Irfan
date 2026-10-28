@@ -6,8 +6,8 @@
   "ayahEnd": 7,
   "reference": "Qur'an 1:1-7",
   "arabic": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ اَلْحَمْدُ لِلّٰهِ رَبِّ الْعٰلَمِيْنَۙ‏ الرَّحْمٰنِ الرَّحِيْمِۙ‏ مٰلِكِ يَوْمِ الدِّيْنِؕ‏ اِيَّاكَ نَعْبُدُ وَاِيَّاكَ نَسْتَعِيْنُؕ‏ اِهْدِنَا الصِّرَاطَ الْمُسْتَقِيْمَۙ‏ صِرَاطَ الَّذِيْنَ اَنْعَمْتَ عَلَيْهِمْ ۙ‏ غَيْرِ الْمَغْضُوْبِ عَلَيْهِمْ وَلَا الضَّآلِّيْنَ‏",
-  "english": "In the name of Allah, the Beneficent, the Merciful. Praise be to Allah, Lord of the Worlds, The Beneficent, the Merciful. Master of the Day of Judgment, Thee (alone) we worship; Thee (alone) we ask for help. Show us the straight path, The path of those whom Thou hast favoured; Not the (path) of those who earn Thine anger nor of those who go astray.",
-  "urdu": "شروع الله کا نام لے کر جو بڑا مہربان نہایت رحم والا ہے سب طرح کی تعریف خدا ہی کو (سزاوار) ہے جو تمام مخلوقات کا پروردگار ہے بڑا مہربان نہایت رحم والا انصاف کے دن کا حاکم (اے پروردگار) ہم تیری ہی عبادت کرتے ہیں اور تجھ ہی سے مدد مانگتے ہیں ہم کو سیدھے رستے چلا ان لوگوں کے رستے جن پر تو اپنا فضل وکرم کرتا رہا نہ ان کے جن پر غصے ہوتا رہا اور نہ گمراہوں کے",
+  "english": "Beginning with the Name of Allah, Who is Very Kind, Extremely Merciful. All Praiseworthy Attributes are for Allah, Who is the Rabb of all the worlds. (He is) Very Kind, Extremely Merciful. (He is) the Master of the Day of Justice. It is only You, Whom we worship, and it is only Your Help that we seek. Make us walk on the straight path. On the path of those people on whom You have bestowed blessings. Excepting the path of those people on whom You have sent wrath, and nor of those who are astray.",
+  "urdu": "شروع اللہ کے نام سے جو بڑے مہربان نہایت رحم کرنے والے ہیں - تمام خوبیاں اللہ کے لیے ہیں جو سب عالموں کے پروردگار ہیں۔ بڑے مہربان نہایت رحم کرنے والے ہیں۔ انصاف کے دن کے مالک ہیں۔ ہم آپ ہی کی عبادت کرتے ہیں اور آپ ہی کی مدد چاہتے ہیں۔ ہم کو سیدھے راستے پر چلائیے۔ ان لوگوں کے راستے پر جن پر آپ نے انعام کیا۔ سوائے ان لوگوں کی راہ کے جن پر آپ نے غضب کیا اور نہ گمراہوں کی۔",
   "theme": "opening"
  },
  {
@@ -17,8 +17,8 @@
   "ayahEnd": 152,
   "reference": "Qur'an 2:152",
   "arabic": "فَاذْكُرُوْنِىْٓ اَذْكُرْكُمْ وَاشْکُرُوْا لِىْ وَلَا تَكْفُرُوْنِ‏",
-  "english": "Therefore remember Me, I will remember you. Give thanks to Me, and reject not Me.",
-  "urdu": "سو تم مجھے یاد کرو۔ میں تمہیں یاد کیا کروں گا۔ اور میرے احسان مانتے رہنا اور ناشکری نہ کرنا",
+  "english": "Therefore, remember Me, I will remember you, and thank Me and do not be ungrateful.",
+  "urdu": "پس تم مجھ کو یاد کرو میں تمہیں یاد کروں گااور میرا شکرادا کرو اور ناشکری نہ کرو۔",
   "theme": "gratitude"
  },
  {
@@ -28,8 +28,8 @@
   "ayahEnd": 153,
   "reference": "Qur'an 2:153",
   "arabic": "يٰٓاَيُّهَا الَّذِيْنَ اٰمَنُوا اسْتَعِيْنُوْا بِالصَّبْرِ وَالصَّلٰوةِ ؕ اِنَّ اللّٰهَ مَعَ الصّٰبِرِيْنَ‏",
-  "english": "O ye who believe! Seek help in steadfastness and prayer. Lo! Allah is with the steadfast.",
-  "urdu": "اے ایمان والو صبر اور نماز سے مدد لیا کرو بےشک خدا صبر کرنے والوں کے ساتھ ہے",
+  "english": "O believers! Seek help in patience and Salah. Assuredly, Allah is with those who observe patience.",
+  "urdu": "اے ایمان والو! صبر اور نماز سے مدد حاصل کرو یقیناً اللہ صبر کرنے والوں کے ساتھ ہیں۔",
   "theme": "sabr"
  },
  {
@@ -39,8 +39,8 @@
   "ayahEnd": 157,
   "reference": "Qur'an 2:155-157",
   "arabic": "وَلَـنَبْلُوَنَّكُمْ بِشَىْءٍ مِّنَ الْخَـوْفِ وَالْجُـوْعِ وَنَقْصٍ مِّنَ الْاَمْوَالِ وَالْاَنْفُسِ وَالثَّمَرٰتِؕ وَبَشِّرِ الصّٰبِرِيْنَۙ‏ الَّذِيْنَ اِذَآ اَصَابَتْهُمْ مُّصِيْبَةٌ  ۙ قَالُوْٓا اِنَّا لِلّٰهِ وَاِنَّـآ اِلَيْهِ رٰجِعُوْنَؕ‏ اُولٰٓٮِٕكَ عَلَيْهِمْ صَلَوٰتٌ مِّنْ رَّبِّهِمْ وَرَحْمَةٌ​ وَاُولٰٓٮِٕكَ هُمُ الْمُهْتَدُوْنَ‏",
-  "english": "And surely We shall try you with something of fear and hunger, and loss of wealth and lives and crops; but give glad tidings to the steadfast, Who say, when a misfortune striketh them: Lo! we are Allah's and lo! unto Him we are returning. Such are they on whom are blessings from their Lord, and mercy. Such are the rightly guided.",
-  "urdu": "اور ہم کسی قدر خوف اور بھوک اور مال اور جانوں اور میوؤں کے نقصان سے تمہاری آزمائش کریں گے توصبر کرنے والوں کو (خدا کی خوشنودی کی) بشارت سنا دو ان لوگوں پر جب کوئی مصیبت واقع ہوتی ہے تو کہتے ہیں کہ ہم خدا ہی کا مال ہیں اور اسی کی طرف لوٹ کر جانے والے ہیں یہی لوگ ہیں جن پر ان کے پروردگار کی مہربانی اور رحمت ہے۔ اور یہی سیدھے رستے پر ہیں",
+  "english": "And We will try you with some fear and hunger, and loss of property, life and fruits; and give the good news to those who observe patience. Those people who, when a calamity befalls them say, ‘Indeed, we belong to Allah, and indeed we are going to return to Him.’ These are the people on whom are special Favours and Mercy from their Rabb, and they are the people to find the straight path.",
+  "urdu": "اور ہم تمہیں کس قدر خوف اور بھوک اور مالوں اور جانوں اور پھلوں کی کمی سے آزمائیں گے اور آپ صبر کرنے والوں کو خوشخبری دیں۔ وہ لوگ کہ جب ان پر کوئی مصیبت آتی ہے تو کہتے ہیں یقیناً ہم اللہ کے لیئے ہیں اور یقیناً ہم پھر کر اس کے پاس جانے والے ہیں۔ یہی لوگ ہیں جن پر ان کے پروردگار کی طرف سے خاص مہربانیاں ہیں اوررحمت اور یہی لوگ سیدھی راہ پانے والے ہیں ۔",
   "theme": "sabr"
  },
  {
@@ -50,8 +50,8 @@
   "ayahEnd": 186,
   "reference": "Qur'an 2:186",
   "arabic": "وَاِذَا سَاَلَـكَ عِبَادِىْ عَنِّىْ فَاِنِّىْ قَرِيْبٌؕ اُجِيْبُ دَعْوَةَ الدَّاعِ اِذَا دَعَانِ فَلْيَسْتَجِيْبُوْا لِىْ وَلْيُؤْمِنُوْا بِىْ لَعَلَّهُمْ يَرْشُدُوْنَ‏",
-  "english": "And when My servants question thee concerning Me, then surely I am nigh. I answer the prayer of the suppliant when he crieth unto Me. So let them hear My call and let them trust in Me, in order that they may be led aright.",
-  "urdu": "اور (اے پیغمبر) جب تم سے میرے بندے میرے بارے میں دریافت کریں تو (کہہ دو کہ) میں تو (تمہارے) پاس ہوں جب کوئی پکارنے والا مجھے پکارتا ہے تو میں اس کی دعا قبول کرتا ہوں تو ان کو چاہیئے کہ میرے حکموں کو مانیں اور مجھ پر ایمان لائیں تاکہ نیک رستہ پائیں",
+  "english": "And when My slaves ask you about Me, indeed I am close; (and) whenever someone calls Me, I accept the prayer of the suppliant; so they should also obey My Commands and believe in Me, so that they may find guidance.",
+  "urdu": "اور جب آپ سے میرے بندے میرے بارے پوچھیں سو یقینا میں قریب ہوں(اور)جب کوئی مجھے پکارتا ہے تو مانگنے والے کی دعا قبول کرتا ہوں پس چاہیے کہ یہ بھی میرا حکم قبول کریں اور میری ذات پر ایمان لائیں تاکہ وہ ہدایت پائیں۔",
   "theme": "dua"
  },
  {
@@ -61,8 +61,8 @@
   "ayahEnd": 201,
   "reference": "Qur'an 2:201",
   "arabic": "وَمِنْهُمْ مَّنْ يَّقُوْلُ رَبَّنَآ اٰتِنَا فِى الدُّنْيَا حَسَنَةً وَّفِى الْاٰخِرَةِ حَسَنَةً وَّ قِنَا عَذَابَ النَّارِ‏",
-  "english": "And of them (also) is he who saith: \"Our Lord! Give unto us in the world that which is good and in the Hereafter that which is good, and guard us from the doom of Fire.\"",
-  "urdu": "اور بعضے ایسے ہیں کہ دعا کرتے ہیں کہ پروردگار ہم کو دنیا میں بھی نعمت عطا فرما اور آخرت میں بھی نعمت بخشیو اور دوزخ کے عذاب سے محفوظ رکھیو",
+  "english": "And some of them say, ‘O our Rabb! Grant us good in this world and also grant the good of the Hereafter, and save us from the torment of the Fire.’",
+  "urdu": "اور کوئی ان میں سے کہتا ہے اے ہمارے پروردگار! ہمیں دنیا میں بھی بھلائی دیں اور آخرت کی بھلائی بھی عطا کریں اورہمیں آگ کے عذاب سے بچائیں۔",
   "theme": "balance"
  },
  {
@@ -72,8 +72,8 @@
   "ayahEnd": 216,
   "reference": "Qur'an 2:216",
   "arabic": "كُتِبَ عَلَيْکُمُ الْقِتَالُ وَهُوَ كُرْهٌ لَّـكُمْ​ۚ وَعَسٰۤى اَنْ تَكْرَهُوْا شَيْـــًٔا وَّهُوَ خَيْرٌ لَّـکُمْ​ۚ وَعَسٰۤى اَنْ تُحِبُّوْا شَيْـــًٔا وَّهُوَ شَرٌّ لَّـكُمْؕ وَاللّٰهُ يَعْلَمُ وَاَنْـتُمْ لَا تَعْلَمُوْنَ‏",
-  "english": "Warfare is ordained for you, though it is hateful unto you; but it may happen that ye hate a thing which is good for you, and it may happen that ye love a thing which is bad for you. Allah knoweth, ye know not.",
-  "urdu": "(مسلمانو) تم پر (خدا کے رستے میں) لڑنا فرض کردیا گیا ہے وہ تمہیں ناگوار تو ہوگا مگر عجب نہیں کہ ایک چیز تم کو بری لگے اور وہ تمہارے حق میں بھلی ہو اور عجب نہیں کہ ایک چیز تم کو بھلی لگے اور وہ تمہارے لئے مضر ہو۔ اور ان باتوں کو) خدا ہی بہتر جانتا ہے اور تم نہیں جانتے",
+  "english": "Jihad (fighting) is ordained for you, and it (by nature) feels heavy upon you; and it may be that you dislike something and it is good for you, and it may be that you consider something good, and it is bad for you; and Allah knows, and you do not know.",
+  "urdu": "تم پر جہاد(لڑنا)فرض کیا گیا اور وہ (طبعاً)تم پر گراں گزرتا ہے اور ہوسکتا ہے کہ ایک چیز تمہیں ناپسند ہو اور وہ تمہارے لیئےبہتر ہو اور ہو سکتا ہے کہ تم ایک چیز کواچھاسمجھو اور وہ تمہارے لئے بری ہو۔ اور اللہ جانتے ہیں اور تم نہیں جانتے ہو۔",
   "theme": "trust"
  },
  {
@@ -83,8 +83,8 @@
   "ayahEnd": 255,
   "reference": "Qur'an 2:255",
   "arabic": "اللّٰهُ لَاۤ اِلٰهَ اِلَّا هُوَ الْحَـىُّ الْقَيُّوْمُۚ  لَا تَاْخُذُهٗ سِنَةٌ وَّلَا نَوْمٌ​ؕ لَهٗ مَا فِى السَّمٰوٰتِ وَمَا فِى الْاَرْضِ​ؕ مَنْ ذَا الَّذِىْ يَشْفَعُ عِنْدَهٗۤ اِلَّا بِاِذْنِهٖ​ؕ يَعْلَمُ مَا بَيْنَ اَيْدِيْهِمْ وَمَا خَلْفَهُمْ​ۚ وَلَا يُحِيْطُوْنَ بِشَىْءٍ مِّنْ عِلْمِهٖۤ اِلَّا بِمَا شَآءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمٰوٰتِ وَالْاَرْضَ​​ۚ وَلَا يَـــُٔوْدُهٗ حِفْظُهُمَا ​ۚ وَ هُوَ الْعَلِىُّ الْعَظِيْمُ‏",
-  "english": "Allah! There is no deity save Him, the Alive, the Eternal. Neither slumber nor sleep overtaketh Him. Unto Him belongeth whatsoever is in the heavens and whatsoever is in the earth. Who is he that intercedeth with Him save by His leave? He knoweth that which is in front of them and that which is behind them, while they encompass nothing of His knowledge save what He will. His throne includeth the heavens and the earth, and He is never weary of preserving them. He is the Sublime, the Tremendous.",
-  "urdu": "خدا (وہ معبود برحق ہے کہ) اس کے سوا کوئی عبادت کے لائق نہیں زندہ ہمیشہ رہنے والا اسے نہ اونگھ آتی ہے نہ نیند جو کچھ آسمانوں میں اور جو کچھ زمین میں ہیں سب اسی کا ہے کون ہے جو اس کی اجازت کے بغیر اس سے (کسی کی) سفارش کر سکے جو کچھ لوگوں کے روبرو ہو رہا ہے اور جو کچھ ان کے پیچھے ہوچکا ہے اسے سب معلوم ہے اور وہ اس کی معلومات میں سے کسی چیز پر دسترس حاصل نہیں کر سکتے ہاں جس قدر وہ چاہتا ہے (اسی قدر معلوم کرا دیتا ہے) اس کی بادشاہی (اور علم) آسمان اور زمین سب پر حاوی ہے اور اسے ان کی حفاظت کچھ بھی دشوار نہیں وہ بڑا عالی رتبہ اور جلیل القدر ہے",
+  "english": "Allah (is Such that), there is no one worthy of worship except Him, He is Alive, Eternal; neither slumber nor sleep overtakes Him. To Him belongs whatsoever is in the heavens and whatsoever is in the earth. Who is there who can intercede with Him without His permission? He knows what is before them and what is after them, and they cannot bring anything of His Knowledge within the sphere of their knowledge, except as much as He wills. His Chair is encompassing all the heavens and the earth, and the protection of both is not heavy upon Him. And He is the Exalted, the Great.",
+  "urdu": "اللہ(ایسا ہے)کہ اس کے سوا کوئی عبادت کے لائق نہیں وہ زندہ ہے ہمیشہ قائم رہنے والا ہے نہ اس کو اونگھ آتی ہے اور نہ نیند۔ اسی کا ہے سب جو کچھ آسمانوں میں ہے اور جوکچھ زمین میں ہے۔ کون ہے جو اس کی اجازت کے بغیر اس کے ہاں سفارش کرے وہ جانتا ہے جو کچھ ان کے سامنے ہے اور جو کچھ ان کے بعد ہے اور وہ اس کے علم میں سے کسی چیز کو احاطہ علمی میں نہیں لاسکتے مگر جس قدر وہ چاہے۔ اس کی کرسی نے سب آسمانوں اورزمین کو اندر لے رکھا ہے اوراس پر ان دونوں کی حفاظت گراں نہیں گزرتی اور وہ عالی شان، عظیم الشان ہے۔",
   "theme": "tawhid"
  },
  {
@@ -94,8 +94,8 @@
   "ayahEnd": 256,
   "reference": "Qur'an 2:256",
   "arabic": "لَاۤ اِكْرَاهَ فِى الدِّيْنِ​ۙ  قَد تَّبَيَّنَ الرُّشْدُ مِنَ الْغَىِّ​ۚ فَمَنْ يَّكْفُرْ بِالطَّاغُوْتِ وَيُؤْمِنْۢ بِاللّٰهِ فَقَدِ اسْتَمْسَكَ بِالْعُرْوَةِ الْوُثْقٰى لَا انْفِصَامَ لَهَا​​ ؕ وَاللّٰهُ سَمِيْعٌ عَلِيْمٌ‏",
-  "english": "There is no compulsion in religion. The right direction is henceforth distinct from error. And he who rejecteth false deities and believeth in Allah hath grasped a firm handhold which will never break. Allah is Hearer, Knower.",
-  "urdu": "دین (اسلام) میں زبردستی نہیں ہے ہدایت (صاف طور پر ظاہر اور) گمراہی سے الگ ہو چکی ہے تو جو شخص بتوں سے اعتقاد نہ رکھے اور خدا پر ایمان لائے اس نے ایسی مضبوط رسی ہاتھ میں پکڑ لی ہے جو کبھی ٹوٹنے والی نہیں اور خدا (سب کچھ) سنتا اور (سب کچھ) جانتا ہے",
+  "english": "There is no compulsion in Deen. Guidance has become clearly distinct from misguidance; thus, he who refuses (the suggestion of) Shaitan and believes in Allah, he is holding that Strong Handhold which is unbreakable. And Allah is Hearer, Knower.",
+  "urdu": "دین میں زبردستی نہیں ہے بے شک ہدایت گمراہی سے الگ واضح ہوچکی پس جو شیطان(کی بات) سے انکار کرے اوراللہ کے ساتھ ایمان لائے تو اس نے اس مضبوط حلقہ کو پکڑ رکھا ہے جو ٹوٹنے والا نہیں اور اللہ والے جاننے والے ہیں۔",
   "theme": "faith"
  },
  {
@@ -105,8 +105,8 @@
   "ayahEnd": 286,
   "reference": "Qur'an 2:286",
   "arabic": "لَا يُكَلِّفُ اللّٰهُ نَفْسًا اِلَّا وُسْعَهَا ​ؕ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ​ؕ رَبَّنَا لَا تُؤَاخِذْنَاۤ اِنْ نَّسِيْنَاۤ اَوْ اَخْطَاْنَا ​ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَاۤ اِصْرًا كَمَا حَمَلْتَهٗ عَلَى الَّذِيْنَ مِنْ قَبْلِنَا ​​ۚرَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهٖ​ ۚ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا اَنْتَ مَوْلٰٮنَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكٰفِرِيْنَ‏ ﻿﻿",
-  "english": "Allah tasketh not a soul beyond its scope. For it (is only) that which it hath earned, and against it (only) that which it hath deserved. Our Lord! Condemn us not if we forget, or miss the mark! Our Lord! Lay not on us such a burden as thou didst lay on those before us! Our Lord! Impose not on us that which we have not the strength to bear! Pardon us, absolve us and have mercy on us, Thou, our Protector, and give us victory over the disbelieving folk.",
-  "urdu": "خدا کسی شخص کو اس کی طاقت سے زیادہ تکلیف نہیں دیتا۔ اچھے کام کرے گا تو اس کو ان کا فائدہ ملے گا برے کرے گا تو اسے ان کا نقصان پہنچے گا۔ اے پروردگار اگر ہم سے بھول یا چوک ہوگئی ہو تو ہم سے مؤاخذہ نہ کیجیو۔ اے پروردگار ہم پر ایسا بوجھ نہ ڈالیو جیسا تو نے ہم سے پہلے لوگوں پر ڈالا تھا۔ اے پروردگار جتنا بوجھ اٹھانے کی ہم میں طاقت نہیں اتنا ہمارے سر پر نہ رکھیو۔ اور (اے پروردگار) ہمارے گناہوں سے درگزر کر اور ہمیں بخش دے۔ اور ہم پر رحم فرما۔ تو ہی ہمارا مالک ہے اور ہم کو کافروں پر غالب فرما",
+  "english": "Allah does not burden anyone beyond his capacity. For him is whatever (good) he does, and on him will be (the loss of) whatever (evil) he does. ‘O our Rabb! Do not grasp us if we forget or make a mistake. O our Rabb! And do not lay on us a burden, like You laid on those before us. O our Rabb! And do not place on us a burden that we do not have the strength to bear. Overlook our sins, and forgive us, and have mercy on us. You are our Patron; so make us victorious over the disbelieving folk.’",
+  "urdu": "اللہ کسی کو اِس کی طاقت سے زیادہ تکلیف نہیں دیتے جو (اچھا)کرے گا وہ اس کے لئے ہے اور جو برُا کرے گا اسی کو نقصان ہوگا اے ہمارے پروردگار! اگر ہم بھول گئے یا ہم سے خطا ہوئی تو اس پر ہماری گرفت نہ کیجئے۔ اے ہمارے پروردگار! اور ہم پر بوجھ نہ ڈالیئے جیسا آپ نے ہم سے پہلوں پر ڈالا اے ہمارے پروردگار! اور جتنا بوجھ اٹھانے کی ہم میں طاقت نہیں وہ ہم پر نہ ڈالیئے اور ہمارے گناہوں سے درگزر فرمائیے اور ہمیں بخش دیجیئےاور ہم پر رحم فرمائیے آپ ہی ہمارے مالک ہیں پس ہم کو کافروں کی قوم پہ غالب فرمائیے-",
   "theme": "mercy"
  },
  {
@@ -116,8 +116,8 @@
   "ayahEnd": 8,
   "reference": "Qur'an 3:8",
   "arabic": "رَبَّنَا لَا تُزِغْ قُلُوْبَنَا بَعْدَ اِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنْكَ رَحْمَةً ​ ۚ اِنَّكَ اَنْتَ الْوَهَّابُ‏",
-  "english": "Our Lord! Cause not our hearts to stray after Thou hast guided us, and bestow upon us mercy from Thy Presence. Lo! Thou, only Thou, art the Bestower.",
-  "urdu": "اے پروردگار جب تو نے ہمیں ہدایت بخشی ہے تو اس کے بعد ہمارے دلوں میں کجی نہ پیدا کر دیجیو اور ہمیں اپنے ہاں سے نعمت عطا فرما تو تو بڑا عطا فرمانے والا ہے",
+  "english": "(Those who say), ‘O our Rabb! You have shown us the path, do not cause crookedness in our hearts after this, and bestow on us Mercy from Your Presence; without doubt, it is You, Who is the Bestower.",
+  "urdu": "(جو کہتے ہیں)اے ہمارے پروردگار! آپ نے ہمیں راہ دکھائی اس کے بعد ہمارے دلوںمیں کجی پیدا نہ کیجئے اور ہمیں اپنے ہاں سے رحمت عطا فرمائیے بے شک آپ ہی عطا فرمانےوالے ہیں۔",
   "theme": "steadfastness"
  },
  {
@@ -127,8 +127,8 @@
   "ayahEnd": 26,
   "reference": "Qur'an 3:26",
   "arabic": "قُلِ اللّٰهُمَّ مٰلِكَ الْمُلْكِ تُؤْتِى الْمُلْكَ مَنْ تَشَآءُ وَتَنْزِعُ الْمُلْكَ مِمَّنْ تَشَآءُ وَتُعِزُّ مَنْ تَشَآءُ وَتُذِلُّ مَنْ تَشَآءُ​ ؕ بِيَدِكَ الْخَيْرُ​ؕ اِنَّكَ عَلٰى كُلِّ شَىْءٍ قَدِيْرٌ‏",
-  "english": "Say: O Allah! Owner of Sovereignty! Thou givest sovereignty unto whom Thou wilt, and Thou withdrawest sovereignty from whom Thou wilt. Thou exaltest whom Thou wilt, and Thou abasest whom Thou wilt. In Thy hand is the good. Lo! Thou art Able to do all things.",
-  "urdu": "کہو کہ اے خدا (اے) بادشاہی کے مالک تو جس کو چاہے بادشاہی بخشے اور جس سے چاہے بادشاہی چھین لے اور جس کو چاہے عزت دے اور جسے چاہے ذلیل کرے ہر طرح کی بھلائی تیرے ہی ہاتھ ہے اور بے شک تو ہر چیز پر قادر ہے",
+  "english": "Say, ‘O Allah! You are the Owner of Sovereignty. You may grant kingdom to whom You will and take away kingdom from whom You will, and You may grant honour to whom You will and grant dishonour to whom You will. (All form of) good is in Your Hand. Indeed, You have Power over everything.",
+  "urdu": "کہہ دیجیئےاے اللہ! آپ مالک ہیں بادشاہی کے جسے چاہیں بادشاہی دیں اور جس سے چاہیں بادشاہی چھین لیں اور آپ جسے چاہیں عزت دیں اور جسے چاہیں ذلت۔ (ہر طرح کی) بھلائی آپ کے ہاتھ میں ہے یقینا ًآپ ہر چیز پر قادر ہیں۔",
   "theme": "sovereignty"
  },
  {
@@ -138,8 +138,8 @@
   "ayahEnd": 54,
   "reference": "Qur'an 3:54",
   "arabic": "وَمَكَرُوْا وَمَكَرَاللّٰهُ ​ؕ وَاللّٰهُ خَيْرُ الْمَاكِرِيْنَ‏",
-  "english": "And they (the disbelievers) schemed, and Allah schemed (against them): and Allah is the best of schemers.",
-  "urdu": "اور وہ (یعنی یہود قتل عیسیٰ کے بارے میں ایک) چال چلے اور خدا بھی (عیسیٰ کو بچانے کے لیے) چال چلا اور خدا خوب چال چلنے والا ہے",
+  "english": "They (the unbelievers) plotted and Allah planned; and Allah is the Best of planners.",
+  "urdu": "انہوں نے تدبیر کی اور اللہ نے تدبیر کی اور اللہ بہتر تدبیر کرنے والے ہیں۔",
   "theme": "trust"
  },
  {
@@ -149,8 +149,8 @@
   "ayahEnd": 134,
   "reference": "Qur'an 3:133-134",
   "arabic": "وَسَارِعُوْۤا اِلٰى مَغْفِرَةٍ مِّنْ رَّبِّكُمْ وَجَنَّةٍ عَرْضُهَا السَّمٰوٰتُ وَالْاَرْضُۙ اُعِدَّتْ لِلْمُتَّقِيْنَۙ‏ الَّذِيْنَ يُنْفِقُوْنَ فِى السَّرَّآءِ وَالضَّرَّآءِ وَالْكٰظِمِيْنَ الْغَيْظَ وَالْعَافِيْنَ عَنِ النَّاسِ​ؕ وَاللّٰهُ يُحِبُّ الْمُحْسِنِيْنَ​ۚ‏",
-  "english": "And vie one with another for forgiveness from your Lord, and for a paradise as wide as are the heavens and the earth, prepared for those who ward off (evil); Those who spend (of that which Allah hath given them) in ease and in adversity, those who control their wrath and are forgiving toward mankind; Allah loveth the good;",
-  "urdu": "اپنے پروردگار کی بخشش اور بہشت کی طرف لپکو جس کا عرض آسمان اور زمین کے برابر ہے اور جو (خدا سے) ڈرنے والوں کے لیے تیار کی گئی ہے جو آسودگی اور تنگی میں (اپنا مال خدا کی راہ میں) خرچ کرتےہیں اور غصے کو روکتے اور لوگوں کے قصور معاف کرتے ہیں اور خدا نیکو کاروں کو دوست رکھتا ہے",
+  "english": "And advance hastily towards the forgiveness of your Rabb and towards Paradise, whose width equals the heavens and earth, (which) has been prepared for the Allah-conscious. The people who spend (in Allah’s Way) in prosperity and (also) in adversity and control their anger and forgive people; and Allah loves the benevolent.",
+  "urdu": "اور اپنے پروردگار کی بخشش کی طرف اور جنت کی طرف تیزی سے بڑھو جس کی چوڑائی آسمانوںاورزمین کے برابر ہے (جو)پرہیزگاروں کے لیئےتیار کی گئی ہے۔ جو لوگ خوشی کے حال میں(اللہ کی راہ میں)خرچ کرتے ہیں اور تنگی میں(بھی)اورغصے کو ضبط کرتے ہیں اور لوگوں کو معاف کرتے ہیں۔ اور اللہ احسان کرنے والوں سے پیار کرتے ہیں۔",
   "theme": "forgiveness"
  },
  {
@@ -160,8 +160,8 @@
   "ayahEnd": 139,
   "reference": "Qur'an 3:139",
   "arabic": "وَلَا تَهِنُوْا وَ لَا تَحْزَنُوْا وَاَنْتُمُ الْاَعْلَوْنَ اِنْ كُنْتُمْ مُّؤْمِنِيْنَ‏",
-  "english": "Faint not nor grieve, for ye will overcome them if ye are (indeed) believers.",
-  "urdu": "اور (دیکھو) بے دل نہ ہونا اور نہ کسی طرح کا غم کرنا اگر تم مومن (صادق) ہو تو تم ہی غالب رہو گے",
+  "english": "And do not slacken and do not grieve (in any way); and it is you who will be successful if you are (true) believers.",
+  "urdu": "اور سستی نہ کرو اور (کسی طرح کا)غم نہ کرو اور تم ہی کامیاب ہوگے اگر تم مومن (صادق )ہو۔",
   "theme": "hope"
  },
  {
@@ -171,8 +171,8 @@
   "ayahEnd": 159,
   "reference": "Qur'an 3:159",
   "arabic": "فَبِمَا رَحْمَةٍ مِّنَ اللّٰهِ لِنْتَ لَهُمْ​ۚ وَلَوْ كُنْتَ فَظًّا غَلِيْظَ الْقَلْبِ لَانْفَضُّوْا مِنْ حَوْلِكَ​ فَاعْفُ عَنْهُمْ وَاسْتَغْفِرْ لَهُمْ وَشَاوِرْهُمْ فِى الْاَمْرِ​ۚ فَاِذَا عَزَمْتَ فَتَوَكَّلْ عَلَى اللّٰهِ​ؕ اِنَّ اللّٰهَ يُحِبُّ الْمُتَوَكِّلِيْنَ‏",
-  "english": "It was by the mercy of Allah that thou wast lenient with them (O Muhammad), for if thou hadst been stern and fierce of heart they would have dispersed from round about thee. So pardon them and ask forgiveness for them and consult with them upon the conduct of affairs. And when thou art resolved, then put thy trust in Allah. Lo! Allah loveth those who put their trust (in Him).",
-  "urdu": "(اے محمدﷺ) خدا کی مہربانی سے تمہاری افتاد مزاج ان لوگوں کے لئے نرم واقع ہوئی ہے۔ اور اگر تم بدخو اور سخت دل ہوتے تو یہ تمہارے پاس سے بھاگ کھڑے ہوتے۔ تو ان کو معاف کردو اور ان کے لئے (خدا سے) مغفرت مانگو۔ اور اپنے کاموں میں ان سے مشورت لیا کرو۔ اور جب (کسی کام کا) عزم مصمم کرلو تو خدا پر بھروسا رکھو۔ بےشک خدا بھروسا رکھنے والوں کو دوست رکھتا ہے",
+  "english": "So by some Mercy of Allah, you are very gentle with them; and had you been harsh, hard-hearted, they would have dispersed from around you. So excuse them and seek forgiveness for them, and consult them in the conduct of affairs. And when you have taken a firm decision (about some matter) then put your trust in Allah. Without doubt, Allah loves those who trust Him.",
+  "urdu": "پس کچھ اللہ ہی کی رحمت سے آپ ان کے لئیے بہت نرم مزاج ہیں اور اگر آپ تُند خُو سخت طبیعت ہوتے تو وہ آپ کے پاس سے بھاگ جاتے پس ان سے درگزر فرمائیں اور ان کے لئیےبخشش طلب فرمائیں اور ان سے کاموں میں مشورہ لیا کریں پس جب (کسی کام کا)مصمم ارادہ کرلیں تو اللہ پر بھروسہ کریں بے شک اللہ بھروسہ کرنے والوں کو محبوب رکھتے ہیں۔",
   "theme": "gentleness"
  },
  {
@@ -182,8 +182,8 @@
   "ayahEnd": 173,
   "reference": "Qur'an 3:173",
   "arabic": "اَلَّذِيْنَ قَالَ لَهُمُ النَّاسُ اِنَّ النَّاسَ قَدْ جَمَعُوْا لَـكُمْ فَاخْشَوْهُمْ فَزَادَهُمْ اِيْمَانًا  ۖ وَّقَالُوْا حَسْبُنَا اللّٰهُ وَنِعْمَ الْوَكِيْلُ‏",
-  "english": "Those unto whom men said: Lo! the people have gathered against you, therefor fear them. (The threat of danger) but increased the faith of them and they cried: Allah is Sufficient for us! Most Excellent is He in Whom we trust!",
-  "urdu": "(جب) ان سے لوگوں نے آکر بیان کیا کہ کفار نے تمہارے (مقابلے کے) لئے لشکر کثیر) جمع کیا ہے تو ان سے ڈرو۔ تو ان کا ایمان اور زیادہ ہوگیا۔ اور کہنے لگے ہم کو خدا کافی ہے اور وہ بہت اچھا کارساز ہے",
+  "english": "Those who, when told by the people (unbelievers), ‘Without doubt, people have gathered resources against you, so fear them,’ their Faith became even stronger (refreshed) and they said, ‘Allah is Sufficient for us and He is the Best Manager of affairs.’",
+  "urdu": "وہ لوگ کہ جن کو لوگوں (کافروں )نے کہا کہ بے شک لوگوں نے تمہارے مقابلہ کے لئیے سامان جمع کررکھا ہے سو ان سے ڈرو تو ان کا ایمان اور زیادہ (تازہ)ہوگیا اور انہوں نے کہا کہ ہمیں اللہ کافی ہیں اور وہی بہتر کارساز ہیں۔",
   "theme": "tawakkul"
  },
  {
@@ -193,8 +193,8 @@
   "ayahEnd": 185,
   "reference": "Qur'an 3:185",
   "arabic": "كُلُّ نَفْسٍ ذَآٮِٕقَةُ الْمَوْتِ​ؕ وَاِنَّمَا تُوَفَّوْنَ اُجُوْرَكُمْ يَوْمَ الْقِيٰمَةِ​ؕ فَمَنْ زُحْزِحَ عَنِ النَّارِ وَاُدْخِلَ الْجَـنَّةَ فَقَدْ فَازَ ​ؕ وَمَا الْحَيٰوةُ الدُّنْيَاۤ اِلَّا مَتَاعُ الْغُرُوْرِ‏",
-  "english": "Every soul will taste of death. And ye will be paid on the Day of Resurrection only that which ye have fairly earned. Whoso is removed from the Fire and is made to enter paradise, he indeed is triumphant. The life of this world is but comfort of illusion.",
-  "urdu": "ہر متنفس کو موت کا مزا چکھنا ہے اور تم کو قیامت کے دن تمہارے اعمال کا پورا پورا بدلا دیا جائے گا۔ تو جو شخص آتش جہنم سے دور رکھا گیا اور بہشت میں داخل کیا گیا وہ مراد کو پہنچ گیا اور دنیا کی زندگی تو دھوکے کا سامان ہے",
+  "english": "Every soul has to taste death; and indeed you will be paid full recompense (for your deeds) on the Day of Qiyamah. So whoever is saved from the Fire and is entered in Paradise, he surely attained his goal; and the life of the world is merely an illusionary possession.",
+  "urdu": "ہر جان کو موت کا مزہ چکھنا ہے اور یقیناً تم کو قیامت کے روز (تمہارے اعمال کا)پورا بدلہ دیا جائے گا پس جو آگ سے بچا لیا گیا اور جنت میں داخل کیا گیا تو یقیناً وہ مراد کو پہنچا اور دنیا کی زندگی تو صرف دھوکے کا سامان ہے۔",
   "theme": "reflection"
  },
  {
@@ -204,8 +204,8 @@
   "ayahEnd": 191,
   "reference": "Qur'an 3:190-191",
   "arabic": "اِنَّ فِىْ خَلْقِ السَّمٰوٰتِ وَالْاَرْضِ وَاخْتِلَافِ الَّيْلِ وَالنَّهَارِ لَاٰيٰتٍ لِّاُولِى الْاَلْبَابِ ۚۖ‏ الَّذِيْنَ يَذْكُرُوْنَ اللّٰهَ قِيَامًا وَّقُعُوْدًا وَّعَلٰى جُنُوْبِهِمْ وَيَتَفَكَّرُوْنَ فِىْ خَلْقِ السَّمٰوٰتِ وَالْاَرْضِ​ۚ رَبَّنَا مَا خَلَقْتَ هٰذَا بَاطِلًا ۚ سُبْحٰنَكَ فَقِنَا عَذَابَ النَّارِ‏",
-  "english": "Lo! In the creation of the heavens and the earth and (in) the difference of night and day are tokens (of His Sovereignty) for men of understanding, Such as remember Allah, standing, sitting, and reclining, and consider the creation of the heavens and the earth, (and say): Our Lord! Thou createdst not this in vain. Glory be to Thee! Preserve us from the doom of Fire.",
-  "urdu": "بے شک آسمانوں اور زمین کی پیدائش اور رات اور دن کے بدل بدل کے آنے جانے میں عقل والوں کے لیے نشانیاں ہیں جو کھڑے اور بیٹھے اور لیٹے (ہر حال میں) خدا کو یاد کرتے اور آسمان اور زمین کی پیدائش میں غور کرتے (اور کہتے ہیں) کہ اے پروردگار! تو نے اس (مخلوق) کو بے فائدہ نہیں پیدا کیا تو پاک ہے تو (قیامت کے دن) ہمیں دوزخ کے عذاب سے بچائیو",
+  "english": "Indeed, in the creation of the heavens and the earth, and in the alternations of night and day, are signs for the intelligent. Those who do Allah’s Zikr standing, sitting and lying (in all states), and ponder upon the creation of the heavens and the earth. (They say) ‘O our Rabb! You did not create (all) this without purpose. Hallowed are You; so save us from the torment of the Fire.",
+  "urdu": "یقیناً آسمانوں اور زمین کی پیدائش اور رات اور دن کے بدل بدل کر آنے میں عقل والوں کے لیئےنشانیاں ہیں۔ وہ جو اللہ کا ذکر کرتے ہیں کھڑے اور بیٹھے اور لیٹے (ہر حال میں)اور آسمانوں اور زمین کی پیدائش میں غور کرتے ہیں (کہتے ہیں)اے ہمارے پروردگار! آپ نے یہ (سب)بے فائدہ پیدانہیں کیا۔ آپ پاک ہیں پس ہم کو آگ کے عذاب سے بچا لیجئیے۔",
   "theme": "reflection"
  },
  {
@@ -215,8 +215,8 @@
   "ayahEnd": 103,
   "reference": "Qur'an 4:103",
   "arabic": "فَاِذَا قَضَيْتُمُ الصَّلٰوةَ فَاذْكُرُوا اللّٰهَ قِيَامًا وَّقُعُوْدًا وَّعَلٰى جُنُوْبِكُمْ ۚؕ فَاِذَا اطْمَاْنَنْتُمْ فَاَقِيْمُوا الصَّلٰوةَ​ ۚ اِنَّ الصَّلٰوةَ كَانَتْ عَلَى الْمُؤْمِنِيْنَ كِتٰبًا مَّوْقُوْتًا‏",
-  "english": "When ye have performed the act of worship, remember Allah, standing, sitting and reclining. And when ye are in safety, observe proper worship. Worship at fixed times hath been enjoined on the believers.",
-  "urdu": "پھر جب تم نماز تمام کرچکو تو کھڑے اور بیٹھے اور لیٹے (ہر حالت میں) خدا کو یاد کرو پھر جب خوف جاتا رہے تو (اس طرح سے) نماز پڑھو (جس طرح امن کی حالت میں پڑھتے ہو) بےشک نماز کا مومنوں پر اوقات (مقررہ) میں ادا کرنا فرض ہے",
+  "english": "Thus, when you have offered your Salah, perform Allah’s Zikr, standing as well as sitting, and as well as lying down. Then when you are secure, offer the Salah (as in peaceful environment). Without doubt, Salah is obligatory upon the Muslims at prescribed times.",
+  "urdu": "پس جب تم نماز ادا کرچکو تو اللہ کا ذکر کرو کھڑے بھی اور بیٹھے بھی اور لیٹے ہوئے بھی پھرجب تم مطمئن ہوجاؤ تو نماز ادا کرو (حالت امن کی طرح)بے شک نماز مسلمانوں پر وقت مقررہ کے ساتھ فرض ہے۔",
   "theme": "prayer"
  },
  {
@@ -226,8 +226,8 @@
   "ayahEnd": 35,
   "reference": "Qur'an 5:35",
   "arabic": "يٰۤاَيُّهَا الَّذِيْنَ اٰمَنُوا اتَّقُوا اللّٰهَ وَابْتَغُوْۤا اِلَيْهِ الْوَسِيْلَةَ وَجَاهِدُوْا فِىْ سَبِيْلِهٖ لَعَلَّـكُمْ تُفْلِحُوْنَ‏",
-  "english": "O ye who believe! Be mindful of your duty to Allah, and seek the way of approach unto Him, and strive in His way in order that ye may succeed.",
-  "urdu": "اے ایمان والو! خدا سے ڈرتے رہو اور اس کا قرب حاصل کرنے کا ذریعہ تلاش کرتے رہو اور اس کے رستے میں جہاد کرو تاکہ رستگاری پاؤ",
+  "english": "O believers! Be conscious of Allah and seek the means to attain His Nearness, and do Jihad (strive) in His Way, so that you succeed.",
+  "urdu": "اے ایمان والو! اللہ سے ڈرو اور اس کا قرب پانے کا سبب تلاش کرو اور اس کی راہ میں جہاد (محنت) کرو تاکہ تم فلاح پاؤ۔",
   "theme": "striving"
  },
  {
@@ -237,8 +237,8 @@
   "ayahEnd": 59,
   "reference": "Qur'an 6:59",
   "arabic": "وَعِنْدَهٗ مَفَاتِحُ الْغَيْبِ لَا يَعْلَمُهَاۤ اِلَّا هُوَ​ؕ وَيَعْلَمُ مَا فِى الْبَرِّ وَالْبَحْرِ​ؕ وَمَا تَسْقُطُ مِنْ وَّرَقَةٍ اِلَّا يَعْلَمُهَا وَلَا حَبَّةٍ فِىْ ظُلُمٰتِ الْاَرْضِ وَلَا رَطْبٍ وَّلَا يَابِسٍ اِلَّا فِىْ كِتٰبٍ مُّبِيْنٍ‏ ﻿﻿",
-  "english": "And with Him are the keys of the Invisible. None but He knoweth them. And He knoweth what is in the land and the sea. Not a leaf falleth but He knoweth it, not a grain amid the darkness of the earth, naught of wet or dry but (it is noted) in a clear record.",
-  "urdu": "اور اسی کے پاس غیب کی کنجیاں ہیں جن کو اس کے سوا کوئی نہیں جانتا۔ اور اسے جنگلوں اور دریاؤں کی سب چیزوں کا علم ہے۔ اور کوئی پتہ نہیں جھڑتا مگر وہ اس کو جانتا ہے اور زمین کے اندھیروں میں کوئی دانہ اور کوئی ہری اور سوکھی چیز نہیں ہے مگر کتاب روشن میں (لکھی ہوئی) ہے",
+  "english": "And with Him alone are the keys of the Unseen, which no one knows except Him. And He knows whatever is on the land and in the water, and not a leaf falls but He knows it, and there is not a grain in the darkness of the earth nor a thing fresh or dry but is (written) in the Luminous Book.",
+  "urdu": "اور اسی کے پاس غیب کی کنجیاں ہیں جن کو اس کے سوا کوئی نہیں جانتا اور وہ جانتا ہے جو کچھ خشکی پر ہے اور پانی میں ہے اور کوئی پتہ نہیں گرتا مگر وہ اس کو جانتا ہے اور زمین کے اندھیروں میں کوئی دانہ اور کوئی ہری اور سوکھی چیز نہیں ہے مگر روشن کتاب میں (لکھی ہوئی)ہے۔",
   "theme": "knowledge"
  },
  {
@@ -248,8 +248,8 @@
   "ayahEnd": 55,
   "reference": "Qur'an 7:55",
   "arabic": "اُدْعُوْا رَبَّكُمْ تَضَرُّعًا وَّخُفْيَةً​ ؕ اِنَّهٗ لَا يُحِبُّ الْمُعْتَدِيْنَ​ ۚ‏",
-  "english": "(O mankind!) Call upon your Lord humbly and in secret. Lo! He loveth not aggressors.",
-  "urdu": "(لوگو) اپنے پروردگار سے عاجزی سے اور چپکے چپکے دعائیں مانگا کرو۔ وہ حد سے بڑھنے والوں کو دوست نہیں رکھتا",
+  "english": "Invoke your Rabb humbly and secretly. Indeed, He does not like the transgressors.",
+  "urdu": "اپنے پروردگار کو عاجزی سے اور چپکے چپکے پکارو بے شک وہ حد سے بڑھنے والوں کو پسند نہیں فرماتے۔",
   "theme": "dua"
  },
  {
@@ -259,8 +259,8 @@
   "ayahEnd": 56,
   "reference": "Qur'an 7:56",
   "arabic": "وَلَا تُفْسِدُوْا فِى الْاَرْضِ بَعْدَ اِصْلَاحِهَا وَادْعُوْهُ خَوْفًا وَّطَمَعًا​ ؕ اِنَّ رَحْمَتَ اللّٰهِ قَرِيْبٌ مِّنَ الْمُحْسِنِيْنَ‏",
-  "english": "Work not confusion in the earth after the fair ordering (thereof). and call on Him in fear and hope. Lo! the mercy of Allah is nigh unto the good.",
-  "urdu": "اور ملک میں اصلاح کے بعد خرابی نہ کرنا اور خدا سے خوف کرتے ہوئے اور امید رکھ کر دعائیں مانگتے رہنا۔ کچھ شک نہیں کہ خدا کی رحمت نیکی کرنے والوں سے قریب ہے",
+  "english": "Do not spread corruption in the land after it has been set in order, and call upon Him with hope and fear; indeed, Allah’s mercy is close to the doers of good.",
+  "urdu": "اور تم ملک میں اس کی اصلاح ہوجانے کے بعد فساد نہ کرو اور اسے ڈرتے ہوئے اور امید رکھتے ہوئے پکارو بے شک اللہ کی رحمت (خلوص سے) نیکی کرنے والوں کے قریب تر ہے۔",
   "theme": "mercy"
  },
  {
@@ -270,8 +270,8 @@
   "ayahEnd": 180,
   "reference": "Qur'an 7:180",
   "arabic": "وَلِلّٰهِ الْاَسْمَآءُ الْحُسْنٰى فَادْعُوْهُ بِهَا​ وَذَرُوا الَّذِيْنَ يُلْحِدُوْنَ فِىْۤ اَسْمَآٮِٕهٖ​ ؕ سَيُجْزَوْنَ مَا كَانُوْا يَعْمَلُوْنَ‏",
-  "english": "Allah's are the fairest names. Invoke Him by them. And leave the company of those who blaspheme His names. They will be requited what they do.",
-  "urdu": "اور خدا کے سب نام اچھے ہی اچھے ہیں۔ تو اس کو اس کے ناموں سے پکارا کرو اور جو لوگ اس کے ناموں میں کجی اختیار کرتے ہیں ان کو چھوڑ دو۔ وہ جو کچھ کر رہے ہیں عنقریب اس کی سزا پائیں گے",
+  "english": "And all Beautiful Names are for Allah alone, so invoke Him by these (Names), and forsake the people who adopt profanity in His Names. Soon these people will be punished for their deeds.",
+  "urdu": "اور اللہ ہی کے لئے سب اچھے نام ہے پس اس کو ان (ناموں)سے پکارا کرو اور جو لوگ اس کے ناموں میں کجروی اختیار کرتے ہیں ان کو چھوڑ دو عنقریب ان لوگوں کوان کے اعمال کی سزا دی جائے گی۔",
   "theme": "names"
  },
  {
@@ -281,8 +281,8 @@
   "ayahEnd": 2,
   "reference": "Qur'an 8:2",
   "arabic": "اِنَّمَا الْمُؤْمِنُوْنَ الَّذِيْنَ اِذَا ذُكِرَ اللّٰهُ وَجِلَتْ قُلُوْبُهُمْ وَاِذَا تُلِيَتْ عَلَيْهِمْ اٰيٰتُهٗ زَادَتْهُمْ اِيْمَانًا وَّعَلٰى رَبِّهِمْ يَتَوَكَّلُوْنَ ​​ۖ ​ۚ‏",
-  "english": "They only are the (true) believers whose hearts feel fear when Allah is mentioned, and when His revelations are recited unto them they increase their faith, and who trust in their Lord;",
-  "urdu": "مومن تو وہ ہیں کہ جب خدا کا ذکر کیا جاتا ہے کہ ان کے دل ڈر جاتے ہیں اور جب انہیں اس کی آیتیں پڑھ کر سنائی جاتی ہیں تو ان کا ایمان اور بڑھ جاتا ہے۔ اور وہ اپنے پروردگار پر بھروسہ رکھتے ہیں",
+  "english": "Indeed, the believers are those whose hearts are filled with fear when Allah is mentioned (in front of them), whose faith is further increased when His Ayaat are recited to them, and who repose their trust in their Rabb.",
+  "urdu": "یقیناً ایمان والے تو وہ ہیں کہ جب (ان کے سامنے)اللہ کا ذکر کیا جا تا ہے تو ان کے دل ڈر جاتے ہیں اور جب ان کو اس کی آیات پڑھ کر سنائی جاتی ہیں تو ان کے ایمان کو اور زیادہ کردیتی ہیں اور اپنے پروردگار پر بھروسہ رکھتے ہیں۔",
   "theme": "faith"
  },
  {
@@ -292,8 +292,8 @@
   "ayahEnd": 40,
   "reference": "Qur'an 9:40",
   "arabic": "اِلَّا تَـنْصُرُوْهُ فَقَدْ نَصَرَهُ اللّٰهُ اِذْ اَخْرَجَهُ الَّذِيْنَ كَفَرُوْا ثَانِىَ اثْنَيْنِ اِذْ هُمَا فِى الْغَارِ اِذْ يَقُوْلُ لِصَاحِبِهٖ لَا تَحْزَنْ اِنَّ اللّٰهَ مَعَنَا​ ۚ فَاَنْزَلَ اللّٰهُ سَكِيْنَـتَهٗ عَلَيْهِ وَاَ يَّدَهٗ بِجُنُوْدٍ لَّمْ تَرَوْهَا وَجَعَلَ كَلِمَةَ الَّذِيْنَ كَفَرُوا السُّفْلٰى​ ؕ وَكَلِمَةُ اللّٰهِ هِىَ الْعُلْيَا ؕ وَاللّٰهُ عَزِيْزٌ حَكِيْمٌ‏",
-  "english": "If ye help him not, still Allah helped him when those who disbelieve drove him forth, the second of two; when they two were in the cave, when he said unto his comrade: Grieve not. Lo! Allah is with us. Then Allah caused His peace of reassurance to descend upon him and supported him with hosts ye cannot see, and made the word of those who disbelieved the nethermost, while Allah's Word it was that became the uppermost. Allah is Mighty, Wise.",
-  "urdu": "اگر تم پیغمبر کی مدد نہ کرو گے تو خدا اُن کا مددگار ہے (وہ وقت تم کو یاد ہوگا) جب ان کو کافروں نے گھر سے نکال دیا۔ (اس وقت) دو (ہی ایسے شخص تھے جن) میں (ایک ابوبکرؓ تھے) اور دوسرے (خود رسول الله) جب وہ دونوں غار (ثور) میں تھے اس وقت پیغمبر اپنے رفیق کو تسلی دیتے تھے کہ غم نہ کرو خدا ہمارے ساتھ ہے۔ تو خدا نے ان پر تسکین نازل فرمائی اور ان کو ایسے لشکروں سے مدد دی جو تم کو نظر نہیں آتے تھے اور کافروں کی بات کو پست کر دیا۔ اور بات تو خدا ہی کی بلند ہے۔ اور خدا زبردست (اور) حکمت والا ہے",
+  "english": "If you do not aid him (the Holy Prophet - Sall Allah-o Alaihi wa Sallam), then Allah certainly helped him when the unbelievers had exiled him, when he (Sall Allah-o Alaihi wa Sallam) was one of the two, when both of them were in the cave, and when he was telling his friend (companion), ‘Do not grieve (for me), indeed Allah is with us.’ So Allah sent down tranquillity from Himself upon him and helped them with such forces which you did not see, and brought low the word of the unbelievers (they failed); and it was Allah’s Word that reigned supreme, and Allah is Dominant, Wise.",
+  "urdu": "اگر تم ان(حضور اکرمﷺ) کی مددنہ کرو گے تو یقیناً اللہ نے ان کی مدد فرمائی جب کافروں نے ان کو جلاوطن کردیا تھا جب دو میں ایک آپ(ﷺ)تھے جس وقت کہ دونوں غار میں تھے جب وہ اپنے دوست (ساتھی)سے فرماتے تھے کہ (میرا)غم نہ کرو یقیناً اللہ ہمارے ساتھ ہیں سو اللہ نے آپ پر اپنی طرف سے تسکین نازل فرمائی اور ان کی ایسے لشکروں سے مدد فرمائی جو تم کو نظر نہ آتے تھے اور کافروں کی بات کو نیچا کردیا (وہ ناکام رہے)اور اللہ ہی کا بول بالا رہا اور اللہ زبردست حکمت والے ہیں۔",
   "theme": "companionship"
  },
  {
@@ -303,8 +303,8 @@
   "ayahEnd": 51,
   "reference": "Qur'an 9:51",
   "arabic": "قُلْ لَّنْ يُّصِيْبَـنَاۤ اِلَّا مَا كَتَبَ اللّٰهُ لَـنَا ۚ هُوَ مَوْلٰٮنَا ​ ۚ وَعَلَى اللّٰهِ فَلْيَتَوَكَّلِ الْمُؤْمِنُوْنَ‏",
-  "english": "Say: Naught befalleth us save that which Allah hath decreed for us. He is our Protecting Friend. In Allah let believers put their trust!",
-  "urdu": "کہہ دو کہ ہم کو کوئی مصیبت نہیں پہنچ سکتی بجز اس کے جو خدا نے ہمارے لیے لکھ دی ہو وہی ہمارا کارساز ہے۔ اور مومنوں کو خدا ہی کا بھروسہ رکھنا چاہیئے",
+  "english": "Say, ‘Assuredly no distress can befall us except that which Allah has decreed for us. He is our Master. And in Allah should the believers put their trust.’",
+  "urdu": "فرما دیجئے کہ ہم پر ہرگز کوئی مصیبت نہیں آسکتی سوائے اس کے جو اللہ نے ہمارے لئے مقدر فرمادی ہے وہ ہمارا مالک ہے اور ایمان والوں کواللہ ہی پر بھروسہ رکھنا چاہیے۔",
   "theme": "decree"
  },
  {
@@ -314,8 +314,8 @@
   "ayahEnd": 88,
   "reference": "Qur'an 11:88",
   "arabic": "قَالَ يٰقَوْمِ اَرَءَيْتُمْ اِنْ كُنْتُ عَلٰى بَيِّنَةٍ مِّنْ رَّبِّىْ وَرَزَقَنِىْ مِنْهُ رِزْقًا حَسَنًا​ ؕ وَمَاۤ اُرِيْدُ اَنْ اُخَالِفَكُمْ اِلٰى مَاۤ اَنْهٰٮكُمْ عَنْهُ​ ؕ اِنْ اُرِيْدُ اِلَّا الْاِصْلَاحَ مَا اسْتَطَعْتُ​ ؕ وَمَا تَوْفِيْقِىْۤ اِلَّا بِاللّٰهِ​ ؕ عَلَيْهِ تَوَكَّلْتُ وَاِلَيْهِ اُنِيْبُ‏",
-  "english": "He said: O my people! Bethink you: if I am (acting) on a clear proof from my Lord and He sustaineth me with fair sustenance from Him (how can I concede aught to you)? I desire not to do behind your backs that which I ask you not to do. I desire naught save reform so far as I am able. My welfare is only in Allah. In Him I trust and unto Him I turn (repentant).",
-  "urdu": "انہوں نے کہا کہ اے قوم! دیکھو تو اگر میں اپنے پروردگار کی طرف سے دلیل روشن پر ہوں اور اس نے اپنے ہاں سے مجھے نیک روزی دی ہو (تو کیا میں ان کے خلاف کروں گا؟) اور میں نہیں چاہتا کہ جس امر سے میں تمہیں منع کروں خود اس کو کرنے لگوں۔ میں تو جہاں تک مجھ سے ہوسکے (تمہارے معاملات کی) اصلاح چاہتا ہوں اور (اس بارے میں) مجھے توفیق کا ملنا خدا ہی (کے فضل) سے ہے۔ میں اسی پر بھروسہ رکھتا ہوں اور اس کی طرف رجوع کرتا ہوں",
+  "english": "He said, ‘O my people! Just see! If I am on clear evidence from my Rabb and He has bestowed from Himself an excellent wealth (Prophethood) on me, (how can I not preach?). I do not want that, on the contrary, I myself start indulging in the act that I forbid you from. I only want to reform as much as is possible by me. And the capacity I have comes only from Allah. In Him I trust, and to Him I turn in repentance.",
+  "urdu": "انہوں نے فرمایا اے میری قوم! دیکھو تو اگر میں اپنے پروردگار کی طرف سے واضح دلیل پر ہوں اور اس نے اپنے ہاں سے مجھے عمدہ دولت (نبوت)بخشی ہو (تو کیسے تبلیغ نہ کروں)اور میں نہیں چاہتا کہ جس کام سےمیں تم کو منع کروں تمہارے برخلاف وہ خود کرنے لگوں میں تو جس قدر مجھ سے ہوسکے اصلاح چاہتا ہوں اورمجھ کو جو توفیق ہوجاتی ہے صرف اللہ ہی (کی طرف)سے ہے۔ میں اسی پر بھروسہ کرتا ہوں اور اسی کی طرف رجوع کرتا ہوں۔",
   "theme": "tawfiq"
  },
  {
@@ -325,8 +325,8 @@
   "ayahEnd": 87,
   "reference": "Qur'an 12:87",
   "arabic": "يٰبَنِىَّ اذْهَبُوْا فَتَحَسَّسُوْا مِنْ يُّوْسُفَ وَاَخِيْهِ وَلَا تَايْــَٔسُوْا مِنْ رَّوْحِ اللّٰهِ​ؕ اِنَّهٗ لَا يَايْــَٔسُ مِنْ رَّوْحِ اللّٰهِ اِلَّا الْقَوْمُ الْكٰفِرُوْنَ‏",
-  "english": "Go, O my sons, and ascertain concerning Joseph and his brother, and despair not of the Spirit of Allah. Lo! none despaireth of the Spirit of Allah save disbelieving folk.",
-  "urdu": "بیٹا (یوں کرو کہ ایک دفعہ پھر) جاؤ اور یوسف اور اس کے بھائی کو تلاش کرو اور خدا کی رحمت سے ناامید نہ ہو۔ کہ خدا کی رحمت سے بےایمان لوگ ناامید ہوا کرتے ہیں",
+  "english": "O my sons! Go and look for Yousuf (Alaihi as-Salam) and his brother, and do not despair of Allah’s Mercy, indeed only the unbelievers despair of Allah’s Mercy.’",
+  "urdu": "اے میرے بیٹو! جاؤ پس یوسف (علیہ السلام)اور ان کے بھائی کو تلاش کرو اور اللہ کی رحمت سے ناامید نہ ہو۔ بے شک اللہ کی رحمت سے کافر لوگ ہی ناامید ہوا کرتے ہیں۔",
   "theme": "hope"
  },
  {
@@ -336,8 +336,8 @@
   "ayahEnd": 11,
   "reference": "Qur'an 13:11",
   "arabic": "لَهٗ مُعَقِّبٰتٌ مِّنْۢ بَيْنِ يَدَيْهِ وَمِنْ خَلْفِهٖ يَحْفَظُوْنَهٗ مِنْ اَمْرِ اللّٰهِ​ؕ اِنَّ اللّٰهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتّٰى يُغَيِّرُوْا مَا بِاَنْفُسِهِمْ​ؕ وَاِذَاۤ اَرَادَ اللّٰهُ بِقَوْمٍ سُوْۤءًا فَلَا مَرَدَّ لَهٗ​ۚ وَمَا لَهُمْ مِّنْ دُوْنِهٖ مِنْ وَّالٍ‏",
-  "english": "For him are angels ranged before him and behind him, who guard him by Allah's command. Lo! Allah changeth not the condition of a folk until they (first) change that which is in their hearts; and if Allah willeth misfortune for a folk there is none that can repel it, nor have they a defender beside Him.",
-  "urdu": "اس کے آگے اور پیچھے خدا کے چوکیدار ہیں جو خدا کے حکم سے اس کی حفاظت کرتے ہیں۔ خدا اس (نعمت) کو جو کسی قوم کو (حاصل) ہے نہیں بدلتا جب تک کہ وہ اپنی حالت کو نہ بدلے۔ اور جب خدا کسی قوم کے ساتھ برائی کا ارادہ کرتا ہے تو پھر وہ پھر نہیں سکتی۔ اور خدا کے سوا ان کا کوئی مددگار نہیں ہوتا",
+  "english": "Before and behind him are His (Allah’s) guardians (angels) who guard him by Allah’s Command. Certainly, Allah does not change the condition of any nation till they themselves change their condition. And when Allah decides (to send) a calamity upon a nation, there remains no means of averting it, and they have no helper except for Him (Allah).",
+  "urdu": "اس کے آگے اور پیچھے اس (اللہ)کے چوکیدار(فرشتے)ہیں اور جو اللہ کے حکم سے اس کی حفاظت کرتے ہیں ۔ واقعی اللہ کسی قوم کی حالت میں تبدیلی نہیں فرماتے جب تک کہ وہ اپنی حالت کو نہ بدلے۔ اور جب اللہ کسی قوم پر مصیبت کا ارادہ فرمالیتے ہیں تو اس کے ہٹنے کی کوئی صورت نہیں رہتی اور اس (اللہ)کے سوا کوئی ان کا مددگارنہیں ہوتا۔",
   "theme": "change"
  },
  {
@@ -347,8 +347,8 @@
   "ayahEnd": 28,
   "reference": "Qur'an 13:28",
   "arabic": "اَلَّذِيْنَ اٰمَنُوْا وَتَطْمَٮِٕنُّ قُلُوْبُهُمْ بِذِكْرِ اللّٰهِ​ ؕ اَلَا بِذِكْرِ اللّٰهِ تَطْمَٮِٕنُّ الْقُلُوْبُ ؕ‏",
-  "english": "Who have believed and whose hearts have rest in the remembrance of Allah. Verily in the remembrance of Allah do hearts find rest!",
-  "urdu": "(یعنی) جو لوگ ایمان لاتے اور جن کے دل یادِ خدا سے آرام پاتے ہیں (ان کو) اور سن رکھو کہ خدا کی یاد سے دل آرام پاتے ہیں",
+  "english": "(That is) the people who believe and their hearts find satisfaction in Allah’s Zikr. Remember! Only in Allah’s Zikr do hearts find satisfaction.",
+  "urdu": "(مراد وہ لوگ ہیں )جو لوگ ایمان لائے اور اللہ کے ذکر سے ان کے دلوں کو اطمینان ہوتا ہے۔ یاد رکھو! اللہ کے ذکر سے ہی دل اطمینان پاتے ہیں۔",
   "theme": "zikr"
  },
  {
@@ -358,8 +358,8 @@
   "ayahEnd": 7,
   "reference": "Qur'an 14:7",
   "arabic": "وَاِذْ تَاَذَّنَ رَبُّكُمْ لَٮِٕنْ شَكَرْتُمْ لَاَزِيْدَنَّـكُمْ​ وَلَٮِٕنْ كَفَرْتُمْ اِنَّ عَذَابِىْ لَشَدِيْدٌ‏",
-  "english": "And when your Lord proclaimed: If ye give thanks, I will give you more; but if ye are thankless, lo! My punishment is dire.",
-  "urdu": "اور جب تمہارے پروردگار نے (تم کو) آگاہ کیا کہ اگر شکر کرو گے تو میں تمہیں زیادہ دوں گا اور اگر ناشکری کرو گے تو (یاد رکھو کہ) میرا عذاب بھی سخت ہے",
+  "english": "And when your Rabb had announced to you: ‘If you are thankful, I will grant you more (blessings), and if you are ungrateful then, without doubt, My torment is very severe.’",
+  "urdu": "اور جب تمہارے پروردگار نے تم کو آگاہ فرمایا تھا کہ اگر تم شکر کرو گے تو میں تم کوزیادہ (نعمت)عطا کروں گا اور اگر تم ناشکری کرو گے تو بے شک میرا عذاب بڑا سخت ہے۔",
   "theme": "gratitude"
  },
  {
@@ -369,8 +369,8 @@
   "ayahEnd": 34,
   "reference": "Qur'an 14:34",
   "arabic": "وَاٰتٰٮكُمْ مِّنْ كُلِّ مَا سَاَلْـتُمُوْهُ​ ؕ وَاِنْ تَعُدُّوْا نِعْمَتَ اللّٰهِ لَا تُحْصُوْهَا ؕ اِنَّ الْاِنْسَانَ لَـظَلُوْمٌ كَفَّارٌ‏",
-  "english": "And He giveth you of all ye ask of Him, and if ye would count the bounty of Allah ye cannot reckon it. Lo! man is verily a wrong-doer, an ingrate.",
-  "urdu": "اور جو کچھ تم نے مانگا سب میں سے تم کو عنایت کیا۔ اور اگر خدا کے احسان گننے لگو تو شمار نہ کرسکو۔ (مگر لوگ نعمتوں کا شکر نہیں کرتے) کچھ شک نہیں کہ انسان بڑا بےانصاف اور ناشکرا ہے",
+  "english": "And He has granted you whatever you asked of Him. And if you start counting the Favours of Allah, you would not be able to count them. Undoubtedly, man is very unjust, very ungrateful.",
+  "urdu": "اور جو کچھ تم نے اس سے مانگا سب تم کو عنایت فرمایا اور اگر تم اللہ کی نعمتوں کو گننے لگو تو ان کو شمار نہ کرسکو بے شک انسان بڑا ہی بے انصاف، بڑا ناشکرا ہے۔",
   "theme": "blessings"
  },
  {
@@ -380,8 +380,8 @@
   "ayahEnd": 49,
   "reference": "Qur'an 15:49",
   "arabic": "نَبِّئْ عِبَادِىْۤ اَنِّىْۤ اَنَا الْغَفُوْرُ الرَّحِيْمُۙ‏",
-  "english": "Announce, (O Muhammad) unto My slaves that verily I am the Forgiving, the Merciful,",
-  "urdu": "(اے پیغمبر) میرے بندوں کو بتادو کہ میں بڑا بخشنے والا (اور) مہربان ہوں",
+  "english": "Tell My slaves that I am most Forgiving, Merciful.",
+  "urdu": "میرے بندوں کو بتا دیجئے کہ میں بڑا بخشش والا رحمت والا ہوں۔",
   "theme": "mercy"
  },
  {
@@ -391,8 +391,8 @@
   "ayahEnd": 97,
   "reference": "Qur'an 16:97",
   "arabic": "مَنْ عَمِلَ صَالِحًـا مِّنْ ذَكَرٍ اَوْ اُنْثٰى وَهُوَ مُؤْمِنٌ فَلَـنُحْيِيَنَّهٗ حَيٰوةً طَيِّبَةً​ ۚ وَلَـنَجْزِيَـنَّهُمْ اَجْرَهُمْ بِاَحْسَنِ مَا كَانُوْا يَعْمَلُوْنَ‏ ﻿﻿",
-  "english": "Whosoever doeth right, whether male or female, and is a believer, him verily we shall quicken with good life, and We shall pay them a recompense in proportion to the best of what they used to do.",
-  "urdu": "جو شخص نیک اعمال کرے گا مرد ہو یا عورت وہ مومن بھی ہوگا تو ہم اس کو (دنیا میں) پاک (اور آرام کی) زندگی سے زندہ رکھیں گے اور (آخرت میں) اُن کے اعمال کا نہایت اچھا صلہ دیں گے",
+  "english": "Whoever performs righteous deeds, whether man or woman, provided he possesses faith, We will certainly grant him a pure (and comfortable) life (in the world), and will grant (such people) an excellent reward (in the Hereafter) for their deeds.",
+  "urdu": "جو شخص نیک کام کرے وہ خود مرد ہو یا عورت بشرطیکہ وہ صاحب ایمان ہو تو ہم ضرور اس کو (دنیا میں )پاک(اور آرام کی)زندگی عطا فرمائیں گے اور (آخرت میں )ان کے اعمال کا بہت اچھا صلہ عطا فرمائیں گے۔",
   "theme": "good_life"
  },
  {
@@ -402,8 +402,8 @@
   "ayahEnd": 128,
   "reference": "Qur'an 16:128",
   "arabic": "اِنَّ اللّٰهَ مَعَ الَّذِيْنَ اتَّقَوْا وَّالَّذِيْنَ هُمْ مُّحْسِنُوْنَ‏ ﻿﻿",
-  "english": "Lo! Allah is with those who keep their duty unto Him and those who are doers of good.",
-  "urdu": "کچھ شک نہیں کہ جو پرہیزگار ہیں اور جو نیکوکار ہیں خدا ان کا مددگار ہے",
+  "english": "Indeed Allah is with the people who are Allah-conscious and those who do righteous deeds with sincerity.",
+  "urdu": "بے شک اللہ ان لوگوں کے ساتھ ہوتے ہیں جو پرہیز گار ہوتے ہیں اور جو خلوص دل سے نیک کام کرنے والے ہوتے ہیں۔",
   "theme": "ihsan"
  },
  {
@@ -413,8 +413,8 @@
   "ayahEnd": 80,
   "reference": "Qur'an 17:80",
   "arabic": "وَقُلْ رَّبِّ اَدْخِلْنِىْ مُدْخَلَ صِدْقٍ وَّ اَخْرِجْنِىْ مُخْرَجَ صِدْقٍ وَّاجْعَلْ لِّىْ مِنْ لَّدُنْكَ سُلْطٰنًا نَّصِيْرًا‏",
-  "english": "And say: My Lord! Cause me to come in with a firm incoming and to go out with a firm outgoing. And give me from Thy presence a sustaining Power.",
-  "urdu": "اور کہو کہ اے پروردگار مجھے (مدینے میں) اچھی طرح داخل کیجیو اور (مکے سے) اچھی طرح نکالیو۔ اور اپنے ہاں سے زور وقوت کو میرا مددگار بنائیو",
+  "english": "And pray, ‘O my Rabb! Cause me to enter (in Madinah Munawwarah) in a rightful manner, and cause me to go out (from Makkah Mukarramah) in a rightful manner, and grant me, from Your Self, dominance which is accompanied by Your Help.’",
+  "urdu": "اور آپ دعا کیجئیے کہ اے میرے پروردگار! مجھے (مدینہ منورہ میں )اچھی طرح داخل کیجیواور (مکہ مکرمہ سے)اچھی طرح نکالیو اورمجھے اپنے پاس سے ایسا غلبہ دیجئیو جس کے ساتھ آپ کی مدد ہو۔",
   "theme": "dua"
  },
  {
@@ -424,8 +424,8 @@
   "ayahEnd": 10,
   "reference": "Qur'an 18:10",
   "arabic": "اِذْ اَوَى الْفِتْيَةُ اِلَى الْـكَهْفِ فَقَالُوْا رَبَّنَاۤ اٰتِنَا مِنْ لَّدُنْكَ رَحْمَةً وَّهَيِّئْ لَـنَا مِنْ اَمْرِنَا رَشَدًا‏",
-  "english": "When the young men fled for refuge to the Cave and said: Our Lord! Give us mercy from Thy presence, and shape for us right conduct in our plight.",
-  "urdu": "جب وہ جوان غار میں جا رہے تو کہنے لگے کہ اے ہمارے پروردگار ہم پر اپنے ہاں سے رحمت نازل فرما۔ اور ہمارے کام درستی (کے سامان) مہیا کر",
+  "english": "When these youths took refuge in the cave, they said, ‘O our Rabb! Grant us Mercy from Yourself, and provide for us (the means of) guidance in our affair.’",
+  "urdu": "جب ان نوجوانوں نے غار میں پناہ لی تو کہنے لگے اے ہمارے پروردگار! ہم کو اپنے پاس سے رحمت عطا فرمائیے اور ہمارے لئے ہمارے کام میں درستی (کا سامان)مہیا فرما دیجئیے۔",
   "theme": "guidance"
  },
  {
@@ -435,8 +435,8 @@
   "ayahEnd": 28,
   "reference": "Qur'an 20:25-28",
   "arabic": "قَالَ رَبِّ اشْرَحْ لِىْ صَدْرِىْ ۙ‏ وَيَسِّرْ لِىْۤ اَمْرِىْ ۙ‏ وَاحْلُلْ عُقْدَةً مِّنْ لِّسَانِیْ ۙ‏ يَفْقَهُوْا قَوْلِیْ ‏",
-  "english": "(Moses) said: My Lord! relieve my mind And ease my task for me; And loose a knot from my tongue, That they may understand my saying.",
-  "urdu": "کہا میرے پروردگار (اس کام کے لئے) میرا سینہ کھول دے اور میرا کام آسان کردے اور میری زبان کی گرہ کھول دے تاکہ وہ بات سمجھ لیں",
+  "english": "He said, ‘O my Rabb! Expand my breast (for this task). And make my task easy for me. And untie the knot (of stammer) from my tongue. (So that) they may understand my speech.",
+  "urdu": "انہوں نے عرض کیا اے میرے پروردگار (اس کام کے لئے)میرا سینہ کھول دیں۔ اور میرے لئے میرا کام آسان فرمادیں۔ اور میری زبان پر سے (لکنت کی)گرہ کھول دیجئیے۔ (تاکہ)وہ میری بات سمجھ سکیں۔",
   "theme": "ease"
  },
  {
@@ -446,8 +446,8 @@
   "ayahEnd": 114,
   "reference": "Qur'an 20:114",
   "arabic": "فَتَعٰلَى اللّٰهُ الْمَلِكُ الْحَـقُّ​ ۚ وَلَا تَعْجَلْ بِالْقُرْاٰنِ مِنْ قَبْلِ اَنْ يُّقْضٰٓى اِلَيْكَ وَحْيُهٗ​ وَقُلْ رَّبِّ زِدْنِىْ عِلْمًا‏",
-  "english": "Then exalted be Allah, the True King! And hasten not (O Muhammad) with the Qur'an ere its revelation hath been perfected unto thee, and say: My Lord! Increase me in knowledge.",
-  "urdu": "تو خدا جو سچا بادشاہ ہے عالی قدر ہے۔ اور قرآن کی وحی جو تمہاری طرف بھیجی جاتی ہے اس کے پورا ہونے سے پہلے قرآن کے (پڑھنے کے) لئے جلدی نہ کیا کرو اور دعا کرو کہ میرے پروردگار مجھے اور زیادہ علم دے",
+  "english": "Thus Allah, Who is the Real Sovereign, is greatly Exalted in Majesty. And you should not hasten in (the recitation of) the Quran before its Revelation is completed to you; and pray thus: ‘O my Rabb! Increase my knowledge.’",
+  "urdu": "پس اللہ جو حقیقی بادشاہ ہیں بڑے عالیشان ہیں اورآپ قرآن (پڑھنے)میں جلدی نہ کیجئیے اس سے پہلے کہ آپ پر اس کی پوری وحی نازل ہوچکے اور یہ دعا کیجئیے کہ اے میرے پروردگار ! میرا علم بڑھا دیجئیے۔",
   "theme": "knowledge"
  },
  {
@@ -457,8 +457,8 @@
   "ayahEnd": 87,
   "reference": "Qur'an 21:87",
   "arabic": "وَ ذَا النُّوْنِ اِذْ ذَّهَبَ مُغَاضِبًا فَظَنَّ اَنْ لَّنْ نَّـقْدِرَ عَلَيْهِ فَنَادٰى فِى الظُّلُمٰتِ اَنْ لَّاۤ اِلٰهَ اِلَّاۤ اَنْتَ سُبْحٰنَكَ ​ۖ  اِنِّىْ كُنْتُ مِنَ الظّٰلِمِيْنَ​ ۖ ​ۚ‏",
-  "english": "And (mention) Dhu'n-Nun, when he went off in anger and deemed that We had no power over him, but he cried out in the darkness, saying: There is no Allah save Thee. Be Thou Glorified! Lo! I have been a wrong-doer.",
-  "urdu": "اور ذوالنون (کو یاد کرو) جب وہ (اپنی قوم سے ناراض ہو کر) غصے کی حالت میں چل دیئے اور خیال کیا کہ ہم ان پر قابو نہیں پاسکیں گے۔ آخر اندھیرے میں (خدا کو) پکارنے لگے کہ تیرے سوا کوئی معبود نہیں۔ تو پاک ہے (اور) بےشک میں قصوروار ہوں",
+  "english": "And Zun-noon (Man of the fish), when he walked away in anger (displeased with his people) and then thought that We will not take him to task (for going away). Then he cried in the darkness (of the fish’s belly), ‘There is none worthy of worship other than You, Hallowed are You. Without doubt, I am of the wrongdoers.’",
+  "urdu": "اور ذوالنون (مچھلی والے)جب وہ (اپنی قوم سے ناراض ہوکر) غصے کی حالت میں چل دیئے پھر سوچا کہ ہم ان پر (چلے جانے کی وجہ سے)کوئی داروگیرنہ کریں گے پس انہوں نے اندھیروں (مچھلی کے پیٹ)میں پکارا کہ (اللہ)آپ کے سوا کوئی عبادت کا مستحق نہیں آپ پاک ہیں بے شک میں قصورواروں میں سے ہوں۔",
   "theme": "repentance"
  },
  {
@@ -468,8 +468,8 @@
   "ayahEnd": 2,
   "reference": "Qur'an 23:1-2",
   "arabic": "قَدْ اَفْلَحَ الْمُؤْمِنُوْنَۙ‏ الَّذِيْنَ هُمْ فِىْ صَلَاتِهِمْ خَاشِعُوْنَ ۙ‏",
-  "english": "Successful indeed are the believers Who are humble in their prayers,",
-  "urdu": "بےشک ایمان والے رستگار ہوگئے جو نماز میں عجزو نیاز کرتے ہیں",
+  "english": "Without doubt, the believers have attained success. Who in their Salah are lowly and humble.",
+  "urdu": "بے شک ایمان والے کامیاب ہوئے۔ جو اپنی نماز میں عجزونیاز کرنے والے ہیں۔",
   "theme": "success"
  },
  {
@@ -479,8 +479,8 @@
   "ayahEnd": 35,
   "reference": "Qur'an 24:35",
   "arabic": "اَللّٰهُ نُوْرُ السَّمٰوٰتِ وَالْاَرْضِ ​ؕ مَثَلُ نُوْرِهٖ كَمِشْكٰوةٍ فِيْهَا مِصْبَاحٌ​ ؕ الْمِصْبَاحُ فِىْ زُجَاجَةٍ​ ؕ اَلزُّجَاجَةُ كَاَنَّهَا كَوْكَبٌ دُرِّىٌّ يُّوْقَدُ مِنْ شَجَرَةٍ مُّبٰـرَكَةٍ زَيْتُوْنَةٍ لَّا شَرْقِيَّةٍ وَّلَا غَرْبِيَّةٍ ۙ يَّـكَادُ زَيْتُهَا يُضِىْٓءُ وَلَوْ لَمْ تَمْسَسْهُ نَارٌ​ ؕ نُوْرٌ عَلٰى نُوْرٍ​ ؕ يَهْدِى اللّٰهُ لِنُوْرِهٖ مَنْ يَّشَآءُ​ ؕ وَ يَضْرِبُ اللّٰهُ الْاَمْثَالَ لِلنَّاسِ​ؕ وَاللّٰهُ بِكُلِّ شَىْءٍ عَلِيْمٌ ۙ‏",
-  "english": "Allah is the Light of the heavens and the earth. The similitude of His light is as a niche wherein is a lamp. The lamp is in a glass. The glass is as it were a shining star. (This lamp is) kindled from a blessed tree, an olive neither of the East nor of the West, whose oil would almost glow forth (of itself) though no fire touched it. Light upon light. Allah guideth unto His light whom He will. And Allah speaketh to mankind in allegories, for Allah is Knower of all things.",
-  "urdu": "خدا آسمانوں اور زمین کا نور ہے۔ اس کے نور کی مثال ایسی ہے کہ گویا ایک طاق ہے جس میں چراغ ہے۔ اور چراغ ایک قندیل میں ہے۔ اور قندیل (ایسی صاف شفاف ہے کہ) گویا موتی کا سا چمکتا ہوا تارہ ہے اس میں ایک مبارک درخت کا تیل جلایا جاتا ہے (یعنی) زیتون کہ نہ مشرق کی طرف ہے نہ مغرب کی طرف۔ (ایسا معلوم ہوتا ہے کہ) اس کا تیل خواہ آگ اسے نہ بھی چھوئے جلنے کو تیار ہے (پڑی) روشنی پر روشنی (ہو رہی ہے) خدا اپنے نور سے جس کو چاہتا ہے سیدھی راہ دکھاتا ہے۔ اور خدا نے (جو مثالیں) بیان فرماتا ہے (تو) لوگوں کے (سمجھانے کے) لئے اور خدا ہر چیز سے واقف ہے",
+  "english": "Allah is the Noor of the heavens and the earth. The simile of His Noor is as of a niche in which is a lamp. The lamp is enclosed in a casing (of glass), and the casing is (so crystalline) as though it were a pearl-like brilliant star. In this is lit the oil of a blessed tree (that is) olive, which is neither to the east nor to the west. It is well-nigh (it seems) that its oil will light up (by itself) even if not touched by fire. (And if it is touched by fire then) Noor upon Noor (there will be light upon light)! Allah shows the straight path, by His Noor, to whomever He wills. And Allah cites similes for people, and Allah knows everything well.",
+  "urdu": "اللہ آسمانوں اور زمین کانور ہے۔ اس کے نور کی مثال ایسی ہے جیسے ایک طاق ہے اس میں ایک چراغ ہے۔ وہ چراغ ایک (شیشہ کی)قندیل میں ہے۔ اور وہ قندیل (ایسی شفاف ہے)گویا موتی کا سا چمکتا ہوا ستارہ ہو۔ اس میں ایک مبارک درخت کا تیل جلایا جاتا ہے (یعنی)زیتون کہ نہ مشرق کی جانب ہے اور نہ مغرب کی، قریب ہے (ایسا لگتا ہے)کہ اس کا تیل اگر اس کو آگ نہ بھی لگی تو (خود بخود)جل اٹھے گا ( اور اگر آگ دکھادی گئی تو)نور علیٰ نور (روشنی ہی روشنی ہوجائے گی)۔ اللہ اپنے نور سے جس کو چاہتے ہیں سیدھی راہ دکھاتے ہیں۔ اور اللہ لوگوں کے لئے مثالیں بیان فرماتے ہیں اور اللہ ہر چیز کو خوب جاننے والے ہیں۔",
   "theme": "light"
  },
  {
@@ -490,8 +490,8 @@
   "ayahEnd": 74,
   "reference": "Qur'an 25:74",
   "arabic": "وَالَّذِيْنَ يَقُوْلُوْنَ رَبَّنَا هَبْ لَـنَا مِنْ اَزْوَاجِنَا وَذُرِّيّٰتِنَا قُرَّةَ اَعْيُنٍ وَّاجْعَلْنَا لِلْمُتَّقِيْنَ اِمَامًا‏",
-  "english": "And who say: Our Lord! Vouchsafe us comfort of our wives and of our offspring, and make us patterns for (all) those who ward off (evil).",
-  "urdu": "اور وہ جو (خدا سے) دعا مانگتے ہیں کہ اے پروردگار ہم کو ہماری بیویوں کی طرف سے (دل کا چین) اور اولاد کی طرف سے آنکھ کی ٹھنڈک عطا فرما اور ہمیں پرہیزگاروں کا امام بنا",
+  "english": "And they keep praying, ‘O our Rabb! Bestow upon us the coolness of our eyes (comfort) from our wives and children, and make us the leaders of the Allah-conscious.",
+  "urdu": "اور وہ لوگ دعا کرتے رہتے ہیں اے ہمارے پروردگار! ہم کو ہماری بیویوں کی طرف سے اور ہماری اولاد کی طرف سے آنکھوں کی ٹھنڈک (راحت)عطا فرمائیے اور ہم کو پرہیزگاروں کا پیشوا بنادیجئیے۔",
   "theme": "family"
  },
  {
@@ -501,8 +501,8 @@
   "ayahEnd": 62,
   "reference": "Qur'an 27:62",
   "arabic": "اَمَّنْ يُّجِيْبُ الْمُضْطَرَّ اِذَا دَعَاهُ وَيَكْشِفُ السُّوْٓءَ وَيَجْعَلُكُمْ خُلَفَآءَ الْاَرْضِ​ ؕ ءَاِلٰـهٌ مَّعَ اللّٰهِ ​ؕ قَلِيْلًا مَّا تَذَكَّرُوْنَ ؕ‏",
-  "english": "Is not He (best) Who answereth the wronged one when he crieth unto Him and removeth the evil, and hath made you viceroys of the earth? Is there any Allah beside Allah? Little do they reflect!",
-  "urdu": "بھلا کون بیقرار کی التجا قبول کرتا ہے۔ جب وہ اس سے دعا کرتا ہے اور (کون اس کی) تکلیف کو دور کرتا ہے اور (کون) تم کو زمین میں (اگلوں کا) جانشین بناتا ہے (یہ سب کچھ خدا کرتا ہے) تو کیا خدا کے ساتھ کوئی اور معبود بھی ہے (ہرگز نہیں مگر) تم بہت کم غور کرتے ہو",
+  "english": "And Who listens to the prayer of the restless person when he calls Him, and He removes (his) distress and makes you the successors (of the earlier generations) in the land. So, is there any Ilaha along with Allah (who does all this)? (Not at all, but) you reflect very little.",
+  "urdu": "اور بے قرار آدمی کی دعا کون سنتا ہے جب وہ اس کو پکارتا ہے اوروہ (اس کی)مصیبت کو دور فرماتا ہے اور تم کو زمین میں (اگلوں کا)جانشین بناتا ہے تو کیا اللہ کے ساتھ کوئی اور معبود بھی ہے(جو یہ سب کچھ کرتا ہے؟ ہرگز نہیں مگر)تم بہت کم غورکرتے ہو۔",
   "theme": "reliance"
  },
  {
@@ -512,8 +512,8 @@
   "ayahEnd": 45,
   "reference": "Qur'an 29:45",
   "arabic": "اُتْلُ مَاۤ اُوْحِىَ اِلَيْكَ مِنَ الْكِتٰبِ وَاَقِمِ الصَّلٰوةَ ​ؕ اِنَّ الصَّلٰوةَ تَنْهٰى عَنِ الْفَحْشَآءِ وَالْمُنْكَرِ​ؕ وَلَذِكْرُ اللّٰهِ اَكْبَرُ ​ؕ وَاللّٰهُ يَعْلَمُ مَا تَصْنَعُوْنَ‏",
-  "english": "Recite that which hath been inspired in thee of the Scripture, and establish worship. Lo! worship preserveth from lewdness and iniquity, but verily remembrance of Allah is more important. And Allah knoweth what ye do.",
-  "urdu": "(اے محمدﷺ! یہ) کتاب جو تمہاری طرف وحی کی گئی ہے اس کو پڑھا کرو اور نماز کے پابند رہو۔ کچھ شک نہیں کہ نماز بےحیائی اور بری باتوں سے روکتی ہے۔ اور خدا کا ذکر بڑا (اچھا کام) ہے۔ اور جو کچھ تم کرتے ہو خدا اُسے جانتا ہے",
+  "english": "Recite the Book that has been revealed to you, and adhere to Salah. Indeed Salah restrains from immorality and evil acts, and the Zikr of Allah (Remembrance) is the greatest. And Allah knows your works.",
+  "urdu": "جوکتاب آپ پروحی کی گئی آپ اس کو پڑھا کیجئیے اور نماز کی پابندی کیجئیے بے شک نماز بے حیائی اور بری باتوں سے روکتی ہے ۔ اور اللہ کا ذکر (یاد)سب سے بڑا ہے اور اللہ تمہارے کاموںکو جانتے ہیں۔",
   "theme": "prayer"
  },
  {
@@ -523,8 +523,8 @@
   "ayahEnd": 69,
   "reference": "Qur'an 29:69",
   "arabic": "وَالَّذِيْنَ جَاهَدُوْا فِيْنَا لَنَهْدِيَنَّهُمْ سُبُلَنَا ​ؕ وَاِنَّ اللّٰهَ لَمَعَ الْمُحْسِنِيْنَ‏",
-  "english": "As for those who strive in Us, We surely guide them to Our paths, and lo! Allah is with the good.",
-  "urdu": "اور جن لوگوں نے ہمارے لئے کوشش کی ہم اُن کو ضرور اپنے رستے دکھا دیں گے۔ اور خدا تو نیکو کاروں کے ساتھ ہے",
+  "english": "And We will certainly show Our Ways to the people who endure hardship for Us. And without doubt, Allah is with the sincere.",
+  "urdu": "اور جو لوگ ہمارے لئے مشقت برداشت کرتے ہیں ہم ان کو اپنے رستے ضرور دکھا دیں گے۔ اور بے شک اللہ خلوص والوں کے ساتھ ہیں۔",
   "theme": "striving"
  },
  {
@@ -534,8 +534,8 @@
   "ayahEnd": 42,
   "reference": "Qur'an 33:41-42",
   "arabic": "يٰۤـاَيُّهَا الَّذِيْنَ اٰمَنُوا اذْكُرُوْا اللّٰهَ ذِكْرًا كَثِيْرًا ۙ‏ وَّ سَبِّحُوْهُ بُكْرَةً وَّاَصِيْلًا‏",
-  "english": "O ye who believe! Remember Allah with much remembrance. And glorify Him early and late.",
-  "urdu": "اے اہل ایمان خدا کا بہت ذکر کیا کرو اور صبح اور شام اس کی پاکی بیان کرتے رہو",
+  "english": "O believers! Perform Allah’s Zikr abundantly. And celebrate His Glory (continuously) morning and evening.",
+  "urdu": "اے ایمان والو! اللہ کا ذکر بہت کثرت سے کرو۔ اور صبح اور شام (علی الدوام)اس کی پاکی بیان کرو۔",
   "theme": "zikr"
  },
  {
@@ -545,8 +545,8 @@
   "ayahEnd": 56,
   "reference": "Qur'an 33:56",
   "arabic": "اِنَّ اللّٰهَ وَمَلٰٓٮِٕكَتَهٗ يُصَلُّوْنَ عَلَى النَّبِىِّ ؕ يٰۤـاَيُّهَا الَّذِيْنَ اٰمَنُوْا صَلُّوْا عَلَيْهِ وَسَلِّمُوْا تَسْلِيْمًا‏",
-  "english": "Lo! Allah and His angels shower blessings on the Prophet. O ye who believe! Ask blessings on him and salute him with a worthy salutation.",
-  "urdu": "خدا اور اس کے فرشتے پیغمبر پر درود بھیجتے ہیں۔ مومنو تم بھی ان پر دُرود اور سلام بھیجا کرو",
+  "english": "Without doubt, Allah and His angels send Blessings upon the Messenger. O believers! You too invoke (Allah’s)blessings for him and send Salam upon him in abundance.",
+  "urdu": "بے شک اللہ اور اس کے فرشتے درود بھیجتے ہیں پیغمبر پر۔ اے ایمان والو! تم بھی ان پر درود اور خوب سلام بھیجا کرو۔",
   "theme": "salawat"
  },
  {
@@ -556,8 +556,8 @@
   "ayahEnd": 58,
   "reference": "Qur'an 36:58",
   "arabic": "سَلٰمٌ قَوْلًا مِّنْ رَّبٍّ رَّحِيْمٍ‏",
-  "english": "The word from a Merciful Lord (for them) is: Peace!",
-  "urdu": "پروردگار مہربان کی طرف سے سلام (کہا جائے گا)",
+  "english": "‘Salam’ will be said (to them) from the Merciful Rabb.",
+  "urdu": "(ان کو)مہربان پروردگار کی طرف سے سلام فرمایا جائے گا۔",
   "theme": "peace"
  },
  {
@@ -567,8 +567,8 @@
   "ayahEnd": 10,
   "reference": "Qur'an 39:10",
   "arabic": "قُلْ يٰعِبَادِ الَّذِيْنَ اٰمَنُوا اتَّقُوْا رَبَّكُمْ​ ؕ لِلَّذِيْنَ اَحْسَنُوْا فِىْ هٰذِهِ الدُّنْيَا حَسَنَةٌ ​ ؕ وَاَرْضُ اللّٰهِ وَاسِعَةٌ ​ ؕ اِنَّمَا يُوَفَّى الصّٰبِرُوْنَ اَجْرَهُمْ بِغَيْرِ حِسَابٍ‏",
-  "english": "Say: O My bondmen who believe! Observe your duty to your Lord. For those who do good in this world there is good, and Allah's earth is spacious. Verily the steadfast will be paid their wages without stint.",
-  "urdu": "کہہ دو کہ اے میرے بندو جو ایمان لائے ہو اپنے پروردگار سے ڈرو۔ جنہوں نے اس دنیا میں نیکی کی ان کے لئے بھلائی ہے۔ اور خدا کی زمین کشادہ ہے۔ جو صبر کرنے والے ہیں ان کو بےشمار ثواب ملے گا",
+  "english": "Say (on My behalf), ‘O My slaves who have believed, be conscious of your Rabb. There is goodness for those who do good in this world, and Allah’s earth is spacious. Without doubt, those who observe patience will be granted their reward without measure.’",
+  "urdu": "فرمادیجئے (میری طرف سے) کہ اے میرے بندو! جو ایمان لائے ہو اپنے پروردگار سے ڈرو۔ جنہوں نے اس دنیا میں نیکی کی ان کے لئے بھلائی ہے اور اللہ کی زمین کشادہ ہے جو صبر کرنے والے ہیں بے شک ان کو بے شمار صلہ ملے گا۔",
   "theme": "sabr"
  },
  {
@@ -578,8 +578,8 @@
   "ayahEnd": 53,
   "reference": "Qur'an 39:53",
   "arabic": "قُلْ يٰعِبَادِىَ الَّذِيْنَ اَسْرَفُوْا عَلٰٓى اَنْفُسِهِمْ لَا تَقْنَطُوْا مِنْ رَّحْمَةِ اللّٰهِ​ ؕ اِنَّ اللّٰهَ يَغْفِرُ الذُّنُوْبَ جَمِيْعًا​ ؕ اِنَّهٗ هُوَ الْغَفُوْرُ الرَّحِيْمُ‏",
-  "english": "Say: O My slaves who have been prodigal to their own hurt! Despair not of the mercy of Allah, Who forgiveth all sins. Lo! He is the Forgiving, the Merciful.",
-  "urdu": "(اے پیغمبر میری طرف سے لوگوں کو) کہہ دو کہ اے میرے بندو جنہوں نے اپنی جانوں پر زیادتی کی ہے خدا کی رحمت سے ناامید نہ ہونا۔ خدا تو سب گناہوں کو بخش دیتا ہے۔ (اور) وہ تو بخشنے والا مہربان ہے",
+  "english": "Say, (on My behalf), ‘O My slaves who have wronged themselves! Do not despair of the Mercy of Allah. Without doubt, Allah will forgive all (previous) sins. Without doubt, He is Extremely Forgiving, Extremely Merciful.",
+  "urdu": "آپ فرما دیجئیے (میری طرف سے) کہ اے میرے بندو! جنہوں نے اپنے آپ پر زیادتی کی ہے اللہ کی رحمت سے نااُمید نہ ہونا۔ بے شک اللہ تمام (گذشتہ) گناہوں کو معاف فرمادیں گے۔ بے شک وہ بڑے بخشنے والے، بڑے رحمت والے ہیں۔",
   "theme": "forgiveness"
  },
  {
@@ -589,8 +589,8 @@
   "ayahEnd": 60,
   "reference": "Qur'an 40:60",
   "arabic": "وَقَالَ رَبُّكُمُ ادْعُوْنِىْۤ اَسْتَجِبْ لَـكُمْؕ اِنَّ الَّذِيْنَ يَسْتَكْبِرُوْنَ عَنْ عِبَادَتِىْ سَيَدْخُلُوْنَ جَهَنَّمَ دَاخِرِيْنَ‏",
-  "english": "And your Lord hath said: Pray unto Me and I will hear your prayer. Lo! those who scorn My service, they will enter hell, disgraced.",
-  "urdu": "اور تمہارے پروردگار نے کہا ہے کہ تم مجھ سے دعا کرو میں تمہاری (دعا) قبول کروں گا۔ جو لوگ میری عبادت سے ازراہ تکبر کنیاتے ہیں۔ عنقریب جہنم میں ذلیل ہو کر داخل ہوں گے",
+  "english": "And your Rabb has said, ‘Pray to Me, I shall accept your prayer. Without doubt, the people who are proud against My worship, they will soon enter Hell, humiliated.’",
+  "urdu": "اور تمہارے پروردگار نے فرما دیا ہے کہ مجھ سے دعا کرو میں تمہاری دعا قبول فرماؤں گا۔ بے شک جو لوگ میری عبادت سے تکبر کرتے ہیں عنقریب وہ ذلیل ہو کر دوزخ میں داخل ہوں گے۔",
   "theme": "dua"
  },
  {
@@ -600,8 +600,8 @@
   "ayahEnd": 30,
   "reference": "Qur'an 41:30",
   "arabic": "اِنَّ الَّذِيْنَ قَالُوْا رَبُّنَا اللّٰهُ ثُمَّ اسْتَقَامُوْا تَتَنَزَّلُ عَلَيْهِمُ الْمَلٰٓٮِٕكَةُ اَلَّا تَخَافُوْا وَلَا تَحْزَنُوْا وَاَبْشِرُوْا بِالْجَـنَّةِ الَّتِىْ كُنْتُمْ تُوْعَدُوْنَ‏",
-  "english": "Lo! those who say: Our Lord is Allah, and afterward are upright, the angels descend upon them, saying: Fear not nor grieve, but hear good tidings of the paradise which ye are promised.",
-  "urdu": "جن لوگوں نے کہا کہ ہمارا پروردگار خدا ہے پھر وہ (اس پر) قائم رہے ان پر فرشتے اُتریں گے (اور کہیں گے) کہ نہ خوف کرو اور نہ غمناک ہو اور بہشت کی جس کا تم سے وعدہ کیا جاتا تھا خوشی مناؤ",
+  "english": "Without doubt, the people who said, ‘Our Rabb is Allah,’ then they remained steadfast (on this), the angels will descend on them (saying), ‘Have no fear nor grieve, and rejoice over Paradise which used to be promised to you.",
+  "urdu": "بے شک جن لوگوں نے کہا کہ ہمارا پروردگار اللہ ہے پھر وہ (اس پر) قائم رہے ان پر فرشتے اتریں گے کہ تم کوئی خوف نہ کرو اور نہ کوئی رنج کرو اور جنت پر خوش ہو جاؤ جس کا تم سے وعدہ کیا جاتا تھا۔",
   "theme": "steadfastness"
  },
  {
@@ -611,8 +611,8 @@
   "ayahEnd": 25,
   "reference": "Qur'an 42:25",
   "arabic": "وَهُوَ الَّذِىْ يَقْبَلُ التَّوْبَةَ عَنْ عِبَادِهٖ وَيَعْفُوْا عَنِ السَّيِّاٰتِ وَيَعْلَمُ مَا تَفْعَلُوْنَ ۙ‏",
-  "english": "And He it is Who accepteth repentance from His bondmen, and pardoneth the evil deeds, and knoweth what ye do,",
-  "urdu": "اور وہی تو ہے جو اپنے بندوں کی توبہ قبول کرتا اور (ان کے) قصور معاف فرماتا ہے اور جو تم کرتے ہو (سب) جانتا ہے",
+  "english": "It is He,Who accepts the repentance of His slaves and forgives their faults and knows all that you do.",
+  "urdu": "اور وہی ہیں جو اپنے بندوں کی توبہ قبول فرماتے ہیں اور ان کے قصور معاف فرماتے ہیں اور جو تم کرتے ہو سب جانتے ہیں۔",
   "theme": "repentance"
  },
  {
@@ -622,8 +622,8 @@
   "ayahEnd": 15,
   "reference": "Qur'an 46:15",
   "arabic": "وَوَصَّيْنَا الْاِنْسَانَ بِوَالِدَيْهِ اِحْسَانًا​ ؕ حَمَلَـتْهُ اُمُّهٗ كُرْهًا وَّوَضَعَتْهُ كُرْهًا​ ؕ وَحَمْلُهٗ وَفِصٰلُهٗ ثَلٰـثُوْنَ شَهْرًا​ ؕ حَتّٰٓى اِذَا بَلَغَ اَشُدَّهٗ وَبَلَغَ اَرْبَعِيْنَ سَنَةً  ۙ قَالَ رَبِّ اَوْزِعْنِىْۤ اَنْ اَشْكُرَ نِعْمَتَكَ الَّتِىْۤ اَنْعَمْتَ عَلَىَّ وَعَلٰى وَالِدَىَّ وَاَنْ اَعْمَلَ صَالِحًا تَرْضٰٮهُ وَاَصْلِحْ لِىْ فِىْ ذُرِّيَّتِىْ ؕۚ اِنِّىْ تُبْتُ اِلَيْكَ وَاِنِّىْ مِنَ الْمُسْلِمِيْنَ‏",
-  "english": "And We have commended unto man kindness toward parents. His mother beareth him with reluctance, and bringeth him forth with reluctance, and the bearing of him and the weaning of him is thirty months, till, when he attaineth full strength and reacheth forty years, he saith: My Lord! Arouse me that I may give thanks for the favour wherewith Thou hast favoured me and my parents, and that I may do right acceptable unto Thee. And be gracious unto me in the matter of my seed. Lo! I have turned unto Thee repentant, and lo! I am of those who surrender (unto Thee).",
-  "urdu": "اور ہم نے انسان کو اپنے والدین کے ساتھ بھلائی کرنے کا حکم دیا۔ اس کی ماں نے اس کو تکلیف سے پیٹ میں رکھا اور تکلیف ہی سے جنا۔ اور اس کا پیٹ میں رہنا اور دودھ چھوڑنا ڈھائی برس میں ہوتا ہے۔ یہاں تک کہ جب خوب جوان ہوتا ہے اور چالیس برس کو پہنچ جاتا ہے تو کہتا ہے کہ اے میرے پروردگار مجھے توفیق دے کہ تو نے جو احسان مجھ پر اور میرے ماں باپ پر کئے ہیں ان کا شکر گزار ہوں اور یہ کہ نیک عمل کروں جن کو تو پسند کرے۔ اور میرے لئے میری اولاد میں صلاح (وتقویٰ) دے۔ میں تیری طرف رجوع کرتا ہوں اور میں فرمانبرداروں میں ہوں",
+  "english": "And We have commanded man to treat his parents kindly. His mother carried him in her womb with great hardship and delivered him with pain; and the carrying and weaning of him is (completed) in thirty months, until when he attains full maturity and reaches the age of forty years, he says, ‘O my Rabb! Grant me the capacity to give thanks for the favours You have bestowed upon me and upon my parents, and that I may perform righteous deeds that please You, and grant righteousness for my sake to my progeny also. I repent before You, and assuredly I am of the obedient.’",
+  "urdu": "اور ہم نے انسان کو اپنے ماں باپ کے ساتھ نیک سلوک کرنے کا حکم دیا ہے۔ اس ماں نے بڑی مشقت کے ساتھ اس کو پیٹ میں رکھا اور تکلیف سے اس کو جنا اور اس کا پیٹ میں رکھنا اور اس کا دودھ چھڑانا تیس ماہ میں (پورا) ہوتا ہے یہاں تک کہ جب وہ خوب جوان ہوجاتا ہے اور چالیس برس کو پہنچ جاتا ہے تو کہتا ہے اے میرے پروردگار! مجھے توفیق عطا فرما کہ آپ نے جو احسان مجھ پر اور میرے ماں باپ پر فرمائے ہیں، ان کا شکر ادا کروں اور یہ کہ نیک کام کروں جن کو آپ پسند فرمائیں اور میری اولاد میں بھی میرے لیئے صلاحیت پیدا فرما دیجئیے۔ میں آپ کی بارگاہ میں توبہ کرتا ہوں اور یقیناً میں فرمانبردار ہوں۔",
   "theme": "parents"
  },
  {
@@ -633,8 +633,8 @@
   "ayahEnd": 4,
   "reference": "Qur'an 48:4",
   "arabic": "هُوَ الَّذِىْۤ اَنْزَلَ السَّكِيْنَةَ فِىْ قُلُوْبِ الْمُؤْمِنِيْنَ لِيَزْدَادُوْۤا اِيْمَانًا مَّعَ اِيْمَانِهِمْ​ ؕ وَلِلّٰهِ جُنُوْدُ السَّمٰوٰتِ وَالْاَرْضِ​ؕ وَكَانَ اللّٰهُ عَلِيْمًا حَكِيْمًا ۙ‏",
-  "english": "He it is Who sent down peace of reassurance into the hearts of the believers that they might add faith unto their faith. Allah's are the hosts of the heavens and the earth, and Allah is ever Knower, Wise -",
-  "urdu": "وہی تو ہے جس نے مومنوں کے دلوں پر تسلی نازل فرمائی تاکہ ان کے ایمان کے ساتھ اور ایمان بڑھے۔ اور آسمانوں اور زمین کے لشکر (سب) خدا ہی کے ہیں۔ اور خدا جاننے والا (اور) حکمت والا ہے",
+  "english": "He it is, Who sent down tranquillity into the hearts of the believers so that more faith is added to their faith.And to Allah belong the entire hosts of the heavens and the earth, and Allah is Knowing, Wise.",
+  "urdu": "وہی تو ہے جس نے ایمان والوں کے دلوں پر تسلی نازل فرمائی تاکہ ان کے ایمان کے ساتھ اور ایمان بڑھے۔ اور آسمانوں اور زمین کا سب لشکر اللہ ہی کا ہے اور اللہ جاننے والے حکمت والے ہیں۔",
   "theme": "tranquility"
  },
  {
@@ -644,8 +644,8 @@
   "ayahEnd": 13,
   "reference": "Qur'an 49:13",
   "arabic": "يٰۤاَيُّهَا النَّاسُ اِنَّا خَلَقْنٰكُمْ مِّنْ ذَكَرٍ وَّاُنْثٰى وَجَعَلْنٰكُمْ شُعُوْبًا وَّقَبَآٮِٕلَ لِتَعَارَفُوْا​ ؕ اِنَّ اَكْرَمَكُمْ عِنْدَ اللّٰهِ اَ تْقٰٮكُمْ​ ؕ اِنَّ اللّٰهَ عَلِيْمٌ خَبِيْرٌ‏",
-  "english": "O mankind! Lo! We have created you male and female, and have made you nations and tribes that ye may know one another. Lo! the noblest of you, in the sight of Allah, is the best in conduct. Lo! Allah is Knower, Aware.",
-  "urdu": "لوگو! ہم نے تم کو ایک مرد اور ایک عورت سے پیدا کیا اور تمہاری قومیں اور قبیلے بنائے۔ تاکہ ایک دوسرے کو شناخت کرو۔ اور خدا کے نزدیک تم میں زیادہ عزت والا وہ ہے جو زیادہ پرہیزگار ہے۔ بےشک خدا سب کچھ جاننے والا (اور) سب سے خبردار ہے",
+  "english": "O people! Indeed We have created you from one man and one woman, and made you different nations and families so that you can identify one another. Indeed, the more honourable of you, with Allah, is the one who is more Allah-conscious. Undoubtedly, Allah is Knowing, Aware.",
+  "urdu": "اے لوگو! بے شک ہم نے تم کو ایک مرد اور ایک عورت سے پیدا فرمایا ہے اور تم کو مختلف قومیں اور خاندان بنایا تاکہ ایک دوسرے کو شناخت کرسکو۔ بے شک اللہ کے نزدیک تم میں زیادہ عزت والا وہ ہے جو زیادہ پرہیز گار ہے۔ بے شک اللہ جاننے والے خبر رکھنے والے ہیں۔",
   "theme": "honour"
  },
  {
@@ -655,8 +655,8 @@
   "ayahEnd": 16,
   "reference": "Qur'an 50:16",
   "arabic": "وَلَقَدْ خَلَقْنَا الْاِنْسَانَ وَنَعْلَمُ مَا تُوَسْوِسُ بِهٖ نَفْسُهٗ ۖۚ وَنَحْنُ اَقْرَبُ اِلَيْهِ مِنْ حَبْلِ الْوَرِيْدِ‏",
-  "english": "We verily created man and We know what his soul whispereth to him, and We are nearer to him than his jugular vein.",
-  "urdu": "اور ہم ہی نے انسان کو پیدا کیا ہے اور جو خیالات اس کے دل میں گزرتے ہیں ہم ان کو جانتے ہیں۔ اور ہم اس کی رگ جان سے بھی اس سے زیادہ قریب ہیں",
+  "english": "Indeed We created man, and We know the thoughts that occur within his soul. And We are even nearer to him than his jugular vein.",
+  "urdu": "اور یقیناً ہم نے انسان کو پیدا فرمایا اور اس کے جی میں جو خیالات آتے ہیں، ہم ان کو جانتے ہیں اور ہم اس کی رگِ جاں سے بھی زیادہ اس کے قریب ہیں۔",
   "theme": "nearness"
  },
  {
@@ -666,8 +666,8 @@
   "ayahEnd": 60,
   "reference": "Qur'an 55:60",
   "arabic": "هَلْ جَزَآءُ الْاِحْسَانِ اِلَّا الْاِحْسَانُ​ۚ‏",
-  "english": "Is the reward of goodness aught save goodness?",
-  "urdu": "نیکی کا بدلہ نیکی کے سوا کچھ نہیں ہے",
+  "english": "Well then, can be the reward of goodness other than goodness!",
+  "urdu": "بھلا نیکی کا بدلہ نیکی کے سوا اور کچھ ہوسکتا ہے!",
   "theme": "ihsan"
  },
  {
@@ -677,8 +677,8 @@
   "ayahEnd": 4,
   "reference": "Qur'an 57:4",
   "arabic": "هُوَ الَّذِىْ خَلَقَ السَّمٰوٰتِ وَالْاَرْضَ فِىْ سِتَّةِ اَيَّامٍ ثُمَّ اسْتَوٰى عَلَى الْعَرْشِ​ؕ يَعْلَمُ مَا يَلِجُ فِى الْاَرْضِ وَمَا يَخْرُجُ مِنْهَا وَمَا يَنْزِلُ مِنَ السَّمَآءِ وَمَا يَعْرُجُ فِيْهَاؕ وَهُوَ مَعَكُمْ اَيْنَ مَا كُنْتُمْ​ؕ وَاللّٰهُ بِمَا تَعْمَلُوْنَ بَصِيْرٌ‏",
-  "english": "He it is Who created the heavens and the earth in six Days; then He mounted the Throne. He knoweth all that entereth the earth and all that emergeth therefrom and all that cometh down from the sky and all that ascendeth therein; and He is with you wheresoever ye may be. And Allah is Seer of what ye do.",
-  "urdu": "وہی ہے جس نے آسمانوں اور زمین کو چھ دن میں پیدا کیا پھر عرش پر جا ٹھہرا۔ جو چیز زمین میں داخل ہوتی اور جو اس سے نکلتی ہے اور جو آسمان سے اُترتی اور جو اس کی طرف چڑھتی ہے سب اس کو معلوم ہے۔ اور تم جہاں کہیں ہو وہ تمہارے ساتھ ہے۔ اور جو کچھ تم کرتے ہو خدا اس کو دیکھ رہا ہے",
+  "english": "It is He, Who has created the heavens and the earth in six days, then established (Himself) on the Throne. He knows what enters into the earth and what comes out of it, and what descends from the sky and what ascends to it. And He is with you wherever you may be. And Allah also watches all your deeds.",
+  "urdu": "وہی ہے جس نے آسمانوں اور زمین کو چھ دنوں میں پیدا فرمایا پھر عرش پر قائم ہوا۔ وہ جانتا ہے جو چیز زمین کے اندر داخل ہوتی ہے اور جو چیز اس سے نکلتی ہے اور جو چیز آسمان سے اترتی ہے اور جو چیز اس میں چڑھتی ہے۔ اور وہ تمہارے ساتھ ہے خواہ تم کہیں بھی ہو۔ اور اللہ تمہارے سب اعمال کو بھی دیکھتا ہے۔",
   "theme": "nearness"
  },
  {
@@ -688,8 +688,8 @@
   "ayahEnd": 24,
   "reference": "Qur'an 59:22-24",
   "arabic": "هُوَ اللّٰهُ الَّذِىْ لَاۤ اِلٰهَ اِلَّا هُوَ​ ۚ عٰلِمُ الْغَيْبِ وَالشَّهَادَةِ​ ۚ هُوَ الرَّحْمٰنُ الرَّحِيْمُ‏ هُوَ اللّٰهُ الَّذِىْ لَاۤ اِلٰهَ اِلَّا هُوَ​ۚ اَلْمَلِكُ الْقُدُّوْسُ السَّلٰمُ الْمُؤْمِنُ الْمُهَيْمِنُ الْعَزِيْزُ الْجَـبَّارُ الْمُتَكَبِّرُ​ؕ سُبْحٰنَ اللّٰهِ عَمَّا يُشْرِكُوْنَ‏ هُوَ اللّٰهُ الْخَـالِـقُ الْبَارِئُ الْمُصَوِّرُ​ لَـهُ الْاَسْمَآءُ الْحُسْنٰى​ؕ يُسَبِّحُ لَهٗ مَا فِى السَّمٰوٰتِ وَالْاَرْضِ​ۚ وَهُوَ الْعَزِيْزُ الْحَكِيْمُ‏ ﻿﻿",
-  "english": "He is Allah, than Whom there is no other Allah, the Knower of the Invisible and the Visible. He is the Beneficent, Merciful. He is Allah, than Whom there is no other Allah, the Sovereign Lord, the Holy One, Peace, the Keeper of Faith, the Guardian, the Majestic, the Compeller, the Superb. Glorified be Allah from all that they ascribe as partner (unto Him). He is Allah, the Creator, the Shaper out of naught, the Fashioner. His are the most beautiful names. All that is in the heavens and the earth glorifieth Him, and He is the Mighty, the Wise.",
-  "urdu": "وہی خدا ہے جس کے سوا کوئی معبود نہیں۔ پوشیدہ اور ظاہر کا جاننے والا ہے وہ بڑا مہربان نہایت رحم والا ہے وہی خدا ہے جس کے سوا کوئی عبادت کے لائق نہیں۔ بادشاہ (حقیقی) پاک ذات (ہر عیب سے) سلامتی امن دینے والا نگہبان غالب زبردست بڑائی والا۔ خدا ان لوگوں کے شریک مقرر کرنے سے پاک ہے وہی خدا (تمام مخلوقات کا) خالق۔ ایجاد واختراع کرنے والا صورتیں بنانے والا اس کے سب اچھے سے اچھے نام ہیں۔ جتنی چیزیں آسمانوں اور زمین میں ہیں سب اس کی تسبیح کرتی ہیں اور وہ غالب حکمت والا ہے",
+  "english": "He, Allah is Such Ilaha that, there is no one worthy of worship other than Him. He is the Knower of the Unseen and the Seen. He is Very Kind, Extremely Merciful. He, Allah is Such Ilaha that, there is no one worthy of worship other than Him. He is (the Real) Sovereign, the Holy, the Granter of Peace, the Granter of Security, the Guardian, the Dominant, the Subduer, the Owner of Greatness. Hallowed is Allah from the associates that these people set up He, Allah is the Creator, the Maker, the Designer; for Him are all good Names. All things that are in the heavens and in the earth celebrate His Glory, and He is the Dominant, the Wise.",
+  "urdu": "وہ اللہ ایسا معبود ہے کہ اُس کے سوا کوئی عبادت کے لائق نہیں۔ وہ پوشیدہ اور ظاہر چیزوں کا جاننے والا ہے۔ وہ بہت بڑا مہربان نہایت رحم والا ہے۔ وہ اللہ ایسا معبود ہے کہ اُس کے سوا کوئی معبود نہیں۔ بادشاہ (حقیقی) پاک ذات، سلامتی، امن دینے والا، نگہبان غالب، زبردست، بڑائی والا ہے۔ اللہ ان لوگوں کے شریک مقرر کرنے سے پاک ہے۔ وہی اللہ پیدا کرنے والا، ایجاد کرنے والا، صورتیں بنانے والا، اُسی کے لیے سب اچھے نام ہیں۔ سب چیزیں جو آسمانوں میں اور زمین میں ہیں، اُس کی پاکی بیان کرتی ہیں۔ اور وہی زبردست، حکمت والا ہے۔",
   "theme": "names"
  },
  {
@@ -699,8 +699,8 @@
   "ayahEnd": 11,
   "reference": "Qur'an 64:11",
   "arabic": "مَاۤ اَصَابَ مِنْ مُّصِيْبَةٍ اِلَّا بِاِذْنِ اللّٰهِ​ؕ وَمَنْ يُّؤْمِنْۢ بِاللّٰهِ يَهْدِ قَلْبَهٗ​ؕ وَاللّٰهُ بِكُلِّ شَىْءٍ عَلِيْمٌ‏",
-  "english": "No calamity befalleth save by Allah's leave. And whosoever believeth in Allah, He guideth his heart. And Allah is Knower of all things.",
-  "urdu": "کوئی مصیبت نازل نہیں ہوتی مگر خدا کے حکم سے۔ اور جو شخص خدا پر ایمان لاتا ہے وہ اس کے دل کو ہدایت دیتا ہے۔ اور خدا ہر چیز سے باخبر ہے",
+  "english": "Whatever calamity befalls, it befalls by Allah’s Command. Allah guides the heart of the person who believes in Him, and Allah is Aware of everything.",
+  "urdu": "جو مصیبت بھی آتی ہے اللہ کے حکم سے آتی ہے۔ اور جو شخص اللہ پر ایمان لاتا ہے وہ اس کے دل کو ہدایت دیتے ہیں۔ اور اللہ ہر چیز سے باخبر ہیں۔",
   "theme": "decree"
  },
  {
@@ -710,8 +710,8 @@
   "ayahEnd": 3,
   "reference": "Qur'an 65:2-3",
   "arabic": "فَاِذَا بَلَغْنَ اَجَلَهُنَّ فَاَمْسِكُوْهُنَّ بِمَعْرُوْفٍ اَوْ فَارِقُوْهُنَّ بِمَعْرُوْفٍ وَّاَشْهِدُوْا ذَوَىْ عَدْلٍ مِّنْكُمْ وَاَقِيْمُوا الشَّهَادَةَ لِلّٰهِ​ ؕ ذٰ لِكُمْ يُوْعَظُ بِهٖ مَنْ كَانَ يُؤْمِنُ بِاللّٰهِ وَالْيَوْمِ الْاٰخِرِ​ ۙ وَمَنْ يَّـتَّـقِ اللّٰهَ يَجْعَلْ لَّهٗ مَخْرَجًا ۙ‏ وَّيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ​ ؕ وَمَنْ يَّتَوَكَّلْ عَلَى اللّٰهِ فَهُوَ حَسْبُهٗ ؕ اِنَّ اللّٰهَ بَالِغُ اَمْرِهٖ​ ؕ قَدْ جَعَلَ اللّٰهُ لِكُلِّ شَىْءٍ قَدْرًا‏",
-  "english": "Then, when they have reached their term, take them back in kindness or part from them in kindness, and call to witness two just men among you, and keep your testimony upright for Allah. Whoso believeth in Allah and the Last Day is exhorted to act thus. And whosoever keepeth his duty to Allah, Allah will appoint a way out for him, And will provide for him from (a quarter) whence he hath no expectation. And whosoever putteth his trust in Allah, He will suffice him. Lo! Allah bringeth His command to pass. Allah hath set a measure for all things.",
-  "urdu": "پھر جب وہ اپنی میعاد (یعنی انقضائے عدت) کے قریب پہنچ جائیں تو یا تو ان کو اچھی طرح (زوجیت میں) رہنے دو یا اچھی طرح سے علیحدہ کردو اور اپنے میں سے دو منصف مردوں کو گواہ کرلو اور (گواہ ہو!) خدا کے لئے درست گواہی دینا۔ ان باتوں سے اس شخص کو نصیحت کی جاتی ہے جو خدا پر اور روز آخرت پر ایمان رکھتا ہے۔ اور جو کوئی خدا سے ڈرے گا وہ اس کے لئے (رنج ومحن سے) مخلصی (کی صورت) پیدا کرے گا اور اس کو ایسی جگہ سے رزق دے گا جہاں سے (وہم و) گمان بھی نہ ہو۔ اور جو خدا پر بھروسہ رکھے گا تو وہ اس کو کفایت کرے گا۔ خدا اپنے کام کو (جو وہ کرنا چاہتا ہے) پورا کردیتا ہے۔ خدا نے ہر چیز کا اندازہ مقرر کر رکھا ہے",
+  "english": "Then when they approach the end of their ‘Iddat, then let them remain (in the wedlock) in a good manner or separate them in a good manner; and appoint two reliable persons as witnesses and (if the need arises for testimony) then testify correctly for Allah. By these words is advised the person who believes in Allah and the Last Day, and whoever is Allah-conscious, He creates a way out for him. And provides him sustenance from such a source he does not even imagine. And the person who trusts in Allah then He suffices for him; indeed Allah accomplishes His purpose (that He wills), assuredly Allah has set a perfect measure for everything.",
+  "urdu": "پھر جب وہ اپنی عدت گزرنے کے قریب پہنچ جائیں تو ان کو اچھی طرح سے(زوجیت میں) رہنے دو یا اچھی طرح سے علیحدہ کردو۔ اور اپنے میں سے دو معتبر شخصوں کو گواہ کرلو اور (گواہی کی ضرورت پڑے تو) اللہ کے لیئے درست گواہی دو۔ ان باتوں سے اس شخص کو نصیحت کی جاتی ہے جو اللہ پر اور آخرت کے دن پر ایمان رکھتا ہے اور جو کوئی اللہ سے ڈرتا ہے تو وہ اس کے لیئے نجات کی صورت پیدا کردیتے ہیں۔ اور اس کو ایسی جگہ سے رزق پہنچاتے ہیں جہاں سے اس کا گمان بھی نہیں ہوتا۔ اور جو شخص اللہ پر بھروسہ کرتا ہے تو وہ اس کے لیئےکافی ہیں۔ بے شک اللہ اپنے کام کو (جو وہ کرنا چاہیں) پورا کردیتے ہیں۔ یقیناً اللہ نے ہر چیز کا پورا اندازہ فرما رکھا ہے۔",
   "theme": "tawakkul"
  },
  {
@@ -721,8 +721,8 @@
   "ayahEnd": 7,
   "reference": "Qur'an 65:7",
   "arabic": "لِيُنْفِقْ ذُوْ سَعَةٍ مِّنْ سَعَتِهٖ​ؕ وَمَنْ قُدِرَ عَلَيْهِ رِزْقُهٗ فَلْيُنْفِقْ مِمَّاۤ اٰتٰٮهُ اللّٰهُ​ؕ لَا يُكَلِّفُ اللّٰهُ نَفْسًا اِلَّا مَاۤ اٰتٰٮهَا​ؕ سَيَجْعَلُ اللّٰهُ بَعْدَ عُسْرٍ يُّسْرًا‏",
-  "english": "Let him who hath abundance spend of his abundance, and he whose provision is measured, let him spend of that which Allah hath given him. Allah asketh naught of any soul save that which He hath given it. Allah will vouchsafe, after hardship, ease.",
-  "urdu": "صاحب وسعت کو اپنی وسعت کے مطابق خرچ کرنا چاہیئے۔ اور جس کے رزق میں تنگی ہو وہ جتنا خدا نے اس کو دیا ہے اس کے موافق خرچ کرے۔ خدا کسی کو تکلیف نہیں دیتا مگر اسی کے مطابق جو اس کو دیا ہے۔ اور خدا عنقریب تنگی کے بعد کشائش بخشے گا",
+  "english": "The rich should spend according to his means, and the one whose sustenance is straitened should spend according to what Allah has given him. Allah does not place any difficulty on anyone, except according to what He has given them. Soon Allah will also grant ease after hardship.",
+  "urdu": "دولت مند کو اپنی حیثیت کے مطابق خرچ کرنا چاہیے۔ اور جس کے رزق میں تنگی ہوتو جتنا اس کو اللہ نے دیا ہے اس کے مطابق خرچ کرے۔ اللہ کسی کو تکلیف نہیں دیتا مگر اُس کے مطابق جو اُس نے اُن کو دیا ہے۔ اللہ عنقریب تنگی کے بعد فراخی بھی بخشے گا۔",
   "theme": "ease"
  },
  {
@@ -732,8 +732,8 @@
   "ayahEnd": 2,
   "reference": "Qur'an 67:2",
   "arabic": "اۨلَّذِىْ خَلَقَ الْمَوْتَ وَالْحَيٰوةَ لِيَبْلُوَكُمْ اَيُّكُمْ اَحْسَنُ عَمَلًا ؕ وَهُوَ الْعَزِيْزُ الْغَفُوْرُۙ‏",
-  "english": "Who hath created life and death that He may try you which of you is best in conduct; and He is the Mighty, the Forgiving,",
-  "urdu": "اسی نے موت اور زندگی کو پیدا کیا تاکہ تمہاری آزمائش کرے کہ تم میں کون اچھے عمل کرتا ہے۔ اور وہ زبردست (اور) بخشنے والا ہے",
+  "english": "Who created death and life, so that (He) may try you as to which of you is best in deed; and He is Dominant (and) Forgiving.",
+  "urdu": "جس نے موت اور زندگی کو پیدا فرمایا تاکہ تمہیں آزمائے کہ تم میں کون عمل میں زیادہ اچھا ہے اور وہ زبردست (اور) بخشنے والا ہے۔",
   "theme": "test"
  },
  {
@@ -743,8 +743,8 @@
   "ayahEnd": 15,
   "reference": "Qur'an 87:14-15",
   "arabic": "قَدْ اَفْلَحَ مَنْ تَزَكّٰىۙ‏ وَذَكَرَ اسْمَ رَبِّهٖ فَصَلّٰى​ ؕ‏",
-  "english": "He is successful who groweth, And remembereth the name of his Lord, so prayeth,",
-  "urdu": "بے شک وہ مراد کو پہنچ گیا جو پاک ہوا اور اپنے پروردگار کے نام کا ذکر کرتا رہا اور نماز پڑھتا رہا",
+  "english": "He who purifies himself assuredly reached the goal. And he kept performing the Zikr of his Rabb’s Name, then kept worshipping.",
+  "urdu": "جو پاک ہوا یقیناً وہ مراد کو پہنچ گیا۔ اور اپنے پروردگار کے نام کا ذکر کرتا رہا پھر عبادت کرتا رہا۔",
   "theme": "purification"
  },
  {
@@ -754,8 +754,8 @@
   "ayahEnd": 5,
   "reference": "Qur'an 93:4-5",
   "arabic": "وَلَـلْاٰخِرَةُ خَيْرٌ لَّكَ مِنَ الْاُوْلٰىؕ‏ وَلَسَوْفَ يُعْطِيْكَ رَبُّكَ فَتَرْضٰىؕ‏",
-  "english": "And verily the latter portion will be better for thee than the former, And verily thy Lord will give unto thee so that thou wilt be content.",
-  "urdu": "اور آخرت تمہارے لیے پہلی (حالت یعنی دنیا) سے کہیں بہتر ہے اور تمہیں پروردگار عنقریب وہ کچھ عطا فرمائے گا کہ تم خوش ہو جاؤ گے",
+  "english": "And the Hereafter is far better for you than the present (phase - meaning the world). And your Rabb will soon grant you that with which you will become pleased.",
+  "urdu": "اور آخرت آپ کے لیے پہلی (حالت یعنی دنیا) سے کہیں بہتر ہے۔ اور آپ کو آپ کا پروردگار عنقریب وہ کچھ عطا فرمائے گا کہ آپ خوش ہو جائیں گے۔",
   "theme": "hope"
  },
  {
@@ -765,8 +765,8 @@
   "ayahEnd": 6,
   "reference": "Qur'an 94:5-6",
   "arabic": "فَاِنَّ مَعَ الْعُسْرِ يُسْرًا ۙ‏ اِنَّ مَعَ الْعُسْرِ يُسْرًا ؕ‏",
-  "english": "But lo! with hardship goeth ease, Lo! with hardship goeth ease;",
-  "urdu": "ہاں ہاں مشکل کے ساتھ آسانی بھی ہے (اور) بے شک مشکل کے ساتھ آسانی ہے",
+  "english": "Yes, yes, there is also ease along with difficulty. No doubt, there is also ease along with difficulty.",
+  "urdu": "ہاں ہاں مشکل کے ساتھ آسانی بھی ہے۔ بے شک مشکل کے ساتھ آسانی بھی ہے۔",
   "theme": "ease"
  },
  {
@@ -776,8 +776,8 @@
   "ayahEnd": 3,
   "reference": "Qur'an 103:1-3",
   "arabic": "وَالْعَصْرِۙ‏ اِنَّ الْاِنْسَانَ لَفِىْ خُسْرٍۙ‏ اِلَّا الَّذِيْنَ اٰمَنُوْا وَ عَمِلُوا الصّٰلِحٰتِ وَتَوَاصَوْا بِالْحَقِّ   ۙ وَتَوَاصَوْا بِالصَّبْرِ‏",
-  "english": "By the declining day, Lo! man is a state of loss, Save those who believe and do good works, and exhort one another to truth and exhort one another to endurance.",
-  "urdu": "عصر کی قسم کہ انسان نقصان میں ہے مگر وہ لوگ جو ایمان لائے اور نیک عمل کرتے رہے اور آپس میں حق (بات) کی تلقین اور صبر کی تاکید کرتے رہے",
+  "english": "By the time. Indeed man is in loss. Except for those people who believed and kept performing righteous deeds and kept preaching (the words of) Truth among themselves and kept enjoining patience.",
+  "urdu": "زمانے کی قسم۔ یقیناً انسان نقصان میں ہے۔ سوائے ان لوگوں کے جو ایمان لائے اور نیک عمل کرتے رہے اور آپس میں حق (بات) کی تلقین کرتے رہے اور صبر کی تاکید کرتے رہے۔",
   "theme": "time"
  },
  {
@@ -787,8 +787,8 @@
   "ayahEnd": 4,
   "reference": "Qur'an 112:1-4",
   "arabic": "قُلْ هُوَ اللّٰهُ اَحَدٌ​ ۚ‏ اَللّٰهُ الصَّمَدُ​ ۚ‏ لَمْ يَلِدْ   ۙ وَلَمْ يُوْلَدْ ۙ‏ وَلَمْ يَكُنْ لَّهٗ كُفُوًا اَحَدٌ‏",
-  "english": "Say: He is Allah, the One! Allah, the eternally Besought of all! He begetteth not nor was begotten. And there is none comparable unto Him.",
-  "urdu": "کہو کہ وہ (ذات پاک جس کا نام) الله (ہے) ایک ہے معبود برحق جو بےنیاز ہے نہ کسی کا باپ ہے اور نہ کسی کا بیٹا اور کوئی اس کا ہمسر نہیں",
+  "english": "Say, ‘He, Allah is One. Allah is Absolute. Neither is He anyone’s father and nor anyone’s son. And there is none equal to Him.’",
+  "urdu": "کہہ دیجئیے وہ اللہ ایک ہے۔ اللہ بے احتیاج ہے۔ نہ کسی کا باپ ہے اور نہ کسی کا بیٹا۔ اور کوئی اُس کی برابری کرنے والا نہیں۔",
   "theme": "tawhid"
  }
 ]

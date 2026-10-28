@@ -1,27 +1,5 @@
 [
  {
-  "id": "sample-en",
-  "title": "English — Pickthall",
-  "kind": "translation",
-  "language": "en",
-  "author": "Marmaduke Pickthall",
-  "sourceUrl": "https://alquran.cloud/",
-  "rightsStatus": "publicDomain",
-  "isAvailableOffline": true,
-  "reviewState": "publicApproved"
- },
- {
-  "id": "ur-jalandhry",
-  "title": "اردو ترجمہ — فتح محمد جالندھری",
-  "kind": "translation",
-  "language": "ur",
-  "author": "Fateh Muhammad Jalandhry",
-  "sourceUrl": "https://alquran.cloud/",
-  "rightsStatus": "publicDomain",
-  "isAvailableOffline": true,
-  "reviewState": "publicApproved"
- },
- {
   "id": "asrar-at-tanzil-en",
   "title": "Asrar-at-Tanzil (English Tafseer)",
   "kind": "tafsir",

@@ -40,9 +40,9 @@ struct Dua: Codable, Sendable, Identifiable, Equatable {
 }
 
 /// One curated "ayah of the day" candidate. Bundled (daily_ayat.json) so the
-/// Today card works fully offline; text is verbatim from api.alquran.cloud
-/// (Arabic Uthmani + Pickthall English, both public domain) with Urdu where
-/// licensing permits.
+/// Today card works fully offline. Arabic is the Uthmani text; the English and
+/// Urdu are the Silsila's Akram-ut-Tarajum for the same ayat
+/// (Tools/Library/silsila_translations_only.py).
 struct DailyAyah: Codable, Sendable, Identifiable, Equatable {
     /// "surah:ayah" or "surah:start-end".
     var id: String
