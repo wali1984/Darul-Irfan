@@ -101,15 +101,21 @@ struct TodayDailySection: View {
 
     // MARK: - Hadith of the day
 
+    /// A picture published for today takes the card's place; without one,
+    /// the day's hadith from the app's own collections.
     @ViewBuilder
     private var hadithCard: some View {
-        if let hadith = viewModel.hadith {
+        if let picture = viewModel.picture(for: .hadith) {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     DISectionHeaderInline(title: "Hadith of the Day", systemImage: "text.book.closed")
-                    if let picture = viewModel.picture(for: .hadith) {
-                        DailyPicture(item: picture)
-                    }
+                    DailyPicture(item: picture)
+                }
+            }
+        } else if let hadith = viewModel.hadith {
+            DICard {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    DISectionHeaderInline(title: "Hadith of the Day", systemImage: "text.book.closed")
                     if let translation = hadith.translation {
                         translationText(translation, urdu: hadith.translationIsUrdu)
                             .lineLimit(10)
@@ -140,13 +146,6 @@ struct TodayDailySection: View {
                     }
                 }
             }
-        } else if let picture = viewModel.picture(for: .hadith) {
-            DICard {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    DISectionHeaderInline(title: "Hadith of the Day", systemImage: "text.book.closed")
-                    DailyPicture(item: picture)
-                }
-            }
         }
     }
 
@@ -158,14 +157,15 @@ struct TodayDailySection: View {
                 HStack {
                     DIPillBadge(text: String(localized: "Ayah of the Day"))
                     Spacer()
-                    if let share = viewModel.ayahShare() {
+                    if viewModel.picture(for: .ayah) == nil, let share = viewModel.ayahShare() {
                         shareButton(share)
                     }
                 }
+                // A picture published for today takes the verse's place;
+                // without one, the day's ayah from the app's own Quran.
                 if let picture = viewModel.picture(for: .ayah) {
                     DailyPicture(item: picture)
-                }
-                if let ayah = viewModel.ayah {
+                } else if let ayah = viewModel.ayah {
                     let silsila = viewModel.silsilaAyah
                     Text(verbatim: silsila?.arabic ?? ayah.arabic)
                         .font(DIFont.quranArabic(scale: 1.05))
@@ -274,20 +274,22 @@ struct TodayDailySection: View {
                     HStack {
                         DISectionHeaderInline(title: "Aqwal-e-Sheikh", systemImage: "quote.opening")
                         Spacer()
-                        if let share = viewModel.aqwalShare() {
+                        if viewModel.picture(for: .aqwal) == nil, let share = viewModel.aqwalShare() {
                             shareButton(share)
                         }
                     }
+                    // A picture published for today takes the saying's place.
                     if let picture = viewModel.picture(for: .aqwal) {
                         DailyPicture(item: picture)
+                    } else {
+                        Text(aqwal.text)
+                            .font(.system(.body, design: .serif))
+                            .foregroundStyle(DIColor.textPrimary)
+                            .italic()
+                        Text(aqwal.attribution)
+                            .font(.caption)
+                            .foregroundStyle(DIColor.textMuted)
                     }
-                    Text(aqwal.text)
-                        .font(.system(.body, design: .serif))
-                        .foregroundStyle(DIColor.textPrimary)
-                        .italic()
-                    Text(aqwal.attribution)
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
                 }
             }
         }

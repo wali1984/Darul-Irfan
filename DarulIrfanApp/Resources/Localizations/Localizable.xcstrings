@@ -23851,6 +23851,23 @@
           }
         }
       }
+    },
+    "On that day it takes its card's place on the Today page, in each reader's own time zone. Without a picture, the card shows the app's own ayah, hadith or saying for the day.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On that day it takes its card's place on the Today page, in each reader's own time zone. Without a picture, the card shows the app's own ayah, hadith or saying for the day."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس دن یہ آج کے صفحے پر اپنے کارڈ کی جگہ لیتی ہے، ہر قاری کے اپنے وقت کے مطابق۔ تصویر نہ ہو تو کارڈ اس دن کی ایپ کی اپنی آیت، حدیث یا قول دکھاتا ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -140,7 +140,7 @@ struct DailyMediaEditor: View {
             } footer: {
                 Text(slot == .quote
                      ? "The day's quote opens over the Today page once, the first time it is opened that day."
-                     : "It shows on its card on the Today page on that day, in each reader's own time zone.")
+                     : "On that day it takes its card's place on the Today page, in each reader's own time zone. Without a picture, the card shows the app's own ayah, hadith or saying for the day.")
             }
             if let error {
                 Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
