@@ -210,9 +210,9 @@ struct ContentReadingProgress: Codable, Sendable, Equatable {
 /// the reader can render lazily and no record approaches the size that crashed
 /// the Quran reader in v1.6.9.
 ///
-/// `reviewState` is `machineProvisional` for every bundled page: the text has
-/// been through OCR arbitration and a visual cross-check but no human
-/// proofreading. `unresolvedBlocks` carries how many of the page's blocks the
+/// `reviewState` is `claudeTranscribed` for pages re-read from the scan by
+/// Claude, and `machineProvisional` for the original OCR (arbitration and a
+/// visual cross-check, no human proofreading). `unresolvedBlocks` carries how many of the page's blocks the
 /// validator could not settle, so the reader can mark a page rather than
 /// present unverified text as if it were checked. Arabic quotations inside the
 /// prose are the book's own and are NOT canonical scripture — they must never
@@ -236,4 +236,8 @@ struct BookPage: Codable, Sendable, Identifiable, Equatable {
 
     /// True when the validator could not settle any block on this page.
     var isFullyResolved: Bool { unresolvedBlocks == 0 }
+
+    /// Still the original OCR text. Pages re-read from the scan by Claude
+    /// (`claudeTranscribed`) are shown without the proofreading notice.
+    var isMachineProvisional: Bool { reviewState == "machineProvisional" }
 }

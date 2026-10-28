@@ -759,7 +759,9 @@ def check_library(seed: Path, report: Report) -> None:
         if not isinstance(page, int) or page < 1:
             bad_page_numbers.append(f"{book_id}:{page}")
         text = row.get("text") or ""
-        if not text.strip():
+        # A cover or blank page re-read by Claude is deliberately empty (the
+        # readers skip it); empty original OCR text is still a defect.
+        if not text.strip() and row.get("reviewState") != "claudeTranscribed":
             empty.append(f"{book_id}:{page}")
         size = len(text.encode("utf-8"))
         if size > MAX_TEXT_BLOCK_BYTES:
@@ -779,7 +781,8 @@ def check_library(seed: Path, report: Report) -> None:
                  f"{len(bad_page_numbers)} book pages with invalid page numbers: "
                  f"{bad_page_numbers[:5]}")
     report.check(not empty, f"{len(empty)} book pages with empty text: {empty[:5]}")
-    report.check(set(states) <= {"machineProvisional", "humanVerified"},
+    # claudeTranscribed: re-read from the scan by Claude (Tools/Library/ingest_claude_pages.py).
+    report.check(set(states) <= {"machineProvisional", "claudeTranscribed", "humanVerified"},
                  f"unknown book page reviewState values: {sorted(set(states))}")
 
     report.facts["bookPages"] = {

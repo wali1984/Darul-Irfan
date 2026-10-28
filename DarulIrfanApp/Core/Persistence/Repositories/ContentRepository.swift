@@ -290,6 +290,14 @@ struct ContentRepository: ContentRepositoryProtocol {
         return rows.first?.int("n") ?? 0
     }
 
+    func bookHasMachineProvisionalPages(bookID: String) async throws -> Bool {
+        let rows = try await database.connection.query(
+            "SELECT COUNT(*) AS n FROM book_pages WHERE book_id = ? AND review_state = 'machineProvisional'",
+            [.text(bookID)]
+        )
+        return (rows.first?.int("n") ?? 0) > 0
+    }
+
     /// Upsert on `(book_id, page)`. The generator verifies that pair is unique
     /// before writing the seed, so a re-import updates in place rather than
     /// dropping pages on a key collision.

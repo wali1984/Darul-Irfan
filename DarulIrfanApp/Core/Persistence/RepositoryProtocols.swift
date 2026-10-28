@@ -101,6 +101,9 @@ protocol ContentRepositoryProtocol: Sendable {
     /// How many OCR'd pages a book has, without loading their text.
     func bookPageCount(bookID: String) async throws -> Int
 
+    /// True while any of a book's pages is still original OCR text.
+    func bookHasMachineProvisionalPages(bookID: String) async throws -> Bool
+
     func upsertBookPages(_ pages: [BookPage]) async throws
     func categoryCounts() async throws -> [ContentCategory: Int]
 }

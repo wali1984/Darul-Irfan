@@ -24021,6 +24021,40 @@
           }
         }
       }
+    },
+    "%lld pages — searchable text": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld pages — searchable text"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld صفحات — قابلِ تلاش متن"
+          }
+        }
+      }
+    },
+    "Read the text, %lld pages": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read the text, %lld pages"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متن پڑھیں، %lld صفحات"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

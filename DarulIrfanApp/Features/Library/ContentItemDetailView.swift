@@ -203,9 +203,15 @@ struct ContentItemDetailView: View {
                     Text("Read the text")
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
-                    Text("\(viewModel.bookPageCount) pages — searchable, machine-read, not yet proofread")
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
+                    Group {
+                        if viewModel.bookTextIsMachineRead {
+                            Text("\(viewModel.bookPageCount) pages — searchable, machine-read, not yet proofread")
+                        } else {
+                            Text("\(viewModel.bookPageCount) pages — searchable text")
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
@@ -224,7 +230,9 @@ struct ContentItemDetailView: View {
         .buttonStyle(DIPressableStyle())
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages, machine-read and not yet proofread"))
+        .accessibilityLabel(viewModel.bookTextIsMachineRead
+            ? Text("Read the text, \(viewModel.bookPageCount) pages, machine-read and not yet proofread")
+            : Text("Read the text, \(viewModel.bookPageCount) pages"))
     }
 
     // MARK: - Gradient header

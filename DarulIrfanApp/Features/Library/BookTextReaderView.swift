@@ -30,7 +30,12 @@ struct BookTextReaderView: View {
     @State private var hasScrolledToStart = false
 
     private var unresolvedPageCount: Int {
-        pages.filter { !$0.isFullyResolved }.count
+        pages.filter { $0.isMachineProvisional && !$0.isFullyResolved }.count
+    }
+
+    /// The proofreading notice only applies while original OCR text remains.
+    private var hasMachineProvisionalPages: Bool {
+        pages.contains { $0.isMachineProvisional }
     }
 
     var body: some View {
@@ -49,7 +54,9 @@ struct BookTextReaderView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: DISpacing.lg) {
-                            provenanceNote
+                            if hasMachineProvisionalPages {
+                                provenanceNote
+                            }
                             ForEach(pages) { page in
                                 pageView(page)
                             }
@@ -98,7 +105,7 @@ struct BookTextReaderView: View {
                 Text("Page \(page.page)")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIColor.textMuted)
-                if !page.isFullyResolved {
+                if page.isMachineProvisional && !page.isFullyResolved {
                     Label {
                         Text("unchecked passages")
                             .font(.caption2)
@@ -167,7 +174,8 @@ struct BookTextReaderView: View {
                 ScriptDirection.isRightToLeft($0.text, fallbackLanguage: language)
             })
         }.value
-        pages = loaded
+        // A cover or blank page re-read from the scan carries no text.
+        pages = loaded.filter { !$0.text.isEmpty }
         isLoading = false
     }
 }
