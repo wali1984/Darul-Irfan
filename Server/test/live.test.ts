@@ -57,17 +57,13 @@ describe("live zikr pipeline", () => {
     expect(sent.filter(s => s.url.includes("graph.facebook.com"))).toEqual([]);
   });
 
-  it("offers the room itself to join while it is open and nothing streams yet", async () => {
+  it("is live while the room is open, but never sends members to the Paltalk app", async () => {
     const { raw, heartbeat, live } = setup();
-    raw.prepare("UPDATE live_broadcasts SET paltalk_url='https://www.paltalk.com' WHERE id='official-live'").run();
-    await heartbeat({ listener: "listener-a", inRoom: true, streaming: false });
-    let on = await live();
-    expect(on.state).toBe("live");
-    // The bare site joins nothing, so it is not offered.
-    expect(on.sources).toEqual([]);
     raw.prepare("UPDATE live_broadcasts SET paltalk_url='https://www.paltalk.com/room/zikr' WHERE id='official-live'").run();
-    on = await live();
-    expect(on.sources).toEqual([expect.objectContaining({ kind: "paltalk", url: "https://www.paltalk.com/room/zikr" })]);
+    await heartbeat({ listener: "listener-a", inRoom: true, streaming: false });
+    const on = await live();
+    expect(on.state).toBe("live");
+    expect(on.sources).toEqual([]);
     await heartbeat({ listener: "listener-a", inRoom: false, streaming: false });
     expect((await live()).state).toBe("ended");
   });
