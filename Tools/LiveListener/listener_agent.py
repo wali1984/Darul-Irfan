@@ -58,6 +58,8 @@ FRAME = HERE / "daily_zikr_frame.png"
 RATE, CHANNELS, CHUNK = 48_000, 2, 1_024
 PALTALK = Path(os.environ.get("LOCALAPPDATA", "")) / "Paltalk" / "Paltalk.exe"
 SEARCH_EVERY = 30
+# Cloudflare refuses Python's default "Python-urllib" signature (error 1010).
+USER_AGENT = "DarulIrfanListener/1.0"
 
 
 def log(message: str) -> None:
@@ -501,7 +503,7 @@ class ChatCues:
     def _request(self, path: str, body: dict | None = None) -> dict:
         request = urllib.request.Request(f"{self.base}{path}", data=json.dumps(body).encode() if body is not None else None,
                                          method="POST" if body is not None else "GET",
-                                         headers={"content-type": "application/json", "authorization": f"Bearer {self.token}"})
+                                         headers={"content-type": "application/json", "authorization": f"Bearer {self.token}", "user-agent": USER_AGENT})
         with urllib.request.urlopen(request, timeout=10) as response:
             return json.loads(response.read() or b"{}")
 
@@ -571,7 +573,7 @@ def heartbeat(endpoint: str | None, token: str | None, state: dict) -> None:
         return
     body = json.dumps({**state, "at": datetime.now(timezone.utc).isoformat()}).encode()
     request = urllib.request.Request(endpoint, data=body, method="POST",
-                                     headers={"content-type": "application/json", "authorization": f"Bearer {token}"})
+                                     headers={"content-type": "application/json", "authorization": f"Bearer {token}", "user-agent": USER_AGENT})
     try:
         urllib.request.urlopen(request, timeout=10).close()
     except Exception:  # noqa: BLE001 - a missed heartbeat is itself the signal
