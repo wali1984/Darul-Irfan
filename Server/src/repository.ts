@@ -1,5 +1,6 @@
 import type { AppBootstrap, Env, LiveBroadcast, LiveCue, OfficialFeedItem, RemoteZikrSchedule } from "./contracts";
 import { currentCue, RELAY_PLAYLIST } from "./liveRelay";
+import { paltalkRoomStatus } from "./paltalkRoom";
 import { parseJSON, validHTTPURL } from "./util";
 import { schemaVersion } from "./contracts";
 import { integrationStatus } from "./community";
@@ -33,7 +34,14 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
     sources, updatedAt: String(row.updated_at),
     automaticBroadcast: integrationStatus(env).liveBroadcast,
     cue: await sessionCue(env, row),
+    room: await openRoom(env),
   };
+}
+
+/** The Paltalk room while Paltalk's directory lists it as open. */
+async function openRoom(env: Env): Promise<LiveBroadcast["room"]> {
+  const status = await paltalkRoomStatus(env);
+  return status?.online ? { platform: "paltalk", listeners: status.listeners, since: status.since } : undefined;
 }
 
 /** The host's last cue, while the session it was given in is still live. */

@@ -67,6 +67,7 @@ DOUBLE_HINT = re.compile(r"\b(pauseSeconds|rate|playbackRate|percent|fraction|pr
 # the key Swift really generates is recorded here.
 KNOWN_KEYS = {
     "%@ minutes before": "%lld minutes before",
+    "Live on Paltalk now · %@ listening": "Live on Paltalk now · %lld listening",
     "%@%": "%lld%",
     "%@. %@": "%lld. %@",
     "%lf% played": "%lld% played",

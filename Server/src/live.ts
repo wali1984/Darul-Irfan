@@ -2,17 +2,13 @@ import type { Env } from "./contracts";
 import { sendPushToInstallations, sendTopicPush } from "./apns";
 import { cleanText, json } from "./util";
 import { RELAY_PLAYLIST } from "./liveRelay";
+import { paltalkRoomStatus } from "./paltalkRoom";
 
 // The live zikr pipeline (Docs/LIVE_ZIKR_PIPELINE.md): cloud listeners join
 // the Paltalk room and stream it to Cloudflare Stream, which simulcasts to
 // YouTube and Facebook. This module keeps the app's broadcast in step with
-// them and tells admins the moment any part stops.
+// them and with the Paltalk room's state in Paltalk's own directory.
 
-/** A listener that has not reported for this long is down. */
-const LISTENER_STALE_MS = 3 * 60_000;
-/** A listener problem (in the room but not streaming, Paltalk closed) is
- *  reported once it has lasted this long, so a passing hiccup is not. */
-const PROBLEM_GRACE_MS = 2 * 60_000;
 /** A streaming report is trusted for this long. */
 const STREAMING_FRESH_MS = 90_000;
 
@@ -96,14 +92,14 @@ export async function reconcileLive(env: Env, now = new Date()): Promise<void> {
     .filter(row => row.streaming === 1 && row.input_id && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS)
     .map(row => String(row.input_id)));
   const liveInput = streamInputs(env).find(id => streamingInputs.has(id) && reported.get(id) !== false);
-  // A fresh listener in the room means the room is open, stream or not.
-  const roomOpen = listeners.some(row => row.in_room === 1 && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS);
+  // Paltalk's own directory says the room is open; a listener in it also counts.
+  const roomOpen = (await paltalkRoomStatus(env))?.online === true
+    || listeners.some(row => row.in_room === 1 && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS);
   // Stream inputs (paid) win when configured; the free R2 relay otherwise.
   const hubURL = liveInput ? playbackURL(env, liveInput)
     : streamingInputs.has("r2") ? `${env.PUBLIC_BASE_URL.replace(/\/$/, "")}${RELAY_PLAYLIST}` : null;
   await settleBroadcast(env, hubURL, roomOpen, now);
-
-  for (const listener of listeners) await checkListener(env, listener, now);
+  // No alerts about listeners: the owner retired them (2026-10-28).
 }
 
 /** The room carries Daily Zikr in the evening and the Tahajjud zikr before
@@ -145,23 +141,6 @@ async function settleBroadcast(env: Env, hubURL: string | null, roomOpen: boolea
       state=CASE WHEN youtube_live=1 THEN state ELSE 'ended' END,
       ended_at=CASE WHEN youtube_live=1 THEN ended_at ELSE ? END,updated_at=? WHERE id='official-live'`)
       .bind(at, at).run();
-  }
-}
-
-async function checkListener(env: Env, listener: ListenerRow, now: Date): Promise<void> {
-  const silentFor = now.getTime() - Date.parse(listener.last_seen_at);
-  let trouble: string | null = null;
-  if (silentFor > LISTENER_STALE_MS) {
-    trouble = `Live listener ${listener.id} has stopped reporting (last heard ${Math.round(silentFor / 60_000)} min ago).`;
-  } else if (listener.problem && listener.problem_since && now.getTime() - Date.parse(listener.problem_since) > PROBLEM_GRACE_MS) {
-    trouble = `Live listener ${listener.id}: ${listener.problem}`;
-  }
-  if (trouble && !listener.alerted_at) {
-    await env.DB.prepare("UPDATE live_listeners SET alerted_at=? WHERE id=?").bind(now.toISOString(), listener.id).run();
-    await alertAdmins(env, `listener-down:${listener.id}:${now.toISOString().slice(0, 16)}`, trouble);
-  } else if (!trouble && listener.alerted_at) {
-    await env.DB.prepare("UPDATE live_listeners SET alerted_at=NULL WHERE id=?").bind(listener.id).run();
-    await alertAdmins(env, `listener-up:${listener.id}:${now.toISOString().slice(0, 16)}`, `Live listener ${listener.id} is working again.`);
   }
 }
 

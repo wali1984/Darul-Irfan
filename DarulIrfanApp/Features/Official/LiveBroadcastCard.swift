@@ -39,6 +39,11 @@ struct LiveBroadcastCard: View {
             if isLive, let cue = current.cue {
                 cueBanner(cue)
             }
+            if let room = current.room {
+                Label("Live on Paltalk now · \(room.listeners) listening", systemImage: "person.3.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(fg)
+            }
 
             if let details = current.details, !details.isEmpty {
                 Text(details).font(.subheadline).foregroundStyle(fgMuted)
@@ -51,7 +56,7 @@ struct LiveBroadcastCard: View {
 
             ForEach(displaySources) { source in
                 Button { activate(source) } label: {
-                    Label(source.kind == .youtube ? "Join Daily Zikr with Sheikh ul Mukarram - YouTube" : "Join Daily Zikr with Sheikh ul Mukarram",
+                    Label("Join Daily Zikr with Sheikh ul Mukarram",
                           systemImage: source.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.onPrimary)
@@ -177,8 +182,10 @@ struct LiveBroadcastCard: View {
     /// still list is never offered: zikr is joined inside Darul Irfan, not in
     /// another app.
     private var displaySources: [LiveSource] {
-        guard isLive || current.state == .scheduled else { return [] }
-        return current.sources.filter { $0.kind == .ownedStream || ($0.kind == .youtube && $0.videoID != nil) }
+        // One Join button: the room's own sound when it is relayed, the
+        // channel's live video otherwise - both played here, in the app.
+        guard isLive || current.state == .scheduled, let source = current.preferredSource else { return [] }
+        return [source]
     }
 
     private var statusText: String {

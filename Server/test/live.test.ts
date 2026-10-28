@@ -96,28 +96,10 @@ describe("live zikr pipeline", () => {
     expect((await live()).state).toBe("live");
   });
 
-  it("alerts admins once when a listener goes silent, and again when it is back", async () => {
-    const { env, heartbeat, sent } = setup();
-    await heartbeat({ listener: "listener-a", inRoom: false, streaming: false });
-    const later = new Date(Date.now() + 4 * 60_000);
-    await reconcileLive(env, later);
-    await reconcileLive(env, new Date(later.getTime() + 60_000));
-    const alerts = () => sent.filter(s => s.url === "https://graph.facebook.com/v25.0/123456/messages");
-    expect(alerts()).toHaveLength(1);
-    expect(JSON.parse(alerts()[0]!.body)).toMatchObject({ to: "19292405561", type: "text" });
-    expect(alerts()[0]!.body).toContain("listener-a has stopped reporting");
-    await heartbeat({ listener: "listener-a", inRoom: false, streaming: false });
-    expect(alerts()).toHaveLength(2);
-    expect(alerts()[1]!.body).toContain("working again");
-  });
-
-  it("reports a lasting listener problem, not a passing one", async () => {
+  it("sends no alerts about listeners, silent or troubled (retired 2026-10-28)", async () => {
     const { env, heartbeat, sent } = setup();
     await heartbeat({ listener: "listener-a", inRoom: true, streaming: false, problem: "In the room but not streaming" });
-    const alerts = () => sent.filter(s => s.url.includes("/messages"));
-    expect(alerts()).toHaveLength(0);
-    await reconcileLive(env, new Date(Date.now() + 2.5 * 60_000));
-    expect(alerts()).toHaveLength(1);
-    expect(alerts()[0]!.body).toContain("In the room but not streaming");
+    await reconcileLive(env, new Date(Date.now() + 10 * 60_000));
+    expect(sent.filter(s => s.url.includes("/messages"))).toEqual([]);
   });
 });

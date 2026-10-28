@@ -1,4 +1,5 @@
 import type { DeviceRegistration, Env } from "./contracts";
+import { refreshPaltalkRoom } from "./paltalkRoom";
 import { liveAudioFile, liveCue, listenerConfig } from "./liveRelay";
 import { adminRequest } from "./admin";
 import { bootstrap, feed, liveBroadcast } from "./repository";
@@ -243,15 +244,22 @@ export default {
     // access to the official Page, the Graph API cannot read its posts. The
     // app deep-links to Facebook instead. Re-add refreshFacebook here once a
     // Page access token is available.
+    // Every minute: whether the Paltalk room is open and the channel is live,
+    // so the app and the notifications follow within a minute.
     const jobs: Array<{ name: string; run: Promise<void> }> = [
-      { name: "youtube", run: refreshYouTube(env) },
-      // Catches a listener that has gone silent, which no heartbeat reports.
-      { name: "live-listeners", run: reconcileLive(env) },
+      { name: "live", run: Promise.allSettled([refreshPaltalkRoom(env), refreshYouTube(env)])
+          .then(async results => {
+            await reconcileLive(env);
+            const failed = results.find(result => result.status === "rejected");
+            if (failed && failed.status === "rejected") throw failed.reason;
+          }) },
+    ];
+    if (minute % 5 === 0) jobs.push(
       // Starts a group's zikr that plays a recording by itself at its time.
       { name: "group-autoplay", run: autoplayDue(env) },
       // Copies finished room recordings into our storage and the group's recordings.
       { name: "room-recordings", run: collectRoomRecordings(env) },
-    ];
+    );
     if (minute % 15 === 0) jobs.push(
       { name: "website", run: refreshWebsiteCatalog(env) }
     );

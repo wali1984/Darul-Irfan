@@ -39,6 +39,16 @@ export interface LiveBroadcast {
   automaticBroadcast?: boolean;
   /** The host's last cue in the room this session ("L-3", "M-Nabvee"). */
   cue?: LiveCue;
+  /** The Paltalk room while it is open: how many are in it, since when. */
+  room?: { platform: "paltalk"; listeners: number; since?: string };
+}
+
+/** The Silsila's Paltalk room, as Paltalk's public directory lists it. */
+export interface PaltalkRoomStatus {
+  online: boolean;
+  listeners: number;
+  since?: string;
+  checkedAt: string;
 }
 
 export interface LiveCue {
@@ -121,6 +131,9 @@ export interface Env {
   REALTIME_PRESET_MEMBER?: string;
   /** Live zikr pipeline: the listeners' shared bearer token. */
   LISTENER_TOKEN?: string;
+  /** The Paltalk room watched in Paltalk's directory, and its group number. */
+  PALTALK_ROOM?: string;
+  PALTALK_GROUP_ID?: string;
   /** Paltalk usernames whose room chat messages are cues (comma list). */
   LIVE_CUE_HOSTS?: string;
   /** Cloudflare Stream live input ids, in failover order ("A,B"). */

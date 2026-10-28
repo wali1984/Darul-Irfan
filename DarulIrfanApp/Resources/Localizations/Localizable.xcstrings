@@ -24446,6 +24446,23 @@
           }
         }
       }
+    },
+    "Live on Paltalk now · %lld listening": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live on Paltalk now · %lld listening"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی پال ٹاک پر براہِ راست · %lld سن رہے ہیں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

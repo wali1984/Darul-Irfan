@@ -93,6 +93,8 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
     /// The host's last cue in the room this session ("1st Latifa", "Ahdiat"),
     /// exactly as written there.
     var cue: LiveCue? = nil
+    /// The Silsila's Paltalk room while it is open, from Paltalk's directory.
+    var room: LiveRoom? = nil
 
     /// Only sources the app plays itself. An external chat room (the
     /// `.paltalk` kind the server may still send) is never offered: zikr is
@@ -109,6 +111,13 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
         sources: [],
         updatedAt: .distantPast
     )
+}
+
+/// The zikr room on Paltalk while it is open: how many are in it, since when.
+struct LiveRoom: Codable, Sendable, Equatable {
+    var platform: String
+    var listeners: Int
+    var since: Date?
 }
 
 /// A latifa or muraqaba change the room's host announced.
