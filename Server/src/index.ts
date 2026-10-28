@@ -1,4 +1,5 @@
 import type { DeviceRegistration, Env } from "./contracts";
+import { liveAudioFile, liveCue, listenerConfig } from "./liveRelay";
 import { adminRequest } from "./admin";
 import { bootstrap, feed, liveBroadcast } from "./repository";
 import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
@@ -63,6 +64,12 @@ async function route(request: Request, env: Env): Promise<Response> {
   // arrive every few seconds while a session runs.
   if (request.method === "POST" && path === "/v1/live/listener") return listenerHeartbeat(request, env);
   if (request.method === "POST" && path === "/v1/live/stream-events") return streamEvent(request, env);
+  if (request.method === "GET" && path === "/v1/live/listener/config") return listenerConfig(request, env);
+  if (request.method === "POST" && path === "/v1/live/cue") return liveCue(request, env);
+  // The free relay of the room's sound: public, like the stream it replaces.
+  if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/live/audio/")) {
+    return liveAudioFile(request, env, path.slice("/v1/live/audio/".length));
+  }
   // The in-app meeting screen. It holds no secret: the participant token
   // travels in the URL fragment, which browsers never send.
   if (request.method === "GET" && path === "/v1/meet") return meetingPage();
@@ -221,7 +228,7 @@ export default {
       const response = await route(request, env);
       // Public, read-only feeds are intentionally available to web companions.
       // Administrative and device routes never receive browser CORS permission.
-      if (request.method === "GET" && (["/v1/live", "/v1/bootstrap", "/v1/feed", "/v1/audio/quran/manifest"].includes(new URL(request.url).pathname) || new URL(request.url).pathname.startsWith("/v1/audio/quran/"))) response.headers.set("access-control-allow-origin", "*");
+      if (request.method === "GET" && (["/v1/live", "/v1/bootstrap", "/v1/feed", "/v1/audio/quran/manifest"].includes(new URL(request.url).pathname) || new URL(request.url).pathname.startsWith("/v1/audio/quran/") || new URL(request.url).pathname.startsWith("/v1/live/audio/"))) response.headers.set("access-control-allow-origin", "*");
       return response;
     }
     catch (error) {

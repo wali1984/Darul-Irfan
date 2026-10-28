@@ -1,6 +1,7 @@
 import type { Env } from "./contracts";
 import { sendPushToInstallations, sendTopicPush } from "./apns";
 import { cleanText, json } from "./util";
+import { RELAY_PLAYLIST } from "./liveRelay";
 
 // The live zikr pipeline (Docs/LIVE_ZIKR_PIPELINE.md): cloud listeners join
 // the Paltalk room and stream it to Cloudflare Stream, which simulcasts to
@@ -47,7 +48,8 @@ export async function listenerHeartbeat(request: Request, env: Env): Promise<Res
   const input = await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>));
   const id = cleanText(input.listener, 40);
   if (!id || !/^[a-z0-9-]+$/.test(id)) return json({ error: "listener is required" }, { status: 400 });
-  const inputID = typeof input.input === "string" && /^[a-f0-9]{32}$/.test(input.input) ? input.input : null;
+  // "r2": the listener relays through R2 (liveRelay.ts) instead of a Stream input.
+  const inputID = typeof input.input === "string" && /^([a-f0-9]{32}|r2)$/.test(input.input) ? input.input : null;
   const problem = cleanText(input.problem, 200) ?? null;
   const now = new Date().toISOString();
   const prior = await env.DB.prepare("SELECT * FROM live_listeners WHERE id=?").bind(id).first<ListenerRow>();
@@ -96,7 +98,10 @@ export async function reconcileLive(env: Env, now = new Date()): Promise<void> {
   const liveInput = streamInputs(env).find(id => streamingInputs.has(id) && reported.get(id) !== false);
   // A fresh listener in the room means the room is open, stream or not.
   const roomOpen = listeners.some(row => row.in_room === 1 && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS);
-  await settleBroadcast(env, liveInput ? playbackURL(env, liveInput) : null, roomOpen, now);
+  // Stream inputs (paid) win when configured; the free R2 relay otherwise.
+  const hubURL = liveInput ? playbackURL(env, liveInput)
+    : streamingInputs.has("r2") ? `${env.PUBLIC_BASE_URL.replace(/\/$/, "")}${RELAY_PLAYLIST}` : null;
+  await settleBroadcast(env, hubURL, roomOpen, now);
 
   for (const listener of listeners) await checkListener(env, listener, now);
 }

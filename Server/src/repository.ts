@@ -1,4 +1,5 @@
-import type { AppBootstrap, Env, LiveBroadcast, OfficialFeedItem, RemoteZikrSchedule } from "./contracts";
+import type { AppBootstrap, Env, LiveBroadcast, LiveCue, OfficialFeedItem, RemoteZikrSchedule } from "./contracts";
+import { currentCue, RELAY_PLAYLIST } from "./liveRelay";
 import { parseJSON, validHTTPURL } from "./util";
 import { schemaVersion } from "./contracts";
 import { integrationStatus } from "./community";
@@ -11,9 +12,10 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
     return { id: "official-live", state: "offline", title: "Daily Zikr", sources: [], updatedAt: new Date().toISOString() };
   }
   const sources: LiveBroadcast["sources"] = [];
-  // The hub is offered only while the channel's own live video is not on:
-  // the video is free to watch, the hub is paid per minute delivered.
-  const hub = row.youtube_live === 1 ? undefined : validHTTPURL(row.hub_stream_url);
+  // The room's own sound comes first. The free R2 relay is offered beside the
+  // channel's live video; a paid Stream input only while the video is off.
+  const hubLink = validHTTPURL(row.hub_stream_url);
+  const hub = hubLink && (hubLink.endsWith(RELAY_PLAYLIST) || row.youtube_live !== 1) ? hubLink : undefined;
   if (hub) sources.push({ kind: "ownedStream", url: hub, supportsBackgroundAudio: true });
   const owned = validHTTPURL(row.owned_stream_url);
   const videoID = typeof row.youtube_video_id === "string" ? row.youtube_video_id : undefined;
@@ -30,7 +32,19 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
     endedAt: typeof row.ended_at === "string" ? row.ended_at : undefined,
     sources, updatedAt: String(row.updated_at),
     automaticBroadcast: integrationStatus(env).liveBroadcast,
+    cue: await sessionCue(env, row),
   };
+}
+
+/** The host's last cue, while the session it was given in is still live. */
+async function sessionCue(env: Env, row: Row): Promise<LiveCue | undefined> {
+  if (row.state !== "live") return undefined;
+  const cue = await currentCue(env);
+  const started = typeof row.started_at === "string" ? Date.parse(row.started_at) : NaN;
+  if (!cue) return undefined;
+  // A session without a start time still drops a cue older than three hours.
+  const since = Number.isFinite(started) ? started : Date.now() - 3 * 3_600_000;
+  return Date.parse(cue.at) >= since ? cue : undefined;
 }
 
 export async function schedules(env: Env): Promise<RemoteZikrSchedule[]> {

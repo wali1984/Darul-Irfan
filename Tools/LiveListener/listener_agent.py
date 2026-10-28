@@ -18,9 +18,20 @@ Joining: Paltalk's room search finds a room only while it is open, so the
 agent repeats the search every 30 seconds and opens the room's tile the moment
 it appears. A listener account never talks; it only listens.
 
+  5. Sends the room's cues: a chat message from a host (an admin, moderator or
+     speaker, listed on the server) - "L-3", "M-Nabvee" - goes to the server
+     exactly as written, which alerts the app with sound. Nobody else's chat
+     leaves this machine.
+
+Outputs: srt:// or rtmps:// (Cloudflare Stream, YouTube, Facebook), or "r2":
+the free relay - HLS audio pieces uploaded to the R2 bucket, which the apps
+play from the server. With no output the agent only sends cues.
+
 Usage:
   listener_agent.py --once-test 20           # 20 s test to a local file
   listener_agent.py --output srt://... [--backup rtmps://...]
+  listener_agent.py --output r2              # free relay through R2
+  listener_agent.py                          # cues only
 """
 
 from __future__ import annotations
@@ -223,15 +234,17 @@ def toggle_room_speaker() -> bool:
 # MARK: - Audio
 
 class LoopbackAudio:
-    """Feeds the default speaker's loopback into a queue of PCM chunks."""
+    """Feeds an output device's loopback into a queue of PCM chunks: the
+    default speaker, or - on a PC used for anything else - only the device
+    Paltalk alone plays to (LOOPBACK_DEVICE), so no other sound is relayed."""
 
-    def __init__(self) -> None:
+    def __init__(self, device_name: str | None = None) -> None:
         self.audio = pyaudio.PyAudio()
         wasapi = self.audio.get_host_api_info_by_type(pyaudio.paWASAPI)
-        default = self.audio.get_device_info_by_index(wasapi["defaultOutputDevice"])
-        device = next((d for d in self.audio.get_loopback_device_info_generator() if default["name"] in d["name"]), None)
+        wanted = device_name or self.audio.get_device_info_by_index(wasapi["defaultOutputDevice"])["name"]
+        device = next((d for d in self.audio.get_loopback_device_info_generator() if wanted.lower() in d["name"].lower()), None)
         if device is None:
-            raise RuntimeError("No loopback device for the default output")
+            raise RuntimeError(f"No loopback device for {wanted!r}")
         self.rate = int(device["defaultSampleRate"])
         self.channels = int(device["maxInputChannels"])
         self.chunks: queue.Queue[bytes] = queue.Queue(maxsize=400)
@@ -309,9 +322,24 @@ def ensure_frame() -> None:
     ], check=True)
 
 
+RELAY_DIR = HERE / "relay"
+
+
 def encoder_command(audio: LoopbackAudio, output: str) -> list[str]:
     """Still frame + live audio, as a stream YouTube and Facebook accept:
-    H.264 keyframes every 2 s, AAC 128 kb/s, constant frame rate."""
+    H.264 keyframes every 2 s, AAC 128 kb/s, constant frame rate. For the R2
+    relay: audio only, 4-second HLS pieces numbered by the clock, so a
+    restarted encoder never reuses a name the apps have already played."""
+    if output == "r2":
+        RELAY_DIR.mkdir(exist_ok=True)
+        return [
+            FFMPEG, "-hide_banner", "-loglevel", "warning", "-nostats", "-y",
+            "-f", "s16le", "-ar", str(audio.rate), "-ch_layout", "stereo" if audio.channels == 2 else "mono", "-i", "pipe:0",
+            "-c:a", "aac", "-b:a", "64k", "-ar", "44100", "-ac", "2",
+            "-f", "hls", "-hls_time", "4", "-hls_list_size", "8", "-hls_segment_type", "mpegts",
+            "-hls_flags", "delete_segments+omit_endlist", "-hls_start_number_source", "epoch",
+            "-hls_segment_filename", str(RELAY_DIR / "seg-%d.ts"), str(RELAY_DIR / "index.m3u8"),
+        ]
     command = [
         FFMPEG, "-hide_banner", "-loglevel", "warning", "-nostats", "-y",
         "-re", "-loop", "1", "-framerate", "15", "-i", str(FRAME),
@@ -400,6 +428,129 @@ def redact(url: str) -> str:
     return url.split("?")[0].rsplit("/", 1)[0] + "/…" if "/" in url else url
 
 
+# MARK: - R2 relay
+
+class R2Relay:
+    """Uploads the encoder's HLS pieces, then the playlist that names them, to
+    R2 under live/official/; removes pieces from R2 once the playlist has
+    moved on. R2 charges nothing for what the apps read."""
+
+    def __init__(self, settings: dict[str, str]) -> None:
+        import boto3
+        self.s3 = boto3.client("s3", endpoint_url=f"https://{settings['R2_ACCOUNT_ID']}.r2.cloudflarestorage.com",
+                               aws_access_key_id=settings["R2_ACCESS_KEY_ID"],
+                               aws_secret_access_key=settings["R2_SECRET_ACCESS_KEY"], region_name="auto")
+        self.bucket = settings.get("R2_BUCKET", "darul-irfan-media")
+        self.sent: dict[str, float] = {}
+        self.playlist_mtime = 0.0
+        self.running = True
+        self.ok_at = 0.0
+        threading.Thread(target=self._run, daemon=True).start()
+
+    def _put(self, path: Path, content_type: str, cache: str) -> None:
+        self.s3.put_object(Bucket=self.bucket, Key=f"live/official/{path.name}", Body=path.read_bytes(),
+                           ContentType=content_type, CacheControl=cache)
+
+    def _run(self) -> None:
+        while self.running:
+            try:
+                playlist = RELAY_DIR / "index.m3u8"
+                if playlist.exists() and playlist.stat().st_mtime != self.playlist_mtime:
+                    mtime = playlist.stat().st_mtime
+                    listed = [line.strip() for line in playlist.read_text().splitlines() if line.strip().endswith(".ts")]
+                    for name in listed:
+                        if name not in self.sent and (RELAY_DIR / name).exists():
+                            self._put(RELAY_DIR / name, "video/mp2t", "public, max-age=300")
+                            self.sent[name] = time.time()
+                    self._put(playlist, "application/vnd.apple.mpegurl", "no-store")
+                    self.playlist_mtime, self.ok_at = mtime, time.time()
+                    for name, at in list(self.sent.items()):
+                        if name not in listed and time.time() - at > 120:
+                            self.s3.delete_object(Bucket=self.bucket, Key=f"live/official/{name}")
+                            del self.sent[name]
+            except Exception as error:  # noqa: BLE001 - a network blip; the next round retries
+                log(f"relay upload failed: {type(error).__name__}")
+            time.sleep(1)
+
+    @property
+    def healthy(self) -> bool:
+        return time.time() - self.ok_at < 30
+
+    def stop(self) -> None:
+        self.running = False
+
+
+# MARK: - Cues from the room's hosts
+
+class ChatCues:
+    """Reads the joined room's chat log (sender and text of each message) and
+    sends a host's new messages to the server. What was already on screen when
+    the agent joined is not sent."""
+
+    def __init__(self, base_url: str, token: str) -> None:
+        self.base, self.token = base_url.rstrip("/"), token
+        self.hosts: set[str] = set()
+        self.hosts_at = 0.0
+        self.seen: list[tuple[str, str]] | None = None
+
+    def _request(self, path: str, body: dict | None = None) -> dict:
+        request = urllib.request.Request(f"{self.base}{path}", data=json.dumps(body).encode() if body is not None else None,
+                                         method="POST" if body is not None else "GET",
+                                         headers={"content-type": "application/json", "authorization": f"Bearer {self.token}"})
+        with urllib.request.urlopen(request, timeout=10) as response:
+            return json.loads(response.read() or b"{}")
+
+    def _messages(self) -> list[tuple[str, str]]:
+        window = paltalk_window()
+        if window is None:
+            return []
+        found = []
+        for item in window.descendants():
+            if not (item.element_info.automation_id or "").endswith("ui::chatlog::TextMessageWidget"):
+                continue
+            sender = text = ""
+            for part in item.descendants():
+                kind = (part.element_info.automation_id or "").rsplit(".", 1)[-1]
+                if kind == "QLabel" and not sender:
+                    sender = part.window_text() or ""
+                elif kind == "QTextBrowser":
+                    try:
+                        text = part.iface_text.DocumentRange.GetText(-1) or ""
+                    except Exception:  # noqa: BLE001
+                        text = part.window_text() or ""
+            if sender and text.strip():
+                found.append((sender.strip(), text.strip()))
+        return found
+
+    def check(self) -> None:
+        if time.time() - self.hosts_at > 300:
+            try:
+                self.hosts = {name.lower() for name in self._request("/v1/live/listener/config").get("cueHosts", [])}
+                self.hosts_at = time.time()
+            except Exception:  # noqa: BLE001
+                pass
+        current = self._messages()
+        if self.seen is None:
+            self.seen = current
+            return
+        # New lines follow the longest run the last read ended with.
+        start = 0
+        for size in range(min(len(self.seen), len(current)), 0, -1):
+            if self.seen[-size:] == current[:size]:
+                start = size
+                break
+        if start == 0 and current and self.seen and current[-1] == self.seen[-1]:
+            start = len(current)
+        for sender, text in current[start:]:
+            if sender.lower() in self.hosts:
+                log(f"cue from a host: {text[:60]}")
+                try:
+                    self._request("/v1/live/cue", {"sender": sender, "text": text})
+                except Exception as error:  # noqa: BLE001
+                    log(f"cue not sent: {type(error).__name__}")
+        self.seen = current
+
+
 # MARK: - Heartbeat
 
 def heartbeat(endpoint: str | None, token: str | None, state: dict) -> None:
@@ -422,7 +573,12 @@ def main() -> int:
     # stream key and token never sit on a command line others can list.
     settings = env_file(HERE / "listener.env")
     parser.add_argument("--room", default=settings.get("ROOM", "oursheikh"))
-    parser.add_argument("--output", default=settings.get("OUTPUT"), help="srt:// (hub) or rtmps:// (direct) destination")
+    parser.add_argument("--output", default=settings.get("OUTPUT"),
+                        help="srt:// (hub), rtmps:// (direct) or r2 (free relay); none: cues only")
+    parser.add_argument("--no-join", action="store_true", default=settings.get("JOIN", "1") == "0",
+                        help="never search for or open the room (a PC someone uses joins by hand)")
+    parser.add_argument("--loopback-device", default=settings.get("LOOPBACK_DEVICE"),
+                        help="capture only this output device (the one Paltalk alone plays to)")
     parser.add_argument("--heartbeat-url", default=settings.get("HEARTBEAT_URL"))
     parser.add_argument("--heartbeat-token", default=settings.get("LISTENER_TOKEN"))
     parser.add_argument("--listener-id", default=settings.get("LISTENER_ID", "listener-a"))
@@ -435,7 +591,7 @@ def main() -> int:
         log("ffmpeg is not installed")
         return 2
     ensure_frame()
-    audio = LoopbackAudio()
+    audio = LoopbackAudio(args.loopback_device) if (args.output or args.once_test) else None
 
     if args.once_test:
         out = HERE / "test_stream.ts"
@@ -448,25 +604,32 @@ def main() -> int:
         return 0
 
     if not args.output:
-        parser.error("--output is required outside --once-test")
+        log("no output: sending the room's cues only")
+    base = (args.heartbeat_url or "").split("/v1/")[0]
+    cues = ChatCues(base, args.heartbeat_token) if base and args.heartbeat_token else None
+    relay = R2Relay(settings) if args.output == "r2" else None
+    input_id = "r2" if relay else args.input_id
     encoder: Encoder | None = None
     last_search = 0.0
     # A room whose speaker is off plays nothing, so nothing is captured.
     # Someone under Talking Now with silence on the loopback means the
     # speaker is off: press it, and press again if that made it worse.
     talker_since: float | None = None
+    last_beat = 0.0
     last_toggle = 0.0
     toggles_without_sound = 0
     try:
         while True:
             problem = ensure_paltalk()
             title = joined_room_title(args.room) if problem is None else None
-            if title is None and problem is None and time.time() - last_search >= SEARCH_EVERY:
+            if title is None and problem is None and not args.no_join and time.time() - last_search >= SEARCH_EVERY:
                 last_search = time.time()
                 if try_join(args.room):
                     time.sleep(5)
                     title = joined_room_title(args.room)
-            if title and encoder is None:
+            if title and cues:
+                cues.check()
+            if title and encoder is None and audio is not None:
                 log(f"in the room ({title}); going live")
                 encoder = Encoder(audio, args.output)
                 encoder.start()
@@ -490,16 +653,25 @@ def main() -> int:
                     problem = "Someone is talking in the room but no sound reaches the stream"
             if title and encoder is not None and encoder.process and encoder.process.poll() is not None:
                 problem = "In the room but the stream keeps stopping"
-            heartbeat(args.heartbeat_url, args.heartbeat_token,
-                      {"listener": args.listener_id, "inRoom": bool(title), "streaming": encoder is not None,
-                       "input": args.input_id, "problem": problem})
-            time.sleep(10)
+            if relay and encoder is not None and not relay.healthy:
+                problem = problem or "In the room but the relay cannot upload"
+            # Cues are read every 2 seconds; the heartbeat goes every 10.
+            if time.time() - last_beat >= 10:
+                last_beat = time.time()
+                heartbeat(args.heartbeat_url, args.heartbeat_token,
+                          {"listener": args.listener_id, "inRoom": bool(title),
+                           "streaming": encoder is not None and (relay is None or relay.healthy),
+                           "input": input_id, "problem": problem})
+            time.sleep(2)
     except KeyboardInterrupt:
         pass
     finally:
         if encoder:
             encoder.stop()
-        audio.close()
+        if relay:
+            relay.stop()
+        if audio:
+            audio.close()
     return 0
 
 

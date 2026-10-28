@@ -37,6 +37,14 @@ export interface LiveBroadcast {
   updatedAt: string;
   /** False until the automatic broadcast (listeners + hub) is connected. */
   automaticBroadcast?: boolean;
+  /** The host's last cue in the room this session ("L-3", "M-Nabvee"). */
+  cue?: LiveCue;
+}
+
+export interface LiveCue {
+  text: string;
+  sender?: string;
+  at: string;
 }
 
 export interface RemoteZikrSchedule {
@@ -113,6 +121,8 @@ export interface Env {
   REALTIME_PRESET_MEMBER?: string;
   /** Live zikr pipeline: the listeners' shared bearer token. */
   LISTENER_TOKEN?: string;
+  /** Paltalk usernames whose room chat messages are cues (comma list). */
+  LIVE_CUE_HOSTS?: string;
   /** Cloudflare Stream live input ids, in failover order ("A,B"). */
   STREAM_INPUTS?: string;
   /** Stream playback host, customer-<code>.cloudflarestream.com. */
