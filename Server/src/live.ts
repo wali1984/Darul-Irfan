@@ -109,38 +109,41 @@ export function zikrTitle(now: Date): string {
   return hour < 7 ? "Tahajjud Zikr" : "Daily Zikr";
 }
 
+/** The official broadcast is the channel's live video (or a hub stream when
+ *  one is on). The Paltalk room opening never makes it live - the app would
+ *  show "live" with nothing to play - and is recorded beside it: the Tahajjud
+ *  zikr is joined in the room, and its opening is announced. */
 async function settleBroadcast(env: Env, hubURL: string | null, roomOpen: boolean, now: Date): Promise<void> {
   const row = await env.DB.prepare("SELECT state,source_mode,hub_stream_url,room_open FROM live_broadcasts WHERE id='official-live'")
     .first<{ state: string; source_mode: string; hub_stream_url: string | null; room_open: number }>();
   if (!row || row.source_mode === "manual") return;
   if (row.hub_stream_url === hubURL && (row.room_open === 1) === roomOpen) return;
   const at = now.toISOString();
-  const title = zikrTitle(now);
+  const opened = roomOpen && row.room_open !== 1;
   if (hubURL) {
-    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=?,room_open=?,state='live',title=?,
+    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=?,room_open=?,state='live',
       started_at=CASE WHEN state='live' THEN started_at ELSE ? END,ended_at=NULL,updated_at=? WHERE id='official-live'`)
-      .bind(hubURL, roomOpen ? 1 : 0, title, at, at).run();
+      .bind(hubURL, roomOpen ? 1 : 0, at, at).run();
     // Whichever source goes live first announces it; the other sees "live".
     if (row.state !== "live") {
       await sendTopicPush(env, `hub-live:${at.slice(0, 16)}`, "liveZikr", "Daily Zikr has started",
         "Join the official daily zikr in Darul Irfan.", "darulirfan://live/official-live").catch(() => 0);
     }
-  } else if (roomOpen) {
-    // No stream to play in the app yet: the room itself is offered to join.
-    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=1,state='live',
-      title=CASE WHEN youtube_live=1 THEN title ELSE ? END,
-      started_at=CASE WHEN state='live' THEN started_at ELSE ? END,ended_at=NULL,updated_at=? WHERE id='official-live'`)
-      .bind(title, at, at).run();
-    if (row.state !== "live") {
-      await sendTopicPush(env, `room-open:${at.slice(0, 16)}`, "liveZikr", `${title} has started`,
-        "Join the zikr from Darul Irfan.", "darulirfan://live/official-live").catch(() => 0);
-    }
-  } else {
-    // The channel's live video, if it is on, keeps the broadcast live.
-    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=0,
+  } else if (row.hub_stream_url) {
+    // The hub stopped: the channel's live video, if it is on, keeps it live.
+    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=?,
       state=CASE WHEN youtube_live=1 THEN state ELSE 'ended' END,
       ended_at=CASE WHEN youtube_live=1 THEN ended_at ELSE ? END,updated_at=? WHERE id='official-live'`)
-      .bind(at, at).run();
+      .bind(roomOpen ? 1 : 0, at, at).run();
+  } else {
+    await env.DB.prepare("UPDATE live_broadcasts SET room_open=?,updated_at=? WHERE id='official-live'")
+      .bind(roomOpen ? 1 : 0, at).run();
+  }
+  // Daily Zikr is announced when the channel goes live; the room opening
+  // before dawn announces the Tahajjud zikr, which is joined on Paltalk.
+  if (opened && zikrTitle(now) === "Tahajjud Zikr") {
+    await sendTopicPush(env, `room-open:${at.slice(0, 16)}`, "liveZikr", "Tahajjud Zikr has started",
+      "Join it on Paltalk from Darul Irfan.", "darulirfan://zikr").catch(() => 0);
   }
 }
 

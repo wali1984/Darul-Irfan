@@ -25,6 +25,9 @@ export function catalogTimestamp(item: Pick<CatalogContent, "publishedAt" | "upd
   return undefined;
 }
 
+/** The official broadcast's name in the apps, whatever the video is titled. */
+export const OFFICIAL_LIVE_TITLE = "Online Zikr with Sheikh-ul-Mukarram Hazrat Ameer Abdul Qadeer Awan MZA";
+
 export async function refreshYouTube(env: Env): Promise<void> {
   if (!env.YOUTUBE_API_KEY) throw new Error("YOUTUBE_API_KEY is not configured");
   // Quota-safe detection: read the channel's uploads playlist (1 unit) then
@@ -62,7 +65,7 @@ export async function refreshYouTube(env: Env): Promise<void> {
       candidate = {
         id,
         state: snippet.liveBroadcastContent === "live" ? "live" : "scheduled",
-        title: cleanText(snippet.title, 300) ?? "Daily Zikr",
+        title: OFFICIAL_LIVE_TITLE,
         details: item.liveStreamingDetails,
       };
     }

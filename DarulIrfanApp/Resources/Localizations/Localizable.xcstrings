@@ -24480,6 +24480,125 @@
           }
         }
       }
+    },
+    "Join Daily Zikr with Sheikh-ul-Mukarram": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Daily Zikr with Sheikh-ul-Mukarram"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شیخ المکرم کے ساتھ روزانہ ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "Join Zikr on YouTube": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Zikr on YouTube"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یوٹیوب پر ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "Join Zikr on Paltalk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Zikr on Paltalk"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پال ٹاک پر ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "Available when the zikr is live on YouTube": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available when the zikr is live on YouTube"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یوٹیوب پر ذکر براہِ راست ہونے پر دستیاب"
+          }
+        }
+      }
+    },
+    "Available when the Paltalk room is open": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available when the Paltalk room is open"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پال ٹاک روم کھلنے پر دستیاب"
+          }
+        }
+      }
+    },
+    "Online Zikr with Sheikh-ul-Mukarram Hazrat Ameer Abdul Qadeer Awan MZA": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Online Zikr with Sheikh-ul-Mukarram Hazrat Ameer Abdul Qadeer Awan MZA"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شیخ المکرم حضرت امیر عبدالقدیر اعوان مدظلہ العالی کے ساتھ آن لائن ذکر"
+          }
+        }
+      }
+    },
+    "Tahajjud Zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahajjud Zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تہجد ذکر"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -42,7 +42,7 @@ struct ZikrHomeView: View {
 
                 DISectionHeader(titleKey: "Daily Zikr", systemImage: "dot.radiowaves.left.and.right")
                 LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer,
-                                  sessionOpen: sessionOpen, platform: dependencies.officialPlatform)
+                                  platform: dependencies.officialPlatform)
                     .diAppear(delay: 0.08)
                 liveAlertToggle
 
@@ -73,7 +73,9 @@ struct ZikrHomeView: View {
                     .diAppear(delay: 0.1)
                 } else {
                     ForEach(Array(viewModel.sessions.enumerated()), id: \.element.id) { index, session in
-                        ZikrSessionCard(session: session, viewModel: viewModel)
+                        ZikrSessionCard(session: session, viewModel: viewModel) { videoID in
+                            presentedVideo = ZikrPresentedVideo(id: videoID, title: viewModel.live.title)
+                        }
                             .diAppear(delay: 0.1 + 0.05 * Double(index))
                     }
                 }
@@ -113,6 +115,7 @@ struct ZikrHomeView: View {
         .diScreenBackground()
         .task { await viewModel.load() }
         .task { await viewModel.followLiveGroups(service: groupService) }
+        .task { await viewModel.followLive() }
         .refreshable {
             await viewModel.load(forceRefresh: true)
             await viewModel.refreshLiveGroups(service: groupService)
@@ -206,18 +209,6 @@ struct ZikrHomeView: View {
 
 /// A living gradient header carrying Qur'an 13:28 — the verse of remembrance
 /// that anchors the whole app and this section in particular.
-extension ZikrHomeView {
-    /// From ten minutes before a session until half an hour after its end.
-    var sessionOpen: Bool {
-        let now = Date()
-        return viewModel.sessions.contains { session in
-            guard let start = ZikrScheduleMath.currentOrNextOccurrence(of: session, at: now.addingTimeInterval(-1_800)) else { return false }
-            let end = start.addingTimeInterval(TimeInterval(session.durationMinutes * 60 + 1_800))
-            return now >= start.addingTimeInterval(-600) && now <= end
-        }
-    }
-}
-
 private struct ZikrHeroHeader: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -317,6 +308,30 @@ private struct MethodOfZikrCard: View {
 private struct ZikrSessionCard: View {
     let session: ZikrSession
     let viewModel: ZikrHomeViewModel
+    /// Plays the channel's live video in the app.
+    let playVideo: (String) -> Void
+    @Environment(\.openURL) private var openURL
+
+    /// The Tahajjud zikr is held in the Paltalk room; Daily Zikr is joined
+    /// through the channel's live video, in the app.
+    private var joinsOnPaltalk: Bool {
+        session.zikrAnchor == .beforeFajr || session.zikrAnchor == .tahajjud || session.id.contains("tahajjud")
+    }
+
+    /// The room is open now and it is before dawn in Pakistan, as the server
+    /// names the session; the same room carries Daily Zikr in the evening.
+    private var openRoom: LiveRoom? {
+        guard joinsOnPaltalk, let room = viewModel.live.room, room.url != nil else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Karachi") ?? .current
+        return calendar.component(.hour, from: Date()) < 7 ? room : nil
+    }
+
+    /// The channel's live video, while it is on air.
+    private var liveVideoID: String? {
+        guard !joinsOnPaltalk, viewModel.live.state == .live else { return nil }
+        return viewModel.live.sources.first { $0.kind == .youtube && $0.videoID != nil }?.videoID
+    }
 
     var body: some View {
         DIElevatedCard(glow: DIColor.primary) {
@@ -368,13 +383,12 @@ private struct ZikrSessionCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                // Joining happens in the app: the live zikr plays above, in
-                // the Daily Zikr card. Joining steps and links for an outside
-                // service, which older schedules carried, are not shown.
-                Label("Join Zikr when it begins.", systemImage: "person.3.fill")
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
+                if let room = openRoom {
+                    Label("Live on Paltalk now · \(room.listeners) listening", systemImage: "person.3.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(DIColor.primary)
+                }
+                joinButton
 
                 Toggle(isOn: Binding(
                     get: { viewModel.isReminderEnabled(session.id) },
@@ -391,6 +405,30 @@ private struct ZikrSessionCard: View {
 
             }
         }
+    }
+
+    /// Always shown; greyed out until the zikr is on: the live video for
+    /// Daily Zikr, the open room for the Tahajjud zikr.
+    private var joinButton: some View {
+        let available = joinsOnPaltalk ? openRoom != nil : liveVideoID != nil
+        return Button {
+            DIHaptics.light()
+            if let url = openRoom?.url { openURL(url) } else if let videoID = liveVideoID { playVideo(videoID) }
+        } label: {
+            Label(joinsOnPaltalk ? "Join Zikr on Paltalk" : "Join Zikr on YouTube",
+                  systemImage: joinsOnPaltalk ? "person.3.fill" : "play.rectangle.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(available ? DIColor.onPrimary : DIColor.textMuted)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .background(
+                    available ? AnyShapeStyle(DIColor.primary) : AnyShapeStyle(DIColor.sandstone.opacity(0.6)),
+                    in: RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+                )
+        }
+        .buttonStyle(DIPressableStyle())
+        .disabled(!available)
+        .accessibilityHint(available ? Text("")
+            : joinsOnPaltalk ? Text("Available when the Paltalk room is open") : Text("Available when the zikr is live on YouTube"))
     }
 
     private var liveDot: some View {

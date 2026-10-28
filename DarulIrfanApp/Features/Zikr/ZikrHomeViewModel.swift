@@ -90,6 +90,16 @@ final class ZikrHomeViewModel {
         isLoaded = true
     }
 
+    /// Keeps the live state current while the screen is open, so a session's
+    /// Join turns on when its video goes live or its room opens.
+    func followLive() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(30))
+            if Task.isCancelled { break }
+            live = await platform.currentLiveBroadcast(forceRefresh: true)
+        }
+    }
+
     /// Keeps the live halqahs current while the screen is open.
     func followLiveGroups(service: MemberGroupService) async {
         while !Task.isCancelled {

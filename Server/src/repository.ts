@@ -22,9 +22,9 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
   const videoID = typeof row.youtube_video_id === "string" ? row.youtube_video_id : undefined;
   if (owned) sources.push({ kind: "ownedStream", url: owned, supportsBackgroundAudio: true });
   if (videoID) sources.push({ kind: "youtube", url: `https://www.youtube.com/watch?v=${encodeURIComponent(videoID)}`, videoID, supportsBackgroundAudio: false });
-  // The Paltalk room (paltalk_url) is never offered to the apps: zikr is
-  // joined inside Darul Irfan, and builds that still know the "paltalk" kind
-  // would open the Paltalk app. The listeners use the room; members do not.
+  // The Paltalk room (paltalk_url) is never a source of the official
+  // broadcast, which is the channel's live video; builds that still know the
+  // "paltalk" kind would open it as one. It travels as `room` instead.
   return {
     id: String(row.id), state: row.state as LiveBroadcast["state"], title: String(row.title),
     details: typeof row.details === "string" ? row.details : undefined,
@@ -34,14 +34,16 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
     sources, updatedAt: String(row.updated_at),
     automaticBroadcast: integrationStatus(env).liveBroadcast,
     cue: await sessionCue(env, row),
-    room: await openRoom(env),
+    room: await openRoom(env, row),
   };
 }
 
-/** The Paltalk room while Paltalk's directory lists it as open. */
-async function openRoom(env: Env): Promise<LiveBroadcast["room"]> {
+/** The Paltalk room while Paltalk's directory lists it as open, with the
+ *  room's link: the Tahajjud zikr is joined there. */
+async function openRoom(env: Env, row: Row): Promise<LiveBroadcast["room"]> {
   const status = await paltalkRoomStatus(env);
-  return status?.online ? { platform: "paltalk", listeners: status.listeners, since: status.since } : undefined;
+  if (!status?.online) return undefined;
+  return { platform: "paltalk", listeners: status.listeners, since: status.since, url: validHTTPURL(row.paltalk_url) };
 }
 
 /** The host's last cue, while the session it was given in is still live. */

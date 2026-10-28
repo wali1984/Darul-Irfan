@@ -4,9 +4,6 @@ import SwiftUI
 struct LiveBroadcastCard: View {
     let broadcast: LiveBroadcast
     let audioPlayer: any AudioPlayerServicing
-    /// A zikr session's time has come: the card says the zikr has begun and
-    /// that the live stream appears here, rather than "off air".
-    var sessionOpen = false
     /// When given, the card checks the live state every 30 seconds while it is
     /// on screen, so the in-app player appears the moment the stream starts.
     var platform: OfficialPlatformService? = nil
@@ -39,12 +36,6 @@ struct LiveBroadcastCard: View {
             if isLive, let cue = current.cue {
                 cueBanner(cue)
             }
-            if let room = current.room {
-                Label("Live on Paltalk now · \(room.listeners) listening", systemImage: "person.3.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(fg)
-            }
-
             if let details = current.details, !details.isEmpty {
                 Text(details).font(.subheadline).foregroundStyle(fgMuted)
             }
@@ -54,11 +45,11 @@ struct LiveBroadcastCard: View {
                     .foregroundStyle(fg)
             }
 
-            // Always shown; greyed out until the room or the channel is live
-            // with something the app can play.
+            // Always shown; greyed out until the channel is live with
+            // something the app can play.
             let source = displaySources.first
             Button { if let source { activate(source) } } label: {
-                Label("Join Daily Zikr with Sheikh ul Mukarram",
+                Label("Join Daily Zikr with Sheikh-ul-Mukarram",
                       systemImage: source?.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(source == nil ? DIColor.textMuted : (isLive ? DIColor.primaryDeep : DIColor.onPrimary))
@@ -72,17 +63,11 @@ struct LiveBroadcastCard: View {
             .buttonStyle(DIPressableStyle())
             .disabled(source == nil)
             .accessibilityHint(source == nil ? Text("Available when Daily Zikr is live") : Text(""))
+            // Says only what the channel itself reports: nothing here claims
+            // the zikr has begun before its live video is on air.
             if displaySources.isEmpty {
-                if isLive || sessionOpen {
-                    // The zikr has begun (the room is open) but no stream the
-                    // app can play is on air yet. Zikr is joined here, never in
-                    // another app, so the card waits for the stream.
-                    Label("Zikr has started. The live stream appears here as soon as it is on air.", systemImage: "dot.radiowaves.left.and.right")
-                        .font(.footnote).foregroundStyle(fgMuted)
-                } else {
-                    Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
-                        .font(.footnote).foregroundStyle(fgMuted)
-                }
+                Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
+                    .font(.footnote).foregroundStyle(fgMuted)
             }
             if current.updatedAt != .distantPast {
                 Text("Updated \(current.updatedAt.formatted(.relative(presentation: .named)))")
@@ -182,9 +167,8 @@ struct LiveBroadcastCard: View {
     }
 
     /// What the app plays inside itself - its own audio stream, or the live
-    /// video - while it is live or announced. The Paltalk room the server may
-    /// still list is never offered: zikr is joined inside Darul Irfan, not in
-    /// another app.
+    /// video - while it is live. The Paltalk room is not this card's: the
+    /// Tahajjud zikr's card below joins it.
     private var displaySources: [LiveSource] {
         // One Join button: the room's own sound when it is relayed, the
         // channel's live video otherwise - both played here, in the app.
@@ -193,7 +177,6 @@ struct LiveBroadcastCard: View {
     }
 
     private var statusText: String {
-        if !isLive && sessionOpen { return "STARTING" }
         switch current.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
     }
 }

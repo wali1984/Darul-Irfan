@@ -40,7 +40,7 @@ export interface LiveBroadcast {
   /** The host's last cue in the room this session ("L-3", "M-Nabvee"). */
   cue?: LiveCue;
   /** The Paltalk room while it is open: how many are in it, since when. */
-  room?: { platform: "paltalk"; listeners: number; since?: string };
+  room?: { platform: "paltalk"; listeners: number; since?: string; url?: string };
 }
 
 /** The Silsila's Paltalk room, as Paltalk's public directory lists it. */

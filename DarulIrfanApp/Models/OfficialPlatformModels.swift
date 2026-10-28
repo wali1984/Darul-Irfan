@@ -113,11 +113,13 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
     )
 }
 
-/// The zikr room on Paltalk while it is open: how many are in it, since when.
+/// The zikr room on Paltalk while it is open: how many are in it, since when,
+/// and its link (the Tahajjud zikr is joined there).
 struct LiveRoom: Codable, Sendable, Equatable {
     var platform: String
     var listeners: Int
     var since: Date?
+    var url: URL?
 }
 
 /// A latifa or muraqaba change the room's host announced.

@@ -57,15 +57,13 @@ describe("live zikr pipeline", () => {
     expect(sent.filter(s => s.url.includes("graph.facebook.com"))).toEqual([]);
   });
 
-  it("is live while the room is open, but never sends members to the Paltalk app", async () => {
+  it("does not call the YouTube zikr live because the room is open, and never lists the room as a source", async () => {
     const { raw, heartbeat, live } = setup();
     raw.prepare("UPDATE live_broadcasts SET paltalk_url='https://www.paltalk.com/room/zikr' WHERE id='official-live'").run();
     await heartbeat({ listener: "listener-a", inRoom: true, streaming: false });
     const on = await live();
-    expect(on.state).toBe("live");
+    expect(on.state).not.toBe("live");
     expect(on.sources).toEqual([]);
-    await heartbeat({ listener: "listener-a", inRoom: false, streaming: false });
-    expect((await live()).state).toBe("ended");
   });
 
   it("names the session by Pakistan time: Tahajjud before dawn, Daily Zikr otherwise", () => {
