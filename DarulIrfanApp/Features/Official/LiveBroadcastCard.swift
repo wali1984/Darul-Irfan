@@ -54,20 +54,24 @@ struct LiveBroadcastCard: View {
                     .foregroundStyle(fg)
             }
 
-            ForEach(displaySources) { source in
-                Button { activate(source) } label: {
-                    Label("Join Daily Zikr with Sheikh ul Mukarram",
-                          systemImage: source.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.onPrimary)
-                        .frame(maxWidth: .infinity, minHeight: 46)
-                        .background(
-                            isLive ? AnyShapeStyle(DIGradient.goldSheen) : AnyShapeStyle(DIColor.primary),
-                            in: RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                        )
-                }
-                .buttonStyle(DIPressableStyle())
+            // Always shown; greyed out until the room or the channel is live
+            // with something the app can play.
+            let source = displaySources.first
+            Button { if let source { activate(source) } } label: {
+                Label("Join Daily Zikr with Sheikh ul Mukarram",
+                      systemImage: source?.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(source == nil ? DIColor.textMuted : (isLive ? DIColor.primaryDeep : DIColor.onPrimary))
+                    .frame(maxWidth: .infinity, minHeight: 46)
+                    .background(
+                        source == nil ? AnyShapeStyle(DIColor.sandstone.opacity(isLive ? 0.35 : 0.6))
+                            : isLive ? AnyShapeStyle(DIGradient.goldSheen) : AnyShapeStyle(DIColor.primary),
+                        in: RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+                    )
             }
+            .buttonStyle(DIPressableStyle())
+            .disabled(source == nil)
+            .accessibilityHint(source == nil ? Text("Available when Daily Zikr is live") : Text(""))
             if displaySources.isEmpty {
                 if isLive || sessionOpen {
                     // The zikr has begun (the room is open) but no stream the
@@ -184,7 +188,7 @@ struct LiveBroadcastCard: View {
     private var displaySources: [LiveSource] {
         // One Join button: the room's own sound when it is relayed, the
         // channel's live video otherwise - both played here, in the app.
-        guard isLive || current.state == .scheduled, let source = current.preferredSource else { return [] }
+        guard isLive, let source = current.preferredSource else { return [] }
         return [source]
     }
 

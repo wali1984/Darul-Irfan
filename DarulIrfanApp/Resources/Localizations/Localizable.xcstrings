@@ -24463,6 +24463,23 @@
           }
         }
       }
+    },
+    "Available when Daily Zikr is live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Available when Daily Zikr is live"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر براہِ راست ہونے پر دستیاب"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
