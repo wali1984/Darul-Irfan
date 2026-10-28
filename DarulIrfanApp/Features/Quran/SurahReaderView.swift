@@ -332,7 +332,7 @@ struct SurahReaderView: View {
     /// Starts playback at an ayah in the chosen mode and range.
     private func start(from ayahNumber: Int) {
         speaker.stop()
-        player.start(from: AyahRef(surah: viewModel.surah.id, ayah: ayahNumber), content: effectiveContent,
+        player.start(from: ListenAyah(surah: viewModel.surah.id, ayah: ayahNumber), content: effectiveContent,
                      scope: listenScope, translationEdition: narratedTranslationEdition)
     }
 

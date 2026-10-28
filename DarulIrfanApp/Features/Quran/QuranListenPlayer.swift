@@ -24,36 +24,36 @@ enum QuranListenScope: String, CaseIterable, Identifiable, Sendable {
     var id: String { rawValue }
 }
 
-struct AyahRef: Hashable, Comparable, Sendable {
+struct ListenAyah: Hashable, Comparable, Sendable {
     var surah: Int
     var ayah: Int
 
-    static func < (lhs: AyahRef, rhs: AyahRef) -> Bool {
+    static func < (lhs: ListenAyah, rhs: ListenAyah) -> Bool {
         (lhs.surah, lhs.ayah) < (rhs.surah, rhs.ayah)
     }
 }
 
 enum QuranListenRange {
     /// Every ayah from `start` to the end of its ayah, ruku, surah or juz.
-    static func ayahs(from start: AyahRef, scope: QuranListenScope) -> [AyahRef] {
-        let end: AyahRef
+    static func ayahs(from start: ListenAyah, scope: QuranListenScope) -> [ListenAyah] {
+        let end: ListenAyah
         switch scope {
         case .ayah:
             return [start]
         case .surah:
-            end = AyahRef(surah: start.surah, ayah: ayahCount(start.surah))
+            end = ListenAyah(surah: start.surah, ayah: ayahCount(start.surah))
         case .ruku:
             end = before(next(after: start, in: QuranDivisions.rukuStarts))
         case .juz:
             end = before(next(after: start, in: QuranDivisions.juzStarts))
         }
-        var result: [AyahRef] = []
+        var result: [ListenAyah] = []
         var current = start
         while current <= end {
             result.append(current)
             current = current.ayah < ayahCount(current.surah)
-                ? AyahRef(surah: current.surah, ayah: current.ayah + 1)
-                : AyahRef(surah: current.surah + 1, ayah: 1)
+                ? ListenAyah(surah: current.surah, ayah: current.ayah + 1)
+                : ListenAyah(surah: current.surah + 1, ayah: 1)
             if current.surah > 114 { break }
         }
         return result
@@ -64,14 +64,14 @@ enum QuranListenRange {
     }
 
     /// The first division start after `ayah` (or the end of the Qur'an).
-    private static func next(after ayah: AyahRef, in starts: [[Int]]) -> AyahRef? {
-        starts.map { AyahRef(surah: $0[0], ayah: $0[1]) }.first { $0 > ayah }
+    private static func next(after ayah: ListenAyah, in starts: [[Int]]) -> ListenAyah? {
+        starts.map { ListenAyah(surah: $0[0], ayah: $0[1]) }.first { $0 > ayah }
     }
 
-    private static func before(_ ref: AyahRef?) -> AyahRef {
-        guard let ref else { return AyahRef(surah: 114, ayah: ayahCount(114)) }
-        return ref.ayah > 1 ? AyahRef(surah: ref.surah, ayah: ref.ayah - 1)
-            : AyahRef(surah: ref.surah - 1, ayah: ayahCount(ref.surah - 1))
+    private static func before(_ ref: ListenAyah?) -> ListenAyah {
+        guard let ref else { return ListenAyah(surah: 114, ayah: ayahCount(114)) }
+        return ref.ayah > 1 ? ListenAyah(surah: ref.surah, ayah: ref.ayah - 1)
+            : ListenAyah(surah: ref.surah - 1, ayah: ayahCount(ref.surah - 1))
     }
 }
 
@@ -90,16 +90,19 @@ final class QuranListenPlayer {
     enum Part: Sendable { case arabic, translation }
 
     private(set) var isPlaying = false
-    private(set) var current: AyahRef?
+    private(set) var current: ListenAyah?
     private(set) var part: Part?
     private(set) var currentWordPosition: Int?
     private(set) var content: QuranListenContent = .arabic
     private(set) var scope: QuranListenScope = .surah
 
-    @ObservationIgnored private var steps: [AyahRef] = []
+    @ObservationIgnored private var steps: [ListenAyah] = []
     @ObservationIgnored private var index = 0
     @ObservationIgnored private var translationEdition: String?
     @ObservationIgnored private var session = 0
+    /// Bumped each time a recitation part starts, so its end is handled once.
+    @ObservationIgnored private var partToken = 0
+    @ObservationIgnored private var afterPart: (() -> Void)?
 
     @ObservationIgnored private var reciter: AVPlayer?
     @ObservationIgnored private var reciterSurah: Int?
@@ -109,7 +112,7 @@ final class QuranListenPlayer {
     @ObservationIgnored private var reciterEnd: NSObjectProtocol?
 
     @ObservationIgnored private let narrator = AVQueuePlayer()
-    @ObservationIgnored private var narrated: [ObjectIdentifier: AyahRef] = [:]
+    @ObservationIgnored private var narrated: [ObjectIdentifier: ListenAyah] = [:]
     @ObservationIgnored private var narratorEnd: NSObjectProtocol?
     @ObservationIgnored private var narratorItemWatch: NSKeyValueObservation?
 
@@ -123,7 +126,7 @@ final class QuranListenPlayer {
         return NarrationCatalog.shared.manifest?.editions[edition]?["translation"]?.isEmpty == false
     }
 
-    func start(from ayah: AyahRef, content: QuranListenContent, scope: QuranListenScope, translationEdition: String?) {
+    func start(from ayah: ListenAyah, content: QuranListenContent, scope: QuranListenScope, translationEdition: String?) {
         stop()
         session += 1
         self.content = content
@@ -155,6 +158,8 @@ final class QuranListenPlayer {
 
     func stop() {
         session += 1
+        partToken += 1
+        afterPart = nil
         clearReciterObservers()
         reciter?.pause()
         reciter = nil
@@ -175,7 +180,7 @@ final class QuranListenPlayer {
     }
 
     func isSounding(surah: Int, ayah: Int) -> Bool {
-        isPlaying && current == AyahRef(surah: surah, ayah: ayah)
+        isPlaying && current == ListenAyah(surah: surah, ayah: ayah)
     }
 
     func isActive(inSurah surah: Int) -> Bool {
@@ -214,7 +219,7 @@ final class QuranListenPlayer {
 
     // MARK: Recitation
 
-    private func playRecitation(from first: AyahRef, to last: AyahRef, then: @escaping () -> Void) {
+    private func playRecitation(from first: ListenAyah, to last: ListenAyah, then: @escaping () -> Void) {
         guard let surahRecitation = RecitationProvider.shared.recitation(forSurah: first.surah),
               let start = surahRecitation.verse(first.ayah), let end = surahRecitation.verse(last.ayah),
               let url = URL(string: surahRecitation.audioUrl) else {
@@ -233,41 +238,45 @@ final class QuranListenPlayer {
             recitation = surahRecitation
             tick = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 20), queue: .main) { [weak self] time in
                 let ms = Int(time.seconds * 1000)
-                MainActor.assumeIsolated { self?.follow(ms: ms) }
+                Task { @MainActor in self?.follow(ms: ms) }
             }
         }
         guard let reciter else { return }
         if let boundary { reciter.removeTimeObserver(boundary); self.boundary = nil }
         if let reciterEnd { NotificationCenter.default.removeObserver(reciterEnd); self.reciterEnd = nil }
         let mySession = session
-        var done = false
-        let finishPart: () -> Void = { [weak self] in
-            guard let self, !done, self.session == mySession else { return }
-            done = true
-            self.reciter?.pause()
-            then()
-        }
+        partToken += 1
+        let token = partToken
+        afterPart = then
         // The last ayah of a recording runs to its end; any other stops at its timing.
         if end.toMs < surahRecitation.durationMs - 300 {
             boundary = reciter.addBoundaryTimeObserver(
                 forTimes: [NSValue(time: CMTime(value: CMTimeValue(end.toMs), timescale: 1000))], queue: .main
-            ) { MainActor.assumeIsolated { finishPart() } }
+            ) { [weak self] in Task { @MainActor in self?.endPart(token) } }
         }
         reciterEnd = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime, object: reciter.currentItem, queue: .main
-        ) { _ in MainActor.assumeIsolated { finishPart() } }
+        ) { [weak self] _ in Task { @MainActor in self?.endPart(token) } }
         reciter.seek(to: CMTime(value: CMTimeValue(start.fromMs), timescale: 1000), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
-            MainActor.assumeIsolated {
+            Task { @MainActor in
                 guard let self, self.session == mySession, self.isPlaying else { return }
                 self.reciter?.play()
             }
         }
     }
 
+    /// A recitation part has reached its last ayah's end (once per part).
+    private func endPart(_ token: Int) {
+        guard token == partToken, let then = afterPart else { return }
+        afterPart = nil
+        reciter?.pause()
+        then()
+    }
+
     private func follow(ms: Int) {
         guard part == .arabic, let recitation, let surah = reciterSurah else { return }
         guard let verse = recitation.verses.first(where: { ms >= $0.fromMs && ms < $0.toMs }) else { return }
-        let ref = AyahRef(surah: surah, ayah: verse.ayah)
+        let ref = ListenAyah(surah: surah, ayah: verse.ayah)
         if current != ref { current = ref }
         currentWordPosition = verse.words.first(where: { ms >= $0.startMs && ms < $0.endMs })?.position
     }
@@ -283,12 +292,12 @@ final class QuranListenPlayer {
 
     // MARK: Translation
 
-    private func hasNarration(_ ref: AyahRef) -> Bool {
+    private func hasNarration(_ ref: ListenAyah) -> Bool {
         guard let edition = translationEdition else { return false }
         return NarrationCatalog.shared.has(edition: edition, kind: "translation", surah: ref.surah, start: ref.ayah, end: ref.ayah)
     }
 
-    private func item(for ref: AyahRef) -> AVPlayerItem? {
+    private func item(for ref: ListenAyah) -> AVPlayerItem? {
         guard let edition = translationEdition, hasNarration(ref) else { return nil }
         let name = NarrationCatalog.name(surah: ref.surah, start: ref.ayah, end: ref.ayah)
         let local = NarrationCatalog.localURL(edition: edition, kind: "translation", name: name)
@@ -301,7 +310,7 @@ final class QuranListenPlayer {
     }
 
     /// One ayah's translation, then `then` (recitation + translation mode).
-    private func playTranslation(of ref: AyahRef, then: @escaping () -> Void) {
+    private func playTranslation(of ref: ListenAyah, then: @escaping () -> Void) {
         guard let item = item(for: ref) else { then(); return }
         part = .translation
         current = ref
@@ -311,7 +320,7 @@ final class QuranListenPlayer {
         if let narratorEnd { NotificationCenter.default.removeObserver(narratorEnd) }
         let mySession = session
         narratorEnd = NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: item, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated {
+            Task { @MainActor in
                 guard let self, self.session == mySession else { return }
                 then()
             }
