@@ -7,7 +7,9 @@ preview_urls = false
 
 [vars]
 ENVIRONMENT = "production"
-PUBLIC_BASE_URL = "https://api.naqshbandiaowaisiah.us"
+# The custom domain sits behind a Cloudflare firewall rule that blocks phones;
+# links handed to the app use the workers.dev address the app already calls.
+PUBLIC_BASE_URL = "https://darul-irfan-platform.wajidmahmoodali1984-e23.workers.dev"
 YOUTUBE_CHANNEL_ID = "UCefP_tP1ROXmqu2miDVCtCg"
 FACEBOOK_PAGE_ID = "oursheikh.official"
 FACEBOOK_GRAPH_VERSION = "v25.0"
