@@ -451,7 +451,12 @@ async function createRoom(env: Env, title: string, recordFor: string | null): Pr
   });
   const body = await response.json<{ data?: { id?: string }; result?: { id?: string } }>().catch(() => ({}) as Record<string, never>);
   const id = (body as { data?: { id?: string } }).data?.id ?? (body as { result?: { id?: string } }).result?.id;
-  if (!response.ok || !id) return json({ error: "The meeting room could not be opened. Try again." }, { status: 502 });
+  if (!response.ok || !id) {
+    // The service's own reason (a refused token, a bad setting) goes to the
+    // log, so a failure can be traced; the person sees a plain message.
+    console.error(`RealtimeKit room ${response.status}: ${JSON.stringify((body as { errors?: unknown }).errors ?? body).slice(0, 300)}`);
+    return json({ error: "The meeting room could not be opened. Try again." }, { status: 502 });
+  }
   return id;
 }
 
@@ -472,7 +477,10 @@ async function addParticipant(env: Env, roomID: string, memberID: string, name: 
   const data = (body as { data?: { token?: string; authToken?: string } }).data
     ?? (body as { result?: { token?: string; authToken?: string } }).result;
   const token = data?.authToken ?? data?.token;
-  if (!response.ok || !token) return json({ error: "Could not join the room. Try again." }, { status: 502 });
+  if (!response.ok || !token) {
+    console.error(`RealtimeKit participant ${response.status}: ${JSON.stringify((body as { errors?: unknown }).errors ?? body).slice(0, 300)}`);
+    return json({ error: "Could not join the room. Try again." }, { status: 502 });
+  }
   return token;
 }
 
