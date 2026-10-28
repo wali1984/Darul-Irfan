@@ -75,11 +75,14 @@ def paltalk_window():
     return None
 
 
-def ensure_paltalk() -> str | None:
-    """Starts Paltalk if it is not running. Returns a problem, or None."""
+def ensure_paltalk(hands_off: bool = False) -> str | None:
+    """Starts Paltalk if it is not running. Returns a problem, or None. On a
+    PC someone uses (hands_off) it never starts or reopens Paltalk."""
     if any((proc.info.get("name") or "").lower() == "paltalk.exe" for proc in psutil.process_iter(["name"])):
         if paltalk_window():
             return None
+        if hands_off:
+            return "Paltalk's window is closed"
         # Closed to the tray: starting it again brings the running copy's
         # window back. It comes to the front, so only at a quiet moment.
         if PALTALK.exists() and seconds_since_input() >= IDLE_BEFORE_SEARCH:
@@ -88,6 +91,8 @@ def ensure_paltalk() -> str | None:
         return "Paltalk is running but its window is not available"
     if not PALTALK.exists():
         return "Paltalk is not installed"
+    if hands_off:
+        return "Paltalk is not running"
     subprocess.Popen([str(PALTALK)], close_fds=True)
     log("Paltalk was not running; started it")
     return "Paltalk was not running (started again)"
@@ -628,8 +633,11 @@ def main() -> int:
     toggles_without_sound = 0
     try:
         while True:
-            problem = ensure_paltalk()
+            problem = ensure_paltalk(hands_off=args.no_join)
             title = joined_room_title(args.room) if problem is None else None
+            # Paltalk closed on a PC someone uses is normal, not a fault to alert on.
+            if args.no_join and problem in ("Paltalk's window is closed", "Paltalk is not running"):
+                problem = None
             if title is None and problem is None and not args.no_join and time.time() - last_search >= SEARCH_EVERY:
                 last_search = time.time()
                 if try_join(args.room):
