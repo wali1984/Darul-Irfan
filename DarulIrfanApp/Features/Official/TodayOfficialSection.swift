@@ -17,7 +17,7 @@ struct TodayOfficialSection: View {
         Group {
             if viewModel.live.state == .live || viewModel.live.state == .scheduled {
                 DISectionHeader(titleKey: "Live & Upcoming", systemImage: "dot.radiowaves.left.and.right")
-                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer)
+                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer, platform: dependencies.officialPlatform)
             } else if let featured = viewModel.feedItems.first(where: \.isFeatured) ?? viewModel.feedItems.first {
                 Button {
                     presentedItem = featured

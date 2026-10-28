@@ -3,13 +3,17 @@ import SwiftUI
 struct LiveBroadcastCard: View {
     let broadcast: LiveBroadcast
     let audioPlayer: any AudioPlayerServicing
-    /// A zikr session's time has come. With no stream to play here yet, the
-    /// zikr room itself is offered to join.
+    /// A zikr session's time has come: the card says the zikr has begun and
+    /// that the live stream appears here, rather than "off air".
     var sessionOpen = false
+    /// When given, the card checks the live state every 30 seconds while it is
+    /// on screen, so the in-app player appears the moment the stream starts.
+    var platform: OfficialPlatformService? = nil
     @State private var presentedVideo: PresentedVideo?
-    @Environment(\.openURL) private var openURL
+    @State private var latest: LiveBroadcast?
 
-    private var isLive: Bool { broadcast.state == .live }
+    private var current: LiveBroadcast { latest ?? broadcast }
+    private var isLive: Bool { current.state == .live }
     private var fg: Color { isLive ? .white : DIColor.textPrimary }
     private var fgMuted: Color { isLive ? Color.white.opacity(0.82) : DIColor.textMuted }
 
@@ -24,17 +28,17 @@ struct LiveBroadcastCard: View {
                 // Looked up as a key so the default title ("Daily Zikr")
                 // follows the app language; a title the server sends that is
                 // not in the catalogue shows exactly as sent.
-                Text(LocalizedStringKey(broadcast.title))
+                Text(LocalizedStringKey(current.title))
                     .font(DIFont.subheading)
                     .foregroundStyle(fg)
                 Spacer(minLength: DISpacing.sm)
                 statusBadge
             }
 
-            if let details = broadcast.details, !details.isEmpty {
+            if let details = current.details, !details.isEmpty {
                 Text(details).font(.subheadline).foregroundStyle(fgMuted)
             }
-            if let start = broadcast.scheduledStart, broadcast.state == .scheduled {
+            if let start = current.scheduledStart, current.state == .scheduled {
                 Label(start.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(fg)
@@ -42,7 +46,7 @@ struct LiveBroadcastCard: View {
 
             ForEach(displaySources) { source in
                 Button { activate(source) } label: {
-                    Label(label(for: source), systemImage: icon(for: source))
+                    Label("Join Daily Zikr", systemImage: source.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.onPrimary)
                         .frame(maxWidth: .infinity, minHeight: 46)
@@ -54,15 +58,19 @@ struct LiveBroadcastCard: View {
                 .buttonStyle(DIPressableStyle())
             }
             if displaySources.isEmpty {
-                Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
-                    .font(.footnote).foregroundStyle(fgMuted)
-                if broadcast.automaticBroadcast == false {
-                    Label("Starting Daily Zikr here automatically: integration in progress.", systemImage: "hourglass")
-                        .font(.caption).foregroundStyle(fgMuted)
+                if isLive || sessionOpen {
+                    // The zikr has begun (the room is open) but no stream the
+                    // app can play is on air yet. Zikr is joined here, never in
+                    // another app, so the card waits for the stream.
+                    Label("Zikr has started. The live stream appears here as soon as it is on air.", systemImage: "dot.radiowaves.left.and.right")
+                        .font(.footnote).foregroundStyle(fgMuted)
+                } else {
+                    Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
+                        .font(.footnote).foregroundStyle(fgMuted)
                 }
             }
-            if broadcast.updatedAt != .distantPast {
-                Text("Updated \(broadcast.updatedAt.formatted(.relative(presentation: .named)))")
+            if current.updatedAt != .distantPast {
+                Text("Updated \(current.updatedAt.formatted(.relative(presentation: .named)))")
                     .font(.caption2).foregroundStyle(fgMuted)
             }
         }
@@ -78,7 +86,20 @@ struct LiveBroadcastCard: View {
             color: isLive ? DIColor.primaryDeep.opacity(0.4) : Color.black.opacity(0.06),
             radius: isLive ? 18 : 8, x: 0, y: isLive ? 10 : 4
         )
-        .sheet(item: $presentedVideo) { video in YouTubePlayerSheet(videoID: video.id, title: broadcast.title) }
+        .sheet(item: $presentedVideo) { video in YouTubePlayerSheet(videoID: video.id, title: current.title) }
+        .onChange(of: broadcast) { latest = nil }
+        .task(id: platform == nil) { await follow() }
+    }
+
+    /// Re-reads the live state every 30 seconds while the card is visible.
+    private func follow() async {
+        guard let platform else { return }
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(30))
+            if Task.isCancelled { break }
+            let fresh = await platform.currentLiveBroadcast(forceRefresh: true)
+            if fresh != current { latest = fresh }
+        }
     }
 
     @ViewBuilder private var cardBackground: some View {
@@ -104,39 +125,27 @@ struct LiveBroadcastCard: View {
     private func activate(_ source: LiveSource) {
         switch source.kind {
         case .ownedStream:
-            let item = AudioPlayableItem(id: "official-live", title: broadcast.title, subtitle: "Darul Irfan", url: source.url)
+            let item = AudioPlayableItem(id: "official-live", title: current.title, subtitle: "Darul Irfan", url: source.url)
             audioPlayer.play(item, queue: [item])
         case .youtube:
             if let videoID = source.videoID { presentedVideo = PresentedVideo(id: videoID) }
-        case .paltalk: openURL(source.url)
+        case .paltalk:
+            break
         }
     }
 
     /// What the app plays inside itself - its own audio stream, or the live
-    /// video - while it is live; otherwise, while the zikr room is open, the
-    /// room itself. A video left over from the last stream never stands in
-    /// for the room.
+    /// video - while it is live or announced. The Paltalk room the server may
+    /// still list is never offered: zikr is joined inside Darul Irfan, not in
+    /// another app.
     private var displaySources: [LiveSource] {
-        let inApp = broadcast.sources.filter { $0.kind == .ownedStream || ($0.kind == .youtube && $0.videoID != nil) }
-        if isLive && !inApp.isEmpty { return inApp }
-        guard isLive || sessionOpen else { return inApp }
-        let room = broadcast.sources.filter { source in
-            switch source.kind {
-            case .ownedStream, .youtube: return false
-            case .paltalk: return !source.url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/")).isEmpty
-            }
-        }
-        return room.isEmpty ? inApp : room
+        guard isLive || current.state == .scheduled else { return [] }
+        return current.sources.filter { $0.kind == .ownedStream || ($0.kind == .youtube && $0.videoID != nil) }
     }
 
     private var statusText: String {
-        switch broadcast.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
-    }
-    private func label(for source: LiveSource) -> LocalizedStringKey {
-        switch source.kind { case .ownedStream, .youtube: return "Join Daily Zikr"; case .paltalk: return "Join Zikr" }
-    }
-    private func icon(for source: LiveSource) -> String {
-        switch source.kind { case .ownedStream: return "headphones"; case .youtube: return "play.rectangle.fill"; case .paltalk: return "person.3.fill" }
+        if !isLive && sessionOpen { return "STARTING" }
+        switch current.state { case .offline: return "OFF AIR"; case .scheduled: return "SCHEDULED"; case .live: return "LIVE"; case .ended: return "ENDED" }
     }
 }
 

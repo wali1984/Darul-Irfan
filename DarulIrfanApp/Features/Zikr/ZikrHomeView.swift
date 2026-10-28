@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Zikr section entry point, linked from the More tab: a living gradient hero
 /// carrying the anchor verse of remembrance, the verified Method of Zikr, the
@@ -7,10 +8,14 @@ import SwiftUI
 struct ZikrHomeView: View {
     @State private var viewModel: ZikrHomeViewModel
     @State private var presentedVideo: ZikrPresentedVideo?
+    @State private var liveAlertsDenied = false
     private let dependencies: AppDependencies
+    private let appState: AppState
+    private let groupService = MemberGroupService()
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
+        self.appState = appState
         _viewModel = State(initialValue: ZikrHomeViewModel(
             notifications: dependencies.notifications,
             platform: dependencies.officialPlatform,
@@ -36,8 +41,24 @@ struct ZikrHomeView: View {
                     .diAppear(delay: 0.05)
 
                 DISectionHeader(titleKey: "Daily Zikr", systemImage: "dot.radiowaves.left.and.right")
-                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer, sessionOpen: sessionOpen)
+                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer,
+                                  sessionOpen: sessionOpen, platform: dependencies.officialPlatform)
                     .diAppear(delay: 0.08)
+                liveAlertToggle
+
+                // Halqah zikr that admins have started in the member's groups,
+                // joined from here as well as from the group itself.
+                if !viewModel.liveGroups.isEmpty {
+                    DISectionHeader(titleKey: "Halqah Zikr live now", systemImage: "person.3.fill")
+                    ForEach(viewModel.liveGroups) { group in
+                        NavigationLink {
+                            GroupDetailView(group: group, service: groupService, dependencies: dependencies)
+                        } label: {
+                            LiveHalqahRow(group: group)
+                        }
+                        .buttonStyle(DIPressableStyle())
+                    }
+                }
 
                 DISectionHeader(titleKey: "Online Zikr", systemImage: "clock")
                 if viewModel.isLoaded && viewModel.sessions.isEmpty {
@@ -91,15 +112,60 @@ struct ZikrHomeView: View {
         .diPageHeading("Zikr")
         .diScreenBackground()
         .task { await viewModel.load() }
-        .refreshable { await viewModel.load(forceRefresh: true) }
+        .task { await viewModel.followLiveGroups(service: groupService) }
+        .refreshable {
+            await viewModel.load(forceRefresh: true)
+            await viewModel.refreshLiveGroups(service: groupService)
+        }
         .alert("Notifications are off", isPresented: $viewModel.showPermissionAlert) {
             Button("OK", role: .cancel) {}
         } message: {
             Text("To receive zikr reminders, please allow notifications for Darul Irfan in iOS Settings.")
         }
+        .alert("Notifications are off", isPresented: $liveAlertsDenied) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("To be told when Daily Zikr goes live, please allow notifications for Darul Irfan in iOS Settings.")
+        }
         .sheet(item: $presentedVideo) { video in
             YouTubePlayerSheet(videoID: video.id, title: video.title)
         }
+    }
+
+    // MARK: - Live alert
+
+    /// The official "Daily Zikr has started" notification. It is the same
+    /// consented choice as Settings > Official Alerts, offered where it matters.
+    private var liveAlertToggle: some View {
+        DICard(padding: DISpacing.sm) {
+            Toggle(isOn: Binding(
+                get: { appState.settings.push.isEnabled && appState.settings.push.topics.contains(.liveZikr) },
+                set: { enabled in Task { await setLiveAlerts(enabled) } }
+            )) {
+                Label("Notify me when Daily Zikr goes live", systemImage: "bell.badge")
+                    .font(.subheadline)
+                    .foregroundStyle(DIColor.textPrimary)
+            }
+            .tint(DIColor.primary)
+        }
+    }
+
+    private func setLiveAlerts(_ enabled: Bool) async {
+        if enabled {
+            guard await dependencies.notifications.requestPermission() else { liveAlertsDenied = true; return }
+            await appState.updateSettings {
+                $0.push.isEnabled = true
+                $0.push.topics.insert(.liveZikr)
+                $0.push.consentVersion = PushPreferences.currentConsentVersion
+            }
+        } else {
+            await appState.updateSettings {
+                $0.push.topics.remove(.liveZikr)
+                $0.push.consentVersion = PushPreferences.currentConsentVersion
+            }
+        }
+        // Registration carries the topics, so a change is sent the same way.
+        UIApplication.shared.registerForRemoteNotifications()
     }
 
     // MARK: - Tasbih entry
@@ -384,6 +450,36 @@ private struct ZikrSessionCountdown: View {
                 .accessibilityElement(children: .combine)
             }
         }
+    }
+}
+
+// MARK: - Live halqah zikr
+
+/// A group of the member's where an admin has started zikr; opens the group,
+/// whose live card plays it and holds the room.
+private struct LiveHalqahRow: View {
+    let group: MemberGroup
+
+    var body: some View {
+        DIElevatedCard(glow: DIColor.primary) {
+            HStack(spacing: DISpacing.md) {
+                DILivePulse(color: DIColor.primary, size: 9)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: group.name)
+                        .font(DIFont.subheading)
+                        .foregroundStyle(DIColor.textPrimary)
+                    Text("Zikr is live in this halqah. Tap to join.")
+                        .font(.subheadline)
+                        .foregroundStyle(DIColor.textMuted)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.forward")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .accessibilityHidden(true)
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

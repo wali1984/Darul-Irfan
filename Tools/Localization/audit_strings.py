@@ -89,7 +89,7 @@ KNOWN_KEYS = {
     "%@ attended": "%lld attended",
     "%@ listening": "%lld listening",
     "The group is at %@ of %lld": "The group is at %@ of %@",
-    "Updated \\(broadcast.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",
+    "Updated \\(current.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",
 }
 
 

@@ -26,6 +26,8 @@ struct GroupDetailView: View {
     @State private var joining = false
     @State private var joinError: String?
     @State private var sheet: AdminSheet?
+    /// The official Daily Zikr, shown in every halqah while it is live.
+    @State private var officialLive: LiveBroadcast?
 
     enum AdminSheet: String, Identifiable {
         case people, post, live, meeting, zikr, duas, history
@@ -46,6 +48,7 @@ struct GroupDetailView: View {
                         }
                     }
                 } else {
+                    officialLiveSection
                     liveSection
                     zikrSection
                     meetingsSection
@@ -83,6 +86,14 @@ struct GroupDetailView: View {
     private var whatsappReady: Bool { detail?.integrations?.whatsappForwarding ?? true }
 
     // MARK: Live
+
+    @ViewBuilder
+    private var officialLiveSection: some View {
+        if let officialLive, officialLive.state == .live, let dependencies {
+            LiveBroadcastCard(broadcast: officialLive, audioPlayer: dependencies.audioPlayer,
+                              platform: dependencies.officialPlatform)
+        }
+    }
 
     @ViewBuilder
     private var liveSection: some View {
@@ -324,6 +335,7 @@ struct GroupDetailView: View {
             detail = loaded
             posts = try await service.posts(in: group.id)
             drafts = loaded.canManage ? ((try? await service.posts(in: group.id, drafts: true)) ?? []) : []
+            officialLive = await dependencies?.officialPlatform.currentLiveBroadcast(forceRefresh: true)
         } catch {
             failure = error.localizedDescription
         }

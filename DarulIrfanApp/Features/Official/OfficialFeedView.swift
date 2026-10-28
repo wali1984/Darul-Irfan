@@ -45,7 +45,7 @@ struct OfficialFeedView: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: DISpacing.md) {
                 if viewModel.isLiveHubEnabled {
-                    LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer)
+                    LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer, platform: dependencies.officialPlatform)
                 }
                 if viewModel.isShowingCachedContent {
                     Label("Showing saved updates", systemImage: "wifi.slash")

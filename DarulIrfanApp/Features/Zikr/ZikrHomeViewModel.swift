@@ -20,6 +20,8 @@ final class ZikrHomeViewModel {
     /// Latest official videos, shown as in-app playable "Recent Bayans" so the
     /// section is useful even when no live session is on air.
     private(set) var recentBayans: [OfficialFeedItem] = []
+    /// The signed-in member's groups where zikr (or a meeting) is live now.
+    private(set) var liveGroups: [MemberGroup] = []
     var showPermissionAlert = false
 
     /// Minutes before the session start that the reminder fires.
@@ -86,6 +88,22 @@ final class ZikrHomeViewModel {
             }
         }
         isLoaded = true
+    }
+
+    /// Keeps the live halqahs current while the screen is open.
+    func followLiveGroups(service: MemberGroupService) async {
+        while !Task.isCancelled {
+            await refreshLiveGroups(service: service)
+            try? await Task.sleep(for: .seconds(30))
+        }
+    }
+
+    func refreshLiveGroups(service: MemberGroupService) async {
+        guard await service.isSignedIn, let list = try? await service.groups() else {
+            liveGroups = []
+            return
+        }
+        liveGroups = list.groups.filter { $0.isLive == true }
     }
 
     func isReminderEnabled(_ sessionID: String) -> Bool {

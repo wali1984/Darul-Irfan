@@ -96,7 +96,8 @@ struct MediaTabView: View {
     private var liveCard: some View {
         LiveBroadcastCard(
             broadcast: officialViewModel.live,
-            audioPlayer: dependencies.audioPlayer
+            audioPlayer: dependencies.audioPlayer,
+            platform: dependencies.officialPlatform
         )
     }
 

@@ -24191,6 +24191,108 @@
           }
         }
       }
+    },
+    "Zikr has started. The live stream appears here as soon as it is on air.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr has started. The live stream appears here as soon as it is on air."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر شروع ہو چکا ہے۔ براہِ راست نشریات شروع ہوتے ہی یہیں نظر آئیں گی۔"
+          }
+        }
+      }
+    },
+    "STARTING": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STARTING"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شروع ہو رہا ہے"
+          }
+        }
+      }
+    },
+    "Notify me when Daily Zikr goes live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notify me when Daily Zikr goes live"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر براہِ راست شروع ہو تو مجھے اطلاع دیں"
+          }
+        }
+      }
+    },
+    "To be told when Daily Zikr goes live, please allow notifications for Darul Irfan in iOS Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To be told when Daily Zikr goes live, please allow notifications for Darul Irfan in iOS Settings."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر براہِ راست شروع ہونے کی اطلاع کے لیے، براہِ کرم iOS سیٹنگز میں دارالعرفان کے لیے اطلاعات کی اجازت دیں۔"
+          }
+        }
+      }
+    },
+    "Halqah Zikr live now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halqah Zikr live now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقۂ ذکر ابھی براہِ راست"
+          }
+        }
+      }
+    },
+    "Zikr is live in this halqah. Tap to join.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr is live in this halqah. Tap to join."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حلقے میں ذکر براہِ راست جاری ہے۔ شامل ہونے کے لیے ٹیپ کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
