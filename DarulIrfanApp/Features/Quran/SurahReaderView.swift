@@ -14,8 +14,10 @@ struct SurahReaderView: View {
     private let audioPlayer: any AudioPlayerServicing
     private let dependencies: AppDependencies
     @State private var viewModel: SurahReaderViewModel
-    @State private var player = RecitationPlayer()
+    @State private var player = QuranListenPlayer.shared
     @State private var speaker = TranslationSpeaker()
+    @AppStorage("quranListenContent") private var listenContent: QuranListenContent = .arabic
+    @AppStorage("quranListenScope") private var listenScope: QuranListenScope = .surah
     @State private var hasScrolledToFocus = false
     @State private var hasAutoAdvanced = false
     @State private var bayanError: String?
@@ -83,7 +85,9 @@ struct SurahReaderView: View {
                 await NarrationCatalog.shared.load()
             }
             .onDisappear {
-                player.stop()
+                // A juz carries on into the next surah's reader; anything
+                // else stops with the surah it belongs to.
+                if player.scope != .juz || !player.isPlaying { player.stop() }
                 speaker.stop()
                 let readerViewModel = viewModel
                 Task { await readerViewModel.flushLastRead() }
@@ -142,8 +146,8 @@ struct SurahReaderView: View {
                     if showsBismillahHeader {
                         bismillahHeader
                     }
-                    if viewModel.recitation != nil {
-                        recitationBar
+                    if viewModel.recitation != nil || canPlayTranslation {
+                        listenBar
                     }
                     if appState.settings.quranReaderDisplayMode.showsTranslation {
                         contentModeSelector
@@ -173,6 +177,7 @@ struct SurahReaderView: View {
                             dependencies: dependencies,
                             player: player,
                             speaker: speaker,
+                            listen: { start(from: $0) },
                             fontScale: appState.settings.readerFontScale.rawValue,
                             displayMode: appState.settings.quranReaderDisplayMode
                         )
@@ -298,44 +303,123 @@ struct SurahReaderView: View {
         }
     }
 
-    /// Whole-surah recitation control + reciter credit.
-    private var recitationBar: some View {
-        let isThisSurah = player.currentSurah == viewModel.surah.id
-        let isPlaying = player.isPlaying && isThisSurah
-        return DICard(padding: DISpacing.sm) {
-            HStack(spacing: DISpacing.md) {
-                Button {
-                    guard let recitation = viewModel.recitation else { return }
-                    if isPlaying {
-                        player.pause()
-                    } else if isThisSurah {
-                        speaker.stop()
-                        player.resume()
-                    } else {
-                        speaker.stop()
-                        player.start(surah: viewModel.surah.id, recitation: recitation, fromAyah: 1)
-                    }
-                } label: {
-                    Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                        .font(.system(size: 34))
-                        .foregroundStyle(DIColor.primary)
-                }
-                .accessibilityLabel(isPlaying ? Text("Pause recitation") : Text("Play recitation"))
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Recitation")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DIColor.textPrimary)
-                    Text(RecitationProvider.shared.reciterName)
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
-                }
-                Spacer(minLength: 0)
-                if isPlaying {
-                    Image(systemName: "waveform")
-                        .foregroundStyle(DIColor.accent)
-                        .symbolEffect(.variableColor.iterative, options: .repeating)
-                }
+    // MARK: - Listen
+
+    /// The translation on screen, when its narration exists.
+    private var narratedTranslationEdition: String? {
+        let edition = viewModel.translationEdition?.id
+        return QuranListenPlayer.hasTranslation(edition: edition) ? edition : nil
+    }
+
+    private var canPlayTranslation: Bool { narratedTranslationEdition != nil }
+
+    /// What can be chosen here: the recitation needs the reciter's timings,
+    /// the translation its narration.
+    private var listenContents: [QuranListenContent] {
+        QuranListenContent.allCases.filter { content in
+            switch content {
+            case .arabic: return viewModel.recitation != nil
+            case .translation: return canPlayTranslation
+            case .both: return viewModel.recitation != nil && canPlayTranslation
             }
+        }
+    }
+
+    private var effectiveContent: QuranListenContent {
+        listenContents.contains(listenContent) ? listenContent : (listenContents.first ?? .arabic)
+    }
+
+    /// Starts playback at an ayah in the chosen mode and range.
+    private func start(from ayahNumber: Int) {
+        speaker.stop()
+        player.start(from: AyahRef(surah: viewModel.surah.id, ayah: ayahNumber), content: effectiveContent,
+                     scope: listenScope, translationEdition: narratedTranslationEdition)
+    }
+
+    /// Recitation, translation, or both ayah by ayah - over an ayah, ruku,
+    /// surah or juz (para) - from the top, or from any ayah's play button.
+    private var listenBar: some View {
+        let isHere = player.isActive(inSurah: viewModel.surah.id)
+        let isPlaying = player.isPlaying && isHere
+        return DICard(padding: DISpacing.sm) {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                HStack(spacing: DISpacing.md) {
+                    Button {
+                        if isPlaying {
+                            player.pause()
+                        } else if isHere {
+                            speaker.stop()
+                            player.resume()
+                        } else {
+                            start(from: 1)
+                        }
+                    } label: {
+                        Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                            .font(.system(size: 34))
+                            .foregroundStyle(DIColor.primary)
+                    }
+                    .accessibilityLabel(isPlaying ? Text("Pause") : Text("Play"))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Listen")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(DIColor.textPrimary)
+                        Text(listenSubtitle)
+                            .font(.caption)
+                            .foregroundStyle(DIColor.textMuted)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 0)
+                    if isHere {
+                        if isPlaying {
+                            Image(systemName: "waveform")
+                                .foregroundStyle(DIColor.accent)
+                                .symbolEffect(.variableColor.iterative, options: .repeating)
+                        }
+                        Button {
+                            player.stop()
+                        } label: {
+                            Image(systemName: "stop.circle")
+                                .font(.title3)
+                                .foregroundStyle(DIColor.textMuted)
+                        }
+                        .accessibilityLabel(Text("Stop"))
+                    }
+                }
+                if listenContents.count > 1 {
+                    DISegmentedControl(
+                        items: listenContents,
+                        title: { content in
+                            switch content {
+                            case .arabic: return "Recitation"
+                            case .translation: return "Translation"
+                            case .both: return "Both"
+                            }
+                        },
+                        selection: Binding(get: { effectiveContent }, set: { listenContent = $0 })
+                    )
+                }
+                Picker(selection: $listenScope) {
+                    Text("Ayah").tag(QuranListenScope.ayah)
+                    Text("Ruku").tag(QuranListenScope.ruku)
+                    Text("Surah").tag(QuranListenScope.surah)
+                    Text("Juz (Para)").tag(QuranListenScope.juz)
+                } label: {
+                    Text("Play to the end of")
+                }
+                .pickerStyle(.segmented)
+                .accessibilityLabel(Text("Play to the end of"))
+            }
+        }
+        .onChange(of: listenContent) { if isHere { player.stop() } }
+        .onChange(of: listenScope) { if isHere { player.stop() } }
+    }
+
+    /// Who reads: the reciter, the translation, or both.
+    private var listenSubtitle: String {
+        switch effectiveContent {
+        case .arabic: return RecitationProvider.shared.reciterName
+        case .translation: return viewModel.translationEdition?.title ?? String(localized: "Translation")
+        case .both: return String(localized: "Recitation, then translation, ayah by ayah")
         }
     }
 
@@ -681,8 +765,9 @@ private struct AyahCardView: View {
     let ayah: QuranAyah
     let viewModel: SurahReaderViewModel
     let dependencies: AppDependencies
-    let player: RecitationPlayer
+    let player: QuranListenPlayer
     let speaker: TranslationSpeaker
+    let listen: (Int) -> Void
     let fontScale: Double
     let displayMode: QuranReaderDisplayMode
 
@@ -695,10 +780,6 @@ private struct AyahCardView: View {
         player.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
     }
 
-    /// This ayah's translation narration is playing (not its tafsir).
-    private var isSpeaking: Bool {
-        speaker.currentKind == "translation" && speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
-    }
 
     var body: some View {
         DICard(
@@ -732,7 +813,7 @@ private struct AyahCardView: View {
             }
         }
         .overlay(alignment: .leading) {
-            if isSounding || isSpeaking {
+            if isSounding {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(DIColor.accent)
                     .frame(width: 3)
@@ -783,13 +864,12 @@ private struct AyahCardView: View {
 
     @ViewBuilder
     private var playButton: some View {
-        if let recitation = viewModel.recitation {
+        if viewModel.recitation != nil || QuranListenPlayer.hasTranslation(edition: viewModel.translationEdition?.id) {
             Button {
                 if isSounding {
                     player.pause()
                 } else {
-                    speaker.stop()
-                    player.start(surah: ayah.surahNumber, recitation: recitation, fromAyah: ayah.ayahNumber)
+                    listen(ayah.ayahNumber)
                 }
             } label: {
                 Image(systemName: isSounding ? "pause.circle.fill" : "play.circle")
@@ -834,7 +914,7 @@ private struct AyahCardView: View {
 
     /// Joins the recitation words, tinting the one currently sounding.
     private func highlightedArabic(words: [RecitationWord]) -> AttributedString {
-        let highlight = isSounding ? player.currentWordPosition : nil
+        let highlight = isSounding && player.part == .arabic ? player.currentWordPosition : nil
         var result = AttributedString()
         for (index, word) in words.enumerated() {
             var piece = AttributedString(word.text)
@@ -891,24 +971,6 @@ private struct AyahCardView: View {
     private var shellsRow: some View {
         VStack(alignment: .leading, spacing: DISpacing.xs) {
             HStack(spacing: DISpacing.sm) {
-                if let edition = narratedTranslationEdition {
-                    Button {
-                        player.stop()
-                        speaker.toggle(edition: edition, surah: ayah.surahNumber, ayah: ayah.ayahNumber,
-                                       lastAyah: viewModel.surah.ayahCount)
-                    } label: {
-                        shellChip(
-                            isSpeaking ? "Stop" : "Listen",
-                            isSpeaking ? "stop.fill" : "speaker.wave.2",
-                            enabled: true
-                        )
-                    }
-                    .accessibilityLabel(
-                        isSpeaking
-                            ? Text("Stop the translation narration")
-                            : Text("Listen to the translation of Ayah \(ayah.ayahNumber)")
-                    )
-                }
                 if let passage = narratedTafsirPassage {
                     Button {
                         player.stop()
@@ -935,11 +997,6 @@ private struct AyahCardView: View {
                 }
                 .accessibilityLabel(Text("Write a note on Ayah \(ayah.ayahNumber)"))
             }
-            if isSpeaking || isReadingTafsir, let credit = narrationCredit {
-                Text(credit)
-                    .font(.caption2)
-                    .foregroundStyle(DIColor.textMuted)
-            }
         }
         .sheet(isPresented: $isWritingNote) {
             NavigationStack {
@@ -960,17 +1017,6 @@ private struct AyahCardView: View {
         MyDayStore.shared.notes(about: noteReference).count
     }
 
-    /// The edition whose narration matches the translation on screen, when this
-    /// ayah has one. Only the Silsila's own text is ever narrated.
-    private var narratedTranslationEdition: String? {
-        guard displayMode.showsTranslation,
-              let translation = viewModel.translation(for: ayah.ayahNumber),
-              NarrationCatalog.shared.has(edition: translation.editionID, kind: "translation",
-                                          surah: ayah.surahNumber, start: ayah.ayahNumber, end: ayah.ayahNumber)
-        else { return nil }
-        return translation.editionID
-    }
-
     /// The tafsir passage beginning at this ayah, when it has a narration.
     private var narratedTafsirPassage: QuranTafsir? {
         guard let passage = viewModel.tafsirEntry(startingAt: ayah.ayahNumber),
@@ -982,15 +1028,6 @@ private struct AyahCardView: View {
 
     private var isReadingTafsir: Bool {
         speaker.currentKind == "tafsir" && speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
-    }
-
-    /// Says whose recordings the synthesized voice is modelled on, so nobody
-    /// takes it for that reader's own reading of the Silsila's text.
-    private var narrationCredit: String? {
-        guard let edition = speaker.currentEdition else { return nil }
-        let language = edition.hasSuffix("-ur") ? "ur" : "en"
-        guard let name = NarrationCatalog.shared.voiceName(language: language) else { return nil }
-        return String(localized: "Narrated in a synthesized voice modelled on recordings of \(name), used with permission.")
     }
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {

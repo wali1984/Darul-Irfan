@@ -43,6 +43,9 @@ REF_TEXT = json.loads((V / "refs/ref_texts.json").read_text(encoding="utf-8"))["
 LEAD = "<|prosody:speed_slow|>"
 PAUSE = " <|prosody:pause|> "
 SENTENCE_GAP, PARAGRAPH_GAP = 0.65, 1.1
+# Every piece fades in and out, so no join clicks; each file ends in a fade and
+# a short silence, so one ayah runs into the next like a breath, not a cut.
+FADE_IN, FADE_OUT, FILE_FADE, FILE_TAIL, FILE_LEAD = 0.01, 0.03, 0.08, 0.35, 0.05
 MAX_CHUNK = 240
 
 # Words the voice misreads, with the vowel marks that make it read them right.
@@ -213,6 +216,16 @@ def recitation(name: str, rate: int) -> np.ndarray:
     return np.frombuffer(raw, dtype=np.float32)
 
 
+def faded(audio: np.ndarray, rate: int, fade_in: float = FADE_IN, fade_out: float = FADE_OUT) -> np.ndarray:
+    audio = audio.astype(np.float32, copy=True)
+    n_in, n_out = min(len(audio), int(rate * fade_in)), min(len(audio), int(rate * fade_out))
+    if n_in:
+        audio[:n_in] *= np.linspace(0.0, 1.0, n_in, dtype=np.float32)
+    if n_out:
+        audio[-n_out:] *= np.linspace(1.0, 0.0, n_out, dtype=np.float32)
+    return audio
+
+
 def gpu_temperature() -> int:
     out = subprocess.run(["nvidia-smi", "--query-gpu=temperature.gpu", "--format=csv,noheader,nounits"],
                          check=True, capture_output=True, text=True).stdout
@@ -242,12 +255,12 @@ def main() -> int:
                 for chunk in chunks(segment["say"]):
                     audio, flag = voice.say(chunk)
                     bad |= flag
-                    pieces += [audio, np.zeros(int(voice.rate * SENTENCE_GAP), np.float32)]
+                    pieces += [faded(audio, voice.rate), np.zeros(int(voice.rate * SENTENCE_GAP), np.float32)]
             elif "para" in segment and pieces:
                 pieces[-1] = np.zeros(int(voice.rate * PARAGRAPH_GAP), np.float32)
             elif "recite" in segment and voice.rate:
                 try:
-                    pieces += [np.zeros(int(voice.rate * 0.3), np.float32), recitation(segment["recite"], voice.rate),
+                    pieces += [np.zeros(int(voice.rate * 0.3), np.float32), faded(recitation(segment["recite"], voice.rate), voice.rate, 0.02, 0.15),
                                np.zeros(int(voice.rate * 0.8), np.float32)]
                 except subprocess.CalledProcessError:
                     log(f"no recitation for {segment['recite']}; left out")
@@ -255,7 +268,9 @@ def main() -> int:
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
         wav = target.with_suffix(".wav")
-        sf.write(wav, np.concatenate(pieces[:-1] if len(pieces) > 1 else pieces), voice.rate)
+        body = faded(np.concatenate(pieces[:-1] if len(pieces) > 1 else pieces), voice.rate, FADE_IN, FILE_FADE)
+        sf.write(wav, np.concatenate([np.zeros(int(voice.rate * FILE_LEAD), np.float32), body,
+                                      np.zeros(int(voice.rate * FILE_TAIL), np.float32)]), voice.rate)
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(wav), "-ac", "1", "-b:a", "64k", str(target)], check=True)
         wav.unlink()
         if bad:

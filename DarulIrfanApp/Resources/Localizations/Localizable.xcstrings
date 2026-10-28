@@ -24344,6 +24344,108 @@
           }
         }
       }
+    },
+    "Both": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Both"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دونوں"
+          }
+        }
+      }
+    },
+    "Ruku": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruku"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رکوع"
+          }
+        }
+      }
+    },
+    "Juz (Para)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juz (Para)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پارہ"
+          }
+        }
+      }
+    },
+    "Play to the end of": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play to the end of"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہاں تک سنیں"
+          }
+        }
+      }
+    },
+    "Recitation, then translation, ayah by ayah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recitation, then translation, ayah by ayah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پہلے تلاوت، پھر ترجمہ، آیت بہ آیت"
+          }
+        }
+      }
+    },
+    "The Urdu narration of the translation and tafsir was created with Boson AI's Higgs Audio, in a voice modelled on recordings of Shamshad Ali Khan, used with permission.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Urdu narration of the translation and tafsir was created with Boson AI's Higgs Audio, in a voice modelled on recordings of Shamshad Ali Khan, used with permission."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ترجمہ اور تفسیر کی اردو آواز Boson AI کے Higgs Audio سے تیار کی گئی ہے، شمشاد علی خان کی ریکارڈنگز پر مبنی آواز میں، اجازت کے ساتھ۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

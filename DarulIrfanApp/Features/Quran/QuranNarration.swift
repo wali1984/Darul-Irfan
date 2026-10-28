@@ -175,7 +175,7 @@ final class TranslationSpeaker {
         play(edition: edition, kind: "translation", surah: surah, start: end + 1, end: end + 1)
     }
 
-    private static func keepForOffline(_ remote: URL, at local: URL) {
+    static func keepForOffline(_ remote: URL, at local: URL) {
         Task.detached(priority: .utility) {
             guard let (temporary, response) = try? await URLSession.shared.download(from: remote),
                   (response as? HTTPURLResponse)?.statusCode == 200 else { return }
