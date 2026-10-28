@@ -77,7 +77,7 @@ struct GroupPostComposer: View {
                 Text("Up to 10 pictures and videos; each video up to 95 MB. They are seen by this Halqah only.")
             }
             Section {
-                TextField("Title", text: $title, axis: .vertical)
+                TextField(attachments.isEmpty ? "Title" : "Title (optional)", text: $title, axis: .vertical)
                 TextField("Message", text: $message, axis: .vertical)
                     .lineLimit(3...12)
                 TextField("Video link (optional)", text: $videoLink)
@@ -129,9 +129,12 @@ struct GroupPostComposer: View {
         }
     }
 
+    /// A title, or at least a picture or video, which can stand on its own.
     private var canSave: Bool {
-        !working && !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && (videoLink.isEmpty || VideoLink.id(from: videoLink) != nil)
+        let hasTitle = !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let hasVideo = VideoLink.id(from: videoLink) != nil
+        return !working && (hasTitle || !attachments.isEmpty || hasVideo)
+            && (videoLink.isEmpty || hasVideo)
     }
 
     private func paste() {

@@ -204,20 +204,24 @@ export async function createPost(env: Env, memberID: string, groupID: string, in
   if (!await canSee(env, memberID, role, groupID)) return notFound();
   if (!await canManage(env, memberID, role, groupID)) return forbidden();
   const kind = input.kind === "zikr" ? "zikr" : "announcement";
-  const title = cleanText(input.title, 300);
-  if (!title) return json({ error: "A title is required" }, { status: 400 });
   const video = typeof input.youtubeVideoID === "string" && /^[\w-]{11}$/.test(input.youtubeVideoID) ? input.youtubeVideoID : null;
   if (kind === "zikr" && !video) return json({ error: "A recorded zikr needs a video" }, { status: 400 });
   const publish = input.publish !== false;
   const attachments = await validAttachments(env, groupID, input.media);
   if (attachments instanceof Response) return attachments;
+  // A picture or video can stand on its own; anything else needs a title.
+  const title = cleanText(input.title, 300) ?? "";
+  if (!title && !attachments.length && !video) return json({ error: "Add a title, or a picture or video." }, { status: 400 });
   const id = newID("post");
   const now = new Date().toISOString();
   await env.DB.prepare(`INSERT INTO member_group_posts(id,group_id,kind,title,body,youtube_video_id,link_url,published_at,author_email,is_hidden,updated_at,status,source,media_json)
     VALUES(?,?,?,?,?,?,?,?,?,0,?,?,'admin',?)`)
     .bind(id, groupID, kind, title, cleanText(input.body, 8_000) ?? null, video, validHTTPURL(input.linkURL) ?? null,
       now, `member:${memberID}`, now, publish ? "published" : "draft", attachments.length ? JSON.stringify(attachments) : null).run();
-  if (publish) await notifyGroup(env, groupID, `post:${id}`, title, cleanText(input.body, 140) ?? "", `darulirfan://groups/${groupID}`);
+  if (publish) {
+    const pictures = attachments.length ? (attachments.some(item => item.kind === "video") ? "A new post with a video." : "A new post with pictures.") : "";
+    await notifyGroup(env, groupID, `post:${id}`, title || "New post", cleanText(input.body, 140) ?? pictures, `darulirfan://groups/${groupID}`);
+  }
   return json({ ok: true, id, published: publish }, { status: 201 });
 }
 

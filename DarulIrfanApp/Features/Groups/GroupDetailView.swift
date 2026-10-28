@@ -257,8 +257,11 @@ struct GroupDetailView: View {
                 HStack(spacing: DISpacing.sm) {
                     Image(systemName: post.kind == .zikr ? "waveform" : "megaphone")
                         .foregroundStyle(DIColor.accent)
-                    Text(verbatim: post.title)
-                        .font(.headline)
+                    // A post of pictures alone may have no title.
+                    if !post.title.isEmpty {
+                        Text(verbatim: post.title)
+                            .font(.headline)
+                    }
                     Spacer(minLength: 0)
                 }
                 Text(post.publishedAt, format: .dateTime.day().month(.wide).year())

@@ -779,6 +779,9 @@ describe("post pictures and videos", () => {
     expect((await call(admin, "POST", "/v1/groups/usa/posts", { title: "Gathering", media: ["posts/canada/x.jpg"] })).status).toBe(400);
     expect((await call(admin, "POST", "/v1/groups/usa/posts", { title: "Gathering", media: [`posts/usa/${crypto.randomUUID()}.jpg`] })).status).toBe(400);
     expect((await call(admin, "POST", "/v1/groups/usa/posts", { title: "Gathering", media: [picture.key, video.key] })).status).toBe(201);
+    // A picture stands on its own; with nothing at all, a title is needed.
+    expect((await call(admin, "POST", "/v1/groups/usa/posts", { media: [picture.key] })).status).toBe(201);
+    expect((await call(admin, "POST", "/v1/groups/usa/posts", { body: "text only" })).status).toBe(400);
     const posts = (await (await call(member, "GET", "/v1/groups/usa/posts")).json()) as { posts: { title: string; media?: { url: string; kind: string }[] }[] };
     const post = posts.posts.find(item => item.title === "Gathering");
     expect(post?.media?.map(item => item.kind)).toEqual(["image", "video"]);

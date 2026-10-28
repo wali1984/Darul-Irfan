@@ -191,10 +191,14 @@ struct DailyMediaEditor: View {
     /// The chosen picture, made a JPEG no larger than 2048 pixels across.
     private func read(_ chosen: PhotosPickerItem?) async {
         guard let chosen, let data = try? await chosen.loadTransferable(type: Data.self), let image = UIImage(data: data) else { return }
-        let longest = max(image.size.width, image.size.height)
-        let scale = min(1, 2048 / max(longest, 1))
-        let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
-        let resized = UIGraphicsImageRenderer(size: size).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+        // In pixels: a pasted picture may carry a scale of its own.
+        let pixels = CGSize(width: image.size.width * image.scale, height: image.size.height * image.scale)
+        let scale = min(1, 2048 / max(pixels.width, pixels.height, 1))
+        let size = CGSize(width: (pixels.width * scale).rounded(), height: (pixels.height * scale).rounded())
+        // At 1x, not the screen's scale, so the picture is the size intended.
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1
+        let resized = UIGraphicsImageRenderer(size: size, format: format).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
         preview = resized
         picture = resized.jpegData(compressionQuality: 0.85)
     }
