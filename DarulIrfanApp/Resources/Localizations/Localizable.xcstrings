@@ -24055,6 +24055,142 @@
           }
         }
       }
+    },
+    "Listen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سنیں"
+          }
+        }
+      }
+    },
+    "Listen to tafsir": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen to tafsir"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفسیر سنیں"
+          }
+        }
+      }
+    },
+    "Stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روکیں"
+          }
+        }
+      }
+    },
+    "Stop the translation narration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop the translation narration"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ترجمے کی آواز روکیں"
+          }
+        }
+      }
+    },
+    "Listen to the translation of Ayah %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen to the translation of Ayah %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیت %lld کا ترجمہ سنیں"
+          }
+        }
+      }
+    },
+    "Stop the tafsir narration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop the tafsir narration"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفسیر کی آواز روکیں"
+          }
+        }
+      }
+    },
+    "Listen to the tafsir of Ayah %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen to the tafsir of Ayah %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیت %lld کی تفسیر سنیں"
+          }
+        }
+      }
+    },
+    "Narrated in a synthesized voice modelled on recordings of %@, used with permission.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Narrated in a synthesized voice modelled on recordings of %@, used with permission."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ آواز %@ کی ریکارڈنگز کی بنیاد پر تیار کی گئی ہے، اجازت کے ساتھ استعمال کی گئی۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

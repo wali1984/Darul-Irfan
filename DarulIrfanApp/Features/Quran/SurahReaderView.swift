@@ -80,6 +80,7 @@ struct SurahReaderView: View {
                 // rather than during a card's render.
                 MyDayStore.shared.loadIfNeeded()
                 await viewModel.load()
+                await NarrationCatalog.shared.load()
             }
             .onDisappear {
                 player.stop()
@@ -694,8 +695,9 @@ private struct AyahCardView: View {
         player.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
     }
 
+    /// This ayah's translation narration is playing (not its tafsir).
     private var isSpeaking: Bool {
-        speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
+        speaker.currentKind == "translation" && speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
     }
 
     var body: some View {
@@ -884,31 +886,45 @@ private struct AyahCardView: View {
         .tint(DIColor.primary)
     }
 
-    // MARK: Shells (prepared for later)
+    // MARK: Listen and note
 
     private var shellsRow: some View {
         VStack(alignment: .leading, spacing: DISpacing.xs) {
             HStack(spacing: DISpacing.sm) {
-                if let audio = translationAudio {
+                if let edition = narratedTranslationEdition {
                     Button {
                         player.stop()
-                        speaker.toggle(
-                            text: audio.text,
-                            language: audio.language,
-                            surah: ayah.surahNumber,
-                            ayah: ayah.ayahNumber
-                        )
+                        speaker.toggle(edition: edition, surah: ayah.surahNumber, ayah: ayah.ayahNumber,
+                                       lastAyah: viewModel.surah.ayahCount)
                     } label: {
                         shellChip(
-                            isSpeaking ? "Stop" : "Translation audio",
+                            isSpeaking ? "Stop" : "Listen",
                             isSpeaking ? "stop.fill" : "speaker.wave.2",
                             enabled: true
                         )
                     }
                     .accessibilityLabel(
                         isSpeaking
-                            ? Text("Stop translation audio")
-                            : Text("Play translation audio for Ayah \(ayah.ayahNumber)")
+                            ? Text("Stop the translation narration")
+                            : Text("Listen to the translation of Ayah \(ayah.ayahNumber)")
+                    )
+                }
+                if let passage = narratedTafsirPassage {
+                    Button {
+                        player.stop()
+                        speaker.toggle(edition: passage.editionID, kind: "tafsir", surah: passage.surahNumber,
+                                       ayah: passage.ayahStart, end: passage.ayahEnd, lastAyah: viewModel.surah.ayahCount)
+                    } label: {
+                        shellChip(
+                            isReadingTafsir ? "Stop" : "Listen to tafsir",
+                            isReadingTafsir ? "stop.fill" : "text.bubble",
+                            enabled: true
+                        )
+                    }
+                    .accessibilityLabel(
+                        isReadingTafsir
+                            ? Text("Stop the tafsir narration")
+                            : Text("Listen to the tafsir of Ayah \(ayah.ayahNumber)")
                     )
                 }
                 // A private note on this ayah, kept in My Day on this phone.
@@ -918,6 +934,11 @@ private struct AyahCardView: View {
                     shellChip(noteCount > 0 ? String(localized: "Notes (\(noteCount))") : String(localized: "Note"), "square.and.pencil", enabled: true)
                 }
                 .accessibilityLabel(Text("Write a note on Ayah \(ayah.ayahNumber)"))
+            }
+            if isSpeaking || isReadingTafsir, let credit = narrationCredit {
+                Text(credit)
+                    .font(.caption2)
+                    .foregroundStyle(DIColor.textMuted)
             }
         }
         .sheet(isPresented: $isWritingNote) {
@@ -939,26 +960,37 @@ private struct AyahCardView: View {
         MyDayStore.shared.notes(about: noteReference).count
     }
 
-    /// The on-screen translation text + a device voice language, when both a
-    /// translation and a usable voice are available for this ayah.
-    private var translationAudio: (text: String, language: String)? {
+    /// The edition whose narration matches the translation on screen, when this
+    /// ayah has one. Only the Silsila's own text is ever narrated.
+    private var narratedTranslationEdition: String? {
         guard displayMode.showsTranslation,
               let translation = viewModel.translation(for: ayah.ayahNumber),
-              !translation.text.isEmpty else { return nil }
-        let editionLanguage = viewModel.edition(id: translation.editionID)?.language
-        let voiceLanguage = Self.voiceLanguage(for: editionLanguage ?? "ur")
-        guard TranslationSpeaker.hasVoice(for: voiceLanguage) else { return nil }
-        return (translation.text, voiceLanguage)
+              NarrationCatalog.shared.has(edition: translation.editionID, kind: "translation",
+                                          surah: ayah.surahNumber, start: ayah.ayahNumber, end: ayah.ayahNumber)
+        else { return nil }
+        return translation.editionID
     }
 
-    /// Maps a content language code to a BCP-47 voice tag the synthesizer knows.
-    private static func voiceLanguage(for code: String) -> String {
-        switch code {
-        case "ur": return "ur-PK"
-        case "ar": return "ar-SA"
-        case "en": return "en-US"
-        default: return code
-        }
+    /// The tafsir passage beginning at this ayah, when it has a narration.
+    private var narratedTafsirPassage: QuranTafsir? {
+        guard let passage = viewModel.tafsirEntry(startingAt: ayah.ayahNumber),
+              NarrationCatalog.shared.has(edition: passage.editionID, kind: "tafsir", surah: passage.surahNumber,
+                                          start: passage.ayahStart, end: passage.ayahEnd)
+        else { return nil }
+        return passage
+    }
+
+    private var isReadingTafsir: Bool {
+        speaker.currentKind == "tafsir" && speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
+    }
+
+    /// Says whose recordings the synthesized voice is modelled on, so nobody
+    /// takes it for that reader's own reading of the Silsila's text.
+    private var narrationCredit: String? {
+        guard let edition = speaker.currentEdition else { return nil }
+        let language = edition.hasSuffix("-ur") ? "ur" : "en"
+        guard let name = NarrationCatalog.shared.voiceName(language: language) else { return nil }
+        return String(localized: "Narrated in a synthesized voice modelled on recordings of \(name), used with permission.")
     }
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {

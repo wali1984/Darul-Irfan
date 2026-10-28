@@ -10,6 +10,7 @@ import {
   publishDraft, registerMemberDevice, removeZikrSession, saveZikrSession, scheduleMeeting, setLive,
 } from "./community";
 import { serveMedia } from "./media";
+import { quranAudioFile, quranAudioManifest } from "./audio";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
@@ -65,6 +66,13 @@ async function route(request: Request, env: Env): Promise<Response> {
   // The in-app meeting screen. It holds no secret: the participant token
   // travels in the URL fragment, which browsers never send.
   if (request.method === "GET" && path === "/v1/meet") return meetingPage();
+  // Narrated Qur'an translations and tafsir: public, cacheable, ranged.
+  if ((request.method === "GET" || request.method === "HEAD") && path === "/v1/audio/quran/manifest") {
+    return quranAudioManifest(env);
+  }
+  if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/audio/quran/")) {
+    return quranAudioFile(request, env, path.slice("/v1/audio/quran/".length));
+  }
   // Pictures and recordings, by signed and expiring link only.
   if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/media/")) {
     return serveMedia(request, env, path.slice("/v1/media/".length), url);
@@ -213,7 +221,7 @@ export default {
       const response = await route(request, env);
       // Public, read-only feeds are intentionally available to web companions.
       // Administrative and device routes never receive browser CORS permission.
-      if (request.method === "GET" && ["/v1/live", "/v1/bootstrap", "/v1/feed"].includes(new URL(request.url).pathname)) response.headers.set("access-control-allow-origin", "*");
+      if (request.method === "GET" && (["/v1/live", "/v1/bootstrap", "/v1/feed", "/v1/audio/quran/manifest"].includes(new URL(request.url).pathname) || new URL(request.url).pathname.startsWith("/v1/audio/quran/"))) response.headers.set("access-control-allow-origin", "*");
       return response;
     }
     catch (error) {

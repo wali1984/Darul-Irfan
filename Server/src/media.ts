@@ -73,6 +73,13 @@ export async function serveMedia(request: Request, env: Env, rawKey: string, url
   let difference = 0;
   for (let i = 0; i < expected.length; i += 1) difference |= expected.charCodeAt(i) ^ given.charCodeAt(i);
   if (difference !== 0) return json({ error: "Not found" }, { status: 404 });
+  // Private to the device that asked; the link itself expires.
+  return serveObject(request, env, key, "private, max-age=3600");
+}
+
+/** An R2 object with byte ranges honoured: players stream in parts and seek. */
+export async function serveObject(request: Request, env: Env, key: string, cacheControl: string): Promise<Response> {
+  if (!env.MEDIA) return json({ error: "Not found" }, { status: 404 });
   const ranged = request.headers.has("range");
   const object = request.method === "HEAD"
     ? await env.MEDIA.head(key)
@@ -81,8 +88,7 @@ export async function serveMedia(request: Request, env: Env, rawKey: string, url
   const headers = new Headers({
     "content-type": object.httpMetadata?.contentType ?? "application/octet-stream",
     "accept-ranges": "bytes",
-    // Private to the device that asked; the link itself expires.
-    "cache-control": "private, max-age=3600",
+    "cache-control": cacheControl,
     "x-content-type-options": "nosniff",
   });
   const range = object.range as { offset?: number; length?: number; suffix?: number } | undefined;
