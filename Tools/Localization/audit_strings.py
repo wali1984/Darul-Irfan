@@ -90,6 +90,7 @@ KNOWN_KEYS = {
     "%@ listening": "%lld listening",
     "The group is at %@ of %lld": "The group is at %@ of %@",
     "Updated \\(current.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",
+    "Now in the zikr · \\(cue.at.formatted(.relative(presentation: .named)))": "Now in the zikr · %@",
 }
 
 

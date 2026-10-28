@@ -505,9 +505,15 @@ class ChatCues:
         if window is None:
             return []
         found = []
-        for item in window.descendants():
-            if not (item.element_info.automation_id or "").endswith("ui::chatlog::TextMessageWidget"):
-                continue
+        items = [item for item in window.descendants()
+                 if (item.element_info.automation_id or "").endswith("ui::chatlog::TextMessageWidget")]
+        # Paltalk names the sender only on the first of their consecutive
+        # messages ("1st Latifa", then "2nd", "3rd" without a name), so the
+        # messages are read top to bottom and an unnamed one is the previous
+        # sender's.
+        items.sort(key=lambda item: item.rectangle().top)
+        previous = ""
+        for item in items:
             sender = text = ""
             for part in item.descendants():
                 kind = (part.element_info.automation_id or "").rsplit(".", 1)[-1]
@@ -518,8 +524,10 @@ class ChatCues:
                         text = part.iface_text.DocumentRange.GetText(-1) or ""
                     except Exception:  # noqa: BLE001
                         text = part.window_text() or ""
+            sender = sender.strip() or previous
+            previous = sender
             if sender and text.strip():
-                found.append((sender.strip(), text.strip()))
+                found.append((sender, text.strip()))
         return found
 
     def check(self) -> None:

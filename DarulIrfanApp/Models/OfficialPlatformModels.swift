@@ -90,6 +90,9 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
     var updatedAt: Date
     /// False until the automatic broadcast is connected; nil from an older server.
     var automaticBroadcast: Bool? = nil
+    /// The host's last cue in the room this session ("1st Latifa", "Ahdiat"),
+    /// exactly as written there.
+    var cue: LiveCue? = nil
 
     /// Only sources the app plays itself. An external chat room (the
     /// `.paltalk` kind the server may still send) is never offered: zikr is
@@ -106,6 +109,13 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
         sources: [],
         updatedAt: .distantPast
     )
+}
+
+/// A latifa or muraqaba change the room's host announced.
+struct LiveCue: Codable, Sendable, Equatable {
+    var text: String
+    var sender: String?
+    var at: Date
 }
 
 struct RemoteZikrSchedule: Codable, Sendable, Identifiable, Equatable {

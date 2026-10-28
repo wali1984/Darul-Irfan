@@ -24293,6 +24293,57 @@
           }
         }
       }
+    },
+    "Join Daily Zikr with Sheikh ul Mukarram": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Daily Zikr with Sheikh ul Mukarram"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شیخ المکرم کے ساتھ روزانہ ذکر میں شامل ہوں"
+          }
+        }
+      }
+    },
+    "Join Daily Zikr with Sheikh ul Mukarram - YouTube": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Daily Zikr with Sheikh ul Mukarram - YouTube"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شیخ المکرم کے ساتھ روزانہ ذکر میں شامل ہوں - یوٹیوب"
+          }
+        }
+      }
+    },
+    "Now in the zikr · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Now in the zikr · %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اب ذکر میں · %@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

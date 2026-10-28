@@ -1,3 +1,4 @@
+import AudioToolbox
 import SwiftUI
 
 struct LiveBroadcastCard: View {
@@ -35,6 +36,10 @@ struct LiveBroadcastCard: View {
                 statusBadge
             }
 
+            if isLive, let cue = current.cue {
+                cueBanner(cue)
+            }
+
             if let details = current.details, !details.isEmpty {
                 Text(details).font(.subheadline).foregroundStyle(fgMuted)
             }
@@ -46,7 +51,8 @@ struct LiveBroadcastCard: View {
 
             ForEach(displaySources) { source in
                 Button { activate(source) } label: {
-                    Label("Join Daily Zikr", systemImage: source.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
+                    Label(source.kind == .youtube ? "Join Daily Zikr with Sheikh ul Mukarram - YouTube" : "Join Daily Zikr with Sheikh ul Mukarram",
+                          systemImage: source.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.onPrimary)
                         .frame(maxWidth: .infinity, minHeight: 46)
@@ -88,18 +94,50 @@ struct LiveBroadcastCard: View {
         )
         .sheet(item: $presentedVideo) { video in YouTubePlayerSheet(videoID: video.id, title: current.title) }
         .onChange(of: broadcast) { latest = nil }
+        .onChange(of: current.cue) { old, new in
+            // A new latifa or muraqaba while the card is on screen: a chime
+            // over the stream, since the mic may have dropped as it changed.
+            if old != nil, let new, new != old {
+                AudioServicesPlaySystemSound(1013)
+                DIHaptics.success()
+            }
+        }
         .task(id: platform == nil) { await follow() }
     }
 
-    /// Re-reads the live state every 30 seconds while the card is visible.
+    /// Re-reads the live state while the card is visible: every 10 seconds
+    /// during a session, so a cue shows promptly; every 30 otherwise.
     private func follow() async {
         guard let platform else { return }
         while !Task.isCancelled {
-            try? await Task.sleep(for: .seconds(30))
+            try? await Task.sleep(for: .seconds(isLive ? 10 : 30))
             if Task.isCancelled { break }
             let fresh = await platform.currentLiveBroadcast(forceRefresh: true)
             if fresh != current { latest = fresh }
         }
+    }
+
+    /// The host's current latifa or muraqaba, exactly as written in the room.
+    private func cueBanner(_ cue: LiveCue) -> some View {
+        HStack(spacing: DISpacing.sm) {
+            Image(systemName: "bell.and.waves.left.and.right.fill")
+                .font(.title3)
+                .foregroundStyle(DIColor.primaryDeep)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: cue.text)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(DIColor.primaryDeep)
+                Text("Now in the zikr · \(cue.at.formatted(.relative(presentation: .named)))")
+                    .font(.caption)
+                    .foregroundStyle(DIColor.primaryDeep.opacity(0.75))
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(DISpacing.sm)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(DIGradient.goldSheen, in: RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.updatesFrequently)
     }
 
     @ViewBuilder private var cardBackground: some View {
