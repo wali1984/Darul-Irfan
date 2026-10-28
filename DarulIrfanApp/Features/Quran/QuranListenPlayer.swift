@@ -231,7 +231,7 @@ final class QuranListenPlayer {
         if reciterSurah != first.surah || reciter == nil {
             clearReciterObservers()
             reciter?.pause()
-            let player = AVPlayer(url: url)
+            let player = AVPlayer(playerItem: Self.recitationItem(url, durationMs: surahRecitation.durationMs))
             player.automaticallyWaitsToMinimizeStalling = true
             reciter = player
             reciterSurah = first.surah
@@ -257,12 +257,32 @@ final class QuranListenPlayer {
         reciterEnd = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime, object: reciter.currentItem, queue: .main
         ) { [weak self] _ in Task { @MainActor in self?.endPart(token) } }
+        // The next ayah begins where the last one stopped (recitation with
+        // translation): play on from there rather than seek to it again.
+        let here = reciter.currentTime().seconds
+        if here.isFinite, abs(Int(here * 1000) - start.fromMs) < 400 {
+            if isPlaying { reciter.play() }
+            return
+        }
         reciter.seek(to: CMTime(value: CMTimeValue(start.fromMs), timescale: 1000), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
             Task { @MainActor in
                 guard let self, self.session == mySession, self.isPlaying else { return }
                 self.reciter?.play()
             }
         }
+    }
+
+    /// The surah's recording, timed exactly. The reciters' files are variable
+    /// bitrate: timed by estimate, a seek lands away from the ayah, so the
+    /// ayah was cut short and the one before heard again. A copy is kept on
+    /// the phone (surahs up to half an hour) so later seeks are exact and fast.
+    private static func recitationItem(_ remote: URL, durationMs: Int) -> AVPlayerItem {
+        let local = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("recitation" + remote.path)
+        let exists = FileManager.default.fileExists(atPath: local.path)
+        if !exists && durationMs <= 30 * 60_000 { TranslationSpeaker.keepForOffline(remote, at: local) }
+        let asset = AVURLAsset(url: exists ? local : remote, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+        return AVPlayerItem(asset: asset)
     }
 
     /// A recitation part has reached its last ayah's end (once per part).

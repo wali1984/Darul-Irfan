@@ -196,7 +196,23 @@ struct SurahReaderView: View {
                 .padding(.top, DISpacing.sm)
                 .padding(.bottom, DISpacing.xl)
             }
-            .onAppear { scrollToFocusIfNeeded(proxy: proxy) }
+            .onAppear {
+                scrollToFocusIfNeeded(proxy: proxy)
+                // A juz carried into this surah: show the ayah it is on.
+                if let current = player.current, current.surah == viewModel.surah.id, player.isPlaying {
+                    DispatchQueue.main.async { proxy.scrollTo(current.ayah, anchor: .top) }
+                }
+            }
+            // The reader follows what is playing: each ayah is brought into
+            // view as it starts, and a juz turns to the next surah.
+            .onChange(of: player.current) { _, current in
+                guard let current, player.isPlaying else { return }
+                if current.surah == viewModel.surah.id {
+                    withAnimation(.easeInOut(duration: 0.35)) { proxy.scrollTo(current.ayah, anchor: .top) }
+                } else if current.surah == viewModel.surah.id + 1, player.scope == .juz {
+                    onRequestNextSurah()
+                }
+            }
         }
     }
 
