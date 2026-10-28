@@ -23868,6 +23868,91 @@
           }
         }
       }
+    },
+    "Add photos or videos": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add photos or videos"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصاویر یا ویڈیوز شامل کریں"
+          }
+        }
+      }
+    },
+    "Copy a message or a picture in WhatsApp or anywhere else, then paste it here. The first line becomes the title.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy a message or a picture in WhatsApp or anywhere else, then paste it here. The first line becomes the title."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واٹس ایپ یا کہیں سے بھی کوئی پیغام یا تصویر کاپی کریں، پھر یہاں پیسٹ کریں۔ پہلی سطر عنوان بن جائے گی۔"
+          }
+        }
+      }
+    },
+    "Paste a copied message or picture": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste a copied message or picture"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاپی کیا گیا پیغام یا تصویر پیسٹ کریں"
+          }
+        }
+      }
+    },
+    "Sending %lld of %lld...": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sending %lld of %lld..."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$lld میں سے %1$lld بھیجی جا رہی ہے..."
+          }
+        }
+      }
+    },
+    "Up to 10 pictures and videos; each video up to 95 MB. They are seen by this Halqah only.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to 10 pictures and videos; each video up to 95 MB. They are seen by this Halqah only."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "زیادہ سے زیادہ 10 تصاویر اور ویڈیوز؛ ہر ویڈیو 95 MB تک۔ انہیں صرف یہ حلقہ دیکھ سکتا ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

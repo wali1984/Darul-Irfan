@@ -754,3 +754,34 @@ describe("daily pictures", () => {
     expect(raw.prepare("SELECT COUNT(*) AS n FROM member_group_posts").get()).toEqual({ n: 0 });
   });
 });
+
+describe("post pictures and videos", () => {
+  it("lets an admin attach pictures and videos to a post, kept private to the group", async () => {
+    const stored = new Map<string, string>();
+    const media = {
+      async put(key: string, _value: unknown, options: { httpMetadata: { contentType: string } }) { stored.set(key, options.httpMetadata.contentType); },
+      async head(key: string) { return stored.has(key) ? { size: 3, httpMetadata: { contentType: stored.get(key) } } : null; },
+    };
+    const { env, call, member, admin } = await setup({ MEDIA: media, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
+    const send = (token: string, type: string, group = "usa") =>
+      worker.fetch(new Request(`https://api.example.com/v1/groups/${group}/media`, {
+        method: "POST", body: new Uint8Array([1, 2, 3]) as unknown as BodyInit,
+        headers: { authorization: `Bearer ${token}`, "content-type": type, "content-length": "3" },
+      }), env);
+    expect((await send(member, "image/jpeg")).status).toBe(403);
+    expect((await send(admin, "application/zip")).status).toBe(415);
+    const picture = (await (await send(admin, "image/jpeg")).json()) as { key: string; kind: string };
+    const video = (await (await send(admin, "video/quicktime")).json()) as { key: string; kind: string };
+    expect([picture.kind, video.kind]).toEqual(["image", "video"]);
+    expect(picture.key).toMatch(/^posts\/usa\/[0-9a-f-]{36}\.jpg$/);
+
+    // Only this group's own uploads, and only ones that arrived.
+    expect((await call(admin, "POST", "/v1/groups/usa/posts", { title: "Gathering", media: ["posts/canada/x.jpg"] })).status).toBe(400);
+    expect((await call(admin, "POST", "/v1/groups/usa/posts", { title: "Gathering", media: [`posts/usa/${crypto.randomUUID()}.jpg`] })).status).toBe(400);
+    expect((await call(admin, "POST", "/v1/groups/usa/posts", { title: "Gathering", media: [picture.key, video.key] })).status).toBe(201);
+    const posts = (await (await call(member, "GET", "/v1/groups/usa/posts")).json()) as { posts: { title: string; media?: { url: string; kind: string }[] }[] };
+    const post = posts.posts.find(item => item.title === "Gathering");
+    expect(post?.media?.map(item => item.kind)).toEqual(["image", "video"]);
+    expect(post?.media?.[0]?.url).toContain("/v1/media/posts%2Fusa%2F");
+  });
+});

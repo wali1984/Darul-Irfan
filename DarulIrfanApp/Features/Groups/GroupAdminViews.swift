@@ -1,4 +1,5 @@
 import AVFoundation
+import PhotosUI
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -39,21 +40,41 @@ struct GroupPostComposer: View {
     @State private var title = ""
     @State private var message = ""
     @State private var videoLink = ""
+    @State private var attachments: [PostDraftAttachment] = []
+    @State private var picks: [PhotosPickerItem] = []
+    @State private var progress: String?
     @State private var working = false
     @State private var error: String?
+
+    private static let maxAttachments = 10
 
     var body: some View {
         Form {
             Section {
                 // The quickest route from a WhatsApp group: copy the message
-                // there, then paste it here.
+                // (or a picture) there, then paste it here.
                 Button {
                     paste()
                 } label: {
-                    Label("Paste a copied message", systemImage: "doc.on.clipboard")
+                    Label("Paste a copied message or picture", systemImage: "doc.on.clipboard")
                 }
             } footer: {
-                Text("Copy a message in WhatsApp or anywhere else, then paste it here. The first line becomes the title.")
+                Text("Copy a message or a picture in WhatsApp or anywhere else, then paste it here. The first line becomes the title.")
+            }
+            Section {
+                PhotosPicker(
+                    selection: $picks,
+                    maxSelectionCount: max(1, Self.maxAttachments - attachments.count),
+                    matching: .any(of: [.images, .videos])
+                ) {
+                    Label("Add photos or videos", systemImage: "photo.on.rectangle.angled")
+                }
+                .disabled(attachments.count >= Self.maxAttachments)
+                if !attachments.isEmpty {
+                    PostAttachmentStrip(attachments: $attachments)
+                }
+            } footer: {
+                Text("Up to 10 pictures and videos; each video up to 95 MB. They are seen by this Halqah only.")
             }
             Section {
                 TextField("Title", text: $title, axis: .vertical)
@@ -70,6 +91,14 @@ struct GroupPostComposer: View {
             }
             if let error {
                 Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+            }
+            if let progress {
+                Section {
+                    HStack(spacing: DISpacing.sm) {
+                        ProgressView()
+                        Text(verbatim: progress)
+                    }
+                }
             }
             Section {
                 Button {
@@ -89,6 +118,15 @@ struct GroupPostComposer: View {
         .navigationTitle("New post")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .onChange(of: picks) { _, chosen in
+            guard !chosen.isEmpty else { return }
+            Task {
+                for item in chosen where attachments.count < Self.maxAttachments {
+                    if let attachment = await PostMediaPreparation.load(item) { attachments.append(attachment) }
+                }
+                picks = []
+            }
+        }
     }
 
     private var canSave: Bool {
@@ -97,6 +135,12 @@ struct GroupPostComposer: View {
     }
 
     private func paste() {
+        // Pictures copied from WhatsApp, Photos or a browser.
+        for image in UIPasteboard.general.images ?? [] where attachments.count < Self.maxAttachments {
+            if let prepared = PostMediaPreparation.picture(from: image) {
+                attachments.append(PostDraftAttachment(content: .picture(prepared.0), preview: prepared.1))
+            }
+        }
         guard let text = UIPasteboard.general.string?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else { return }
         var lines = text.components(separatedBy: .newlines)
         let first = lines.removeFirst().trimmingCharacters(in: .whitespaces)
@@ -110,13 +154,25 @@ struct GroupPostComposer: View {
 
     private func save(publish: Bool) async {
         working = true
-        defer { working = false }
+        defer { working = false; progress = nil }
         do {
+            // Each file goes up first; the post then names them, in order.
+            var keys: [String] = []
+            for (index, attachment) in attachments.enumerated() {
+                progress = String(localized: "Sending \(index + 1) of \(attachments.count)...")
+                switch attachment.content {
+                case .picture(let data):
+                    keys.append(try await service.uploadPostMedia(picture: data, contentType: "image/jpeg", in: groupID))
+                case .video(let url):
+                    keys.append(try await service.uploadPostMedia(video: url, contentType: PostMediaPreparation.videoType(url), in: groupID))
+                }
+            }
             try await service.createPost(
                 in: groupID,
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                 body: message.trimmingCharacters(in: .whitespacesAndNewlines),
                 videoID: VideoLink.id(from: videoLink),
+                media: keys,
                 publish: publish
             )
             dismiss()

@@ -145,10 +145,12 @@ actor MemberGroupService {
 
     // MARK: Group admin actions
 
-    func createPost(in groupID: String, title: String, body: String?, videoID: String?, publish: Bool) async throws {
+    /// `media` are keys from `uploadPostMedia`, in the order they show.
+    func createPost(in groupID: String, title: String, body: String?, videoID: String?, media: [String] = [], publish: Bool) async throws {
         var payload: [String: Any] = ["title": title, "kind": "announcement", "publish": publish]
         if let body, !body.isEmpty { payload["body"] = body }
         if let videoID { payload["youtubeVideoID"] = videoID }
+        if !media.isEmpty { payload["media"] = media }
         try await send("POST", path: "v1/groups/\(groupID)/posts", payload: payload, expecting: [201])
     }
 
@@ -299,6 +301,33 @@ actor MemberGroupService {
     /// The Super admin places someone from the directory.
     func place(_ memberID: String, in groupID: String, role: GroupRole) async throws {
         try await send("POST", path: "v1/groups/\(groupID)/people", payload: ["memberID": memberID, "role": role.rawValue], expecting: [201])
+    }
+
+    /// Sends one picture (as data) or video (as a file) for a post, and
+    /// returns its key.
+    func uploadPostMedia(picture: Data? = nil, video: URL? = nil, contentType: String, in groupID: String) async throws -> String {
+        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/groups/\(groupID)/media"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
+        request.setValue(contentType, forHTTPHeaderField: "content-type")
+        let result: (Data, URLResponse)
+        if let video {
+            result = try await uploads.upload(for: request, fromFile: video)
+        } else {
+            result = try await uploads.upload(for: request, from: picture ?? Data())
+        }
+        let (data, response) = result
+        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if code == 401 {
+            SecureMemberSession.delete()
+            throw MemberGroupError.notSignedIn
+        }
+        let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        guard code == 201, let key = body?["key"] as? String else {
+            throw (body?["error"] as? String).map(MemberGroupError.server) ?? MemberGroupError.requestFailed
+        }
+        return key
     }
 
     // MARK: Today's pictures

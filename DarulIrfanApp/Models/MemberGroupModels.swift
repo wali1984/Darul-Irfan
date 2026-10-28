@@ -289,6 +289,8 @@ struct MemberGroupPost: Codable, Sendable, Identifiable, Equatable {
     var linkURL: URL?
     /// A picture forwarded with the post, by an expiring private link.
     var imageURL: URL? = nil
+    /// Pictures and videos an admin attached from the phone, in order.
+    var media: [PostAttachment]? = nil
     var publishedAt: Date
     /// Drafts are visible to the group's admins only, until published.
     var isDraft: Bool? = nil
@@ -340,6 +342,16 @@ struct GroupPeople: Decodable, Sendable, Equatable {
     var canAppointAdministrators: Bool?
     var members: [GroupPerson]
     var invitations: [GroupInvitation]
+}
+
+/// A picture or video on a post, by an expiring private link.
+struct PostAttachment: Codable, Sendable, Identifiable, Equatable {
+    var url: URL
+    /// "image" or "video".
+    var kind: String
+    var contentType: String?
+
+    var id: String { url.path }
 }
 
 /// Everyone who has signed in, for the Super admin.

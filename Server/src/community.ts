@@ -5,6 +5,7 @@ import { signedMediaURL } from "./media";
 import { youtubeVideos } from "./recordings";
 import { beginSession, endSession, liveRow, queueOf, resolveQueue, sessionPayload, unreadDuaCount } from "./session";
 import { recordingConfig, trackRoom } from "./roomRecordings";
+import { presentAttachments, validAttachments } from "./postMedia";
 
 // Community groups: what members see and do inside their group, and what the
 // group's admins can run from the app itself.
@@ -176,7 +177,7 @@ export async function communityPosts(env: Env, memberID: string, groupID: string
   if (!await canSee(env, memberID, role, groupID)) return notFound();
   const managing = drafts && await canManage(env, memberID, role, groupID);
   const status = managing ? "draft" : "published";
-  const result = await env.DB.prepare(`SELECT id,kind,title,body,youtube_video_id,link_url,published_at,status,source,image_key
+  const result = await env.DB.prepare(`SELECT id,kind,title,body,youtube_video_id,link_url,published_at,status,source,image_key,media_json
     FROM member_group_posts WHERE group_id=? AND is_hidden=0 AND status=?
     ORDER BY published_at DESC, id DESC LIMIT ?`).bind(groupID, status, limit).all();
   const posts = [];
@@ -187,6 +188,8 @@ export async function communityPosts(env: Env, memberID: string, groupID: string
       // A day-long link: long enough to read, short enough that a copied
       // link does not leave the group for good.
       imageURL: row.image_key ? await signedMediaURL(env, String(row.image_key)) : undefined,
+      // Pictures and videos the admin attached from the phone, in order.
+      media: row.media_json ? await presentAttachments(env, row.media_json) : undefined,
       publishedAt: row.published_at, isDraft: row.status === "draft", source: row.source,
     });
   }
@@ -206,12 +209,14 @@ export async function createPost(env: Env, memberID: string, groupID: string, in
   const video = typeof input.youtubeVideoID === "string" && /^[\w-]{11}$/.test(input.youtubeVideoID) ? input.youtubeVideoID : null;
   if (kind === "zikr" && !video) return json({ error: "A recorded zikr needs a video" }, { status: 400 });
   const publish = input.publish !== false;
+  const attachments = await validAttachments(env, groupID, input.media);
+  if (attachments instanceof Response) return attachments;
   const id = newID("post");
   const now = new Date().toISOString();
-  await env.DB.prepare(`INSERT INTO member_group_posts(id,group_id,kind,title,body,youtube_video_id,link_url,published_at,author_email,is_hidden,updated_at,status,source)
-    VALUES(?,?,?,?,?,?,?,?,?,0,?,?,'admin')`)
+  await env.DB.prepare(`INSERT INTO member_group_posts(id,group_id,kind,title,body,youtube_video_id,link_url,published_at,author_email,is_hidden,updated_at,status,source,media_json)
+    VALUES(?,?,?,?,?,?,?,?,?,0,?,?,'admin',?)`)
     .bind(id, groupID, kind, title, cleanText(input.body, 8_000) ?? null, video, validHTTPURL(input.linkURL) ?? null,
-      now, `member:${memberID}`, now, publish ? "published" : "draft").run();
+      now, `member:${memberID}`, now, publish ? "published" : "draft", attachments.length ? JSON.stringify(attachments) : null).run();
   if (publish) await notifyGroup(env, groupID, `post:${id}`, title, cleanText(input.body, 140) ?? "", `darulirfan://groups/${groupID}`);
   return json({ ok: true, id, published: publish }, { status: 201 });
 }

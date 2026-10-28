@@ -17,6 +17,7 @@ import { autoplayDue, checkIn, controlSession, duaRequests, markDuaRead, request
 import { collectRoomRecordings } from "./roomRecordings";
 import { createHalqah, memberDirectory, retireHalqah, updateHalqah } from "./halqahs";
 import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
+import { uploadPostMedia } from "./postMedia";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -99,7 +100,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (!section && request.method === "GET") return groupDetail(env, member, groupID);
@@ -130,6 +131,10 @@ async function route(request: Request, env: Env): Promise<Response> {
       return uploadRecording(request, env, member, groupID, url);
     }
     if (section === "recordings" && entity && request.method === "DELETE") return deleteRecording(env, member, groupID, entity);
+    if (section === "media" && !entity && request.method === "POST") {
+      if (!await withinWriteLimit(request, env, "post-media", 120)) return json({ error: "Too many requests" }, { status: 429 });
+      return uploadPostMedia(request, env, member, groupID);
+    }
     if (section === "control" && !entity && request.method === "POST") return controlSession(env, member, groupID, await body());
     if (section === "presence" && !entity && request.method === "POST") return checkIn(env, member, groupID);
     if (section === "duas" && !entity && request.method === "GET") return duaRequests(env, member, groupID);

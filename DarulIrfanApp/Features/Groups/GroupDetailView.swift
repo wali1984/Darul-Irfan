@@ -264,6 +264,9 @@ struct GroupDetailView: View {
                 Text(post.publishedAt, format: .dateTime.day().month(.wide).year())
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                if let media = post.media, !media.isEmpty {
+                    PostMediaView(media: media)
+                }
                 if let imageURL = post.imageURL {
                     GroupPostImage(url: imageURL)
                 }

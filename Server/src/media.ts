@@ -56,7 +56,7 @@ export async function signedMediaURL(env: Env, key: string, seconds = 86_400): P
   return `${env.PUBLIC_BASE_URL}/v1/media/${encodeURIComponent(key)}?exp=${expires}&sig=${sig}`;
 }
 
-const SERVABLE = /^(whatsapp\/[A-Za-z0-9._-]{1,120}|recordings\/[a-z0-9-]{1,40}\/[A-Za-z0-9._-]{1,120}|daily\/[A-Za-z0-9._-]{1,120})$/;
+const SERVABLE = /^(whatsapp\/[A-Za-z0-9._-]{1,120}|recordings\/[a-z0-9-]{1,40}\/[A-Za-z0-9._-]{1,120}|daily\/[A-Za-z0-9._-]{1,120}|posts\/[a-z0-9-]{1,40}\/[A-Za-z0-9._-]{1,120})$/;
 
 /** Serves a stored picture or recording to a holder of a valid, unexpired
  *  link. Byte ranges are honoured: the player streams a recording in parts
