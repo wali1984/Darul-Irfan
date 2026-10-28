@@ -17,7 +17,7 @@ interface DirectoryRoom {
 }
 
 function roomName(env: Env): string {
-  return (env.PALTALK_ROOM ?? "oursheikh").trim().toLowerCase();
+  return (env.PALTALK_ROOM ?? "Our Sheikh").trim().toLowerCase();
 }
 
 /** The room as the directory lists it, or null when it is not open. */
