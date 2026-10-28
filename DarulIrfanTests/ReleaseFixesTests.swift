@@ -266,8 +266,7 @@ final class ReleaseFixesTests: XCTestCase {
     /// 9:15 PM in Pakistan is 12:15 PM in New York in daylight time and
     /// 11:15 AM in standard time; Pakistan has no daylight saving.
     /// The day's cards follow the local day where the phone is: a new pick
-    /// after local midnight, and the same day in Karachi and New York can be
-    /// different days.
+    /// at local midnight in New York, and at Karachi's own midnight there.
     func testDailyCardsChangeWithTheLocalDay() throws {
         let newYork = try XCTUnwrap(TimeZone(identifier: "America/New_York"))
         let karachi = try XCTUnwrap(TimeZone(identifier: "Asia/Karachi"))
@@ -277,9 +276,13 @@ final class ReleaseFixesTests: XCTestCase {
                        DailySelector.epochDay(for: lateEvening, timeZone: newYork) + 1)
         XCTAssertNotEqual(DailySelector.nameNumber(for: lateEvening, timeZone: newYork),
                           DailySelector.nameNumber(for: afterMidnight, timeZone: newYork))
-        // 08:30 in Karachi is already the next day there.
-        XCTAssertEqual(DailySelector.epochDay(for: lateEvening, timeZone: karachi),
-                       DailySelector.epochDay(for: lateEvening, timeZone: newYork) + 1)
+        let beforeKarachiMidnight = try XCTUnwrap(ISO8601DateFormatter().date(from: "2026-10-27T18:59:00Z")) // 23:59 in Karachi
+        let afterKarachiMidnight = beforeKarachiMidnight.addingTimeInterval(120)
+        XCTAssertEqual(DailySelector.epochDay(for: afterKarachiMidnight, timeZone: karachi),
+                       DailySelector.epochDay(for: beforeKarachiMidnight, timeZone: karachi) + 1)
+        // The same moment is still the same day in New York.
+        XCTAssertEqual(DailySelector.epochDay(for: afterKarachiMidnight, timeZone: newYork),
+                       DailySelector.epochDay(for: beforeKarachiMidnight, timeZone: newYork))
     }
 
     func testDailyZikrInNewYork() throws {
