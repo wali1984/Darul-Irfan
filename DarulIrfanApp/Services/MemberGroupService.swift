@@ -209,8 +209,13 @@ actor MemberGroupService {
         try await send("POST", path: "v1/groups/\(groupID)/duas/\(duaID)/read", payload: [:], expecting: [204])
     }
 
-    func sessionHistory(in groupID: String) async throws -> [GroupSessionRecord] {
-        try await authorized(GroupSessionHistory.self, path: "v1/groups/\(groupID)/history").sessions
+    func sessionHistory(in groupID: String) async throws -> GroupSessionHistory {
+        try await authorized(GroupSessionHistory.self, path: "v1/groups/\(groupID)/history")
+    }
+
+    /// Removes a past session, with its attendance and dua requests (Super admin).
+    func deleteSessionRecord(_ sessionID: String, in groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/history/\(sessionID)", payload: nil, expecting: [204])
     }
 
     func attendees(of sessionID: String, in groupID: String) async throws -> [GroupAttendee] {

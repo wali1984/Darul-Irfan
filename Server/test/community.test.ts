@@ -487,6 +487,15 @@ describe("recorded zikr", () => {
     const attendees = (await (await call(admin, "GET", `/v1/groups/usa/history/${history.sessions[0]!.id}`)).json()) as { attendees: { name: string }[] };
     expect(attendees.attendees).toHaveLength(2);
     expect((await call(member, "GET", "/v1/groups/usa/history")).status).toBe(403);
+    // Only the Super admin deletes a past session, with its attendance.
+    const sessionID = history.sessions[0]!.id;
+    expect(((await (await call(admin, "GET", "/v1/groups/usa/history")).json()) as { canDelete: boolean }).canDelete).toBe(false);
+    expect((await call(admin, "DELETE", `/v1/groups/usa/history/${sessionID}`)).status).toBe(403);
+    const { superAdmin: owner } = { superAdmin: "3".repeat(64) };
+    expect(((await (await call(owner, "GET", "/v1/groups/usa/history")).json()) as { canDelete: boolean }).canDelete).toBe(true);
+    expect((await call(owner, "DELETE", `/v1/groups/usa/history/${sessionID}`)).status).toBe(204);
+    expect(((await (await call(owner, "GET", "/v1/groups/usa/history")).json()) as { sessions: unknown[] }).sessions).toEqual([]);
+    expect(((await (await call(owner, "GET", `/v1/groups/usa/history/${sessionID}`)).json()) as { attendees: unknown[] }).attendees).toEqual([]);
   });
 
   it("starts a clock-time zikr by itself with its recording, once, when no session is live", async () => {

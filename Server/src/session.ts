@@ -371,10 +371,30 @@ export async function sessionHistory(env: Env, memberID: string, groupID: string
     WHERE group_id=? ORDER BY started_at DESC LIMIT 50`).bind(groupID)
     .all<{ session_id: string; kind: string; title: string | null; started_at: string; ended_at: string; attendees: number }>();
   return json({
+    // Only the Super admin removes a past session from the record.
+    canDelete: role === "superadmin",
     sessions: (rows.results ?? []).map(row => ({
       id: row.session_id, kind: row.kind, title: row.title ?? undefined, startedAt: row.started_at, endedAt: row.ended_at, attendees: row.attendees,
     })),
   });
+}
+
+/** Removes a past session from the record, with who attended it and the
+ *  dua requests sent during it. Super admin only; a live session is ended,
+ *  not deleted. */
+export async function deleteSessionRecord(env: Env, memberID: string, groupID: string, sessionID: string): Promise<Response> {
+  const role = await memberRole(env, memberID);
+  if (!await canSee(env, memberID, role, groupID)) return notFound();
+  if (role !== "superadmin") return json({ error: "Super admin only" }, { status: 403 });
+  const live = await liveRow(env, groupID);
+  if (live?.state === "live" && live.session_id === sessionID) {
+    return json({ error: "This session is live. End it first." }, { status: 409 });
+  }
+  const removed = await env.DB.prepare("DELETE FROM group_live_history WHERE group_id=? AND session_id=?").bind(groupID, sessionID).run();
+  if ((removed.meta?.changes ?? 0) === 0) return notFound();
+  await env.DB.prepare("DELETE FROM group_live_presence WHERE group_id=? AND session_id=?").bind(groupID, sessionID).run();
+  await env.DB.prepare("DELETE FROM group_dua_requests WHERE group_id=? AND session_id=?").bind(groupID, sessionID).run();
+  return new Response(null, { status: 204 });
 }
 
 // MARK: - Playing by itself at the zikr time

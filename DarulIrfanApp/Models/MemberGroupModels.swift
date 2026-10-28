@@ -182,6 +182,8 @@ struct GroupSessionRecord: Codable, Sendable, Identifiable, Equatable {
 
 struct GroupSessionHistory: Codable, Sendable {
     var sessions: [GroupSessionRecord]
+    /// The Super admin may remove a past session from the record.
+    var canDelete: Bool?
 }
 
 struct GroupSessionAttendees: Codable, Sendable {

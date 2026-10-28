@@ -666,13 +666,22 @@ struct GroupSessionHistoryView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var sessions: [GroupSessionRecord]?
+    @State private var canDelete = false
+    @State private var deleting: GroupSessionRecord?
     @State private var failed = false
+    @State private var error: String?
 
     var body: some View {
         List {
+            if let error {
+                Text(verbatim: error).foregroundStyle(DIColor.danger)
+            }
             if let sessions {
                 if sessions.isEmpty {
                     Text("No sessions yet. Each one appears here when it ends.").foregroundStyle(DIColor.textMuted)
+                }
+                if canDelete && !sessions.isEmpty {
+                    Text("Swipe a session to delete it.").font(.caption).foregroundStyle(DIColor.textMuted)
                 }
                 ForEach(sessions) { session in
                     NavigationLink {
@@ -688,6 +697,11 @@ struct GroupSessionHistoryView: View {
                                 .foregroundStyle(DIColor.textMuted)
                         }
                     }
+                    .swipeActions {
+                        if canDelete {
+                            Button("Delete", role: .destructive) { deleting = session }
+                        }
+                    }
                 }
             } else if failed {
                 Button("Try again") { Task { await load() } }
@@ -701,11 +715,37 @@ struct GroupSessionHistoryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         .task { await load() }
+        .confirmationDialog(
+            "Delete this session?",
+            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
+            titleVisibility: .visible,
+            presenting: deleting
+        ) { session in
+            Button("Delete", role: .destructive) { Task { await delete(session) } }
+        } message: { _ in
+            Text("Its attendance and the dua requests sent during it are deleted too.")
+        }
     }
 
     private func load() async {
         failed = false
-        do { sessions = try await service.sessionHistory(in: groupID) } catch { failed = true }
+        do {
+            let history = try await service.sessionHistory(in: groupID)
+            sessions = history.sessions
+            canDelete = history.canDelete == true
+        } catch {
+            failed = true
+        }
+    }
+
+    private func delete(_ session: GroupSessionRecord) async {
+        do {
+            try await service.deleteSessionRecord(session.id, in: groupID)
+            error = nil
+            await load()
+        } catch {
+            self.error = error.localizedDescription
+        }
     }
 }
 

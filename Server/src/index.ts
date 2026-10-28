@@ -13,7 +13,7 @@ import { serveMedia } from "./media";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
-import { autoplayDue, checkIn, controlSession, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
+import { autoplayDue, checkIn, controlSession, deleteSessionRecord, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
 import { collectRoomRecordings } from "./roomRecordings";
 import { createHalqah, memberDirectory, retireHalqah, updateHalqah } from "./halqahs";
 import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
@@ -141,6 +141,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (section === "duas" && !entity && request.method === "POST") return requestDua(env, member, groupID, await body());
     if (section === "duas" && entity && action === "read" && request.method === "POST") return markDuaRead(env, member, groupID, entity);
     if (section === "history" && request.method === "GET") return sessionHistory(env, member, groupID, entity);
+    if (section === "history" && entity && request.method === "DELETE") return deleteSessionRecord(env, member, groupID, entity);
     return json({ error: "Not found" }, { status: 404 });
   }
   if (request.method === "POST" && path === "/v1/devices") {

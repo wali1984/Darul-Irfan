@@ -23970,6 +23970,57 @@
           }
         }
       }
+    },
+    "Swipe a session to delete it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swipe a session to delete it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حذف کرنے کے لیے نشست کو سوائپ کریں۔"
+          }
+        }
+      }
+    },
+    "Delete this session?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this session?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ نشست حذف کریں؟"
+          }
+        }
+      }
+    },
+    "Its attendance and the dua requests sent during it are deleted too.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Its attendance and the dua requests sent during it are deleted too."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس کی حاضری اور اس دوران بھیجی گئی دعا کی درخواستیں بھی حذف ہو جائیں گی۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
