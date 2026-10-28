@@ -2,6 +2,7 @@ import type { Env } from "./contracts";
 import { cleanText, json, validHTTPURL } from "./util";
 import { recordGroupDraft, routeToGroup } from "./community";
 import { signedMediaURL, storeWhatsAppImage } from "./media";
+import { dailyTag, recordDailyDraft } from "./dailyMedia";
 
 interface WhatsAppMessage {
   from?: string;
@@ -97,6 +98,14 @@ export async function whatsappWebhook(request: Request, env: Env, rawBody: strin
         const publishedAt = Number.isFinite(seconds) && seconds > 0
           ? new Date(seconds * 1000).toISOString()
           : now;
+        // #ayah, #hadith, #aqwal, #quote or #announcement: a picture for the
+        // Today page, a draft until the Super admin publishes it for a day.
+        const daily = dailyTag(caption);
+        if (daily) {
+          await recordDailyDraft(env, `whatsapp:${message.id}`, daily, imageKey, from);
+          recorded += 1;
+          continue;
+        }
         // A #tag at the start, or the sender's own group, sends it to that
         // group's drafts, where its admins approve it in the app.
         const routed = await routeToGroup(env, from, body);

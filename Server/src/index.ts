@@ -16,6 +16,7 @@ import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
 import { autoplayDue, checkIn, controlSession, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
 import { collectRoomRecordings } from "./roomRecordings";
 import { createHalqah, memberDirectory, retireHalqah, updateHalqah } from "./halqahs";
+import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -66,6 +67,23 @@ async function route(request: Request, env: Env): Promise<Response> {
   // Pictures and recordings, by signed and expiring link only.
   if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/media/")) {
     return serveMedia(request, env, path.slice("/v1/media/".length), url);
+  }
+  // The Today page's pictures for a day, as published.
+  if (request.method === "GET" && path === "/v1/daily-media") return dailyMediaFor(env, url);
+  if (path.startsWith("/v1/daily-media/manage")) {
+    const member = await authenticatedMember(request, env);
+    if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
+    const item = /^\/v1\/daily-media\/manage\/(daily-[a-f0-9-]{12})$/.exec(path)?.[1];
+    if (path === "/v1/daily-media/manage" && request.method === "GET") return manageDailyMedia(env, member);
+    if (path === "/v1/daily-media/manage" && request.method === "POST") {
+      if (!await withinWriteLimit(request, env, "daily-media-upload", 60)) return json({ error: "Too many requests" }, { status: 429 });
+      return uploadDailyMedia(request, env, member, url);
+    }
+    const input = (request.headers.get("content-type") ?? "").includes("json")
+      ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
+    if (item && request.method === "PUT") return updateDailyMedia(env, member, item, input);
+    if (item && request.method === "DELETE") return deleteDailyMedia(env, member, item);
+    return json({ error: "Not found" }, { status: 404 });
   }
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
     const member = await authenticatedMember(request, env);

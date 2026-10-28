@@ -2,14 +2,18 @@ import SwiftUI
 import UIKit
 
 /// The daily spiritual companion cards shown at the top of the Today tab:
-/// a branded hero with the anchor verse, then the day's ayah, Aqwal-e-Sheikh,
-/// dua, dhikr, and Name of Allah. Self-contained; embedded in the Today tab's
+/// any announcement, then the day's ayah, Aqwal-e-Sheikh, hadith, dua, dhikr,
+/// and Name of Allah - with the picture the Super admin published for the
+/// card that day, and the day's quote opening over the page once. Self-contained; embedded in the Today tab's
 /// scroll above the prayer content.
 struct TodayDailySection: View {
     let appState: AppState
     private let dependencies: AppDependencies?
     @State private var viewModel: TodayDailyViewModel
     @State private var shareItem: ShareImageItem?
+    @State private var popupItem: DailyMediaItem?
+    /// Pop-ups already shown, so each opens once.
+    @AppStorage("today.seenPopups") private var seenPopups = ""
     @Environment(\.scenePhase) private var scenePhase
 
     init(appState: AppState, dependencies: AppDependencies? = nil) {
@@ -17,15 +21,20 @@ struct TodayDailySection: View {
         self.dependencies = dependencies
         _viewModel = State(initialValue: TodayDailyViewModel(
             appState: appState,
-            quranRepository: dependencies?.quranRepository
+            quranRepository: dependencies?.quranRepository,
+            hadithRepository: dependencies?.hadithRepository
         ))
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             if viewModel.isLoaded {
+                ForEach(viewModel.announcements) { item in
+                    announcementCard(item)
+                }
                 verseCard.diAppear(delay: 0.05)
                 aqwalCard.diAppear(delay: 0.10)
+                hadithCard.diAppear(delay: 0.12)
                 duaCard.diAppear(delay: 0.15)
                 dhikrCard.diAppear(delay: 0.20)
                 nameCard.diAppear(delay: 0.25)
@@ -34,10 +43,18 @@ struct TodayDailySection: View {
         .task {
             viewModel.load()
             await viewModel.loadSilsilaAyah()
+            await viewModel.loadHadith()
+            await viewModel.loadMedia()
+            showPopupIfDue()
         }
         .onChange(of: appState.settings.language) {
-            Task { await viewModel.loadSilsilaAyah() }
+            Task {
+                await viewModel.loadSilsilaAyah()
+                await viewModel.loadHadith()
+            }
         }
+        .onChange(of: viewModel.media) { showPopupIfDue() }
+        .fullScreenCover(item: $popupItem) { item in DailyPictureViewer(item: item) }
         // A new day where the phone is: back in the app, local midnight
         // (iOS announces it), or a new time zone after travel.
         .onChange(of: scenePhase) { _, phase in
@@ -63,6 +80,76 @@ struct TodayDailySection: View {
         }
     }
 
+    // MARK: - Pictures and announcements
+
+    private func showPopupIfDue() {
+        let seen = Set(seenPopups.split(separator: ",").map(String.init))
+        guard popupItem == nil, let item = viewModel.popup(seen: seen) else { return }
+        popupItem = item
+        // Remembered, and the list kept short.
+        seenPopups = (Array(seen.suffix(40)) + [item.id]).joined(separator: ",")
+    }
+
+    private func announcementCard(_ item: DailyMediaItem) -> some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                DISectionHeaderInline(title: "Announcement", systemImage: "megaphone.fill")
+                DailyPicture(item: item)
+            }
+        }
+    }
+
+    // MARK: - Hadith of the day
+
+    @ViewBuilder
+    private var hadithCard: some View {
+        if let hadith = viewModel.hadith {
+            DICard {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    DISectionHeaderInline(title: "Hadith of the Day", systemImage: "text.book.closed")
+                    if let picture = viewModel.picture(for: .hadith) {
+                        DailyPicture(item: picture)
+                    }
+                    if let translation = hadith.translation {
+                        translationText(translation, urdu: hadith.translationIsUrdu)
+                            .lineLimit(10)
+                    }
+                    if let arabic = hadith.arabic, !arabic.isEmpty {
+                        Text(verbatim: arabic)
+                            .font(DIFont.quranArabic(scale: 0.7))
+                            .foregroundStyle(DIColor.textMuted)
+                            .lineLimit(3)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .environment(\.layoutDirection, .rightToLeft)
+                    }
+                    HStack {
+                        let title = hadith.book.map { viewModel.language == .urdu ? $0.titleUrdu : $0.titleEnglish } ?? ""
+                        Text(verbatim: "\(title) \(hadith.number)")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIColor.primary)
+                        Spacer()
+                        if let book = hadith.book, let dependencies {
+                            NavigationLink {
+                                HadithBookView(book: book, repository: dependencies.hadithRepository, appState: appState, initialHadith: hadith.id)
+                            } label: {
+                                Label("Read in full", systemImage: "arrow.up.forward.square")
+                                    .font(.caption.weight(.semibold))
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                }
+            }
+        } else if let picture = viewModel.picture(for: .hadith) {
+            DICard {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    DISectionHeaderInline(title: "Hadith of the Day", systemImage: "text.book.closed")
+                    DailyPicture(item: picture)
+                }
+            }
+        }
+    }
+
     // MARK: - Verse of the day
 
     private var verseCard: some View {
@@ -74,6 +161,9 @@ struct TodayDailySection: View {
                     if let share = viewModel.ayahShare() {
                         shareButton(share)
                     }
+                }
+                if let picture = viewModel.picture(for: .ayah) {
+                    DailyPicture(item: picture)
                 }
                 if let ayah = viewModel.ayah {
                     let silsila = viewModel.silsilaAyah
@@ -187,6 +277,9 @@ struct TodayDailySection: View {
                         if let share = viewModel.aqwalShare() {
                             shareButton(share)
                         }
+                    }
+                    if let picture = viewModel.picture(for: .aqwal) {
+                        DailyPicture(item: picture)
                     }
                     Text(aqwal.text)
                         .font(.system(.body, design: .serif))

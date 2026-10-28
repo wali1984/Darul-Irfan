@@ -22,6 +22,7 @@ enum DailySelector {
         case name = 211
         case aqwal = 337
         case dhikr = 449
+        case hadith = 563
     }
 
     /// Whole civil days since the Unix epoch for `date` in `timeZone`

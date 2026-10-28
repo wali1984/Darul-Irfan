@@ -301,6 +301,64 @@ actor MemberGroupService {
         try await send("POST", path: "v1/groups/\(groupID)/people", payload: ["memberID": memberID, "role": role.rawValue], expecting: [201])
     }
 
+    // MARK: Today's pictures
+
+    /// What the Super admin published for a local day ("yyyy-MM-dd"). Public:
+    /// no sign-in needed.
+    func dailyMedia(day: String) async throws -> [DailyMediaItem] {
+        var components = URLComponents(url: baseURL.appendingPathComponent("v1/daily-media"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [URLQueryItem(name: "day", value: day)]
+        guard let url = components?.url else { throw MemberGroupError.requestFailed }
+        let (data, response) = try await session.data(for: URLRequest(url: url))
+        guard (response as? HTTPURLResponse)?.statusCode == 200,
+              let list = try? decoder.decode(DailyMediaList.self, from: data) else { throw MemberGroupError.requestFailed }
+        return list.items
+    }
+
+    /// The Super admin's list: drafts, then what is published from a week ago.
+    func manageDailyMedia() async throws -> [DailyMediaItem] {
+        try await authorized(DailyMediaList.self, path: "v1/daily-media/manage").items
+    }
+
+    func uploadDailyMedia(
+        _ picture: Data, contentType: String, slot: DailyMediaItem.Slot, day: String?, endDay: String?,
+        caption: String?, popup: Bool, publish: Bool
+    ) async throws {
+        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        var components = URLComponents(url: baseURL.appendingPathComponent("v1/daily-media/manage"), resolvingAgainstBaseURL: false)
+        var query = [URLQueryItem(name: "slot", value: slot.rawValue), URLQueryItem(name: "popup", value: popup ? "1" : "0"),
+                     URLQueryItem(name: "publish", value: publish ? "1" : "0")]
+        if let day { query.append(URLQueryItem(name: "day", value: day)) }
+        if let endDay { query.append(URLQueryItem(name: "endDay", value: endDay)) }
+        if let caption, !caption.isEmpty { query.append(URLQueryItem(name: "caption", value: caption)) }
+        components?.queryItems = query
+        guard let url = components?.url else { throw MemberGroupError.requestFailed }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
+        request.setValue(contentType, forHTTPHeaderField: "content-type")
+        let (data, response) = try await uploads.upload(for: request, from: picture)
+        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if code == 401 {
+            SecureMemberSession.delete()
+            throw MemberGroupError.notSignedIn
+        }
+        guard code == 201 else {
+            let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? String
+            throw message.map(MemberGroupError.server) ?? MemberGroupError.requestFailed
+        }
+    }
+
+    /// Changes place, day, last day, caption, pop-up or status
+    /// ("draft", "published", "hidden").
+    func updateDailyMedia(_ id: String, _ fields: [String: Any]) async throws {
+        try await send("PUT", path: "v1/daily-media/manage/\(id)", payload: fields, expecting: [200])
+    }
+
+    func deleteDailyMedia(_ id: String) async throws {
+        try await send("DELETE", path: "v1/daily-media/manage/\(id)", payload: nil, expecting: [204])
+    }
+
     // MARK: Halqahs (Super admin)
 
     func createHalqah(name: String, description: String?) async throws {

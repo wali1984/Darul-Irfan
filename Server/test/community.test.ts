@@ -5,6 +5,7 @@ import { sqliteD1 } from "./sqlite-d1";
 import { claimEmailGrants } from "../src/members";
 import { autoplayDue } from "../src/session";
 import { collectRoomRecordings } from "../src/roomRecordings";
+import { dailyTag } from "../src/dailyMedia";
 
 const SECRET = "test-app-secret";
 
@@ -665,5 +666,91 @@ describe("administrators and Halqahs", () => {
     expect(after.groups.map(group => group.id)).toEqual(["usa"]);
     // Retired, not deleted: its people are kept.
     expect(raw.prepare("SELECT COUNT(*) AS n FROM member_group_members WHERE group_id=?").get(id)).toEqual({ n: 1 });
+  });
+});
+
+describe("daily pictures", () => {
+  const bucket = () => {
+    const stored = new Map<string, Uint8Array>();
+    return {
+      stored,
+      async put(key: string, value: ReadableStream | ArrayBuffer) {
+        stored.set(key, new Uint8Array(value instanceof ArrayBuffer ? value : await new Response(value).arrayBuffer()));
+      },
+      async delete(key: string) { stored.delete(key); },
+    };
+  };
+  const upload = (env: Env, token: string, query: string) =>
+    worker.fetch(new Request(`https://api.example.com/v1/daily-media/manage?${query}`, {
+      method: "POST", body: new Uint8Array([1, 2, 3]) as unknown as BodyInit,
+      headers: { authorization: `Bearer ${token}`, "content-type": "image/jpeg", "content-length": "3" },
+    }), env);
+  const publicDay = async (env: Env, day: string) =>
+    ((await (await worker.fetch(new Request(`https://api.example.com/v1/daily-media?day=${day}`), env)).json()) as
+      { items: { id: string; slot: string; imageURL?: string; popup: boolean; caption?: string }[] }).items;
+
+  it("reads the place and day from a forwarded caption's #tag", () => {
+    expect(dailyTag("#aqwal 2026-10-30 Remembrance is the life of the heart")).toEqual({ slot: "aqwal", day: "2026-10-30", caption: "Remembrance is the life of the heart" });
+    expect(dailyTag("#حدیث")).toEqual({ slot: "hadith", day: null, caption: "" });
+    expect(dailyTag("#usa Friday gathering")).toBeNull();
+    expect(dailyTag("No tag")).toBeNull();
+  });
+
+  it("shows only what the Super admin publishes, and only on its days", async () => {
+    const media = bucket();
+    const { env, call, admin, superAdmin } = await setup({ MEDIA: media, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
+    expect((await upload(env, admin, "slot=aqwal&day=2026-10-30&publish=1")).status).toBe(403);
+    expect((await upload(env, superAdmin, "slot=nowhere&day=2026-10-30")).status).toBe(400);
+    expect((await upload(env, superAdmin, "slot=aqwal&publish=1")).status).toBe(400);
+    const published = (await (await upload(env, superAdmin, "slot=aqwal&day=2026-10-30&publish=1&caption=Today")).json()) as { id: string };
+    const draft = (await (await upload(env, superAdmin, "slot=quote&day=2026-10-30&popup=1")).json()) as { id: string };
+    expect(media.stored.size).toBe(2);
+
+    let items = await publicDay(env, "2026-10-30");
+    expect(items.map(item => item.id)).toEqual([published.id]);
+    expect(items[0]).toMatchObject({ slot: "aqwal", caption: "Today", popup: false });
+    expect(items[0]?.imageURL).toContain("/v1/media/daily%2F");
+    expect(await publicDay(env, "2026-10-31")).toEqual([]);
+
+    // Published as a pop-up quote; an announcement for three days.
+    expect((await call(superAdmin, "PUT", `/v1/daily-media/manage/${draft.id}`, { status: "published" })).status).toBe(200);
+    const notice = (await (await upload(env, superAdmin, "slot=announcement&day=2026-10-29&endDay=2026-10-31&publish=1")).json()) as { id: string };
+    items = await publicDay(env, "2026-10-30");
+    expect(items.map(item => item.slot).sort()).toEqual(["announcement", "aqwal", "quote"]);
+    expect(items.find(item => item.slot === "quote")?.popup).toBe(true);
+    expect((await publicDay(env, "2026-10-31")).map(item => item.id)).toEqual([notice.id]);
+    expect((await call(superAdmin, "PUT", `/v1/daily-media/manage/${notice.id}`, { endDay: "2026-10-01" })).status).toBe(400);
+
+    // Hidden, it goes; deleted, its file goes too.
+    await call(superAdmin, "PUT", `/v1/daily-media/manage/${published.id}`, { status: "hidden" });
+    expect((await publicDay(env, "2026-10-30")).some(item => item.id === published.id)).toBe(false);
+    expect((await call(admin, "DELETE", `/v1/daily-media/manage/${notice.id}`)).status).toBe(403);
+    expect((await call(superAdmin, "DELETE", `/v1/daily-media/manage/${notice.id}`)).status).toBe(204);
+    expect(media.stored.size).toBe(2);
+    const manage = (await (await call(superAdmin, "GET", "/v1/daily-media/manage")).json()) as { items: { id: string; status: string }[] };
+    expect(manage.items.map(item => item.status).sort()).toEqual(["hidden", "published"]);
+  });
+
+  it("records a #tagged picture forwarded on WhatsApp as a draft for its place", async () => {
+    vi.stubGlobal("fetch", async (url: string) => String(url).startsWith("https://graph.facebook.com/")
+      ? new Response(JSON.stringify({ url: "https://lookaside.example/img", mime_type: "image/jpeg", file_size: 4 }), { status: 200 })
+      : new Response(new Uint8Array([1, 2, 3, 4]), { status: 200 }));
+    const media = { async put() {} };
+    const { env, raw } = await setup({ MEDIA: media, WHATSAPP_ACCESS_TOKEN: "t", MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
+    const body = JSON.stringify({ entry: [{ changes: [{ value: { messages: [{
+      from: "923001111111", id: "wamid.quote", type: "image", timestamp: "1760000000",
+      image: { id: "987654321", mime_type: "image/jpeg", caption: "#quote 2026-11-02" },
+    }] } }] }] });
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const signed = new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body)));
+    const send = () => worker.fetch(new Request("https://api.example.com/v1/whatsapp", {
+      method: "POST", body, headers: { "x-hub-signature-256": "sha256=" + [...signed].map(b => b.toString(16).padStart(2, "0")).join("") },
+    }), env);
+    await send();
+    await send(); // Meta's retry
+    expect(raw.prepare("SELECT slot,day,status,source,media_key FROM daily_media").all()).toEqual([
+      { slot: "quote", day: "2026-11-02", status: "draft", source: "whatsapp", media_key: "whatsapp/wamid.quote.jpg" },
+    ]);
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM member_group_posts").get()).toEqual({ n: 0 });
   });
 });

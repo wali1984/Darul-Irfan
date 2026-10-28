@@ -9,6 +9,23 @@ import Observation
 final class TodayDailyViewModel {
     private let appState: AppState
     private let quranRepository: (any QuranRepositoryProtocol)?
+    private let hadithRepository: (any HadithRepositoryProtocol)?
+    private let mediaService = MemberGroupService()
+
+    /// The day's hadith: one of the narrations the topics cite (each checked
+    /// against its collection), in the reading language where it has one.
+    struct HadithOfTheDay: Equatable {
+        var id: String
+        var book: HadithBook?
+        var number: String
+        var arabic: String?
+        var translation: String?
+        var translationIsUrdu: Bool
+    }
+
+    private(set) var hadith: HadithOfTheDay?
+    /// What the Super admin published for today.
+    private(set) var media: [DailyMediaItem] = []
 
     /// The day's ayah as the reader shows it: the mushaf's own Arabic, the
     /// Silsila's Akram-ut-Tarajum in the reading language, a full reference,
@@ -38,9 +55,61 @@ final class TodayDailyViewModel {
     /// The local day the cards were chosen for.
     private(set) var loadedDay: Int?
 
-    init(appState: AppState, quranRepository: (any QuranRepositoryProtocol)? = nil) {
+    init(
+        appState: AppState, quranRepository: (any QuranRepositoryProtocol)? = nil,
+        hadithRepository: (any HadithRepositoryProtocol)? = nil
+    ) {
         self.appState = appState
         self.quranRepository = quranRepository
+        self.hadithRepository = hadithRepository
+    }
+
+    /// The published picture for a card, if there is one today.
+    func picture(for slot: DailyMediaItem.Slot) -> DailyMediaItem? {
+        media.first { $0.slot == slot }
+    }
+
+    var announcements: [DailyMediaItem] { media.filter { $0.slot == .announcement } }
+
+    /// What opens over the page: the day's quote, or an announcement marked
+    /// to, the first time it is seen.
+    func popup(seen: Set<String>) -> DailyMediaItem? {
+        media.first { ($0.slot == .quote || $0.popup) && !seen.contains($0.id) && $0.imageURL != nil }
+    }
+
+    /// Today's pictures, for the phone's local day. Quietly nothing offline.
+    func loadMedia(on date: Date = Date()) async {
+        media = (try? await mediaService.dailyMedia(day: DayKey.make(from: date, timeZone: .autoupdatingCurrent))) ?? []
+    }
+
+    /// Picks the day's hadith, preferring one short enough for the card and
+    /// with a translation in the reading language.
+    func loadHadith(on date: Date = Date()) async {
+        guard let repository = hadithRepository else { return }
+        let refs = Array(Set(SeedBundle.topics().flatMap { $0.hadithRefs ?? [] })).sorted()
+        guard !refs.isEmpty else { return }
+        let start = DailySelector.index(count: refs.count, for: date, stream: .hadith)
+        let window = (0..<12).map { refs[(start + $0) % refs.count] }
+        let entries = (try? await repository.entries(canonicalIDs: window)) ?? []
+        let byID = Dictionary(entries.map { ($0.canonicalID, $0) }, uniquingKeysWith: { a, _ in a })
+        let urduReader = language == .urdu
+        func text(_ entry: HadithEntry) -> (String?, Bool) {
+            let urdu = entry.textUrdu.flatMap { $0.isEmpty ? nil : $0 }
+            let english = entry.textEnglish.flatMap { $0.isEmpty ? nil : $0 }
+            return urduReader ? (urdu ?? english, urdu != nil) : (english ?? urdu, false)
+        }
+        let ordered = window.compactMap { byID[$0] }
+        let chosen = ordered.first { entry in
+            let (translation, isUrdu) = text(entry)
+            return (translation?.count ?? .max) <= 700 && (!urduReader || isUrdu)
+        } ?? ordered.first
+        guard let chosen else { return }
+        let books = (try? await repository.books()) ?? []
+        let (translation, isUrdu) = text(chosen)
+        hadith = HadithOfTheDay(
+            id: chosen.canonicalID, book: books.first { $0.id == chosen.bookID }, number: chosen.displayNumber,
+            arabic: chosen.textArabic, translation: translation, translationIsUrdu: isUrdu
+        )
     }
 
     var language: AppLanguage { appState.settings.language }
@@ -68,6 +137,8 @@ final class TodayDailyViewModel {
         guard DailySelector.epochDay(for: date) != loadedDay else { return }
         load(on: date)
         await loadSilsilaAyah()
+        await loadHadith(on: date)
+        await loadMedia(on: date)
     }
 
     /// Replaces the bundled list's generic translation with the Silsila's

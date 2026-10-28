@@ -214,6 +214,13 @@ struct GroupsHomeView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.bordered)
+                NavigationLink {
+                    DailyMediaManagerView(service: model.service)
+                } label: {
+                    Label("Today's pictures", systemImage: "photo.stack")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.bordered)
                 Text("Press and hold a Halqah to rename or retire it.")
                     .font(.caption)
                     .foregroundStyle(DIColor.textMuted)
