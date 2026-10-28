@@ -59,6 +59,7 @@ final class NarrationCatalog {
 
     private func apply(_ manifest: NarrationManifest) {
         self.manifest = manifest
+        Self.voiceTag = Self.tag(for: manifest.voices)
         var sets: [String: Set<String>] = [:]
         for (edition, kinds) in manifest.editions {
             for (kind, names) in kinds { sets["\(edition)/\(kind)"] = Set(names) }
@@ -80,10 +81,23 @@ final class NarrationCatalog {
             .appendingPathComponent("v1/audio/quran/\(edition)/\(kind)/\(name).mp3")
     }
 
+    /// The voices the kept narrations were made with. When the server's voice
+    /// changes, earlier copies are no longer used, so nobody keeps hearing a
+    /// withdrawn voice from their own cache.
+    private static var voiceTag = "v0"
+
+    private static func tag(for voices: [String: NarrationManifest.Voice]) -> String {
+        let signature = voices.keys.sorted().map { "\($0)=\(voices[$0]?.name ?? "")" }.joined(separator: ";")
+        // FNV-1a: stable across launches, unlike hashValue.
+        var hash: UInt64 = 0xcbf29ce484222325
+        for byte in signature.utf8 { hash = (hash ^ UInt64(byte)) &* 0x100000001b3 }
+        return String(hash, radix: 36)
+    }
+
     /// Where a played narration is kept so it plays again offline.
     static func localURL(edition: String, kind: String, name: String) -> URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("narration/\(edition)/\(kind)/\(name).mp3")
+            .appendingPathComponent("narration/\(voiceTag)/\(edition)/\(kind)/\(name).mp3")
     }
 
     /// Credit for the voice reading a language, e.g. "Shamshad Ali Khan".
