@@ -10,6 +10,7 @@ import { json } from "./util";
 // being read (the complete Akram-ut-Tarajum is 165 MB).
 
 const SOURCE_HOST = "www.naqshbandiaowaisiah.org";
+const SOURCE_FOLDERS = ["/uploads/", "/docs/"];
 /** Kept at Cloudflare's edge for 30 days; it then answers ranges itself. */
 const EDGE_TTL_SECONDS = 30 * 86_400;
 /** How long the source has to start answering. The body itself may take longer. */
@@ -33,14 +34,15 @@ export function libraryPDF(src: string | null): string | null {
   }
   if (url.protocol !== "https:" || url.hostname !== SOURCE_HOST || url.port !== "" || url.username || url.password) return null;
   const path = url.pathname;
-  if (!path.startsWith("/uploads/") || !path.toLowerCase().endsWith(".pdf")) return null;
+  // The site keeps its PDFs under /uploads/ and, for a few older papers, /docs/.
+  if (!SOURCE_FOLDERS.some(folder => path.startsWith(folder)) || !path.toLowerCase().endsWith(".pdf")) return null;
   let decoded: string;
   try {
     decoded = decodeURIComponent(path);
   } catch {
     return null;
   }
-  // An encoded slash or backslash could still climb out of /uploads/.
+  // An encoded slash or backslash could still climb out of the folder.
   if (decoded.includes("\\") || decoded.split("/").some(segment => segment === ".." || segment === ".")) return null;
   return url.toString();
 }

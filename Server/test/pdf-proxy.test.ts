@@ -52,6 +52,9 @@ describe("PDF relay: what it passes", () => {
   it("accepts the site's own PDFs, any letter case of .pdf", () => {
     expect(libraryPDF(PDF)).toBe(PDF);
     expect(libraryPDF("https://www.naqshbandiaowaisiah.org/uploads/books/Dalael-us-Salook-Urdu.PDF")).not.toBeNull();
+    // A few older papers live under /docs/ (the library's "Conditions for Muraqbat").
+    expect(libraryPDF("https://www.naqshbandiaowaisiah.org/docs/Conditions-for-Muraqbat-in-English.pdf")).not.toBeNull();
+    expect(libraryPDF("https://www.naqshbandiaowaisiah.org/docs/..%2Fadmin%2Fa.pdf")).toBeNull();
   });
 
   it("answers only GET, HEAD and OPTIONS", async () => {
