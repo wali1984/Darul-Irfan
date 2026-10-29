@@ -2,14 +2,15 @@
 "deploy tag release all what is completed. update again after urdu narration
 and another one on completion of tafsir").
 
-Task Scheduler runs this every hour (task "Darul Irfan - release watch"). Each
-run:
+Task Scheduler runs this every 10 minutes (task "Darul Irfan - release watch").
+Each run:
   1. Urdu narration: once amd has re-recorded and published the corrected
      translation narration (redo_corrections.sh), tell the owner.
-  2. iOS v1.12.0: Codemagic refuses builds until billing is enabled (HTTP 402).
-     When it accepts one, build ios-verify; if that passes, build for
-     TestFlight and put the build in front of the testers, then tell the
-     owner. A failed verify stops here and says so: the code needs a person.
+  2. iOS v1.12.0: Codemagic refuses builds until billing is enabled (HTTP 402)
+     or the free minutes renew on the 1st of the month. When it accepts one,
+     build ios-testflight (it runs the unit tests and content gates before it
+     signs anything), put the build in front of the testers, then tell the
+     owner. A failed build stops here and says so: the code needs a person.
      Skipped while the Akram-ut-Tafaseer release is building from main, which
      carries v1.12.0 too.
 Each event is announced once (notify.py: a Windows notification and a line in
@@ -62,6 +63,8 @@ def amd(command: str) -> str:
                SSH_ASKPASS=str(ASKPASS), SSH_ASKPASS_REQUIRE="force", DISPLAY=":0")
     result = subprocess.run([str(SSH), "-o", "ConnectTimeout=20", AMD, command], env=env,
                             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
+    if result.returncode == 255:  # ssh itself failed: amd unreachable, not a stopped run
+        raise RuntimeError("ssh to amd failed: " + result.stderr.strip()[:200])
     return result.stdout
 
 
@@ -114,35 +117,25 @@ def ios(state: dict) -> None:
     akram = json.loads(AKRAM_STATE.read_text(encoding="utf-8")) if AKRAM_STATE.exists() else {}
     if "committed" in akram.get("done", []) and "testflight" not in akram.get("done", []):
         return  # that release builds main, which carries v1.12.0
-    if not state.get("verify_build"):
-        build = start("ios-verify")
-        if build is None:
-            if not state.get("billing_noted"):
-                notify("iOS release waiting on Codemagic billing",
-                       "Codemagic refuses builds until billing is enabled. v1.12.0 goes to TestFlight "
-                       "by itself within the hour after it is.")
-                state["billing_noted"] = True
-            return
-        state["verify_build"] = build
-        save(state)
-    status = wait(state["verify_build"])
-    if status != "finished":
-        notify("iOS v1.12.0 does not build",
-               f"Codemagic ios-verify ended '{status}' (build {state['verify_build']}); the Swift needs a fix "
-               "before TestFlight. Nothing was released.")
-        state["ios_failed"] = True
-        return
     if not state.get("testflight_build"):
         started = datetime.now(timezone.utc)
         build = start("ios-testflight")
         if build is None:
+            if not state.get("billing_noted"):
+                notify("iOS release waiting on Codemagic billing",
+                       "Codemagic refuses builds until billing is enabled or the free minutes renew on the 1st. "
+                       "v1.12.0 goes to TestFlight by itself within 10 minutes after either.")
+                state["billing_noted"] = True
             return
         state["testflight_build"], state["testflight_started"] = build, started.isoformat()
         save(state)
+        notify("iOS 1.12 is building", f"Codemagic accepted the TestFlight build ({build}). The testers get it "
+                                       "once it passes its tests and Apple has processed it.")
     status = wait(state["testflight_build"])
     if status != "finished":
-        notify("iOS TestFlight build failed",
-               f"Codemagic ios-testflight ended '{status}' (build {state['testflight_build']}). Nothing was released.")
+        notify("iOS v1.12.0 build failed",
+               f"Codemagic ios-testflight ended '{status}' (build {state['testflight_build']}); the code needs a "
+               "fix before TestFlight. Nothing was released.")
         state["ios_failed"] = True
         return
     started = datetime.fromisoformat(state["testflight_started"])
@@ -154,7 +147,7 @@ def ios(state: dict) -> None:
             break
         time.sleep(60)
     if not number:
-        return  # tried again next hour
+        return  # tried again next run
     notes = NOTES.read_text(encoding="utf-8").strip() if NOTES.exists() else "Darul Irfan 1.12"
     if testflight.release(number, notes[:3900]) == 0:
         notify("Darul Irfan 1.12 is on TestFlight", f"Build {number} is with the internal testers and submitted to "
