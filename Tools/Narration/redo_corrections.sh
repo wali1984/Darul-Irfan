@@ -22,7 +22,14 @@ key = lambda s, a: f"akram-ut-tarajum-ur/translation/{int(s):03d}{int(a):03d}"
 redo = {line for line in (V / "redo.txt").read_text().split() if line} if (V / "redo.txt").exists() else set()
 results = json.loads((V / "verify_translation.json").read_text(encoding="utf-8"))
 redo |= {k for k, r in results.items() if r.get("flag")}
-redo |= {key(*k.split(":")) for k in corrected}
+# A corrected ayah is remade unless its file is newer than the corrections
+# (the chain may already have remade it with the corrected text).
+since = (V / "text_corrections.json").stat().st_mtime
+for k in corrected:
+    name = key(*k.split(":"))
+    mp3 = V / "quran-higgs" / f"{name}.mp3"
+    if not mp3.exists() or mp3.stat().st_mtime < since:
+        redo.add(name)
 (V / "redo.txt").write_text("".join(f"{k}\n" for k in sorted(redo)))
 print(f"to remake: {len(redo)} ({len(corrected)} corrected texts)")
 PY

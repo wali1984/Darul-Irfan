@@ -63,27 +63,19 @@ Reviewed content does not fail a gate merely because a human has not read every
 line of it. Specifically, none of these block a tag:
 
 - Outstanding line-by-line proofreading of any `testFlightApproved` edition.
-- The 154 replacement characters inherited from the upstream hadith corpus
-  (see below).
 - Missing translations, provided they are represented honestly.
 
-## Known upstream defect: 154 lost Arabic characters
+## Repaired: the 154 lost Arabic characters (2026-10-29)
 
-76 narrations carry a `U+FFFD` replacement character in their Arabic, 154 in
-total. Each one stands where a single Arabic character was lost to a bad decode
-**upstream, before the data reached this project** — the same corruption is
-present in both of the upstream Arabic editions (with and without diacritics),
-so it cannot be repaired from that source. It has been in every build the app
-has shipped.
+76 narrations used to carry a `U+FFFD` replacement character in their Arabic
+(154 in all, plus three `U+FFFC` in Bukhari): characters lost to a bad decode
+upstream, present in both upstream Arabic editions. On 2026-10-29 every one was
+restored from the same narration's text on sunnah.com. A run is replaced only
+where its exact 4-10 character context occurs once in that text and the
+replacement has as many bytes as were lost (Tools/Hadith, hadith-data fixes).
 
-The exact inventory is recorded in
-`Tools/ContentIntegrity/known_upstream_defects.json`, per narration and per
-language. The content gate uses it to tell an inherited defect from a new one:
-**any replacement character not in that inventory, or one more than recorded,
-fails the build.** The inventory cannot drift, and it can only shrink.
-
-Repairing these needs a second authoritative Arabic corpus to cross-reference
-against. That is a public-release task.
+`Tools/ContentIntegrity/known_upstream_defects.json` now lists no narrations,
+so the content gate fails on **any** replacement character in the hadith packs.
 
 ## Running the gate
 

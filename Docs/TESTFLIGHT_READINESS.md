@@ -169,16 +169,19 @@ These are honest gaps, not bugs. Do not let a tester report them as defects.
   re-run the per-ayah indexer over the clean source. Do **not** attempt
   heuristic span alignment; it silently duplicated commentary across adjacent
   blocks every time it was tried, and was reverted.
-- **Two Asrar verses are deliberately blank** — 23:38 and 80:41 — because the
-  authoritative source's own English is wrong there. Never guessed at.
-- **154 `U+FFFD` in the Arabic of 76 narrations**, inherited from both upstream
-  Arabic editions. Inventoried in `known_upstream_defects.json`; the gate fails
-  on any replacement character outside that list. Repair needs a second
-  authoritative Arabic corpus and is a public-release task.
-- **Book text (43 works) is machine OCR**, `machineProvisional`, with 20.3% of
-  blocks unresolved and counted per page so the reader marks a page rather than
-  hiding it. Quality varies; embedded Arabic quotations are corrupt in places
-  and must never be read as Quran or hadith.
+- **One Asrar verse is deliberately blank** — 23:38 — because its printed page
+  is missing from the PDF. Never guessed at. (80:41 is filled from the printed
+  book since 2026-10-29: "Dust-covered.")
+- **The 154 lost Arabic characters in 76 narrations were repaired on
+  2026-10-29** from the same narrations on sunnah.com; the inventory in
+  `known_upstream_defects.json` is empty and the gate fails on any
+  replacement character.
+- **Book text (43 works and both Urdu tafsir works) is Claude's reading of the
+  printed pages** (`claudeTranscribed`), laid out as printed; it still awaits
+  human proofreading before public release. Akram-ut-Tafaseer is still the
+  original OCR (`machineProvisional`) until its Claude re-read in November.
+  Embedded Arabic quotations are shown as Qur'an only where they match the
+  mushaf.
 - Review state is internal metadata only. It is never rendered as a badge next
   to scripture; provenance lives in Acknowledgements and
   `Docs/CONTENT_INTEGRITY.md`.
