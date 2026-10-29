@@ -9,6 +9,8 @@ struct LiveBroadcastCard: View {
     var platform: OfficialPlatformService? = nil
     @State private var presentedVideo: PresentedVideo?
     @State private var latest: LiveBroadcast?
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.followsLiveState) private var followsLiveState
 
     private var current: LiveBroadcast { latest ?? broadcast }
     private var isLive: Bool { current.state == .live }
@@ -96,13 +98,16 @@ struct LiveBroadcastCard: View {
                 DIHaptics.success()
             }
         }
-        .task(id: platform == nil) { await follow() }
+        // Only while the app is in front and the card is in sight: with
+        // audio playing in the background, a card left on screen kept asking
+        // the server.
+        .task(id: platform != nil && scenePhase == .active && followsLiveState) { await follow() }
     }
 
     /// Re-reads the live state while the card is visible: every 10 seconds
     /// during a session, so a cue shows promptly; every 30 otherwise.
     private func follow() async {
-        guard let platform else { return }
+        guard let platform, scenePhase == .active, followsLiveState else { return }
         while !Task.isCancelled {
             try? await Task.sleep(for: .seconds(isLive ? 10 : 30))
             if Task.isCancelled { break }
@@ -182,3 +187,16 @@ struct LiveBroadcastCard: View {
 }
 
 private struct PresentedVideo: Identifiable { let id: String }
+
+private struct FollowsLiveStateKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+    /// Whether a live card keeps the live state current. A screen kept alive
+    /// out of sight (a Discover section not chosen) turns it off.
+    var followsLiveState: Bool {
+        get { self[FollowsLiveStateKey.self] }
+        set { self[FollowsLiveStateKey.self] = newValue }
+    }
+}

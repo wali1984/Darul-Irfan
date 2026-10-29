@@ -49,6 +49,8 @@ struct PrayerActivityWidget: Widget {
                 }
             }
             .padding()
+            // Times on the place's clock, as the app shows them.
+            .environment(\.timeZone, context.attributes.timeZone)
             .activityBackgroundTint(WidgetPalette.cream)
             .activitySystemActionForegroundColor(WidgetPalette.emerald)
             .widgetURL(URL(string: "darulirfan://today"))
@@ -80,7 +82,9 @@ struct PrayerActivityWidget: Widget {
                         Spacer()
                         if let following = context.state.followingPrayerName,
                            let time = context.state.followingPrayerTime {
-                            Text("Then \(following) at \(time.formatted(date: .omitted, time: .shortened))")
+                            // On the place's clock, as the app shows it.
+                            let at = time.formatted(Date.FormatStyle(date: .omitted, time: .shortened, timeZone: context.attributes.timeZone))
+                            Text("Then \(following) at \(at)")
                                 .font(.caption)
                         }
                     }

@@ -125,6 +125,8 @@ private struct OnboardingBadge<Glyph: View>: View {
 /// gradient background) carrying the glowing seal, the wordmark, the tagline,
 /// and the app's anchoring verse. Everything springs gently into place.
 struct OnboardingWelcomeStep: View {
+    @Environment(\.locale) private var locale
+
     var body: some View {
         VStack(spacing: DISpacing.lg) {
             seal
@@ -195,10 +197,18 @@ struct OnboardingWelcomeStep: View {
                 .environment(\.layoutDirection, .rightToLeft)
                 .multilineTextAlignment(.center)
 
-            Text(DIBrand.anchorVerseEnglish)
-                .font(.callout.italic())
-                .foregroundStyle(DIColor.onPrimary.opacity(0.9))
-                .multilineTextAlignment(.center)
+            if DIBrand.readsUrdu(locale) {
+                Text(verbatim: DIBrand.anchorVerseUrdu)
+                    .font(DIFont.urduBody(scale: 0.95))
+                    .foregroundStyle(DIColor.onPrimary.opacity(0.9))
+                    .multilineTextAlignment(.center)
+                    .environment(\.layoutDirection, .rightToLeft)
+            } else {
+                Text(verbatim: DIBrand.anchorVerseEnglish)
+                    .font(.callout.italic())
+                    .foregroundStyle(DIColor.onPrimary.opacity(0.9))
+                    .multilineTextAlignment(.center)
+            }
 
             Text(DIBrand.anchorVerseReference)
                 .font(.caption.weight(.semibold))

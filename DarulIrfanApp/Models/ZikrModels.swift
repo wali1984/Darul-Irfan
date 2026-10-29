@@ -34,8 +34,29 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     var anchorOffsetMinutes: Int? = nil
     /// A group's zikr time that plays a recording by itself: what it plays.
     var autoplayTitle: String? = nil
+    /// The Urdu wording of `title` and `availabilityNote`, shown when the app
+    /// is in Urdu; the catalogue fills them once the owner approves the
+    /// wording, and the English is shown until then.
+    var titleUrdu: String? = nil
+    var availabilityNoteUrdu: String? = nil
 
     var zikrAnchor: ZikrAnchor? { anchor.flatMap(ZikrAnchor.init(rawValue:)) }
+
+    /// The Urdu name for Urdu readers when there is one, else the English,
+    /// as `Dua` and `IslamicDay` choose theirs.
+    func displayTitle(urdu: Bool) -> String {
+        if urdu, let titleUrdu, !titleUrdu.isEmpty { return titleUrdu }
+        return title
+    }
+
+    func displayAvailabilityNote(urdu: Bool) -> String? {
+        if urdu, let availabilityNoteUrdu, !availabilityNoteUrdu.isEmpty { return availabilityNoteUrdu }
+        return availabilityNote
+    }
+
+    func title(inUrdu urdu: Bool) -> String { displayTitle(urdu: urdu) }
+
+    func availabilityNote(inUrdu urdu: Bool) -> String? { displayAvailabilityNote(urdu: urdu) }
 }
 
 /// Prayer-time events an online zikr session is announced against.

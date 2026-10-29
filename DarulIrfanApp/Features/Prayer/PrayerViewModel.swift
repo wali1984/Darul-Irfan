@@ -130,7 +130,11 @@ final class PrayerViewModel {
         if let maghrib = todaySchedule?.time(for: .maghrib), now < maghrib {
             return RamadanCountdownTarget(kind: .iftar, time: maghrib)
         }
-        if let fajrTomorrow = tomorrowSchedule?.time(for: .fajr), now < fajrTomorrow {
+        // Only while tomorrow is still a fast: after the last iftar the next
+        // Fajr is Eid morning, not the end of a suhoor.
+        let placeTimeZone = appState.activePlace?.timeZone ?? .current
+        if let fajrTomorrow = tomorrowSchedule?.time(for: .fajr), now < fajrTomorrow,
+           hijriService.isRamadan(fajrTomorrow, offsetDays: appState.settings.hijri.dayOffset, timeZone: placeTimeZone) {
             return RamadanCountdownTarget(kind: .suhoorEnds, time: fajrTomorrow)
         }
         return nil
@@ -217,12 +221,7 @@ final class PrayerViewModel {
     }
 
     var completedPrayerCount: Int {
-        Prayer.obligatory.reduce(into: 0) { count, prayer in
-            switch completion(for: prayer) {
-            case .unmarked: break
-            case .prayed, .jamaat, .qaza: count += 1
-            }
-        }
+        Prayer.obligatory.filter { completion(for: $0).countsAsPrayed }.count
     }
 
     /// Cycles unmarked -> prayed -> jamaat -> qaza -> unmarked and persists.

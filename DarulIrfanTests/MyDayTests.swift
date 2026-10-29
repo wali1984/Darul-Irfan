@@ -71,6 +71,70 @@ final class MyDayTests: XCTestCase {
         XCTAssertEqual(next, tomorrowEvening)
     }
 
+    /// A repeating task keeps reminding without the app being opened: the
+    /// planner hands out its next several times, not just the first.
+    func testRepeatingTaskYieldsSeveralUpcomingTimes() {
+        let now = TestDates.make(year: 2026, month: 1, day: 15, hour: 6, minute: 0, timeZone: TestDates.karachi)
+        var task = DayTask(title: "Walk", startDay: now)
+        task.timing = .clock(hour: 18, minute: 0)
+        task.repeatRule = .daily
+        task.completedDays = [DayKey.make(from: now.addingTimeInterval(86_400), timeZone: TestDates.karachi)]
+
+        let times = MyDayPlanner.occurrences(of: task, after: now, schedules: [], limit: 3, calendar: calendar)
+
+        XCTAssertEqual(times, [
+            TestDates.make(year: 2026, month: 1, day: 15, hour: 18, minute: 0, timeZone: TestDates.karachi),
+            // The 16th is already done.
+            TestDates.make(year: 2026, month: 1, day: 17, hour: 18, minute: 0, timeZone: TestDates.karachi),
+            TestDates.make(year: 2026, month: 1, day: 18, hour: 18, minute: 0, timeZone: TestDates.karachi),
+        ])
+    }
+
+    /// One entry this build cannot read costs that entry, never the whole
+    /// document (every save rewrites it).
+    func testDocumentDecodingSkipsAnUnreadableEntryAndFillsMissingFields() throws {
+        let json = """
+        {
+          "tasks": [
+            {"title": "Read", "startDay": "2026-01-15T00:00:00Z"},
+            {"title": 42},
+            {"id": "6F1C1C55-2C85-4B4E-9C8C-2B1B8E5B3D11", "title": "Walk", "startDay": "2026-01-16T00:00:00Z", "remind": true}
+          ],
+          "notes": [{"text": "Reflection"}, {"nope": true}],
+          "fasts": {"2026-01-15": "voluntary", "2026-01-16": "unknownKind"}
+        }
+        """
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let document = try decoder.decode(MyDayDocument.self, from: Data(json.utf8))
+
+        XCTAssertEqual(document.tasks.map(\.title), ["Read", "Walk"])
+        XCTAssertEqual(document.tasks.first?.repeatRule, .never)
+        XCTAssertEqual(document.tasks.last?.remind, true)
+        XCTAssertEqual(document.notes.map(\.text), ["Reflection"])
+        XCTAssertEqual(document.fasts, ["2026-01-15": .voluntary])
+        XCTAssertEqual(document.version, 1)
+    }
+
+    /// A file that does not decode is set aside, not saved over.
+    @MainActor
+    func testUnreadableFileIsKeptAsideRatherThanOverwritten() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let url = folder.appendingPathComponent("my_day.json")
+        try Data("not json".utf8).write(to: url)
+
+        let store = MyDayStore(fileURL: url)
+        store.upsert(DayTask(title: "New", startDay: Date()))
+
+        let names = try FileManager.default.contentsOfDirectory(atPath: folder.path)
+        XCTAssertTrue(names.contains { $0.hasPrefix("my_day.unreadable-") }, "The old file is kept")
+        let reopened = MyDayStore(fileURL: url)
+        reopened.loadIfNeeded()
+        XCTAssertEqual(reopened.document.tasks.map(\.title), ["New"])
+        try FileManager.default.removeItem(at: folder)
+    }
+
     @MainActor
     func testStoreRoundTripsOnDisk() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString).appendingPathComponent("my_day.json")

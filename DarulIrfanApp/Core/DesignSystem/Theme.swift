@@ -136,7 +136,15 @@ enum DIBrand {
     static let anchorVerseArabic = "اَلَا بِذِكْرِ اللّٰهِ تَطْمَئِنُّ الْقُلُوْبُ"
     /// 13:28 in the Silsila's Akram-ut-Tarajum (English), the app's only translation source.
     static let anchorVerseEnglish = "Remember! Only in Allah’s Zikr do hearts find satisfaction."
-    static let anchorVerseReference = "Qur'an 13:28"
+    /// The same words of 13:28 in the Silsila's Akram-ut-Tarajum (Urdu). A
+    /// test checks both against the bundled translation.
+    static let anchorVerseUrdu = "یاد رکھو! اللہ کے ذکر سے ہی دل اطمینان پاتے ہیں۔"
+
+    /// True when `locale` reads Urdu, so the anchor verse shows its Urdu translation.
+    static func readsUrdu(_ locale: Locale) -> Bool {
+        locale.language.languageCode?.identifier == "ur"
+    }
+    static var anchorVerseReference: String { String(localized: "Qur'an 13:28") }
     /// Site tagline, used as an onboarding/subtitle line.
     static let tagline = "Exploring the Treasures of the Heart"
     static let wordmark = "Darul Irfan"

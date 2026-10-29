@@ -24,9 +24,6 @@ final class ZikrHomeViewModel {
     private(set) var liveGroups: [MemberGroup] = []
     var showPermissionAlert = false
 
-    /// Minutes before the session start that the reminder fires.
-    private let reminderLeadMinutes = 10
-
     init(
         notifications: any NotificationScheduling,
         platform: OfficialPlatformService,
@@ -82,8 +79,8 @@ final class ZikrHomeViewModel {
             let enabled = UserDefaults.standard.bool(forKey: reminderKey(session.id))
             reminderEnabled[session.id] = enabled
             if enabled {
-                // Reminders are one-off notifications; refresh to the next
-                // occurrence every time the screen loads so they stay current.
+                // Each reminder is a one-off notification: refresh the coming
+                // week of them every time the screen loads.
                 await scheduleReminder(for: session)
             }
         }
@@ -91,10 +88,12 @@ final class ZikrHomeViewModel {
     }
 
     /// Keeps the live state current while the screen is open, so a session's
-    /// Join turns on when its video goes live or its room opens.
+    /// Join turns on when its video goes live or its room opens: every 10
+    /// seconds during the broadcast, so the host's cue shows promptly, and
+    /// every 30 otherwise.
     func followLive() async {
         while !Task.isCancelled {
-            try? await Task.sleep(for: .seconds(30))
+            try? await Task.sleep(for: .seconds(live.state == .live ? 10 : 30))
             if Task.isCancelled { break }
             live = await platform.currentLiveBroadcast(forceRefresh: true)
         }
@@ -149,25 +148,25 @@ final class ZikrHomeViewModel {
         "zikrReminder.\(sessionID)"
     }
 
+    /// The coming week of reminders for one session. A single reminder fired
+    /// once and then stayed silent until this screen was opened again; the
+    /// app now also refreshes them with the prayer alerts (ZikrReminders).
+    /// The Tahajjud zikr's says it is joined on Paltalk.
     private func scheduleReminder(for session: ZikrSession) async {
         // Always recompute: the occurrence cached at load() may have passed
-        // while the screen stayed open. nextOccurrence(after:) is strictly
-        // in the future, so a valid fire date always exists.
+        // while the screen stayed open.
         let now = Date()
         let current = ZikrAnchorResolver.resolved(session, at: now, calculator: prayerCalculation)
-        guard let next = ZikrScheduleMath.nextOccurrence(of: current, after: now) else { return }
-        nextOccurrences[session.id] = next
-
-        var fireDate = next.addingTimeInterval(TimeInterval(-reminderLeadMinutes * 60))
-        if fireDate <= now {
-            fireDate = next
+        if let next = ZikrScheduleMath.nextOccurrence(of: current, after: now) {
+            nextOccurrences[session.id] = next
         }
-
-        await notifications.scheduleReminder(
+        await ZikrReminders.schedule(
+            session,
             id: reminderKey(session.id),
-            title: session.title,
-            body: String(localized: "Daily Zikr begins soon. Open Darul Irfan to join it live."),
-            at: fireDate
+            body: ZikrReminders.body(for: session),
+            notifications: notifications,
+            calculator: prayerCalculation,
+            now: now
         )
     }
 }

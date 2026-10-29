@@ -13,6 +13,9 @@ final class MyDayStore {
     private(set) var hasLoaded = false
 
     @ObservationIgnored private let fileURL: URL
+    /// Set when the file could not be decoded and could not be moved aside
+    /// either: nothing is saved over it then.
+    @ObservationIgnored private var saveBlocked = false
 
     init(fileURL: URL? = nil) {
         if let fileURL {
@@ -25,18 +28,37 @@ final class MyDayStore {
         }
     }
 
+    /// Reads the file once. The next save rewrites the whole file, so the
+    /// store must never start empty over one it could not read: a file that
+    /// is there but unreadable for now (before the first unlock after a
+    /// restart) is tried again later, and one that does not decode is kept
+    /// beside the new one rather than overwritten.
     func loadIfNeeded() {
         guard !hasLoaded else { return }
-        hasLoaded = true
+        let manager = FileManager.default
+        guard manager.fileExists(atPath: fileURL.path) else {
+            hasLoaded = true
+            return
+        }
         guard let data = try? Data(contentsOf: fileURL) else { return }
+        hasLoaded = true
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        if let stored = try? decoder.decode(MyDayDocument.self, from: data) {
-            document = stored
+        do {
+            document = try decoder.decode(MyDayDocument.self, from: data)
+        } catch {
+            let aside = fileURL.deletingLastPathComponent()
+                .appendingPathComponent("my_day.unreadable-\(Int(Date().timeIntervalSince1970)).json")
+            do {
+                try manager.moveItem(at: fileURL, to: aside)
+            } catch {
+                saveBlocked = true
+            }
         }
     }
 
     private func save() {
+        guard hasLoaded, !saveBlocked else { return }
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         guard let data = try? encoder.encode(document) else { return }
@@ -55,7 +77,11 @@ final class MyDayStore {
         document.tasks.filter { $0.occurs(on: day, calendar: calendar) }
     }
 
+    // Every change loads first, so it lands on the stored document rather
+    // than replacing it.
+
     func upsert(_ task: DayTask) {
+        loadIfNeeded()
         if let index = document.tasks.firstIndex(where: { $0.id == task.id }) {
             document.tasks[index] = task
         } else {
@@ -65,11 +91,13 @@ final class MyDayStore {
     }
 
     func delete(taskID: UUID) {
+        loadIfNeeded()
         document.tasks.removeAll { $0.id == taskID }
         save()
     }
 
     func toggleDone(taskID: UUID, on day: Date) {
+        loadIfNeeded()
         guard let index = document.tasks.firstIndex(where: { $0.id == taskID }) else { return }
         let key = DayKey.make(from: day)
         if document.tasks[index].completedDays.contains(key) {
@@ -83,6 +111,7 @@ final class MyDayStore {
     // MARK: Notes
 
     func upsert(_ note: DayNote) {
+        loadIfNeeded()
         var note = note
         note.updatedAt = Date()
         if let index = document.notes.firstIndex(where: { $0.id == note.id }) {
@@ -94,6 +123,7 @@ final class MyDayStore {
     }
 
     func delete(noteID: UUID) {
+        loadIfNeeded()
         document.notes.removeAll { $0.id == noteID }
         save()
     }
@@ -109,6 +139,7 @@ final class MyDayStore {
     }
 
     func setFast(_ kind: FastKind?, on day: Date) {
+        loadIfNeeded()
         document.fasts[DayKey.make(from: day)] = kind
         save()
     }
@@ -179,7 +210,20 @@ enum MyDayPlanner {
         schedules: [PrayerDaySchedule],
         calendar: Calendar = .current
     ) -> Date? {
-        for offset in 0..<9 {
+        occurrences(of: task, after: now, schedules: schedules, limit: 1, calendar: calendar).first
+    }
+
+    /// Up to `limit` times the task falls after `now`, over the nine days the
+    /// schedules cover, skipping days already marked done.
+    static func occurrences(
+        of task: DayTask,
+        after now: Date,
+        schedules: [PrayerDaySchedule],
+        limit: Int,
+        calendar: Calendar = .current
+    ) -> [Date] {
+        var times: [Date] = []
+        for offset in 0..<9 where times.count < limit {
             guard let day = calendar.date(byAdding: .day, value: offset, to: calendar.startOfDay(for: now)),
                   task.occurs(on: day, calendar: calendar),
                   !task.isDone(on: day, calendar: calendar) else { continue }
@@ -188,10 +232,10 @@ enum MyDayPlanner {
                 return calendar.isDate(date, inSameDayAs: day)
             }
             if let time = time(of: task, on: day, schedule: schedule, calendar: calendar), time > now {
-                return time
+                times.append(time)
             }
         }
-        return nil
+        return times
     }
 
     /// How a task's timing reads, e.g. "After Fajr" or "15 min before Maghrib".
@@ -215,11 +259,19 @@ enum MyDayPlanner {
 
 // MARK: - Reminders
 
-/// Keeps one local notification per reminding task, for its next
-/// occurrence. Refreshed with the prayer alerts, so a prayer-relative task
-/// follows that day's prayer times.
+/// Keeps the next few reminders of each reminding task scheduled. A
+/// repeating task used to keep only its next one, so it reminded once and
+/// then waited for the app to be opened. Refreshed with the prayer alerts, so
+/// a prayer-relative task follows each day's prayer times.
 enum MyDayReminders {
     private static let scheduledKey = "myday.scheduledReminderIDs"
+
+    /// Upcoming reminders kept per task.
+    static let occurrencesPerTask = 7
+
+    /// All tasks' reminders together, soonest first, so they never crowd the
+    /// prayer alerts out of the 64-alert budget.
+    static let totalBudget = 21
 
     @MainActor
     static func refresh(
@@ -229,17 +281,31 @@ enum MyDayReminders {
         now: Date = Date()
     ) async {
         store.loadIfNeeded()
+        // A file not readable yet (before the first unlock) leaves the store
+        // empty for now: that is not every task being deleted.
+        guard store.hasLoaded else { return }
         let previously = Set(UserDefaults.standard.stringArray(forKey: scheduledKey) ?? [])
+        let reminding = store.document.tasks.filter { $0.remind && $0.timing.isTimed }
+        let soonest = reminding
+            .flatMap { task in
+                MyDayPlanner.occurrences(of: task, after: now, schedules: schedules, limit: occurrencesPerTask)
+                    .map { (taskID: task.id, fire: $0) }
+            }
+            .sorted { $0.fire < $1.fire }
+            .prefix(totalBudget)
         var scheduled: [String] = []
-        for task in store.document.tasks where task.remind && task.timing.isTimed {
+        for task in reminding {
             let id = reminderID(task.id)
-            await notifications.cancelReminder(id: id)
-            guard let fire = MyDayPlanner.nextOccurrence(of: task, after: now, schedules: schedules) else { continue }
-            await notifications.scheduleReminder(
+            let fires = soonest.filter { $0.taskID == task.id }.map { $0.fire }
+            guard let first = fires.first else {
+                await notifications.cancelReminder(id: id)
+                continue
+            }
+            await notifications.scheduleReminders(
                 id: id,
                 title: task.title,
-                body: MyDayPlanner.timingText(task.timing, resolved: fire),
-                at: fire
+                body: MyDayPlanner.timingText(task.timing, resolved: first),
+                at: fires
             )
             scheduled.append(id)
         }

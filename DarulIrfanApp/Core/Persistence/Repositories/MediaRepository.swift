@@ -24,8 +24,9 @@ struct MediaRepository: MediaRepositoryProtocol {
         var conditions: [String] = []
         var parameters: [SQLValue] = []
         if let category {
-            conditions.append("category = ?")
-            parameters.append(.text(category.rawValue))
+            let filter = Self.categoryFilter(category)
+            conditions.append(filter.sql)
+            parameters.append(contentsOf: filter.parameters)
         }
         if let year {
             conditions.append("year = ?")
@@ -73,8 +74,9 @@ struct MediaRepository: MediaRepositoryProtocol {
         var sql = "SELECT DISTINCT year FROM media_items WHERE year IS NOT NULL"
         var parameters: [SQLValue] = []
         if let category {
-            sql += " AND category = ?"
-            parameters.append(.text(category.rawValue))
+            let filter = Self.categoryFilter(category)
+            sql += " AND " + filter.sql
+            parameters.append(contentsOf: filter.parameters)
         }
         sql += " ORDER BY year DESC"
         let rows = try await database.connection.query(sql, parameters)
@@ -339,6 +341,20 @@ struct MediaRepository: MediaRepositoryProtocol {
             )
         }
         try await database.connection.executeBatch(statements)
+    }
+
+    /// Which rows a category shows. Video Lectures is every lecture with a
+    /// video: the catalogue keeps one row per lecture, so an audio lecture
+    /// that also has its official YouTube recording is listed there too
+    /// (`MediaCategory.contains` says the same for the counts).
+    private static func categoryFilter(_ category: MediaCategory) -> (sql: String, parameters: [SQLValue]) {
+        if category == .videoLectures {
+            return (
+                "(category = ? OR (category = ? AND youtube_id IS NOT NULL AND youtube_id <> ''))",
+                [.text(MediaCategory.videoLectures.rawValue), .text(MediaCategory.audioLectures.rawValue)]
+            )
+        }
+        return ("category = ?", [.text(category.rawValue)])
     }
 
     // MARK: - Row mapping

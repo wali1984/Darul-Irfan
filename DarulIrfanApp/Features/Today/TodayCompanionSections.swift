@@ -19,8 +19,8 @@ struct TodayQuickTools: View {
             HStack(spacing: DISpacing.sm) {
                 Button {
                     DIHaptics.soft()
-                    // The Quran lives in the Read tab; the shell switches to it.
-                    NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: "quran")
+                    // The Quran lives in the Read tab; the router takes it there.
+                    DeepLinkRouter.shared.open(.quran(surah: nil, ayah: nil))
                 } label: {
                     QuickToolChip(title: "Quran", systemImage: "book.closed")
                 }
@@ -87,10 +87,11 @@ struct TodayMyDayCard: View {
     let appState: AppState
     @State private var store = MyDayStore.shared
     @State private var isAdding = false
+    @State private var editing: DayTask?
 
     var body: some View {
         let today = Date()
-        let schedule = MyDayPrayerTimes.schedule(on: today, dependencies: dependencies, appState: appState)
+        let schedule = prayerSchedule(on: today)
         let open = MyDayPlanner.ordered(store.tasks(on: today), on: today, schedule: schedule)
             .filter { !$0.task.isDone(on: today) }
         DICard {
@@ -115,7 +116,9 @@ struct TodayMyDayCard: View {
                         store.toggleDone(taskID: entry.task.id, on: today)
                         DIHaptics.light()
                         Task { await appState.refreshScheduledNotificationsAndWidgets() }
-                    } onOpen: {}
+                    } onOpen: {
+                        editing = entry.task
+                    }
                 }
                 NavigationLink {
                     MyDayView(dependencies: dependencies, appState: appState)
@@ -127,13 +130,28 @@ struct TodayMyDayCard: View {
         }
         .sheet(isPresented: $isAdding) {
             NavigationStack {
-                DayTaskEditorView(task: nil) { task in
+                DayTaskEditorView(task: nil, prayerSchedule: { prayerSchedule(on: $0) }) { task in
                     store.upsert(task)
                     Task { await appState.refreshScheduledNotificationsAndWidgets() }
                 }
             }
         }
+        .sheet(item: $editing) { task in
+            NavigationStack {
+                DayTaskEditorView(task: task, prayerSchedule: { prayerSchedule(on: $0) }, onSave: { updated in
+                    store.upsert(updated)
+                    Task { await appState.refreshScheduledNotificationsAndWidgets() }
+                }, onDelete: {
+                    store.delete(taskID: task.id)
+                    Task { await appState.refreshScheduledNotificationsAndWidgets() }
+                })
+            }
+        }
         .onAppear { store.loadIfNeeded() }
+    }
+
+    private func prayerSchedule(on day: Date) -> PrayerDaySchedule? {
+        MyDayPrayerTimes.schedule(on: day, dependencies: dependencies, appState: appState)
     }
 }
 
@@ -146,6 +164,9 @@ struct TodayContinueCard: View {
 
     @State private var reading: (surah: QuranSurah, ayah: Int)?
     @State private var listening: (item: MediaItem, progress: PlaybackProgress)?
+    /// The last lecture as the player takes it: the downloaded file when
+    /// there is one, so it resumes offline too.
+    @State private var listeningPlayable: AudioPlayableItem?
 
     var body: some View {
         Group {
@@ -156,11 +177,9 @@ struct TodayContinueCard: View {
                         if let reading {
                             Button {
                                 DIHaptics.soft()
-                                NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: "quran")
-                                NotificationCenter.default.post(
-                                    name: .openQuranAyah,
-                                    object: QuranAyahLink(surah: reading.surah.id, ayah: reading.ayah)
-                                )
+                                // Kept until the reader takes it, so it lands even
+                                // the first time the Read tab opens.
+                                DeepLinkRouter.shared.open(.quranAyah(surah: reading.surah.id, ayah: reading.ayah))
                             } label: {
                                 row(
                                     icon: "book.closed",
@@ -170,18 +189,11 @@ struct TodayContinueCard: View {
                             }
                             .buttonStyle(.plain)
                         }
-                        if let listening, let url = listening.item.streamUrl.flatMap({ URL(string: $0) }) {
+                        if let listening, let playable = listeningPlayable {
                             Button {
                                 DIHaptics.soft()
                                 // The player restores the saved position itself.
-                                let item = AudioPlayableItem(
-                                    id: listening.item.id,
-                                    title: listening.item.title,
-                                    subtitle: listening.item.speaker,
-                                    url: url,
-                                    mediaItemID: listening.item.id
-                                )
-                                dependencies.audioPlayer.play(item, queue: [])
+                                dependencies.audioPlayer.play(playable, queue: [])
                             } label: {
                                 row(
                                     icon: "play.circle",
@@ -222,6 +234,12 @@ struct TodayContinueCard: View {
         }
         if let recent = try? await dependencies.mediaRepository.recentlyPlayed(limit: 1).first {
             listening = recent
+            let assets = (try? await dependencies.downloadsRepository.allAssets()) ?? []
+            listeningPlayable = MediaPlayback.playableItem(
+                for: recent.item,
+                asset: assets.first(where: { $0.mediaItemID == recent.item.id }),
+                downloadManager: dependencies.downloadManager
+            )
         }
     }
 }
@@ -284,40 +302,91 @@ struct TodayUnderstandCard: View {
 struct TodayUpcomingCard: View {
     let dependencies: AppDependencies
     let appState: AppState
-    @State private var zikr: (title: String, start: Date)?
-    @State private var event: CommunityEvent?
+    @Environment(\.scenePhase) private var scenePhase
+    /// The official schedule, as the Zikr tab and the reminders follow it.
+    @State private var sessions: [ZikrSession] = []
+    @State private var events: [CommunityEvent] = []
+
+    /// Event dates are calendar days, stored as midnight UTC. They are read
+    /// and shown as that day, not moved into the phone's time zone, where
+    /// they fell a day early across the Americas.
+    private static let eventTimeZone = TimeZone(identifier: "UTC") ?? .current
 
     var body: some View {
-        Group {
-            if zikr != nil || event != nil {
-                DICard {
-                    VStack(alignment: .leading, spacing: DISpacing.sm) {
-                        DISectionHeader(titleKey: "Upcoming", systemImage: "calendar.badge.clock")
-                        if let zikr {
-                            Button {
-                                NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: "zikr")
-                            } label: {
-                                line(icon: "sparkles", title: zikr.title, when: Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.start))"))
-                            }
-                            .buttonStyle(.plain)
+        // Re-read every minute, so a session that has ended gives way to
+        // the next one while Today stays open.
+        TimelineView(.everyMinute) { context in
+            content(at: context.date)
+        }
+        .task { await load() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task { await load() }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func content(at now: Date) -> some View {
+        let zikr = nextZikr(at: now)
+        let event = nextEvent(at: now)
+        if zikr != nil || event != nil {
+            DICard {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    DISectionHeader(titleKey: "Upcoming", systemImage: "calendar.badge.clock")
+                    if let zikr {
+                        Button {
+                            DeepLinkRouter.shared.open(route(for: zikr))
+                        } label: {
+                            line(icon: "sparkles", title: zikr.title, when: Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.startsAt))"))
                         }
-                        if let event, let start = event.startDate {
-                            NavigationLink {
-                                EventDetailView(event: event, notifications: dependencies.notifications)
-                            } label: {
-                                line(
-                                    icon: "building.columns",
-                                    title: event.title,
-                                    when: Text(start, format: .dateTime.weekday(.abbreviated).day().month())
-                                )
-                            }
-                            .buttonStyle(.plain)
+                        .buttonStyle(.plain)
+                    }
+                    if let event, let start = event.startDate {
+                        NavigationLink {
+                            EventDetailView(event: event, notifications: dependencies.notifications)
+                        } label: {
+                            line(
+                                icon: "building.columns",
+                                title: event.title,
+                                when: Text(start, format: Date.FormatStyle(timeZone: Self.eventTimeZone).weekday(.abbreviated).day().month())
+                            )
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
         }
-        .task { await load() }
+    }
+
+    /// The Zikr tab at the card of the session shown: the Daily Zikr
+    /// broadcast, or the Tahajjud zikr joined on Paltalk.
+    private func route(for zikr: WidgetZikrSession) -> AppRoute {
+        let sessionID = zikr.id.split(separator: "|").first.map(String.init) ?? ""
+        if sessionID == "zikr-after-isha" { return .live }
+        if sessionID.contains("tahajjud") { return .zikr(session: "tahajjud") }
+        return .zikr(session: nil)
+    }
+
+    /// The session in progress, or else the next one.
+    private func nextZikr(at now: Date) -> WidgetZikrSession? {
+        ZikrOccurrences.widgetSessions(
+            for: sessions,
+            reference: now,
+            perSession: 2,
+            calculator: dependencies.prayerCalculation
+        ).first
+    }
+
+    /// The first program on or after the person's today.
+    private func nextEvent(at now: Date) -> CommunityEvent? {
+        let today = DayKey.make(from: now)
+        return events
+            .filter { event in
+                guard let start = event.startDate else { return false }
+                return DayKey.make(from: start, timeZone: Self.eventTimeZone) >= today
+            }
+            .min { ($0.startDate ?? .distantFuture) < ($1.startDate ?? .distantFuture) }
     }
 
     private func line(icon: String, title: String, when: Text) -> some View {
@@ -334,19 +403,8 @@ struct TodayUpcomingCard: View {
     }
 
     private func load() async {
-        let now = Date()
-        let sessions = SeedBundle.zikrSessions()
-            .map { ZikrAnchorResolver.resolved($0, at: now, calculator: dependencies.prayerCalculation) }
-        zikr = sessions
-            .compactMap { session in
-                ZikrScheduleMath.currentOrNextOccurrence(of: session, at: now).map { (session.title, $0) }
-            }
-            .min { $0.1 < $1.1 }
-            .map { (title: $0.0, start: $0.1) }
-        let events = (try? await dependencies.eventsRepository.events()) ?? []
-        event = events
-            .filter { ($0.startDate ?? .distantPast) >= Calendar.current.startOfDay(for: now) }
-            .min { ($0.startDate ?? .distantFuture) < ($1.startDate ?? .distantFuture) }
+        sessions = OfficialZikrSchedule.sessions()
+        events = (try? await dependencies.eventsRepository.events()) ?? []
     }
 }
 
@@ -359,6 +417,7 @@ struct TodayUpcomingCard: View {
 struct TodayReminderStatus: View {
     let dependencies: AppDependencies
     let appState: AppState
+    @Environment(\.scenePhase) private var scenePhase
     @State private var allowed: Bool?
 
     var body: some View {
@@ -384,11 +443,13 @@ struct TodayReminderStatus: View {
             .padding(.vertical, DISpacing.xs)
         }
         .buttonStyle(.plain)
-        .task {
-            let settings = await UNUserNotificationCenter.current().notificationSettings()
-            allowed = settings.authorizationStatus == .authorized
-                || settings.authorizationStatus == .provisional
-                || settings.authorizationStatus == .ephemeral
+        .task { allowed = await dependencies.notifications.notificationsAllowed() }
+        // Coming back from the Settings app with notifications allowed must
+        // not leave "Notifications are off" on screen.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task { allowed = await dependencies.notifications.notificationsAllowed() }
+            }
         }
     }
 

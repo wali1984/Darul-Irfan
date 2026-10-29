@@ -9,6 +9,7 @@ extension SearchDomain {
     var displayTitle: String {
         switch self {
         case .quran: return "Quran"
+        case .hadith: return "Hadith"
         case .library: return "Library"
         case .media: return "Media"
         case .events: return "Events"
@@ -19,6 +20,7 @@ extension SearchDomain {
     var iconName: String {
         switch self {
         case .quran: return "book.closed"
+        case .hadith: return "text.book.closed"
         case .library: return "books.vertical"
         case .media: return "play.circle"
         case .events: return "calendar"
@@ -74,7 +76,9 @@ final class SearchViewModel {
     @ObservationIgnored private var searchTask: Task<Void, Never>?
 
     private static let debounceNanoseconds: UInt64 = 300_000_000
-    private static let resultLimit = 60
+    /// Results per section. Each section has its own limit, so under "All" a
+    /// common word's Qur'an hits cannot crowd out the books and lectures.
+    private static let resultLimit = 25
 
     init(
         searchIndex: any SearchIndexServicing,
@@ -107,9 +111,10 @@ final class SearchViewModel {
 
     // MARK: Intents
 
-    /// Called on every keystroke; schedules a debounced search.
-    /// Urdu/Arabic text passes through unchanged — the FTS tokenizer handles
-    /// diacritics, so no normalization happens here.
+    /// Called on every keystroke; schedules a debounced search. The search
+    /// index folds the query itself (Arabic harakat dropped, Arabic and Urdu
+    /// letter forms matched - `SearchNormalizer`), so it is passed on as
+    /// typed.
     func updateQuery(_ newValue: String) {
         guard newValue != query else { return }
         query = newValue
@@ -142,8 +147,19 @@ final class SearchViewModel {
         var parts: [String] = [result.title]
         switch result.domain {
         case .quran:
-            parts.append("Quran \(result.itemID)")
-        case .library, .media, .events:
+            if let reference = result.ayahReference {
+                parts.append("Quran \(reference.surah):\(reference.ayah)")
+            }
+        case .hadith:
+            // The title is the reference: the collection and the number.
+            break
+        case .library:
+            if let page = result.bookPage {
+                parts.append("\(page.bookID), p. \(page.page)")
+            } else {
+                parts.append(result.itemID)
+            }
+        case .media, .events:
             parts.append(result.itemID)
         }
         return parts.joined(separator: " — ")
@@ -197,8 +213,8 @@ final class SearchViewModel {
         }
     }
 
-    /// Buckets results by domain in the fixed Quran/Library/Media/Events
-    /// order, deduplicating IDs defensively so `ForEach` stays stable.
+    /// Buckets results by domain in the fixed Quran/Hadith/Library/Media/
+    /// Events order, deduplicating IDs defensively so `ForEach` stays stable.
     private static func grouped(_ results: [SearchResult]) -> [SearchResultGroup] {
         var seenIDs = Set<String>()
         var buckets: [SearchDomain: [SearchResult]] = [:]

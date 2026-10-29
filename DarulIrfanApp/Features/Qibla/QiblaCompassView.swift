@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Qibla compass screen (pushed from the More tab). Shows a live compass
 /// pointing to the Kaaba for the active place, a calibration banner when the
@@ -59,6 +60,10 @@ struct QiblaCompassView: View {
                     calibrationBanner
                 }
 
+                if viewModel.needsLocationForTrueNorth {
+                    magneticNorthNotice
+                }
+
                 QiblaDialView(
                     dialRotation: viewModel.dialRotationDegrees,
                     kaabaRotation: viewModel.kaabaRotationDegrees,
@@ -110,6 +115,33 @@ struct QiblaCompassView: View {
                     Text("Move your iPhone in a figure-eight motion until the reading settles.")
                         .font(.footnote)
                         .foregroundStyle(DIColor.textMuted)
+                }
+            }
+        }
+    }
+
+    /// Without location permission iOS gives only a magnetic heading, which
+    /// the true-north bearing to the Kaaba cannot be compared with exactly.
+    private var magneticNorthNotice: some View {
+        DICard {
+            HStack(alignment: .top, spacing: DISpacing.sm) {
+                Image(systemName: "location.slash")
+                    .foregroundStyle(DIColor.accent)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: DISpacing.xs) {
+                    Text("Pointing by magnetic north")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(DIColor.textPrimary)
+                    Text("Magnetic north can differ by several degrees from true north, which the Qibla bearing is measured from. Allow location access while using the app for an exact direction.")
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                    Button("Open Settings") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(DIColor.primary)
                 }
             }
         }
@@ -185,12 +217,12 @@ struct QiblaCompassView: View {
                     .foregroundStyle(DIColor.textPrimary)
                     .accessibilityAddTraits(.isHeader)
                 if let bearing = viewModel.qiblaBearingRounded {
-                    Text("Qibla: \(bearing)° from North")
+                    Text("Qibla: \(bearing)° from true north")
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(DIColor.primary)
                         .monospacedDigit()
                 }
-                Text("Face north using any compass, then turn clockwise by this bearing to face the Kaaba in Makkah.")
+                Text("Face true north, then turn clockwise by this bearing to face the Kaaba in Makkah. A magnetic compass points to magnetic north, which can be several degrees away from true north.")
                     .font(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }

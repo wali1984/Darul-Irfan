@@ -56,15 +56,59 @@ struct PrayerCalculationService: PrayerCalculationServicing, QiblaServicing {
             isha = isha.addingTimeInterval(30 * 60)
         }
 
+        // Maghrib is never shown before it begins. The library rounds every
+        // time to the nearest minute, which on about half the days put
+        // Maghrib, and with it iftar, up to 29 seconds before sunset. So
+        // Maghrib alone is rounded up to the next whole minute; the other
+        // times keep the library's rounding. The Android, HarmonyOS and web
+        // apps use the same rule. Everything that shows or schedules Maghrib
+        // (prayer times, iftar, reminders, widgets, Live Activity, Watch)
+        // reads it from this schedule.
+        let maghrib = exactMaghrib(coordinates: coordinates, date: date, parameters: parameters)
+            .map(Self.roundedUpToMinute) ?? prayerTimes.maghrib
+
         let times: [Prayer: Date] = [
             .fajr: fajr,
             .sunrise: prayerTimes.sunrise,
             .dhuhr: prayerTimes.dhuhr,
             .asr: prayerTimes.asr,
-            .maghrib: prayerTimes.maghrib,
+            .maghrib: maghrib,
             .isha: isha,
         ]
         return PrayerDaySchedule(date: date, location: place, times: times)
+    }
+
+    /// The moment Maghrib begins, to the whole second (before any rounding
+    /// to the minute; manual and method adjustments included).
+    func exactMaghrib(
+        for date: DateComponents,
+        at place: PlaceCoordinate,
+        preferences: PrayerCalculationPreferences
+    ) -> Date? {
+        exactMaghrib(
+            coordinates: Coordinates(latitude: place.latitude, longitude: place.longitude),
+            date: date,
+            parameters: calculationParameters(for: preferences)
+        )
+    }
+
+    private func exactMaghrib(
+        coordinates: Coordinates,
+        date: DateComponents,
+        parameters: CalculationParameters
+    ) -> Date? {
+        var exact = parameters
+        exact.rounding = Rounding.none
+        return PrayerTimes(coordinates: coordinates, date: date, calculationParameters: exact)?.maghrib
+    }
+
+    /// Up to the next whole minute, unchanged on a whole minute: 17:03:00
+    /// stays 17:03, and 17:03:01 through 17:03:59 become 17:04. Parts of a
+    /// second are dropped first, as the library does.
+    static func roundedUpToMinute(_ date: Date) -> Date {
+        let seconds = date.timeIntervalSinceReferenceDate.rounded(.down)
+        let minuteStart = (seconds / 60).rounded(.down) * 60
+        return Date(timeIntervalSinceReferenceDate: seconds > minuteStart ? minuteStart + 60 : minuteStart)
     }
 
     func schedules(

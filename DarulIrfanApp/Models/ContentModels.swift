@@ -217,6 +217,13 @@ struct ContentReadingProgress: Codable, Sendable, Equatable {
 /// present unverified text as if it were checked. Arabic quotations inside the
 /// prose are the book's own and are NOT canonical scripture — they must never
 /// be rendered as Qur'an or hadith.
+///
+/// `layout` is set for the pages Claude re-read: Claude returned each page as
+/// typed blocks, and the layout keeps their kinds, one letter per block in
+/// the order of the text's blank-line-separated parts (see `layoutKinds`), so
+/// the reader sets headings, poetry, Arabic quotations and footnotes out as
+/// printed instead of guessing them from the plain text. Nil for the original
+/// OCR, which is laid out from its text as before.
 struct BookPage: Codable, Sendable, Identifiable, Equatable {
     /// `library_items.json` id of the book this page belongs to.
     var bookID: String
@@ -231,6 +238,11 @@ struct BookPage: Codable, Sendable, Identifiable, Equatable {
     var reviewState: String
     /// Model that produced the arbitrated text.
     var validator: String
+    /// One letter per block of `text`: h heading, p paragraph, v verse (a
+    /// couplet or stanza, its printed lines kept), a Arabic quotation,
+    /// f footnote, t table, c caption. Optional in the seed, so older rows
+    /// and the original OCR decode without it.
+    var layout: String? = nil
 
     var id: String { "\(bookID)|\(page)" }
 

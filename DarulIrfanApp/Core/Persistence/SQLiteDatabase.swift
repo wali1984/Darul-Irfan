@@ -172,11 +172,39 @@ actor SQLiteDatabase {
 
     /// Executes a batch of parameterized statements inside one transaction,
     /// rolling back if any statement fails. Used by seed/content importers.
+    ///
+    /// A seed import sends tens of thousands of rows that share one INSERT, so
+    /// each distinct SQL text is prepared once per batch and re-bound for every
+    /// row. Preparing it again for each row was most of the work the import
+    /// did behind the launch screen.
     func executeBatch(_ statements: [(sql: String, parameters: [SQLValue])]) throws {
         try execute("BEGIN IMMEDIATE TRANSACTION")
+        var prepared: [String: OpaquePointer] = [:]
+        defer {
+            for statement in prepared.values {
+                sqlite3_finalize(statement)
+            }
+        }
         do {
-            for statement in statements {
-                try execute(statement.sql, statement.parameters)
+            for item in statements {
+                let statement: OpaquePointer
+                if let cached = prepared[item.sql] {
+                    statement = cached
+                } else {
+                    statement = try prepareStatement(item.sql)
+                    prepared[item.sql] = statement
+                }
+                try bind(item.parameters, to: statement)
+                let result = sqlite3_step(statement)
+                guard result == SQLITE_DONE || result == SQLITE_ROW else {
+                    let message = errorMessage()
+                    sqlite3_reset(statement)
+                    throw SQLiteError.stepFailed(sql: item.sql, message: message)
+                }
+                // Reset at once, so no statement is still running when the
+                // transaction commits or rolls back.
+                sqlite3_reset(statement)
+                sqlite3_clear_bindings(statement)
             }
             try execute("COMMIT")
         } catch {
@@ -246,6 +274,17 @@ actor SQLiteDatabase {
     // MARK: - Internals
 
     private func prepare(_ sql: String, _ parameters: [SQLValue]) throws -> OpaquePointer {
+        let statement = try prepareStatement(sql)
+        do {
+            try bind(parameters, to: statement)
+        } catch {
+            sqlite3_finalize(statement)
+            throw error
+        }
+        return statement
+    }
+
+    private func prepareStatement(_ sql: String) throws -> OpaquePointer {
         guard let handle else {
             throw SQLiteError.prepareFailed(sql: sql, message: "database closed")
         }
@@ -253,6 +292,12 @@ actor SQLiteDatabase {
         guard sqlite3_prepare_v2(handle, sql, -1, &statement, nil) == SQLITE_OK, let statement else {
             throw SQLiteError.prepareFailed(sql: sql, message: errorMessage())
         }
+        return statement
+    }
+
+    /// Binds `parameters` to positions 1...n. The caller owns the statement
+    /// and finalizes it on failure.
+    private func bind(_ parameters: [SQLValue], to statement: OpaquePointer) throws {
         for (offset, value) in parameters.enumerated() {
             let index = Int32(offset + 1)
             let bindResult: Int32
@@ -271,11 +316,9 @@ actor SQLiteDatabase {
                 }
             }
             guard bindResult == SQLITE_OK else {
-                sqlite3_finalize(statement)
                 throw SQLiteError.bindFailed(index: Int(index), message: errorMessage())
             }
         }
-        return statement
     }
 
     private func readRow(_ statement: OpaquePointer) -> SQLRow {

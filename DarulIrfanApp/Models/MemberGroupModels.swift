@@ -250,6 +250,9 @@ struct GroupDetail: Codable, Sendable {
     var integrations: GroupIntegrations?
     /// Dua requests no admin has read yet; admins only.
     var unreadDuaRequests: Int?
+    /// How many people the Halqah has, as its People list counts them: a
+    /// number, never who. Absent from an older server.
+    var memberCount: Int?
 }
 
 /// Services a group feature depends on. Until one is connected the app says
@@ -303,6 +306,9 @@ struct MemberGroupPost: Codable, Sendable, Identifiable, Equatable {
 struct MemberGroupList: Codable, Sendable {
     var role: MemberRole? = nil
     var groups: [MemberGroup]
+    /// Everyone who has signed in; sent to the Super admin only, for their
+    /// dashboard. Absent for everyone else and from an older server.
+    var signedIn: Int? = nil
 }
 
 struct MemberGroupPostList: Codable, Sendable {

@@ -2,6 +2,17 @@ import AVFoundation
 import Foundation
 import Observation
 
+// MARK: - One recording at a time
+
+extension Notification.Name {
+    /// Posted when the Qur'an reader's own audio starts - the recitation, its
+    /// translation, a tafsir narration or memorisation practice - so the
+    /// bayan player pauses instead of playing over it.
+    static let quranAudioWillStart = Notification.Name("DarulIrfan.quranAudioWillStart")
+    /// Posted by the bayan player when it starts, so the Qur'an players stop.
+    static let bayanAudioWillStart = Notification.Name("DarulIrfan.bayanAudioWillStart")
+}
+
 // MARK: - What to play
 
 /// What is heard: the recitation, the Silsila's translation, or each ayah's
@@ -115,9 +126,17 @@ final class QuranListenPlayer {
     @ObservationIgnored private var narrated: [ObjectIdentifier: ListenAyah] = [:]
     @ObservationIgnored private var narratorEnd: NSObjectProtocol?
     @ObservationIgnored private var narratorItemWatch: NSKeyValueObservation?
+    @ObservationIgnored private var bayanObserver: NSObjectProtocol?
 
     private init() {
         narrator.actionAtItemEnd = .advance
+        // A bayan started anywhere in the app ends the recitation, rather
+        // than the two playing at once.
+        bayanObserver = NotificationCenter.default.addObserver(
+            forName: .bayanAudioWillStart, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.stop() }
+        }
     }
 
     /// Whether the translation in `edition` can be played for any ayah.
@@ -140,6 +159,7 @@ final class QuranListenPlayer {
         guard !steps.isEmpty else { return }
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
         try? AVAudioSession.sharedInstance().setActive(true)
+        NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
         isPlaying = true
         playStep()
     }
@@ -152,6 +172,7 @@ final class QuranListenPlayer {
 
     func resume() {
         guard current != nil else { return }
+        NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
         if part == .translation { narrator.play() } else { reciter?.play() }
         isPlaying = true
     }
@@ -276,7 +297,8 @@ final class QuranListenPlayer {
     /// bitrate: timed by estimate, a seek lands away from the ayah, so the
     /// ayah was cut short and the one before heard again. A copy is kept on
     /// the phone (surahs up to half an hour) so later seeks are exact and fast.
-    private static func recitationItem(_ remote: URL, durationMs: Int) -> AVPlayerItem {
+    /// Memorisation practice plays the same item for the same reason.
+    static func recitationItem(_ remote: URL, durationMs: Int) -> AVPlayerItem {
         let local = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("recitation" + remote.path)
         let exists = FileManager.default.fileExists(atPath: local.path)
@@ -298,7 +320,10 @@ final class QuranListenPlayer {
         guard let verse = recitation.verses.first(where: { ms >= $0.fromMs && ms < $0.toMs }) else { return }
         let ref = ListenAyah(surah: surah, ayah: verse.ayah)
         if current != ref { current = ref }
-        currentWordPosition = verse.words.first(where: { ms >= $0.startMs && ms < $0.endMs })?.position
+        // Assigned only on change: this runs twenty times a second, and every
+        // assignment redraws the sounding ayah's card.
+        let position = verse.words.first(where: { ms >= $0.startMs && ms < $0.endMs })?.position
+        if currentWordPosition != position { currentWordPosition = position }
     }
 
     private func clearReciterObservers() {

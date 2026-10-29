@@ -96,6 +96,8 @@ struct NextPrayerComplication: Widget {
                 Text(next?.displayName ?? "Darul Irfan").font(.headline)
                 if let time = next?.time { Text(time, style: .time).font(.caption).monospacedDigit() }
             }
+            // On the place's clock, as the iPhone app shows it.
+            .environment(\.timeZone, entry.snapshot?.timeZone ?? .current)
             .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Next Prayer")

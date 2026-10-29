@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 // MARK: - Seed manifest
 
@@ -22,9 +23,10 @@ struct SeedManifest: Codable, Sendable, Equatable {
 /// `Resources/SeedData/` (schema v1, camelCase keys matching the Codable
 /// models, ISO-8601 date strings without fractional seconds).
 ///
-/// Every loader is tolerant of a missing or corrupt file: it logs the
-/// problem via `print` and returns an empty array (or `nil`), so a
-/// packaging mistake degrades gracefully instead of crashing the app.
+/// Every loader below is tolerant of a missing or corrupt file: it logs the
+/// problem and returns an empty array (or `nil`), so a packaging mistake
+/// degrades gracefully instead of crashing the app. The seed import uses the
+/// strict loaders at the end of this type instead.
 enum SeedBundle {
 
     // MARK: Manifest
@@ -206,5 +208,98 @@ enum SeedBundle {
             AppLog.content("Could not decode seed file \(fileName).json: \(error.localizedDescription)")
             return nil
         }
+    }
+
+    // MARK: - Strict loaders (seed import)
+
+    /// Thrown by the strict loaders the seed import uses.
+    enum LoadError: Error, CustomStringConvertible {
+        case unreadable(file: String, reason: String)
+        case undecodable(file: String, reason: String)
+
+        var description: String {
+            switch self {
+            case .unreadable(let file, let reason): return "Seed file \(file).json could not be read: \(reason)"
+            case .undecodable(let file, let reason): return "Seed file \(file).json does not decode: \(reason)"
+            }
+        }
+    }
+
+    /// Like the tolerant loaders, but a file that is present and does not
+    /// decode throws instead of reading as empty. The import stamps a stage
+    /// once it succeeds, so treating a damaged file as "nothing to import"
+    /// would leave that content empty until the next seed change. A missing
+    /// file still reads as empty: that is how a seed leaves a file out.
+    static func strictArray<Element: Decodable>(
+        _ element: Element.Type,
+        fromFile fileName: String
+    ) throws -> [Element] {
+        guard let data = try strictData(forFile: fileName) else { return [] }
+        do {
+            return try makeDecoder().decode([Element].self, from: data)
+        } catch {
+            throw LoadError.undecodable(file: fileName, reason: String(describing: error))
+        }
+    }
+
+    static func strictObject<Value: Decodable>(
+        _ value: Value.Type,
+        fromFile fileName: String
+    ) throws -> Value? {
+        guard let data = try strictData(forFile: fileName) else { return nil }
+        do {
+            return try makeDecoder().decode(Value.self, from: data)
+        } catch {
+            throw LoadError.undecodable(file: fileName, reason: String(describing: error))
+        }
+    }
+
+    private static func strictData(forFile fileName: String) throws -> Data? {
+        guard let url = url(forFile: fileName) else { return nil }
+        do {
+            return try Data(contentsOf: url)
+        } catch {
+            throw LoadError.unreadable(file: fileName, reason: error.localizedDescription)
+        }
+    }
+
+    // MARK: - Fingerprints (seed import)
+
+    /// SHA-256 of a bundled seed file as lowercase hex, "missing" when the
+    /// bundle has no such file, or "unreadable" when reading it failed.
+    /// Read in 4 MB pieces: the largest hadith pack is 58 MB.
+    static func digest(ofFile fileName: String) -> String {
+        guard let url = url(forFile: fileName) else { return "missing" }
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return "unreadable" }
+        defer { try? handle.close() }
+        var hasher = SHA256()
+        while true {
+            let chunk: Data?
+            do {
+                chunk = try autoreleasepool { try handle.read(upToCount: 4 << 20) }
+            } catch {
+                return "unreadable"
+            }
+            guard let chunk, !chunk.isEmpty else { break }
+            hasher.update(data: chunk)
+        }
+        return hexString(hasher.finalize())
+    }
+
+    /// Identifies what one import stage would write: its name, the revision
+    /// of its import logic and the digest of every file it reads, in order.
+    /// The input is plain text so the value can be computed outside the app
+    /// too; the transition table in `ContentSyncService` was produced that
+    /// way, and a test pins the format.
+    static func stageFingerprint(stage: String, revision: Int, files: [(name: String, digest: String)]) -> String {
+        var text = "darul-irfan-seed-stage\nstage:\(stage)\nrevision:\(revision)\n"
+        for file in files {
+            text += "file:\(file.name):\(file.digest)\n"
+        }
+        return hexString(SHA256.hash(data: Data(text.utf8)))
+    }
+
+    private static func hexString<Bytes: Sequence>(_ bytes: Bytes) -> String where Bytes.Element == UInt8 {
+        bytes.map { String(format: "%02x", $0) }.joined()
     }
 }

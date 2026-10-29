@@ -37,21 +37,20 @@ struct TodayTimesProvider: TimelineProvider {
         // One entry per remaining highlight transition today, each dated at a
         // prayer's time: the view computes the highlight from `entry.date`, so
         // it advances exactly on time even if iOS defers the reload below.
+        // "Today" is the place's day, as in the app.
         var entries: [TodayTimesEntry] = [TodayTimesEntry(date: now, snapshot: snapshot)]
+        var refreshDate = now.addingTimeInterval(60 * 60)
         if let snapshot {
             for item in snapshot.times(onSameDayAs: now) where item.time > now {
                 entries.append(TodayTimesEntry(date: item.time, snapshot: snapshot))
             }
-        }
-
-        // Reload to roll the grid over to the new day (and to pick up a fresh
-        // snapshot): capped at one hour, and never later than the start of
-        // tomorrow.
-        var refreshDate = now.addingTimeInterval(60 * 60)
-        let calendar = Calendar.current
-        if let startOfTomorrow = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)),
-           startOfTomorrow > now, startOfTomorrow < refreshDate {
-            refreshDate = startOfTomorrow
+            // The new day's grid and Hijri date from its first moment, even
+            // if iOS defers the reload; the reload (capped at one hour) then
+            // picks up a fresh snapshot.
+            if let startOfTomorrow = snapshot.startOfNextDay(after: now), startOfTomorrow > now {
+                entries.append(TodayTimesEntry(date: startOfTomorrow, snapshot: snapshot))
+                refreshDate = min(refreshDate, startOfTomorrow)
+            }
         }
 
         completion(Timeline(entries: entries, policy: .after(refreshDate)))
@@ -93,6 +92,8 @@ struct TodayTimesWidgetView: View {
                 WidgetEmptyStateView()
             }
         }
+        // Times on the place's clock, as the app shows them.
+        .environment(\.timeZone, entry.snapshot?.timeZone ?? .current)
         .containerBackground(for: .widget) {
             WidgetPalette.background(for: colorScheme)
         }
@@ -108,7 +109,7 @@ struct TodayTimesWidgetView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
-                Text(snapshot.hijriDateText)
+                Text(snapshot.hijriText(on: entry.date))
                     .font(.system(.footnote, design: .serif).weight(.semibold))
                     .foregroundStyle(WidgetPalette.emeraldTone(for: colorScheme))
                     .lineLimit(1)

@@ -92,7 +92,7 @@ final class TodayDailyViewModel {
         let window = (0..<12).map { refs[(start + $0) % refs.count] }
         let entries = (try? await repository.entries(canonicalIDs: window)) ?? []
         let byID = Dictionary(entries.map { ($0.canonicalID, $0) }, uniquingKeysWith: { a, _ in a })
-        let urduReader = language == .urdu
+        let urduReader = readsUrdu
         func text(_ entry: HadithEntry) -> (String?, Bool) {
             let urdu = entry.textUrdu.flatMap { $0.isEmpty ? nil : $0 }
             let english = entry.textEnglish.flatMap { $0.isEmpty ? nil : $0 }
@@ -113,6 +113,10 @@ final class TodayDailyViewModel {
     }
 
     var language: AppLanguage { appState.settings.language }
+
+    /// True when content should be in Urdu, including the "System" setting
+    /// on a phone set to Urdu.
+    var readsUrdu: Bool { language.contentLanguageCode == "ur" }
 
     func load(on date: Date = Date()) {
         let ayat = SeedBundle.dailyAyat()
@@ -218,13 +222,13 @@ final class TodayDailyViewModel {
 
     func duaTranslation() -> String? {
         guard let dua else { return nil }
-        if language == .urdu, let ur = dua.translationUrdu, !ur.isEmpty { return ur }
+        if readsUrdu, let ur = dua.translationUrdu, !ur.isEmpty { return ur }
         return dua.translationEnglish
     }
 
     func nameMeaning() -> String? {
         guard let name else { return nil }
-        if language == .urdu, let ur = name.meaningUrdu, !ur.isEmpty { return ur }
+        if readsUrdu, let ur = name.meaningUrdu, !ur.isEmpty { return ur }
         return name.meaningEnglish
     }
 
@@ -233,17 +237,17 @@ final class TodayDailyViewModel {
     func ayahShare() -> ShareableContent? {
         guard let ayah else { return nil }
         if let silsila = silsilaAyah {
-            return ShareableContent(badge: "Ayah of the Day", arabic: silsila.arabic,
+            return ShareableContent(badge: String(localized: "Ayah of the Day"), arabic: silsila.arabic,
                                     translation: silsila.translation,
                                     attribution: "\(silsila.reference) · \(silsila.translationEdition)")
         }
-        return ShareableContent(badge: "Ayah of the Day", arabic: ayah.arabic,
+        return ShareableContent(badge: String(localized: "Ayah of the Day"), arabic: ayah.arabic,
                                 translation: ayahTranslation(), attribution: ayah.reference)
     }
 
     func aqwalShare() -> ShareableContent? {
         guard let aqwal else { return nil }
-        return ShareableContent(badge: "Aqwal-e-Sheikh", arabic: nil,
+        return ShareableContent(badge: String(localized: "Aqwal-e-Sheikh"), arabic: nil,
                                 translation: aqwal.text, attribution: aqwal.attribution)
     }
 }

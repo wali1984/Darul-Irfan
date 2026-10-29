@@ -105,7 +105,7 @@ struct GroupPeopleView: View {
             }
             Spacer(minLength: DISpacing.sm)
             if person.role != .member {
-                roleBadge(person.role.title)
+                roleBadge(person.role)
             }
             if person.isChangeable(byAppointer: appointer) {
                 Menu {
@@ -140,13 +140,18 @@ struct GroupPeopleView: View {
         }
     }
 
-    private func roleBadge(_ title: LocalizedStringKey) -> some View {
-        Text(title)
-            .font(.caption2.weight(.bold))
-            .foregroundStyle(DIColor.primary)
-            .padding(.horizontal, DISpacing.sm)
-            .padding(.vertical, 2)
-            .background(DIColor.primary.opacity(0.12), in: Capsule())
+    /// A role with the symbol the Halqah pages give it: crown, shield or key.
+    private func roleBadge(_ role: GroupRole) -> some View {
+        Label {
+            Text(role.title)
+        } icon: {
+            Image(systemName: role.badgeSymbol)
+        }
+        .font(.caption2.weight(.bold))
+        .foregroundStyle(DIColor.primary)
+        .padding(.horizontal, DISpacing.sm)
+        .padding(.vertical, 2)
+        .background(DIColor.primary.opacity(0.12), in: Capsule())
     }
 
     private func invitationRow(_ invitation: GroupInvitation) -> some View {
@@ -170,7 +175,7 @@ struct GroupPeopleView: View {
                 .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: DISpacing.sm)
-            if invitation.role != .member { roleBadge(invitation.role.title) }
+            if invitation.role != .member { roleBadge(invitation.role) }
             if invitation.role != .administrator || appointer {
                 Button(role: .destructive) {
                     Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }

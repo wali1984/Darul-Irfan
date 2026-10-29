@@ -57,5 +57,7 @@ struct DISegmentedControl<Item: Hashable>: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        // VoiceOver announces which segment is chosen, as for a system picker.
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

@@ -34,6 +34,38 @@
           }
         }
       }
+    },
+    "NSCameraUsageDescription" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darul Irfan uses the camera only when you join a Halqah meeting and turn your video on."
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دارالعرفان کیمرا صرف اس وقت استعمال کرتا ہے جب آپ حلقے کی میٹنگ میں شامل ہو کر اپنی ویڈیو آن کریں۔"
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darul Irfan uses the microphone only when you join a Halqah meeting or Halqah zikr and choose to speak."
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دارالعرفان مائیکروفون صرف اس وقت استعمال کرتا ہے جب آپ حلقے کی میٹنگ یا حلقۂ ذکر میں شامل ہو کر بولنا چاہیں۔"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

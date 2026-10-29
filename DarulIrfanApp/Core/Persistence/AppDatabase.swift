@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 8
+    static let schemaVersion = 10
 
     /// User-owned tables that no content migration may ever disturb. Migration
     /// v4 asserts their row counts are identical before and after it runs; a
@@ -56,19 +56,19 @@ final class AppDatabase: Sendable {
         try await AppDatabase(url: nil)
     }
 
+    /// Every step runs in one transaction with its `user_version` bump: a
+    /// kill between v6's ALTERs and the bump once left the schema half
+    /// applied, and every later launch failed on "duplicate column name".
     private func migrate() async throws {
         let version = try await connection.schemaVersion()
         if version < 1 {
-            try await connection.executeScript(Self.migrationV1)
-            try await connection.setSchemaVersion(1)
+            try await connection.migrate(to: 1, script: Self.migrationV1)
         }
         if version < 2 {
-            try await connection.executeScript(Self.migrationV2)
-            try await connection.setSchemaVersion(2)
+            try await connection.migrate(to: 2, script: Self.migrationV2)
         }
         if version < 3 {
-            try await connection.executeScript(Self.migrationV3)
-            try await connection.setSchemaVersion(3)
+            try await connection.migrate(to: 3, script: Self.migrationV3)
         }
         if version < 4 {
             try await connection.migrate(
@@ -79,22 +79,105 @@ final class AppDatabase: Sendable {
             )
         }
         if version < 5 {
-            try await connection.executeScript(Self.migrationV5)
-            try await connection.setSchemaVersion(5)
+            try await connection.migrate(to: 5, script: Self.migrationV5)
         }
         if version < 6 {
-            try await connection.executeScript(Self.migrationV6)
-            try await connection.setSchemaVersion(6)
+            try await connection.migrate(to: 6, script: Self.migrationV6)
         }
         if version < 7 {
-            try await connection.executeScript(Self.migrationV7)
-            try await connection.setSchemaVersion(7)
+            try await connection.migrate(to: 7, script: Self.migrationV7)
         }
         if version < 8 {
-            try await connection.executeScript(Self.migrationV8)
-            try await connection.setSchemaVersion(8)
+            try await connection.migrate(to: 8, script: Self.migrationV8)
+        }
+        if version < 9 {
+            // One transaction: a partly applied v9 (an ALTER that ran before
+            // a crash) would otherwise fail on every launch.
+            try await connection.migrate(to: 9, script: Self.migrationV9)
+        }
+        if version < 10 {
+            // In a transaction for the same reason: an ADD COLUMN that ran
+            // before a crash would fail on every later launch.
+            try await connection.migrate(to: 10, script: Self.migrationV10)
         }
     }
+
+    // MARK: - Schema v10 (the printed layout of re-read book pages)
+
+    /// Adds `book_pages.layout`: for a page Claude re-read from the scan, one
+    /// letter per block of its text (heading, paragraph, verse, Arabic
+    /// quotation, footnote, table, caption), so the reader sets the page out
+    /// as it was printed instead of guessing from the plain text.
+    ///
+    /// Its own version rather than part of v9, so a store that ran v9 in
+    /// any build still gets the column.
+    ///
+    /// Additive only: one nullable column, nothing user-owned touched. Rows
+    /// already imported read NULL and keep the inferred layout until the
+    /// book pages stage imports again, which it does when book_pages.json
+    /// changes, as it does in the release that adds the layouts.
+    static let migrationV10 = """
+    ALTER TABLE book_pages ADD COLUMN layout TEXT;
+    """
+
+    // MARK: - Schema v9 (search that matches Arabic and Urdu as typed)
+
+    /// Search tables that hold folded text: Arabic harakat and Qur'anic marks
+    /// removed, and the Arabic and Urdu forms of one letter (ي/ی, ك/ک, ة/ہ, أ/ا)
+    /// folded together, so a word typed without vowels, on an Arabic or an
+    /// Urdu keyboard, finds the vowelled Qur'an, the hadith and the books.
+    ///
+    /// `search_fts` replaces v1's `search_index` for the Qur'an, library,
+    /// media and events. Its folded columns are what is matched; the
+    /// `display_` columns keep the original text, so a result never shows the
+    /// folded form of the Qur'an. The old table stays until the new one has
+    /// been built for every section, and is then dropped by the search index.
+    ///
+    /// The hadith, the book pages and the per-ayah tafsir are too large to
+    /// keep twice, so their tables are contentless: they hold only the index,
+    /// each row keyed by the rowid of the row whose text it indexes. They are
+    /// built in the background whenever their content changes; the
+    /// `search.fts.*` rows in key_value say whether each is in step.
+    ///
+    /// The hadith columns record each translation's provenance, which was
+    /// decoded from the packs but never stored, so a provisional Urdu text
+    /// could not carry its notice.
+    ///
+    /// Additive only: new tables, new nullable columns and three sync-state
+    /// rows; no content table rewritten and nothing user-owned touched.
+    static let migrationV9 = """
+    CREATE VIRTUAL TABLE IF NOT EXISTS search_fts USING fts5(
+        domain UNINDEXED,
+        item_id UNINDEXED,
+        title,
+        body,
+        author,
+        language UNINDEXED,
+        display_title UNINDEXED,
+        display_body UNINDEXED,
+        tokenize = 'unicode61 remove_diacritics 2'
+    );
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS hadith_fts USING fts5(
+        body, content = '', tokenize = 'unicode61 remove_diacritics 2'
+    );
+    CREATE VIRTUAL TABLE IF NOT EXISTS book_page_fts USING fts5(
+        body, content = '', tokenize = 'unicode61 remove_diacritics 2'
+    );
+    CREATE VIRTUAL TABLE IF NOT EXISTS tafsir_fts USING fts5(
+        body, content = '', tokenize = 'unicode61 remove_diacritics 2'
+    );
+
+    INSERT INTO key_value (key, value, updated_at) VALUES
+        ('search.fts.hadith_fts', 'stale:v9', strftime('%s', 'now')),
+        ('search.fts.book_page_fts', 'stale:v9', strftime('%s', 'now')),
+        ('search.fts.tafsir_fts', 'stale:v9', strftime('%s', 'now'))
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at;
+
+    ALTER TABLE hadith_entries ADD COLUMN english_review_state TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN urdu_review_state TEXT;
+    ALTER TABLE hadith_entries ADD COLUMN urdu_source TEXT;
+    """
 
     // MARK: - Schema v8 (page-structured book text)
 

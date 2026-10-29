@@ -54,8 +54,10 @@ struct MediaTabView: View {
                         .diOctagramWatermark(size: 260, opacity: 0.05)
                         .diAppear(delay: 0.1)
                     } else {
-                        categoriesSection
-                            .diAppear(delay: 0.1)
+                        if !shownCategories.isEmpty {
+                            categoriesSection
+                                .diAppear(delay: 0.1)
+                        }
                         browseByYearLink
                             .diAppear(delay: 0.15)
                     }
@@ -165,12 +167,18 @@ struct MediaTabView: View {
                 alignment: .leading,
                 spacing: DISpacing.md
             ) {
-                ForEach(Array(MediaCategory.allCases.enumerated()), id: \.element) { index, category in
+                ForEach(Array(shownCategories.enumerated()), id: \.element) { index, category in
                     categoryCell(category)
                         .diAppear(delay: 0.12 + Double(index) * 0.04)
                 }
             }
         }
+    }
+
+    /// Categories with something in them. Six of the eight are empty in the
+    /// catalogue; a tile saying "No items yet" made it look broken.
+    private var shownCategories: [MediaCategory] {
+        MediaCategory.allCases.filter { (viewModel.categoryCounts[$0] ?? 0) > 0 }
     }
 
     private func categoryCell(_ category: MediaCategory) -> some View {

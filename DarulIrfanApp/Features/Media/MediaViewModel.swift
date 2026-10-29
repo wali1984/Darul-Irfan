@@ -89,16 +89,26 @@ enum MediaTimeFormat {
 
 // MARK: - Shared title view
 
-/// Renders a media item's title with the correct script treatment: Urdu
-/// titles use the Nastaliq face inside a right-to-left environment; other
-/// languages use the given system font.
+/// Renders a media item's title with the correct script treatment: a title
+/// written in Arabic script uses the Nastaliq face inside a right-to-left
+/// environment; any other uses the given system font. Judged by the title's
+/// own letters, not the item's language: the bayans are all in Urdu, but
+/// some 330 carry English titles ("Al-Murshid TV Program (Episode - 212)"),
+/// which were set in Nastaliq, right to left.
 struct MediaTitleText: View {
     let item: MediaItem
     var latinFont: Font = .headline
     var lineLimit: Int = 2
 
+    private var isArabicScript: Bool {
+        item.title.unicodeScalars.contains { scalar in
+            (0x0600...0x06FF).contains(scalar.value) || (0x0750...0x077F).contains(scalar.value)
+                || (0xFB50...0xFDFF).contains(scalar.value) || (0xFE70...0xFEFF).contains(scalar.value)
+        }
+    }
+
     var body: some View {
-        if item.language == "ur" {
+        if isArabicScript {
             Text(item.title)
                 .font(DIFont.urduBody())
                 .foregroundStyle(DIColor.textPrimary)
@@ -163,9 +173,11 @@ final class MediaViewModel {
                 category: nil, year: nil, month: nil, limit: 10_000
             )
             totalItemCount = allItems.count
+            // As each list shows them: an audio lecture with its video counts
+            // under Video Lectures too.
             var counts: [MediaCategory: Int] = [:]
-            for item in allItems {
-                counts[item.category, default: 0] += 1
+            for category in MediaCategory.allCases {
+                counts[category] = allItems.filter { category.contains($0) }.count
             }
             categoryCounts = counts
 

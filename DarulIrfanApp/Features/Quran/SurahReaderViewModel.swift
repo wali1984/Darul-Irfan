@@ -37,6 +37,15 @@ final class SurahReaderViewModel {
     var contentMode: QuranContentMode = .tarajum
     /// Word-by-word recitation (audio + timings) for this surah, when bundled.
     private(set) var recitation: SurahRecitation?
+    /// Where each recited word sits in each ayah's mushaf text, for the ayat
+    /// whose timings spell that text exactly (see `MushafWordMap`). Set with
+    /// `recitation`, before the reader shows.
+    @ObservationIgnored private var wordMaps: [Int: MushafWordMap] = [:]
+    /// Urdu tafsir laid out once per entry, mostly off the main thread, rather
+    /// than on every redraw of its card: the sounding card redraws with each
+    /// word, and an Akram-ut-Tafaseer entry runs to 23 KB.
+    @ObservationIgnored private var formattedTafsirByID: [String: BookPageFormatter.Page] = [:]
+    @ObservationIgnored private var tafsirLayoutTask: Task<Void, Never>?
     /// The Basmala, read from the bundled mushaf (Al-Fatihah 1:1) rather than
     /// hardcoded, so it always matches the shipped orthography. Nil when the
     /// Arabic pack is unavailable, in which case the header is simply omitted.
@@ -64,7 +73,8 @@ final class SurahReaderViewModel {
 
     // Last-read throttling
     @ObservationIgnored private var pendingSaveTask: Task<Void, Never>?
-    @ObservationIgnored private var visibleAyahNumber: Int?
+    /// The ayah at the top of the screen, which is where a reader is.
+    @ObservationIgnored private var topAyahNumber: Int?
     @ObservationIgnored private var lastPersistedAyahNumber: Int?
 
     init(
@@ -149,7 +159,26 @@ final class SurahReaderViewModel {
                 asrarRows.map { ($0.ayahNumber, $0) }, uniquingKeysWith: { first, _ in first }
             )
 
-            recitation = RecitationProvider.shared.recitation(forSurah: surah.id)
+            // The timings file is large; it is decoded and matched against the
+            // mushaf away from the main thread.
+            let surahID = surah.id
+            let texts = Dictionary(ayahs.map { ($0.ayahNumber, $0.textArabic) }, uniquingKeysWith: { first, _ in first })
+            let (loadedRecitation, maps) = await Task.detached(priority: .userInitiated) {
+                () -> (SurahRecitation?, [Int: MushafWordMap]) in
+                // The tafsir cards check their quotations against the mushaf;
+                // its index is built here rather than on the first card.
+                QuranQuotation.warmUp()
+                guard let recitation = RecitationProvider.shared.recitation(forSurah: surahID) else { return (nil, [:]) }
+                var maps: [Int: MushafWordMap] = [:]
+                for verse in recitation.verses {
+                    if let text = texts[verse.ayah], let map = MushafWordMap(text: text, words: verse.words) {
+                        maps[verse.ayah] = map
+                    }
+                }
+                return (recitation, maps)
+            }.value
+            recitation = loadedRecitation
+            wordMaps = maps
 
             var entries: [QuranTafsir] = []
             var pointers: [QuranEdition] = []
@@ -168,6 +197,7 @@ final class SurahReaderViewModel {
 
             await refreshBookmarks()
             phase = .ready
+            layOutUrduTafsir()
         } catch {
             phase = .failed
         }
@@ -296,17 +326,85 @@ final class SurahReaderViewModel {
     /// The full printed volumes of the current mode's tafsir in the language
     /// being read, where this surah's commentary begins in each.
     var fullVolumes: [TafsirVolume] {
-        guard let prefix = contentMode.tafsirEditionPrefix else { return [] }
+        fullVolumes(for: contentMode)
+    }
+
+    /// The printed volumes of one work in the language being read.
+    func fullVolumes(for mode: QuranContentMode) -> [TafsirVolume] {
+        guard let prefix = mode.tafsirEditionPrefix else { return [] }
         return TafsirVolumeProvider.shared.volumes(surah: surah.id, editionPrefix: prefix, language: readingLanguage)
+    }
+
+    /// Whether one work has verse-by-verse commentary on this surah in the
+    /// language being read.
+    func hasTafsir(for mode: QuranContentMode) -> Bool {
+        guard let prefix = mode.tafsirEditionPrefix else { return false }
+        return tafsirEntries.contains {
+            $0.editionID.hasPrefix(prefix) && edition(id: $0.editionID)?.language == readingLanguage
+        }
+    }
+
+    /// True for an ayah the Asrar tab leaves blank on purpose although the
+    /// surah has Asrar's translation in this language: the two ayat whose
+    /// source text was wrong (23:38, 80:41) are withheld until checked. The
+    /// reader says so instead of showing an unexplained gap.
+    func isAsrarTranslationWithheld(_ ayahNumber: Int) -> Bool {
+        contentMode == .asrarTanzil
+            && !asrarTranslationsByAyah.isEmpty
+            && translation(for: ayahNumber) == nil
     }
 
     var hasAnyTafsir: Bool {
         !tafsirEntries.isEmpty || !tafsirEditionPointers.isEmpty
     }
 
-    /// Recitation words for an ayah (nil when this surah has no bundled audio).
-    func words(forAyah ayahNumber: Int) -> [RecitationWord]? {
-        recitation?.verse(ayahNumber)?.words
+    /// Where the recited words sit in this ayah's mushaf text, for tinting the
+    /// word that is sounding. Nil when the surah has no timings or this ayah's
+    /// timings do not spell the mushaf text; the ayah is then drawn untinted.
+    func wordMap(forAyah ayahNumber: Int) -> MushafWordMap? {
+        wordMaps[ayahNumber]
+    }
+
+    /// An Urdu tafsir entry laid out into headings, paragraphs and verified
+    /// Qur'an quotations, checked against the mushaf as its source calls for
+    /// (`quranCheck(forTafsirEdition:)`).
+    func formattedTafsir(_ entry: QuranTafsir) -> BookPageFormatter.Page {
+        if let cached = formattedTafsirByID[entry.id] { return cached }
+        let page = BookPageFormatter.format(entry.text, quranCheck: Self.quranCheck(forTafsirEdition: entry.editionID))
+        formattedTafsirByID[entry.id] = page
+        return page
+    }
+
+    /// How closely an Urdu tafsir's Arabic must follow the mushaf to be set
+    /// as Qur'an, as `BookPageFormatter.quranCheck(for:)` decides for a book
+    /// page. Asrar-at-Tanzil's Urdu rows are cut from pages Claude re-read
+    /// from the scan, so a quotation is matched by its letters. Akram-ut-
+    /// Tafaseer's come from the original OCR of the printed volumes, so a
+    /// quotation must match exactly, vowel marks included.
+    nonisolated static func quranCheck(forTafsirEdition editionID: String) -> QuranQuotation.Check {
+        editionID == "asrar-at-tanzil-ur" ? .letters : .exact
+    }
+
+    private func layOutUrduTafsir() {
+        let urduEntries = tafsirEntries.filter {
+            editionsByID[$0.editionID]?.language == "ur" && formattedTafsirByID[$0.id] == nil
+        }
+        guard !urduEntries.isEmpty else { return }
+        tafsirLayoutTask?.cancel()
+        tafsirLayoutTask = Task { [weak self] in
+            let pages = await Task.detached(priority: .utility) { () -> [String: BookPageFormatter.Page] in
+                var pages: [String: BookPageFormatter.Page] = [:]
+                for entry in urduEntries {
+                    pages[entry.id] = BookPageFormatter.format(
+                        entry.text,
+                        quranCheck: SurahReaderViewModel.quranCheck(forTafsirEdition: entry.editionID)
+                    )
+                }
+                return pages
+            }.value
+            guard !Task.isCancelled, let self else { return }
+            self.formattedTafsirByID.merge(pages) { existing, _ in existing }
+        }
     }
 
     /// The tafsir entry to show under `ayahNumber` for the current mode, if any.
@@ -380,11 +478,13 @@ final class SurahReaderViewModel {
 
     // MARK: - Last-read persistence (throttled)
 
-    /// Called from each ayah card's `onAppear` while scrolling. Saves are
-    /// debounced so fast scrolling does not hammer the database.
-    func ayahBecameVisible(_ ayahNumber: Int) {
+    /// Called when the ayah at the top of the screen changes. That ayah, not
+    /// the last card laid out below the screen, is where the reader is, so
+    /// "Continue reading" returns to it. Saves are debounced so fast scrolling
+    /// does not hammer the database.
+    func topAyahChanged(_ ayahNumber: Int) {
         guard phase == .ready else { return }
-        visibleAyahNumber = ayahNumber
+        topAyahNumber = ayahNumber
         pendingSaveTask?.cancel()
         pendingSaveTask = Task { [weak self] in
             do {
@@ -404,7 +504,7 @@ final class SurahReaderViewModel {
     }
 
     private func persistLastRead() async {
-        guard phase == .ready, let ayahNumber = visibleAyahNumber else { return }
+        guard phase == .ready, let ayahNumber = topAyahNumber else { return }
         guard ayahNumber != lastPersistedAyahNumber else { return }
         lastPersistedAyahNumber = ayahNumber
         let progress = ReadingProgress(

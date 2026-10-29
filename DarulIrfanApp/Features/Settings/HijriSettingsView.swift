@@ -70,7 +70,7 @@ struct HijriSettingsView: View {
         } header: {
             SettingsSectionHeader(titleKey: "Day Offset", systemImage: "plusminus.circle.fill")
         } footer: {
-            Text("Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. Islamic day reminders follow this setting.")
+            Text("Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. The Hijri dates and Islamic days across the app follow this setting.")
         }
     }
 
@@ -98,7 +98,8 @@ struct HijriSettingsView: View {
         hijriPreview = dependencies.hijri.hijriDateText(
             for: Date(),
             offsetDays: appState.settings.hijri.dayOffset,
-            locale: Locale.current
+            locale: LanguageManager.locale(for: appState.settings.language),
+            timeZone: appState.activePlace?.timeZone ?? .current
         )
     }
 }

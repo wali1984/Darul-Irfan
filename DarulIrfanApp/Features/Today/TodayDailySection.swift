@@ -129,7 +129,7 @@ struct TodayDailySection: View {
                             .environment(\.layoutDirection, .rightToLeft)
                     }
                     HStack {
-                        let title = hadith.book.map { viewModel.language == .urdu ? $0.titleUrdu : $0.titleEnglish } ?? ""
+                        let title = hadith.book.map { viewModel.readsUrdu ? $0.titleUrdu : $0.titleEnglish } ?? ""
                         Text(verbatim: "\(title) \(hadith.number)")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(DIColor.primary)
@@ -175,7 +175,7 @@ struct TodayDailySection: View {
                         .environment(\.layoutDirection, .rightToLeft)
                     Rectangle().fill(DIColor.accent).frame(height: 1).opacity(0.5)
                     if let translation = silsila?.translation ?? viewModel.ayahTranslation() {
-                        translationText(translation, urdu: silsila?.isUrdu ?? (viewModel.language == .urdu))
+                        translationText(translation, urdu: silsila?.isUrdu ?? viewModel.readsUrdu)
                     }
                     // Whose translation it is, and exactly where it is from.
                     VStack(alignment: .leading, spacing: 2) {
@@ -205,11 +205,7 @@ struct TodayDailySection: View {
                     HStack(spacing: DISpacing.sm) {
                         Button {
                             DIHaptics.soft()
-                            NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: "quran")
-                            NotificationCenter.default.post(
-                                name: .openQuranAyah,
-                                object: QuranAyahLink(surah: ayah.surah, ayah: ayah.ayahStart)
-                            )
+                            DeepLinkRouter.shared.open(.quranAyah(surah: ayah.surah, ayah: ayah.ayahStart))
                         } label: {
                             Label("Open in the Quran", systemImage: "book.closed")
                                 .font(.subheadline.weight(.semibold))
@@ -252,15 +248,18 @@ struct TodayDailySection: View {
         }
     }
 
-    /// Plays the bayan on these verses through the shared player.
+    /// Plays the bayan on these verses through the shared player, from the
+    /// downloaded file when there is one so it also plays offline.
     private func play(_ link: AyahBayanLink, dependencies: AppDependencies) {
         Task {
-            guard let item = try? await dependencies.mediaRepository.item(id: link.mediaID),
-                  let url = item.streamUrl.flatMap({ URL(string: $0) }) else { return }
-            dependencies.audioPlayer.play(
-                AudioPlayableItem(id: item.id, title: item.title, subtitle: item.speaker, url: url, mediaItemID: item.id),
-                queue: []
-            )
+            guard let item = try? await dependencies.mediaRepository.item(id: link.mediaID) else { return }
+            let assets = (try? await dependencies.downloadsRepository.allAssets()) ?? []
+            guard let playable = MediaPlayback.playableItem(
+                for: item,
+                asset: assets.first(where: { $0.mediaItemID == item.id }),
+                downloadManager: dependencies.downloadManager
+            ) else { return }
+            dependencies.audioPlayer.play(playable, queue: [])
         }
     }
 
@@ -302,8 +301,8 @@ struct TodayDailySection: View {
         if let dua = viewModel.dua {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    DISectionHeaderInline(title: "Daily Dua", systemImage: "hands.sparkles")
-                    Text(dua.title)
+                    DISectionHeaderInline(title: "Dua of the Day", systemImage: "hands.sparkles")
+                    Text(verbatim: dua.displayTitle(urdu: viewModel.readsUrdu))
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
                     Text(dua.arabic)
@@ -329,7 +328,7 @@ struct TodayDailySection: View {
         if let dhikr = viewModel.dhikr {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    DISectionHeaderInline(title: "Daily Dhikr", systemImage: "circle.hexagongrid")
+                    DISectionHeaderInline(title: "Zikr of the Day", systemImage: "circle.hexagongrid")
                     HStack(alignment: .firstTextBaseline) {
                         Text(dhikr.arabic)
                             .font(DIFont.quranArabic(scale: 0.95))
@@ -358,7 +357,7 @@ struct TodayDailySection: View {
         if let name = viewModel.name {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    DISectionHeaderInline(title: "Name of Allah", systemImage: "sparkle")
+                    DISectionHeaderInline(title: "Name of the Day", systemImage: "sparkle")
                     HStack {
                         Text(name.arabic)
                             .font(DIFont.quranArabic(scale: 1.1))

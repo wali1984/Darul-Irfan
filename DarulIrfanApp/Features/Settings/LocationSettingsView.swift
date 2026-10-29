@@ -32,6 +32,14 @@ struct LocationSettingsView: View {
         .task {
             await viewModel.refreshAuthorizationStatus()
         }
+        .onChange(of: appState.settings.locationMode) { _, mode in
+            // A fresh fix rather than the last place this phone was found
+            // at, which would otherwise drive the times until the app next
+            // comes to the foreground.
+            if mode == .device {
+                updateDevicePlace()
+            }
+        }
     }
 
     // MARK: - Mode

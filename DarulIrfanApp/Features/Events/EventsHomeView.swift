@@ -6,17 +6,31 @@ import SwiftUI
 @MainActor
 struct EventsHomeView: View {
     @State private var viewModel: EventsHomeViewModel
+    /// A program a notification or a link named, opened over the list.
+    @State private var linkedEvent: CommunityEvent?
+    /// For an announcement that is a library item, opened in full.
+    @State private var libraryViewModel: LibraryViewModel
     private let dependencies: AppDependencies
+    private let appState: AppState
+    /// Opens the program a link names. Only Discover's copy of this screen
+    /// does, so the one under the Halqah tab does not take it as well.
+    private let followsLinks: Bool
 
-    init(dependencies: AppDependencies, appState: AppState) {
+    init(dependencies: AppDependencies, appState: AppState, followsLinks: Bool = false) {
         self.dependencies = dependencies
-        _viewModel = State(initialValue: EventsHomeViewModel(eventsRepository: dependencies.eventsRepository))
+        self.appState = appState
+        self.followsLinks = followsLinks
+        _viewModel = State(initialValue: EventsHomeViewModel(
+            eventsRepository: dependencies.eventsRepository,
+            contentRepository: dependencies.contentRepository
+        ))
+        _libraryViewModel = State(initialValue: LibraryViewModel(contentRepository: dependencies.contentRepository))
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
-                EventsHeroHeader(eventCount: viewModel.isLoaded ? viewModel.events.count : nil)
+                EventsHeroHeader(eventCount: viewModel.isLoaded ? viewModel.upcoming.count : nil)
                     .diAppear()
 
                 if !viewModel.isLoaded {
@@ -24,8 +38,10 @@ struct EventsHomeView: View {
                         .frame(maxWidth: .infinity)
                         .padding(DISpacing.xl)
                 } else {
+                    // What is coming, when anything is, and the standing
+                    // programs; what has taken place is listed further down.
                     DISectionHeader(titleKey: "Programs & Events", systemImage: "calendar")
-                    if viewModel.events.isEmpty {
+                    if viewModel.upcoming.isEmpty && viewModel.regular.isEmpty {
                         DIElevatedCard {
                             DIEmptyState(
                                 systemImage: "calendar",
@@ -36,14 +52,9 @@ struct EventsHomeView: View {
                         }
                         .diAppear(delay: 0.05)
                     } else {
-                        ForEach(Array(viewModel.events.enumerated()), id: \.element.id) { index, event in
-                            NavigationLink {
-                                EventDetailView(event: event, notifications: dependencies.notifications)
-                            } label: {
-                                EventRowCard(event: event)
-                            }
-                            .buttonStyle(DIPressableStyle())
-                            .diAppear(delay: 0.05 + 0.05 * Double(index))
+                        ForEach(Array((viewModel.upcoming + viewModel.regular).enumerated()), id: \.element.id) { index, event in
+                            eventLink(event, isPast: false)
+                                .diAppear(delay: 0.05 + 0.05 * Double(index))
                         }
                     }
 
@@ -65,8 +76,15 @@ struct EventsHomeView: View {
                         }
                     } else {
                         ForEach(Array(viewModel.announcements.enumerated()), id: \.element.id) { index, announcement in
-                            AnnouncementCard(announcement: announcement)
+                            announcementRow(announcement)
                                 .diAppear(delay: 0.05 * Double(index))
+                        }
+                    }
+
+                    if !viewModel.past.isEmpty {
+                        DISectionHeader(titleKey: "Past programs", systemImage: "clock.arrow.circlepath")
+                        ForEach(viewModel.past) { event in
+                            eventLink(event, isPast: true)
                         }
                     }
                 }
@@ -77,6 +95,53 @@ struct EventsHomeView: View {
         .diPageHeading("Events & Dar-ul-Irfan")
         .diScreenBackground()
         .task { await viewModel.load() }
+        .onAppear(perform: openLinkedEvent)
+        .onChange(of: viewModel.isLoaded) { _, _ in openLinkedEvent() }
+        .onChange(of: DeepLinkRouter.shared.requestCount) { _, _ in openLinkedEvent() }
+        .navigationDestination(isPresented: Binding(
+            get: { linkedEvent != nil },
+            set: { if !$0 { linkedEvent = nil } }
+        )) {
+            if let linkedEvent {
+                EventDetailView(event: linkedEvent, notifications: dependencies.notifications)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func announcementRow(_ announcement: Announcement) -> some View {
+        if viewModel.libraryAnnouncementIDs.contains(announcement.id) {
+            NavigationLink {
+                ContentItemDetailView(
+                    itemID: announcement.id,
+                    dependencies: dependencies,
+                    appState: appState,
+                    libraryViewModel: libraryViewModel
+                )
+            } label: {
+                AnnouncementCard(announcement: announcement)
+            }
+            .buttonStyle(DIPressableStyle())
+        } else {
+            AnnouncementCard(announcement: announcement)
+        }
+    }
+
+    private func eventLink(_ event: CommunityEvent, isPast: Bool) -> some View {
+        NavigationLink {
+            EventDetailView(event: event, notifications: dependencies.notifications)
+        } label: {
+            EventRowCard(event: event, isPast: isPast)
+        }
+        .buttonStyle(DIPressableStyle())
+    }
+
+    /// A link to one program ("darulirfan://events/<id>") opens it once the
+    /// programs are loaded.
+    private func openLinkedEvent() {
+        guard followsLinks, viewModel.isLoaded,
+              let id = DeepLinkRouter.shared.take(\.eventID) else { return }
+        linkedEvent = viewModel.allEvents.first { $0.id == id }
     }
 }
 
@@ -136,6 +201,9 @@ private struct EventsHeroHeader: View {
 
 private struct EventRowCard: View {
     let event: CommunityEvent
+    /// A program that has taken place shows its date, which approximate
+    /// dates otherwise hide.
+    var isPast = false
 
     var body: some View {
         DIElevatedCard(glow: event.kind.eventTint.opacity(0.7)) {
@@ -178,10 +246,10 @@ private struct EventRowCard: View {
 
     @ViewBuilder
     private var eventDatesLine: some View {
-        if let start = event.startDate, !event.datesAreApproximate {
+        if let start = event.startDate, !event.datesAreApproximate || isPast {
             if let end = event.endDate, end > start {
                 Label {
-                    Text("\(start.formatted(date: .abbreviated, time: .omitted)) – \(end.formatted(date: .abbreviated, time: .omitted))")
+                    Text("\(CommunityEvent.dayText(start, .abbreviated)) – \(CommunityEvent.dayText(end, .abbreviated))")
                 } icon: {
                     Image(systemName: "calendar")
                 }
@@ -189,7 +257,7 @@ private struct EventRowCard: View {
                 .foregroundStyle(DIColor.primary)
             } else {
                 Label {
-                    Text(start.formatted(date: .abbreviated, time: .omitted))
+                    Text(CommunityEvent.dayText(start, .abbreviated))
                 } icon: {
                     Image(systemName: "calendar")
                 }

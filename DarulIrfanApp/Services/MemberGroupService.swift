@@ -49,33 +49,19 @@ actor MemberGroupService {
         uploading.timeoutIntervalForRequest = 60
         uploading.timeoutIntervalForResource = 3_600
         uploads = URLSession(configuration: uploading)
-        let decoder = JSONDecoder()
         // The server writes JavaScript's toISOString(), which carries
         // milliseconds ("2026-10-27T10:15:00.000Z"). The stock .iso8601
         // strategy rejects fractional seconds, which made every post and
-        // meeting fail to decode; both forms are accepted.
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let text = try decoder.singleValueContainer().decode(String.self)
-            if let date = Self.fractional.date(from: text) ?? Self.whole.date(from: text) { return date }
-            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unreadable date \(text)"))
-        }
-        self.decoder = decoder
+        // meeting fail to decode; both forms are accepted (ServerDate).
+        decoder = JSONDecoder.darulIrfanServer()
     }
-
-    private nonisolated(unsafe) static let fractional: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    private nonisolated(unsafe) static let whole: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
 
     var isSignedIn: Bool { SecureMemberSession.load() != nil }
     var memberID: String? { SecureMemberSession.load()?.memberID }
+
+    /// Whether a member is signed in on this phone. Static, so it is read
+    /// without the actor (by the push registration).
+    static var hasSavedSession: Bool { SecureMemberSession.load() != nil }
 
     /// Exchanges Apple's signed identity token for a session of our own.
     ///
@@ -108,6 +94,12 @@ actor MemberGroupService {
         var request = URLRequest(url: baseURL.appendingPathComponent("v1/members/invite"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "content-type")
+        // Signed in already: the code is added to this same account. Without
+        // the token the server cannot tell, and makes a new one-group account
+        // that replaces this one on the phone.
+        if let saved = SecureMemberSession.load() {
+            request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
+        }
         var payload: [String: String] = ["code": code]
         if let displayName, !displayName.isEmpty { payload["displayName"] = displayName }
         request.httpBody = try JSONSerialization.data(withJSONObject: payload)
@@ -120,9 +112,26 @@ actor MemberGroupService {
         return value.memberID
     }
 
-    /// Forgets the session on this device without deleting the account.
-    func signOut() {
+    /// Signs this phone out without deleting the account: the server ends
+    /// this session and stops sending the member's Halqah notices here, so
+    /// the next person to use the phone does not see them on the lock screen.
+    /// The local session goes even when the server cannot be reached.
+    func signOut() async {
+        if SecureMemberSession.load() != nil {
+            var payload: [String: Any] = [:]
+            if let installation = SecureInstallationIdentity.load() { payload["installationID"] = installation.uuidString }
+            _ = try? await send("POST", path: "v1/members/signout", payload: payload, expecting: [204])
+        }
         SecureMemberSession.delete()
+        HalqahNoticeChoice.isTurnedOff = false
+    }
+
+    /// The member's own name, as their Halqah's admins, the attendance and the
+    /// meeting room show it.
+    func rename(to displayName: String) async throws -> MemberProfile {
+        let data = try await send("PUT", path: "v1/members/me", payload: ["displayName": displayName], expecting: [200])
+        guard let profile = try? decoder.decode(MemberProfile.self, from: data) else { throw MemberGroupError.requestFailed }
+        return profile
     }
 
     func groups() async throws -> MemberGroupList {
@@ -262,7 +271,7 @@ actor MemberGroupService {
 
     func scheduleMeeting(in groupID: String, title: String, startsAt: Date, durationMinutes: Int) async throws {
         try await send("POST", path: "v1/groups/\(groupID)/meetings", payload: [
-            "title": title, "startsAt": Self.whole.string(from: startsAt), "durationMinutes": durationMinutes,
+            "title": title, "startsAt": ServerDate.string(from: startsAt), "durationMinutes": durationMinutes,
         ], expecting: [201])
     }
 
@@ -442,6 +451,11 @@ actor MemberGroupService {
         _ = try? await send("POST", path: "v1/members/devices", payload: ["installationID": installationID.uuidString], expecting: [204])
     }
 
+    /// Stops the member's Halqah notices on this phone; the session stays.
+    func unlinkNotifications(installationID: UUID) async throws {
+        try await send("DELETE", path: "v1/members/devices/\(installationID.uuidString)", payload: nil, expecting: [204])
+    }
+
     @discardableResult
     private func send(_ method: String, path: String, payload: [String: Any]?, expecting codes: Set<Int>) async throws -> Data {
         guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
@@ -483,6 +497,7 @@ actor MemberGroupService {
         // should still go, so the member is not left signed in to nothing.
         guard code == 204 || code == 401 else { throw MemberGroupError.requestFailed }
         SecureMemberSession.delete()
+        HalqahNoticeChoice.isTurnedOff = false
     }
 
     private func authorized<T: Decodable>(_ type: T.Type, path: String, query: String? = nil) async throws -> T {
@@ -507,6 +522,22 @@ actor MemberGroupService {
         }
         return value
     }
+}
+
+/// Whether this phone shows its member's Halqah notices: posts, sessions and
+/// notices of their Halqahs. On once a member is signed in here, unless they
+/// turned it off on the Halqah page. While it is wanted, the phone stays
+/// registered for notifications even with official alerts off, since a group
+/// notice can only reach a registered phone.
+enum HalqahNoticeChoice {
+    private static let offKey = "halqah.notices.turnedOff"
+
+    static var isTurnedOff: Bool {
+        get { UserDefaults.standard.bool(forKey: offKey) }
+        set { UserDefaults.standard.set(newValue, forKey: offKey) }
+    }
+
+    static var isWanted: Bool { MemberGroupService.hasSavedSession && !isTurnedOff }
 }
 
 /// The member's bearer token, kept in the keychain rather than user defaults:

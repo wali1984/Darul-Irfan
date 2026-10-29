@@ -157,10 +157,53 @@ final class SearchIndexServiceTests: XCTestCase {
 
         let results = try await service.search("Tableegh", domains: [.media], limit: 20)
         XCTAssertEqual(results.first?.itemID, "lecture-3725")
+        // The Urdu spellings are folded as the index is: "صلوٰۃ" → "صلوہ".
         XCTAssertEqual(
             SearchIndexService.ftsMatchExpression(from: "namaz breath"),
-            "(\"namaz\"* OR \"نماز\"* OR \"صلوٰۃ\"*) AND \"breath\"*"
+            "(\"namaz\"* OR \"نماز\"* OR \"صلوہ\"*) AND \"breath\"*"
         )
+    }
+
+    /// An Arabic word typed without harakat finds the vowelled mushaf, and the
+    /// result shows the mushaf's own text, harakat and all (IOSR-002).
+    func testUnvowelledArabicFindsTheVowelledMushaf() async throws {
+        try await seedAllDomains()
+        try await quranRepository.upsertAyahs([
+            QuranAyah(surahNumber: 1, ayahNumber: 2, textArabic: "اَلْحَمْدُ لِلّٰهِ رَبِّ الْعٰلَمِيْنَ")
+        ])
+        try await service.reindex(domains: [.quran])
+        let results = try await service.search("الحمد", domains: [.quran], limit: 20)
+        XCTAssertEqual(results.map(\.itemID), ["1:2"])
+        XCTAssertTrue(results.first?.snippet?.contains("اَلْحَمْدُ") == true)
+    }
+
+    /// Every section has its own limit: a common word's Qur'an hits cannot
+    /// crowd the library out of "All" (IOSR-022).
+    func testEachSectionHasItsOwnLimit() async throws {
+        try await seedAllDomains()
+        try await quranRepository.upsertAyahs((2...4).map {
+            QuranAyah(surahNumber: 1, ayahNumber: $0, textArabic: "breath \($0)")
+        })
+        try await service.reindex(domains: [.quran])
+        let results = try await service.search("breath", domains: [.quran, .library], limit: 2)
+        XCTAssertEqual(results.filter { $0.domain == .quran }.count, 2)
+        XCTAssertEqual(results.filter { $0.domain == .library }.map(\.itemID), ["method-of-zikr"])
+    }
+
+    /// The text of the books is searchable, and a hit opens the page it is on
+    /// (IOSR-008).
+    func testBookPagesAreSearchable() async throws {
+        try await seedAllDomains()
+        try await contentRepository.upsertBookPages([
+            BookPage(bookID: "method-of-zikr", page: 23, text: "اللہ کریم نے اپنے بندوں سے ایک شے طلب فرمائی", blocks: 1,
+                     unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test"),
+        ])
+        await LargeSearchIndexBuilder.shared.buildStaleIndexes(database: database)
+        let results = try await service.search("طلب", domains: [.library], limit: 20)
+        let page = try XCTUnwrap(results.first { $0.bookPage != nil })
+        XCTAssertEqual(page.bookPage?.bookID, "method-of-zikr")
+        XCTAssertEqual(page.bookPage?.page, 23)
+        XCTAssertTrue(page.snippet?.contains("طلب") == true)
     }
 
     func testEmptyAndWhitespaceQueriesReturnNothing() async throws {

@@ -20,6 +20,10 @@ final class QiblaViewModel {
     private(set) var hasHeading = false
     private(set) var needsCalibration = false
     private(set) var isHeadingAvailable = true
+    /// True while the live heading is magnetic rather than true north.
+    private(set) var isMagneticHeading = false
+    /// Whether location permission (and so true north) is available.
+    private(set) var canUseTrueNorth = false
 
     private var lastRawHeading: Double?
     private var wasAligned = false
@@ -65,9 +69,18 @@ final class QiblaViewModel {
         return Self.signedOffset(qibla - heading)
     }
 
+    /// Within the tolerance of the Qibla. Never claimed on a magnetic
+    /// heading: the bearing is from true north, and magnetic north differs
+    /// from it by more than the tolerance in much of the world.
     var isAligned: Bool {
-        guard let offset = relativeOffsetDegrees else { return false }
+        guard !isMagneticHeading, let offset = relativeOffsetDegrees else { return false }
         return abs(offset) <= alignmentTolerance
+    }
+
+    /// The heading is magnetic because location permission is missing, so
+    /// the screen asks for it rather than waiting for a location fix.
+    var needsLocationForTrueNorth: Bool {
+        hasHeading && isMagneticHeading && !canUseTrueNorth
     }
 
     /// Rotation applied to the compass card so its north tracks true north
@@ -96,6 +109,8 @@ final class QiblaViewModel {
 
     private func headingDidChange() {
         needsCalibration = headingProvider.needsCalibration
+        isMagneticHeading = headingProvider.isMagneticHeading
+        canUseTrueNorth = headingProvider.canUseTrueNorth
         guard let raw = headingProvider.currentHeading else { return }
         if let last = lastRawHeading {
             displayHeading += Self.signedOffset(raw - last)

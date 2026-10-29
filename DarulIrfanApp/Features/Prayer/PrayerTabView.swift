@@ -190,7 +190,8 @@ struct PrayerTabView: View {
     }
 
     private func alertButton(prayer: Prayer, style: PrayerAlertStyle) -> some View {
-        Button {
+        let styleName = String(localized: String.LocalizationValue(style.englishName))
+        return Button {
             Task { await viewModel.cycleAlertStyle(for: prayer) }
         } label: {
             Image(systemName: alertIconName(for: style))
@@ -200,7 +201,7 @@ struct PrayerTabView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text("\(prayer.englishName) alert: \(style.englishName)"))
+        .accessibilityLabel(Text("\(localizedName(of: prayer)) alert: \(styleName)"))
         .accessibilityHint(Text("Double tap to change the alert style."))
     }
 
@@ -335,12 +336,19 @@ struct PrayerTabView: View {
     }
 
     private func trackerAccessibilityLabel(prayer: Prayer, completion: PrayerCompletion) -> Text {
+        let name = localizedName(of: prayer)
         switch completion {
-        case .unmarked: return Text("\(prayer.englishName): not marked yet")
-        case .prayed: return Text("\(prayer.englishName): prayed")
-        case .jamaat: return Text("\(prayer.englishName): prayed in congregation")
-        case .qaza: return Text("\(prayer.englishName): marked as Qaza")
+        case .unmarked: return Text("\(name): not marked yet")
+        case .prayed: return Text("\(name): prayed")
+        case .jamaat: return Text("\(name): prayed in congregation")
+        case .qaza: return Text("\(name): marked as Qaza")
         }
+    }
+
+    /// The prayer's name in the app's language, for spoken labels: the
+    /// English name interpolated into them was read out in English.
+    private func localizedName(of prayer: Prayer) -> String {
+        String(localized: String.LocalizationValue(prayer.englishName))
     }
 
     @ViewBuilder
@@ -409,12 +417,12 @@ struct PrayerTabView: View {
                 .disabled(viewModel.isRequestingLocation)
 
                 if viewModel.locationRequestFailed {
-                    Text("We couldn't determine your location. You can allow location access in iOS Settings, or choose a city from the More tab under Settings.")
+                    Text("We couldn't determine your location. You can allow location access in iOS Settings, or choose a city in the Halqah tab under Settings.")
                         .font(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.center)
                 } else {
-                    Text("Prefer a specific city? You can choose one anytime from the More tab under Settings.")
+                    Text("Prefer a specific city? You can choose one anytime in the Halqah tab under Settings.")
                         .font(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.center)

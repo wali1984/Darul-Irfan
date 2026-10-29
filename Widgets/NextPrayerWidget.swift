@@ -177,6 +177,8 @@ struct NextPrayerWidgetView: View {
                 WidgetEmptyStateView()
             }
         }
+        // Times on the place's clock, as the app shows them.
+        .environment(\.timeZone, entry.snapshot?.timeZone ?? .current)
         .containerBackground(for: .widget) {
             WidgetPalette.background(for: colorScheme)
         }

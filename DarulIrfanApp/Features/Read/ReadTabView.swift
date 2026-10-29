@@ -25,10 +25,12 @@ enum ReadSection: String, CaseIterable, Hashable, Identifiable {
     var blurb: LocalizedStringKey {
         switch self {
         case .quran: return "All 114 surahs with translation and tafsir"
-        case .hadith: return "Seven collections in Arabic, English and Urdu"
+        case .hadith: return "Hadith collections in Arabic, with English and Urdu where translated"
         }
     }
 }
+
+
 
 /// Read tab: one tab holding two equal readers.
 ///
@@ -65,20 +67,49 @@ struct ReadTabView: View {
                 landing
             }
         }
-        .onAppear(perform: restoreLastSection)
+        .onAppear {
+            restoreLastSection()
+            // A request made before this tab existed - the first "Open in the
+            // Quran" after launch, a notification - waits in the router.
+            followRouter()
+        }
+        .onChange(of: DeepLinkRouter.shared.requestCount) { _, _ in followRouter() }
         .onReceive(NotificationCenter.default.publisher(for: .didReceiveAppDeepLink)) { notification in
             if let path = notification.object as? String { open(deepLinkPath: path) }
         }
-        // A Qur'an verse quoted inside a hadith was tapped: switch to the Quran
-        // reader and open it at that ayah — all in-app, no external site.
+        // An ayah to open, relayed by RootView or posted by a screen that
+        // still uses the notification: switch to the Quran reader and open
+        // it at that ayah — all in-app, no external site.
         .onReceive(NotificationCenter.default.publisher(for: .openQuranAyah)) { notification in
             guard let link = notification.object as? QuranAyahLink else { return }
-            Task { @MainActor in
-                let surahs = (try? await dependencies.quranRepository.allSurahs()) ?? []
-                guard let surah = surahs.first(where: { $0.id == link.surah }) else { return }
+            openAyah(link)
+        }
+    }
+
+    /// Takes a Quran or Hadith request from the router, once: which reader,
+    /// and the ayah to open.
+    private func followRouter() {
+        guard let route = DeepLinkRouter.shared.take({ $0.isRead ? $0 : nil }) else { return }
+        switch route {
+        case .hadith:
+            select(.hadith)
+        case .quran(let surah, let ayah):
+            if let surah {
+                openAyah(QuranAyahLink(surah: surah, ayah: ayah))
+            } else {
                 select(.quran)
-                quranPath = [.reader(surah: surah, focusAyah: link.ayah)]
             }
+        default:
+            break
+        }
+    }
+
+    private func openAyah(_ link: QuranAyahLink) {
+        Task { @MainActor in
+            let surahs = (try? await dependencies.quranRepository.allSurahs()) ?? []
+            guard let surah = surahs.first(where: { $0.id == link.surah }) else { return }
+            select(.quran)
+            quranPath = [.reader(surah: surah, focusAyah: link.ayah)]
         }
     }
 

@@ -74,6 +74,16 @@ struct DevotionalDashboardProvider: AppIntentTimelineProvider {
             if zikr.startsAt > now { dates.append(zikr.startsAt) }
             dates.append(zikr.endsAt)
         }
+        // At midnight today's counts start again from nothing (the phone's
+        // day, as the tracker keeps it) and the Hijri date turns over (the
+        // place's day), even if iOS defers the reload.
+        let calendar = Calendar.current
+        if let midnight = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)) {
+            dates.append(midnight)
+        }
+        if let placeMidnight = snapshot?.startOfNextDay(after: now) {
+            dates.append(placeMidnight)
+        }
         let entries = Array(Set(dates)).sorted().map {
             DevotionalDashboardEntry(date: $0, snapshot: snapshot, configuration: configuration)
         }
@@ -138,7 +148,7 @@ private struct DevotionalDashboardWidgetView: View {
                     Text("Devotional Dashboard")
                         .font(.headline)
                         .foregroundStyle(WidgetPalette.emeraldTone(for: colorScheme))
-                    Text(snapshot.hijriDateText)
+                    Text(snapshot.hijriText(on: entry.date))
                         .font(.caption2)
                         .foregroundStyle(WidgetPalette.mutedTone(for: colorScheme))
                 }
@@ -151,7 +161,7 @@ private struct DevotionalDashboardWidgetView: View {
                 }
             }
             HStack(spacing: 8) {
-                metricTile("Prayers", value: "\(metrics.prayersCompleted)/\(metrics.prayerGoal)", progress: prayerProgress(metrics), icon: "checkmark")
+                metricTile("Prayers", value: "\(prayersToday(metrics))/\(metrics.prayerGoal)", progress: prayerProgress(metrics), icon: "checkmark")
                 metricTile("30-day", value: "\(Int((metrics.prayerCompletionRate * 100).rounded()))%", progress: metrics.prayerCompletionRate, icon: "chart.line.uptrend.xyaxis")
                 metricTile("Quran", value: quranValue(metrics), progress: quranProgress(metrics), icon: "book.fill")
                 metricTile("Zikr", value: zikrValue(metrics), progress: tasbihProgress(metrics), icon: "sparkles")
@@ -171,14 +181,14 @@ private struct DevotionalDashboardWidgetView: View {
                 .frame(width: 40, height: 40)
             switch entry.configuration.focus {
             case .overview, .prayer:
-                focusMetric("Prayers", value: "\(metrics.prayersCompleted)/\(metrics.prayerGoal)", progress: prayerProgress(metrics))
+                focusMetric("Prayers", value: "\(prayersToday(metrics))/\(metrics.prayerGoal)", progress: prayerProgress(metrics))
                 (Text(verbatim: "\(metrics.prayerStreakDays)") + Text(" day streak")).font(.caption2)
             case .quran:
                 focusMetric("Quran", value: quranValue(metrics), progress: quranProgress(metrics))
                 Text("Continue reading").font(.caption2)
             case .zikr:
                 focusMetric("Zikr & Tasbih", value: zikrValue(metrics), progress: tasbihProgress(metrics))
-                Text(metrics.tasbihTitle ?? "Daily zikr").font(.caption2).lineLimit(1)
+                Text(verbatim: metrics.tasbihTitle ?? String(localized: "Daily zikr")).font(.caption2).lineLimit(1)
             }
         }
         .foregroundStyle(WidgetPalette.textTone(for: colorScheme))
@@ -194,13 +204,13 @@ private struct DevotionalDashboardWidgetView: View {
             switch entry.configuration.focus {
             case .overview, .prayer:
                 Label("Prayer progress", systemImage: "checkmark.circle")
-                Text(verbatim: "\(metrics.prayersCompleted)/\(metrics.prayerGoal) · \(metrics.prayerStreakDays)") + Text(" day streak")
+                Text(verbatim: "\(prayersToday(metrics))/\(metrics.prayerGoal) · \(metrics.prayerStreakDays)") + Text(" day streak")
             case .quran:
                 Label("Continue Quran", systemImage: "book.fill")
                 Text(quranLongValue(metrics))
             case .zikr:
                 Label("Zikr & Tasbih", systemImage: "sparkles")
-                Text(verbatim: "\(zikrValue(metrics)) · \(metrics.zikrCompletionsToday)") + Text(" completed today")
+                Text(verbatim: "\(zikrValue(metrics)) · \(metrics.zikrCompletions(on: entry.date))") + Text(" completed today")
             }
         }
         .font(.caption)
@@ -250,9 +260,15 @@ private struct DevotionalDashboardWidgetView: View {
         .frame(width: diameter, height: diameter)
     }
 
+    /// Today's marked prayers: nothing yet once the day the app last counted
+    /// them is over.
+    private func prayersToday(_ metrics: WidgetDevotionalMetrics) -> Int {
+        metrics.completedPrayers(on: entry.date)
+    }
+
     private func prayerProgress(_ metrics: WidgetDevotionalMetrics) -> Double {
         guard metrics.prayerGoal > 0 else { return 0 }
-        return Double(metrics.prayersCompleted) / Double(metrics.prayerGoal)
+        return Double(prayersToday(metrics)) / Double(metrics.prayerGoal)
     }
 
     private func quranValue(_ metrics: WidgetDevotionalMetrics) -> String {
@@ -279,7 +295,7 @@ private struct DevotionalDashboardWidgetView: View {
 
     private func tasbihProgress(_ metrics: WidgetDevotionalMetrics) -> Double {
         guard let target = metrics.tasbihTarget, target > 0 else {
-            return metrics.zikrCompletionsToday > 0 ? 1 : 0
+            return metrics.zikrCompletions(on: entry.date) > 0 ? 1 : 0
         }
         return min(max(Double(metrics.tasbihCount) / Double(target), 0), 1)
     }

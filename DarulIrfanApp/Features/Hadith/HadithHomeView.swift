@@ -9,6 +9,9 @@ struct HadithHomeView: View {
     @State private var isLoading = true
     @State private var searchText = ""
     @State private var results: [HadithEntry] = []
+    /// How many narrations matched in all, when known; the results are a few
+    /// from each collection, so this is usually more than are shown.
+    @State private var matchCount: Int?
     @State private var isSearching = false
     /// Debounces typing so a long corpus scan does not run on every keystroke.
     @State private var searchTask: Task<Void, Never>?
@@ -18,7 +21,8 @@ struct HadithHomeView: View {
         self.appState = appState
     }
 
-    private var languageCode: String { appState.settings.language.rawValue }
+    /// The content language: "System" on an Urdu phone reads in Urdu.
+    private var languageCode: String { appState.settings.language.contentLanguageCode }
 
     var body: some View {
         ScrollView {
@@ -61,17 +65,18 @@ struct HadithHomeView: View {
             searchTask?.cancel()
             let query = term.trimmingCharacters(in: .whitespaces)
             guard query.count >= 2 else {
-                results = []; isSearching = false; return
+                results = []; matchCount = nil; isSearching = false; return
             }
             isSearching = true
             searchTask = Task {
                 try? await Task.sleep(for: .milliseconds(350))
                 guard !Task.isCancelled else { return }
-                let found = (try? await dependencies.hadithRepository.search(
-                    query, bookID: nil, limit: 100
-                )) ?? []
+                let repository = dependencies.hadithRepository
+                let found = (try? await repository.search(query, bookID: nil, limit: 100)) ?? []
+                let total = (try? await repository.searchCount(query, bookID: nil)) ?? nil
                 guard !Task.isCancelled else { return }
                 results = found
+                matchCount = total
                 isSearching = false
             }
         }
@@ -93,9 +98,15 @@ struct HadithHomeView: View {
             )
         } else {
             DISectionHeader(titleKey: "Results", systemImage: "magnifyingglass")
-            Text("Matches: \(results.count)")
-                .font(.caption)
-                .foregroundStyle(DIColor.textMuted)
+            Group {
+                if let matchCount, matchCount > results.count {
+                    Text("Showing \(results.count) of \(matchCount) matches, a few from each collection")
+                } else {
+                    Text("Matches: \(results.count)")
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(DIColor.textMuted)
             ForEach(results) { entry in
                 // A result must open the exact narration in its collection, not
                 // just sit there: wrap it in the same value-based link the
@@ -170,9 +181,14 @@ struct HadithHomeView: View {
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
-                    Text("\(book.hadithCount) hadith")
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
+                    HStack(spacing: DISpacing.sm) {
+                        Text("\(book.hadithCount) hadith")
+                            .font(.caption)
+                            .foregroundStyle(DIColor.textMuted)
+                        if let note = translationNote(for: book) {
+                            DIPillBadge(text: note, color: DIColor.accent)
+                        }
+                    }
                 }
 
                 Spacer(minLength: 0)
@@ -185,7 +201,19 @@ struct HadithHomeView: View {
         }
     }
 
+    /// Says on the card when a collection cannot be read in translation, so
+    /// nobody opens 30,000 narrations to find each one "has no English
+    /// translation".
+    private func translationNote(for book: HadithBook) -> String? {
+        if !book.hasEnglish && !book.hasUrdu { return String(localized: "Arabic only") }
+        if !book.hasUrdu { return String(localized: "No Urdu translation") }
+        if !book.hasEnglish { return String(localized: "No English translation") }
+        return nil
+    }
+
     private func load() async {
+        // In reading order: the two Sahihs and the Sunan first, the
+        // Arabic-only works after them (HadithRepository.collectionOrder).
         books = (try? await dependencies.hadithRepository.books()) ?? []
         isLoading = false
     }

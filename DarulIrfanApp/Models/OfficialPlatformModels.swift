@@ -98,10 +98,12 @@ struct LiveBroadcast: Codable, Sendable, Identifiable, Equatable {
 
     /// Only sources the app plays itself. An external chat room (the
     /// `.paltalk` kind the server may still send) is never offered: zikr is
-    /// watched inside Darul Irfan.
+    /// watched inside Darul Irfan. Daily Zikr follows the channel's live video
+    /// (the owner's decision, 2026-10-28), so the video comes first; a stream
+    /// staff set by hand is played only when there is no video.
     var preferredSource: LiveSource? {
-        sources.first(where: { $0.kind == .ownedStream })
-            ?? sources.first(where: { $0.kind == .youtube && $0.videoID != nil })
+        sources.first(where: { $0.kind == .youtube && $0.videoID != nil })
+            ?? sources.first(where: { $0.kind == .ownedStream })
     }
 
     static let offline = LiveBroadcast(
@@ -256,4 +258,59 @@ struct DeviceRegistration: Codable, Sendable {
     var topics: [PushTopic]
     var environment: String
     var appVersion: String
+    /// Registers the phone for its member's Halqah notices without touching
+    /// the official alert topics it may already have (nil is left out).
+    var keepTopics: Bool? = nil
+}
+
+// MARK: - Server dates
+
+/// Reads the dates in the Darul Irfan server's JSON.
+///
+/// The Worker wrote JavaScript's toISOString(), which always carries
+/// milliseconds ("2026-10-28T17:15:16.645Z"). The stock `.iso8601` strategy
+/// rejects those, so the live state, the bootstrap and every feed page holding
+/// a website article failed to decode: the Daily Zikr card stayed off air and
+/// Updates stopped after the first videos. The server now sends whole seconds;
+/// both forms are read, so neither an older deployment nor a cached answer can
+/// blank those screens again.
+enum ServerDate {
+    private nonisolated(unsafe) static let fractional: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private nonisolated(unsafe) static let whole: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+
+    /// "2026-10-28T17:15:16.645Z" or "2026-10-28T17:15:16Z".
+    static func date(from text: String) -> Date? {
+        fractional.date(from: text) ?? whole.date(from: text)
+    }
+
+    /// Whole seconds, as the server reads them back.
+    static func string(from date: Date) -> String {
+        whole.string(from: date)
+    }
+
+    static var decodingStrategy: JSONDecoder.DateDecodingStrategy {
+        .custom { decoder in
+            let text = try decoder.singleValueContainer().decode(String.self)
+            if let date = ServerDate.date(from: text) { return date }
+            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unreadable date \(text)"))
+        }
+    }
+}
+
+extension JSONDecoder {
+    /// A decoder for the Darul Irfan server's JSON: see `ServerDate`.
+    static func darulIrfanServer() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = ServerDate.decodingStrategy
+        return decoder
+    }
 }

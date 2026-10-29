@@ -20,8 +20,6 @@ final class DevotionalMetricsSyncService {
     }
 
     func refresh(reference: Date = Date()) async {
-        guard var snapshot = PrayerWidgetSnapshot.load() else { return }
-
         let dayKey = DayKey.make(from: reference)
         let prayerRows = (try? await trackerRepository.prayerLog(dayKeys: [dayKey])) ?? []
         let summary = try? await trackerRepository.streakSummary(endingAt: dayKey, windowDays: 30)
@@ -29,15 +27,13 @@ final class DevotionalMetricsSyncService {
         let counters = (try? await trackerRepository.tasbihCounters()) ?? []
         let zikrHabit = (try? await trackerRepository.zikrHabit(dayKeys: [dayKey]))?.first
 
-        let completed = prayerRows.filter { row in
-            switch row.completion {
-            case .unmarked: return false
-            case .prayed, .jamaat: return true
-            case .qaza: return false
-            }
-        }.count
+        let completed = prayerRows.filter { $0.completion.countsAsPrayed }.count
         let activeCounter = counters.max { lhs, rhs in lhs.updatedAt < rhs.updatedAt }
 
+        // Loaded only now, with nothing awaited before the save: a snapshot
+        // the app wrote while the queries above ran (a new place or method)
+        // must not be overwritten with the older one.
+        guard var snapshot = PrayerWidgetSnapshot.load() else { return }
         snapshot.devotionalMetrics = WidgetDevotionalMetrics(
             prayersCompleted: min(completed, 5),
             prayerGoal: 5,

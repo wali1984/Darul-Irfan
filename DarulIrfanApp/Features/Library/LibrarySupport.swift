@@ -206,6 +206,7 @@ enum LibraryLanguage {
         case "ur": return "Urdu"
         case "ar": return "Arabic"
         case "pa": return "Punjabi"
+        case "zh": return "Chinese"
         default: return code.uppercased()
         }
     }

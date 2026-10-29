@@ -14,6 +14,10 @@ final class IslamicDaysViewModel {
         let day: IslamicDay
         let gregorianDate: Date
         let hijriText: String
+        /// For a night kept from the sunset before its date: that evening.
+        /// The night of 15 Sha'ban, for one, begins on the evening of the
+        /// 14th, so showing only the 15th would send people a night late.
+        var eveDate: Date? = nil
         var id: String { "\(day.id)|\(DayKey.make(from: gregorianDate))" }
     }
 
@@ -31,13 +35,19 @@ final class IslamicDaysViewModel {
         self.hijri = hijri
     }
 
-    func load(offsetDays: Int) {
+    /// `locale` is the app's own language, which may differ from the phone's.
+    func load(offsetDays: Int, locale: Locale) {
         let upcoming = hijri.upcomingIslamicDays(from: Date(), within: 400, offsetDays: offsetDays)
             .sorted { $0.gregorianDate < $1.gregorianDate }
 
         let monthFormatter = DateFormatter()
-        monthFormatter.locale = Locale.current
+        monthFormatter.locale = locale
         monthFormatter.setLocalizedDateFormatFromTemplate("MMMM y")
+
+        // The same calendar the dates above were found with (the phone's
+        // time zone), so "the day before" is the civil day before.
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = .current
 
         var result: [MonthGroup] = []
         for entry in upcoming {
@@ -47,8 +57,11 @@ final class IslamicDaysViewModel {
                 hijriText: hijri.hijriDateText(
                     for: entry.gregorianDate,
                     offsetDays: offsetDays,
-                    locale: Locale.current
-                )
+                    locale: locale
+                ),
+                eveDate: entry.day.observedOnEve == true
+                    ? gregorian.date(byAdding: .day, value: -1, to: entry.gregorianDate)
+                    : nil
             )
             let title = monthFormatter.string(from: entry.gregorianDate)
             if let lastIndex = result.indices.last, result[lastIndex].title == title {
@@ -106,7 +119,8 @@ struct IslamicDaysView: View {
                                 ForEach(group.occurrences) { occurrence in
                                     IslamicDayTimelineRow(
                                         occurrence: occurrence,
-                                        isNext: occurrence.id == viewModel.firstOccurrenceID
+                                        isNext: occurrence.id == viewModel.firstOccurrenceID,
+                                        urdu: appState.settings.language.contentLanguageCode == "ur"
                                     )
                                 }
                             }
@@ -125,7 +139,10 @@ struct IslamicDaysView: View {
         .navigationTitle("Islamic Days")
         .diScreenBackground()
         .task {
-            viewModel.load(offsetDays: appState.settings.hijri.dayOffset)
+            viewModel.load(
+                offsetDays: appState.settings.hijri.dayOffset,
+                locale: LanguageManager.locale(for: appState.settings.language)
+            )
         }
     }
 
@@ -147,6 +164,8 @@ struct IslamicDaysView: View {
 private struct IslamicDayTimelineRow: View {
     let occurrence: IslamicDaysViewModel.Occurrence
     let isNext: Bool
+    /// Shows the day's Urdu name and note where the bundle has them.
+    let urdu: Bool
 
     var body: some View {
         HStack(alignment: .top, spacing: DISpacing.sm) {
@@ -157,11 +176,11 @@ private struct IslamicDayTimelineRow: View {
                         if isNext {
                             DIPillBadge(text: String(localized: "Next"), color: DIColor.accent)
                         }
-                        Text(verbatim: occurrence.day.title)
+                        Text(verbatim: occurrence.day.displayTitle(urdu: urdu))
                             .font(.headline)
                             .foregroundStyle(DIColor.textPrimary)
                             .fixedSize(horizontal: false, vertical: true)
-                        if let note = occurrence.day.note {
+                        if let note = occurrence.day.displayNote(urdu: urdu) {
                             Text(verbatim: note)
                                 .font(.caption)
                                 .foregroundStyle(DIColor.textMuted)
@@ -173,9 +192,17 @@ private struct IslamicDayTimelineRow: View {
                         Text(verbatim: occurrence.hijriText)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(DIColor.primary)
-                        Text("≈ \(occurrence.gregorianDate.formatted(date: .abbreviated, time: .omitted))")
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
+                        if let eve = occurrence.eveDate {
+                            let evening = eve.formatted(date: .abbreviated, time: .omitted)
+                            Text("Night of ≈ \(evening)")
+                                .font(.caption)
+                                .foregroundStyle(DIColor.textMuted)
+                        } else {
+                            let day = occurrence.gregorianDate.formatted(date: .abbreviated, time: .omitted)
+                            Text("≈ \(day)")
+                                .font(.caption)
+                                .foregroundStyle(DIColor.textMuted)
+                        }
                     }
                 }
             }

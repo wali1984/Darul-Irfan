@@ -171,9 +171,9 @@ struct ContentItemRow: View {
                                     .foregroundStyle(DIColor.textMuted)
                             }
                             HStack(spacing: DISpacing.sm) {
-                                DIPillBadge(text: item.type.libraryDisplayName, color: item.type.libraryAccent)
+                                DIPillBadge(text: String(localized: String.LocalizationValue(item.type.libraryDisplayName)), color: item.type.libraryAccent)
                                 DIPillBadge(
-                                    text: LibraryLanguage.displayName(forCode: item.language),
+                                    text: String(localized: String.LocalizationValue(LibraryLanguage.displayName(forCode: item.language))),
                                     color: DIColor.textMuted
                                 )
                             }

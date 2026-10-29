@@ -22,9 +22,10 @@ struct Topic: Codable, Sendable, Identifiable, Equatable {
     /// The FTS query for related content (OR of the terms).
     var searchQuery: String { searchTerms.joined(separator: " ") }
 
-    /// Localized display name.
+    /// Localized display name: Urdu for Urdu content, which includes the
+    /// default "System" setting on a phone set to Urdu.
     func name(for language: AppLanguage) -> String {
-        if language == .urdu, let nameUrdu, !nameUrdu.isEmpty { return nameUrdu }
+        if language.contentLanguageCode == "ur", let nameUrdu, !nameUrdu.isEmpty { return nameUrdu }
         return nameEnglish
     }
 }
@@ -35,22 +36,26 @@ struct AyahRef: Equatable {
     var start: Int
     var end: Int
 
-    /// Parses "13:28" or "33:41-42".
+    /// Parses "13:28" or "33:41-42". A reference that cannot name real ayat
+    /// - a reversed range ("2:257-255"), ayah 0, a surah outside 1...114 - is
+    /// rejected: topics can arrive remotely, and building a range from a
+    /// reversed one stopped the app.
     init?(_ raw: String) {
         let parts = raw.split(separator: ":")
-        guard parts.count == 2, let surah = Int(parts[0]) else { return nil }
+        guard parts.count == 2, let surah = Int(parts[0]), (1...114).contains(surah) else { return nil }
         let ayahPart = parts[1]
         if let dash = ayahPart.firstIndex(of: "-") {
             guard let s = Int(ayahPart[ayahPart.startIndex..<dash]),
-                  let e = Int(ayahPart[ayahPart.index(after: dash)...]) else { return nil }
+                  let e = Int(ayahPart[ayahPart.index(after: dash)...]),
+                  s >= 1, e >= s else { return nil }
             self.surah = surah; self.start = s; self.end = e
         } else {
-            guard let a = Int(ayahPart) else { return nil }
+            guard let a = Int(ayahPart), a >= 1 else { return nil }
             self.surah = surah; self.start = a; self.end = a
         }
     }
 
     var reference: String {
-        start == end ? "Qur'an \(surah):\(start)" : "Qur'an \(surah):\(start)-\(end)"
+        start == end ? String(localized: "Qur'an \(surah):\(start)") : String(localized: "Qur'an \(surah):\(start)-\(end)")
     }
 }

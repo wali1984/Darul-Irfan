@@ -26,6 +26,14 @@ struct Dua: Codable, Sendable, Identifiable, Equatable {
     /// Optional so older seed rows without it still decode.
     var category: String?
     var rightsStatus: RightsStatus?
+    /// Urdu name of the dua, where the bundle carries one.
+    var titleUrdu: String? = nil
+
+    /// The Urdu name for Urdu readers when there is one, else the English.
+    func displayTitle(urdu: Bool) -> String {
+        if urdu, let titleUrdu, !titleUrdu.isEmpty { return titleUrdu }
+        return title
+    }
 
     /// Human-readable section title for the dua's category.
     var categoryTitle: String {
@@ -93,6 +101,22 @@ struct IslamicDay: Codable, Sendable, Identifiable, Equatable {
     /// Hijri day of month.
     var hijriDay: Int
     var note: String?
+    /// Urdu name and note, where the bundle carries them.
+    var titleUrdu: String? = nil
+    var noteUrdu: String? = nil
+    /// True for a night kept from the sunset before its date (Shab-e-Barat,
+    /// Laylat-ul-Qadr, Isra and Mi'raj), so the app can name that evening.
+    var observedOnEve: Bool? = nil
+
+    func displayTitle(urdu: Bool) -> String {
+        if urdu, let titleUrdu, !titleUrdu.isEmpty { return titleUrdu }
+        return title
+    }
+
+    func displayNote(urdu: Bool) -> String? {
+        if urdu, let noteUrdu, !noteUrdu.isEmpty { return noteUrdu }
+        return note
+    }
 }
 
 /// User's Hijri display preferences.

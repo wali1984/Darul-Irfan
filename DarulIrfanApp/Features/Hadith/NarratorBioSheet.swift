@@ -17,7 +17,8 @@ struct NarratorBioSheet: View {
     @State private var narrator: HadithNarrator?
     @State private var isLoading = true
 
-    private var languageCode: String { appState.settings.language.rawValue }
+    /// The content language: "System" on an Urdu phone reads in Urdu.
+    private var languageCode: String { appState.settings.language.contentLanguageCode }
     private var fontScale: Double { appState.settings.readerFontScale.rawValue }
     private var isUrdu: Bool { languageCode == "ur" }
 
@@ -33,10 +34,12 @@ struct NarratorBioSheet: View {
                         .padding(DISpacing.md)
                         .diResponsiveWidth()
                 } else {
+                    // Some narrators in the chains have no biography at the
+                    // source either (it has no page for them), so none is on
+                    // its way: say only that there is none.
                     DIEmptyState(
                         systemImage: "person.crop.circle.badge.questionmark",
-                        titleKey: "Biography not available yet",
-                        messageKey: "This narrator's biography will arrive with a future content update."
+                        titleKey: "No biography is available for this narrator."
                     )
                     .padding(DISpacing.xl)
                 }

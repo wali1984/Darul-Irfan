@@ -34,6 +34,10 @@ final class EventDetailViewModel {
         !event.datesAreApproximate && event.startDate != nil
     }
 
+    /// The program has taken place: its date is shown, with nothing to add
+    /// to a calendar or be reminded of.
+    var hasEnded: Bool { event.hasEnded() }
+
     /// When the reminder would fire: a day before the event, or an hour
     /// before if the event is closer than that. Nil when the event has
     /// already begun (the reminder action is hidden then).

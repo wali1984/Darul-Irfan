@@ -116,7 +116,8 @@ struct AppSettings: Codable, Sendable, Equatable {
     var hasCompletedOnboarding = false
 
     // Content
-    /// Whether to auto-download new content packs on Wi-Fi.
+    /// No longer offered: there are no content packs to fetch, and the switch
+    /// did nothing. Kept so settings saved by earlier builds round-trip.
     var autoDownloadOnWifi = false
 
     // Official platform services. No account or personal profile is created.
@@ -159,9 +160,13 @@ struct AppSettings: Codable, Sendable, Equatable {
 
 // MARK: - Search
 
-/// Domains searchable from the global search screen.
+/// Domains searchable from the global search screen, in the order their
+/// filter chips and result sections appear.
 enum SearchDomain: String, Codable, Sendable, CaseIterable, Identifiable {
     case quran
+    /// The hadith collections. Searched in their own index (`hadith_fts`),
+    /// the one the Hadith tab uses, not in `search_fts`.
+    case hadith
     case library
     case media
     case events
@@ -174,7 +179,8 @@ enum SearchDomain: String, Codable, Sendable, CaseIterable, Identifiable {
 struct SearchResult: Sendable, Identifiable, Equatable {
     var id: String { "\(domain.rawValue)|\(itemID)" }
     var domain: SearchDomain
-    /// ID within the domain (ayah "1:5", content item ID, media item ID, event ID).
+    /// ID within the domain (ayah "1:5", a narration's canonical ID, content
+    /// item ID, media item ID, event ID).
     var itemID: String
     var title: String
     /// Snippet with the match, for display.

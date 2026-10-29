@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// Ayah-by-ayah reader for one surah. Shows Arabic with word-by-word recitation
-/// highlighting, the Akram-ut-Tarajum translation, and an expandable tafsir
-/// (Asrar-at-Tanzil / Akram-ut-Tafaseer) selected from a segmented control.
+/// Ayah-by-ayah reader for one surah. Shows the mushaf Arabic, tinting the
+/// word the reciter is sounding, the Akram-ut-Tarajum translation, and an
+/// expandable tafsir (Asrar-at-Tanzil / Akram-ut-Tafaseer) selected from a
+/// segmented control.
 struct SurahReaderView: View {
     private let appState: AppState
     private let focusAyah: Int?
@@ -21,6 +22,23 @@ struct SurahReaderView: View {
     @State private var hasScrolledToFocus = false
     @State private var hasAutoAdvanced = false
     @State private var bayanError: String?
+    /// The ayah at the top of the screen; it is where the reader is.
+    @State private var topAyah: Int?
+    /// Set once the reader has scrolled into the surah, so reaching its end
+    /// can open the next one; a surah that fits on the screen never fires.
+    @State private var hasScrolledIntoSurah = false
+    /// Only the reader on screen follows the recitation. A reader further
+    /// back in the stack, or one being left, must not scroll or push.
+    @State private var isOnScreen = false
+    /// Set just before a juz is handed on to the next surah's reader, so
+    /// leaving this one does not stop the recitation.
+    @State private var isHandingOnJuz = false
+    @State private var showsGoToAyah = false
+    @State private var goToAyahText = ""
+    @State private var pendingScrollAyah: Int?
+    /// Volumes whose book still has original OCR pages, which carry the
+    /// "not yet proofread" line; the re-read volumes do not.
+    @State private var machineReadVolumeIDs: Set<String> = []
 
     init(
         surah: QuranSurah,
@@ -77,6 +95,14 @@ struct SurahReaderView: View {
                     }
                 }
             }
+            .alert("Go to ayah", isPresented: $showsGoToAyah) {
+                TextField("Ayah number", text: $goToAyahText)
+                    .keyboardType(.numberPad)
+                Button("Go") { goToTypedAyah() }
+                Button("Cancel", role: .cancel) { goToAyahText = "" }
+            } message: {
+                Text("1 to \(viewModel.surah.ayahCount)")
+            }
             .task {
                 // Notes are counted on each ayah card; read them once here
                 // rather than during a card's render.
@@ -84,10 +110,16 @@ struct SurahReaderView: View {
                 await viewModel.load()
                 await NarrationCatalog.shared.load()
             }
+            .onAppear {
+                isOnScreen = true
+                isHandingOnJuz = false
+            }
             .onDisappear {
-                // A juz carries on into the next surah's reader; anything
-                // else stops with the surah it belongs to.
-                if player.scope != .juz || !player.isPlaying { player.stop() }
+                isOnScreen = false
+                // The recitation stops with the reader that started it. Only a
+                // juz being handed on to the next surah's reader carries on;
+                // anything else would keep sounding with no control in reach.
+                if !isHandingOnJuz { player.stop() }
                 speaker.stop()
                 let readerViewModel = viewModel
                 Task { await readerViewModel.flushLastRead() }
@@ -166,8 +198,8 @@ struct SurahReaderView: View {
                         }
                         if !viewModel.readingLanguagesWithTafsirForMode.isEmpty {
                             otherLanguageTafsirCard
-                        } else if viewModel.fullVolumes.isEmpty && !viewModel.tafsirEditionPointers.isEmpty {
-                            tafsirPointerCard
+                        } else if viewModel.fullVolumes.isEmpty {
+                            tafsirMissingCard
                         }
                     }
                     ForEach(viewModel.ayahs, id: \.ayahNumber) { ayah in
@@ -182,7 +214,6 @@ struct SurahReaderView: View {
                             displayMode: appState.settings.quranReaderDisplayMode
                         )
                         .id(ayah.ayahNumber)
-                        .onAppear { viewModel.ayahBecameVisible(ayah.ayahNumber) }
                     }
                     if appState.settings.quranReaderDisplayMode.showsTranslation
                         && viewModel.contentMode.isTafsir
@@ -192,9 +223,16 @@ struct SurahReaderView: View {
                     }
                     readerEndMarker
                 }
+                .scrollTargetLayout()
                 .padding(.horizontal, DISpacing.md)
                 .padding(.top, DISpacing.sm)
                 .padding(.bottom, DISpacing.xl)
+            }
+            .scrollPosition(id: $topAyah, anchor: .top)
+            .onChange(of: topAyah) { _, ayah in
+                guard let ayah else { return }
+                if ayah > 1 { hasScrolledIntoSurah = true }
+                viewModel.topAyahChanged(ayah)
             }
             .onAppear {
                 scrollToFocusIfNeeded(proxy: proxy)
@@ -203,13 +241,19 @@ struct SurahReaderView: View {
                     DispatchQueue.main.async { proxy.scrollTo(current.ayah, anchor: .top) }
                 }
             }
+            .onChange(of: pendingScrollAyah) { _, ayah in
+                guard let ayah else { return }
+                withAnimation(.easeInOut(duration: 0.35)) { proxy.scrollTo(ayah, anchor: .top) }
+                pendingScrollAyah = nil
+            }
             // The reader follows what is playing: each ayah is brought into
             // view as it starts, and a juz turns to the next surah.
             .onChange(of: player.current) { _, current in
-                guard let current, player.isPlaying else { return }
+                guard isOnScreen, let current, player.isPlaying else { return }
                 if current.surah == viewModel.surah.id {
                     withAnimation(.easeInOut(duration: 0.35)) { proxy.scrollTo(current.ayah, anchor: .top) }
-                } else if current.surah == viewModel.surah.id + 1, player.scope == .juz {
+                } else if current.surah == viewModel.surah.id + 1, player.scope == .juz, !isHandingOnJuz {
+                    isHandingOnJuz = true
                     onRequestNextSurah()
                 }
             }
@@ -225,19 +269,33 @@ struct SurahReaderView: View {
         }
     }
 
+    /// "Go to ayah": the number typed, on any keyboard (Urdu and Arabic
+    /// digits are read as well).
+    private func goToTypedAyah() {
+        let digits = SearchNormalizer.normalize(goToAyahText).trimmingCharacters(in: .whitespaces)
+        goToAyahText = ""
+        guard let number = Int(digits), (1...viewModel.surah.ayahCount).contains(number) else { return }
+        pendingScrollAyah = number
+    }
+
+    /// The end of the surah: the next one opens on its own when the reader
+    /// has scrolled here with "Automatically open next surah" on, and can
+    /// always be opened from here.
     @ViewBuilder
     private var readerEndMarker: some View {
         if viewModel.surah.id < 114 {
-            if appState.settings.quranAutoAdvanceSurah {
-                HStack(spacing: DISpacing.sm) {
-                    ProgressView()
-                    Text("Opening next surah…")
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, DISpacing.md)
-                .onAppear(perform: requestNextSurahIfNeeded)
+            Button {
+                advanceToNextSurah()
+            } label: {
+                Label("Next surah", systemImage: "arrow.forward.circle")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .padding(.vertical, DISpacing.md)
+            .onAppear {
+                guard appState.settings.quranAutoAdvanceSurah, hasScrolledIntoSurah else { return }
+                advanceToNextSurah()
             }
         } else {
             Label("Quran reading complete", systemImage: "checkmark.seal.fill")
@@ -248,10 +306,8 @@ struct SurahReaderView: View {
         }
     }
 
-    private func requestNextSurahIfNeeded() {
-        guard appState.settings.quranAutoAdvanceSurah,
-              viewModel.surah.id < 114,
-              !hasAutoAdvanced else { return }
+    private func advanceToNextSurah() {
+        guard viewModel.surah.id < 114, !hasAutoAdvanced else { return }
         hasAutoAdvanced = true
         onRequestNextSurah()
     }
@@ -263,8 +319,8 @@ struct SurahReaderView: View {
                     .font(DIFont.quranArabic(scale: 1.15))
                     .foregroundStyle(DIColor.primary)
                     .diGoldGlow(radius: 7, opacity: 0.28)
-                Text(viewModel.surah.nameEnglish)
-                    .font(DIFont.subheading)
+                Text(surahMeaning)
+                    .font(viewModel.readingLanguage == "ur" ? DIFont.urduBody() : DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
                 HStack(spacing: DISpacing.sm) {
                     DIPillBadge(
@@ -279,6 +335,13 @@ struct SurahReaderView: View {
             .frame(maxWidth: .infinity)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    /// The surah's meaning in the language being read, as the surah list
+    /// shows it.
+    private var surahMeaning: String {
+        if viewModel.readingLanguage == "ur", let urdu = viewModel.surah.nameUrdu, !urdu.isEmpty { return urdu }
+        return viewModel.surah.nameEnglish
     }
 
     /// Whether to print the Basmala above the first ayah.
@@ -488,21 +551,24 @@ struct SurahReaderView: View {
 
     /// Resolves the linked lecture in the media catalogue and hands it to the
     /// shared player, so it keeps playing with the mini player and Lock Screen
-    /// controls the rest of the app already uses.
+    /// controls the rest of the app already uses. The recitation and any
+    /// narration stop first: one recording at a time.
     private func play(_ link: AyahBayanLink) {
         let repository = mediaRepository
-        let player = audioPlayer
+        let bayanPlayer = audioPlayer
+        player.stop()
+        speaker.stop()
         Task {
             guard let item = try? await repository.item(id: link.mediaID) else {
-                bayanError = "This bayan is not in the offline catalogue yet."
+                bayanError = String(localized: "This bayan is not in the offline catalogue yet.")
                 return
             }
             guard let stream = item.streamUrl, let url = URL(string: stream) else {
-                bayanError = "This bayan has no playable audio source."
+                bayanError = String(localized: "This bayan has no playable audio source.")
                 return
             }
             bayanError = nil
-            player.play(
+            bayanPlayer.play(
                 AudioPlayableItem(
                     id: item.id,
                     title: item.title,
@@ -561,50 +627,113 @@ struct SurahReaderView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 ForEach(viewModel.fullVolumes) { volume in
-                    NavigationLink {
-                        TafsirVolumeDestination(volume: volume, dependencies: dependencies)
-                    } label: {
-                        Label {
-                            Text(volumeTitle(volume))
-                                .font(.subheadline.weight(.medium))
-                                .multilineTextAlignment(.leading)
-                        } icon: {
-                            Image(systemName: "text.book.closed")
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .buttonStyle(.bordered)
+                    volumeLink(volume, title: volumeTitle(volume))
                 }
-                Text("Machine-read from the printed book and not yet proofread.")
-                    .font(.caption)
-                    .foregroundStyle(DIColor.textMuted)
+                // Only while the volume still holds original OCR pages; the
+                // volumes re-read from the scan carry no such notice.
+                if viewModel.fullVolumes.contains(where: { machineReadVolumeIDs.contains($0.bookID) }) {
+                    Text("Machine-read from the printed book and not yet proofread.")
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                }
             }
         }
+        .task(id: viewModel.fullVolumes.map(\.bookID)) {
+            await loadVolumeProvenance(viewModel.fullVolumes)
+        }
+    }
+
+    private func volumeLink(_ volume: TafsirVolume, title: String) -> some View {
+        NavigationLink {
+            TafsirVolumeDestination(
+                volume: volume,
+                dependencies: dependencies,
+                fontScale: appState.settings.readerFontScale.rawValue
+            )
+        } label: {
+            Label {
+                Text(title)
+                    .font(.subheadline.weight(.medium))
+                    .multilineTextAlignment(.leading)
+            } icon: {
+                Image(systemName: "text.book.closed")
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.bordered)
+    }
+
+    @MainActor
+    private func loadVolumeProvenance(_ volumes: [TafsirVolume]) async {
+        var machineRead: Set<String> = []
+        for volume in volumes {
+            if (try? await dependencies.contentRepository.bookHasMachineProvisionalPages(bookID: volume.bookID)) ?? true {
+                machineRead.insert(volume.bookID)
+            }
+        }
+        machineReadVolumeIDs = machineRead
     }
 
     private func volumeTitle(_ volume: TafsirVolume) -> String {
-        if volume.bookID.hasPrefix("tafaseer-parah-"),
-           let parah = Int(volume.bookID.dropFirst("tafaseer-parah-".count)) {
-            return String(localized: "\(viewModel.contentMode.localizedTitle), Parah \(parah), from page \(volume.page)")
-        }
-        return String(localized: "\(viewModel.contentMode.localizedTitle): Surah \(viewModel.surah.nameTransliterated)")
+        volumeTitle(volume, workTitle: viewModel.contentMode.localizedTitle)
     }
 
-    /// Native availability status for a tafsir edition not yet included for
-    /// this surah. The edition remains visible so content updates are seamless.
-    private var tafsirPointerCard: some View {
-        DICard {
+    private func volumeTitle(_ volume: TafsirVolume, workTitle: String) -> String {
+        let prefix = "tafaseer-parah-"
+        if volume.bookID.hasPrefix(prefix) {
+            let name = volume.bookID.dropFirst(prefix.count)
+            if let parah = Int(name) {
+                return String(localized: "\(workTitle), Parah \(parah), from page \(volume.page)")
+            }
+            // Parah 30 is printed in two volumes; the second is
+            // "tafaseer-parah-30-part-2".
+            let parts = name.components(separatedBy: "-part-")
+            if parts.count == 2, let parah = Int(parts[0]), parts[1] == "2" {
+                return String(localized: "\(workTitle), Parah \(parah) (part 2), from page \(volume.page)")
+            }
+        }
+        return String(localized: "\(workTitle): Surah \(viewModel.surah.nameTransliterated)")
+    }
+
+    /// This work has nothing for the surah in the app, in either language.
+    /// Says so plainly - nothing is on its way by itself - and points to the
+    /// Silsila's other tafsir, which the app does have.
+    private var tafsirMissingCard: some View {
+        let otherWork: QuranContentMode = viewModel.contentMode == .akramTafaseer ? .asrarTanzil : .akramTafaseer
+        let otherVolumes = viewModel.fullVolumes(for: otherWork)
+        let otherHasVerses = viewModel.hasTafsir(for: otherWork)
+        return DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text("Tafsir availability")
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
-                Text("This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically.")
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.textMuted)
-                ForEach(viewModel.tafsirEditionPointers) { edition in
-                    Label(edition.title, systemImage: "clock.arrow.circlepath")
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.primary)
+                Group {
+                    if viewModel.contentMode == .akramTafaseer && viewModel.surah.id >= 92 {
+                        Text("Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet.")
+                    } else {
+                        Text("This commentary is not in the app for this surah.")
+                    }
+                }
+                .font(.subheadline)
+                .foregroundStyle(DIColor.textMuted)
+                if otherHasVerses || !otherVolumes.isEmpty {
+                    Text("The Silsila's other tafsir is available:")
+                        .font(.subheadline)
+                        .foregroundStyle(DIColor.textMuted)
+                    if otherHasVerses {
+                        Button {
+                            DIHaptics.light()
+                            viewModel.contentMode = otherWork
+                        } label: {
+                            Text("Read \(otherWork.localizedTitle)")
+                                .font(.subheadline.weight(.medium))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    ForEach(otherVolumes) { volume in
+                        volumeLink(volume, title: volumeTitle(volume, workTitle: otherWork.localizedTitle))
+                    }
                 }
             }
         }
@@ -665,6 +794,11 @@ struct SurahReaderView: View {
 
     private var readerOptionsMenu: some View {
         Menu {
+            Button {
+                showsGoToAyah = true
+            } label: {
+                Label("Go to ayah", systemImage: "arrow.down.to.line")
+            }
             Picker("Text Size", selection: fontScaleBinding) {
                 ForEach(ReaderFontScale.allCases) { scale in
                     Text(LocalizedStringKey(scale.readerDisplayName)).tag(scale)
@@ -736,21 +870,32 @@ struct SurahReaderView: View {
 
 /// Opens a tafsir volume's text at a page. The library row gives the title;
 /// if the library has not imported it, a minimal item still opens the pages,
-/// which is all the text reader needs.
+/// which is all the text reader needs. A volume with no stored pages opens
+/// nothing, not an empty reader.
 struct TafsirVolumeDestination: View {
     let volume: TafsirVolume
     let dependencies: AppDependencies
+    /// The reader's text size, carried into the book text.
+    var fontScale: Double = 1
     @State private var item: ContentItem?
+    @State private var hasNoPages = false
 
     var body: some View {
         Group {
             if let item {
-                BookTextReaderView(item: item, dependencies: dependencies, startPage: volume.page)
+                BookTextReaderView(item: item, dependencies: dependencies, startPage: volume.page, fontScale: fontScale)
+            } else if hasNoPages {
+                DIEmptyState(systemImage: "text.book.closed", titleKey: "No text for this book yet")
             } else {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .task {
+            let pageCount = (try? await dependencies.contentRepository.bookPageCount(bookID: volume.bookID)) ?? 0
+            guard pageCount > 0 else {
+                hasNoPages = true
+                return
+            }
             let stored = try? await dependencies.contentRepository.item(id: volume.bookID)
             item = stored ?? ContentItem(
                 id: volume.bookID,
@@ -812,6 +957,13 @@ private struct AyahCardView: View {
                    let translation = viewModel.translation(for: ayah.ayahNumber) {
                     if displayMode.showsArabic { Divider() }
                     translationView(translation)
+                } else if displayMode.showsTranslation, viewModel.isAsrarTranslationWithheld(ayah.ayahNumber) {
+                    if displayMode.showsArabic { Divider() }
+                    Text("Asrar-at-Tanzil's translation of this ayah is still being checked and is not shown yet.")
+                        .font(.footnote)
+                        .italic()
+                        .foregroundStyle(DIColor.textMuted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 if displayMode.showsTranslation,
                    viewModel.contentMode.isTafsir,
@@ -843,6 +995,9 @@ private struct AyahCardView: View {
     private var header: some View {
         HStack(spacing: DISpacing.md) {
             ayahNumberBadge
+            if let para = QuranDivisions.juzStarting(surah: ayah.surahNumber, ayah: ayah.ayahNumber) {
+                DIPillBadge(text: String(localized: "Parah \(para)"), color: DIColor.accent)
+            }
             playButton
             Spacer(minLength: 0)
             // Either tafsir, in either language, for this ayah alone.
@@ -912,37 +1067,32 @@ private struct AyahCardView: View {
     // MARK: Arabic (word-by-word highlight)
 
     private var arabicText: some View {
-        Group {
-            if let words = viewModel.words(forAyah: ayah.ayahNumber), !words.isEmpty {
-                Text(highlightedArabic(words: words))
-            } else {
-                Text(ayah.textArabic)
-            }
-        }
-        .font(DIFont.quranArabic(scale: fontScale * 1.15))
-        .lineSpacing(CGFloat(18 * fontScale))
-        .foregroundStyle(DIColor.textPrimary)
-        .diGoldGlow(radius: 5, opacity: 0.18)
-        .textSelection(.enabled)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .environment(\.layoutDirection, .rightToLeft)
+        Text(arabicAttributedText)
+            .font(DIFont.quranArabic(scale: fontScale * 1.15))
+            .lineSpacing(CGFloat(18 * fontScale))
+            .foregroundStyle(DIColor.textPrimary)
+            .diGoldGlow(radius: 5, opacity: 0.18)
+            .textSelection(.enabled)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .environment(\.layoutDirection, .rightToLeft)
     }
 
-    /// Joins the recitation words, tinting the one currently sounding.
-    private func highlightedArabic(words: [RecitationWord]) -> AttributedString {
-        let highlight = isSounding && player.part == .arabic ? player.currentWordPosition : nil
-        var result = AttributedString()
-        for (index, word) in words.enumerated() {
-            var piece = AttributedString(word.text)
-            if word.position == highlight {
-                piece.backgroundColor = DIColor.accent.opacity(0.30)
-                piece.foregroundColor = DIColor.primaryDeep
-            }
-            result += piece
-            if index < words.count - 1 {
-                result += AttributedString(" ")
-            }
+    /// Always the mushaf text (quran_ayahs.json), never the reciter's word
+    /// list: that follows the recitation, repeats and all. The timings only
+    /// choose which word of the mushaf to tint while it sounds; an ayah whose
+    /// timings do not spell the mushaf is shown untinted.
+    private var arabicAttributedText: AttributedString {
+        let text = ayah.textArabic
+        guard isSounding, player.part == .arabic, let position = player.currentWordPosition,
+              let pieces = viewModel.wordMap(forAyah: ayah.ayahNumber)?.pieces(of: text, position: position) else {
+            return AttributedString(text)
         }
+        var word = AttributedString(pieces.word)
+        word.backgroundColor = DIColor.accent.opacity(0.30)
+        word.foregroundColor = DIColor.primaryDeep
+        var result = AttributedString(pieces.before)
+        result += word
+        result += AttributedString(pieces.after)
         return result
     }
 
@@ -967,8 +1117,9 @@ private struct AyahCardView: View {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 if edition?.language == "ur" && !entry.text.isEmpty {
                     // Urdu tafsir quotes the Qur'an inside its prose; set
-                    // the quotations apart as the book pages do.
-                    FormattedBookPage(page: BookPageFormatter.format(entry.text), scale: fontScale)
+                    // the quotations apart as the book pages do. Laid out
+                    // once by the view model, not on every redraw.
+                    FormattedBookPage(page: viewModel.formattedTafsir(entry), scale: fontScale)
                 } else if !entry.text.isEmpty {
                     bodyText(entry.text, languageCode: edition?.language)
                 }

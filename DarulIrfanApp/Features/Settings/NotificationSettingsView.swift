@@ -61,7 +61,15 @@ struct NotificationSettingsView: View {
             switch viewModel.permission {
             case .notDetermined:
                 Button {
-                    Task { await viewModel.requestPermission() }
+                    Task {
+                        await viewModel.requestPermission()
+                        // Alerts added before permission was given were
+                        // rejected, so schedule them now and show the count.
+                        if viewModel.permission == .authorized {
+                            await appState.refreshScheduledNotificationsAndWidgets()
+                            await viewModel.refresh()
+                        }
+                    }
                 } label: {
                     HStack {
                         Text("Allow Notifications")

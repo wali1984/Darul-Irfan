@@ -105,7 +105,8 @@ final class MonthlyTimetableViewModel {
         lines.append(String(localized: "Darul Irfan — prayer times for \(monthTitle)"))
         lines.append(place.name)
         lines.append("")
-        lines.append(Prayer.allCases.map { $0.englishName }.joined(separator: " · "))
+        // Names in the app's language, as the screen shows them.
+        lines.append(Prayer.allCases.map { String(localized: String.LocalizationValue($0.englishName)) }.joined(separator: " · "))
         for row in days {
             let dayLabel = row.date.formatted(dayLabelFormat)
             let times = Prayer.allCases.compactMap { prayer -> String? in
@@ -115,7 +116,8 @@ final class MonthlyTimetableViewModel {
             lines.append("\(dayLabel): \(times)")
         }
         lines.append("")
-        lines.append(String(localized: "Method: \(appState.settings.calculation.method.englishName)"))
+        let method = String(localized: String.LocalizationValue(appState.settings.calculation.method.englishName))
+        lines.append(String(localized: "Method: \(method)"))
         return lines.joined(separator: "\n")
     }
 }

@@ -129,11 +129,12 @@ enum QuranContentMode: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// Label for the segmented selector — the works are named in full.
+    /// Label for the segmented selector — the works are named in full, spelt
+    /// as everywhere else in the app.
     var shortTitle: String {
         switch self {
         case .tarajum: return "Akram-ut-Tarajum"
-        case .asrarTanzil: return "Asrar-ut-Tanzil"
+        case .asrarTanzil: return "Asrar-at-Tanzil"
         case .akramTafaseer: return "Akram-ut-Tafaseer"
         }
     }

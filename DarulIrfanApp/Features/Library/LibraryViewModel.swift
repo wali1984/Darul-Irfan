@@ -121,6 +121,9 @@ final class LibraryViewModel {
     // MARK: - Item queries
 
     /// Items for one category with the active filters applied, newest first.
+    /// The Qur'an's translation and tafsir volumes are kept in Qur'an order
+    /// instead (`quranOrder`); undated items are ordered by title the way a
+    /// person reads numbers ("Parah 2" before "Parah 10").
     func items(in category: ContentCategory) async -> [ContentItem] {
         let fetched = (try? await contentRepository.items(
             category: category,
@@ -128,14 +131,47 @@ final class LibraryViewModel {
             language: languageFilter,
             limit: 500
         )) ?? []
+        if category == .quranTafsir || category == .quranTranslation {
+            return fetched.sorted { lhs, rhs in
+                let left = Self.quranOrder(lhs), right = Self.quranOrder(rhs)
+                if left != right { return left.lexicographicallyPrecedes(right) }
+                return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
+            }
+        }
         return fetched.sorted { lhs, rhs in
             if let left = lhs.publishedAt, let right = rhs.publishedAt, left != right {
                 return left > right
             }
             if lhs.publishedAt != nil && rhs.publishedAt == nil { return true }
             if lhs.publishedAt == nil && rhs.publishedAt != nil { return false }
-            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
         }
+    }
+
+    /// Where a Qur'an volume sits, read from its id: the Akram-ut-Tafaseer
+    /// parahs (tafaseer-parah-N) in parah order, then the Asrar-at-Tanzil
+    /// volumes (asrar-N-ur / asrar-N-en) in surah order with Urdu before
+    /// English, then the Akram-ut-Tarajum parahs (the parah number in the
+    /// id, single parahs before the combined volumes). Anything else follows,
+    /// by title.
+    static func quranOrder(_ item: ContentItem) -> [Int] {
+        let id = item.id.lowercased()
+        let numbers = id.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
+        if id.hasPrefix("tafaseer-parah-"), let parah = numbers.first {
+            return [0, parah, 0]
+        }
+        if id.hasPrefix("asrar-"), let surah = numbers.first {
+            return [1, surah, id.hasSuffix("-en") ? 1 : 0]
+        }
+        if id.contains("tarajum") || id.contains("tarjum") {
+            // A combined volume ("Parah 1 to 15") after the single parahs:
+            // the halves, then the whole.
+            if numbers.count >= 2, let first = numbers.first, let last = numbers.last {
+                return [2, 100 + (last - first), first]
+            }
+            if let parah = numbers.first { return [2, parah, 0] }
+        }
+        return [3, 0, 0]
     }
 
     /// Favorited content items, most recently favorited first.

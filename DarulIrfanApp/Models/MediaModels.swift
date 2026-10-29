@@ -22,6 +22,14 @@ enum MediaCategory: String, Codable, Sendable, CaseIterable, Identifiable {
     var id: String { rawValue }
     var localizationKey: String { "media.category.\(rawValue)" }
 
+    /// Whether this category lists `item`. Video Lectures also holds the
+    /// audio lectures that carry their official YouTube recording, as the
+    /// media repository lists them.
+    func contains(_ item: MediaItem) -> Bool {
+        if item.category == self { return true }
+        return self == .videoLectures && item.category == .audioLectures && !(item.youtubeId ?? "").isEmpty
+    }
+
     var englishName: String {
         switch self {
         case .audioLectures: return "Audio Lectures"
@@ -60,6 +68,10 @@ struct MediaItem: Codable, Sendable, Identifiable, Equatable {
     var category: MediaCategory
     var transcriptUrl: String?
     var rightsStatus: RightsStatus
+    /// The file's real type when its name says otherwise: "audio/mp4" for
+    /// MPEG-4 audio named .mp3. Read from the catalogue by the audio player;
+    /// the database does not keep it.
+    var mimeType: String? = nil
 
     /// Whether the item can be played natively in-app (vs. opened externally).
     var isNativelyPlayable: Bool {

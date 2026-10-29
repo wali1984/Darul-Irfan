@@ -27,7 +27,12 @@ struct EventDetailView: View {
                     .diAppear(delay: 0.05)
                 }
 
-                if viewModel.hasConcreteDates {
+                if viewModel.hasEnded {
+                    Text("This program has taken place.")
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                        .padding(.horizontal, DISpacing.xs)
+                } else if viewModel.hasConcreteDates {
                     actionsCard
                         .diAppear(delay: 0.1)
                 } else {
@@ -123,10 +128,10 @@ struct EventDetailView: View {
 
     @ViewBuilder
     private var datesLine: some View {
-        if let start = viewModel.event.startDate, viewModel.hasConcreteDates {
+        if let start = viewModel.event.startDate, viewModel.hasConcreteDates || viewModel.hasEnded {
             if let end = viewModel.event.endDate, end > start {
                 Label {
-                    Text("\(start.formatted(date: .long, time: .omitted)) – \(end.formatted(date: .long, time: .omitted))")
+                    Text("\(CommunityEvent.dayText(start, .long)) – \(CommunityEvent.dayText(end, .long))")
                 } icon: {
                     Image(systemName: "calendar")
                 }
@@ -134,7 +139,7 @@ struct EventDetailView: View {
                 .foregroundStyle(DIColor.goldGlow)
             } else {
                 Label {
-                    Text(start.formatted(date: .long, time: .omitted))
+                    Text(CommunityEvent.dayText(start, .long))
                 } icon: {
                     Image(systemName: "calendar")
                 }

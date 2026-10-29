@@ -3,6 +3,9 @@ import UserNotifications
 
 extension Notification.Name {
     static let didReceiveAPNSToken = Notification.Name("DarulIrfan.didReceiveAPNSToken")
+    /// A screen asks for a place in the app by name ("quran", "zikr"). Object
+    /// is the path. RootView hands it to `DeepLinkRouter`, which new code
+    /// calls directly.
     static let didReceiveAppDeepLink = Notification.Name("DarulIrfan.didReceiveAppDeepLink")
     /// Posted when a Qur'an verse quoted inside a hadith is tapped, so the Read
     /// tab opens the app's own Quran reader at that ayah. Object is a
@@ -49,7 +52,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         if let path = response.notification.request.content.userInfo["path"] as? String {
-            NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: path)
+            // Kept until the screen it opens exists: with the app closed, this
+            // arrives during the splash, before any screen is listening.
+            Task { @MainActor in DeepLinkRouter.shared.open(path: path) }
         }
         completionHandler()
     }

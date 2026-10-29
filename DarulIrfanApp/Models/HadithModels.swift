@@ -34,6 +34,17 @@ struct HadithBook: Codable, Sendable, Identifiable, Hashable {
         guard let number, let sections else { return nil }
         return sections.first { $0.number == number }
     }
+
+    /// A kitab's number as the source prints it - "35b" for the book stored
+    /// under 0 - or nil for an opening book the source does not number,
+    /// which is headed by its title alone. A number the catalogue does not
+    /// list is shown as it is.
+    func printedSectionNumber(_ number: Int) -> String? {
+        guard let found = section(number: number) else {
+            return number == 0 ? nil : String(number)
+        }
+        return found.isUnnumbered ? nil : found.displayNumber
+    }
 }
 
 /// One book (kitab) within a collection. Sahih al-Bukhari has 97 of these;
@@ -48,13 +59,31 @@ struct HadithSection: Codable, Sendable, Identifiable, Hashable {
     var titleUrdu: String? = nil
     /// Narrations in this book, counted from the packaged records.
     var hadithCount: Int
+    /// The book's printed label where it is not a plain number - Sunan
+    /// an-Nasa'i's "35b", Shama'il's "8b" - with `number` then a unique stand-in.
+    /// Absent from older packs.
+    var label: String? = nil
 
     var id: Int { number }
 
-    /// Title for the reader's current language (Arabic shown alongside).
+    /// The book's number as printed.
+    var displayNumber: String {
+        if let label, !label.isEmpty { return label }
+        return String(number)
+    }
+
+    /// An opening book the source does not number (Sahih Muslim's
+    /// Introduction, Ibn Majah's Book of the Sunnah): number 0 and no label.
+    /// It is shown by its title, never as "Book 0".
+    var isUnnumbered: Bool { number == 0 && (label ?? "").isEmpty }
+
+    /// Title for the reader's current language (Arabic shown alongside). A
+    /// book with no English title - the Arabic-only collections - shows its
+    /// Arabic one rather than a blank line.
     func title(languageCode: String) -> String {
         if languageCode == "ur", let titleUrdu, !titleUrdu.isEmpty { return titleUrdu }
-        return languageCode == "ur" ? titleArabic : titleEnglish
+        if languageCode == "ur" { return titleArabic }
+        return titleEnglish.isEmpty ? titleArabic : titleEnglish
     }
 }
 
@@ -134,6 +163,9 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
     /// draft so no one mistakes it for reviewed scholarship.
     var englishReviewState: String?
     var urduReviewState: String?
+    /// Where the Urdu came from, when it is not the corpus's own (e.g. a
+    /// provisional text from another site, pending review).
+    var urduSource: String?
 
     enum CodingKeys: String, CodingKey {
         case canonicalID
@@ -158,6 +190,7 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
         case chapterTitleUrdu
         case englishReviewState
         case urduReviewState
+        case urduSource
     }
 
     /// True when the text shown for this language is an unreviewed machine
@@ -165,6 +198,14 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
     func isMachineTranslated(languageCode: String) -> Bool {
         let state = languageCode == "ur" ? urduReviewState : englishReviewState
         return state == "machineTranslated"
+    }
+
+    /// True when the text shown for this language is provisional - taken
+    /// from a source that has not been reviewed (the packs mark it
+    /// `machine_provisional`). The reader says so beside it.
+    func isProvisional(languageCode: String) -> Bool {
+        let state = languageCode == "ur" ? urduReviewState : englishReviewState
+        return state == "machine_provisional"
     }
 
     /// The Arabic as segments, always. When the pack has no segmentation yet,
@@ -247,6 +288,17 @@ struct HadithSegment: Codable, Sendable, Equatable, Hashable {
          surah: Int? = nil, ayahStart: Int? = nil, ayahEnd: Int? = nil) {
         self.kind = kind; self.text = text; self.narratorId = narratorId
         self.surah = surah; self.ayahStart = ayahStart; self.ayahEnd = ayahEnd
+    }
+
+    /// The id the source gives every narrator a chain does not name ("a
+    /// man", "someone"; 2,150 spans). It has no biography at the source.
+    static let unnamedNarratorID = 1131
+
+    /// The narrator a tap on this span opens: none for the matn, a verse or
+    /// the unnamed narrator, which read as plain text.
+    var linkedNarratorID: Int? {
+        guard kind == .isnad, let narratorId, narratorId != Self.unnamedNarratorID else { return nil }
+        return narratorId
     }
 
     enum CodingKeys: String, CodingKey {

@@ -59,12 +59,30 @@ final class NarrationCatalog {
 
     private func apply(_ manifest: NarrationManifest) {
         self.manifest = manifest
-        Self.voiceTag = Self.tag(for: manifest.voices)
+        let tag = Self.tag(for: manifest.voices)
+        let isNewVoice = tag != Self.voiceTag
+        Self.voiceTag = tag
         var sets: [String: Set<String>] = [:]
         for (edition, kinds) in manifest.editions {
             for (kind, names) in kinds { sets["\(edition)/\(kind)"] = Set(names) }
         }
         available = sets
+        if isNewVoice { Self.removeCopies(otherThan: tag) }
+    }
+
+    /// Copies kept under an earlier voice or revision are never played again
+    /// (`localURL` names the folder after the current one); they are removed
+    /// rather than left filling the phone.
+    private static func removeCopies(otherThan tag: String) {
+        let root = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("narration")
+        Task.detached(priority: .background) {
+            let fileManager = FileManager.default
+            guard let folders = try? fileManager.contentsOfDirectory(atPath: root.path) else { return }
+            for folder in folders where folder != tag {
+                try? fileManager.removeItem(at: root.appendingPathComponent(folder))
+            }
+        }
     }
 
     static func name(surah: Int, start: Int, end: Int) -> String {
@@ -76,14 +94,23 @@ final class NarrationCatalog {
         available["\(edition)/\(kind)"]?.contains(Self.name(surah: surah, start: start, end: end)) ?? false
     }
 
+    /// The file's address, carrying the voice revision. A re-made narration
+    /// keeps its file name, and the server lets copies be cached for a week;
+    /// with the revision in the address, a cache on the phone or on the way
+    /// holds an old recording only under the old address.
     func remoteURL(edition: String, kind: String, name: String) -> URL {
-        OfficialPlatformConfiguration.baseURL
+        let file = OfficialPlatformConfiguration.baseURL
             .appendingPathComponent("v1/audio/quran/\(edition)/\(kind)/\(name).mp3")
+        var components = URLComponents(url: file, resolvingAgainstBaseURL: false)
+        components?.queryItems = [URLQueryItem(name: "v", value: Self.voiceTag)]
+        return components?.url ?? file
     }
 
-    /// The voices the kept narrations were made with. When the server's voice
-    /// changes, earlier copies are no longer used, so nobody keeps hearing a
-    /// withdrawn voice from their own cache.
+    /// The voices the kept narrations were made with: a hash of each voice's
+    /// credit line, which carries a revision mark ("· rev 2") when the
+    /// narrations are re-made. When it changes, earlier copies are no longer
+    /// used, so nobody keeps hearing a withdrawn voice or an uncorrected ayah
+    /// from their own cache.
     private static var voiceTag = "v0"
 
     private static func tag(for voices: [String: NarrationManifest.Voice]) -> String {
@@ -122,6 +149,7 @@ final class TranslationSpeaker {
 
     @ObservationIgnored private var player: AVPlayer?
     @ObservationIgnored private var endObserver: NSObjectProtocol?
+    @ObservationIgnored private var bayanObserver: NSObjectProtocol?
     @ObservationIgnored private var passageEnd: Int?
     @ObservationIgnored private var lastAyahInSurah = 0
 
@@ -146,6 +174,12 @@ final class TranslationSpeaker {
 
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
         try? AVAudioSession.sharedInstance().setActive(true)
+        NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
+        bayanObserver = NotificationCenter.default.addObserver(
+            forName: .bayanAudioWillStart, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.stop() }
+        }
         let item = AVPlayerItem(url: source)
         let newPlayer = AVPlayer(playerItem: item)
         player = newPlayer
@@ -188,6 +222,8 @@ final class TranslationSpeaker {
     func stop() {
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         endObserver = nil
+        if let bayanObserver { NotificationCenter.default.removeObserver(bayanObserver) }
+        bayanObserver = nil
         player?.pause()
         player = nil
         isSpeaking = false

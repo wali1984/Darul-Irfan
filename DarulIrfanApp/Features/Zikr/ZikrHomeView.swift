@@ -9,9 +9,23 @@ struct ZikrHomeView: View {
     @State private var viewModel: ZikrHomeViewModel
     @State private var presentedVideo: ZikrPresentedVideo?
     @State private var liveAlertsDenied = false
+    /// What a notification or a link asked this screen to show.
+    @State private var focus: Focus?
+    @Environment(\.scenePhase) private var scenePhase
     private let dependencies: AppDependencies
     private let appState: AppState
     private let groupService = MemberGroupService()
+
+    private enum Focus: Equatable {
+        /// The Daily Zikr broadcast.
+        case live
+        /// An online zikr session, by its id or a word of it ("tahajjud").
+        case session(String)
+        /// The screen itself.
+        case top
+    }
+
+    private static let liveAnchor = "zikr.live"
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
@@ -25,6 +39,50 @@ struct ZikrHomeView: View {
     }
 
     var body: some View {
+        ScrollViewReader { proxy in
+            page
+                .onAppear {
+                    if let asked = DeepLinkRouter.shared.take(Self.focus(for:)) { focus = asked }
+                    scrollToFocus(proxy)
+                }
+                .onChange(of: viewModel.isLoaded) { _, _ in scrollToFocus(proxy) }
+        }
+    }
+
+    private static func focus(for route: AppRoute) -> Focus? {
+        switch route {
+        case .live: return .live
+        case .zikr(let session): return session.map { .session($0) } ?? .top
+        default: return nil
+        }
+    }
+
+    /// Brings what was asked for into view. A session waits for the
+    /// schedule, which arrives with the first load.
+    private func scrollToFocus(_ proxy: ScrollViewProxy) {
+        guard let focus else { return }
+        let target: String?
+        switch focus {
+        case .top:
+            target = nil
+        case .live:
+            target = Self.liveAnchor
+        case .session(let name):
+            guard viewModel.isLoaded else { return }
+            target = viewModel.sessions.first { session in
+                session.id == name || session.id.contains(name) || (name == "tahajjud" && ZikrReminders.isTahajjud(session))
+            }?.id
+        }
+        self.focus = nil
+        guard let target else { return }
+        Task { @MainActor in
+            // Once the page is laid out.
+            try? await Task.sleep(for: .milliseconds(300))
+            withAnimation(.easeInOut) { proxy.scrollTo(target, anchor: .top) }
+        }
+    }
+
+    private var page: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
                 ZikrHeroHeader()
@@ -41,8 +99,10 @@ struct ZikrHomeView: View {
                     .diAppear(delay: 0.05)
 
                 DISectionHeader(titleKey: "Daily Zikr", systemImage: "dot.radiowaves.left.and.right")
-                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer,
-                                  platform: dependencies.officialPlatform)
+                    .id(Self.liveAnchor)
+                // The screen keeps the live state current itself (the session
+                // cards need it too), so the card does not ask a second time.
+                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer)
                     .diAppear(delay: 0.08)
                 liveAlertToggle
 
@@ -76,6 +136,7 @@ struct ZikrHomeView: View {
                         ZikrSessionCard(session: session, viewModel: viewModel) { videoID in
                             presentedVideo = ZikrPresentedVideo(id: videoID, title: viewModel.live.title)
                         }
+                            .id(session.id)
                             .diAppear(delay: 0.1 + 0.05 * Double(index))
                     }
                 }
@@ -114,8 +175,16 @@ struct ZikrHomeView: View {
         .diPageHeading("Zikr")
         .diScreenBackground()
         .task { await viewModel.load() }
-        .task { await viewModel.followLiveGroups(service: groupService) }
-        .task { await viewModel.followLive() }
+        // Followed while the app is in front only: in the background, with a
+        // lecture playing, this screen kept asking the server for nothing.
+        .task(id: scenePhase == .active) {
+            guard scenePhase == .active else { return }
+            await viewModel.followLiveGroups(service: groupService)
+        }
+        .task(id: scenePhase == .active) {
+            guard scenePhase == .active else { return }
+            await viewModel.followLive()
+        }
         .refreshable {
             await viewModel.load(forceRefresh: true)
             await viewModel.refreshLiveGroups(service: groupService)
@@ -210,6 +279,8 @@ struct ZikrHomeView: View {
 /// A living gradient header carrying Qur'an 13:28 — the verse of remembrance
 /// that anchors the whole app and this section in particular.
 private struct ZikrHeroHeader: View {
+    @Environment(\.locale) private var locale
+
     var body: some View {
         ZStack(alignment: .topLeading) {
             DIGradient.hero()
@@ -243,10 +314,19 @@ private struct ZikrHeroHeader: View {
                         .diGoldGlow(radius: 12, opacity: 0.5)
                         .environment(\.layoutDirection, .rightToLeft)
                         .multilineTextAlignment(.center)
-                    Text(DIBrand.anchorVerseEnglish)
-                        .font(.footnote)
-                        .foregroundStyle(.white.opacity(0.88))
-                        .multilineTextAlignment(.center)
+                    // The Silsila's own translation of 13:28 in the reader's language.
+                    if DIBrand.readsUrdu(locale) {
+                        Text(verbatim: DIBrand.anchorVerseUrdu)
+                            .font(DIFont.urduBody(scale: 0.85))
+                            .foregroundStyle(.white.opacity(0.88))
+                            .multilineTextAlignment(.center)
+                            .environment(\.layoutDirection, .rightToLeft)
+                    } else {
+                        Text(verbatim: DIBrand.anchorVerseEnglish)
+                            .font(.footnote)
+                            .foregroundStyle(.white.opacity(0.88))
+                            .multilineTextAlignment(.center)
+                    }
                     Text(DIBrand.anchorVerseReference)
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(DIColor.goldGlow)
@@ -311,6 +391,10 @@ private struct ZikrSessionCard: View {
     /// Plays the channel's live video in the app.
     let playVideo: (String) -> Void
     @Environment(\.openURL) private var openURL
+    @Environment(\.locale) private var locale
+
+    /// The app is in Urdu (chosen in the app, or the phone's own language).
+    private var inUrdu: Bool { DIBrand.readsUrdu(locale) }
 
     /// The Tahajjud zikr is held in the Paltalk room; Daily Zikr is joined
     /// through the channel's live video, in the app.
@@ -338,7 +422,7 @@ private struct ZikrSessionCard: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack(spacing: DISpacing.sm) {
                     liveDot
-                    Text(verbatim: session.title)
+                    Text(verbatim: session.displayTitle(urdu: inUrdu))
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
                 }
@@ -375,7 +459,7 @@ private struct ZikrSessionCard: View {
                     .foregroundStyle(DIColor.textMuted)
                 }
 
-                if let note = session.availabilityNote {
+                if let note = session.displayAvailabilityNote(urdu: inUrdu) {
                     Text(verbatim: note)
                         .font(.footnote)
                         .italic()

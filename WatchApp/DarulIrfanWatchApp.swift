@@ -7,9 +7,16 @@ import UserNotifications
 @main
 struct DarulIrfanWatchApp: App {
     @State private var store = WatchPrayerStore()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
-        WindowGroup { WatchRootView(store: store) }
+        WindowGroup {
+            WatchRootView(store: store)
+                .onChange(of: scenePhase) { _, phase in
+                    guard phase == .active else { return }
+                    Task { await store.refreshPrayerAlertsIfEnabled() }
+                }
+        }
     }
 }
 
@@ -52,8 +59,24 @@ final class WatchPrayerStore: NSObject, WCSessionDelegate {
             value.save()
             snapshot = value
             WidgetCenter.shared.reloadAllTimelines()
+            // New times (a new day, place or method) re-plan the alerts.
+            await refreshPrayerAlertsIfEnabled()
         }
     }
+
+    /// The alerts cover the times the iPhone last sent, so they are planned
+    /// again whenever new times arrive or the app opens, not only when the
+    /// toggle changes: otherwise they stopped after the first few days.
+    func refreshPrayerAlertsIfEnabled() async {
+        guard UserDefaults.standard.bool(forKey: Self.alertsEnabledKey) else { return }
+        await setPrayerAlertsEnabled(true)
+    }
+
+    static let alertsEnabledKey = "watchPrayerAlertsEnabled"
+
+    /// The snapshot covers nine days; this keeps them all, within the
+    /// Watch's 64 pending notifications.
+    private static let plannedAlertLimit = 45
 
     func setPrayerAlertsEnabled(_ enabled: Bool) async {
         let center = UNUserNotificationCenter.current()
@@ -64,21 +87,40 @@ final class WatchPrayerStore: NSObject, WCSessionDelegate {
         guard enabled, let snapshot else { return }
         let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
         guard granted else { return }
-        for prayer in snapshot.upcomingTimes.filter({ $0.isObligatory && $0.time > Date() }).prefix(12) {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+        let upcoming = snapshot.upcomingTimes.filter { $0.isObligatory && $0.time > Date() }
+        for prayer in upcoming.prefix(Self.plannedAlertLimit) {
             let content = UNMutableNotificationContent()
-            content.title = "\(prayer.displayName) time"
+            content.title = Self.alertTitle(for: prayer)
             content.body = snapshot.placeName
             content.sound = .default
-            let components = Calendar.current.dateComponents(
+            // The zone travels with the components, so the alert keeps its
+            // instant if the Watch changes time zone before it fires.
+            var components = calendar.dateComponents(
                 [.year, .month, .day, .hour, .minute],
                 from: prayer.time
             )
+            components.timeZone = calendar.timeZone
             let request = UNNotificationRequest(
                 identifier: "watch.prayer.\(prayer.prayerKey).\(Int(prayer.time.timeIntervalSince1970))",
                 content: content,
                 trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             )
             try? await center.add(request)
+        }
+    }
+
+    /// The same localized titles the iPhone's alerts use.
+    private static func alertTitle(for prayer: WidgetPrayerTime) -> String {
+        switch prayer.prayerKey {
+        case "fajr": return String(localized: "Fajr time")
+        case "sunrise": return String(localized: "Sunrise time")
+        case "dhuhr": return String(localized: "Dhuhr time")
+        case "asr": return String(localized: "Asr time")
+        case "maghrib": return String(localized: "Maghrib time")
+        case "isha": return String(localized: "Isha time")
+        default: return prayer.displayName
         }
     }
 }
@@ -127,7 +169,7 @@ private struct WatchHomeView: View {
                 }
 
                 if let metrics = snapshot.devotionalMetrics {
-                    WatchDevotionalMetricsView(metrics: metrics)
+                    WatchDevotionalMetricsView(metrics: metrics, date: Date())
                 }
 
                 NavigationLink {
@@ -151,11 +193,13 @@ private struct WatchHomeView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                Text(snapshot.hijriDateText)
+                Text(snapshot.hijriText(on: Date()))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
         }
+        // Prayer times on the place's clock, as the iPhone app shows them.
+        .environment(\.timeZone, snapshot.timeZone)
         .navigationTitle(snapshot.placeName)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -163,14 +207,17 @@ private struct WatchHomeView: View {
 
 private struct WatchDevotionalMetricsView: View {
     let metrics: WidgetDevotionalMetrics
+    /// The day being shown: counts from an earlier day read as nothing yet.
+    let date: Date
 
     var body: some View {
+        let prayers = metrics.completedPrayers(on: date)
         HStack(spacing: 7) {
             metric(
                 label: "Prayer",
-                value: "\(metrics.prayersCompleted)/\(metrics.prayerGoal)",
+                value: "\(prayers)/\(metrics.prayerGoal)",
                 progress: metrics.prayerGoal > 0
-                    ? Double(metrics.prayersCompleted) / Double(metrics.prayerGoal)
+                    ? Double(prayers) / Double(metrics.prayerGoal)
                     : 0,
                 icon: "checkmark"
             )
@@ -215,7 +262,7 @@ private struct WatchDevotionalMetricsView: View {
 
     private var tasbihProgress: Double {
         guard let target = metrics.tasbihTarget, target > 0 else {
-            return metrics.zikrCompletionsToday > 0 ? 1 : 0
+            return metrics.zikrCompletions(on: date) > 0 ? 1 : 0
         }
         return Double(metrics.tasbihCount) / Double(target)
     }
@@ -234,7 +281,7 @@ private struct WatchAzanCard: View {
                 Text(next.time, style: .timer)
                     .font(.system(.title2, design: .rounded).weight(.medium).monospacedDigit())
                     .contentTransition(.numericText())
-                Text("until azan · \(next.time.formatted(date: .omitted, time: .shortened))")
+                Text("until azan · \(next.time.formatted(Date.FormatStyle(date: .omitted, time: .shortened, timeZone: snapshot.timeZone)))")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             } else {
@@ -319,6 +366,7 @@ private struct WatchPrayerScheduleView: View {
                 }
             }
         }
+        .environment(\.timeZone, snapshot.timeZone)
         .navigationTitle("Prayer times")
     }
 }

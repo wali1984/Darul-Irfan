@@ -1,8 +1,8 @@
 import Observation
 import SwiftUI
 
-/// Content & storage settings: auto-download preference, space used by
-/// downloads, and a confirmed "clear all downloads" action.
+/// Content & storage settings: space used by downloads, and a confirmed
+/// "clear all downloads" action.
 @MainActor
 struct ContentStorageSettingsView: View {
     private let appState: AppState
@@ -19,7 +19,6 @@ struct ContentStorageSettingsView: View {
 
     var body: some View {
         List {
-            downloadsSection
             storageSection
         }
         .listStyle(.insetGrouped)
@@ -42,28 +41,6 @@ struct ContentStorageSettingsView: View {
         } message: {
             Text("Downloaded audio and documents will be removed from this device. Your bookmarks and reading progress are kept.")
         }
-    }
-
-    // MARK: - Auto-download
-
-    private var downloadsSection: some View {
-        Section {
-            Toggle("Auto-download new content on Wi-Fi", isOn: autoDownloadBinding)
-                .tint(DIColor.primary)
-                .listRowBackground(DIColor.surface)
-        } header: {
-            SettingsSectionHeader(titleKey: "Downloads", systemImage: "arrow.down.circle.fill")
-        } footer: {
-            Text("When enabled, new content packs are fetched automatically while you are on Wi-Fi.")
-        }
-    }
-
-    private var autoDownloadBinding: Binding<Bool> {
-        SettingsBinding.value(
-            in: appState,
-            get: { $0.autoDownloadOnWifi },
-            set: { settings, enabled in settings.autoDownloadOnWifi = enabled }
-        )
     }
 
     // MARK: - Storage

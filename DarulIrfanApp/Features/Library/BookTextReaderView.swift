@@ -11,31 +11,55 @@ import SwiftUI
 /// which is what made a large body unrenderable; nothing here holds more than
 /// the visible pages.
 ///
-/// The text is `machineProvisional`: OCR arbitration plus a visual
-/// cross-check, no human proofreading. That is stated once at the top rather
-/// than left for the reader to discover, and any page the validator could not
-/// fully settle is marked. Arabic quotations are the book's own and are not
-/// presented as Qur'an or hadith.
+/// A page re-read from the scan is set out as it was read: headings,
+/// paragraphs, poetry line by line, Arabic quotations, tables and captions,
+/// with its footnotes at the foot of the page, in Urdu or English as each
+/// block is written. A page still in its original OCR is laid out from its
+/// text when it is Urdu and shown as it is otherwise.
+///
+/// Pages still in their original OCR (`machineProvisional`: OCR arbitration
+/// plus a visual cross-check, no human proofreading) are announced once at the
+/// top - how many of the book's pages they are - and, in a book that mixes
+/// them with pages re-read from the scan (`claudeTranscribed`), each such page
+/// is marked; the re-read pages carry no notice. Any page the validator could
+/// not fully settle is marked too. Arabic is set as Qur'an only where the
+/// mushaf confirms it; other quotations are the book's own text.
+///
+/// The page at the top of the screen is kept, so the book reopens there.
 struct BookTextReaderView: View {
     let item: ContentItem
     let dependencies: AppDependencies
     /// Page to open at, e.g. where a surah begins inside a parah volume when
-    /// the Quran reader sends someone here. Nil opens at the start.
+    /// the Quran reader sends someone here. Nil opens where the reader left
+    /// the book, or at the start.
     var startPage: Int?
+    /// The reader's text size, as the article reader and the Quran use it.
+    var fontScale: Double = 1
 
     @State private var pages: [BookPage] = []
-    /// Urdu pages laid out into headings, paragraphs and quotations.
+    /// Pages set out into headings, paragraphs, poetry and quotations.
     @State private var formatted: [String: BookPageFormatter.Page] = [:]
     @State private var isLoading = true
     @State private var hasScrolledToStart = false
+    /// The printed page at the top of the screen.
+    @State private var topPage: Int?
+    @State private var showsGoToPage = false
+    @State private var goToPageText = ""
+    @State private var pendingPage: Int?
 
     private var unresolvedPageCount: Int {
         pages.filter { $0.isMachineProvisional && !$0.isFullyResolved }.count
     }
 
-    /// The proofreading notice only applies while original OCR text remains.
-    private var hasMachineProvisionalPages: Bool {
-        pages.contains { $0.isMachineProvisional }
+    /// Pages still in their original OCR; the notice is about these only.
+    private var machineReadPageCount: Int {
+        pages.filter(\.isMachineProvisional).count
+    }
+
+    /// Some pages re-read from the scan and some not: each original OCR page
+    /// is then marked, so the reader can tell which is which.
+    private var mixesReviewStates: Bool {
+        machineReadPageCount > 0 && machineReadPageCount < pages.count
     }
 
     var body: some View {
@@ -54,14 +78,28 @@ struct BookTextReaderView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: DISpacing.lg) {
-                            if hasMachineProvisionalPages {
+                            if machineReadPageCount > 0 {
                                 provenanceNote
                             }
-                            ForEach(pages) { page in
+                            ForEach(pages, id: \.page) { page in
                                 pageView(page)
+                                    .id(page.page)
                             }
                         }
+                        .scrollTargetLayout()
                         .padding(DISpacing.md)
+                    }
+                    .scrollPosition(id: $topPage, anchor: .top)
+                    .onChange(of: topPage) { _, page in
+                        if let page { BookReadingPosition.save(page: page, bookID: item.id) }
+                    }
+                    .onChange(of: pendingPage) { _, requested in
+                        guard let requested else { return }
+                        // Scans skip blank pages: the nearest page at or after.
+                        if let target = pages.first(where: { $0.page >= requested }) ?? pages.last {
+                            proxy.scrollTo(target.page, anchor: .top)
+                        }
+                        pendingPage = nil
                     }
                     .onAppear { scrollToStartIfNeeded(proxy) }
                 }
@@ -70,6 +108,32 @@ struct BookTextReaderView: View {
         .diScreenBackground()
         .navigationTitle(Text(verbatim: item.title))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if pages.count > 1 {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showsGoToPage = true
+                    } label: {
+                        Image(systemName: "arrow.down.to.line")
+                    }
+                    .accessibilityLabel(Text("Go to page"))
+                }
+            }
+        }
+        .alert("Go to page", isPresented: $showsGoToPage) {
+            TextField("Page number", text: $goToPageText)
+                .keyboardType(.numberPad)
+            Button("Go") {
+                let digits = SearchNormalizer.normalize(goToPageText).trimmingCharacters(in: .whitespaces)
+                goToPageText = ""
+                if let number = Int(digits) { pendingPage = number }
+            }
+            Button("Cancel", role: .cancel) { goToPageText = "" }
+        } message: {
+            if let first = pages.first?.page, let last = pages.last?.page {
+                Text("Pages \(first) to \(last)")
+            }
+        }
         .task {
             await load()
         }
@@ -86,9 +150,15 @@ struct BookTextReaderView: View {
                     Image(systemName: "info.circle")
                 }
                 .foregroundStyle(DIColor.textPrimary)
-                Text("Scanned and machine-corrected from the printed book. It has not been checked by a person. Read the PDF for the authoritative text.")
-                    .font(.caption)
-                    .foregroundStyle(DIColor.textMuted)
+                if mixesReviewStates {
+                    Text("\(machineReadPageCount) of \(pages.count) pages are still machine-read and have not been checked by a person; they are marked. Read the PDF for the authoritative text.")
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                } else {
+                    Text("Scanned and machine-corrected from the printed book. It has not been checked by a person. Read the PDF for the authoritative text.")
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                }
                 if unresolvedPageCount > 0 {
                     Text("\(unresolvedPageCount) of \(pages.count) pages have passages the checker could not settle; those are marked.")
                         .font(.caption)
@@ -105,6 +175,15 @@ struct BookTextReaderView: View {
                 Text("Page \(page.page)")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIColor.textMuted)
+                if mixesReviewStates && page.isMachineProvisional {
+                    Label {
+                        Text("machine-read, not yet proofread")
+                            .font(.caption2)
+                    } icon: {
+                        Image(systemName: "doc.text.magnifyingglass")
+                    }
+                    .foregroundStyle(DIColor.textMuted)
+                }
                 if page.isMachineProvisional && !page.isFullyResolved {
                     Label {
                         Text("unchecked passages")
@@ -117,14 +196,13 @@ struct BookTextReaderView: View {
                 }
                 Spacer()
             }
-            if let layout = formatted[page.id] {
-                FormattedBookPage(page: layout)
+            if let formattedPage = formatted[page.id] {
+                FormattedBookPage(page: formattedPage, scale: fontScale)
             } else {
                 pageText(page.text)
             }
             Divider().overlay(DIColor.border)
         }
-        .id("book-page-\(page.page)")
     }
 
     /// Direction and face follow the page's own script, not a fixed Urdu
@@ -135,18 +213,18 @@ struct BookTextReaderView: View {
     private func pageText(_ text: String) -> some View {
         if ScriptDirection.isRightToLeft(text, fallbackLanguage: item.language) {
             Text(verbatim: text)
-                .font(DIFont.urduBody())
+                .font(DIFont.urduBody(scale: fontScale))
                 .foregroundStyle(DIColor.textPrimary)
-                .lineSpacing(10)
+                .lineSpacing(CGFloat(10 * fontScale))
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .environment(\.layoutDirection, .rightToLeft)
                 .textSelection(.enabled)
         } else {
             Text(verbatim: text)
-                .font(.body)
+                .font(.system(size: bodyBaseSize * fontScale))
                 .foregroundStyle(DIColor.textPrimary)
-                .lineSpacing(5)
+                .lineSpacing(CGFloat(5 * fontScale))
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .environment(\.layoutDirection, .leftToRight)
@@ -154,14 +232,18 @@ struct BookTextReaderView: View {
         }
     }
 
+    @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
+
+    /// Opens at the page asked for, else where the reader left the book.
     private func scrollToStartIfNeeded(_ proxy: ScrollViewProxy) {
-        guard !hasScrolledToStart, let startPage, !pages.isEmpty else { return }
+        guard !hasScrolledToStart, !pages.isEmpty,
+              let wanted = startPage ?? BookReadingPosition.page(bookID: item.id) else { return }
         hasScrolledToStart = true
         // The nearest page at or after the requested one: scans skip blank
         // pages, so the exact number is not always present.
-        guard let target = pages.first(where: { $0.page >= startPage }) ?? pages.last else { return }
+        guard let target = pages.first(where: { $0.page >= wanted }) ?? pages.last else { return }
         DispatchQueue.main.async {
-            proxy.scrollTo("book-page-\(target.page)", anchor: .top)
+            proxy.scrollTo(target.page, anchor: .top)
         }
     }
 
@@ -170,8 +252,11 @@ struct BookTextReaderView: View {
         let loaded = (try? await dependencies.contentRepository.bookPages(bookID: item.id)) ?? []
         let language = item.language
         formatted = await Task.detached(priority: .userInitiated) {
+            // A re-read page is set out from its own layout in either script;
+            // an original OCR page is laid out only when it is Urdu.
             BookPageFormatter.format(pages: loaded.filter {
-                ScriptDirection.isRightToLeft($0.text, fallbackLanguage: language)
+                BookPageFormatter.laidOutParts(of: $0) != nil
+                    || ScriptDirection.isRightToLeft($0.text, fallbackLanguage: language)
             })
         }.value
         // A cover or blank page re-read from the scan carries no text.
@@ -180,24 +265,48 @@ struct BookTextReaderView: View {
     }
 }
 
-/// Urdu text as `BookPageFormatter` laid it out: a book page, or the
-/// tafsir under an ayah.
+/// The page each book's text was left at, so it reopens there. Small, and
+/// private to the device.
+enum BookReadingPosition {
+    private static func key(_ bookID: String) -> String { "bookText.page.\(bookID)" }
+
+    static func save(page: Int, bookID: String) {
+        UserDefaults.standard.set(page, forKey: key(bookID))
+    }
+
+    static func page(bookID: String) -> Int? {
+        let page = UserDefaults.standard.integer(forKey: key(bookID))
+        return page > 0 ? page : nil
+    }
+}
+
+/// Text as `BookPageFormatter` laid it out: a book page, or the tafsir under
+/// an ayah.
+///
+/// Each block takes its direction and face from its own script, so a page can
+/// hold both: Urdu right to left in the Urdu face, and the English column of
+/// an Asrar page left to right in the system face.
 struct FormattedBookPage: View {
     let page: BookPageFormatter.Page
     /// The reader's text size.
     var scale: Double = 1
     @State private var showsContents = false
+    @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
 
     var body: some View {
         Group {
             if page.isContents {
                 DisclosureGroup(isExpanded: $showsContents) {
-                    Text(verbatim: contentsText)
-                        .font(DIFont.urduBody(scale: 0.85 * scale))
-                        .foregroundStyle(DIColor.textMuted)
-                        .lineSpacing(6)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
+                    if let text = contentsText {
+                        Text(verbatim: text)
+                            .font(DIFont.urduBody(scale: 0.85 * scale))
+                            .foregroundStyle(DIColor.textMuted)
+                            .lineSpacing(6)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    } else {
+                        blockList
+                    }
                 } label: {
                     Label("Contents page", systemImage: "list.bullet")
                         .font(.footnote.weight(.semibold))
@@ -205,39 +314,39 @@ struct FormattedBookPage: View {
                 }
                 .tint(DIColor.primary)
             } else {
-                VStack(alignment: .leading, spacing: DISpacing.md) {
-                    ForEach(Array(page.blocks.enumerated()), id: \.offset) { _, block in
-                        blockView(block)
-                    }
-                }
+                blockList
             }
         }
         .environment(\.layoutDirection, .rightToLeft)
     }
 
-    private var contentsText: String {
-        guard case .paragraph(let runs)? = page.blocks.first else { return "" }
-        return runs.map(\.text).joined(separator: " ")
+    /// The text of a contents page from the original OCR, which is one
+    /// paragraph of rows. Nil for a page set out from its own layout, whose
+    /// blocks are shown instead.
+    private var contentsText: String? {
+        guard page.blocks.count == 1, page.footnotes.isEmpty,
+              case .paragraph(let runs)? = page.blocks.first else { return nil }
+        return plainText(runs)
+    }
+
+    private var blockList: some View {
+        VStack(alignment: .leading, spacing: DISpacing.md) {
+            ForEach(Array(page.blocks.enumerated()), id: \.offset) { _, block in
+                blockView(block)
+            }
+            if !page.footnotes.isEmpty {
+                footnoteList
+            }
+        }
     }
 
     @ViewBuilder
     private func blockView(_ block: BookPageFormatter.Block) -> some View {
         switch block {
         case .heading(let text):
-            Text(verbatim: text)
-                .font(DIFont.urduBody(scale: 1.1 * scale).weight(.semibold))
-                .foregroundStyle(DIColor.primary)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, DISpacing.xs)
+            heading(text)
         case .paragraph(let runs):
-            prose(runs)
-                .font(DIFont.urduBody(scale: scale))
-                .foregroundStyle(DIColor.textPrimary)
-                .lineSpacing(CGFloat(10 * scale))
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .textSelection(.enabled)
+            paragraph(runs)
         case .quran(let text):
             Text(verbatim: text)
                 .font(DIFont.quranArabic(scale: 0.8 * scale))
@@ -251,14 +360,144 @@ struct FormattedBookPage: View {
                         .fill(DIColor.primary.opacity(0.07))
                 )
                 .textSelection(.enabled)
+        case .arabic(let text):
+            arabicQuotation(text)
+        case .verse(let text):
+            verse(text)
+        case .table(let rows):
+            table(rows)
+        case .caption(let text):
+            caption(text)
         }
     }
 
-    /// Prose, with a short Qur'anic quotation kept inline in the Qur'an face.
+    private func heading(_ text: String) -> some View {
+        let rightToLeft = isRightToLeft(text)
+        return Text(verbatim: text)
+            .font(face(rightToLeft, size: 1.1).weight(.semibold))
+            .foregroundStyle(DIColor.primary)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, DISpacing.xs)
+            .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
+    }
+
+    private func paragraph(_ runs: [BookPageFormatter.Run]) -> some View {
+        let rightToLeft = isRightToLeft(plainText(runs))
+        return prose(runs)
+            .font(face(rightToLeft))
+            .foregroundStyle(DIColor.textPrimary)
+            .lineSpacing(CGFloat((rightToLeft ? 10 : 5) * scale))
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
+            .textSelection(.enabled)
+    }
+
+    /// Arabic the mushaf does not confirm - a hadith, a du'a, a saying - set
+    /// apart in the Arabic face, without the Qur'an's colour and panel.
+    private func arabicQuotation(_ text: String) -> some View {
+        Text(verbatim: text)
+            .font(DIFont.quranArabic(scale: 0.75 * scale))
+            .foregroundStyle(DIColor.textPrimary)
+            .lineSpacing(CGFloat(8 * scale))
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, DISpacing.xs)
+            .environment(\.layoutDirection, .rightToLeft)
+            .textSelection(.enabled)
+    }
+
+    /// A couplet or stanza: each printed line on a line of its own, centred
+    /// as Urdu books set their verse.
+    private func verse(_ text: String) -> some View {
+        let rightToLeft = isRightToLeft(text)
+        return Text(verbatim: text)
+            .font(face(rightToLeft))
+            .foregroundStyle(DIColor.textPrimary)
+            .lineSpacing(CGFloat((rightToLeft ? 12 : 6) * scale))
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
+            .textSelection(.enabled)
+    }
+
+    /// A table as printed: its cells in columns, a rule between the rows. A
+    /// row with fewer cells than the widest leaves the rest of its columns
+    /// empty.
+    private func table(_ rows: [[String]]) -> some View {
+        let columns = max(1, rows.map(\.count).max() ?? 1)
+        let rightToLeft = isRightToLeft(rows.joined().joined(separator: " "))
+        return VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
+                if index > 0 {
+                    Divider().overlay(DIColor.border)
+                }
+                HStack(alignment: .top, spacing: DISpacing.sm) {
+                    ForEach(0..<columns, id: \.self) { column in
+                        Text(verbatim: column < row.count ? row[column] : "")
+                            .font(face(rightToLeft, size: 0.85))
+                            .foregroundStyle(DIColor.textPrimary)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(.vertical, DISpacing.xs)
+            }
+        }
+        .padding(DISpacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                .fill(DIColor.sandstone)
+        )
+        .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
+        .textSelection(.enabled)
+    }
+
+    private func caption(_ text: String) -> some View {
+        let rightToLeft = isRightToLeft(text)
+        return Text(verbatim: text)
+            .font(face(rightToLeft, size: 0.8))
+            .foregroundStyle(DIColor.textMuted)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
+            .textSelection(.enabled)
+    }
+
+    /// The page's footnotes after its text, small, under a short rule as a
+    /// printed page sets them.
+    private var footnoteList: some View {
+        VStack(alignment: .leading, spacing: DISpacing.xs) {
+            Rectangle()
+                .fill(DIColor.border)
+                .frame(width: 72, height: 1)
+                .accessibilityHidden(true)
+            ForEach(Array(page.footnotes.enumerated()), id: \.offset) { _, note in
+                footnote(note)
+            }
+        }
+        .padding(.top, DISpacing.xs)
+    }
+
+    private func footnote(_ text: String) -> some View {
+        let rightToLeft = isRightToLeft(text)
+        return Text(verbatim: text)
+            .font(face(rightToLeft, size: 0.8))
+            .foregroundStyle(DIColor.textMuted)
+            .lineSpacing(CGFloat((rightToLeft ? 6 : 3) * scale))
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
+            .textSelection(.enabled)
+    }
+
+    /// Prose, with a short Qur'anic quotation kept inline in the Qur'an face
+    /// and a printed line break kept where the paragraph had one.
     private func prose(_ runs: [BookPageFormatter.Run]) -> Text {
         var text = Text(verbatim: "")
         for (index, run) in runs.enumerated() {
-            if index > 0 { text = text + Text(verbatim: " ") }
+            if index > 0 { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
             if run.isQuranic {
                 text = text + Text(verbatim: run.text)
                     .font(DIFont.quranArabic(scale: 0.72 * scale))
@@ -268,6 +507,30 @@ struct FormattedBookPage: View {
             }
         }
         return text
+    }
+
+    /// The runs' words as plain text, printed line breaks kept.
+    private func plainText(_ runs: [BookPageFormatter.Run]) -> String {
+        var text = ""
+        for (index, run) in runs.enumerated() {
+            if index > 0 { text += run.startsLine ? "\n" : " " }
+            text += run.text
+        }
+        return text
+    }
+
+    /// The Urdu face for Arabic-script text, the system face for Latin text,
+    /// at `size` times the reader's text size.
+    private func face(_ rightToLeft: Bool, size: Double = 1) -> Font {
+        rightToLeft
+            ? DIFont.urduBody(scale: size * scale)
+            : Font.system(size: bodyBaseSize * CGFloat(size * scale))
+    }
+
+    /// Arabic script reads right to left. Text with no letters (a row of
+    /// numbers) follows the page, which is Urdu.
+    private func isRightToLeft(_ text: String) -> Bool {
+        ScriptDirection.isRightToLeft(text, fallbackLanguage: "ur")
     }
 }
 

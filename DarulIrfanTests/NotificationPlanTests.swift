@@ -307,6 +307,37 @@ final class NotificationPlanTests: XCTestCase {
         XCTAssertFalse(PrayerNotificationPlan.isPrayerIdentifier("some-other-id"))
     }
 
+    // MARK: - Iqamah
+
+    /// Opening the app after the azan reschedules everything; the iqamah
+    /// heads-up that is still ahead must be planned again, not dropped with
+    /// the azan that has passed.
+    func testIqamahReminderSurvivesARescheduleAfterTheAzan() throws {
+        var preferences = PrayerNotificationPreferences(styles: styles(.azanClip), preReminders: [:])
+        preferences.iqamahGaps = [.dhuhr: 15]
+        // Dhuhr is 12:30 in the fixture; two minutes after it.
+        let afterAzan = TestDates.make(year: 2026, month: 1, day: 15, hour: 12, minute: 32, timeZone: TestDates.karachi)
+        let plan = PrayerNotificationPlan.build(schedules: makeSchedules(days: 1), preferences: preferences, now: afterAzan)
+
+        XCTAssertFalse(plan.contains { $0.identifier == "prayer|2026-01-15|dhuhr" }, "The azan has passed")
+        let iqamah = try XCTUnwrap(plan.first { $0.identifier == "prayer-iqamah|2026-01-15|dhuhr" })
+        let expected = TestDates.make(year: 2026, month: 1, day: 15, hour: 12, minute: 40, timeZone: TestDates.karachi)
+        XCTAssertEqual(iqamah.fireDate, expected, "Five minutes before an iqamah 15 minutes after the azan")
+    }
+
+    /// The settings promise the iqamah heads-up whatever the azan alert is
+    /// set to, Off included.
+    func testIqamahReminderIsPlannedWhenTheAzanAlertIsOff() throws {
+        var preferences = PrayerNotificationPreferences(styles: styles(.off), preReminders: [:])
+        preferences.iqamahGaps = [.asr: 10]
+        let plan = PrayerNotificationPlan.build(schedules: makeSchedules(days: 1), preferences: preferences, now: now)
+
+        XCTAssertFalse(plan.contains { $0.identifier.hasPrefix(PrayerNotificationPlan.prayerIdentifierPrefix) })
+        let iqamah = try XCTUnwrap(plan.first { $0.identifier == "prayer-iqamah|2026-01-15|asr" })
+        let expected = TestDates.make(year: 2026, month: 1, day: 15, hour: 16, minute: 5, timeZone: TestDates.karachi)
+        XCTAssertEqual(iqamah.fireDate, expected)
+    }
+
     // MARK: - Trigger components
 
     func testTriggerComponentsCarryFullDateAndTimezone() throws {

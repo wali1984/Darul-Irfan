@@ -60,6 +60,9 @@ protocol HadithRepositoryProtocol: Sendable {
     /// directly into that book without guessing from printed numbering.
     func firstEntry(bookID: String, sourceBook: Int) async throws -> HadithEntry?
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry]
+    /// How many narrations a search matches in all (the results are capped),
+    /// or nil when that is not known yet.
+    func searchCount(_ term: String, bookID: String?) async throws -> Int?
     /// A narrator's bundled biography for the reader's tap-to-open bio sheet.
     func narrator(id: Int) async throws -> HadithNarrator?
 
@@ -105,6 +108,9 @@ protocol ContentRepositoryProtocol: Sendable {
 
     /// True while any of a book's pages is still original OCR text.
     func bookHasMachineProvisionalPages(bookID: String) async throws -> Bool
+
+    /// How many of a book's pages are still original OCR text.
+    func bookMachineProvisionalPageCount(bookID: String) async throws -> Int
 
     func upsertBookPages(_ pages: [BookPage]) async throws
     func categoryCounts() async throws -> [ContentCategory: Int]

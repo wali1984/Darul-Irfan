@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Global search across Quran, Library, Media, and Events. Presented as a
-/// sheet from feature toolbars; owns its own NavigationStack.
+/// Global search across Quran, Hadith, Library, Media, and Events. Presented
+/// as a sheet from feature toolbars; owns its own NavigationStack.
 ///
 /// A custom prominent search field is used instead of `.searchable` so the
 /// field is immediately visible and focused inside the sheet, keeps a plain
@@ -10,6 +10,8 @@ import SwiftUI
 @MainActor
 struct GlobalSearchView: View {
     @State private var viewModel: SearchViewModel
+    /// Shared by every library result, with the favourites loaded once.
+    @State private var libraryViewModel: LibraryViewModel
     private let dependencies: AppDependencies
     private let appState: AppState
     @Environment(\.dismiss) private var dismiss
@@ -28,6 +30,7 @@ struct GlobalSearchView: View {
             mediaRepository: dependencies.mediaRepository,
             eventsRepository: dependencies.eventsRepository
         ))
+        _libraryViewModel = State(initialValue: LibraryViewModel(contentRepository: dependencies.contentRepository))
     }
 
     private var queryBinding: Binding<String> {
@@ -60,6 +63,7 @@ struct GlobalSearchView: View {
         .onAppear {
             isSearchFieldFocused = true
         }
+        .task { await libraryViewModel.loadFavorites() }
     }
 
     // MARK: - Search field
@@ -72,7 +76,7 @@ struct GlobalSearchView: View {
                 .accessibilityHidden(true)
 
             TextField(
-                "Search Quran, library, media, and events",
+                "Search Quran, hadith, library, media, and events",
                 text: queryBinding
             )
             .focused($isSearchFieldFocused)
@@ -208,7 +212,7 @@ struct GlobalSearchView: View {
                         .font(DIFont.heading)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.center)
-                    Text("Find ayahs, articles, books, lectures, and events. You can search in English, Urdu, or Arabic.")
+                    Text("Find ayahs, tafsir, hadith, articles, the text of the books, lectures, and events. You can search in English, Urdu, or Arabic, with or without vowel marks.")
                         .font(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.center)
@@ -306,6 +310,7 @@ struct GlobalSearchView: View {
                         groupHeader(group)
                         ForEach(Array(group.results.enumerated()), id: \.element.id) { rowIndex, result in
                             SearchResultLink(result: result, dependencies: dependencies, appState: appState,
+                                             libraryViewModel: libraryViewModel,
                                              close: { dismiss() }) {
                                 SearchResultRow(
                                     result: result,

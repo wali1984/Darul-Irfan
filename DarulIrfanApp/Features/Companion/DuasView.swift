@@ -125,6 +125,7 @@ private struct DuaGroupHeader: View {
 
 private struct FeaturedDuaCard: View {
     let dua: Dua
+    @Environment(\.locale) private var locale
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -146,7 +147,7 @@ private struct FeaturedDuaCard: View {
                     .padding(.vertical, DISpacing.xs)
                     .background(Capsule().fill(Color.white.opacity(0.16)))
 
-                Text(verbatim: dua.title)
+                Text(verbatim: dua.displayTitle(urdu: DIBrand.readsUrdu(locale)))
                     .font(DIFont.subheading)
                     .foregroundStyle(.white)
 
@@ -181,11 +182,12 @@ private struct FeaturedDuaCard: View {
 
 private struct DuaCard: View {
     let dua: Dua
+    @Environment(\.locale) private var locale
 
     var body: some View {
         DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text(verbatim: dua.title)
+                Text(verbatim: dua.displayTitle(urdu: DIBrand.readsUrdu(locale)))
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
 

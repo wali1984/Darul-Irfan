@@ -10,17 +10,19 @@ struct SearchResultRow: View {
     let reference: String
 
     /// Urdu/Arabic content blocks lay out right-to-left; row chrome (the
-    /// domain crest) stays in the surrounding layout direction.
+    /// domain crest) stays in the surrounding layout direction. Decided from
+    /// the text shown, not the row's language: a Qur'an hit is filed as
+    /// Arabic, but its snippet may be the English translation.
     private var isRightToLeftContent: Bool {
-        result.language == "ur" || result.language == "ar"
+        ScriptDirection.isRightToLeft(result.snippet ?? result.title, fallbackLanguage: result.language)
     }
 
     private var titleFont: Font {
-        result.language == "ur" ? DIFont.urduBody() : .headline
+        ScriptDirection.isRightToLeft(result.title, fallbackLanguage: result.language) ? DIFont.urduBody() : .headline
     }
 
     private var snippetFont: Font {
-        result.language == "ur" ? DIFont.urduBody(scale: 0.85) : .subheadline
+        isRightToLeftContent ? DIFont.urduBody(scale: 0.85) : .subheadline
     }
 
     var body: some View {

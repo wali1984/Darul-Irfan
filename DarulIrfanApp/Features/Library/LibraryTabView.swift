@@ -159,7 +159,7 @@ struct LibraryTabView: View {
         .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
     }
 
-    private func heroStat(icon: String, value: String, label: String) -> some View {
+    private func heroStat(icon: String, value: String, label: LocalizedStringKey) -> some View {
         HStack(spacing: DISpacing.xs) {
             Image(systemName: icon).font(.caption2)
             Text(value).font(.subheadline.weight(.bold).monospacedDigit())

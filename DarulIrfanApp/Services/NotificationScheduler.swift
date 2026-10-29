@@ -79,6 +79,10 @@ enum PrayerNotificationPlan {
     ///   fire date after `now`: one at-time notification.
     /// - A pre-reminder preference other than `.off` adds a second
     ///   notification N minutes earlier (when that instant is also after `now`).
+    /// - An iqamah gap adds a heads-up before the iqamah whatever the azan
+    ///   alert is set to, as long as that heads-up is still ahead: a
+    ///   reschedule between the azan and the iqamah (any time the app comes
+    ///   to the foreground) must not drop it.
     /// - Candidates are sorted chronologically and capped at `limit - 1`, then
     ///   one trailing "Open Darul Irfan to keep prayer alerts fresh" reminder
     ///   is appended after the last planned notification, keeping the total
@@ -99,45 +103,45 @@ enum PrayerNotificationPlan {
             let scheduleDayDate = calendar.date(from: schedule.date)
 
             for prayer in Prayer.allCases {
-                let style = preferences.style(for: prayer)
-                guard style != .off else { continue }
-                guard let fireDate = schedule.time(for: prayer), fireDate > now else { continue }
-
+                guard let fireDate = schedule.time(for: prayer) else { continue }
                 let dayKey = DayKey.make(from: scheduleDayDate ?? fireDate, timeZone: timeZone)
+                let style = preferences.style(for: prayer)
 
-                candidates.append(
-                    PlannedNotification(
-                        identifier: "\(prayerIdentifierPrefix)\(dayKey)|\(prayer.rawValue)",
-                        title: title(for: prayer),
-                        body: body(for: prayer),
-                        soundKind: soundKind(for: style),
-                        fireDate: fireDate,
-                        dateComponents: triggerComponents(for: fireDate, timeZone: timeZone)
-                    )
-                )
-
-                let preReminder = preferences.preReminder(for: prayer)
-                if preReminder != .off {
-                    let minutes = preReminder.rawValue
-                    let preFireDate = fireDate.addingTimeInterval(TimeInterval(-minutes * 60))
-                    if preFireDate > now {
-                        candidates.append(
-                            PlannedNotification(
-                                identifier: "\(preReminderIdentifierPrefix)\(dayKey)|\(prayer.rawValue)",
-                                title: String(localized: "Prayer reminder"),
-                                body: preReminderBody(for: prayer, minutes: minutes),
-                                soundKind: style == .silent ? .silent : .defaultSound,
-                                fireDate: preFireDate,
-                                dateComponents: triggerComponents(for: preFireDate, timeZone: timeZone)
-                            )
+                if style != .off, fireDate > now {
+                    candidates.append(
+                        PlannedNotification(
+                            identifier: "\(prayerIdentifierPrefix)\(dayKey)|\(prayer.rawValue)",
+                            title: title(for: prayer),
+                            body: body(for: prayer),
+                            soundKind: soundKind(for: style),
+                            fireDate: fireDate,
+                            dateComponents: triggerComponents(for: fireDate, timeZone: timeZone)
                         )
+                    )
+
+                    let preReminder = preferences.preReminder(for: prayer)
+                    if preReminder != .off {
+                        let minutes = preReminder.rawValue
+                        let preFireDate = fireDate.addingTimeInterval(TimeInterval(-minutes * 60))
+                        if preFireDate > now {
+                            candidates.append(
+                                PlannedNotification(
+                                    identifier: "\(preReminderIdentifierPrefix)\(dayKey)|\(prayer.rawValue)",
+                                    title: String(localized: "Prayer reminder"),
+                                    body: preReminderBody(for: prayer, minutes: minutes),
+                                    soundKind: style == .silent ? .silent : .defaultSound,
+                                    fireDate: preFireDate,
+                                    dateComponents: triggerComponents(for: preFireDate, timeZone: timeZone)
+                                )
+                            )
+                        }
                     }
                 }
 
                 // A personal iqamah: a heads-up five minutes before the time
                 // the person keeps after the azan (or at it, for short gaps).
                 // Independent of the azan alert style, since someone may keep
-                // the azan silent and still want to be ready for jamaat.
+                // the azan off or silent and still want to be ready for jamaat.
                 let gap = preferences.iqamahGap(for: prayer)
                 if gap > 0, prayer != .sunrise {
                     let lead = gap > 5 ? 5 : 0
@@ -279,6 +283,12 @@ final class NotificationScheduler: NotificationScheduling {
     /// refresh reminder.
     static let pendingRequestLimit = 64
 
+    /// The prayer plan never gets fewer slots than this, however many other
+    /// reminders are pending. Past 64, iOS keeps the soonest-firing requests
+    /// and drops the latest ones, which is better than prayer alerts going
+    /// quiet because zikr and task reminders filled the budget.
+    static let minimumPrayerPlan = 30
+
     init() {}
 
     // MARK: Permission
@@ -318,7 +328,7 @@ final class NotificationScheduler: NotificationScheduling {
             schedules: schedules,
             preferences: preferences,
             now: Date(),
-            limit: max(0, Self.pendingRequestLimit - otherPendingCount)
+            limit: max(Self.minimumPrayerPlan, Self.pendingRequestLimit - otherPendingCount)
         )
         guard !planned.isEmpty else { return }
 
@@ -352,38 +362,91 @@ final class NotificationScheduler: NotificationScheduling {
         }
     }
 
-    // MARK: One-off reminders (zikr sessions, events)
+    // MARK: Reminders (zikr sessions, events, My Day tasks)
 
     func scheduleReminder(id: String, title: String, body: String, at date: Date) async {
         guard date > Date() else { return }
+        let center = UNUserNotificationCenter.current()
+        let base = Self.reminderIdentifier(id)
+        let pending = await center.pendingNotificationRequests()
+        // A recurring set for this id already holds this reminder; a one-off
+        // beside it would arrive twice.
+        guard !pending.contains(where: { $0.identifier.hasPrefix(base + "|") }) else { return }
 
+        let request = UNNotificationRequest(
+            identifier: base,
+            content: Self.reminderContent(title: title, body: body),
+            trigger: Self.reminderTrigger(at: date)
+        )
+        try? await center.add(request)
+    }
+
+    func scheduleReminders(id: String, title: String, body: String, at dates: [Date]) async {
+        let center = UNUserNotificationCenter.current()
+        let base = Self.reminderIdentifier(id)
+        let pending = await center.pendingNotificationRequests()
+        let replaced = pending.map(\.identifier).filter { Self.belongs($0, to: base) }
+        if !replaced.isEmpty {
+            center.removePendingNotificationRequests(withIdentifiers: replaced)
+        }
+        let now = Date()
+        for date in Set(dates).sorted() where date > now {
+            let request = UNNotificationRequest(
+                identifier: "\(base)|\(Int(date.timeIntervalSince1970))",
+                content: Self.reminderContent(title: title, body: body),
+                trigger: Self.reminderTrigger(at: date)
+            )
+            // A single failed add should not drop the rest of the set.
+            try? await center.add(request)
+        }
+    }
+
+    func cancelReminder(id: String) async {
+        let center = UNUserNotificationCenter.current()
+        let base = Self.reminderIdentifier(id)
+        let pending = await center.pendingNotificationRequests()
+        let identifiers = pending.map(\.identifier).filter { Self.belongs($0, to: base) }
+        center.removePendingNotificationRequests(withIdentifiers: identifiers + [base])
+    }
+
+    func notificationsAllowed() async -> Bool {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        switch settings.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// "reminder|<id>" for a one-off, "reminder|<id>|<epoch seconds>" for
+    /// each reminder of a recurring set.
+    private static func reminderIdentifier(_ id: String) -> String {
+        "reminder|\(id)"
+    }
+
+    private static func belongs(_ identifier: String, to base: String) -> Bool {
+        identifier == base || identifier.hasPrefix(base + "|")
+    }
+
+    private static func reminderContent(title: String, body: String) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
-
-        // Calendar triggers carry minute precision, so anything due within
-        // the minute (the "send a test reminder" check) would land in the
-        // past and never fire; those use an interval instead.
-        let interval = date.timeIntervalSinceNow
-        let trigger: UNNotificationTrigger
-        if interval < 60 {
-            trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, interval), repeats: false)
-        } else {
-            let components = PrayerNotificationPlan.triggerComponents(for: date, timeZone: .current)
-            trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        }
-        let request = UNNotificationRequest(
-            identifier: "reminder|\(id)",
-            content: content,
-            trigger: trigger
-        )
-        try? await UNUserNotificationCenter.current().add(request)
+        return content
     }
 
-    func cancelReminder(id: String) async {
-        UNUserNotificationCenter.current()
-            .removePendingNotificationRequests(withIdentifiers: ["reminder|\(id)"])
+    /// Calendar triggers carry minute precision, so anything due within the
+    /// minute (the "send a test reminder" check) would land in the past and
+    /// never fire; those use an interval instead.
+    private static func reminderTrigger(at date: Date) -> UNNotificationTrigger {
+        let interval = date.timeIntervalSinceNow
+        if interval < 60 {
+            return UNTimeIntervalNotificationTrigger(timeInterval: max(1, interval), repeats: false)
+        }
+        let components = PrayerNotificationPlan.triggerComponents(for: date, timeZone: .current)
+        return UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
     }
 
     // MARK: Diagnostics

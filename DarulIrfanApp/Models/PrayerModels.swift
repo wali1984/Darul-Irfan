@@ -333,6 +333,12 @@ enum PrayerCompletion: String, Codable, Sendable, CaseIterable {
     case jamaat
     /// Missed, to be made up (qaza).
     case qaza
+
+    /// Prayed, alone or in congregation: what "prayers today", the streak,
+    /// the widgets and the Watch all count. A prayer marked qaza was missed.
+    var countsAsPrayed: Bool {
+        self == .prayed || self == .jamaat
+    }
 }
 
 /// One prayer's tracker entry for one day. Stored locally only.

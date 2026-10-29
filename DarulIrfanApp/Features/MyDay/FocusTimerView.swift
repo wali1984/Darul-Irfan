@@ -1,4 +1,57 @@
+import Observation
 import SwiftUI
+
+/// The running focus session, kept outside the screen. It used to live in
+/// the screen's own state, so leaving the screen dropped a running session
+/// while its end alert stayed scheduled, with no way left to cancel it.
+/// Saved, so it also survives the app being closed.
+@Observable
+@MainActor
+final class FocusSession {
+    static let shared = FocusSession()
+
+    private(set) var endsAt: Date?
+    private(set) var pausedRemaining: TimeInterval?
+
+    private enum Keys {
+        static let endsAt = "focus.endsAt"
+        static let pausedRemaining = "focus.pausedRemaining"
+    }
+
+    private init() {
+        let defaults = UserDefaults.standard
+        // A session that ended while the app was away is simply over.
+        if let end = defaults.object(forKey: Keys.endsAt) as? Date, end > Date() {
+            endsAt = end
+        }
+        pausedRemaining = defaults.object(forKey: Keys.pausedRemaining) as? Double
+    }
+
+    func start(endingAt end: Date) {
+        endsAt = end
+        pausedRemaining = nil
+        save()
+    }
+
+    func pause() {
+        guard let endsAt else { return }
+        pausedRemaining = max(0, endsAt.timeIntervalSinceNow)
+        self.endsAt = nil
+        save()
+    }
+
+    func clear() {
+        endsAt = nil
+        pausedRemaining = nil
+        save()
+    }
+
+    private func save() {
+        let defaults = UserDefaults.standard
+        defaults.set(endsAt, forKey: Keys.endsAt)
+        defaults.set(pausedRemaining, forKey: Keys.pausedRemaining)
+    }
+}
 
 /// A focus session for study, reading or work, which knows the prayer
 /// times: before starting it says whether the next prayer falls inside the
@@ -9,9 +62,11 @@ struct FocusTimerView: View {
     let appState: AppState
 
     @State private var minutes = 25
-    @State private var endsAt: Date?
-    @State private var pausedRemaining: TimeInterval?
+    @State private var session = FocusSession.shared
     @State private var stopsAtPrayer = true
+
+    private var endsAt: Date? { session.endsAt }
+    private var pausedRemaining: TimeInterval? { session.pausedRemaining }
 
     private static let choices = [10, 15, 25, 45, 60, 90]
     private static let reminderID = "focus-session"
@@ -134,8 +189,7 @@ struct FocusTimerView: View {
         if stopsAtPrayer, let prayer = prayerInsideSession, prayer.time < end {
             end = prayer.time
         }
-        endsAt = end
-        pausedRemaining = nil
+        session.start(endingAt: end)
         // A notification marks the end even if the phone is locked or the
         // app is closed.
         let notifications = dependencies.notifications
@@ -150,21 +204,18 @@ struct FocusTimerView: View {
     }
 
     private func pause() {
-        guard let endsAt else { return }
-        pausedRemaining = max(0, endsAt.timeIntervalSinceNow)
-        self.endsAt = nil
+        guard endsAt != nil else { return }
+        session.pause()
         cancelReminder()
     }
 
     private func reset() {
-        endsAt = nil
-        pausedRemaining = nil
+        session.clear()
         cancelReminder()
     }
 
     private func finish() {
-        endsAt = nil
-        pausedRemaining = nil
+        session.clear()
         DIHaptics.success()
     }
 

@@ -8,11 +8,25 @@ import SwiftUI
 /// tabs, Explore vanished from the bar and ended up inside a More within our
 /// own More. Quran and Hadith are therefore paired under Read as equals rather
 /// than given a tab each; see `ReadTabView`.
+@MainActor
 struct RootView: View {
-    private enum AppTab: Hashable { case today, read, zikr, explore, more }
+    private enum AppTab: String, Hashable { case today, read, zikr, explore, more }
     let dependencies: AppDependencies
     let appState: AppState
-    @State private var selectedTab: AppTab = .today
+    /// Scene storage, not `@State`: changing the language rebuilds this view
+    /// with a new identity (`.id(language)` in `ReadyRootView`), and the tab
+    /// the person was on must survive that.
+    @SceneStorage("root.selectedTab") private var selectedTab: AppTab = .today
+    /// Whether the Read tab has been built: from then on it hears the older
+    /// notifications itself.
+    @State private var readTabShown = false
+    /// Changed to bring the Zikr tab back to its own screen, from wherever it
+    /// had been taken, when a notification or a link asks for it.
+    @State private var zikrStack = UUID()
+    /// A Halqah a notification opened, shown over the Halqah tab.
+    @State private var linkedGroup: LinkedGroup?
+
+    private var router: DeepLinkRouter { .shared }
 
     var body: some View {
         if appState.settings.hasCompletedOnboarding {
@@ -35,12 +49,14 @@ struct RootView: View {
             // knowledge, two equally weighted destinations, neither nested
             // inside the other.
             ReadTabView(dependencies: dependencies, appState: appState)
+                .onAppear { readTabShown = true }
                 .tabItem { Label("Read", systemImage: "books.vertical") }
                 .tag(AppTab.read)
 
             NavigationStack {
                 ZikrHomeView(dependencies: dependencies, appState: appState)
             }
+            .id(zikrStack)
             .tabItem { Label("Zikr", systemImage: "sparkles") }
             .tag(AppTab.zikr)
 
@@ -63,31 +79,71 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: dependencies.audioPlayer.nowPlaying)
+        // Notifications, widgets and links go through DeepLinkRouter, which
+        // keeps a request made during the splash or onboarding for this.
+        .onAppear(perform: followRouter)
+        .onChange(of: router.requestCount) { _, _ in followRouter() }
+        // Screens that still ask for a place by notification (Today's
+        // buttons) become requests like any other.
         .onReceive(NotificationCenter.default.publisher(for: .didReceiveAppDeepLink)) { notification in
             guard let path = notification.object as? String else { return }
-            selectTab(forDeepLinkPath: path)
+            openFromScreen(AppRoute(path: path))
         }
-        .onOpenURL { url in
-            let path = ((url.host ?? "") + url.path)
-            selectTab(forDeepLinkPath: path)
-            // Re-broadcast so the Read tab can pick the right reader. The
-            // AppDelegate route already posts this; a URL opened directly into
-            // a running scene does not.
-            NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: path)
+        .onReceive(NotificationCenter.default.publisher(for: .openQuranAyah)) { notification in
+            guard let link = notification.object as? QuranAyahLink else { return }
+            openFromScreen(.quranAyah(surah: link.surah, ayah: link.ayah))
+        }
+        .onOpenURL { url in router.open(url: url) }
+        .sheet(item: $linkedGroup) { group in
+            NavigationStack {
+                GroupLinkView(groupID: group.id, dependencies: dependencies)
+            }
         }
     }
 
-    /// Both readers are addressable directly: `…/hadith` opens Hadith without
-    /// travelling through the Quran, and vice versa. `ReadTabView` picks the
-    /// reader from the same path.
-    private func selectTab(forDeepLinkPath path: String) {
-        let lowered = path.lowercased()
-        if lowered.contains("live") || lowered.contains("zikr") { selectedTab = .zikr }
-        else if lowered.contains("group") { selectedTab = .more }
-        else if lowered.contains("feed") || lowered.contains("event") { selectedTab = .explore }
-        else if lowered.contains("today") || lowered.contains("prayer") { selectedTab = .today }
-        else if lowered.contains("quran") || lowered.contains("surah") || lowered.contains("hadith") {
+    /// A request one of the app's own screens posted. A Read tab that exists
+    /// heard the same notification itself, so only the tab bar moves; one not
+    /// built yet takes the request from the router when it appears. (Once no
+    /// screen posts these notifications, this and the observers above go.)
+    private func openFromScreen(_ route: AppRoute?) {
+        guard let route else { return }
+        router.open(route)
+        if readTabShown, route.isRead { router.clear(route) }
+    }
+
+    /// Goes where the newest request goes, once per request.
+    private func followRouter() {
+        if let route = router.takeTabRequest() { show(route) }
+    }
+
+    /// Selects the tab a route belongs to. The screen it names takes the
+    /// rest: the Read tab the reader and ayah, the Zikr screen the session,
+    /// Discover the section, and so on.
+    private func show(_ route: AppRoute) {
+        switch route {
+        case .today:
+            selectedTab = .today
+            router.clear(route)
+        case .quran, .hadith:
             selectedTab = .read
+        case .zikr, .live:
+            // A fresh Zikr screen, which shows the session asked for.
+            zikrStack = UUID()
+            selectedTab = .zikr
+        case .groups:
+            selectedTab = .more
+            router.clear(route)
+        case .group(let id):
+            selectedTab = .more
+            router.clear(route)
+            linkedGroup = LinkedGroup(id: id)
+        case .updates, .events, .media, .library, .topics:
+            selectedTab = .explore
         }
     }
+}
+
+/// A Halqah opened by a notification.
+private struct LinkedGroup: Identifiable {
+    let id: String
 }

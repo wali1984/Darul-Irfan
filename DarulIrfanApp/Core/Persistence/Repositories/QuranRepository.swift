@@ -344,7 +344,7 @@ struct QuranRepository: QuranRepositoryProtocol {
 
     func upsertTafsir(_ tafsir: [QuranTafsir]) async throws {
         guard !tafsir.isEmpty else { return }
-        let statements: [(sql: String, parameters: [SQLValue])] = tafsir.map { entry in
+        var statements: [(sql: String, parameters: [SQLValue])] = tafsir.map { entry in
             (
                 sql: """
                 INSERT INTO quran_tafsir (edition_id, surah_number, ayah_start,
@@ -365,14 +365,17 @@ struct QuranRepository: QuranRepositoryProtocol {
                 ]
             )
         }
+        // The tafsir's search index is rebuilt from the new rows in the
+        // background.
+        statements.append(SearchIndexState.markStale(.tafsir))
         try await database.connection.executeBatch(statements)
     }
 
     func deleteTafsir(editionID: String) async throws {
-        try await database.connection.execute(
-            "DELETE FROM quran_tafsir WHERE edition_id = ?",
-            [.text(editionID)]
-        )
+        try await database.connection.executeBatch([
+            ("DELETE FROM quran_tafsir WHERE edition_id = ?", [.text(editionID)]),
+            SearchIndexState.markStale(.tafsir),
+        ])
     }
 
     // MARK: - Row mapping

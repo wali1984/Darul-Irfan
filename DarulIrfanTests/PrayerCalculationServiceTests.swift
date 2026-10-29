@@ -312,6 +312,56 @@ final class PrayerCalculationServiceTests: XCTestCase {
         XCTAssertEqual(next.scheduleDate.day, 15)
     }
 
+    // MARK: - Maghrib is never shown early
+
+    /// A sunset at hh:mm:01 through hh:mm:59 shows as the next minute; one
+    /// on the whole minute stays.
+    func testMaghribRoundsUpToTheNextWholeMinute() {
+        let minute = TestDates.make(year: 2026, month: 1, day: 15, hour: 17, minute: 3, timeZone: TestDates.karachi)
+        let next = minute.addingTimeInterval(60)
+
+        XCTAssertEqual(PrayerCalculationService.roundedUpToMinute(minute), minute)
+        for second in 1...59 {
+            XCTAssertEqual(
+                PrayerCalculationService.roundedUpToMinute(minute.addingTimeInterval(TimeInterval(second))), next,
+                "17:03:\(second) shows as 17:04"
+            )
+        }
+        // Parts of a second are dropped first, as the library drops them.
+        XCTAssertEqual(PrayerCalculationService.roundedUpToMinute(minute.addingTimeInterval(0.4)), minute)
+        XCTAssertEqual(PrayerCalculationService.roundedUpToMinute(minute.addingTimeInterval(59.9)), next)
+    }
+
+    /// Over a whole year, Maghrib is a whole minute, never before the moment
+    /// it begins and less than a minute after it, including on the days the
+    /// nearest minute would have shown it early.
+    func testMaghribIsNeverShownBeforeItBegins() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TestDates.utc
+        let preferences = karachiPreferences()
+        var earlyUnderNearest = 0
+
+        for place in [TestPlaces.karachi, TestPlaces.newYork] {
+            for dayOffset in 0..<366 {
+                let day = try XCTUnwrap(calendar.date(byAdding: .day, value: dayOffset, to: TestDates.make(year: 2026, month: 1, day: 1, timeZone: TestDates.utc)))
+                let date = calendar.dateComponents([.year, .month, .day], from: day)
+                let schedule = try XCTUnwrap(service.schedule(for: date, at: place, preferences: preferences))
+                let shown = try XCTUnwrap(schedule.time(for: .maghrib))
+                let begins = try XCTUnwrap(service.exactMaghrib(for: date, at: place, preferences: preferences))
+
+                let late = shown.timeIntervalSince(begins)
+                XCTAssertGreaterThanOrEqual(late, 0, "\(place.name) \(date): Maghrib shown before it begins")
+                XCTAssertLessThan(late, 60, "\(place.name) \(date)")
+                XCTAssertEqual(shown.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 60), 0, "a whole minute")
+
+                let second = Int(begins.timeIntervalSinceReferenceDate.rounded(.down)) % 60
+                if (1...29).contains(second) { earlyUnderNearest += 1 }
+            }
+        }
+        // The sample does contain the days the old rounding got wrong.
+        XCTAssertGreaterThan(earlyUnderNearest, 0)
+    }
+
     /// Sunrise is never returned as a "next prayer" — only obligatory prayers.
     func testNextPrayerSkipsSunrise() throws {
         let preferences = karachiPreferences()

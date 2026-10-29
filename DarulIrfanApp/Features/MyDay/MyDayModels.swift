@@ -135,3 +135,59 @@ struct MyDayDocument: Codable, Sendable, Equatable {
     /// Fasts by day key ("yyyy-MM-dd").
     var fasts: [String: FastKind] = [:]
 }
+
+// MARK: - Tolerant decoding
+
+// The whole document is one file that every change rewrites, so a single
+// entry this build cannot read (damaged, or written by a newer build with a
+// field it does not know) must cost that entry at most, never everything:
+// missing fields take their defaults, and an unreadable task, note or fast is
+// skipped.
+
+extension MyDayDocument {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = (try? container.decodeIfPresent(Int.self, forKey: .version)) ?? 1
+        tasks = ((try? container.decodeIfPresent([Lenient<DayTask>].self, forKey: .tasks)) ?? [])
+            .compactMap(\.value)
+        notes = ((try? container.decodeIfPresent([Lenient<DayNote>].self, forKey: .notes)) ?? [])
+            .compactMap(\.value)
+        let storedFasts = (try? container.decodeIfPresent([String: Lenient<FastKind>].self, forKey: .fasts)) ?? [:]
+        fasts = storedFasts.compactMapValues(\.value)
+    }
+}
+
+extension DayTask {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = (try? container.decodeIfPresent(UUID.self, forKey: .id)) ?? UUID()
+        title = try container.decode(String.self, forKey: .title)
+        startDay = try container.decode(Date.self, forKey: .startDay)
+        timing = (try? container.decodeIfPresent(DayTaskTiming.self, forKey: .timing)) ?? .anytime
+        repeatRule = (try? container.decodeIfPresent(DayTaskRepeat.self, forKey: .repeatRule)) ?? .never
+        remind = (try? container.decodeIfPresent(Bool.self, forKey: .remind)) ?? false
+        note = try? container.decodeIfPresent(String.self, forKey: .note)
+        completedDays = (try? container.decodeIfPresent(Set<String>.self, forKey: .completedDays)) ?? []
+        createdAt = (try? container.decodeIfPresent(Date.self, forKey: .createdAt)) ?? startDay
+    }
+}
+
+extension DayNote {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = (try? container.decodeIfPresent(UUID.self, forKey: .id)) ?? UUID()
+        text = try container.decode(String.self, forKey: .text)
+        reference = try? container.decodeIfPresent(NoteReference.self, forKey: .reference)
+        createdAt = (try? container.decodeIfPresent(Date.self, forKey: .createdAt)) ?? Date()
+        updatedAt = (try? container.decodeIfPresent(Date.self, forKey: .updatedAt)) ?? createdAt
+    }
+}
+
+/// Decodes a value or nothing, so one bad element does not fail its array.
+private struct Lenient<Value: Decodable>: Decodable {
+    let value: Value?
+
+    init(from decoder: Decoder) throws {
+        value = try? Value(from: decoder)
+    }
+}

@@ -4,9 +4,10 @@ import SwiftUI
 /// language, whatever the reader is showing under the ayat at the time.
 ///
 /// Where a work has no verse-by-verse text for this ayah in the chosen
-/// language (Asrar-ut-Tanzil in Urdu is kept as printed pages), the printed
+/// language (Asrar-at-Tanzil in Urdu is kept as printed pages), the printed
 /// volume opens where the surah begins. The last work and language chosen are
-/// remembered, so a reader who studies one tafsir lands on it each time.
+/// remembered, so a reader who studies one tafsir lands on it each time;
+/// until one is chosen, the sheet opens in the language being read.
 @MainActor
 struct AyahTafsirSheet: View {
     let ayah: QuranAyah
@@ -15,13 +16,32 @@ struct AyahTafsirSheet: View {
     let fontScale: Double
 
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("ayahTafsir.work") private var workRaw = QuranContentMode.akramTafaseer.rawValue
-    @AppStorage("ayahTafsir.language") private var language = "ur"
+    /// Empty until the reader chooses; then the choice is kept.
+    @AppStorage("ayahTafsir.work") private var storedWork = ""
+    @AppStorage("ayahTafsir.language") private var storedLanguage = ""
+    @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
 
     private static let works: [QuranContentMode] = [.akramTafaseer, .asrarTanzil]
 
+    /// The language chosen here, or the one the reader is reading in.
+    private var language: String {
+        storedLanguage.isEmpty ? viewModel.readingLanguage : storedLanguage
+    }
+
+    /// The work chosen here; at first the one with verse-by-verse text in
+    /// the reader's language (Akram-ut-Tafaseer is Urdu, Asrar-at-Tanzil's
+    /// per-ayah commentary English).
     private var work: QuranContentMode {
-        QuranContentMode(rawValue: workRaw).flatMap { $0.isTafsir ? $0 : nil } ?? .akramTafaseer
+        if let chosen = QuranContentMode(rawValue: storedWork), chosen.isTafsir { return chosen }
+        return language == "en" ? .asrarTanzil : .akramTafaseer
+    }
+
+    private var workBinding: Binding<String> {
+        Binding(get: { work.rawValue }, set: { storedWork = $0 })
+    }
+
+    private var languageBinding: Binding<String> {
+        Binding(get: { language }, set: { storedLanguage = $0 })
     }
 
     private func entries(language: String) -> [QuranTafsir] {
@@ -41,13 +61,13 @@ struct AyahTafsirSheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                Picker("Tafsir", selection: $workRaw) {
+                Picker("Tafsir", selection: workBinding) {
                     ForEach(Self.works) { mode in
                         Text(LocalizedStringKey(mode.shortTitle)).tag(mode.rawValue)
                     }
                 }
                 .pickerStyle(.segmented)
-                Picker("Language", selection: $language) {
+                Picker("Language", selection: languageBinding) {
                     Text(verbatim: "اردو").tag("ur")
                     Text(verbatim: "English").tag("en")
                 }
@@ -91,10 +111,10 @@ struct AyahTafsirSheet: View {
                     .foregroundStyle(DIColor.textMuted)
             }
             if language == "ur" {
-                FormattedBookPage(page: BookPageFormatter.format(entry.text), scale: fontScale)
+                FormattedBookPage(page: viewModel.formattedTafsir(entry), scale: fontScale)
             } else {
                 Text(verbatim: entry.text)
-                    .font(.system(size: 17 * fontScale))
+                    .font(.system(size: bodyBaseSize * fontScale))
                     .lineSpacing(CGFloat(4 * fontScale))
                     .foregroundStyle(DIColor.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -106,22 +126,51 @@ struct AyahTafsirSheet: View {
 
     @ViewBuilder
     private var emptyNote: some View {
+        let otherWork: QuranContentMode = work == .akramTafaseer ? .asrarTanzil : .akramTafaseer
         DICard(background: DIColor.sandstone) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text(volumes.isEmpty
-                     ? "This tafsir has no commentary on this ayah in this language."
-                     : "This tafsir has no verse-by-verse commentary on this ayah in this language. The printed volume is below, opened where the surah begins.")
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.textPrimary)
+                Group {
+                    if work == .akramTafaseer && ayah.surahNumber >= 92 {
+                        Text("Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet.")
+                    } else if volumes.isEmpty {
+                        Text("This tafsir has no commentary on this ayah in this language.")
+                    } else {
+                        Text("This tafsir has no verse-by-verse commentary on this ayah in this language. The printed volume is below, opened where the surah begins.")
+                    }
+                }
+                .font(.subheadline)
+                .foregroundStyle(DIColor.textPrimary)
                 if !entries(language: otherLanguage).isEmpty {
                     Button {
-                        language = otherLanguage
+                        storedLanguage = otherLanguage
                     } label: {
                         Label(otherLanguage == "ur" ? "Read it in Urdu" : "Read it in English", systemImage: "character.bubble")
                     }
                     .buttonStyle(.bordered)
                 }
+                if hasEntries(of: otherWork) || !TafsirVolumeProvider.shared.volumes(
+                    surah: ayah.surahNumber, editionPrefix: otherWork.tafsirEditionPrefix ?? "", language: language
+                ).isEmpty {
+                    Button {
+                        storedWork = otherWork.rawValue
+                    } label: {
+                        Label {
+                            Text("Read \(otherWork.localizedTitle)")
+                        } icon: {
+                            Image(systemName: "text.book.closed")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                }
             }
+        }
+    }
+
+    /// Whether another work has commentary on this ayah in this language.
+    private func hasEntries(of other: QuranContentMode) -> Bool {
+        guard let prefix = other.tafsirEditionPrefix else { return false }
+        return viewModel.allTafsir(for: ayah.ayahNumber).contains {
+            $0.editionID.hasPrefix(prefix) && viewModel.edition(id: $0.editionID)?.language == language
         }
     }
 
@@ -134,7 +183,7 @@ struct AyahTafsirSheet: View {
                     .foregroundStyle(DIColor.textMuted)
                 ForEach(volumes) { volume in
                     NavigationLink {
-                        TafsirVolumeDestination(volume: volume, dependencies: dependencies)
+                        TafsirVolumeDestination(volume: volume, dependencies: dependencies, fontScale: fontScale)
                     } label: {
                         Label {
                             Text("Open at page \(volume.page)")

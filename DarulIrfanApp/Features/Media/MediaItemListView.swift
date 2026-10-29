@@ -9,6 +9,15 @@ enum MediaListFilter: Equatable {
     case category(MediaCategory)
     case year(category: MediaCategory?, year: Int)
     case month(category: MediaCategory?, year: Int, month: Int)
+
+    /// A Video Lectures list opens each lecture's video first, also for an
+    /// audio lecture listed there for its video.
+    var opensVideosFirst: Bool {
+        switch self {
+        case .category(let category): return category == .videoLectures
+        case .year(let category, _), .month(let category, _, _): return category == .videoLectures
+        }
+    }
 }
 
 // MARK: - List view model
@@ -60,8 +69,10 @@ final class MediaListViewModel {
             let fetched: [MediaItem]
             switch filter {
             case .category(let category):
+                // The whole category: at 500 the 300 oldest of the 800 audio
+                // lectures (2015-2017) were never listed.
                 fetched = try await mediaRepository.items(
-                    category: category, year: nil, month: nil, limit: 500
+                    category: category, year: nil, month: nil, limit: 10_000
                 )
             case .year(let category, let year):
                 fetched = try await mediaRepository.items(
@@ -232,6 +243,7 @@ struct MediaItemListView: View {
                     isDownloading: viewModel.isDownloading(item),
                     downloadProgress: viewModel.downloadProgress(for: item),
                     canPlay: viewModel.canPlay(item),
+                    prefersVideo: viewModel.filter.opensVideosFirst,
                     onPlay: { viewModel.play(item) },
                     onDownload: { viewModel.download(item) }
                 )
@@ -264,6 +276,9 @@ struct MediaItemRow: View {
     let isDownloading: Bool
     let downloadProgress: Double?
     let canPlay: Bool
+    /// The row's main action opens the video when there is one (Video
+    /// Lectures); the audio stays in the menu.
+    var prefersVideo = false
     let onPlay: () -> Void
     let onDownload: () -> Void
     @State private var presentedVideo: MediaPresentedVideo?
@@ -298,7 +313,9 @@ struct MediaItemRow: View {
 
     @ViewBuilder
     private var leadingAction: some View {
-        if isWMAOnly {
+        if prefersVideo, let youtubeVideoID {
+            videoButton(youtubeVideoID)
+        } else if isWMAOnly {
             mutedMedallion("exclamationmark")
         } else if canPlay {
             Button {
@@ -310,16 +327,20 @@ struct MediaItemRow: View {
             .buttonStyle(DIPressableStyle())
             .accessibilityLabel(Text("Play \(item.title)"))
         } else if let youtubeVideoID {
-            Button {
-                presentedVideo = MediaPresentedVideo(id: youtubeVideoID, title: item.title)
-            } label: {
-                crimsonMedallion("play.rectangle.fill")
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Play \(item.title) in Darul Irfan"))
+            videoButton(youtubeVideoID)
         } else {
             mutedMedallion("waveform")
         }
+    }
+
+    private func videoButton(_ videoID: String) -> some View {
+        Button {
+            presentedVideo = MediaPresentedVideo(id: videoID, title: item.title)
+        } label: {
+            crimsonMedallion("play.rectangle.fill")
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Play \(item.title) in Darul Irfan"))
     }
 
     /// The category-tinted gradient disc used for the primary row affordance.
@@ -393,7 +414,7 @@ struct MediaItemRow: View {
         } else {
             HStack(spacing: DISpacing.xs) {
                 if isDownloaded {
-                    DIPillBadge(text: "Offline", color: MediaStyle.accent(item.category))
+                    DIPillBadge(text: String(localized: "Offline"), color: MediaStyle.accent(item.category))
                 }
                 if item.mediaType == .youtube {
                     Text("Plays in Darul Irfan")

@@ -13,7 +13,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "تمام ۱۱۴ سورتیں ترجمہ اور تفسیر کے ساتھ"
+            "value": "تمام 114 سورتیں ترجمہ اور تفسیر کے ساتھ"
           }
         }
       }
@@ -302,7 +302,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اکرم التراجم کے مکمل اردو اور انگریزی تراجم حضرت امیر محمد اکرم اعوانؒ کے ہیں اور تنظیم کی اجازت سے ایپ میں شامل کیے گئے ہیں۔"
+            "value": "اکرم التراجم کے مکمل اردو اور انگریزی تراجم حضرت امیر محمد اکرم اعوان رحمۃ اللہ علیہ کے ہیں اور تنظیم کی اجازت سے ایپ میں شامل کیے گئے ہیں۔"
           }
         }
       }
@@ -687,13 +687,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pull down later after the content archive refreshes."
+            "value": "The illustration could not be loaded. Check your connection and try again."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "مواد کا ذخیرہ تازہ ہونے کے بعد دوبارہ نیچے کھینچیں۔"
+            "value": "تصویر لوڈ نہیں ہو سکی۔ اپنا کنکشن دیکھ کر دوبارہ کوشش کریں۔"
           }
         }
       }
@@ -738,13 +738,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Books, articles, and announcements will appear here after the first verified content update."
+            "value": "Books, articles, and announcements appear here once the library is ready. If it stays empty, update the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "پہلی تصدیق شدہ اپ ڈیٹ کے بعد کتابیں، مضامین اور اعلانات یہاں ظاہر ہوں گے۔"
+            "value": "کتب خانہ تیار ہونے پر کتابیں، مضامین اور اعلانات یہاں نظر آئیں گے۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
           }
         }
       }
@@ -755,13 +755,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Items in this section will appear automatically after the next verified content update."
+            "value": "This section has no items in this version of the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اگلی تصدیق شدہ اپ ڈیٹ کے بعد اس حصے کا مواد خود بخود ظاہر ہو گا۔"
+            "value": "ایپ کے اس ورژن میں اس حصے میں کوئی اندراج نہیں۔"
           }
         }
       }
@@ -772,13 +772,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Programs at Dar-ul-Irfan will appear here automatically when they are announced."
+            "value": "No programs are listed right now. New programs are added with app updates."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "دارالعرفان کے پروگراموں کا اعلان ہونے پر وہ خود بخود یہاں ظاہر ہوں گے۔"
+            "value": "اس وقت کوئی پروگرام درج نہیں۔ نئے پروگرام ایپ کی اپ ڈیٹ کے ساتھ شامل کیے جاتے ہیں۔"
           }
         }
       }
@@ -789,13 +789,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Offline text packs arrive automatically through verified content updates."
+            "value": "Updating or reinstalling the app restores the bundled Qur'an text."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "آف لائن قرآنی متن تصدیق شدہ مواد کی اپ ڈیٹس کے ذریعے خود بخود آتا ہے۔"
+            "value": "ایپ اپ ڈیٹ یا دوبارہ انسٹال کرنے سے قرآن کا شامل متن بحال ہو جائے گا۔"
           }
         }
       }
@@ -857,13 +857,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The online zikr schedule could not be loaded. Pull down later to check for a verified update."
+            "value": "The online zikr schedule could not be loaded. Check your connection and pull down to try again."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "آن لائن ذکر کا شیڈول لوڈ نہیں ہو سکا۔ تصدیق شدہ اپ ڈیٹ کے لیے بعد میں نیچے کھینچیں۔"
+            "value": "آن لائن ذکر کا شیڈول لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کے لیے نیچے کھینچیں۔"
           }
         }
       }
@@ -1628,7 +1628,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld چیزیں"
+            "value": "%lld اندراجات"
           }
         }
       }
@@ -2291,7 +2291,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "آج کے تمام اوقات ایک نظر میں، اگلی نماز نمایاں کے ساتھ۔"
+            "value": "آج کے تمام اوقات ایک نظر میں، اگلی نماز کو نمایاں کر کے۔"
           }
         }
       }
@@ -3169,13 +3169,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "By default, Fajr, Dhuhr, Asr, Maghrib, and Isha each use the azan clip, and sunrise stays silent. You can adjust every prayer's alert in Settings."
+            "value": "By default, Fajr, Dhuhr, Asr, Maghrib, and Isha each use the azan clip, and sunrise has no alert. You can adjust every prayer's alert in Settings."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "طے شدہ طور پر فجر، ظہر، عصر، مغرب اور عشاء کے لیے اذان کلپ چلتا ہے جبکہ طلوعِ آفتاب خاموش رہتا ہے۔ ہر نماز کا الرٹ ترتیبات میں بدلا جا سکتا ہے۔"
+            "value": "طے شدہ طور پر فجر، ظہر، عصر، مغرب اور عشاء کے لیے اذان کلپ چلتا ہے جبکہ طلوعِ آفتاب پر کوئی الرٹ نہیں ہوتا۔ ہر نماز کا الرٹ ترتیبات میں بدلا جا سکتا ہے۔"
           }
         }
       }
@@ -3271,7 +3271,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Call Dar ul Irfan"
+            "value": "Call Dar-ul-Irfan"
           }
         },
         "ur": {
@@ -3407,13 +3407,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose a lecture from the Media tab to begin listening."
+            "value": "Choose a lecture in Discover › Media to begin listening."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سماعت شروع کرنے کے لیے میڈیا ٹیب سے کوئی خطاب منتخب کریں۔"
+            "value": "سماعت شروع کرنے کے لیے «دریافت» ٹیب میں «میڈیا» سے کوئی خطاب منتخب کریں۔"
           }
         }
       }
@@ -5232,7 +5232,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "حضرت امیر عبد القدیر اعوان"
+            "value": "حضرت امیر عبدالقدیر اعوان"
           }
         }
       }
@@ -5685,13 +5685,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Items for this year will appear after the next library sync."
+            "value": "No lectures are listed for this year."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اس سال کی چیزیں لائبریری کی اگلی ہم آہنگی کے بعد ظاہر ہوں گی۔"
+            "value": "اس سال کا کوئی خطاب درج نہیں۔"
           }
         }
       }
@@ -5702,13 +5702,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Items will appear here after the next library sync. Pull down to refresh."
+            "value": "Nothing is listed here yet."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "چیزیں لائبریری کی اگلی ہم آہنگی کے بعد یہاں ظاہر ہوں گی۔ تازہ کرنے کے لیے نیچے کھینچیں۔"
+            "value": "یہاں ابھی کچھ درج نہیں۔"
           }
         }
       }
@@ -5940,13 +5940,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lectures and programs will appear here after the first content sync. Pull down to refresh."
+            "value": "Lectures and programs appear here once the app has prepared them. If this stays empty, update the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "خطابات اور پروگرام مواد کی پہلی ہم آہنگی کے بعد یہاں ظاہر ہوں گے۔ تازہ کرنے کے لیے نیچے کھینچیں۔"
+            "value": "ایپ کی تیاری مکمل ہونے پر خطابات اور پروگرام یہاں نظر آئیں گے۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
           }
         }
       }
@@ -8207,7 +8207,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "نماز کی سرگزشت"
+            "value": "نماز کا ریکارڈ"
           }
         }
       }
@@ -8377,7 +8377,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "نماز کے اوقات اور قبلے کی سمت کا حساب مقامی طور پر ہوتا ہے۔ آپ کے کوآرڈینیٹس کبھی کسی سرور کو نہیں بھیجے جاتے، اور مقام کی کوئی سرگزشت نہیں رکھی جاتی — صرف حساب کے لیے استعمال ہونے والا شہر محفوظ ہوتا ہے، جس کے کوآرڈینیٹس شہر کی سطح تک محدود کیے جاتے ہیں۔"
+            "value": "نماز کے اوقات اور قبلے کی سمت کا حساب مقامی طور پر ہوتا ہے۔ آپ کے کوآرڈینیٹس کبھی کسی سرور کو نہیں بھیجے جاتے، اور مقام کا کوئی ریکارڈ نہیں رکھا جاتا — صرف حساب کے لیے استعمال ہونے والا شہر محفوظ ہوتا ہے، جس کے کوآرڈینیٹس شہر کی سطح تک محدود کیے جاتے ہیں۔"
           }
         }
       }
@@ -9346,7 +9346,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سرکاری لائیو اطلاعات حاصل کرنے کے لیے iOS Settings میں نوٹیفیکیشنز کی اجازت دیں۔"
+            "value": "سرکاری براہِ راست اطلاعات حاصل کرنے کے لیے iOS کی ترتیبات میں اطلاعات کی اجازت دیں۔"
           }
         }
       }
@@ -9363,7 +9363,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "گمنام Apple MetricKit تشخیصی معلومات صرف رضامندی کے بعد بھیجی جاتی ہیں۔ ان میں مقام، نشانات، نماز کی تاریخ، نام اور ای میل شامل نہیں ہوتے اور انہیں 30 دن تک رکھا جاتا ہے۔"
+            "value": "گمنام Apple MetricKit تشخیصی معلومات صرف رضامندی کے بعد بھیجی جاتی ہیں۔ ان میں مقام، نشانیاں، نماز کا ریکارڈ، نام اور ای میل شامل نہیں ہوتے اور انہیں 30 دن تک رکھا جاتا ہے۔"
           }
         }
       }
@@ -9431,7 +9431,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سیٹنگز کھولیں"
+            "value": "ترتیبات کھولیں"
           }
         }
       }
@@ -9482,7 +9482,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "فعال کرنے پر ایک بے ترتیب تنصیب شناخت اور Apple پش ٹوکن رجسٹر ہوتے ہیں۔ کوئی اکاؤنٹ، درست مقام، نماز کی تاریخ یا مطالعے کی سرگرمی نہیں بھیجی جاتی۔"
+            "value": "فعال کرنے پر ایک بے ترتیب تنصیب شناخت اور Apple پش ٹوکن رجسٹر ہوتے ہیں۔ کوئی اکاؤنٹ، درست مقام، نماز کا ریکارڈ یا مطالعے کی سرگرمی نہیں بھیجی جاتی۔"
           }
         }
       }
@@ -9646,13 +9646,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Set a location on the Prayer tab and the monthly timetable will appear here."
+            "value": "Set a location on the Today tab and the monthly timetable will appear here."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "نماز ٹیب پر مقام مقرر کریں، ماہانہ نظام الاوقات یہاں ظاہر ہو جائے گا۔"
+            "value": "«آج» ٹیب پر مقام مقرر کریں تو ماہانہ نظام الاوقات یہاں ظاہر ہو جائے گا۔"
           }
         }
       }
@@ -10462,13 +10462,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap the circles on the Prayer tab to record each prayer — gently, at your own pace."
+            "value": "Tap the circles on the Today tab to record each prayer — gently, at your own pace."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "ہر نماز درج کرنے کے لیے نماز ٹیب پر دائروں کو چھوئیں — نرمی سے، اپنی رفتار کے ساتھ۔"
+            "value": "ہر نماز درج کرنے کے لیے «آج» ٹیب پر دائروں کو چھوئیں — نرمی سے، اپنی رفتار کے ساتھ۔"
           }
         }
       }
@@ -11057,13 +11057,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The order was revived in the last century by Shaikh Allah Yar Khan (1904–1984) and afterwards led by Hazrat Ameer Muhammad Akram Awan (RA). It is presently led by Sheikh-e-Silsila Hazrat Ameer Abdul Qadeer Awan (MZA), born 26 March 1973 in Munara, District Chakwal."
+            "value": "The order was revived in the last century by Hazrat Maulana Allah Yar Khan (RA) (1904–1984) and afterwards led by Hazrat Ameer Muhammad Akram Awan (RA). It is presently led by Sheikh-e-Silsila Hazrat Ameer Abdul Qadeer Awan (MZA), born 26 March 1973 in Munara, District Chakwal."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "گزشتہ صدی میں اس سلسلے کا احیاء شیخ اللہ یار خان (1904–1984) کے ہاتھوں ہوا، جس کے بعد حضرت امیر محمد اکرم اعوان (رحمۃ اللہ علیہ) نے قیادت فرمائی۔ اس وقت شیخِ سلسلہ حضرت امیر عبد القدیر اعوان (مدظلہ العالی) قیادت فرما رہے ہیں، جن کی ولادت 26 مارچ 1973 کو منارہ، ضلع چکوال میں ہوئی۔"
+            "value": "گزشتہ صدی میں اس سلسلے کا احیاء حضرت مولانا اللہ یار خان رحمۃ اللہ علیہ (1904–1984) کے ہاتھوں ہوا، جس کے بعد حضرت امیر محمد اکرم اعوان رحمۃ اللہ علیہ نے قیادت فرمائی۔ اس وقت شیخِ سلسلہ حضرت امیر عبدالقدیر اعوان مدظلہ العالی قیادت فرما رہے ہیں، جن کی ولادت 26 مارچ 1973 کو منارہ، ضلع چکوال میں ہوئی۔"
           }
         }
       }
@@ -11896,7 +11896,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "نمازوں کی سرگزشت دیکھیں"
+            "value": "نمازوں کا ریکارڈ دیکھیں"
           }
         }
       }
@@ -12094,13 +12094,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yearly lecture archives will appear here after the library syncs. Pull down to refresh."
+            "value": "The yearly lecture archive appears here once the app has prepared it. If it stays empty, update the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سالانہ خطابات کا آرکائیو لائبریری کی ہم آہنگی کے بعد یہاں ظاہر ہوگا۔ تازہ کرنے کے لیے نیچے کھینچیں۔"
+            "value": "ایپ کی تیاری مکمل ہونے پر سالانہ خطابات کا آرکائیو یہاں نظر آئے گا۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
           }
         }
       }
@@ -12519,13 +12519,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically."
+            "value": "This item is listed in the Darul Irfan archive; its text or document is not in the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "یہ مواد دارالعرفان کے محفوظ ذخیرے میں شامل ہے۔ بعد میں شامل کیا جانے والا تصدیق شدہ متن، تصویر، آڈیو یا دستاویز یہاں خودکار طور پر ظاہر ہوگا۔"
+            "value": "یہ اندراج دارالعرفان کے ذخیرے میں درج ہے؛ اس کا متن یا دستاویز ایپ میں موجود نہیں۔"
           }
         }
       }
@@ -13624,7 +13624,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deleting removes your sign-in and your place in every group. Nothing the silsila published is affected."
+            "value": "Deleting removes your sign-in and your place in every group. Nothing the Silsila published is affected."
           }
         },
         "ur": {
@@ -13692,7 +13692,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Explore themes across the Qur'an, tafseer, books, and bayans."
+            "value": "Explore themes across the Qur'an, tafsir, books, and bayans."
           }
         },
         "ur": {
@@ -13896,13 +13896,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It will arrive with the next content update."
+            "value": "Updating the app restores the bundled collections."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "یہ اگلی مواد کی تجدید کے ساتھ آ جائے گا۔"
+            "value": "ایپ اپ ڈیٹ کرنے سے شامل مجموعے بحال ہو جائیں گے۔"
           }
         }
       }
@@ -13913,13 +13913,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It will be restored automatically after a verified content refresh."
+            "value": "The illustration could not be loaded. Check your connection and try again."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "تصدیق شدہ مواد کی تجدید کے بعد یہ خود بخود بحال ہو جائے گا۔"
+            "value": "تصویر لوڈ نہیں ہو سکی۔ اپنا کنکشن دیکھ کر دوبارہ کوشش کریں۔"
           }
         }
       }
@@ -15545,13 +15545,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The verified native guide will appear after the next content refresh."
+            "value": "Updating the app restores the Method of Zikr."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "تصدیق شدہ رہنمائی اگلی مواد کی تجدید کے بعد ظاہر ہو گی۔"
+            "value": "ایپ اپ ڈیٹ کرنے سے طریقۂ ذکر بحال ہو جائے گا۔"
           }
         }
       }
@@ -15596,13 +15596,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "They will appear here after the next content update."
+            "value": "They appear here once the app has prepared them. If this stays empty, update the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "یہ اگلی مواد کی تجدید کے بعد یہاں نظر آئیں گے۔"
+            "value": "ایپ کی تیاری مکمل ہونے پر یہ یہاں نظر آئیں گے۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
           }
         }
       }
@@ -15868,7 +15868,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verses, tafseer, books & bayans by theme"
+            "value": "Verses, tafsir, books & bayans by theme"
           }
         },
         "ur": {
@@ -16123,7 +16123,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ask the administrator of your region's group - Darul Irfan, United States or Canada - for an invitation code. Each code admits one person to one group and expires after 30 days."
+            "value": "Ask the administrator of your region's group — Darul Irfan, United States or Canada — for an invitation code. Each code admits one person to one group and expires after 30 days."
           }
         },
         "ur": {
@@ -17653,7 +17653,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "News and posts from the silsila"
+            "value": "News and posts from the Silsila"
           }
         },
         "ur": {
@@ -17789,7 +17789,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Notifications are off - prayer alerts will not arrive"
+            "value": "Notifications are off — prayer alerts will not arrive"
           }
         },
         "ur": {
@@ -18418,7 +18418,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Qada (make-up)"
+            "value": "Qaza (make-up)"
           }
         },
         "ur": {
@@ -21699,13 +21699,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uploading..."
+            "value": "Uploading…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اپ لوڈ ہو رہا ہے..."
+            "value": "اپ لوڈ ہو رہا ہے…"
           }
         }
       }
@@ -22804,7 +22804,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add someone by email, or send an invitation code to their phone, as a member, an Admin or - if you may appoint them - an Administrator of this Halqah."
+            "value": "Add someone by email, or send an invitation code to their phone, as a member, an Admin or — if you may appoint them — an Administrator of this Halqah."
           }
         },
         "ur": {
@@ -23348,7 +23348,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Admin: you run your Halqah - posts, zikr, meetings and people - and can make other Admins."
+            "value": "Admin: you run your Halqah — posts, zikr, meetings and people — and can make other Admins."
           }
         },
         "ur": {
@@ -23926,13 +23926,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sending %lld of %lld..."
+            "value": "Sending %lld of %lld…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "%2$lld میں سے %1$lld بھیجی جا رہی ہے..."
+            "value": "%2$lld میں سے %1$lld بھیجی جا رہی ہے…"
           }
         }
       }
@@ -24255,7 +24255,7 @@
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "روزانہ ذکر براہِ راست شروع ہونے کی اطلاع کے لیے، براہِ کرم iOS سیٹنگز میں دارالعرفان کے لیے اطلاعات کی اجازت دیں۔"
+            "value": "روزانہ ذکر براہِ راست شروع ہونے کی اطلاع کے لیے، براہِ کرم iOS کی ترتیبات میں دارالعرفان کے لیے اطلاعات کی اجازت دیں۔"
           }
         }
       }
@@ -24283,7 +24283,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zikr is live in this halqah. Tap to join."
+            "value": "Zikr is live in this Halqah. Tap to join."
           }
         },
         "ur": {
@@ -24385,7 +24385,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Juz (Para)"
+            "value": "Juz (Parah)"
           }
         },
         "ur": {
@@ -24596,6 +24596,2658 @@
           "stringUnit": {
             "state": "translated",
             "value": "تہجد ذکر"
+          }
+        }
+      }
+    },
+    "Preparing the Qur'an…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing the Qur'an…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن تیار کیا جا رہا ہے…"
+          }
+        }
+      }
+    },
+    "Preparing the library…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing the library…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتب خانہ تیار کیا جا رہا ہے…"
+          }
+        }
+      }
+    },
+    "Preparing the bayans…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing the bayans…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بیانات تیار کیے جا رہے ہیں…"
+          }
+        }
+      }
+    },
+    "Preparing the events…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing the events…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تقریبات تیار کی جا رہی ہیں…"
+          }
+        }
+      }
+    },
+    "Preparing the books…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing the books…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتابیں تیار کی جا رہی ہیں…"
+          }
+        }
+      }
+    },
+    "Preparing the hadith collections…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing the hadith collections…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حدیث کے مجموعے تیار کیے جا رہے ہیں…"
+          }
+        }
+      }
+    },
+    "Preparing search…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing search…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تلاش تیار کی جا رہی ہے…"
+          }
+        }
+      }
+    },
+    "This takes a moment after installing or updating the app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This takes a moment after installing or updating the app."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایپ انسٹال یا اپ ڈیٹ کرنے کے بعد اس میں کچھ دیر لگتی ہے۔"
+          }
+        }
+      }
+    },
+    "Tahajjud Zikr begins soon. Join it on Paltalk from Darul Irfan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahajjud Zikr begins soon. Join it on Paltalk from Darul Irfan."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تہجد ذکر جلد شروع ہو رہا ہے۔ دارالعرفان سے پال ٹاک پر اس میں شامل ہوں۔"
+          }
+        }
+      }
+    },
+    "%@ begins soon. Open Darul Irfan to join it live.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ begins soon. Open Darul Irfan to join it live."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ جلد شروع ہو رہا ہے۔ براہِ راست شامل ہونے کے لیے دارالعرفان کھولیں۔"
+          }
+        }
+      }
+    },
+    "Pointing by magnetic north": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pointing by magnetic north"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقناطیسی شمال کے مطابق سمت"
+          }
+        }
+      }
+    },
+    "Magnetic north can differ by several degrees from true north, which the Qibla bearing is measured from. Allow location access while using the app for an exact direction.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magnetic north can differ by several degrees from true north, which the Qibla bearing is measured from. Allow location access while using the app for an exact direction."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقناطیسی شمال، حقیقی شمال سے کئی درجے مختلف ہو سکتا ہے، جبکہ قبلہ کا زاویہ حقیقی شمال سے ناپا جاتا ہے۔ درست سمت کے لیے ایپ استعمال کرتے وقت مقام تک رسائی کی اجازت دیں۔"
+          }
+        }
+      }
+    },
+    "Qibla: %lld° from true north": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qibla: %lld° from true north"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قبلہ: حقیقی شمال سے %lld°"
+          }
+        }
+      }
+    },
+    "Face true north, then turn clockwise by this bearing to face the Kaaba in Makkah. A magnetic compass points to magnetic north, which can be several degrees away from true north.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face true north, then turn clockwise by this bearing to face the Kaaba in Makkah. A magnetic compass points to magnetic north, which can be several degrees away from true north."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حقیقی شمال کی طرف رخ کریں، پھر اس زاویے کے مطابق گھڑی کی سمت میں گھومیں تاکہ آپ کا رخ مکہ مکرمہ میں کعبہ کی طرف ہو جائے۔ مقناطیسی قطب نما مقناطیسی شمال دکھاتا ہے، جو حقیقی شمال سے کئی درجے ہٹ کر ہو سکتا ہے۔"
+          }
+        }
+      }
+    },
+    "We couldn't determine your location. You can allow location access in iOS Settings, or choose a city in the Halqah tab under Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn't determine your location. You can allow location access in iOS Settings, or choose a city in the Halqah tab under Settings."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہم آپ کا مقام معلوم نہیں کر سکے۔ آپ iOS کی ترتیبات میں مقام کی اجازت دے سکتے ہیں، یا حلقہ ٹیب میں ترتیبات سے کوئی شہر منتخب کر سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Prefer a specific city? You can choose one anytime in the Halqah tab under Settings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prefer a specific city? You can choose one anytime in the Halqah tab under Settings."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی خاص شہر کو ترجیح دیتے ہیں؟ حلقہ ٹیب میں ترتیبات سے کبھی بھی منتخب کیا جا سکتا ہے۔"
+          }
+        }
+      }
+    },
+    "Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. The Hijri dates and Islamic days across the app follow this setting.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. The Hijri dates and Islamic days across the app follow this setting."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگر آپ کی مقامی رؤیتِ ہلال حساب شدہ امّ القریٰ کیلنڈر سے مختلف ہو تو زیادہ سے زیادہ دو دن کی ایڈجسٹمنٹ کریں۔ ایپ میں ہجری تاریخیں اور اسلامی ایام اسی ترتیب کے مطابق ہوتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Set your location first, so the task can follow your prayer times.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set your location first, so the task can follow your prayer times."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پہلے اپنا مقام مقرر کریں، تاکہ یہ کام آپ کے اوقاتِ نماز کے مطابق چلے۔"
+          }
+        }
+      }
+    },
+    "What arrived was not the PDF, perhaps a Wi-Fi sign-in page. Please try again on another connection.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What arrived was not the PDF, perhaps a Wi-Fi sign-in page. Please try again on another connection."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جو فائل موصول ہوئی وہ PDF نہیں تھی، غالباً وائی فائی کا سائن اِن صفحہ۔ براہِ کرم کسی دوسرے کنکشن پر دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "The download could not be completed right now (server status %lld). Please try again later.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The download could not be completed right now (server status %lld). Please try again later."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ڈاؤن لوڈ اس وقت مکمل نہیں ہو سکا (سرور اسٹیٹس %lld)۔ براہِ کرم بعد میں دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "Night of ≈ %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Night of ≈ %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شب ≈ %@"
+          }
+        }
+      }
+    },
+    "%lld here now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld here now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ابھی موجود"
+          }
+        }
+      }
+    },
+    "%lld new": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld new"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld نئی"
+          }
+        }
+      }
+    },
+    "Adds a regular zikr time to this Halqah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adds a regular zikr time to this Halqah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حلقے میں ذکر کا ایک باقاعدہ وقت شامل کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "Adds recordings or past zikr to this session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adds recordings or past zikr to this session."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس نشست میں ریکارڈنگز یا گزشتہ ذکر شامل کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "Attendance of each session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attendance of each session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر نشست کی حاضری"
+          }
+        }
+      }
+    },
+    "Drafts waiting: %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafts waiting: %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتظر مسودے: %lld"
+          }
+        }
+      }
+    },
+    "Halqah admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halqah admin"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کا انتظام"
+          }
+        }
+      }
+    },
+    "Live meetings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live meetings"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست میٹنگز"
+          }
+        }
+      }
+    },
+    "Live now: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live now: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی براہِ راست: %@"
+          }
+        }
+      }
+    },
+    "Makes a new Halqah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Makes a new Halqah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نیا حلقہ بناتا ہے۔"
+          }
+        }
+      }
+    },
+    "Manage %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کا انتظام"
+          }
+        }
+      }
+    },
+    "Meetings: %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meetings: %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگز: %lld"
+          }
+        }
+      }
+    },
+    "Members: %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members: %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین: %lld"
+          }
+        }
+      }
+    },
+    "Next meeting: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next meeting: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی میٹنگ: %@"
+          }
+        }
+      }
+    },
+    "Next zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلا ذکر"
+          }
+        }
+      }
+    },
+    "Next zikr: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next zikr: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلا ذکر: %@"
+          }
+        }
+      }
+    },
+    "No meeting planned": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No meeting planned"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی میٹنگ طے نہیں"
+          }
+        }
+      }
+    },
+    "No new requests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No new requests"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی نئی درخواست نہیں"
+          }
+        }
+      }
+    },
+    "No session now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No session now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی کوئی نشست نہیں"
+          }
+        }
+      }
+    },
+    "No zikr times yet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No zikr times yet"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی ذکر کا کوئی وقت مقرر نہیں"
+          }
+        }
+      }
+    },
+    "Opens a new post for this Halqah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens a new post for this Halqah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس حلقے کے لیے نئی پوسٹ کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "Opens everyone who has signed in.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens everyone who has signed in."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سائن اِن کرنے والے سب افراد کی فہرست کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "Opens here when the Halqah goes live.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens here when the Halqah goes live."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقہ براہِ راست ہونے پر یہیں کھلے گا۔"
+          }
+        }
+      }
+    },
+    "Opens past sessions and who attended them.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens past sessions and who attended them."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گزشتہ نشستیں اور ان کی حاضری کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "Opens the dua requests sent to the admins.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the dua requests sent to the admins."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتظمین کو بھیجی گئی دعا کی درخواستیں کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "Opens the meeting planner.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the meeting planner."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میٹنگ طے کرنے کا صفحہ کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "Opens the members, admins and invitations.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the members, admins and invitations."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین، منتظمین اور دعوت نامے کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "Opens the pictures for the Today page.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the pictures for the Today page."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آج کے صفحے کی تصاویر کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "Opens who has joined this session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens who has joined this session."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس نشست میں شامل ہونے والوں کی فہرست کھولتا ہے۔"
+          }
+        }
+      }
+    },
+    "People": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "People"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "افراد"
+          }
+        }
+      }
+    },
+    "Pictures for the Today page": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pictures for the Today page"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آج کے صفحے کی تصاویر"
+          }
+        }
+      }
+    },
+    "Pictures, videos and messages": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pictures, videos and messages"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصاویر، ویڈیوز اور پیغامات"
+          }
+        }
+      }
+    },
+    "Place anyone in any Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Place anyone in any Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی کو بھی کسی بھی حلقے میں شامل کریں"
+          }
+        }
+      }
+    },
+    "Recording now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ جاری ہے"
+          }
+        }
+      }
+    },
+    "Recordings or past zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recordings or past zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگز یا گزشتہ ذکر"
+          }
+        }
+      }
+    },
+    "Records the room into the Halqah's recordings.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Records the room into the Halqah's recordings."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کمرے کو حلقے کی ریکارڈنگز میں ریکارڈ کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "Right now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی"
+          }
+        }
+      }
+    },
+    "Sends a dua request to the Halqah's admins.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sends a dua request to the Halqah's admins."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کے منتظمین کو دعا کی درخواست بھیجتا ہے۔"
+          }
+        }
+      }
+    },
+    "Session controls": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Session controls"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست کے کنٹرول"
+          }
+        }
+      }
+    },
+    "Shows a short message to everyone in the session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shows a short message to everyone in the session."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نشست میں سب کو ایک مختصر پیغام دکھاتا ہے۔"
+          }
+        }
+      }
+    },
+    "Signed in": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed in"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سائن اِن کرنے والے"
+          }
+        }
+      }
+    },
+    "Starts a zikr or meeting for the whole Halqah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts a zikr or meeting for the whole Halqah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پورے حلقے کے لیے ذکر یا میٹنگ شروع کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "Starts empty. Add its first Administrator.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts empty. Add its first Administrator."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خالی شروع ہوتا ہے۔ اس کا پہلا ایڈمنسٹریٹر شامل کریں۔"
+          }
+        }
+      }
+    },
+    "Stops recording the room.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stops recording the room."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کمرے کی ریکارڈنگ بند کرتا ہے۔"
+          }
+        }
+      }
+    },
+    "Tap ⋯ on a Halqah, or press and hold it, to rename or retire it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap ⋯ on a Halqah, or press and hold it, to rename or retire it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نام بدلنے یا ختم کرنے کے لیے حلقے پر ⋯ تھپتھپائیں، یا اسے دبا کر رکھیں۔"
+          }
+        }
+      }
+    },
+    "The zikr time has begun": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The zikr time has begun"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کا وقت شروع ہو گیا ہے"
+          }
+        }
+      }
+    },
+    "Time until the next zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time until the next zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلے ذکر میں باقی وقت"
+          }
+        }
+      }
+    },
+    "Your role: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your role: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کی حیثیت: %@"
+          }
+        }
+      }
+    },
+    "Zikr times: %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr times: %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کے اوقات: %lld"
+          }
+        }
+      }
+    },
+    "In-book reference: Book %@, Hadith %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In-book reference: Book %@, Hadith %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتاب میں حوالہ: کتاب %1$@، حدیث %2$lld"
+          }
+        }
+      }
+    },
+    "No biography is available for this narrator.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No biography is available for this narrator."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس راوی کے حالات دستیاب نہیں ہیں۔"
+          }
+        }
+      }
+    },
+    "Search Quran, hadith, library, media, and events": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Quran, hadith, library, media, and events"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن، حدیث، کتب خانہ، میڈیا اور تقریبات میں تلاش کریں"
+          }
+        }
+      }
+    },
+    "Find ayahs, tafsir, hadith, articles, the text of the books, lectures, and events. You can search in English, Urdu, or Arabic, with or without vowel marks.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find ayahs, tafsir, hadith, articles, the text of the books, lectures, and events. You can search in English, Urdu, or Arabic, with or without vowel marks."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیات، تفسیر، احادیث، مضامین، کتابوں کا متن، بیانات اور تقریبات تلاش کریں۔ آپ انگریزی، اردو یا عربی میں، اعراب کے ساتھ یا ان کے بغیر، تلاش کر سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Hadith not found": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hadith not found"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حدیث نہیں ملی"
+          }
+        }
+      }
+    },
+    "This narration is not among the collections in the app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This narration is not among the collections in the app."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ روایت ایپ کے مجموعوں میں شامل نہیں۔"
+          }
+        }
+      }
+    },
+    "%@, Parah %lld (part 2), from page %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, Parah %lld (part 2), from page %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@، پارہ %2$lld (حصہ دوم)، صفحہ %3$lld سے"
+          }
+        }
+      }
+    },
+    "Browse by Parah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browse by Parah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پارہ وار دیکھیں"
+          }
+        }
+      }
+    },
+    "The 30 parahs, each opened at its first ayah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The 30 parahs, each opened at its first ayah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تیس پارے، ہر ایک اپنی پہلی آیت سے"
+          }
+        }
+      }
+    },
+    "Parah %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parah %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پارہ %lld"
+          }
+        }
+      }
+    },
+    "Parahs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parahs"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پارے"
+          }
+        }
+      }
+    },
+    "Your name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your name"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کا نام"
+          }
+        }
+      }
+    },
+    "Your name is shown to your Halqah's admins and in the meeting room.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your name is shown to your Halqah's admins and in the meeting room."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کا نام آپ کے حلقے کے منتظمین کو اور میٹنگ روم میں دکھایا جاتا ہے۔"
+          }
+        }
+      }
+    },
+    "Halqah notifications": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halqah notifications"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کی اطلاعات"
+          }
+        }
+      }
+    },
+    "Posts, zikr and meetings from your Halqah, on this phone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posts, zikr and meetings from your Halqah, on this phone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کے حلقے کی پوسٹس، ذکر اور میٹنگز، اس فون پر۔"
+          }
+        }
+      }
+    },
+    "Notifications are off for Darul Irfan. Allow them in iOS Settings to receive Halqah notifications.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications are off for Darul Irfan. Allow them in iOS Settings to receive Halqah notifications."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان کے لیے اطلاعات بند ہیں۔ حلقے کی اطلاعات پانے کے لیے iOS کی ترتیبات میں ان کی اجازت دیں۔"
+          }
+        }
+      }
+    },
+    "Turn on Halqah notifications?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Halqah notifications?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کی اطلاعات آن کریں؟"
+          }
+        }
+      }
+    },
+    "Turn on": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آن کریں"
+          }
+        }
+      }
+    },
+    "Not now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not now"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابھی نہیں"
+          }
+        }
+      }
+    },
+    "Your Halqah's posts, zikr and meetings will be shown on this phone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Halqah's posts, zikr and meetings will be shown on this phone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کے حلقے کی پوسٹس، ذکر اور میٹنگز اس فون پر دکھائی جائیں گی۔"
+          }
+        }
+      }
+    },
+    "Past programs": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Past programs"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گزشتہ پروگرام"
+          }
+        }
+      }
+    },
+    "This program has taken place.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This program has taken place."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ پروگرام منعقد ہو چکا ہے۔"
+          }
+        }
+      }
+    },
+    "%lld more in the queue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld more in the queue"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قطار میں مزید %lld"
+          }
+        }
+      }
+    },
+    "Go to ayah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go to ayah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیت پر جائیں"
+          }
+        }
+      }
+    },
+    "Ayah number": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayah number"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیت نمبر"
+          }
+        }
+      }
+    },
+    "Go": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جائیں"
+          }
+        }
+      }
+    },
+    "1 to %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 to %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 سے %lld تک"
+          }
+        }
+      }
+    },
+    "Next surah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next surah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی سورت"
+          }
+        }
+      }
+    },
+    "Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس سورت کی اکرم التفاسیر پارہ 30 کے حصہ دوم میں ہے، جو ابھی ایپ میں شامل نہیں۔"
+          }
+        }
+      }
+    },
+    "This commentary is not in the app for this surah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This commentary is not in the app for this surah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس سورت پر یہ تفسیر ایپ میں شامل نہیں۔"
+          }
+        }
+      }
+    },
+    "The Silsila's other tafsir is available:": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Silsila's other tafsir is available:"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سلسلہ کی دوسری تفسیر دستیاب ہے:"
+          }
+        }
+      }
+    },
+    "Read %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ پڑھیں"
+          }
+        }
+      }
+    },
+    "Asrar-at-Tanzil's translation of this ayah is still being checked and is not shown yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asrar-at-Tanzil's translation of this ayah is still being checked and is not shown yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس آیت کا اسرار التنزیل کا ترجمہ ابھی جانچا جا رہا ہے، اس لیے ابھی نہیں دکھایا گیا۔"
+          }
+        }
+      }
+    },
+    "This bayan is not in the offline catalogue yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This bayan is not in the offline catalogue yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ بیان ابھی آف لائن فہرست میں شامل نہیں۔"
+          }
+        }
+      }
+    },
+    "This bayan has no playable audio source.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This bayan has no playable audio source."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس بیان کی کوئی قابلِ سماعت آڈیو موجود نہیں۔"
+          }
+        }
+      }
+    },
+    "Go to %@ %lld:%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go to %@ %lld:%lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %lld:%lld پر جائیں"
+          }
+        }
+      }
+    },
+    "Grading": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grading"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "درجۂ حدیث"
+          }
+        }
+      }
+    },
+    "Provisional translation — pending scholarly review": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Provisional translation — pending scholarly review"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عارضی ترجمہ — علمی نظرثانی باقی ہے"
+          }
+        }
+      }
+    },
+    "Book %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Book %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتاب %@"
+          }
+        }
+      }
+    },
+    "Showing %lld of %lld matches, a few from each collection": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Showing %lld of %lld matches, a few from each collection"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کل %2$lld میں سے %1$lld نتائج دکھائے گئے ہیں، ہر مجموعے سے چند"
+          }
+        }
+      }
+    },
+    "No Urdu translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Urdu translation"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اردو ترجمہ نہیں"
+          }
+        }
+      }
+    },
+    "No English translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No English translation"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انگریزی ترجمہ نہیں"
+          }
+        }
+      }
+    },
+    "Hadith collections in Arabic, with English and Urdu where translated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hadith collections in Arabic, with English and Urdu where translated"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "احادیث کے مجموعے عربی میں، جہاں ترجمہ ہوا وہاں انگریزی اور اردو کے ساتھ"
+          }
+        }
+      }
+    },
+    "Go to page": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go to page"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صفحے پر جائیں"
+          }
+        }
+      }
+    },
+    "Page number": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page number"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صفحہ نمبر"
+          }
+        }
+      }
+    },
+    "Pages %lld to %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pages %lld to %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صفحات %1$lld تا %2$lld"
+          }
+        }
+      }
+    },
+    "Pages 1 to %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pages 1 to %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صفحات 1 تا %lld"
+          }
+        }
+      }
+    },
+    "%lld of %lld pages are still machine-read and have not been checked by a person; they are marked. Read the PDF for the authoritative text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld of %lld pages are still machine-read and have not been checked by a person; they are marked. Read the PDF for the authoritative text."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$lld میں سے %1$lld صفحات ابھی مشینی طور پر پڑھے گئے ہیں اور کسی شخص نے ان کی جانچ نہیں کی؛ ان پر نشان لگا ہے۔ مستند متن کے لیے PDF پڑھیں۔"
+          }
+        }
+      }
+    },
+    "machine-read, not yet proofread": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "machine-read, not yet proofread"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشینی طور پر پڑھا گیا، ابھی پروف ریڈنگ نہیں ہوئی"
+          }
+        }
+      }
+    },
+    "This file is not available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This file is not available"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ فائل دستیاب نہیں"
+          }
+        }
+      }
+    },
+    "The source no longer provides this file, or what it sends is not a readable PDF. Trying again will not bring it back.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The source no longer provides this file, or what it sends is not a readable PDF. Trying again will not bring it back."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ماخذ اب یہ فائل فراہم نہیں کرتا، یا جو بھیجتا ہے وہ پڑھنے کے قابل PDF نہیں۔ دوبارہ کوشش سے یہ واپس نہیں آئے گی۔"
+          }
+        }
+      }
+    },
+    "Find ayahs, tafsir, articles, the text of the books, lectures, and events. You can search in English, Urdu, or Arabic, with or without vowel marks.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find ayahs, tafsir, articles, the text of the books, lectures, and events. You can search in English, Urdu, or Arabic, with or without vowel marks."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیات، تفسیر، مضامین، کتابوں کا متن، بیانات اور تقریبات تلاش کریں۔ آپ انگریزی، اردو یا عربی میں، اعراب کے ساتھ یا ان کے بغیر، تلاش کر سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "%lld pages — searchable text; %lld still machine-read": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld pages — searchable text; %lld still machine-read"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld صفحات — قابلِ تلاش متن؛ %2$lld ابھی مشینی طور پر پڑھے گئے"
+          }
+        }
+      }
+    },
+    "Zikr of the Day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr of the Day"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آج کا ذکر"
+          }
+        }
+      }
+    },
+    "Prayers today": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayers today"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آج کی نمازیں"
+          }
+        }
+      }
+    },
+    "Last 30 days": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last 30 days"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گزشتہ 30 دن"
+          }
+        }
+      }
+    },
+    "Items": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Items"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اندراجات"
+          }
+        }
+      }
+    },
+    "Offline": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آف لائن"
+          }
+        }
+      }
+    },
+    "Chinese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chinese"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چینی"
+          }
+        }
+      }
+    },
+    "Darul Irfan contains no advertising and no third-party tracking SDK. Reading, listening, prayer history, bookmarks, and tasbih activity remain on this device. Anonymous Apple diagnostics are sent only if you explicitly opt in.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Darul Irfan contains no advertising and no third-party tracking SDK. Reading, listening, prayer history, bookmarks, and tasbih activity remain on this device. Anonymous Apple diagnostics are sent only if you explicitly opt in."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں نہ کوئی اشتہار ہے اور نہ کسی تیسرے فریق کا ٹریکنگ SDK۔ مطالعہ، سماعت، نماز کا ریکارڈ، نشانیاں اور تسبیح کی سرگرمی اسی ڈیوائس پر رہتی ہیں۔ گمنام Apple تشخیصی معلومات صرف اسی صورت بھیجی جاتی ہیں جب آپ واضح طور پر اس کی اجازت دیں۔"
+          }
+        }
+      }
+    },
+    "Prayer and reminder alerts are scheduled locally. You also opted in to official live/update alerts; only a random installation ID, Apple push token, locale, timezone, app version, and selected topics are registered.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer and reminder alerts are scheduled locally. You also opted in to official live/update alerts; only a random installation ID, Apple push token, locale, timezone, app version, and selected topics are registered."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز اور یاد دہانی کے الرٹس اسی ڈیوائس پر طے ہوتے ہیں۔ آپ نے سرکاری براہِ راست اور تازہ اطلاعات بھی فعال کی ہیں؛ اس کے لیے صرف ایک بے ترتیب تنصیب شناخت، Apple پش ٹوکن، زبان و علاقہ، ٹائم زون، ایپ ورژن اور منتخب موضوعات رجسٹر ہوتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Prayer alerts and reminders are scheduled entirely on this device. Official live/update push alerts are currently off.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer alerts and reminders are scheduled entirely on this device. Official live/update push alerts are currently off."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کے الرٹس اور یاد دہانیاں مکمل طور پر اسی ڈیوائس پر طے ہوتی ہیں۔ سرکاری براہِ راست اور تازہ پش اطلاعات اس وقت بند ہیں۔"
+          }
+        }
+      }
+    },
+    "Audio could not be loaded. Check your connection and tap Retry.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio could not be loaded. Check your connection and tap Retry."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آڈیو لوڈ نہیں ہو سکی۔ اپنا کنکشن دیکھ کر «دوبارہ کوشش کریں» پر ٹیپ کریں۔"
+          }
+        }
+      }
+    },
+    "Audio is unavailable right now. Finish your call or other audio session, then tap Retry.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio is unavailable right now. Finish your call or other audio session, then tap Retry."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آڈیو اس وقت دستیاب نہیں۔ اپنی کال یا کوئی دوسری آڈیو ختم کریں، پھر «دوبارہ کوشش کریں» پر ٹیپ کریں۔"
+          }
+        }
+      }
+    },
+    "Qur'an 13:28": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qur'an 13:28"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن 13:28"
+          }
+        }
+      }
+    },
+    "Qur'an %lld:%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qur'an %lld:%lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن %lld:%lld"
+          }
+        }
+      }
+    },
+    "Qur'an %lld:%lld-%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qur'an %lld:%lld-%lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن %lld:%lld-%lld"
+          }
+        }
+      }
+    },
+    "Dar ul Irfan, Munara, Khushab Road, District Chakwal, Punjab, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dar ul Irfan, Munara, Khushab Road, District Chakwal, Punjab, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان، منارہ، خوشاب روڈ، ضلع چکوال، پنجاب، پاکستان"
+          }
+        }
+      }
+    },
+    "Daily zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزانہ ذکر"
+          }
+        }
+      }
+    },
+    "The current or next online zikr session with a live countdown.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current or next online zikr session with a live countdown."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاری یا اگلی آن لائن ذکر کی نشست، براہِ راست الٹی گنتی کے ساتھ۔"
+          }
+        }
+      }
+    },
+    "The current or next online zikr session.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current or next online zikr session."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاری یا اگلی آن لائن ذکر کی نشست۔"
+          }
+        }
+      }
+    },
+    "The next prayer and its local time.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The next prayer and its local time."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی نماز اور اس کا مقامی وقت۔"
+          }
+        }
+      }
+    },
+    "Zikr live · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr live · %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر جاری · %@"
+          }
+        }
+      }
+    },
+    "Zikr · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr · %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر · %@"
+          }
+        }
+      }
+    },
+    "Sync zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sync zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر ہم آہنگ کریں"
+          }
+        }
+      }
+    },
+    "Open Zikr on iPhone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Zikr on iPhone"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آئی فون پر ذکر کھولیں"
+          }
+        }
+      }
+    },
+    "Open Darul Irfan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Darul Irfan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان کھولیں"
+          }
+        }
+      }
+    },
+    "Set up prayer times on your iPhone to sync them here.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up prayer times on your iPhone to sync them here."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کے اوقات یہاں لانے کے لیے انہیں اپنے آئی فون پر ترتیب دیں۔"
+          }
+        }
+      }
+    },
+    "Zikr timer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zikr timer"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کا ٹائمر"
+          }
+        }
+      }
+    },
+    "Prayer times": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer times"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کے اوقات"
+          }
+        }
+      }
+    },
+    "Preferences": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preferences"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ترجیحات"
+          }
+        }
+      }
+    },
+    "until azan · %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "until azan · %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اذان میں باقی · %@"
+          }
+        }
+      }
+    },
+    "Open the iPhone app to refresh prayer times.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the iPhone app to refresh prayer times."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کے اوقات تازہ کرنے کے لیے آئی فون پر ایپ کھولیں۔"
+          }
+        }
+      }
+    },
+    "No zikr schedule": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No zikr schedule"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر کا کوئی شیڈول نہیں"
+          }
+        }
+      }
+    },
+    "Open Zikr on your iPhone to sync the latest schedule.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Zikr on your iPhone to sync the latest schedule."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تازہ ترین شیڈول لانے کے لیے آئی فون پر ذکر کھولیں۔"
+          }
+        }
+      }
+    },
+    "Prayer calculations and preferences sync privately from your iPhone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer calculations and preferences sync privately from your iPhone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کے حسابات اور ترجیحات آپ کے آئی فون سے نجی طور پر یہاں آتی ہیں۔"
           }
         }
       }

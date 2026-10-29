@@ -233,11 +233,13 @@ struct PrayerTrackerDetailView: View {
     }
 
     private func cellAccessibilityLabel(prayer: Prayer, completion: PrayerCompletion) -> Text {
+        // The name in the app's language: the English one was read out as is.
+        let name = String(localized: String.LocalizationValue(prayer.englishName))
         switch completion {
-        case .unmarked: return Text("\(prayer.englishName): not marked")
-        case .prayed: return Text("\(prayer.englishName): prayed")
-        case .jamaat: return Text("\(prayer.englishName): prayed in congregation")
-        case .qaza: return Text("\(prayer.englishName): marked as Qaza")
+        case .unmarked: return Text("\(name): not marked")
+        case .prayed: return Text("\(name): prayed")
+        case .jamaat: return Text("\(name): prayed in congregation")
+        case .qaza: return Text("\(name): marked as Qaza")
         }
     }
 

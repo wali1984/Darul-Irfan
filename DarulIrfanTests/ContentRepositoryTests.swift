@@ -202,4 +202,33 @@ final class ContentRepositoryTests: XCTestCase {
         let collections = try await repository.collections()
         XCTAssertEqual(collections, [collection])
     }
+
+    // MARK: - Book pages
+
+    /// A re-read page's layout is stored and read back with it; the original
+    /// OCR has none, and a page imported again without one loses it.
+    func testBookPageLayoutRoundtrip() async throws {
+        let laidOut = BookPage(bookID: "book-ur", page: 3, text: "باب اول\n\nانسان جو چیز بناتا ہے۔", blocks: 2,
+                               unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test", layout: "hp")
+        let original = BookPage(bookID: "book-ur", page: 4, text: "انسان جو چیز بناتا ہے۔", blocks: 1,
+                                unresolvedBlocks: 0, reviewState: "machineProvisional", validator: "test")
+        try await repository.upsertBookPages([laidOut, original])
+        let pages = try await repository.bookPages(bookID: "book-ur")
+        XCTAssertEqual(pages, [laidOut, original])
+        XCTAssertEqual(pages.first?.layout, "hp")
+        XCTAssertNil(pages.last?.layout)
+
+        var withoutLayout = laidOut
+        withoutLayout.layout = nil
+        try await repository.upsertBookPages([withoutLayout])
+        let updated = try await repository.bookPages(bookID: "book-ur")
+        XCTAssertNil(updated.first?.layout)
+        XCTAssertEqual(updated.first?.text, laidOut.text)
+    }
+
+    /// Schema v10 gives the book pages table its layout column.
+    func testBookPagesTableHasALayoutColumn() async throws {
+        let columns = try await database.connection.query("SELECT name FROM pragma_table_info('book_pages')")
+        XCTAssertTrue(columns.compactMap { $0.text("name") }.contains("layout"))
+    }
 }

@@ -87,15 +87,15 @@ struct OfficialServicesSettingsView: View {
         Binding(
             get: { appState.settings.liveActivitiesEnabled },
             set: { enabled in
-                Task {
-                    await appState.updateSettings { $0.liveActivitiesEnabled = enabled }
-                    await appState.refreshScheduledNotificationsAndWidgets()
-                }
+                // updateSettings starts or ends the Live Activity itself.
+                Task { await appState.updateSettings { $0.liveActivitiesEnabled = enabled } }
             }
         )
     }
 
-    private func topicToggle(_ title: String, topic: PushTopic) -> some View {
+    /// `LocalizedStringKey`, so the topic names come from the catalogue: a
+    /// `String` title is shown as written, in English.
+    private func topicToggle(_ title: LocalizedStringKey, topic: PushTopic) -> some View {
         Toggle(title, isOn: Binding(
             get: { appState.settings.push.topics.contains(topic) },
             set: { enabled in

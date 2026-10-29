@@ -27,7 +27,8 @@ struct TopicDetailView: View {
         ))
     }
 
-    private var isUrdu: Bool { appState.settings.language == .urdu }
+    /// Urdu content, including "System" on an Urdu phone.
+    private var isUrdu: Bool { appState.settings.language.contentLanguageCode == "ur" }
 
     var body: some View {
         ScrollView {
@@ -108,11 +109,7 @@ struct TopicDetailView: View {
                     Spacer()
                     Button {
                         DIHaptics.soft()
-                        NotificationCenter.default.post(name: .didReceiveAppDeepLink, object: "quran")
-                        NotificationCenter.default.post(
-                            name: .openQuranAyah,
-                            object: QuranAyahLink(surah: verse.surah, ayah: verse.ayah)
-                        )
+                        DeepLinkRouter.shared.open(.quranAyah(surah: verse.surah, ayah: verse.ayah))
                     } label: {
                         Label("Open in the Quran", systemImage: "book.closed")
                             .font(.caption.weight(.semibold))
@@ -132,7 +129,7 @@ struct TopicDetailView: View {
                     itemID: item.itemID,
                     dependencies: dependencies,
                     appState: appState,
-                    libraryViewModel: LibraryViewModel(contentRepository: dependencies.contentRepository)
+                    libraryViewModel: viewModel.libraryViewModel
                 )
             } label: {
                 relatedLabel(item)
@@ -236,7 +233,7 @@ private struct TopicHadithCard: View {
     let books: [String: HadithBook]
     @State private var expanded = false
 
-    private var isUrdu: Bool { appState.settings.language == .urdu }
+    private var isUrdu: Bool { appState.settings.language.contentLanguageCode == "ur" }
 
     var body: some View {
         DICard {
@@ -332,11 +329,15 @@ final class TopicDetailViewModel {
     private(set) var books: [String: HadithBook] = [:]
     private(set) var related: [RelatedItem] = []
     private(set) var isLoading = true
+    /// One library state for the related works, with the favourites loaded,
+    /// so a work's star is right and starring it twice cannot add it twice.
+    let libraryViewModel: LibraryViewModel
 
     init(topic: Topic, dependencies: AppDependencies, language: AppLanguage) {
         self.topic = topic
         self.dependencies = dependencies
         self.language = language
+        self.libraryViewModel = LibraryViewModel(contentRepository: dependencies.contentRepository)
     }
 
     func load() async {
@@ -344,10 +345,12 @@ final class TopicDetailViewModel {
         await resolveVerses()
         await resolveHadith()
         await findRelated()
+        await libraryViewModel.loadFavorites()
         isLoading = false
     }
 
-    private var isUrdu: Bool { language == .urdu }
+    /// Urdu content, including "System" on an Urdu phone.
+    private var isUrdu: Bool { language.contentLanguageCode == "ur" }
 
     private func resolveVerses() async {
         let refs = topic.ayahRefs.compactMap { AyahRef($0) }
@@ -419,18 +422,24 @@ final class TopicDetailViewModel {
         var merged: [SearchResult] = []
         for term in topic.searchTerms where !term.trimmingCharacters(in: .whitespaces).isEmpty {
             let results = (try? await dependencies.searchIndex.search(term, domains: [.library, .media], limit: 12)) ?? []
-            for result in results where seen.insert(result.id).inserted {
-                merged.append(result)
+            for result in results {
+                // A matching page of a book stands for the book itself: the
+                // related list names works, not pages.
+                let work = result.bookPage.map {
+                    SearchResult(domain: .library, itemID: $0.bookID, title: result.title,
+                                 snippet: result.snippet, language: result.language)
+                } ?? result
+                if seen.insert(work.id).inserted { merged.append(work) }
             }
             if merged.count >= 40 { break }
         }
         var items: [RelatedItem] = []
         for result in merged {
             var title = result.title
-            if result.domain == .library, isUrdu,
-               let item = try? await dependencies.contentRepository.item(id: result.itemID),
-               let urduTitle = item.titleUrdu, !urduTitle.isEmpty {
-                title = urduTitle
+            if result.domain == .library,
+               let item = try? await dependencies.contentRepository.item(id: result.itemID) {
+                title = item.title
+                if isUrdu, let urduTitle = item.titleUrdu, !urduTitle.isEmpty { title = urduTitle }
             }
             let titleIsUrdu = ScriptDirection.isRightToLeft(title, fallbackLanguage: nil)
             // The snippet only where it is in the same script as the title:

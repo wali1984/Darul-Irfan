@@ -1,5 +1,6 @@
 import Foundation
 import CoreLocation
+import UIKit
 
 /// Live compass feed for the Qibla screen.
 ///
@@ -7,9 +8,10 @@ import CoreLocation
 /// actor, matching the `@MainActor` `HeadingProviding` contract). Heading
 /// updates and location updates are started together: `trueHeading` is only
 /// valid while location updates are also running, so we prefer it when it is
-/// valid (`>= 0`) and fall back to `magneticHeading` otherwise. A negative
-/// `headingAccuracy` from CoreLocation means the compass needs a figure-eight
-/// calibration, surfaced via `needsCalibration`.
+/// valid (`>= 0`) and fall back to `magneticHeading` otherwise, saying so
+/// through `isMagneticHeading`. A negative `headingAccuracy` from CoreLocation
+/// means the compass needs a figure-eight calibration, surfaced via
+/// `needsCalibration`.
 ///
 /// Delegate callbacks are `nonisolated` (the Objective-C requirements carry no
 /// actor isolation); they copy the plain `Double` values out of `CLHeading`
@@ -25,11 +27,21 @@ final class CompassHeadingProvider: NSObject, HeadingProviding, CLLocationManage
     /// Nil until the first valid reading arrives.
     private(set) var currentHeading: Double?
 
+    /// True while the reading is magnetic (no true heading available).
+    private(set) var isMagneticHeading = false
+
     /// True when CoreLocation reports a negative heading accuracy.
     private(set) var needsCalibration: Bool = false
 
     var isHeadingAvailable: Bool {
         CLLocationManager.headingAvailable()
+    }
+
+    var canUseTrueNorth: Bool {
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways: return true
+        default: return false
+        }
     }
 
     override init() {
@@ -51,6 +63,7 @@ final class CompassHeadingProvider: NSObject, HeadingProviding, CLLocationManage
 
         guard CLLocationManager.headingAvailable() else { return }
 
+        updateHeadingOrientation()
         // Magnetic heading works without any location permission.
         manager.startUpdatingHeading()
 
@@ -74,6 +87,29 @@ final class CompassHeadingProvider: NSObject, HeadingProviding, CLLocationManage
         onChange = nil
     }
 
+    /// Headings are measured from the top of the screen as the interface is
+    /// shown. CoreLocation measures from the top of the device held upright:
+    /// the same on iPhone, where the app is portrait only, but a quarter or
+    /// half turn off on an iPad turned sideways or upside down.
+    private func updateHeadingOrientation() {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        guard let interface = scene?.effectiveGeometry.interfaceOrientation else { return }
+        let device: CLDeviceOrientation
+        switch interface {
+        case .portrait: device = .portrait
+        case .portraitUpsideDown: device = .portraitUpsideDown
+        // The interface turns against the device: with the interface in
+        // landscape-left the device itself is turned to the right.
+        case .landscapeLeft: device = .landscapeRight
+        case .landscapeRight: device = .landscapeLeft
+        default: return
+        }
+        if manager.headingOrientation != device {
+            manager.headingOrientation = device
+        }
+    }
+
     // MARK: - CLLocationManagerDelegate
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -83,10 +119,14 @@ final class CompassHeadingProvider: NSObject, HeadingProviding, CLLocationManage
 
         Task { @MainActor in
             guard self.isRunning else { return }
+            // Follows the iPad as it rotates; the next reading uses it.
+            self.updateHeadingOrientation()
             self.needsCalibration = accuracy < 0
-            let resolved = trueHeading >= 0 ? trueHeading : magneticHeading
+            let usesTrueNorth = trueHeading >= 0
+            let resolved = usesTrueNorth ? trueHeading : magneticHeading
             // Both headings negative means no usable reading at all.
             self.currentHeading = resolved >= 0 ? resolved : nil
+            self.isMagneticHeading = !usesTrueNorth
             self.onChange?()
         }
     }
@@ -98,6 +138,7 @@ final class CompassHeadingProvider: NSObject, HeadingProviding, CLLocationManage
             if status == .authorizedWhenInUse || status == .authorizedAlways {
                 self.manager.startUpdatingLocation()
             }
+            self.onChange?()
         }
     }
 

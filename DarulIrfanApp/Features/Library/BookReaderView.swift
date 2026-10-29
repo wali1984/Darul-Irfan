@@ -5,20 +5,31 @@ import PDFKit
 /// opens its actual pages INSIDE the app — no external viewer, no "download
 /// then open" step. The PDF is fetched once and cached for fully offline
 /// reading, then rendered with PDFKit with live page tracking and share.
+///
+/// The page being read is kept, so the work reopens there; "Go to page"
+/// jumps anywhere in it.
 struct BookReaderView: View {
     let item: ContentItem
     let dependencies: AppDependencies
 
     @State private var phase: Phase = .preparing
+    @State private var document: PDFDocument?
     @State private var pageCount: Int = 0
     @State private var currentPage: Int = 1
+    @State private var requestedPage: Int?
     @State private var shareURL: URL?
+    @State private var showsGoToPage = false
+    @State private var goToPageText = ""
 
     enum Phase: Equatable {
         case preparing
         case downloading
         case ready(URL)
-        case unavailable
+        /// The source no longer has the file (HTTP 404/410), or what came
+        /// back is not a readable PDF. Trying again will not help.
+        case notAvailable
+        /// The file could not be fetched; another try, online, may work.
+        case connectionFailed
     }
 
     /// The work's PDF: the first `.pdf` download URL, else the first file.
@@ -32,12 +43,41 @@ struct BookReaderView: View {
             .navigationTitle(Text(verbatim: item.title))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if case .ready = phase, let shareURL {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        ShareLink(item: shareURL) { Image(systemName: "square.and.arrow.up") }
-                            .accessibilityLabel(Text("Share"))
+                if case .ready = phase {
+                    if pageCount > 1 {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                showsGoToPage = true
+                            } label: {
+                                Image(systemName: "arrow.down.to.line")
+                            }
+                            .accessibilityLabel(Text("Go to page"))
+                        }
+                    }
+                    if let shareURL {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            ShareLink(item: shareURL) { Image(systemName: "square.and.arrow.up") }
+                                .accessibilityLabel(Text("Share"))
+                        }
                     }
                 }
+            }
+            .alert("Go to page", isPresented: $showsGoToPage) {
+                TextField("Page number", text: $goToPageText)
+                    .keyboardType(.numberPad)
+                Button("Go") {
+                    let digits = SearchNormalizer.normalize(goToPageText).trimmingCharacters(in: .whitespaces)
+                    goToPageText = ""
+                    if let number = Int(digits), (1...max(1, pageCount)).contains(number) {
+                        requestedPage = number
+                    }
+                }
+                Button("Cancel", role: .cancel) { goToPageText = "" }
+            } message: {
+                Text("Pages 1 to \(pageCount)")
+            }
+            .onChange(of: currentPage) { _, page in
+                if case .ready = phase { PDFReadingPosition.save(page: page, itemID: item.id) }
             }
             .task { await prepare() }
     }
@@ -47,14 +87,33 @@ struct BookReaderView: View {
         switch phase {
         case .preparing, .downloading:
             loadingView
-        case .ready(let url):
-            readerView(url: url)
-        case .unavailable:
+        case .ready:
+            if let document {
+                readerView(document: document)
+            } else {
+                loadingView
+            }
+        case .notAvailable:
             DIEmptyState(
-                systemImage: "wifi.exclamationmark",
-                titleKey: "Couldn't open this work",
-                messageKey: "The pages could not be loaded. Check your connection and try again — once opened, it stays available offline."
+                systemImage: "doc.questionmark",
+                titleKey: "This file is not available",
+                messageKey: "The source no longer provides this file, or what it sends is not a readable PDF. Trying again will not bring it back."
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        case .connectionFailed:
+            VStack(spacing: DISpacing.md) {
+                DIEmptyState(
+                    systemImage: "wifi.exclamationmark",
+                    titleKey: "Couldn't open this work",
+                    messageKey: "The pages could not be loaded. Check your connection and try again — once opened, it stays available offline."
+                )
+                Button("Try Again") {
+                    phase = .preparing
+                    Task { await prepare() }
+                }
+                .buttonStyle(DISecondaryButtonStyle())
+                .padding(.horizontal, DISpacing.xl)
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
@@ -74,10 +133,16 @@ struct BookReaderView: View {
         .padding(DISpacing.xl)
     }
 
-    private func readerView(url: URL) -> some View {
+    private func readerView(document: PDFDocument) -> some View {
         ZStack(alignment: .bottom) {
-            PDFReaderKit(url: url, pageCount: $pageCount, currentPage: $currentPage)
-                .ignoresSafeArea(edges: .bottom)
+            PDFReaderKit(
+                document: document,
+                startPage: PDFReadingPosition.page(itemID: item.id) ?? 1,
+                requestedPage: $requestedPage,
+                pageCount: $pageCount,
+                currentPage: $currentPage
+            )
+            .ignoresSafeArea(edges: .bottom)
 
             if pageCount > 0 {
                 pageBar
@@ -108,15 +173,20 @@ struct BookReaderView: View {
     private func prepare() async {
         guard case .preparing = phase else { return }
         guard let urlString = pdfURLString, let url = URL(string: urlString) else {
-            phase = .unavailable; return
+            phase = .notAvailable; return
         }
 
-        // Already cached? open instantly, fully offline.
+        // Already cached? Open instantly, fully offline - if it really is a
+        // PDF. A copy that is not (cut short, or a captive portal's page
+        // saved in its place) is removed and fetched again, instead of
+        // opening as a blank screen every time.
         if let asset = try? await dependencies.downloadsRepository.asset(remoteUrl: urlString),
            let local = dependencies.downloadManager.localURL(for: asset) {
-            shareURL = local
-            phase = .ready(local)
-            return
+            if let opened = Self.openPDF(at: local) {
+                show(opened, from: local)
+                return
+            }
+            try? await dependencies.downloadManager.deleteAsset(asset)
         }
 
         // Otherwise fetch once and cache.
@@ -125,22 +195,72 @@ struct BookReaderView: View {
             let asset = try await dependencies.downloadManager.download(
                 url: url, forContentItem: item.id, mediaItemID: nil
             )
-            if let local = dependencies.downloadManager.localURL(for: asset) {
-                shareURL = local
-                phase = .ready(local)
-            } else {
-                phase = .unavailable
+            guard let local = dependencies.downloadManager.localURL(for: asset) else {
+                phase = .connectionFailed
+                return
+            }
+            guard let opened = Self.openPDF(at: local) else {
+                try? await dependencies.downloadManager.deleteAsset(asset)
+                phase = .notAvailable
+                return
+            }
+            show(opened, from: local)
+        } catch let error as DownloadManagerError {
+            switch error {
+            // The source answered that the file is not there (404, 410) or
+            // will not be given (other 4xx). Trying again will not help;
+            // a timeout (408), a rate limit (429) or a server fault (5xx) may.
+            case .serverError(let statusCode)
+                where (400..<500).contains(statusCode) && statusCode != 408 && statusCode != 429:
+                phase = .notAvailable
+            default:
+                phase = .connectionFailed
             }
         } catch {
-            phase = .unavailable
+            phase = .connectionFailed
         }
+    }
+
+    private func show(_ opened: PDFDocument, from local: URL) {
+        document = opened
+        shareURL = local
+        phase = .ready(local)
+    }
+
+    /// The document, when the file is a PDF that PDFKit can open.
+    private static func openPDF(at url: URL) -> PDFDocument? {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
+        let head = (try? handle.read(upToCount: 5)) ?? nil
+        try? handle.close()
+        guard head == Data("%PDF-".utf8) else { return nil }
+        guard let document = PDFDocument(url: url), document.pageCount > 0 else { return nil }
+        return document
+    }
+}
+
+/// The page each PDF was left at, so it reopens there. Small, and private to
+/// the device.
+enum PDFReadingPosition {
+    private static func key(_ itemID: String) -> String { "bookPDF.page.\(itemID)" }
+
+    static func save(page: Int, itemID: String) {
+        UserDefaults.standard.set(page, forKey: key(itemID))
+    }
+
+    static func page(itemID: String) -> Int? {
+        let page = UserDefaults.standard.integer(forKey: key(itemID))
+        return page > 0 ? page : nil
     }
 }
 
 /// PDFKit reader with live page tracking. Night mode is applied by the parent
 /// as a `.difference` blend overlay (iOS-safe).
 private struct PDFReaderKit: UIViewRepresentable {
-    let url: URL
+    let document: PDFDocument
+    /// 1-based page shown first.
+    let startPage: Int
+    /// A page to go to, set by "Go to page"; cleared once shown.
+    @Binding var requestedPage: Int?
     @Binding var pageCount: Int
     @Binding var currentPage: Int
 
@@ -153,9 +273,11 @@ private struct PDFReaderKit: UIViewRepresentable {
         view.displayDirection = .vertical
         view.usePageViewController(false)
         view.backgroundColor = .clear
-        if let document = PDFDocument(url: url) {
-            view.document = document
-            DispatchQueue.main.async { pageCount = document.pageCount }
+        view.document = document
+        let count = document.pageCount
+        DispatchQueue.main.async { pageCount = count }
+        if startPage > 1, let page = document.page(at: min(startPage, count) - 1) {
+            DispatchQueue.main.async { view.go(to: page) }
         }
         NotificationCenter.default.addObserver(
             context.coordinator,
@@ -165,7 +287,13 @@ private struct PDFReaderKit: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ view: PDFView, context: Context) {}
+    func updateUIView(_ view: PDFView, context: Context) {
+        guard let requested = requestedPage else { return }
+        if let page = document.page(at: max(1, min(requested, document.pageCount)) - 1) {
+            view.go(to: page)
+        }
+        DispatchQueue.main.async { requestedPage = nil }
+    }
 
     final class Coordinator: NSObject {
         let parent: PDFReaderKit

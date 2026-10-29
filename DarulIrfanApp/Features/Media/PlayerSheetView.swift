@@ -127,7 +127,7 @@ struct PlayerSheetView: View {
                     VStack(spacing: 0) {
                         if let error = audioPlayer.playbackError {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text(error).font(.callout)
+                                Text(LocalizedStringKey(error)).font(.callout)
                                 Button("Retry") { audioPlayer.togglePlayPause() }.buttonStyle(.borderedProminent)
                             }.padding().frame(maxWidth: .infinity, alignment: .leading)
                         } else if audioPlayer.isBuffering {
@@ -304,10 +304,20 @@ struct PlayerSheetView: View {
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(DIColor.textMuted)
                 }
-            } else {
+            } else if isLiveStream {
                 HStack(spacing: DISpacing.sm) {
                     MediaLivePill()
                     Text("Live stream — seeking is unavailable")
+                        .font(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                }
+            } else {
+                // A lecture whose length has not loaded yet: the catalogue
+                // carries no durations, so every lecture starts here.
+                HStack(spacing: DISpacing.sm) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Loading")
                         .font(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
@@ -483,18 +493,35 @@ struct PlayerSheetView: View {
 
     // MARK: Queue
 
+    /// The rows the queue shows: the lecture playing and those after it. A
+    /// category's queue holds hundreds, and this sheet is redrawn twice a
+    /// second while audio plays.
+    private var queueWindow: (rows: ArraySlice<AudioPlayableItem>, moreCount: Int) {
+        let queue = audioPlayer.queue
+        let current = queue.firstIndex { $0.id == audioPlayer.nowPlaying?.id } ?? 0
+        let start = max(0, current - 2)
+        let end = min(queue.count, start + 20)
+        return (queue[start..<end], queue.count - (end - start))
+    }
+
     private var queueSection: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
+        let window = queueWindow
+        return VStack(alignment: .leading, spacing: DISpacing.sm) {
             DISectionHeader(titleKey: "Queue", systemImage: "list.bullet")
             DICard {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(audioPlayer.queue) { entry in
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    ForEach(window.rows) { entry in
                         queueRow(entry)
-                        if entry.id != audioPlayer.queue.last?.id {
+                        if entry.id != window.rows.last?.id {
                             Divider()
                         }
                     }
                 }
+            }
+            if window.moreCount > 0 {
+                Text("\(window.moreCount) more in the queue")
+                    .font(.caption)
+                    .foregroundStyle(DIColor.textMuted)
             }
         }
     }

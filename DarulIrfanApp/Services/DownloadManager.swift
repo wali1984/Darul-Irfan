@@ -8,11 +8,16 @@ import Observation
 enum DownloadManagerError: LocalizedError {
     /// The server answered, but not with a success status code.
     case serverError(statusCode: Int)
+    /// A PDF address answered "success" with something that is not a PDF,
+    /// typically a Wi-Fi sign-in page. Never kept as the book.
+    case notAPDF
 
     var errorDescription: String? {
         switch self {
         case .serverError(let statusCode):
-            return "The download could not be completed right now (server status \(statusCode)). Please try again later."
+            return String(localized: "The download could not be completed right now (server status \(statusCode)). Please try again later.")
+        case .notAPDF:
+            return String(localized: "What arrived was not the PDF, perhaps a Wi-Fi sign-in page. Please try again on another connection.")
         }
     }
 }
@@ -27,17 +32,15 @@ enum DownloadManagerError: LocalizedError {
 /// (asset `id` == the SHA-256 hex of the remote URL string, so the same URL
 /// always maps to the same file and row).
 ///
-/// Progress note: transfers use the async `URLSession.download(from:)` API,
-/// which does not report byte-level progress. `activeDownloads` therefore
-/// holds a small indeterminate value (0.05) for the whole transfer and the
-/// entry disappears on completion — UIs should render entries as an
-/// indeterminate spinner rather than a percentage bar.
+/// Progress: `activeDownloads` holds the fraction received so far (0...1),
+/// updated in steps of at least one percent, so a 165 MB tafsir volume shows
+/// how far it has come; the entry disappears on completion.
 @Observable
 @MainActor
 final class DownloadManager: DownloadManaging {
 
-    /// Active + queued downloads keyed by remote URL string.
-    /// Values are indeterminate placeholders (see class note above).
+    /// Active + queued downloads keyed by remote URL string, with the
+    /// fraction received so far.
     private(set) var activeDownloads: [String: Double] = [:]
 
     private let downloadsRepository: any DownloadsRepositoryProtocol
@@ -74,7 +77,9 @@ final class DownloadManager: DownloadManaging {
 
         let repository = downloadsRepository
         let transfer = Task { () throws -> DownloadedAsset in
-            let (temporaryURL, response) = try await URLSession.shared.download(from: url)
+            let (temporaryURL, response) = try await DownloadManager.fetch(url) { [weak self] fraction in
+                Task { @MainActor in self?.reportProgress(fraction, for: key) }
+            }
 
             if let httpResponse = response as? HTTPURLResponse,
                !(200...299).contains(httpResponse.statusCode) {
@@ -82,7 +87,19 @@ final class DownloadManager: DownloadManaging {
                 throw DownloadManagerError.serverError(statusCode: httpResponse.statusCode)
             }
 
-            try Task.checkCancellation()
+            // A captive portal answers any address with its own page and a
+            // success status; kept, that page would open as the book.
+            if DownloadManager.fileExtension(for: url) == "pdf", !DownloadManager.looksLikePDF(at: temporaryURL) {
+                try? FileManager.default.removeItem(at: temporaryURL)
+                throw DownloadManagerError.notAPDF
+            }
+
+            do {
+                try Task.checkCancellation()
+            } catch {
+                try? FileManager.default.removeItem(at: temporaryURL)
+                throw error
+            }
 
             let assetID = DownloadManager.sha256Hex(of: key)
             let fileName = "\(assetID).\(DownloadManager.fileExtension(for: url))"
@@ -104,7 +121,7 @@ final class DownloadManager: DownloadManaging {
         }
 
         inFlightTasks[key] = transfer
-        activeDownloads[key] = 0.05
+        activeDownloads[key] = 0
 
         do {
             let asset = try await transfer.value
@@ -116,6 +133,13 @@ final class DownloadManager: DownloadManaging {
             activeDownloads[key] = nil
             throw error
         }
+    }
+
+    /// Progress from the transfer, dropped once it has finished or been
+    /// cancelled.
+    private func reportProgress(_ fraction: Double, for key: String) {
+        guard inFlightTasks[key] != nil else { return }
+        activeDownloads[key] = min(max(fraction, 0), 1)
     }
 
     func cancelDownload(url: URL) {
@@ -158,6 +182,54 @@ final class DownloadManager: DownloadManaging {
             return total
         }
         return await task.value
+    }
+
+    // MARK: - Transfer
+
+    /// Downloads `url` to a temporary file the caller then owns, reporting
+    /// the fraction received in steps of at least one percent. Cancelling the
+    /// calling task cancels the transfer.
+    private nonisolated static func fetch(
+        _ url: URL,
+        progress: @escaping @Sendable (Double) -> Void
+    ) async throws -> (URL, URLResponse) {
+        let handle = TransferHandle()
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(URL, URLResponse), Error>) in
+                let task = URLSession.shared.downloadTask(with: url) { temporaryURL, response, error in
+                    handle.finish()
+                    if let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+                    guard let temporaryURL, let response else {
+                        continuation.resume(throwing: URLError(.badServerResponse))
+                        return
+                    }
+                    // The system deletes its file as soon as this returns.
+                    let kept = FileManager.default.temporaryDirectory
+                        .appendingPathComponent(UUID().uuidString, isDirectory: false)
+                    do {
+                        try FileManager.default.moveItem(at: temporaryURL, to: kept)
+                        continuation.resume(returning: (kept, response))
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                }
+                handle.start(task, progress: progress)
+            }
+        } onCancel: {
+            handle.cancel()
+        }
+    }
+
+    /// A PDF begins with "%PDF-"; readers accept it anywhere in the first
+    /// kilobyte, so that is where it is looked for.
+    private nonisolated static func looksLikePDF(at url: URL) -> Bool {
+        guard let file = try? FileHandle(forReadingFrom: url) else { return false }
+        defer { try? file.close() }
+        guard let head = try? file.read(upToCount: 1_024) else { return false }
+        return head.range(of: Data("%PDF-".utf8)) != nil
     }
 
     // MARK: - File helpers (nonisolated; safe from any executor)
@@ -218,5 +290,58 @@ final class DownloadManager: DownloadManaging {
     nonisolated static func sha256Hex(of string: String) -> String {
         let digest = SHA256.hash(data: Data(string.utf8))
         return digest.map { String(format: "%02x", $0) }.joined()
+    }
+}
+
+// MARK: - Transfer handle
+
+/// The URLSession task behind one download, so that cancelling the Swift
+/// task cancels it, with its progress passed on in steps.
+private final class TransferHandle: @unchecked Sendable {
+    private let lock = NSLock()
+    private var task: URLSessionDownloadTask?
+    private var observation: NSKeyValueObservation?
+    private var isCancelled = false
+    private var lastReported = 0.0
+
+    func start(_ task: URLSessionDownloadTask, progress: @escaping @Sendable (Double) -> Void) {
+        let observation = task.progress.observe(\.fractionCompleted) { [weak self] value, _ in
+            self?.report(value.fractionCompleted, to: progress)
+        }
+        lock.lock()
+        self.task = task
+        self.observation = observation
+        let cancelledAlready = isCancelled
+        lock.unlock()
+        // Resumed either way, so its completion handler (which resumes the
+        // waiting continuation) is certain to run.
+        task.resume()
+        if cancelledAlready {
+            task.cancel()
+        }
+    }
+
+    func cancel() {
+        lock.lock()
+        isCancelled = true
+        let task = self.task
+        lock.unlock()
+        task?.cancel()
+    }
+
+    func finish() {
+        lock.lock()
+        let observation = self.observation
+        self.observation = nil
+        lock.unlock()
+        observation?.invalidate()
+    }
+
+    private func report(_ fraction: Double, to progress: @Sendable (Double) -> Void) {
+        lock.lock()
+        let isStep = fraction - lastReported >= 0.01 || (fraction >= 1 && lastReported < 1)
+        if isStep { lastReported = fraction }
+        lock.unlock()
+        if isStep { progress(fraction) }
     }
 }

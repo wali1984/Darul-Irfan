@@ -3,6 +3,14 @@ import WatchConnectivity
 
 @MainActor
 final class WatchSyncService: NSObject, WCSessionDelegate {
+    /// Occurrences shown per session: covers the nine days of prayer times
+    /// the snapshot carries.
+    static let zikrOccurrencesPerSession = 9
+
+    /// Resolves sessions announced against a prayer time day by day. Set by
+    /// `AppState`; without it they keep the time they were resolved to.
+    var prayerCalculation: (any PrayerCalculationServicing)?
+
     override init() {
         super.init()
         if WCSession.isSupported() {
@@ -17,30 +25,18 @@ final class WatchSyncService: NSObject, WCSessionDelegate {
         try? WCSession.default.updateApplicationContext(context)
     }
 
-    /// Resolves several concrete occurrences per remote/bundled zikr schedule,
-    /// merges them into the prayer snapshot, and transfers one atomic payload.
+    /// Takes the official zikr schedule the Zikr tab loaded, remembers it for
+    /// the reminders and Today, resolves concrete occurrences into the prayer
+    /// snapshot, and transfers one atomic payload.
     func updateZikrSessions(_ sessions: [ZikrSession], reference: Date = Date()) {
+        OfficialZikrSchedule.remember(sessions)
         guard var snapshot = PrayerWidgetSnapshot.load() else { return }
-        var occurrences: [WidgetZikrSession] = []
-
-        for session in sessions {
-            var cursor = reference.addingTimeInterval(-TimeInterval(max(session.durationMinutes, 0) * 60))
-            for _ in 0..<8 {
-                guard let start = ZikrScheduleMath.nextOccurrence(of: session, after: cursor) else { break }
-                let end = start.addingTimeInterval(TimeInterval(max(session.durationMinutes, 1) * 60))
-                if end > reference {
-                    occurrences.append(WidgetZikrSession(
-                        id: "\(session.id)|\(Int(start.timeIntervalSince1970))",
-                        title: session.title,
-                        startsAt: start,
-                        endsAt: end
-                    ))
-                }
-                cursor = start.addingTimeInterval(1)
-            }
-        }
-
-        snapshot.zikrSessions = occurrences.sorted { $0.startsAt < $1.startsAt }
+        snapshot.zikrSessions = ZikrOccurrences.widgetSessions(
+            for: sessions,
+            reference: reference,
+            perSession: Self.zikrOccurrencesPerSession,
+            calculator: prayerCalculation
+        )
         snapshot.save()
         send(snapshot)
     }

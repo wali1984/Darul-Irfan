@@ -136,11 +136,19 @@ struct ContentRepository: ContentRepositoryProtocol {
         }
     }
 
+    /// One favourite per item. A screen that had not loaded the favourites
+    /// used to add a second row for an item already starred, and removing
+    /// one of them left the item in Favourites.
     func addFavorite(_ favorite: Favorite) async throws {
         try await database.connection.execute(
             """
             INSERT INTO favorites (id, content_item_id, media_item_id, created_at)
-            VALUES (?, ?, ?, ?)
+            SELECT ?, ?, ?, ?
+            WHERE NOT EXISTS (
+                SELECT 1 FROM favorites
+                WHERE (? IS NOT NULL AND content_item_id = ?)
+                   OR (? IS NOT NULL AND media_item_id = ?)
+            )
             ON CONFLICT(id) DO UPDATE SET
                 content_item_id = excluded.content_item_id,
                 media_item_id = excluded.media_item_id,
@@ -151,13 +159,24 @@ struct ContentRepository: ContentRepositoryProtocol {
                 .optionalText(favorite.contentItemID),
                 .optionalText(favorite.mediaItemID),
                 .date(favorite.createdAt),
+                .optionalText(favorite.contentItemID),
+                .optionalText(favorite.contentItemID),
+                .optionalText(favorite.mediaItemID),
+                .optionalText(favorite.mediaItemID),
             ]
         )
     }
 
+    /// Removes the favourite and any duplicate rows for the same item that
+    /// earlier builds wrote, so the item really leaves Favourites.
     func removeFavorite(id: UUID) async throws {
         try await database.connection.execute(
-            "DELETE FROM favorites WHERE id = ?",
+            """
+            DELETE FROM favorites
+            WHERE id = ?1
+               OR content_item_id = (SELECT content_item_id FROM favorites WHERE id = ?1)
+               OR media_item_id = (SELECT media_item_id FROM favorites WHERE id = ?1)
+            """,
             [.text(id.uuidString)]
         )
     }
@@ -272,7 +291,7 @@ struct ContentRepository: ContentRepositoryProtocol {
         let rows = try await database.connection.query(
             """
             SELECT book_id, page, text, blocks, unresolved_blocks,
-                   review_state, validator
+                   review_state, validator, layout
             FROM book_pages
             WHERE book_id = ?
             ORDER BY page
@@ -285,6 +304,14 @@ struct ContentRepository: ContentRepositoryProtocol {
     func bookPageCount(bookID: String) async throws -> Int {
         let rows = try await database.connection.query(
             "SELECT COUNT(*) AS n FROM book_pages WHERE book_id = ?",
+            [.text(bookID)]
+        )
+        return rows.first?.int("n") ?? 0
+    }
+
+    func bookMachineProvisionalPageCount(bookID: String) async throws -> Int {
+        let rows = try await database.connection.query(
+            "SELECT COUNT(*) AS n FROM book_pages WHERE book_id = ? AND review_state = 'machineProvisional'",
             [.text(bookID)]
         )
         return rows.first?.int("n") ?? 0
@@ -303,18 +330,19 @@ struct ContentRepository: ContentRepositoryProtocol {
     /// dropping pages on a key collision.
     func upsertBookPages(_ pages: [BookPage]) async throws {
         guard !pages.isEmpty else { return }
-        let statements: [(sql: String, parameters: [SQLValue])] = pages.map { page in
+        var statements: [(sql: String, parameters: [SQLValue])] = pages.map { page in
             (
                 sql: """
                 INSERT INTO book_pages (book_id, page, text, blocks,
-                    unresolved_blocks, review_state, validator)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    unresolved_blocks, review_state, validator, layout)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(book_id, page) DO UPDATE SET
                     text = excluded.text,
                     blocks = excluded.blocks,
                     unresolved_blocks = excluded.unresolved_blocks,
                     review_state = excluded.review_state,
-                    validator = excluded.validator
+                    validator = excluded.validator,
+                    layout = excluded.layout
                 """,
                 parameters: [
                     .text(page.bookID),
@@ -324,9 +352,15 @@ struct ContentRepository: ContentRepositoryProtocol {
                     .int(page.unresolvedBlocks),
                     .text(page.reviewState),
                     .text(page.validator),
+                    // NULL when the page has none, so a page that loses its
+                    // layout is laid out from its text, not from a stale one.
+                    .optionalText(page.layout),
                 ]
             )
         }
+        // The pages' search index is rebuilt from the new text in the
+        // background.
+        statements.append(SearchIndexState.markStale(.bookPages))
         try await database.connection.executeBatch(statements)
     }
 
@@ -365,7 +399,8 @@ struct ContentRepository: ContentRepositoryProtocol {
             blocks: row.int("blocks") ?? 0,
             unresolvedBlocks: row.int("unresolved_blocks") ?? 0,
             reviewState: row.text("review_state") ?? "machineProvisional",
-            validator: row.text("validator") ?? "unknown"
+            validator: row.text("validator") ?? "unknown",
+            layout: row.text("layout")
         )
     }
 

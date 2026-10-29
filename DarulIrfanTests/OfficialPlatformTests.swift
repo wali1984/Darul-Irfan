@@ -16,33 +16,40 @@ final class OfficialPlatformTests: XCTestCase {
           "contentVersions":{"officialFeed":1}
         }
         """
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        let value = try decoder.decode(AppBootstrap.self, from: Data(json.utf8))
+        let value = try JSONDecoder.darulIrfanServer().decode(AppBootstrap.self, from: Data(json.utf8))
         XCTAssertTrue(value.featureFlags.officialFeed)
         XCTAssertEqual(value.schedules.first?.timeZoneIdentifier, "Asia/Karachi")
         XCTAssertEqual(value.live.preferredSource?.kind, .youtube)
         XCTAssertFalse(value.live.preferredSource?.supportsBackgroundAudio ?? true)
     }
 
+    /// The fixture carries the server's real millisecond timestamps, which
+    /// the stock .iso8601 strategy rejects; the app's decoder reads them.
     func testDecodesSharedWorkerBootstrapFixture() throws {
         let url = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "bootstrap", withExtension: "json"))
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        let value = try decoder.decode(AppBootstrap.self, from: Data(contentsOf: url))
+        let value = try JSONDecoder.darulIrfanServer().decode(AppBootstrap.self, from: Data(contentsOf: url))
         XCTAssertEqual(value.schemaVersion, 1)
         XCTAssertEqual(value.live.preferredSource?.kind, .youtube)
         XCTAssertEqual(value.schedules.first?.timeZoneIdentifier, "Asia/Karachi")
+        XCTAssertEqual(value.live.cue?.text, "L-3")
+        XCTAssertEqual(value.live.room?.url?.absoluteString, "https://paltalk.im/egnMPD3Y")
+        let updated = try XCTUnwrap(ServerDate.date(from: "2026-10-29T00:24:00.011Z"))
+        XCTAssertEqual(value.live.updatedAt.timeIntervalSince1970, updated.timeIntervalSince1970, accuracy: 0.0005)
     }
 
-    func testOwnedStreamTakesPriorityOverYouTubeAndPaltalk() {
+    /// Daily Zikr follows the channel's live video (the owner's decision,
+    /// 2026-10-28): the video comes first, a stream staff set by hand only
+    /// without one.
+    func testYouTubeVideoTakesPriorityOverOwnedStream() {
         let https = URL(string: "https://example.com/live.mp3") ?? URL(fileURLWithPath: "/")
         var live = LiveBroadcast.offline
         live.sources = [
             LiveSource(kind: .paltalk, url: https, supportsBackgroundAudio: false),
-            LiveSource(kind: .youtube, url: https, videoID: "video", supportsBackgroundAudio: false),
             LiveSource(kind: .ownedStream, url: https, supportsBackgroundAudio: true),
+            LiveSource(kind: .youtube, url: https, videoID: "video", supportsBackgroundAudio: false),
         ]
+        XCTAssertEqual(live.preferredSource?.kind, .youtube)
+        live.sources = [LiveSource(kind: .ownedStream, url: https, supportsBackgroundAudio: true)]
         XCTAssertEqual(live.preferredSource?.kind, .ownedStream)
         XCTAssertTrue(live.preferredSource?.supportsBackgroundAudio ?? false)
     }

@@ -8,6 +8,8 @@ import SwiftUI
 /// Docs/RESEARCH_NOTES.md (verified against naqshbandiaowaisiah.org).
 @MainActor
 struct AboutView: View {
+    @Environment(\.locale) private var locale
+
     var body: some View {
         ScrollView {
             VStack(spacing: DISpacing.md) {
@@ -68,10 +70,18 @@ struct AboutView: View {
                     .environment(\.layoutDirection, .rightToLeft)
                     .multilineTextAlignment(.center)
 
-                Text(verbatim: DIBrand.anchorVerseEnglish)
-                    .font(.footnote.italic())
-                    .foregroundStyle(.white.opacity(0.82))
-                    .multilineTextAlignment(.center)
+                if DIBrand.readsUrdu(locale) {
+                    Text(verbatim: DIBrand.anchorVerseUrdu)
+                        .font(DIFont.urduBody(scale: 0.85))
+                        .foregroundStyle(.white.opacity(0.82))
+                        .multilineTextAlignment(.center)
+                        .environment(\.layoutDirection, .rightToLeft)
+                } else {
+                    Text(verbatim: DIBrand.anchorVerseEnglish)
+                        .font(.footnote.italic())
+                        .foregroundStyle(.white.opacity(0.82))
+                        .multilineTextAlignment(.center)
+                }
 
                 Text(verbatim: DIBrand.anchorVerseReference)
                     .font(.caption2.weight(.semibold))
@@ -129,7 +139,7 @@ struct AboutView: View {
                 aboutHeader("Headquarters", systemImage: "building.columns")
 
                 Label {
-                    Text(verbatim: "Dar ul Irfan, Munara, Khushab Road, District Chakwal, Punjab, Pakistan")
+                    Text("Dar ul Irfan, Munara, Khushab Road, District Chakwal, Punjab, Pakistan")
                         .font(.subheadline)
                         .foregroundStyle(DIColor.textPrimary)
                 } icon: {

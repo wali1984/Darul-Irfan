@@ -22,8 +22,13 @@ struct HadithBookView: View {
     @State private var hasShownCover = false
 
     @State private var entries: [HadithEntry] = []
+    /// Rows that open a kitab or a chapter in the loaded listing, and so carry
+    /// its heading. Worked out whenever the listing changes.
+    @State private var bookHeadingRows: Set<String> = []
+    @State private var chapterHeadingRows: Set<String> = []
     @State private var isLoading = true
     @State private var isLoadingMore = false
+    @State private var isLoadingEarlier = false
     @State private var reachedEnd = false
     @State private var showsArabic = true
     @State private var searchText = ""
@@ -39,15 +44,26 @@ struct HadithBookView: View {
     /// from `entries.count`) so paging is correct even when the first page
     /// begins partway into the book — as it does when opening to a hadith.
     @State private var nextOffset = 0
+    /// Offset of the first loaded row: above it, earlier narrations are loaded
+    /// when the reader scrolls up, so a jump into a book can be read back.
+    @State private var firstOffset = 0
     /// The row to scroll to once it is loaded, then briefly highlight.
     @State private var pendingScrollTarget: String?
     @State private var highlightedID: String?
+    /// The row to keep in place after earlier rows are added above it.
+    @State private var anchorAfterPrepend: String?
+    /// The row at the top of the screen, saved so the collection reopens there.
+    @State private var topRowID: String?
     /// A tapped isnad narrator, presented as a bio sheet (nil = none open).
     @State private var selectedNarrator: NarratorRef?
 
+    @ScaledMetric(relativeTo: .body) private var englishBaseSize: CGFloat = 17
+
     private static let pageSize = 50
 
-    private var languageCode: String { appState.settings.language.rawValue }
+    /// The content language: "System" on an Urdu phone reads in Urdu, as the
+    /// Quran reader does.
+    private var languageCode: String { appState.settings.language.contentLanguageCode }
     /// Same reader text-size setting the Quran uses, so both scale together.
     private var fontScale: Double { appState.settings.readerFontScale.rawValue }
 
@@ -74,10 +90,19 @@ struct HadithBookView: View {
                         .tint(DIColor.primary)
                         .padding(.horizontal, DISpacing.xs)
 
-                        ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                        if isLoadingEarlier {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .padding(DISpacing.md)
+                        }
+
+                        ForEach(entries) { entry in
                             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                                if !isSearchResults, showsHeader(at: index) {
+                                if !isSearchResults, bookHeadingRows.contains(entry.id) {
                                     sectionHeader(for: entry)
+                                }
+                                if !isSearchResults, chapterHeadingRows.contains(entry.id) {
+                                    chapterHeader(for: entry)
                                 }
                                 if isSearchResults {
                                     // A result must land the reader ON the
@@ -110,8 +135,17 @@ struct HadithBookView: View {
                         }
                     }
                 }
+                .scrollTargetLayout()
                 .padding(DISpacing.md)
                 .diResponsiveWidth()
+            }
+            .scrollPosition(id: $topRowID, anchor: .top)
+            .onChange(of: topRowID) { _, id in
+                guard let id, !isSearchResults else { return }
+                HadithReadingPosition.save(id, bookID: book.id)
+                // Scrolled up to the first row loaded: bring in the ones
+                // before it.
+                if id == entries.first?.id { Task { await loadEarlier() } }
             }
             .onChange(of: pendingScrollTarget) { _, target in
                 guard let target else { return }
@@ -126,6 +160,11 @@ struct HadithBookView: View {
                     withAnimation { highlightedID = nil }
                     pendingScrollTarget = nil
                 }
+            }
+            .onChange(of: anchorAfterPrepend) { _, anchor in
+                guard let anchor else { return }
+                proxy.scrollTo(anchor, anchor: .top)
+                anchorAfterPrepend = nil
             }
         }
         .diScreenBackground()
@@ -179,18 +218,21 @@ struct HadithBookView: View {
                 entries = found
                 isSearchResults = true
                 reachedEnd = true          // results are not paged
+                firstOffset = 0
                 isLoading = false
             }
         }
         .task {
-            // The cover shows on a normal open only: a tapped search result
-            // must land on its hadith, not a splash. Content loads beneath it,
-            // so dismissal reveals a ready page.
-            if initialHadith == nil && !hasShownCover {
+            // The cover shows on a normal open only: a tapped search result,
+            // or a collection the reader is returning to, must land on its
+            // hadith, not a splash. Content loads beneath it, so dismissal
+            // reveals a ready page.
+            let resume = initialHadith == nil ? HadithReadingPosition.load(bookID: book.id) : nil
+            if initialHadith == nil && resume == nil && !hasShownCover {
                 hasShownCover = true
                 showsCover = true
             }
-            await loadFirstPage()
+            await loadFirstPage(target: initialHadith ?? resume, highlights: initialHadith != nil)
         }
         .overlay { if showsCover { coverPage } }
     }
@@ -263,9 +305,6 @@ struct HadithBookView: View {
                     // The number exactly as the collection prints it, including
                     // sub-numbers such as 402.2 — never rounded to an integer.
                     DIPillBadge(text: "#\(entry.displayNumber)", color: DIColor.primary)
-                    if let grades = entry.grades, let first = grades.first {
-                        DIPillBadge(text: first, color: DIColor.accent)
-                    }
                     Spacer(minLength: 0)
                 }
 
@@ -312,7 +351,7 @@ struct HadithBookView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     } else {
                         Text(verbatim: text)
-                            .font(.system(size: 17 * fontScale))
+                            .font(.system(size: englishBaseSize * fontScale))
                             .lineSpacing(CGFloat(5 * fontScale))
                             .foregroundStyle(DIColor.textPrimary)
                             .textSelection(.enabled)
@@ -324,6 +363,8 @@ struct HadithBookView: View {
 
                 if entry.isMachineTranslated(languageCode: languageCode) {
                     machineDraftNote
+                } else if entry.isProvisional(languageCode: languageCode) {
+                    provisionalNote
                 }
 
                 referenceBlock(entry)
@@ -332,8 +373,10 @@ struct HadithBookView: View {
     }
 
     /// The citation block shown beneath each narration: the collection
-    /// reference (with its exact printed number, sub-numbers and all) and, when
-    /// the source carries it, the in-book "Book N, Hadith M".
+    /// reference (with its exact printed number, sub-numbers and all), when
+    /// the source carries it the in-book "Book N, Hadith M", and every grading
+    /// the source prints. All of them: the graders disagree, and showing only
+    /// the first - alphabetically - hid a Da'if behind a Sahih.
     @ViewBuilder
     private func referenceBlock(_ entry: HadithEntry) -> some View {
         Divider().overlay(DIColor.border)
@@ -341,10 +384,25 @@ struct HadithBookView: View {
             Text(verbatim: "\(book.title(languageCode: languageCode)) \(entry.displayNumber)")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIColor.textMuted)
-            if let refBook = entry.sourceBook, let refHadith = entry.sourceHadith {
-                Text("In-book reference: Book \(refBook), Hadith \(refHadith)")
+            if let refBook = entry.sourceBook, let hadithNumber = entry.sourceHadith {
+                // The book as the source prints it: Sunan an-Nasa'i's "35b",
+                // not the stand-in number it is stored under.
+                let bookLabel = book.section(number: refBook)?.displayNumber ?? String(refBook)
+                Text("In-book reference: Book \(bookLabel), Hadith \(hadithNumber)")
                     .font(.caption2)
                     .foregroundStyle(DIColor.textMuted)
+            }
+            if let grades = entry.grades, !grades.isEmpty {
+                Text("Grading")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIColor.accent)
+                    .padding(.top, 2)
+                ForEach(grades, id: \.self) { grade in
+                    Text(verbatim: grade)
+                        .font(.caption2)
+                        .foregroundStyle(DIColor.textMuted)
+                        .environment(\.layoutDirection, .leftToRight)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -359,7 +417,9 @@ struct HadithBookView: View {
             var run = AttributedString(seg.text)
             switch seg.kind {
             case .isnad:
-                if let nid = seg.narratorId, let url = URL(string: "narrator:\(nid)") {
+                // The unnamed narrator ("a man", "someone") has no biography
+                // to open, so that span stays plain text, like the matn.
+                if let nid = seg.linkedNarratorID, let url = URL(string: "narrator:\(nid)") {
                     run.link = url
                 }
             case .verse:
@@ -378,7 +438,8 @@ struct HadithBookView: View {
     }
 
     /// Routes a tap on a coloured Arabic span. Narrator → native bio sheet;
-    /// verse → the app's own Quran reader (via notification). No external links.
+    /// verse → the app's own Quran reader, switching to the Read tab when the
+    /// hadith is shown elsewhere (Today, a topic). No external links.
     private func handleArabicTap(_ url: URL) {
         switch url.scheme {
         case "narrator":
@@ -389,10 +450,7 @@ struct HadithBookView: View {
             let parts = raw.split(separator: "/").compactMap { Int($0) }
             guard let surah = parts.first else { return }
             let ayah = parts.count > 1 ? parts[1] : nil
-            NotificationCenter.default.post(
-                name: .openQuranAyah,
-                object: QuranAyahLink(surah: surah, ayah: ayah)
-            )
+            DeepLinkRouter.shared.open(.quranAyah(surah: surah, ayah: ayah))
         default:
             break
         }
@@ -426,29 +484,65 @@ struct HadithBookView: View {
         }
     }
 
-    /// True when `entries[index]` opens a new book (kitab) and so should carry a
-    /// heading. The listing is in source order, so a change of book is a change
-    /// of `sourceBook` from the previous row.
-    private func showsHeader(at index: Int) -> Bool {
-        guard index < entries.count else { return false }
-        guard index > 0 else { return true }
-        return entries[index].sourceBook != entries[index - 1].sourceBook
+    // MARK: - Headings
+
+    /// Works out which rows carry a kitab or chapter heading. A kitab heading
+    /// opens a run of its book's narrations. A single row inside another
+    /// book that carries a different book's number (the source mislabels a
+    /// few) neither gets that book's heading nor breaks the run it sits in,
+    /// which used to repeat both headings in the middle of a book.
+    private func refreshHeadings() {
+        var books: Set<String> = []
+        var chapters: Set<String> = []
+        var currentBook: Int?
+        var previousChapter: String?
+        for index in entries.indices {
+            let entry = entries[index]
+            if let number = entry.sourceBook {
+                let before = index > 0 ? entries[index - 1].sourceBook : nil
+                let after = index + 1 < entries.count ? entries[index + 1].sourceBook : nil
+                let isStray = index > 0 && index + 1 < entries.count
+                    && number != before && number != after
+                    && (book.section(number: number)?.hadithCount ?? 2) > 1
+                if !isStray, number != currentBook {
+                    books.insert(entry.id)
+                    currentBook = number
+                }
+            }
+            let chapter = Self.chapterKey(entry)
+            if let chapter, chapter != previousChapter { chapters.insert(entry.id) }
+            previousChapter = chapter
+        }
+        bookHeadingRows = books
+        chapterHeadingRows = chapters
     }
 
-    /// A book (kitab) heading: the book's number, its English name, and its
-    /// Arabic name in the Quran face.
+    private static func chapterKey(_ entry: HadithEntry) -> String? {
+        let title = entry.chapterTitleEnglish ?? entry.chapterTitleArabic ?? entry.chapterTitleUrdu
+        guard let title, !title.isEmpty else { return nil }
+        return "\(entry.sourceBook ?? -1)|\(entry.chapterNumber ?? -1)|\(title)"
+    }
+
+    /// A book (kitab) heading: its number (a collection's unnumbered opening
+    /// book has none), its name in the reader's language, and its Arabic name
+    /// in the Quran face.
     @ViewBuilder
     private func sectionHeader(for entry: HadithEntry) -> some View {
         if let number = entry.sourceBook {
             let section = book.section(number: number)
+            let title = section?.title(languageCode: languageCode) ?? ""
             VStack(alignment: .leading, spacing: 2) {
-                Text("Book \(number)")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(DIColor.accent)
-                Text(verbatim: section?.titleEnglish ?? "")
-                    .font(DIFont.subheading)
-                    .foregroundStyle(DIColor.textPrimary)
-                if let arabic = section?.titleArabic, !arabic.isEmpty {
+                if let bookLabel = book.printedSectionNumber(number) {
+                    Text("Book \(bookLabel)")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(DIColor.accent)
+                }
+                if !title.isEmpty {
+                    Text(verbatim: title)
+                        .font(languageCode == "ur" ? DIFont.urduBody(scale: 1.05) : DIFont.subheading)
+                        .foregroundStyle(DIColor.textPrimary)
+                }
+                if let arabic = section?.titleArabic, !arabic.isEmpty, arabic != title {
                     Text(verbatim: arabic)
                         .font(DIFont.quranArabic(scale: fontScale * 0.7))
                         .foregroundStyle(DIColor.textMuted)
@@ -460,6 +554,42 @@ struct HadithBookView: View {
             .padding(.top, DISpacing.sm)
             .padding(.bottom, DISpacing.xs)
         }
+    }
+
+    /// The chapter (bab) a run of narrations sits under - in Hisn al-Muslim
+    /// the occasion each supplication is for. In Urdu the Arabic heading is
+    /// shown where the pack has no Urdu one, rather than the English.
+    @ViewBuilder
+    private func chapterHeader(for entry: HadithEntry) -> some View {
+        let urdu = entry.chapterTitleUrdu.flatMap { $0.isEmpty ? nil : $0 }
+        let arabic = entry.chapterTitleArabic.flatMap { $0.isEmpty ? nil : $0 }
+        let english = entry.chapterTitleEnglish.flatMap { $0.isEmpty ? nil : $0 }
+        VStack(alignment: .leading, spacing: 2) {
+            if languageCode == "ur" {
+                if let heading = urdu ?? arabic {
+                    Text(verbatim: heading)
+                        .font(DIFont.urduBody(scale: 0.95))
+                        .foregroundStyle(DIColor.primary)
+                        .environment(\.layoutDirection, .rightToLeft)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+            } else {
+                if let english {
+                    Text(verbatim: english)
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(DIColor.primary)
+                }
+                if let arabic {
+                    Text(verbatim: arabic)
+                        .font(DIFont.quranArabic(scale: fontScale * 0.6))
+                        .foregroundStyle(DIColor.textMuted)
+                        .environment(\.layoutDirection, .rightToLeft)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, DISpacing.xs)
     }
 
     /// Shown when this narration has no text in the reader's language. Says so
@@ -483,6 +613,15 @@ struct HadithBookView: View {
             .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
 
+    /// Beneath a translation taken from a source that has not been reviewed
+    /// (the provisional Urdu of Mishkat and part of Sunan an-Nasa'i).
+    private var provisionalNote: some View {
+        Label("Provisional translation — pending scholarly review", systemImage: "exclamationmark.triangle")
+            .font(.caption2)
+            .foregroundStyle(DIColor.textMuted)
+            .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
+    }
+
     private var missingTranslationNote: some View {
         Text(missingTranslationKey)
             .font(.footnote)
@@ -490,6 +629,8 @@ struct HadithBookView: View {
             .foregroundStyle(DIColor.textMuted)
             .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
+
+    // MARK: - Loading
 
     /// Leaves search mode and opens the reader at this narration, exactly as
     /// a cross-collection search result does.
@@ -525,33 +666,40 @@ struct HadithBookView: View {
         }
     }
 
-    private func loadFirstPage() async {
+    /// Opening at a narration (a tapped search result, or where the reader
+    /// left the collection) starts the listing on the page that holds it and
+    /// scrolls there; only a tapped one is highlighted.
+    private func loadFirstPage(target: String?, highlights: Bool) async {
         guard entries.isEmpty else { return }
-        // Opening to a specific narration (a tapped search result) starts the
-        // listing on the page that holds it and scrolls there.
-        if let target = initialHadith,
+        if let target,
            let index = try? await repository.readingIndex(bookID: book.id, canonicalID: target) {
             await loadWindow(startingAt: max(0, index - 6))
             // The target is a canonicalID, which is exactly what each row's
             // scroll id is — scrollTo used to be handed the printed number
             // here, which matches no row, so the jump silently did nothing.
-            pendingScrollTarget = target
+            if highlights {
+                pendingScrollTarget = target
+            } else {
+                anchorAfterPrepend = target
+            }
             return
         }
         await loadWindow(startingAt: 0)
     }
 
     /// Loads a page beginning at `offset` and sets paging to continue from its
-    /// end. Entries before `offset` are simply not loaded (fine for a jump).
+    /// end. Rows before `offset` load when the reader scrolls up to them.
     private func loadWindow(startingAt offset: Int) async {
         let page = (try? await repository.entries(
             bookID: book.id, limit: Self.pageSize, offset: offset
         )) ?? []
         entries = page
+        firstOffset = offset
         nextOffset = offset + page.count
         isSearchResults = false
         reachedEnd = page.count < Self.pageSize
         isLoading = false
+        refreshHeadings()
     }
 
     /// Clearing the search box returns to the ordinary paged listing.
@@ -570,6 +718,38 @@ struct HadithBookView: View {
         entries.append(contentsOf: next.filter { !known.contains($0.id) })
         nextOffset += next.count
         isLoadingMore = false
+        refreshHeadings()
+    }
+
+    /// The narrations before the first one loaded, added above it while the
+    /// reader stays on the row they were reading.
+    private func loadEarlier() async {
+        guard !isLoadingEarlier, firstOffset > 0, !isSearchResults, let anchor = entries.first?.id else { return }
+        isLoadingEarlier = true
+        let start = max(0, firstOffset - Self.pageSize)
+        let earlier = (try? await repository.entries(
+            bookID: book.id, limit: firstOffset - start, offset: start
+        )) ?? []
+        let known = Set(entries.map(\.id))
+        entries.insert(contentsOf: earlier.filter { !known.contains($0.id) }, at: 0)
+        firstOffset = start
+        isLoadingEarlier = false
+        refreshHeadings()
+        anchorAfterPrepend = anchor
+    }
+}
+
+/// Where the reader left each collection, so it reopens on that narration
+/// rather than at the cover. Small, and private to the device.
+enum HadithReadingPosition {
+    private static func key(_ bookID: String) -> String { "hadith.position.\(bookID)" }
+
+    static func save(_ canonicalID: String, bookID: String) {
+        UserDefaults.standard.set(canonicalID, forKey: key(bookID))
+    }
+
+    static func load(bookID: String) -> String? {
+        UserDefaults.standard.string(forKey: key(bookID))
     }
 }
 
@@ -591,9 +771,10 @@ private struct HadithContentsView: View {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !needle.isEmpty else { return all }
         return all.filter {
-            String($0.number).localizedCaseInsensitiveContains(needle) ||
+            $0.displayNumber.localizedCaseInsensitiveContains(needle) ||
             $0.titleEnglish.localizedCaseInsensitiveContains(needle) ||
-            $0.titleArabic.localizedCaseInsensitiveContains(needle)
+            $0.titleArabic.localizedCaseInsensitiveContains(needle) ||
+            ($0.titleUrdu ?? "").localizedCaseInsensitiveContains(needle)
         }
     }
 
@@ -623,7 +804,8 @@ private struct HadithContentsView: View {
                                 select(section)
                             } label: {
                                 HStack(alignment: .top, spacing: DISpacing.sm) {
-                                    Text(verbatim: "\(section.number)")
+                                    // No "0" beside an unnumbered opening book.
+                                    Text(verbatim: section.isUnnumbered ? "" : section.displayNumber)
                                         .font(.caption.monospacedDigit().weight(.bold))
                                         .foregroundStyle(DIColor.accent)
                                         .frame(minWidth: 28, alignment: .leading)
@@ -632,7 +814,8 @@ private struct HadithContentsView: View {
                                             .font(.body.weight(.semibold))
                                             .foregroundStyle(DIColor.textPrimary)
                                             .multilineTextAlignment(.leading)
-                                        if languageCode != "ur", !section.titleArabic.isEmpty {
+                                        if languageCode != "ur", !section.titleArabic.isEmpty,
+                                           section.titleArabic != section.title(languageCode: languageCode) {
                                             Text(verbatim: section.titleArabic)
                                                 .font(DIFont.quranArabic(scale: 0.65))
                                                 .foregroundStyle(DIColor.textMuted)

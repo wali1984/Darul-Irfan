@@ -51,6 +51,10 @@ struct ContentItemDetailView: View {
             }
         }
         .task {
+            // The favourites too: this screen is also opened from search and
+            // from topics, whose library state had not read them, so a
+            // starred work showed an empty star.
+            await libraryViewModel.loadFavorites()
             await viewModel.load()
         }
         .onDisappear {
@@ -96,7 +100,10 @@ struct ContentItemDetailView: View {
                             readerCard(for: item)
                         } else {
                             excerptCard(for: item)
-                            if !hasReadablePDF(item) && item.mediaUrls.isEmpty {
+                            // Only when there is nothing to read here at all:
+                            // a work whose text opens above is not a bare
+                            // archive record.
+                            if !hasReadablePDF(item) && item.mediaUrls.isEmpty && viewModel.bookPageCount == 0 {
                                 nativeAvailabilityCard
                             }
                         }
@@ -193,7 +200,11 @@ struct ContentItemDetailView: View {
     /// been proofread.
     private func readTextButton(for item: ContentItem) -> some View {
         NavigationLink {
-            BookTextReaderView(item: item, dependencies: dependencies)
+            BookTextReaderView(
+                item: item,
+                dependencies: dependencies,
+                fontScale: appState.settings.readerFontScale.rawValue
+            )
         } label: {
             HStack(spacing: DISpacing.md) {
                 Image(systemName: "text.book.closed")
@@ -204,8 +215,11 @@ struct ContentItemDetailView: View {
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
                     Group {
-                        if viewModel.bookTextIsMachineRead {
+                        if viewModel.machineReadPageCount >= viewModel.bookPageCount {
                             Text("\(viewModel.bookPageCount) pages — searchable, machine-read, not yet proofread")
+                        } else if viewModel.machineReadPageCount > 0 {
+                            // Mostly re-read from the scan: say how much is not.
+                            Text("\(viewModel.bookPageCount) pages — searchable text; \(viewModel.machineReadPageCount) still machine-read")
                         } else {
                             Text("\(viewModel.bookPageCount) pages — searchable text")
                         }
@@ -280,8 +294,8 @@ struct ContentItemDetailView: View {
                 }
 
                 HStack(spacing: DISpacing.sm) {
-                    headerBadge(item.type.libraryDisplayName, systemImage: item.type.isFeaturedPublication ? "star.fill" : nil)
-                    headerBadge(LibraryLanguage.displayName(forCode: item.language), systemImage: "character.book.closed")
+                    headerBadge(String(localized: String.LocalizationValue(item.type.libraryDisplayName)), systemImage: item.type.isFeaturedPublication ? "star.fill" : nil)
+                    headerBadge(String(localized: String.LocalizationValue(LibraryLanguage.displayName(forCode: item.language))), systemImage: "character.book.closed")
                     Spacer(minLength: 0)
                 }
                 .padding(.top, DISpacing.xs)
@@ -459,15 +473,17 @@ struct ContentItemDetailView: View {
 
     // MARK: - Content date
 
+    /// The work's own date first: an Al-Murshid issue of 1981 used to show
+    /// "Last updated" with the day the catalogue was built.
     private func dateSection(for item: ContentItem) -> some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                if let updatedAt = item.updatedAt {
-                    Text("Last updated \(updatedAt, format: .dateTime.day().month().year())")
+                if let publishedAt = item.publishedAt {
+                    Text("Published \(publishedAt, format: .dateTime.day().month().year())")
                         .font(.footnote)
                         .foregroundStyle(DIColor.textMuted)
-                } else if let publishedAt = item.publishedAt {
-                    Text("Published \(publishedAt, format: .dateTime.day().month().year())")
+                } else if let updatedAt = item.updatedAt {
+                    Text("Last updated \(updatedAt, format: .dateTime.day().month().year())")
                         .font(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 } else {
@@ -582,7 +598,13 @@ struct LibraryDownloadRow: View {
             }
         case .downloaded(_, let localURL):
             HStack(spacing: DISpacing.md) {
-                NavigationLink(value: LibraryRoute.pdf(url: localURL, title: fileName)) {
+                // A link that carries its own destination: this screen is
+                // also pushed by search, a topic and the Quran tab, whose
+                // stacks have no route for library values, so a value link
+                // did nothing there.
+                NavigationLink {
+                    PDFViewerView(fileURL: localURL, title: fileName)
+                } label: {
                     Text("Open PDF")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.primary)

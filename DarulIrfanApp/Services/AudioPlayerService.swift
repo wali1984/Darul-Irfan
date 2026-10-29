@@ -49,11 +49,30 @@ final class AudioPlayerService: AudioPlayerServicing {
     @ObservationIgnored private var itemEndObserver: NSObjectProtocol?
     @ObservationIgnored private var interruptionObserver: NSObjectProtocol?
     @ObservationIgnored private var routeChangeObserver: NSObjectProtocol?
+    @ObservationIgnored private var quranAudioObserver: NSObjectProtocol?
+    /// The lock screen shows the Qur'an reader's recitation, not this player.
+    @ObservationIgnored private var showsRecitation = false
+    @ObservationIgnored private var recitationTracked = false
     @ObservationIgnored private var resumeTask: Task<Void, Never>?
     @ObservationIgnored private var playerStateObserver: NSKeyValueObservation?
     @ObservationIgnored private var itemStateObserver: NSKeyValueObservation?
     @ObservationIgnored private var lastProgressSaveDate: Date = .distantPast
     @ObservationIgnored private var wasPlayingBeforeInterruption: Bool = false
+    /// A seek asked for before the item could take one - a saved place, or
+    /// Continue Listening - made once the item is ready. AVPlayerItem cancels
+    /// a seek outside its seekable ranges, which stay empty until then.
+    @ObservationIgnored private var pendingSeek: Double?
+    /// Whether the current item has opened; a failure before that may be the
+    /// file's format, after it the connection.
+    @ObservationIgnored private var itemBecameReady = false
+    /// The item tried again as MPEG-4 audio after failing to open as MP3.
+    @ObservationIgnored private var retriedAsMPEG4ID: String?
+    /// Streams that opened only as MPEG-4 audio, opened that way at once.
+    @ObservationIgnored private var mpeg4URLs: Set<URL> = []
+    /// Lectures the catalogue marks as MPEG-4 audio (mimeType "audio/mp4"),
+    /// read once from the bundled catalogue the first time a lecture plays.
+    @ObservationIgnored private var mpeg4MediaIDs: Set<String> = []
+    @ObservationIgnored private var mpeg4MediaIDsRequested = false
 
     /// Seconds of playback between periodic progress saves.
     private static let progressSaveInterval: TimeInterval = 10
@@ -70,6 +89,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         configureRemoteCommands()
         installInterruptionObserver()
         installRouteChangeObserver()
+        installQuranAudioObserver()
     }
 
     // MARK: - AudioPlayerServicing
@@ -110,22 +130,72 @@ final class AudioPlayerService: AudioPlayerServicing {
 
         guard activateAudioSession() else { return }
 
-        let playerItem = AVPlayerItem(url: item.url)
+        pendingSeek = nil
+        loadCatalogueContainersIfNeeded()
+        let asMPEG4 = opensAsMPEG4(item)
+        // Opened as MPEG-4 from the start, a failure is not the format's.
+        retriedAsMPEG4ID = asMPEG4 ? item.id : nil
+        startPlayer(for: item, asMPEG4: asMPEG4)
+
+        updateNowPlayingInfo()
+        restoreSavedProgressIfNeeded(for: item)
+    }
+
+    /// Opens `item` in a new AVPlayer and starts it.
+    private func startPlayer(for item: AudioPlayableItem, asMPEG4: Bool) {
+        let playerItem: AVPlayerItem
+        if asMPEG4 {
+            let asset = AVURLAsset(url: item.url, options: [AVURLAssetOverrideMIMETypeKey: "audio/mp4"])
+            playerItem = AVPlayerItem(asset: asset)
+        } else {
+            playerItem = AVPlayerItem(url: item.url)
+        }
         let newPlayer = AVPlayer(playerItem: playerItem)
         newPlayer.defaultRate = Float(playbackSpeed.rawValue)
         player = newPlayer
+        itemBecameReady = false
         installStateObservers(on: newPlayer, item: playerItem)
 
         installTimeObserver(on: newPlayer)
         installItemEndObserver(for: playerItem)
 
+        // One recording at a time: the Qur'an reader's audio stops.
+        NotificationCenter.default.post(name: .bayanAudioWillStart, object: nil)
         newPlayer.play()
         newPlayer.rate = Float(playbackSpeed.rawValue)
         isBuffering = true
         lastProgressSaveDate = Date()
+    }
 
+    /// Whether `item` is known to be MPEG-4 audio: the catalogue says so, or
+    /// it opened only that way before.
+    private func opensAsMPEG4(_ item: AudioPlayableItem) -> Bool {
+        mpeg4URLs.contains(item.url) || item.mediaItemID.map { mpeg4MediaIDs.contains($0) } == true
+    }
+
+    /// Reads which lectures are MPEG-4 audio from the bundled catalogue, off
+    /// the main thread. A lecture played before the answer arrives still
+    /// opens, by the retry below.
+    private func loadCatalogueContainersIfNeeded() {
+        guard !mpeg4MediaIDsRequested else { return }
+        mpeg4MediaIDsRequested = true
+        Task.detached(priority: .utility) { [weak self] in
+            let ids = Set(SeedBundle.mediaItems().filter { $0.mimeType == "audio/mp4" }.map(\.id))
+            await MainActor.run { self?.mpeg4MediaIDs = ids }
+        }
+    }
+
+    /// Some lectures named .mp3 hold MPEG-4 audio (nine of the 2025
+    /// Siraj-e-Moneera conference tour do) and are served as audio/mpeg, so
+    /// AVPlayer opens them as MP3 and fails. Such a file is opened once more
+    /// as what it is, at the place it was to start from.
+    private func retryAsMPEG4(_ item: AudioPlayableItem) {
+        retriedAsMPEG4ID = item.id
+        let resumeAt = pendingSeek ?? (currentTime > 0 ? currentTime : nil)
+        teardownPlayer()
+        pendingSeek = resumeAt
+        startPlayer(for: item, asMPEG4: true)
         updateNowPlayingInfo()
-        restoreSavedProgressIfNeeded(for: item)
     }
 
     func togglePlayPause() {
@@ -149,8 +219,15 @@ final class AudioPlayerService: AudioPlayerServicing {
             target = min(target, duration)
         }
         currentTime = target
-        let time = CMTime(seconds: target, preferredTimescale: 600)
-        player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
+        if player.currentItem?.status == .readyToPlay {
+            pendingSeek = nil
+            let time = CMTime(seconds: target, preferredTimescale: 600)
+            player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
+        } else {
+            // Made once the item is ready: see `pendingSeek`. Resuming a
+            // lecture used to start it from the beginning instead.
+            pendingSeek = target
+        }
         updateNowPlayingInfo()
     }
 
@@ -207,6 +284,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         duration = 0
         queue = []
         wasPlayingBeforeInterruption = false
+        pendingSeek = nil
 
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         try? AVAudioSession.sharedInstance().setActive(
@@ -242,6 +320,7 @@ final class AudioPlayerService: AudioPlayerServicing {
     private func resumePlayback() {
         guard nowPlaying != nil, let player else { return }
         guard activateAudioSession() else { return }
+        NotificationCenter.default.post(name: .bayanAudioWillStart, object: nil)
         player.play()
         player.rate = Float(playbackSpeed.rawValue)
         isBuffering = true
@@ -377,11 +456,25 @@ final class AudioPlayerService: AudioPlayerServicing {
     private func synchronizePlaybackState(identity: ObjectIdentifier) {
         guard let player, ObjectIdentifier(player) == identity else { return }
         if player.currentItem?.status == .failed {
+            // A file that never opened may be MPEG-4 audio named .mp3.
+            if let item = nowPlaying, !itemBecameReady, retriedAsMPEG4ID != item.id,
+               item.url.pathExtension.lowercased() == "mp3" {
+                retryAsMPEG4(item)
+                return
+            }
             isPlaying = false
             isBuffering = false
             playbackError = "Audio could not be loaded. Check your connection and tap Retry."
             persistProgressNow()
         } else {
+            if player.currentItem?.status == .readyToPlay, !itemBecameReady {
+                itemBecameReady = true
+                if let item = nowPlaying, retriedAsMPEG4ID == item.id { mpeg4URLs.insert(item.url) }
+                if let target = pendingSeek {
+                    pendingSeek = nil
+                    player.seek(to: CMTime(seconds: target, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+                }
+            }
             isPlaying = player.timeControlStatus == .playing
             isBuffering = player.timeControlStatus == .waitingToPlayAtSpecifiedRate
         }
@@ -473,9 +566,65 @@ final class AudioPlayerService: AudioPlayerServicing {
         }
     }
 
+    // MARK: - One recording at a time
+
+    /// The Qur'an reader's audio (its recitation, translation, tafsir or
+    /// memorising) pauses a bayan rather than playing over it. The bayan stays
+    /// loaded, so the mini player can resume it, which stops the Qur'an audio.
+    private func installQuranAudioObserver() {
+        quranAudioObserver = NotificationCenter.default.addObserver(
+            forName: .quranAudioWillStart,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                if self.isPlaying || self.isBuffering { self.pausePlayback() }
+                self.followRecitation()
+            }
+        }
+    }
+
+    /// The recitation under way, playing or paused, if there is one.
+    private var recitation: QuranListenPlayer? {
+        QuranListenPlayer.shared.current != nil ? QuranListenPlayer.shared : nil
+    }
+
+    /// While the reader recites, the lock screen shows the recitation, not a
+    /// paused bayan; followed until it ends, when this player's own details
+    /// come back.
+    private func followRecitation() {
+        let listen = QuranListenPlayer.shared
+        if let ayah = listen.current {
+            showsRecitation = true
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = [
+                MPMediaItemPropertyTitle: String(localized: "Quran"),
+                MPMediaItemPropertyArtist: "\(ayah.surah):\(ayah.ayah)",
+                MPNowPlayingInfoPropertyPlaybackRate: listen.isPlaying ? 1.0 : 0.0,
+            ]
+        } else if showsRecitation {
+            showsRecitation = false
+            updateNowPlayingInfo()
+            return
+        }
+        guard !recitationTracked else { return }
+        recitationTracked = true
+        withObservationTracking {
+            _ = listen.current
+            _ = listen.isPlaying
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                self?.recitationTracked = false
+                self?.followRecitation()
+            }
+        }
+    }
+
     // MARK: - Now Playing / remote commands
 
     private func updateNowPlayingInfo() {
+        // The recitation has the lock screen while it is under way.
+        guard !showsRecitation else { return }
         guard let item = nowPlaying else {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             return
@@ -499,9 +648,16 @@ final class AudioPlayerService: AudioPlayerServicing {
     private func configureRemoteCommands() {
         let center = MPRemoteCommandCenter.shared()
 
+        // While the reader recites, play and pause from the lock screen or
+        // AirPods are the recitation's: they used to resume a paused bayan
+        // over it.
         center.playCommand.isEnabled = true
         center.playCommand.addTarget { [weak self] _ in
             Task { @MainActor in
+                if let recitation = self?.recitation {
+                    recitation.resume()
+                    return
+                }
                 guard let self, let item = self.nowPlaying, !self.isPlaying else { return }
                 if self.playbackError != nil { self.play(item, queue: self.queue) }
                 else { self.resumePlayback() }
@@ -512,6 +668,10 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.pauseCommand.isEnabled = true
         center.pauseCommand.addTarget { [weak self] _ in
             Task { @MainActor in
+                if let recitation = self?.recitation {
+                    recitation.pause()
+                    return
+                }
                 guard let self, self.isPlaying || self.isBuffering else { return }
                 self.pausePlayback()
             }
@@ -521,6 +681,10 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.togglePlayPauseCommand.isEnabled = true
         center.togglePlayPauseCommand.addTarget { [weak self] _ in
             Task { @MainActor in
+                if let recitation = self?.recitation {
+                    if recitation.isPlaying { recitation.pause() } else { recitation.resume() }
+                    return
+                }
                 self?.togglePlayPause()
             }
             return .success
@@ -531,6 +695,8 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.skipForwardCommand.addTarget { [weak self] event in
             let interval = (event as? MPSkipIntervalCommandEvent)?.interval ?? 30
             Task { @MainActor in
+                // Not the paused bayan under a recitation.
+                guard self?.recitation == nil else { return }
                 self?.skipForward(interval)
             }
             return .success
@@ -541,6 +707,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.skipBackwardCommand.addTarget { [weak self] event in
             let interval = (event as? MPSkipIntervalCommandEvent)?.interval ?? 15
             Task { @MainActor in
+                guard self?.recitation == nil else { return }
                 self?.skipBackward(interval)
             }
             return .success
@@ -553,6 +720,7 @@ final class AudioPlayerService: AudioPlayerServicing {
             }
             let position = positionEvent.positionTime
             Task { @MainActor in
+                guard self?.recitation == nil else { return }
                 self?.seek(to: position)
             }
             return .success

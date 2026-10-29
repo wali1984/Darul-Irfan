@@ -1,15 +1,33 @@
 import Foundation
 
-/// Where each juz (para) and each ruku begins, as [surah, ayah] - the Tanzil
-/// Qur'an metadata (via api.alquran.cloud/v1/meta), the divisions printed in
-/// the IndoPak mushaf. Generated; do not edit by hand.
+/// Where each juz (para) and each ruku begins, as [surah, ayah].
 enum QuranDivisions {
+    /// The first ayah of each parah as the Silsila prints it: Akram-ut-Tarajum,
+    /// the IndoPak division a Pakistani reader follows. Seven parahs open at
+    /// a different ayah from the Madani juz table this list used to hold
+    /// (3:92, 5:83, 9:94, 15:2, 27:60, 29:45 and 36:22, against 3:93, 5:82,
+    /// 9:93, 15:1, 27:56, 29:46 and 36:28). Checked against the first page of
+    /// each printed parah; edit only from the printed book.
     static let juzStarts: [[Int]] = [
-        [1, 1], [2, 142], [2, 253], [3, 93], [4, 24], [4, 148], [5, 82], [6, 111],
-        [7, 88], [8, 41], [9, 93], [11, 6], [12, 53], [15, 1], [17, 1], [18, 75],
-        [21, 1], [23, 1], [25, 21], [27, 56], [29, 46], [33, 31], [36, 28], [39, 32],
+        [1, 1], [2, 142], [2, 253], [3, 92], [4, 24], [4, 148], [5, 83], [6, 111],
+        [7, 88], [8, 41], [9, 94], [11, 6], [12, 53], [15, 2], [17, 1], [18, 75],
+        [21, 1], [23, 1], [25, 21], [27, 60], [29, 45], [33, 31], [36, 22], [39, 32],
         [41, 47], [46, 1], [51, 31], [58, 1], [67, 1], [78, 1]
     ]
+
+    /// The parah (juz) an ayah is in, 1...30.
+    static func juz(surah: Int, ayah: Int) -> Int {
+        var number = 1
+        for (index, start) in juzStarts.enumerated() where (start[0], start[1]) <= (surah, ayah) {
+            number = index + 1
+        }
+        return number
+    }
+
+    /// The parah that opens at this ayah, if one does.
+    static func juzStarting(surah: Int, ayah: Int) -> Int? {
+        juzStarts.firstIndex { $0[0] == surah && $0[1] == ayah }.map { $0 + 1 }
+    }
 
     /// Ayahs in each surah, 1 to 114 (6,236 in all).
     static let ayahCounts: [Int] = [
@@ -21,6 +39,8 @@ enum QuranDivisions {
         19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6
     ]
 
+    /// The rukus: Tanzil's Qur'an metadata (via api.alquran.cloud/v1/meta).
+    /// Generated; do not edit by hand.
     static let rukuStarts: [[Int]] = [
         [1, 1], [2, 1], [2, 8], [2, 21], [2, 30], [2, 40], [2, 47], [2, 60],
         [2, 62], [2, 72], [2, 83], [2, 87], [2, 97], [2, 104], [2, 113], [2, 122],

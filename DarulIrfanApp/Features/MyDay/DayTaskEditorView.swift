@@ -8,6 +8,9 @@ struct DayTaskEditorView: View {
     let original: DayTask?
     let onSave: (DayTask) -> Void
     let onDelete: (() -> Void)?
+    /// The day's prayer times (nil without a place), for placing a
+    /// prayer-relative task in the calendar.
+    let prayerSchedule: @MainActor (Date) -> PrayerDaySchedule?
 
     private enum TimingKind: String, CaseIterable, Identifiable {
         case anytime = "Any time"
@@ -29,8 +32,14 @@ struct DayTaskEditorView: View {
     @State private var note: String
     @State private var calendarMessage: LocalizedStringKey?
 
-    init(task: DayTask?, onSave: @escaping (DayTask) -> Void, onDelete: (() -> Void)? = nil) {
+    init(
+        task: DayTask?,
+        prayerSchedule: @escaping @MainActor (Date) -> PrayerDaySchedule?,
+        onSave: @escaping (DayTask) -> Void,
+        onDelete: (() -> Void)? = nil
+    ) {
         self.original = task
+        self.prayerSchedule = prayerSchedule
         self.onSave = onSave
         self.onDelete = onDelete
         let calendar = Calendar.current
@@ -182,26 +191,49 @@ struct DayTaskEditorView: View {
     }
 
     /// Adds the next occurrence to the calendar, write-only: the app never
-    /// asks to read the calendar. A prayer-relative task is placed at today's
-    /// computed time, and says so in its notes.
+    /// asks to read the calendar. A prayer-relative task is placed at its
+    /// first day's computed prayer time, and says so in its notes.
     private func addToCalendar() async {
         guard Bundle.main.object(forInfoDictionaryKey: "NSCalendarsWriteOnlyAccessUsageDescription") != nil else {
             calendarMessage = "Calendar access is not available in this build."
             return
+        }
+        let task = builtTask
+        let start: Date
+        switch task.timing {
+        case .clock(let hour, let minute):
+            start = Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: task.startDay) ?? task.startDay
+        default:
+            // From the later of now and the task's first day, over the days
+            // the planner looks at, with each day's own prayer times.
+            let calendar = Calendar.current
+            let from = max(Date().addingTimeInterval(-60), task.startDay)
+            let firstDay = calendar.startOfDay(for: from)
+            var schedules: [PrayerDaySchedule] = []
+            for offset in 0..<9 {
+                if let day = calendar.date(byAdding: .day, value: offset, to: firstDay),
+                   let schedule = prayerSchedule(day) {
+                    schedules.append(schedule)
+                }
+            }
+            guard !schedules.isEmpty else {
+                calendarMessage = "Set your location first, so the task can follow your prayer times."
+                return
+            }
+            // The next time it falls; for a one-off whose time has passed,
+            // that day's time.
+            guard let resolved = MyDayPlanner.nextOccurrence(of: task, after: from, schedules: schedules)
+                ?? MyDayPlanner.time(of: task, on: task.startDay, schedule: prayerSchedule(task.startDay)) else {
+                calendarMessage = "The task could not be added to your calendar."
+                return
+            }
+            start = resolved
         }
         let store = EKEventStore()
         do {
             guard try await store.requestWriteOnlyAccessToEvents() else {
                 calendarMessage = "Allow calendar access in Settings to add tasks to your calendar."
                 return
-            }
-            let task = builtTask
-            let start: Date
-            switch task.timing {
-            case .clock(let hour, let minute):
-                start = Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: task.startDay) ?? task.startDay
-            default:
-                start = MyDayPlanner.nextOccurrence(of: task, after: Date().addingTimeInterval(-60), schedules: []) ?? task.startDay
             }
             let event = EKEvent(eventStore: store)
             event.title = task.title

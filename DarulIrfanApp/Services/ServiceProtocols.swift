@@ -78,6 +78,13 @@ protocol HeadingProviding: AnyObject {
     var isHeadingAvailable: Bool { get }
     /// Degrees from north; prefers true heading, falls back to magnetic.
     var currentHeading: Double? { get }
+    /// True while `currentHeading` is magnetic rather than true north.
+    /// CoreLocation gives true north only while location updates run, which
+    /// needs location permission; magnetic north is off by the local
+    /// declination (about 13 degrees in New York).
+    var isMagneticHeading: Bool { get }
+    /// Whether location permission, and so true north, is available.
+    var canUseTrueNorth: Bool { get }
     /// Negative accuracy from CoreLocation means the compass needs calibration.
     var needsCalibration: Bool { get }
     func startUpdates(onChange: @escaping @MainActor () -> Void)
@@ -99,10 +106,22 @@ protocol NotificationScheduling: Sendable {
         preferences: PrayerNotificationPreferences
     ) async
 
-    /// Schedules a one-off reminder (zikr session, event) at `date`.
+    /// Schedules a one-off reminder (event, focus session, test) at `date`.
+    /// Does nothing when a recurring set for `id` is already pending, since
+    /// that set holds this reminder too.
     func scheduleReminder(id: String, title: String, body: String, at date: Date) async
 
+    /// Schedules one reminder per date under `id`, replacing every reminder
+    /// already pending for it (a one-off or an earlier set). Each is its own
+    /// one-off request, so a recurring session or task keeps reminding
+    /// without the app being opened in between.
+    func scheduleReminders(id: String, title: String, body: String, at dates: [Date]) async
+
+    /// Removes the reminder for `id`, or every reminder of its recurring set.
     func cancelReminder(id: String) async
+
+    /// Whether this app's notifications are allowed (including provisionally).
+    func notificationsAllowed() async -> Bool
 
     /// Count of currently pending requests (used by tests/diagnostics).
     func pendingCount() async -> Int
@@ -187,14 +206,18 @@ protocol DownloadManaging: AnyObject {
 // MARK: - Content sync
 
 protocol ContentSyncServicing: Sendable {
-    /// Imports bundled seed JSON into the database on first launch (idempotent,
-    /// checksum-guarded). Returns number of imported records.
+    /// Imports the parts of the bundled seed that changed since they were
+    /// last imported (all of it on first launch), reporting each step that
+    /// runs through `progress`. Returns the number of imported records.
     @discardableResult
-    func importSeedDataIfNeeded() async throws -> Int
+    func importSeedDataIfNeeded(progress: @escaping @Sendable (SeedImportStep) async -> Void) async throws -> Int
+}
 
-    /// Fetches the remote manifest (if reachable) and applies updates.
-    /// Never removes user data; respects rightsStatus rules.
-    func refreshFromRemoteManifest() async throws
+extension ContentSyncServicing {
+    @discardableResult
+    func importSeedDataIfNeeded() async throws -> Int {
+        try await importSeedDataIfNeeded(progress: { _ in })
+    }
 }
 
 // MARK: - Search

@@ -9,12 +9,29 @@ struct HadithRepository: HadithRepositoryProtocol {
     canonical_id, book_id, display_number, number_major, number_minor,
     source_sequence, text_ar, text_en, text_ur, grades, source_book, source_hadith,
     arabic_segments_json, quran_refs_json, urdu_sanad, urdu_text,
-    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur
+    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur,
+    english_review_state, urdu_review_state, urdu_source
     """
 
     /// The source edition's own order. See `HadithEntry` for why neither the
     /// display number nor `number_minor` can be used to sort.
     private static let readingOrder = "ORDER BY book_id, source_sequence"
+
+    /// The collections in the order a reader looks for them: the two Sahihs,
+    /// the Sunan, the Muwatta, then the other translated works. Collections
+    /// not named here (the Arabic-only works) follow, largest first.
+    static let collectionOrder = [
+        "bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah", "malik",
+        "ahmad", "darimi", "riyadussalihin", "mishkat", "bulugh", "adab", "shamail",
+        "nawawi40", "qudsi40", "hisn", "virtues",
+    ]
+
+    /// SQL ranking a collection id by `collectionOrder`.
+    private static func collectionRank(_ column: String) -> String {
+        "CASE \(column) "
+            + collectionOrder.enumerated().map { "WHEN '\($0.element)' THEN \($0.offset)" }.joined(separator: " ")
+            + " ELSE \(collectionOrder.count) END"
+    }
 
     // MARK: - Reads
 
@@ -24,7 +41,7 @@ struct HadithRepository: HadithRepositoryProtocol {
             SELECT id, title_english, title_urdu, hadith_count,
                    has_arabic, has_english, has_urdu, section_count, sections_json
             FROM hadith_books
-            ORDER BY hadith_count DESC
+            ORDER BY \(Self.collectionRank("id")), hadith_count DESC, id
             """,
             []
         )
@@ -211,10 +228,34 @@ struct HadithRepository: HadithRepositoryProtocol {
         return rows.first?.int("n") ?? 0
     }
 
-    /// The first narration assigned to a collection's kitab. Both predicates
-    /// are required: book numbers restart independently in every collection.
+    /// The first narration of a collection's kitab. Both predicates are
+    /// required: book numbers restart independently in every collection.
+    ///
+    /// The first row carrying the book's number is not always where the book
+    /// starts: a source reference can label a narration in another book with
+    /// it (two such rows inside Sahih Muslim's Book of Faith carry the numbers
+    /// of the Books of Marriage and of Virtues). The book's start is the first
+    /// row followed by more of its own; a stray row has none beside it.
     func firstEntry(bookID: String, sourceBook: Int) async throws -> HadithEntry? {
         let rows = try await database.connection.query(
+            """
+            SELECT \(Self.entryColumns)
+            FROM hadith_entries h
+            WHERE h.book_id = ? AND h.source_book = ?
+              AND EXISTS (
+                SELECT 1 FROM hadith_entries n
+                WHERE n.book_id = h.book_id AND n.source_book = h.source_book
+                  AND n.source_sequence > h.source_sequence
+                  AND n.source_sequence <= h.source_sequence + 3
+              )
+            ORDER BY h.source_sequence
+            LIMIT 1
+            """,
+            [.text(bookID), .int(sourceBook)]
+        )
+        if let start = rows.compactMap(Self.entry(from:)).first { return start }
+        // A book of a single narration has nothing beside it.
+        let single = try await database.connection.query(
             """
             SELECT \(Self.entryColumns)
             FROM hadith_entries
@@ -224,23 +265,103 @@ struct HadithRepository: HadithRepositoryProtocol {
             """,
             [.text(bookID), .int(sourceBook)]
         )
-        return rows.compactMap(Self.entry(from:)).first
+        return single.compactMap(Self.entry(from:)).first
     }
 
-    /// Substring search across whichever scripts are stored.
+    /// Search across the Arabic, English and Urdu of the narrations.
+    ///
+    /// Matches the folded index (`hadith_fts`): an Arabic word typed without
+    /// harakat finds the fully vowelled text, and the Arabic and Urdu forms of
+    /// a letter match each other. Across collections the results come a few
+    /// per collection in `collectionOrder`, so Sahih al-Bukhari and Sahih
+    /// Muslim lead instead of whichever collection sorts first by name.
+    /// Until the index has been built (in the background, after a content
+    /// update) the plain substring search answers instead.
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry] {
+        let expression = SearchIndexService.ftsMatchExpression(from: term)
+        guard !expression.isEmpty else { return [] }
+        guard await SearchIndexState.isReady(.hadith, database: database) else {
+            SearchIndexService.scheduleLargeIndexBuild(database: database)
+            return try await substringSearch(term, bookID: bookID, limit: limit)
+        }
+        let perCollection = bookID == nil ? max(5, limit / 10) : max(1, limit)
+        var filter = ""
+        var params: [SQLValue] = [.text(expression)]
+        if let bookID {
+            filter = "AND e.book_id = ?"
+            params.append(.text(bookID))
+        }
+        params.append(contentsOf: [.int(perCollection), .int(max(1, limit))])
+        do {
+            let rows = try await database.connection.query(
+                """
+                WITH hits AS (
+                    SELECT e.rowid AS rid, e.book_id AS book, e.source_sequence AS seq
+                    FROM hadith_fts JOIN hadith_entries e ON e.rowid = hadith_fts.rowid
+                    WHERE hadith_fts MATCH ? \(filter)
+                ), ranked AS (
+                    SELECT rid, book, seq, ROW_NUMBER() OVER (PARTITION BY book ORDER BY seq) AS rn
+                    FROM hits
+                )
+                SELECT \(Self.entryColumns)
+                FROM ranked JOIN hadith_entries ON hadith_entries.rowid = ranked.rid
+                WHERE ranked.rn <= ?
+                ORDER BY \(Self.collectionRank("ranked.book")), ranked.book, ranked.rn
+                LIMIT ?
+                """,
+                params
+            )
+            return rows.compactMap(Self.entry(from:))
+        } catch {
+            // A query the index rejects reads as "no results".
+            AppLog.search("Hadith search failed: \(error.localizedDescription)")
+            return []
+        }
+    }
+
+    /// How many narrations match, for "showing N of M". Nil while the index
+    /// is being built.
+    func searchCount(_ term: String, bookID: String?) async throws -> Int? {
+        let expression = SearchIndexService.ftsMatchExpression(from: term)
+        guard !expression.isEmpty, await SearchIndexState.isReady(.hadith, database: database) else { return nil }
+        do {
+            let rows: [SQLRow]
+            if let bookID {
+                rows = try await database.connection.query(
+                    """
+                    SELECT COUNT(*) AS n FROM hadith_fts
+                    JOIN hadith_entries e ON e.rowid = hadith_fts.rowid
+                    WHERE hadith_fts MATCH ? AND e.book_id = ?
+                    """,
+                    [.text(expression), .text(bookID)]
+                )
+            } else {
+                rows = try await database.connection.query(
+                    "SELECT COUNT(*) AS n FROM hadith_fts WHERE hadith_fts MATCH ?",
+                    [.text(expression)]
+                )
+            }
+            return rows.first?.int("n")
+        } catch {
+            return nil
+        }
+    }
+
+    /// The plain substring search, in collection order. Arabic matches only
+    /// as stored, vowels and all.
+    private func substringSearch(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry] {
         let needle = "%\(term)%"
         var sql = """
         SELECT \(Self.entryColumns)
         FROM hadith_entries
-        WHERE (text_en LIKE ? OR text_ur LIKE ? OR text_ar LIKE ?)
+        WHERE (text_en LIKE ? OR text_ur LIKE ? OR text_ar LIKE ? OR urdu_text LIKE ?)
         """
-        var params: [SQLValue] = [.text(needle), .text(needle), .text(needle)]
+        var params: [SQLValue] = [.text(needle), .text(needle), .text(needle), .text(needle)]
         if let bookID {
             sql += " AND book_id = ?"
             params.append(.text(bookID))
         }
-        sql += " \(Self.readingOrder) LIMIT ?"
+        sql += " ORDER BY \(Self.collectionRank("book_id")), book_id, source_sequence LIMIT ?"
         params.append(.int(limit))
         let rows = try await database.connection.query(sql, params)
         return rows.compactMap(Self.entry(from:))
@@ -289,10 +410,12 @@ struct HadithRepository: HadithRepositoryProtocol {
     /// the stored count would drift above the pack's and the integrity check
     /// after import would fail every launch.
     func deleteEntries(bookID: String) async throws {
-        try await database.connection.execute(
-            "DELETE FROM hadith_entries WHERE book_id = ?",
-            [.text(bookID)]
-        )
+        try await database.connection.executeBatch([
+            ("DELETE FROM hadith_entries WHERE book_id = ?", [.text(bookID)]),
+            // The search index is keyed by these rows; it is rebuilt from the
+            // new ones in the background.
+            SearchIndexState.markStale(.hadith),
+        ])
     }
 
     /// Inserts one collection's narrations.
@@ -305,15 +428,16 @@ struct HadithRepository: HadithRepositoryProtocol {
     /// caller checks the resulting row count.
     func upsertEntries(_ entries: [HadithEntry]) async throws {
         guard !entries.isEmpty else { return }
-        let statements: [(sql: String, parameters: [SQLValue])] = entries.map { entry in
+        var statements: [(sql: String, parameters: [SQLValue])] = entries.map { entry in
             (
                 sql: """
                 INSERT INTO hadith_entries (canonical_id, book_id, display_number,
                     number_major, number_minor, source_sequence,
                     text_ar, text_en, text_ur, grades, source_book, source_hadith,
                     arabic_segments_json, quran_refs_json, urdu_sanad, urdu_text,
-                    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur,
+                    english_review_state, urdu_review_state, urdu_source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(canonical_id) DO UPDATE SET
                     book_id = excluded.book_id,
                     display_number = excluded.display_number,
@@ -333,7 +457,10 @@ struct HadithRepository: HadithRepositoryProtocol {
                     chapter_number = excluded.chapter_number,
                     chapter_title_en = excluded.chapter_title_en,
                     chapter_title_ar = excluded.chapter_title_ar,
-                    chapter_title_ur = excluded.chapter_title_ur
+                    chapter_title_ur = excluded.chapter_title_ur,
+                    english_review_state = excluded.english_review_state,
+                    urdu_review_state = excluded.urdu_review_state,
+                    urdu_source = excluded.urdu_source
                 """,
                 parameters: [
                     .text(entry.canonicalID),
@@ -356,9 +483,13 @@ struct HadithRepository: HadithRepositoryProtocol {
                     .optionalText(entry.chapterTitleEnglish),
                     .optionalText(entry.chapterTitleArabic),
                     .optionalText(entry.chapterTitleUrdu),
+                    .optionalText(entry.englishReviewState),
+                    .optionalText(entry.urduReviewState),
+                    .optionalText(entry.urduSource),
                 ]
             )
         }
+        statements.append(SearchIndexState.markStale(.hadith))
         try await database.connection.executeBatch(statements)
     }
 
@@ -393,7 +524,10 @@ struct HadithRepository: HadithRepositoryProtocol {
             chapterNumber: row.int("chapter_number"),
             chapterTitleEnglish: row.text("chapter_title_en"),
             chapterTitleArabic: row.text("chapter_title_ar"),
-            chapterTitleUrdu: row.text("chapter_title_ur")
+            chapterTitleUrdu: row.text("chapter_title_ur"),
+            englishReviewState: row.text("english_review_state"),
+            urduReviewState: row.text("urdu_review_state"),
+            urduSource: row.text("urdu_source")
         )
     }
 }

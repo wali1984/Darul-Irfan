@@ -24,13 +24,17 @@ struct OfficialFeedView: View {
     }
 
     let dependencies: AppDependencies
+    /// Opens the update a link names. Only Discover's copy of this screen
+    /// does, so the one under the Halqah tab does not take it as well.
+    private let followsLinks: Bool
     @State private var viewModel: OfficialPlatformViewModel
     @State private var presentedVideo: FeedVideo?
     @State private var presentedItem: OfficialFeedItem?
     @State private var filter: FeedFilter = .all
 
-    init(dependencies: AppDependencies) {
+    init(dependencies: AppDependencies, followsLinks: Bool = false) {
         self.dependencies = dependencies
+        self.followsLinks = followsLinks
         _viewModel = State(initialValue: OfficialPlatformViewModel(
             feedService: dependencies.officialPlatform,
             liveService: dependencies.officialPlatform
@@ -65,12 +69,29 @@ struct OfficialFeedView: View {
         }
         .diScreenBackground()
         .refreshable { await viewModel.load(forceRefresh: true) }
-        .task { await viewModel.load() }
+        .task {
+            await viewModel.load()
+            openLinkedUpdate()
+        }
+        .onChange(of: DeepLinkRouter.shared.requestCount) { _, _ in openLinkedUpdate() }
         .sheet(item: $presentedVideo) { video in
             YouTubePlayerSheet(videoID: video.id, title: video.title)
         }
         .sheet(item: $presentedItem) { item in
             OfficialFeedDetailView(item: item)
+        }
+    }
+
+    /// A link to one update ("darulirfan://feed/<id>") opens it once the
+    /// feed has loaded, when it is among the updates shown.
+    private func openLinkedUpdate() {
+        guard followsLinks, !viewModel.isLoading,
+              let id = DeepLinkRouter.shared.take(\.updateID) else { return }
+        guard let item = viewModel.feedItems.first(where: { $0.id == id }) else { return }
+        if let videoID = item.videoID {
+            presentedVideo = FeedVideo(id: videoID, title: item.title)
+        } else {
+            presentedItem = item
         }
     }
 

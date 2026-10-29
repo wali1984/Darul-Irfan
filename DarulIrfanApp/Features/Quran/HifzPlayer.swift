@@ -35,6 +35,12 @@ final class HifzPlayer {
     @ObservationIgnored private var timeObserver: Any?
     @ObservationIgnored private var recitation: SurahRecitation?
     @ObservationIgnored private var pauseTask: Task<Void, Never>?
+    @ObservationIgnored private var bayanObserver: NSObjectProtocol?
+    /// Bumped by each seek, so only the latest one starts playback.
+    @ObservationIgnored private var seekToken = 0
+    /// While a seek is under way the player still reports the old position;
+    /// the end-of-verse check ignores it until the seek lands.
+    @ObservationIgnored private var isSeeking = false
 
     @ObservationIgnored private var range: ClosedRange<Int> = 1...1
     @ObservationIgnored private var repeats = 3
@@ -58,7 +64,20 @@ final class HifzPlayer {
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
         try? AVAudioSession.sharedInstance().setActive(true)
 
-        let newPlayer = AVPlayer(playerItem: AVPlayerItem(url: url))
+        // One recording at a time: the reader's recitation stops and the
+        // bayan player pauses; a bayan started later ends the practice.
+        QuranListenPlayer.shared.stop()
+        NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
+        bayanObserver = NotificationCenter.default.addObserver(
+            forName: .bayanAudioWillStart, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.stop() }
+        }
+
+        // The reader's exactly-timed item, with its offline copy: the file is
+        // variable bitrate, and a seek timed by estimate lands inside the
+        // ayah before or cuts the one being memorised.
+        let newPlayer = AVPlayer(playerItem: QuranListenPlayer.recitationItem(url, durationMs: recitation.durationMs))
         player = newPlayer
         // 20 Hz is enough to stop within a fiftieth of a second of a verse end,
         // which is below what a listener notices, and cheap.
@@ -93,6 +112,10 @@ final class HifzPlayer {
         pauseTask = nil
         if let timeObserver, let player { player.removeTimeObserver(timeObserver) }
         timeObserver = nil
+        if let bayanObserver { NotificationCenter.default.removeObserver(bayanObserver) }
+        bayanObserver = nil
+        seekToken += 1
+        isSeeking = false
         player?.pause()
         player = nil
         recitation = nil
@@ -109,19 +132,32 @@ final class HifzPlayer {
         recite(ayah: ayah)
     }
 
+    /// Plays the verse's window from its first word. Playback starts only once
+    /// the seek has landed; started at once, the end-of-verse check could act
+    /// on the position before the seek and cut the repetition short.
     private func recite(ayah: Int) {
         guard let player, let verse = recitation?.verse(ayah) else { return }
         phase = .reciting
+        player.pause()
+        seekToken += 1
+        let token = seekToken
+        isSeeking = true
         player.seek(
             to: CMTime(value: CMTimeValue(verse.fromMs), timescale: 1000),
             toleranceBefore: .zero,
             toleranceAfter: .zero
-        )
-        player.play()
+        ) { [weak self] finished in
+            Task { @MainActor in
+                guard let self, token == self.seekToken else { return }
+                self.isSeeking = false
+                guard finished, self.phase == .reciting else { return }
+                self.player?.play()
+            }
+        }
     }
 
     private func observe(ms: Int) {
-        guard phase == .reciting, let ayah = currentAyah,
+        guard phase == .reciting, !isSeeking, let ayah = currentAyah,
               let verse = recitation?.verse(ayah), ms >= verse.toMs else { return }
         player?.pause()
         if repetition < repeats {

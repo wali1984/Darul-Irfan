@@ -85,6 +85,8 @@ final class OnboardingViewModel {
         self.location = location
         self.notifications = notifications
         self.appState = appState
+        // Resumes where the flow was when a language choice rebuilt it.
+        self.step = appState.onboardingStep
         self.selectedLanguage = appState.settings.language
         self.selectedMethod = appState.settings.calculation.method
         self.selectedAsrMethod = appState.settings.calculation.asrMethod
@@ -99,11 +101,16 @@ final class OnboardingViewModel {
     var activePlaceName: String? { appState.activePlace?.name }
 
     func advance() {
-        if let next = step.next { step = next }
+        if let next = step.next { show(next) }
     }
 
     func goBack() {
-        if let previous = step.previous { step = previous }
+        if let previous = step.previous { show(previous) }
+    }
+
+    private func show(_ newStep: OnboardingStep) {
+        step = newStep
+        appState.onboardingStep = newStep
     }
 
     // MARK: - Language
@@ -205,6 +212,7 @@ final class OnboardingViewModel {
     func completeOnboarding() async {
         guard !isFinishing else { return }
         isFinishing = true
+        appState.onboardingStep = .welcome
         await appState.updateSettings { $0.hasCompletedOnboarding = true }
         await appState.refreshScheduledNotificationsAndWidgets()
         isFinishing = false

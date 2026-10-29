@@ -77,12 +77,12 @@ struct MyDayView: View {
         }
         .sheet(isPresented: $isAdding) {
             NavigationStack {
-                DayTaskEditorView(task: nil) { task in save(task) }
+                DayTaskEditorView(task: nil, prayerSchedule: { prayerSchedule(on: $0) }) { task in save(task) }
             }
         }
         .sheet(item: $editing) { task in
             NavigationStack {
-                DayTaskEditorView(task: task, onSave: { save($0) }, onDelete: {
+                DayTaskEditorView(task: task, prayerSchedule: { prayerSchedule(on: $0) }, onSave: { save($0) }, onDelete: {
                     store.delete(taskID: task.id)
                     refreshReminders()
                 })
@@ -133,6 +133,10 @@ struct MyDayView: View {
     private func save(_ task: DayTask) {
         store.upsert(task)
         refreshReminders()
+    }
+
+    private func prayerSchedule(on day: Date) -> PrayerDaySchedule? {
+        MyDayPrayerTimes.schedule(on: day, dependencies: dependencies, appState: appState)
     }
 
     /// Reminders follow the prayer alerts' refresh, which schedules them in

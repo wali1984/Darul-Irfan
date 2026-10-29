@@ -40,9 +40,8 @@ actor OfficialPlatformService:
         configuration.timeoutIntervalForResource = 30
         configuration.waitsForConnectivity = false
         session = URLSession(configuration: configuration)
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        self.decoder = decoder
+        // The server's timestamps, with or without milliseconds: see ServerDate.
+        decoder = JSONDecoder.darulIrfanServer()
         encoder.dateEncodingStrategy = .iso8601
     }
 
@@ -100,26 +99,12 @@ actor OfficialPlatformService:
             await unregisterFromPush()
             return
         }
-        let identity = SecureInstallationIdentity.loadOrCreate()
         let tokenString = token.map { String(format: "%02x", $0) }.joined()
         SecurePushToken.save(tokenString)
-        let registration = DeviceRegistration(
-            installationID: identity,
-            apnsToken: tokenString,
-            locale: Locale.current.identifier,
-            timeZone: TimeZone.current.identifier,
-            topics: preferences.topics.sorted { $0.rawValue < $1.rawValue },
-            environment: Self.pushEnvironment,
-            appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        let registration = try await sendRegistration(
+            token: tokenString,
+            topics: preferences.topics.sorted { $0.rawValue < $1.rawValue }
         )
-        var request = URLRequest(url: baseURL.appendingPathComponent("v1/devices"))
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try encoder.encode(registration)
-        let (_, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 201 else {
-            throw OfficialPlatformError.invalidResponse
-        }
         try await database.connection.execute(
             """
             INSERT INTO push_registration_state(installation_id,token_hash,topics_json,updated_at)
@@ -129,21 +114,74 @@ actor OfficialPlatformService:
               topics_json=excluded.topics_json,
               updated_at=excluded.updated_at
             """,
-            [.text(identity.uuidString), .text("registered"), .text(String(data: try encoder.encode(registration.topics), encoding: .utf8) ?? "[]"), .date(Date())]
+            [.text(registration.installationID.uuidString), .text("registered"), .text(String(data: try encoder.encode(registration.topics), encoding: .utf8) ?? "[]"), .date(Date())]
         )
+    }
+
+    /// Makes sure the server can reach this phone with its member's Halqah
+    /// notices, whether or not official alerts are on: a group notice goes to
+    /// every registered phone linked to a member of the group. The official
+    /// alert topics the phone may have are left exactly as they are - the
+    /// server keeps them, and the ones this phone last registered are sent
+    /// as well, so a server that predates `keepTopics` cannot clear them.
+    func registerForHalqahNotices(token: Data) async throws {
+        let tokenString = token.map { String(format: "%02x", $0) }.joined()
+        SecurePushToken.save(tokenString)
+        _ = try await sendRegistration(token: tokenString, topics: await registeredTopics(), keepTopics: true)
+    }
+
+    /// The official alert topics this phone last registered, if it has.
+    private func registeredTopics() async -> [PushTopic] {
+        guard let identity = SecureInstallationIdentity.load(),
+              let row = try? await database.connection.query(
+                  "SELECT topics_json FROM push_registration_state WHERE installation_id=?",
+                  [.text(identity.uuidString)]
+              ).first,
+              let json = row.text("topics_json"),
+              let topics = try? JSONDecoder().decode([PushTopic].self, from: Data(json.utf8)) else { return [] }
+        return topics
+    }
+
+    /// POST /v1/devices for this installation.
+    private func sendRegistration(token: String, topics: [PushTopic], keepTopics: Bool = false) async throws -> DeviceRegistration {
+        let registration = DeviceRegistration(
+            installationID: SecureInstallationIdentity.loadOrCreate(),
+            apnsToken: token,
+            locale: Locale.current.identifier,
+            timeZone: TimeZone.current.identifier,
+            topics: topics,
+            environment: Self.pushEnvironment,
+            appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown",
+            keepTopics: keepTopics ? true : nil
+        )
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/devices"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try encoder.encode(registration)
+        let (_, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 201 else {
+            throw OfficialPlatformError.invalidResponse
+        }
+        return registration
     }
 
     func unregisterFromPush() async {
         guard let identity = SecureInstallationIdentity.load(),
               let token = SecurePushToken.load() else { return }
-        var request = URLRequest(url: baseURL.appendingPathComponent("v1/devices/\(identity.uuidString)"))
-        request.httpMethod = "DELETE"
-        request.setValue(token, forHTTPHeaderField: "X-APNS-Token")
-        _ = try? await session.data(for: request)
         try? await database.connection.execute(
             "DELETE FROM push_registration_state WHERE installation_id=?",
             [.text(identity.uuidString)]
         )
+        // Halqah notices still need the phone registered: keep it, with no
+        // official topic, rather than removing it and silencing the group.
+        if HalqahNoticeChoice.isWanted {
+            _ = try? await sendRegistration(token: token, topics: [])
+            return
+        }
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/devices/\(identity.uuidString)"))
+        request.httpMethod = "DELETE"
+        request.setValue(token, forHTTPHeaderField: "X-APNS-Token")
+        _ = try? await session.data(for: request)
         SecurePushToken.delete()
     }
 
