@@ -31,21 +31,34 @@ import numpy as np
 import requests
 import soundfile as sf
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import narration_finish as finishing  # noqa: E402
+from urdu_spoken import LETTER_AYAT, spell_letters  # noqa: E402
+
 V = Path("/mnt/sata1tb/di-voices")
 OUT = V / "quran-higgs"
 STOP = V / "STOP"
 FLAGGED = V / "higgs_flagged.json"
+# Wording corrected against the printed Akram-ut-Tarajum (tarajum_check.py),
+# keyed "surah:ayah"; the website the text was typed from has typing errors.
+CORRECTIONS = V / "text_corrections.json"
+# Files to make again (the check found words the voice added or dropped):
+# one "edition/kind/name" per line. Each is remade and checked again.
+REDO = V / "redo.txt"
 ITEMS = [item for item in json.loads(Path("/mnt/sata1tb/di-tts/tts_input.json").read_text(encoding="utf-8"))
          if item["voice"] == "ur"]
 ITEMS.sort(key=lambda item: (item["kind"] != "translation", item["surah"], item["ayahStart"]))
+CORRECTED = json.loads(CORRECTIONS.read_text(encoding="utf-8")) if CORRECTIONS.exists() else {}
+# Remake only what redo.txt lists (and nothing new) when started with --redo.
+REDO_ONLY = "--redo" in sys.argv
 REF_AUDIO = str(V / "refs/ur/002186.wav")
 REF_TEXT = json.loads((V / "refs/ref_texts.json").read_text(encoding="utf-8"))["ur/002186"]
 LEAD = "<|prosody:speed_slow|>"
 PAUSE = " <|prosody:pause|> "
 SENTENCE_GAP, PARAGRAPH_GAP = 0.65, 1.1
-# Every piece fades in and out, so no join clicks; each file ends in a fade and
-# a short silence, so one ayah runs into the next like a breath, not a cut.
-FADE_IN, FADE_OUT, FILE_FADE, FILE_TAIL, FILE_LEAD = 0.01, 0.03, 0.08, 0.35, 0.05
+# Every piece fades in and out, so no join clicks. The file's own start and
+# end (hiss out, cut to the speech, an even pause) are narration_finish's.
+FADE_IN, FADE_OUT = 0.01, 0.03
 MAX_CHUNK = 240
 
 # Words the voice misreads, with the vowel marks that make it read them right.
@@ -142,9 +155,14 @@ def script(item: dict) -> list[dict]:
     """The reading script: sentences ("say"), paragraph breaks and the Qari's
     recitation of a quoted ayah ("recite")."""
     segments: list[dict] = []
+    text = item["text"]
+    if item["kind"] == "translation":
+        text = CORRECTED.get(f"{item['surah']}:{item['ayahStart']}", text)
+        if (item["surah"], item["ayahStart"]) in LETTER_AYAT:
+            text = spell_letters(text)
     # A line the scan broke mid-sentence joins the next ("وہ گمراہ ⏎ ہے").
     paragraphs: list[str] = []
-    for block in re.split(r"\n\s*\n", item["text"]):
+    for block in re.split(r"\n\s*\n", text):
         block = block.strip()
         if paragraphs and paragraphs[-1] and not paragraphs[-1].rstrip(" -").endswith(TERMINAL) \
                 and not AYAH_MARKER.search(paragraphs[-1][-12:]):
@@ -234,6 +252,7 @@ def gpu_temperature() -> int:
 
 def main() -> int:
     voice = Voice()
+    redo = set(REDO.read_text().split()) if REDO.exists() else set()
     flagged = json.loads(FLAGGED.read_text()) if FLAGGED.exists() else {}
     made = 0
     started = time.monotonic()
@@ -242,8 +261,9 @@ def main() -> int:
             log("stop requested; leaving off here")
             return 4
         name = f"{item['surah']:03d}{item['ayahStart']:03d}" + (f"-{item['ayahEnd']:03d}" if item["ayahEnd"] != item["ayahStart"] else "")
+        key = f"{item['edition']}/{item['kind']}/{name}"
         target = OUT / item["edition"] / item["kind"] / f"{name}.mp3"
-        if target.exists():
+        if (target.exists() or REDO_ONLY) and key not in redo:
             continue
         if gpu_temperature() >= 83:
             log("GPU hot, pausing")
@@ -267,12 +287,16 @@ def main() -> int:
         if not pieces:
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
-        wav = target.with_suffix(".wav")
-        body = faded(np.concatenate(pieces[:-1] if len(pieces) > 1 else pieces), voice.rate, FADE_IN, FILE_FADE)
-        sf.write(wav, np.concatenate([np.zeros(int(voice.rate * FILE_LEAD), np.float32), body,
-                                      np.zeros(int(voice.rate * FILE_TAIL), np.float32)]), voice.rate)
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(wav), "-ac", "1", "-b:a", "64k", str(target)], check=True)
-        wav.unlink()
+        body = np.concatenate(pieces[:-1] if len(pieces) > 1 else pieces)
+        if voice.rate != finishing.RATE:
+            body = np.interp(np.linspace(0, len(body) - 1, int(len(body) * finishing.RATE / voice.rate)),
+                             np.arange(len(body)), body).astype(np.float32)
+        finishing.encode(finishing.finish(body), target)
+        with (V / f"finished_{item['kind']}.txt").open("a") as done:
+            done.write(str(target) + "\n")
+        if key in redo:
+            redo.discard(key)
+            REDO.write_text("\n".join(sorted(redo)) + ("\n" if redo else ""))
         if bad:
             flagged[f"{item['edition']}/{item['kind']}/{name}"] = "length far from expected after 3 tries"
             FLAGGED.write_text(json.dumps(flagged, indent=1))
