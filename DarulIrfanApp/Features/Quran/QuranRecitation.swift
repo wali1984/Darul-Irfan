@@ -94,7 +94,7 @@ struct MushafWordMap: Sendable, Equatable {
 
         let scalars = Array(text.unicodeScalars)
         var cursor = 0
-        var found: [Int: Range<Int>] = [:]
+        var spelled: [Range<Int>] = []
         for position in 1...wordByPosition.count {
             guard let word = wordByPosition[position] else { return nil }
             let significant = word.unicodeScalars.filter { !Self.isIgnorable($0) }
@@ -107,12 +107,33 @@ struct MushafWordMap: Sendable, Equatable {
                 cursor += 1
             }
             guard let start else { return nil }
-            found[position] = Self.widened(start..<cursor, in: scalars)
+            spelled.append(start..<cursor)
         }
         // Every letter of the mushaf must belong to a recited word.
         while cursor < scalars.count, Self.isIgnorable(scalars[cursor]) { cursor += 1 }
         guard cursor == scalars.count else { return nil }
-        ranges = found
+        ranges = Self.tints(for: spelled, in: scalars)
+    }
+
+    /// One tint per word position, from where each word is spelt in the text
+    /// (in position order). Where the mushaf runs words together and a letter
+    /// joins across the gap ("بِكُمْوَلَا"), widening a word's edge to the next
+    /// safe break reaches into its neighbour; the tint then covers both whole
+    /// words, so no word is ever tinted in part.
+    private static func tints(for spelled: [Range<Int>], in scalars: [Unicode.Scalar]) -> [Int: Range<Int>] {
+        var result: [Int: Range<Int>] = [:]
+        var first = 0
+        while first < spelled.count {
+            var last = first
+            var range = widened(spelled[first], in: scalars)
+            while last + 1 < spelled.count, range.upperBound > spelled[last + 1].lowerBound {
+                last += 1
+                range = widened(range.lowerBound..<max(range.upperBound, spelled[last].upperBound), in: scalars)
+            }
+            for index in first...last { result[index + 1] = range }
+            first = last + 1
+        }
+        return result
     }
 
     /// The ayah's own text cut around the word at `position`: before, the

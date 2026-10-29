@@ -224,8 +224,12 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertTrue(mismatches.isEmpty, "Script does not match edition language: \(mismatches.prefix(10))")
     }
 
-    /// Akram-ut-Tafaseer is now in the reader per ayah, in rows small enough
-    /// for the reader (a 662 KB block once crashed it), one per starting ayah.
+    /// Akram-ut-Tafaseer is in the reader per ayah, one row per starting ayah.
+    /// Urdu rows are laid out block by block (FormattedBookPage), so a long
+    /// commentary is never one huge text; the cap catches a runaway row such
+    /// as the 662 KB block that once crashed the reader. Rows are no longer
+    /// cut at 40 KB: content 45 carries the long commentaries whole (2:29 is
+    /// 69 KB, in 75 paragraphs of at most 4 KB).
     func testAkramUtTafaseerRowsAreWellFormed() throws {
         try XCTSkipIf(SeedBundle.manifest() == nil, "SeedData resources are not visible to this test host")
         let rows = SeedBundle.quranTafsir().filter { $0.editionID == "akram-ut-tafaseer-ur" }
@@ -233,7 +237,7 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertTrue(rows.contains { $0.surahNumber == 1 && $0.ayahStart == 1 }, "Al-Fatihah must have Urdu commentary")
         var starts = Set<String>()
         for row in rows {
-            XCTAssertLessThanOrEqual(row.text.utf8.count, 41 * 1024, "\(row.surahNumber):\(row.ayahStart) is too large")
+            XCTAssertLessThanOrEqual(row.text.utf8.count, 96 * 1024, "\(row.surahNumber):\(row.ayahStart) is too large")
             XCTAssertTrue(starts.insert("\(row.surahNumber):\(row.ayahStart)").inserted, "duplicate start \(row.surahNumber):\(row.ayahStart)")
             XCTAssertFalse(row.text.contains("OCR نوٹ"), "OCR notes are not commentary")
         }

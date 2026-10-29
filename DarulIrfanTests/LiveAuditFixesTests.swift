@@ -10,8 +10,11 @@ final class LiveAuditFixesTests: XCTestCase {
     // MARK: - Server dates (LIVE-001)
 
     /// /v1/live exactly as production sent it on 2026-10-29, milliseconds
-    /// and all: the stock decoder rejected it, so the Daily Zikr card stayed
-    /// off air and both Join buttons stayed grey.
+    /// and all: the stock `.iso8601` strategy of the iOS versions the app
+    /// supports rejected it, so the Daily Zikr card stayed off air and both
+    /// Join buttons stayed grey. (Newer systems' stock strategy accepts these
+    /// bytes, so that is not asserted here; the app decodes with its own
+    /// strategy on every version.)
     private let productionLive = #"{"id":"official-live","state":"live","title":"Online Zikr with Sheikh-ul-Mukarram Hazrat Ameer Abdul Qadeer Awan MZA","details":"Join the official live zikr when a broadcast is available.","startedAt":"2026-10-28T16:17:18Z","endedAt":"2026-10-28T17:15:16.645Z","sources":[{"kind":"youtube","url":"https://www.youtube.com/watch?v=TQJMn7Nw13s","videoID":"TQJMn7Nw13s","supportsBackgroundAudio":false}],"updatedAt":"2026-10-29T00:24:00.011Z","automaticBroadcast":false,"cue":{"text":"L-3","sender":"host","at":"2026-10-28T16:40:02.456Z"},"room":{"platform":"paltalk","listeners":12,"since":"2026-10-28T23:01:05.120Z","url":"https://paltalk.im/egnMPD3Y"}}"#
 
     func testDecodesProductionLivePayloadWithMilliseconds() throws {
@@ -22,13 +25,6 @@ final class LiveAuditFixesTests: XCTestCase {
         XCTAssertEqual(live.cue?.text, "L-3")
         let ended = try XCTUnwrap(live.endedAt)
         XCTAssertEqual(ended.timeIntervalSince1970.truncatingRemainder(dividingBy: 1), 0.645, accuracy: 0.0005)
-    }
-
-    /// Why the shared strategy exists: the stock one throws on the same bytes.
-    func testStockStrategyRejectsMilliseconds() {
-        let stock = JSONDecoder()
-        stock.dateDecodingStrategy = .iso8601
-        XCTAssertThrowsError(try stock.decode(LiveBroadcast.self, from: Data(productionLive.utf8)))
     }
 
     /// A feed page holding a website article (milliseconds) and a video
