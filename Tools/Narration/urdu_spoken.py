@@ -29,6 +29,17 @@ LETTER_AYAT = {(2, 1), (3, 1), (7, 1), (10, 1), (11, 1), (12, 1), (13, 1), (14, 
 OPENING_LETTERS = re.compile(r"^\s*([\u0621-\u06D3\u064B-\u0670\u06D6-\u06ED]{1,9}?)\s*(۔|$|\s)")
 
 
+# A number printed in words and again in digits ("سو(100)دانے", "اُنیس (19
+# فرشتے)") is read once, in words: the voice read both ("سو سو دانے", 2:261).
+BRACKETED_DIGITS = re.compile(r"\(\s*[0-9\u0660-\u0669\u06F0-\u06F9]+\s*\)")
+DIGITS_OPENING_NOTE = re.compile(r"\(\s*[0-9\u0660-\u0669\u06F0-\u06F9]+\s+")
+
+
+def drop_digits(text: str) -> str:
+    """Leave out the digits that repeat a number already written in words."""
+    return DIGITS_OPENING_NOTE.sub("(", BRACKETED_DIGITS.sub(" ", text))
+
+
 def spell_letters(text: str) -> str:
     """An opening of disjointed letters, spoken as the letters' names."""
     match = OPENING_LETTERS.match(text)

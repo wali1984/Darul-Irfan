@@ -33,7 +33,7 @@ import soundfile as sf
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import narration_finish as finishing  # noqa: E402
-from urdu_spoken import HONORIFICS, LETTER_AYAT, spell_letters  # noqa: E402
+from urdu_spoken import HONORIFICS, LETTER_AYAT, drop_digits, spell_letters  # noqa: E402
 
 V = Path("/mnt/sata1tb/di-voices")
 OUT = V / "quran-higgs"
@@ -152,7 +152,7 @@ def script(item: dict) -> list[dict]:
     segments: list[dict] = []
     text = item["text"]
     if item["kind"] == "translation":
-        text = CORRECTED.get(f"{item['surah']}:{item['ayahStart']}", text)
+        text = drop_digits(CORRECTED.get(f"{item['surah']}:{item['ayahStart']}", text))
         if (item["surah"], item["ayahStart"]) in LETTER_AYAT:
             text = spell_letters(text)
     # A line the scan broke mid-sentence joins the next ("وہ گمراہ ⏎ ہے").
