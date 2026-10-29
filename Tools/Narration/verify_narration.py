@@ -65,8 +65,37 @@ def compare(source: str, heard: str) -> dict:
         elif op == "replace":
             replaced = max(replaced, max(i2 - i1, j2 - j1))
     ratio = matcher.ratio()
-    flag = added >= ADDED or dropped >= DROPPED or replaced >= REPLACED or ratio < RATIO
-    return {"ratio": round(ratio, 3), "added": added, "dropped": dropped, "replaced": replaced, "flag": flag}
+    moved = moved_breaks(source, heard, matcher)
+    flag = added >= ADDED or dropped >= DROPPED or replaced >= REPLACED or ratio < RATIO or moved > 0
+    return {"ratio": round(ratio, 3), "added": added, "dropped": dropped, "replaced": replaced, "moved": moved, "flag": flag}
+
+
+def breaks(text: str) -> set[int]:
+    """Where the word breaks fall, counted in letters."""
+    positions, count = set(), 0
+    for word in MARKS.sub("", text).translate(FOLD).split():
+        count += len(NOT_LETTER.sub("", word))
+        positions.add(count)
+    return positions
+
+
+def moved_breaks(source: str, heard: str, matcher: difflib.SequenceMatcher) -> int:
+    """Word breaks the voice moved by a letter or two: the same letters, other
+    words ("اندھیرا چھا" said as "اندھیر اچھا"). Only inside stretches where
+    the letters agree; a break merely present or absent is not counted."""
+    to_heard = {}
+    for a, b, size in matcher.get_matching_blocks():
+        for offset in range(size + 1):
+            to_heard[a + offset] = b + offset
+    said, written = breaks(heard), breaks(source)
+    moved = 0
+    for position in written:
+        if position not in to_heard or to_heard[position] in said:
+            continue
+        near = {to_heard.get(position + d) for d in (-2, -1, 1, 2)} & said
+        if any(back not in written for back in (p for p, h in to_heard.items() if h in near)):
+            moved += 1
+    return moved
 
 
 def decode(path: Path) -> np.ndarray:
