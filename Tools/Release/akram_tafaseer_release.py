@@ -56,6 +56,7 @@ ROOT = IOS.parent
 sys.path.insert(0, str(HERE))
 import codemagic  # noqa: E402
 import testflight  # noqa: E402
+from notify import notify  # noqa: E402
 
 WORK = ROOT / "automation" / "akram-tafaseer"
 LOG, STATE, LOCK = WORK / "release.log", WORK / "state.json", WORK / "run.lock"
@@ -368,11 +369,17 @@ def run() -> int:
         except Waiting as reason:
             if state.get("last_wait") != str(reason):
                 log(f"waiting: {reason}")
+                notify("Akram-ut-Tafaseer: iOS waits on Codemagic",
+                       f"The re-read is in the apps' content and live on the web ({state.get('tag')}); the TestFlight "
+                       "build follows by itself once Codemagic billing is enabled.")
                 state["last_wait"] = str(reason); save_state(state)
             return 0
         done.append("testflight"); save_state(state)
     state["released"] = True; save_state(state)
     log(f"RELEASED {state.get('tag')}: TestFlight build {state.get('build_number')}, web app deployed")
+    notify("Akram-ut-Tafaseer released",
+           f"{state.get('tag')}: Claude's reading of the printed volumes is in all four apps' content, live on the web, "
+           f"and TestFlight build {state.get('build_number')} is with the testers.")
     return 0
 
 
@@ -425,6 +432,11 @@ def main() -> int:
         sys.exit(__doc__)
     except Stop as stop:
         log(f"STOPPED: {stop}")
+        state = load_state()
+        reason = str(stop).splitlines()[0][:180]
+        if state.get("last_stop") != reason:
+            notify("Akram-ut-Tafaseer release stopped", reason + " (log: automation/akram-tafaseer/release.log)")
+            state["last_stop"] = reason; save_state(state)
         return 1
     except SystemExit as stop:      # codemagic.py exits on an HTTP error
         if stop.code in (0, None):
