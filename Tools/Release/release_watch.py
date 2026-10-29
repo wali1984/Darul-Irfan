@@ -164,8 +164,10 @@ def announce(state: dict) -> None:
     # Nothing is written until the server serves the releases: its deploy
     # waits for the owner's go-ahead.
     if not state.get("releases_route_live"):
+        # Cloudflare refuses Python's own user agent (error 1010).
+        request = urllib.request.Request(SERVER + "/v1/app/releases", headers={"User-Agent": "DarulIrfan-release-watch"})
         try:
-            urllib.request.urlopen(SERVER + "/v1/app/releases", timeout=20).close()
+            urllib.request.urlopen(request, timeout=20).close()
         except (urllib.error.URLError, TimeoutError):
             return
         state["releases_route_live"] = True
