@@ -352,6 +352,10 @@ def run() -> int:
         fetch_pages(pages)
         python("Tools/Library/ingest_claude_pages.py", "--pages", str(pages), "--add-pages", "--write")
         python("Tools/Library/segment_akram_tafaseer.py", "--write", "--report", str(WORK / "segment_report.json"))
+        segment = json.loads((WORK / "segment_report.json").read_text(encoding="utf-8"))
+        state["check_ayat"] = segment.get("commentaryUnderLaterAyah", [])
+        if state["check_ayat"]:
+            log("commentary that may sit under a later ayah, for a person to check: " + ", ".join(state["check_ayat"]))
         version = bump_manifests()
         same_on_all_platforms()
         checks()
@@ -379,7 +383,9 @@ def run() -> int:
     log(f"RELEASED {state.get('tag')}: TestFlight build {state.get('build_number')}, web app deployed")
     notify("Akram-ut-Tafaseer released",
            f"{state.get('tag')}: Claude's reading of the printed volumes is in all four apps' content, live on the web, "
-           f"and TestFlight build {state.get('build_number')} is with the testers.")
+           f"and TestFlight build {state.get('build_number')} is with the testers."
+           + (f" Please check {len(state['check_ayat'])} commentary entries that may sit under a later ayah: "
+              f"{', '.join(state['check_ayat'])}." if state.get("check_ayat") else ""))
     return 0
 
 

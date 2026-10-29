@@ -1186,19 +1186,33 @@ class Volume:
                      if len(HARAKA.findall(m.group(1))) >= 4]
             spans += [(s, body[s:e]) for s, e in quranic_runs(body)]
             spans.sort()
+            hits = []
             for start, quote in spans:
                 if start <= opening_end:
                     continue
                 hit = self.mushaf.best(quote, (surah, ayah), (surah, stop))
-                if hit and hit[0][1] > (cuts[-1][1] if cuts else ayah):
-                    paragraph = body.rfind("\n", 0, start)
-                    cut = paragraph + 1 if paragraph != -1 else snap_to_line(body, start)
-                    # A short heading over the quotation ("آیت الکرسی") goes with it.
-                    above = body.rfind("\n\n", 0, max(0, cut - 2))
-                    heading = body[above + 2:cut].strip() if above != -1 else ""
-                    if heading and len(heading) < 80 and not heading.endswith(("۔", "؟", "!", ".")):
-                        cut = above + 2
-                    cuts.append((cut, hit[0][1]))
+                if hit:
+                    hits.append((start, hit[0][1], len(quote)))
+            for index, (start, quoted, size) in enumerate(hits):
+                if quoted <= (cuts[-1][1] if cuts else ayah):
+                    continue
+                # A quotation ahead of the commentary - a heading that takes the
+                # section's last ayah as its theme before the commentary on the
+                # first (2:21-29 opens on 2:29) - is not where the commentary
+                # turns to that ayah: what follows it still quotes the ayat
+                # before. Such a cut would file their commentary under it.
+                behind = sum(other_size for _, other, other_size in hits[index + 1:] if other < quoted)
+                onward = size + sum(other_size for _, other, other_size in hits[index + 1:] if other >= quoted)
+                if behind > onward:
+                    continue
+                paragraph = body.rfind("\n", 0, start)
+                cut = paragraph + 1 if paragraph != -1 else snap_to_line(body, start)
+                # A short heading over the quotation ("آیت الکرسی") goes with it.
+                above = body.rfind("\n\n", 0, max(0, cut - 2))
+                heading = body[above + 2:cut].strip() if above != -1 else ""
+                if heading and len(heading) < 80 and not heading.endswith(("۔", "؟", "!", ".")):
+                    cut = above + 2
+                cuts.append((cut, quoted))
             parts, cursor, current = [], 0, ayah
             for cut, next_ayah in cuts:
                 if cut <= cursor:
@@ -1310,8 +1324,29 @@ def build(seed: Path, report: dict):
         "ayatCovered": len(covered),
         "surahsTouched": len({r["surahNumber"] for r in rows}),
         "largestRowBytes": max(len(r["text"].encode()) for r in rows),
+        "commentaryUnderLaterAyah": misfiled(rows, mushaf),
     })
     return rows, {str(k): v for k, v in sorted(volumes.items())}
+
+
+def misfiled(rows: list[dict], mushaf: Mushaf) -> list[str]:
+    """Rows whose commentary quotes three or more of the ayat just before
+    their own: the sign of a section cut in the wrong place, the commentary
+    on its earlier ayat filed under a later one (2:29 once held 2:21-28's).
+    Listed for a person to check; nothing is moved."""
+    found = []
+    for row in rows:
+        surah, start, end, text = row["surahNumber"], row["ayahStart"], row["ayahEnd"], row["text"]
+        quotes = [m.group(1) for m in QUOTE.finditer(text) if len(HARAKA.findall(m.group(1))) >= 4]
+        quotes += [text[s:e] for s, e in quranic_runs(text)]
+        earlier = set()
+        for quote in quotes:
+            hit = mushaf.best(quote, (surah, max(1, start - 30)), (surah, end))
+            if hit and hit[0][1] < start:
+                earlier.add(hit[0][1])
+        if len(earlier) >= 3:
+            found.append(f"{surah}:{start}-{end}")
+    return found
 
 
 def main() -> int:
