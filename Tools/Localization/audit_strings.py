@@ -67,6 +67,8 @@ DOUBLE_HINT = re.compile(r"\b(pauseSeconds|rate|playbackRate|percent|fraction|pr
 # the key Swift really generates is recorded here.
 KNOWN_KEYS = {
     "%@ minutes before": "%lld minutes before",
+    "Go to %@ %@:%lld": "Go to %@ %lld:%lld",
+    "Pages %@ to %@": "Pages %lld to %lld",
     "Live on Paltalk now · %@ listening": "Live on Paltalk now · %lld listening",
     "%@%": "%lld%",
     "%@. %@": "%lld. %@",
@@ -76,11 +78,15 @@ KNOWN_KEYS = {
     "Jump to %lld": "Jump to %@",
     "Last updated %lld": "Last updated %@",
     "Name %@ of 99": "Name %lld of 99",
+    "Parah %@": "Parah %lld",
     "Pause \\(pauseSeconds, specifier: ": "Pause %.1f seconds",
     "Published %lld": "Published %@",
     "Qibla is %@° to your left": "Qibla is %lld° to your left",
     "Qibla is %@° to your right": "Qibla is %lld° to your right",
     "Qibla: %@° from North": "Qibla: %lld° from North",
+    "Qibla: %@° from true north": "Qibla: %lld° from true north",
+    "Qur'an %@:%@": "Qur'an %lld:%lld",
+    "Qur'an %@:%@-%@": "Qur'an %lld:%lld-%lld",
     "Resume %@, %lf percent played": "Resume %@, %lld percent played",
     "Step %@ of %lld": "Step %lld of %lld",
     "Surah %@ (%@), Ayah %@": "Surah %@ (%lld), Ayah %@",
@@ -90,6 +96,8 @@ KNOWN_KEYS = {
     "%@ attended": "%lld attended",
     "%@ listening": "%lld listening",
     "The group is at %@ of %lld": "The group is at %@ of %@",
+    "The download could not be completed right now (server status %@). Please try again later.":
+        "The download could not be completed right now (server status %lld). Please try again later.",
     "Updated \\(current.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",
     "Now in the zikr · \\(cue.at.formatted(.relative(presentation: .named)))": "Now in the zikr · %@",
 }

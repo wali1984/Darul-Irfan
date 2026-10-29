@@ -1,0 +1,285 @@
+{
+  "remove": {
+    "page-articles-index": "empty index of the website's articles",
+    "booklets-on-tasawwuf-in-urdu": "website menu page listing the booklets (now in Booklets)",
+    "books": "website menu page listing books",
+    "list-of-books": "duplicate of 'books'",
+    "documents": "website menu page listing the documents (now in Important Documents)",
+    "english-articles": "website list of speech titles",
+    "sufi-poetry": "website menu page listing the poetry books (now in Sufi Poetry)",
+    "training-courses": "website menu page listing the courses (now in Training Courses)",
+    "religious-messenger": "'Coming Soon!!' placeholder",
+    "seminar-1159-2020-06-19-salana-tarbiati-programme-2020-in-munara-chakwal-punjab": "video listing of a 2020 event page",
+    "rubb-deeyan-gullaan": "one-paragraph description of a video series",
+    "book-Dalael-us-Salook-Urdu.pdf": "duplicate of book-dalael-us-salook-urdu (same PDF, no text, wrong author)",
+    "silsila-naqshbandia-owaisiah": "duplicate of page-silsila-naqshbandia-owaisiah",
+    "hazrat-ameer-abdul-qadeer-awan": "duplicate of page-hazrat-ameer-abdul-qadeer-awan",
+    "hazrat-ameer-muhammad-akram-awan-ra": "duplicate of page-hazrat-ameer-muhammad-akram-awan"
+  },
+  "authors": {
+    "uploads-books-maktobaat": "Hazrat Maulana Allah Yar Khan (RA)",
+    "uploads-books-israr-ul-harmain": "Hazrat Maulana Allah Yar Khan (RA)",
+    "uploads-books-tasawwuf-aur-tameer-e-seraat": "Prof. Hafiz Abdul Razzaq",
+    "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk": "Asia Awan",
+    "uploads-books-rah-nawerd-e-shauk-1": "Bushra Ijaz",
+    "uploads-books-rah-nawerd-e-shauk-2": "Bushra Ijaz",
+    "uploads-books-asaas-us-salook": "Maulana Mahmood Khalid (compiler)",
+    "book-hayyat-e-tayyabah-i": "Abul Ahmadain (compiler) — biography of Hazrat Maulana Allah Yar Khan (RA)",
+    "book-dalael-us-salook-urdu": "Hazrat Maulana Allah Yar Khan (RA)",
+    "book-ocr-aas-jazeera": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-bai-at-kiya-hai": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-deeda-e-tar": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-deyar-e-habib-sall-allah-o-alaihi-wa-sallam-mai-chand-roz": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-dil-darwaza": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-gard-e-safar": "Hazrat Ameer Muhammad Akram Awan (RA) (pen name Seemab Owaisi)",
+    "book-ocr-hamd-o-naat": "Hazrat Ameer Muhammad Akram Awan (RA); compiled by Hafiz Hafeez-ur-Rahman",
+    "book-ocr-haqiqat-e-rooh": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-hasht-roza-course": "Idarah Naqshbandiah Owaisiah (Shoba Taleem-e-Balighan, Darul Irfan)",
+    "book-ocr-introduction": "Hazrat Ameer Abdul Qadeer Awan (MZA)",
+    "book-ocr-islah-e-qalb-aur-zarorat-e-shaikh": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-kon-si-aaisi-baat-hoi-hai": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-laiha-e-amal": "Idarah Naqshbandiah Owaisiah (Shoba Nashr-o-Ishaat)",
+    "book-ocr-lataif-aur-tazkiya-e-nafs": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-mata-e-faqeer": "Hazrat Ameer Muhammad Akram Awan (RA) (pen name Seemab Owaisi)",
+    "book-ocr-nishaan-e-manzil": "Hazrat Ameer Muhammad Akram Awan (RA) (pen name Seemab Owaisi)",
+    "book-ocr-pardah": "Asia Akram Awan",
+    "book-ocr-rohaniyat-kay-mutalliq-50-sawalat": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-sai-hafta-course": "Idarah Naqshbandiah Owaisiah (Shoba Taleem-e-Balighan, Darul Irfan)",
+    "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah": "Hazrat Ameer Muhammad Akram Awan (RA)",
+    "book-ocr-zikr-allah": "Idarah Naqshbandiah Owaisiah",
+    "book-ocr-zikr-pas-anfas": "Idarah Naqshbandiah Owaisiah (fatwas of ulema)"
+  },
+  "titleUrdu": {
+    "book-dalael-us-salook-urdu": "دلائل السلوک",
+    "book-hayyat-e-tayyabah-i": "حیاتِ طیّبہ (حصہ اوّل)",
+    "uploads-books-hayyat-e-tayyabah-2": "حیاتِ طیّبہ (حصہ دوم)",
+    "uploads-books-asaas-us-salook": "اساس السلوک",
+    "uploads-books-ghubar-e-rah-2": "غبارِ راہ (حصہ دوم)",
+    "uploads-books-irshaad-us-salikeen-i": "ارشاد السالکین (حصہ اوّل)",
+    "uploads-books-irshaad-us-salikeen-ii": "ارشاد السالکین (حصہ دوم)",
+    "uploads-books-islah-e-qalb": "إصلاح القلب وأهمية المرشد",
+    "uploads-books-israr-ul-harmain": "اسرار الحرمین",
+    "uploads-books-kanooz-e-dil-urdu": "کنوزِ دل (شرح رموزِ دل)",
+    "uploads-books-kanz-al-talibeen": "کنز الطالبین",
+    "uploads-books-mahafil-e-sheikh": "محافلِ شیخ",
+    "uploads-books-maktobaat": "مکتوبات",
+    "uploads-books-naqoosh-e-haq": "نقوشِ حق (حصہ اوّل)",
+    "uploads-books-rah-nawerd-e-shauk-1": "رہ نوردِ شوق (حصہ اوّل)",
+    "uploads-books-rah-nawerd-e-shauk-2": "رہ نوردِ شوق (حصہ دوم)",
+    "uploads-books-ramooz-e-dil-urdu": "رموزِ دل",
+    "uploads-books-talemaat-o-barkaat-e-nabuwat-saw": "تعلیمات و برکاتِ نبوت ﷺ",
+    "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk": "طریق السلوک فی آداب الشیوخ",
+    "uploads-books-tareeq-nisbat-owaisiah": "طریقِ نسبتِ اویسیہ",
+    "uploads-books-tasawwuf-aur-tameer-e-seraat": "تصوف اور تعمیرِ سیرت",
+    "book-ocr-aas-jazeera": "آس جزیرہ",
+    "book-ocr-bai-at-kiya-hai": "بیعت کیا ہے؟",
+    "book-ocr-deeda-e-tar": "دیدۂ تر",
+    "book-ocr-deyar-e-habib-sall-allah-o-alaihi-wa-sallam-mai-chand-roz": "دیارِ حبیب ﷺ میں چند روز",
+    "book-ocr-dil-darwaza": "دِل دروازہ",
+    "book-ocr-gard-e-safar": "گردِ سفر",
+    "book-ocr-hamd-o-naat": "حمد و نعت",
+    "book-ocr-haqiqat-e-rooh": "حقیقتِ روح",
+    "book-ocr-hasht-roza-course": "ہشت روزہ کورس",
+    "book-ocr-introduction": "تعارف",
+    "book-ocr-islah-e-qalb-aur-zarorat-e-shaikh": "اصلاحِ قلب اور ضرورتِ شیخ",
+    "book-ocr-kon-si-aaisi-baat-hoi-hai": "کونسی ایسی بات ہوئی ہے",
+    "book-ocr-laiha-e-amal": "لائحہ عمل",
+    "book-ocr-lataif-aur-tazkiya-e-nafs": "لطائف اور تزکیۂ نفس",
+    "book-ocr-mata-e-faqeer": "متاعِ فقیر",
+    "book-ocr-nishaan-e-manzil": "نشانِ منزل",
+    "book-ocr-pardah": "پردہ",
+    "book-ocr-rohaniyat-kay-mutalliq-50-sawalat": "روحانیت سے متعلق آپ کے 50 سوالات کے جوابات",
+    "book-ocr-sai-hafta-course": "سہ ہفتہ کورس",
+    "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah": "شجرہ سلسلہ نسبتِ اویسیہ",
+    "book-ocr-zikr-allah": "ذکر اللہ — قرآن و سنت کی روشنی میں",
+    "book-ocr-zikr-pas-anfas": "ذکر اللہ بطریق پاس انفاس"
+  },
+  "titles": {
+    "uploads-books-israr-ul-harmain": "Israr-ul-Harmain",
+    "uploads-books-naqoosh-e-haq": "Naqoosh-e-Haq (Part 1)",
+    "uploads-books-kanooz-e-dil-urdu": "Kanooz-e-Dil (Sharh Ramooz-e-Dil)",
+    "uploads-books-ramooz-e-dil-urdu": "Ramooz-e-Dil",
+    "uploads-books-ghubar-e-rah-2": "Ghubar-e-Rah (Part 2)",
+    "uploads-books-hayyat-e-tayyabah-2": "Hayyat-e-Tayyabah (Part 2)",
+    "book-hayyat-e-tayyabah-i": "Hayyat-e-Tayyabah (Part 1)",
+    "uploads-books-talemaat-o-barkaat-e-nabuwat-saw": "Talemaat-o-Barkaat-e-Nabuwat SAW",
+    "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk": "Tareeq-e-Saluk fi Adab-e-Shayuk",
+    "uploads-books-islah-e-qalb": "Islah-e-Qalb (Arabic translation: Islah al-Qalb wa Ahammiyat al-Murshid)",
+    "the-woman-in-the-islam": "The Woman in Islam",
+    "press-release-4049-2026-04-14-eechay-chalne-wala-kabhi-barabar-nahi-ho-sakta": "Peechay Chalne Wala Kabhi Barabar Nahi Ho Sakta",
+    "press-release-4165-2026-05-15-islami-muashi-nizaam-rupay-ko-aik-jagah-ruknay-nahi-deta": "Islami Muashi Nizaam Rupay Ko Aik Jagah Ruknay Nahi Deta",
+    "press-release-4260-2026-08-14-watan-aziz-ki-khidmat-qaumi-yakjahti-ke-farogh-aur-aik-mazboot-pakistan-ki-taamer-ke-liye-hamesha-apna-bharpoor-kirdaar-ada-karte-rahen-ge": "Watan-e-Aziz Ki Khidmat, Qaumi Yakjahti Ke Farogh Aur Aik Mazboot Pakistan Ki Taamer Ke Liye Hamesha Apna Bharpoor Kirdaar Ada Karte Rahen Ge",
+    "press-release-3985-2026-03-23-markaz-darul-irfan-mnarh-mein-23-march-ke-mauqa-par-yom-pakistan-ki-munasbat-se-aik-purwaqar-taqreeb-munaqqid-hui": "Markaz Darul Irfan Munara Mein 23 March Ke Mauqa Par Yom-e-Pakistan Ki Munasbat Se Aik Purwaqar Taqreeb Munaqqid Hui",
+    "press-release-4151-2026-05-03-bzahir-agar-kufar-taqatwar-b-nzr-aaye-lekin-un-ka-nazriya-kabhi-nafiz-nah-ho-sakay-ga": "Bazahir Agar Kufr Taqatwar Bhi Nazar Aaye Lekin Un Ka Nazriya Kabhi Nafiz Na Ho Sakay Ga",
+    "press-release-4262-2026-08-21-nabi-kareem-saw-ko-rehmat-allaalmin-bana-kar-bheja-gaya": "Nabi Kareem SAW Ko Rehmat-ul-lil-Aalameen Bana Kar Bheja Gaya",
+    "press-release-4222-2026-07-12-aaj-hamaray-muashray-mein-be-cheeni-ki-barri-wajah-hamari-badamaliya-hain": "Aaj Hamaray Muashray Mein Be Cheeni Ki Barri Wajah Hamari Badamaliyan Hain"
+  },
+  "languages": {
+    "uploads-books-islah-e-qalb": "ar",
+    "book-ocr-dil-darwaza": "pa"
+  },
+  "category": {
+    "book-ocr-introduction": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-haqiqat-e-rooh": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-lataif-aur-tazkiya-e-nafs": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-rohaniyat-kay-mutalliq-50-sawalat": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-deyar-e-habib-sall-allah-o-alaihi-wa-sallam-mai-chand-roz": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-islah-e-qalb-aur-zarorat-e-shaikh": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-zikr-allah": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-bai-at-kiya-hai": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-zikr-pas-anfas": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-pardah": [
+      "booklets",
+      "booklet"
+    ],
+    "book-ocr-hamd-o-naat": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-deeda-e-tar": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-dil-darwaza": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-aas-jazeera": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-kon-si-aaisi-baat-hoi-hai": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-mata-e-faqeer": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-nishaan-e-manzil": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-gard-e-safar": [
+      "sufiPoetry",
+      "poetry"
+    ],
+    "book-ocr-laiha-e-amal": [
+      "trainingCourses",
+      null
+    ],
+    "book-ocr-hasht-roza-course": [
+      "trainingCourses",
+      null
+    ],
+    "book-ocr-sai-hafta-course": [
+      "trainingCourses",
+      null
+    ]
+  },
+  "downloadUrls": {
+    "book-ocr-aas-jazeera": "https://www.naqshbandiaowaisiah.org/uploads/books/Aas-Jazeera.pdf",
+    "book-ocr-bai-at-kiya-hai": "https://www.naqshbandiaowaisiah.org/uploads/books/Bait-Kiya-hay.pdf",
+    "book-ocr-deeda-e-tar": "https://www.naqshbandiaowaisiah.org/uploads/books/Deeda-e-Tar.pdf",
+    "book-ocr-deyar-e-habib-sall-allah-o-alaihi-wa-sallam-mai-chand-roz": "https://www.naqshbandiaowaisiah.org/uploads/books/Deyar-e-Habib-S.A.W-mai-chand-roz.pdf",
+    "book-ocr-dil-darwaza": "https://www.naqshbandiaowaisiah.org/uploads/books/Dil-Darwaza.pdf",
+    "book-ocr-gard-e-safar": "https://www.naqshbandiaowaisiah.org/uploads/books/Gard-e-Safar.pdf",
+    "book-ocr-hamd-o-naat": "https://www.naqshbandiaowaisiah.org/uploads/books/Hamd-O-Naat.pdf",
+    "book-ocr-haqiqat-e-rooh": "https://www.naqshbandiaowaisiah.org/uploads/books/Haqiqat-e-Rooh.pdf",
+    "book-ocr-hasht-roza-course": "https://www.naqshbandiaowaisiah.org/uploads/books/Hasht-Roza-Course.pdf",
+    "book-ocr-introduction": "https://www.naqshbandiaowaisiah.org/uploads/books/Introduction.pdf",
+    "book-ocr-islah-e-qalb-aur-zarorat-e-shaikh": "https://www.naqshbandiaowaisiah.org/uploads/books/Islah-e-Qalb-aur-Zarorat-e-Shaikh.pdf",
+    "book-ocr-kon-si-aaisi-baat-hoi-hai": "https://www.naqshbandiaowaisiah.org/uploads/books/Kon-Si-Aaisi-Baat-Hoi-Hai.pdf",
+    "book-ocr-laiha-e-amal": "https://www.naqshbandiaowaisiah.org/uploads/books/Laiha-Amal.pdf",
+    "book-ocr-lataif-aur-tazkiya-e-nafs": "https://www.naqshbandiaowaisiah.org/uploads/books/Lataif-aur-Tazkiya-e-Nafs.pdf",
+    "book-ocr-mata-e-faqeer": "https://www.naqshbandiaowaisiah.org/uploads/books/Mata-e-Faqeer.pdf",
+    "book-ocr-nishaan-e-manzil": "https://www.naqshbandiaowaisiah.org/uploads/books/Nishaan-e-Manzil.pdf",
+    "book-ocr-pardah": "https://www.naqshbandiaowaisiah.org/uploads/books/Pardah.pdf",
+    "book-ocr-rohaniyat-kay-mutalliq-50-sawalat": "https://www.naqshbandiaowaisiah.org/uploads/books/Rohaneyat-kay-matliq-50-swalat.pdf",
+    "book-ocr-sai-hafta-course": "https://www.naqshbandiaowaisiah.org/uploads/books/Sai-Hafta-Course.pdf",
+    "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah": "https://www.naqshbandiaowaisiah.org/uploads/books/Shajarah-e-Silsilah-e-Nisbaat-e-Owaisiah.pdf",
+    "book-ocr-zikr-allah": "https://www.naqshbandiaowaisiah.org/uploads/books/Zikr-Allah.pdf",
+    "book-ocr-zikr-pas-anfas": "https://www.naqshbandiaowaisiah.org/uploads/books/zikr-pas-anfas.pdf",
+    "uploads-almurshid-magazines-almurshid-january-2009": "https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_jan_2009.pdf",
+    "uploads-almurshid-magazines-almurshid-november-december": "https://www.naqshbandiaowaisiah.org/uploads/almurshid-magazines/almurshid_november_december_1982.pdf"
+  },
+  "excerpts": {
+    "page-silsila-naqshbandia-owaisiah": "An introduction to Silsila Naqshbandia Owaisiah, a Sufi order whose spiritual lineage traces to Khawajah Owais Qarni.",
+    "book-dalael-us-salook-urdu": "The Urdu book Dalael-us-Salook.",
+    "book-hayyat-e-tayyabah-i": "Volume I of Hayyat-e-Tayyabah.",
+    "page-method-of-zikr": "The method of Zikr-e-Khafi Qalbi with Pas Anfas (guarding every breath)."
+  },
+  "mediaUrls": {
+    "page-method-of-zikr": [
+      "https://www.naqshbandiaowaisiah.org/assets/images/Method_of_Zikr_%20Eng.jpg",
+      "https://www.naqshbandiaowaisiah.org/assets/images/Method_of_Zikr_Urdu.png"
+    ]
+  },
+  "textReplacements": [
+    {
+      "id": "page-shajra-silsila-naqshbandia-owaisiah",
+      "old": "Hadhrat Maulana Muhammad Akram Awan (Rahmat Allah 'Alaihi, d. 1438 H)",
+      "new": "Hadhrat Maulana Muhammad Akram Awan (Rahmat Allah 'Alaihi, d. 1439 H)"
+    },
+    {
+      "id": "page-silsila-naqshbandia-owaisiah",
+      "old": "<p>click here for More info</p>",
+      "new": ""
+    },
+    {
+      "id": "page-silsila-naqshbandia-owaisiah",
+      "old": "\n\nclick here for More info",
+      "new": ""
+    }
+  ],
+  "addDocuments": [
+    {
+      "id": "document-conditions-for-muraqbat-en",
+      "title": "Conditions for Muraqbat (English)",
+      "language": "en",
+      "url": "https://www.naqshbandiaowaisiah.org/docs/Conditions-for-Muraqbat-in-English.pdf"
+    },
+    {
+      "id": "document-conditions-for-muraqbat-ur",
+      "title": "Conditions for Muraqbat (Urdu)",
+      "language": "ur",
+      "url": "https://www.naqshbandiaowaisiah.org/docs/Conditions-for-Muraqbat-in-Urdu.pdf"
+    }
+  ],
+  "documentsSourceUrl": "https://www.naqshbandiaowaisiah.org/documents.html",
+  "tarajumTitleUrdu": {
+    "old": "اکرم الترجم",
+    "new": "اکرم التراجم"
+  }
+}

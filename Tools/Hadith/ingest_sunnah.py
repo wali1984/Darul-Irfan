@@ -63,6 +63,9 @@ import unicodedata
 import hashlib
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import hadith_gate  # noqa: E402  (same folder: the rules every pack must pass)
+
 try:
     import requests
     from bs4 import BeautifulSoup
@@ -232,7 +235,11 @@ def segment_arabic(html_fragment: str) -> tuple[list[dict], list[dict]]:
             else:
                 push_matn(txt)
         elif name is None and isinstance(el, str):
-            if el.parent is not None and el.parent.name == "a":
+            # Any <a> ancestor, not only the direct parent: a verse link wraps
+            # its text in a <span>, and checking the parent alone re-added
+            # that text as matn right after the verse segment, so the reader
+            # printed the quoted verse twice (142 records, Musnad Ahmad most).
+            if any(getattr(p, "name", None) == "a" for p in el.parents):
                 continue
             push_matn(str(el))
 
@@ -350,10 +357,22 @@ def ref_number_from(cont) -> str | None:
 INBOOK_RE = re.compile(r"In-book reference\s*:\s*Book\s*(\d+)\s*,\s*Hadith\s*(\d+)", re.I)
 
 
-def parse_book_page(html: str) -> dict[str, dict]:
-    """Map displayNumber -> {segments, quranRefs, text_en, chapter...} for a book page."""
+class _Blocks(list):
+    """A page's hadith blocks in page order, as (displayNumber, data) pairs.
+    `.items()` keeps the old dict call sites working, but two blocks with the
+    same number no longer overwrite each other: "Hisn al-Muslim 75a" maps to
+    displayNumber 75 like the plain "75" after it, and the dict this used to
+    be kept only the second - the 75a du'a was lost (audit HAD-021)."""
+
+    def items(self):
+        return iter(self)
+
+
+def parse_book_page(html: str) -> "_Blocks":
+    """Every hadith block of a book page: (displayNumber, {segments, quranRefs,
+    text_en, chapter...}) in page order, repeated numbers included."""
     soup = BeautifulSoup(html, "lxml")
-    out: dict[str, dict] = {}
+    out = _Blocks()
     for cont in soup.select(".actualHadithContainer"):
         num = ref_number_from(cont)
         if not num:
@@ -370,7 +389,7 @@ def parse_book_page(html: str) -> dict[str, dict]:
         ref_el = cont.select_one(".hadith_reference")
         im = INBOOK_RE.search(ref_el.get_text(" ", strip=True)) if ref_el else None
         inbook = [int(im.group(1)), int(im.group(2))] if im else None
-        out[num] = {
+        out.append((num, {
             # The container's own id ("h119620") is the Arabic URN, which the
             # Urdu records carry as matchingArabicURN. It is the reliable join
             # key between the two — see the note in enrich_collection.
@@ -389,7 +408,7 @@ def parse_book_page(html: str) -> dict[str, dict]:
             "text_en": clean(en_el.get_text()) if en_el else None,
             "chapterTitleEnglish": clean(ch_en.get_text()) if ch_en else None,
             "chapterTitleArabic": clean(ch_ar.get_text()) if ch_ar else None,
-        }
+        }))
     return out
 
 
@@ -708,6 +727,17 @@ def enrich_collection(slug: str, fetcher: Fetcher, report: dict) -> tuple[list[d
             if rec is None:
                 report.setdefault("unmatched_ref", []).append(f"{slug}:{num}")
                 continue
+            # A number or in-book key only proposes a join; the Arabic decides.
+            # sunnah.com numbers Muslim by Fuad 'Abd al-Baqi while fawazahmed0's
+            # sequence is its own, so "379" joined Abu Mahdhura's adhan to a
+            # Sa'd hadith - 4,650 Muslim/Malik records showed another
+            # narration's Arabic this way (audit HAD-001/002). A record with
+            # no Arabic of its own cannot be checked and gets nothing: filling
+            # it from the join is how 85 records got copies of other
+            # narrations (HAD-003).
+            if not hadith_gate.same_narration(rec.get("text_ar"), extra.get("text_ar")):
+                report.setdefault("rejected_join", []).append(f"{slug}:{num}->{rec['canonicalID']}")
+                continue
             if extra.get("arabicSegments"):
                 rec["arabicSegments"] = extra["arabicSegments"]
                 for s in extra["arabicSegments"]:
@@ -879,6 +909,26 @@ def selftest() -> int:
                and s["ayahEnd"] == 5 for s in segs)
     assert refs == [{"surah": 74, "ayahStart": 1, "ayahEnd": 5}]
     assert any(s["type"] == "matn" for s in segs)
+    # A verse link whose text sits in a nested <span> is printed once (the
+    # parser used to repeat it as matn: 142 records showed a verse twice).
+    nested = ('<div class="arabic_hadith_full arabic">فَقَرَأَ '
+              '<a href="javascript:openquran(68,40,41)"><span>إِنَّهُ لَقَوْلُ رَسُولٍ كَرِيمٍ</span></a>'
+              ' قَالَ</div>')
+    segs2, _ = segment_arabic(nested)
+    assert sum(s["text"].count("لَقَوْلُ") for s in segs2) == 1, segs2
+    # A join is accepted only for the same narration, never for an empty one.
+    assert hadith_gate.same_narration("حَدَّثَنَا يَحْيَى عَنْ مَالِكٍ عَنْ نَافِعٍ عَنِ ابْنِ عُمَرَ",
+                                      "حَدَّثَنَا يَحْيَى، عَنْ مَالِكٍ، عَنْ نَافِعٍ، عَنِ ابْنِ عُمَرَ")
+    assert not hadith_gate.same_narration("حَدَّثَنَا يَحْيَى عَنْ مَالِكٍ عَنْ نَافِعٍ عَنِ ابْنِ عُمَرَ",
+                                          "أَخْبَرَنَا قُتَيْبَةُ عَنِ اللَّيْثِ عَنْ يَزِيدَ عَنْ أَبِي الْخَيْرِ")
+    assert not hadith_gate.same_narration(None, "حَدَّثَنَا يَحْيَى")
+    # Two blocks that map to one number ("75a" then "75") are both kept.
+    page = ('<div class="actualHadithContainer" id="h1"><div class="arabic_hadith_full arabic">الْحَمْدُ لِلَّهِ وَحْدَهُ</div>'
+            '<div class="hadith_reference">Reference : Hisn al-Muslim 75a</div></div>'
+            '<div class="actualHadithContainer" id="h2"><div class="arabic_hadith_full arabic">أَعُوذُ بِاللَّهِ</div>'
+            '<div class="hadith_reference">Reference : Hisn al-Muslim 75</div></div>')
+    blocks = parse_book_page(page)
+    assert [n for n, _ in blocks.items()] == ["75", "75"] and len(blocks) == 2, blocks
 
     def cont(html):
         return BeautifulSoup(html, "lxml").select_one(".actualHadithContainer")
@@ -932,6 +982,16 @@ def main() -> int:
         (args.out / f"hadith_{slug}.json").write_text(
             json.dumps(records, ensure_ascii=False, indent=1), encoding="utf-8")
         if args.pack:
+            # Nothing reaches the four seed folders unless it passes the
+            # content rules (display = own narration, no markup/controls, no
+            # copied fills, verse links quote their ayah). See hadith_gate.py.
+            failures, warnings = hadith_gate.check_pack(slug, records)
+            for w in warnings:
+                print("  warning:", w)
+            if failures:
+                for f in failures:
+                    print("  GATE:", f)
+                raise SystemExit(f"{slug}: hadith gate failed; nothing written for this collection")
             pack(slug, records, [])
 
     if args.skip_narrators:

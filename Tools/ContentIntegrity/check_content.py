@@ -103,6 +103,22 @@ HADITH_BOOKS = [
     "ibnabishayba", "daraqutni", "bayhaqi", "nasaikubra",
 ]
 
+# HAD-004: Sahih Muslim shows its standard reference (as sunnah.com prints the
+# Fuad 'Abd al-Baqi numbering: 8a, 150b, Introduction 8) while canonicalID keeps
+# the fawazahmed0 sequence number it was created with, because bookmarks and
+# topics point at it. Tools/Hadith/muslim_reference_numbers.json records both
+# for every Muslim narration; chains of one hadith may share its printed
+# number ("shared"). Every display number has one of these forms.
+MUSLIM_REFERENCES = IOS_ROOT / "Tools/Hadith/muslim_reference_numbers.json"
+NUMBER_FORM = re.compile(r"(?:Introduction )?(\d+)(?:\.(\d+)|([a-z]))?(?:–(\d+))?")
+
+
+def load_muslim_references() -> dict[str, dict[str, Any]]:
+    if not MUSLIM_REFERENCES.exists():
+        return {}
+    return json.loads(MUSLIM_REFERENCES.read_text(encoding="utf-8"))["records"]
+
+
 # Byte sequences that appear when UTF-8 has been decoded as Latin-1/CP1252 and
 # re-encoded. Any of these in sacred text means the pipeline mangled it.
 MOJIBAKE = [
@@ -340,6 +356,7 @@ def check_hadith(seed: Path, report: Report) -> None:
     missing_language = {"ar": 0, "en": 0, "ur": 0}
     total_duplicates = 0
     known_defects = load_known_defects()
+    muslim_refs = load_muslim_references()
     new_defects: list[str] = []
     inherited_defects = 0
 
@@ -375,31 +392,45 @@ def check_hadith(seed: Path, report: Report) -> None:
             canonical.add(cid)
 
             number = record.get("displayNumber")
-            if number in display and book_id not in PER_BOOK_NUMBERED:
+            ref = muslim_refs.get(cid) if book_id == "muslim" else None
+            if number in display and book_id not in PER_BOOK_NUMBERED and not (ref and ref.get("shared")):
                 # For the core collections a repeated printed number IS
                 # corruption — the integer-keyed schema once lost 103
                 # narrations to exactly that. But some sources restart their
-                # printed numbering per book (kitab), so for those a repeat is
-                # the source's own numbering, kept rather than dropped;
-                # canonicalID uniqueness above still guards every record.
+                # printed numbering per book (kitab), and in Sahih Muslim the
+                # further chains of one hadith may share its number; both are
+                # kept, and canonicalID uniqueness above still guards every record.
                 duplicates.append(f"{book_id}|{number}")
             display.add(number)
 
             # The identifier must round-trip: canonicalID is built from the
-            # other three fields, so a mismatch means one of them was edited
-            # by hand and the pack is no longer self-consistent.
-            expected = f"{book_id}|{number}|{record.get('sourceSequence')}"
+            # number the record was created with and its sequence, so a
+            # mismatch means one of them was edited by hand. For Muslim that
+            # number is the recorded fawazahmed0 one and the shown number must
+            # be the recorded reference (HAD-004).
+            created = ref["legacy"] if ref else number
+            expected = f"{book_id}|{created}|{record.get('sourceSequence')}"
             if cid != expected:
                 malformed.append(f"{cid} != {expected}")
+            if ref and ref["display"] != number:
+                malformed.append(f"{cid}: displayNumber {number!r} is not the recorded {ref['display']!r}")
 
             # displayNumber is textual; the split parts must agree with it.
-            major, _, minor = str(number).partition(".")
-            if str(record.get("numberMajor")) != major:
-                malformed.append(f"{cid}: numberMajor != {major}")
-            if minor and str(record.get("numberMinor")) != str(int(minor)):
-                malformed.append(f"{cid}: numberMinor does not match '{minor}'")
-            if not minor and record.get("numberMinor") is not None:
-                malformed.append(f"{cid}: numberMinor set on a whole number")
+            # Forms: 402, 402.2, 8a (letter = sub-number 1, 2 ...),
+            # Introduction 8, 274–275 (no number of its own; lies between).
+            m = NUMBER_FORM.fullmatch(str(number))
+            if m is None:
+                malformed.append(f"{cid}: displayNumber {number!r} has an unknown form")
+            else:
+                major = m.group(1)
+                minor = (str(int(m.group(2))) if m.group(2) else
+                         str(ord(m.group(3)) - 96) if m.group(3) else None)
+                if str(record.get("numberMajor")) != major:
+                    malformed.append(f"{cid}: numberMajor != {major}")
+                if minor and str(record.get("numberMinor")) != minor:
+                    malformed.append(f"{cid}: numberMinor does not match '{number}'")
+                if not minor and record.get("numberMinor") is not None:
+                    malformed.append(f"{cid}: numberMinor set on a whole number")
 
             sequences.add(record.get("sourceSequence"))
 
@@ -433,6 +464,16 @@ def check_hadith(seed: Path, report: Report) -> None:
                      f"'{book_id}': {len(malformed)} malformed identifiers: {malformed[:5]}")
         report.check(len(sequences) == len(records),
                      f"'{book_id}': sourceSequence is not unique across the pack")
+        # Every recorded Muslim narration must still be in the pack under the
+        # canonicalID it was recorded with. An id that is not recorded is held
+        # to the plain round-trip above, so without this a rebuild that made
+        # canonicalID from the new display numbers would pass while every
+        # Muslim bookmark and topic link broke (HAD-004).
+        if book_id == "muslim" and muslim_refs:
+            lost = sorted(set(muslim_refs) - canonical)
+            report.check(not lost,
+                         f"'muslim': {len(lost)} narrations recorded in "
+                         f"muslim_reference_numbers.json are not in the pack: {lost[:5]}")
 
         oversized = [
             record["canonicalID"] for record in records

@@ -89,8 +89,20 @@ def main() -> int:
             kitab = r.get("sourceBook")
             if kitab is not None:
                 counts[kitab] = counts.get(kitab, 0) + 1
+        # A section already in the catalogue keeps its titles and its label:
+        # book 0 is not always an introduction. Shama'il's is sunnah.com book
+        # "8b" and Nasa'i's is "35b" (The Book of Agriculture), books the
+        # source numbers with a letter; renaming them "Introduction" here is
+        # how Shama'il came to open with two misfiled narrations (HAD-018).
+        existing = {s["number"]: s for s in book.get("sections") or []}
         sections = []
         for number in sorted(counts):
+            old = existing.get(number)
+            if old is not None:
+                kept = dict(old)
+                kept["hadithCount"] = counts[number]
+                sections.append(kept)
+                continue
             source = "introduction" if number == 0 else number
             english, arabic = page_titles(cache, slug, source)
             if number == 0 and not english:
@@ -101,6 +113,9 @@ def main() -> int:
                 "titleArabic": arabic,
                 "hadithCount": counts[number],
             })
+        # keep the catalogue's order (35b is listed after 35, not first)
+        order = {s["number"]: k for k, s in enumerate(book.get("sections") or [])}
+        sections.sort(key=lambda s: (order.get(s["number"], len(order) + s["number"]), s["number"]))
         book["sections"] = sections or None
         book["sectionCount"] = len(sections)
 

@@ -6,9 +6,12 @@ from scratch before the fix shipped null plain Arabic (mishkat: 0 of 5,306) —
 which empties the reader's Arabic display and text_ar search for those
 collections. The builder is fixed; this repairs packs already on disk.
 
-Only records with segments and no text_ar are touched, so the seven core
-packs (whose text_ar is the canonical fawazahmed0 Arabic) are untouched by
-construction. Idempotent; writes all four platform seed dirs.
+Only records with segments and no text_ar are touched. The seven core packs
+are skipped outright: their segments are JOINED onto fawazahmed0 records, so a
+record without Arabic of its own has nothing to prove the join with. "By
+construction" was not enough - 85 core records with empty Arabic had been
+joined to another narration and this script turned that narration into their
+text_ar (audit HAD-003). Idempotent; writes all four platform seed dirs.
 """
 from __future__ import annotations
 
@@ -18,14 +21,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ingest_sunnah import SEED_DIRS, PRIMARY_SEED  # noqa: E402
+from ingest_sunnah import SEED_DIRS, PRIMARY_SEED, CORE  # noqa: E402
 
 
 def main() -> int:
     changed_any = False
     for pack_path in sorted(PRIMARY_SEED.glob("hadith_*.json")):
         slug = pack_path.stem[len("hadith_"):]
-        if slug in ("books", "narrators"):
+        if slug in ("books", "narrators") or slug in CORE:
             continue
         records = json.loads(pack_path.read_text(encoding="utf-8"))
         filled = 0

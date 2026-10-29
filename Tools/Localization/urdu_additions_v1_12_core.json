@@ -1,0 +1,23 @@
+{
+  "Preparing the Qur'an…": "قرآن تیار کیا جا رہا ہے…",
+  "Preparing the library…": "کتب خانہ تیار کیا جا رہا ہے…",
+  "Preparing the bayans…": "بیانات تیار کیے جا رہے ہیں…",
+  "Preparing the events…": "تقریبات تیار کی جا رہی ہیں…",
+  "Preparing the books…": "کتابیں تیار کی جا رہی ہیں…",
+  "Preparing the hadith collections…": "حدیث کے مجموعے تیار کیے جا رہے ہیں…",
+  "Preparing search…": "تلاش تیار کی جا رہی ہے…",
+  "This takes a moment after installing or updating the app.": "ایپ انسٹال یا اپ ڈیٹ کرنے کے بعد اس میں کچھ دیر لگتی ہے۔",
+  "Tahajjud Zikr begins soon. Join it on Paltalk from Darul Irfan.": "تہجد ذکر جلد شروع ہو رہا ہے۔ دارالعرفان سے پال ٹاک پر اس میں شامل ہوں۔",
+  "%@ begins soon. Open Darul Irfan to join it live.": "%@ جلد شروع ہو رہا ہے۔ براہِ راست شامل ہونے کے لیے دارالعرفان کھولیں۔",
+  "Pointing by magnetic north": "مقناطیسی شمال کے مطابق سمت",
+  "Magnetic north can differ by several degrees from true north, which the Qibla bearing is measured from. Allow location access while using the app for an exact direction.": "مقناطیسی شمال، حقیقی شمال سے کئی درجے مختلف ہو سکتا ہے، جبکہ قبلہ کا زاویہ حقیقی شمال سے ناپا جاتا ہے۔ درست سمت کے لیے ایپ استعمال کرتے وقت مقام تک رسائی کی اجازت دیں۔",
+  "Qibla: %lld° from true north": "قبلہ: حقیقی شمال سے %lld°",
+  "Face true north, then turn clockwise by this bearing to face the Kaaba in Makkah. A magnetic compass points to magnetic north, which can be several degrees away from true north.": "حقیقی شمال کی طرف رخ کریں، پھر اس زاویے کے مطابق گھڑی کی سمت میں گھومیں تاکہ آپ کا رخ مکہ مکرمہ میں کعبہ کی طرف ہو جائے۔ مقناطیسی قطب نما مقناطیسی شمال دکھاتا ہے، جو حقیقی شمال سے کئی درجے ہٹ کر ہو سکتا ہے۔",
+  "We couldn't determine your location. You can allow location access in iOS Settings, or choose a city in the Halqah tab under Settings.": "ہم آپ کا مقام معلوم نہیں کر سکے۔ آپ iOS کی ترتیبات میں مقام کی اجازت دے سکتے ہیں، یا حلقہ ٹیب میں ترتیبات سے کوئی شہر منتخب کر سکتے ہیں۔",
+  "Prefer a specific city? You can choose one anytime in the Halqah tab under Settings.": "کسی خاص شہر کو ترجیح دیتے ہیں؟ حلقہ ٹیب میں ترتیبات سے کبھی بھی منتخب کیا جا سکتا ہے۔",
+  "Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. The Hijri dates and Islamic days across the app follow this setting.": "اگر آپ کی مقامی رؤیتِ ہلال حساب شدہ امّ القریٰ کیلنڈر سے مختلف ہو تو زیادہ سے زیادہ دو دن کی ایڈجسٹمنٹ کریں۔ ایپ میں ہجری تاریخیں اور اسلامی ایام اسی ترتیب کے مطابق ہوتے ہیں۔",
+  "Set your location first, so the task can follow your prayer times.": "پہلے اپنا مقام مقرر کریں، تاکہ یہ کام آپ کے اوقاتِ نماز کے مطابق چلے۔",
+  "What arrived was not the PDF, perhaps a Wi-Fi sign-in page. Please try again on another connection.": "جو فائل موصول ہوئی وہ PDF نہیں تھی، غالباً وائی فائی کا سائن اِن صفحہ۔ براہِ کرم کسی دوسرے کنکشن پر دوبارہ کوشش کریں۔",
+  "The download could not be completed right now (server status %lld). Please try again later.": "ڈاؤن لوڈ اس وقت مکمل نہیں ہو سکا (سرور اسٹیٹس %lld)۔ براہِ کرم بعد میں دوبارہ کوشش کریں۔",
+  "Night of ≈ %@": "شب ≈ %@"
+}

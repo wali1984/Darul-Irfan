@@ -1,0 +1,169 @@
+{
+  "youtubeOnly": {
+    "lecture-3837-2026-01-23-kamyabi-ki-rah": {
+      "youtubeId": "Kd3V755MUXY",
+      "date": "2026-01-23"
+    },
+    "lecture-3441-2025-09-26-ankar-ka-anjam": {
+      "youtubeId": "ljK2TUd3-qo",
+      "date": "2025-09-26"
+    },
+    "lecture-3575-2025-11-14-bait-ullah-shareef-ki-barkaat": {
+      "youtubeId": "SlWcYGpBAUQ",
+      "date": "2025-11-14"
+    },
+    "lecture-3987-2026-03-20-hasil-ramzan": {
+      "youtubeId": "0f5YGk4OnU4",
+      "date": "2026-03-20"
+    },
+    "lecture-137-2017-08-06-dua-salana-ijtima-2017": {
+      "youtubeId": "ryv3gnY7oyk",
+      "date": "2017-08-06"
+    }
+  },
+  "titles": {
+    "lecture-3113-2015-09-11-surah-as-sajdah-4-to-13": {
+      "old": "1 سورۃ السجدہ آیت نمبر 4 تا 3",
+      "new": "سورۃ السجدہ آیت نمبر 4 تا 13"
+    },
+    "lecture-3177-2016-07-01-s-rat-a-m-m-sajdah-1to-8": {
+      "old": "سورة ﺣﻢ ﺍﻟﺴﺠﺪﺓ آیت نمبر 1 تا 8",
+      "new": "سورۃ حم السجدہ آیت نمبر 1 تا 8"
+    },
+    "lecture-3178-2016-07-08-s-rat-a-m-m-sajdah-9-to-18": {
+      "old": "1سورة ﺣﻢ ﺍﻟﺴﺠﺪﺓ آیت نمبر 9 تا 8",
+      "new": "سورۃ حم السجدہ آیت نمبر 9 تا 18"
+    },
+    "lecture-3179-2016-07-15-s-rat-a-m-m-sajdah-19-to-32": {
+      "old": "32 سورة ﺣﻢ ﺍﻟﺴﺠﺪﺓ آیت نمبر 19  تا",
+      "new": "سورۃ حم السجدہ آیت نمبر 19 تا 32"
+    },
+    "lecture-3180-2016-07-22-s-rat-a-m-m-sajdah-33-to-46": {
+      "old": "سورة ﺣﻢ ﺍﻟﺴﺠﺪﺓ آیت نمبر 33 تا 46",
+      "new": "سورۃ حم السجدہ آیت نمبر 33 تا 46"
+    },
+    "lecture-3181-2016-07-29-surat-a-m-m-sajdah-47-to-54-surat-ash-shuraa-1-t0-4": {
+      "old": "سورة ﺣﻢ ﺍﻟﺴﺠﺪﺓ آیت نمبر 47  تا 54 سورۃ الشورٰی آیت نمبر 1 تا 4",
+      "new": "سورۃ حم السجدہ آیت نمبر 47 تا 54 سورۃ الشورٰی آیت نمبر 1 تا 4"
+    },
+    "lecture-3194-2016-08-17-surah-ad-dukhan-1-to-29": {
+      "old": "29 سورۃ الدخان آیت نمبر 1 تا",
+      "new": "سورۃ الدخان آیت نمبر 1 تا 29"
+    },
+    "lecture-3195-2016-08-18-surah-ad-dukhan-30-to-59": {
+      "old": "59 سورۃ الدخان آیت نمبر 30 تا",
+      "new": "سورۃ الدخان آیت نمبر 30 تا 59"
+    },
+    "lecture-3216-2016-09-29-surah-al-hujurat-1": {
+      "old": "1سورۃ الحجرات آیت نمبر",
+      "new": "سورۃ الحجرات آیت نمبر 1"
+    },
+    "lecture-3200-2016-08-23-surah-al-ahqaf-1-to-10": {
+      "old": "سورۃ الاحقا ف آیت نمبر 1 تا 10",
+      "new": "سورۃ الاحقاف آیت نمبر 1 تا 10"
+    },
+    "lecture-3201-2016-08-24-surah-al-ahqaf-11-to-20": {
+      "old": "سورۃ الاحقا ف آیت نمبر 11 تا 20",
+      "new": "سورۃ الاحقاف آیت نمبر 11 تا 20"
+    },
+    "lecture-3202-2016-08-25-surah-al-ahqaf-21-to-26": {
+      "old": "سورۃ الاحقا ف آیت نمبر 21 تا 26",
+      "new": "سورۃ الاحقاف آیت نمبر 21 تا 26"
+    },
+    "lecture-3203-2016-08-26-surah-al-ahqaf-27-to-35": {
+      "old": "سورۃ الاحقا ف آیت نمبر 27 تا 35",
+      "new": "سورۃ الاحقاف آیت نمبر 27 تا 35"
+    },
+    "lecture-3294-2016-12-06-surah-nuh-1-to-13": {
+      "old": "سورۃ نوع آیت نمبر 1 تا 13",
+      "new": "سورۃ نوح آیت نمبر 1 تا 13"
+    },
+    "lecture-3295-2016-12-07-surah-nuh-14-to-28": {
+      "old": "سورۃ نوع آیت نمبر 14 تا 28",
+      "new": "سورۃ نوح آیت نمبر 14 تا 28"
+    },
+    "lecture-3331-2016-12-27-surah-al-inshiqaq-1-to-25": {
+      "old": "سورۃ النشقاق آیت نمبر 1 تا 25",
+      "new": "سورۃ الانشقاق آیت نمبر 1 تا 25"
+    },
+    "lecture-3335-2016-12-31-surah-al-a-la-1-to-3": {
+      "old": "سورۃ اعلٰی آیت نمبر 1 تا 3",
+      "new": "سورۃ الاعلیٰ آیت نمبر 1 تا 3"
+    },
+    "lecture-2030-2022-06-08-bait-ullah-ki-azmat": {
+      "old": "بیعت اللہ شریف کی عظمت",
+      "new": "بیت اللہ شریف کی عظمت"
+    },
+    "lecture-2059-2022-07-08-bait-ullah-shareef-ki-azmat": {
+      "old": "بیعت اللہ شریف کی عظمت",
+      "new": "بیت اللہ شریف کی عظمت"
+    },
+    "lecture-3413-2025-09-06-jalsa-baisat-rehmat-alam-saw-sananwan": {
+      "old": "جلسہ بعثت رحنمت عالم صلی اللہ علیہ وسلم سنانواں",
+      "new": "جلسہ بعثت رحمت عالم صلی اللہ علیہ وسلم سنانواں"
+    },
+    "lecture-2224-2023-04-20-ramzan-ul-mubarak-ko-rukhsat-no-karain": {
+      "old": "رمضان البارک کو رخصت نہ کریں",
+      "new": "رمضان المبارک کو رخصت نہ کریں"
+    },
+    "lecture-2237-2023-05-12-moashi-nizam-k-asrat": {
+      "old": "معاشی نظام کے ااہمیت",
+      "new": "معاشی نظام کے اثرات"
+    },
+    "lecture-3344-2025-06-06-qurbani-ka-falsafah": {
+      "old": "قربانی کا فلسفلہ",
+      "new": "قربانی کا فلسفہ"
+    },
+    "lecture-2010-2022-06-04-tarbiat-ki-ahmiat": {
+      "old": "تربیتی کی اہمیت",
+      "new": "تربیت کی اہمیت"
+    },
+    "lecture-2076-2022-08-26-taubah-kay-bad-amli-zindgi": {
+      "old": "توبہ کی بعد عملی زندگی",
+      "new": "توبہ کے بعد عملی زندگی"
+    },
+    "lecture-2065-2022-08-05-muslim-ummah-ka-itehad": {
+      "old": "مسلم اُمہ کا اتحآد",
+      "new": "مسلم اُمہ کا اتحاد"
+    },
+    "lecture-1821-2021-12-05-quwat-e-ghazbia-aur-quwat-e-shahwania-mahana-ijtima-dar-ul-irfan-munarah": {
+      "old": "قوت غضبیہ اور قوت شہوانیہ (ماہاہ اجتماع دارالعرفان منارہ)",
+      "new": "قوت غضبیہ اور قوت شہوانیہ (ماہانہ اجتماع دارالعرفان منارہ)"
+    },
+    "lecture-1599-2021-02-05-halal-o-haram-ka-miyar": {
+      "old": "حلال و حرام کا میعار",
+      "new": "حلال و حرام کا معیار"
+    },
+    "lecture-1778-2021-10-17-jalsa-besat-rehmat-e-alam-faisal-abad": {
+      "old": "جلسہ بعثت رحمت عالم صلی اللہ علیہ وسلم ٖفیصل آباد",
+      "new": "جلسہ بعثت رحمت عالم صلی اللہ علیہ وسلم فیصل آباد"
+    },
+    "lecture-3347-2025-06-16-mojza-aur-karamat-mein-farq-salana-ijtima": {
+      "old": "معجزہ اور کرامت میں فرق ( سالانہ اجتماع",
+      "new": "معجزہ اور کرامت میں فرق (سالانہ اجتماع)"
+    },
+    "lecture-1573-2021-01-03-akhrat-pr-nigah-mahana-ijtima": {
+      "old": "آخرت پر نگاہ ( ماہانہ اجتماع",
+      "new": "آخرت پر نگاہ (ماہانہ اجتماع)"
+    },
+    "lecture-24-2017-01-28-surah-ash-shrah-ayait-4": {
+      "old": "Surah Ash-Shrah Ayait 4",
+      "new": "Surah Ash-Sharh Ayat 4"
+    },
+    "lecture-25-2017-01-30-surah-ash-shrah-ayait-5-to-8": {
+      "old": "Surah Ash-Shrah Ayait 5 to 8",
+      "new": "Surah Ash-Sharh Ayat 5 to 8"
+    },
+    "lecture-27-2017-02-01-surah-al-alaq-ayait-1": {
+      "old": "Surah Al-Alaq Ayait 1",
+      "new": "Surah Al-Alaq Ayat 1"
+    },
+    "lecture-28-2017-02-02-surah-al-alaq-ayait-2": {
+      "old": "Surah Al-Alaq Ayait 2",
+      "new": "Surah Al-Alaq Ayat 2"
+    }
+  },
+  "speakers": {
+    "lecture-64-2017-05-12-allah-k-noor-ki-taqseem-sahibzada-abdul-qadeer-awan-ka-intikhab-qaim-muqaam-sheikh": "By Qasim-e-Fayuzat Hazrat Ameer Muhammad Akram Awan (RA)"
+  }
+}

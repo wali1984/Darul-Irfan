@@ -1,0 +1,131 @@
+{
+  "names_of_allah": {
+    "arabic": {
+      "39": {
+        "old": "المُقيِت",
+        "new": "الْمُقِيتُ"
+      },
+      "40": {
+        "old": "الْحسِيبُ",
+        "new": "الْحَسِيبُ"
+      },
+      "66": {
+        "old": "الْواحِدُ",
+        "new": "الْوَاحِدُ"
+      },
+      "73": {
+        "old": "الأوَّلُ",
+        "new": "الأَوَّلُ"
+      },
+      "80": {
+        "old": "التَّوَابُ",
+        "new": "التَّوَّابُ"
+      },
+      "85": {
+        "old": "ذُوالْجَلاَلِ وَالإكْرَامِ",
+        "new": "ذُو الْجَلاَلِ وَالإِكْرَامِ"
+      },
+      "91": {
+        "old": "الضَّارَّ",
+        "new": "الضَّارُّ"
+      }
+    },
+    "transliteration": {
+      "44": [
+        "Al Mujeeb ",
+        "Al Mujeeb"
+      ],
+      "47": [
+        "Al Wudood",
+        "Al Wadood"
+      ],
+      "60": [
+        "Al Muhiy",
+        "Al Muhyi"
+      ],
+      "89": [
+        "Al Mughi",
+        "Al Mughni"
+      ],
+      "91": [
+        "Ad Daaarr",
+        "Ad Daarr"
+      ]
+    },
+    "meaningEnglish": {
+      "32": [
+        "The Forebearing",
+        "The Forbearing"
+      ],
+      "33": [
+        "The Maginificent",
+        "The Magnificent"
+      ],
+      "80": [
+        "The Guide to Repentence",
+        "The Guide to Repentance"
+      ],
+      "84": [
+        "The Owner / Soverign of All",
+        "The Owner / Sovereign of All"
+      ]
+    }
+  },
+  "surahNameUrdu": {
+    "11": [
+      "حود",
+      "ہود"
+    ],
+    "17": [
+      "رات کا صفر",
+      "رات کا سفر"
+    ],
+    "26": [
+      "شعراٗ",
+      "شعراء"
+    ],
+    "45": [
+      "زانوٗوں کے بل گری ہوئی",
+      "زانوؤں کے بل گری ہوئی"
+    ],
+    "80": [
+      "تیوری چڑہائی",
+      "تیوری چڑھائی"
+    ],
+    "87": [
+      "اعلی",
+      "اعلیٰ"
+    ],
+    "67": [
+      "بادشاہ",
+      "بادشاہی"
+    ]
+  },
+  "events": {
+    "exactDatePrefix": "seminar-",
+    "details": {
+      "event-monthly-ijtema": "The monthly congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan.",
+      "event-salana-ijtema": "The annual congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan.",
+      "event-ramadan-aitekaaf": "Collective Aitekaaf observed at Dar-ul-Irfan during Ramadan. Dates follow the Islamic lunar calendar."
+    }
+  },
+  "islamic_days": {
+    "isra-and-miraj": "The night of 27 Rajab; it begins at sunset on 26 Rajab. Observed dates vary.",
+    "shab-e-barat": "The night of 15 Sha'ban; it begins at sunset on 14 Sha'ban.",
+    "laylat-ul-qadr": "Sought on the odd nights of the last ten days of Ramadan; the 27th night, which begins at sunset on 26 Ramadan, is widely observed."
+  },
+  "zikr_sessions": {
+    "zikr-tahajjud": "The time follows Fajr at Dar-ul-Irfan and changes through the year."
+  },
+  "quran_editions": {
+    "sourceUrl": {
+      "old": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil",
+      "new": "https://www.naqshbandiaowaisiah.org/asrar-at-tanzil.html"
+    }
+  },
+  "aqwal_e_sheikh": {
+    "oldPrefix": "Silsila Naqshbandia Owaisiah · ",
+    "newPrefix": "Hazrat Ameer Muhammad Akram Awan (RA) · ",
+    "speechOpening": "Translated Speech of\nHis Eminence Ameer Muhammad Akram Awan"
+  }
+}

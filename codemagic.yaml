@@ -113,6 +113,12 @@ workflows:
           python3 Tools/ContentIntegrity/check_content.py \
             --migration-status passed \
             --report build/CONTENT_INTEGRITY.md
+      - name: Hadith content gate
+        script: |
+          # The October 2026 audit's hadith rules (HAD-035): each narration
+          # shows its own Arabic, no markup, verse links quote their ayah,
+          # Muslim numbers as recorded.
+          python3 Tools/Hadith/hadith_gate.py
     artifacts:
       - build/*.xcresult
       - build/logs/*.log
@@ -212,6 +218,12 @@ workflows:
           python3 Tools/ContentIntegrity/check_content.py \
             --migration-status passed \
             --report build/CONTENT_INTEGRITY.md
+      - name: Hadith content gate
+        script: |
+          # The October 2026 audit's hadith rules (HAD-035): each narration
+          # shows its own Arabic, no markup, verse links quote their ayah,
+          # Muslim numbers as recorded.
+          python3 Tools/Hadith/hadith_gate.py
       - name: Set up code signing (create cert + profile if needed)
         script: |
           # set -e so a failure in fetch-signing-files aborts the step and
@@ -339,6 +351,12 @@ workflows:
         script: |
           python3 Tools/ContentIntegrity/check_content.py \
             --report "$CM_BUILD_DIR/build/CONTENT_INTEGRITY.md"
+      - name: Hadith content gate
+        script: |
+          # The October 2026 audit's hadith rules (HAD-035): each narration
+          # shows its own Arabic, no markup, verse links quote their ayah,
+          # Muslim numbers as recorded.
+          python3 Tools/Hadith/hadith_gate.py
       - name: Commit regenerated seed back (or fall back to an artifact)
         script: |
           set -e

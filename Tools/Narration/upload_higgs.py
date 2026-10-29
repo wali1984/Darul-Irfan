@@ -45,6 +45,11 @@ VERIFIED = {kind: json.loads((V / f"verify_{kind}.json").read_text(encoding="utf
 
 
 def main() -> int:
+    # 2026-10-29: held while the Urdu translation is set to the 2020 print, so the
+    # first rev-2 publish carries the re-made ayat (phones cache by voice tag).
+    if (V / "HOLD_UPLOAD").exists():
+        print("upload held: HOLD_UPLOAD present")
+        return 0
     c = {}
     for line in (Path.home() / ".config/darul-irfan/r2.env").read_text().splitlines():
         if "=" in line:
