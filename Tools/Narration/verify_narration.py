@@ -102,14 +102,35 @@ def repeated(source: str, heard: str) -> int:
 
 def inserted(source: str, heard: str) -> int:
     """The most letters a stretch of heard words adds over the words of the
-    text it lines up with."""
+    text it lines up with. A phrase the text itself repeats ("کرنے والے اور"
+    in 3:17) can pull the word alignment out of line, so a long stretch counts
+    only if the voice says it more often than the text has it."""
     written = [word for word in (letters(w) for w in source.split()) if word]
     said = [word for word in (letters(w) for w in heard.split()) if word]
+    text, spoken_text = "".join(written), "".join(said)
     worst = 0
     for op, i1, i2, j1, j2 in difflib.SequenceMatcher(None, written, said, autojunk=False).get_opcodes():
-        if op != "equal":
-            worst = max(worst, len("".join(said[j1:j2])) - len("".join(written[i1:i2])))
+        if op == "equal":
+            continue
+        stretch = "".join(said[j1:j2])
+        extra = len(stretch) - len("".join(written[i1:i2]))
+        if extra >= INSERTED and occurrences(stretch, spoken_text) <= occurrences(stretch, text):
+            continue
+        worst = max(worst, extra)
     return worst
+
+
+def occurrences(part: str, whole: str, close: float = 0.85) -> int:
+    """How often `part` appears in `whole`, allowing for Whisper's spelling
+    ("سہر" for "سحر"): windows of its length that match it closely."""
+    count, start, size = 0, 0, len(part)
+    while size and start + size <= len(whole):
+        if difflib.SequenceMatcher(None, part, whole[start:start + size], autojunk=False).ratio() >= close:
+            count += 1
+            start += size
+        else:
+            start += 1
+    return count
 
 
 def breaks(text: str) -> set[int]:
