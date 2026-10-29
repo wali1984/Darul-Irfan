@@ -13,6 +13,10 @@ Each run:
      owner. A failed build stops here and says so: the code needs a person.
      Skipped while the Akram-ut-Tafaseer release is building from main, which
      carries v1.12.0 too.
+  3. The update banner: the newest build Apple has passed for the external
+     testers is named to the apps (testflight.py announce), so a TestFlight
+     copy on an older build offers the newer one on Today. This is the step
+     that keeps the watch running after the release.
 Each event is announced once (notify.py: a Windows notification and a line in
 automation/UPDATES.md). Akram-ut-Tafaseer announces itself
 (akram_tafaseer_release.py).
@@ -46,6 +50,7 @@ NOTES = ROOT / "audit-2026-10-29" / "TESTFLIGHT-WHAT-TO-TEST-v1.12.txt"
 SSH = Path(r"C:\Program Files\Git\usr\bin\ssh.exe")
 ASKPASS = ROOT / "automation" / "askpass.sh"
 AMD = "wali@10.10.100.100"
+SERVER = "https://darul-irfan-platform.wajidmahmoodali1984-e23.workers.dev"   # the apps' OfficialPlatformBaseURL
 VOICES = "/mnt/sata1tb/di-voices"
 
 
@@ -155,11 +160,25 @@ def ios(state: dict) -> None:
         state["ios_done"] = True
 
 
+def announce(state: dict) -> None:
+    # Nothing is written until the server serves the releases: its deploy
+    # waits for the owner's go-ahead.
+    if not state.get("releases_route_live"):
+        try:
+            urllib.request.urlopen(SERVER + "/v1/app/releases", timeout=20).close()
+        except (urllib.error.URLError, TimeoutError):
+            return
+        state["releases_route_live"] = True
+    number = testflight.announce(known=state.get("announced_build"))
+    if number:
+        state["announced_build"] = number
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     WORK.mkdir(parents=True, exist_ok=True)
     state = load()
-    for step in (narration, ios):
+    for step in (narration, ios, announce):
         try:
             step(state)
         except Exception as error:  # noqa: BLE001 - an unattended watch must not die on one step

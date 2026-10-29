@@ -100,6 +100,7 @@ KNOWN_KEYS = {
         "The download could not be completed right now (server status %lld). Please try again later.",
     "Updated \\(current.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",
     "Now in the zikr · \\(cue.at.formatted(.relative(presentation: .named)))": "Now in the zikr · %@",
+    "Version %@ (build %@) is in TestFlight.": "Version %@ (build %lld) is in TestFlight.",
 }
 
 

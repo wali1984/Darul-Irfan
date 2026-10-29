@@ -8,12 +8,20 @@ issuer and key ids are in `appstoreconnect.md` one folder above this repository
 usage:
   testflight.py newest [count]                 newest builds and their processing state
   testflight.py release <build number> "<what to test>"
+  testflight.py announce                       name the newest tester build to the apps
 
 `release` waits until App Store Connect has processed the build, sets its What
 to Test text, adds it to the external group and submits it for Beta App Review.
 If an earlier build of the same version is already approved, Apple usually
 passes this one without a full review and the testers are notified straight
 away; if the earlier build is still waiting, this one joins the queue.
+
+`announce` writes the newest build Apple has passed for the external testers
+to app/releases.json in R2, which the server serves at /v1/app/releases: a
+TestFlight copy on an older build then shows the update banner on Today
+(TestFlight has no lookup an app can ask). The R2 credentials are the "S3
+clients" ones in `cloudflare.md` one folder above this repository (outside
+git), never printed.
 """
 from __future__ import annotations
 
@@ -23,6 +31,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 
 import jwt  # PyJWT
@@ -32,6 +41,8 @@ CONFIG = REPO.parent / "appstoreconnect.md"
 API = "https://api.appstoreconnect.apple.com"
 APP = "6789375037"
 EXTERNAL_GROUP = "040ba83d-04ce-4f69-8ed0-7a838d64bdc1"
+R2_CONFIG = REPO.parent / "cloudflare.md"
+BUCKET, RELEASES = "darul-irfan-media", "app/releases.json"
 
 
 def credentials() -> tuple[str, str]:
@@ -124,6 +135,58 @@ def release(number: str, notes: str) -> int:
     return 0
 
 
+def tester_build() -> tuple[int, str] | None:
+    """(build number, version) of the newest build Apple has passed for the
+    external testers."""
+    data = get(f"/v1/builds?filter[app]={APP}&sort=-uploadedDate&limit=20&include=preReleaseVersion,buildBetaDetail"
+               "&fields[builds]=version,preReleaseVersion,buildBetaDetail&fields[preReleaseVersions]=version"
+               "&fields[buildBetaDetails]=externalBuildState")
+    included = {(item["type"], item["id"]): item["attributes"] for item in data.get("included", [])}
+    passed = []
+    for build in data.get("data", []):
+        links = build["relationships"]
+        detail = included.get(("buildBetaDetails", links["buildBetaDetail"]["data"]["id"]), {})
+        if detail.get("externalBuildState") == "IN_BETA_TESTING":
+            version = included.get(("preReleaseVersions", links["preReleaseVersion"]["data"]["id"]), {}).get("version")
+            passed.append((int(build["attributes"]["version"]), version))
+    return max(passed) if passed else None
+
+
+def r2():
+    """The media bucket, with the "credentials for S3 clients" in cloudflare.md."""
+    import boto3
+    lines = [line.strip() for line in R2_CONFIG.read_text(encoding="utf-8").splitlines()]
+
+    def after(label: str) -> str:
+        return next(line for line in lines[lines.index(label) + 1:] if line)
+
+    endpoint = next(line for line in lines if line.startswith("https://") and ".r2.cloudflarestorage.com" in line)
+    return boto3.client("s3", endpoint_url=endpoint, aws_access_key_id=after("Access Key ID"),
+                        aws_secret_access_key=after("Secret Access Key"), region_name="auto")
+
+
+def announce(known: int | None = None) -> int | None:
+    """Name the newest tester build in app/releases.json. Returns its number
+    when the file changed; nothing is read from R2 while it is `known`."""
+    found = tester_build()
+    if not found or found[0] == known:
+        return None
+    number, version = found
+    bucket = r2()
+    try:
+        releases = json.loads(bucket.get_object(Bucket=BUCKET, Key=RELEASES)["Body"].read())
+    except bucket.exceptions.NoSuchKey:
+        releases = {}
+    if releases.get("ios", {}).get("testflight", {}).get("build") == number:
+        return None
+    releases.setdefault("ios", {})["testflight"] = {
+        "version": version, "build": number,
+        "releasedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    bucket.put_object(Bucket=BUCKET, Key=RELEASES, Body=json.dumps(releases, separators=(",", ":")).encode(),
+                      ContentType="application/json", CacheControl="public, max-age=300")
+    return number
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     args = sys.argv[1:]
@@ -133,6 +196,10 @@ def main() -> int:
         return 0
     if args[0] == "release" and len(args) == 3:
         return release(args[1], args[2])
+    if args[0] == "announce":
+        number = announce()
+        print(f"announced build {number}" if number else "already announced")
+        return 0
     sys.exit(__doc__)
 
 

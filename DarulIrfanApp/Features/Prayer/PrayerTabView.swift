@@ -20,6 +20,8 @@ struct PrayerTabView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.md) {
+                    // A newer TestFlight or App Store build, while one is out.
+                    TodayUpdateBanner()
                     // A readable prayer overview using the selected place's clock.
                     TodayHeroView(
                         placeName: appState.activePlace?.name,

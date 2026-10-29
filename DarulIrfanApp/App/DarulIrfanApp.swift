@@ -66,8 +66,10 @@ struct DarulIrfanApp: App {
                 switch newPhase {
                 case .active:
                     refreshAfterActivation(force: false)
+                    AppUpdateChecker.shared.appBecameActive()
                 case .background:
                     persistPlaybackProgress()
+                    AppUpdateChecker.shared.appEnteredBackground()
                 default:
                     break
                 }
@@ -163,6 +165,9 @@ struct DarulIrfanApp: App {
 
             launchState = .ready(dependencies, appState)
             lastForegroundRefresh = Date()
+            // The first activation came before the app was ready, so the
+            // update check for this launch starts here.
+            AppUpdateChecker.shared.appBecameActive()
 
             // Initial refresh of place, notifications, and widgets. Skipped
             // until onboarding is complete: resolving the device place would

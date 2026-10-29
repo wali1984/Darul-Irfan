@@ -27251,6 +27251,91 @@
           }
         }
       }
+    },
+    "A newer version is available": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A newer version is available"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نیا ورژن دستیاب ہے"
+          }
+        }
+      }
+    },
+    "Version %@ (build %lld) is in TestFlight.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ (build %lld) is in TestFlight."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ورژن %@ (بلڈ %lld) ٹیسٹ فلائٹ میں دستیاب ہے۔"
+          }
+        }
+      }
+    },
+    "Version %@ is in the App Store.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ is in the App Store."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ورژن %@ ایپ اسٹور میں دستیاب ہے۔"
+          }
+        }
+      }
+    },
+    "Update": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپ ڈیٹ کریں"
+          }
+        }
+      }
+    },
+    "Close": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بند کریں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
