@@ -13,6 +13,8 @@ Writes verify_<kind>.json: {name: {ratio, added, dropped, replaced, heard, flag}
 Resumable; a file whose mp3 is newer than its result is checked again.
 
     verify_narration.py [translation|tafsir] [--device cuda|cpu] [names...]
+    verify_narration.py translation --rescore   compare the stored transcripts
+                                                  again (texts corrected since)
 """
 
 from __future__ import annotations
@@ -32,7 +34,7 @@ os.environ.setdefault("HF_HOME", "/mnt/sata1tb/di-whisper/hf")
 from faster_whisper import WhisperModel  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from urdu_spoken import LETTER_AYAT, spell_letters  # noqa: E402
+from urdu_spoken import spoken  # noqa: E402
 
 V = Path("/mnt/sata1tb/di-voices")
 ROOT = V / "quran-higgs"
@@ -81,9 +83,9 @@ def sources(kind: str) -> dict[str, str]:
             continue
         name = f"{item['surah']:03d}{item['ayahStart']:03d}" + (f"-{item['ayahEnd']:03d}" if item["ayahEnd"] != item["ayahStart"] else "")
         text = corrections.get(f"{item['surah']}:{item['ayahStart']}", item["text"]) if kind == "translation" else item["text"]
-        # The disjointed letters are spoken as their names (urdu_spoken).
-        texts[f"{item['edition']}/{kind}/{name}"] = (spell_letters(text) if kind == "translation"
-                                                     and (item["surah"], item["ayahStart"]) in LETTER_AYAT else text)
+        # Compared with what the voice was asked to say: honorifics in full,
+        # the disjointed letters by name (urdu_spoken).
+        texts[f"{item['edition']}/{kind}/{name}"] = spoken(text, item["surah"], item["ayahStart"])
     return texts
 
 
@@ -91,10 +93,19 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("kind", nargs="?", default="translation")
     parser.add_argument("--device", default="cuda")
+    parser.add_argument("--rescore", action="store_true")
     parser.add_argument("names", nargs="*")
     args = parser.parse_args()
     out = V / f"verify_{args.kind}.json"
     results = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {}
+    if args.rescore:
+        texts = sources(args.kind)
+        for key, result in results.items():
+            if key in texts:
+                result.update(compare(texts[key], result["heard"]))
+        out.write_text(json.dumps(results, ensure_ascii=False, indent=0), encoding="utf-8")
+        print(f"rescored {len(results)}: {sum(r['flag'] for r in results.values())} flagged", flush=True)
+        return 0
     model = WhisperModel("large-v3", device=args.device, compute_type="float16" if args.device == "cuda" else "int8")
     texts = sources(args.kind)
     done = 0

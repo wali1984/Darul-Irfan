@@ -33,7 +33,7 @@ import soundfile as sf
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import narration_finish as finishing  # noqa: E402
-from urdu_spoken import LETTER_AYAT, spell_letters  # noqa: E402
+from urdu_spoken import HONORIFICS, LETTER_AYAT, spell_letters  # noqa: E402
 
 V = Path("/mnt/sata1tb/di-voices")
 OUT = V / "quran-higgs"
@@ -64,11 +64,6 @@ MAX_CHUNK = 240
 # Words the voice misreads, with the vowel marks that make it read them right.
 PRONOUNCE = {
     "کرسی": "کُرسی",
-}
-# Honorifics printed as one symbol are read out in full.
-HONORIFICS = {
-    "ﷺ": " صلی اللہ علیہ وآلہ وسلم ", "ؐ": " صلی اللہ علیہ وآلہ وسلم ",
-    "ؓ": " رضی اللہ عنہ ", "ؒ": " رحمۃ اللہ علیہ ", "ؑ": " علیہ السلام ", "ﷻ": " جل جلالہ ",
 }
 # Words the typesetting ran together ("اورزمین", "جوکچھ", "لاسکتے").
 JOINED = [

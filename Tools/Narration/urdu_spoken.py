@@ -9,6 +9,11 @@ from __future__ import annotations
 
 import re
 
+# Honorifics printed as one symbol are read out in full.
+HONORIFICS = {
+    "ﷺ": " صلی اللہ علیہ وآلہ وسلم ", "ؐ": " صلی اللہ علیہ وآلہ وسلم ",
+    "ؓ": " رضی اللہ عنہ ", "ؒ": " رحمۃ اللہ علیہ ", "ؑ": " علیہ السلام ", "ﷻ": " جل جلالہ ",
+}
 # The disjointed letters that open some surahs (الم، یس، حٰمٓ) are read as
 # the letters' names, as they are recited - never as a word ("یس" is not
 # "yes", "الم" is not "pain").
@@ -32,3 +37,13 @@ def spell_letters(text: str) -> str:
     letters = re.sub(r"[\u064B-\u0670\u06D6-\u06ED]", "", match.group(1)).replace("ھ", "ہ")
     spoken = MUQATTAAT.get(letters)
     return f"{spoken}۔ {text[match.end():].strip()}".strip() if spoken else text
+
+
+def spoken(text: str, surah: int, ayah: int) -> str:
+    """What the voice is asked to say for an ayah's translation: honorifics
+    in full and the disjointed letters by name (pause and vowel marks aside)."""
+    if (surah, ayah) in LETTER_AYAT:
+        text = spell_letters(text)
+    for symbol, words in HONORIFICS.items():
+        text = text.replace(symbol, words)
+    return " ".join(text.split())
