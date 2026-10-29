@@ -71,8 +71,11 @@ REPOS = {
 }
 SYNCED = ["book_pages.json", "book_pages_index.json", "quran_tafsir.json", "tafsir_volumes.json", "manifest.json"]
 WEB_URL = "https://darul-irfan-app.wajidmahmoodali1984-e23.workers.dev"
-CLOUDFLARE = ROOT / "cloudflare.md"
-CLOUDFLARE_TOKEN_INDEX = 8          # the token the Worker and web deploys use
+# The Workers/D1 deploy token is the 8th long value in the repository's own
+# cloudflare.md (git-ignored), as Tools' cf.sh reads it; the parent folder's
+# cloudflare.md holds other keys (R2, RealtimeKit).
+CLOUDFLARE = IOS / "cloudflare.md"
+CLOUDFLARE_TOKEN_INDEX = 8
 WHAT_TO_TEST = ("Akram-ut-Tafaseer, read again from all 31 printed parts and laid out as printed, "
                 "including Parah 30 part 2 (Surah Al-Layl to An-Nas), which is new in the app. "
                 "Open any ayah's tafsir, or the Library, to read it.")
@@ -397,7 +400,8 @@ def dry_run(pages_dir: Path | None) -> int:
     attempt("next tag", next_tag)
     attempt("Codemagic API", lambda: len(codemagic.call("GET", f"/builds?appId={codemagic.APP_ID}").get("builds", [])))
     attempt("App Store Connect API", lambda: testflight.newest(1))
-    attempt("Cloudflare credentials", lambda: bool(cloudflare_env()["CLOUDFLARE_API_TOKEN"]) and "present")
+    attempt("Cloudflare deploy token", lambda: "logged in" in npm("npx", "wrangler", "whoami", cwd=REPOS["web"][0],
+                                                                  env=cloudflare_env(), timeout=300) and "accepted")
     log(f"dry-run finished: {len(problems)} problem(s) {problems}")
     return 1 if problems else 0
 
