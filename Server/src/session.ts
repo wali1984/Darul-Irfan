@@ -420,9 +420,14 @@ export async function autoplayDue(env: Env, now = new Date()): Promise<void> {
   for (const row of rows.results ?? []) {
     if (row.state === "live") continue;
     const clock = localClock(now, row.time_zone);
-    const late = clock.minutes - (row.start_hour * 60 + row.start_minute);
+    const start = row.start_hour * 60 + row.start_minute;
+    // Minutes since the start, across midnight: a 23:58 zikr is two minutes
+    // late on the 00:00 tick, and it is the day before's zikr (1 = Sunday,
+    // so the day before Sunday is 7).
+    const late = (clock.minutes - start + 1_440) % 1_440;
+    const day = clock.minutes < start ? (clock.weekday + 5) % 7 + 1 : clock.weekday;
     const weekdays = JSON.parse(row.weekdays_json) as number[];
-    if (!weekdays.includes(clock.weekday) || late < 0 || late >= 5) continue;
+    if (!weekdays.includes(day) || late >= 5) continue;
     if (row.last_autoplay_at && now.getTime() - Date.parse(row.last_autoplay_at) < 3_600_000) continue;
     const queue = queueOf({ queue_json: row.autoplay_json });
     if (!queue.length) continue;

@@ -30,14 +30,19 @@ function setup() {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("free relay of the room and its cues", () => {
-  it("plays the room through R2, beside the channel's live video", async () => {
+  // Daily Zikr follows the channel's live video only (the owner, 2026-10-28).
+  it("never offers the room's relay as the official broadcast, beside the channel's video or instead of it", async () => {
     const { raw, post, live } = setup();
     raw.prepare("UPDATE live_broadcasts SET youtube_live=1,youtube_video_id='TQJMn7Nw13s',state='live' WHERE id='official-live'").run();
     expect((await post("/v1/live/listener", { listener: "listener-a", inRoom: true, streaming: true, input: "r2" })).status).toBe(200);
     const on = await live();
     expect(on.state).toBe("live");
-    expect(on.sources.map(s => s.kind)).toEqual(["ownedStream", "youtube"]);
-    expect(on.sources[0]?.url).toBe("https://api.example.com/v1/live/audio/index.m3u8");
+    expect(on.sources.map(s => s.kind)).toEqual(["youtube"]);
+    raw.prepare("UPDATE live_broadcasts SET youtube_live=0,youtube_video_id=NULL,state='ended' WHERE id='official-live'").run();
+    await post("/v1/live/listener", { listener: "listener-a", inRoom: true, streaming: true, input: "r2" });
+    const off = await live();
+    expect(off.state).toBe("ended");
+    expect(off.sources).toEqual([]);
   });
 
   it("serves only the relay's playlist and pieces, the playlist uncached", async () => {

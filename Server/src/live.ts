@@ -1,16 +1,16 @@
 import type { Env } from "./contracts";
-import { sendPushToInstallations, sendTopicPush } from "./apns";
+import { LIVE_ALERT, sendPushToInstallations, sendTopicPush } from "./apns";
 import { cleanText, json } from "./util";
-import { RELAY_PLAYLIST } from "./liveRelay";
 import { paltalkRoomStatus } from "./paltalkRoom";
 
-// The live zikr pipeline (Docs/LIVE_ZIKR_PIPELINE.md): cloud listeners join
-// the Paltalk room and stream it to Cloudflare Stream, which simulcasts to
-// YouTube and Facebook. This module keeps the app's broadcast in step with
-// them and with the Paltalk room's state in Paltalk's own directory.
+// The live zikr pipeline (Docs/LIVE_ZIKR_PIPELINE.md). Daily Zikr follows the
+// channel's live video only (sources.ts; the owner's decision, 2026-10-28).
+// This module records the listeners' and Stream's reports and keeps the
+// Paltalk room's state from Paltalk's own directory beside the broadcast: the
+// Tahajjud zikr is joined in that room.
 
-/** A streaming report is trusted for this long. */
-const STREAMING_FRESH_MS = 90_000;
+/** A listener's report is trusted for this long. */
+const REPORT_FRESH_MS = 90_000;
 
 interface ListenerRow {
   id: string; in_room: number; streaming: number; input_id: string | null;
@@ -22,16 +22,6 @@ function equalSecret(left: string, right: string): boolean {
   let difference = 0;
   for (let index = 0; index < left.length; index += 1) difference |= left.charCodeAt(index) ^ right.charCodeAt(index);
   return difference === 0;
-}
-
-function streamInputs(env: Env): string[] {
-  return (env.STREAM_INPUTS ?? "").split(",").map(value => value.trim()).filter(value => /^[a-f0-9]{32}$/.test(value));
-}
-
-function playbackURL(env: Env, inputID: string): string | null {
-  const host = (env.STREAM_CUSTOMER_HOST ?? "").trim();
-  if (!/^customer-[a-z0-9]+\.cloudflarestream\.com$/.test(host)) return null;
-  return `https://${host}/${inputID}/manifest/video.m3u8`;
 }
 
 /** POST /v1/live/listener - a listener's heartbeat, every few seconds. */
@@ -78,27 +68,16 @@ export async function streamEvent(request: Request, env: Env): Promise<Response>
   return json({ ok: true });
 }
 
-/** Puts the broadcast in step with the listeners, and alerts on failures.
- *  Called on every heartbeat, every Stream event and every cron tick. */
+/** Puts the room's state beside the broadcast. Called on every heartbeat,
+ *  every Stream event and every cron tick. A listener streaming, to Stream or
+ *  to the relay, no longer makes the broadcast live: Daily Zikr follows the
+ *  channel's live video alone. */
 export async function reconcileLive(env: Env, now = new Date()): Promise<void> {
   const listeners = (await env.DB.prepare("SELECT * FROM live_listeners ORDER BY id").all<ListenerRow>()).results ?? [];
-  const inputs = (await env.DB.prepare("SELECT id,connected FROM live_inputs").all<{ id: string; connected: number }>()).results ?? [];
-  const reported = new Map(inputs.map(row => [row.id, row.connected === 1]));
-
-  // The hub is live on an input a fresh listener is streaming to and that
-  // Stream itself has not reported disconnected. Inputs keep their configured
-  // order, so the app stays on input A while it is up.
-  const streamingInputs = new Set(listeners
-    .filter(row => row.streaming === 1 && row.input_id && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS)
-    .map(row => String(row.input_id)));
-  const liveInput = streamInputs(env).find(id => streamingInputs.has(id) && reported.get(id) !== false);
   // Paltalk's own directory says the room is open; a listener in it also counts.
   const roomOpen = (await paltalkRoomStatus(env))?.online === true
-    || listeners.some(row => row.in_room === 1 && now.getTime() - Date.parse(row.last_seen_at) < STREAMING_FRESH_MS);
-  // Stream inputs (paid) win when configured; the free R2 relay otherwise.
-  const hubURL = liveInput ? playbackURL(env, liveInput)
-    : streamingInputs.has("r2") ? `${env.PUBLIC_BASE_URL.replace(/\/$/, "")}${RELAY_PLAYLIST}` : null;
-  await settleBroadcast(env, hubURL, roomOpen, now);
+    || listeners.some(row => row.in_room === 1 && now.getTime() - Date.parse(row.last_seen_at) < REPORT_FRESH_MS);
+  await settleBroadcast(env, roomOpen, now);
   // No alerts about listeners: the owner retired them (2026-10-28).
 }
 
@@ -109,41 +88,33 @@ export function zikrTitle(now: Date): string {
   return hour < 7 ? "Tahajjud Zikr" : "Daily Zikr";
 }
 
-/** The official broadcast is the channel's live video (or a hub stream when
- *  one is on). The Paltalk room opening never makes it live - the app would
- *  show "live" with nothing to play - and is recorded beside it: the Tahajjud
- *  zikr is joined in the room, and its opening is announced. */
-async function settleBroadcast(env: Env, hubURL: string | null, roomOpen: boolean, now: Date): Promise<void> {
-  const row = await env.DB.prepare("SELECT state,source_mode,hub_stream_url,room_open FROM live_broadcasts WHERE id='official-live'")
-    .first<{ state: string; source_mode: string; hub_stream_url: string | null; room_open: number }>();
+/** The day in Pakistan, "2026-10-29": one Tahajjud zikr each. */
+export function pakistanDay(now: Date): string {
+  return new Date(now.getTime() + 5 * 3_600_000).toISOString().slice(0, 10);
+}
+
+/** The official broadcast is the channel's live video. The Paltalk room
+ *  opening never makes it live - the app would show "live" with nothing to
+ *  play - and is recorded beside it: the Tahajjud zikr is joined in the room,
+ *  and its opening is announced. */
+async function settleBroadcast(env: Env, roomOpen: boolean, now: Date): Promise<void> {
+  const row = await env.DB.prepare("SELECT source_mode,hub_stream_url,room_open FROM live_broadcasts WHERE id='official-live'")
+    .first<{ source_mode: string; hub_stream_url: string | null; room_open: number }>();
   if (!row || row.source_mode === "manual") return;
-  if (row.hub_stream_url === hubURL && (row.room_open === 1) === roomOpen) return;
+  if (!row.hub_stream_url && (row.room_open === 1) === roomOpen) return;
   const at = now.toISOString();
   const opened = roomOpen && row.room_open !== 1;
-  if (hubURL) {
-    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=?,room_open=?,state='live',
-      started_at=CASE WHEN state='live' THEN started_at ELSE ? END,ended_at=NULL,updated_at=? WHERE id='official-live'`)
-      .bind(hubURL, roomOpen ? 1 : 0, at, at).run();
-    // Whichever source goes live first announces it; the other sees "live".
-    if (row.state !== "live") {
-      await sendTopicPush(env, `hub-live:${at.slice(0, 16)}`, "liveZikr", "Daily Zikr has started",
-        "Join the official daily zikr in Darul Irfan.", "darulirfan://live/official-live").catch(() => 0);
-    }
-  } else if (row.hub_stream_url) {
-    // The hub stopped: the channel's live video, if it is on, keeps it live.
-    await env.DB.prepare(`UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=?,
-      state=CASE WHEN youtube_live=1 THEN state ELSE 'ended' END,
-      ended_at=CASE WHEN youtube_live=1 THEN ended_at ELSE ? END,updated_at=? WHERE id='official-live'`)
-      .bind(roomOpen ? 1 : 0, at, at).run();
-  } else {
-    await env.DB.prepare("UPDATE live_broadcasts SET room_open=?,updated_at=? WHERE id='official-live'")
-      .bind(roomOpen ? 1 : 0, at).run();
-  }
+  // A relay link left from before is dropped, never followed; whether the
+  // broadcast is live stays the video's to say.
+  await env.DB.prepare("UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=?,updated_at=? WHERE id='official-live'")
+    .bind(roomOpen ? 1 : 0, at).run();
   // Daily Zikr is announced when the channel goes live; the room opening
-  // before dawn announces the Tahajjud zikr, which is joined on Paltalk.
+  // before dawn announces the Tahajjud zikr, which is joined on Paltalk. Once
+  // a day: a room that drops out of the directory for a minute and reappears
+  // is not announced again.
   if (opened && zikrTitle(now) === "Tahajjud Zikr") {
-    await sendTopicPush(env, `room-open:${at.slice(0, 16)}`, "liveZikr", "Tahajjud Zikr has started",
-      "Join it on Paltalk from Darul Irfan.", "darulirfan://zikr").catch(() => 0);
+    await sendTopicPush(env, `room-open:${pakistanDay(now)}`, "liveZikr", "Tahajjud Zikr has started",
+      "Join it on Paltalk from Darul Irfan.", "darulirfan://zikr/tahajjud", LIVE_ALERT).catch(() => 0);
   }
 }
 

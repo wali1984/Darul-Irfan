@@ -58,7 +58,9 @@ describe("the Paltalk room, from Paltalk's public directory", () => {
     await refreshPaltalkRoom(early.env, dawn);
     await reconcileLive(early.env, dawn);
     await reconcileLive(early.env, new Date(dawn.getTime() + 60_000)); // still open: not again
-    expect(pushes).toEqual([{ title: "Tahajjud Zikr has started", path: "darulirfan://zikr" }]);
+    // The app opens the Tahajjud card, with its Join on Paltalk button; builds
+    // that only know "zikr" still open the Zikr tab.
+    expect(pushes).toEqual([{ title: "Tahajjud Zikr has started", path: "darulirfan://zikr/tahajjud" }]);
     pushes.length = 0;
     const evening = new Date("2026-10-29T16:15:00Z"); // 21:15 in Pakistan
     const late = setup(() => [room()]);

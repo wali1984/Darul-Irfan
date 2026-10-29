@@ -1,5 +1,5 @@
 import type { Env } from "./contracts";
-import { canAppointAdministrators, canManage, canSee, halqahRole, isSuperAdmin, memberRole, type HalqahRole, type Role } from "./community";
+import { canAppointAdministrators, canManage, canSee, halqahRole, isSuperAdmin, memberRole, roleIn, type HalqahRole, type Role } from "./community";
 import { mintInvite, upsertMembership } from "./members";
 import { cleanText, json } from "./util";
 
@@ -99,6 +99,8 @@ export async function addPerson(env: Env, memberID: string, groupID: string, inp
     const person = await env.DB.prepare("SELECT id,display_name FROM members WHERE id=?").bind(input.memberID)
       .first<{ id: string; display_name: string | null }>();
     if (!person) return notFound();
+    const refusal = await alreadyPlaced(env, memberID, groupID, person.id, allowed.seniors);
+    if (refusal) return refusal;
     await upsertMembership(env, groupID, person.id, role, actor, false);
     return json({ result: "added", name: person.display_name ?? undefined, role }, { status: 201 });
   }
@@ -109,8 +111,16 @@ export async function addPerson(env: Env, memberID: string, groupID: string, inp
       .bind(email).first<{ id: string; display_name: string | null }>();
     if (existing) {
       if (existing.id === memberID) return json({ error: "You are already in this group." }, { status: 400 });
+      const refusal = await alreadyPlaced(env, memberID, groupID, existing.id, allowed.seniors);
+      if (refusal) return refusal;
       await upsertMembership(env, groupID, existing.id, role, actor, false);
       return json({ result: "added", name: existing.display_name ?? undefined, role }, { status: 201 });
+    }
+    // An Administrator's invitation is changed only by those who may make one.
+    if (!allowed.seniors) {
+      const pending = await env.DB.prepare("SELECT role FROM member_group_grants WHERE group_id=? AND email=? AND claimed_at IS NULL")
+        .bind(groupID, email).first<{ role: string }>();
+      if (pending && halqahRole(pending.role) === "administrator") return seniorsOnly();
     }
     await env.DB.prepare(`INSERT INTO member_group_grants(id,group_id,email,role,created_by,created_at) VALUES(?,?,?,?,?,?)
       ON CONFLICT(group_id,email) DO UPDATE SET role=excluded.role,created_by=excluded.created_by,
@@ -180,6 +190,16 @@ export async function revokeInvitation(env: Env, memberID: string, groupID: stri
       : null;
   if (!result || (result.meta?.changes ?? 0) === 0) return notFound();
   return new Response(null, { status: 204 });
+}
+
+/** Adding someone who already has a place in the Halqah changes that place,
+ *  so it is held to the same rule as changing it directly: an Admin cannot
+ *  demote an Administrator by "adding" their email as a member. */
+async function alreadyPlaced(
+  env: Env, memberID: string, groupID: string, personID: string, seniors: boolean,
+): Promise<Response | null> {
+  if (!await roleIn(env, personID, groupID)) return null;
+  return protectedPerson(env, memberID, groupID, personID, seniors);
 }
 
 /** Someone the caller may not change: not in the Halqah, themselves, a

@@ -72,8 +72,11 @@ export async function groupExists(env: Env, groupID: string): Promise<boolean> {
   return !!await env.DB.prepare("SELECT 1 AS ok FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
 }
 
+/** A place in a Halqah that is still active: a retired Halqah is gone for its
+ *  members too, not only from their list. */
 async function isMember(env: Env, memberID: string, groupID: string): Promise<boolean> {
-  return !!await env.DB.prepare("SELECT 1 AS ok FROM member_group_members WHERE group_id=? AND member_id=?")
+  return !!await env.DB.prepare(`SELECT 1 AS ok FROM member_group_members WHERE group_id=? AND member_id=?
+    AND EXISTS (SELECT 1 FROM member_groups g WHERE g.id=member_group_members.group_id AND g.is_active=1)`)
     .bind(groupID, memberID).first();
 }
 
@@ -102,6 +105,16 @@ export async function me(env: Env, memberID: string): Promise<Response> {
   return json({ memberID: row.id, role: await memberRole(env, memberID), displayName: row.display_name ?? undefined });
 }
 
+/** PUT /v1/members/me - the member's own name, as their Halqah's admins, the
+ *  attendance and the meeting room show it. A member who joined by code has
+ *  no other way to give one. */
+export async function renameMember(env: Env, memberID: string, input: Record<string, unknown>): Promise<Response> {
+  const name = cleanText(input.displayName, 80);
+  if (!name) return json({ error: "Enter your name." }, { status: 400 });
+  await env.DB.prepare("UPDATE members SET display_name=? WHERE id=?").bind(name, memberID).run();
+  return me(env, memberID);
+}
+
 /** The caller's groups - every group for the super admin - each with whether
  *  they manage it and whether something is live in it now. */
 export async function communityGroups(env: Env, memberID: string): Promise<Response> {
@@ -126,15 +139,19 @@ export async function communityGroups(env: Env, memberID: string): Promise<Respo
       canManage: await canManage(env, memberID, role, String(row.id)),
     });
   }
-  return json({ role, groups });
+  if (role !== "superadmin") return json({ role, groups });
+  // For the Super admin's dashboard: everyone who has signed in, as the
+  // directory lists them. Nobody else is told how many people there are.
+  const signedIn = await env.DB.prepare("SELECT COUNT(*) AS n FROM members").first<{ n: number }>();
+  return json({ role, groups, signedIn: signedIn?.n ?? 0 });
 }
 
 /** Everything about one group a member needs: its live session, its zikr
- *  times and its upcoming meetings. */
+ *  times, its upcoming meetings, and how many people it has. */
 export async function groupDetail(env: Env, memberID: string, groupID: string): Promise<Response> {
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
-  const [group, live, zikr, meetings] = await Promise.all([
+  const [group, live, zikr, meetings, people] = await Promise.all([
     env.DB.prepare("SELECT id,name,description FROM member_groups WHERE id=?").bind(groupID).first(),
     liveRow(env, groupID),
     env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,autoplay_json
@@ -142,12 +159,17 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
     env.DB.prepare(`SELECT id,title,starts_at,duration_minutes FROM group_meetings
       WHERE group_id=? AND is_cancelled=0 AND starts_at >= ? ORDER BY starts_at LIMIT 20`)
       .bind(groupID, new Date(Date.now() - 6 * 3_600_000).toISOString()).all(),
+    // Counted as the Halqah's People list counts them: members, Admins and
+    // Administrators with an account. A number, never who they are.
+    env.DB.prepare(`SELECT COUNT(*) AS n FROM member_group_members g JOIN members m ON m.id=g.member_id
+      WHERE g.group_id=?`).bind(groupID).first<{ n: number }>(),
   ]);
   const isLive = live?.state === "live";
   const managing = await canManage(env, memberID, role, groupID);
   return json({
     group: { id: group?.id, name: group?.name, description: group?.description ?? undefined },
     canManage: managing,
+    memberCount: people?.n ?? 0,
     live: isLive && live ? {
       kind: live?.kind, title: live?.title ?? undefined,
       // The video plays in the app; the room is joined through /join.
@@ -535,9 +557,21 @@ export async function registerMemberDevice(env: Env, memberID: string, input: Re
   const installation = typeof input.installationID === "string" && /^[0-9A-Fa-f-]{36}$/.test(input.installationID)
     ? input.installationID.toUpperCase() : null;
   if (!installation) return json({ error: "A valid installation id is required" }, { status: 400 });
+  // A phone carries one member's notices: whoever signs in on it after
+  // another takes it over, and the one before stops being told on it.
+  await env.DB.prepare("DELETE FROM member_devices WHERE upper(installation_id)=? AND member_id<>?").bind(installation, memberID).run();
   await env.DB.prepare(`INSERT INTO member_devices(member_id,installation_id,updated_at) VALUES(?,?,?)
     ON CONFLICT(member_id,installation_id) DO UPDATE SET updated_at=excluded.updated_at`)
     .bind(memberID, installation, new Date().toISOString()).run();
+  return new Response(null, { status: 204 });
+}
+
+/** DELETE /v1/members/devices/{installation} - the member turned their
+ *  Halqah notices off on that phone. They stay signed in, and the phone keeps
+ *  any official alerts it has. */
+export async function unlinkMemberDevice(env: Env, memberID: string, installationID: string): Promise<Response> {
+  await env.DB.prepare("DELETE FROM member_devices WHERE member_id=? AND upper(installation_id)=?")
+    .bind(memberID, installationID.toUpperCase()).run();
   return new Response(null, { status: 204 });
 }
 

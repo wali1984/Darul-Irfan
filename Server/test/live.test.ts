@@ -37,6 +37,14 @@ function setup() {
 
 afterEach(() => vi.unstubAllGlobals());
 
+/** A throwaway P-256 key, so APNs provider tokens can be signed. */
+async function p256pem(): Promise<string> {
+  const pair = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]) as CryptoKeyPair;
+  const der = new Uint8Array(await crypto.subtle.exportKey("pkcs8", pair.privateKey) as ArrayBuffer);
+  let binary = ""; der.forEach(byte => binary += String.fromCharCode(byte));
+  return `-----BEGIN PRIVATE KEY-----${btoa(binary)}-----END PRIVATE KEY-----`;
+}
+
 describe("live zikr pipeline", () => {
   it("refuses heartbeats and Stream events without their secrets", async () => {
     const { heartbeat, streamEvent } = setup();
@@ -44,16 +52,19 @@ describe("live zikr pipeline", () => {
     expect((await streamEvent(INPUT_A, "live_input.connected", "wrong")).status).toBe(404);
   });
 
-  it("goes live in the app when a listener streams, and ends when it stops", async () => {
-    const { heartbeat, live, sent } = setup();
+  // Daily Zikr follows the channel's live video only (the owner, 2026-10-28).
+  it("never makes Daily Zikr live from a streaming listener, offers no hub source and sends no alert", async () => {
+    const { env, raw, heartbeat, live, sent } = setup();
+    // Credentials and a subscribed phone, so an alert would really be sent.
+    Object.assign(env, { APNS_KEY_ID: "KEY", APNS_TEAM_ID: "TEAM", APNS_PRIVATE_KEY: await p256pem() });
+    raw.prepare(`INSERT INTO devices(installation_id,apns_token,locale,timezone,topics_json,environment,app_version,created_at,last_seen_at)
+      VALUES('11111111-1111-4111-8111-111111111111',?,'en','UTC','["liveZikr"]','production','1',datetime('now'),datetime('now'))`).run("a".repeat(64));
     expect((await heartbeat({ listener: "listener-a", inRoom: true, streaming: true, input: INPUT_A })).status).toBe(200);
+    expect((await heartbeat({ listener: "listener-b", inRoom: true, streaming: true, input: "r2" })).status).toBe(200);
     const on = await live();
-    expect(on.state).toBe("live");
-    expect(on.sources[0]).toEqual(expect.objectContaining({ kind: "ownedStream", url: `https://${HOST}/${INPUT_A}/manifest/video.m3u8` }));
-    await heartbeat({ listener: "listener-a", inRoom: false, streaming: false });
-    const off = await live();
-    expect(off.state).toBe("ended");
-    expect(off.sources.filter(s => s.kind === "ownedStream")).toEqual([]);
+    expect(on.state).not.toBe("live");
+    expect(on.sources).toEqual([]);
+    expect(sent.filter(s => s.url.includes("push.apple.com"))).toEqual([]);
     expect(sent.filter(s => s.url.includes("graph.facebook.com"))).toEqual([]);
   });
 
@@ -71,27 +82,35 @@ describe("live zikr pipeline", () => {
     expect(zikrTitle(new Date("2026-10-27T16:15:00Z"))).toBe("Daily Zikr"); // 21:15
   });
 
-  it("fails over to input B when Stream reports input A disconnected", async () => {
-    const { heartbeat, streamEvent, live } = setup();
+  it("records Stream's input reports, which no longer make the broadcast live", async () => {
+    const { raw, heartbeat, streamEvent, live } = setup();
     await heartbeat({ listener: "listener-a", inRoom: true, streaming: true, input: INPUT_A });
-    await heartbeat({ listener: "listener-b", inRoom: true, streaming: true, input: INPUT_B });
-    expect((await live()).sources[0]?.url).toContain(INPUT_A);
-    await streamEvent(INPUT_A, "live_input.disconnected");
-    expect((await live()).sources[0]?.url).toContain(INPUT_B);
-    await streamEvent(INPUT_A, "live_input.connected");
-    expect((await live()).sources[0]?.url).toContain(INPUT_A);
+    expect((await streamEvent(INPUT_B, "live_input.connected")).status).toBe(200);
+    expect(raw.prepare("SELECT connected FROM live_inputs WHERE id=?").get(INPUT_B)).toEqual({ connected: 1 });
+    const on = await live();
+    expect(on.state).not.toBe("live");
+    expect(on.sources).toEqual([]);
   });
 
-  it("offers the hub only while the channel's own live video is off", async () => {
+  it("follows the channel's live video alone: a listener starting or stopping neither adds a source nor ends it", async () => {
     const { raw, heartbeat, live } = setup();
+    raw.prepare("UPDATE live_broadcasts SET state='live',youtube_live=1,youtube_video_id='abcdefghijk' WHERE id='official-live'").run();
     await heartbeat({ listener: "listener-a", inRoom: true, streaming: true, input: INPUT_A });
-    raw.prepare("UPDATE live_broadcasts SET youtube_live=1,youtube_video_id='abcdefghijk' WHERE id='official-live'").run();
-    const kinds = (await live()).sources.map(s => s.kind);
-    expect(kinds).toContain("youtube");
-    expect(kinds).not.toContain("ownedStream");
-    // When the hub stops, the video keeps the broadcast live.
+    expect((await live()).sources.map(s => s.kind)).toEqual(["youtube"]);
     await heartbeat({ listener: "listener-a", inRoom: false, streaming: false });
-    expect((await live()).state).toBe("live");
+    const after = await live();
+    expect(after.state).toBe("live");
+    expect(after.sources.map(s => s.kind)).toEqual(["youtube"]);
+  });
+
+  it("drops a relay link left from before without ending the video's broadcast", async () => {
+    const { env, raw, live } = setup();
+    raw.prepare(`UPDATE live_broadcasts SET state='live',youtube_live=1,youtube_video_id='abcdefghijk',
+      hub_stream_url='https://api.example.com/v1/live/audio/index.m3u8' WHERE id='official-live'`).run();
+    await reconcileLive(env);
+    expect(raw.prepare("SELECT state,hub_stream_url FROM live_broadcasts WHERE id='official-live'").get())
+      .toEqual({ state: "live", hub_stream_url: null });
+    expect((await live()).sources.map(s => s.kind)).toEqual(["youtube"]);
   });
 
   it("sends no alerts about listeners, silent or troubled (retired 2026-10-28)", async () => {

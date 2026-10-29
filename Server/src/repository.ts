@@ -1,7 +1,7 @@
 import type { AppBootstrap, Env, LiveBroadcast, LiveCue, OfficialFeedItem, RemoteZikrSchedule } from "./contracts";
-import { currentCue, RELAY_PLAYLIST } from "./liveRelay";
+import { currentCue } from "./liveRelay";
 import { paltalkRoomStatus } from "./paltalkRoom";
-import { parseJSON, validHTTPURL } from "./util";
+import { isoSeconds, parseJSON, validHTTPURL, wholeSeconds } from "./util";
 import { schemaVersion } from "./contracts";
 import { integrationStatus } from "./community";
 
@@ -10,14 +10,12 @@ type Row = Record<string, string | number | null>;
 export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
   const row = await env.DB.prepare("SELECT * FROM live_broadcasts WHERE id = ?").bind("official-live").first<Row>();
   if (!row) {
-    return { id: "official-live", state: "offline", title: "Daily Zikr", sources: [], updatedAt: new Date().toISOString() };
+    return { id: "official-live", state: "offline", title: "Daily Zikr", sources: [], updatedAt: wholeSeconds(new Date()) };
   }
   const sources: LiveBroadcast["sources"] = [];
-  // The room's own sound comes first. The free R2 relay is offered beside the
-  // channel's live video; a paid Stream input only while the video is off.
-  const hubLink = validHTTPURL(row.hub_stream_url);
-  const hub = hubLink && (hubLink.endsWith(RELAY_PLAYLIST) || row.youtube_live !== 1) ? hubLink : undefined;
-  if (hub) sources.push({ kind: "ownedStream", url: hub, supportsBackgroundAudio: true });
+  // The official broadcast is the channel's live video (the owner's decision,
+  // 2026-10-28). The retired relay's link is never offered, so the app cannot
+  // play the room's sound in its place; a stream staff set by hand still is.
   const owned = validHTTPURL(row.owned_stream_url);
   const videoID = typeof row.youtube_video_id === "string" ? row.youtube_video_id : undefined;
   if (owned) sources.push({ kind: "ownedStream", url: owned, supportsBackgroundAudio: true });
@@ -25,13 +23,14 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
   // The Paltalk room (paltalk_url) is never a source of the official
   // broadcast, which is the channel's live video; builds that still know the
   // "paltalk" kind would open it as one. It travels as `room` instead.
+  // Every date in whole seconds: see wholeSeconds.
   return {
     id: String(row.id), state: row.state as LiveBroadcast["state"], title: String(row.title),
     details: typeof row.details === "string" ? row.details : undefined,
-    scheduledStart: typeof row.scheduled_start === "string" ? row.scheduled_start : undefined,
-    startedAt: typeof row.started_at === "string" ? row.started_at : undefined,
-    endedAt: typeof row.ended_at === "string" ? row.ended_at : undefined,
-    sources, updatedAt: String(row.updated_at),
+    scheduledStart: isoSeconds(row.scheduled_start),
+    startedAt: isoSeconds(row.started_at),
+    endedAt: isoSeconds(row.ended_at),
+    sources, updatedAt: isoSeconds(row.updated_at) ?? wholeSeconds(new Date()),
     automaticBroadcast: integrationStatus(env).liveBroadcast,
     cue: await sessionCue(env, row),
     room: await openRoom(env, row),
@@ -43,7 +42,7 @@ export async function liveBroadcast(env: Env): Promise<LiveBroadcast> {
 async function openRoom(env: Env, row: Row): Promise<LiveBroadcast["room"]> {
   const status = await paltalkRoomStatus(env);
   if (!status?.online) return undefined;
-  return { platform: "paltalk", listeners: status.listeners, since: status.since, url: validHTTPURL(row.paltalk_url) };
+  return { platform: "paltalk", listeners: status.listeners, since: isoSeconds(status.since), url: validHTTPURL(row.paltalk_url) };
 }
 
 /** The host's last cue, while the session it was given in is still live. */
@@ -54,7 +53,8 @@ async function sessionCue(env: Env, row: Row): Promise<LiveCue | undefined> {
   if (!cue) return undefined;
   // A session without a start time still drops a cue older than three hours.
   const since = Number.isFinite(started) ? started : Date.now() - 3 * 3_600_000;
-  return Date.parse(cue.at) >= since ? cue : undefined;
+  const at = isoSeconds(cue.at);
+  return at && Date.parse(cue.at) >= since ? { ...cue, at } : undefined;
 }
 
 export async function schedules(env: Env): Promise<RemoteZikrSchedule[]> {
@@ -72,7 +72,7 @@ export async function bootstrap(env: Env): Promise<AppBootstrap> {
   const config = await env.DB.prepare("SELECT key, value_json FROM app_config").all<Row>();
   const values = Object.fromEntries(config.results.map(row => [String(row.key), parseJSON(String(row.value_json), null)]));
   return {
-    schemaVersion, generatedAt: new Date().toISOString(),
+    schemaVersion, generatedAt: wholeSeconds(new Date()),
     minimumSupportedVersion: typeof values.minimumSupportedVersion === "string" ? values.minimumSupportedVersion : "1.2.1",
     featureFlags: (values.featureFlags ?? {}) as Record<string, boolean>,
     officialLinks: (values.officialLinks ?? {}) as Record<string, string>,
@@ -97,12 +97,21 @@ export async function feed(env: Env, limit: number, cursor?: string): Promise<{ 
     : env.DB.prepare(sql).bind(bounded + 1);
   const rows = (await statement.all<Row>()).results;
   const visible = rows.slice(0, bounded);
-  const items = visible.map(row => ({
-    id: String(row.id), source: row.source as OfficialFeedItem["source"], kind: row.kind as OfficialFeedItem["kind"],
-    title: String(row.title), body: typeof row.body === "string" ? row.body : undefined, sourceURL: String(row.source_url),
-    imageURL: validHTTPURL(row.image_url), videoID: typeof row.video_id === "string" ? row.video_id : undefined,
-    publishedAt: String(row.published_at), isFeatured: Number(row.is_featured) === 1
-  }));
+  const items: OfficialFeedItem[] = [];
+  for (const row of visible) {
+    // One unreadable date would fail the app's whole page, so such an item
+    // is left out rather than sent.
+    const publishedAt = isoSeconds(row.published_at);
+    if (!publishedAt) continue;
+    items.push({
+      id: String(row.id), source: row.source as OfficialFeedItem["source"], kind: row.kind as OfficialFeedItem["kind"],
+      title: String(row.title), body: typeof row.body === "string" ? row.body : undefined, sourceURL: String(row.source_url),
+      imageURL: validHTTPURL(row.image_url), videoID: typeof row.video_id === "string" ? row.video_id : undefined,
+      publishedAt, isFeatured: Number(row.is_featured) === 1
+    });
+  }
+  // The cursor keeps the stored text of the last row: the next page's SQL
+  // compares against exactly that.
   const last = rows.length > bounded ? visible.at(-1) : undefined;
   return { items, nextCursor: last ? encodeFeedCursor(Number(last.is_featured) === 1, String(last.published_at), String(last.id)) : undefined };
 }

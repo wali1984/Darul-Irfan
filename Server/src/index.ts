@@ -6,31 +6,38 @@ import { bootstrap, feed, liveBroadcast } from "./repository";
 import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
 import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
 import { whatsappSubscription, whatsappWebhook } from "./whatsapp";
-import { authenticatedMember, createSession, deleteMember, redeemInvite } from "./members";
+import { authenticatedMember, createSession, deleteMember, redeemInvite, signOutMember } from "./members";
 import {
   cancelMeeting, communityGroups, communityPosts, createPost, groupDetail, hidePost, joinRoom, me, meetingPage,
-  publishDraft, registerMemberDevice, removeZikrSession, saveZikrSession, scheduleMeeting, setLive,
+  publishDraft, registerMemberDevice, removeZikrSession, renameMember, saveZikrSession, scheduleMeeting, setLive,
+  unlinkMemberDevice,
 } from "./community";
 import { serveMedia } from "./media";
 import { quranAudioFile, quranAudioManifest } from "./audio";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
-import { listenerHealth, listenerHeartbeat, reconcileLive, streamEvent } from "./live";
+import { listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
 import { autoplayDue, checkIn, controlSession, deleteSessionRecord, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
 import { collectRoomRecordings } from "./roomRecordings";
 import { createHalqah, memberDirectory, retireHalqah, updateHalqah } from "./halqahs";
 import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
 import { uploadPostMedia } from "./postMedia";
+import { libraryPDFRoute } from "./pdfProxy";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
+
+/** Uploads carry a file as the body and check its size themselves: a
+ *  recording or a post's video up to 95 MB, a Today picture up to 12 MB. */
+const UPLOAD_ROUTE = /^\/v1\/(?:groups\/[a-z0-9-]{1,40}\/(?:recordings|media)|daily-media\/manage)$/;
 
 async function route(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url); const path = url.pathname.replace(/\/$/, "") || "/";
   if (path === "/health") {
-    const health = await env.DB.prepare("SELECT * FROM source_health ORDER BY source").all();
+    // Public, so only whether all is well: the jobs' error text and the
+    // listeners are for staff, at /admin/api/health.
+    const health = await env.DB.prepare("SELECT status FROM source_health").all();
     const degraded = health.results.some(row => row.status === "degraded");
-    return json({ ok: !degraded, environment: env.ENVIRONMENT, sources: health.results, listeners: await listenerHealth(env) },
-      { status: degraded ? 503 : 200 });
+    return json({ ok: !degraded }, { status: degraded ? 503 : 200 });
   }
   if (path.startsWith("/admin")) return adminRequest(request, env, path);
   if (request.method === "GET" && path === "/v1/bootstrap") return cachedJSON(await bootstrap(env), request, 300);
@@ -39,6 +46,11 @@ async function route(request: Request, env: Env): Promise<Response> {
     const limit = Number(url.searchParams.get("limit") ?? 20); const cursor = url.searchParams.get("cursor") ?? undefined;
     if (!Number.isInteger(limit) || limit < 1 || limit > 50) return json({ error: "Limit must be an integer from 1 to 50" }, { status: 400 });
     return cachedJSON(await feed(env, limit, cursor), request, 300);
+  }
+  // The library's PDFs for the Web app, which cannot read them from the site
+  // itself (no CORS there): the site's own uploads only, streamed.
+  if (path === "/v1/pdf" && (request.method === "GET" || request.method === "HEAD" || request.method === "OPTIONS")) {
+    return libraryPDFRoute(request, url);
   }
   // Authenticated by Meta's HMAC over the raw body, so it needs the body text
   // rather than a parsed object, and it is deliberately not rate limited: a
@@ -55,10 +67,15 @@ async function route(request: Request, env: Env): Promise<Response> {
     return createSession(request, env);
   }
   if (request.method === "POST" && path === "/v1/members/invite") {
-    // Rate limited harder than the session exchange: this one takes a secret
-    // that could otherwise be guessed at.
-    if (!await withinWriteLimit(request, env, "member-invite", 10)) return json({ error: "Too many requests" }, { status: 429 });
-    return redeemInvite(request, env);
+    // This one takes a secret that could otherwise be guessed at, so wrong
+    // codes are limited hard. Codes that work are not: at an Ijtema everyone
+    // may be behind one address, and the eleventh person with a good code
+    // must not be turned away.
+    if (!await withinWriteLimit(request, env, "member-invite", 60)) return json({ error: "Too many requests" }, { status: 429 });
+    if (await requestCount(request, env, "member-invite-refused") >= 10) return json({ error: "Too many requests" }, { status: 429 });
+    const response = await redeemInvite(request, env);
+    if (response.status === 400 || response.status === 403) await countRequest(request, env, "member-invite-refused");
+    return response;
   }
   // The live zikr pipeline: listener heartbeats and Stream's input events,
   // each authenticated by its own secret and not rate limited, since both
@@ -112,7 +129,12 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (request.method === "POST" && path === "/v1/groups") return createHalqah(env, member, await body());
     if (request.method === "GET" && path === "/v1/members") return memberDirectory(env, member);
     if (request.method === "GET" && path === "/v1/members/me") return me(env, member);
+    if (request.method === "PUT" && path === "/v1/members/me") return renameMember(env, member, await body());
+    if (request.method === "POST" && path === "/v1/members/signout") return signOutMember(request, env, member, await body());
     if (request.method === "POST" && path === "/v1/members/devices") return registerMemberDevice(env, member, await body());
+    // The member turned their Halqah notices off on this phone.
+    const unlinked = /^\/v1\/members\/devices\/([0-9A-Fa-f-]{36})$/.exec(path)?.[1];
+    if (request.method === "DELETE" && unlinked) return unlinkMemberDevice(env, member, unlinked);
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
@@ -172,15 +194,33 @@ async function route(request: Request, env: Env): Promise<Response> {
   return json({ error: "Not found" }, { status: 404 });
 }
 
-async function withinWriteLimit(request: Request, env: Env, bucket: string, maximum: number): Promise<boolean> {
+/** This client's counter in a bucket, for the current hour. */
+async function limitKey(request: Request, bucket: string): Promise<{ keyHash: string; windowStart: string }> {
   const client = request.headers.get("cf-connecting-ip") ?? "unknown";
-  const keyHash = await sha256(`${bucket}:${client}`);
   const now = new Date();
-  const windowStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours())).toISOString();
+  return {
+    keyHash: await sha256(`${bucket}:${client}`),
+    windowStart: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours())).toISOString(),
+  };
+}
+
+async function countRequest(request: Request, env: Env, bucket: string): Promise<void> {
+  const { keyHash, windowStart } = await limitKey(request, bucket);
   await env.DB.prepare(`INSERT INTO rate_limits(key_hash,window_start,request_count) VALUES(?,?,1)
     ON CONFLICT(key_hash,window_start) DO UPDATE SET request_count=request_count+1`).bind(keyHash, windowStart).run();
+}
+
+/** How many this client has counted in the bucket this hour. */
+async function requestCount(request: Request, env: Env, bucket: string, unreadable = 0): Promise<number> {
+  const { keyHash, windowStart } = await limitKey(request, bucket);
   const row = await env.DB.prepare("SELECT request_count FROM rate_limits WHERE key_hash=? AND window_start=?").bind(keyHash, windowStart).first<{ request_count: number }>();
-  return Number(row?.request_count ?? maximum + 1) <= maximum;
+  return Number(row?.request_count ?? unreadable);
+}
+
+async function withinWriteLimit(request: Request, env: Env, bucket: string, maximum: number): Promise<boolean> {
+  await countRequest(request, env, bucket);
+  // A counter that cannot be read back refuses rather than lets through.
+  return await requestCount(request, env, bucket, maximum + 1) <= maximum;
 }
 
 async function cachedJSON(value: unknown, request: Request, maxAge: number): Promise<Response> {
@@ -193,13 +233,17 @@ async function registerDevice(request: Request, env: Env): Promise<Response> {
   const input = await request.json<DeviceRegistration>();
   if (!input || !isUUID(input.installationID) || !/^[0-9a-f]{64,200}$/i.test(input.apnsToken) || !["sandbox", "production"].includes(input.environment) || !Array.isArray(input.topics) || input.topics.some(topic => typeof topic !== "string")) return json({ error: "Invalid registration" }, { status: 400 });
   const topics = [...new Set(input.topics.filter(topic => allowedTopics.has(topic)))];
+  // A registration made for Halqah notices keeps the official topics the
+  // phone already has: the app's two registrations may cross, and this one
+  // must never switch official alerts off.
+  const keepTopics = input.keepTopics === true;
   const now = new Date().toISOString();
   // APNs may return the same token after a reinstall. Move it to the current
   // anonymous installation instead of failing the UNIQUE constraint.
   await env.DB.prepare("DELETE FROM devices WHERE apns_token=? AND installation_id<>?")
     .bind(input.apnsToken.toLowerCase(), input.installationID).run();
   await env.DB.prepare(`INSERT INTO devices(installation_id,apns_token,locale,timezone,topics_json,environment,app_version,created_at,last_seen_at)
-    VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(installation_id) DO UPDATE SET apns_token=excluded.apns_token,locale=excluded.locale,timezone=excluded.timezone,topics_json=excluded.topics_json,environment=excluded.environment,app_version=excluded.app_version,last_seen_at=excluded.last_seen_at`)
+    VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(installation_id) DO UPDATE SET apns_token=excluded.apns_token,locale=excluded.locale,timezone=excluded.timezone,${keepTopics ? "" : "topics_json=excluded.topics_json,"}environment=excluded.environment,app_version=excluded.app_version,last_seen_at=excluded.last_seen_at`)
     .bind(input.installationID, input.apnsToken.toLowerCase(), cleanText(input.locale, 20) ?? "en", cleanText(input.timeZone, 80) ?? "UTC", JSON.stringify(topics), input.environment, cleanText(input.appVersion, 30) ?? "unknown", now, now).run();
   return json({ ok: true }, { status: 201 });
 }
@@ -225,7 +269,10 @@ async function diagnostics(request: Request, env: Env): Promise<Response> {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     try {
-      if (request.method === "POST" && Number(request.headers.get("content-length") ?? 0) > 256_000) return json({ error: "Payload too large" }, { status: 413 });
+      const pathname = new URL(request.url).pathname.replace(/\/$/, "");
+      if (request.method === "POST" && !UPLOAD_ROUTE.test(pathname) && Number(request.headers.get("content-length") ?? 0) > 256_000) {
+        return json({ error: "Payload too large" }, { status: 413 });
+      }
       const response = await route(request, env);
       // Public, read-only feeds are intentionally available to web companions.
       // Administrative and device routes never receive browser CORS permission.

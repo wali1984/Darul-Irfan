@@ -31,6 +31,20 @@ export function sqliteD1(): { db: D1Database; raw: DatabaseSync } {
       };
       return statement;
     },
+    /** Like D1: the statements run in order as one transaction, and a
+     *  failure in any of them undoes them all. */
+    async batch(statements: Array<{ run: () => Promise<unknown> }>) {
+      raw.exec("BEGIN");
+      try {
+        const results: unknown[] = [];
+        for (const statement of statements) results.push(await statement.run());
+        raw.exec("COMMIT");
+        return results;
+      } catch (error) {
+        raw.exec("ROLLBACK");
+        throw error;
+      }
+    },
   };
   return { db: db as unknown as D1Database, raw };
 }

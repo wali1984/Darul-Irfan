@@ -27,6 +27,22 @@ export const validISODate = (value: unknown): string | undefined => {
   return Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : undefined;
 };
 
+/** An instant in whole seconds, "2026-10-28T16:17:18Z". toISOString() always
+ *  adds milliseconds, and the stock ISO-8601 decoder in the iOS builds already
+ *  installed rejects them, so every date the public API sends goes through
+ *  here. */
+export const wholeSeconds = (date: Date): string => date.toISOString().replace(/\.\d{3}Z$/, "Z");
+
+/** A stored timestamp in whole seconds, or undefined when it is not a date.
+ *  SQLite's own datetime() text ("2026-10-28 16:17:18") carries no zone and
+ *  is UTC. */
+export const isoSeconds = (value: unknown): string | undefined => {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const text = value.trim();
+  const parsed = Date.parse(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(text) ? `${text.replace(" ", "T")}Z` : text);
+  return Number.isFinite(parsed) ? wholeSeconds(new Date(parsed)) : undefined;
+};
+
 export const parseJSON = <T>(value: string | null, fallback: T): T => {
   if (!value) return fallback;
   try { return JSON.parse(value) as T; } catch { return fallback; }

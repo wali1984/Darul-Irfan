@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanText, isUUID, redactDiagnostics, validHTTPURL, validISODate } from "../src/util";
+import { cleanText, isoSeconds, isUUID, redactDiagnostics, validHTTPURL, validISODate, wholeSeconds } from "../src/util";
 import { catalogTimestamp } from "../src/sources";
 import { decodeFeedCursor, encodeFeedCursor } from "../src/repository";
 import bootstrapFixture from "./fixtures/bootstrap.json" with { type: "json" };
@@ -36,12 +36,23 @@ describe("public input validation", () => {
       metricKitPayload: { diagnostics: [{ phone: "[redacted]", safe: true }] },
     });
   });
-  it("keeps evergreen website pages out of the chronological updates feed", () => {
+  it("keeps evergreen website pages out of the chronological updates feed, and dates the rest in whole seconds", () => {
     expect(catalogTimestamp({})).toBeUndefined();
     expect(catalogTimestamp({ publishedAt: "not-a-date" })).toBeUndefined();
-    expect(catalogTimestamp({ updatedAt: "2026-07-20T10:00:00Z" })).toBe("2026-07-20T10:00:00.000Z");
+    expect(catalogTimestamp({ updatedAt: "2026-07-20T10:00:00.250Z" })).toBe("2026-07-20T10:00:00Z");
     expect(catalogTimestamp({ publishedAt: "2026-07-21T11:30:00+05:00", updatedAt: "2026-07-20T10:00:00Z" }))
-      .toBe("2026-07-21T06:30:00.000Z");
+      .toBe("2026-07-21T06:30:00Z");
+  });
+  it("writes timestamps in whole seconds, reading SQLite's own text as UTC", () => {
+    expect(isoSeconds("2026-10-28T17:15:16.645Z")).toBe("2026-10-28T17:15:16Z");
+    expect(isoSeconds("2026-10-28T16:17:18Z")).toBe("2026-10-28T16:17:18Z");
+    expect(isoSeconds("2026-10-28T21:17:18+05:00")).toBe("2026-10-28T16:17:18Z");
+    expect(isoSeconds("2026-10-29 02:16:48")).toBe("2026-10-29T02:16:48Z");
+    expect(isoSeconds("2026-09-06")).toBe("2026-09-06T00:00:00Z");
+    expect(isoSeconds("soon")).toBeUndefined();
+    expect(isoSeconds("")).toBeUndefined();
+    expect(isoSeconds(null)).toBeUndefined();
+    expect(wholeSeconds(new Date("2026-10-29T02:16:48.303Z"))).toBe("2026-10-29T02:16:48Z");
   });
   it("round-trips the featured/date/id feed cursor and accepts the v1 cursor", () => {
     const encoded = encodeFeedCursor(true, "2026-07-23T20:00:00Z", "announcement:live");

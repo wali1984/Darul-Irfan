@@ -89,6 +89,9 @@ export interface DeviceRegistration {
   topics: PushTopic[];
   environment: "sandbox" | "production";
   appVersion: string;
+  /** Registers the phone for its member's Halqah notices only: an existing
+   *  registration keeps the official topics it has. */
+  keepTopics?: boolean;
 }
 
 export interface Env {

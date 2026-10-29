@@ -797,3 +797,41 @@ describe("post pictures and videos", () => {
     expect(post?.media?.[0]?.url).toContain("/v1/media/posts%2Fusa%2F");
   });
 });
+
+describe("counts on the Halqah page and the Super admin's dashboard", () => {
+  it("counts a Halqah's people for anyone who can see it, and gives no one outside it anything", async () => {
+    const { call, raw, member, admin, superAdmin } = await setup();
+    const count = async (token: string, group: string) =>
+      ((await (await call(token, "GET", `/v1/groups/${group}`)).json()) as { memberCount?: number }).memberCount;
+    // The USA member and the USA Admin; the Super admin sees it without a place in it.
+    expect(await count(member, "usa")).toBe(2);
+    expect(await count(admin, "usa")).toBe(2);
+    expect(await count(superAdmin, "usa")).toBe(2);
+    expect(await count(superAdmin, "canada")).toBe(0);
+    // A Halqah they are not in answers exactly as one that does not exist.
+    const outside = await call(member, "GET", "/v1/groups/canada");
+    expect(outside.status).toBe(404);
+    expect(await outside.json()).toEqual({ error: "Not found" });
+    // Someone placed in the Halqah counts; someone who deletes their account no longer does.
+    const now = new Date().toISOString();
+    raw.prepare("INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at) VALUES(?,?,?,?,?,?)")
+      .run("d".repeat(32), `invite:${"d".repeat(32)}`, "New member", null, now, now);
+    raw.prepare("INSERT INTO member_group_members(group_id,member_id,added_at,added_by,role) VALUES('usa',?,?,'test','member')")
+      .run("d".repeat(32), now);
+    expect(await count(member, "usa")).toBe(3);
+    expect((await call(member, "DELETE", "/v1/members/me")).status).toBe(204);
+    expect(await count(admin, "usa")).toBe(2);
+  });
+
+  it("tells only the Super admin how many people have signed in", async () => {
+    const { call, member, admin, superAdmin } = await setup();
+    const list = async (token: string) => (await (await call(token, "GET", "/v1/groups")).json()) as { signedIn?: number };
+    expect((await list(superAdmin)).signedIn).toBe(3);
+    // Members and Admins are never told how many people there are.
+    expect(await list(member)).not.toHaveProperty("signedIn");
+    expect(await list(admin)).not.toHaveProperty("signedIn");
+    // The count follows the directory: a deleted account leaves it.
+    expect((await call(member, "DELETE", "/v1/members/me")).status).toBe(204);
+    expect((await list(superAdmin)).signedIn).toBe(2);
+  });
+});

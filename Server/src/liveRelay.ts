@@ -1,5 +1,6 @@
 import type { Env, LiveCue } from "./contracts";
-import { sendTopicPush } from "./apns";
+import { CUE_ALERT, sendTopicPush } from "./apns";
+import { zikrTitle } from "./live";
 import { serveObject } from "./media";
 import { cleanText, json } from "./util";
 
@@ -67,11 +68,11 @@ export async function liveCue(request: Request, env: Env, now = new Date()): Pro
   await env.DB.prepare(`INSERT INTO app_config(key,value_json,updated_at) VALUES('liveCue',?,?)
     ON CONFLICT(key) DO UPDATE SET value_json=excluded.value_json,updated_at=excluded.updated_at`)
     .bind(JSON.stringify(cue), cue.at).run();
-  const live = await env.DB.prepare("SELECT title FROM live_broadcasts WHERE id='official-live'").first<{ title: string }>();
   // The message itself is the notification's title, exactly as the host
-  // wrote it; the sound is the point - the mic may have dropped.
-  await sendTopicPush(env, `cue:${cue.at.slice(0, 19)}`, "liveZikr", text, live?.title ?? "Daily Zikr",
-    "darulirfan://live/official-live").catch(() => 0);
+  // wrote it; the sound is the point - the mic may have dropped. Its body
+  // names the session by Pakistan time, so a cue before dawn says Tahajjud.
+  await sendTopicPush(env, `cue:${cue.at.slice(0, 19)}`, "liveZikr", text, zikrTitle(now),
+    "darulirfan://live/official-live", CUE_ALERT).catch(() => 0);
   return json({ ok: true, sent: true });
 }
 

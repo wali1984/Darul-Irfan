@@ -99,14 +99,37 @@ export async function createSession(request: Request, env: Env, resolveKey?: JWT
 /** Resolves the bearer token to a member, or null. Only the hash is compared,
  * and an expired session is treated as absent. */
 export async function authenticatedMember(request: Request, env: Env): Promise<string | null> {
-  const header = request.headers.get("authorization") ?? "";
-  if (!header.toLowerCase().startsWith("bearer ")) return null;
-  const token = header.slice(7).trim();
-  if (!/^[0-9a-f]{64}$/.test(token)) return null;
+  const token = bearerToken(request);
+  if (!token) return null;
   const row = await env.DB.prepare("SELECT member_id,expires_at FROM member_sessions WHERE token_hash=?")
     .bind(await sha256(token)).first<{ member_id: string; expires_at: string }>();
   if (!row || Date.parse(row.expires_at) <= Date.now()) return null;
   return row.member_id;
+}
+
+/** The member bearer token of a request, when it has the right shape. */
+function bearerToken(request: Request): string | null {
+  const header = request.headers.get("authorization") ?? "";
+  if (!header.toLowerCase().startsWith("bearer ")) return null;
+  const token = header.slice(7).trim();
+  return /^[0-9a-f]{64}$/.test(token) ? token : null;
+}
+
+/** POST /v1/members/signout - ends this phone's session: its own token (the
+ *  member stays signed in on other phones) and this phone's link to the
+ *  member's Halqah notices, so the next person to use the phone is not shown
+ *  them on the lock screen. */
+export async function signOutMember(request: Request, env: Env, memberID: string, input: Record<string, unknown>): Promise<Response> {
+  const token = bearerToken(request);
+  if (token) {
+    await env.DB.prepare("DELETE FROM member_sessions WHERE token_hash=? AND member_id=?").bind(await sha256(token), memberID).run();
+  }
+  const installation = typeof input.installationID === "string" && /^[0-9A-Fa-f-]{36}$/.test(input.installationID)
+    ? input.installationID.toUpperCase() : null;
+  if (installation) {
+    await env.DB.prepare("DELETE FROM member_devices WHERE member_id=? AND upper(installation_id)=?").bind(memberID, installation).run();
+  }
+  return new Response(null, { status: 204 });
 }
 
 /** The groups this member belongs to, and nothing else: the catalogue of groups
@@ -334,6 +357,12 @@ export async function redeemInvite(request: Request, env: Env): Promise<Response
   // A code gives its role in this Halqah only. A role only ever goes up
   // through a code: a member code given to an Admin does not demote them.
   await upsertMembership(env, row.group_id, memberID, halqahRole(row.grants_role), "invite", true);
+  // Someone already signed in who had no name yet gives it with this code; a
+  // name already known is never replaced.
+  const name = cleanText(input?.displayName, 80);
+  if (existing && name) {
+    await env.DB.prepare("UPDATE members SET display_name=COALESCE(display_name,?) WHERE id=?").bind(name, memberID).run();
+  }
 
   const token = hexOf(crypto.getRandomValues(new Uint8Array(32)));
   const expires = new Date(now.getTime() + SESSION_DAYS * 86_400_000).toISOString();
