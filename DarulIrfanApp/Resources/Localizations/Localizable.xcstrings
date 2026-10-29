@@ -27336,6 +27336,57 @@
           }
         }
       }
+    },
+    "Hazrat Ameer Akram Awan (RA) Tafsir": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazrat Ameer Akram Awan (RA) Tafsir"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفسیر حضرت امیر محمد اکرم اعوان رحمۃ اللہ علیہ"
+          }
+        }
+      }
+    },
+    "Hazrat Ameer Abdul Qadeer Awan (MZA) Tafsir": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazrat Ameer Abdul Qadeer Awan (MZA) Tafsir"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفسیر حضرت امیر عبدالقدیر اعوان مدظلہ العالی"
+          }
+        }
+      }
+    },
+    "Bayans on this surah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bayans on this surah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس سورت پر بیانات"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

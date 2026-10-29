@@ -9,6 +9,9 @@ struct DISegmentedControl<Item: Hashable>: View {
     let title: (Item) -> LocalizedStringKey
     var icon: (Item) -> String? = { _ in nil }
     @Binding var selection: Item
+    /// On a dark (emerald) surface the track and labels turn light and the
+    /// chosen pill gold, so the control reads against it.
+    var onDark = false
 
     @Namespace private var namespace
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -20,8 +23,13 @@ struct DISegmentedControl<Item: Hashable>: View {
             }
         }
         .padding(4)
-        .background(Capsule(style: .continuous).fill(DIColor.sandstone.opacity(0.55)))
-        .overlay(Capsule(style: .continuous).stroke(DIColor.border, lineWidth: 1))
+        .background(Capsule(style: .continuous).fill(onDark ? Color.white.opacity(0.10) : DIColor.sandstone.opacity(0.55)))
+        .overlay(Capsule(style: .continuous).stroke(onDark ? Color.white.opacity(0.18) : DIColor.border, lineWidth: 1))
+    }
+
+    private func labelColor(selected: Bool) -> Color {
+        if onDark { return selected ? DIColor.primaryDeep : DIColor.onPrimary.opacity(0.8) }
+        return selected ? DIColor.onPrimary : DIColor.textMuted
     }
 
     private func segment(_ item: Item) -> some View {
@@ -42,16 +50,17 @@ struct DISegmentedControl<Item: Hashable>: View {
                     .font(.footnote.weight(.semibold))
                     .lineLimit(1)
             }
-            .foregroundStyle(selected ? DIColor.onPrimary : DIColor.textMuted)
+            .foregroundStyle(labelColor(selected: selected))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .padding(.horizontal, 6)
             .background {
                 if selected {
                     Capsule(style: .continuous)
-                        .fill(DIColor.primary)
+                        .fill(onDark ? AnyShapeStyle(DIGradient.goldSheen) : AnyShapeStyle(DIColor.primary))
                         .matchedGeometryEffect(id: "di.segment.pill", in: namespace)
-                        .shadow(color: DIColor.primaryDeep.opacity(0.3), radius: 5, y: 2)
+                        .shadow(color: onDark ? DIColor.goldGlow.opacity(0.45) : DIColor.primaryDeep.opacity(0.3),
+                                radius: onDark ? 7 : 5, y: 2)
                 }
             }
             .contentShape(Capsule())

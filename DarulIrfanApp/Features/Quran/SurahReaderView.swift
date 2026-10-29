@@ -22,6 +22,7 @@ struct SurahReaderView: View {
     @State private var hasScrolledToFocus = false
     @State private var hasAutoAdvanced = false
     @State private var bayanError: String?
+    @State private var showsBayanList = false
     /// The ayah at the top of the screen; it is where the reader is.
     @State private var topAyah: Int?
     /// Set once the reader has scrolled into the surah, so reaching its end
@@ -80,6 +81,19 @@ struct SurahReaderView: View {
                             readingLanguageMenu
                         }
                     }
+                    // The sheikhs' bayans on this surah, to choose from; the
+                    // ayat carry their own notes, so nothing is set above the
+                    // text.
+                    if !viewModel.bayans.isEmpty {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                showsBayanList = true
+                            } label: {
+                                Image(systemName: "waveform.circle")
+                            }
+                            .accessibilityLabel(Text("Bayans on this surah"))
+                        }
+                    }
                     if viewModel.recitation != nil {
                         ToolbarItem(placement: .topBarTrailing) {
                             NavigationLink {
@@ -102,6 +116,11 @@ struct SurahReaderView: View {
                 Button("Cancel", role: .cancel) { goToAyahText = "" }
             } message: {
                 Text("1 to \(viewModel.surah.ayahCount)")
+            }
+            .sheet(isPresented: $showsBayanList) {
+                NavigationStack {
+                    BayanListSheet(links: viewModel.bayans) { play($0) }
+                }
             }
             .task {
                 // Notes are counted on each ayah card; read them once here
@@ -184,9 +203,6 @@ struct SurahReaderView: View {
                     if appState.settings.quranReaderDisplayMode.showsTranslation {
                         contentModeSelector
                     }
-                    if !viewModel.bayans.isEmpty {
-                        bayanCard
-                    }
                     if appState.settings.quranReaderDisplayMode.showsTranslation
                         && viewModel.contentMode.isTafsir
                         && !viewModel.hasTafsirForMode {
@@ -211,7 +227,8 @@ struct SurahReaderView: View {
                             speaker: speaker,
                             listen: { start(from: $0) },
                             fontScale: appState.settings.readerFontScale.rawValue,
-                            displayMode: appState.settings.quranReaderDisplayMode
+                            displayMode: appState.settings.quranReaderDisplayMode,
+                            playBayan: { play($0) }
                         )
                         .id(ayah.ayahNumber)
                     }
@@ -229,6 +246,11 @@ struct SurahReaderView: View {
                 .padding(.bottom, DISpacing.xl)
             }
             .scrollPosition(id: $topAyah, anchor: .top)
+            .alert("Bayan", isPresented: Binding(get: { bayanError != nil }, set: { if !$0 { bayanError = nil } })) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(bayanError ?? "")
+            }
             .onChange(of: topAyah) { _, ayah in
                 guard let ayah else { return }
                 if ayah > 1 { hasScrolledIntoSurah = true }
@@ -417,78 +439,115 @@ struct SurahReaderView: View {
 
     /// Recitation, translation, or both ayah by ayah - over an ayah, ruku,
     /// surah or juz (para) - from the top, or from any ayah's play button.
+    /// A deep emerald player with a gold play control, so it stands out from
+    /// the text cards around it.
     private var listenBar: some View {
         let isHere = player.isActive(inSurah: viewModel.surah.id)
         let isPlaying = player.isPlaying && isHere
-        return DICard(padding: DISpacing.sm) {
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack(spacing: DISpacing.md) {
-                    Button {
-                        if isPlaying {
-                            player.pause()
-                        } else if isHere {
-                            speaker.stop()
-                            player.resume()
-                        } else {
-                            start(from: 1)
-                        }
-                    } label: {
-                        Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                            .font(.system(size: 34))
-                            .foregroundStyle(DIColor.primary)
+        return VStack(alignment: .leading, spacing: DISpacing.md) {
+            HStack(spacing: DISpacing.md) {
+                Button {
+                    if isPlaying {
+                        player.pause()
+                    } else if isHere {
+                        speaker.stop()
+                        player.resume()
+                    } else {
+                        start(from: 1)
                     }
-                    .accessibilityLabel(isPlaying ? Text("Pause") : Text("Play"))
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("Listen")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(DIColor.textPrimary)
-                        Text(listenSubtitle)
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
-                            .lineLimit(1)
-                    }
-                    Spacer(minLength: 0)
-                    if isHere {
-                        if isPlaying {
-                            Image(systemName: "waveform")
-                                .foregroundStyle(DIColor.accent)
-                                .symbolEffect(.variableColor.iterative, options: .repeating)
-                        }
-                        Button {
-                            player.stop()
-                        } label: {
-                            Image(systemName: "stop.circle")
-                                .font(.title3)
-                                .foregroundStyle(DIColor.textMuted)
-                        }
-                        .accessibilityLabel(Text("Stop"))
-                    }
-                }
-                if listenContents.count > 1 {
-                    DISegmentedControl(
-                        items: listenContents,
-                        title: { content in
-                            switch content {
-                            case .arabic: return "Recitation"
-                            case .translation: return "Translation"
-                            case .both: return "Both"
-                            }
-                        },
-                        selection: Binding(get: { effectiveContent }, set: { listenContent = $0 })
-                    )
-                }
-                Picker(selection: $listenScope) {
-                    Text("Ayah").tag(QuranListenScope.ayah)
-                    Text("Ruku").tag(QuranListenScope.ruku)
-                    Text("Surah").tag(QuranListenScope.surah)
-                    Text("Juz (Para)").tag(QuranListenScope.juz)
                 } label: {
-                    Text("Play to the end of")
+                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(DIColor.primaryDeep)
+                        .frame(width: 56, height: 56)
+                        .background(Circle().fill(DIGradient.goldSheen))
+                        .overlay(Circle().stroke(DIColor.onPrimary.opacity(0.6), lineWidth: 1))
+                        .diGoldGlow(radius: isPlaying ? 14 : 8, opacity: isPlaying ? 0.6 : 0.4)
                 }
-                .pickerStyle(.segmented)
-                .accessibilityLabel(Text("Play to the end of"))
+                .buttonStyle(.plain)
+                .accessibilityLabel(isPlaying ? Text("Pause") : Text("Play"))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Listen")
+                        .font(.headline)
+                        .foregroundStyle(DIColor.onPrimary)
+                    Text(listenSubtitle)
+                        .font(.caption)
+                        .foregroundStyle(DIColor.onPrimary.opacity(0.75))
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+                if isHere {
+                    if isPlaying {
+                        Image(systemName: "waveform")
+                            .font(.title3)
+                            .foregroundStyle(DIColor.goldGlow)
+                            .symbolEffect(.variableColor.iterative, options: .repeating)
+                    }
+                    Button {
+                        player.stop()
+                    } label: {
+                        Image(systemName: "stop.fill")
+                            .font(.footnote.weight(.bold))
+                            .foregroundStyle(DIColor.onPrimary)
+                            .frame(width: 34, height: 34)
+                            .background(Circle().fill(DIColor.onPrimary.opacity(0.14)))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Stop"))
+                }
+            }
+            if listenContents.count > 1 {
+                DISegmentedControl(
+                    items: listenContents,
+                    title: { content in
+                        switch content {
+                        case .arabic: return "Recitation"
+                        case .translation: return "Translation"
+                        case .both: return "Both"
+                        }
+                    },
+                    icon: { content in
+                        switch content {
+                        case .arabic: return "music.mic"
+                        case .translation: return "text.bubble"
+                        case .both: return "square.stack.3d.up"
+                        }
+                    },
+                    selection: Binding(get: { effectiveContent }, set: { listenContent = $0 }),
+                    onDark: true
+                )
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Play to the end of")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIColor.onPrimary.opacity(0.75))
+                DISegmentedControl(
+                    items: QuranListenScope.allCases,
+                    title: { scope in
+                        switch scope {
+                        case .ayah: return "Ayah"
+                        case .ruku: return "Ruku"
+                        case .surah: return "Surah"
+                        case .juz: return "Juz (Para)"
+                        }
+                    },
+                    selection: $listenScope,
+                    onDark: true
+                )
             }
         }
+        .padding(DISpacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                .fill(DIGradient.emerald)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
+                .stroke(DIGradient.goldSheen, lineWidth: 1)
+                .opacity(0.75)
+        )
+        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 14, x: 0, y: 8)
         .onChange(of: listenContent) { if isHere { player.stop() } }
         .onChange(of: listenScope) { if isHere { player.stop() } }
     }
@@ -502,50 +561,58 @@ struct SurahReaderView: View {
         }
     }
 
-    /// Segmented control choosing translation-only vs a tafsir edition.
+    /// The three works as tiles: the translation, and the two commentaries
+    /// shown under it. The chosen one is lit in emerald with a gold edge.
     private var contentModeSelector: some View {
-        DISegmentedControl(
-            items: QuranContentMode.allCases,
-            title: { LocalizedStringKey($0.shortTitle) },
-            selection: contentModeBinding
-        )
+        HStack(spacing: DISpacing.sm) {
+            ForEach(QuranContentMode.allCases) { mode in
+                contentModeTile(mode)
+            }
+        }
     }
 
-    /// The sheikh's bayans on this surah, each labelled with the verses it
-    /// expounds so a reader can go straight to the one covering what they are
-    /// reading. Only part of the catalogue is verse-addressed, so this appears
-    /// for the surahs that have such lectures and is absent elsewhere rather
-    /// than showing an empty shelf.
-    private var bayanCard: some View {
-        DICard {
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                DISectionHeader(titleKey: "Bayan on these verses", systemImage: "waveform")
-                ForEach(viewModel.bayans) { link in
-                    Button {
-                        DIHaptics.light()
-                        play(link)
-                    } label: {
-                        HStack(spacing: DISpacing.sm) {
-                            Image(systemName: "play.circle.fill")
-                                .foregroundStyle(DIColor.primary)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(link.title)
-                                    .font(.subheadline.weight(.medium))
-                                    .multilineTextAlignment(.leading)
-                                Text(LocalizedStringKey("Ayat \(link.ayahStart)-\(link.ayahEnd)"))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer(minLength: 0)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .buttonStyle(.plain)
-                }
-                if let error = bayanError {
-                    Text(error).font(.caption).foregroundStyle(.secondary)
-                }
+    private func contentModeTile(_ mode: QuranContentMode) -> some View {
+        let selected = viewModel.contentMode == mode
+        let shape = RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+        return Button {
+            DIHaptics.soft()
+            withAnimation(.spring(response: 0.34, dampingFraction: 0.82)) { viewModel.contentMode = mode }
+        } label: {
+            VStack(spacing: 6) {
+                Image(systemName: Self.symbol(for: mode))
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(selected ? DIColor.goldGlow : DIColor.primary)
+                    .frame(width: 40, height: 40)
+                    .background(Circle().fill(selected ? Color.white.opacity(0.14) : DIColor.primary.opacity(0.10)))
+                Text(LocalizedStringKey(mode.shortTitle))
+                    .font(.footnote.weight(.bold))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .foregroundStyle(selected ? DIColor.onPrimary : DIColor.textPrimary)
+                Text(mode.isTafsir ? LocalizedStringKey("Tafsir") : LocalizedStringKey("Translation"))
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(selected ? DIColor.onPrimary.opacity(0.8) : DIColor.textMuted)
             }
+            .frame(maxWidth: .infinity, minHeight: 112)
+            .padding(.vertical, DISpacing.sm)
+            .padding(.horizontal, 6)
+            .background(shape.fill(selected ? AnyShapeStyle(DIGradient.emerald) : AnyShapeStyle(DIColor.surface)))
+            .overlay(shape.stroke(selected ? AnyShapeStyle(DIGradient.goldSheen) : AnyShapeStyle(DIColor.primary.opacity(0.25)),
+                                  lineWidth: selected ? 1.5 : 1))
+            .shadow(color: selected ? DIColor.primaryDeep.opacity(0.35) : .clear, radius: 10, x: 0, y: 5)
+            .scaleEffect(selected ? 1 : 0.97)
+            .contentShape(shape)
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private static func symbol(for mode: QuranContentMode) -> String {
+        switch mode {
+        case .tarajum: return "character.book.closed"
+        case .asrarTanzil: return "sparkles"
+        case .akramTafaseer: return "books.vertical"
         }
     }
 
@@ -857,13 +924,6 @@ struct SurahReaderView: View {
             }
         )
     }
-
-    private var contentModeBinding: Binding<QuranContentMode> {
-        Binding(
-            get: { viewModel.contentMode },
-            set: { viewModel.contentMode = $0 }
-        )
-    }
 }
 
 // MARK: - Tafsir volume
@@ -931,6 +991,7 @@ private struct AyahCardView: View {
     let listen: (Int) -> Void
     let fontScale: Double
     let displayMode: QuranReaderDisplayMode
+    let playBayan: (AyahBayanLink) -> Void
 
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
     @State private var tafsirExpanded = true
@@ -1164,6 +1225,13 @@ private struct AyahCardView: View {
                 }
                 .accessibilityLabel(Text("Write a note on Ayah \(ayah.ayahNumber)"))
             }
+            // The sheikhs' bayans on this ayah, one note each. Not in
+            // Arabic-only reading, which is the mushaf alone.
+            if displayMode.showsTranslation {
+                ForEach(bayanGroups) { group in
+                    bayanNote(group)
+                }
+            }
         }
         .sheet(isPresented: $isWritingNote) {
             NavigationStack {
@@ -1195,6 +1263,66 @@ private struct AyahCardView: View {
 
     private var isReadingTafsir: Bool {
         speaker.currentKind == "tafsir" && speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
+    }
+
+    private var bayanGroups: [BayanGroup] {
+        let links = AyahBayanLinkProvider.shared.links(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
+        return BayanSheikh.allCases.compactMap { sheikh in
+            let own = links.filter { $0.sheikh == sheikh }
+            return own.isEmpty ? nil : BayanGroup(sheikh: sheikh, links: own)
+        }
+    }
+
+    /// One bayan plays at a tap; several open a short list to choose from.
+    @ViewBuilder
+    private func bayanNote(_ group: BayanGroup) -> some View {
+        if group.links.count == 1, let link = group.links.first {
+            Button {
+                DIHaptics.light()
+                playBayan(link)
+            } label: {
+                bayanNoteLabel(group)
+            }
+            .buttonStyle(.plain)
+        } else {
+            Menu {
+                ForEach(group.links) { link in
+                    Button {
+                        playBayan(link)
+                    } label: {
+                        Text(verbatim: "\(link.title) · \(link.reference)")
+                    }
+                }
+            } label: {
+                bayanNoteLabel(group)
+            }
+        }
+    }
+
+    private func bayanNoteLabel(_ group: BayanGroup) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "note.text")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIColor.accent)
+            Text(LocalizedStringKey(group.sheikh.tafsirTitle))
+                .font(.caption.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            if group.links.count > 1 {
+                Text(verbatim: "\(group.links.count)")
+                    .font(.caption2.weight(.bold))
+                    .padding(.horizontal, 5)
+                    .background(Capsule().fill(DIColor.accent.opacity(0.3)))
+            }
+            Image(systemName: "play.fill")
+                .font(.caption2)
+                .foregroundStyle(DIColor.accent)
+        }
+        .foregroundStyle(DIColor.textPrimary)
+        .padding(.horizontal, DISpacing.sm)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(DIColor.accent.opacity(0.14)))
+        .overlay(Capsule().stroke(DIColor.accent.opacity(0.55), lineWidth: 1))
     }
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {
@@ -1233,6 +1361,66 @@ private struct AyahCardView: View {
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .environment(\.layoutDirection, .leftToRight)
+        }
+    }
+}
+
+// MARK: - Bayans
+
+/// The bayans of one sheikh on an ayah.
+private struct BayanGroup: Identifiable {
+    let sheikh: BayanSheikh
+    let links: [AyahBayanLink]
+    var id: BayanSheikh { sheikh }
+}
+
+/// Every bayan on the surah, by sheikh, for a reader who would rather choose
+/// one than follow the notes on the ayat. Opened from the reader's toolbar,
+/// so the surah itself opens on its text.
+private struct BayanListSheet: View {
+    let links: [AyahBayanLink]
+    let play: (AyahBayanLink) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            ForEach(BayanSheikh.allCases, id: \.self) { sheikh in
+                let own = links.filter { $0.sheikh == sheikh }
+                if !own.isEmpty {
+                    Section {
+                        ForEach(own) { link in
+                            Button {
+                                DIHaptics.light()
+                                play(link)
+                                dismiss()
+                            } label: {
+                                HStack(spacing: DISpacing.sm) {
+                                    Image(systemName: "play.circle.fill")
+                                        .foregroundStyle(DIColor.primary)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(verbatim: link.title)
+                                            .font(.subheadline.weight(.medium))
+                                            .foregroundStyle(DIColor.textPrimary)
+                                            .multilineTextAlignment(.leading)
+                                        Text(LocalizedStringKey("Ayat \(link.ayahStart)-\(link.ayahEnd)"))
+                                            .font(.caption)
+                                            .foregroundStyle(DIColor.textMuted)
+                                    }
+                                }
+                            }
+                        }
+                    } header: {
+                        Text(LocalizedStringKey(sheikh.tafsirTitle))
+                    }
+                }
+            }
+        }
+        .navigationTitle(Text("Bayans on this surah"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done") { dismiss() }
+            }
         }
     }
 }

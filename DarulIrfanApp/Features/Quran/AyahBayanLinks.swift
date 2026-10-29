@@ -22,6 +22,43 @@ struct AyahBayanLink: Codable, Sendable, Identifiable, Equatable {
     }
 
     func covers(ayah: Int) -> Bool { ayahStart <= ayah && ayah <= ayahEnd }
+
+    /// The year the lecture was recorded, from its catalogue id
+    /// ("lecture-2437-2005-01-07-surah-al-fatihah-1-7").
+    var recordedYear: Int? {
+        let parts = mediaID.split(separator: "-")
+        for index in parts.indices.dropLast(2) {
+            let year = parts[index], month = parts[index + 1], day = parts[index + 2]
+            if year.count == 4, month.count == 2, day.count == 2,
+               Int(month) != nil, Int(day) != nil, let value = Int(year) {
+                return value
+            }
+        }
+        return nil
+    }
+
+    var sheikh: BayanSheikh {
+        (recordedYear ?? 0) >= 2018 ? .abdulQadeerAwan : .akramAwan
+    }
+}
+
+/// Whose tafsir a linked bayan is. The catalogue's speaker labels are not
+/// reliable for the weekly tafsir series (a 2009 lesson is labelled with
+/// Hazrat Maulana Allah Yar Khan (RA), who passed away in 1984), so, as the
+/// owner set it (29 October 2026), the recording date decides: up to
+/// December 2017 Hazrat Ameer Muhammad Akram Awan (RA), who passed away on
+/// 7 December 2017; after that Hazrat Ameer Abdul Qadeer Awan (MZA).
+enum BayanSheikh: String, CaseIterable, Sendable {
+    case akramAwan
+    case abdulQadeerAwan
+
+    /// The catalogue key of the note's label beside an ayah.
+    var tafsirTitle: String {
+        switch self {
+        case .akramAwan: return "Hazrat Ameer Akram Awan (RA) Tafsir"
+        case .abdulQadeerAwan: return "Hazrat Ameer Abdul Qadeer Awan (MZA) Tafsir"
+        }
+    }
 }
 
 private struct AyahBayanLinkFile: Codable, Sendable {

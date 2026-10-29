@@ -78,6 +78,10 @@ struct QuranTabView: View {
     private func destination(for route: QuranRoute) -> some View {
         switch route {
         case .reader(let surah, let focusAyah):
+            // Each surah gets a reader of its own. Next surah replaces the
+            // route in the same place in the stack, and without this the
+            // reader there kept its state - the surah it had - so the button
+            // showed the same surah again and then did nothing.
             SurahReaderView(
                 surah: surah,
                 focusAyah: focusAyah,
@@ -87,6 +91,7 @@ struct QuranTabView: View {
                     openNextSurah(after: surah)
                 }
             )
+            .id(surah.id)
         case .bookmarks:
             BookmarksListView(viewModel: viewModel)
         case .topics:
