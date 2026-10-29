@@ -275,6 +275,31 @@ class Mushaf:
             for gram in grams:
                 self.index[gram].append(key)
         self._words: dict[tuple[int, int], list[tuple[int, int, str]]] = {}
+        self._by_first: dict[str, list[tuple[tuple[int, int], int]]] | None = None
+
+    def matches(self, letters: list[str]) -> list[tuple[tuple[int, int], int, int]]:
+        """(ayah, word index, how many words agree) for every place an ayah
+        has the first of `letters`, read on word by word, letters exactly."""
+        if self._by_first is None:
+            self._by_first = defaultdict(list)
+            for key in self.text:
+                for index, (_, _, word) in enumerate(self.words(key)):
+                    self._by_first[word].append((key, index))
+        found = []
+        for key, index in self._by_first.get(letters[0], ()):
+            words = self.words(key)
+            count = 0
+            while count < len(letters) and index + count < len(words) and words[index + count][2] == letters[count]:
+                count += 1
+            found.append((key, index, count))
+        return found
+
+    def span_text(self, key: tuple[int, int], index: int, length: int) -> str:
+        """The mushaf's own words for `length` words of an ayah from `index`,
+        exactly as it writes them (its invisible marks too, so a quotation
+        already in its words is left untouched)."""
+        words = self.words(key)
+        return self.text[key][words[index][0]:words[index + length - 1][1]]
 
     def best(self, quote: str, first: tuple[int, int], last: tuple[int, int]):
         """((surah, ayah), jaccard) of the one ayah between `first` and `last` a
@@ -522,6 +547,60 @@ def correct_fragments(text: str, first, last, mushaf: Mushaf) -> tuple[str, int]
         out.append(replacement)
         cursor = end
         count += 1
+    out.append(text[cursor:])
+    return "".join(out), count
+
+
+def letter_words(fragment: str) -> list[tuple[int, int, str]]:
+    """(start, end, letters) of each word of a fragment; a lone particle the
+    OCR set apart ("وَ اَمَّمُوا") joins its word, as passages() reads them."""
+    words: list[tuple[int, int, str]] = []
+    for match in re.finditer(r"\S+", fragment):
+        letters = norm_arabic(match.group(0))
+        if not letters:
+            continue
+        if words and len(words[-1][2]) == 1:
+            start, _, joined = words[-1]
+            words[-1] = (start, match.end(), joined + letters)
+        else:
+            words.append((match.start(), match.end(), letters))
+    return words
+
+
+def correct_by_letters(text: str, first, last, mushaf: Mushaf) -> tuple[str, int]:
+    """Give a quotation the mushaf's words where its letters are exactly the
+    mushaf's, word for word: the OCR read the letters right and a vowel wrong
+    ("مُلْكُ يَوْمِ الدِّيْنِ" for 1:4), or ran a quotation on into the Urdu
+    after it. Short quotations count too, since every letter must agree; from
+    each word the longest such stretch is taken. It is replaced only when it
+    has one reading in the Qur'an, or one among the row's own ayat, so no
+    vowel is guessed; a word the OCR mangled ends the stretch and stays as
+    printed."""
+    out, cursor, count = [], 0, 0
+    for start, end in quranic_runs(text):
+        words = letter_words(text[start:end])
+        index = 0
+        while index < len(words) - 1:
+            found = mushaf.matches([w[2] for w in words[index:]])
+            longest = max((n for _, _, n in found), default=0)
+            replacement = None
+            if longest >= 2:
+                readings: dict[str, list[tuple[int, int]]] = defaultdict(list)
+                for key, at, n in found:
+                    if n >= longest:
+                        readings[mushaf.span_text(key, at, longest)].append(key)
+                own = [t for t, keys in readings.items() if any(first <= key <= last for key in keys)]
+                replacement = next(iter(readings)) if len(readings) == 1 else own[0] if len(own) == 1 else None
+            if replacement is None:
+                index += 1
+                continue
+            a, b = start + words[index][0], start + words[index + longest - 1][1]
+            if text[a:b] != replacement:
+                out.append(text[cursor:a])
+                out.append(replacement)
+                cursor = b
+                count += 1
+            index += longest
     out.append(text[cursor:])
     return "".join(out), count
 
@@ -1279,7 +1358,7 @@ def build(seed: Path, report: dict):
     report.setdefault("openingKinds", {})
     for name in ("quotationsReplacedWithMushaf", "fragmentsReplacedWithMushaf", "oversizeSplits",
                  "citationsReplacedWithMushaf", "crossReferencesReplacedWithMushaf", "markersRenumbered",
-                 "markersRenumberedByRow", "citationsMatchedWithoutAnEdgeWord"):
+                 "markersRenumberedByRow", "citationsMatchedWithoutAnEdgeWord", "quotationsMatchedByLetters"):
         report.setdefault(name, 0)
     for name in ("citationMarkersUnidentified", "citationMarkersAmbiguous"):
         report.setdefault(name, [])
@@ -1313,6 +1392,13 @@ def build(seed: Path, report: dict):
             if asrar_pages.get(book):
                 volumes[surah].append({"edition": f"asrar-at-tanzil-{language}", "bookID": book,
                                        "page": min(asrar_pages[book])})
+
+    # What the corrections above left as the OCR read it, where its letters
+    # are still exactly the mushaf's (correct_by_letters).
+    for row in rows:
+        row["text"], fixed = correct_by_letters(row["text"], (row["surahNumber"], row["ayahStart"]),
+                                                (row["surahNumber"], row["ayahEnd"]), mushaf)
+        report["quotationsMatchedByLetters"] += fixed
 
     rows.sort(key=lambda r: (r["surahNumber"], r["ayahStart"]))
     keys = [(r["surahNumber"], r["ayahStart"]) for r in rows]
@@ -1355,10 +1441,31 @@ def main() -> int:
     parser.add_argument("--targets", default="ios,android,harmony,web",
                         help="comma-separated seed folders to write: ios, android, harmony, web")
     parser.add_argument("--report", help="also save the full build report as JSON here")
+    parser.add_argument("--requote", action="store_true",
+                        help="only give the Akram rows already in the iOS seed the mushaf's words where their letters "
+                             "are exactly the mushaf's (correct_by_letters), without cutting them again")
     args = parser.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
 
     primary = SEED_DIRS[0]
+    if args.requote:
+        mushaf = Mushaf(load(primary, "quran_ayahs"))
+        tafsir = load(primary, "quran_tafsir")
+        fixed = 0
+        for row in tafsir:
+            if row["editionID"] == EDITION:
+                row["text"], count = correct_by_letters(row["text"], (row["surahNumber"], row["ayahStart"]),
+                                                        (row["surahNumber"], row["ayahEnd"]), mushaf)
+                fixed += count
+        print(f"quotations given the mushaf's words by their letters: {fixed}")
+        if args.write:
+            for target in args.targets.split(","):
+                path = SEED_DIRS[TARGETS[target.strip()]] / "quran_tafsir.json"
+                with path.open("w", encoding="utf-8", newline="\n") as handle:
+                    json.dump(tafsir, handle, ensure_ascii=False, indent=1)
+                    handle.write("\n")
+                print(f"wrote {path}")
+        return 0
     report: dict = {}
     rows, volumes = build(primary, report)
     summary = {k: (v if not isinstance(v, list) or len(v) <= 12 else v[:12] + [f"... {len(v)} in all"])
