@@ -420,6 +420,18 @@ final class SurahReaderViewModel {
         }
     }
 
+    /// The commentary of the current mode that takes in this ayah from an
+    /// earlier one (ayat 13-32, seen from ayah 20), in the reader's language:
+    /// the book explains some passages as a whole.
+    func tafsirEntry(covering ayahNumber: Int) -> QuranTafsir? {
+        guard let prefix = contentMode.tafsirEditionPrefix else { return nil }
+        return tafsirEntries.first {
+            $0.ayahStart < ayahNumber && ayahNumber <= $0.ayahEnd
+                && $0.editionID.hasPrefix(prefix)
+                && edition(id: $0.editionID)?.language == readingLanguage
+        }
+    }
+
     /// Whether tafsir text in the reader's language exists for the current mode
     /// anywhere in this surah.
     var hasTafsirForMode: Bool {

@@ -27387,6 +27387,40 @@
           }
         }
       }
+    },
+    "Commentary with ayat %lld–%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commentary with ayat %lld–%lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آیات %1$lld تا %2$lld کے ساتھ تفسیر"
+          }
+        }
+      }
+    },
+    "A bayan on this ayah is not in the app yet.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A bayan on this ayah is not in the app yet."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس آیت پر بیان ابھی ایپ میں نہیں ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -228,7 +228,8 @@ struct SurahReaderView: View {
                             listen: { start(from: $0) },
                             fontScale: appState.settings.readerFontScale.rawValue,
                             displayMode: appState.settings.quranReaderDisplayMode,
-                            playBayan: { play($0) }
+                            playBayan: { play($0) },
+                            scrollToAyah: { pendingScrollAyah = $0 }
                         )
                         .id(ayah.ayahNumber)
                     }
@@ -992,11 +993,14 @@ private struct AyahCardView: View {
     let fontScale: Double
     let displayMode: QuranReaderDisplayMode
     let playBayan: (AyahBayanLink) -> Void
+    let scrollToAyah: (Int) -> Void
 
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
     @State private var tafsirExpanded = true
     @State private var isWritingNote = false
     @State private var showsTafsir = false
+    /// The sheikh whose note was tapped where no bayan of his is linked yet.
+    @State private var bayanNotYet: BayanSheikh?
 
     private var isSounding: Bool {
         player.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
@@ -1031,6 +1035,19 @@ private struct AyahCardView: View {
                    let entry = viewModel.tafsirEntry(startingAt: ayah.ayahNumber) {
                     Divider()
                     tafsirDisclosure(entry)
+                } else if displayMode.showsTranslation,
+                          viewModel.contentMode.isTafsir,
+                          let covering = viewModel.tafsirEntry(covering: ayah.ayahNumber) {
+                    // Explained with the passage it belongs to: say where.
+                    Divider()
+                    Button {
+                        scrollToAyah(covering.ayahStart)
+                    } label: {
+                        Label("Commentary with ayat \(covering.ayahStart)–\(covering.ayahEnd)", systemImage: "arrow.up.doc")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(DIColor.primary)
+                    }
+                    .buttonStyle(.plain)
                 }
                 Divider()
                 shellsRow
@@ -1040,6 +1057,12 @@ private struct AyahCardView: View {
             NavigationStack {
                 AyahTafsirSheet(ayah: ayah, viewModel: viewModel, dependencies: dependencies, fontScale: fontScale)
             }
+        }
+        .alert(Text(LocalizedStringKey(bayanNotYet?.tafsirTitle ?? "Bayan")),
+               isPresented: Binding(get: { bayanNotYet != nil }, set: { if !$0 { bayanNotYet = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("A bayan on this ayah is not in the app yet.")
         }
         .overlay(alignment: .leading) {
             if isSounding {
@@ -1217,7 +1240,9 @@ private struct AyahCardView: View {
                             : Text("Listen to the tafsir of Ayah \(ayah.ayahNumber)")
                     )
                 }
-                // A private note on this ayah, kept in My Day on this phone.
+                // A private note on this ayah, kept in My Day on this phone;
+                // at the far side of the row.
+                Spacer(minLength: 0)
                 Button {
                     isWritingNote = true
                 } label: {
@@ -1265,18 +1290,30 @@ private struct AyahCardView: View {
         speaker.currentKind == "tafsir" && speaker.isSounding(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
     }
 
+    /// The notes beside an ayah with bayans: Hazrat Ameer Akram Awan (RA)'s
+    /// where his cover it, and Hazrat Ameer Abdul Qadeer Awan (MZA)'s below it
+    /// always (owner, 29 October 2026), playing his where one covers the ayah.
     private var bayanGroups: [BayanGroup] {
         let links = AyahBayanLinkProvider.shared.links(surah: ayah.surahNumber, ayah: ayah.ayahNumber)
+        guard !links.isEmpty else { return [] }
         return BayanSheikh.allCases.compactMap { sheikh in
             let own = links.filter { $0.sheikh == sheikh }
-            return own.isEmpty ? nil : BayanGroup(sheikh: sheikh, links: own)
+            return own.isEmpty && sheikh != .abdulQadeerAwan ? nil : BayanGroup(sheikh: sheikh, links: own)
         }
     }
 
-    /// One bayan plays at a tap; several open a short list to choose from.
+    /// One bayan plays at a tap; several open a short list to choose from;
+    /// none yet says so.
     @ViewBuilder
     private func bayanNote(_ group: BayanGroup) -> some View {
-        if group.links.count == 1, let link = group.links.first {
+        if group.links.isEmpty {
+            Button {
+                bayanNotYet = group.sheikh
+            } label: {
+                bayanNoteLabel(group)
+            }
+            .buttonStyle(.plain)
+        } else if group.links.count == 1, let link = group.links.first {
             Button {
                 DIHaptics.light()
                 playBayan(link)
@@ -1300,10 +1337,11 @@ private struct AyahCardView: View {
     }
 
     private func bayanNoteLabel(_ group: BayanGroup) -> some View {
-        HStack(spacing: 6) {
+        let available = !group.links.isEmpty
+        return HStack(spacing: 6) {
             Image(systemName: "note.text")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(DIColor.accent)
+                .foregroundStyle(available ? DIColor.accent : DIColor.textMuted)
             Text(LocalizedStringKey(group.sheikh.tafsirTitle))
                 .font(.caption.weight(.semibold))
                 .lineLimit(1)
@@ -1314,15 +1352,17 @@ private struct AyahCardView: View {
                     .padding(.horizontal, 5)
                     .background(Capsule().fill(DIColor.accent.opacity(0.3)))
             }
-            Image(systemName: "play.fill")
-                .font(.caption2)
-                .foregroundStyle(DIColor.accent)
+            if available {
+                Image(systemName: "play.fill")
+                    .font(.caption2)
+                    .foregroundStyle(DIColor.accent)
+            }
         }
-        .foregroundStyle(DIColor.textPrimary)
+        .foregroundStyle(available ? DIColor.textPrimary : DIColor.textMuted)
         .padding(.horizontal, DISpacing.sm)
         .padding(.vertical, 6)
-        .background(Capsule().fill(DIColor.accent.opacity(0.14)))
-        .overlay(Capsule().stroke(DIColor.accent.opacity(0.55), lineWidth: 1))
+        .background(Capsule().fill(available ? DIColor.accent.opacity(0.14) : DIColor.sandstone.opacity(0.45)))
+        .overlay(Capsule().stroke(available ? DIColor.accent.opacity(0.55) : DIColor.textMuted.opacity(0.25), lineWidth: 1))
     }
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {
