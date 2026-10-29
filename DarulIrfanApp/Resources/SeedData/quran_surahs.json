@@ -33,7 +33,7 @@
   "nameEnglish": "The Women",
   "ayahCount": 176,
   "revelationPlace": "madinah",
-  "nameUrdu": "عورت"
+  "nameUrdu": "عورتیں"
  },
  {
   "id": 5,
@@ -96,7 +96,7 @@
   "nameEnglish": "Hud",
   "ayahCount": 123,
   "revelationPlace": "makkah",
-  "nameUrdu": "حود"
+  "nameUrdu": "ہود"
  },
  {
   "id": 12,
@@ -150,7 +150,7 @@
   "nameEnglish": "The Night Journey",
   "ayahCount": 111,
   "revelationPlace": "makkah",
-  "nameUrdu": "رات کا صفر"
+  "nameUrdu": "رات کا سفر"
  },
  {
   "id": 18,
@@ -231,7 +231,7 @@
   "nameEnglish": "The Poets",
   "ayahCount": 227,
   "revelationPlace": "makkah",
-  "nameUrdu": "شعراٗ"
+  "nameUrdu": "شعراء"
  },
  {
   "id": 27,
@@ -402,7 +402,7 @@
   "nameEnglish": "Crouching",
   "ayahCount": 37,
   "revelationPlace": "makkah",
-  "nameUrdu": "زانوٗوں کے بل گری ہوئی"
+  "nameUrdu": "زانوؤں کے بل گری ہوئی"
  },
  {
   "id": 46,
@@ -420,7 +420,7 @@
   "nameEnglish": "Muhammad",
   "ayahCount": 38,
   "revelationPlace": "madinah",
-  "nameUrdu": "محمدﷺ"
+  "nameUrdu": "محمد ﷺ"
  },
  {
   "id": 48,
@@ -600,7 +600,7 @@
   "nameEnglish": "The Sovereignty",
   "ayahCount": 30,
   "revelationPlace": "makkah",
-  "nameUrdu": "بادشاہ"
+  "nameUrdu": "بادشاہی"
  },
  {
   "id": 68,
@@ -672,7 +672,7 @@
   "nameEnglish": "The Resurrection",
   "ayahCount": 40,
   "revelationPlace": "makkah",
-  "nameUrdu": "قیامۃ"
+  "nameUrdu": "قیامت"
  },
  {
   "id": 76,
@@ -717,7 +717,7 @@
   "nameEnglish": "He frowned",
   "ayahCount": 42,
   "revelationPlace": "makkah",
-  "nameUrdu": "تیوری چڑہائی"
+  "nameUrdu": "تیوری چڑھائی"
  },
  {
   "id": 81,
@@ -780,7 +780,7 @@
   "nameEnglish": "The Most High",
   "ayahCount": 19,
   "revelationPlace": "makkah",
-  "nameUrdu": "اعلی"
+  "nameUrdu": "اعلیٰ"
  },
  {
   "id": 88,

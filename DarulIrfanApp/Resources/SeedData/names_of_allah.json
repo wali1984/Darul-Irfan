@@ -189,13 +189,13 @@
     "id": 32,
     "arabic": "الْحَلِيمُ",
     "transliteration": "Al Haleem",
-    "meaningEnglish": "The Forebearing"
+    "meaningEnglish": "The Forbearing"
   },
   {
     "id": 33,
     "arabic": "الْعَظِيمُ",
     "transliteration": "Al 'Azeem",
-    "meaningEnglish": "The Maginificent"
+    "meaningEnglish": "The Magnificent"
   },
   {
     "id": 34,
@@ -229,13 +229,13 @@
   },
   {
     "id": 39,
-    "arabic": "المُقيِت",
+    "arabic": "الْمُقِيتُ",
     "transliteration": "Al Muqeet",
     "meaningEnglish": "The Nourisher"
   },
   {
     "id": 40,
-    "arabic": "الْحسِيبُ",
+    "arabic": "الْحَسِيبُ",
     "transliteration": "Al Haseeb",
     "meaningEnglish": "The Reckoner"
   },
@@ -260,7 +260,7 @@
   {
     "id": 44,
     "arabic": "الْمُجِيبُ",
-    "transliteration": "Al Mujeeb ",
+    "transliteration": "Al Mujeeb",
     "meaningEnglish": "The Responder to Prayer"
   },
   {
@@ -278,7 +278,7 @@
   {
     "id": 47,
     "arabic": "الْوَدُودُ",
-    "transliteration": "Al Wudood",
+    "transliteration": "Al Wadood",
     "meaningEnglish": "The Loving One"
   },
   {
@@ -356,7 +356,7 @@
   {
     "id": 60,
     "arabic": "الْمُحْيِي",
-    "transliteration": "Al Muhiy",
+    "transliteration": "Al Muhyi",
     "meaningEnglish": "The Giver of life"
   },
   {
@@ -391,7 +391,7 @@
   },
   {
     "id": 66,
-    "arabic": "الْواحِدُ",
+    "arabic": "الْوَاحِدُ",
     "transliteration": "Al Waahid",
     "meaningEnglish": "The Only One"
   },
@@ -428,12 +428,12 @@
   {
     "id": 72,
     "arabic": "الْمُؤَخِّرُ",
-    "transliteration": "Al Mu’akhir",
+    "transliteration": "Al Mu'akhir",
     "meaningEnglish": "The Delayer"
   },
   {
     "id": 73,
-    "arabic": "الأوَّلُ",
+    "arabic": "الأَوَّلُ",
     "transliteration": "Al Awwal",
     "meaningEnglish": "The First"
   },
@@ -464,7 +464,7 @@
   {
     "id": 78,
     "arabic": "الْمُتَعَالِي",
-    "transliteration": "Al Muta’ali",
+    "transliteration": "Al Muta'ali",
     "meaningEnglish": "The Supreme One"
   },
   {
@@ -475,9 +475,9 @@
   },
   {
     "id": 80,
-    "arabic": "التَّوَابُ",
+    "arabic": "التَّوَّابُ",
     "transliteration": "At Tawwaab",
-    "meaningEnglish": "The Guide to Repentence"
+    "meaningEnglish": "The Guide to Repentance"
   },
   {
     "id": 81,
@@ -494,18 +494,18 @@
   {
     "id": 83,
     "arabic": "الرَّؤُوفُ",
-    "transliteration": "Ar Ra’oof",
+    "transliteration": "Ar Ra'oof",
     "meaningEnglish": "The Clement"
   },
   {
     "id": 84,
     "arabic": "مَالِكُ الْمُلْكِ",
     "transliteration": "Maalik Ul Mulk",
-    "meaningEnglish": "The Owner / Soverign of All"
+    "meaningEnglish": "The Owner / Sovereign of All"
   },
   {
     "id": 85,
-    "arabic": "ذُوالْجَلاَلِ وَالإكْرَامِ",
+    "arabic": "ذُو الْجَلاَلِ وَالإِكْرَامِ",
     "transliteration": "Dhu Al Jalaali Wa Al Ikraam",
     "meaningEnglish": "Possessor of Majesty and Bounty"
   },
@@ -530,7 +530,7 @@
   {
     "id": 89,
     "arabic": "الْمُغْنِي",
-    "transliteration": "Al Mughi",
+    "transliteration": "Al Mughni",
     "meaningEnglish": "The Enricher"
   },
   {
@@ -541,14 +541,14 @@
   },
   {
     "id": 91,
-    "arabic": "الضَّارَّ",
-    "transliteration": "Ad Daaarr",
+    "arabic": "الضَّارُّ",
+    "transliteration": "Ad Daarr",
     "meaningEnglish": "The Creator of the harmful"
   },
   {
     "id": 92,
     "arabic": "النَّافِعُ",
-    "transliteration": "An Naafi’",
+    "transliteration": "An Naafi'",
     "meaningEnglish": "The Bestower of Benefits"
   },
   {

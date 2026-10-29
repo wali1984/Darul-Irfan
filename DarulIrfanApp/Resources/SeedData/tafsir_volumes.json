@@ -5,7 +5,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-1",
-    "page": 19
+    "page": 15
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -27,12 +27,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-2",
-    "page": 48
+    "page": 21
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-3",
-    "page": 1
+    "page": 15
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -49,12 +49,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-3",
-    "page": 1
+    "page": 129
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-4",
-    "page": 46
+    "page": 14
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -71,12 +71,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-4",
-    "page": 357
+    "page": 332
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-5",
-    "page": 21
+    "page": 20
    },
    {
     "edition": "akram-ut-tafaseer-ur",
@@ -120,12 +120,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-7",
-    "page": 143
+    "page": 127
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-8",
-    "page": 132
+    "page": 19
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -142,12 +142,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-8",
-    "page": 216
+    "page": 173
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-9",
-    "page": 24
+    "page": 18
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -164,12 +164,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-9",
-    "page": 275
+    "page": 234
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-10",
-    "page": 29
+    "page": 19
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -191,7 +191,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-11",
-    "page": 2
+    "page": 14
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -208,7 +208,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-11",
-    "page": 136
+    "page": 116
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -225,12 +225,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-11",
-    "page": 2
+    "page": 300
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-12",
-    "page": 38
+    "page": 16
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -247,12 +247,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-12",
-    "page": 205
+    "page": 161
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-13",
-    "page": 42
+    "page": 15
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -269,12 +269,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-13",
-    "page": 81
+    "page": 69
    },
    {
     "edition": "asrar-at-tanzil-ur",
     "bookID": "asrar-13-ur",
-    "page": 2
+    "page": 1
    },
    {
     "edition": "asrar-at-tanzil-en",
@@ -302,6 +302,11 @@
   "15": [
    {
     "edition": "akram-ut-tafaseer-ur",
+    "bookID": "tafaseer-parah-13",
+    "page": 220
+   },
+   {
+    "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-14",
     "page": 15
    },
@@ -320,7 +325,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-14",
-    "page": 64
+    "page": 65
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -337,7 +342,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-15",
-    "page": 24
+    "page": 17
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -410,7 +415,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-17",
-    "page": 16
+    "page": 15
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -444,7 +449,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-18",
-    "page": 38
+    "page": 16
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -461,7 +466,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-18",
-    "page": 118
+    "page": 117
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -483,12 +488,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-19",
-    "page": 16
+    "page": 15
    },
    {
     "edition": "asrar-at-tanzil-ur",
     "bookID": "asrar-25-ur",
-    "page": 2
+    "page": 1
    },
    {
     "edition": "asrar-at-tanzil-en",
@@ -561,7 +566,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-21",
-    "page": 32
+    "page": 16
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -612,7 +617,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-21",
-    "page": 191
+    "page": 161
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -690,7 +695,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-23",
-    "page": 24
+    "page": 16
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -763,7 +768,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-24",
-    "page": 57
+    "page": 58
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -780,12 +785,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-24",
-    "page": 142
+    "page": 131
    },
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-25",
-    "page": 3
+    "page": 17
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -819,7 +824,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-25",
-    "page": 105
+    "page": 95
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -836,12 +841,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-25",
-    "page": 169
+    "page": 160
    },
    {
     "edition": "asrar-at-tanzil-ur",
     "bookID": "asrar-44-ur",
-    "page": 2
+    "page": 1
    },
    {
     "edition": "asrar-at-tanzil-en",
@@ -887,7 +892,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-26",
-    "page": 77
+    "page": 62
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -904,7 +909,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-26",
-    "page": 135
+    "page": 109
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -921,7 +926,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-26",
-    "page": 192
+    "page": 169
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -938,7 +943,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-26",
-    "page": 214
+    "page": 204
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -955,7 +960,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-26",
-    "page": 243
+    "page": 239
    },
    {
     "edition": "akram-ut-tafaseer-ur",
@@ -977,7 +982,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-27",
-    "page": 44
+    "page": 34
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -994,7 +999,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-27",
-    "page": 69
+    "page": 54
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1011,7 +1016,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-27",
-    "page": 99
+    "page": 90
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1028,7 +1033,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-27",
-    "page": 119
+    "page": 112
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1045,7 +1050,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-27",
-    "page": 142
+    "page": 141
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1096,7 +1101,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-28",
-    "page": 66
+    "page": 49
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1147,7 +1152,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-28",
-    "page": 126
+    "page": 125
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1164,7 +1169,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-28",
-    "page": 3
+    "page": 146
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1198,7 +1203,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-28",
-    "page": 3
+    "page": 183
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1215,7 +1220,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-28",
-    "page": 217
+    "page": 204
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1232,7 +1237,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-29",
-    "page": 25
+    "page": 17
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1283,7 +1288,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-29",
-    "page": 96
+    "page": 90
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1317,7 +1322,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-29",
-    "page": 147
+    "page": 130
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1351,7 +1356,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-29",
-    "page": 178
+    "page": 176
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1402,7 +1407,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-29",
-    "page": 238
+    "page": 225
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1419,7 +1424,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 3
+    "page": 20
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1436,7 +1441,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 40
+    "page": 34
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1453,12 +1458,12 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 60
+    "page": 56
    },
    {
     "edition": "asrar-at-tanzil-ur",
     "bookID": "asrar-80-ur",
-    "page": 2
+    "page": 1
    },
    {
     "edition": "asrar-at-tanzil-en",
@@ -1504,7 +1509,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 99
+    "page": 87
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1538,7 +1543,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 126
+    "page": 116
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1572,7 +1577,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 3
+    "page": 143
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1589,7 +1594,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 168
+    "page": 167
    },
    {
     "edition": "asrar-at-tanzil-ur",
@@ -1606,7 +1611,7 @@
    {
     "edition": "akram-ut-tafaseer-ur",
     "bookID": "tafaseer-parah-30",
-    "page": 3
+    "page": 182
    },
    {
     "edition": "asrar-at-tanzil-ur",

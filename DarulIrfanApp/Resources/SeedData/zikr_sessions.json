@@ -16,7 +16,8 @@
     "durationMinutes": 30,
     "timeZoneIdentifier": "Asia/Karachi",
     "availabilityNote": "Daily Zikr is shown live here in Darul Irfan while the session is in progress.",
-    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html"
+    "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html",
+    "titleUrdu": "روزانہ ذکر"
   },
   {
     "id": "zikr-tahajjud",
@@ -34,9 +35,10 @@
     "startMinute": 0,
     "durationMinutes": 30,
     "timeZoneIdentifier": "Asia/Karachi",
-    "availabilityNote": "Before Fajr, Pakistan time. The exact time will be confirmed.",
+    "availabilityNote": "The time follows Fajr at Dar-ul-Irfan and changes through the year.",
     "sourceUrl": "https://www.naqshbandiaowaisiah.org/online-zikr-joining-instructions.html",
     "anchor": "beforeFajr",
-    "anchorOffsetMinutes": 60
+    "anchorOffsetMinutes": 60,
+    "titleUrdu": "تہجد ذکر"
   }
 ]

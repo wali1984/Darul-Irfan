@@ -17,21 +17,23 @@
     "title": "Eid Milad-un-Nabi",
     "hijriMonth": 3,
     "hijriDay": 12,
-    "note": "Commemoration of the birth of the holy Prophet (peace be upon him); observed dates vary by community."
+    "note": "Commemoration of the birth of the Holy Prophet ﷺ; observed dates vary by community."
   },
   {
     "id": "isra-and-miraj",
     "title": "Isra and Mi'raj",
     "hijriMonth": 7,
     "hijriDay": 27,
-    "note": "Widely observed on 27 Rajab; observed dates vary."
+    "note": "The night of 27 Rajab; it begins at sunset on 26 Rajab. Observed dates vary.",
+    "observedOnEve": true
   },
   {
     "id": "shab-e-barat",
     "title": "Shab-e-Barat",
     "hijriMonth": 8,
     "hijriDay": 15,
-    "note": "The night of 15 Sha'ban."
+    "note": "The night of 15 Sha'ban; it begins at sunset on 14 Sha'ban.",
+    "observedOnEve": true
   },
   {
     "id": "first-of-ramadan",
@@ -45,7 +47,8 @@
     "title": "Laylat-ul-Qadr",
     "hijriMonth": 9,
     "hijriDay": 27,
-    "note": "Sought on the odd nights of the last ten days of Ramadan; the 27th night is widely observed."
+    "note": "Sought on the odd nights of the last ten days of Ramadan; the 27th night, which begins at sunset on 26 Ramadan, is widely observed.",
+    "observedOnEve": true
   },
   {
     "id": "eid-ul-fitr",
