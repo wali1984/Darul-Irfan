@@ -29,7 +29,8 @@ SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com,wajidmahmood@hotmail.com"
 # asks Google for tokens with. Public, not a secret. Until it is set, Google
 # sign-in answers 503 and Sign in with Apple is unaffected. SUPER_ADMIN_EMAILS
 # applies to the Google account's verified email as it does to Apple's.
-# GOOGLE_CLIENT_IDS = "<web-client-id>.apps.googleusercontent.com"
+# Firebase project darul-irfan-e8f62, its "Web client (auto created by Google Service)".
+GOOGLE_CLIENT_IDS = "361266757599-qe8lut74c1nh5fgul0gsup9o9muve5hh.apps.googleusercontent.com"
 
 [[d1_databases]]
 binding = "DB"
