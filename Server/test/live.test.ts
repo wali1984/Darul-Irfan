@@ -35,7 +35,7 @@ function setup() {
   return { env, raw, sent, heartbeat, streamEvent, live };
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 /** A throwaway P-256 key, so APNs provider tokens can be signed. */
 async function p256pem(): Promise<string> {
@@ -53,7 +53,11 @@ describe("live zikr pipeline", () => {
   });
 
   // Daily Zikr follows the channel's live video only (the owner, 2026-10-28).
+  // At a Daily Zikr hour: before 7 am in Pakistan the room opening rightly
+  // announces the Tahajjud zikr (the next test), whatever the clock says.
   it("never makes Daily Zikr live from a streaming listener, offers no hub source and sends no alert", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-30T12:00:00Z")); // 17:00 in Pakistan
     const { env, raw, heartbeat, live, sent } = setup();
     // Credentials and a subscribed phone, so an alert would really be sent.
     Object.assign(env, { APNS_KEY_ID: "KEY", APNS_TEAM_ID: "TEAM", APNS_PRIVATE_KEY: await p256pem() });
@@ -66,6 +70,24 @@ describe("live zikr pipeline", () => {
     expect(on.sources).toEqual([]);
     expect(sent.filter(s => s.url.includes("push.apple.com"))).toEqual([]);
     expect(sent.filter(s => s.url.includes("graph.facebook.com"))).toEqual([]);
+  });
+
+  it("announces the Tahajjud zikr once when the room opens before dawn, and never makes the broadcast live", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-29T23:30:00Z")); // 04:30 in Pakistan
+    const { env, raw, heartbeat, live, sent } = setup();
+    Object.assign(env, { APNS_KEY_ID: "KEY", APNS_TEAM_ID: "TEAM", APNS_PRIVATE_KEY: await p256pem() });
+    raw.prepare(`INSERT INTO devices(installation_id,apns_token,locale,timezone,topics_json,environment,app_version,created_at,last_seen_at)
+      VALUES('11111111-1111-4111-8111-111111111111',?,'en','UTC','["liveZikr"]','production','1',datetime('now'),datetime('now'))`).run("a".repeat(64));
+    expect((await heartbeat({ listener: "listener-a", inRoom: true, streaming: true, input: INPUT_A })).status).toBe(200);
+    expect((await heartbeat({ listener: "listener-b", inRoom: true, streaming: true, input: "r2" })).status).toBe(200);
+    const on = await live();
+    expect(on.state).not.toBe("live");
+    expect(on.sources).toEqual([]);
+    const alerts = sent.filter(s => s.url.includes("push.apple.com"));
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0]!.body).toContain("Tahajjud Zikr has started");
+    expect(alerts[0]!.body).toContain("darulirfan://zikr/tahajjud");
   });
 
   it("does not call the YouTube zikr live because the room is open, and never lists the room as a source", async () => {
