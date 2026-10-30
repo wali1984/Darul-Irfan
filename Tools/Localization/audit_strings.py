@@ -101,6 +101,10 @@ KNOWN_KEYS = {
     "Updated \\(current.updatedAt.formatted(.relative(presentation: .named)))": "Updated %@",
     "Now in the zikr · \\(cue.at.formatted(.relative(presentation: .named)))": "Now in the zikr · %@",
     "Version %@ (build %@) is in TestFlight.": "Version %@ (build %lld) is in TestFlight.",
+    # The hadith number is its display string (402.2 is an identifier).
+    "Hadith %lld": "Hadith %@",
+    "Page %lld of %@": "Page %lld of %lld",
+    "Resume %@, %@ percent played": "Resume %@, %lld percent played",
 }
 
 
