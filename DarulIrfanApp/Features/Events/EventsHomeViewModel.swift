@@ -1,14 +1,14 @@
 import Foundation
 import Observation
 
-/// State for the Events & Dar-ul-Irfan screen: community events and
-/// announcements from the events repository, plus the bundled Dar-ul-Irfan
-/// place information.
+/// State for the Events section: the community events from the events
+/// repository, plus the bundled Dar-ul-Irfan place information. The
+/// announcements it used to list are under Updates › Announcements and
+/// press (`UpdatesNewsModel`).
 @Observable
 @MainActor
 final class EventsHomeViewModel {
     private let eventsRepository: any EventsRepositoryProtocol
-    private let contentRepository: (any ContentRepositoryProtocol)?
 
     /// Dated programs still to come, soonest first.
     private(set) var upcoming: [CommunityEvent] = []
@@ -17,15 +17,14 @@ final class EventsHomeViewModel {
     private(set) var regular: [CommunityEvent] = []
     /// Programs that have taken place, newest first.
     private(set) var past: [CommunityEvent] = []
-    private(set) var announcements: [Announcement] = []
-    /// Announcements that are library items, which open in full.
-    private(set) var libraryAnnouncementIDs: Set<String> = []
     private(set) var place: DarulIrfanPlace?
     private(set) var isLoaded = false
 
+    /// `contentRepository` is no longer read here; the parameter stays so
+    /// existing callers keep compiling.
     init(eventsRepository: any EventsRepositoryProtocol, contentRepository: (any ContentRepositoryProtocol)? = nil) {
         self.eventsRepository = eventsRepository
-        self.contentRepository = contentRepository
+        _ = contentRepository
     }
 
     func load() async {
@@ -54,30 +53,6 @@ final class EventsHomeViewModel {
         past = fetchedEvents
             .filter { $0.hasEnded(at: now) }
             .sorted { ($0.startDate ?? .distantPast) > ($1.startDate ?? .distantPast) }
-
-        let fetchedAnnouncements: [Announcement]
-        do {
-            fetchedAnnouncements = try await eventsRepository.announcements(limit: 20)
-        } catch {
-            fetchedAnnouncements = []
-        }
-        // The site's announcements are library items (16 of them); the
-        // announcements file holds only the app's own welcome note.
-        let library = (try? await contentRepository?.items(category: nil, type: .announcement, language: nil, limit: 50)) ?? []
-        libraryAnnouncementIDs = Set(library.map(\.id))
-        let fromLibrary = library.map { item in
-            Announcement(
-                id: item.id,
-                title: item.title,
-                body: item.excerpt ?? item.bodyPlainText.map { String($0.prefix(280)) },
-                publishedAt: item.publishedAt ?? item.updatedAt,
-                sourceUrl: item.sourceUrl
-            )
-        }
-        var seen = Set<String>()
-        announcements = (fetchedAnnouncements + fromLibrary)
-            .filter { seen.insert($0.id).inserted }
-            .sorted { ($0.publishedAt ?? Date.distantPast) > ($1.publishedAt ?? Date.distantPast) }
 
         place = SeedBundle.darulIrfanPlace()
         isLoaded = true
