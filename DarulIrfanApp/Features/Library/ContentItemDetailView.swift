@@ -288,8 +288,8 @@ struct ContentItemDetailView: View {
                         .font(DIFont.urduBody())
                         .foregroundStyle(.white)
                         .diGoldGlow(radius: 8, opacity: 0.35)
-                        .multilineTextAlignment(.trailing)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
                 }
 
@@ -307,7 +307,7 @@ struct ContentItemDetailView: View {
                     if let publishedAt = item.publishedAt {
                         headerMetaRow(
                             systemImage: "calendar",
-                            text: Text("Published \(publishedAt, format: .dateTime.day().month().year())")
+                            text: Text("Published \(publishedAt, format: Date.FormatStyle(timeZone: .gmt).day().month().year())")
                         )
                     }
                 }
@@ -479,7 +479,7 @@ struct ContentItemDetailView: View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 if let publishedAt = item.publishedAt {
-                    Text("Published \(publishedAt, format: .dateTime.day().month().year())")
+                    Text("Published \(publishedAt, format: Date.FormatStyle(timeZone: .gmt).day().month().year())")
                         .font(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 } else if let updatedAt = item.updatedAt {

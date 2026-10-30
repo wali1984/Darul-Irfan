@@ -75,6 +75,12 @@ struct HadithBookView: View {
                         ProgressView()
                             .frame(maxWidth: .infinity)
                             .padding(DISpacing.xl)
+                    } else if entries.isEmpty && isSearchResults {
+                        DIEmptyState(
+                            systemImage: "magnifyingglass",
+                            titleKey: "No hadith match that search",
+                            messageKey: "Try a different word or a shorter phrase."
+                        )
                     } else if entries.isEmpty {
                         DIEmptyState(
                             systemImage: "book.closed",
@@ -201,9 +207,10 @@ struct HadithBookView: View {
             searchTask?.cancel()
             let query = term.trimmingCharacters(in: .whitespaces)
             guard query.count >= 2 else {
-                // Back to the normal paged listing — unless a tapped result is
-                // mid-jump, in which case the jump owns the listing.
-                if !isJumpingToResult {
+                // Leaving results returns to the narration read before the
+                // search; short text on the listing changes nothing. A tapped
+                // result mid-jump owns the listing.
+                if isSearchResults && !isJumpingToResult {
                     Task { await restorePagedListing() }
                 }
                 return
@@ -345,8 +352,8 @@ struct HadithBookView: View {
                             .font(DIFont.urduBody(scale: fontScale))
                             .lineSpacing(CGFloat(6 * fontScale))
                             .foregroundStyle(DIColor.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .environment(\.layoutDirection, .rightToLeft)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
                             .textSelection(.enabled)
                             .fixedSize(horizontal: false, vertical: true)
                     } else {
@@ -466,8 +473,8 @@ struct HadithBookView: View {
                     .font(DIFont.urduBody(scale: fontScale * 0.92))
                     .lineSpacing(CGFloat(6 * fontScale))
                     .foregroundStyle(DIColor.textMuted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .environment(\.layoutDirection, .rightToLeft)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
                     .textSelection(.enabled)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -476,8 +483,8 @@ struct HadithBookView: View {
                     .font(DIFont.urduBody(scale: fontScale))
                     .lineSpacing(CGFloat(6 * fontScale))
                     .foregroundStyle(DIColor.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .environment(\.layoutDirection, .rightToLeft)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
                     .textSelection(.enabled)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -546,8 +553,8 @@ struct HadithBookView: View {
                     Text(verbatim: arabic)
                         .font(DIFont.quranArabic(scale: fontScale * 0.7))
                         .foregroundStyle(DIColor.textMuted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -570,8 +577,8 @@ struct HadithBookView: View {
                     Text(verbatim: heading)
                         .font(DIFont.urduBody(scale: 0.95))
                         .foregroundStyle(DIColor.primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
             } else {
                 if let english {
@@ -583,8 +590,8 @@ struct HadithBookView: View {
                     Text(verbatim: arabic)
                         .font(DIFont.quranArabic(scale: fontScale * 0.6))
                         .foregroundStyle(DIColor.textMuted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
             }
         }
@@ -704,6 +711,12 @@ struct HadithBookView: View {
 
     /// Clearing the search box returns to the ordinary paged listing.
     private func restorePagedListing() async {
+        if let saved = HadithReadingPosition.load(bookID: book.id),
+           let index = try? await repository.readingIndex(bookID: book.id, canonicalID: saved) {
+            await loadWindow(startingAt: max(0, index - 6))
+            anchorAfterPrepend = saved
+            return
+        }
         await loadWindow(startingAt: 0)
     }
 
@@ -819,8 +832,8 @@ private struct HadithContentsView: View {
                                             Text(verbatim: section.titleArabic)
                                                 .font(DIFont.quranArabic(scale: 0.65))
                                                 .foregroundStyle(DIColor.textMuted)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
                                                 .environment(\.layoutDirection, .rightToLeft)
-                                                .frame(maxWidth: .infinity, alignment: .trailing)
                                         }
                                         Text("\(section.hadithCount) narrations")
                                             .font(.caption)

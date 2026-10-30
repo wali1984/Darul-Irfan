@@ -67,8 +67,8 @@ struct NarratorBioSheet: View {
                     Text(verbatim: ar)
                         .font(DIFont.quranArabic(scale: fontScale * 0.9))
                         .foregroundStyle(DIColor.textPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
                 let localname = n.name(languageCode: languageCode)
                 Text(verbatim: localname)

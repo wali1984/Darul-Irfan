@@ -136,7 +136,11 @@ struct ContentItemRow: View {
             parts.append(author)
         }
         if let publishedAt = item.publishedAt {
-            parts.append(String(Calendar.current.component(.year, from: publishedAt)))
+            // The catalogue gives the day as midnight UTC: read it in UTC, or
+            // west of Greenwich a 1 January issue shows the year before.
+            var utc = Calendar(identifier: .gregorian)
+            utc.timeZone = .gmt
+            parts.append(String(utc.component(.year, from: publishedAt)))
         }
         return parts.joined(separator: " • ")
     }

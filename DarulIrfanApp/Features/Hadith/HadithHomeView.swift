@@ -145,9 +145,9 @@ struct HadithHomeView: View {
                         .font(style.font)
                         .foregroundStyle(DIColor.textPrimary)
                         .lineLimit(4)
-                        .multilineTextAlignment(style.isRTL ? .trailing : .leading)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, style.isRTL ? .rightToLeft : .leftToRight)
-                        .frame(maxWidth: .infinity, alignment: style.isRTL ? .trailing : .leading)
                 }
             }
         }
