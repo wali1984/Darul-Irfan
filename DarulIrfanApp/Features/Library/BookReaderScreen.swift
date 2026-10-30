@@ -429,6 +429,11 @@ struct BookReaderScreen: View {
                     }
                 )
                 .tint(DIColor.accent)
+                // Drawn left to right and then mirrored for a book read right
+                // to left, so page 1 and the pages read sit at the right
+                // whether or not the slider would mirror itself.
+                .environment(\.layoutDirection, .leftToRight)
+                .scaleEffect(x: bookIsRightToLeft ? -1 : 1, y: 1)
                 .accessibilityLabel(Text("Page"))
                 .accessibilityValue(Text("Page \(displayedPage) of \(numbers.last ?? 1)"))
                 HStack(spacing: DISpacing.xs) {
@@ -486,6 +491,7 @@ struct BookReaderScreen: View {
         .accessibilityLabel(Text(label))
     }
 
+    /// The scrubber, in page positions (0 for the first page).
     private var scrubBinding: Binding<Double> {
         Binding(
             get: {
