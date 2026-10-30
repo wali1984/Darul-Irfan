@@ -205,6 +205,9 @@ struct ReadTabView: View {
         switch route {
         case .hadith:
             select(.hadith)
+        case .library:
+            // The books moved here from Discover.
+            select(.books)
         case .quran(let surah, let ayah):
             if let surah {
                 openAyah(QuranAyahLink(surah: surah, ayah: ayah))

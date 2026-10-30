@@ -128,7 +128,7 @@ struct RootView: View {
         case .today:
             selectedTab = .today
             router.clear(route)
-        case .quran, .hadith:
+        case .quran, .hadith, .library:
             selectedTab = .read
         case .zikr, .live:
             // A fresh Zikr screen, which shows the session asked for.
@@ -144,7 +144,7 @@ struct RootView: View {
             selectedTab = .more
             router.clear(route)
             linkedGroup = LinkedGroup(id: id)
-        case .updates, .events, .media, .library, .topics:
+        case .updates, .events, .media, .topics:
             selectedTab = .explore
         }
     }

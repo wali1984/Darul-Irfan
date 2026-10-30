@@ -124,10 +124,10 @@ enum AppRoute: Equatable, Sendable {
         return nil
     }
 
-    /// Read-tab routes: the Qur'an or Hadith reader.
+    /// Read-tab routes: the Qur'an or Hadith reader, or the books.
     var isRead: Bool {
         switch self {
-        case .quran, .hadith: return true
+        case .quran, .hadith, .library: return true
         default: return false
         }
     }
