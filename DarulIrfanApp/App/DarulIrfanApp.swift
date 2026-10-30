@@ -127,6 +127,12 @@ struct DarulIrfanApp: App {
             } else if launchArguments.contains("--uitesting-reset-onboarding") {
                 await appState.updateSettings { $0.hasCompletedOnboarding = false }
             }
+            // The screenshot run picks the appearance (RedesignScreenshotTests).
+            if launchArguments.contains("--uitesting-theme-dark") {
+                await appState.updateSettings { $0.theme = .dark }
+            } else if launchArguments.contains("--uitesting-theme-light") {
+                await appState.updateSettings { $0.theme = .light }
+            }
             if launchArguments.contains(where: { $0.hasPrefix("--uitesting") }) {
                 // The Read tab reopens on the reader last used, which would
                 // make "does Read offer both?" depend on whatever a previous

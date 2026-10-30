@@ -156,6 +156,56 @@ workflows:
   # The declarative `ios_signing` environment block is intentionally NOT used:
   # it only *fetches* existing profiles and fails ("No matching profiles
   # found") when none exist yet.
+  ios-screens:
+    # Screenshots of every redesigned screen in English and Urdu, light and
+    # dark, to check against parity-spec/redesign/boards before a release.
+    # Started by hand only (Tools/Release/codemagic.py start ios-screens <branch>).
+    name: iOS screenshots (unsigned, simulator)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: latest
+    cache:
+      cache_paths:
+        - ~/Library/Caches/org.swift.swiftpm
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen
+      - name: Generate Xcode project
+        script: |
+          xcodegen generate
+      - name: Screenshot tour on simulator
+        ignore_failure: true
+        script: |
+          set -o pipefail
+          command -v xcbeautify >/dev/null || brew install xcbeautify
+          mkdir -p build/logs
+          DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
+          echo "Using simulator: ${DEVICE}"
+          TEST_RUNNER_DI_SCREENSHOTS=1 xcodebuild test \
+            -project DarulIrfan.xcodeproj \
+            -scheme DarulIrfan \
+            -destination "platform=iOS Simulator,name=${DEVICE}" \
+            -only-testing:DarulIrfanUITests/RedesignScreenshotTests \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath build/Screens.xcresult \
+            2>&1 | tee build/logs/xcodebuild-screens.log | xcbeautify
+      - name: Export the screenshots
+        script: |
+          mkdir -p build/screens
+          if xcrun xcresulttool export attachments --path build/Screens.xcresult --output-path build/screens; then
+            ls build/screens | head -n 5
+          else
+            echo "Exporting the attachments failed; keeping the result bundle instead."
+            (cd build && zip -qr Screens.xcresult.zip Screens.xcresult)
+          fi
+          cd build && zip -qr screens.zip screens
+    artifacts:
+      - build/screens.zip
+      - build/Screens.xcresult.zip
+      - build/logs/*.log
+
   ios-testflight:
     name: iOS TestFlight release (signed)
     instance_type: mac_mini_m2
