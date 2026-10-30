@@ -46,16 +46,17 @@ final class ZikrHomeViewModel {
         let bootstrap = await platform.bootstrap(forceRefresh: forceRefresh)
         live = await platform.currentLiveBroadcast(forceRefresh: forceRefresh)
         // The channel's uploads are mostly the daily zikr streams: skip them,
-        // and read on (three pages at most) until six bayans are found.
-        var bayans: [OfficialFeedItem] = []
+        // and read on (three pages at most) until six bayans are found. When
+        // no page loads, the section keeps what it showed.
+        var bayans: [OfficialFeedItem]?
         var cursor: String?
         for _ in 0..<3 {
             guard let page = try? await platform.feed(after: cursor, forceRefresh: forceRefresh) else { break }
-            bayans += page.items.filter { $0.videoID != nil && !Self.isZikrRecording($0) }
-            guard bayans.count < 6, let next = page.nextCursor else { break }
+            bayans = (bayans ?? []) + page.items.filter { $0.videoID != nil && !Self.isZikrRecording($0) }
+            guard (bayans?.count ?? 0) < 6, let next = page.nextCursor else { break }
             cursor = next
         }
-        recentBayans = Array(bayans.prefix(6))
+        if let bayans { recentBayans = Array(bayans.prefix(6)) }
         let remote = bootstrap.schedules.map { schedule in
             ZikrSession(
                 id: schedule.id,
