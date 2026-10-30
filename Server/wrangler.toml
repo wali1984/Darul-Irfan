@@ -23,7 +23,7 @@ PALTALK_GROUP_ID = "463712"
 # Paltalk usernames whose OURSHEIKH chat messages are cues (latifa changes,
 # muraqabat): the room's admins, moderators and speakers.
 LIVE_CUE_HOSTS = "ameer_imam,ghazi_faiz,siqarian2"
-SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com,wajidmahmood@hotmail.com"
+SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com,wajidmahmood@hotmail.com,wajidmahmoodali@gmail.com"
 # Google sign-in (Android): the OAuth client IDs a Google ID token may be
 # issued to (its "aud"), comma-separated - the Web client ID the Android app
 # asks Google for tokens with. Public, not a secret. Until it is set, Google
