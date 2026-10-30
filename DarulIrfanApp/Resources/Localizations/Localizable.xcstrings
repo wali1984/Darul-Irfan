@@ -29036,6 +29036,23 @@
           }
         }
       }
+    },
+    "Credits and licences": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credits and licences"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اعترافات اور لائسنس"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

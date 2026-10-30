@@ -27,7 +27,6 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
     case contentStorage
     case officialAlerts
     case privacy
-    case licences
     case about
 
     var id: String { rawValue }
@@ -60,7 +59,6 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .contentStorage: return ["Content & Storage"]
         case .officialAlerts: return ["Official Alerts & Privacy"]
         case .privacy: return ["Privacy"]
-        case .licences: return ["Licences"]
         case .about: return ["About"]
         }
     }
@@ -94,7 +92,6 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .contentStorage: return "internaldrive.fill"
         case .officialAlerts: return "dot.radiowaves.left.and.right"
         case .privacy: return "hand.raised.fill"
-        case .licences: return "doc.text.fill"
         case .about: return "info.circle.fill"
         }
     }
@@ -105,7 +102,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .privateGroups, .about:
             return "Halqah"
         case .settings, .language, .location, .calculation, .manualOffsets, .notifications, .appearance,
-             .hijri, .contentStorage, .officialAlerts, .privacy, .licences:
+             .hijri, .contentStorage, .officialAlerts, .privacy:
             return "Settings"
         default:
             return "Tools"
@@ -214,8 +211,6 @@ struct SearchAppDestinationScreen: View {
             NotificationSettingsView(dependencies: dependencies, appState: appState)
         case .privacy:
             PrivacySettingsView(appState: appState, dependencies: dependencies)
-        case .licences:
-            AcknowledgementsView()
         case .about:
             AboutView()
         }

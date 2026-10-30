@@ -3,7 +3,8 @@ import SwiftUI
 /// Every setting, in the order the redesign lists them: Language first, then
 /// Location, Prayer calculation and Notifications (one screen for every
 /// alert and reminder); then Appearance, the Hijri calendar, Content and
-/// storage, Privacy and the licences.
+/// storage, and Privacy. The credits and licences, which must stay in the
+/// app, are linked at the foot of About Darul Irfan (Halqah › Silsila).
 enum SettingsEntry: String, CaseIterable, Identifiable {
     case language
     case location
@@ -13,7 +14,6 @@ enum SettingsEntry: String, CaseIterable, Identifiable {
     case hijriCalendar
     case contentStorage
     case privacy
-    case licences
 
     var id: String { rawValue }
 
@@ -28,7 +28,6 @@ enum SettingsEntry: String, CaseIterable, Identifiable {
         case .hijriCalendar: return "Hijri Calendar"
         case .contentStorage: return "Content & Storage"
         case .privacy: return "Privacy"
-        case .licences: return "Licences"
         }
     }
 
@@ -42,7 +41,6 @@ enum SettingsEntry: String, CaseIterable, Identifiable {
         case .hijriCalendar: return "moon.stars.fill"
         case .contentStorage: return "internaldrive.fill"
         case .privacy: return "lock.shield.fill"
-        case .licences: return "doc.text.fill"
         }
     }
 
@@ -108,13 +106,6 @@ struct SettingsList: View {
             // diagnostics choice stayed with privacy.
             SettingsRowLink(entry: entry, value: nil) {
                 PrivacySettingsView(appState: appState, dependencies: dependencies)
-            }
-        case .licences:
-            // The notices are not optional: adhan-swift is MIT, the fonts are
-            // OFL and the Fajr azan recording is CC BY 3.0, and each requires
-            // its attribution to ship in the app.
-            SettingsRowLink(entry: entry, value: nil) {
-                AcknowledgementsView()
             }
         }
     }

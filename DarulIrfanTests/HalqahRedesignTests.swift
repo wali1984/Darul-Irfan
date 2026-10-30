@@ -36,7 +36,6 @@ final class HalqahRedesignTests: XCTestCase {
             "Hijri Calendar",
             "Content & Storage",
             "Privacy",
-            "Licences",
         ])
     }
 
