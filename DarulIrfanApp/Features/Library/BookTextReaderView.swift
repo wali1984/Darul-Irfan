@@ -26,7 +26,13 @@ import SwiftUI
 /// mushaf confirms it; other quotations are the book's own text.
 ///
 /// The page at the top of the screen is kept, so the book reopens there.
-struct BookTextReaderView: View {
+///
+/// Each page is set on a softly lit sheet of paper (a warm dark page at
+/// night) with its number at the foot between two gold rules. Inside the
+/// app's one reader (`BookReaderScreen`), this view reports its pages and the
+/// page on screen to `session` and goes where the session asks; the reader's
+/// bars then carry Go to page.
+struct BookTextPagesView: View {
     let item: ContentItem
     let dependencies: AppDependencies
     /// Page to open at, e.g. where a surah begins inside a parah volume when
@@ -35,6 +41,8 @@ struct BookTextReaderView: View {
     var startPage: Int?
     /// The reader's text size, as the article reader and the Quran use it.
     var fontScale: Double = 1
+    /// Set by `BookReaderScreen`; nil when the view stands alone.
+    var session: BookReaderSession? = nil
 
     @State private var pages: [BookPage] = []
     /// Pages set out into headings, paragraphs, poetry and quotations.
@@ -91,13 +99,18 @@ struct BookTextReaderView: View {
                     }
                     .scrollPosition(id: $topPage, anchor: .top)
                     .onChange(of: topPage) { _, page in
-                        if let page { BookReadingPosition.save(page: page, bookID: item.id) }
+                        if let page {
+                            BookReadingPosition.save(page: page, bookID: item.id)
+                            session?.currentPage = page
+                        }
                     }
                     .onChange(of: pendingPage) { _, requested in
                         guard let requested else { return }
                         // Scans skip blank pages: the nearest page at or after.
                         if let target = pages.first(where: { $0.page >= requested }) ?? pages.last {
                             proxy.scrollTo(target.page, anchor: .top)
+                            BookReadingPosition.save(page: target.page, bookID: item.id)
+                            session?.currentPage = target.page
                         }
                         pendingPage = nil
                     }
@@ -109,7 +122,8 @@ struct BookTextReaderView: View {
         .navigationTitle(Text(verbatim: item.title))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if pages.count > 1 {
+            // In the reader, its floating bar carries Go to page.
+            if session == nil && pages.count > 1 {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showsGoToPage = true
@@ -133,6 +147,13 @@ struct BookTextReaderView: View {
             if let first = pages.first?.page, let last = pages.last?.page {
                 Text("Pages \(first) to \(last)")
             }
+        }
+        // A page the reader's bars asked for, once the pages are here; one
+        // asked for before they load is taken by `scrollToStartIfNeeded`.
+        .onChange(of: session?.requestedPage) { _, requested in
+            guard let requested, !pages.isEmpty else { return }
+            pendingPage = requested
+            session?.requestedPage = nil
         }
         .task {
             await load()
@@ -168,40 +189,55 @@ struct BookTextReaderView: View {
         }
     }
 
+    /// One printed page on its sheet: the marks a page carries (still
+    /// machine-read in a book that mixes the two; passages the checker could
+    /// not settle), its text, and its number at the foot.
     @ViewBuilder
     private func pageView(_ page: BookPage) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            HStack(spacing: DISpacing.sm) {
-                Text("Page \(page.page)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIColor.textMuted)
-                if mixesReviewStates && page.isMachineProvisional {
-                    Label {
-                        Text("machine-read, not yet proofread")
-                            .font(.caption2)
-                    } icon: {
-                        Image(systemName: "doc.text.magnifyingglass")
-                    }
-                    .foregroundStyle(DIColor.textMuted)
-                }
-                if page.isMachineProvisional && !page.isFullyResolved {
-                    Label {
-                        Text("unchecked passages")
-                            .font(.caption2)
-                    } icon: {
-                        Image(systemName: "exclamationmark.triangle")
-                    }
-                    .foregroundStyle(DIColor.accent)
-                    .accessibilityLabel(Text("This page has \(page.unresolvedBlocks) passages the checker could not settle"))
-                }
-                Spacer()
+            if carriesMarks(page) {
+                pageMarks(page)
             }
             if let formattedPage = formatted[page.id] {
                 FormattedBookPage(page: formattedPage, scale: fontScale)
             } else {
                 pageText(page.text)
             }
-            Divider().overlay(DIColor.border)
+            BookPageFolio(number: page.page)
+        }
+        .padding(.horizontal, 22)
+        .padding(.top, 26)
+        .padding(.bottom, 20)
+        .background(BookPaper())
+    }
+
+    private func carriesMarks(_ page: BookPage) -> Bool {
+        (mixesReviewStates && page.isMachineProvisional)
+            || (page.isMachineProvisional && !page.isFullyResolved)
+    }
+
+    private func pageMarks(_ page: BookPage) -> some View {
+        HStack(spacing: DISpacing.sm) {
+            if mixesReviewStates && page.isMachineProvisional {
+                Label {
+                    Text("machine-read, not yet proofread")
+                        .font(.caption2)
+                } icon: {
+                    Image(systemName: "doc.text.magnifyingglass")
+                }
+                .foregroundStyle(DIColor.textMuted)
+            }
+            if page.isMachineProvisional && !page.isFullyResolved {
+                Label {
+                    Text("unchecked passages")
+                        .font(.caption2)
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle")
+                }
+                .foregroundStyle(DIColor.accent)
+                .accessibilityLabel(Text("This page has \(page.unresolvedBlocks) passages the checker could not settle"))
+            }
+            Spacer(minLength: 0)
         }
     }
 
@@ -234,14 +270,18 @@ struct BookTextReaderView: View {
 
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
 
-    /// Opens at the page asked for, else where the reader left the book.
+    /// Opens at the page asked for (by the reader's bars or search, or by
+    /// whoever opened the book), else where the reader left the book.
     private func scrollToStartIfNeeded(_ proxy: ScrollViewProxy) {
-        guard !hasScrolledToStart, !pages.isEmpty,
-              let wanted = startPage ?? BookReadingPosition.page(bookID: item.id) else { return }
+        guard !hasScrolledToStart, !pages.isEmpty else { return }
+        let requested = session?.requestedPage
+        guard let wanted = requested ?? startPage ?? BookReadingPosition.page(bookID: item.id) else { return }
         hasScrolledToStart = true
+        if requested != nil { session?.requestedPage = nil }
         // The nearest page at or after the requested one: scans skip blank
         // pages, so the exact number is not always present.
         guard let target = pages.first(where: { $0.page >= wanted }) ?? pages.last else { return }
+        session?.currentPage = target.page
         DispatchQueue.main.async {
             proxy.scrollTo(target.page, anchor: .top)
         }
@@ -261,7 +301,83 @@ struct BookTextReaderView: View {
         }.value
         // A cover or blank page re-read from the scan carries no text.
         pages = loaded.filter { !$0.text.isEmpty }
+        session?.pageNumbers = pages.map(\.page)
+        if let first = pages.first?.page {
+            session?.currentPage = first
+        }
         isLoading = false
+    }
+}
+
+/// Reads a book's text in the app's one reader, at a page when one is given.
+/// Search results and the Quran reader's printed volumes open here; a work
+/// that also has its PDF offers its printed pages beside the text.
+struct BookTextReaderView: View {
+    let item: ContentItem
+    let dependencies: AppDependencies
+    /// Page to open at; nil opens where the reader left the book.
+    var startPage: Int?
+    /// The reader's text size, as the article reader and the Quran use it.
+    var fontScale: Double = 1
+
+    var body: some View {
+        BookReaderScreen(
+            item: item,
+            dependencies: dependencies,
+            mode: .text,
+            startPage: startPage,
+            fontScale: fontScale
+        )
+    }
+}
+
+/// The softly lit sheet a page of text is set on: paper by day, a warm dark
+/// page at night, a little light at its head.
+struct BookPaper: View {
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: 22, style: .continuous)
+        ZStack(alignment: .top) {
+            shape.fill(ReadPalette.paper)
+            RadialGradient(
+                colors: [ReadPalette.pageGlow, Color.clear],
+                center: .top,
+                startRadius: 0,
+                endRadius: 240
+            )
+            .frame(height: 120)
+        }
+        .clipShape(shape)
+        .overlay(shape.stroke(ReadPalette.paperEdge, lineWidth: 1))
+        .shadow(color: ReadPalette.softShadow, radius: 22, y: 14)
+        .accessibilityHidden(true)
+    }
+}
+
+/// A page's number at its foot, between two short gold rules.
+struct BookPageFolio: View {
+    let number: Int
+
+    var body: some View {
+        HStack(spacing: 10) {
+            LinearGradient(
+                colors: [ReadPalette.goldLine.opacity(0), ReadPalette.goldLine],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(height: 1)
+            Text(verbatim: "\(number)")
+                .font(.footnote.weight(.heavy).monospacedDigit())
+                .foregroundStyle(ReadPalette.goldLine)
+            LinearGradient(
+                colors: [ReadPalette.goldLine, ReadPalette.goldLine.opacity(0)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(height: 1)
+        }
+        .padding(.top, DISpacing.md)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Page \(number)"))
     }
 }
 

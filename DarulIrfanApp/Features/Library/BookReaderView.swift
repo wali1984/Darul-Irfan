@@ -8,9 +8,16 @@ import PDFKit
 ///
 /// The page being read is kept, so the work reopens there; "Go to page"
 /// jumps anywhere in it.
+///
+/// Inside the app's one reader (`BookReaderScreen`) the reader's own bars
+/// turn the pages: this view then reports its page and its pages to
+/// `session`, goes where the session asks, and leaves out its own page bar,
+/// Go to page and Share.
 struct BookReaderView: View {
     let item: ContentItem
     let dependencies: AppDependencies
+    /// Set by `BookReaderScreen`; nil when the view stands alone.
+    var session: BookReaderSession? = nil
 
     @State private var phase: Phase = .preparing
     @State private var document: PDFDocument?
@@ -43,21 +50,24 @@ struct BookReaderView: View {
             .navigationTitle(Text(verbatim: item.title))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if case .ready = phase {
-                    if pageCount > 1 {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                showsGoToPage = true
-                            } label: {
-                                Image(systemName: "arrow.down.to.line")
+                // In the reader, its own bars carry Go to page and Share.
+                if session == nil {
+                    if case .ready = phase {
+                        if pageCount > 1 {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button {
+                                    showsGoToPage = true
+                                } label: {
+                                    Image(systemName: "arrow.down.to.line")
+                                }
+                                .accessibilityLabel(Text("Go to page"))
                             }
-                            .accessibilityLabel(Text("Go to page"))
                         }
-                    }
-                    if let shareURL {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            ShareLink(item: shareURL) { Image(systemName: "square.and.arrow.up") }
-                                .accessibilityLabel(Text("Share"))
+                        if let shareURL {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                ShareLink(item: shareURL) { Image(systemName: "square.and.arrow.up") }
+                                    .accessibilityLabel(Text("Share"))
+                            }
                         }
                     }
                 }
@@ -78,6 +88,16 @@ struct BookReaderView: View {
             }
             .onChange(of: currentPage) { _, page in
                 if case .ready = phase { PDFReadingPosition.save(page: page, itemID: item.id) }
+                session?.currentPage = page
+            }
+            .onChange(of: pageCount) { _, count in
+                session?.pageNumbers = count > 0 ? Array(1...count) : []
+            }
+            // A page the reader's bars asked for.
+            .onChange(of: session?.requestedPage) { _, page in
+                guard let page else { return }
+                requestedPage = page
+                session?.requestedPage = nil
             }
             .task { await prepare() }
     }
@@ -142,9 +162,11 @@ struct BookReaderView: View {
                 pageCount: $pageCount,
                 currentPage: $currentPage
             )
-            .ignoresSafeArea(edges: .bottom)
+            // Alone, the pages run under the home indicator; in the reader
+            // they stop above its floating bar.
+            .ignoresSafeArea(edges: session == nil ? .bottom : [])
 
-            if pageCount > 0 {
+            if pageCount > 0 && session == nil {
                 pageBar
             }
         }
@@ -224,6 +246,7 @@ struct BookReaderView: View {
     private func show(_ opened: PDFDocument, from local: URL) {
         document = opened
         shareURL = local
+        session?.shareURL = local
         phase = .ready(local)
     }
 
