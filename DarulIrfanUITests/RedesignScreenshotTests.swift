@@ -18,14 +18,14 @@ final class RedesignScreenshotTests: XCTestCase {
             "Bayans": "Bayans", "Updates": "Updates", "Events": "Events", "Topics": "Topics",
             "All times and alerts": "All times and alerts", "Done": "Done",
             "Read in App": "Read in App", "Notifications": "Notifications", "Booklets": "Booklets",
-            "Pages": "Pages", "Text": "Text",
+            "Pages": "Pages", "Text": "Text", "Keep reading": "Keep reading",
         ],
         "ur": [
             "Quran": "قرآن", "Hadith": "حدیث", "Books": "کتابیں",
             "Bayans": "بیانات", "Updates": "تازہ معلومات", "Events": "تقریبات", "Topics": "موضوعات",
             "All times and alerts": "تمام اوقات اور الرٹس", "Done": "ہو گیا",
             "Read in App": "ایپ میں پڑھیں", "Notifications": "اطلاعات", "Booklets": "کتابچے",
-            "Pages": "صفحات", "Text": "متن",
+            "Pages": "صفحات", "Text": "متن", "Keep reading": "پڑھنا جاری رکھیں",
         ],
     ]
 
@@ -159,12 +159,16 @@ final class RedesignScreenshotTests: XCTestCase {
         if tap(onScreen(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", label("Booklets"))))) {
             pause(3)
             shot("books-shelf")
-            if tapFirstCard() {
-                pause(3)
-                shot("book-page")
+            tapFirstCard()
+            pause(4)
+            shot("book-page")
+            if !app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", label("Booklets"))).firstMatch.exists {
                 scrollShots("book-page", count: 1)
                 scrollToTop()
-                if tap(button("Read in App")) {
+                let read = onScreen(app.buttons.matching(NSPredicate(
+                    format: "label BEGINSWITH %@ OR label BEGINSWITH %@", label("Read in App"), label("Keep reading")
+                )))
+                if tap(read) {
                     pause(5)
                     shot("book-reader")
                     if tap(button("Text")) {
@@ -243,10 +247,9 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     /// The shelf's first card, by where it sits (the cards are not exposed as
-    /// list cells); true once its page has opened.
-    private func tapFirstCard() -> Bool {
-        app.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.24)).tap()
-        return button("Read in App").waitForExistence(timeout: 8)
+    /// list cells).
+    private func tapFirstCard() {
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.22)).tap()
     }
 
     private func goBack() {
