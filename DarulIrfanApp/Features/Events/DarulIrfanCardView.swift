@@ -138,22 +138,12 @@ struct DarulIrfanCardView: View {
         return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    private var directionsUrl: URL? {
-        guard let latitude = place.latitude, let longitude = place.longitude else { return nil }
-        return URL(string: "https://maps.apple.com/?daddr=\(latitude),\(longitude)")
-    }
+    // The same links as the Events hero card (`DarulIrfanPlace` in
+    // EventsHomeView.swift).
+    private var directionsUrl: URL? { place.directionsURL }
 
-    private var phoneUrl: URL? {
-        guard let phone = place.phone else { return nil }
-        let allowed = Set("+0123456789")
-        let digits = String(phone.filter { allowed.contains($0) })
-        guard !digits.isEmpty else { return nil }
-        return URL(string: "tel:\(digits)")
-    }
+    private var phoneUrl: URL? { place.phoneURL }
 
-    private var emailUrl: URL? {
-        guard let email = place.email else { return nil }
-        return URL(string: "mailto:\(email)")
-    }
+    private var emailUrl: URL? { place.emailURL }
 
 }

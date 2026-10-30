@@ -99,6 +99,8 @@ struct MediaTitleText: View {
     let item: MediaItem
     var latinFont: Font = .headline
     var lineLimit: Int = 2
+    /// The text colour: white on an emerald hero card.
+    var color: Color = DIColor.textPrimary
 
     private var isArabicScript: Bool {
         item.title.unicodeScalars.contains { scalar in
@@ -111,13 +113,13 @@ struct MediaTitleText: View {
         if isArabicScript {
             Text(item.title)
                 .font(DIFont.urduBody())
-                .foregroundStyle(DIColor.textPrimary)
+                .foregroundStyle(color)
                 .lineLimit(lineLimit)
                 .environment(\.layoutDirection, .rightToLeft)
         } else {
             Text(item.title)
                 .font(latinFont)
-                .foregroundStyle(DIColor.textPrimary)
+                .foregroundStyle(color)
                 .lineLimit(lineLimit)
         }
     }
@@ -142,7 +144,8 @@ final class MediaViewModel {
     private(set) var totalItemCount = 0
     private(set) var assetsByMediaItemID: [String: DownloadedAsset] = [:]
 
-    private var hasLoadedOnce = false
+    /// The catalogue has been read once.
+    private(set) var hasLoadedOnce = false
 
     init(
         mediaRepository: any MediaRepositoryProtocol,
@@ -158,6 +161,18 @@ final class MediaViewModel {
 
     var isEmpty: Bool {
         totalItemCount == 0 && resumeEntries.isEmpty
+    }
+
+    /// Reads the catalogue the first time. Afterwards only Continue
+    /// Listening is read again, which changes as bayans are played.
+    func loadIfNeeded() async {
+        guard hasLoadedOnce else {
+            await load()
+            return
+        }
+        if let recent = try? await mediaRepository.recentlyPlayed(limit: 10) {
+            resumeEntries = recent.map { MediaResumeEntry(item: $0.item, progress: $0.progress) }
+        }
     }
 
     func load() async {

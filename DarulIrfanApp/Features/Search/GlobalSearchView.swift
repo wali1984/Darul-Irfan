@@ -176,26 +176,45 @@ struct GlobalSearchView: View {
                     .overlay(alignment: .top) {
                         refreshingBadge
                     }
+            } else if !appMatches.isEmpty {
+                // The app's own screens are known at once.
+                resultsList
             } else {
                 SearchSkeletonView()
             }
         case .results:
             resultsList
         case .empty:
-            brandedState(
-                systemImage: "text.magnifyingglass",
-                titleKey: "No results found",
-                messageKey: viewModel.selectedDomain == nil
-                    ? "Try a different word or a shorter phrase."
-                    : "Try a different word, or switch to All to search every section."
-            )
+            if appMatches.isEmpty {
+                brandedState(
+                    systemImage: "text.magnifyingglass",
+                    titleKey: "No results found",
+                    messageKey: viewModel.selectedDomain == nil
+                        ? "Try a different word or a shorter phrase."
+                        : "Try a different word, or switch to All to search every section."
+                )
+            } else {
+                resultsList
+            }
         case .failed:
-            brandedState(
-                systemImage: "exclamationmark.circle",
-                titleKey: "Search is unavailable right now",
-                messageKey: "Please try again in a moment."
-            )
+            if appMatches.isEmpty {
+                brandedState(
+                    systemImage: "exclamationmark.circle",
+                    titleKey: "Search is unavailable right now",
+                    messageKey: "Please try again in a moment."
+                )
+            } else {
+                resultsList
+            }
         }
+    }
+
+    /// The app's own screens whose names hold the query, listed first as
+    /// "In the app". Only while every section is searched: a chosen section
+    /// narrows the results to it.
+    private var appMatches: [SearchAppDestination] {
+        guard viewModel.selectedDomain == nil else { return [] }
+        return SearchAppDestination.matches(for: viewModel.trimmedQuery)
     }
 
     // MARK: Idle — branded prompt
@@ -305,6 +324,9 @@ struct GlobalSearchView: View {
     private var resultsList: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: DISpacing.lg) {
+                if !appMatches.isEmpty {
+                    appGroup
+                }
                 ForEach(Array(viewModel.groups.enumerated()), id: \.element.id) { groupIndex, group in
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
                         groupHeader(group)
@@ -329,9 +351,34 @@ struct GlobalSearchView: View {
         .scrollDismissesKeyboard(.immediately)
     }
 
+    /// "In the app": the screens whose names match, each opening the screen.
+    private var appGroup: some View {
+        let matches = appMatches
+        return VStack(alignment: .leading, spacing: DISpacing.sm) {
+            sectionHeader(titleKey: "In the app", systemImage: "square.grid.2x2", count: matches.count)
+            ForEach(Array(matches.enumerated()), id: \.element.id) { index, destination in
+                NavigationLink {
+                    SearchAppDestinationScreen(destination: destination, dependencies: dependencies, appState: appState)
+                } label: {
+                    SearchAppDestinationRow(destination: destination)
+                }
+                .buttonStyle(.plain)
+                .diAppear(delay: min(Double(index) * 0.04, 0.3))
+            }
+        }
+    }
+
     private func groupHeader(_ group: SearchResultGroup) -> some View {
+        sectionHeader(
+            titleKey: LocalizedStringKey(group.domain.displayTitle),
+            systemImage: group.domain.iconName,
+            count: group.results.count
+        )
+    }
+
+    private func sectionHeader(titleKey: LocalizedStringKey, systemImage: String, count: Int) -> some View {
         HStack(spacing: DISpacing.sm) {
-            Image(systemName: group.domain.iconName)
+            Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(DIColor.primary)
                 .frame(width: 30, height: 30)
@@ -341,13 +388,13 @@ struct GlobalSearchView: View {
                 )
                 .accessibilityHidden(true)
 
-            Text(LocalizedStringKey(group.domain.displayTitle))
+            Text(titleKey)
                 .font(DIFont.subheading)
                 .foregroundStyle(DIColor.textPrimary)
 
             Spacer(minLength: 0)
 
-            DIPillBadge(text: "\(group.results.count)", color: DIColor.accent)
+            DIPillBadge(text: "\(count)", color: DIColor.accent)
         }
         .padding(.horizontal, DISpacing.xs)
         .accessibilityElement(children: .combine)
