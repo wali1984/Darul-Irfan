@@ -19,6 +19,10 @@ final class LibraryViewModel {
     /// Favorites keyed by content item ID for O(1) star lookups.
     private(set) var favoritesByContentID: [String: Favorite] = [:]
 
+    /// The one item of each category that holds exactly one, so its shelf
+    /// opens the item itself instead of a list of one.
+    private(set) var soleItems: [ContentCategory: ContentItem] = [:]
+
     /// Active filters applied to category item lists ("en"/"ur"/"ar", nil = all).
     var languageFilter: String?
     var typeFilter: ContentType?
@@ -40,6 +44,34 @@ final class LibraryViewModel {
 
     func count(for category: ContentCategory) -> Int {
         categoryCounts[category] ?? 0
+    }
+
+    /// Items on a shelf: the sum of its categories.
+    func count(for shelf: LibraryShelf) -> Int {
+        shelf.categories.reduce(0) { $0 + count(for: $1) }
+    }
+
+    /// The item a shelf opens directly: its categories hold exactly one
+    /// item between them.
+    func soleItem(for categories: [ContentCategory]) -> ContentItem? {
+        let total = categories.reduce(0) { $0 + count(for: $1) }
+        guard total == 1 else { return nil }
+        for category in categories {
+            if let item = soleItems[category] { return item }
+        }
+        return nil
+    }
+
+    /// Where a shelf opens: a shelf of one item opens that item, a shelf of
+    /// one category its list, and a shelf of two the list of both.
+    func target(for shelf: LibraryShelf) -> LibraryShelfTarget {
+        if let item = soleItem(for: shelf.categories) {
+            return .item(id: item.id)
+        }
+        if shelf.categories.count == 1, let only = shelf.categories.first {
+            return .category(only)
+        }
+        return .shelf
     }
 
     /// Categories with no items yet, tucked behind the "More categories"
@@ -72,6 +104,7 @@ final class LibraryViewModel {
             let counts = try await contentRepository.categoryCounts()
             try Task.checkCancellation()
             categoryCounts = counts
+            await loadSoleItems(counts)
             hasLoadedCounts = true
             loadFailed = false
         } catch is CancellationError {
@@ -79,6 +112,23 @@ final class LibraryViewModel {
         } catch {
             loadFailed = true
         }
+    }
+
+    /// Finds the item of each category that holds one: these open directly.
+    private func loadSoleItems(_ counts: [ContentCategory: Int]) async {
+        var found: [ContentCategory: ContentItem] = [:]
+        for (category, count) in counts where count == 1 {
+            let items = (try? await contentRepository.items(
+                category: category,
+                type: nil,
+                language: nil,
+                limit: 2
+            )) ?? []
+            if items.count == 1, let item = items.first {
+                found[category] = item
+            }
+        }
+        soleItems = found
     }
 
     func loadFavorites() async {
@@ -138,7 +188,27 @@ final class LibraryViewModel {
                 return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
             }
         }
-        return fetched.sorted { lhs, rhs in
+        return Self.newestFirst(fetched)
+    }
+
+    /// Items of several categories listed together (the Books shelf
+    /// "Courses and documents"), with the active filters, newest first.
+    func items(in categories: [ContentCategory]) async -> [ContentItem] {
+        if categories.count == 1, let only = categories.first {
+            return await items(in: only)
+        }
+        var all: [ContentItem] = []
+        for category in categories {
+            let found = await items(in: category)
+            all.append(contentsOf: found)
+        }
+        return Self.newestFirst(all)
+    }
+
+    /// Newest first; undated items after the dated ones, by title the way a
+    /// person reads numbers.
+    static func newestFirst(_ items: [ContentItem]) -> [ContentItem] {
+        items.sorted { lhs, rhs in
             if let left = lhs.publishedAt, let right = rhs.publishedAt, left != right {
                 return left > right
             }

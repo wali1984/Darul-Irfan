@@ -1,6 +1,12 @@
 import SwiftUI
 
-/// Hadith section: the bundled collections, opening into a paged reader.
+/// The Hadith reader's page: Continue (the collection opened last, at the
+/// narration it was left on), then the collections in three groups -
+/// Sahihain and Sunan, more collections (folded beyond the first few), and
+/// the Arabic-only works - with search across all of them.
+///
+/// Under Read it is titled "Read", with the Quran | Hadith | Books switch at
+/// the top of the page.
 @MainActor
 struct HadithHomeView: View {
     private let dependencies: AppDependencies
@@ -15,6 +21,12 @@ struct HadithHomeView: View {
     @State private var isSearching = false
     /// Debounces typing so a long corpus scan does not run on every keystroke.
     @State private var searchTask: Task<Void, Never>?
+    /// The groups opened past their first few with "Show all".
+    @State private var expandedGroups: Set<HadithCollectionGroup.Kind> = []
+    /// The collection opened last and the narration it was left on.
+    @State private var resume: HadithResume?
+    @Environment(\.readTabActions) private var readActions
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
@@ -24,10 +36,18 @@ struct HadithHomeView: View {
     /// The content language: "System" on an Urdu phone reads in Urdu.
     private var languageCode: String { appState.settings.language.contentLanguageCode }
 
+    private var hasQuery: Bool {
+        !searchText.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                if !searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+                if let selection = readActions?.selection {
+                    ReadSectionPicker(selection: selection)
+                }
+                ReadFindField(prompt: "Search hadith by word or topic", text: $searchText)
+                if hasQuery {
                     searchSection
                 } else if isLoading {
                     ProgressView()
@@ -40,27 +60,22 @@ struct HadithHomeView: View {
                         messageKey: "They will appear here after the next content update."
                     )
                 } else {
-                    DISectionHeader(titleKey: "Collections", systemImage: "books.vertical.fill")
-                    ForEach(Array(books.enumerated()), id: \.element.id) { index, book in
-                        // Value-based so the Read tab can own this reader's
-                        // navigation history; see HadithTabView.
-                        NavigationLink(value: HadithRoute.collection(book)) {
-                            bookCard(book)
-                        }
-                        .buttonStyle(DIPressableStyle())
-                        .diAppear(delay: 0.04 * Double(index))
+                    if let resume {
+                        continueCard(resume)
+                            .diAppear()
+                    }
+                    ForEach(HadithCollectionGroup.groups(from: books)) { group in
+                        groupSection(group)
                     }
                 }
             }
-            .padding(DISpacing.md)
+            .padding(.horizontal, DISpacing.md)
+            .padding(.top, DISpacing.sm)
+            .padding(.bottom, DISpacing.xl)
             .diResponsiveWidth()
         }
         .diScreenBackground()
-        .diPageHeading("Hadith")
-        .searchable(
-            text: $searchText,
-            prompt: Text("Search hadith by word or topic")
-        )
+        .diPageHeading(readActions == nil ? "Hadith" : "Read")
         .onChange(of: searchText) { _, term in
             searchTask?.cancel()
             let query = term.trimmingCharacters(in: .whitespaces)
@@ -81,7 +96,144 @@ struct HadithHomeView: View {
             }
         }
         .task { await load() }
+        // Back from a collection, the narration it was left on has moved.
+        .onAppear {
+            Task { await refreshResume() }
+        }
     }
+
+    // MARK: - Continue
+
+    /// The collection opened last. Opening it as a collection resumes at the
+    /// narration the reader saved (`HadithReadingPosition`), with no cover.
+    private func continueCard(_ resume: HadithResume) -> some View {
+        NavigationLink(value: HadithRoute.collection(resume.book)) {
+            HStack(spacing: 14) {
+                ReadOrb(systemImage: "book.closed", diameter: 46)
+                VStack(alignment: .leading, spacing: 2) {
+                    ReadCaps("Continue")
+                    Text(verbatim: resume.book.title(languageCode: languageCode))
+                        .font(.headline.weight(.heavy))
+                        .foregroundStyle(DIColor.textPrimary)
+                        .multilineTextAlignment(.leading)
+                    if let number = resume.number {
+                        Text("Hadith \(number)")
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(DIColor.textMuted)
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.forward")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIColor.textMuted)
+                    .accessibilityHidden(true)
+            }
+            .padding(DISpacing.md)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .diGlassPanel(cornerRadius: 26)
+            .contentShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+        }
+        .buttonStyle(DIPressableStyle())
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: - Collections
+
+    private func groupSection(_ group: HadithCollectionGroup) -> some View {
+        let expanded = expandedGroups.contains(group.kind)
+        let shown = group.visibleBooks(expanded: expanded)
+        return VStack(alignment: .leading, spacing: DISpacing.sm) {
+            ReadGroupTitle(titleKey: group.titleKey)
+            VStack(spacing: 0) {
+                ForEach(Array(shown.enumerated()), id: \.element.id) { index, book in
+                    if index > 0 {
+                        ReadRowRule()
+                    }
+                    // Value-based so the Read tab can own this reader's
+                    // navigation history; see HadithTabView.
+                    NavigationLink(value: HadithRoute.collection(book)) {
+                        collectionRow(book, showsNote: group.kind != .arabicOnly)
+                    }
+                    .buttonStyle(.plain)
+                }
+                if group.isFoldable {
+                    ReadRowRule()
+                    Button {
+                        toggle(group.kind)
+                    } label: {
+                        showAllRow(expanded: expanded, count: group.books.count)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(6)
+            .readGlassList(cornerRadius: 24)
+        }
+    }
+
+    private func collectionRow(_ book: HadithBook, showsNote: Bool) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: book.title(languageCode: languageCode))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(DIColor.textPrimary)
+                    .multilineTextAlignment(.leading)
+                Text("\(book.hadithCount) hadith")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(DIColor.textMuted)
+            }
+            Spacer(minLength: DISpacing.sm)
+            if showsNote, let note = translationNote(for: book) {
+                DIPillBadge(text: note, color: ReadPalette.madinahInk)
+            }
+            Image(systemName: "chevron.forward")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIColor.textMuted)
+                .accessibilityHidden(true)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 11)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+    }
+
+    private func showAllRow(expanded: Bool, count: Int) -> some View {
+        HStack(spacing: DISpacing.sm) {
+            if expanded {
+                Text("Show less")
+            } else {
+                Text("Show all \(count)")
+            }
+            Image(systemName: expanded ? "chevron.up" : "chevron.down")
+                .font(.caption.weight(.bold))
+                .accessibilityHidden(true)
+            Spacer(minLength: 0)
+        }
+        .font(.subheadline.weight(.bold))
+        .foregroundStyle(ReadPalette.emeraldInk)
+        .padding(.horizontal, 12)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+    }
+
+    private func toggle(_ kind: HadithCollectionGroup.Kind) {
+        DIHaptics.soft()
+        let change = {
+            if expandedGroups.contains(kind) {
+                expandedGroups.remove(kind)
+            } else {
+                expandedGroups.insert(kind)
+            }
+        }
+        if reduceMotion {
+            change()
+        } else {
+            withAnimation(.easeInOut(duration: 0.25)) { change() }
+        }
+    }
+
+    // MARK: - Search
 
     /// Results across every collection, searched in all three scripts.
     @ViewBuilder
@@ -136,7 +288,7 @@ struct HadithHomeView: View {
                     Spacer(minLength: 0)
                 }
                 // A search can match a script the reader is not currently in, so
-                // the preview shows whatever text exists — but styled for the
+                // the preview shows whatever text exists - but styled for the
                 // language it actually is, never the reader's. English set in
                 // Nastaliq and reversed would misrepresent it as the Urdu.
                 if let preview = entry.availableText(preferring: languageCode) {
@@ -164,44 +316,7 @@ struct HadithHomeView: View {
         }
     }
 
-    private func bookCard(_ book: HadithBook) -> some View {
-        DIElevatedCard(glow: DIColor.accent) {
-            HStack(spacing: DISpacing.md) {
-                ZStack {
-                    Circle().fill(DIGradient.emerald)
-                    Image(systemName: "book.closed.fill")
-                        .font(.headline)
-                        .foregroundStyle(DIColor.onPrimary)
-                }
-                .frame(width: 44, height: 44)
-                .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text(verbatim: book.title(languageCode: languageCode))
-                        .font(DIFont.subheading)
-                        .foregroundStyle(DIColor.textPrimary)
-                        .multilineTextAlignment(.leading)
-                    HStack(spacing: DISpacing.sm) {
-                        Text("\(book.hadithCount) hadith")
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
-                        if let note = translationNote(for: book) {
-                            DIPillBadge(text: note, color: DIColor.accent)
-                        }
-                    }
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.forward")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIColor.textMuted)
-                    .accessibilityHidden(true)
-            }
-        }
-    }
-
-    /// Says on the card when a collection cannot be read in translation, so
+    /// Says on the row when a collection cannot be read in translation, so
     /// nobody opens 30,000 narrations to find each one "has no English
     /// translation".
     private func translationNote(for book: HadithBook) -> String? {
@@ -211,10 +326,128 @@ struct HadithHomeView: View {
         return nil
     }
 
+    // MARK: - Loading
+
     private func load() async {
         // In reading order: the two Sahihs and the Sunan first, the
         // Arabic-only works after them (HadithRepository.collectionOrder).
         books = (try? await dependencies.hadithRepository.books()) ?? []
         isLoading = false
+        await refreshResume()
+    }
+
+    /// The collection opened last (recorded by the Read tab as it opens one)
+    /// and the narration its reader saved.
+    private func refreshResume() async {
+        guard let bookID = HadithLastCollection.load(),
+              let book = books.first(where: { $0.id == bookID }) else {
+            resume = nil
+            return
+        }
+        var number: String?
+        if let canonicalID = HadithReadingPosition.load(bookID: book.id) {
+            let entries = (try? await dependencies.hadithRepository.entries(canonicalIDs: [canonicalID])) ?? []
+            number = entries.first?.displayNumber
+        }
+        resume = HadithResume(book: book, number: number)
+    }
+}
+
+/// The collection the Hadith page offers to continue, and the printed number
+/// of the narration it was left on.
+private struct HadithResume: Equatable {
+    let book: HadithBook
+    let number: String?
+}
+
+// MARK: - Groups
+
+/// The hadith collections in the three groups the Hadith page shows, in the
+/// repository's reading order within each.
+struct HadithCollectionGroup: Identifiable, Equatable {
+    enum Kind: String, Hashable, CaseIterable {
+        /// The two Sahihs and the four Sunan.
+        case sahihainAndSunan
+        /// Every other collection with a translation.
+        case more
+        /// The works with neither English nor Urdu, by the catalogue's flags.
+        case arabicOnly
+    }
+
+    let kind: Kind
+    let books: [HadithBook]
+
+    var id: String { kind.rawValue }
+
+    /// The six collections of the first group, in their canonical order.
+    static let sahihainAndSunanIDs = ["bukhari", "muslim", "abudawud", "tirmidhi", "nasai", "ibnmajah"]
+
+    var titleKey: LocalizedStringKey {
+        switch kind {
+        case .sahihainAndSunan: return "Sahihain and Sunan"
+        case .more: return "More collections"
+        case .arabicOnly: return "Arabic only"
+        }
+    }
+
+    /// How many show before "Show all"; nil shows the whole group.
+    var foldedCount: Int? {
+        switch kind {
+        case .sahihainAndSunan: return nil
+        case .more: return 3
+        case .arabicOnly: return 1
+        }
+    }
+
+    /// True when the group holds more than it shows folded.
+    var isFoldable: Bool {
+        guard let foldedCount else { return false }
+        return books.count > foldedCount
+    }
+
+    func visibleBooks(expanded: Bool) -> [HadithBook] {
+        guard !expanded, let foldedCount, books.count > foldedCount else { return books }
+        return Array(books.prefix(foldedCount))
+    }
+
+    /// The groups for `books`, leaving out any that would be empty.
+    static func groups(from books: [HadithBook]) -> [HadithCollectionGroup] {
+        var six: [HadithBook] = []
+        var more: [HadithBook] = []
+        var arabic: [HadithBook] = []
+        for book in books {
+            if Self.sahihainAndSunanIDs.contains(book.id) {
+                six.append(book)
+            } else if !book.hasEnglish && !book.hasUrdu {
+                arabic.append(book)
+            } else {
+                more.append(book)
+            }
+        }
+        six.sort { lhs, rhs in
+            let order = HadithCollectionGroup.sahihainAndSunanIDs
+            return (order.firstIndex(of: lhs.id) ?? 0) < (order.firstIndex(of: rhs.id) ?? 0)
+        }
+        let all: [(Kind, [HadithBook])] = [(.sahihainAndSunan, six), (.more, more), (.arabicOnly, arabic)]
+        return all.compactMap { kind, list in
+            list.isEmpty ? nil : HadithCollectionGroup(kind: kind, books: list)
+        }
+    }
+}
+
+// MARK: - Last collection
+
+/// The collection opened last, for the Hadith page's Continue. The narration
+/// in it is kept by the reader (`HadithReadingPosition`). Small, and private
+/// to the device.
+enum HadithLastCollection {
+    private static let key = "read.hadith.lastCollection"
+
+    static func save(_ bookID: String) {
+        UserDefaults.standard.set(bookID, forKey: key)
+    }
+
+    static func load() -> String? {
+        UserDefaults.standard.string(forKey: key)
     }
 }

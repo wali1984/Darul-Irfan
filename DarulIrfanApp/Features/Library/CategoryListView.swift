@@ -1,13 +1,26 @@
 import SwiftUI
 
 /// Items within one library category, with language/type filters and
-/// favorite toggles.
+/// favorite toggles. A Books shelf of two categories ("Courses and
+/// documents") lists both together under the shelf's name.
 struct CategoryListView: View {
     let category: ContentCategory
     @Bindable var viewModel: LibraryViewModel
+    /// Further categories listed with this one, under `shelfTitle`.
+    var alsoListing: [ContentCategory] = []
+    /// The shelf's own name when it lists more than one category.
+    var shelfTitle: String? = nil
 
     @State private var items: [ContentItem] = []
     @State private var isLoading = true
+
+    private var categories: [ContentCategory] {
+        [category] + alsoListing
+    }
+
+    private var title: String {
+        shelfTitle ?? category.englishName
+    }
 
     private var hasActiveFilters: Bool {
         viewModel.languageFilter != nil || viewModel.typeFilter != nil
@@ -17,7 +30,8 @@ struct CategoryListView: View {
     private var reloadKey: String {
         let language = viewModel.languageFilter ?? "all"
         let type = viewModel.typeFilter?.rawValue ?? "all"
-        return "\(category.rawValue)|\(language)|\(type)"
+        let listed = categories.map(\.rawValue).joined(separator: ",")
+        return "\(listed)|\(language)|\(type)"
     }
 
     var body: some View {
@@ -45,7 +59,7 @@ struct CategoryListView: View {
             }
         }
         .diScreenBackground()
-        .navigationTitle(LocalizedStringKey(category.englishName))
+        .navigationTitle(LocalizedStringKey(title))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -54,7 +68,7 @@ struct CategoryListView: View {
         }
         .task(id: reloadKey) {
             isLoading = true
-            items = await viewModel.items(in: category)
+            items = await viewModel.items(in: categories)
             isLoading = false
         }
     }
