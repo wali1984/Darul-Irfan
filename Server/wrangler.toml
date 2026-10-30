@@ -24,6 +24,12 @@ PALTALK_GROUP_ID = "463712"
 # muraqabat): the room's admins, moderators and speakers.
 LIVE_CUE_HOSTS = "ameer_imam,ghazi_faiz,siqarian2"
 SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com,wajidmahmood@hotmail.com"
+# Google sign-in (Android): the OAuth client IDs a Google ID token may be
+# issued to (its "aud"), comma-separated - the Web client ID the Android app
+# asks Google for tokens with. Public, not a secret. Until it is set, Google
+# sign-in answers 503 and Sign in with Apple is unaffected. SUPER_ADMIN_EMAILS
+# applies to the Google account's verified email as it does to Apple's.
+# GOOGLE_CLIENT_IDS = "<web-client-id>.apps.googleusercontent.com"
 
 [[d1_databases]]
 binding = "DB"
@@ -46,3 +52,8 @@ enabled = true
 # YOUTUBE_API_KEY, FACEBOOK_PAGE_ACCESS_TOKEN,
 # APNS_KEY_ID, APNS_TEAM_ID, APNS_PRIVATE_KEY,
 # ADMIN_EDITOR_EMAILS, ADMIN_BROADCASTER_EMAILS
+# Android alerts (Firebase Cloud Messaging HTTP v1), from the Firebase
+# project's service account key file (project_id, client_email, private_key;
+# the key may be pasted with the file's literal \n line breaks). Until all
+# three are set, Android phones are skipped and iPhones are sent as before:
+# FCM_PROJECT_ID, FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY
