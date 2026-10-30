@@ -1,10 +1,6 @@
 import type { Env, PushTopic } from "./contracts";
-
-const base64url = (input: ArrayBuffer | string): string => {
-  const bytes = typeof input === "string" ? new TextEncoder().encode(input) : new Uint8Array(input);
-  let binary = ""; bytes.forEach(value => binary += String.fromCharCode(value));
-  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-};
+import { deliverFCM } from "./fcm";
+import { base64url, inParallel } from "./util";
 
 /** Extra APNs headers for an alert that means nothing once its moment has
  *  passed. Posts and group notices send none of these. */
@@ -79,21 +75,33 @@ export async function sendPushToInstallations(
   return deliver(env, eventID, thread, devices, title, body, path, options);
 }
 
-/** Runs `work` over `items`, at most `limit` at a time, keeping their order. */
-async function inParallel<T, R>(items: T[], limit: number, work: (item: T) => Promise<R>): Promise<R[]> {
-  const results = new Array<R>(items.length);
-  let next = 0;
-  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
-    while (next < items.length) {
-      const index = next++;
-      results[index] = await work(items[index]!);
+/** Each phone by its platform: APNs for an iPhone, FCM for an Android phone,
+ *  with the same title, body and deep link. A list of iPhones alone is sent
+ *  exactly as before. A failure of APNs credentials is still thrown, but only
+ *  after the Android phones have been sent to; FCM never throws here (unset,
+ *  its phones are skipped). */
+async function deliver(
+  env: Env, eventID: string, topic: string, devices: Record<string, string>[], title: string, body: string, path: string,
+  options: PushOptions,
+): Promise<number> {
+  if (!devices.length) return 0;
+  const android = devices.filter(device => device.platform === "android");
+  const apple = android.length ? devices.filter(device => device.platform !== "android") : devices;
+  let accepted = 0;
+  let appleFailed = false; let appleError: unknown;
+  if (apple.length) {
+    try { accepted += await deliverAPNs(env, eventID, topic, apple, title, body, path, options); }
+    catch (error) {
+      if (!android.length) throw error;
+      appleFailed = true; appleError = error;
     }
-  });
-  await Promise.all(runners);
-  return results;
+  }
+  if (android.length) accepted += await deliverFCM(env, eventID, topic, android, title, body, path, options);
+  if (appleFailed) throw appleError;
+  return accepted;
 }
 
-async function deliver(
+async function deliverAPNs(
   env: Env, eventID: string, topic: string, devices: Record<string, string>[], title: string, body: string, path: string,
   options: PushOptions,
 ): Promise<number> {

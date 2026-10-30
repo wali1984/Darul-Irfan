@@ -1,4 +1,4 @@
-import type { DeviceRegistration, Env } from "./contracts";
+import type { AndroidDeviceRegistration, DeviceRegistration, Env } from "./contracts";
 import { refreshPaltalkRoom } from "./paltalkRoom";
 import { liveAudioFile, liveCue, listenerConfig } from "./liveRelay";
 import { adminRequest } from "./admin";
@@ -233,7 +233,10 @@ async function cachedJSON(value: unknown, request: Request, maxAge: number): Pro
 }
 
 async function registerDevice(request: Request, env: Env): Promise<Response> {
-  const input = await request.json<DeviceRegistration>();
+  const input = await request.json<DeviceRegistration | AndroidDeviceRegistration>();
+  // An Android phone's alerts go through FCM. An iPhone's body is unchanged.
+  if (input?.platform === "android") return registerAndroidDevice(env, input);
+  if (input?.platform != null && input.platform !== "ios") return json({ error: "Invalid registration" }, { status: 400 });
   if (!input || !isUUID(input.installationID) || !/^[0-9a-f]{64,200}$/i.test(input.apnsToken) || !["sandbox", "production"].includes(input.environment) || !Array.isArray(input.topics) || input.topics.some(topic => typeof topic !== "string")) return json({ error: "Invalid registration" }, { status: 400 });
   const topics = [...new Set(input.topics.filter(topic => allowedTopics.has(topic)))];
   // A registration made for Halqah notices keeps the official topics the
@@ -246,15 +249,44 @@ async function registerDevice(request: Request, env: Env): Promise<Response> {
   await env.DB.prepare("DELETE FROM devices WHERE apns_token=? AND installation_id<>?")
     .bind(input.apnsToken.toLowerCase(), input.installationID).run();
   await env.DB.prepare(`INSERT INTO devices(installation_id,apns_token,locale,timezone,topics_json,environment,app_version,created_at,last_seen_at)
-    VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(installation_id) DO UPDATE SET apns_token=excluded.apns_token,locale=excluded.locale,timezone=excluded.timezone,${keepTopics ? "" : "topics_json=excluded.topics_json,"}environment=excluded.environment,app_version=excluded.app_version,last_seen_at=excluded.last_seen_at`)
+    VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(installation_id) DO UPDATE SET apns_token=excluded.apns_token,locale=excluded.locale,timezone=excluded.timezone,${keepTopics ? "" : "topics_json=excluded.topics_json,"}environment=excluded.environment,app_version=excluded.app_version,last_seen_at=excluded.last_seen_at,platform='ios'`)
     .bind(input.installationID, input.apnsToken.toLowerCase(), cleanText(input.locale, 20) ?? "en", cleanText(input.timeZone, 80) ?? "UTC", JSON.stringify(topics), input.environment, cleanText(input.appVersion, 30) ?? "unknown", now, now).run();
   return json({ ok: true }, { status: 201 });
 }
 
+/** An FCM registration token: URL-safe base64 in parts joined by ':', about
+ *  160 characters. Case matters in it, so it is kept exactly as sent. */
+const FCM_TOKEN = /^[A-Za-z0-9_:.+/=-]{32,4096}$/;
+
+/** POST /v1/devices with "platform":"android": the same registration as an
+ *  iPhone's, with the phone's FCM registration token as `token`. */
+async function registerAndroidDevice(env: Env, input: AndroidDeviceRegistration): Promise<Response> {
+  const token = typeof input.token === "string" ? input.token.trim() : "";
+  const environment = input.environment ?? "production";
+  if (typeof input.installationID !== "string" || !isUUID(input.installationID) || !FCM_TOKEN.test(token)
+    || !["sandbox", "production"].includes(environment) || !Array.isArray(input.topics)
+    || input.topics.some(topic => typeof topic !== "string")) return json({ error: "Invalid registration" }, { status: 400 });
+  const topics = [...new Set(input.topics.filter(topic => allowedTopics.has(topic)))];
+  // As on iOS: a Halqah-only registration keeps the official topics it has.
+  const keepTopics = input.keepTopics === true;
+  const now = new Date().toISOString();
+  // A token now held by another installation (the app reinstalled) moves to this one.
+  await env.DB.prepare("DELETE FROM devices WHERE apns_token=? AND installation_id<>?")
+    .bind(token, input.installationID).run();
+  await env.DB.prepare(`INSERT INTO devices(installation_id,apns_token,locale,timezone,topics_json,environment,app_version,created_at,last_seen_at,platform)
+    VALUES(?,?,?,?,?,?,?,?,?,'android') ON CONFLICT(installation_id) DO UPDATE SET apns_token=excluded.apns_token,locale=excluded.locale,timezone=excluded.timezone,${keepTopics ? "" : "topics_json=excluded.topics_json,"}environment=excluded.environment,app_version=excluded.app_version,last_seen_at=excluded.last_seen_at,platform='android'`)
+    .bind(input.installationID, token, cleanText(input.locale, 20) ?? "en", cleanText(input.timeZone, 80) ?? "UTC", JSON.stringify(topics), environment, cleanText(input.appVersion, 30) ?? "unknown", now, now).run();
+  return json({ ok: true }, { status: 201 });
+}
+
+/** The phone proves it is itself with its push token: an iPhone's APNs token
+ *  in x-apns-token (any case, as before), an Android phone's FCM token in
+ *  x-push-token (exactly; x-apns-token is accepted for it too). */
 async function deleteDevice(request: Request, env: Env, installationID: string): Promise<Response> {
   if (!isUUID(installationID)) return json({ error: "Invalid installation ID" }, { status: 400 });
-  const token = request.headers.get("x-apns-token"); if (!token) return json({ error: "Token confirmation required" }, { status: 401 });
-  await env.DB.prepare("DELETE FROM devices WHERE installation_id=? AND apns_token=?").bind(installationID, token.toLowerCase()).run();
+  const token = request.headers.get("x-push-token") ?? request.headers.get("x-apns-token"); if (!token) return json({ error: "Token confirmation required" }, { status: 401 });
+  await env.DB.prepare("DELETE FROM devices WHERE installation_id=? AND ((platform='android' AND apns_token=?) OR (platform<>'android' AND apns_token=?))")
+    .bind(installationID, token, token.toLowerCase()).run();
   return new Response(null, { status: 204 });
 }
 
