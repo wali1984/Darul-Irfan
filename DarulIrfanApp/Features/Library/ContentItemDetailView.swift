@@ -1,12 +1,24 @@
 import SwiftUI
 
-/// Detail screen for one library item: metadata card, rights-aware native
-/// reader, native image/PDF presentation, downloadable files, and dates.
+/// Detail screen for one library item.
+///
+/// A book or publication - a work read as printed pages or as text, with no
+/// article body - opens as a book page (boards/Book.dc.html): a cover made in
+/// the Silsila's style, the title, author and chips, the gold "Keep reading"
+/// at the page it was left on, the printed pages and the text, keeping it on
+/// this phone, the rights line, and the excerpt and dates.
+///
+/// Everything else - articles, pages, notices, archive records - keeps the
+/// metadata card, rights-aware native reader, native image presentation,
+/// downloadable files, and dates. Both open the app's one reader
+/// (`BookReaderScreen`).
 struct ContentItemDetailView: View {
     private let appState: AppState
     private let dependencies: AppDependencies
     private let libraryViewModel: LibraryViewModel
     @State private var viewModel: ContentItemDetailViewModel
+    /// Where the work was left, for Keep reading.
+    @State private var resume: BookResume?
     @ScaledMetric(relativeTo: .body) private var baseBodySize: CGFloat = 17
 
     init(
@@ -56,10 +68,27 @@ struct ContentItemDetailView: View {
             // starred work showed an empty star.
             await libraryViewModel.loadFavorites()
             await viewModel.load()
+            refreshResume()
+        }
+        // Back from the reader, the page it was left on has moved.
+        .onAppear {
+            refreshResume()
         }
         .onDisappear {
             viewModel.flushReadingProgress()
         }
+    }
+
+    private func refreshResume() {
+        guard let item = viewModel.item else {
+            resume = nil
+            return
+        }
+        resume = BookReadingHistory.resume(
+            itemID: item.id,
+            hasPDF: hasReadablePDF(item),
+            hasText: viewModel.bookPageCount > 0
+        )
     }
 
     // MARK: - Toolbar
@@ -86,29 +115,12 @@ struct ContentItemDetailView: View {
         GeometryReader { outer in
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: DISpacing.md) {
-                        detailHeader(for: item)
-                            .diAppear(delay: 0.03)
-                        if hasReadablePDF(item) {
-                            readInAppButton(for: item).diAppear(delay: 0.06)
-                        }
-                        if viewModel.bookPageCount > 0 {
-                            readTextButton(for: item).diAppear(delay: 0.09)
-                        }
-                        nativeMediaSection(for: item)
-                        if viewModel.showsBody {
-                            readerCard(for: item)
+                    Group {
+                        if isBookPage(item) {
+                            bookPage(for: item)
                         } else {
-                            excerptCard(for: item)
-                            // Only when there is nothing to read here at all:
-                            // a work whose text opens above is not a bare
-                            // archive record.
-                            if !hasReadablePDF(item) && item.mediaUrls.isEmpty && viewModel.bookPageCount == 0 {
-                                nativeAvailabilityCard
-                            }
+                            itemPage(for: item)
                         }
-                        downloadsSection(for: item)
-                        dateSection(for: item)
                     }
                     .padding(DISpacing.md)
                     .background(scrollMetricsReader(viewportHeight: outer.size.height))
@@ -124,6 +136,35 @@ struct ContentItemDetailView: View {
                     await restoreReadingPositionIfNeeded(proxy: proxy)
                 }
             }
+        }
+    }
+
+    /// Metadata, the native reader or the excerpt, files and dates: an
+    /// article, a page, a notice, an archive record.
+    private func itemPage(for item: ContentItem) -> some View {
+        VStack(alignment: .leading, spacing: DISpacing.md) {
+            detailHeader(for: item)
+                .diAppear(delay: 0.03)
+            if hasReadablePDF(item) {
+                readInAppButton(for: item).diAppear(delay: 0.06)
+            }
+            if viewModel.bookPageCount > 0 {
+                readTextButton(for: item).diAppear(delay: 0.09)
+            }
+            nativeMediaSection(for: item)
+            if viewModel.showsBody {
+                readerCard(for: item)
+            } else {
+                excerptCard(for: item)
+                // Only when there is nothing to read here at all:
+                // a work whose text opens above is not a bare
+                // archive record.
+                if !hasReadablePDF(item) && item.mediaUrls.isEmpty && viewModel.bookPageCount == 0 {
+                    nativeAvailabilityCard
+                }
+            }
+            downloadsSection(for: item)
+            dateSection(for: item)
         }
     }
 
@@ -160,7 +201,7 @@ struct ContentItemDetailView: View {
     /// offline), not an external viewer or a bare download.
     private func readInAppButton(for item: ContentItem) -> some View {
         NavigationLink {
-            BookReaderView(item: item, dependencies: dependencies)
+            reader(for: item, mode: .pages)
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
@@ -200,11 +241,7 @@ struct ContentItemDetailView: View {
     /// been proofread.
     private func readTextButton(for item: ContentItem) -> some View {
         NavigationLink {
-            BookTextReaderView(
-                item: item,
-                dependencies: dependencies,
-                fontScale: appState.settings.readerFontScale.rawValue
-            )
+            reader(for: item, mode: .text)
         } label: {
             HStack(spacing: DISpacing.md) {
                 Image(systemName: "text.book.closed")
@@ -247,6 +284,267 @@ struct ContentItemDetailView: View {
         .accessibilityLabel(viewModel.bookTextIsMachineRead
             ? Text("Read the text, \(viewModel.bookPageCount) pages, machine-read and not yet proofread")
             : Text("Read the text, \(viewModel.bookPageCount) pages"))
+    }
+
+    /// The app's one reader, on the printed pages or the text.
+    private func reader(for item: ContentItem, mode: BookReaderMode) -> some View {
+        BookReaderScreen(
+            item: item,
+            dependencies: dependencies,
+            mode: mode,
+            appState: appState,
+            fontScale: appState.settings.readerFontScale.rawValue
+        )
+    }
+
+    // MARK: - Book page
+
+    /// A work read as printed pages or as text, with no article body.
+    private func isBookPage(_ item: ContentItem) -> Bool {
+        !viewModel.showsBody && (hasReadablePDF(item) || viewModel.bookPageCount > 0)
+    }
+
+    private func bookPage(for item: ContentItem) -> some View {
+        VStack(spacing: 18) {
+            BookCoverView(item: item)
+                .diAppear(delay: 0.02)
+            bookTitleBlock(for: item)
+                .diAppear(delay: 0.05)
+            keepReadingButton(for: item)
+                .diAppear(delay: 0.08)
+            readingTiles(for: item)
+                .diAppear(delay: 0.11)
+            nativeMediaSection(for: item)
+            keepOnPhonePanel(for: item)
+            excerptCard(for: item)
+            dateSection(for: item)
+        }
+        .frame(maxWidth: .infinity)
+        .diResponsiveWidth()
+    }
+
+    private func bookTitleBlock(for item: ContentItem) -> some View {
+        VStack(spacing: 6) {
+            Text(verbatim: item.title)
+                .font(.title2.weight(.heavy))
+                .foregroundStyle(DIColor.textPrimary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            if let author = item.author, !author.isEmpty {
+                Text(verbatim: author)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(ReadPalette.goldInk)
+                    .multilineTextAlignment(.center)
+            }
+            HStack(spacing: 6) {
+                bookChip(Text(LocalizedStringKey(item.type.libraryDisplayName)))
+                bookChip(Text(LocalizedStringKey(LibraryLanguage.displayName(forCode: item.language))))
+                if let pages = chipPageCount(for: item) {
+                    bookChip(Text("\(pages) pages"))
+                }
+            }
+            .padding(.top, DISpacing.xs)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func bookChip(_ text: Text) -> some View {
+        text
+            .font(.caption.weight(.bold))
+            .foregroundStyle(ReadPalette.emeraldInk)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(ReadPalette.chipTrack))
+    }
+
+    /// The pages of the text, or of the PDF once it has been opened.
+    private func chipPageCount(for item: ContentItem) -> Int? {
+        if viewModel.bookPageCount > 0 { return viewModel.bookPageCount }
+        return BookReadingHistory.pageCount(itemID: item.id, mode: .pages)
+    }
+
+    /// Gold: back to the page it was left on, or the first reading.
+    private func keepReadingButton(for item: ContentItem) -> some View {
+        let startMode: BookReaderMode = resume?.mode ?? (hasReadablePDF(item) ? .pages : .text)
+        return NavigationLink {
+            reader(for: item, mode: startMode)
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "book")
+                    .font(.headline)
+                    .foregroundStyle(Color(hex: 0xFFE9A8))
+                    .frame(width: 46, height: 46)
+                    .background(Circle().fill(Color(hex: 0x064B34)))
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    if let resume {
+                        Text("Keep reading")
+                            .font(.headline.weight(.heavy))
+                        Group {
+                            if let count = resume.pageCount {
+                                Text("Page \(resume.page) of \(count)")
+                            } else {
+                                Text("Page \(resume.page)")
+                            }
+                        }
+                        .font(.footnote.weight(.semibold))
+                        .opacity(0.8)
+                        if let fraction = resume.fraction {
+                            ReadProgressLight(
+                                fraction: fraction,
+                                height: 4,
+                                track: Color(hex: 0x064B34).opacity(0.18),
+                                colors: [Color(hex: 0x064B34), Color(hex: 0x064B34)],
+                                glows: false
+                            )
+                            .padding(.top, 6)
+                        }
+                    } else {
+                        Text("Read in App")
+                            .font(.headline.weight(.heavy))
+                        Group {
+                            if hasReadablePDF(item) {
+                                Text("Read the pages here — offline after first open")
+                            } else {
+                                Text("\(viewModel.bookPageCount) pages — searchable text")
+                            }
+                        }
+                        .font(.footnote.weight(.semibold))
+                        .opacity(0.8)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .foregroundStyle(Color(hex: 0x064B34))
+            .padding(.vertical, DISpacing.md)
+            .padding(.horizontal, 18)
+            .background(
+                RoundedRectangle(cornerRadius: 26, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(hex: 0xFFE9A8), Color(hex: 0xE0B75F), Color(hex: 0xC99A3A)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .shadow(color: DIColor.goldGlow.opacity(0.45), radius: 14)
+            )
+            .readSheen(cornerRadius: 26, period: 4, strength: 0.5)
+            .contentShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+        }
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
+        .accessibilityElement(children: .combine)
+    }
+
+    /// The printed pages (the PDF) and the text, each opening the reader.
+    private func readingTiles(for item: ContentItem) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            if hasReadablePDF(item) {
+                NavigationLink {
+                    reader(for: item, mode: .pages)
+                } label: {
+                    readingTile(
+                        systemImage: "doc.richtext",
+                        titleKey: "The printed pages",
+                        detail: Text("As published. Offline after the first open.")
+                    )
+                }
+                .buttonStyle(DIPressableStyle())
+                .accessibilityElement(children: .combine)
+            }
+            if viewModel.bookPageCount > 0 {
+                NavigationLink {
+                    reader(for: item, mode: .text)
+                } label: {
+                    readingTile(systemImage: "text.alignleft", titleKey: "The text", detail: textTileDetail)
+                }
+                .buttonStyle(DIPressableStyle())
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(viewModel.bookTextIsMachineRead
+                    ? Text("Read the text, \(viewModel.bookPageCount) pages, machine-read and not yet proofread")
+                    : Text("Read the text, \(viewModel.bookPageCount) pages"))
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// The text's pages and how much of it is still machine-read, as the
+    /// text has always said.
+    private var textTileDetail: Text {
+        if viewModel.machineReadPageCount >= viewModel.bookPageCount {
+            return Text("\(viewModel.bookPageCount) pages — searchable, machine-read, not yet proofread")
+        }
+        if viewModel.machineReadPageCount > 0 {
+            // Mostly re-read from the scan: say how much is not.
+            return Text("\(viewModel.bookPageCount) pages — searchable text; \(viewModel.machineReadPageCount) still machine-read")
+        }
+        return Text("\(viewModel.bookPageCount) pages — searchable text")
+    }
+
+    private func readingTile(systemImage: String, titleKey: LocalizedStringKey, detail: Text) -> some View {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            Image(systemName: systemImage)
+                .font(.title3)
+                .foregroundStyle(ReadPalette.emeraldInk)
+                .accessibilityHidden(true)
+            Text(titleKey)
+                .font(.subheadline.weight(.heavy))
+                .foregroundStyle(DIColor.textPrimary)
+                .multilineTextAlignment(.leading)
+            detail
+                .font(.caption.weight(.medium))
+                .foregroundStyle(DIColor.textMuted)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .diGlassPanel(cornerRadius: 22)
+        .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    /// Keep it on this phone (the PDF downloaded for offline reading, with
+    /// every state a file row has), any further files, and the rights line.
+    @ViewBuilder
+    private func keepOnPhonePanel(for item: ContentItem) -> some View {
+        let primary = item.downloadUrls.first { $0.lowercased().hasSuffix(".pdf") }
+        let others = item.downloadUrls.filter { $0 != primary }
+        let showsRights = item.rightsStatus == .permissionConfirmed
+        if primary != nil || !others.isEmpty || showsRights {
+            VStack(spacing: 0) {
+                if let primary {
+                    BookKeepOfflineRow(urlString: primary, viewModel: viewModel)
+                }
+                ForEach(Array(others.enumerated()), id: \.element) { index, urlString in
+                    if primary != nil || index > 0 {
+                        ReadRowRule()
+                    }
+                    LibraryDownloadRow(urlString: urlString, viewModel: viewModel)
+                        .padding(.horizontal, 12)
+                }
+                if showsRights {
+                    if primary != nil || !others.isEmpty {
+                        ReadRowRule()
+                    }
+                    HStack(spacing: 12) {
+                        Image(systemName: "checkmark.shield")
+                            .font(.title3)
+                            .foregroundStyle(ReadPalette.goldLine)
+                            .accessibilityHidden(true)
+                        Text("Shared with the Silsila's permission")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(DIColor.textPrimary)
+                            .multilineTextAlignment(.leading)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 52)
+                }
+            }
+            .padding(6)
+            .diGlassPanel(cornerRadius: 24)
+        }
     }
 
     // MARK: - Gradient header
@@ -631,6 +929,156 @@ struct LibraryDownloadRow: View {
                 Text("Try Again")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(DIColor.primary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Try downloading again"))
+        }
+    }
+}
+
+// MARK: - Keep it on this phone
+
+/// The book page's "Keep it on this phone": the work's PDF downloaded for
+/// reading offline, with a file row's states - download, live progress with
+/// cancel, open or remove, try again.
+struct BookKeepOfflineRow: View {
+    let urlString: String
+    let viewModel: ContentItemDetailViewModel
+
+    private var fileName: String {
+        LibraryFileName.displayName(from: urlString)
+    }
+
+    private var state: ContentItemDetailViewModel.DownloadRowState {
+        viewModel.downloadStates[urlString] ?? .notDownloaded
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "arrow.down.to.line")
+                .font(.title3)
+                .foregroundStyle(ReadPalette.goldLine)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Keep it on this phone")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(DIColor.textPrimary)
+                subtitle
+            }
+            Spacer(minLength: DISpacing.sm)
+            trailingControls
+        }
+        .padding(.horizontal, 12)
+        .frame(minHeight: 56)
+    }
+
+    @ViewBuilder
+    private var subtitle: some View {
+        switch state {
+        case .notDownloaded:
+            Text("The PDF, for reading offline")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(DIColor.textMuted)
+        case .downloading:
+            Text("Downloading…")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(DIColor.textMuted)
+        case .downloaded(let asset, _):
+            if asset.byteSize > 0 {
+                Text(verbatim: asset.byteSize.formatted(.byteCount(style: .file)))
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(DIColor.textMuted)
+            } else {
+                Text("Downloaded")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(DIColor.textMuted)
+            }
+        case .failed:
+            Text("The download didn't finish. Please try again.")
+                .font(.caption)
+                .foregroundStyle(DIColor.danger)
+        }
+    }
+
+    @ViewBuilder
+    private var trailingControls: some View {
+        switch state {
+        case .notDownloaded:
+            Button {
+                Task {
+                    await viewModel.download(urlString: urlString)
+                }
+            } label: {
+                Text("Download")
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(Color.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 7)
+                    .background(
+                        Capsule().fill(
+                            LinearGradient(
+                                colors: [Color(hex: 0x13A06F), Color(hex: 0x0B7250)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Download file"))
+        case .downloading:
+            TimelineView(.periodic(from: .now, by: 0.5)) { _ in
+                HStack(spacing: DISpacing.sm) {
+                    if let progress = viewModel.progressFraction(for: urlString) {
+                        ProgressView(value: progress)
+                            .progressViewStyle(.linear)
+                            .tint(DIColor.primary)
+                            .frame(width: 72)
+                    } else {
+                        ProgressView()
+                            .tint(DIColor.primary)
+                    }
+                    Button {
+                        viewModel.cancelDownload(urlString: urlString)
+                    } label: {
+                        Image(systemName: "xmark.circle")
+                            .foregroundStyle(DIColor.textMuted)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Cancel download"))
+                }
+            }
+        case .downloaded(_, let localURL):
+            HStack(spacing: DISpacing.md) {
+                NavigationLink {
+                    PDFViewerView(fileURL: localURL, title: fileName)
+                } label: {
+                    Text("Open PDF")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(ReadPalette.emeraldInk)
+                }
+                .buttonStyle(.plain)
+                Button(role: .destructive) {
+                    Task {
+                        await viewModel.deleteDownload(urlString: urlString)
+                    }
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.subheadline)
+                        .foregroundStyle(DIColor.danger)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Remove download"))
+            }
+        case .failed:
+            Button {
+                Task {
+                    await viewModel.download(urlString: urlString)
+                }
+            } label: {
+                Text("Try Again")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(ReadPalette.emeraldInk)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text("Try downloading again"))
