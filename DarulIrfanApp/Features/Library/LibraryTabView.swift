@@ -192,22 +192,18 @@ struct LibraryTabView: View {
 
     /// "Page 12 of 576 · the author", from what is known.
     private func detailLine(_ last: LastBook) -> Text? {
-        var line: Text?
+        var parts: [String] = []
         if let resume = last.resume {
             if let count = resume.pageCount {
-                line = Text("Page \(resume.page) of \(count)")
+                parts.append(String(localized: "Page \(resume.page) of \(count)"))
             } else {
-                line = Text("Page \(resume.page)")
+                parts.append(String(localized: "Page \(resume.page)"))
             }
         }
         if let author = last.item.author, !author.isEmpty {
-            if let page = line {
-                line = page + Text(verbatim: " · \(author)")
-            } else {
-                line = Text(verbatim: author)
-            }
+            parts.append(author)
         }
-        return line
+        return parts.isEmpty ? nil : Text(verbatim: parts.joined(separator: " · "))
     }
 
     private func refreshLastBook() async {

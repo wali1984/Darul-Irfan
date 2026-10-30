@@ -97,7 +97,9 @@ struct HadithHomeView: View {
         }
         .task { await load() }
         // Back from a collection, the narration it was left on has moved.
+        // (The first appearance is covered by load.)
         .onAppear {
+            guard !isLoading else { return }
             Task { await refreshResume() }
         }
     }
@@ -219,7 +221,7 @@ struct HadithHomeView: View {
 
     private func toggle(_ kind: HadithCollectionGroup.Kind) {
         DIHaptics.soft()
-        let change = {
+        let change: () -> Void = {
             if expandedGroups.contains(kind) {
                 expandedGroups.remove(kind)
             } else {

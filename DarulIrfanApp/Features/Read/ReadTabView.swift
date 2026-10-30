@@ -28,10 +28,10 @@ enum ReadSection: String, CaseIterable, Hashable, Identifiable {
 }
 
 /// What the Read tab hands each reader's page: the switch, which sits in the
-/// page under the large title, and the toolbar's Saved and Search.
+/// page under the large title, and the toolbar's Search. (Saved comes in
+/// through `readerSwitch`'s action.)
 struct ReadTabActions {
     var selection: Binding<ReadSection>
-    var openSaved: () -> Void
     var openSearch: () -> Void
 }
 
@@ -119,11 +119,7 @@ struct ReadTabView: View {
         .onChange(of: DeepLinkRouter.shared.requestCount) { _, _ in followRouter() }
         // The collection opened last, for Hadith's Continue: the reader keeps
         // the narration itself (HadithReadingPosition).
-        .onChange(of: hadithPath) { _, path in
-            if let bookID = Self.collectionID(in: path) {
-                HadithLastCollection.save(bookID)
-            }
-        }
+        .background(HadithPathWatcher(path: $hadithPath))
         .onReceive(NotificationCenter.default.publisher(for: .didReceiveAppDeepLink)) { notification in
             if let path = notification.object as? String { open(deepLinkPath: path) }
         }
@@ -179,7 +175,6 @@ struct ReadTabView: View {
     private var actions: ReadTabActions {
         ReadTabActions(
             selection: selectionBinding,
-            openSaved: { sheet = .saved },
             openSearch: { sheet = .search }
         )
     }
@@ -239,15 +234,6 @@ struct ReadTabView: View {
         }
     }
 
-    /// The collection a Hadith path last opened, if it opened one.
-    private static func collectionID(in path: [HadithRoute]) -> String? {
-        for route in path.reversed() {
-            if case .collection(let book) = route { return book.id }
-            if case .hadith(let book, _) = route { return book.id }
-        }
-        return nil
-    }
-
     /// Deep links address a reader directly: none is reachable only through
     /// another, so `…/hadith` never has to travel via the Quran.
     func open(deepLinkPath path: String) {
@@ -257,6 +243,31 @@ struct ReadTabView: View {
         } else if lowered.contains("quran") || lowered.contains("surah") {
             select(.quran)
         }
+    }
+}
+
+/// Notes the collection the Hadith reader opens, for its Continue. A view of
+/// its own, so a push or pop in the Hadith reader redraws only this.
+private struct HadithPathWatcher: View {
+    @Binding var path: [HadithRoute]
+
+    var body: some View {
+        Color.clear
+            .accessibilityHidden(true)
+            .onChange(of: path) { _, newPath in
+                if let bookID = Self.collectionID(in: newPath) {
+                    HadithLastCollection.save(bookID)
+                }
+            }
+    }
+
+    /// The collection a Hadith path last opened, if it opened one.
+    private static func collectionID(in path: [HadithRoute]) -> String? {
+        for route in path.reversed() {
+            if case .collection(let book) = route { return book.id }
+            if case .hadith(let book, _) = route { return book.id }
+        }
+        return nil
     }
 }
 
