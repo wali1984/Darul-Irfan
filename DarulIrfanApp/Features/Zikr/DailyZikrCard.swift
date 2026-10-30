@@ -166,6 +166,7 @@ struct DailyZikrCard: View {
     /// Always shown; greyed until the channel is live with something the app
     /// can play, then gold.
     private var joinButton: some View {
+        let source = self.source
         let available = source != nil
         return Button {
             guard let source else { return }
