@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Appearance settings: theme, app language, and reader text size.
+/// Appearance settings: theme, reader text size and the Urdu lettering.
+/// The app language is the first row of Settings now (and stays on Today).
 @MainActor
 struct AppearanceSettingsView: View {
     private let appState: AppState
@@ -13,7 +14,6 @@ struct AppearanceSettingsView: View {
     var body: some View {
         List {
             themeSection
-            languageSection
             readerScaleSection
             if AppFonts.appleNastaliqName != nil {
                 urduLetteringSection
@@ -49,34 +49,6 @@ struct AppearanceSettingsView: View {
             in: appState,
             get: { $0.theme },
             set: { settings, theme in settings.theme = theme }
-        )
-    }
-
-    // MARK: - Language
-
-    private var languageSection: some View {
-        Section {
-            Picker(selection: languageBinding) {
-                ForEach(AppLanguage.allCases) { language in
-                    Text(LocalizedStringKey(language.displayName)).tag(language)
-                }
-            } label: {
-                Text("App Language")
-                    .foregroundStyle(DIColor.textPrimary)
-            }
-            .listRowBackground(DIColor.surface)
-        } header: {
-            SettingsSectionHeader(titleKey: "Language", systemImage: "globe")
-        } footer: {
-            Text("Urdu applies a right-to-left layout across the app.")
-        }
-    }
-
-    private var languageBinding: Binding<AppLanguage> {
-        SettingsBinding.value(
-            in: appState,
-            get: { $0.language },
-            set: { settings, language in settings.language = language }
         )
     }
 

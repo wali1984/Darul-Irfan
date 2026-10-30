@@ -4,19 +4,39 @@ import SwiftUI
 import UIKit
 import UserNotifications
 
-/// Notification settings: permission status, per-prayer alert styles,
-/// a shared pre-prayer reminder, an alert-sound preview, and in-app
-/// playback of the bundled full azan recordings.
+/// Notifications: one screen for every alert and reminder. Permission
+/// status; the prayer alerts (per-prayer styles, the pre-prayer and iqamah
+/// reminders); the zikr reminders (each session's "10 minutes before" and
+/// Daily Zikr going live, the same settings the Zikr tab uses); Halqah
+/// notifications; the official alerts and their topics; the event reminders
+/// that are set; a test reminder; and the alert sound and full azan.
 @MainActor
 struct NotificationSettingsView: View {
     private let appState: AppState
+    private let dependencies: AppDependencies
     @State private var viewModel: NotificationSettingsViewModel
+    @State private var zikrReminders: ZikrReminderSettingsModel
+    @State private var halqahNotices: HalqahNoticesModel
+    /// Signed in to the private groups on this phone.
+    @State private var isHalqahMember = false
+    @State private var eventsWithReminders: [CommunityEvent] = []
+    @State private var liveAlertsDenied = false
+    @State private var officialAlertsDenied = false
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.locale) private var locale
 
-    init(dependencies: AppDependencies, appState: AppState) {
+    /// `halqahNotices` is the Halqah tab's own switch, so a change made here
+    /// shows on the tab at once; without it the screen uses its own.
+    init(dependencies: AppDependencies, appState: AppState, halqahNotices: HalqahNoticesModel? = nil) {
         self.appState = appState
+        self.dependencies = dependencies
         _viewModel = State(initialValue: NotificationSettingsViewModel(notifications: dependencies.notifications))
+        _zikrReminders = State(initialValue: ZikrReminderSettingsModel(
+            notifications: dependencies.notifications,
+            calculator: dependencies.prayerCalculation
+        ))
+        _halqahNotices = State(initialValue: halqahNotices ?? HalqahNoticesModel())
     }
 
     var body: some View {
@@ -25,6 +45,10 @@ struct NotificationSettingsView: View {
             alertStylesSection
             preReminderSection
             iqamahSection
+            zikrSection
+            halqahSection
+            officialAlertsSection
+            eventRemindersSection
             testReminderSection
             soundSection
         }
@@ -35,15 +59,53 @@ struct NotificationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.refresh()
+            await loadGathered()
         }
         .onChange(of: scenePhase) {
             if scenePhase == .active {
-                Task { await viewModel.refresh() }
+                Task {
+                    await viewModel.refresh()
+                    if isHalqahMember { await halqahNotices.refreshState() }
+                }
             }
         }
         .onDisappear {
             viewModel.stopFullAzan()
         }
+        .alert("Notifications are off", isPresented: $zikrReminders.permissionDenied) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("To receive zikr reminders, please allow notifications for Darul Irfan in iOS Settings.")
+        }
+        .alert("Notifications are off", isPresented: $liveAlertsDenied) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("To be told when Daily Zikr goes live, please allow notifications for Darul Irfan in iOS Settings.")
+        }
+        .alert("Notifications are disabled", isPresented: $officialAlertsDenied) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Allow notifications in iOS Settings to receive official live alerts.")
+        }
+    }
+
+    /// The reminders and notices gathered here from elsewhere, read again
+    /// each time the screen shows (a program's reminder may have been
+    /// cancelled on its page meanwhile).
+    private func loadGathered() async {
+        zikrReminders.load()
+        isHalqahMember = MemberGroupService.hasSavedSession
+        if isHalqahMember {
+            // Registers the phone when the switch is turned on, as the
+            // Halqah page does.
+            if halqahNotices.platform == nil { halqahNotices.platform = dependencies.officialPlatform }
+            await halqahNotices.refreshState()
+        }
+        let events = (try? await dependencies.eventsRepository.events()) ?? []
+        eventsWithReminders = EventReminderList.upcomingWithReminders(in: events)
     }
 
     // MARK: - Permission
@@ -253,6 +315,163 @@ struct NotificationSettingsView: View {
                 settings.prayerNotifications.iqamahGaps = gaps.isEmpty ? nil : gaps
             }
         )
+    }
+
+    // MARK: - Zikr reminders
+
+    /// Each official session's reminder ten minutes before, and Daily Zikr
+    /// going live: the same settings as the Zikr tab's.
+    private var zikrSection: some View {
+        Section {
+            ForEach(zikrReminders.sessions) { session in
+                Toggle(isOn: Binding(
+                    get: { zikrReminders.isOn(session) },
+                    set: { on in Task { await zikrReminders.set(on, for: session) } }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(verbatim: session.displayTitle(urdu: DIBrand.readsUrdu(locale)))
+                            .foregroundStyle(DIColor.textPrimary)
+                        Text("\(ZikrReminders.leadMinutes) minutes before")
+                            .font(.footnote)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
+                }
+                .tint(DIColor.primary)
+                .listRowBackground(DIColor.surface)
+            }
+            Toggle(isOn: Binding(
+                get: { AlertSettingsRules.dailyZikrLiveIsOn(appState.settings) },
+                set: { enabled in
+                    Task {
+                        let done = await OfficialAlertSwitches.setDailyZikrLive(enabled, dependencies: dependencies, appState: appState)
+                        if !done { liveAlertsDenied = true }
+                    }
+                }
+            )) {
+                Text("Notify me when Daily Zikr goes live")
+                    .foregroundStyle(DIColor.textPrimary)
+            }
+            .tint(DIColor.primary)
+            .listRowBackground(DIColor.surface)
+        } header: {
+            SettingsSectionHeader(titleKey: "Zikr reminders", systemImage: "sparkles")
+        }
+    }
+
+    // MARK: - Halqah
+
+    /// The member's Halqah notices on this phone, shown while signed in to
+    /// the private groups. The same switch as on the Halqah tab.
+    @ViewBuilder
+    private var halqahSection: some View {
+        if isHalqahMember {
+            Section {
+                Toggle(isOn: Binding(
+                    get: { halqahNotices.status == .on },
+                    set: { on in Task { await halqahNotices.set(on) } }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Halqah notifications")
+                            .foregroundStyle(DIColor.textPrimary)
+                        Text("Posts, zikr and meetings from your Halqah, on this phone.")
+                            .font(.footnote)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
+                }
+                .tint(DIColor.primary)
+                .disabled(halqahNotices.isChanging)
+                .listRowBackground(DIColor.surface)
+                if halqahNotices.status == .blocked {
+                    Text("Notifications are off for Darul Irfan. Allow them in iOS Settings to receive Halqah notifications.")
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                        .listRowBackground(DIColor.surface)
+                }
+            } header: {
+                SettingsSectionHeader(titleKey: "Halqah", systemImage: "person.3.fill")
+            }
+        }
+    }
+
+    // MARK: - Official alerts
+
+    /// The official live and update alerts and their topics. Daily Zikr
+    /// going live, the live zikr topic, is switched with the zikr reminders
+    /// above.
+    private var officialAlertsSection: some View {
+        Section {
+            Toggle(isOn: Binding(
+                get: { appState.settings.push.isEnabled },
+                set: { enabled in
+                    Task {
+                        let done = await OfficialAlertSwitches.setOfficialAlerts(enabled, dependencies: dependencies, appState: appState)
+                        if !done { officialAlertsDenied = true }
+                    }
+                }
+            )) {
+                Text("Official live and update alerts")
+                    .foregroundStyle(DIColor.textPrimary)
+            }
+            .tint(DIColor.primary)
+            .listRowBackground(DIColor.surface)
+            if appState.settings.push.isEnabled {
+                topicToggle("Broadcasts", topic: .broadcasts)
+                topicToggle("Announcements", topic: .announcements)
+                topicToggle("Events", topic: .events)
+            }
+        } header: {
+            SettingsSectionHeader(titleKey: "Official Alerts", systemImage: "dot.radiowaves.left.and.right")
+        } footer: {
+            Text("When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.")
+        }
+    }
+
+    /// `LocalizedStringKey`, so the topic names come from the catalogue.
+    private func topicToggle(_ title: LocalizedStringKey, topic: PushTopic) -> some View {
+        Toggle(isOn: Binding(
+            get: { appState.settings.push.topics.contains(topic) },
+            set: { enabled in Task { await OfficialAlertSwitches.setTopic(topic, enabled, appState: appState) } }
+        )) {
+            Text(title)
+                .foregroundStyle(DIColor.textPrimary)
+        }
+        .tint(DIColor.primary)
+        .listRowBackground(DIColor.surface)
+    }
+
+    // MARK: - Event reminders
+
+    /// The programs with a reminder set, each opening its page, where the
+    /// reminder is cancelled.
+    @ViewBuilder
+    private var eventRemindersSection: some View {
+        if !eventsWithReminders.isEmpty {
+            Section {
+                ForEach(eventsWithReminders) { event in
+                    NavigationLink {
+                        EventDetailView(event: event, notifications: dependencies.notifications)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(verbatim: eventTitle(event))
+                                .foregroundStyle(DIColor.textPrimary)
+                            if let start = event.startDate {
+                                Text(verbatim: CommunityEvent.dayText(start, .abbreviated))
+                                    .font(.footnote)
+                                    .foregroundStyle(DIColor.textMuted)
+                            }
+                        }
+                    }
+                    .listRowBackground(DIColor.surface)
+                }
+            } header: {
+                SettingsSectionHeader(titleKey: "Event reminders", systemImage: "calendar")
+            }
+        }
+    }
+
+    private func eventTitle(_ event: CommunityEvent) -> String {
+        if DIBrand.readsUrdu(locale), let urdu = event.titleUrdu, !urdu.isEmpty { return urdu }
+        return event.title
     }
 
     // MARK: - Test reminder

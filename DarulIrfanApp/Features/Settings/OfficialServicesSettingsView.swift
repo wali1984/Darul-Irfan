@@ -1,6 +1,11 @@
 import SwiftUI
 import UIKit
 
+/// The former "Official Alerts & Privacy" screen. Settings no longer lists it:
+/// the official alerts and their topics are in Settings > Notifications, and
+/// the Live Activity and diagnostics in Settings > Privacy. Kept for anything
+/// that still links to it; every switch works through `OfficialAlertSwitches`,
+/// as those screens' do.
 @MainActor
 struct OfficialServicesSettingsView: View {
     let dependencies: AppDependencies
@@ -51,21 +56,8 @@ struct OfficialServicesSettingsView: View {
             get: { appState.settings.push.isEnabled },
             set: { enabled in
                 Task {
-                    if enabled {
-                        let granted = await dependencies.notifications.requestPermission()
-                        guard granted else { permissionDenied = true; return }
-                        await appState.updateSettings {
-                            $0.push.isEnabled = true
-                            $0.push.consentVersion = PushPreferences.currentConsentVersion
-                        }
-                        UIApplication.shared.registerForRemoteNotifications()
-                    } else {
-                        await appState.updateSettings {
-                            $0.push.isEnabled = false
-                            $0.push.consentVersion = PushPreferences.currentConsentVersion
-                        }
-                        await dependencies.officialPlatform.unregisterFromPush()
-                    }
+                    let done = await OfficialAlertSwitches.setOfficialAlerts(enabled, dependencies: dependencies, appState: appState)
+                    if !done { permissionDenied = true }
                 }
             }
         )
@@ -75,10 +67,7 @@ struct OfficialServicesSettingsView: View {
         Binding(
             get: { appState.settings.diagnosticsConsent },
             set: { consent in
-                Task {
-                    await appState.updateSettings { $0.diagnosticsConsent = consent }
-                    await dependencies.officialPlatform.setConsent(consent)
-                }
+                Task { await OfficialAlertSwitches.setDiagnostics(consent, dependencies: dependencies, appState: appState) }
             }
         )
     }
@@ -88,7 +77,7 @@ struct OfficialServicesSettingsView: View {
             get: { appState.settings.liveActivitiesEnabled },
             set: { enabled in
                 // updateSettings starts or ends the Live Activity itself.
-                Task { await appState.updateSettings { $0.liveActivitiesEnabled = enabled } }
+                Task { await OfficialAlertSwitches.setLiveActivity(enabled, appState: appState) }
             }
         )
     }
@@ -99,14 +88,7 @@ struct OfficialServicesSettingsView: View {
         Toggle(title, isOn: Binding(
             get: { appState.settings.push.topics.contains(topic) },
             set: { enabled in
-                Task {
-                    await appState.updateSettings { settings in
-                        if enabled { settings.push.topics.insert(topic) }
-                        else { settings.push.topics.remove(topic) }
-                        settings.push.consentVersion = PushPreferences.currentConsentVersion
-                    }
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
+                Task { await OfficialAlertSwitches.setTopic(topic, enabled, appState: appState) }
             }
         ))
     }

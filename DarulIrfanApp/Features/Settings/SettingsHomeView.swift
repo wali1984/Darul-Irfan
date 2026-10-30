@@ -1,146 +1,153 @@
 import SwiftUI
 
-/// Settings root: a branded hub linking to every settings subscreen with a
-/// glance at the current value where helpful. Elevated to match the app's
-/// living design language — a slim brand banner and premium card rows grouped
-/// by intent, each with a gold-rimmed emerald medallion, spring press, a soft
-/// haptic and a staggered appear.
-@MainActor
-struct SettingsHomeView: View {
-    private let dependencies: AppDependencies
-    private let appState: AppState
+/// Every setting, in the order the redesign lists them: Language first, then
+/// Location, Prayer calculation and Notifications (one screen for every
+/// alert and reminder); then Appearance, the Hijri calendar, Content and
+/// storage, Privacy and the licences.
+enum SettingsEntry: String, CaseIterable, Identifiable {
+    case language
+    case location
+    case prayerCalculation
+    case notifications
+    case appearance
+    case hijriCalendar
+    case contentStorage
+    case privacy
+    case licences
 
-    init(dependencies: AppDependencies, appState: AppState) {
-        self.dependencies = dependencies
-        self.appState = appState
+    var id: String { rawValue }
+
+    /// The row's name: an English key the string catalogue translates.
+    var title: String {
+        switch self {
+        case .language: return "Language"
+        case .location: return "Location"
+        case .prayerCalculation: return "Prayer calculation"
+        case .notifications: return "Notifications"
+        case .appearance: return "Appearance"
+        case .hijriCalendar: return "Hijri Calendar"
+        case .contentStorage: return "Content & Storage"
+        case .privacy: return "Privacy"
+        case .licences: return "Licences"
+        }
     }
+
+    var systemImage: String {
+        switch self {
+        case .language: return "globe"
+        case .location: return "location.fill"
+        case .prayerCalculation: return "clock.fill"
+        case .notifications: return "bell.fill"
+        case .appearance: return "circle.lefthalf.filled"
+        case .hijriCalendar: return "moon.stars.fill"
+        case .contentStorage: return "internaldrive.fill"
+        case .privacy: return "lock.shield.fill"
+        case .licences: return "doc.text.fill"
+        }
+    }
+
+    /// Notifications, which gathers every alert, is the gold row.
+    var isGold: Bool { self == .notifications }
+}
+
+/// The one place for settings: the Halqah tab shows this list at its root,
+/// and `SettingsHomeView` on a page of its own. Each row glances at its
+/// current value where that helps.
+@MainActor
+struct SettingsList: View {
+    let dependencies: AppDependencies
+    let appState: AppState
+    /// The Halqah tab's own Halqah notices switch, so a change made in
+    /// Notifications shows on the tab at once. Nil makes Notifications use
+    /// one of its own.
+    var halqahNotices: HalqahNoticesModel? = nil
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: DISpacing.lg) {
-                SettingsBrandBanner(
-                    titleKey: "Darul Irfan",
-                    subtitleKey: "Prayer, display, content and privacy"
-                )
-                .diAppear()
-
-                prayerSection
-                displaySection
-                contentSection
+        HalqahGlassList {
+            ForEach(Array(SettingsEntry.allCases.enumerated()), id: \.element) { index, entry in
+                if index > 0 {
+                    HalqahRowDivider()
+                }
+                row(for: entry)
             }
-            .padding(DISpacing.md)
         }
-        .diScreenBackground()
-        .navigationTitle("Settings")
     }
 
-    // MARK: - Sections
-
-    private var prayerSection: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Prayer Setup", systemImage: "sun.max")
-                .diAppear(delay: 0.05)
-
-            SettingsNavLink(
-                titleKey: "Location",
-                systemImage: "location.fill",
-                value: locationValue,
-                delay: 0.10
-            ) {
+    @ViewBuilder
+    private func row(for entry: SettingsEntry) -> some View {
+        switch entry {
+        case .language:
+            languageRow
+        case .location:
+            SettingsRowLink(entry: entry, value: locationValue) {
                 LocationSettingsView(dependencies: dependencies, appState: appState)
             }
-
-            SettingsNavLink(
-                titleKey: "Calculation",
-                systemImage: "sun.and.horizon.fill",
-                value: Text(LocalizedStringKey(appState.settings.calculation.method.englishName)),
-                delay: 0.16
-            ) {
+        case .prayerCalculation:
+            SettingsRowLink(entry: entry, value: Text(LocalizedStringKey(appState.settings.calculation.method.englishName))) {
                 CalculationSettingsView(appState: appState)
             }
-
-            SettingsNavLink(
-                titleKey: "Notifications",
-                systemImage: "bell.fill",
-                value: Text("\(enabledAlertCount) on"),
-                delay: 0.22
-            ) {
-                NotificationSettingsView(dependencies: dependencies, appState: appState)
+        case .notifications:
+            SettingsRowLink(entry: entry, value: Text("All in one place")) {
+                NotificationSettingsView(dependencies: dependencies, appState: appState, halqahNotices: halqahNotices)
             }
-        }
-    }
-
-    private var displaySection: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Display", systemImage: "paintpalette")
-                .diAppear(delay: 0.28)
-
-            SettingsNavLink(
-                titleKey: "Appearance",
-                systemImage: "paintbrush.fill",
-                value: nil,
-                delay: 0.34
-            ) {
+        case .appearance:
+            SettingsRowLink(entry: entry, value: themeValue) {
                 AppearanceSettingsView(appState: appState)
             }
-
-            SettingsNavLink(
-                titleKey: "Hijri Calendar",
-                systemImage: "moon.stars.fill",
-                value: hijriValue,
-                accent: true,
-                delay: 0.40
-            ) {
+        case .hijriCalendar:
+            SettingsRowLink(entry: entry, value: hijriValue) {
                 HijriSettingsView(dependencies: dependencies, appState: appState)
             }
-        }
-    }
-
-    private var contentSection: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Content & Privacy", systemImage: "hand.raised")
-                .diAppear(delay: 0.46)
-
-            SettingsNavLink(
-                titleKey: "Content & Storage",
-                systemImage: "internaldrive.fill",
-                value: nil,
-                delay: 0.52
-            ) {
+        case .contentStorage:
+            SettingsRowLink(entry: entry, value: nil) {
                 ContentStorageSettingsView(dependencies: dependencies, appState: appState)
             }
-
-            SettingsNavLink(
-                titleKey: "Official Alerts & Privacy",
-                systemImage: "dot.radiowaves.left.and.right",
-                value: Text(appState.settings.push.isEnabled ? "On" : "Off"),
-                delay: 0.55
-            ) {
-                OfficialServicesSettingsView(dependencies: dependencies, appState: appState)
+        case .privacy:
+            // Official Alerts & Privacy and Privacy are one screen now: the
+            // alerts went to Notifications, the Live Activity and the
+            // diagnostics choice stayed with privacy.
+            SettingsRowLink(entry: entry, value: nil) {
+                PrivacySettingsView(appState: appState, dependencies: dependencies)
             }
-
-            SettingsNavLink(
-                titleKey: "Privacy",
-                systemImage: "hand.raised.fill",
-                value: nil,
-                delay: 0.58
-            ) {
-                PrivacySettingsView(appState: appState)
-            }
-
-            // Moved here from About, which no longer carries it. The notices
-            // are not optional: adhan-swift is MIT, the fonts are OFL and the
-            // Fajr azan recording is CC BY 3.0, and each requires its
-            // attribution to ship in the app.
-            SettingsNavLink(
-                titleKey: "Licences",
-                systemImage: "doc.text.fill",
-                value: nil,
-                delay: 0.61
-            ) {
+        case .licences:
+            // The notices are not optional: adhan-swift is MIT, the fonts are
+            // OFL and the Fajr azan recording is CC BY 3.0, and each requires
+            // its attribution to ship in the app.
+            SettingsRowLink(entry: entry, value: nil) {
                 AcknowledgementsView()
             }
         }
+    }
+
+    // MARK: - Language
+
+    /// The app language, first and one tap away: a menu, as on Today. The
+    /// whole app turns to the language chosen at once.
+    private var languageRow: some View {
+        Menu {
+            Picker("Language", selection: languageBinding) {
+                ForEach(AppLanguage.allCases) { language in
+                    Text(LocalizedStringKey(language.displayName)).tag(language)
+                }
+            }
+        } label: {
+            HalqahListRowLabel(
+                titleKey: LocalizedStringKey(SettingsEntry.language.title),
+                systemImage: SettingsEntry.language.systemImage,
+                value: Text(LocalizedStringKey(appState.settings.language.displayName)),
+                chevronSymbol: "chevron.up.chevron.down"
+            )
+        }
+    }
+
+    private var languageBinding: Binding<AppLanguage> {
+        Binding(
+            get: { appState.settings.language },
+            set: { newValue in
+                DIHaptics.light()
+                Task { await appState.updateSettings { $0.language = newValue } }
+            }
+        )
     }
 
     // MARK: - Value summaries
@@ -152,10 +159,12 @@ struct SettingsHomeView: View {
         return Text("Not set")
     }
 
-    private var enabledAlertCount: Int {
-        Prayer.allCases.filter { prayer in
-            appState.settings.prayerNotifications.style(for: prayer) != .off
-        }.count
+    private var themeValue: Text {
+        switch appState.settings.theme {
+        case .system: return Text("System")
+        case .light: return Text("Light")
+        case .dark: return Text("Dark")
+        }
     }
 
     private var hijriValue: Text {
@@ -171,60 +180,47 @@ struct SettingsHomeView: View {
     }
 }
 
-// MARK: - Navigation card row
-
-/// A premium settings row: a gold-rimmed medallion icon, a title, an optional
-/// current-value glance, inside an elevated card with spring press, a soft
-/// haptic, and a staggered appear.
-private struct SettingsNavLink<Destination: View>: View {
-    let titleKey: LocalizedStringKey
-    let systemImage: String
+/// One settings row that opens its screen.
+private struct SettingsRowLink<Destination: View>: View {
+    let entry: SettingsEntry
     let value: Text?
-    /// Uses the gold gradient medallion instead of emerald.
-    var accent: Bool = false
-    var delay: Double = 0
     @ViewBuilder var destination: () -> Destination
 
     var body: some View {
         NavigationLink {
             destination()
         } label: {
-            DIElevatedCard {
-                HStack(spacing: DISpacing.md) {
-                    medallion
-                    Text(titleKey)
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(DIColor.textPrimary)
-                    Spacer(minLength: DISpacing.sm)
-                    if let value {
-                        value
-                            .font(.subheadline)
-                            .foregroundStyle(DIColor.textMuted)
-                            .lineLimit(1)
-                    }
-                    Image(systemName: "chevron.forward")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(DIColor.textMuted)
-                        .accessibilityHidden(true)
-                }
-            }
+            HalqahListRowLabel(
+                titleKey: LocalizedStringKey(entry.title),
+                systemImage: entry.systemImage,
+                value: value,
+                tint: entry.isGold ? .gold : .green
+            )
         }
-        .buttonStyle(DIPressableStyle())
+        .buttonStyle(.plain)
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
-        .diAppear(delay: delay)
+    }
+}
+
+/// The settings on a page of their own, for anything that links to
+/// "Settings"; the Halqah tab shows the same list at its root.
+@MainActor
+struct SettingsHomeView: View {
+    private let dependencies: AppDependencies
+    private let appState: AppState
+
+    init(dependencies: AppDependencies, appState: AppState) {
+        self.dependencies = dependencies
+        self.appState = appState
     }
 
-    private var medallion: some View {
-        ZStack {
-            Circle()
-                .fill(accent ? DIGradient.goldSheen : DIGradient.emerald)
-            Circle()
-                .strokeBorder(DIColor.accent.opacity(0.5), lineWidth: 1)
-            Image(systemName: systemImage)
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(accent ? DIColor.primaryDeep : Color.white)
+    var body: some View {
+        ScrollView {
+            SettingsList(dependencies: dependencies, appState: appState)
+                .padding(DISpacing.md)
+                .diResponsiveWidth()
         }
-        .frame(width: 40, height: 40)
-        .accessibilityHidden(true)
+        .diScreenBackground()
+        .navigationTitle("Settings")
     }
 }

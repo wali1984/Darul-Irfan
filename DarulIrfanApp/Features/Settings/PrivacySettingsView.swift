@@ -1,9 +1,15 @@
 import SwiftUI
 
-/// Privacy summary reflecting the user's current opt-in service choices.
+/// Privacy: the choices that stayed with privacy when "Official Alerts &
+/// Privacy" and "Privacy" became one screen (the next-prayer Live Activity
+/// and sharing diagnostics; the official alerts moved to Notifications),
+/// then a summary reflecting the user's current opt-in service choices.
 @MainActor
 struct PrivacySettingsView: View {
     let appState: AppState
+    /// Tells the platform service the diagnostics choice; Settings passes it.
+    var dependencies: AppDependencies? = nil
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
@@ -12,6 +18,9 @@ struct PrivacySettingsView: View {
                     subtitleKey: "On-device by design"
                 )
                 .diAppear()
+
+                PrivacyChoicesCard(appState: appState, dependencies: dependencies)
+                    .diAppear(delay: 0.03)
 
                 PrivacyCard(
                     systemImage: "location.fill",
@@ -55,6 +64,61 @@ struct PrivacySettingsView: View {
         .diScreenBackground()
         .navigationTitle("Privacy")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - Choices
+
+/// The next-prayer Live Activity, and whether anonymous diagnostics are
+/// shared: the same settings Official Alerts & Privacy held.
+@MainActor
+private struct PrivacyChoicesCard: View {
+    let appState: AppState
+    let dependencies: AppDependencies?
+
+    var body: some View {
+        DIElevatedCard {
+            VStack(alignment: .leading, spacing: DISpacing.md) {
+                Toggle(isOn: Binding(
+                    get: { appState.settings.liveActivitiesEnabled },
+                    set: { enabled in
+                        // Saving the setting starts or ends the Live Activity.
+                        Task { await OfficialAlertSwitches.setLiveActivity(enabled, appState: appState) }
+                    }
+                )) {
+                    Text("Next-prayer Live Activity")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(DIColor.textPrimary)
+                }
+                .tint(DIColor.primary)
+
+                if let dependencies {
+                    Divider()
+                    HStack(spacing: DISpacing.sm) {
+                        Text("Share diagnostics")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(DIColor.textPrimary)
+                        Spacer(minLength: DISpacing.sm)
+                        Picker("Share diagnostics", selection: Binding(
+                            get: { appState.settings.diagnosticsConsent },
+                            set: { consent in
+                                Task { await OfficialAlertSwitches.setDiagnostics(consent, dependencies: dependencies, appState: appState) }
+                            }
+                        )) {
+                            Text("Ask me later").tag(DiagnosticsConsent.notAsked)
+                            Text("Do not share").tag(DiagnosticsConsent.declined)
+                            Text("Share anonymously").tag(DiagnosticsConsent.granted)
+                        }
+                        .pickerStyle(.menu)
+                        .tint(DIColor.primary)
+                    }
+                    Text("Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.")
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
     }
 }
 
