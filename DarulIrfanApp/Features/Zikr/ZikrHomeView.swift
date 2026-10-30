@@ -100,6 +100,10 @@ struct ZikrHomeView: View {
                 ZikrAyahBlock()
                     .diAppear()
 
+                // The Shajra, one tap under the ayah (owner).
+                ZikrShajraLink()
+                    .diAppear(delay: 0.03)
+
                 dailyZikrCard
                     .id(Self.liveAnchor)
                     .diAppear(delay: 0.06)

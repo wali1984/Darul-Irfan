@@ -29053,6 +29053,40 @@
           }
         }
       }
+    },
+    "Chain of Transmission": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chain of Transmission"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شجرہ مبارک"
+          }
+        }
+      }
+    },
+    "Shajra Silsila Naqshbandia Owaisiah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shajra Silsila Naqshbandia Owaisiah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سلسلہ نقشبندیہ اویسیہ"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

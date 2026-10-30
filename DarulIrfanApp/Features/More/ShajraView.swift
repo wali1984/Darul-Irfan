@@ -16,9 +16,9 @@ import SwiftUI
 
 // MARK: - Routing
 
-/// Where the Shajra opens from: the Halqah tab's Shajra row, and the
-/// library's Shajra page wherever that is reached (search, topics, Saved,
-/// a shelf).
+/// Where the Shajra opens from: the Halqah tab's Shajra row, the Zikr tab's
+/// Shajra button, and the library's Shajra page wherever that is reached
+/// (search, topics, Saved, a shelf).
 enum ShajraRoute {
     /// The library's Shajra page (category `.shajra`).
     static let libraryItemID = "page-shajra-silsila-naqshbandia-owaisiah"

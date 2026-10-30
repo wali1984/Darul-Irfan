@@ -43,7 +43,7 @@ struct ContentItemDetailView: View {
 
     var body: some View {
         // The Shajra is drawn in the app's theme now: search, topics and
-        // Saved open it, as the Halqah tab does.
+        // Saved open it, as the Halqah and Zikr tabs do.
         if ShajraRoute.opensShajraView(itemID: viewModel.itemID) {
             ShajraView()
         } else {
