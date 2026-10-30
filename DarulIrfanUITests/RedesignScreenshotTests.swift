@@ -159,7 +159,7 @@ final class RedesignScreenshotTests: XCTestCase {
         if tap(onScreen(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", label("Booklets"))))) {
             pause(3)
             shot("books-shelf")
-            if tap(firstListItem()) {
+            if tapFirstCard() {
                 pause(3)
                 shot("book-page")
                 scrollShots("book-page", count: 1)
@@ -242,14 +242,11 @@ final class RedesignScreenshotTests: XCTestCase {
         return true
     }
 
-    /// The first entry of the list on screen, below the navigation bar.
-    private func firstListItem() -> XCUIElement {
-        let candidates = [
-            app.collectionViews.cells.firstMatch,
-            app.tables.cells.firstMatch,
-            app.scrollViews.firstMatch.buttons.element(boundBy: 0),
-        ]
-        return candidates.first(where: { $0.waitForExistence(timeout: 3) }) ?? candidates[0]
+    /// The shelf's first card, by where it sits (the cards are not exposed as
+    /// list cells); true once its page has opened.
+    private func tapFirstCard() -> Bool {
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.24)).tap()
+        return button("Read in App").waitForExistence(timeout: 8)
     }
 
     private func goBack() {
