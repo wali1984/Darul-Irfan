@@ -20,6 +20,9 @@ final class ZikrHomeViewModel {
     /// Latest official videos, shown as in-app playable "Recent Bayans" so the
     /// section is useful even when no live session is on air.
     private(set) var recentBayans: [OfficialFeedItem] = []
+    /// The channel's recordings of the daily online zikr, newest first,
+    /// listed under the Daily Zikr Join button for anyone who wants to play one.
+    private(set) var recordedZikr: [OfficialFeedItem] = []
     /// The signed-in member's groups where zikr (or a meeting) is live now.
     private(set) var liveGroups: [MemberGroup] = []
     var showPermissionAlert = false
@@ -45,18 +48,25 @@ final class ZikrHomeViewModel {
     func load(forceRefresh: Bool = false) async {
         let bootstrap = await platform.bootstrap(forceRefresh: forceRefresh)
         live = await platform.currentLiveBroadcast(forceRefresh: forceRefresh)
-        // The channel's uploads are mostly the daily zikr streams: skip them,
-        // and read on (three pages at most) until six bayans are found. When
-        // no page loads, the section keeps what it showed.
+        // The channel's uploads are mostly the daily zikr streams: they are
+        // listed as recordings under the Join button, not as bayans, and the
+        // feed is read on (three pages at most) until six bayans are found.
+        // When no page loads, both lists keep what they showed.
         var bayans: [OfficialFeedItem]?
+        var recordings: [OfficialFeedItem] = []
         var cursor: String?
         for _ in 0..<3 {
             guard let page = try? await platform.feed(after: cursor, forceRefresh: forceRefresh) else { break }
-            bayans = (bayans ?? []) + page.items.filter { $0.videoID != nil && !Self.isZikrRecording($0) }
+            let videos = page.items.filter { $0.videoID != nil }
+            bayans = (bayans ?? []) + videos.filter { !Self.isZikrRecording($0) }
+            recordings += videos.filter { Self.isZikrRecording($0) }
             guard (bayans?.count ?? 0) < 6, let next = page.nextCursor else { break }
             cursor = next
         }
-        if let bayans { recentBayans = Array(bayans.prefix(6)) }
+        if let bayans {
+            recentBayans = Array(bayans.prefix(6))
+            recordedZikr = Array(recordings.sorted { $0.publishedAt > $1.publishedAt }.prefix(10))
+        }
         let remote = bootstrap.schedules.map { schedule in
             ZikrSession(
                 id: schedule.id,

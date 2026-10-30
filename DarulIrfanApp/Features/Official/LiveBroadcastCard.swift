@@ -7,8 +7,12 @@ struct LiveBroadcastCard: View {
     /// When given, the card checks the live state every 30 seconds while it is
     /// on screen, so the in-app player appears the moment the stream starts.
     var platform: OfficialPlatformService? = nil
+    /// The channel's recordings of earlier sessions, listed under the Join
+    /// button and folded away until opened (the Zikr tab passes them).
+    var recordings: [OfficialFeedItem] = []
     @State private var presentedVideo: PresentedVideo?
     @State private var latest: LiveBroadcast?
+    @State private var showsRecordings = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.followsLiveState) private var followsLiveState
 
@@ -75,6 +79,9 @@ struct LiveBroadcastCard: View {
                 Text("Updated \(current.updatedAt.formatted(.relative(presentation: .named)))")
                     .font(.caption2).foregroundStyle(fgMuted)
             }
+            if !recordings.isEmpty {
+                recordingsList
+            }
         }
         .padding(DISpacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -88,7 +95,7 @@ struct LiveBroadcastCard: View {
             color: isLive ? DIColor.primaryDeep.opacity(0.4) : Color.black.opacity(0.06),
             radius: isLive ? 18 : 8, x: 0, y: isLive ? 10 : 4
         )
-        .sheet(item: $presentedVideo) { video in YouTubePlayerSheet(videoID: video.id, title: current.title) }
+        .sheet(item: $presentedVideo) { video in YouTubePlayerSheet(videoID: video.id, title: video.title ?? current.title) }
         .onChange(of: broadcast) { latest = nil }
         .onChange(of: current.cue) { old, new in
             // A new latifa or muraqaba while the card is on screen: a chime
@@ -114,6 +121,50 @@ struct LiveBroadcastCard: View {
             let fresh = await platform.currentLiveBroadcast(forceRefresh: true)
             if fresh != current { latest = fresh }
         }
+    }
+
+    /// Earlier sessions to play, folded away until opened. Every recording
+    /// carries the same title, so each is named by when it was streamed.
+    private var recordingsList: some View {
+        DisclosureGroup(isExpanded: $showsRecordings) {
+            VStack(spacing: 0) {
+                ForEach(recordings) { item in
+                    Button {
+                        guard let videoID = item.videoID else { return }
+                        DIHaptics.light()
+                        presentedVideo = PresentedVideo(id: videoID, title: item.title)
+                    } label: {
+                        HStack(spacing: DISpacing.sm) {
+                            Image(systemName: "play.fill")
+                                .font(.caption2)
+                                .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.onPrimary)
+                                .frame(width: 26, height: 26)
+                                .background(Circle().fill(isLive ? AnyShapeStyle(DIGradient.goldSheen) : AnyShapeStyle(DIColor.primary)))
+                                .accessibilityHidden(true)
+                            Text(item.publishedAt, format: .dateTime.weekday(.wide).day().month(.wide))
+                                .font(.subheadline)
+                                .foregroundStyle(fg)
+                            Spacer(minLength: DISpacing.sm)
+                            Text(item.publishedAt, format: .dateTime.hour().minute())
+                                .font(.subheadline.monospacedDigit())
+                                .foregroundStyle(fgMuted)
+                        }
+                        .padding(.vertical, DISpacing.sm)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    if item.id != recordings.last?.id {
+                        Divider().overlay(isLive ? Color.white.opacity(0.2) : DIColor.border)
+                    }
+                }
+            }
+            .padding(.top, DISpacing.xs)
+        } label: {
+            Label("Recorded zikr", systemImage: "play.rectangle.on.rectangle")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(fg)
+        }
+        .tint(fgMuted)
     }
 
     /// The host's current latifa or muraqaba, exactly as written in the room.
@@ -186,7 +237,11 @@ struct LiveBroadcastCard: View {
     }
 }
 
-private struct PresentedVideo: Identifiable { let id: String }
+private struct PresentedVideo: Identifiable {
+    let id: String
+    /// A recording's own title; the live video goes by the broadcast's.
+    var title: String? = nil
+}
 
 private struct FollowsLiveStateKey: EnvironmentKey {
     static let defaultValue = true

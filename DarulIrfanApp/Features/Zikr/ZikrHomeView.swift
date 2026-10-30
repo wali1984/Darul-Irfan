@@ -102,7 +102,8 @@ struct ZikrHomeView: View {
                     .id(Self.liveAnchor)
                 // The screen keeps the live state current itself (the session
                 // cards need it too), so the card does not ask a second time.
-                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer)
+                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer,
+                                  recordings: viewModel.recordedZikr)
                     .diAppear(delay: 0.08)
                 liveAlertToggle
 

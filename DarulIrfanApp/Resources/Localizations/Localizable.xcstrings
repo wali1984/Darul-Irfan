@@ -27421,6 +27421,23 @@
           }
         }
       }
+    },
+    "Recorded zikr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recorded zikr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈ شدہ ذکر"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
