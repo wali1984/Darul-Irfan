@@ -160,7 +160,8 @@ workflows:
     # Screenshots of every redesigned screen in English and Urdu, light and
     # dark, to check against parity-spec/redesign/boards before a release.
     # Started by hand only (Tools/Release/codemagic.py start ios-screens <branch>).
-    # A build started with the variable DI_SCREENSHOTS=books takes only Read's books.
+    # A build started with the variable DI_SCREENSHOTS=books takes only Read's books,
+    # and one with DI_SCREENSHOTS=shajra only the Shajra (Zikr's button, Halqah's row).
     name: iOS screenshots (unsigned, simulator)
     instance_type: mac_mini_m2
     max_build_duration: 60

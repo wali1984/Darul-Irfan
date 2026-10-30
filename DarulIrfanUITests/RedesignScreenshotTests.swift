@@ -7,8 +7,9 @@ import XCTest
 ///
 /// Runs only when the test runner is given DI_SCREENSHOTS=1, as Codemagic's
 /// ios-screens workflow does (TEST_RUNNER_DI_SCREENSHOTS); the ordinary UI
-/// test run skips it. It asserts nothing: a step whose button is missing is
-/// skipped, and whatever is on screen is still kept.
+/// test run skips it. DI_SCREENSHOTS=books takes only Read's books, and
+/// DI_SCREENSHOTS=shajra only the Shajra. It asserts nothing: a step whose
+/// button is missing is skipped, and whatever is on screen is still kept.
 final class RedesignScreenshotTests: XCTestCase {
 
     /// The labels the tour taps, in each language (Localizable.xcstrings).
@@ -19,6 +20,7 @@ final class RedesignScreenshotTests: XCTestCase {
             "All times and alerts": "All times and alerts", "Done": "Done",
             "Read in App": "Read in App", "Notifications": "Notifications", "Booklets": "Booklets",
             "Pages": "Pages", "Text": "Text", "Keep reading": "Keep reading",
+            "Chain of Transmission": "Chain of Transmission", "Shajra": "Shajra",
         ],
         "ur": [
             "Quran": "قرآن", "Hadith": "حدیث", "Books": "کتابیں",
@@ -26,6 +28,7 @@ final class RedesignScreenshotTests: XCTestCase {
             "All times and alerts": "تمام اوقات اور الرٹس", "Done": "ہو گیا",
             "Read in App": "ایپ میں پڑھیں", "Notifications": "اطلاعات", "Booklets": "کتابچے",
             "Pages": "صفحات", "Text": "متن", "Keep reading": "پڑھنا جاری رکھیں",
+            "Chain of Transmission": "شجرہ مبارک", "Shajra": "شجرہ",
         ],
     ]
 
@@ -35,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -80,6 +83,12 @@ final class RedesignScreenshotTests: XCTestCase {
             selectTab(1)
             pause(3)
             booksTour()
+            return
+        }
+
+        // DI_SCREENSHOTS=shajra: the Shajra only.
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "shajra" {
+            shajraTour()
             return
         }
 
@@ -143,6 +152,9 @@ final class RedesignScreenshotTests: XCTestCase {
             scrollShots("notifications", count: 2)
             goBack()
         }
+
+        // The Shajra, from the Zikr tab and from Halqah.
+        shajraTour()
     }
 
     /// Read › Books, a shelf, a book page, and the reader in both modes.
@@ -162,32 +174,74 @@ final class RedesignScreenshotTests: XCTestCase {
             tapFirstCard()
             pause(4)
             shot("book-page")
-            if !app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", label("Booklets"))).firstMatch.exists {
-                scrollShots("book-page", count: 1)
-                scrollToTop()
-                let read = onScreen(app.buttons.matching(NSPredicate(
-                    format: "label BEGINSWITH %@ OR label BEGINSWITH %@", label("Read in App"), label("Keep reading")
-                )))
-                // The gold button, or where it sits when it is not exposed as a button.
-                if !tap(read) {
-                    app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72)).tap()
-                }
-                do {
-                    pause(5)
-                    shot("book-reader")
-                    if tap(button("Text")) {
-                        pause(3)
-                        shot("book-reader-text")
-                    }
-                    goBack()
+            // No check for the shelf here: the book page's back button is
+            // labelled Booklets too.
+            scrollShots("book-page", count: 1)
+            scrollToTop()
+            let read = onScreen(app.buttons.matching(NSPredicate(
+                format: "label BEGINSWITH %@ OR label BEGINSWITH %@", label("Read in App"), label("Keep reading")
+            )))
+            // The gold button, or where it sits when it is not exposed as a button.
+            if !tap(read) {
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72)).tap()
+            }
+            do {
+                pause(5)
+                shot("book-reader")
+                if tap(button("Text")) {
+                    pause(3)
+                    shot("book-reader-text")
                 }
                 goBack()
             }
+            goBack()
             goBack()
         }
         // Leave Read on the Quran, as a fresh install opens it.
         scrollToTop()
         _ = tap(button("Quran"))
+    }
+
+    /// The Shajra: the Zikr tab's button under the ayah, the chain it opens
+    /// (the top and three screens down), then Halqah › Silsila's Shajra
+    /// row, which opens the same page.
+    private func shajraTour() {
+        selectTab(2)
+        pause(4)
+        scrollToTop()
+        let shajraButton = onScreen(app.buttons.matching(NSPredicate(
+            format: "label BEGINSWITH %@", label("Chain of Transmission")
+        )))
+        shot("zikr-shajra-button")
+        if tap(shajraButton) {
+            // The chain takes about three seconds to arrive.
+            pause(4)
+            shot("shajra")
+            scrollShots("shajra", count: 3)
+            goBack()
+        } else {
+            shot("no-shajra-button")
+        }
+
+        selectTab(4)
+        pause(3)
+        scrollToTop()
+        // The row sits under the brand header and My Halqahs: scroll to it.
+        var opened = tap(button("Shajra"))
+        var swipes = 0
+        while !opened && swipes < 4 {
+            app.swipeUp()
+            pause(1)
+            opened = tap(button("Shajra"))
+            swipes += 1
+        }
+        if opened {
+            pause(4)
+            shot("shajra-from-halqah")
+            goBack()
+        } else {
+            shot("no-shajra-row")
+        }
     }
 
     // MARK: - Steps
