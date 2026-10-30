@@ -18,12 +18,14 @@ final class RedesignScreenshotTests: XCTestCase {
             "Bayans": "Bayans", "Updates": "Updates", "Events": "Events", "Topics": "Topics",
             "All times and alerts": "All times and alerts", "Done": "Done",
             "Read in App": "Read in App", "Notifications": "Notifications", "Booklets": "Booklets",
+            "Pages": "Pages", "Text": "Text",
         ],
         "ur": [
             "Quran": "قرآن", "Hadith": "حدیث", "Books": "کتابیں",
             "Bayans": "بیانات", "Updates": "تازہ معلومات", "Events": "تقریبات", "Topics": "موضوعات",
             "All times and alerts": "تمام اوقات اور الرٹس", "Done": "ہو گیا",
             "Read in App": "ایپ میں پڑھیں", "Notifications": "اطلاعات", "Booklets": "کتابچے",
+            "Pages": "صفحات", "Text": "متن",
         ],
     ]
 
@@ -33,7 +35,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "1",
+            ["1", "books"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -73,6 +75,14 @@ final class RedesignScreenshotTests: XCTestCase {
         pause(6)
         closePopup()
 
+        // DI_SCREENSHOTS=books: the Books section, a book page and the reader only.
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "books" {
+            selectTab(1)
+            pause(3)
+            booksTour()
+            return
+        }
+
         // Today, then the Prayer times page it opens.
         selectTab(0)
         shot("today")
@@ -98,32 +108,7 @@ final class RedesignScreenshotTests: XCTestCase {
             scrollShots("read-hadith", count: 1)
             scrollToTop()
         }
-        if tap(button("Books")) {
-            pause(3)
-            shot("read-books")
-            scrollShots("read-books", count: 1)
-            scrollToTop()
-            if tap(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", label("Booklets"))).firstMatch) {
-                pause(3)
-                shot("books-shelf")
-                if tap(firstListItem()) {
-                    pause(3)
-                    shot("book-page")
-                    scrollShots("book-page", count: 1)
-                    scrollToTop()
-                    if tap(button("Read in App")) {
-                        pause(5)
-                        shot("book-reader")
-                        goBack()
-                    }
-                    goBack()
-                }
-                goBack()
-            }
-            // Leave Read on the Quran, as a fresh install opens it.
-            scrollToTop()
-            _ = tap(button("Quran"))
-        }
+        booksTour()
 
         // Zikr.
         selectTab(2)
@@ -158,6 +143,43 @@ final class RedesignScreenshotTests: XCTestCase {
             scrollShots("notifications", count: 2)
             goBack()
         }
+    }
+
+    /// Read › Books, a shelf, a book page, and the reader in both modes.
+    private func booksTour() {
+        scrollToTop()
+        guard tap(button("Books")) else {
+            shot("no-books-switch")
+            return
+        }
+        pause(3)
+        shot("read-books")
+        scrollShots("read-books", count: 2)
+        scrollToTop()
+        if tap(onScreen(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", label("Booklets"))))) {
+            pause(3)
+            shot("books-shelf")
+            if tap(firstListItem()) {
+                pause(3)
+                shot("book-page")
+                scrollShots("book-page", count: 1)
+                scrollToTop()
+                if tap(button("Read in App")) {
+                    pause(5)
+                    shot("book-reader")
+                    if tap(button("Text")) {
+                        pause(3)
+                        shot("book-reader-text")
+                    }
+                    goBack()
+                }
+                goBack()
+            }
+            goBack()
+        }
+        // Leave Read on the Quran, as a fresh install opens it.
+        scrollToTop()
+        _ = tap(button("Quran"))
     }
 
     // MARK: - Steps
@@ -199,7 +221,18 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     private func button(_ key: String) -> XCUIElement {
-        app.buttons[label(key)].firstMatch
+        onScreen(app.buttons.matching(NSPredicate(format: "label == %@", label(key))))
+    }
+
+    /// The first of the matches that can be tapped: Read keeps each reader it
+    /// has opened, hidden, with its own copy of the switch.
+    private func onScreen(_ matches: XCUIElementQuery) -> XCUIElement {
+        _ = matches.firstMatch.waitForExistence(timeout: 6)
+        for index in 0..<matches.count {
+            let element = matches.element(boundBy: index)
+            if element.isHittable { return element }
+        }
+        return matches.firstMatch
     }
 
     /// Taps it if it turns up; false when it never did.
