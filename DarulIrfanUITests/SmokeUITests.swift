@@ -63,9 +63,10 @@ final class SmokeUITests: XCTestCase {
         }
     }
 
-    /// Read must offer both readers as equals: Hadith cannot be buried inside
-    /// the Quran, nor reachable only through it.
-    func testReadTabOffersQuranAndHadithAsEqualDestinations() {
+    /// Read must offer its three readers as equals in one switch: Hadith and
+    /// the books cannot be buried inside the Quran, nor reachable only
+    /// through it.
+    func testReadTabOffersQuranHadithAndBooksAsEqualDestinations() {
         let app = makeApp()
         app.launch()
 
@@ -74,17 +75,23 @@ final class SmokeUITests: XCTestCase {
         readTab.tap()
 
         // Launching with a --uitesting argument clears the remembered reader,
-        // so Read always opens on its two cards here.
-        let quran = app.buttons["read.destination.quran"]
-        let hadith = app.buttons["read.destination.hadith"]
-        XCTAssertTrue(quran.waitForExistence(timeout: 10), "Read must offer Quran")
+        // so Read opens on the Quran, with the switch at the top of its page.
+        let hadith = app.buttons["Hadith"]
+        XCTAssertTrue(app.buttons["Quran"].waitForExistence(timeout: 10), "Read must offer Quran")
         XCTAssertTrue(hadith.waitForExistence(timeout: 10), "Read must offer Hadith")
+        XCTAssertTrue(app.buttons["Books"].waitForExistence(timeout: 10), "Read must offer Books")
+        XCTAssertTrue(app.buttons["read.saved"].waitForExistence(timeout: 10), "Read must offer Saved")
 
-        // Opening one must not hide the other: the switch keeps both reachable.
+        // Choosing one must not hide the others: the switch keeps all three
+        // one tap away.
         hadith.tap()
         XCTAssertTrue(
-            app.navigationBars.buttons["Show both readers"].waitForExistence(timeout: 10),
-            "Entering a reader should keep a way back to both"
+            app.buttons["Quran"].waitForExistence(timeout: 10),
+            "Choosing a reader should keep the Quran one tap away"
+        )
+        XCTAssertTrue(
+            app.buttons["Books"].waitForExistence(timeout: 10),
+            "Choosing a reader should keep the books one tap away"
         )
     }
 
