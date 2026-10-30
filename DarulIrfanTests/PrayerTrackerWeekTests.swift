@@ -172,6 +172,36 @@ final class PrayerTrackerWeekTests: XCTestCase {
         XCTAssertEqual(key(PrayerTrackerCalendar.shownDay(selected: monday, weekOffset: -1, today: today, calendar: utc)), "2026-10-23")
     }
 
+    // MARK: - Reading a week while marking
+
+    /// A week read from the tracker never puts an older mark back over one
+    /// made while the read was in flight, and leaves other weeks alone.
+    func testAWeeksReadKeepsMarksMadeWhileItWasInFlight() {
+        let stored = [
+            PrayerLogEntry(dayKey: "2026-10-27", prayer: .fajr, completion: .prayed, updatedAt: Date(timeIntervalSince1970: 0)),
+            PrayerLogEntry(dayKey: "2026-10-28", prayer: .asr, completion: .qaza, updatedAt: Date(timeIntervalSince1970: 0)),
+        ]
+        // Tuesday's Fajr was marked in congregation during the read.
+        let onScreen: [String: [Prayer: PrayerCompletion]] = [
+            "2026-10-27": [.fajr: .jamaat],
+            "2026-10-20": [.isha: .prayed],
+        ]
+        let merged = PrayerTrackerCalendar.merge(
+            read: stored,
+            keys: ["2026-10-26", "2026-10-27", "2026-10-28"],
+            into: onScreen,
+            changedDuringRead: ["2026-10-27"]
+        )
+        XCTAssertEqual(merged["2026-10-27"], [.fajr: .jamaat], "The newer mark stays")
+        XCTAssertEqual(merged["2026-10-28"], [.asr: .qaza], "Stored marks arrive")
+        XCTAssertEqual(merged["2026-10-26"], [:], "A day with nothing stored has no marks")
+        XCTAssertEqual(merged["2026-10-20"], [.isha: .prayed], "A day outside the read is untouched")
+
+        // Nothing marked meanwhile: the stored marks win everywhere read.
+        let plain = PrayerTrackerCalendar.merge(read: stored, keys: ["2026-10-27"], into: onScreen, changedDuringRead: [])
+        XCTAssertEqual(plain["2026-10-27"], [.fajr: .prayed])
+    }
+
     // MARK: - Saving an earlier day
 
     /// A past day's mark goes through the same repository write as today's,

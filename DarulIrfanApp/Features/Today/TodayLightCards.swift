@@ -94,13 +94,15 @@ struct TodayLightCardBackground: View {
                 .offset(y: -120)
                 Spacer(minLength: 0)
             }
-            // The glow is wider than a small phone's card; the frame keeps
-            // it from widening the surface, and the clip trims it.
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            // The glow and the octagram can be wider than a narrow card
+            // (Slide Over): frames that take the card's size whatever their
+            // content keep them from widening the surface, and the clip
+            // trims them.
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
             TodayTurningOctagram(size: 300, color: TodayPalette.accent, lineWidth: 1.8, period: 120)
                 .opacity(0.16)
                 .offset(x: 120, y: 120)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .bottomTrailing)
         }
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .allowsHitTesting(false)
@@ -189,7 +191,8 @@ struct TodayAyahCard: View {
     let readsUrdu: Bool
     let picture: DailyMediaItem?
     let onShare: (() -> Void)?
-    let onTafsir: () -> Void
+    /// Opens the ayah's Tafsir sheet; nil hides Tafsir.
+    let onTafsir: (() -> Void)?
     let onBayan: ((AyahBayanLink) -> Void)?
 
     var body: some View {
@@ -256,14 +259,17 @@ struct TodayAyahCard: View {
         .buttonStyle(DIPressableStyle())
     }
 
+    @ViewBuilder
     private var tafsirButton: some View {
-        Button {
-            DIHaptics.soft()
-            onTafsir()
-        } label: {
-            TodayPill(titleKey: "Tafsir", kind: .glass)
+        if let onTafsir {
+            Button {
+                DIHaptics.soft()
+                onTafsir()
+            } label: {
+                TodayPill(titleKey: "Tafsir", kind: .glass)
+            }
+            .buttonStyle(DIPressableStyle())
         }
-        .buttonStyle(DIPressableStyle())
     }
 
     @ViewBuilder
@@ -469,12 +475,16 @@ struct TodayZikrCard: View {
     let dhikr: DailyDhikr?
     let onShare: (() -> Void)?
     let dependencies: AppDependencies?
+    /// The ring turns only while the card is the one shown.
+    var isShown = true
 
     var body: some View {
         VStack(spacing: 12) {
             TodayLightCardHeader(titleKey: "Zikr of the Day", onShare: onShare)
             if let dhikr {
-                TodayZikrRing(arabic: dhikr.arabic, count: dhikr.count)
+                TodayZikrRing(arabic: dhikr.arabic, count: dhikr.count, turns: isShown)
+                    // Built afresh when shown or hidden, so it starts or rests.
+                    .id(isShown)
                     .padding(.top, 6)
                 Text(dhikr.transliteration)
                     .font(.title3.weight(.heavy))
@@ -511,6 +521,7 @@ struct TodayZikrCard: View {
 struct TodayZikrRing: View {
     let arabic: String
     let count: Int
+    var turns = true
     @State private var turning = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -552,7 +563,7 @@ struct TodayZikrRing: View {
         }
         .frame(width: 200, height: 200)
         .onAppear {
-            guard !reduceMotion else { return }
+            guard turns, !reduceMotion else { return }
             withAnimation(.linear(duration: 24).repeatForever(autoreverses: false)) {
                 turning = true
             }
@@ -568,13 +579,17 @@ struct TodayNameCard: View {
     let name: NameOfAllah?
     let meaning: String?
     let onShare: (() -> Void)?
+    /// The octagram turns only while the card is the one shown.
+    var isShown = true
 
     var body: some View {
         VStack(spacing: 10) {
             TodayLightCardHeader(titleKey: "Name of the Day", onShare: onShare)
             if let name {
                 ZStack {
-                    TodayTurningOctagram(size: 220, color: TodayPalette.accent, lineWidth: 1.5, period: 60)
+                    TodayTurningOctagram(size: 220, color: TodayPalette.accent, lineWidth: 1.5, period: 60, turns: isShown)
+                        // Built afresh when shown or hidden, so it starts or rests.
+                        .id(isShown)
                         .opacity(0.55)
                     Circle()
                         .stroke(TodayPalette.accent.opacity(0.4), lineWidth: 1)

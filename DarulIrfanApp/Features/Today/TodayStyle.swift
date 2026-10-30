@@ -234,13 +234,15 @@ struct TodayPill: View {
 // MARK: - Ornaments
 
 /// The redesign's octagram outline (two squares, one turned through 45
-/// degrees), turning slowly. Still under Reduce Motion.
+/// degrees), turning slowly. Still under Reduce Motion, and when `turns` is
+/// false (a card kept laid out but out of sight).
 struct TodayTurningOctagram: View {
     let size: CGFloat
     var color: Color = TodayPalette.accent
     var lineWidth: CGFloat = 1
     /// Seconds for one turn.
     var period: Double = 90
+    var turns = true
 
     @State private var turning = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -260,7 +262,7 @@ struct TodayTurningOctagram: View {
         .allowsHitTesting(false)
         .accessibilityHidden(true)
         .onAppear {
-            guard !reduceMotion else { return }
+            guard turns, !reduceMotion else { return }
             withAnimation(.linear(duration: period).repeatForever(autoreverses: false)) {
                 turning = true
             }

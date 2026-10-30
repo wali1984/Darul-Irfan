@@ -373,7 +373,9 @@ struct TodayHeroSurface: View {
             TodayTurningOctagram(size: 250, color: DIColor.goldGlow, lineWidth: 2, period: 90)
                 .opacity(0.15)
                 .offset(x: 80, y: -80)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                // Takes the card's size whatever the octagram's, so it never
+                // widens the surface; the clip trims it.
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topTrailing)
                 .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
         }
         .allowsHitTesting(false)

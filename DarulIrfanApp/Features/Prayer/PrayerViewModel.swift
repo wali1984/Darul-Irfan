@@ -62,7 +62,15 @@ final class PrayerViewModel {
     /// Marks of the days the tracker has shown, by day key. Today's marks
     /// are read from `todayCompletions`, which Today's prayer card changes.
     private(set) var trackerMarks: [String: [Prayer: PrayerCompletion]] = [:]
+    /// Days whose stored marks have been read into `trackerMarks`. A mark is
+    /// only ever cycled from what is stored, never from a day not read yet.
+    private(set) var trackerLoadedKeys: Set<String> = []
+    /// The day `todayCompletions` was read for.
+    private var todayLoadedKey: String?
 
+    /// Counts the marks made on each day, so a read that was in flight when
+    /// a mark was made does not put the older mark back on screen.
+    @ObservationIgnored private var markRevisions: [String: Int] = [:]
     @ObservationIgnored private var rolloverTask: Task<Void, Never>?
 
     // MARK: - Init
@@ -289,16 +297,21 @@ final class PrayerViewModel {
 
     /// Cycles one prayer's mark on any day up to today, and persists it
     /// through the tracker repository as that day's entry, the same write
-    /// today's mark has always made. A day after today is never marked.
+    /// today's mark has always made. A day after today is never marked, and
+    /// a day's stored marks are read first, so a tap can never put "prayed"
+    /// over a congregation or qaza mark that was not on screen yet.
     func cycleCompletion(for prayer: Prayer, on day: Date) async {
         let now = Date()
+        guard PrayerTrackerCalendar.isMarkable(day, today: now, calendar: trackerCalendar) else { return }
+        let todayKey = DayKey.make(from: now)
+        guard await readMarksIfNeeded(forKey: DayKey.make(from: day), todayKey: todayKey) else { return }
         guard let entry = PrayerTrackerCalendar.entry(
             cycling: completion(for: prayer, on: day),
             for: prayer,
             on: day,
             now: now
         ) else { return }
-        let todayKey = DayKey.make(from: now)
+        markRevisions[entry.dayKey, default: 0] += 1
         if entry.dayKey == todayKey {
             todayCompletions[prayer] = entry.completion
         }
@@ -317,14 +330,50 @@ final class PrayerViewModel {
         }
     }
 
-    /// A prayer's mark on any day: today's from `todayCompletions`, an
-    /// earlier day's from the marks the tracker has loaded.
+    /// A prayer's mark on any day: today's from `todayCompletions` once it
+    /// has been read for today, any other day's from the marks the tracker
+    /// has read.
     func completion(for prayer: Prayer, on day: Date) -> PrayerCompletion {
         let key = DayKey.make(from: day)
-        if key == DayKey.make(from: Date()) {
+        if key == DayKey.make(from: Date()), todayLoadedKey == key {
             return completion(for: prayer)
         }
         return trackerMarks[key]?[prayer] ?? .unmarked
+    }
+
+    /// Whether a day's stored marks have been read, so its prayers can be
+    /// marked.
+    func isTrackerDayLoaded(_ day: Date) -> Bool {
+        let key = DayKey.make(from: day)
+        return trackerLoadedKeys.contains(key)
+            || (key == DayKey.make(from: Date()) && todayLoadedKey == key)
+    }
+
+    /// Reads one day's stored marks when they have not been read yet. False
+    /// when they cannot be read, and the day is then left as it is.
+    private func readMarksIfNeeded(forKey key: String, todayKey: String) async -> Bool {
+        if key == todayKey, todayLoadedKey == todayKey { return true }
+        if key != todayKey, trackerLoadedKeys.contains(key) { return true }
+        do {
+            let entries = try await trackerRepository.prayerLog(dayKeys: [key])
+            var marks: [Prayer: PrayerCompletion] = [:]
+            for entry in entries {
+                marks[entry.prayer] = entry.completion
+            }
+            // Another tap may have read the day meanwhile and marked it.
+            if key == todayKey {
+                if todayLoadedKey != todayKey {
+                    todayCompletions = marks
+                    todayLoadedKey = todayKey
+                }
+            } else if !trackerLoadedKeys.contains(key) {
+                trackerMarks[key] = marks
+                trackerLoadedKeys.insert(key)
+            }
+            return true
+        } catch {
+            return false
+        }
     }
 
     /// How many of a day's five prayers are marked prayed, alone or in
@@ -388,32 +437,41 @@ final class PrayerViewModel {
 
     /// Reads the shown week's marks through the tracker repository. Only
     /// this week's days are replaced, so a slower read for another week
-    /// never clears these.
+    /// never clears these, and a day marked while the read was in flight
+    /// keeps its newer mark.
     func reloadTrackerWeek() async {
         let keys = PrayerTrackerCalendar.dayKeys(weekOffset: trackerWeekOffset, today: Date(), calendar: trackerCalendar)
+        let revisionsBefore = markRevisions
         do {
             let entries = try await trackerRepository.prayerLog(dayKeys: keys)
-            var byDay: [String: [Prayer: PrayerCompletion]] = [:]
-            for entry in entries {
-                byDay[entry.dayKey, default: [:]][entry.prayer] = entry.completion
-            }
-            for key in keys {
-                trackerMarks[key] = byDay[key] ?? [:]
-            }
+            let changed = Set(keys.filter { (markRevisions[$0] ?? 0) != (revisionsBefore[$0] ?? 0) })
+            trackerMarks = PrayerTrackerCalendar.merge(
+                read: entries,
+                keys: keys,
+                into: trackerMarks,
+                changedDuringRead: changed
+            )
+            trackerLoadedKeys.formUnion(keys)
         } catch {
             // Keep whatever was shown before; the tracker is non-critical.
+            // Days not read stay unmarkable until a read succeeds.
         }
     }
 
     private func reloadTracker(now: Date) async {
         let dayKey = DayKey.make(from: now)
+        let revisionBefore = markRevisions[dayKey] ?? 0
         do {
             let entries = try await trackerRepository.prayerLog(dayKeys: [dayKey])
             var map: [Prayer: PrayerCompletion] = [:]
             for entry in entries {
                 map[entry.prayer] = entry.completion
             }
-            todayCompletions = map
+            // A mark made while this read was in flight is newer: keep it.
+            if (markRevisions[dayKey] ?? 0) == revisionBefore {
+                todayCompletions = map
+                todayLoadedKey = dayKey
+            }
             streakSummary = try await trackerRepository.streakSummary(
                 endingAt: dayKey,
                 windowDays: 30

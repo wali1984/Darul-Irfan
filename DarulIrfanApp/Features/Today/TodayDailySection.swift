@@ -22,7 +22,6 @@ struct TodayDailySection: View {
     @AppStorage("today.seenPopups") private var seenPopups = ""
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     init(appState: AppState, dependencies: AppDependencies? = nil) {
         self.appState = appState
@@ -98,15 +97,14 @@ struct TodayDailySection: View {
 
     // MARK: - Switch
 
-    /// One switch for the six cards; at the largest text sizes, chips that
-    /// scroll sideways, so no name is cut short.
-    @ViewBuilder
+    /// One switch for the six cards. When its six names do not fit at the
+    /// text size in use, chips that scroll sideways take its place, so no
+    /// name is cut short.
     private var picker: some View {
-        if dynamicTypeSize.isAccessibilitySize {
+        ViewThatFits(in: .horizontal) {
+            DISegmentedControl(items: TodayLightKind.allCases, title: { $0.segmentTitle }, selection: $selection)
             DIChipTabs(items: TodayLightKind.allCases, title: { $0.segmentTitle }, selection: $selection)
                 .padding(.horizontal, -DISpacing.md)
-        } else {
-            DISegmentedControl(items: TodayLightKind.allCases, title: { $0.segmentTitle }, selection: $selection)
         }
     }
 
@@ -145,7 +143,7 @@ struct TodayDailySection: View {
                 readsUrdu: viewModel.readsUrdu,
                 picture: viewModel.picture(for: .ayah),
                 onShare: viewModel.picture(for: .ayah) == nil ? shareAction(viewModel.ayahShare()) : nil,
-                onTafsir: { showsTafsir = true },
+                onTafsir: tafsirAction,
                 onBayan: bayanAction
             )
         case .hadith:
@@ -174,13 +172,15 @@ struct TodayDailySection: View {
             TodayZikrCard(
                 dhikr: viewModel.dhikr,
                 onShare: shareAction(viewModel.dhikrShare()),
-                dependencies: dependencies
+                dependencies: dependencies,
+                isShown: selection == .zikr
             )
         case .name:
             TodayNameCard(
                 name: viewModel.name,
                 meaning: viewModel.nameMeaning(),
-                onShare: shareAction(viewModel.nameShare())
+                onShare: shareAction(viewModel.nameShare()),
+                isShown: selection == .name
             )
         }
     }
@@ -234,6 +234,12 @@ struct TodayDailySection: View {
                 shareItem = ShareImageItem(image: image)
             }
         }
+    }
+
+    /// Opens the ayah's Tafsir sheet, which needs the Qur'an repository.
+    private var tafsirAction: (() -> Void)? {
+        guard dependencies != nil else { return nil }
+        return { showsTafsir = true }
     }
 
     /// Plays the bayan on the day's ayah, when the app has its dependencies.

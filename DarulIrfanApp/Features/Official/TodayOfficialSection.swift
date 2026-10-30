@@ -29,9 +29,9 @@ enum TodayLiveStrip: Equatable {
 }
 
 /// Follows the live state for Today's strip while Today is on screen and
-/// the app is in front: once at once, then every 30 seconds, as the Zikr tab
-/// does. Owned by the Today screen, so the strip can appear the moment a
-/// session goes live even though nothing shows before it.
+/// the app is in front: straight away, then every 30 seconds, as the Zikr
+/// tab does. Owned by the Today screen, so the strip can appear the moment
+/// a session goes live even though nothing shows before it.
 @Observable
 @MainActor
 final class TodayLiveModel {

@@ -22,9 +22,10 @@ struct PrayerWeekTrackerCard: View {
             header(days: days)
             dayStrip(days: days, shown: shown)
             dayHeader(shown)
+            // A new identity for each day, so its prayers rise in afresh.
             dayPrayers(shown)
-                .id(DayKey.make(from: shown))
                 .diAppear()
+                .id(DayKey.make(from: shown))
             legend
             historyLink
         }
@@ -173,10 +174,11 @@ struct PrayerWeekTrackerCard: View {
     // MARK: - The chosen day
 
     private func dayHeader(_ day: Date) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: DISpacing.sm) {
+        let dayAndMonth = day.formatted(Date.FormatStyle().day().month(.wide).locale(locale))
+        return HStack(alignment: .firstTextBaseline, spacing: DISpacing.sm) {
             Group {
                 if viewModel.isTrackerToday(day) {
-                    Text("Today, \(day.formatted(Date.FormatStyle().day().month(.wide).locale(locale)))")
+                    Text("Today, \(dayAndMonth)")
                 } else {
                     Text(day, format: .dateTime.weekday(.wide).day().month(.wide))
                 }
@@ -193,7 +195,8 @@ struct PrayerWeekTrackerCard: View {
     }
 
     private func dayPrayers(_ day: Date) -> some View {
-        let markable = viewModel.isTrackerDayMarkable(day)
+        // Up to today, and only once the day's stored marks have been read.
+        let markable = viewModel.isTrackerDayMarkable(day) && viewModel.isTrackerDayLoaded(day)
         let layout = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(spacing: 6))
             : AnyLayout(HStackLayout(alignment: .top, spacing: 6))

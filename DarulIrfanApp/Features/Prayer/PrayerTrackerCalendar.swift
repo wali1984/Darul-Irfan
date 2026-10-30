@@ -95,6 +95,27 @@ enum PrayerTrackerCalendar {
         return week.last ?? calendar.startOfDay(for: today)
     }
 
+    /// Marks just read from the tracker for `keys`, merged into the marks
+    /// on screen. A day marked while the read was in flight keeps its newer
+    /// marks, which are already being saved; every other day takes what is
+    /// stored, and a day with nothing stored has no marks.
+    static func merge(
+        read entries: [PrayerLogEntry],
+        keys: [String],
+        into current: [String: [Prayer: PrayerCompletion]],
+        changedDuringRead: Set<String>
+    ) -> [String: [Prayer: PrayerCompletion]] {
+        var byDay: [String: [Prayer: PrayerCompletion]] = [:]
+        for entry in entries {
+            byDay[entry.dayKey, default: [:]][entry.prayer] = entry.completion
+        }
+        var merged = current
+        for key in keys where !changedDuringRead.contains(key) {
+            merged[key] = byDay[key] ?? [:]
+        }
+        return merged
+    }
+
     /// The tracker entry that moves `prayer` on `day` from `current` to its
     /// next mark, keyed by that day, or nil when `day` is after today
     /// (`now`) and cannot be marked yet.
