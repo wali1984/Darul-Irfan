@@ -2,7 +2,10 @@ import SwiftUI
 
 /// Native presentation of the verified illustrated Method of Zikr entry. The
 /// repository may refresh its source metadata remotely, but the user remains
-/// inside Darul Irfan for text and images.
+/// inside Darul Irfan for text and images. Opened from the Zikr tab's Method
+/// of Zikr tile, it opens with the order's method in brief (the paragraphs
+/// that used to stand on the Zikr tab), then the verified text and the
+/// illustrations.
 struct NativeMethodOfZikrView: View {
     let repository: any ContentRepositoryProtocol
     @State private var item: ContentItem?
@@ -15,49 +18,29 @@ struct NativeMethodOfZikrView: View {
                     ProgressView("Preparing illustrated method…")
                         .frame(maxWidth: .infinity)
                         .padding(DISpacing.xl)
-                } else if let item {
-                    Text(verbatim: item.title)
-                        .font(DIFont.heading)
-                        .foregroundStyle(DIColor.textPrimary)
-
-                    if let text = item.bodyPlainText, !text.isEmpty {
-                        DICard(padding: DISpacing.lg) {
-                            Text(verbatim: text)
-                                .font(.body)
-                                .foregroundStyle(DIColor.textPrimary)
-                                .lineSpacing(5)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-
-                    ForEach(item.mediaUrls.compactMap { nativeURL($0) }, id: \.absoluteString) { url in
-                        DICard(padding: DISpacing.sm) {
-                            AsyncImage(url: url) { phase in
-                                switch phase {
-                                case .success(let image): image.resizable().scaledToFit()
-                                case .failure:
-                                    DIEmptyState(
-                                        systemImage: "photo",
-                                        titleKey: "Illustration unavailable",
-                                        messageKey: "It will be restored automatically after a verified content refresh."
-                                    )
-                                default:
-                                    ProgressView().frame(maxWidth: .infinity, minHeight: 220)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                            .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-                        }
-                    }
                 } else {
-                    DIEmptyState(
-                        systemImage: "book.pages",
-                        titleKey: "Method of Zikr is being prepared",
-                        messageKey: "The verified native guide will appear after the next content refresh."
-                    )
+                    if let item {
+                        Text(verbatim: item.title)
+                            .font(DIFont.heading)
+                            .foregroundStyle(DIColor.textPrimary)
+                    }
+
+                    MethodOfZikrIntro()
+                        .diAppear()
+
+                    if let item {
+                        methodText(item)
+                    } else {
+                        DIEmptyState(
+                            systemImage: "book.pages",
+                            titleKey: "Method of Zikr is being prepared",
+                            messageKey: "The verified native guide will appear after the next content refresh."
+                        )
+                    }
                 }
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .navigationTitle("Method of Zikr")
         .navigationBarTitleDisplayMode(.inline)
@@ -77,9 +60,76 @@ struct NativeMethodOfZikrView: View {
         }
     }
 
+    /// The verified text, then each illustration.
+    @ViewBuilder
+    private func methodText(_ item: ContentItem) -> some View {
+        if let text = item.bodyPlainText, !text.isEmpty {
+            Text(verbatim: text)
+                .font(.body)
+                .foregroundStyle(DIColor.textPrimary)
+                .lineSpacing(5)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(DISpacing.lg)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .diGlassPanel(cornerRadius: 24)
+        }
+
+        ForEach(item.mediaUrls.compactMap { nativeURL($0) }, id: \.absoluteString) { url in
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image): image.resizable().scaledToFit()
+                case .failure:
+                    DIEmptyState(
+                        systemImage: "photo",
+                        titleKey: "Illustration unavailable",
+                        messageKey: "It will be restored automatically after a verified content refresh."
+                    )
+                default:
+                    ProgressView().frame(maxWidth: .infinity, minHeight: 220)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
+            .padding(DISpacing.sm)
+            .diGlassPanel(cornerRadius: 24)
+        }
+    }
+
     private static let itemID = "page-method-of-zikr"
 
     private func nativeURL(_ raw: String) -> URL? {
         URL(string: raw) ?? URL(string: raw.replacingOccurrences(of: " ", with: "%20"))
+    }
+}
+
+/// The order's method in brief: Zikr-e Khafi Qalbi with Pas Anfas, and the
+/// Owaisiah transmission. Verified description only (Docs/RESEARCH_NOTES.md);
+/// the full illustrated instructions follow from the verified content.
+private struct MethodOfZikrIntro: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            HStack(spacing: DISpacing.sm) {
+                Image(systemName: "heart.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(DIColor.primary)
+                    .accessibilityHidden(true)
+                Text("Zikr-e Khafi Qalbi")
+                    .font(DIFont.subheading)
+                    .foregroundStyle(DIColor.textPrimary)
+            }
+            DIJaliDivider(height: 14, opacity: 0.4)
+                .padding(.vertical, DISpacing.xs)
+            Text("The method of zikr in the Naqshbandia Owaisiah order is Zikr-e Khafi Qalbi, practised with Pas Anfas — \"guarding every breath\".")
+                .font(.body)
+                .foregroundStyle(DIColor.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("A distinguishing feature of this order is spiritual bai'at directly at the hands of the holy Prophet ﷺ — the Owaisiah transmission.")
+                .font(.body)
+                .foregroundStyle(DIColor.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(DISpacing.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .diGlassPanel(cornerRadius: 24)
     }
 }
