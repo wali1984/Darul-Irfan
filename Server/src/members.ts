@@ -1,6 +1,7 @@
 import { halqahRole, type HalqahRole } from "./community";
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from "jose";
 import type { Env } from "./contracts";
+import { googleClientIDs, verifyGoogleIDToken, type GoogleIdentity } from "./google";
 import { cleanText, json, sha256, validHTTPURL } from "./util";
 
 /** Private regional groups. Members sign in with Apple, admins publish, members
@@ -56,19 +57,32 @@ export async function appleSubject(
   }
 }
 
-/** Exchanges an Apple identity token for one of our bearer tokens.
+/** POST /v1/members/session: Sign in with Apple's body as always, or
+ *  {"provider":"google","idToken":...} from Android. */
+interface SessionInput {
+  provider?: unknown;
+  identityToken?: string;
+  displayName?: string;
+  idToken?: unknown;
+  name?: unknown;
+}
+
+/** Exchanges an Apple identity token - or, with "provider":"google", a Google
+ * ID token - for one of our bearer tokens.
  *
  * Signing in creates the member but grants no access on its own: a new member
  * belongs to no group until an admin adds them, so an uninvited sign-in sees
  * nothing at all. */
 export async function createSession(request: Request, env: Env, resolveKey?: JWTVerifyGetKey): Promise<Response> {
-  const input = await request.json<{ identityToken?: string; displayName?: string }>();
+  const input = await request.json<SessionInput>();
+  const provider = input?.provider == null || input.provider === "" ? "apple" : String(input.provider).trim().toLowerCase();
+  if (provider === "google") return createGoogleSession(env, input);
+  if (provider !== "apple") return json({ error: "Unknown sign-in provider" }, { status: 400 });
   const verified = await appleSubject(String(input?.identityToken ?? ""), env, resolveKey);
   if (!verified) return json({ error: "Apple identity could not be verified" }, { status: 401 });
 
   const now = new Date();
   const nowISO = now.toISOString();
-  const expires = new Date(now.getTime() + SESSION_DAYS * 86_400_000).toISOString();
   const subjectHash = await sha256(`member:${verified.subject}`);
   const memberID = subjectHash.slice(0, 32);
 
@@ -89,11 +103,82 @@ export async function createSession(request: Request, env: Env, resolveKey?: JWT
   // Groups an admin added this email to before the person signed in.
   if (verified.email) await claimEmailGrants(env, id, verified.email);
 
+  return startSession(env, id, now);
+}
+
+/** A new bearer token for the member - the one answer both sign-ins give:
+ *  {token, expiresAt, memberID}, 201. */
+async function startSession(env: Env, memberID: string, now: Date): Promise<Response> {
+  const nowISO = now.toISOString();
+  const expires = new Date(now.getTime() + SESSION_DAYS * 86_400_000).toISOString();
   const token = hexOf(crypto.getRandomValues(new Uint8Array(32)));
   await env.DB.prepare("INSERT INTO member_sessions(token_hash,member_id,created_at,expires_at,last_seen_at) VALUES(?,?,?,?,?)")
-    .bind(await sha256(token), id, nowISO, expires, nowISO).run();
+    .bind(await sha256(token), memberID, nowISO, expires, nowISO).run();
 
-  return json({ token, expiresAt: expires, memberID: id }, { status: 201 });
+  return json({ token, expiresAt: expires, memberID }, { status: 201 });
+}
+
+/** Google sign-in (Android). The member is the one this Google account signed
+ *  in as before; failing that, the member its verified email already belongs
+ *  to (someone who signed in with Apple, now on Android too); failing that, a
+ *  new member - who, as with Apple, belongs to no group until admitted. */
+async function createGoogleSession(env: Env, input: SessionInput): Promise<Response> {
+  if (!googleClientIDs(env).length) {
+    return json({ error: "Google sign-in is not configured on this server" }, { status: 503 });
+  }
+  const result = await verifyGoogleIDToken(typeof input.idToken === "string" ? input.idToken.trim() : "", env);
+  if (!result.ok) {
+    if (result.reason === "unavailable") return json({ error: "Google sign-in is unavailable right now. Try again shortly." }, { status: 503 });
+    if (result.reason === "unverified") return json({ error: "The Google account's email address is not verified" }, { status: 401 });
+    return json({ error: "Google identity could not be verified" }, { status: 401 });
+  }
+  const identity = result.identity;
+  const now = new Date();
+  const name = cleanText(input.name, 80) ?? cleanText(input.displayName, 80) ?? cleanText(identity.name, 80) ?? null;
+  const memberID = await googleMember(env, identity, name, now.toISOString());
+  // Groups an admin added this email to before the person signed in.
+  await claimEmailGrants(env, memberID, identity.email);
+  return startSession(env, memberID, now);
+}
+
+/** The member a verified Google identity signs in as, linked or made here. A
+ *  name is only ever given where none is known: one the member chose is kept. */
+async function googleMember(env: Env, identity: GoogleIdentity, name: string | null, nowISO: string): Promise<string> {
+  const bySubject = () => env.DB.prepare("SELECT id FROM members WHERE google_subject=?").bind(identity.subject).first<{ id: string }>();
+  const known = await bySubject();
+  if (known) {
+    // A member known only through Google has the Google account's email, as
+    // it is now; a member who also signs in with Apple keeps Apple's.
+    await env.DB.prepare(`UPDATE members SET last_seen_at=?,
+        email=CASE WHEN email IS NULL OR apple_subject LIKE 'google:%' THEN ? ELSE email END,
+        google_email=?, display_name=COALESCE(display_name,?) WHERE id=?`)
+      .bind(nowISO, identity.email, identity.email, name, known.id).run();
+    return known.id;
+  }
+
+  // The same verified email as a member who has no Google account yet: the
+  // same person, so the accounts are linked rather than doubled.
+  const byEmail = await env.DB.prepare(`SELECT id FROM members WHERE lower(email)=? AND google_subject IS NULL
+    ORDER BY created_at, id LIMIT 1`).bind(identity.email).first<{ id: string }>();
+  if (byEmail) {
+    try {
+      const linked = await env.DB.prepare(`UPDATE members SET google_subject=?,google_email=?,last_seen_at=?,
+          display_name=COALESCE(display_name,?) WHERE id=? AND google_subject IS NULL`)
+        .bind(identity.subject, identity.email, nowISO, name, byEmail.id).run();
+      if ((linked.meta?.changes ?? 0) > 0) return byEmail.id;
+    } catch {
+      // Another sign-in of this Google account linked it first; read below.
+    }
+  }
+
+  // Someone new. Like an invite member, they carry an identity of ours in
+  // apple_subject, which keeps it unique and non-null.
+  const subject = `google:${identity.subject}`;
+  const memberID = (await sha256(`member:${subject}`)).slice(0, 32);
+  await env.DB.prepare(`INSERT OR IGNORE INTO members(id,apple_subject,google_subject,google_email,display_name,email,created_at,last_seen_at)
+    VALUES(?,?,?,?,?,?,?,?)`)
+    .bind(memberID, subject, identity.subject, identity.email, name, identity.email, nowISO, nowISO).run();
+  return (await bySubject())?.id ?? memberID;
 }
 
 /** Resolves the bearer token to a member, or null. Only the hash is compared,

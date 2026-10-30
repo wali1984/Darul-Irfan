@@ -51,6 +51,27 @@ export const parseJSON = <T>(value: string | null, fallback: T): T => {
 export const isUUID = (value: string): boolean =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 
+/** Base64url without padding, as a JWT's three parts are written. */
+export const base64url = (input: ArrayBuffer | Uint8Array | string): string => {
+  const bytes = typeof input === "string" ? new TextEncoder().encode(input) : input instanceof Uint8Array ? input : new Uint8Array(input);
+  let binary = ""; bytes.forEach(value => binary += String.fromCharCode(value));
+  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+};
+
+/** Runs `work` over `items`, at most `limit` at a time, keeping their order. */
+export async function inParallel<T, R>(items: T[], limit: number, work: (item: T) => Promise<R>): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let next = 0;
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await work(items[index]!);
+    }
+  });
+  await Promise.all(runners);
+  return results;
+}
+
 export async function sha256(value: string): Promise<string> {
   const data = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest("SHA-256", data);

@@ -81,6 +81,8 @@ export interface AppBootstrap {
   contentVersions: Record<string, number>;
 }
 
+/** POST /v1/devices from an iPhone - the body the iOS app has always sent.
+ *  The phone's alerts go through APNs (devices.platform 'ios'). */
 export interface DeviceRegistration {
   installationID: string;
   apnsToken: string;
@@ -92,6 +94,24 @@ export interface DeviceRegistration {
   /** Registers the phone for its member's Halqah notices only: an existing
    *  registration keeps the official topics it has. */
   keepTopics?: boolean;
+  /** Absent, or "ios". "android" is AndroidDeviceRegistration. */
+  platform?: "ios";
+}
+
+/** POST /v1/devices from an Android phone, whose alerts go through Firebase
+ *  Cloud Messaging (devices.platform 'android'): `token` is its FCM
+ *  registration token, kept exactly as sent. FCM has no sandbox, so
+ *  `environment` may be left out. */
+export interface AndroidDeviceRegistration {
+  platform: "android";
+  installationID: string;
+  token: string;
+  locale?: string;
+  timeZone?: string;
+  topics: PushTopic[];
+  appVersion?: string;
+  keepTopics?: boolean;
+  environment?: "sandbox" | "production";
 }
 
 export interface Env {
@@ -151,6 +171,18 @@ export interface Env {
   WHATSAPP_PHONE_NUMBER_ID?: string;
   /** Approved template (one body parameter) for alerts outside 24 hours. */
   ALERT_WHATSAPP_TEMPLATE?: string;
+  /** Firebase Cloud Messaging for Android alerts (HTTP v1): the Firebase
+   *  project id and its service account's client email. Until all three FCM
+   *  values are set, Android phones are skipped and iPhones are sent as before. */
+  FCM_PROJECT_ID?: string;
+  FCM_CLIENT_EMAIL?: string;
+  /** The service account's PKCS#8 PEM private key, as in its JSON key file;
+   *  the file's literal "\n" line breaks are accepted. */
+  FCM_PRIVATE_KEY?: string;
+  /** Google sign-in: the OAuth client ids a Google ID token may be issued to
+   *  (its `aud`), comma-separated - the Web client id the Android app asks
+   *  Google for tokens with. Unset, a Google sign-in answers 503. */
+  GOOGLE_CLIENT_IDS?: string;
 }
 
 /** A private regional group as its members see it. The catalogue of groups is

@@ -20,6 +20,13 @@ missing. Rotate social tokens immediately when an administrator
 loses Page/channel access. Rotate the APNs key according to the organization’s
 credential policy and after any suspected exposure.
 
+Android alerts need `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL` and `FCM_PRIVATE_KEY`,
+taken from the Firebase project's service-account key; until all three are
+set, Android phones are skipped and iPhones are unaffected. Google sign-in
+needs the `GOOGLE_CLIENT_IDS` variable (the Web client ID from the same
+project), kept in `wrangler.toml` `[vars]` so a deploy does not drop it. Rotate
+the service-account key like the APNs key. `Server/README.md` lists the steps.
+
 ## Publishing workflow
 
 1. Sign in through Cloudflare Access.
@@ -40,7 +47,9 @@ live editor prevents the YouTube poller from replacing an urgent staff update.
 Alert on Worker exceptions, five consecutive cron failures, YouTube quota or
 authentication errors, Facebook authorization errors, APNs 403 responses,
 and a live record older than fifteen minutes while marked live. APNs 410
-responses automatically remove invalid tokens.
+responses automatically remove invalid tokens, as FCM `UNREGISTERED` answers
+do for Android; other FCM failures are recorded in the `fcm` row of
+`source_health` (`/admin/api/health`) without touching any device.
 
 During an outage the app shows its last-known-good feed/live state with an
 updated timestamp. Prayer calculations, local alerts, Quran, downloaded
@@ -54,11 +63,17 @@ organization’s access and retention policy.
 
 ## Release checklist
 
-- Apply all D1 migrations in staging and production.
+- Back up D1, then apply all D1 migrations in staging and production
+  **before** deploying the Worker (from 0015 on, the code writes
+  `devices.platform`, so deploying first breaks device registration for
+  iPhones too).
 - Run `npm ci && npm run check && npm test` in `Server/`.
 - Verify `/health`, `/v1/bootstrap`, `/v1/feed`, and `/v1/live` with no auth.
 - Verify `/admin` is inaccessible without Cloudflare Access.
 - Test one APNs sandbox registration, opt-out deletion, and deduplicated push.
+- Test one Android FCM registration, opt-out deletion and a Halqah notice, and
+  one Google sign-in on Android (the debug build needs its own Firebase app
+  entry with the debug key's SHA-1).
 - Verify YouTube foreground playback, Paltalk handoff, and owned-stream
   background playback independently.
 - Record credential owners and expiry/review dates outside the repository.
