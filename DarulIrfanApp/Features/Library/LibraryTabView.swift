@@ -1,28 +1,48 @@
 import SwiftUI
 
-/// Library tab root: a living emerald hero, featured Silsila/Sheikh pages, a
-/// grouped browser of elevated category cards, favorites, and navigation into
-/// category lists, item details, and PDFs.
+/// The Silsila's library, which is the Read tab's Books: the work read last
+/// (with the Silsila's seal), the Silsila's publications, and its Qur'an
+/// translation and tafsir volumes, as tiles. A shelf opens its list - with
+/// the language and type filters - or, holding one item, that item.
+///
+/// The library's About pages and Teachings went to Halqah, and its news
+/// (announcements, press releases) to Discover › Updates. Favourites are in
+/// Read › Saved, and library search is the toolbar's Search.
+@MainActor
 struct LibraryTabView: View {
     private let dependencies: AppDependencies
     private let appState: AppState
+    private let readerSelection: Binding<ReadSection>?
+    private let onShowAllReaders: (() -> Void)?
     @State private var viewModel: LibraryViewModel
     @State private var isShowingSearch = false
-    @State private var isMoreExpanded = false
+    /// The work read last, for Keep reading.
+    @State private var lastBook: LastBook?
 
-    init(dependencies: AppDependencies, appState: AppState) {
+    init(
+        dependencies: AppDependencies,
+        appState: AppState,
+        readerSelection: Binding<ReadSection>? = nil,
+        onShowAllReaders: (() -> Void)? = nil
+    ) {
         self.dependencies = dependencies
         self.appState = appState
+        self.readerSelection = readerSelection
+        self.onShowAllReaders = onShowAllReaders
         _viewModel = State(initialValue: LibraryViewModel(contentRepository: dependencies.contentRepository))
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: DISpacing.lg) {
-                    libraryHero
-                        .diAppear()
-                    featuredSection
+                VStack(alignment: .leading, spacing: DISpacing.md) {
+                    if let readerSelection {
+                        ReadSectionPicker(selection: readerSelection)
+                    }
+                    if let lastBook {
+                        keepReadingCard(lastBook)
+                            .diAppear()
+                    }
                     if viewModel.loadFailed {
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
                             Text("The library could not be refreshed. Your saved items are still available.")
@@ -33,9 +53,9 @@ struct LibraryTabView: View {
                         }
                     }
                     if viewModel.hasLoadedCounts {
-                        if viewModel.totalItemCount > 0 {
-                            categorySections
-                            moreCategoriesSection
+                        if hasShelves {
+                            shelfSection("The Silsila's publications", shelves: LibraryShelf.publications)
+                            shelfSection("Qur'an translation and tafsir", shelves: LibraryShelf.quranVolumes)
                         } else {
                             DIEmptyState(
                                 systemImage: "books.vertical",
@@ -49,29 +69,52 @@ struct LibraryTabView: View {
                         loadingSection
                     }
                 }
-                .padding(DISpacing.md)
+                .padding(.horizontal, DISpacing.md)
+                .padding(.top, DISpacing.sm)
+                .padding(.bottom, DISpacing.xl)
                 .diResponsiveWidth()
             }
             .diScreenBackground()
-            .diPageHeading("Library")
+            .diPageHeading(readerSelection == nil ? "Library" : "Read")
             .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button {
-                        DIHaptics.light()
-                        isShowingSearch = true
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                    }
-                    .accessibilityLabel(Text("Search"))
+                // Under Read, the reader's toolbar has Saved and Search.
+                if readerSelection == nil {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Button {
+                            DIHaptics.light()
+                            isShowingSearch = true
+                        } label: {
+                            Image(systemName: "magnifyingglass")
+                        }
+                        .accessibilityLabel(Text("Search"))
 
-                    NavigationLink(value: LibraryRoute.favorites) {
-                        Image(systemName: "heart")
+                        NavigationLink(value: LibraryRoute.favorites) {
+                            Image(systemName: "heart")
+                        }
+                        .accessibilityLabel(Text("Favorites"))
                     }
-                    .accessibilityLabel(Text("Favorites"))
                 }
             }
+            // Inside the stack so it lands in this reader's navigation bar.
+            .modifier(OptionalReaderSwitch(
+                selection: readerSelection,
+                onShowAll: onShowAllReaders
+            ))
             .navigationDestination(for: LibraryRoute.self) { route in
-                destination(for: route)
+                LibraryDestination(
+                    route: route,
+                    dependencies: dependencies,
+                    appState: appState,
+                    viewModel: viewModel
+                )
+            }
+            .navigationDestination(for: LibraryShelf.self) { shelf in
+                CategoryListView(
+                    category: shelf.primaryCategory,
+                    viewModel: viewModel,
+                    alsoListing: Array(shelf.categories.dropFirst()),
+                    shelfTitle: shelf.title
+                )
             }
             .sheet(isPresented: $isShowingSearch) {
                 GlobalSearchView(dependencies: dependencies, appState: appState)
@@ -79,212 +122,182 @@ struct LibraryTabView: View {
             .task {
                 await viewModel.loadHomeIfNeeded()
             }
+            // Back from a book, where it was left has moved.
+            .onAppear {
+                Task { await refreshLastBook() }
+            }
             .refreshable {
                 await viewModel.reloadHome()
             }
         }
     }
 
-    // MARK: - Destinations
+    private var hasShelves: Bool {
+        (LibraryShelf.publications + LibraryShelf.quranVolumes).contains { viewModel.count(for: $0) > 0 }
+    }
+
+    // MARK: - Keep reading
+
+    /// The work read last and where it was left.
+    private struct LastBook: Equatable {
+        let item: ContentItem
+        let resume: BookResume?
+    }
+
+    /// The emerald card with the Silsila's seal. It opens the book's page,
+    /// whose gold button takes the reader back to the page they were on.
+    private func keepReadingCard(_ last: LastBook) -> some View {
+        NavigationLink(value: LibraryRoute.item(id: last.item.id)) {
+            HStack(spacing: DISpacing.md) {
+                DILivingSealMark(diameter: 50)
+                VStack(alignment: .leading, spacing: 3) {
+                    ReadCaps("Keep reading", color: Color(hex: 0xFFE3A0))
+                    bookTitle(last.item)
+                    if let detail = detailLine(last) {
+                        detail
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(Color.white.opacity(0.85))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(DIHeroBackground(cornerRadius: 28))
+            .readSheen(cornerRadius: 28)
+            .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        }
+        .buttonStyle(DIPressableStyle())
+        .accessibilityElement(children: .combine)
+    }
 
     @ViewBuilder
-    private func destination(for route: LibraryRoute) -> some View {
-        switch route {
-        case .category(let category):
-            CategoryListView(category: category, viewModel: viewModel)
-        case .item(let id):
-            ContentItemDetailView(
-                itemID: id,
-                dependencies: dependencies,
-                appState: appState,
-                libraryViewModel: viewModel
-            )
-        case .favorites:
-            FavoritesView(viewModel: viewModel)
-        case .pdf(let url, let title):
-            PDFViewerView(fileURL: url, title: title)
+    private func bookTitle(_ item: ContentItem) -> some View {
+        if let urdu = item.titleUrdu, !urdu.isEmpty {
+            Text(verbatim: urdu)
+                .font(DIFont.urduBody(scale: 1.1))
+                .foregroundStyle(Color.white)
+                .lineLimit(2)
+                .environment(\.layoutDirection, .rightToLeft)
+        } else {
+            Text(verbatim: item.title)
+                .font(.headline.weight(.heavy))
+                .foregroundStyle(Color.white)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
         }
     }
 
-    // MARK: - Living hero
-
-    private var libraryHero: some View {
-        ZStack {
-            DIGradient.hero()
-            DIPatternTexture(tint: .white, opacity: 0.07)
-            DIOctagram(innerRatio: 0.5)
-                .stroke(Color.white, lineWidth: 1.5)
-                .frame(width: 260, height: 260)
-                .opacity(0.06)
-                .offset(x: 96, y: -64)
-
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: DISpacing.xs) {
-                        Text("Library")
-                            .font(DIFont.heading)
-                            .foregroundStyle(.white)
-                        Text("Books, articles, and teachings of the Silsila")
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.85))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer(minLength: DISpacing.sm)
-                    DISealEmblem(diameter: 52, glow: true)
-                        .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 14)
-                }
-
-                if viewModel.hasLoadedCounts && viewModel.totalItemCount > 0 {
-                    HStack(spacing: DISpacing.sm) {
-                        heroStat(icon: "books.vertical.fill", value: "\(viewModel.totalItemCount)", label: "Items")
-                        if viewModel.favoritesCount > 0 {
-                            heroStat(icon: "heart.fill", value: "\(viewModel.favoritesCount)", label: "Favorites")
-                        }
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.top, DISpacing.xs)
-                }
-
-                Text(DIBrand.anchorVerseArabic)
-                    .font(DIFont.quranArabic(scale: 0.62))
-                    .foregroundStyle(.white)
-                    .diGoldGlow(radius: 10, opacity: 0.45)
-                    .environment(\.layoutDirection, .rightToLeft)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, DISpacing.xs)
+    /// "Page 12 of 576 · the author", from what is known.
+    private func detailLine(_ last: LastBook) -> Text? {
+        var parts: [String] = []
+        if let resume = last.resume {
+            if let count = resume.pageCount {
+                parts.append(String(localized: "Page \(resume.page) of \(count)"))
+            } else {
+                parts.append(String(localized: "Page \(resume.page)"))
             }
-            .padding(DISpacing.lg)
         }
-        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
-        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
+        if let author = last.item.author, !author.isEmpty {
+            parts.append(author)
+        }
+        return parts.isEmpty ? nil : Text(verbatim: parts.joined(separator: " · "))
     }
 
-    private func heroStat(icon: String, value: String, label: LocalizedStringKey) -> some View {
-        HStack(spacing: DISpacing.xs) {
-            Image(systemName: icon).font(.caption2)
-            Text(value).font(.subheadline.weight(.bold).monospacedDigit())
-            Text(label).font(.caption).foregroundStyle(.white.opacity(0.8))
+    private func refreshLastBook() async {
+        guard let id = BookReadingHistory.lastItemID(),
+              let item = try? await dependencies.contentRepository.item(id: id) else {
+            lastBook = nil
+            return
         }
-        .foregroundStyle(.white)
-        .padding(.horizontal, DISpacing.sm)
-        .padding(.vertical, 6)
-        .background(Capsule().fill(Color.white.opacity(0.14)))
+        let pageCount = (try? await dependencies.contentRepository.bookPageCount(bookID: item.id)) ?? 0
+        let resume = BookReadingHistory.resume(
+            itemID: item.id,
+            hasPDF: BookReadingHistory.hasPDF(item),
+            hasText: pageCount > 0
+        )
+        lastBook = LastBook(item: item, resume: resume)
     }
 
-    // MARK: - Featured
+    // MARK: - Shelves
 
-    private var featuredSection: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Featured", systemImage: "sparkles")
-            ForEach(Array(Self.featuredEntries.enumerated()), id: \.element.category) { index, entry in
-                NavigationLink(value: LibraryRoute.category(entry.category)) {
-                    LibraryFeaturedCard(
-                        titleKey: entry.title,
-                        subtitleKey: entry.subtitle,
-                        systemImage: entry.icon
-                    )
+    @ViewBuilder
+    private func shelfSection(_ titleKey: LocalizedStringKey, shelves: [LibraryShelf]) -> some View {
+        let visible = shelves.filter { viewModel.count(for: $0) > 0 }
+        if !visible.isEmpty {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                ReadGroupTitle(titleKey: titleKey)
+                LazyVGrid(
+                    columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
+                    spacing: 10
+                ) {
+                    ForEach(visible) { shelf in
+                        shelfLink(shelf)
+                    }
                 }
+            }
+        }
+    }
+
+    /// A shelf of one item opens it; a shelf of one category its list; a
+    /// shelf of two the list of both.
+    @ViewBuilder
+    private func shelfLink(_ shelf: LibraryShelf) -> some View {
+        switch viewModel.target(for: shelf) {
+        case .item(let id):
+            NavigationLink(value: LibraryRoute.item(id: id)) { shelfTile(shelf) }
                 .buttonStyle(DIPressableStyle())
                 .simultaneousGesture(TapGesture().onEnded { DIHaptics.light() })
-                .diAppear(delay: 0.05 + Double(index) * 0.05)
-            }
+        case .category(let category):
+            NavigationLink(value: LibraryRoute.category(category)) { shelfTile(shelf) }
+                .buttonStyle(DIPressableStyle())
+                .simultaneousGesture(TapGesture().onEnded { DIHaptics.light() })
+        case .shelf:
+            NavigationLink(value: shelf) { shelfTile(shelf) }
+                .buttonStyle(DIPressableStyle())
+                .simultaneousGesture(TapGesture().onEnded { DIHaptics.light() })
         }
     }
 
-    private struct FeaturedEntry {
-        let category: ContentCategory
-        let title: LocalizedStringKey
-        let subtitle: LocalizedStringKey
-        let icon: String
-    }
-
-    private static let featuredEntries: [FeaturedEntry] = [
-        FeaturedEntry(
-            category: .aboutSilsila,
-            title: "Silsila Naqshbandia Owaisiah",
-            subtitle: "About the order, its lineage, and its method",
-            icon: "book.closed"
-        ),
-        FeaturedEntry(
-            category: .sheikhAbdulQadeerAwan,
-            title: "Hazrat Ameer Abdul Qadeer Awan",
-            subtitle: "Sheikh-e-Silsila Naqshbandia Owaisiah (MZA)",
-            icon: "person.crop.circle"
-        ),
-        FeaturedEntry(
-            category: .sheikhMuhammadAkramAwan,
-            title: "Hazrat Ameer Muhammad Akram Awan",
-            subtitle: "Former Sheikh-e-Silsila (RA)",
-            icon: "person.crop.circle"
-        )
-    ]
-
-    // MARK: - Category groups
-
-    private var categorySections: some View {
-        ForEach(LibraryCategoryGroup.groups) { group in
-            let visible = group.categories.filter { viewModel.count(for: $0) > 0 }
-            if !visible.isEmpty {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    DISectionHeader(
-                        titleKey: LocalizedStringKey(group.title),
-                        systemImage: group.systemImage
-                    )
-                    ForEach(Array(visible.enumerated()), id: \.element) { index, category in
-                        NavigationLink(value: LibraryRoute.category(category)) {
-                            LibraryCategoryRow(category: category, count: viewModel.count(for: category))
-                        }
-                        .buttonStyle(DIPressableStyle())
-                        .simultaneousGesture(TapGesture().onEnded { DIHaptics.light() })
-                        .diAppear(delay: Double(index) * 0.04)
-                    }
-                }
+    private func shelfTile(_ shelf: LibraryShelf) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ReadOrb(systemImage: shelf.systemImage, gold: shelf.isGold)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(LocalizedStringKey(shelf.title))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(DIColor.textPrimary)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+                shelfCount(shelf)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(DIColor.textMuted)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
             }
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 124, alignment: .topLeading)
+        .diGlassPanel(cornerRadius: 22)
+        .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .accessibilityElement(children: .combine)
     }
 
+    /// The count in the shelf's own word; a shelf of one names its item.
     @ViewBuilder
-    private var moreCategoriesSection: some View {
-        let hidden = viewModel.hiddenCategories
-        if !hidden.isEmpty {
-            DICard {
-                DisclosureGroup(isExpanded: $isMoreExpanded) {
-                    VStack(spacing: 0) {
-                        ForEach(hidden) { category in
-                            NavigationLink(value: LibraryRoute.category(category)) {
-                                HStack(spacing: DISpacing.sm) {
-                                    Image(systemName: category.librarySymbol)
-                                        .foregroundStyle(category.libraryAccent)
-                                        .frame(width: 28)
-                                        .accessibilityHidden(true)
-                                    Text(LocalizedStringKey(category.englishName))
-                                        .font(.body)
-                                        .foregroundStyle(DIColor.textPrimary)
-                                        .multilineTextAlignment(.leading)
-                                    Spacer(minLength: DISpacing.sm)
-                                    Image(systemName: "chevron.forward")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(DIColor.textMuted)
-                                        .accessibilityHidden(true)
-                                }
-                                .padding(.vertical, DISpacing.sm)
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                            if category != hidden.last {
-                                Divider().padding(.leading, 40)
-                            }
-                        }
-                    }
-                    .padding(.top, DISpacing.xs)
-                } label: {
-                    Label("More categories", systemImage: "ellipsis.circle")
-                        .font(.body)
-                        .foregroundStyle(DIColor.textPrimary)
-                }
-                .tint(DIColor.textMuted)
+    private func shelfCount(_ shelf: LibraryShelf) -> some View {
+        let count = viewModel.count(for: shelf)
+        if let sole = viewModel.soleItem(for: shelf.categories) {
+            Text(verbatim: sole.title)
+        } else {
+            switch shelf.noun {
+            case .titles: Text("\(count) titles")
+            case .issues: Text("\(count) issues")
+            case .articles: Text("\(count) articles")
+            case .collections: Text("\(count) collections")
+            case .items: Text("\(count) items")
             }
-            .diAppear(delay: 0.1)
         }
     }
 
@@ -305,7 +318,7 @@ struct LibraryTabView: View {
 
 // MARK: - Featured card
 
-/// Elevated, gilded card for the About Silsila and Sheikh pages — a live panel
+/// Elevated, gilded card for the About Silsila and Sheikh pages - a live panel
 /// with an emerald medallion, spring press feedback, and a gold edge glow.
 struct LibraryFeaturedCard: View {
     let titleKey: LocalizedStringKey

@@ -1,10 +1,12 @@
 import SwiftUI
 
-/// The two readers the Read tab offers. They are peers: neither is a section
-/// of the other, and the interface never implies one contains the other.
+/// The three readers the Read tab offers. They are peers: none is a section
+/// of another, and one switch at the top of each reader's page reaches all
+/// three.
 enum ReadSection: String, CaseIterable, Hashable, Identifiable {
     case quran
     case hadith
+    case books
 
     var id: String { rawValue }
 
@@ -12,6 +14,7 @@ enum ReadSection: String, CaseIterable, Hashable, Identifiable {
         switch self {
         case .quran: return "Quran"
         case .hadith: return "Hadith"
+        case .books: return "Books"
         }
     }
 
@@ -19,72 +22,181 @@ enum ReadSection: String, CaseIterable, Hashable, Identifiable {
         switch self {
         case .quran: return "book"
         case .hadith: return "book.closed"
-        }
-    }
-
-    var blurb: LocalizedStringKey {
-        switch self {
-        case .quran: return "All 114 surahs with translation and tafsir"
-        case .hadith: return "Hadith collections in Arabic, with English and Urdu where translated"
+        case .books: return "books.vertical"
         }
     }
 }
 
+/// What the Read tab hands each reader's page: the switch, which sits in the
+/// page under the large title, and the toolbar's Search. (Saved comes in
+/// through `readerSwitch`'s action.)
+struct ReadTabActions {
+    var selection: Binding<ReadSection>
+    var openSearch: () -> Void
+}
 
+private struct ReadTabActionsKey: EnvironmentKey {
+    static let defaultValue: ReadTabActions? = nil
+}
 
-/// Read tab: one tab holding two equal readers.
+extension EnvironmentValues {
+    /// Set by the Read tab for the readers it holds; nil anywhere else, where
+    /// a reader shows its own title and no switch.
+    var readTabActions: ReadTabActions? {
+        get { self[ReadTabActionsKey.self] }
+        set { self[ReadTabActionsKey.self] = newValue }
+    }
+}
+
+/// Read tab: every text, Qur'an, hadith and books, under one switch.
 ///
-/// Why this exists: the app previously gave Quran and Hadith a top-level tab
-/// each. That made six tabs, and iPhone collapses anything past the fifth into
-/// a system "More" list — so Explore disappeared from the tab bar and sat
-/// inside a More within a More. Pairing the two readers under Read brings the
-/// shell back to five real tabs.
+/// There is no landing page: the tab opens on the reader chosen last (the
+/// Quran the first time), titled "Read", with Saved (bookmarks, favourites
+/// and notes) and Search in its toolbar and the Quran | Hadith | Books switch
+/// at the top of the page.
 ///
-/// Both readers are kept alive side by side rather than swapped in and out, so
-/// each keeps its own navigation history: go three levels into a surah, switch
-/// to Hadith, come back, and the surah is still open. That is also exactly the
-/// lifecycle they had as two sibling tabs, so nothing regresses.
+/// The readers are kept alive side by side rather than swapped in and out, so
+/// each keeps its own navigation history: go three levels into a surah, let
+/// a link open a hadith, come back, and the surah is still open. A reader is
+/// built the first time it is chosen.
+@MainActor
 struct ReadTabView: View {
     let dependencies: AppDependencies
     let appState: AppState
 
-    /// nil while the landing screen is showing. Explicitly defaulted so the
-    /// synthesized memberwise init stays internal.
-    @State private var active: ReadSection? = nil
-    /// Navigation history per reader, held here so switching cannot discard it.
+    @State private var active: ReadSection
+    /// The readers built so far; each is kept once built.
+    @State private var opened: Set<ReadSection>
+    /// Navigation history per reader, held here so links can open a place in it.
     @State private var quranPath: [QuranRoute] = []
     @State private var hadithPath: [HadithRoute] = []
-    /// Survives launches, so the tab reopens where the reader left off.
+    @State private var sheet: ReadSheet?
+    /// Survives launches, so the tab reopens on the reader left last.
     @AppStorage("read.lastSection") private var lastSection: String = ""
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    private enum ReadSheet: String, Identifiable {
+        case saved
+        case search
+        var id: String { rawValue }
+    }
+
+    init(dependencies: AppDependencies, appState: AppState) {
+        self.dependencies = dependencies
+        self.appState = appState
+        let remembered = ReadSection(rawValue: UserDefaults.standard.string(forKey: "read.lastSection") ?? "") ?? .quran
+        _active = State(initialValue: remembered)
+        _opened = State(initialValue: [remembered])
+    }
+
     var body: some View {
-        Group {
-            if let active {
-                readers(active: active)
-            } else {
-                landing
+        ZStack {
+            ForEach(ReadSection.allCases) { section in
+                if opened.contains(section) {
+                    reader(section)
+                        .opacity(section == active ? 1 : 0)
+                        .allowsHitTesting(section == active)
+                        .accessibilityHidden(section != active)
+                        .zIndex(section == active ? 1 : 0)
+                }
+            }
+        }
+        .environment(\.readTabActions, actions)
+        .sheet(item: $sheet) { presented in
+            switch presented {
+            case .saved:
+                ReadSavedView(dependencies: dependencies, appState: appState, onOpenAyah: openFromSaved)
+            case .search:
+                GlobalSearchView(dependencies: dependencies, appState: appState)
             }
         }
         .onAppear {
-            restoreLastSection()
             // A request made before this tab existed - the first "Open in the
             // Quran" after launch, a notification - waits in the router.
             followRouter()
         }
         .onChange(of: DeepLinkRouter.shared.requestCount) { _, _ in followRouter() }
+        // The collection opened last, for Hadith's Continue: the reader keeps
+        // the narration itself (HadithReadingPosition).
+        .background(HadithPathWatcher(path: $hadithPath))
         .onReceive(NotificationCenter.default.publisher(for: .didReceiveAppDeepLink)) { notification in
             if let path = notification.object as? String { open(deepLinkPath: path) }
         }
         // An ayah to open, relayed by RootView or posted by a screen that
         // still uses the notification: switch to the Quran reader and open
-        // it at that ayah — all in-app, no external site.
+        // it at that ayah, all in-app, no external site.
         .onReceive(NotificationCenter.default.publisher(for: .openQuranAyah)) { notification in
             guard let link = notification.object as? QuranAyahLink else { return }
             openAyah(link)
         }
     }
+
+    // MARK: - Readers
+
+    /// Each reader owns its `NavigationStack`; the toolbar and the switch are
+    /// applied inside it (`readerSwitch`), where its navigation bar is.
+    @ViewBuilder
+    private func reader(_ section: ReadSection) -> some View {
+        switch section {
+        case .quran:
+            QuranTabView(
+                dependencies: dependencies,
+                appState: appState,
+                navigationPath: $quranPath,
+                readerSelection: selectionBinding,
+                onShowAllReaders: openSaved
+            )
+        case .hadith:
+            HadithTabView(
+                dependencies: dependencies,
+                appState: appState,
+                navigationPath: $hadithPath,
+                readerSelection: selectionBinding,
+                onShowAllReaders: openSaved
+            )
+        case .books:
+            LibraryTabView(
+                dependencies: dependencies,
+                appState: appState,
+                readerSelection: selectionBinding,
+                onShowAllReaders: openSaved
+            )
+        }
+    }
+
+    private var selectionBinding: Binding<ReadSection> {
+        Binding(
+            get: { active },
+            set: { select($0) }
+        )
+    }
+
+    private var actions: ReadTabActions {
+        ReadTabActions(
+            selection: selectionBinding,
+            openSearch: { sheet = .search }
+        )
+    }
+
+    private func openSaved() {
+        sheet = .saved
+    }
+
+    // MARK: - Selection
+
+    private func select(_ section: ReadSection) {
+        lastSection = section.rawValue
+        opened.insert(section)
+        // The switch itself may animate; the sacred text it reveals never does.
+        if reduceMotion {
+            active = section
+        } else {
+            withAnimation(.easeInOut(duration: 0.2)) { active = section }
+        }
+    }
+
+    // MARK: - Links
 
     /// Takes a Quran or Hadith request from the router, once: which reader,
     /// and the ayah to open.
@@ -113,147 +225,17 @@ struct ReadTabView: View {
         }
     }
 
-    // MARK: - Landing
-
-    /// Two cards of equal weight. Hadith is not a footnote to the Quran here:
-    /// same size, same treatment, same prominence, so it cannot be overlooked.
-    private var landing: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: DISpacing.md) {
-                DISectionHeader(titleKey: "Read", systemImage: "books.vertical.fill")
-
-                ForEach(Array(ReadSection.allCases.enumerated()), id: \.element) { index, section in
-                    Button {
-                        DIHaptics.soft()
-                        select(section)
-                    } label: {
-                        card(for: section)
-                    }
-                    .buttonStyle(DIPressableStyle())
-                    // Stable handle for the UI test that both destinations are
-                    // offered, independent of language.
-                    .accessibilityIdentifier("read.destination.\(section.rawValue)")
-                    .diAppear(delay: 0.05 * Double(index))
-                }
-            }
-            .padding(DISpacing.md)
-            .diResponsiveWidth()
-        }
-        .diScreenBackground()
-        .diPageHeading("Read")
-    }
-
-    private func card(for section: ReadSection) -> some View {
-        DIElevatedCard(glow: DIColor.accent) {
-            HStack(spacing: DISpacing.md) {
-                ZStack {
-                    Circle().fill(DIGradient.emerald)
-                    Image(systemName: section.symbol)
-                        .font(.title3)
-                        .foregroundStyle(DIColor.onPrimary)
-                }
-                .frame(width: 60, height: 60)
-                .accessibilityHidden(true)
-
-                VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text(section.title)
-                        .font(DIFont.heading)
-                        .foregroundStyle(DIColor.textPrimary)
-                    Text(section.blurb)
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.forward")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(DIColor.accent)
-                    .accessibilityHidden(true)
-            }
-            .padding(.vertical, DISpacing.xs)
+    /// A bookmark chosen in Saved: Saved closes, then the Quran reader opens
+    /// at that ayah, so it is not opened behind the sheet.
+    private func openFromSaved(_ link: QuranAyahLink) {
+        sheet = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            openAyah(link)
         }
     }
 
-    // MARK: - Readers
-
-    /// Both readers stay in the hierarchy; only the active one is visible and
-    /// interactive. That is what preserves each one's navigation stack.
-    ///
-    /// The switch is handed down rather than applied here: each reader owns its
-    /// own `NavigationStack`, and a `.toolbar` attached from outside would have
-    /// no navigation bar to attach to.
-    private func readers(active: ReadSection) -> some View {
-        ZStack {
-            keptAlive(isActive: active == .quran) {
-                QuranTabView(
-                    dependencies: dependencies,
-                    appState: appState,
-                    navigationPath: $quranPath,
-                    readerSelection: selectionBinding,
-                    onShowAllReaders: showLanding
-                )
-            }
-            keptAlive(isActive: active == .hadith) {
-                HadithTabView(
-                    dependencies: dependencies,
-                    appState: appState,
-                    navigationPath: $hadithPath,
-                    readerSelection: selectionBinding,
-                    onShowAllReaders: showLanding
-                )
-            }
-        }
-    }
-
-    private func keptAlive<Content: View>(
-        isActive: Bool,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        content()
-            .opacity(isActive ? 1 : 0)
-            .allowsHitTesting(isActive)
-            .accessibilityHidden(!isActive)
-            .zIndex(isActive ? 1 : 0)
-    }
-
-    private var selectionBinding: Binding<ReadSection> {
-        Binding(
-            get: { active ?? .quran },
-            set: { select($0) }
-        )
-    }
-
-    // MARK: - Selection
-
-    private func select(_ section: ReadSection) {
-        lastSection = section.rawValue
-        // The switch itself may animate; the sacred text it reveals never does.
-        if reduceMotion {
-            active = section
-        } else {
-            withAnimation(.easeInOut(duration: 0.2)) { active = section }
-        }
-    }
-
-    private func showLanding() {
-        DIHaptics.soft()
-        if reduceMotion {
-            active = nil
-        } else {
-            withAnimation(.easeInOut(duration: 0.2)) { active = nil }
-        }
-    }
-
-    private func restoreLastSection() {
-        guard active == nil, let remembered = ReadSection(rawValue: lastSection) else { return }
-        active = remembered
-    }
-
-    /// Deep links address a reader directly: neither is reachable only through
-    /// the other, so `…/hadith` never has to travel via the Quran.
+    /// Deep links address a reader directly: none is reachable only through
+    /// another, so `…/hadith` never has to travel via the Quran.
     func open(deepLinkPath path: String) {
         let lowered = path.lowercased()
         if lowered.contains("hadith") {
@@ -264,39 +246,69 @@ struct ReadTabView: View {
     }
 }
 
-// MARK: - Reader switch
+/// Notes the collection the Hadith reader opens, for its Continue. A view of
+/// its own, so a push or pop in the Hadith reader redraws only this.
+private struct HadithPathWatcher: View {
+    @Binding var path: [HadithRoute]
 
-/// The compact switch shown once a reader is open, plus a way back to the two
-/// cards. Lives in the navigation bar so the reading surface below it stays
-/// calm and uninterrupted.
+    var body: some View {
+        Color.clear
+            .accessibilityHidden(true)
+            .onChange(of: path) { _, newPath in
+                if let bookID = Self.collectionID(in: newPath) {
+                    HadithLastCollection.save(bookID)
+                }
+            }
+    }
+
+    /// The collection a Hadith path last opened, if it opened one.
+    private static func collectionID(in path: [HadithRoute]) -> String? {
+        for route in path.reversed() {
+            if case .collection(let book) = route { return book.id }
+            if case .hadith(let book, _) = route { return book.id }
+        }
+        return nil
+    }
+}
+
+// MARK: - Reader toolbar
+
+/// The Read tab's toolbar inside each reader's navigation bar: Saved on the
+/// leading side and Search on the trailing side, as on Today. The switch
+/// itself sits in the page (`ReadSectionPicker`), under the large title.
 struct ReaderSwitch: ViewModifier {
     @Binding var selection: ReadSection
+    /// Opens Saved. (This once led back to a landing page of two cards, which
+    /// the switch in the page replaced.)
     let onShowAll: () -> Void
+    @Environment(\.readTabActions) private var actions
 
     func body(content: Content) -> some View {
         content
-        // The switch occupies the title position, so the large title would
-        // only compete with it. Applied here rather than on the readers
-        // themselves, so a reader shown without the switch keeps its own
-        // large-title treatment unchanged.
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                DISegmentedControl(
-                    items: ReadSection.allCases,
-                    title: { $0.title },
-                    icon: { $0.symbol },
-                    selection: $selection
-                )
-                .frame(maxWidth: 240)
-            }
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: onShowAll) {
-                    Image(systemName: "square.grid.2x2")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        DIHaptics.light()
+                        onShowAll()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "bookmark")
+                            Text("Saved")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                    }
+                    .accessibilityIdentifier("read.saved")
                 }
-                .accessibilityLabel("Show both readers")
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        DIHaptics.light()
+                        actions?.openSearch()
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .accessibilityLabel(Text("Search"))
+                }
             }
-        }
     }
 }
 

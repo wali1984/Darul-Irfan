@@ -63,6 +63,94 @@ struct LibraryCategoryGroup: Identifiable, Sendable {
     ]
 }
 
+// MARK: - Books shelves
+
+/// A shelf on the Read tab's Books: one library category, or two under one
+/// name, with the word its count is given in. The Silsila's About pages and
+/// its news are not shelves here: they live in Halqah and Discover › Updates.
+struct LibraryShelf: Identifiable, Hashable, Sendable {
+    /// The word a shelf's count is given in.
+    enum CountNoun: String, Hashable, Sendable {
+        case titles
+        case issues
+        case articles
+        case collections
+        case items
+    }
+
+    let id: String
+    /// Natural-English name, resolved through the String Catalog at display time.
+    let title: String
+    let noun: CountNoun
+    let systemImage: String
+    /// A gold orb: the boards gild the magazine, the poetry and the tafsir.
+    let isGold: Bool
+    let categories: [ContentCategory]
+
+    /// The category a list of this shelf is opened with.
+    var primaryCategory: ContentCategory { categories.first ?? .books }
+
+    /// The Silsila's publications, in the order the Books page shows them.
+    static let publications: [LibraryShelf] = [
+        LibraryShelf(id: "books", title: "Books", noun: .titles, systemImage: "books.vertical", isGold: false, categories: [.books]),
+        LibraryShelf(id: "almurshid", title: "Al-Murshid Magazine", noun: .issues, systemImage: "magazine", isGold: true, categories: [.alMurshidMagazine]),
+        LibraryShelf(id: "booklets", title: "Booklets", noun: .titles, systemImage: "book", isGold: false, categories: [.booklets]),
+        LibraryShelf(id: "articles", title: "Articles", noun: .articles, systemImage: "doc.text", isGold: false, categories: [.articles]),
+        LibraryShelf(id: "poetry", title: "Sufi Poetry", noun: .collections, systemImage: "text.quote", isGold: true, categories: [.sufiPoetry]),
+        LibraryShelf(
+            id: "courses",
+            title: "Courses and documents",
+            noun: .items,
+            systemImage: "graduationcap",
+            isGold: false,
+            categories: [.trainingCourses, .importantDocuments]
+        ),
+    ]
+
+    /// The Silsila's printed Qur'an volumes: its tafsir and its translation.
+    static let quranVolumes: [LibraryShelf] = [
+        LibraryShelf(id: "tafsir", title: "Quran Tafsir", noun: .items, systemImage: "text.book.closed", isGold: true, categories: [.quranTafsir]),
+        LibraryShelf(id: "translation", title: "Quran Translation", noun: .items, systemImage: "character.book.closed", isGold: false, categories: [.quranTranslation]),
+    ]
+}
+
+/// Where a shelf opens: its one item, its category's list, or a list of its
+/// categories together.
+enum LibraryShelfTarget: Equatable {
+    case item(id: String)
+    case category(ContentCategory)
+    case shelf
+}
+
+/// The library's screens, for any stack that shows library rows: the Books
+/// page and Read › Saved.
+@MainActor
+struct LibraryDestination: View {
+    let route: LibraryRoute
+    let dependencies: AppDependencies
+    let appState: AppState
+    let viewModel: LibraryViewModel
+
+    @ViewBuilder
+    var body: some View {
+        switch route {
+        case .category(let category):
+            CategoryListView(category: category, viewModel: viewModel)
+        case .item(let id):
+            ContentItemDetailView(
+                itemID: id,
+                dependencies: dependencies,
+                appState: appState,
+                libraryViewModel: viewModel
+            )
+        case .favorites:
+            FavoritesView(viewModel: viewModel)
+        case .pdf(let url, let title):
+            PDFViewerView(fileURL: url, title: title)
+        }
+    }
+}
+
 // MARK: - Display names
 
 extension ContentType {

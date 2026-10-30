@@ -1,10 +1,14 @@
 import SwiftUI
 
-/// Bookmarked ayahs grouped by surah. Pushed from the Quran tab toolbar;
-/// tapping a bookmark opens the reader scrolled to that ayah, and rows can be
-/// removed with a swipe.
+/// Bookmarked ayahs grouped by surah. Opened from Read › Saved (and still
+/// routable in the Quran reader's stack); tapping a bookmark opens the reader
+/// scrolled to that ayah, and rows can be removed with a swipe.
 struct BookmarksListView: View {
     let viewModel: QuranViewModel
+    /// Set where the list is shown outside the Quran reader's stack (Read ›
+    /// Saved, a sheet): a bookmark then opens through this, since a link to
+    /// the reader there would have no route to follow.
+    var onOpen: ((QuranSurah, Int) -> Void)? = nil
 
     var body: some View {
         Group {
@@ -30,10 +34,28 @@ struct BookmarksListView: View {
             ForEach(viewModel.bookmarksBySurah) { group in
                 Section {
                     ForEach(group.bookmarks) { bookmark in
-                        NavigationLink(
-                            value: QuranRoute.reader(surah: group.surah, focusAyah: bookmark.ayahNumber)
-                        ) {
-                            bookmarkRow(bookmark)
+                        if let onOpen {
+                            Button {
+                                DIHaptics.soft()
+                                onOpen(group.surah, bookmark.ayahNumber)
+                            } label: {
+                                HStack(spacing: DISpacing.sm) {
+                                    bookmarkRow(bookmark)
+                                    Spacer(minLength: 0)
+                                    Image(systemName: "chevron.forward")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(DIColor.textMuted)
+                                        .accessibilityHidden(true)
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            NavigationLink(
+                                value: QuranRoute.reader(surah: group.surah, focusAyah: bookmark.ayahNumber)
+                            ) {
+                                bookmarkRow(bookmark)
+                            }
                         }
                     }
                     .onDelete { offsets in
