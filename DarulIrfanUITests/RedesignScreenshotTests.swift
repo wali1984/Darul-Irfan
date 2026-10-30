@@ -168,7 +168,11 @@ final class RedesignScreenshotTests: XCTestCase {
                 let read = onScreen(app.buttons.matching(NSPredicate(
                     format: "label BEGINSWITH %@ OR label BEGINSWITH %@", label("Read in App"), label("Keep reading")
                 )))
-                if tap(read) {
+                // The gold button, or where it sits when it is not exposed as a button.
+                if !tap(read) {
+                    app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72)).tap()
+                }
+                do {
                     pause(5)
                     shot("book-reader")
                     if tap(button("Text")) {
