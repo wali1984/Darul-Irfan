@@ -36,12 +36,26 @@ final class ZikrHomeViewModel {
         self.prayerCalculation = prayerCalculation
     }
 
+    /// A recording of the daily online zikr, which the channel uploads every
+    /// day; "Recent Bayans" lists everything else.
+    static func isZikrRecording(_ item: OfficialFeedItem) -> Bool {
+        item.title.localizedCaseInsensitiveContains("online zikr")
+    }
+
     func load(forceRefresh: Bool = false) async {
         let bootstrap = await platform.bootstrap(forceRefresh: forceRefresh)
         live = await platform.currentLiveBroadcast(forceRefresh: forceRefresh)
-        if let page = try? await platform.feed(after: nil, forceRefresh: forceRefresh) {
-            recentBayans = Array(page.items.filter { $0.videoID != nil }.prefix(6))
+        // The channel's uploads are mostly the daily zikr streams: skip them,
+        // and read on (three pages at most) until six bayans are found.
+        var bayans: [OfficialFeedItem] = []
+        var cursor: String?
+        for _ in 0..<3 {
+            guard let page = try? await platform.feed(after: cursor, forceRefresh: forceRefresh) else { break }
+            bayans += page.items.filter { $0.videoID != nil && !Self.isZikrRecording($0) }
+            guard bayans.count < 6, let next = page.nextCursor else { break }
+            cursor = next
         }
+        recentBayans = Array(bayans.prefix(6))
         let remote = bootstrap.schedules.map { schedule in
             ZikrSession(
                 id: schedule.id,
