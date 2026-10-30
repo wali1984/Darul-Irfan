@@ -179,6 +179,10 @@ export interface Env {
   /** The service account's PKCS#8 PEM private key, as in its JSON key file;
    *  the file's literal "\n" line breaks are accepted. */
   FCM_PRIVATE_KEY?: string;
+  /** Google sign-in: the OAuth client ids a Google ID token may be issued to
+   *  (its `aud`), comma-separated - the Web client id the Android app asks
+   *  Google for tokens with. Unset, a Google sign-in answers 503. */
+  GOOGLE_CLIENT_IDS?: string;
 }
 
 /** A private regional group as its members see it. The catalogue of groups is
