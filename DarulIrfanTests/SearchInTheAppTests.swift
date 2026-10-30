@@ -23,6 +23,7 @@ final class SearchInTheAppTests: XCTestCase {
         XCTAssertEqual(SearchAppDestination.matches(for: "timetable", names: english), [.timetable])
         XCTAssertEqual(SearchAppDestination.matches(for: "groups", names: english), [.privateGroups])
         XCTAssertEqual(SearchAppDestination.matches(for: "hijri", names: english), [.hijri])
+        XCTAssertEqual(SearchAppDestination.matches(for: "prayer calc", names: english), [.calculation])
         XCTAssertEqual(SearchAppDestination.matches(for: "NOTIF", names: english), [.notifications])
         XCTAssertEqual(SearchAppDestination.matches(for: "settings", names: english), [.settings])
         XCTAssertEqual(Set(SearchAppDestination.matches(for: "privacy", names: english)), [.privacy, .officialAlerts])

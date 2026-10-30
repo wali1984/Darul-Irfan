@@ -49,7 +49,8 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .privateGroups: return ["Private groups"]
         case .settings: return ["Settings"]
         case .location: return ["Location"]
-        case .calculation: return ["Calculation"]
+        // "Prayer calculation" is the row's name in the redesigned Settings.
+        case .calculation: return ["Calculation", "Prayer calculation"]
         case .manualOffsets: return ["Manual Adjustments", "Per-Prayer Offsets"]
         case .notifications: return ["Notifications"]
         case .appearance: return ["Appearance"]
