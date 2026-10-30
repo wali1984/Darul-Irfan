@@ -75,6 +75,7 @@ private struct ZikrTasbihRing: View {
                     style: StrokeStyle(lineWidth: 5, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
+                .environment(\.layoutDirection, .leftToRight)
             if let practice {
                 Text(verbatim: "\(practice.count)")
                     .font(.system(.subheadline, design: .rounded).weight(.heavy).monospacedDigit())

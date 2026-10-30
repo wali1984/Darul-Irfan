@@ -121,6 +121,7 @@ struct PrayerCountdownRing: View {
                     style: StrokeStyle(lineWidth: 10, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
+                .environment(\.layoutDirection, .leftToRight)
                 .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 14)
             VStack(spacing: 2) {
                 Text(prayerName)

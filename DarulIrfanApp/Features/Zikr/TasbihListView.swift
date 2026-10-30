@@ -174,6 +174,7 @@ private struct TasbihCounterRow: View {
                         style: StrokeStyle(lineWidth: 4, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
+                    .environment(\.layoutDirection, .leftToRight)
             }
             Text("\(counter.count)")
                 .font(.system(.title3, design: .rounded).weight(.medium).monospacedDigit())

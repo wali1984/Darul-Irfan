@@ -39,6 +39,17 @@ final class RedesignScreenshotTests: XCTestCase {
         continueAfterFailure = true
     }
 
+    /// Runs first (tests run in name order): a fresh simulator imports the
+    /// bundled content on its first launch, which can take minutes, so the
+    /// tours that follow find the tab bar at once.
+    func test0Warmup() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "--uitesting-complete-onboarding"]
+        app.launch()
+        _ = app.tabBars.buttons.firstMatch.waitForExistence(timeout: 600)
+        pause(5)
+    }
+
     func testEnglishLight() { tour(language: "en", locale: "en_US", dark: false) }
     func testEnglishDark() { tour(language: "en", locale: "en_US", dark: true) }
     func testUrduLight() { tour(language: "ur", locale: "ur_PK", dark: false) }
@@ -55,7 +66,7 @@ final class RedesignScreenshotTests: XCTestCase {
             "--uitesting-complete-onboarding", dark ? "--uitesting-theme-dark" : "--uitesting-theme-light",
         ]
         app.launch()
-        guard app.tabBars.buttons.firstMatch.waitForExistence(timeout: 40) else {
+        guard app.tabBars.buttons.firstMatch.waitForExistence(timeout: 180) else {
             shot("no-tab-bar")
             return
         }
@@ -79,10 +90,13 @@ final class RedesignScreenshotTests: XCTestCase {
         pause(3)
         shot("read-quran")
         scrollShots("read-quran", count: 1)
+        // The switch sits at the top of each reader's page.
+        scrollToTop()
         if tap(button("Hadith")) {
             pause(3)
             shot("read-hadith")
             scrollShots("read-hadith", count: 1)
+            scrollToTop()
         }
         if tap(button("Books")) {
             pause(3)
@@ -107,6 +121,7 @@ final class RedesignScreenshotTests: XCTestCase {
                 goBack()
             }
             // Leave Read on the Quran, as a fresh install opens it.
+            scrollToTop()
             _ = tap(button("Quran"))
         }
 

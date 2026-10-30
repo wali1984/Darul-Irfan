@@ -754,6 +754,7 @@ struct HalqahCountdownRing: View {
                     style: StrokeStyle(lineWidth: 8, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
+                .environment(\.layoutDirection, .leftToRight)
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.8), value: progress)
             centre
                 .padding(14)

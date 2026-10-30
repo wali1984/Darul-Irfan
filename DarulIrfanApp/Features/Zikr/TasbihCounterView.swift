@@ -115,6 +115,7 @@ struct TasbihCounterView: View {
                         style: StrokeStyle(lineWidth: 14, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
+                    .environment(\.layoutDirection, .leftToRight)
                     .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 12)
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: viewModel.progress)
             } else {

@@ -47,7 +47,8 @@ struct HalqahBrandHeader: View {
             DILivingSealMark(diameter: 54)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
-                Text(verbatim: DIBrand.wordmark)
+                // Darul Irfan in the reader's language (دارالعرفان in Urdu), as Today shows it.
+                Text("Darul Irfan")
                     .font(.title3.weight(.heavy))
                     .foregroundStyle(DIColor.textPrimary)
                 Text(verbatim: DIBrand.tagline)
