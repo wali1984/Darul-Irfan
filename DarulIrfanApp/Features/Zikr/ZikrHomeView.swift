@@ -1,14 +1,18 @@
 import SwiftUI
 import UIKit
 
-/// Zikr section entry point, linked from the More tab: a living gradient hero
-/// carrying the anchor verse of remembrance, the verified Method of Zikr, the
-/// online zikr schedule as live session panels, and the personal tasbih.
+/// The Zikr tab: practice, live sessions and the member's own zikr. At its
+/// head Qur'an 13:28, centred; then Daily Zikr, one card for the broadcast
+/// and its session (YouTube only, played in the app); the Tahajjud zikr,
+/// joined on Paltalk; any halqah where zikr is live now; the member's own
+/// practice (Tasbih and the illustrated Method of Zikr); and the recent
+/// bayans.
 @MainActor
 struct ZikrHomeView: View {
     @State private var viewModel: ZikrHomeViewModel
     @State private var presentedVideo: ZikrPresentedVideo?
     @State private var liveAlertsDenied = false
+    @State private var isSearchPresented = false
     /// What a notification or a link asked this screen to show.
     @State private var focus: Focus?
     @Environment(\.scenePhase) private var scenePhase
@@ -25,6 +29,8 @@ struct ZikrHomeView: View {
         case top
     }
 
+    /// The Daily Zikr card, where a link to the broadcast, or to Daily
+    /// Zikr's own session, scrolls.
     private static let liveAnchor = "zikr.live"
 
     init(dependencies: AppDependencies, appState: AppState) {
@@ -34,7 +40,8 @@ struct ZikrHomeView: View {
             notifications: dependencies.notifications,
             platform: dependencies.officialPlatform,
             watchSync: dependencies.watchSync,
-            prayerCalculation: dependencies.prayerCalculation
+            prayerCalculation: dependencies.prayerCalculation,
+            trackerRepository: dependencies.trackerRepository
         ))
     }
 
@@ -44,6 +51,9 @@ struct ZikrHomeView: View {
                 .onAppear {
                     if let asked = DeepLinkRouter.shared.take(Self.focus(for:)) { focus = asked }
                     scrollToFocus(proxy)
+                    // Also on returning from the counters, so the tile shows
+                    // the count left there.
+                    Task { await viewModel.refreshPractice() }
                 }
                 .onChange(of: viewModel.isLoaded) { _, _ in scrollToFocus(proxy) }
         }
@@ -69,9 +79,11 @@ struct ZikrHomeView: View {
             target = Self.liveAnchor
         case .session(let name):
             guard viewModel.isLoaded else { return }
-            target = viewModel.sessions.first { session in
-                session.id == name || session.id.contains(name) || (name == "tahajjud" && ZikrReminders.isTahajjud(session))
-            }?.id
+            target = ZikrSessionRoles.scrollTarget(
+                forSessionNamed: name,
+                in: viewModel.sessions,
+                dailyTarget: Self.liveAnchor
+            )
         }
         self.focus = nil
         guard let target else { return }
@@ -84,97 +96,64 @@ struct ZikrHomeView: View {
 
     private var page: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: DISpacing.lg) {
-                ZikrHeroHeader()
+            VStack(alignment: .leading, spacing: DISpacing.md) {
+                ZikrAyahBlock()
                     .diAppear()
-                    .diParallaxHero()
 
-                DISectionHeader(titleKey: "Method of Zikr", systemImage: "heart")
-                NavigationLink {
-                    NativeMethodOfZikrView(repository: dependencies.contentRepository)
-                } label: {
-                    MethodOfZikrCard()
-                }
-                .buttonStyle(DIPressableStyle())
-                    .diAppear(delay: 0.05)
-
-                DISectionHeader(titleKey: "Daily Zikr", systemImage: "dot.radiowaves.left.and.right")
+                dailyZikrCard
                     .id(Self.liveAnchor)
-                // The screen keeps the live state current itself (the session
-                // cards need it too), so the card does not ask a second time.
-                LiveBroadcastCard(broadcast: viewModel.live, audioPlayer: dependencies.audioPlayer,
-                                  recordings: viewModel.recordedZikr)
-                    .diAppear(delay: 0.08)
-                liveAlertToggle
+                    .diAppear(delay: 0.06)
 
-                // Halqah zikr that admins have started in the member's groups,
-                // joined from here as well as from the group itself.
-                if !viewModel.liveGroups.isEmpty {
-                    DISectionHeader(titleKey: "Halqah Zikr live now", systemImage: "person.3.fill")
-                    ForEach(viewModel.liveGroups) { group in
-                        NavigationLink {
-                            GroupDetailView(group: group, service: groupService, dependencies: dependencies)
-                        } label: {
-                            LiveHalqahRow(group: group)
-                        }
-                        .buttonStyle(DIPressableStyle())
-                    }
-                }
-
-                DISectionHeader(titleKey: "Online Zikr", systemImage: "clock")
                 if viewModel.isLoaded && viewModel.sessions.isEmpty {
-                    DIElevatedCard {
-                        DIEmptyState(
-                            systemImage: "clock",
-                            titleKey: "Schedule not available",
-                            messageKey: "The online zikr schedule could not be loaded. Pull down later to check for a verified update."
-                        )
-                        .diOctagramWatermark(size: 200, opacity: 0.06)
-                    }
-                    .diAppear(delay: 0.1)
-                } else {
-                    ForEach(Array(viewModel.sessions.enumerated()), id: \.element.id) { index, session in
-                        ZikrSessionCard(session: session, viewModel: viewModel) { videoID in
-                            presentedVideo = ZikrPresentedVideo(id: videoID, title: viewModel.live.title)
-                        }
-                            .id(session.id)
-                            .diAppear(delay: 0.1 + 0.05 * Double(index))
-                    }
+                    scheduleUnavailable
+                        .diAppear(delay: 0.1)
                 }
 
-                if !viewModel.recentBayans.isEmpty {
-                    DISectionHeader(titleKey: "Recent Bayans", systemImage: "play.rectangle.on.rectangle")
-                    ForEach(Array(viewModel.recentBayans.enumerated()), id: \.element.id) { index, item in
-                        Button {
-                            DIHaptics.light()
-                            if let videoID = item.videoID {
-                                presentedVideo = ZikrPresentedVideo(id: videoID, title: item.title)
-                            }
-                        } label: {
-                            BayanRow(item: item)
-                        }
-                        .buttonStyle(DIPressableStyle())
-                        .diAppear(delay: 0.12 + 0.04 * Double(index))
-                    }
-                }
-
-                DISectionHeader(titleKey: "Tasbih", systemImage: "hand.tap")
-                NavigationLink {
-                    TasbihListView(
-                        trackerRepository: dependencies.trackerRepository,
-                        devotionalMetrics: dependencies.devotionalMetrics
+                // The Tahajjud zikr, and any further session published.
+                ForEach(Array(viewModel.otherSessions.enumerated()), id: \.element.id) { index, session in
+                    ZikrSessionPanel(
+                        session: session,
+                        live: viewModel.live,
+                        reminder: reminderBinding(for: session),
+                        playVideo: { videoID in playLiveVideo(videoID) }
                     )
-                } label: {
-                    tasbihEntryCard
+                    .id(session.id)
+                    .diAppear(delay: 0.1 + 0.04 * Double(index))
                 }
-                .buttonStyle(DIPressableStyle())
-                .diAppear(delay: 0.2)
+
+                liveHalqahs
+
+                DISectionHeader(titleKey: "Your practice", systemImage: "heart")
+                    .padding(.top, DISpacing.xs)
+                practiceTiles
+                    .diAppear(delay: 0.16)
+
+                // Recent Bayans stay on the Zikr tab (owner).
+                if !viewModel.recentBayans.isEmpty {
+                    bayansHeader
+                        .padding(.top, DISpacing.xs)
+                    ZikrBayanCarousel(items: viewModel.recentBayans) { item in
+                        if let videoID = item.videoID {
+                            presentedVideo = ZikrPresentedVideo(id: videoID, title: item.title)
+                        }
+                    }
+                }
             }
             .padding(DISpacing.md)
             .diResponsiveWidth()
         }
         .diPageHeading("Zikr")
         .diScreenBackground()
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isSearchPresented = true
+                } label: {
+                    Image(systemName: "magnifyingglass")
+                }
+                .accessibilityLabel(Text("Search"))
+            }
+        }
         .task { await viewModel.load() }
         // Followed while the app is in front only: in the background, with a
         // lecture playing, this screen kept asking the server for nothing.
@@ -203,24 +182,69 @@ struct ZikrHomeView: View {
         .sheet(item: $presentedVideo) { video in
             YouTubePlayerSheet(videoID: video.id, title: video.title)
         }
+        .sheet(isPresented: $isSearchPresented) {
+            GlobalSearchView(dependencies: dependencies, appState: appState)
+        }
     }
 
-    // MARK: - Live alert
+    // MARK: - Daily Zikr
+
+    /// The screen keeps the live state current itself (the session panels
+    /// need it too), so the card does not ask a second time.
+    private var dailyZikrCard: some View {
+        let session = viewModel.dailySession
+        return DailyZikrCard(
+            broadcast: viewModel.live,
+            session: session,
+            recordings: viewModel.recordedZikr,
+            alertsWhenLive: liveAlertsBinding,
+            reminderBeforeSession: session.map { reminderBinding(for: $0) },
+            join: { source in joinDailyZikr(source) },
+            playRecording: { item in
+                if let videoID = item.videoID {
+                    presentedVideo = ZikrPresentedVideo(id: videoID, title: item.title)
+                }
+            }
+        )
+    }
+
+    /// Plays Daily Zikr in the app: the room's own sound when staff relay
+    /// it, the channel's live video otherwise.
+    private func joinDailyZikr(_ source: LiveSource) {
+        switch source.kind {
+        case .ownedStream:
+            let title = DailyZikrPresentation.headline(for: viewModel.live).title
+            let item = AudioPlayableItem(id: "official-live", title: title, subtitle: "Darul Irfan", url: source.url)
+            dependencies.audioPlayer.play(item, queue: [item])
+        case .youtube:
+            if let videoID = source.videoID { playLiveVideo(videoID) }
+        case .paltalk:
+            // The Paltalk room is the Tahajjud zikr's; Daily Zikr is YouTube only.
+            break
+        }
+    }
+
+    private func playLiveVideo(_ videoID: String) {
+        presentedVideo = ZikrPresentedVideo(id: videoID, title: DailyZikrPresentation.headline(for: viewModel.live).title)
+    }
+
+    // MARK: - Reminders
 
     /// The official "Daily Zikr has started" notification. It is the same
     /// consented choice as Settings > Official Alerts, offered where it matters.
-    private var liveAlertToggle: some View {
-        DICard(padding: DISpacing.sm) {
-            Toggle(isOn: Binding(
-                get: { appState.settings.push.isEnabled && appState.settings.push.topics.contains(.liveZikr) },
-                set: { enabled in Task { await setLiveAlerts(enabled) } }
-            )) {
-                Label("Notify me when Daily Zikr goes live", systemImage: "bell.badge")
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.textPrimary)
-            }
-            .tint(DIColor.primary)
-        }
+    private var liveAlertsBinding: Binding<Bool> {
+        Binding(
+            get: { appState.settings.push.isEnabled && appState.settings.push.topics.contains(.liveZikr) },
+            set: { enabled in Task { await setLiveAlerts(enabled) } }
+        )
+    }
+
+    /// The local reminder before each of a session's starts.
+    private func reminderBinding(for session: ZikrSession) -> Binding<Bool> {
+        Binding(
+            get: { viewModel.isReminderEnabled(session.id) },
+            set: { enabled in Task { await viewModel.setReminder(enabled, for: session) } }
+        )
     }
 
     private func setLiveAlerts(_ enabled: Bool) async {
@@ -241,337 +265,76 @@ struct ZikrHomeView: View {
         UIApplication.shared.registerForRemoteNotifications()
     }
 
-    // MARK: - Tasbih entry
+    // MARK: - Sections
 
-    private var tasbihEntryCard: some View {
-        DIElevatedCard(tint: DIColor.sandstone) {
-            HStack(spacing: DISpacing.md) {
-                ZStack {
-                    Circle()
-                        .fill(DIGradient.emerald)
-                        .frame(width: 46, height: 46)
-                    Image(systemName: "hand.tap.fill")
-                        .font(.title3)
-                        .foregroundStyle(DIColor.onPrimary)
-                }
-                .diGoldGlow(radius: 8, opacity: 0.3)
-                .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text("Tasbih Counters")
-                        .font(DIFont.subheading)
-                        .foregroundStyle(DIColor.textPrimary)
-                    Text("Count your personal zikr and build a gentle daily habit.")
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.forward")
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.textMuted)
-                    .accessibilityHidden(true)
-            }
-        }
+    private var scheduleUnavailable: some View {
+        DIEmptyState(
+            systemImage: "clock",
+            titleKey: "Schedule not available",
+            messageKey: "The online zikr schedule could not be loaded. Pull down later to check for a verified update."
+        )
+        .diOctagramWatermark(size: 200, opacity: 0.06)
+        .frame(maxWidth: .infinity)
+        .diGlassPanel(cornerRadius: 26)
     }
-}
 
-// MARK: - Hero
-
-/// A living gradient header carrying Qur'an 13:28 — the verse of remembrance
-/// that anchors the whole app and this section in particular.
-private struct ZikrHeroHeader: View {
-    @Environment(\.locale) private var locale
-
-    var body: some View {
-        ZStack(alignment: .topLeading) {
-            DIGradient.hero()
-                .diPatternOverlay(tint: .white, opacity: 0.07)
-                .overlay(alignment: .topTrailing) {
-                    DIOctagram(innerRatio: 0.5)
-                        .stroke(Color.white, lineWidth: 1.5)
-                        .frame(width: 260, height: 260)
-                        .opacity(0.06)
-                        .offset(x: 70, y: -70)
-                }
-
-            VStack(alignment: .leading, spacing: DISpacing.md) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Zikr Allah")
-                            .font(DIFont.heading)
-                            .foregroundStyle(.white)
-                        Text("The remembrance of Allah")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.85))
-                    }
-                    Spacer()
-                    DILivingSealMark(diameter: 50)
-                }
-
-                VStack(alignment: .center, spacing: DISpacing.sm) {
-                    Text(DIBrand.anchorVerseArabic)
-                        .font(DIFont.quranArabic(scale: 0.78))
-                        .foregroundStyle(.white)
-                        .diGoldGlow(radius: 12, opacity: 0.5)
-                        .environment(\.layoutDirection, .rightToLeft)
-                        .multilineTextAlignment(.center)
-                    // The Silsila's own translation of 13:28 in the reader's language.
-                    if DIBrand.readsUrdu(locale) {
-                        Text(verbatim: DIBrand.anchorVerseUrdu)
-                            .font(DIFont.urduBody(scale: 0.85))
-                            .foregroundStyle(.white.opacity(0.88))
-                            .multilineTextAlignment(.center)
-                            .environment(\.layoutDirection, .rightToLeft)
-                    } else {
-                        Text(verbatim: DIBrand.anchorVerseEnglish)
-                            .font(.footnote)
-                            .foregroundStyle(.white.opacity(0.88))
-                            .multilineTextAlignment(.center)
-                    }
-                    Text(DIBrand.anchorVerseReference)
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(DIColor.goldGlow)
-                }
-                .frame(maxWidth: .infinity)
+    /// Halqah zikr that admins have started in the member's groups, joined
+    /// from here as well as from the group itself. Shown only while live; a
+    /// session ends only when an admin ends it, never here.
+    @ViewBuilder
+    private var liveHalqahs: some View {
+        if !viewModel.liveGroups.isEmpty {
+            DISectionHeader(titleKey: "Halqah Zikr live now", systemImage: "person.3.fill")
                 .padding(.top, DISpacing.xs)
-            }
-            .padding(DISpacing.lg)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
-        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
-    }
-}
-
-// MARK: - Method of Zikr
-
-/// Verified description only — see Docs/RESEARCH_NOTES.md. The full
-/// illustrated instructions are deliberately not reproduced here; they are
-/// supplied through the verified content manifest.
-private struct MethodOfZikrCard: View {
-    var body: some View {
-        DIElevatedCard(tint: DIColor.sandstone) {
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack(spacing: DISpacing.sm) {
-                    Image(systemName: "heart.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(DIColor.primary)
-                        .accessibilityHidden(true)
-                    Text("Zikr-e Khafi Qalbi")
-                        .font(DIFont.subheading)
-                        .foregroundStyle(DIColor.textPrimary)
+            ForEach(viewModel.liveGroups) { group in
+                NavigationLink {
+                    GroupDetailView(group: group, service: groupService, dependencies: dependencies)
+                } label: {
+                    LiveHalqahRow(group: group)
                 }
-                DIJaliDivider(height: 14, opacity: 0.4)
-                    .padding(.vertical, DISpacing.xs)
-                Text("The method of zikr in the Naqshbandia Owaisiah order is Zikr-e Khafi Qalbi, practised with Pas Anfas — \"guarding every breath\".")
-                    .font(.body)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text("A distinguishing feature of this order is spiritual bai'at directly at the hands of the holy Prophet ﷺ — the Owaisiah transmission.")
-                    .font(.body)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text("The complete illustrated method is available natively in Darul Irfan.")
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.textMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-                Label("Open Illustrated Method", systemImage: "book.pages")
+                .buttonStyle(DIPressableStyle())
+            }
+        }
+    }
+
+    /// Tasbih (the counters) and the illustrated Method of Zikr.
+    private var practiceTiles: some View {
+        HStack(alignment: .top, spacing: 10) {
+            NavigationLink {
+                TasbihListView(
+                    trackerRepository: dependencies.trackerRepository,
+                    devotionalMetrics: dependencies.devotionalMetrics
+                )
+            } label: {
+                ZikrTasbihTile(practice: viewModel.practice)
+            }
+            .buttonStyle(DIPressableStyle())
+
+            NavigationLink {
+                NativeMethodOfZikrView(repository: dependencies.contentRepository)
+            } label: {
+                ZikrMethodTile()
+            }
+            .buttonStyle(DIPressableStyle())
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// "Recent Bayans", with See all to Discover › Bayans (the `media` route).
+    private var bayansHeader: some View {
+        HStack(spacing: DISpacing.sm) {
+            DISectionHeader(titleKey: "Recent Bayans", systemImage: "play.rectangle.on.rectangle")
+            Button {
+                DIHaptics.soft()
+                DeepLinkRouter.shared.open(.media)
+            } label: {
+                Text("See all")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(DIColor.primary)
-                    .padding(.top, DISpacing.xs)
+                    .frame(minHeight: 44)
+                    .contentShape(Rectangle())
             }
-        }
-    }
-}
-
-// MARK: - Online zikr session card
-
-@MainActor
-private struct ZikrSessionCard: View {
-    let session: ZikrSession
-    let viewModel: ZikrHomeViewModel
-    /// Plays the channel's live video in the app.
-    let playVideo: (String) -> Void
-    @Environment(\.openURL) private var openURL
-    @Environment(\.locale) private var locale
-
-    /// The app is in Urdu (chosen in the app, or the phone's own language).
-    private var inUrdu: Bool { DIBrand.readsUrdu(locale) }
-
-    /// The Tahajjud zikr is held in the Paltalk room; Daily Zikr is joined
-    /// through the channel's live video, in the app.
-    private var joinsOnPaltalk: Bool {
-        session.zikrAnchor == .beforeFajr || session.zikrAnchor == .tahajjud || session.id.contains("tahajjud")
-    }
-
-    /// The room is open now and it is before dawn in Pakistan, as the server
-    /// names the session; the same room carries Daily Zikr in the evening.
-    private var openRoom: LiveRoom? {
-        guard joinsOnPaltalk, let room = viewModel.live.room, room.url != nil else { return nil }
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Asia/Karachi") ?? .current
-        return calendar.component(.hour, from: Date()) < 7 ? room : nil
-    }
-
-    /// The channel's live video, while it is on air.
-    private var liveVideoID: String? {
-        guard !joinsOnPaltalk, viewModel.live.state == .live else { return nil }
-        return viewModel.live.sources.first { $0.kind == .youtube && $0.videoID != nil }?.videoID
-    }
-
-    var body: some View {
-        DIElevatedCard(glow: DIColor.primary) {
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack(spacing: DISpacing.sm) {
-                    liveDot
-                    Text(verbatim: session.displayTitle(urdu: inUrdu))
-                        .font(DIFont.subheading)
-                        .foregroundStyle(DIColor.textPrimary)
-                }
-
-                HStack(spacing: DISpacing.sm) {
-                    if ZikrScheduleMath.isDaily(session.weekdays) {
-                        DIPillBadge(text: String(localized: "Daily"))
-                    } else {
-                        DIPillBadge(text: ZikrScheduleMath.shortWeekdaySymbols(for: session.weekdays).joined(separator: " · "))
-                    }
-                    if session.durationMinutes > 0 {
-                        DIPillBadge(text: String(localized: "About \(session.durationMinutes) minutes"), color: DIColor.accent)
-                    }
-                }
-
-                ZikrSessionCountdown(session: session)
-
-                // Pakistan time is the reference the silsila announces in; the
-                // countdown above is already in this phone's own time.
-                VStack(alignment: .leading, spacing: 2) {
-                    if let announcement = ZikrAnchorResolver.announcement(for: session) {
-                        Text(verbatim: announcement)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(DIColor.textPrimary)
-                    }
-                    Group {
-                        if session.zikrAnchor == nil {
-                            Text("In Pakistan: \(ZikrScheduleMath.announcedTimeText(for: session))")
-                        } else {
-                            Text("In Pakistan: about \(ZikrScheduleMath.announcedTimeText(for: session))")
-                        }
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.textMuted)
-                }
-
-                if let note = session.displayAvailabilityNote(urdu: inUrdu) {
-                    Text(verbatim: note)
-                        .font(.footnote)
-                        .italic()
-                        .foregroundStyle(DIColor.textMuted)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                if let room = openRoom {
-                    Label("Live on Paltalk now · \(room.listeners) listening", systemImage: "person.3.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
-                }
-                joinButton
-
-                Toggle(isOn: Binding(
-                    get: { viewModel.isReminderEnabled(session.id) },
-                    set: { newValue in
-                        Task { await viewModel.setReminder(newValue, for: session) }
-                    }
-                )) {
-                    Label("Remind me before each session", systemImage: "bell")
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textPrimary)
-                }
-                .tint(DIColor.primary)
-                .padding(.top, DISpacing.xs)
-
-            }
-        }
-    }
-
-    /// Always shown; greyed out until the zikr is on: the live video for
-    /// Daily Zikr, the open room for the Tahajjud zikr.
-    private var joinButton: some View {
-        let available = joinsOnPaltalk ? openRoom != nil : liveVideoID != nil
-        return Button {
-            DIHaptics.light()
-            if let url = openRoom?.url { openURL(url) } else if let videoID = liveVideoID { playVideo(videoID) }
-        } label: {
-            Label(joinsOnPaltalk ? "Join Zikr on Paltalk" : "Join Zikr on YouTube",
-                  systemImage: joinsOnPaltalk ? "person.3.fill" : "play.rectangle.fill")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(available ? DIColor.onPrimary : DIColor.textMuted)
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .background(
-                    available ? AnyShapeStyle(DIColor.primary) : AnyShapeStyle(DIColor.sandstone.opacity(0.6)),
-                    in: RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                )
-        }
-        .buttonStyle(DIPressableStyle())
-        .disabled(!available)
-        .accessibilityHint(available ? Text("")
-            : joinsOnPaltalk ? Text("Available when the Paltalk room is open") : Text("Available when the zikr is live on YouTube"))
-    }
-
-    private var liveDot: some View {
-        Circle()
-            .fill(DIColor.primary)
-            .frame(width: 9, height: 9)
-            .diBreathingGlow(color: DIColor.primary, maxRadius: 8)
-            .accessibilityHidden(true)
-    }
-}
-
-/// Battery-conscious live countdown: SwiftUI's timer text animates the digits
-/// while the timeline reevaluates session state only every thirty seconds.
-private struct ZikrSessionCountdown: View {
-    let session: ZikrSession
-
-    var body: some View {
-        TimelineView(.periodic(from: .now, by: 30)) { context in
-            if let start = ZikrScheduleMath.currentOrNextOccurrence(of: session, at: context.date) {
-                let end = start.addingTimeInterval(TimeInterval(max(session.durationMinutes, 1) * 60))
-                let active = start <= context.date && context.date < end
-
-                HStack(spacing: DISpacing.md) {
-                    ZStack {
-                        Circle()
-                            .fill(active ? DIColor.primary : DIColor.accent.opacity(0.18))
-                            .frame(width: 42, height: 42)
-                        Image(systemName: active ? "dot.radiowaves.left.and.right" : "timer")
-                            .foregroundStyle(active ? Color.white : DIColor.primary)
-                    }
-                    .accessibilityHidden(true)
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(active ? "Zikr in progress" : "Zikr begins in")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(active ? DIColor.primary : DIColor.textMuted)
-                        Text(active ? end : start, style: .timer)
-                            .font(.title3.weight(.semibold).monospacedDigit())
-                            .foregroundStyle(DIColor.textPrimary)
-                            .contentTransition(.numericText())
-                        Text("Your time: \(ZikrScheduleMath.localTimeText(start))")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(DIColor.primary)
-                    }
-                    Spacer(minLength: 0)
-                }
-                .padding(DISpacing.sm)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                        .fill(active ? DIColor.primary.opacity(0.10) : DIColor.accent.opacity(0.08))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                        .stroke(active ? DIColor.primary.opacity(0.42) : DIColor.accent.opacity(0.32), lineWidth: 1)
-                )
-                .accessibilityElement(children: .combine)
-            }
+            .buttonStyle(.plain)
         }
     }
 }
@@ -584,73 +347,33 @@ private struct LiveHalqahRow: View {
     let group: MemberGroup
 
     var body: some View {
-        DIElevatedCard(glow: DIColor.primary) {
-            HStack(spacing: DISpacing.md) {
-                DILivePulse(color: DIColor.primary, size: 9)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: group.name)
-                        .font(DIFont.subheading)
-                        .foregroundStyle(DIColor.textPrimary)
-                    Text("Zikr is live in this halqah. Tap to join.")
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
-                }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.forward")
-                    .font(.footnote)
+        HStack(spacing: DISpacing.md) {
+            DILivePulse(color: DIColor.primary, size: 9)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: group.name)
+                    .font(DIFont.subheading)
+                    .foregroundStyle(DIColor.textPrimary)
+                Text("Zikr is live in this halqah. Tap to join.")
+                    .font(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
-                    .accessibilityHidden(true)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.forward")
+                .font(.footnote)
+                .foregroundStyle(DIColor.textMuted)
+                .accessibilityHidden(true)
         }
+        .padding(DISpacing.md)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .diGlassPanel(cornerRadius: 22)
         .accessibilityElement(children: .combine)
     }
 }
 
-// MARK: - Recent bayans
+// MARK: - Video sheet
 
 private struct ZikrPresentedVideo: Identifiable {
     let id: String
     let title: String
-}
-
-/// A tappable video row — thumbnail with a play glyph + title. Opens the
-/// in-app YouTube player, so watching a bayan never leaves the app.
-private struct BayanRow: View {
-    let item: OfficialFeedItem
-
-    var body: some View {
-        DICard(padding: DISpacing.sm) {
-            HStack(spacing: DISpacing.md) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
-                        .fill(DIColor.primaryDeep.opacity(0.12))
-                    if let imageURL = item.imageURL {
-                        AsyncImage(url: imageURL) { image in
-                            image.resizable().aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            Color.clear
-                        }
-                        .frame(width: 104, height: 62)
-                        .clipped()
-                    }
-                    Image(systemName: "play.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(.white)
-                        .shadow(color: .black.opacity(0.4), radius: 4)
-                }
-                .frame(width: 104, height: 62)
-                .clipShape(RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous))
-
-                Text(verbatim: item.title)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(DIColor.textPrimary)
-                    .lineLimit(3)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(verbatim: item.title))
-        .accessibilityAddTraits(.isButton)
-    }
 }
