@@ -17,6 +17,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
     case tools
     case privateGroups
     case settings
+    case language
     case location
     case calculation
     case manualOffsets
@@ -48,6 +49,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .tools: return ["All tools", "Tools"]
         case .privateGroups: return ["Private groups"]
         case .settings: return ["Settings"]
+        case .language: return ["Language", "App Language"]
         case .location: return ["Location"]
         // "Prayer calculation" is the row's name in the redesigned Settings.
         case .calculation: return ["Calculation", "Prayer calculation"]
@@ -82,6 +84,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .tools: return "square.grid.2x2"
         case .privateGroups: return "lock.shield"
         case .settings: return "gearshape"
+        case .language: return "character.bubble"
         case .location: return "location.fill"
         case .calculation: return "sun.and.horizon.fill"
         case .manualOffsets: return "slider.horizontal.3"
@@ -101,7 +104,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         switch self {
         case .privateGroups, .about:
             return "Halqah"
-        case .settings, .location, .calculation, .manualOffsets, .notifications, .appearance,
+        case .settings, .language, .location, .calculation, .manualOffsets, .notifications, .appearance,
              .hijri, .contentStorage, .officialAlerts, .privacy, .licences:
             return "Settings"
         default:
@@ -189,7 +192,8 @@ struct SearchAppDestinationScreen: View {
             ToolsView(dependencies: dependencies, appState: appState)
         case .privateGroups:
             GroupsHomeView(dependencies: dependencies)
-        case .settings:
+        case .settings, .language:
+            // Language is the first row of Settings.
             SettingsHomeView(dependencies: dependencies, appState: appState)
         case .location:
             LocationSettingsView(dependencies: dependencies, appState: appState)
@@ -206,9 +210,10 @@ struct SearchAppDestinationScreen: View {
         case .contentStorage:
             ContentStorageSettingsView(dependencies: dependencies, appState: appState)
         case .officialAlerts:
-            OfficialServicesSettingsView(dependencies: dependencies, appState: appState)
+            // The official alerts live on the one Notifications screen now.
+            NotificationSettingsView(dependencies: dependencies, appState: appState)
         case .privacy:
-            PrivacySettingsView(appState: appState)
+            PrivacySettingsView(appState: appState, dependencies: dependencies)
         case .licences:
             AcknowledgementsView()
         case .about:
