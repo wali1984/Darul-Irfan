@@ -1,58 +1,72 @@
 import SwiftUI
 import UserNotifications
 
-// The Today screen's everyday sections, in the order a day is lived:
-// tools to hand, the day's own tasks, where reading and listening left off,
-// one thing to understand today, and what is coming up.
+// The Today screen's everyday sections: tools to hand, where reading and
+// listening left off, and the pieces of the Prayer times page that say how
+// the times are calculated and whether alerts will arrive. My Day,
+// Understand and Upcoming left Today in the October 2026 redesign (to the
+// My Day orb, Discover's Theme of the day and the Zikr tab); their cards are
+// kept here for the screens that take them up.
 
 // MARK: - Quick tools
 
-/// Quran, Duas, Qibla, Tasbih, My Day and Focus, one tap each, then every
-/// other tool behind "All tools".
+/// The tool orbs: Duas, Qibla, Tasbih and My Day, one tap each, then every
+/// other tool (Focus, Notes, Fasting, the timetable) behind the gold "All
+/// tools". The Quran is the Read tab's.
 @MainActor
 struct TodayQuickTools: View {
     let dependencies: AppDependencies
     let appState: AppState
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: DISpacing.sm) {
-                Button {
-                    DIHaptics.soft()
-                    // The Quran lives in the Read tab; the router takes it there.
-                    DeepLinkRouter.shared.open(.quran(surah: nil, ayah: nil))
-                } label: {
-                    QuickToolChip(title: "Quran", systemImage: "book.closed")
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                // Large text: three to a row, so no name is cut short.
+                LazyVGrid(
+                    columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())],
+                    spacing: DISpacing.md
+                ) {
+                    orbs
                 }
-                .buttonStyle(DIPressableStyle())
-                chip("Duas", "hands.and.sparkles") { DuasView() }
-                chip("Qibla", "location.north.line") { QiblaCompassView(dependencies: dependencies, appState: appState) }
-                chip("Tasbih", "hand.tap") {
-                    TasbihListView(trackerRepository: dependencies.trackerRepository, devotionalMetrics: dependencies.devotionalMetrics)
+            } else {
+                HStack(alignment: .top, spacing: 6) {
+                    orbs
                 }
-                chip("My Day", "checklist") { MyDayView(dependencies: dependencies, appState: appState) }
-                chip("Focus", "timer") { FocusTimerView(dependencies: dependencies, appState: appState) }
-                chip("All tools", "square.grid.2x2") { ToolsView(dependencies: dependencies, appState: appState) }
             }
-            .padding(.vertical, 2)
         }
+        .padding(.top, 2)
     }
 
-    private func chip<Destination: View>(
+    @ViewBuilder
+    private var orbs: some View {
+        orb("Duas", "hands.and.sparkles") { DuasView() }
+        orb("Qibla", "location.north.line") { QiblaCompassView(dependencies: dependencies, appState: appState) }
+        orb("Tasbih", "hand.tap") {
+            TasbihListView(trackerRepository: dependencies.trackerRepository, devotionalMetrics: dependencies.devotionalMetrics)
+        }
+        orb("My Day", "checklist") { MyDayView(dependencies: dependencies, appState: appState) }
+        orb("All tools", "square.grid.2x2", gold: true) { ToolsView(dependencies: dependencies, appState: appState) }
+    }
+
+    private func orb<Destination: View>(
         _ title: LocalizedStringKey,
         _ systemImage: String,
+        gold: Bool = false,
         @ViewBuilder destination: @escaping () -> Destination
     ) -> some View {
         NavigationLink {
             destination()
         } label: {
-            QuickToolChip(title: title, systemImage: systemImage)
+            DIToolOrb(titleKey: title, systemImage: systemImage, gold: gold)
         }
         .buttonStyle(DIPressableStyle())
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
     }
 }
 
+/// The tool chip Today used before the orbs; kept for any screen that
+/// wants the smaller chip.
 struct QuickToolChip: View {
     let title: LocalizedStringKey
     let systemImage: String
@@ -157,7 +171,8 @@ struct TodayMyDayCard: View {
 
 // MARK: - Continue
 
-/// Where the Quran reading and the last lecture left off.
+/// Continue: where the Qur'an reading and the last bayan left off, as two
+/// tiles side by side, each with how far it has gone.
 @MainActor
 struct TodayContinueCard: View {
     let dependencies: AppDependencies
@@ -170,60 +185,113 @@ struct TodayContinueCard: View {
 
     var body: some View {
         Group {
-            if reading != nil || listening != nil {
-                DICard {
-                    VStack(alignment: .leading, spacing: DISpacing.sm) {
-                        DISectionHeader(titleKey: "Continue", systemImage: "arrow.uturn.forward")
+            if reading != nil || listeningPlayable != nil {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    TodaySectionTitle(titleKey: "Continue", systemImage: "arrow.counterclockwise")
+                    HStack(alignment: .top, spacing: 10) {
                         if let reading {
-                            Button {
-                                DIHaptics.soft()
-                                // Kept until the reader takes it, so it lands even
-                                // the first time the Read tab opens.
-                                DeepLinkRouter.shared.open(.quranAyah(surah: reading.surah.id, ayah: reading.ayah))
-                            } label: {
-                                row(
-                                    icon: "book.closed",
-                                    title: Text(verbatim: reading.surah.nameTransliterated),
-                                    detail: Text("Ayah \(reading.ayah)")
-                                )
-                            }
-                            .buttonStyle(.plain)
+                            readingTile(surah: reading.surah, ayah: reading.ayah)
                         }
                         if let listening, let playable = listeningPlayable {
-                            Button {
-                                DIHaptics.soft()
-                                // The player restores the saved position itself.
-                                dependencies.audioPlayer.play(playable, queue: [])
-                            } label: {
-                                row(
-                                    icon: "play.circle",
-                                    title: Text(verbatim: listening.item.title),
-                                    detail: Text("Resume listening")
-                                )
-                            }
-                            .buttonStyle(.plain)
+                            listeningTile(item: listening.item, progress: listening.progress, playable: playable)
                         }
                     }
+                    .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
         .task { await load() }
     }
 
-    private func row(icon: String, title: Text, detail: Text) -> some View {
-        HStack(spacing: DISpacing.sm) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(DIColor.primary)
-                .frame(width: 30)
+    private func readingTile(surah: QuranSurah, ayah: Int) -> some View {
+        Button {
+            DIHaptics.soft()
+            // Kept until the reader takes it, so it lands even the first
+            // time the Read tab opens.
+            DeepLinkRouter.shared.open(.quranAyah(surah: surah.id, ayah: ayah))
+        } label: {
+            tile(
+                systemImage: "book.closed",
+                gold: false,
+                title: Text(verbatim: surah.nameTransliterated),
+                titleIsUrdu: false,
+                detail: Text("Qur'an · Ayah \(ayah)"),
+                progress: Double(ayah) / Double(max(surah.ayahCount, 1))
+            )
+        }
+        .buttonStyle(DIPressableStyle())
+    }
+
+    private func listeningTile(item: MediaItem, progress: PlaybackProgress, playable: AudioPlayableItem) -> some View {
+        let secondsLeft = max(0, progress.durationSeconds - progress.positionSeconds)
+        let minutesLeft = max(1, Int((secondsLeft / 60).rounded()))
+        return Button {
+            DIHaptics.soft()
+            // The player restores the saved position itself.
+            dependencies.audioPlayer.play(playable, queue: [])
+        } label: {
+            tile(
+                systemImage: "play.fill",
+                gold: true,
+                title: Text(verbatim: item.title),
+                titleIsUrdu: item.language == "ur",
+                detail: progress.durationSeconds > 0 ? Text("Bayan · \(minutesLeft) min left") : Text("Resume listening"),
+                progress: progress.fractionCompleted
+            )
+        }
+        .buttonStyle(DIPressableStyle())
+    }
+
+    private func tile(
+        systemImage: String,
+        gold: Bool,
+        title: Text,
+        titleIsUrdu: Bool,
+        detail: Text,
+        progress: Double
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            TodayOrbIcon(systemImage: systemImage, gold: gold)
             VStack(alignment: .leading, spacing: 2) {
-                title.font(.subheadline.weight(.semibold)).foregroundStyle(DIColor.textPrimary).lineLimit(2)
-                detail.font(.caption).foregroundStyle(DIColor.textMuted)
+                title
+                    .font(titleIsUrdu ? DIFont.urduBody(scale: 0.85) : Font.subheadline.weight(.bold))
+                    .foregroundStyle(DIColor.textPrimary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                detail
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(DIColor.textMuted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             Spacer(minLength: 0)
-            Image(systemName: "chevron.forward").font(.footnote).foregroundStyle(DIColor.textMuted)
+            progressBar(progress)
         }
-        .contentShape(Rectangle())
+        .padding(14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .todayGlass(cornerRadius: 22)
+        .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    private func progressBar(_ progress: Double) -> some View {
+        let value = min(max(progress.isFinite ? progress : 0, 0), 1)
+        return GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(TodayPalette.track)
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(hex: 0x13A06F), DIColor.goldGlow],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: geo.size.width * CGFloat(value))
+            }
+        }
+        .frame(height: 4)
+        .accessibilityHidden(true)
     }
 
     private func load() async {
@@ -411,8 +479,9 @@ struct TodayUpcomingCard: View {
 // MARK: - Reminder status
 
 /// Whether prayer alerts will actually arrive: permission, and how many
-/// prayers have an alert on. Opens the notification settings, where a test
-/// reminder can be sent.
+/// prayers have an alert on ("Alerts on for 5 of 5 prayers ›" under the
+/// Prayer times page's times). Opens the notification settings, where a
+/// test reminder can be sent.
 @MainActor
 struct TodayReminderStatus: View {
     let dependencies: AppDependencies
@@ -424,9 +493,10 @@ struct TodayReminderStatus: View {
         NavigationLink {
             NotificationSettingsView(dependencies: dependencies, appState: appState)
         } label: {
-            HStack(spacing: DISpacing.sm) {
+            HStack(spacing: 6) {
                 Image(systemName: allowed == false ? "bell.slash.fill" : "bell.badge.fill")
-                    .foregroundStyle(allowed == false ? DIColor.danger : DIColor.primary)
+                    .font(.subheadline.weight(.semibold))
+                    .accessibilityHidden(true)
                 Group {
                     if allowed == false {
                         Text("Notifications are off - prayer alerts will not arrive")
@@ -434,13 +504,16 @@ struct TodayReminderStatus: View {
                         Text("Alerts on for \(enabledCount) of 5 prayers")
                     }
                 }
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(DIColor.textPrimary)
+                .font(.subheadline.weight(.bold))
+                .multilineTextAlignment(.leading)
+                Image(systemName: "chevron.forward")
+                    .font(.caption2.weight(.bold))
+                    .accessibilityHidden(true)
                 Spacer(minLength: 0)
-                Image(systemName: "chevron.forward").font(.caption).foregroundStyle(DIColor.textMuted)
             }
-            .padding(.horizontal, DISpacing.sm)
-            .padding(.vertical, DISpacing.xs)
+            .foregroundStyle(allowed == false ? DIColor.danger : TodayPalette.emerald)
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .task { allowed = await dependencies.notifications.notificationsAllowed() }
@@ -462,25 +535,29 @@ struct TodayReminderStatus: View {
 
 /// Which convention today's times follow, and where - stated plainly under
 /// the times so nobody has to guess why they differ from a mosque's sheet.
+/// The Prayer times page names the place in its own header, so it leaves
+/// the place out here.
 @MainActor
 struct TodayMethodLine: View {
     let appState: AppState
+    var showsPlace = true
 
     var body: some View {
         let calculation = appState.settings.calculation
         let method = String(localized: String.LocalizationValue(calculation.method.englishName))
         let asr = calculation.asrMethod == .hanafi ? String(localized: "Hanafi Asr") : String(localized: "Shafi Asr")
-        let place = appState.activePlace?.name ?? ""
+        let place = showsPlace ? (appState.activePlace?.name ?? "") : ""
         Text(verbatim: [method, asr, place].filter { !$0.isEmpty }.joined(separator: " · "))
-            .font(.caption)
+            .font(.footnote.weight(.medium))
             .foregroundStyle(DIColor.textMuted)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, DISpacing.sm)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 
 /// Offered once, when the method in use is not the one used where the
-/// person is and they have never chosen one themselves.
+/// person is and they have never chosen one themselves. Sits in the footer
+/// of the Prayer times page's times.
 @MainActor
 struct TodayMethodSuggestion: View {
     let appState: AppState
@@ -493,30 +570,50 @@ struct TodayMethodSuggestion: View {
            recommended != calculation.method {
             let current = String(localized: String.LocalizationValue(calculation.method.englishName))
             let suggested = String(localized: String.LocalizationValue(recommended.englishName))
-            DICard {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    Label("Check your calculation method", systemImage: "exclamationmark.circle")
-                        .font(.headline)
-                    Text("Times are calculated with \(current). Around \(place.name), \(suggested) is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes.")
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Label("Check your calculation method", systemImage: "exclamationmark.circle")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(TodayPalette.goldText)
+                Text("Times are calculated with \(current). Around \(place.name), \(suggested) is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes.")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+                ViewThatFits(in: .horizontal) {
                     HStack(spacing: DISpacing.sm) {
-                        Button("Use \(suggested)") {
-                            Task {
-                                await appState.updateSettings {
-                                    $0.calculation.method = recommended
-                                    $0.calculation.methodConfirmed = true
-                                }
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        Button("Keep \(current)") {
-                            Task { await appState.updateSettings { $0.calculation.methodConfirmed = true } }
-                        }
-                        .buttonStyle(.bordered)
+                        useButton(recommended: recommended, suggested: suggested)
+                        keepButton(current: current)
+                    }
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        useButton(recommended: recommended, suggested: suggested)
+                        keepButton(current: current)
                     }
                 }
             }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(DIColor.accent.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(.vertical, DISpacing.xs)
         }
+    }
+
+    private func useButton(recommended: CalculationMethodChoice, suggested: String) -> some View {
+        Button("Use \(suggested)") {
+            Task {
+                await appState.updateSettings {
+                    $0.calculation.method = recommended
+                    $0.calculation.methodConfirmed = true
+                }
+            }
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(DIColor.primary)
+    }
+
+    private func keepButton(current: String) -> some View {
+        Button("Keep \(current)") {
+            Task { await appState.updateSettings { $0.calculation.methodConfirmed = true } }
+        }
+        .buttonStyle(.bordered)
+        .tint(DIColor.primary)
     }
 }

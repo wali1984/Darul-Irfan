@@ -13,9 +13,10 @@ struct RamadanCountdownTarget: Equatable {
     var time: Date
 }
 
-/// Drives the Prayer tab dashboard: today's schedule, the next-prayer hero,
-/// Ramadan countdowns, and the gentle prayer tracker. Reads the active place
-/// and settings from `AppState`; never persists settings itself.
+/// Drives Today's prayer card and the Prayer times page it opens: today's
+/// schedule, the next prayer, Ramadan countdowns, and the gentle prayer
+/// tracker, a week at a time back from today. Reads the active place and
+/// settings from `AppState`; never persists settings itself.
 @Observable
 @MainActor
 final class PrayerViewModel {
@@ -39,6 +40,9 @@ final class PrayerViewModel {
     /// whose time has passed), for the gold "Now" accent.
     private(set) var currentPrayer: Prayer?
     private(set) var gregorianDateText: String = ""
+    /// The day without the year ("Friday, 30 October"), for the line under
+    /// Today's title and the Prayer times page.
+    private(set) var gregorianShortText: String = ""
     private(set) var hijriDateText: String = ""
     private(set) var isRamadan = false
     private(set) var ramadanCountdown: RamadanCountdownTarget?
@@ -47,6 +51,26 @@ final class PrayerViewModel {
     private(set) var isRequestingLocation = false
     private(set) var locationRequestFailed = false
 
+    // MARK: - Tracker week (the Prayer times page)
+
+    /// The week the tracker shows: 0 is the week holding today, -1 the week
+    /// before it, and so on back. Never after the current week.
+    private(set) var trackerWeekOffset = 0
+    /// The day chosen in the tracker; nil shows the week's own day (today in
+    /// the current week, a past week's Friday).
+    private(set) var trackerSelectedDay: Date?
+    /// Marks of the days the tracker has shown, by day key. Today's marks
+    /// are read from `todayCompletions`, which Today's prayer card changes.
+    private(set) var trackerMarks: [String: [Prayer: PrayerCompletion]] = [:]
+    /// Days whose stored marks have been read into `trackerMarks`. A mark is
+    /// only ever cycled from what is stored, never from a day not read yet.
+    private(set) var trackerLoadedKeys: Set<String> = []
+    /// The day `todayCompletions` was read for.
+    private var todayLoadedKey: String?
+
+    /// Counts the marks made on each day, so a read that was in flight when
+    /// a mark was made does not put the older mark back on screen.
+    @ObservationIgnored private var markRevisions: [String: Int] = [:]
     @ObservationIgnored private var rolloverTask: Task<Void, Never>?
 
     // MARK: - Init
@@ -88,6 +112,9 @@ final class PrayerViewModel {
         )
         gregorianDateText = now.formatted(
             Date.FormatStyle(date: .complete, time: .omitted, timeZone: placeTimeZone).locale(appLocale)
+        )
+        gregorianShortText = now.formatted(
+            Date.FormatStyle(timeZone: placeTimeZone).weekday(.wide).day().month(.wide).locale(appLocale)
         )
         isRamadan = hijriService.isRamadan(now, offsetDays: settings.hijri.dayOffset, timeZone: placeTimeZone)
 
@@ -193,6 +220,44 @@ final class PrayerViewModel {
         return abs(next.time.timeIntervalSince(time)) < 1.0
     }
 
+    /// How far the time has run (0...1) towards the next prayer, from the
+    /// last of today's times before now (the start of the day before Fajr),
+    /// for the ring on Today's prayer card.
+    func nextPrayerProgress(at now: Date) -> Double {
+        guard let next = nextPrayer else { return 0 }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = appState.activePlace?.timeZone ?? .current
+        let times = (todaySchedule?.orderedTimes ?? []).map { $0.time }
+        return TodayHeroMath.ringProgress(
+            now: now,
+            next: next.time,
+            earlierTimes: times,
+            dayStart: calendar.startOfDay(for: now)
+        )
+    }
+
+    /// Today's six times as text, for Share on the Prayer times page: the
+    /// date, the place, each time, and the method they follow.
+    var todayShareText: String {
+        guard let schedule = todaySchedule else { return "" }
+        var lines: [String] = []
+        lines.append(String(localized: "Darul Irfan — prayer times for \(gregorianDateText)"))
+        if let place = appState.activePlace {
+            lines.append(place.name)
+        }
+        lines.append("")
+        // Names in the app's language, as the screen shows them.
+        for prayer in Prayer.allCases {
+            guard let time = schedule.time(for: prayer) else { continue }
+            let name = String(localized: String.LocalizationValue(prayer.englishName))
+            lines.append("\(name): \(timeText(time))")
+        }
+        lines.append("")
+        let method = String(localized: String.LocalizationValue(appState.settings.calculation.method.englishName))
+        lines.append(String(localized: "Method: \(method)"))
+        return lines.joined(separator: "\n")
+    }
+
     // MARK: - Alerts (bell cycling)
 
     func alertStyle(for prayer: Prayer) -> PrayerAlertStyle {
@@ -224,27 +289,38 @@ final class PrayerViewModel {
         Prayer.obligatory.filter { completion(for: $0).countsAsPrayed }.count
     }
 
-    /// Cycles unmarked -> prayed -> jamaat -> qaza -> unmarked and persists.
+    /// Cycles today's mark for one prayer (Today's prayer card):
+    /// unmarked -> prayed -> jamaat -> qaza -> unmarked, and persists.
     func cycleCompletion(for prayer: Prayer) async {
-        let next: PrayerCompletion
-        switch completion(for: prayer) {
-        case .unmarked: next = .prayed
-        case .prayed: next = .jamaat
-        case .jamaat: next = .qaza
-        case .qaza: next = .unmarked
-        }
+        await cycleCompletion(for: prayer, on: Date())
+    }
+
+    /// Cycles one prayer's mark on any day up to today, and persists it
+    /// through the tracker repository as that day's entry, the same write
+    /// today's mark has always made. A day after today is never marked, and
+    /// a day's stored marks are read first, so a tap can never put "prayed"
+    /// over a congregation or qaza mark that was not on screen yet.
+    func cycleCompletion(for prayer: Prayer, on day: Date) async {
         let now = Date()
-        let entry = PrayerLogEntry(
-            dayKey: DayKey.make(from: now),
-            prayer: prayer,
-            completion: next,
-            updatedAt: now
-        )
-        todayCompletions[prayer] = next
+        guard PrayerTrackerCalendar.isMarkable(day, today: now, calendar: trackerCalendar) else { return }
+        let todayKey = DayKey.make(from: now)
+        guard await readMarksIfNeeded(forKey: DayKey.make(from: day), todayKey: todayKey) else { return }
+        guard let entry = PrayerTrackerCalendar.entry(
+            cycling: completion(for: prayer, on: day),
+            for: prayer,
+            on: day,
+            now: now
+        ) else { return }
+        markRevisions[entry.dayKey, default: 0] += 1
+        if entry.dayKey == todayKey {
+            todayCompletions[prayer] = entry.completion
+        }
+        trackerMarks[entry.dayKey, default: [:]][prayer] = entry.completion
         do {
             try await trackerRepository.savePrayerLog(entry)
+            // The streak always runs to today, whichever day was marked.
             streakSummary = try await trackerRepository.streakSummary(
-                endingAt: entry.dayKey,
+                endingAt: todayKey,
                 windowDays: 30
             )
             await devotionalMetrics.refresh(reference: now)
@@ -254,15 +330,148 @@ final class PrayerViewModel {
         }
     }
 
+    /// A prayer's mark on any day: today's from `todayCompletions` once it
+    /// has been read for today, any other day's from the marks the tracker
+    /// has read.
+    func completion(for prayer: Prayer, on day: Date) -> PrayerCompletion {
+        let key = DayKey.make(from: day)
+        if key == DayKey.make(from: Date()), todayLoadedKey == key {
+            return completion(for: prayer)
+        }
+        return trackerMarks[key]?[prayer] ?? .unmarked
+    }
+
+    /// Whether a day's stored marks have been read, so its prayers can be
+    /// marked.
+    func isTrackerDayLoaded(_ day: Date) -> Bool {
+        let key = DayKey.make(from: day)
+        return trackerLoadedKeys.contains(key)
+            || (key == DayKey.make(from: Date()) && todayLoadedKey == key)
+    }
+
+    /// Reads one day's stored marks when they have not been read yet. False
+    /// when they cannot be read, and the day is then left as it is.
+    private func readMarksIfNeeded(forKey key: String, todayKey: String) async -> Bool {
+        if key == todayKey, todayLoadedKey == todayKey { return true }
+        if key != todayKey, trackerLoadedKeys.contains(key) { return true }
+        do {
+            let entries = try await trackerRepository.prayerLog(dayKeys: [key])
+            var marks: [Prayer: PrayerCompletion] = [:]
+            for entry in entries {
+                marks[entry.prayer] = entry.completion
+            }
+            // Another tap may have read the day meanwhile and marked it.
+            if key == todayKey {
+                if todayLoadedKey != todayKey {
+                    todayCompletions = marks
+                    todayLoadedKey = todayKey
+                }
+            } else if !trackerLoadedKeys.contains(key) {
+                trackerMarks[key] = marks
+                trackerLoadedKeys.insert(key)
+            }
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    /// How many of a day's five prayers are marked prayed, alone or in
+    /// congregation.
+    func prayedCount(on day: Date) -> Int {
+        Prayer.obligatory.filter { completion(for: $0, on: day).countsAsPrayed }.count
+    }
+
+    // MARK: - Tracker week
+
+    /// The tracker's calendar: Saturday-to-Friday weeks in the phone's time
+    /// zone, as tracker day keys are.
+    private var trackerCalendar: Calendar {
+        PrayerTrackerCalendar.calendar()
+    }
+
+    /// The seven days of the week shown, Saturday first.
+    var trackerWeekDays: [Date] {
+        PrayerTrackerCalendar.days(weekOffset: trackerWeekOffset, today: Date(), calendar: trackerCalendar)
+    }
+
+    /// The day whose five prayers the tracker shows.
+    var trackerShownDay: Date {
+        PrayerTrackerCalendar.shownDay(
+            selected: trackerSelectedDay,
+            weekOffset: trackerWeekOffset,
+            today: Date(),
+            calendar: trackerCalendar
+        )
+    }
+
+    /// Next week is offered only from a past week.
+    var canShowNextTrackerWeek: Bool {
+        PrayerTrackerCalendar.canShowNextWeek(from: trackerWeekOffset)
+    }
+
+    /// Any day up to today can be marked; later days wait.
+    func isTrackerDayMarkable(_ day: Date) -> Bool {
+        PrayerTrackerCalendar.isMarkable(day, today: Date(), calendar: trackerCalendar)
+    }
+
+    /// Whether `day` is today, where the phone is.
+    func isTrackerToday(_ day: Date) -> Bool {
+        PrayerTrackerCalendar.isSameDay(day, Date(), calendar: trackerCalendar)
+    }
+
+    /// Shows the week `offset` weeks from the current one (never later than
+    /// it) on its own day, and loads its marks.
+    func showTrackerWeek(offset: Int) async {
+        trackerWeekOffset = PrayerTrackerCalendar.clampedWeekOffset(offset)
+        trackerSelectedDay = nil
+        await reloadTrackerWeek()
+    }
+
+    /// Chooses the day whose prayers the tracker shows. A day after today
+    /// cannot be chosen.
+    func selectTrackerDay(_ day: Date) {
+        guard isTrackerDayMarkable(day) else { return }
+        trackerSelectedDay = day
+    }
+
+    /// Reads the shown week's marks through the tracker repository. Only
+    /// this week's days are replaced, so a slower read for another week
+    /// never clears these, and a day marked while the read was in flight
+    /// keeps its newer mark.
+    func reloadTrackerWeek() async {
+        let keys = PrayerTrackerCalendar.dayKeys(weekOffset: trackerWeekOffset, today: Date(), calendar: trackerCalendar)
+        let revisionsBefore = markRevisions
+        do {
+            let entries = try await trackerRepository.prayerLog(dayKeys: keys)
+            let changed = Set(keys.filter { (markRevisions[$0] ?? 0) != (revisionsBefore[$0] ?? 0) })
+            trackerMarks = PrayerTrackerCalendar.merge(
+                read: entries,
+                keys: keys,
+                into: trackerMarks,
+                changedDuringRead: changed
+            )
+            trackerLoadedKeys.formUnion(keys)
+        } catch {
+            // Keep whatever was shown before; the tracker is non-critical.
+            // Days not read stay unmarkable until a read succeeds.
+        }
+    }
+
     private func reloadTracker(now: Date) async {
         let dayKey = DayKey.make(from: now)
+        let revisionBefore = markRevisions[dayKey] ?? 0
         do {
             let entries = try await trackerRepository.prayerLog(dayKeys: [dayKey])
             var map: [Prayer: PrayerCompletion] = [:]
             for entry in entries {
                 map[entry.prayer] = entry.completion
             }
-            todayCompletions = map
+            // A mark made while this read was in flight is newer: keep it.
+            if (markRevisions[dayKey] ?? 0) == revisionBefore {
+                todayCompletions = map
+                todayLoadedKey = dayKey
+            }
             streakSummary = try await trackerRepository.streakSummary(
                 endingAt: dayKey,
                 windowDays: 30
