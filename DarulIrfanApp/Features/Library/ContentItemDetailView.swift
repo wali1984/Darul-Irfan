@@ -12,6 +12,9 @@ import SwiftUI
 /// metadata card, rights-aware native reader, native image presentation,
 /// downloadable files, and dates. Both open the app's one reader
 /// (`BookReaderScreen`).
+///
+/// The library's Shajra page opens the app's own Shajra (`ShajraView`)
+/// instead, wherever it is reached.
 struct ContentItemDetailView: View {
     private let appState: AppState
     private let dependencies: AppDependencies
@@ -39,6 +42,17 @@ struct ContentItemDetailView: View {
     }
 
     var body: some View {
+        // The Shajra is drawn in the app's theme now: search, topics and
+        // Saved open it, as the Halqah tab does.
+        if ShajraRoute.opensShajraView(itemID: viewModel.itemID) {
+            ShajraView()
+        } else {
+            itemDetail
+        }
+    }
+
+    /// The item's own page.
+    private var itemDetail: some View {
         Group {
             if viewModel.isLoading {
                 ProgressView()

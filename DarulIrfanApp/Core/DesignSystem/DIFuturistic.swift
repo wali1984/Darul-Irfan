@@ -136,6 +136,8 @@ struct DILightRays: View {
 /// tab. Slower and warmer than `diShimmer`.
 private struct GoldTextShimmer: ViewModifier {
     var highlight: Color
+    /// Seconds before the band's first pass.
+    var delay: Double = 0.8
     @State private var phase: CGFloat = -1
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -151,7 +153,7 @@ private struct GoldTextShimmer: ViewModifier {
                     .frame(width: geo.size.width * 0.35)
                     .offset(x: phase * geo.size.width * 1.4)
                     .onAppear {
-                        withAnimation(.easeInOut(duration: 6.5).repeatForever(autoreverses: false).delay(0.8)) {
+                        withAnimation(.easeInOut(duration: 6.5).repeatForever(autoreverses: false).delay(delay)) {
                             phase = 1.2
                         }
                     }
@@ -164,9 +166,10 @@ private struct GoldTextShimmer: ViewModifier {
 }
 
 extension View {
-    /// A slow band of gold light passing over gilded text.
-    func diGoldTextShimmer(highlight: Color = Color(hex: 0xFFF4CF)) -> some View {
-        modifier(GoldTextShimmer(highlight: highlight))
+    /// A slow band of gold light passing over gilded text. `delay` holds
+    /// back its first pass, so lines shown together need not move in step.
+    func diGoldTextShimmer(highlight: Color = Color(hex: 0xFFF4CF), delay: Double = 0.8) -> some View {
+        modifier(GoldTextShimmer(highlight: highlight, delay: delay))
     }
 
     /// The redesign's glass surface: material fill, a light edge and a soft

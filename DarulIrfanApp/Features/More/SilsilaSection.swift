@@ -15,6 +15,10 @@ struct SilsilaEntry: Identifiable, Equatable {
 
     var id: String { category.rawValue }
 
+    /// The Shajra row opens the app's own Shajra (`ShajraView`), drawn in
+    /// the app's theme, rather than the library's page.
+    var opensShajra: Bool { category == .shajra }
+
     /// About the Silsila, its two Sheikhs and the Shajra: the library's
     /// About group.
     static let about: [SilsilaEntry] = [
@@ -98,7 +102,7 @@ private struct SilsilaEntryLink: View {
 
     var body: some View {
         NavigationLink {
-            SilsilaCategoryDestination(entry: entry, dependencies: dependencies, appState: appState, library: library)
+            destination
         } label: {
             HalqahListRowLabel(
                 titleKey: LocalizedStringKey(entry.title),
@@ -107,6 +111,17 @@ private struct SilsilaEntryLink: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    /// The Shajra opens at once, drawn in the app; any other category opens
+    /// its page, or its pages to choose from.
+    @ViewBuilder
+    private var destination: some View {
+        if entry.opensShajra {
+            ShajraView()
+        } else {
+            SilsilaCategoryDestination(entry: entry, dependencies: dependencies, appState: appState, library: library)
+        }
     }
 }
 
