@@ -24,7 +24,7 @@ from pathlib import Path
 
 API = "https://api.codemagic.io"
 APP_ID = "6a502f90353ca0edc6c3fcb8"  # wali1984/Darul-Irfan
-WORKFLOWS = {"ios-verify", "ios-testflight", "hadith-ingest"}
+WORKFLOWS = {"ios-verify", "ios-screens", "ios-testflight", "hadith-ingest"}
 FINAL = {"finished", "failed", "canceled", "timeout", "skipped"}
 TOKEN_FILE = Path(__file__).resolve().parents[3] / "codemagic.md"
 
