@@ -1,61 +1,62 @@
 import SwiftUI
 
-/// Root of the Community tab: the private groups, Dar-ul-Irfan programmes
-/// and official updates, then the tools and the app's Settings and About,
-/// plus the global search sheet. Owns its own NavigationStack per the app navigation
-/// contract. Elevated to match the living "Today" language: a gradient brand
-/// header with a breathing seal, and premium card rows grouped by intent.
+/// The Halqah tab: the community and you. At its root, top to bottom: the
+/// brand header (the living Silsila seal, Darul Irfan, the site's tagline
+/// and the Silsila's name); My Halqahs, so a Halqah is two taps from launch;
+/// the Silsila's pages; every setting, Language first; and the account
+/// while signed in. Search is in the toolbar. Owns its own NavigationStack
+/// per the app navigation contract.
+///
+/// What left: Events & Dar-ul-Irfan and Official Updates (in Discover), and
+/// All tools, Daily Companion and Qibla (Tools and Qibla are on Today; Qibla
+/// also on the Prayer times page). The language menu left the toolbar for
+/// the first row of Settings; it stays on Today.
 @MainActor
 struct MoreTabView: View {
     private let dependencies: AppDependencies
     private let appState: AppState
 
     @State private var isSearchPresented = false
+    /// The member's private groups, shown at the root.
+    @State private var groups = GroupsModel()
+    /// The Silsila's pages: their favourites and their lists.
+    @State private var library: LibraryViewModel
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
         self.appState = appState
-    }
-
-    /// Live app-language switch — changes the whole UI immediately.
-    private var languageBinding: Binding<AppLanguage> {
-        Binding(
-            get: { appState.settings.language },
-            set: { newValue in
-                DIHaptics.light()
-                Task { await appState.updateSettings { $0.language = newValue } }
-            }
-        )
+        _library = State(initialValue: LibraryViewModel(contentRepository: dependencies.contentRepository))
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.lg) {
-                    MoreBrandHeader()
+                    HalqahBrandHeader()
                         .diAppear()
 
-                    communitySection
-                    toolsSection
+                    if MemberGroupsFeature.isEnabled {
+                        MyHalqahsSection(model: groups, dependencies: dependencies)
+                            .diAppear(delay: 0.05)
+                    }
+
+                    SilsilaSection(dependencies: dependencies, appState: appState, library: library)
+                        .diAppear(delay: 0.10)
+
                     settingsSection
+                        .diAppear(delay: 0.15)
+
+                    if MemberGroupsFeature.isEnabled && groups.showsAccount {
+                        HalqahAccountSection(model: groups)
+                    }
                 }
                 .padding(DISpacing.md)
+                .diResponsiveWidth()
+                .background { HalqahPageDecor() }
             }
             .diScreenBackground()
             .diPageHeading("Halqah")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Menu {
-                        Picker("Language", selection: languageBinding) {
-                            ForEach(AppLanguage.allCases) { lang in
-                                Text(LocalizedStringKey(lang.displayName)).tag(lang)
-                            }
-                        }
-                    } label: {
-                        Label("Language", systemImage: "globe")
-                    }
-                    .accessibilityLabel("Change app language")
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isSearchPresented = true
@@ -68,203 +69,20 @@ struct MoreTabView: View {
             .sheet(isPresented: $isSearchPresented) {
                 GlobalSearchView(dependencies: dependencies, appState: appState)
             }
+            .task {
+                groups.platform = dependencies.officialPlatform
+                await groups.appear()
+            }
+            .refreshable { await groups.checkAgain() }
         }
     }
 
-    // MARK: - Sections
-
-    /// The silsila's people and gatherings: private regional groups, the
-    /// Dar-ul-Irfan programmes, and official updates.
-    private var communitySection: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Halqah", systemImage: "person.3")
-                .diAppear(delay: 0.05)
-
-            if MemberGroupsFeature.isEnabled {
-                MoreNavLink(
-                    titleKey: "Private groups",
-                    subtitleKey: "Members only — your region's announcements and zikr",
-                    systemImage: "lock.shield",
-                    delay: 0.10
-                ) {
-                    GroupsHomeView(dependencies: dependencies)
-                }
-            }
-
-            MoreNavLink(
-                titleKey: "Events & Dar-ul-Irfan",
-                subtitleKey: "Ijtema dates, announcements and directions",
-                systemImage: "calendar",
-                delay: 0.16
-            ) {
-                EventsHomeView(dependencies: dependencies, appState: appState)
-            }
-
-            MoreNavLink(
-                titleKey: "Official Updates",
-                subtitleKey: "News and posts from the silsila",
-                systemImage: "newspaper.fill",
-                delay: 0.22
-            ) {
-                OfficialFeedView(dependencies: dependencies)
-                    .navigationTitle("Official Updates")
-            }
-        }
-    }
-
-    private var toolsSection: some View {
-        VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Tools", systemImage: "square.grid.2x2")
-                .diAppear(delay: 0.28)
-
-            MoreNavLink(
-                titleKey: "All tools",
-                subtitleKey: "Qibla, tasbih, duas, My Day, focus and fasting",
-                systemImage: "square.grid.2x2.fill",
-                delay: 0.32
-            ) {
-                ToolsView(dependencies: dependencies, appState: appState)
-            }
-
-            MoreNavLink(
-                titleKey: "Daily Companion",
-                subtitleKey: "99 Names, duas, Islamic days and tasbih",
-                systemImage: "heart.text.square.fill",
-                delay: 0.36
-            ) {
-                CompanionHomeView(dependencies: dependencies, appState: appState)
-            }
-
-            MoreNavLink(
-                titleKey: "Qibla Compass",
-                subtitleKey: "Direction to the Kaaba",
-                systemImage: "location.north.circle.fill",
-                accent: true,
-                delay: 0.40
-            ) {
-                QiblaCompassView(dependencies: dependencies, appState: appState)
-            }
-        }
-    }
-
+    /// Every setting, in one list: the Halqah notices in Notifications are
+    /// the same switch as the one under My Halqahs.
     private var settingsSection: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            DISectionHeader(titleKey: "Settings", systemImage: "gearshape")
-                .diAppear(delay: 0.40)
-
-            MoreNavLink(
-                titleKey: "Settings",
-                subtitleKey: "Prayer setup, appearance and storage",
-                systemImage: "gearshape.fill",
-                delay: 0.46
-            ) {
-                SettingsHomeView(dependencies: dependencies, appState: appState)
-            }
-
-            MoreNavLink(
-                titleKey: "About",
-                subtitleKey: "Darul Irfan and Silsila Naqshbandia Owaisiah",
-                systemImage: "info.circle.fill",
-                delay: 0.52
-            ) {
-                AboutView()
-            }
+            HalqahSectionLabel(titleKey: "Settings")
+            SettingsList(dependencies: dependencies, appState: appState, halqahNotices: groups.noticesModel)
         }
-    }
-}
-
-// MARK: - Brand header
-
-/// The living brand crest for the hub: an emerald gradient panel with a faint
-/// octagram watermark, the breathing silsila seal, wordmark and tagline.
-private struct MoreBrandHeader: View {
-    var body: some View {
-        ZStack {
-            DIGradient.emerald
-            DIOctagram(innerRatio: 0.5)
-                .stroke(Color.white, lineWidth: 1.5)
-                .frame(width: 260, height: 260)
-                .opacity(0.06)
-                .offset(x: 96, y: -66)
-                .accessibilityHidden(true)
-
-            VStack(spacing: DISpacing.sm) {
-                DISealEmblem(diameter: 76, glow: true)
-                    .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 18)
-
-                Text(verbatim: DIBrand.wordmark)
-                    .font(DIFont.heading)
-                    .foregroundStyle(.white)
-
-                Text(verbatim: DIBrand.tagline)
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.85))
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.vertical, DISpacing.lg)
-            .padding(.horizontal, DISpacing.md)
-            .frame(maxWidth: .infinity)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg + 6, style: .continuous))
-        .shadow(color: DIColor.primaryDeep.opacity(0.35), radius: 18, x: 0, y: 10)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(verbatim: "\(DIBrand.wordmark). \(DIBrand.tagline)"))
-    }
-}
-
-// MARK: - Navigation card row
-
-/// A premium hub row: a gold-rimmed emerald medallion icon, title and
-/// subtitle inside an elevated card, with spring press feedback, a soft haptic
-/// on tap, and a staggered appear.
-private struct MoreNavLink<Destination: View>: View {
-    let titleKey: LocalizedStringKey
-    let subtitleKey: LocalizedStringKey
-    let systemImage: String
-    /// Uses the gold gradient medallion instead of emerald (for tool-like rows).
-    var accent: Bool = false
-    var delay: Double = 0
-    @ViewBuilder var destination: () -> Destination
-
-    var body: some View {
-        NavigationLink {
-            destination()
-        } label: {
-            DIElevatedCard {
-                HStack(spacing: DISpacing.md) {
-                    medallion
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(titleKey)
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(DIColor.textPrimary)
-                        Text(subtitleKey)
-                            .font(.caption)
-                            .foregroundStyle(DIColor.textMuted)
-                    }
-                    Spacer(minLength: DISpacing.sm)
-                    Image(systemName: "chevron.forward")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(DIColor.textMuted)
-                        .accessibilityHidden(true)
-                }
-            }
-        }
-        .buttonStyle(DIPressableStyle())
-        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
-        .diAppear(delay: delay)
-    }
-
-    private var medallion: some View {
-        ZStack {
-            Circle()
-                .fill(accent ? DIGradient.goldSheen : DIGradient.emerald)
-            Circle()
-                .strokeBorder(DIColor.accent.opacity(0.5), lineWidth: 1)
-            Image(systemName: systemImage)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(accent ? DIColor.primaryDeep : Color.white)
-        }
-        .frame(width: 44, height: 44)
-        .accessibilityHidden(true)
     }
 }

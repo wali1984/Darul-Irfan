@@ -23,6 +23,9 @@ struct RootView: View {
     /// Changed to bring the Zikr tab back to its own screen, from wherever it
     /// had been taken, when a notification or a link asks for it.
     @State private var zikrStack = UUID()
+    /// Changed to bring the Halqah tab back to its root, with the member's
+    /// Halqahs at the top, when a notification or a link asks for them.
+    @State private var halqahStack = UUID()
     /// A Halqah a notification opened, shown over the Halqah tab.
     @State private var linkedGroup: LinkedGroup?
 
@@ -65,6 +68,7 @@ struct RootView: View {
                 .tag(AppTab.explore)
 
             MoreTabView(dependencies: dependencies, appState: appState)
+                .id(halqahStack)
                 .tabItem { Label("Halqah", systemImage: "person.3") }
                 .tag(AppTab.more)
         }
@@ -131,6 +135,9 @@ struct RootView: View {
             zikrStack = UUID()
             selectedTab = .zikr
         case .groups:
+            // A fresh Halqah tab: its root, with My Halqahs at the top, not
+            // whatever screen it had been taken to.
+            halqahStack = UUID()
             selectedTab = .more
             router.clear(route)
         case .group(let id):
