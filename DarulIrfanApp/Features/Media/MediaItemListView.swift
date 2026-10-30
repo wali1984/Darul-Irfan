@@ -383,7 +383,9 @@ struct MediaItemRow: View {
     private var metadataLine: some View {
         HStack(spacing: DISpacing.xs) {
             if let date = item.date {
-                Text(date, format: Date.FormatStyle(date: .abbreviated, time: .omitted))
+                // The catalogue gives a lecture's day as midnight UTC: read it
+                // in UTC, or west of Greenwich every lecture shows a day early.
+                Text(date, format: Date.FormatStyle(date: .abbreviated, time: .omitted, timeZone: .gmt))
                     .font(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
