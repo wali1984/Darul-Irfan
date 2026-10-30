@@ -2,8 +2,9 @@ import Foundation
 import Observation
 
 /// State for the Zikr home screen: the online zikr schedule (from bundled
-/// seed data, remotely updatable via the content manifest) and per-session
-/// reminder toggles persisted in UserDefaults.
+/// seed data, remotely updatable via the content manifest), per-session
+/// reminder toggles persisted in UserDefaults, the live broadcast, the
+/// recorded zikr and recent bayans, and the Tasbih tile's last counter.
 @Observable
 @MainActor
 final class ZikrHomeViewModel {
@@ -11,6 +12,8 @@ final class ZikrHomeViewModel {
     private let platform: OfficialPlatformService
     private let watchSync: WatchSyncService
     private let prayerCalculation: any PrayerCalculationServicing
+    /// The personal counters, for the Tasbih tile; nil shows no count.
+    private let trackerRepository: (any TrackerRepositoryProtocol)?
 
     private(set) var sessions: [ZikrSession] = []
     private(set) var nextOccurrences: [String: Date] = [:]
@@ -25,19 +28,31 @@ final class ZikrHomeViewModel {
     private(set) var recordedZikr: [OfficialFeedItem] = []
     /// The signed-in member's groups where zikr (or a meeting) is live now.
     private(set) var liveGroups: [MemberGroup] = []
+    /// The counter used last, shown on the Tasbih tile.
+    private(set) var practice: ZikrPracticeSummary?
     var showPermissionAlert = false
 
     init(
         notifications: any NotificationScheduling,
         platform: OfficialPlatformService,
         watchSync: WatchSyncService,
-        prayerCalculation: any PrayerCalculationServicing
+        prayerCalculation: any PrayerCalculationServicing,
+        trackerRepository: (any TrackerRepositoryProtocol)? = nil
     ) {
         self.notifications = notifications
         self.platform = platform
         self.watchSync = watchSync
         self.prayerCalculation = prayerCalculation
+        self.trackerRepository = trackerRepository
     }
+
+    /// Daily Zikr's session, shown inside the Daily Zikr card. It stays in
+    /// `sessions`, which the reminders, widgets and Today follow.
+    var dailySession: ZikrSession? { ZikrSessionRoles.dailySession(in: sessions) }
+
+    /// The sessions with a card of their own: the Tahajjud zikr, and any
+    /// further one the administrators publish.
+    var otherSessions: [ZikrSession] { ZikrSessionRoles.otherSessions(in: sessions) }
 
     /// A recording of the daily online zikr, which the channel uploads every
     /// day; "Recent Bayans" lists everything else.
@@ -130,6 +145,17 @@ final class ZikrHomeViewModel {
             await refreshLiveGroups(service: service)
             try? await Task.sleep(for: .seconds(30))
         }
+    }
+
+    /// Re-reads the counters, so the Tasbih tile shows the count left on
+    /// returning from them.
+    func refreshPractice() async {
+        guard let trackerRepository else {
+            practice = nil
+            return
+        }
+        let counters = (try? await trackerRepository.tasbihCounters()) ?? []
+        practice = ZikrPracticeSummary.latest(from: counters)
     }
 
     func refreshLiveGroups(service: MemberGroupService) async {
