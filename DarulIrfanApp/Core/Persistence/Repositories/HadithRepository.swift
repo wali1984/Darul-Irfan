@@ -278,6 +278,16 @@ struct HadithRepository: HadithRepositoryProtocol {
     /// Until the index has been built (in the background, after a content
     /// update) the plain substring search answers instead.
     func search(_ term: String, bookID: String?, limit: Int) async throws -> [HadithEntry] {
+        if let number = Self.referenceNumber(term) {
+            var params: [SQLValue] = [.text(number)]
+            let filter = bookID == nil ? "" : " AND book_id = ?"
+            if let bookID { params.append(.text(bookID)) }
+            params.append(.int(max(1, limit)))
+            let rows = try await database.connection.query(
+                "SELECT \(Self.entryColumns) FROM hadith_entries WHERE lower(display_number) = ?\(filter) ORDER BY \(Self.collectionRank("book_id")), book_id, source_sequence LIMIT ?", params
+            )
+            return rows.compactMap(Self.entry(from:))
+        }
         let expression = SearchIndexService.ftsMatchExpression(from: term)
         guard !expression.isEmpty else { return [] }
         guard await SearchIndexState.isReady(.hadith, database: database) else {
@@ -322,6 +332,15 @@ struct HadithRepository: HadithRepositoryProtocol {
     /// How many narrations match, for "showing N of M". Nil while the index
     /// is being built.
     func searchCount(_ term: String, bookID: String?) async throws -> Int? {
+        if let number = Self.referenceNumber(term) {
+            var params: [SQLValue] = [.text(number)]
+            let filter = bookID == nil ? "" : " AND book_id = ?"
+            if let bookID { params.append(.text(bookID)) }
+            let rows = try await database.connection.query(
+                "SELECT COUNT(*) AS n FROM hadith_entries WHERE lower(display_number) = ?\(filter)", params
+            )
+            return rows.first?.int("n")
+        }
         let expression = SearchIndexService.ftsMatchExpression(from: term)
         guard !expression.isEmpty, await SearchIndexState.isReady(.hadith, database: database) else { return nil }
         do {
@@ -365,6 +384,14 @@ struct HadithRepository: HadithRepositoryProtocol {
         params.append(.int(limit))
         let rows = try await database.connection.query(sql, params)
         return rows.compactMap(Self.entry(from:))
+    }
+
+    /// An edition reference, not a word query: 773, #1 or 119a.
+    static func referenceNumber(_ term: String) -> String? {
+        var value = term.trimmingCharacters(in: .whitespacesAndNewlines)
+        if value.hasPrefix("#") { value.removeFirst() }
+        value = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return value.range(of: "^[0-9]+[a-z]?$", options: .regularExpression) == nil ? nil : value
     }
 
     // MARK: - Import

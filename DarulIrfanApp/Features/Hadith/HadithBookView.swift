@@ -206,7 +206,7 @@ struct HadithBookView: View {
         .onChange(of: searchText) { _, term in
             searchTask?.cancel()
             let query = term.trimmingCharacters(in: .whitespaces)
-            guard query.count >= 2 else {
+            guard query.count >= 2 || HadithRepository.referenceNumber(query) != nil else {
                 // Leaving results returns to the narration read before the
                 // search; short text on the listing changes nothing. A tapped
                 // result mid-jump owns the listing.

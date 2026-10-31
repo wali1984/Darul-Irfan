@@ -42,6 +42,23 @@ final class HadithSearchTests: XCTestCase {
 
     private let niyyah = "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ"
 
+    func testReferenceSearchWorksBeforeIndexAndDoesNotMatchBodyDigits() async throws {
+        try await repository.upsertEntries([
+            entry("abudawud", 773, english: "Praise"),
+            entry("abudawud", 774, english: "The number 773 in prose"),
+            entry("bukhari", 773, english: "Another collection"),
+            entry("abudawud", 1, english: "First narration"),
+        ])
+        let results = try await repository.search("#773", bookID: "abudawud", limit: 20)
+        XCTAssertEqual(results.map(\.displayNumber), ["773"])
+        let count = try await repository.searchCount("773", bookID: nil)
+        XCTAssertEqual(count, 2)
+        let first = try await repository.search("1", bookID: "abudawud", limit: 20)
+        XCTAssertEqual(first.map(\.displayNumber), ["1"])
+        XCTAssertEqual(HadithRepository.referenceNumber(" #119A "), "119a")
+        XCTAssertNil(HadithRepository.referenceNumber("773 prayers"))
+    }
+
     private func seedThreeCollections() async throws {
         try await repository.upsertEntries([
             entry("abudawud", 1, arabic: niyyah, english: "Actions are by intentions"),

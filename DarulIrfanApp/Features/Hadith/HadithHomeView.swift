@@ -79,7 +79,7 @@ struct HadithHomeView: View {
         .onChange(of: searchText) { _, term in
             searchTask?.cancel()
             let query = term.trimmingCharacters(in: .whitespaces)
-            guard query.count >= 2 else {
+            guard query.count >= 2 || HadithRepository.referenceNumber(query) != nil else {
                 results = []; matchCount = nil; isSearching = false; return
             }
             isSearching = true
