@@ -98,7 +98,6 @@ struct TodayHeroView: View {
                 Spacer(minLength: 0)
                 DILivingSealMark(diameter: dynamicTypeSize.isAccessibilitySize ? 52 : 68).accessibilityHidden(true)
             }
-            .environment(\.layoutDirection, .leftToRight)
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(verbatim: viewModel.gregorianShortText).font(.footnote).foregroundStyle(.white.opacity(0.92))
