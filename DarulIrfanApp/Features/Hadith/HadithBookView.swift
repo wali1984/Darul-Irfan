@@ -479,10 +479,7 @@ struct HadithBookView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let matn = entry.urduText, !matn.isEmpty {
-                Text(verbatim: matn)
-                    .font(DIFont.urduBody(scale: fontScale))
-                    .lineSpacing(CGFloat(6 * fontScale))
-                    .foregroundStyle(DIColor.textPrimary)
+                FormattedBookPage(page: BookPageFormatter.articleParagraph(matn), scale: fontScale)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .environment(\.layoutDirection, .rightToLeft)
                     .textSelection(.enabled)
@@ -678,6 +675,7 @@ struct HadithBookView: View {
     /// scrolls there; only a tapped one is highlighted.
     private func loadFirstPage(target: String?, highlights: Bool) async {
         guard entries.isEmpty else { return }
+        await Task.detached(priority: .utility) { QuranQuotation.warmUp() }.value
         if let target,
            let index = try? await repository.readingIndex(bookID: book.id, canonicalID: target) {
             await loadWindow(startingAt: max(0, index - 6))
