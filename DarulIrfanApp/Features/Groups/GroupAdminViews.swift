@@ -222,6 +222,7 @@ struct GroupLiveStarter: View {
     @State private var recordRoom = true
     @State private var library: GroupRecordingLibrary?
     @State private var libraryFailed = false
+    @State private var showAllPastVideos = false
     /// What plays, in order: recordings and past zikr, picked from either list.
     @State private var picked: [GroupQueueEntry] = []
     @State private var choosingFile = false
@@ -349,13 +350,21 @@ struct GroupLiveStarter: View {
                 if videos.isEmpty {
                     Text("No past zikr videos yet.").foregroundStyle(DIColor.textMuted)
                 }
-                ForEach(videos.prefix(40)) { video in
+                if videos.count > 5 {
+                    Button { showAllPastVideos.toggle() } label: {
+                        if showAllPastVideos { Text("Show less") }
+                        else { Text("Show all \(min(videos.count, 40))") }
+                    }
+                    .buttonStyle(DICompactButtonStyle())
+                }
+                ForEach(videos.prefix(showAllPastVideos ? 40 : 5)) { video in
                     choiceRow(
                         entry: .video(video.videoID),
                         title: video.title,
                         detail: [video.publishedAt.formatted(date: .abbreviated, time: .omitted), length(video.durationSeconds)]
                     )
                 }
+
             } else {
                 libraryStatus
             }
