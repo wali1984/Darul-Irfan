@@ -43,6 +43,14 @@ APP = "6789375037"
 EXTERNAL_GROUP = "040ba83d-04ce-4f69-8ed0-7a838d64bdc1"
 R2_CONFIG = REPO.parent / "cloudflare.md"
 BUCKET, RELEASES = "darul-irfan-media", "app/releases.json"
+POLICY = REPO.parent / "automation" / "testflight-policy.json"
+
+
+def distribution_policy() -> dict:
+    """Keep unattended release jobs within the owner's explicit tester scope."""
+    if POLICY.exists():
+        return json.loads(POLICY.read_text(encoding="utf-8"))
+    return {"externalDistributionEnabled": False, "externalBuildCeiling": 70}
 
 
 def credentials() -> tuple[str, str]:
@@ -96,6 +104,10 @@ def newest(count: int = 5) -> list[dict]:
 
 
 def release(number: str, notes: str) -> int:
+    policy = distribution_policy()
+    if not policy.get("externalDistributionEnabled", False) or int(number) > int(policy.get("externalBuildCeiling", 70)):
+        print("External distribution held by owner policy; internal uploads are unaffected.")
+        return 1
     build = None
     for _ in range(120):
         found = get(f"/v1/builds?filter[app]={APP}&filter[version]={number}&fields[builds]=version,processingState").get("data", [])
@@ -172,6 +184,9 @@ def announce(known: int | None = None) -> int | None:
     if not found or found[0] == known:
         return None
     number, version = found
+    if number > int(distribution_policy().get("externalBuildCeiling", 70)):
+        print("External update announcement held by owner policy.")
+        return None
     bucket = r2()
     try:
         releases = json.loads(bucket.get_object(Bucket=BUCKET, Key=RELEASES)["Body"].read())
