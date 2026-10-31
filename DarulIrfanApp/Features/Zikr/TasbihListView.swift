@@ -82,6 +82,7 @@ struct TasbihListView: View {
                     Image(systemName: "plus")
                 }
                 .accessibilityLabel("New counter")
+                .accessibilityIdentifier("tasbih-new-counter")
             }
         }
         .onAppear {

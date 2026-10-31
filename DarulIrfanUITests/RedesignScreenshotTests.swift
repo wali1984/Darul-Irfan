@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -78,6 +78,15 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "pages" {
+            silsilaTour()
+            practiceTour()
+            return
+        }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "practice" {
+            practiceTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "silsila" {
             silsilaTour()
             return
@@ -273,6 +282,31 @@ final class RedesignScreenshotTests: XCTestCase {
             app.swipeUp()
             pause(1.5)
             shot("\(name)-\(index + 1)")
+        }
+    }
+
+    private func practiceTour() {
+        selectTab(2)
+        shot("practice-zikr")
+        if seek("zikr-method") {
+            shot("practice-method")
+            scrollShots("practice-method", count: 3)
+            goBack()
+        }
+        scrollToTop()
+        if seek("zikr-tasbih") {
+            shot("practice-tasbih")
+            if seek("tasbih-new-counter") {
+                shot("practice-counter-editor")
+                _ = seek("tasbih-editor-cancel")
+            }
+            scrollToTop()
+            if seek("personal-zikr-entry") {
+                shot("practice-personal-zikr")
+                scrollShots("practice-personal-zikr", count: 4)
+                goBack()
+            }
+            goBack()
         }
     }
 

@@ -43,6 +43,7 @@ struct TasbihEditorView: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("tasbih-editor-cancel")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {

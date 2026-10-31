@@ -141,17 +141,7 @@ struct SilsilaTeachingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: DISpacing.lg) {
-                VStack(spacing: 12) {
-                    DILivingSealMark(diameter: 64).accessibilityHidden(true)
-                    Text("Teachings").font(.title2.bold()).foregroundStyle(Color(hex: 0xFFE3A0))
-                    Text("Silsila Naqshbandia Owaisiah").font(.subheadline).foregroundStyle(.white.opacity(0.85))
-                }
-                .multilineTextAlignment(.center)
-                .padding(28)
-                .frame(maxWidth: .infinity)
-                .background(DIGradient.emerald)
-                .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                .diAppear()
+                SilsilaPageHeader(title: "Teachings")
                 HalqahGlassList {
                 ForEach(Array(SilsilaEntry.teachings.enumerated()), id: \.element.id) { index, entry in
                     if index > 0 {
@@ -171,6 +161,25 @@ struct SilsilaTeachingsView: View {
 }
 
 // MARK: - A category's page
+
+/// Shared introduction for the Silsila's teaching and practice pages.
+struct SilsilaPageHeader: View {
+    let title: LocalizedStringKey
+
+    var body: some View {
+        VStack(spacing: 12) {
+            DILivingSealMark(diameter: 64).accessibilityHidden(true)
+            Text(title).font(.title2.bold()).foregroundStyle(Color(hex: 0xFFE3A0))
+            Text("Silsila Naqshbandia Owaisiah").font(.subheadline).foregroundStyle(.white.opacity(0.85))
+        }
+        .multilineTextAlignment(.center)
+        .padding(28)
+        .frame(maxWidth: .infinity)
+        .background(DIGradient.emerald)
+        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .diAppear()
+    }
+}
 
 /// What a Silsila row opens: the category's only page directly, or its pages
 /// to choose from when it holds several.

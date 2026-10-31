@@ -323,13 +323,15 @@ struct ZikrHomeView: View {
                 ZikrTasbihTile(practice: viewModel.practice)
             }
             .buttonStyle(DIPressableStyle())
+            .accessibilityIdentifier("zikr-tasbih")
 
             NavigationLink {
-                NativeMethodOfZikrView(repository: dependencies.contentRepository)
+                NativeMethodOfZikrView(repository: dependencies.contentRepository, readerFontScale: appState.settings.readerFontScale.rawValue)
             } label: {
                 ZikrMethodTile()
             }
             .buttonStyle(DIPressableStyle())
+            .accessibilityIdentifier("zikr-method")
         }
         .fixedSize(horizontal: false, vertical: true)
     }

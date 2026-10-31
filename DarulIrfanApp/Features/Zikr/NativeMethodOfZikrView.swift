@@ -8,6 +8,7 @@ import SwiftUI
 /// illustrations.
 struct NativeMethodOfZikrView: View {
     let repository: any ContentRepositoryProtocol
+    var readerFontScale: Double = 1
     @State private var item: ContentItem?
     @State private var isLoading = true
 
@@ -19,11 +20,7 @@ struct NativeMethodOfZikrView: View {
                         .frame(maxWidth: .infinity)
                         .padding(DISpacing.xl)
                 } else {
-                    if let item {
-                        Text(verbatim: item.title)
-                            .font(DIFont.heading)
-                            .foregroundStyle(DIColor.textPrimary)
-                    }
+                    SilsilaPageHeader(title: "Method of Zikr")
 
                     MethodOfZikrIntro()
                         .diAppear()
@@ -46,6 +43,7 @@ struct NativeMethodOfZikrView: View {
         .navigationBarTitleDisplayMode(.inline)
         .diScreenBackground()
         .task {
+            await Task.detached(priority: .userInitiated) { QuranQuotation.warmUp() }.value
             let stored = try? await repository.item(id: Self.itemID)
             if let stored {
                 item = stored
@@ -64,11 +62,11 @@ struct NativeMethodOfZikrView: View {
     @ViewBuilder
     private func methodText(_ item: ContentItem) -> some View {
         if let text = item.bodyPlainText, !text.isEmpty {
-            Text(verbatim: text)
-                .font(.body)
-                .foregroundStyle(DIColor.textPrimary)
-                .lineSpacing(5)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: DISpacing.md) {
+                ForEach(Array(text.components(separatedBy: "\n\n").enumerated()), id: \.offset) { _, paragraph in
+                    FormattedBookPage(page: BookPageFormatter.articleParagraph(paragraph), scale: readerFontScale)
+                }
+            }
                 .padding(DISpacing.lg)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .diGlassPanel(cornerRadius: 24)
