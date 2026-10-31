@@ -36,14 +36,14 @@ enum BookPageFormatter {
         } else {
             block = .paragraph(proseRuns(text, check: .letters, includeArabicQuotations: true))
         }
-        let citations = reviewedArticleReferences(itemID: itemID, text: text).compactMap { reference -> Block? in
+        let citations = reviewedArticleReferences(itemID: itemID, text: text).flatMap { reference -> [Block] in
             let verses = (reference.start...reference.end).compactMap { ayah in
                 articleArabic["\(reference.surah):\(ayah)"]
             }
             guard verses.count == reference.end - reference.start + 1,
-                  verses.allSatisfy({ !$0.isEmpty }) else { return nil }
+                  verses.allSatisfy({ !$0.isEmpty }) else { return [] }
             let label = reference.start == reference.end ? "\(reference.surah):\(reference.start)" : "\(reference.surah):\(reference.start)-\(reference.end)"
-            return .quran(verses.joined(separator: "\n") + " (\(label))")
+            return [.quran(verses.joined(separator: "\n")), .caption(label)]
         }
         return Page(isContents: false, blocks: citations + [block])
     }
