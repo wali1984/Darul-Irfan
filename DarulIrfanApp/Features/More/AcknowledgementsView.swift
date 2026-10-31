@@ -20,6 +20,7 @@ struct AcknowledgementsView: View {
                     .diAppear(delay: 0.30)
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .diScreenBackground()
         .navigationTitle("Licences")
@@ -36,17 +37,7 @@ struct AcknowledgementsView: View {
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://github.com/batoulapps/adhan-swift") {
-                    Link(destination: url) {
-                        Label {
-                            Text(verbatim: "github.com/batoulapps/adhan-swift")
-                        } icon: {
-                            Image(systemName: "chevron.left.forwardslash.chevron.right")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("View the adhan-swift project on GitHub")
+                    DIExternalResourceLink(destination: url, title: "github.com/batoulapps/adhan-swift", systemImage: "chevron.left.forwardslash.chevron.right", accessibilityTitle: "View the adhan-swift project on GitHub")
                 }
             }
         }
@@ -62,17 +53,7 @@ struct AcknowledgementsView: View {
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://fonts.google.com/specimen/Amiri+Quran") {
-                    Link(destination: url) {
-                        Label {
-                            Text(verbatim: "Amiri Quran · SIL OFL 1.1")
-                        } icon: {
-                            Image(systemName: "character.book.closed")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("View the Amiri Quran font project")
+                    DIExternalResourceLink(destination: url, title: "Amiri Quran · SIL OFL 1.1", systemImage: "character.book.closed", accessibilityTitle: "View the Amiri Quran font project")
                 }
 
             }
@@ -122,17 +103,7 @@ struct AcknowledgementsView: View {
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg") {
-                    Link(destination: url) {
-                        Label {
-                            Text(verbatim: "commons.wikimedia.org · Beautiful adhan")
-                        } icon: {
-                            Image(systemName: "waveform")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("View the azan recording on Wikimedia Commons")
+                    DIExternalResourceLink(destination: url, title: "commons.wikimedia.org · Beautiful adhan", systemImage: "waveform", accessibilityTitle: "View the azan recording on Wikimedia Commons")
                 }
 
                 Text("The Fajr azan recording is by Islamic Center Malmö, from Wikimedia Commons, used under the Creative Commons Attribution 3.0 license. The audio was extracted from the original video and converted for playback in the app.")
@@ -140,17 +111,7 @@ struct AcknowledgementsView: View {
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://commons.wikimedia.org/wiki/File:Eid_al-Fitr_Fajr_azan_at_Malm%C3%B6_Mosque_-_19_August_2012.webm") {
-                    Link(destination: url) {
-                        Label {
-                            Text(verbatim: "commons.wikimedia.org · Fajr azan, Malmö Mosque")
-                        } icon: {
-                            Image(systemName: "waveform")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("View the Fajr azan recording on Wikimedia Commons")
+                    DIExternalResourceLink(destination: url, title: "commons.wikimedia.org · Fajr azan, Malmö Mosque", systemImage: "waveform", accessibilityTitle: "View the Fajr azan recording on Wikimedia Commons")
                 }
             }
         }

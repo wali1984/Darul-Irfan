@@ -32994,6 +32994,57 @@
           }
         }
       }
+    },
+    "Typography": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Typography"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطوط"
+          }
+        }
+      }
+    },
+    "Unable to open link": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to open link"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لنک نہیں کھل سکا"
+          }
+        }
+      }
+    },
+    "No app could open this link. Please check that a suitable app is installed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No app could open this link. Please check that a suitable app is installed."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ لنک کسی ایپ میں نہیں کھل سکا۔ براہِ کرم دیکھیں کہ موزوں ایپ انسٹال ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -128,6 +128,7 @@ struct AboutView: View {
                 Text("The order was revived in the last century by Shaikh Allah Yar Khan (1904–1984) and afterwards led by Hazrat Ameer Muhammad Akram Awan (RA). It is presently led by Sheikh-e-Silsila Hazrat Ameer Abdul Qadeer Awan (MZA), born 26 March 1973 in Munara, District Chakwal.")
                     .font(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
+                MethodOfZikrLink(compact: true)
             }
         }
     }
@@ -158,31 +159,11 @@ struct AboutView: View {
                 aboutHeader("Contact", systemImage: "envelope")
 
                 if let emailURL = URL(string: "mailto:Darulirfan@gmail.com") {
-                    Link(destination: emailURL) {
-                        Label {
-                            Text(verbatim: "Darulirfan@gmail.com")
-                        } icon: {
-                            Image(systemName: "envelope")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("Send an email")
+                    DIExternalResourceLink(destination: emailURL, title: "Darulirfan@gmail.com", systemImage: "envelope", accessibilityTitle: "Send an email")
                 }
 
                 if let phoneURL = URL(string: "tel:+92543562200") {
-                    Link(destination: phoneURL) {
-                        Label {
-                            Text(verbatim: "+92 543 562200")
-                        } icon: {
-                            Image(systemName: "phone")
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.primary)
-                    .accessibilityLabel("Call Dar ul Irfan")
+                    DIExternalResourceLink(destination: phoneURL, title: "+92 543 562200", systemImage: "phone", accessibilityTitle: "Call Dar ul Irfan")
                 }
             }
         }
@@ -205,11 +186,11 @@ struct AboutView: View {
                     .accessibilityHidden(true)
             }
             .font(.footnote.weight(.semibold))
-            .foregroundStyle(DIColor.primary)
+            .foregroundStyle(DIColor.actionForeground)
             .frame(maxWidth: .infinity, minHeight: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DISecondaryButtonStyle())
     }
 
     // MARK: - Shared
@@ -225,5 +206,35 @@ struct AboutView: View {
                 .foregroundStyle(DIColor.textPrimary)
         }
         .accessibilityAddTraits(.isHeader)
+    }
+}
+
+/// Consistent external actions, with feedback when the device cannot handle a URL.
+struct DIExternalResourceLink: View {
+    let destination: URL
+    let title: String
+    let systemImage: String
+    let accessibilityTitle: LocalizedStringKey
+    @Environment(\.openURL) private var openURL
+    @State private var failed = false
+
+    var body: some View {
+        Button {
+            openURL(destination) { accepted in failed = !accepted }
+        } label: {
+            Label {
+                Text(verbatim: title)
+                    .multilineTextAlignment(.center)
+            } icon: {
+                Image(systemName: systemImage).accessibilityHidden(true)
+            }
+        }
+        .buttonStyle(DISecondaryButtonStyle())
+        .accessibilityLabel(accessibilityTitle)
+        .alert("Unable to open link", isPresented: $failed) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("No app could open this link. Please check that a suitable app is installed.")
+        }
     }
 }
