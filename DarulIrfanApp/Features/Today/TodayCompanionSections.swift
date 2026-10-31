@@ -115,30 +115,19 @@ struct TodayMyDayCard: View {
                 HStack {
                     DISectionHeader(titleKey: "My Day", systemImage: "checklist")
                     Spacer()
-                    if store.canRead {
-                        Button {
-                            isAdding = true
-                        } label: {
-                            Label("Add", systemImage: "plus")
-                                .font(.subheadline.weight(.semibold))
-                        }
+                    Button {
+                        isAdding = true
+                    } label: {
+                        Label("Add", systemImage: "plus")
+                            .font(.subheadline.weight(.semibold))
                     }
                 }
-                if !store.canRead {
-                    Text(store.loadFailed ? "Your personal records could not be read. Please try again." : "Loading...")
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
-                    if store.loadFailed {
-                        Button("Retry") { store.loadIfNeeded() }
-                            .buttonStyle(DISecondaryButtonStyle())
-                    }
-                }
-                if store.canRead && open.isEmpty {
+                if open.isEmpty {
                     Text("Nothing left for today. Add a task, or plan one for after a prayer.")
                         .font(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                 }
-                ForEach(store.canRead ? Array(open.prefix(3)) : []) { entry in
+                ForEach(Array(open.prefix(3))) { entry in
                     DayTaskRow(task: entry.task, time: entry.time, day: today) {
                         guard store.toggleDone(taskID: entry.task.id, on: today) else { saveFailed = true; return }
                         DIHaptics.light()
