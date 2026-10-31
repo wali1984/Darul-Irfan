@@ -46,7 +46,7 @@ struct CompanionHomeView: View {
                 .diAppear(delay: 0.1)
 
                 NavigationLink {
-                    IslamicDaysView(hijri: dependencies.hijri, appState: appState)
+                    IslamicDaysView(dependencies: dependencies, appState: appState)
                 } label: {
                     CompanionHubCard(
                         systemImage: "moon.stars",

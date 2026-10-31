@@ -16,7 +16,7 @@ struct ToolsView: View {
                     tool("Qibla", "location.north.line") { QiblaCompassView(dependencies: dependencies, appState: appState) }
                     tool("Monthly timetable", "calendar") { MonthlyTimetableView(dependencies: dependencies, appState: appState) }
                     tool("Fasting record", "moon.haze") { FastingView(dependencies: dependencies, appState: appState) }
-                    tool("Islamic days", "star.circle") { IslamicDaysView(hijri: dependencies.hijri, appState: appState) }
+                    tool("Islamic days", "star.circle") { IslamicDaysView(dependencies: dependencies, appState: appState) }
                 }
                 group("Remembrance", systemImage: "moon.stars") {
                     tool("Tasbih", "hand.tap") {

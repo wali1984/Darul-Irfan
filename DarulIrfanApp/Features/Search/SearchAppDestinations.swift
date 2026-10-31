@@ -174,7 +174,7 @@ struct SearchAppDestinationScreen: View {
         case .names:
             NamesOfAllahView()
         case .islamicDays:
-            IslamicDaysView(hijri: dependencies.hijri, appState: appState)
+            IslamicDaysView(dependencies: dependencies, appState: appState)
         case .myDay:
             MyDayView(dependencies: dependencies, appState: appState)
         case .focus:

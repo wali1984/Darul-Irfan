@@ -93,23 +93,36 @@ final class IslamicDaysViewModel {
 struct IslamicDaysView: View {
     @State private var viewModel: IslamicDaysViewModel
     private let appState: AppState
+    private let dependencies: AppDependencies
 
-    init(hijri: any HijriCalendarServicing, appState: AppState) {
+    init(dependencies: AppDependencies, appState: AppState) {
         self.appState = appState
-        _viewModel = State(initialValue: IslamicDaysViewModel(hijri: hijri))
+        self.dependencies = dependencies
+        _viewModel = State(initialValue: IslamicDaysViewModel(hijri: dependencies.hijri))
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
-                if viewModel.isLoaded && viewModel.groups.isEmpty {
+                NavigationLink {
+                    HijriSettingsView(dependencies: dependencies, appState: appState)
+                } label: {
+                    Label("Local moon sighting", systemImage: "moon.stars")
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .buttonStyle(DISecondaryButtonStyle())
+                if !viewModel.isLoaded {
+                    ProgressView("Loading").padding(DISpacing.lg)
+                } else if viewModel.groups.isEmpty {
                     DIElevatedCard {
-                        DIEmptyState(
-                            systemImage: "moon.stars",
-                            titleKey: "No upcoming days found",
-                            messageKey: "Notable Islamic days will appear here. Updating the app should restore the bundled list."
-                        )
-                        .diOctagramWatermark(size: 220, opacity: 0.06)
+                        VStack(spacing: DISpacing.md) {
+                            DIEmptyState(
+                                systemImage: "moon.stars",
+                                titleKey: "No upcoming days found"
+                            )
+                            .diOctagramWatermark(size: 220, opacity: 0.06)
+                            Button("Retry") { reload() }.buttonStyle(DISecondaryButtonStyle())
+                        }
                     }
                 } else {
                     ForEach(viewModel.groups) { group in
@@ -138,12 +151,14 @@ struct IslamicDaysView: View {
         }
         .navigationTitle("Islamic Days")
         .diScreenBackground()
-        .task {
-            viewModel.load(
-                offsetDays: appState.settings.hijri.dayOffset,
-                locale: LanguageManager.locale(for: appState.settings.language)
-            )
-        }
+        .task(id: "\(appState.settings.hijri.dayOffset)|\(appState.settings.language.contentLanguageCode)") { reload() }
+    }
+
+    private func reload() {
+        viewModel.load(
+            offsetDays: appState.settings.hijri.dayOffset,
+            locale: LanguageManager.locale(for: appState.settings.language)
+        )
     }
 
     private func monthChip(_ title: String) -> some View {
