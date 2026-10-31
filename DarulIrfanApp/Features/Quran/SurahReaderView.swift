@@ -1262,6 +1262,7 @@ private struct AyahCardView: View {
                 }
                 .accessibilityLabel(Text("Write a note on Ayah \(ayah.ayahNumber)"))
             }
+            .buttonStyle(AyahToolbarButtonStyle())
             // The sheikhs' bayans on this ayah, one note each. Not in
             // Arabic-only reading, which is the mushaf alone.
             if displayMode.showsTranslation {
@@ -1379,11 +1380,8 @@ private struct AyahCardView: View {
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {
         Label(LocalizedStringKey(label), systemImage: icon)
-            .font(.caption2.weight(.medium))
-            .padding(.horizontal, DISpacing.sm)
-            .padding(.vertical, 5)
-            .background(Capsule().fill(enabled ? DIColor.primary.opacity(0.12) : DIColor.sandstone.opacity(0.45)))
-            .overlay(Capsule().stroke(enabled ? DIColor.primary.opacity(0.4) : DIColor.textMuted.opacity(0.25), lineWidth: 1))
+            .font(.caption.weight(.semibold))
+            .padding(.vertical, 8)
             .foregroundStyle(enabled ? DIColor.primary : DIColor.textMuted)
     }
 
