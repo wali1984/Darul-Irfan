@@ -51,6 +51,15 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
 
     func displayAvailabilityNote(urdu: Bool) -> String? {
         if urdu, let availabilityNoteUrdu, !availabilityNoteUrdu.isEmpty { return availabilityNoteUrdu }
+        if urdu {
+            switch availabilityNote {
+            case "The time follows Fajr at Dar-ul-Irfan and changes through the year.":
+                return "یہ وقت دارالعرفان میں فجر کے وقت کے مطابق سال بھر بدلتا رہتا ہے۔"
+            case "Daily Zikr is shown live here in Darul Irfan while the session is in progress.":
+                return "روزانہ ذکر کے دوران یہاں دارالعرفان میں براہِ راست نشریات دکھائی جاتی ہیں۔"
+            default: break
+            }
+        }
         return availabilityNote
     }
 

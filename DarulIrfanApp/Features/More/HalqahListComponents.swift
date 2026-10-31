@@ -51,7 +51,7 @@ struct HalqahBrandHeader: View {
                 Text("Darul Irfan")
                     .font(.title3.weight(.heavy))
                     .foregroundStyle(DIColor.textPrimary)
-                Text(verbatim: DIBrand.tagline)
+                Text(LocalizedStringKey(DIBrand.tagline))
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(HalqahInk.goldText)
                 Text("Silsila Naqshbandia Owaisiah")

@@ -25657,8 +25657,18 @@
     "Starts": {
       "extractionState": "manual",
       "localizations": {
-        "en": { "stringUnit": { "state": "translated", "value": "Starts" } },
-        "ur": { "stringUnit": { "state": "translated", "value": "آغاز" } }
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آغاز"
+          }
+        }
       }
     },
     "Starts a zikr or meeting for the whole Halqah.": {
@@ -32947,6 +32957,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "عید الاضحیٰ"
+          }
+        }
+      }
+    },
+    "Exploring the Treasures of the Heart": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exploring the Treasures of the Heart"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دل کے خزانوں کی جستجو"
           }
         }
       }

@@ -22,7 +22,7 @@ class RestoredIdentityTests(unittest.TestCase):
 
     def test_restored_source_inventory_is_lossless_and_ordered(self):
         registry = gate.load_restored_reading_order()
-        for book, expected in [('bulugh',1767),('hisn',268),('adab',1326),('mishkat',5318),('ibnkhuzayma',2879)]:
+        for book, expected in [('bulugh',1767),('hisn',268),('adab',1326),('mishkat',5318),('ibnkhuzayma',2879),('ibnhibban',7651)]:
             rows = json.loads((gate.IOS_SEED/f'hadith_{book}.json').read_bytes())
             self.assertEqual(expected,len(rows))
             self.assertEqual(list(range(1,expected+1)),[r['sourceSequence'] for r in rows])

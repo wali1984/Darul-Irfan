@@ -8,6 +8,18 @@ import XCTest
 /// this phone's time and Pakistan's, and the Tasbih tile.
 final class ZikrTabTests: XCTestCase {
 
+    func testLegacyScheduleNotesFollowUrduButExplicitTranslationWins() {
+        var value = tahajjud
+        value.availabilityNote = "The time follows Fajr at Dar-ul-Irfan and changes through the year."
+        XCTAssertFalse(value.displayAvailabilityNote(urdu: true)!.contains("Fajr"))
+        XCTAssertEqual(value.displayAvailabilityNote(urdu: false), value.availabilityNote)
+        value.availabilityNoteUrdu = "منتظم کا نوٹ"
+        XCTAssertEqual(value.displayAvailabilityNote(urdu: true), "منتظم کا نوٹ")
+        value.availabilityNoteUrdu = nil
+        value.availabilityNote = "A custom schedule note"
+        XCTAssertEqual(value.displayAvailabilityNote(urdu: true), "A custom schedule note")
+    }
+
     func testTasbihTargetAcceptsUrduAndArabicKeyboardDigits() {
         XCTAssertEqual(TasbihCounter.parseTarget(" 100 "), 100)
         XCTAssertEqual(TasbihCounter.parseTarget("\u{0663}\u{0663}"), 33)
