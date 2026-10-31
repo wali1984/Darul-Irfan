@@ -95,7 +95,7 @@ struct TopicDetailView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text(verse.arabic)
                     .font(DIFont.quranArabic(scale: 1.0))
-                    .foregroundStyle(DIColor.textPrimary)
+                    .foregroundStyle(DIColor.scripture)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .environment(\.layoutDirection, .rightToLeft)
                 if let translation = verse.translation, !translation.isEmpty {
@@ -103,7 +103,9 @@ struct TopicDetailView: View {
                     TopicTranslationText(text: translation)
                 }
                 HStack {
-                    Text(verse.reference)
+                    Text(verbatim: verse.reference.replacingOccurrences(
+                        of: "[0-9]+:[0-9]+(?:-[0-9]+)?", with: "\u{2066}$0\u{2069}", options: .regularExpression
+                    ))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIColor.primary)
                     Spacer()
@@ -249,7 +251,7 @@ private struct TopicHadithCard: View {
                 if let arabic = item.arabic, !arabic.isEmpty {
                     Text(verbatim: arabic)
                         .font(DIFont.quranArabic(scale: 0.7))
-                        .foregroundStyle(DIColor.textMuted)
+                        .foregroundStyle(DIColor.scripture)
                         .lineLimit(expanded ? nil : 2)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .environment(\.layoutDirection, .rightToLeft)
