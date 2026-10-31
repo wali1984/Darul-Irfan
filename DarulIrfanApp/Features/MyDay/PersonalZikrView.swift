@@ -11,7 +11,6 @@ struct PersonalZikrView: View {
     @State private var denied = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.locale) private var locale
 
     var body: some View {
         ScrollView {
@@ -64,7 +63,6 @@ struct PersonalZikrView: View {
         let plan = run?.plan ?? store.plan
         let position = PersonalZikrMath.position(plan, elapsed: run?.elapsed(at: now) ?? 0)
         let remaining = PersonalZikrMath.total(plan) - (run?.elapsed(at: now) ?? 0)
-        let remainingText = DisplayNumerals.text(PersonalZikrMath.text(remaining), locale: locale)
         let progress = position.map { 1 - $0.remaining / Double($0.step.minutes * 60) } ?? 0
         return VStack(spacing: 14) {
             HStack {
@@ -83,7 +81,7 @@ struct PersonalZikrView: View {
                     .rotationEffect(.degrees(-90)).padding(8)
                     .animation(reduceMotion ? nil : .linear(duration: 0.85), value: progress)
                 VStack(spacing: 4) {
-                    Text(verbatim: DisplayNumerals.text(PersonalZikrMath.text(position?.remaining ?? 0), locale: locale))
+                    Text(verbatim: PersonalZikrMath.text(position?.remaining ?? 0))
                         .font(.system(size: 42, weight: .light).monospacedDigit()).foregroundStyle(.white)
                         .minimumScaleFactor(0.6).lineLimit(1)
                     Text(run?.startedAt != nil ? "In progress" : run != nil ? "Paused" : "Ready when you are")
@@ -91,7 +89,7 @@ struct PersonalZikrView: View {
                 }
             }
             .frame(width: 184, height: 184)
-            Text("Total remaining: \(remainingText)").font(.footnote).foregroundStyle(.white.opacity(0.8))
+            Text("Total remaining: \(PersonalZikrMath.text(remaining))").font(.footnote).foregroundStyle(.white.opacity(0.8))
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 12) { controls }
                 VStack(spacing: 12) { controls }
@@ -149,7 +147,7 @@ struct PersonalZikrView: View {
         let selected = store.plan.contains { $0.id == step.id }
         return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 10) {
-                Text(verbatim: DisplayNumerals.text("\(index + 1)", locale: locale)).font(.caption).foregroundStyle(DIColor.primary)
+                Text(verbatim: "\(index + 1)").font(.caption).foregroundStyle(DIColor.primary)
                     .frame(width: 30, height: 30).background(DIColor.accent.opacity(0.12), in: Circle())
                 Text(verbatim: step.localizedTitle).font(.subheadline.weight(.medium)).foregroundStyle(DIColor.textPrimary)
                 Spacer(minLength: 0)

@@ -42,31 +42,6 @@ enum LanguageManager {
 
     /// The locale to drive formatting/RTL for the chosen language.
     static func locale(for language: AppLanguage) -> Locale {
-        DisplayNumerals.locale(Locale(identifier: language.forcedLocaleIdentifier ?? Locale.autoupdatingCurrent.identifier))
-    }
-}
-
-/// Presentation only; identifiers, calculations and stored values retain their original form.
-enum DisplayNumerals {
-    static func countdown(_ seconds: TimeInterval, locale: Locale) -> String {
-        let total = Int(max(0, ceil(seconds)))
-        let raw = total >= 3600
-            ? String(format: "%d:%02d:%02d", total / 3600, total / 60 % 60, total % 60)
-            : String(format: "%d:%02d", total / 60, total % 60)
-        return text(raw, locale: locale)
-    }
-
-    static func locale(_ base: Locale) -> Locale {
-        guard base.language.languageCode?.identifier == "ur" else { return base }
-        var components = Locale.Components(locale: base)
-        components.numberingSystem = Locale.NumberingSystem("arabext")
-        return Locale(components: components)
-    }
-
-    static func text(_ value: String, locale: Locale) -> String {
-        guard locale.language.languageCode?.identifier == "ur" else { return value }
-        return String(String.UnicodeScalarView(value.unicodeScalars.map { scalar in
-            (48...57).contains(scalar.value) ? UnicodeScalar(0x06F0 + scalar.value - 48)! : scalar
-        }))
+        Locale(identifier: language.forcedLocaleIdentifier ?? Locale.autoupdatingCurrent.identifier)
     }
 }
