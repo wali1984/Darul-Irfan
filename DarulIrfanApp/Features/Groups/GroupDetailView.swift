@@ -64,7 +64,7 @@ struct GroupDetailView: View {
                     facts: headerFacts
                 )
                 .diAppear()
-                MethodOfZikrLink()
+                MethodOfZikrLink(compact: true)
                 if isLoading && detail == nil {
                     ProgressView().frame(maxWidth: .infinity).padding(.top, DISpacing.lg)
                 } else if let failure {

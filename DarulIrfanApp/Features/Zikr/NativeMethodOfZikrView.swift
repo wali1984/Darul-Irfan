@@ -134,14 +134,29 @@ extension EnvironmentValues {
 
 /// Contextual access to the same verified native guide from any activity.
 struct MethodOfZikrLink: View {
+    var compact = false
     @Environment(\.methodGuideReaderScale) private var readerScale
     var body: some View {
-        NavigationLink {
-            NativeMethodOfZikrView(readerFontScale: readerScale)
-        } label: {
-            Label("Method of Zikr", systemImage: "book.pages")
+        Group {
+            if compact {
+                NavigationLink {
+                    NativeMethodOfZikrView(readerFontScale: readerScale)
+                } label: {
+                    Label("Method of Zikr", systemImage: "book.pages")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(DIColor.actionForeground)
+                        .padding(.horizontal, 14).frame(minHeight: 44)
+                        .background(LinearGradient(colors: [DIColor.surface, DIColor.sandstone], startPoint: .top, endPoint: .bottom), in: Capsule())
+                        .overlay(Capsule().strokeBorder(DIColor.accent.opacity(0.45)))
+                }.buttonStyle(DIPressableStyle())
+            } else {
+                NavigationLink {
+                    NativeMethodOfZikrView(readerFontScale: readerScale)
+                } label: {
+                    Label("Method of Zikr", systemImage: "book.pages")
+                }.buttonStyle(DISecondaryButtonStyle())
+            }
         }
-        .buttonStyle(DISecondaryButtonStyle())
         .accessibilityIdentifier("method-of-zikr-shortcut")
     }
 }
