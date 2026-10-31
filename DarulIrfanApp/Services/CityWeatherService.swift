@@ -15,6 +15,9 @@ struct WeatherCityGrid: Equatable, Sendable {
 }
 
 struct CityWeatherSnapshot: Codable, Sendable {
+    static func deviceUnit(locale: Locale = .autoupdatingCurrent) -> String {
+        UnitTemperature(forLocale: locale) == .fahrenheit ? "F" : "C"
+    }
     let temperatureCelsius: Double
     let feelsLikeCelsius: Double
     let humidity: Double

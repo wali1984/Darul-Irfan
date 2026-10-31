@@ -30141,6 +30141,23 @@
           }
         }
       }
+    },
+    "Follows phone settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Follows phone settings"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فون کی ترتیبات کے مطابق"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -2,6 +2,12 @@ import XCTest
 @testable import DarulIrfan
 
 final class CityWeatherTests: XCTestCase {
+    func testFollowsPhoneTemperaturePreferenceIncludingRegionalOverrides() {
+        XCTAssertEqual(CityWeatherSnapshot.deviceUnit(locale: Locale(identifier: "en_US")), "F")
+        XCTAssertEqual(CityWeatherSnapshot.deviceUnit(locale: Locale(identifier: "ur_PK")), "C")
+        XCTAssertEqual(CityWeatherSnapshot.deviceUnit(locale: Locale(identifier: "en-US-u-mu-celsius")), "C")
+        XCTAssertEqual(CityWeatherSnapshot.deviceUnit(locale: Locale(identifier: "ur-PK-u-mu-fahrenhe")), "F")
+    }
     func testOnlyCityPrecisionLeavesTheDevice() {
         let grid = WeatherCityGrid(latitude: 31.52037, longitude: 74.35874)
         XCTAssertEqual(grid?.latitude, "31.5")

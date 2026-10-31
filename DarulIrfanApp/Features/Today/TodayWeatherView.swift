@@ -5,7 +5,8 @@ struct TodayWeatherView: View {
     let snapshot: CityWeatherSnapshot?
     let city: String
     let timeZone: TimeZone
-    @AppStorage("today.weather.unit") private var unit = "C"
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var unit = CityWeatherSnapshot.deviceUnit()
     @State private var showing = false
     @Environment(\.locale) private var locale
     private static let legal = URL(string: "https://weatherkit.apple.com/legal-attribution.html")!
@@ -15,20 +16,21 @@ struct TodayWeatherView: View {
             if let snapshot {
                 Button { showing = true } label: {
                     HStack(spacing: 6) {
-                        Label("Local weather", systemImage: "thermometer.medium").foregroundStyle(.white.opacity(0.75))
+                        Text("Local weather").foregroundStyle(.white.opacity(0.75))
+                        Text(verbatim: "·").foregroundStyle(.white.opacity(0.5))
                         Text(verbatim: CityWeatherSnapshot.temperature(snapshot.temperatureCelsius, unit: unit, locale: locale)).fontWeight(.semibold).foregroundStyle(Color(hex: 0xFFE3A0))
-                    }.font(.caption).monospacedDigit().frame(minHeight: 32)
+                    }.font(.caption).monospacedDigit().frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text("Local weather"))
                 .accessibilityValue(Text(verbatim: CityWeatherSnapshot.temperature(snapshot.temperatureCelsius, unit: unit, locale: locale)))
-                Spacer(minLength: 8)
-                Link(destination: Self.legal) {
-                    Image("AppleWeatherMark").renderingMode(.original).resizable().scaledToFit().frame(width: 77, height: 14)
-                        .frame(height: 32)
-                }
-                .accessibilityLabel(Text("Apple Weather data sources"))
             }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { unit = CityWeatherSnapshot.deviceUnit() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSLocale.currentLocaleDidChangeNotification)) { _ in
+            unit = CityWeatherSnapshot.deviceUnit()
         }
         .sheet(isPresented: $showing) {
             if let snapshot {
@@ -44,14 +46,15 @@ struct TodayWeatherView: View {
                             LabeledContent("Humidity") { Text(verbatim: "\(Int((snapshot.humidity * 100).rounded()))%") }
                             LabeledContent("Updated") { Text(snapshot.observedAt, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)) }
                         }
-                        Section("Temperature unit") {
-                            Picker("Temperature unit", selection: $unit) {
-                                Text("Celsius (°C)").tag("C")
-                                Text("Fahrenheit (°F)").tag("F")
-                            }.pickerStyle(.segmented)
-                        }
+                        LabeledContent("Temperature unit") { Text("Follows phone settings") }
                         Section {
-                            Link("Apple Weather data sources", destination: Self.legal)
+                            Link(destination: Self.legal) {
+                                HStack(spacing: 16) {
+                                    Image("AppleWeatherMark").renderingMode(.original).resizable().scaledToFit().frame(width: 77, height: 14)
+                                    Text("Apple Weather data sources").font(.caption).foregroundStyle(.white)
+                                }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
+                                    .background(Color(hex: 0x086B50), in: RoundedRectangle(cornerRadius: 12))
+                            }.accessibilityLabel(Text("Apple Weather data sources"))
                         } footer: {
                             Text("Apple Weather uses your selected city's approximate location. Precise device coordinates are not sent.")
                         }
