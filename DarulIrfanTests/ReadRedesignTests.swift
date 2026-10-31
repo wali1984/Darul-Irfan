@@ -112,6 +112,29 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testSilsilaReadFailureIsNotAnEmptyCategoryAndCanRetry() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertItems([libraryItem("silsila-test", category: .aboutSilsila)])
+        let model = LibraryViewModel(contentRepository: repository)
+        // A filter chosen in Books must not hide Silsila navigation content.
+        model.languageFilter = "ar"
+        model.typeFilter = .document
+        try await database.connection.execute("ALTER TABLE content_items RENAME TO unavailable_content_items")
+        do {
+            _ = try await model.silsilaItems(in: .aboutSilsila)
+            XCTFail("A catalogue failure must reach the screen's Retry state")
+        } catch {
+            // Expected database failure, distinct from a legitimate empty result.
+        }
+        try await database.connection.execute("ALTER TABLE unavailable_content_items RENAME TO content_items")
+        let recovered = try await model.silsilaItems(in: .aboutSilsila)
+        XCTAssertEqual(recovered.map(\.id), ["silsila-test"])
+        let empty = try await model.silsilaItems(in: .tasawwuf)
+        XCTAssertTrue(empty.isEmpty)
+    }
+
+    @MainActor
     func testAShelfOfTwoCategoriesListsBothOnceItHoldsMore() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)

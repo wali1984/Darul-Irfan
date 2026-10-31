@@ -170,6 +170,14 @@ final class LibraryViewModel {
 
     // MARK: - Item queries
 
+    /// Silsila navigation must distinguish an unreadable catalogue from an empty category.
+    func silsilaItems(in category: ContentCategory) async throws -> [ContentItem] {
+        let fetched = try await contentRepository.items(
+            category: category, type: nil, language: nil, limit: 500
+        )
+        return Self.newestFirst(fetched)
+    }
+
     /// Items for one category with the active filters applied, newest first.
     /// The Qur'an's translation and tafsir volumes are kept in Qur'an order
     /// instead (`quranOrder`); undated items are ordered by title the way a

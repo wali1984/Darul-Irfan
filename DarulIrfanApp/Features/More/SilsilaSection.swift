@@ -190,10 +190,28 @@ struct SilsilaCategoryDestination: View {
     let appState: AppState
     let library: LibraryViewModel
     @State private var items: [ContentItem]?
+    @State private var loadFailed = false
+    @State private var attempt = 0
 
     var body: some View {
         Group {
-            if let items {
+            if loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    Text("The archive could not be loaded right now. Please try again in a moment.")
+                        .foregroundStyle(DIColor.textPrimary)
+                    Button("Retry") {
+                        loadFailed = false
+                        attempt += 1
+                    }
+                    .buttonStyle(DISecondaryButtonStyle())
+                }
+                .padding(DISpacing.md)
+                .diResponsiveWidth()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .diScreenBackground()
+                .navigationTitle(LocalizedStringKey(entry.title))
+                .navigationBarTitleDisplayMode(.inline)
+            } else if let items {
                 switch SilsilaOpening.forItems(withIDs: items.map(\.id)) {
                 case .item(let id):
                     ContentItemDetailView(itemID: id, dependencies: dependencies, appState: appState, libraryViewModel: library)
@@ -217,9 +235,17 @@ struct SilsilaCategoryDestination: View {
                     .diScreenBackground()
             }
         }
-        .task {
+        .task(id: attempt) {
             guard items == nil else { return }
-            items = await library.items(in: entry.category)
+            loadFailed = false
+            do {
+                items = try await library.silsilaItems(in: entry.category)
+            } catch is CancellationError {
+                return
+            } catch {
+                guard !Task.isCancelled else { return }
+                loadFailed = true
+            }
         }
     }
 }
