@@ -18,7 +18,7 @@ struct PersonalZikrView: View {
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     timer(at: context.date)
                         .onChange(of: store.run?.endsAt.map { $0 <= context.date } ?? false) { _, done in
-                            if done { if scenePhase == .active { store.playChime() }; store.settle(at: context.date); ended = true; DIHaptics.success() }
+                            if done { if scenePhase == .active { store.playChime() }; store.settle(at: context.date); ended = store.run == nil; if ended { DIHaptics.success() } }
                         }
                 }
                 Button { withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { shajra.toggle() } } label: {
@@ -34,7 +34,16 @@ struct PersonalZikrView: View {
                 .accessibilityIdentifier("personal-zikr-shajra")
                 if shajra { ShajraInlineContent().transition(.opacity) }
                 MethodOfZikrLink()
-                PersonalZikrHistoryCard(entries: store.history)
+                if store.historyReadFailed {
+                    DICard {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("Your personal records could not be read. Please try again.").foregroundStyle(DIColor.textPrimary)
+                            Button("Retry") { store.retryHistory() }.buttonStyle(DISecondaryButtonStyle())
+                        }
+                    }
+                } else {
+                    PersonalZikrHistoryCard(entries: store.history)
+                }
                 sequence
                 reminders
             }
@@ -126,10 +135,11 @@ struct PersonalZikrView: View {
                 store.start(); ended = false; DIHaptics.light()
                 Task { denied = !(await store.requestAlerts()) }
             }
-            .buttonStyle(.borderedProminent).tint(DIColor.primary).disabled(store.plan.isEmpty)
+            .buttonStyle(.borderedProminent).tint(DIColor.primary).disabled(store.plan.isEmpty || store.historyReadFailed)
         }
         if store.run != nil {
-            Button("Finish & save") { store.finish(); ended = true; DIHaptics.success() }.buttonStyle(.bordered)
+            Button("Finish & save") { ended = store.finish(); if ended { DIHaptics.success() } }
+                .buttonStyle(.bordered).disabled(store.historyReadFailed)
         }
     }
 

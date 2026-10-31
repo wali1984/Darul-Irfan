@@ -2,6 +2,48 @@ import XCTest
 @testable import DarulIrfan
 
 final class PersonalZikrTests: XCTestCase {
+    @MainActor func testUnreadableHistoryPreservesOriginalAndCompletedRunUntilRetry() throws {
+        let suite = "PersonalZikrTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let original = Data("{broken history".utf8)
+        defaults.set(original, forKey: "personalZikr.history")
+        let start = Date.now.addingTimeInterval(-120)
+        let run = PersonalZikrRun(plan: [PersonalZikrStep(stage: .latifa1)], firstStartedAt: start, startedAt: start)
+        defaults.set(try JSONEncoder().encode(run), forKey: "personalZikr.run")
+        let store = PersonalZikrStore(defaults: defaults)
+        XCTAssertTrue(store.historyReadFailed)
+        XCTAssertEqual(defaults.data(forKey: "personalZikr.history"), original)
+        XCTAssertEqual(store.run?.id, run.id)
+        XCTAssertFalse(store.finish())
+        store.settle()
+        XCTAssertEqual(defaults.data(forKey: "personalZikr.history"), original)
+        XCTAssertEqual(store.run?.id, run.id)
+        defaults.set(try JSONEncoder().encode([PersonalZikrEntry]()), forKey: "personalZikr.history")
+        store.retryHistory()
+        XCTAssertFalse(store.historyReadFailed)
+        XCTAssertNil(store.run)
+        XCTAssertEqual(store.history.map(\.id), [run.id])
+        store.retryHistory()
+        XCTAssertEqual(store.history.map(\.id), [run.id])
+    }
+
+    @MainActor func testWrongTypeHistoryIsNotAnEmptyHistory() throws {
+        let suite = "PersonalZikrTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        defaults.set("unexpected storage type", forKey: "personalZikr.history")
+        let store = PersonalZikrStore(defaults: defaults)
+        XCTAssertTrue(store.historyReadFailed)
+        store.start()
+        XCTAssertNil(store.run)
+        XCTAssertEqual(defaults.string(forKey: "personalZikr.history"), "unexpected storage type")
+        defaults.removeObject(forKey: "personalZikr.history")
+        store.retryHistory()
+        XCTAssertFalse(store.historyReadFailed)
+        XCTAssertTrue(store.history.isEmpty)
+    }
+
     private let plan = [PersonalZikrStep(stage: .latifa1), PersonalZikrStep(stage: .latifa2, minutes: 2), PersonalZikrStep(stage: .aqrabiyyat)]
 
     func testStageChangesAtExactBoundaryAndFinishesAfterLast() {

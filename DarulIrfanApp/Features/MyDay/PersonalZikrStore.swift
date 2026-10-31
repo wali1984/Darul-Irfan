@@ -101,6 +101,7 @@ final class PersonalZikrStore {
     private(set) var customs: [PersonalZikrStep] = []
     private(set) var run: PersonalZikrRun?
     private(set) var history: [PersonalZikrEntry] = []
+    private(set) var historyReadFailed = false
     private(set) var reminders = [PersonalZikrReminder(minuteOfDay: 420), PersonalZikrReminder(minuteOfDay: 1200)]
     var screenActive = false
     private var chime: AVAudioPlayer?
@@ -112,17 +113,33 @@ final class PersonalZikrStore {
         if let saved: [PersonalZikrStep] = decode("personalZikr.plan"), saved.isEmpty || PersonalZikrMath.valid(saved) { plan = saved }
         customs = decode("personalZikr.customs") ?? []
         if let saved: PersonalZikrRun = decode("personalZikr.run"), PersonalZikrMath.valid(saved.plan), saved.elapsedBeforeRun >= 0 { run = saved }
-        history = decode("personalZikr.history") ?? []
+        readHistory()
         if let saved: [PersonalZikrReminder] = decode("personalZikr.reminders"), saved.count == 2, saved.allSatisfy({ (0..<1440).contains($0.minuteOfDay) }) { reminders = saved }
         history = PersonalZikrHistory.retained(history, now: .now)
-        if let current = run, let end = current.endsAt, end <= .now { record(current, at: end); run = nil }
+        if let current = run, let end = current.endsAt, end <= .now, record(current, at: end) { run = nil }
         save()
     }
 
     private func decode<T: Decodable>(_ key: String) -> T? { defaults.data(forKey: key).flatMap { try? JSONDecoder().decode(T.self, from: $0) } }
+    private func readHistory() {
+        guard defaults.object(forKey: "personalZikr.history") != nil else {
+            history = []; historyReadFailed = false; return
+        }
+        guard let saved: [PersonalZikrEntry] = decode("personalZikr.history") else {
+            historyReadFailed = true; return
+        }
+        history = PersonalZikrHistory.retained(saved, now: .now)
+        historyReadFailed = false
+    }
+    func retryHistory() {
+        readHistory()
+        if !historyReadFailed { settle() }
+    }
     private func put<T: Encodable>(_ value: T, _ key: String) { defaults.set(try? JSONEncoder().encode(value), forKey: key) }
     private func save() {
-        put(plan, "personalZikr.plan"); put(customs, "personalZikr.customs"); put(history, "personalZikr.history"); put(reminders, "personalZikr.reminders")
+        put(plan, "personalZikr.plan"); put(customs, "personalZikr.customs")
+        if !historyReadFailed { put(history, "personalZikr.history") }
+        put(reminders, "personalZikr.reminders")
         if let run { put(run, "personalZikr.run") } else { defaults.removeObject(forKey: "personalZikr.run") }
     }
     func storedMinutes(_ stage: PersonalZikrStage) -> Int { max(1, min(60, defaults.integer(forKey: "personalZikr.minutes.\(stage.rawValue)"))) }
@@ -148,6 +165,7 @@ final class PersonalZikrStore {
         customs.removeAll { $0.id == id }; plan.removeAll { $0.id == id }; save()
     }
     func start(at now: Date = .now) {
+        guard !historyReadFailed else { return }
         guard run != nil || PersonalZikrMath.valid(plan) else { return }
         if run == nil { run = PersonalZikrRun(plan: plan, firstStartedAt: now, startedAt: now) }
         else { run?.startedAt = now }
@@ -160,20 +178,24 @@ final class PersonalZikrStore {
         save(); refreshAlerts()
     }
     func discard() { run = nil; save(); refreshAlerts() }
-    func finish(at now: Date = .now) {
-        guard let current = run else { return }
-        record(current, at: min(now, current.endsAt ?? now)); run = nil; save(); refreshAlerts()
+    @discardableResult func finish(at now: Date = .now) -> Bool {
+        guard let current = run else { return true }
+        guard record(current, at: min(now, current.endsAt ?? now)) else { return false }
+        run = nil; save(); refreshAlerts()
+        return true
     }
     func settle(at now: Date = .now) {
         history = PersonalZikrHistory.retained(history, now: now)
         if let current = run, let end = current.endsAt, end <= now { finish(at: end) }
         save()
     }
-    private func record(_ current: PersonalZikrRun, at now: Date) {
+    private func record(_ current: PersonalZikrRun, at now: Date) -> Bool {
+        guard !historyReadFailed else { return false }
         let duration = current.elapsed(at: now)
-        guard duration >= 1, !history.contains(where: { $0.id == current.id }) else { return }
+        guard duration >= 1, !history.contains(where: { $0.id == current.id }) else { return true }
         history.append(PersonalZikrEntry(id: current.id, startedAt: current.firstStartedAt, endedAt: now, duration: duration))
         history = PersonalZikrHistory.retained(history, now: .now)
+        return true
     }
     func setReminder(_ index: Int, _ value: PersonalZikrReminder) { reminders[index] = value; save(); refreshAlerts() }
     func requestAlerts() async -> Bool {
