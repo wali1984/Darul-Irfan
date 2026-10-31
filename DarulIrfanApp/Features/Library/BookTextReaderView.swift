@@ -611,6 +611,7 @@ struct FormattedBookPage: View {
     /// Prose, with a short Qur'anic quotation kept inline in the Qur'an face
     /// and a printed line break kept where the paragraph had one.
     private func prose(_ runs: [BookPageFormatter.Run]) -> Text {
+        let leftToRight = !isRightToLeft(plainText(runs))
         var text = Text(verbatim: "")
         for (index, run) in runs.enumerated() {
             if index > 0 { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
@@ -619,7 +620,21 @@ struct FormattedBookPage: View {
                     .font(DIFont.quranArabic(scale: 0.72 * scale))
                     .foregroundStyle(DIColor.scripture)
             } else {
-                text = text + Text(verbatim: run.text)
+                if leftToRight && run.text.contains("\u{FDFA}") {
+                    // Urdu locale's system fallback uses a tall Nastaliq ligature
+                    // that can collide with adjacent Latin lines. Keep the same
+                    // symbol, explicitly set in the bundled Arabic body face.
+                    let parts = run.text.components(separatedBy: "\u{FDFA}")
+                    for (partIndex, part) in parts.enumerated() {
+                        if partIndex > 0 {
+                            text = text + Text(verbatim: "\u{FDFA}")
+                                .font(DIFont.quranArabic(scale: (17.0 / 27.0) * scale))
+                        }
+                        text = text + Text(verbatim: part)
+                    }
+                } else {
+                    text = text + Text(verbatim: run.text)
+                }
             }
         }
         return text
