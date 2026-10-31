@@ -30,11 +30,11 @@ final class MonthlyTimetableViewModel {
     var hasPlace: Bool { appState.activePlace != nil }
 
     var timeFormat: Date.FormatStyle {
-        Date.FormatStyle(date: .omitted, time: .shortened, timeZone: placeTimeZone)
+        Date.FormatStyle(date: .omitted, time: .shortened, locale: LanguageManager.locale(for: appState.settings.language), timeZone: placeTimeZone)
     }
 
     var dayLabelFormat: Date.FormatStyle {
-        Date.FormatStyle(timeZone: placeTimeZone).day(.twoDigits).weekday(.abbreviated)
+        Date.FormatStyle(locale: LanguageManager.locale(for: appState.settings.language), timeZone: placeTimeZone).day(.twoDigits).weekday(.abbreviated)
     }
 
     private var placeTimeZone: TimeZone {
@@ -95,7 +95,7 @@ final class MonthlyTimetableViewModel {
             return DayRow(id: key, date: date, isToday: key == todayKey, times: schedule.times)
         }
         monthTitle = monthStart.formatted(
-            Date.FormatStyle(timeZone: place.timeZone).month(.wide).year()
+            Date.FormatStyle(locale: LanguageManager.locale(for: appState.settings.language), timeZone: place.timeZone).month(.wide).year()
         )
         shareText = buildShareText(place: place)
     }

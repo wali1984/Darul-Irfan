@@ -6,12 +6,17 @@ import SwiftUI
 struct FastingView: View {
     let dependencies: AppDependencies
     let appState: AppState
+    @Environment(\.locale) private var locale
 
     @State private var store = MyDayStore.shared
     @State private var month = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
     @State private var choosingDay: Date?
 
-    private let calendar = Calendar.current
+    private var calendar: Calendar {
+        var value = Calendar.current
+        value.locale = locale
+        return value
+    }
 
     var body: some View {
         ScrollView {
@@ -57,12 +62,12 @@ struct FastingView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Suhoor ends").font(.caption).foregroundStyle(DIColor.textMuted)
-                            Text(fajr, style: .time).font(.title3.weight(.semibold))
+                            Text(fajr, format: Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone)).font(.title3.weight(.semibold))
                         }
                         Spacer()
                         VStack(alignment: .trailing, spacing: 2) {
                             Text("Iftar").font(.caption).foregroundStyle(DIColor.textMuted)
-                            Text(maghrib, style: .time).font(.title3.weight(.semibold))
+                            Text(maghrib, format: Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone)).font(.title3.weight(.semibold))
                         }
                     }
                     Text("Suhoor ends at Fajr and iftar is at Maghrib, from your prayer settings.")
