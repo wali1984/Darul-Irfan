@@ -26,7 +26,7 @@ enum BookPageFormatter {
 
     /// Articles already have deliberate paragraphs. Preserve them and their line
     /// breaks; do not apply scanned-page heading/noise/column heuristics.
-    static func articleParagraph(_ text: String) -> Page {
+    static func articleParagraph(_ text: String, itemID: String? = nil) -> Page {
         let words = text.split(whereSeparator: \.isWhitespace).map(String.init)
         let block: Block
         if isQuranQuotation(text, check: .letters) {
@@ -36,7 +36,47 @@ enum BookPageFormatter {
         } else {
             block = .paragraph(proseRuns(text, check: .letters, includeArabicQuotations: true))
         }
-        return Page(isContents: false, blocks: [block])
+        let citations = reviewedArticleReferences(itemID: itemID, text: text).compactMap { reference -> Block? in
+            let verses = (reference.start...reference.end).compactMap { ayah in
+                articleArabic["\(reference.surah):\(ayah)"]
+            }
+            guard verses.count == reference.end - reference.start + 1,
+                  verses.allSatisfy({ !$0.isEmpty }) else { return nil }
+            let label = reference.start == reference.end ? "\(reference.surah):\(reference.start)" : "\(reference.surah):\(reference.start)-\(reference.end)"
+            return .quran(verses.joined(separator: "\n") + " (\(label))")
+        }
+        return Page(isContents: false, blocks: citations + [block])
+    }
+
+    private static let articleArabic = Dictionary(uniqueKeysWithValues: SeedBundle.quranAyahs().map {
+        ("\($0.surahNumber):\($0.ayahNumber)", $0.textArabic)
+    })
+
+    struct ArticleReference: Equatable {
+        let surah: Int
+        let start: Int
+        let end: Int
+    }
+
+    /// References reviewed against the official what-is-tasawwuf article.
+    /// Numeric references elsewhere are not automatically treated as Quran.
+    static func reviewedArticleReferences(itemID: String?, text: String) -> [ArticleReference] {
+        guard itemID == "what-is-tasawwuf",
+              let regex = try? NSRegularExpression(pattern: #"\((\d+)\s*:\s*(\d+)(?:\s*[-–]\s*(\d+))?\)"#) else { return [] }
+        let reviewed = [ArticleReference(surah: 2,start: 137,end: 137),
+            ArticleReference(surah: 49,start: 3,end: 3), ArticleReference(surah: 8,start: 4,end: 4),
+            ArticleReference(surah: 9,start: 100,end: 100), ArticleReference(surah: 103,start: 1,end: 2),
+            ArticleReference(surah: 103,start: 3,end: 3)]
+        let ns = text as NSString
+        var result: [ArticleReference] = []
+        for match in regex.matches(in: text, range: NSRange(location: 0,length: ns.length)) {
+            guard let surah = Int(ns.substring(with: match.range(at: 1))),
+                  let start = Int(ns.substring(with: match.range(at: 2))) else { continue }
+            let end = match.range(at: 3).location == NSNotFound ? start : Int(ns.substring(with: match.range(at: 3))) ?? start
+            let reference = ArticleReference(surah: surah,start: start,end: end)
+            if reviewed.contains(reference) && !result.contains(reference) { result.append(reference) }
+        }
+        return result
     }
 
     struct Run: Equatable, Sendable {

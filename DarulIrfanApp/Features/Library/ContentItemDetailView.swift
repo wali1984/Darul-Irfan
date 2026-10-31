@@ -668,7 +668,7 @@ struct ContentItemDetailView: View {
         DICard(padding: DISpacing.lg) {
             VStack(alignment: .leading, spacing: DISpacing.md) {
                 ForEach(Array(viewModel.bodyParagraphs.enumerated()), id: \.offset) { index, paragraph in
-                    FormattedBookPage(page: BookPageFormatter.articleParagraph(paragraph), scale: appState.settings.readerFontScale.rawValue)
+                    FormattedBookPage(page: BookPageFormatter.articleParagraph(paragraph, itemID: item.id), scale: appState.settings.readerFontScale.rawValue)
                         .id("library-paragraph-\(index)")
                 }
             }

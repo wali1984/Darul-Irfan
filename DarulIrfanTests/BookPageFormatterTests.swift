@@ -5,6 +5,21 @@ import XCTest
 /// contents pages folded, and sentences carried across a page break.
 final class BookPageFormatterTests: XCTestCase {
 
+    func testReviewedArticleCitationsAddExactBundledArabicWithoutReplacingSource() {
+        let source = "By the declining day, Lo! Man is in state of loss. (103:1-2)."
+        let page = BookPageFormatter.articleParagraph(source, itemID: "what-is-tasawwuf")
+        XCTAssertEqual(page.blocks.count, 2)
+        guard case .quran(let arabic) = page.blocks.first,
+              case .paragraph(let runs) = page.blocks.last else { return XCTFail("Expected Arabic supplement and original source") }
+        let verses = SeedBundle.quranAyahs().filter { $0.surahNumber == 103 && $0.ayahNumber <= 2 }.sorted { $0.ayahNumber < $1.ayahNumber }
+        XCTAssertEqual(verses.count, 2)
+        XCTAssertEqual(arabic, verses.map(\.textArabic).joined(separator: "\n") + " (103:1-2)")
+        XCTAssertEqual(runs.map(\.text).joined(separator: " "), source)
+        XCTAssertEqual(BookPageFormatter.articleParagraph(source, itemID: "unreviewed").blocks.count, 1)
+        XCTAssertTrue(BookPageFormatter.reviewedArticleReferences(itemID: "what-is-tasawwuf", text: "(103:2-9) (1:1)").isEmpty)
+        XCTAssertEqual(BookPageFormatter.reviewedArticleReferences(itemID: "what-is-tasawwuf", text: "(103:1–2) (103:1-2)").count, 1)
+    }
+
     func testInlineHadithKeepsArabicSeparateFromUrduAndQuran() {
         let quotation = "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ"
         let source = "رسول اللہ ﷺ نے فرمایا: \(quotation) یہ نیت کے بارے میں ہے۔"
