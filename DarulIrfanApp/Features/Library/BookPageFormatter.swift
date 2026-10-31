@@ -34,7 +34,7 @@ enum BookPageFormatter {
         } else if words.count >= 3 && markQuranic(words).allSatisfy({ $0 }) {
             block = .arabic(text)
         } else {
-            block = .paragraph(proseRuns(text, check: .letters))
+            block = .paragraph(proseRuns(text, check: .letters, includeArabicQuotations: true))
         }
         return Page(isContents: false, blocks: [block])
     }
@@ -46,6 +46,8 @@ enum BookPageFormatter {
         /// Printed on a line of its own: a re-read paragraph keeps the line
         /// breaks it was printed with (an address, a signature, a list).
         var startsLine = false
+        /// Vowelled Arabic inside an article; this does not identify it as Quran.
+        var isArabic = false
     }
 
     enum Block: Equatable, Sendable {
@@ -340,21 +342,23 @@ enum BookPageFormatter {
     /// mushaf confirms marked for the Qur'an face. The quotation stays in the
     /// sentence, where the page printed it, and the paragraph keeps its
     /// printed line breaks.
-    private static func proseRuns(_ text: String, check: QuranQuotation.Check) -> [Run] {
+    private static func proseRuns(_ text: String, check: QuranQuotation.Check, includeArabicQuotations: Bool = false) -> [Run] {
         var runs: [Run] = []
         for line in text.split(separator: "\n") {
             let tokens = line.split(whereSeparator: \.isWhitespace).map(String.init)
             guard !tokens.isEmpty else { continue }
             let quranic = verifiedQuranic(tokens, check: check)
+            let arabic = includeArabicQuotations ? markQuranic(tokens) : Array(repeating: false, count: tokens.count)
             var startsLine = !runs.isEmpty
             var index = 0
             while index < tokens.count {
                 var end = index
-                while end < tokens.count && quranic[end] == quranic[index] { end += 1 }
+                while end < tokens.count && quranic[end] == quranic[index] && arabic[end] == arabic[index] { end += 1 }
                 runs.append(Run(
                     text: tokens[index..<end].joined(separator: " "),
                     isQuranic: quranic[index],
-                    startsLine: startsLine
+                    startsLine: startsLine,
+                    isArabic: arabic[index] && !quranic[index]
                 ))
                 startsLine = false
                 index = end

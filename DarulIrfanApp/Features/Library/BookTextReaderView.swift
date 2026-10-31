@@ -614,7 +614,7 @@ struct FormattedBookPage: View {
         var text = Text(verbatim: "")
         for (index, run) in runs.enumerated() {
             if index > 0 { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
-            if run.isQuranic {
+            if run.isQuranic || run.isArabic {
                 text = text + Text(verbatim: run.text)
                     .font(DIFont.quranArabic(scale: 0.72 * scale))
                     .foregroundStyle(DIColor.scripture)

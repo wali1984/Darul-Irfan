@@ -5,6 +5,20 @@ import XCTest
 /// contents pages folded, and sentences carried across a page break.
 final class BookPageFormatterTests: XCTestCase {
 
+    func testInlineHadithKeepsArabicSeparateFromUrduAndQuran() {
+        let quotation = "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ"
+        let source = "رسول اللہ ﷺ نے فرمایا: \(quotation) یہ نیت کے بارے میں ہے۔"
+        guard case .paragraph(let runs) = BookPageFormatter.articleParagraph(source).blocks.first else {
+            return XCTFail("Expected mixed Urdu and Arabic paragraph")
+        }
+        XCTAssertEqual(runs.map(\.text).joined(separator: " "), source)
+        XCTAssertEqual(runs.filter(\.isArabic).map(\.text), [quotation])
+        XCTAssertFalse(runs.contains { $0.isQuranic })
+        let urdu = BookPageFormatter.articleParagraph("یہ ایک عام اُردو جملہ ہے۔")
+        guard case .paragraph(let ordinary) = urdu.blocks.first else { return XCTFail("Expected Urdu prose") }
+        XCTAssertFalse(ordinary.contains { $0.isArabic || $0.isQuranic })
+    }
+
     func testArticleKeepsShortLinesAndUrduAsProse() {
         let text = "اللہ\nیہ ایک عام اردو جملہ ہے۔\nContact: Darul Irfan"
         let page = BookPageFormatter.articleParagraph(text)

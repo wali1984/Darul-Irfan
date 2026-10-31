@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -73,10 +73,15 @@ final class RedesignScreenshotTests: XCTestCase {
         app.launch()
         guard app.tabBars.buttons.firstMatch.waitForExistence(timeout: 180) else {
             shot("no-tab-bar")
+            XCTFail("The app did not reach its navigation tabs")
             return
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "silsila" {
+            silsilaTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audit" {
             auditTour()
             return
@@ -268,6 +273,30 @@ final class RedesignScreenshotTests: XCTestCase {
             app.swipeUp()
             pause(1.5)
             shot("\(name)-\(index + 1)")
+        }
+    }
+
+    private func silsilaTour() {
+        selectTab(4)
+        for category in ["aboutSilsila", "sheikhAbdulQadeerAwan", "sheikhMuhammadAkramAwan", "shajra"] {
+            scrollToTop()
+            if seek("silsila-" + category) {
+                shot("silsila-" + category)
+                scrollShots("silsila-" + category, count: 2)
+                goBack()
+            }
+        }
+        scrollToTop()
+        if seek("silsila-teachings") {
+            for category in ["tasawwuf", "tazkiyahNafs", "zikrAllah", "baiat", "methodOfZikr"] {
+                scrollToTop()
+                if seek("silsila-" + category) {
+                    shot("teaching-" + category)
+                    scrollShots("teaching-" + category, count: 2)
+                    goBack()
+                }
+            }
+            goBack()
         }
     }
 
