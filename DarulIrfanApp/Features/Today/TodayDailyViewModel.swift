@@ -96,16 +96,17 @@ final class TodayDailyViewModel {
         func text(_ entry: HadithEntry) -> (String?, Bool) {
             let urdu = entry.textUrdu.flatMap { $0.isEmpty ? nil : $0 }
             let english = entry.textEnglish.flatMap { $0.isEmpty ? nil : $0 }
-            return urduReader ? (urdu ?? english, urdu != nil) : (english ?? urdu, false)
+            return urduReader ? (urdu, urdu != nil) : (english ?? urdu, false)
         }
         let ordered = window.compactMap { byID[$0] }
         let chosen = ordered.first { entry in
             let (translation, isUrdu) = text(entry)
             return (translation?.count ?? .max) <= 700 && (!urduReader || isUrdu)
-        } ?? ordered.first
+        } ?? (urduReader ? ordered.first { $0.textUrdu?.isEmpty == false } : nil) ?? ordered.first
         guard let chosen else { return }
         let books = (try? await repository.books()) ?? []
         let (translation, isUrdu) = text(chosen)
+        guard urduReader == readsUrdu else { return }
         hadith = HadithOfTheDay(
             id: chosen.canonicalID, book: books.first { $0.id == chosen.bookID }, number: chosen.displayNumber,
             arabic: chosen.textArabic, translation: translation, translationIsUrdu: isUrdu
@@ -119,10 +120,12 @@ final class TodayDailyViewModel {
     var readsUrdu: Bool { language.contentLanguageCode == "ur" }
 
     func load(on date: Date = Date()) {
+        silsilaAyah = nil
+        hadith = nil
         let ayat = SeedBundle.dailyAyat()
         let duas = SeedBundle.duas()
         let names = SeedBundle.namesOfAllah()
-        let quotes = SeedBundle.aqwalESheikh()
+        let quotes = SeedBundle.aqwalESheikh(urdu: readsUrdu)
 
         ayah = DailySelector.pick(ayat, for: date, stream: .ayah)
         dua = DailySelector.pick(duas, for: date, stream: .dua)
@@ -165,7 +168,7 @@ final class TodayDailyViewModel {
             range.count > 1 ? "\(row.text) (\(row.ayahNumber))" : row.text
         }.joined(separator: " ")
 
-        let name = surah?.nameTransliterated ?? ""
+        let name = (language == "ur" ? surah?.nameArabic : surah?.nameTransliterated) ?? ""
         let verses = range.count > 1 ? "\(range.lowerBound)-\(range.upperBound)" : "\(range.lowerBound)"
         let reference = range.count > 1
             ? String(localized: "Surah \(name) (\(ayah.surah)), Ayat \(verses)")
@@ -182,6 +185,7 @@ final class TodayDailyViewModel {
             ? QuranContentMode.akramTafaseer.localizedTitle
             : QuranContentMode.asrarTanzil.localizedTitle
 
+        guard language == appState.settings.language.contentLanguageCode else { return }
         silsilaAyah = SilsilaAyah(
             arabic: arabic,
             translation: translation ?? ayah.translation(for: language == "ur" ? .urdu : .english),
@@ -222,14 +226,13 @@ final class TodayDailyViewModel {
 
     func duaTranslation() -> String? {
         guard let dua else { return nil }
-        if readsUrdu, let ur = dua.translationUrdu, !ur.isEmpty { return ur }
-        return dua.translationEnglish
+        return DailyNoorText.translation(urdu: dua.translationUrdu, english: dua.translationEnglish, readsUrdu: readsUrdu)
     }
 
     func nameMeaning() -> String? {
         guard let name else { return nil }
         if readsUrdu, let ur = name.meaningUrdu, !ur.isEmpty { return ur }
-        return name.meaningEnglish
+        return DailyNoorText.localized(name.meaningEnglish, urdu: readsUrdu)
     }
 
     // MARK: - Share content

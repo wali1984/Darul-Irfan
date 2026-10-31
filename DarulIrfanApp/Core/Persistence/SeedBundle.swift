@@ -128,8 +128,8 @@ enum SeedBundle {
         decodeArray(DailyAyah.self, fromFile: "daily_ayat")
     }
 
-    static func aqwalESheikh() -> [DailyInspiration] {
-        decodeArray(DailyInspiration.self, fromFile: "aqwal_e_sheikh")
+    static func aqwalESheikh(urdu: Bool = false) -> [DailyInspiration] {
+        decodeArray(DailyInspiration.self, fromFile: urdu ? "aqwal_urdu" : "aqwal_e_sheikh")
     }
 
     static func topics() -> [Topic] {

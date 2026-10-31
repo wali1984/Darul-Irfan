@@ -32,7 +32,7 @@ struct Dua: Codable, Sendable, Identifiable, Equatable {
     /// The Urdu name for Urdu readers when there is one, else the English.
     func displayTitle(urdu: Bool) -> String {
         if urdu, let titleUrdu, !titleUrdu.isEmpty { return titleUrdu }
-        return title
+        return DailyNoorText.localized(title, urdu: urdu)
     }
 
     /// Human-readable section title for the dua's category.
@@ -65,7 +65,7 @@ struct DailyAyah: Codable, Sendable, Identifiable, Equatable {
 
     /// Localized translation for the reader's language, English fallback.
     func translation(for language: AppLanguage) -> String? {
-        if language == .urdu, let urdu, !urdu.isEmpty { return urdu }
+        if language.contentLanguageCode == "ur" { return urdu.flatMap { $0.isEmpty ? nil : $0 } }
         return english
     }
 }

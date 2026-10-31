@@ -54,6 +54,7 @@ struct TodayDailySection: View {
         }
         .onChange(of: appState.settings.language) {
             Task {
+                viewModel.load()
                 await viewModel.loadSilsilaAyah()
                 await viewModel.loadHadith()
             }

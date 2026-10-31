@@ -27,7 +27,7 @@ extension TodayDailyViewModel {
             badge: String(localized: "Dua of the Day"),
             arabic: dua.arabic,
             translation: duaTranslation(),
-            attribution: dua.source
+            attribution: DailyNoorText.reference(dua.source, urdu: readsUrdu)
         )
     }
 
@@ -38,8 +38,8 @@ extension TodayDailyViewModel {
         return ShareableContent(
             badge: String(localized: "Zikr of the Day"),
             arabic: dhikr.arabic,
-            translation: "\(dhikr.transliteration)\n\(dhikr.meaning)",
-            attribution: dhikr.source
+            translation: readsUrdu ? DailyNoorText.localized(dhikr.meaning, urdu: true) : "\(dhikr.transliteration)\n\(dhikr.meaning)",
+            attribution: DailyNoorText.reference(dhikr.source, urdu: readsUrdu)
         )
     }
 
@@ -50,7 +50,7 @@ extension TodayDailyViewModel {
         return ShareableContent(
             badge: String(localized: "Name of the Day"),
             arabic: name.arabic,
-            translation: meaning.isEmpty ? name.transliteration : "\(name.transliteration)\n\(meaning)",
+            translation: readsUrdu ? meaning : (meaning.isEmpty ? name.transliteration : "\(name.transliteration)\n\(meaning)"),
             attribution: String(localized: "99 Names")
         )
     }

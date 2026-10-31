@@ -144,9 +144,10 @@ struct TodayTranslationText: View {
 /// A card's reference line, in emerald.
 private struct TodayReferenceText: View {
     let text: String
+    @Environment(\.locale) private var locale
 
     var body: some View {
-        Text(verbatim: text)
+        Text(verbatim: DailyNoorText.reference(text, urdu: DIBrand.readsUrdu(locale)))
             .font(.footnote.weight(.semibold))
             .foregroundStyle(TodayPalette.emerald)
             .fixedSize(horizontal: false, vertical: true)
@@ -309,6 +310,8 @@ struct TodayHadithCard: View {
                 if let translation = hadith.translation {
                     TodayTranslationText(text: translation, urdu: hadith.translationIsUrdu)
                         .lineLimit(10)
+                } else if readsUrdu {
+                    TodayTranslationText(text: String(localized: "Urdu translation is not available for this narration."), urdu: true)
                 }
                 if let arabic = hadith.arabic, !arabic.isEmpty {
                     Text(verbatim: arabic)
@@ -351,6 +354,7 @@ struct TodayHadithCard: View {
 /// Aqwal-e-Sheikh: the saying, large, and whose it is. Share only. A
 /// picture published for the day takes the saying's place.
 struct TodaySayingCard: View {
+    @Environment(\.locale) private var locale
     let aqwal: DailyInspiration?
     let picture: DailyMediaItem?
     let onShare: (() -> Void)?
@@ -368,11 +372,12 @@ struct TodaySayingCard: View {
                     .diGoldGlow(radius: 10, opacity: 0.6)
                     .frame(height: 40, alignment: .top)
                     .accessibilityHidden(true)
-                Text(aqwal.text)
-                    .font(.system(.title3, design: .serif))
-                    .italic()
-                    .foregroundStyle(DIColor.textPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
+                if DIBrand.readsUrdu(locale) {
+                    TodayTranslationText(text: aqwal.text, urdu: true)
+                } else {
+                    Text(aqwal.text).font(.system(.title3, design: .serif)).italic()
+                        .foregroundStyle(DIColor.textPrimary).fixedSize(horizontal: false, vertical: true)
+                }
                 Spacer(minLength: 0)
                 HStack(spacing: 10) {
                     TodayGoldMedallion()
@@ -431,7 +436,7 @@ struct TodayDuaCard: View {
         VStack(alignment: .leading, spacing: 12) {
             TodayLightCardHeader(titleKey: "Dua of the Day", onShare: onShare)
             if let dua {
-                Text(verbatim: dua.displayTitle(urdu: readsUrdu))
+                Text(LocalizedStringKey(dua.displayTitle(urdu: readsUrdu)))
                     .font(.title3.weight(.heavy))
                     .foregroundStyle(DIColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -472,6 +477,7 @@ struct TodayDuaCard: View {
 /// count, the transliteration and meaning, the source, and Count with
 /// Tasbih, which opens the counters.
 struct TodayZikrCard: View {
+    @Environment(\.locale) private var locale
     let dhikr: DailyDhikr?
     let onShare: (() -> Void)?
     let dependencies: AppDependencies?
@@ -486,16 +492,11 @@ struct TodayZikrCard: View {
                     // Built afresh when shown or hidden, so it starts or rests.
                     .id(isShown)
                     .padding(.top, 6)
-                Text(dhikr.transliteration)
-                    .font(.title3.weight(.heavy))
-                    .foregroundStyle(DIColor.textPrimary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text(dhikr.meaning)
-                    .font(.callout.weight(.medium))
-                    .foregroundStyle(DIColor.textMuted)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                if !DIBrand.readsUrdu(locale) {
+                    Text(dhikr.transliteration).font(.title3.weight(.heavy)).foregroundStyle(DIColor.textPrimary)
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                }
+                TodayTranslationText(text: DailyNoorText.localized(dhikr.meaning, urdu: DIBrand.readsUrdu(locale)), urdu: DIBrand.readsUrdu(locale))
                 Spacer(minLength: 0)
                 TodayCardFooter(reference: dhikr.source) {
                     if let dependencies {
@@ -576,6 +577,7 @@ struct TodayZikrRing: View {
 /// Name of the Day: the Name in large Arabic in a turning octagram, its
 /// transliteration and meaning, and All 99 Names.
 struct TodayNameCard: View {
+    @Environment(\.locale) private var locale
     let name: NameOfAllah?
     let meaning: String?
     let onShare: (() -> Void)?
@@ -604,16 +606,12 @@ struct TodayNameCard: View {
                         .environment(\.layoutDirection, .rightToLeft)
                 }
                 .frame(width: 220, height: 220)
-                Text(name.transliteration)
-                    .font(.title2.weight(.heavy))
-                    .foregroundStyle(DIColor.textPrimary)
-                    .multilineTextAlignment(.center)
+                if !DIBrand.readsUrdu(locale) {
+                    Text(name.transliteration).font(.title2.weight(.heavy))
+                        .foregroundStyle(DIColor.textPrimary).multilineTextAlignment(.center)
+                }
                 if let meaning {
-                    Text(meaning)
-                        .font(.callout.weight(.medium))
-                        .foregroundStyle(DIColor.textMuted)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
+                    TodayTranslationText(text: meaning, urdu: DIBrand.readsUrdu(locale))
                 }
                 Spacer(minLength: 0)
                 HStack {
