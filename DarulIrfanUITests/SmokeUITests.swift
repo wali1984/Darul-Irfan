@@ -57,6 +57,20 @@ final class SmokeUITests: XCTestCase {
         app.launch()
         let zikr = app.tabBars.buttons["Zikr"]
         XCTAssertTrue(zikr.waitForExistence(timeout: 60))
+        // A published first-launch announcement can cover the tab bar after
+        // its accessibility elements already exist. Exercise its actual Done
+        // button; do not tap the obscured tab or suppress production content.
+        let tabReady = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: zikr)
+        if XCTWaiter.wait(for: [tabReady], timeout: 3) != .completed {
+            let announcement = app.navigationBars["Announcement"]
+            if announcement.waitForExistence(timeout: 15) {
+                let done = announcement.buttons["Done"]
+                XCTAssertTrue(done.waitForExistence(timeout: 5))
+                done.tap()
+            }
+        }
+        let visibleTab = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: zikr)
+        XCTAssertEqual(XCTWaiter.wait(for: [visibleTab], timeout: 15), .completed)
         zikr.tap()
         let personal = app.buttons["personal-zikr-entry"]
         XCTAssertTrue(personal.waitForExistence(timeout: 10))
