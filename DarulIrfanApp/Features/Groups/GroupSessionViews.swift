@@ -830,21 +830,29 @@ struct GroupSessionHistoryView: View {
                     if sessions.isEmpty {
                         Text("No sessions yet. Each one appears here when it ends.").foregroundStyle(DIColor.textMuted)
                     }
-                    if canDelete && !sessions.isEmpty {
-                        Text("Swipe a session to delete it.").font(.caption).foregroundStyle(DIColor.textMuted)
-                    }
                     ForEach(sessions) { session in
-                        NavigationLink {
-                            GroupSessionAttendeesView(groupID: groupID, session: session, service: service)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
-                                Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .shortened))
-                                    .font(.caption)
-                                    .foregroundStyle(DIColor.textMuted)
-                                Text("\(session.attendees) attended")
-                                    .font(.caption)
-                                    .foregroundStyle(DIColor.textMuted)
+                        HStack(alignment: .center, spacing: DISpacing.sm) {
+                            NavigationLink {
+                                GroupSessionAttendeesView(groupID: groupID, session: session, service: service)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
+                                    Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .shortened))
+                                        .font(.caption)
+                                        .foregroundStyle(DIColor.textMuted)
+                                    Text("\(session.attendees) attended")
+                                        .font(.caption)
+                                        .foregroundStyle(DIColor.textMuted)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            if canDelete {
+                                Button { deleting = session } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .buttonStyle(DICompactButtonStyle(destructive: true))
+                                .disabled(working)
+                                .accessibilityLabel(Text(verbatim: String(localized: "Delete") + ": " + (session.title ?? String(localized: "Halqah Zikr"))))
                             }
                         }
                         .swipeActions {
