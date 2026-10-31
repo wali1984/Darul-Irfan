@@ -130,7 +130,7 @@ def restored_identity_errors(record: dict, reference: dict) -> list[str]:
     for field in ("sourceSequence", "displayNumber"):
         if record.get(field) != reference.get(field):
             errors.append(f"{record.get('canonicalID')}: {field} differs from source restoration ledger")
-    expected = f"{record.get('bookID')}|{reference['displayNumber']}|{reference['identitySequence']}"
+    expected = f"{record.get('bookID')}|{reference.get('identityNumber', reference['displayNumber'])}|{reference['identitySequence']}"
     if record.get("canonicalID") != expected:
         errors.append(f"{record.get('canonicalID')}: restored bookmark identity changed")
     return errors
@@ -428,6 +428,8 @@ def check_hadith(seed: Path, report: Report) -> None:
             # number is the recorded fawazahmed0 one and the shown number must
             # be the recorded reference (HAD-004).
             created = ref["legacy"] if ref else number
+            if restored:
+                created = restored.get("identityNumber", created)
             identity_sequence = restored["identitySequence"] if restored else record.get("sourceSequence")
             expected = f"{book_id}|{created}|{identity_sequence}"
             if restored:
@@ -441,7 +443,12 @@ def check_hadith(seed: Path, report: Report) -> None:
             # Forms: 402, 402.2, 8a (letter = sub-number 1, 2 ...),
             # Introduction 8, 274–275 (no number of its own; lies between).
             m = NUMBER_FORM.fullmatch(str(number))
-            if m is None:
+            local_reference = re.fullmatch(r"([1-9]\d*):([1-9]\d*)", str(number))
+            if local_reference:
+                source_book, source_hadith = map(int, local_reference.groups())
+                if (record.get("sourceBook"), record.get("sourceHadith"), record.get("numberMajor"), record.get("numberMinor")) != (source_book, source_hadith, source_hadith, None):
+                    malformed.append(f"{cid}: compound reference does not match source book/hadith")
+            elif m is None:
                 malformed.append(f"{cid}: displayNumber {number!r} has an unknown form")
             else:
                 major = m.group(1)

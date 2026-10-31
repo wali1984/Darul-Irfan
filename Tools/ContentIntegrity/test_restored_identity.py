@@ -1,5 +1,4 @@
 """Regression checks for restoring omissions without breaking saved bookmarks."""
-import copy
 import json
 import unittest
 from pathlib import Path
@@ -23,7 +22,7 @@ class RestoredIdentityTests(unittest.TestCase):
 
     def test_restored_source_inventory_is_lossless_and_ordered(self):
         registry = gate.load_restored_reading_order()
-        for book, expected in [('bulugh',1767),('hisn',268),('adab',1326)]:
+        for book, expected in [('bulugh',1767),('hisn',268),('adab',1326),('mishkat',5318),('ibnkhuzayma',2879)]:
             rows = json.loads((gate.IOS_SEED/f'hadith_{book}.json').read_bytes())
             self.assertEqual(expected,len(rows))
             self.assertEqual(list(range(1,expected+1)),[r['sourceSequence'] for r in rows])
@@ -35,6 +34,16 @@ class RestoredIdentityTests(unittest.TestCase):
             self.assertEqual(expected,len(set(source_ids)))
         hisn = json.loads((gate.IOS_SEED/'hadith_hisn.json').read_bytes())
         self.assertEqual(['74','75a','75','76'],[r['displayNumber'] for r in hisn[73:77]])
+
+    def test_placeholder_number_is_repaired_without_losing_its_saved_identity(self):
+        registry = gate.load_restored_reading_order()
+        rows = json.loads((gate.IOS_SEED/'hadith_mishkat.json').read_bytes())
+        self.assertNotIn('0',[r['displayNumber'] for r in rows])
+        restored = [r for r in rows if ':' in r['displayNumber']]
+        self.assertEqual(12,len(restored))
+        for row in restored:
+            self.assertEqual(f"{row['sourceBook']}:{row['sourceHadith']}",row['displayNumber'])
+            self.assertEqual([],gate.restored_identity_errors(row,registry[row['canonicalID']]))
 
 
 if __name__ == '__main__':

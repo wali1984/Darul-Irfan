@@ -343,6 +343,13 @@ def ref_number_from(cont) -> str | None:
     el = cont.select_one(".hadith_reference")
     if el is None:
         return None
+    # Some supplementary Mishkat narrations have no global edition number.
+    # The source gives a stable book/hadith reference, while the translation
+    # and Arabic edition rows contain placeholder zeroes. Do not parse those.
+    reference_text = el.get_text(" ", strip=True)
+    local = re.search(r"Sunnah\.com reference\s*:\s*Book\s*(\d+)\s*,\s*Hadith\s*(\d+)", reference_text, re.I)
+    if local and re.search(r"Arabic reference\s*:\s*Book\s*\d+\s*,\s*Hadith\s*0(?:\D|$)", reference_text, re.I):
+        return f"{local.group(1)}:{local.group(2)}"
     head = el.get_text(" ", strip=True).split("In-book")[0]
     m = re.search(r"(\d+)\s*([a-z]?)\s*$", head.strip()) or re.search(r"(\d+)([a-z]?)", head)
     if not m:
@@ -354,7 +361,7 @@ def ref_number_from(cont) -> str | None:
 
 
 # "In-book reference : Book 1, Hadith 1" — the edition-stable join key.
-INBOOK_RE = re.compile(r"In-book reference\s*:\s*Book\s*(\d+)\s*,\s*Hadith\s*(\d+)", re.I)
+INBOOK_RE = re.compile(r"(?:In-book reference|Sunnah\.com reference)\s*:\s*Book\s*(\d+)\s*,\s*Hadith\s*(\d+)", re.I)
 
 
 class _Blocks(list):
@@ -549,6 +556,8 @@ def load_pack(slug: str) -> list[dict] | None:
 
 
 def split_number(display: str) -> tuple[int, int | None]:
+    if ":" in display:
+        return int(display.split(":", 1)[1]), None
     major, _, minor = display.partition(".")
     return int(major), (int(minor) if minor else None)
 

@@ -105,6 +105,7 @@ workflows:
         script: |
           pip3 install -r Tools/Quran/requirements.txt pytest
           python3 -m pytest Tools/Quran/tests -q
+          python3 -m unittest discover -s Tools/Hadith -p test_source_references.py
       - name: Content integrity gate
         script: |
           # Counts, bounds, unique keys, encoding, block sizes, and byte-for-byte
@@ -253,6 +254,7 @@ workflows:
           (cd Tools/ContentIngest && pip3 install -r requirements.txt pytest && python3 -m pytest tests -q)
           pip3 install -r Tools/Quran/requirements.txt pytest
           python3 -m pytest Tools/Quran/tests -q
+          python3 -m unittest discover -s Tools/Hadith -p test_source_references.py
       - name: Run unit tests (includes the schema migration)
         script: |
           # A signed release must not ship past a failing migration or a
