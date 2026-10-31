@@ -326,7 +326,7 @@ struct ZikrHomeView: View {
             .accessibilityIdentifier("zikr-tasbih")
 
             NavigationLink {
-                NativeMethodOfZikrView(repository: dependencies.contentRepository, readerFontScale: appState.settings.readerFontScale.rawValue)
+                NativeMethodOfZikrView(readerFontScale: appState.settings.readerFontScale.rawValue)
             } label: {
                 ZikrMethodTile()
             }

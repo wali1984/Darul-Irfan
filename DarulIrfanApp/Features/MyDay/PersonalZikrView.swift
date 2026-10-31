@@ -33,6 +33,7 @@ struct PersonalZikrView: View {
                 .buttonStyle(DIPressableStyle())
                 .accessibilityIdentifier("personal-zikr-shajra")
                 if shajra { ShajraInlineContent().transition(.opacity) }
+                MethodOfZikrLink()
                 PersonalZikrHistoryCard(entries: store.history)
                 sequence
                 reminders
@@ -246,6 +247,7 @@ private struct PersonalZikrHistoryCard: View {
     let entries: [PersonalZikrEntry]
     @Environment(\.locale) private var locale
     @State private var all = false
+    @State private var expanded = false
     private var days: [Date] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: .now)
@@ -257,12 +259,12 @@ private struct PersonalZikrHistoryCard: View {
     var body: some View {
         DICard {
             VStack(alignment: .leading, spacing: 14) {
-                DISectionHeader(titleKey: "Your last 3 months")
                 HStack {
                     if entries.count == 1 { Text("1 session") } else { Text("\(entries.count) sessions") }
                     Spacer()
                     Text("\(totalMinutes) min")
                 }.font(.headline).foregroundStyle(DIColor.actionForeground)
+                DisclosureGroup(isExpanded: $expanded) {
                 let completed = Set(entries.map { Calendar.current.startOfDay(for: $0.endedAt) })
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 14), spacing: 4) {
                     ForEach(days, id: \.self) { day in
@@ -281,6 +283,7 @@ private struct PersonalZikrHistoryCard: View {
                     }.font(.footnote)
                 }
                 if entries.count > 7 { Button(all ? "Show less" : "Show all sessions") { all.toggle() }.font(.footnote) }
+                } label: { Text("Your last 3 months").font(.subheadline.weight(.semibold)) }
             }
         }
     }

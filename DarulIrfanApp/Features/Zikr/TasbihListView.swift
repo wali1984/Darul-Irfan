@@ -27,6 +27,7 @@ struct TasbihListView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
                 PersonalZikrLink()
+                MethodOfZikrLink()
                 DISectionHeader(titleKey: "Daily Habit", systemImage: "calendar")
                 ZikrHabitStripCard(days: viewModel.habitDays)
                     .diAppear()

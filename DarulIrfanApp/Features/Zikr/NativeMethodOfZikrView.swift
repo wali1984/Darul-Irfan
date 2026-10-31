@@ -22,7 +22,6 @@ struct MethodGuide: Decodable, Sendable {
 }
 
 struct NativeMethodOfZikrView: View {
-    let repository: any ContentRepositoryProtocol
     var readerFontScale: Double = 1
     @Environment(\.locale) private var locale
     @State private var guide: MethodGuide?
@@ -120,5 +119,29 @@ private struct MethodLatifaDiagram: View {
         .environment(\.layoutDirection, .leftToRight)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Method of Zikr"))
+    }
+}
+
+private struct MethodGuideReaderScaleKey: EnvironmentKey {
+    static let defaultValue: Double = 1
+}
+extension EnvironmentValues {
+    var methodGuideReaderScale: Double {
+        get { self[MethodGuideReaderScaleKey.self] }
+        set { self[MethodGuideReaderScaleKey.self] = newValue }
+    }
+}
+
+/// Contextual access to the same verified native guide from any activity.
+struct MethodOfZikrLink: View {
+    @Environment(\.methodGuideReaderScale) private var readerScale
+    var body: some View {
+        NavigationLink {
+            NativeMethodOfZikrView(readerFontScale: readerScale)
+        } label: {
+            Label("Method of Zikr", systemImage: "book.pages")
+        }
+        .buttonStyle(DISecondaryButtonStyle())
+        .accessibilityIdentifier("method-of-zikr-shortcut")
     }
 }
