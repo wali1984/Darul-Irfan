@@ -115,12 +115,12 @@ struct IslamicDay: Codable, Sendable, Identifiable, Equatable {
 
     func displayTitle(urdu: Bool) -> String {
         if urdu, let titleUrdu, !titleUrdu.isEmpty { return titleUrdu }
-        return title
+        return DailyNoorText.localized(title, urdu: urdu)
     }
 
     func displayNote(urdu: Bool) -> String? {
         if urdu, let noteUrdu, !noteUrdu.isEmpty { return noteUrdu }
-        return note
+        return note.map { DailyNoorText.localized($0, urdu: urdu) }
     }
 }
 

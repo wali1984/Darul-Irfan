@@ -32671,6 +32671,278 @@
           }
         }
       }
+    },
+    "Islamic New Year": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Islamic New Year"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسلامی نیا سال"
+          }
+        }
+      }
+    },
+    "The first day of Muharram begins the Hijri year.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The first day of Muharram begins the Hijri year."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محرم کے پہلے دن سے ہجری سال شروع ہوتا ہے۔"
+          }
+        }
+      }
+    },
+    "Ashura": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ashura"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عاشورا"
+          }
+        }
+      }
+    },
+    "Eid Milad-un-Nabi": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eid Milad-un-Nabi"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عید میلاد النبی ﷺ"
+          }
+        }
+      }
+    },
+    "Commemoration of the birth of the Holy Prophet ﷺ; observed dates vary by community.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commemoration of the birth of the Holy Prophet ﷺ; observed dates vary by community."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نبی کریم ﷺ کی ولادت کی یاد؛ مختلف برادریوں میں منانے کی تاریخیں مختلف ہو سکتی ہیں۔"
+          }
+        }
+      }
+    },
+    "Isra and Mi'raj": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isra and Mi'raj"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسراء و معراج"
+          }
+        }
+      }
+    },
+    "The night of 27 Rajab; it begins at sunset on 26 Rajab. Observed dates vary.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The night of 27 Rajab; it begins at sunset on 26 Rajab. Observed dates vary."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "27 رجب کی رات، جو 26 رجب کے غروبِ آفتاب سے شروع ہوتی ہے۔ منانے کی تاریخیں مختلف ہو سکتی ہیں۔"
+          }
+        }
+      }
+    },
+    "Shab-e-Barat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shab-e-Barat"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شبِ برات"
+          }
+        }
+      }
+    },
+    "The night of 15 Sha'ban; it begins at sunset on 14 Sha'ban.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The night of 15 Sha'ban; it begins at sunset on 14 Sha'ban."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15 شعبان کی رات، جو 14 شعبان کے غروبِ آفتاب سے شروع ہوتی ہے۔"
+          }
+        }
+      }
+    },
+    "First of Ramadan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First of Ramadan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یکم رمضان"
+          }
+        }
+      }
+    },
+    "The start of fasting depends on the sighting of the moon.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The start of fasting depends on the sighting of the moon."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزوں کا آغاز چاند نظر آنے پر منحصر ہے۔"
+          }
+        }
+      }
+    },
+    "Laylat-ul-Qadr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laylat-ul-Qadr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لیلۃ القدر"
+          }
+        }
+      }
+    },
+    "Sought on the odd nights of the last ten days of Ramadan; the 27th night, which begins at sunset on 26 Ramadan, is widely observed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sought on the odd nights of the last ten days of Ramadan; the 27th night, which begins at sunset on 26 Ramadan, is widely observed."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رمضان کے آخری عشرے کی طاق راتوں میں تلاش کی جاتی ہے؛ 27ویں رات، جو 26 رمضان کے غروبِ آفتاب سے شروع ہوتی ہے، عام طور پر اہتمام سے منائی جاتی ہے۔"
+          }
+        }
+      }
+    },
+    "Eid-ul-Fitr": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eid-ul-Fitr"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عید الفطر"
+          }
+        }
+      }
+    },
+    "Day of Arafah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day of Arafah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یومِ عرفہ"
+          }
+        }
+      }
+    },
+    "Eid-ul-Adha": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eid-ul-Adha"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عید الاضحیٰ"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

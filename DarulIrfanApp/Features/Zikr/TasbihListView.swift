@@ -191,6 +191,7 @@ private struct TasbihCounterRow: View {
 
 private struct ZikrHabitStripCard: View {
     let days: [ZikrHabitDayItem]
+    @Environment(\.locale) private var locale
 
     /// Trailing consecutive days (ending today) with at least one completion.
     private var currentStreak: Int {
@@ -219,7 +220,7 @@ private struct ZikrHabitStripCard: View {
                 HStack(spacing: DISpacing.sm) {
                     ForEach(days) { day in
                         VStack(spacing: DISpacing.xs) {
-                            Text(day.date.formatted(.dateTime.weekday(.narrow)))
+                            Text(day.date.formatted(Date.FormatStyle(locale: locale).weekday(.abbreviated)))
                                 .font(.caption2)
                                 .foregroundStyle(DIColor.textMuted)
                             ZStack {
