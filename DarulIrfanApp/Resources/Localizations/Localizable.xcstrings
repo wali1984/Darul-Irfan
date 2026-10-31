@@ -33045,6 +33045,40 @@
           }
         }
       }
+    },
+    "Counter options: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Counter options: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاؤنٹر کے اختیارات: %@"
+          }
+        }
+      }
+    },
+    "Current count: %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current count: %lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجودہ گنتی: %lld"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

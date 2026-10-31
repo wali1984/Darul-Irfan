@@ -45,33 +45,35 @@ struct TasbihListView: View {
                     .diAppear(delay: 0.05)
                 } else {
                     ForEach(Array(viewModel.counters.enumerated()), id: \.element.id) { index, counter in
-                        NavigationLink {
-                            TasbihCounterView(
-                                counter: counter,
-                                trackerRepository: trackerRepository,
-                                devotionalMetrics: devotionalMetrics
-                            )
-                        } label: {
-                            TasbihCounterRow(counter: counter)
+                        DIElevatedCard {
+                            HStack(spacing: DISpacing.sm) {
+                                NavigationLink {
+                                    TasbihCounterView(
+                                        counter: counter,
+                                        trackerRepository: trackerRepository,
+                                        devotionalMetrics: devotionalMetrics
+                                    )
+                                } label: {
+                                    TasbihCounterRow(counter: counter)
+                                }
+                                .buttonStyle(DIPressableStyle())
+                                .contextMenu { counterActions(counter) }
+                                Menu { counterActions(counter) } label: {
+                                    Image(systemName: "ellipsis.circle")
+                                        .font(.title3)
+                                        .foregroundStyle(DIColor.actionForeground)
+                                        .frame(width: 44, height: 44)
+                                        .background(DIColor.accent.opacity(0.12), in: Circle())
+                                }
+                                .accessibilityLabel(Text("Counter options: \(counter.title)"))
+                            }
                         }
-                        .buttonStyle(DIPressableStyle())
                         .diAppear(delay: 0.05 + 0.05 * Double(index))
-                        .contextMenu {
-                            Button {
-                                editingCounter = counter
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                            Button(role: .destructive) {
-                                counterPendingDeletion = counter
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
                     }
                 }
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .navigationTitle("Tasbih")
         .diScreenBackground()
@@ -120,6 +122,11 @@ struct TasbihListView: View {
         }
     }
 
+    @ViewBuilder private func counterActions(_ counter: TasbihCounter) -> some View {
+        Button { editingCounter = counter } label: { Label("Edit", systemImage: "pencil") }
+        Button(role: .destructive) { counterPendingDeletion = counter } label: { Label("Delete", systemImage: "trash") }
+    }
+
     private var deletionDialogBinding: Binding<Bool> {
         Binding(
             get: { counterPendingDeletion != nil },
@@ -141,28 +148,26 @@ private struct TasbihCounterRow: View {
     }
 
     var body: some View {
-        DIElevatedCard {
-            HStack(spacing: DISpacing.md) {
-                countRing
-                VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text(verbatim: counter.title)
-                        .font(DIFont.subheading)
-                        .foregroundStyle(DIColor.textPrimary)
-                    if let target = counter.target {
-                        DIPillBadge(text: String(localized: "Target \(target)"), color: DIColor.accent)
-                    } else {
-                        DIPillBadge(text: String(localized: "Open-ended"))
-                    }
-                    Text("Lifetime: \(counter.lifetimeCount + counter.count)")
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
+        HStack(spacing: DISpacing.md) {
+            countRing
+            VStack(alignment: .leading, spacing: DISpacing.xs) {
+                Text(verbatim: counter.title)
+                    .font(DIFont.subheading)
+                    .foregroundStyle(DIColor.textPrimary)
+                if let target = counter.target {
+                    DIPillBadge(text: String(localized: "Target \(target)"), color: DIColor.accent)
+                } else {
+                    DIPillBadge(text: String(localized: "Open-ended"))
                 }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.forward")
-                    .font(.footnote)
+                Text("Lifetime: \(counter.lifetimeCount + counter.count)")
+                    .font(.caption)
                     .foregroundStyle(DIColor.textMuted)
-                    .accessibilityHidden(true)
             }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.forward")
+                .font(.footnote)
+                .foregroundStyle(DIColor.textMuted)
+                .accessibilityHidden(true)
         }
         .accessibilityElement(children: .combine)
     }
@@ -186,7 +191,8 @@ private struct TasbihCounterRow: View {
                 .foregroundStyle(DIColor.actionForeground)
         }
         .frame(width: 52, height: 52)
-        .accessibilityHidden(true)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Current count: \(counter.count)"))
     }
 }
 
