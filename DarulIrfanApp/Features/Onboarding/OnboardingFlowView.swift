@@ -11,6 +11,7 @@ import SwiftUI
 struct OnboardingFlowView: View {
     private let onComplete: () -> Void
     @State private var viewModel: OnboardingViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(dependencies: AppDependencies, appState: AppState, onComplete: @escaping () -> Void) {
         self.onComplete = onComplete
@@ -41,7 +42,7 @@ struct OnboardingFlowView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(backgroundLayer)
-        .animation(.easeInOut(duration: 0.35), value: viewModel.step)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.35), value: viewModel.step)
     }
 
     // MARK: - Living background
@@ -145,7 +146,7 @@ struct OnboardingFlowView: View {
                     .diGoldGlow(radius: isCurrent ? 6 : 0, opacity: isCurrent ? 0.6 : 0)
             }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: viewModel.step)
+        .animation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.7), value: viewModel.step)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Step \(viewModel.step.rawValue + 1) of \(OnboardingStep.allCases.count)"))
     }
