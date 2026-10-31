@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -78,6 +78,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "settings" {
+            settingsTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "pages" {
             silsilaTour()
             practiceTour()
@@ -282,6 +286,18 @@ final class RedesignScreenshotTests: XCTestCase {
             app.swipeUp()
             pause(1.5)
             shot("\(name)-\(index + 1)")
+        }
+    }
+
+    private func settingsTour() {
+        selectTab(4)
+        for entry in ["location", "prayerCalculation", "notifications", "appearance", "hijriCalendar", "contentStorage", "privacy"] {
+            scrollToTop()
+            if seek("settings-" + entry) {
+                shot("settings-" + entry)
+                scrollShots("settings-" + entry, count: entry == "notifications" ? 4 : 2)
+                goBack()
+            }
         }
     }
 

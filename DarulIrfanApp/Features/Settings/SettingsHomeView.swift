@@ -189,6 +189,7 @@ private struct SettingsRowLink<Destination: View>: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("settings-" + entry.id)
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
     }
 }
