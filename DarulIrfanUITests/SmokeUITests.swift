@@ -58,9 +58,14 @@ final class SmokeUITests: XCTestCase {
         let zikr = app.tabBars.buttons["Zikr"]
         XCTAssertTrue(zikr.waitForExistence(timeout: 60))
         zikr.tap()
-        let personal = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Your Daily Personal Zikr")).firstMatch
-        for _ in 0..<4 where !personal.isHittable { app.swipeUp() }
+        let personal = app.buttons["personal-zikr-entry"]
         XCTAssertTrue(personal.waitForExistence(timeout: 10))
+        // The entry is near the top. Wait for the tab transition instead of
+        // swiping it out of view while the destination is still appearing.
+        let ready = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "hittable == true"), object: personal
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
         personal.tap()
         XCTAssertTrue(app.staticTexts["1st Latifa"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Start"].exists)
