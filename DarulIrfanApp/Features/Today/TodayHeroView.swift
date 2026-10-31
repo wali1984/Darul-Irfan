@@ -86,7 +86,13 @@ struct TodayHeroView: View {
                 Spacer(minLength: 0)
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(date, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.headline.weight(.medium)).monospacedDigit().foregroundStyle(.white)
-                    if let place = appState.activePlace?.name { Text(verbatim: place).font(.caption).foregroundStyle(.white.opacity(0.78)) }
+                    if let place = appState.activePlace {
+                        HStack(alignment: .top, spacing: 6) {
+                            Text(verbatim: place.name).font(.caption).foregroundStyle(.white.opacity(0.78))
+                                .fixedSize(horizontal: false, vertical: true)
+                            TodayWeatherView(latitude: place.latitude, longitude: place.longitude, city: place.name, timeZone: timeZone)
+                        }
+                    }
                 }
             }
         }

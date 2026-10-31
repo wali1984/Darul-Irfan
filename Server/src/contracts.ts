@@ -115,6 +115,10 @@ export interface AndroidDeviceRegistration {
 }
 
 export interface Env {
+  WEATHERKIT_TEAM_ID?: string;
+  WEATHERKIT_KEY_ID?: string;
+  WEATHERKIT_SERVICE_ID?: string;
+  WEATHERKIT_PRIVATE_KEY?: string;
   DB: D1Database;
   ENVIRONMENT: string;
   PUBLIC_BASE_URL: string;

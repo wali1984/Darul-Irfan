@@ -180,3 +180,32 @@ is FCM's state. A refused access token (401) is renewed for the next alert.
    `SUPER_ADMIN_EMAILS`, add it there.
 6. Back up D1, apply the migration with `npm run db:migrate:remote`, then
    `npm test`, `npm run check` and `npm run deploy`.
+
+## Apple Weather on Today
+
+Both native clients use `GET /v1/weather/current?lat=<city>&lon=<city>`.
+Coordinates are rounded on the phone to a 0.1-degree city grid and normalized
+again by the Worker. Successful readings are cached for ten minutes at the
+edge; cache misses are limited per client. The response contains temperature,
+feels-like temperature, humidity, timestamps, and Apple attribution. It never
+contains the developer token or signing key. Missing access, invalid readings,
+and provider failures return an unavailable response; the clients hide the
+weather rather than substitute a reading. Location settings can turn it off.
+
+The required Worker secrets are `WEATHERKIT_TEAM_ID`, `WEATHERKIT_KEY_ID`,
+`WEATHERKIT_SERVICE_ID`, and `WEATHERKIT_PRIVATE_KEY`. Keep the `.p8` outside git.
+The owner has a local credential note with `Key ID:`, `Issuer ID:` (the
+10-character Apple Team ID), `Service ID:`, and `Path` (the key directory or
+file). A key's `Services: WeatherKit` capability is separate from its registered
+Services ID. Register that ID through Apple's developer account:
+[Apple's WeatherKit setup](https://developer.apple.com/help/account/capabilities/create-a-services-identifier-and-private-key-for-weatherkit).
+
+From the repository root, `python Tools/Release/weatherkit.py --credentials
+<local-note>` tests a real signed request. Add `--configure` after it succeeds
+to set the four Worker secrets using Wrangler's stdin; no key is printed.
+`--service-id <registered-id>` can supply the ID without editing the note.
+Then deploy the checked Worker with `npm run deploy` from `Server`.
+
+The apps bundle Apple's unmodified white Weather mark obtained from its
+public attribution endpoint, and link to Apple's weather-data attribution.
+No WeatherKit private key or developer token belongs in a native binary.

@@ -9,6 +9,7 @@ struct LocationSettingsView: View {
     private let appState: AppState
     @State private var viewModel: LocationSettingsViewModel
     @State private var isRefreshingDevicePlace = false
+    @AppStorage("today.weather.enabled") private var weatherEnabled = true
     @Environment(\.openURL) private var openURL
 
     init(dependencies: AppDependencies, appState: AppState) {
@@ -23,6 +24,11 @@ struct LocationSettingsView: View {
                 deviceSection
             }
             manualSection
+            Section {
+                Toggle("Weather on Today", isOn: $weatherEnabled)
+            } footer: {
+                Text("Apple Weather uses your selected city's approximate location. Precise device coordinates are not sent.")
+            }
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)

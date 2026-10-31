@@ -58,3 +58,5 @@ enabled = true
 # the key may be pasted with the file's literal \n line breaks). Until all
 # three are set, Android phones are skipped and iPhones are sent as before:
 # FCM_PROJECT_ID, FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY
+# Apple WeatherKit (the Service ID is distinct from the Key ID and Team ID):
+# WEATHERKIT_TEAM_ID, WEATHERKIT_KEY_ID, WEATHERKIT_SERVICE_ID, WEATHERKIT_PRIVATE_KEY
