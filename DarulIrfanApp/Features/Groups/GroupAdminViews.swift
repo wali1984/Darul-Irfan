@@ -642,22 +642,25 @@ struct GroupMeetingScheduler: View {
 
     var body: some View {
         Form {
-            Section {
-                TextField("Title", text: $title)
-                DatePicker("Starts", selection: $startsAt, in: Date()...)
-                Stepper(value: $duration, in: 15...240, step: 15) {
-                    Text("\(duration) minutes")
+            Group {
+                Section {
+                    TextField("Title", text: $title)
+                    DatePicker("Starts", selection: $startsAt, in: Date()...)
+                    Stepper(value: $duration, in: 15...240, step: 15) {
+                        Text("\(duration) minutes")
+                    }
+                } footer: {
+                    Text("Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before.")
                 }
-            } footer: {
-                Text("Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before.")
+                if let error {
+                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                }
+                Section {
+                    Button("Schedule the meeting") { Task { await save() } }
+                        .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
             }
-            if let error {
-                Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
-            }
-            Section {
-                Button("Schedule the meeting") { Task { await save() } }
-                    .disabled(working || title.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -669,12 +672,16 @@ struct GroupMeetingScheduler: View {
     }
 
     private func save() async {
+        guard !working, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         working = true
+        error = nil
         defer { working = false }
         do {
-            try await service.scheduleMeeting(in: groupID, title: title.trimmingCharacters(in: .whitespaces),
+            try await service.scheduleMeeting(in: groupID, title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                                               startsAt: startsAt, durationMinutes: duration)
             dismiss()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
@@ -705,62 +712,78 @@ struct GroupZikrEditor: View {
     /// A recording or past zikr this time plays by itself.
     @State private var autoplay: GroupQueueEntry?
     @State private var library: GroupRecordingLibrary?
+    @State private var libraryFailed = false
+    @State private var loadingLibrary = false
+    @State private var sessionID = "zikr-\(UUID().uuidString.prefix(8).lowercased())"
     @State private var working = false
     @State private var error: String?
 
     var body: some View {
         Form {
-            Section {
-                TextField("Title", text: $title)
-                Picker("When", selection: $timing) {
-                    ForEach(Timing.allCases) { timing in Text(LocalizedStringKey(timing.rawValue)).tag(timing) }
-                }
-                if timing == .clock {
-                    DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
-                }
-                Stepper(value: $duration, in: 10...120, step: 5) {
-                    Text("\(duration) minutes")
-                }
-            } footer: {
-                Text(timing == .clock
-                     ? "The time is in your own time zone; members see it in theirs."
-                     : "Follows the prayer time at Dar-ul-Irfan each day.")
-            }
-            if timing == .clock, let library, !(library.recordings.isEmpty && library.pastVideos.isEmpty) {
+            Group {
                 Section {
-                    Picker("Plays by itself", selection: $autoplay) {
-                        Text("Nothing: an admin starts it").tag(GroupQueueEntry?.none)
-                        ForEach(library.recordings) { recording in
-                            Text(verbatim: recording.title).tag(GroupQueueEntry?.some(.recording(recording.id)))
-                        }
-                        ForEach(library.pastVideos.prefix(20)) { video in
-                            Text(verbatim: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
-                                .tag(GroupQueueEntry?.some(.video(video.videoID)))
-                        }
+                    TextField("Title", text: $title)
+                    Picker("When", selection: $timing) {
+                        ForEach(Timing.allCases) { timing in Text(LocalizedStringKey(timing.rawValue)).tag(timing) }
                     }
-                    .pickerStyle(.navigationLink)
+                    if timing == .clock {
+                        DatePicker("Time", selection: $time, displayedComponents: .hourAndMinute)
+                    }
+                    Stepper(value: $duration, in: 10...120, step: 5) {
+                        Text("\(duration) minutes")
+                    }
                 } footer: {
-                    Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.")
+                    Text(timing == .clock
+                         ? "The time is in your own time zone; members see it in theirs."
+                         : "Follows the prayer time at Dar-ul-Irfan each day.")
                 }
-            }
-            Section("Days") {
-                let symbols = weekdayNames
-                ForEach(1...7, id: \.self) { day in
-                    Toggle(isOn: Binding(
-                        get: { weekdays.contains(day) },
-                        set: { on in if on { weekdays.insert(day) } else if weekdays.count > 1 { weekdays.remove(day) } }
-                    )) {
-                        Text(verbatim: symbols[day - 1])
+                if timing == .clock && (loadingLibrary || libraryFailed) {
+                    Section {
+                        if loadingLibrary { ProgressView("Loading the library…") }
+                        if libraryFailed {
+                            Text("Could not load playback choices.").foregroundStyle(DIColor.danger)
+                            Button("Try again") { Task { await loadLibrary() } }
+                                .buttonStyle(DICompactButtonStyle())
+                        }
                     }
                 }
+                if timing == .clock, let library, !(library.recordings.isEmpty && library.pastVideos.isEmpty) {
+                    Section {
+                        Picker("Plays by itself", selection: $autoplay) {
+                            Text("Nothing: an admin starts it").tag(GroupQueueEntry?.none)
+                            ForEach(library.recordings) { recording in
+                                Text(verbatim: recording.title).tag(GroupQueueEntry?.some(.recording(recording.id)))
+                            }
+                            ForEach(library.pastVideos.prefix(20)) { video in
+                                Text(verbatim: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
+                                    .tag(GroupQueueEntry?.some(.video(video.videoID)))
+                            }
+                        }
+                        .pickerStyle(.navigationLink)
+                    } footer: {
+                        Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.")
+                    }
+                }
+                Section("Days") {
+                    let symbols = weekdayNames
+                    ForEach(1...7, id: \.self) { day in
+                        Toggle(isOn: Binding(
+                            get: { weekdays.contains(day) },
+                            set: { on in if on { weekdays.insert(day) } else if weekdays.count > 1 { weekdays.remove(day) } }
+                        )) {
+                            Text(verbatim: symbols[day - 1])
+                        }
+                    }
+                }
+                if let error {
+                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                }
+                Section {
+                    Button("Save zikr time") { Task { await save() } }
+                        .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
             }
-            if let error {
-                Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
-            }
-            Section {
-                Button("Save zikr time") { Task { await save() } }
-                    .disabled(working || title.trimmingCharacters(in: .whitespaces).isEmpty)
-            }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -769,7 +792,21 @@ struct GroupZikrEditor: View {
         .navigationTitle("Zikr time")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
-        .task { library = try? await service.recordings(in: groupID) }
+        .task { await loadLibrary() }
+    }
+
+    private func loadLibrary() async {
+        guard !loadingLibrary else { return }
+        loadingLibrary = true
+        libraryFailed = false
+        defer { loadingLibrary = false }
+        do {
+            library = try await service.recordings(in: groupID)
+        } catch is CancellationError {
+            return
+        } catch {
+            libraryFailed = true
+        }
     }
 
     private var weekdayNames: [String] {
@@ -779,12 +816,14 @@ struct GroupZikrEditor: View {
     }
 
     private func save() async {
+        guard !working, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         working = true
+        error = nil
         defer { working = false }
         let parts = Calendar.current.dateComponents([.hour, .minute], from: time)
         let session = ZikrSession(
-            id: "zikr-\(UUID().uuidString.prefix(8).lowercased())",
-            title: title.trimmingCharacters(in: .whitespaces),
+            id: sessionID,
+            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
             weekdays: weekdays.sorted(),
             startHour: timing == .clock ? (parts.hour ?? 20) : (timing == .afterIsha ? 21 : 4),
             startMinute: timing == .clock ? (parts.minute ?? 0) : (timing == .afterIsha ? 15 : 0),
@@ -799,6 +838,8 @@ struct GroupZikrEditor: View {
         do {
             try await service.saveZikrSession(session, autoplay: timing == .clock ? [autoplay].compactMap { $0 } : [], in: groupID)
             dismiss()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
