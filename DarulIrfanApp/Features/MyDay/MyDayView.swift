@@ -16,6 +16,7 @@ struct MyDayView: View {
     }
 
     @State private var store = MyDayStore.shared
+    @State private var saveFailed = false
     @Environment(\.locale) private var locale
     @State private var span: Span = .today
     @State private var editing: DayTask?
@@ -65,6 +66,9 @@ struct MyDayView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .alert("Could not save. Please try again.", isPresented: $saveFailed) {
+            Button("OK", role: .cancel) { }
+        }
         .tint(DIColor.actionForeground)
         .navigationTitle("My Day")
         .toolbar {
@@ -86,8 +90,9 @@ struct MyDayView: View {
         .sheet(item: $editing) { task in
             NavigationStack {
                 DayTaskEditorView(task: task, prayerSchedule: { prayerSchedule(on: $0) }, onSave: { save($0) }, onDelete: {
-                    store.delete(taskID: task.id)
+                    guard store.delete(taskID: task.id) else { return false }
                     refreshReminders()
+                    return true
                 })
             }
         }
@@ -112,7 +117,7 @@ struct MyDayView: View {
             }
             ForEach(entries) { entry in
                 DayTaskRow(task: entry.task, time: entry.time, day: day) {
-                    store.toggleDone(taskID: entry.task.id, on: day)
+                    guard store.toggleDone(taskID: entry.task.id, on: day) else { saveFailed = true; return }
                     DIHaptics.light()
                     refreshReminders()
                 } onOpen: {
@@ -120,7 +125,7 @@ struct MyDayView: View {
                 }
                 .swipeActions {
                     Button(role: .destructive) {
-                        store.delete(taskID: entry.task.id)
+                        guard store.delete(taskID: entry.task.id) else { saveFailed = true; return }
                         refreshReminders()
                     } label: {
                         Label("Delete", systemImage: "trash")
@@ -133,9 +138,10 @@ struct MyDayView: View {
         .listRowBackground(DIColor.surface)
     }
 
-    private func save(_ task: DayTask) {
-        store.upsert(task)
+    private func save(_ task: DayTask) -> Bool {
+        guard store.upsert(task) else { return false }
         refreshReminders()
+        return true
     }
 
     private func prayerSchedule(on day: Date) -> PrayerDaySchedule? {

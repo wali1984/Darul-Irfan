@@ -5,6 +5,7 @@ import SwiftUI
 @MainActor
 struct NotesView: View {
     @State private var store = MyDayStore.shared
+    @State private var saveFailed = false
     @State private var editing: DayNote?
     @State private var isAdding = false
 
@@ -45,7 +46,7 @@ struct NotesView: View {
                 .listRowBackground(DIColor.surface)
                 .swipeActions {
                     Button(role: .destructive) {
-                        store.delete(noteID: note.id)
+                        saveFailed = !store.delete(noteID: note.id)
                     } label: {
                         Label("Delete", systemImage: "trash")
                     }
@@ -55,6 +56,9 @@ struct NotesView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .alert("Could not save. Please try again.", isPresented: $saveFailed) {
+            Button("OK", role: .cancel) { }
+        }
         .tint(DIColor.actionForeground)
         .navigationTitle("Private notes")
         .toolbar {
@@ -86,8 +90,10 @@ struct NoteEditorView: View {
     let reference: NoteReference?
 
     @Environment(\.dismiss) private var dismiss
+    @State private var newNoteID = UUID()
     @State private var text: String
     @State private var store = MyDayStore.shared
+    @State private var saveFailed = false
 
     init(note: DayNote?, reference: NoteReference?) {
         self.note = note
@@ -116,6 +122,9 @@ struct NoteEditorView: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .alert("Could not save. Please try again.", isPresented: $saveFailed) {
+            Button("OK", role: .cancel) { }
+        }
         .tint(DIColor.actionForeground)
         .navigationTitle(note == nil ? "New note" : "Note")
         .navigationBarTitleDisplayMode(.inline)
@@ -126,11 +135,10 @@ struct NoteEditorView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     store.loadIfNeeded()
-                    var saved = note ?? DayNote(text: "", reference: reference)
+                    var saved = note ?? DayNote(id: newNoteID, text: "", reference: reference)
                     saved.text = text.trimmingCharacters(in: .whitespacesAndNewlines)
                     saved.reference = reference
-                    store.upsert(saved)
-                    dismiss()
+                    if store.upsert(saved) { dismiss() } else { saveFailed = true }
                 }
                 .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }

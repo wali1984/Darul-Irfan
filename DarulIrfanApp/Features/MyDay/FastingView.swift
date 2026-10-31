@@ -9,6 +9,7 @@ struct FastingView: View {
     @Environment(\.locale) private var locale
 
     @State private var store = MyDayStore.shared
+    @State private var saveFailed = false
     @State private var month = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
     @State private var choosingDay: Date?
 
@@ -28,6 +29,9 @@ struct FastingView: View {
             .padding(DISpacing.md)
         }
         .diScreenBackground()
+        .alert("Could not save. Please try again.", isPresented: $saveFailed) {
+            Button("OK", role: .cancel) { }
+        }
         .tint(DIColor.actionForeground)
         .diPageHeading("Fasting record")
         .onAppear { store.loadIfNeeded() }
@@ -39,12 +43,12 @@ struct FastingView: View {
             if let day = choosingDay {
                 ForEach(FastKind.allCases) { kind in
                     Button(LocalizedStringKey(kind.title)) {
-                        store.setFast(kind, on: day)
+                        saveFailed = !store.setFast(kind, on: day)
                         DIHaptics.light()
                     }
                 }
                 if store.fast(on: day) != nil {
-                    Button("Clear this day", role: .destructive) { store.setFast(nil, on: day) }
+                    Button("Clear this day", role: .destructive) { saveFailed = !store.setFast(nil, on: day) }
                 }
             }
         }

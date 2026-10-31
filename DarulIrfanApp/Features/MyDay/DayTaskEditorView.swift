@@ -6,8 +6,8 @@ import SwiftUI
 @MainActor
 struct DayTaskEditorView: View {
     let original: DayTask?
-    let onSave: (DayTask) -> Void
-    let onDelete: (() -> Void)?
+    let onSave: (DayTask) -> Bool
+    let onDelete: (() -> Bool)?
     /// The day's prayer times (nil without a place), for placing a
     /// prayer-relative task in the calendar.
     let prayerSchedule: @MainActor (Date) -> PrayerDaySchedule?
@@ -20,6 +20,8 @@ struct DayTaskEditorView: View {
         var id: String { rawValue }
     }
 
+    @State private var newTaskID = UUID()
+    @State private var saveFailed = false
     @Environment(\.dismiss) private var dismiss
     @State private var title: String
     @State private var day: Date
@@ -35,8 +37,8 @@ struct DayTaskEditorView: View {
     init(
         task: DayTask?,
         prayerSchedule: @escaping @MainActor (Date) -> PrayerDaySchedule?,
-        onSave: @escaping (DayTask) -> Void,
-        onDelete: (() -> Void)? = nil
+        onSave: @escaping (DayTask) -> Bool,
+        onDelete: (() -> Bool)? = nil
     ) {
         self.original = task
         self.prayerSchedule = prayerSchedule
@@ -140,14 +142,16 @@ struct DayTaskEditorView: View {
             if let onDelete {
                 Section {
                     Button("Delete task", role: .destructive) {
-                        onDelete()
-                        dismiss()
+                        if onDelete() { dismiss() } else { saveFailed = true }
                     }
                 }
             }
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .alert("Could not save. Please try again.", isPresented: $saveFailed) {
+            Button("OK", role: .cancel) { }
+        }
         .navigationTitle(original == nil ? "New task" : "Edit task")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -156,8 +160,7 @@ struct DayTaskEditorView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    onSave(builtTask)
-                    dismiss()
+                    if onSave(builtTask) { dismiss() } else { saveFailed = true }
                 }
                 .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
@@ -179,7 +182,7 @@ struct DayTaskEditorView: View {
     }
 
     private var builtTask: DayTask {
-        var task = original ?? DayTask(title: "", startDay: day)
+        var task = original ?? DayTask(id: newTaskID, title: "", startDay: day)
         task.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         task.startDay = Calendar.current.startOfDay(for: day)
         task.timing = timing

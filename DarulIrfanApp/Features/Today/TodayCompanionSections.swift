@@ -101,6 +101,7 @@ struct TodayMyDayCard: View {
     let dependencies: AppDependencies
     let appState: AppState
     @State private var store = MyDayStore.shared
+    @State private var saveFailed = false
     @State private var isAdding = false
     @State private var editing: DayTask?
 
@@ -128,7 +129,7 @@ struct TodayMyDayCard: View {
                 }
                 ForEach(Array(open.prefix(3))) { entry in
                     DayTaskRow(task: entry.task, time: entry.time, day: today) {
-                        store.toggleDone(taskID: entry.task.id, on: today)
+                        guard store.toggleDone(taskID: entry.task.id, on: today) else { saveFailed = true; return }
                         DIHaptics.light()
                         Task { await appState.refreshScheduledNotificationsAndWidgets() }
                     } onOpen: {
@@ -146,23 +147,29 @@ struct TodayMyDayCard: View {
         .sheet(isPresented: $isAdding) {
             NavigationStack {
                 DayTaskEditorView(task: nil, prayerSchedule: { prayerSchedule(on: $0) }) { task in
-                    store.upsert(task)
+                    guard store.upsert(task) else { return false }
                     Task { await appState.refreshScheduledNotificationsAndWidgets() }
+                    return true
                 }
             }
         }
         .sheet(item: $editing) { task in
             NavigationStack {
                 DayTaskEditorView(task: task, prayerSchedule: { prayerSchedule(on: $0) }, onSave: { updated in
-                    store.upsert(updated)
+                    guard store.upsert(updated) else { return false }
                     Task { await appState.refreshScheduledNotificationsAndWidgets() }
+                    return true
                 }, onDelete: {
-                    store.delete(taskID: task.id)
+                    guard store.delete(taskID: task.id) else { return false }
                     Task { await appState.refreshScheduledNotificationsAndWidgets() }
+                    return true
                 })
             }
         }
         .onAppear { store.loadIfNeeded() }
+        .alert("Could not save. Please try again.", isPresented: $saveFailed) {
+            Button("OK", role: .cancel) { }
+        }
     }
 
     private func prayerSchedule(on day: Date) -> PrayerDaySchedule? {

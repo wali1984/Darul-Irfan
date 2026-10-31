@@ -57,18 +57,21 @@ final class MyDayStore {
         }
     }
 
-    private func save() {
-        guard hasLoaded, !saveBlocked else { return }
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        guard let data = try? encoder.encode(document) else { return }
-        try? FileManager.default.createDirectory(
-            at: fileURL.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-        // Readable after first unlock so a reminder refresh in the
-        // background still works; never readable on a locked, rebooted phone.
-        try? data.write(to: fileURL, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+    private func save(candidate: MyDayDocument) -> Bool {
+        guard hasLoaded, !saveBlocked else {
+            return false
+        }
+        do {
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            let data = try encoder.encode(candidate)
+            try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try data.write(to: fileURL, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+            document = candidate
+            return true
+        } catch {
+            return false
+        }
     }
 
     // MARK: Tasks
@@ -80,52 +83,62 @@ final class MyDayStore {
     // Every change loads first, so it lands on the stored document rather
     // than replacing it.
 
-    func upsert(_ task: DayTask) {
+    @discardableResult
+    func upsert(_ task: DayTask) -> Bool {
         loadIfNeeded()
-        if let index = document.tasks.firstIndex(where: { $0.id == task.id }) {
-            document.tasks[index] = task
+        var candidate = document
+        if let index = candidate.tasks.firstIndex(where: { $0.id == task.id }) {
+            candidate.tasks[index] = task
         } else {
-            document.tasks.append(task)
+            candidate.tasks.append(task)
         }
-        save()
+        return save(candidate: candidate)
     }
 
-    func delete(taskID: UUID) {
+    @discardableResult
+    func delete(taskID: UUID) -> Bool {
         loadIfNeeded()
-        document.tasks.removeAll { $0.id == taskID }
-        save()
+        var candidate = document
+        candidate.tasks.removeAll { $0.id == taskID }
+        return save(candidate: candidate)
     }
 
-    func toggleDone(taskID: UUID, on day: Date) {
+    @discardableResult
+    func toggleDone(taskID: UUID, on day: Date) -> Bool {
         loadIfNeeded()
-        guard let index = document.tasks.firstIndex(where: { $0.id == taskID }) else { return }
+        var candidate = document
+        guard let index = candidate.tasks.firstIndex(where: { $0.id == taskID }) else { return true }
         let key = DayKey.make(from: day)
-        if document.tasks[index].completedDays.contains(key) {
-            document.tasks[index].completedDays.remove(key)
+        if candidate.tasks[index].completedDays.contains(key) {
+            candidate.tasks[index].completedDays.remove(key)
         } else {
-            document.tasks[index].completedDays.insert(key)
+            candidate.tasks[index].completedDays.insert(key)
         }
-        save()
+        return save(candidate: candidate)
     }
 
     // MARK: Notes
 
-    func upsert(_ note: DayNote) {
+    @discardableResult
+    func upsert(_ note: DayNote) -> Bool {
         loadIfNeeded()
+        var candidate = document
         var note = note
         note.updatedAt = Date()
-        if let index = document.notes.firstIndex(where: { $0.id == note.id }) {
-            document.notes[index] = note
+        if let index = candidate.notes.firstIndex(where: { $0.id == note.id }) {
+            candidate.notes[index] = note
         } else {
-            document.notes.insert(note, at: 0)
+            candidate.notes.insert(note, at: 0)
         }
-        save()
+        return save(candidate: candidate)
     }
 
-    func delete(noteID: UUID) {
+    @discardableResult
+    func delete(noteID: UUID) -> Bool {
         loadIfNeeded()
-        document.notes.removeAll { $0.id == noteID }
-        save()
+        var candidate = document
+        candidate.notes.removeAll { $0.id == noteID }
+        return save(candidate: candidate)
     }
 
     func notes(about reference: NoteReference) -> [DayNote] {
@@ -138,10 +151,12 @@ final class MyDayStore {
         document.fasts[DayKey.make(from: day)]
     }
 
-    func setFast(_ kind: FastKind?, on day: Date) {
+    @discardableResult
+    func setFast(_ kind: FastKind?, on day: Date) -> Bool {
         loadIfNeeded()
-        document.fasts[DayKey.make(from: day)] = kind
-        save()
+        var candidate = document
+        candidate.fasts[DayKey.make(from: day)] = kind
+        return save(candidate: candidate)
     }
 
     func fastCount(inYearOf date: Date, kind: FastKind? = nil, calendar: Calendar = .current) -> Int {

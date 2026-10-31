@@ -5,6 +5,54 @@ import XCTest
 /// My Day planning and the personal iqamah reminder.
 final class MyDayTests: XCTestCase {
 
+    @MainActor
+    func testFailedWritesPreserveConfirmedStateAndRetry() throws {
+        let manager = FileManager.default
+        let folder = manager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try manager.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? manager.removeItem(at: folder) }
+        let file = folder.appendingPathComponent("my_day.json")
+        let backup = folder.appendingPathComponent("confirmed.json")
+        let store = MyDayStore(fileURL: file)
+        let day = Date()
+        var note = DayNote(text: "original")
+        var task = DayTask(title: "original task", startDay: day)
+        XCTAssertTrue(store.upsert(note))
+        XCTAssertTrue(store.upsert(task))
+        XCTAssertTrue(store.setFast(.voluntary, on: day))
+        let notes = store.document.notes
+        let tasks = store.document.tasks
+        let fasts = store.document.fasts
+        let data = try Data(contentsOf: file)
+        try manager.moveItem(at: file, to: backup)
+        try manager.createDirectory(at: file, withIntermediateDirectories: true)
+        try Data("block writes".utf8).write(to: file.appendingPathComponent("keep"))
+        note.text = "edited"
+        task.title = "edited"
+        let changes: [() -> Bool] = [
+            { store.upsert(note) }, { store.delete(noteID: note.id) },
+            { store.upsert(task) }, { store.delete(taskID: task.id) },
+            { store.toggleDone(taskID: task.id, on: day) }, { store.setFast(nil, on: day) }
+        ]
+        for change in changes {
+            XCTAssertFalse(change())
+            XCTAssertEqual(store.document.notes, notes)
+            XCTAssertEqual(store.document.tasks, tasks)
+            XCTAssertEqual(store.document.fasts, fasts)
+            XCTAssertEqual(try Data(contentsOf: backup), data)
+        }
+        try manager.removeItem(at: file)
+        try manager.moveItem(at: backup, to: file)
+        XCTAssertTrue(store.upsert(note))
+        let reloaded = MyDayStore(fileURL: file)
+        reloaded.loadIfNeeded()
+        XCTAssertEqual(reloaded.document.notes.count, 1)
+        XCTAssertEqual(reloaded.document.notes.first?.text, "edited")
+        XCTAssertEqual(reloaded.document.tasks.map(\.id), tasks.map(\.id))
+        XCTAssertEqual(reloaded.document.tasks.map(\.title), tasks.map(\.title))
+        XCTAssertEqual(reloaded.document.fasts, fasts)
+    }
+
     private var calendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TestDates.karachi
