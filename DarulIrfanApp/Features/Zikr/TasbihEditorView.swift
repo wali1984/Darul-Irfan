@@ -6,11 +6,14 @@ struct TasbihEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var title: String
     @State private var targetText: String
+    @State private var isSaving = false
+    @State private var saveFailed = false
+    @State private var draftID = UUID()
 
     private let original: TasbihCounter?
-    private let onSave: (TasbihCounter) -> Void
+    private let onSave: (TasbihCounter) async throws -> Void
 
-    init(counter: TasbihCounter?, onSave: @escaping (TasbihCounter) -> Void) {
+    init(counter: TasbihCounter?, onSave: @escaping (TasbihCounter) async throws -> Void) {
         self.original = counter
         self.onSave = onSave
         _title = State(initialValue: counter?.title ?? "")
@@ -36,6 +39,7 @@ struct TasbihEditorView: View {
                     Text("A per-session goal such as 100. Leave empty for open-ended counting.")
                 }
             }
+            .disabled(isSaving)
             .scrollContentBackground(.hidden)
             .diScreenBackground()
             .navigationTitle(original == nil ? "New Counter" : "Edit Counter")
@@ -46,14 +50,21 @@ struct TasbihEditorView: View {
                         dismiss()
                     }
                     .accessibilityIdentifier("tasbih-editor-cancel")
+                    .disabled(isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button(isSaving ? "Saving…" : "Save") {
                         save()
                     }
-                    .disabled(trimmedTitle.isEmpty)
+                    .disabled(trimmedTitle.isEmpty || isSaving)
                 }
             }
+        }
+        .interactiveDismissDisabled(isSaving)
+        .alert("Unable to save counter", isPresented: $saveFailed) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your changes are still here. Please try saving again.")
         }
     }
 
@@ -63,12 +74,12 @@ struct TasbihEditorView: View {
 
     private func save() {
         let name = trimmedTitle
-        guard !name.isEmpty else { return }
+        guard !name.isEmpty, !isSaving else { return }
 
         let target = TasbihCounter.parseTarget(targetText)
 
         var counter = original ?? TasbihCounter(
-            id: UUID(),
+            id: draftID,
             title: name,
             target: nil,
             count: 0,
@@ -78,7 +89,15 @@ struct TasbihEditorView: View {
         counter.title = name
         counter.target = target
         counter.updatedAt = Date()
-        onSave(counter)
-        dismiss()
+        isSaving = true
+        Task { @MainActor in
+            defer { isSaving = false }
+            do {
+                try await onSave(counter)
+                dismiss()
+            } catch {
+                saveFailed = true
+            }
+        }
     }
 }

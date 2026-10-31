@@ -95,12 +95,12 @@ struct TasbihListView: View {
         }
         .sheet(isPresented: $isCreating) {
             TasbihEditorView(counter: nil) { newCounter in
-                Task { await viewModel.save(newCounter) }
+                try await viewModel.save(newCounter)
             }
         }
         .sheet(item: $editingCounter) { counter in
             TasbihEditorView(counter: counter) { updated in
-                Task { await viewModel.save(updated) }
+                try await viewModel.save(updated)
             }
         }
         .confirmationDialog(

@@ -33079,6 +33079,57 @@
           }
         }
       }
+    },
+    "Saving…": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محفوظ ہو رہا ہے…"
+          }
+        }
+      }
+    },
+    "Unable to save counter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to save counter"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاؤنٹر محفوظ نہیں ہو سکا"
+          }
+        }
+      }
+    },
+    "Your changes are still here. Please try saving again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your changes are still here. Please try saving again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کی تبدیلیاں یہیں موجود ہیں۔ براہِ کرم دوبارہ محفوظ کرنے کی کوشش کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

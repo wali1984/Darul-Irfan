@@ -44,13 +44,8 @@ final class TasbihListViewModel {
         isLoaded = true
     }
 
-    func save(_ counter: TasbihCounter) async {
-        do {
-            try await trackerRepository.saveTasbihCounter(counter)
-        } catch {
-            // Local persistence failure; the list reload below shows the
-            // stored truth either way.
-        }
+    func save(_ counter: TasbihCounter) async throws {
+        try await trackerRepository.saveTasbihCounter(counter)
         await load()
     }
 
@@ -166,14 +161,19 @@ final class TasbihCounterViewModel {
     }
 
     /// Applies edits (title/target) coming back from the editor sheet.
-    func apply(_ updated: TasbihCounter) async {
-        counter = updated
-        counter.updatedAt = Date()
+    func apply(_ updated: TasbihCounter) async throws {
+        saveTask?.cancel()
+        await saveTask?.value
+        var saved = counter
+        saved.title = updated.title
+        saved.target = updated.target
+        saved.updatedAt = Date()
+        try await trackerRepository.saveTasbihCounter(saved)
+        counter = saved
         if let target = counter.target, target > 0, counter.count < target {
             hasRecordedTargetThisSession = false
         }
-        saveTask?.cancel()
-        await persist()
+        await devotionalMetrics.refresh(reference: saved.updatedAt)
     }
 
     /// Called when the screen disappears so no taps are lost.

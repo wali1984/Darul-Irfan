@@ -20,6 +20,55 @@ final class TrackerRepositoryTests: XCTestCase {
         database = nil
     }
 
+    @MainActor
+    func testTasbihEditorSaveFailurePropagatesAndRetryKeepsOneCounter() async throws {
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihListViewModel(trackerRepository: repository, devotionalMetrics: metrics)
+        let draft = TasbihCounter(id: UUID(), title: "Draft", target: 100, count: 0, lifetimeCount: 0, updatedAt: Date())
+        try await database.connection.executeScript("CREATE TRIGGER reject_tasbih BEFORE INSERT ON tasbih_counters BEGIN SELECT RAISE(ABORT, 'test write failure'); END;")
+        do {
+            try await model.save(draft)
+            XCTFail("A failed write must reach the editor, not close it as successful")
+        } catch { }
+        let failedRows = try await repository.tasbihCounters()
+        XCTAssertTrue(failedRows.isEmpty)
+        try await database.connection.executeScript("DROP TRIGGER reject_tasbih;")
+        try await model.save(draft)
+        try await model.save(draft)
+        let saved = try await repository.tasbihCounters()
+        XCTAssertEqual(saved.count, 1)
+        XCTAssertEqual(saved.first?.id, draft.id)
+    }
+
+    @MainActor
+    func testTasbihCounterEditCommitsOnlyAfterSaveAndPreservesCounts() async throws {
+        let initial = TasbihCounter(id: UUID(), title: "Original", target: 100, count: 7, lifetimeCount: 21, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        var draft = initial
+        draft.title = "Edited"
+        draft.target = 200
+        draft.count = 999
+        draft.lifetimeCount = 999
+        try await database.connection.executeScript("CREATE TRIGGER reject_tasbih BEFORE INSERT ON tasbih_counters BEGIN SELECT RAISE(ABORT, 'test write failure'); END;")
+        do {
+            try await model.apply(draft)
+            XCTFail("A failed edit must not be accepted")
+        } catch { }
+        XCTAssertEqual(model.counter.title, initial.title)
+        XCTAssertEqual(model.counter.count, 7)
+        try await database.connection.executeScript("DROP TRIGGER reject_tasbih;")
+        try await model.apply(draft)
+        let saved = try await repository.tasbihCounters()
+        XCTAssertEqual(saved.first?.title, "Edited")
+        XCTAssertEqual(saved.first?.target, 200)
+        XCTAssertEqual(saved.first?.count, 7)
+        XCTAssertEqual(saved.first?.lifetimeCount, 21)
+    }
+
     // MARK: - Helpers
 
     /// Marks every obligatory prayer of `dayKey` as fulfilled, mixing

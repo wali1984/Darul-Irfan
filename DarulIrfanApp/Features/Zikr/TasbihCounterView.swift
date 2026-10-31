@@ -69,7 +69,7 @@ struct TasbihCounterView: View {
         }
         .sheet(isPresented: $isEditing) {
             TasbihEditorView(counter: viewModel.counter) { updated in
-                Task { await viewModel.apply(updated) }
+                try await viewModel.apply(updated)
             }
         }
         .confirmationDialog(
