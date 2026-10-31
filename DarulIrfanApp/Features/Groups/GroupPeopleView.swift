@@ -23,46 +23,49 @@ struct GroupPeopleView: View {
 
     var body: some View {
         List {
-            Section {
-                Button {
-                    adding = true
-                } label: {
-                    Label("Add people", systemImage: "person.badge.plus")
-                }
-            } footer: {
-                Text("Add someone by email, or send an invitation code to their phone, as a member, an Admin or - if you may appoint them - an Administrator of this Halqah.")
-            }
-            if let error {
-                Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
-            }
-            if let people {
-                let seniors = people.members.filter { $0.role == .administrator || $0.role == .superadmin }
-                let admins = people.members.filter { $0.role == .admin }
-                let members = people.members.filter { $0.role == .member }
-                if !seniors.isEmpty {
-                    Section("Administrators") { ForEach(seniors) { personRow($0) } }
-                }
-                if !admins.isEmpty {
-                    Section("Admins") { ForEach(admins) { personRow($0) } }
-                }
-                Section("Members") {
-                    if members.isEmpty {
-                        Text("No members yet.").foregroundStyle(DIColor.textMuted)
+            Group {
+                Section {
+                    Button {
+                        adding = true
+                    } label: {
+                        Label("Add people", systemImage: "person.badge.plus")
                     }
-                    ForEach(members) { personRow($0) }
+                } footer: {
+                    Text("Add someone by email, or send an invitation code to their phone, as a member, an Admin or - if you may appoint them - an Administrator of this Halqah.")
                 }
-                if !people.invitations.isEmpty {
-                    Section {
-                        ForEach(people.invitations) { invitationRow($0) }
-                    } header: {
-                        Text("Invitations not used yet")
-                    } footer: {
-                        Text("Withdraw one to stop it admitting anyone.")
+                if let error {
+                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                }
+                if let people {
+                    let seniors = people.members.filter { $0.role == .administrator || $0.role == .superadmin }
+                    let admins = people.members.filter { $0.role == .admin }
+                    let members = people.members.filter { $0.role == .member }
+                    if !seniors.isEmpty {
+                        Section("Administrators") { ForEach(seniors) { personRow($0) } }
                     }
+                    if !admins.isEmpty {
+                        Section("Admins") { ForEach(admins) { personRow($0) } }
+                    }
+                    Section("Members") {
+                        if members.isEmpty {
+                            Text("No members yet.").foregroundStyle(DIColor.textMuted)
+                        }
+                        ForEach(members) { personRow($0) }
+                    }
+                    if !people.invitations.isEmpty {
+                        Section {
+                            ForEach(people.invitations) { invitationRow($0) }
+                        } header: {
+                            Text("Invitations not used yet")
+                        } footer: {
+                            Text("Withdraw one to stop it admitting anyone.")
+                        }
+                    }
+                } else if error == nil {
+                    Section { ProgressView().frame(maxWidth: .infinity) }
                 }
-            } else if error == nil {
-                Section { ProgressView().frame(maxWidth: .infinity) }
             }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -167,91 +170,94 @@ struct GroupPeopleView: View {
                     Text("Code without a note")
                 }
                 Group {
-                    if invitation.kind == "email" {
-                        Text("Added when they sign in")
-                    } else if let expires = invitation.expiresAt {
-                        Text("Code, until \(expires.formatted(date: .abbreviated, time: .omitted))")
-                    }
-                }
-                .font(.caption)
-                .foregroundStyle(DIColor.textMuted)
-                VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    if invitation.role != .member { roleBadge(invitation.role) }
-                    if invitation.role != .administrator || appointer {
-                        Button(role: .destructive) {
-                            Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
-                        } label: {
-                            Text("Withdraw")
+                        if invitation.kind == "email" {
+                            Text("Added when they sign in")
+                        } else if let expires = invitation.expiresAt {
+                            Text("Code, until \(expires.formatted(date: .abbreviated, time: .omitted))")
                         }
-                        .buttonStyle(.bordered)
+                    }
+                    .font(.caption)
+                    .foregroundStyle(DIColor.textMuted)
+                    VStack(alignment: .leading, spacing: DISpacing.xs) {
+                        if invitation.role != .member { roleBadge(invitation.role) }
+                        if invitation.role != .administrator || appointer {
+                            Button(role: .destructive) {
+                                Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
+                            } label: {
+                                Text("Withdraw")
+                            }
+                            .buttonStyle(DICompactButtonStyle(destructive: true))
+                        }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
-    }
 
-    private func load() async {
-        do {
-            people = try await service.people(in: groupID)
-            error = nil
-        } catch {
-            self.error = error.localizedDescription
-        }
-    }
-
-    private func act(_ change: () async throws -> Void) async {
-        guard !working else { return }
-        working = true
-        defer { working = false }
-        do {
-            try await change()
-            error = nil
-            await load()
-        } catch is CancellationError {
-            return
-        } catch {
-            self.error = error.localizedDescription
-        }
-    }
-}
-
-// MARK: - Adding someone
-
-@MainActor
-struct AddGroupPersonView: View {
-    let groupID: String
-    let groupName: String
-    let service: MemberGroupService
-    /// Administrators and the Super admin may also add Administrators.
-    var canAppointAdministrators = false
-
-    private enum Method: String, CaseIterable, Identifiable {
-        case email = "Email"
-        case phone = "Phone"
-        case code = "Code only"
-        var id: String { rawValue }
-    }
-
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
-    @State private var method: Method = .email
-    @State private var email = ""
-    @State private var phone = ""
-    @State private var role: GroupRole = .member
-    @State private var days = 14
-    @State private var working = false
-    @State private var error: String?
-    @State private var result: AddPersonResult?
-    @State private var copied = false
-
-    var body: some View {
-        Form {
-            if let result {
-                resultSections(result)
-            } else {
-                entrySections
+        private func load() async {
+            do {
+                people = try await service.people(in: groupID)
+                error = nil
+            } catch {
+                self.error = error.localizedDescription
             }
+        }
+
+        private func act(_ change: () async throws -> Void) async {
+            guard !working else { return }
+            working = true
+            defer { working = false }
+            do {
+                try await change()
+                error = nil
+                await load()
+            } catch is CancellationError {
+                return
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+    }
+
+    // MARK: - Adding someone
+
+    @MainActor
+    struct AddGroupPersonView: View {
+        let groupID: String
+        let groupName: String
+        let service: MemberGroupService
+        /// Administrators and the Super admin may also add Administrators.
+        var canAppointAdministrators = false
+
+        private enum Method: String, CaseIterable, Identifiable {
+            case email = "Email"
+            case phone = "Phone"
+            case code = "Code only"
+            var id: String { rawValue }
+        }
+
+        @Environment(\.dismiss) private var dismiss
+        @Environment(\.openURL) private var openURL
+        @State private var method: Method = .email
+        @State private var email = ""
+        @State private var phone = ""
+        @State private var role: GroupRole = .member
+        @State private var days = 14
+        @State private var working = false
+        @State private var error: String?
+        @State private var result: AddPersonResult?
+        @State private var copied = false
+
+        var body: some View {
+            Form {
+                Group {
+                if let result {
+                    resultSections(result)
+                } else {
+                    entrySections
+                }
+            }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
