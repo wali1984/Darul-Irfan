@@ -9,6 +9,7 @@ struct YouTubePlayerSheet: View {
     var body: some View {
         NavigationStack {
             YouTubePlayerView(videoID: videoID)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .navigationTitle(title)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
