@@ -727,39 +727,45 @@ struct GroupDuaRequestsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var requests: [GroupDuaRequest]?
     @State private var failed = false
+    @State private var actionError: String?
+    @State private var working = false
 
     var body: some View {
         List {
-            if let requests {
-                if requests.isEmpty {
-                    Text("No dua requests.").foregroundStyle(DIColor.textMuted)
-                }
-                ForEach(requests) { request in
-                    VStack(alignment: .leading, spacing: DISpacing.xs) {
-                        Text(verbatim: request.text)
-                            .foregroundStyle(request.isRead ? DIColor.textMuted : DIColor.textPrimary)
-                        HStack {
-                            if let name = request.name {
-                                Text(verbatim: name)
-                            } else {
-                                Text("Without a name")
+            Group {
+                if let actionError { Text(verbatim: actionError).foregroundStyle(DIColor.danger) }
+                if failed { Button("Try again") { Task { await load() } } }
+                if let requests {
+                    if requests.isEmpty {
+                        Text("No dua requests.").foregroundStyle(DIColor.textMuted)
+                    }
+                    ForEach(requests) { request in
+                        VStack(alignment: .leading, spacing: DISpacing.xs) {
+                            Text(verbatim: request.text)
+                                .foregroundStyle(request.isRead ? DIColor.textMuted : DIColor.textPrimary)
+                            HStack {
+                                if let name = request.name {
+                                    Text(verbatim: name)
+                                } else {
+                                    Text("Without a name")
+                                }
+                                Text(verbatim: "·")
+                                Text(verbatim: request.createdAt.formatted(date: .abbreviated, time: .shortened))
                             }
-                            Text(verbatim: "·")
-                            Text(verbatim: request.createdAt.formatted(date: .abbreviated, time: .shortened))
-                        }
-                        .font(.caption)
-                        .foregroundStyle(DIColor.textMuted)
-                        if !request.isRead {
-                            Button("Mark as read") { Task { await markRead(request) } }
-                                .font(.footnote)
+                            .font(.caption)
+                            .foregroundStyle(DIColor.textMuted)
+                            if !request.isRead {
+                                Button("Mark as read") { Task { await markRead(request) } }
+                                    .buttonStyle(DICompactButtonStyle())
+                                    .disabled(working)
+                            }
                         }
                     }
+                } else if !failed {
+                    ProgressView()
                 }
-            } else if failed {
-                Button("Try again") { Task { await load() } }
-            } else {
-                ProgressView()
             }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -774,12 +780,28 @@ struct GroupDuaRequestsView: View {
 
     private func load() async {
         failed = false
-        do { requests = try await service.duaRequests(in: groupID) } catch { failed = true }
+        do {
+            requests = try await service.duaRequests(in: groupID)
+        } catch is CancellationError {
+            return
+        } catch {
+            failed = true
+        }
     }
 
     private func markRead(_ request: GroupDuaRequest) async {
-        try? await service.markDuaRead(request.id, in: groupID)
-        await load()
+        guard !working else { return }
+        working = true
+        defer { working = false }
+        do {
+            try await service.markDuaRead(request.id, in: groupID)
+            actionError = nil
+            await load()
+        } catch is CancellationError {
+            return
+        } catch {
+            actionError = error.localizedDescription
+        }
     }
 }
 
@@ -793,46 +815,50 @@ struct GroupSessionHistoryView: View {
     @State private var sessions: [GroupSessionRecord]?
     @State private var canDelete = false
     @State private var deleting: GroupSessionRecord?
+    @State private var working = false
     @State private var failed = false
     @State private var error: String?
 
     var body: some View {
         List {
-            if let error {
-                Text(verbatim: error).foregroundStyle(DIColor.danger)
-            }
-            if let sessions {
-                if sessions.isEmpty {
-                    Text("No sessions yet. Each one appears here when it ends.").foregroundStyle(DIColor.textMuted)
+            Group {
+                if let error {
+                    Text(verbatim: error).foregroundStyle(DIColor.danger)
                 }
-                if canDelete && !sessions.isEmpty {
-                    Text("Swipe a session to delete it.").font(.caption).foregroundStyle(DIColor.textMuted)
-                }
-                ForEach(sessions) { session in
-                    NavigationLink {
-                        GroupSessionAttendeesView(groupID: groupID, session: session, service: service)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
-                            Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .shortened))
-                                .font(.caption)
-                                .foregroundStyle(DIColor.textMuted)
-                            Text("\(session.attendees) attended")
-                                .font(.caption)
-                                .foregroundStyle(DIColor.textMuted)
+                if failed { Button("Try again") { Task { await load() } } }
+                if let sessions {
+                    if sessions.isEmpty {
+                        Text("No sessions yet. Each one appears here when it ends.").foregroundStyle(DIColor.textMuted)
+                    }
+                    if canDelete && !sessions.isEmpty {
+                        Text("Swipe a session to delete it.").font(.caption).foregroundStyle(DIColor.textMuted)
+                    }
+                    ForEach(sessions) { session in
+                        NavigationLink {
+                            GroupSessionAttendeesView(groupID: groupID, session: session, service: service)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
+                                Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .shortened))
+                                    .font(.caption)
+                                    .foregroundStyle(DIColor.textMuted)
+                                Text("\(session.attendees) attended")
+                                    .font(.caption)
+                                    .foregroundStyle(DIColor.textMuted)
+                            }
+                        }
+                        .swipeActions {
+                            if canDelete {
+                                Button("Delete", role: .destructive) { deleting = session }
+                                    .disabled(working)
+                            }
                         }
                     }
-                    .swipeActions {
-                        if canDelete {
-                            Button("Delete", role: .destructive) { deleting = session }
-                        }
-                    }
+                } else if !failed {
+                    ProgressView()
                 }
-            } else if failed {
-                Button("Try again") { Task { await load() } }
-            } else {
-                ProgressView()
             }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -860,16 +886,23 @@ struct GroupSessionHistoryView: View {
             let history = try await service.sessionHistory(in: groupID)
             sessions = history.sessions
             canDelete = history.canDelete == true
+        } catch is CancellationError {
+            return
         } catch {
             failed = true
         }
     }
 
     private func delete(_ session: GroupSessionRecord) async {
+        guard !working else { return }
+        working = true
+        defer { working = false }
         do {
             try await service.deleteSessionRecord(session.id, in: groupID)
             error = nil
             await load()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
@@ -883,21 +916,26 @@ struct GroupSessionAttendeesView: View {
     let service: MemberGroupService
 
     @State private var attendees: [GroupAttendee]?
+    @State private var failed = false
 
     var body: some View {
         List {
-            Section {
-                Text(verbatim: "\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) – \(session.endedAt.formatted(date: .omitted, time: .shortened))")
-                    .foregroundStyle(DIColor.textMuted)
-            }
-            if let attendees {
-                if attendees.isEmpty {
-                    Text("No one joined in the app.").foregroundStyle(DIColor.textMuted)
+            Group {
+                Section {
+                    Text(verbatim: "\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) – \(session.endedAt.formatted(date: .omitted, time: .shortened))")
+                        .foregroundStyle(DIColor.textMuted)
                 }
-                ForEach(attendees) { person in GroupAttendeeRow(person: person) }
-            } else {
-                ProgressView()
+                if failed { Button("Try again") { Task { await load() } } }
+                if let attendees {
+                    if attendees.isEmpty {
+                        Text("No one joined in the app.").foregroundStyle(DIColor.textMuted)
+                    }
+                    ForEach(attendees) { person in GroupAttendeeRow(person: person) }
+                } else if !failed {
+                    ProgressView()
+                }
             }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -905,6 +943,17 @@ struct GroupSessionAttendeesView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(Text(verbatim: session.title ?? String(localized: "Halqah Zikr")))
         .navigationBarTitleDisplayMode(.inline)
-        .task { attendees = (try? await service.attendees(of: session.id, in: groupID)) ?? [] }
+        .task { await load() }
+    }
+
+    private func load() async {
+        failed = false
+        do {
+            attendees = try await service.attendees(of: session.id, in: groupID)
+        } catch is CancellationError {
+            return
+        } catch {
+            failed = true
+        }
     }
 }
