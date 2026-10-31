@@ -230,6 +230,8 @@ struct GroupLiveStarter: View {
     @State private var working = false
     @State private var error: String?
 
+    @State private var deletingRecording: GroupRecording?
+
     private var sources: [Source] { addingToSession ? [.youtube, .recording] : Source.allCases }
 
     var body: some View {
@@ -303,6 +305,15 @@ struct GroupLiveStarter: View {
         .navigationTitle(addingToSession ? "Add to the session" : "Go live")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .confirmationDialog("Delete this recording?", isPresented: Binding(
+            get: { deletingRecording != nil },
+            set: { if !$0 { deletingRecording = nil } }
+        ), titleVisibility: .visible, presenting: deletingRecording) { recording in
+            Button("Delete", role: .destructive) { Task { await delete(recording) } }
+            Button("Cancel", role: .cancel) {}
+        } message: { recording in
+            Text(verbatim: recording.title + "\n\n" + String(localized: "This removes the recording from the group's library. This cannot be undone."))
+        }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.audio, .movie]) { result in
             if case .success(let file) = result { Task { await upload(file) } }
         }
@@ -383,13 +394,18 @@ struct GroupLiveStarter: View {
                     Text("No recordings yet. Upload one from your phone.").foregroundStyle(DIColor.textMuted)
                 }
                 ForEach(recordings) { recording in
-                    choiceRow(
-                        entry: .recording(recording.id),
-                        title: recording.title,
-                        detail: [length(recording.durationSeconds), ByteCountFormatter.string(fromByteCount: Int64(recording.byteSize), countStyle: .file)]
-                    )
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        choiceRow(
+                            entry: .recording(recording.id),
+                            title: recording.title,
+                            detail: [length(recording.durationSeconds), ByteCountFormatter.string(fromByteCount: Int64(recording.byteSize), countStyle: .file)]
+                        )
+                        Button("Delete recording") { deletingRecording = recording }
+                            .buttonStyle(DICompactButtonStyle(destructive: true))
+                            .disabled(working || uploading)
+                    }
                     .swipeActions {
-                        Button("Delete", role: .destructive) { Task { await delete(recording) } }
+                        Button("Delete", role: .destructive) { deletingRecording = recording }
                             .disabled(working || uploading)
                     }
                 }
@@ -484,7 +500,7 @@ struct GroupLiveStarter: View {
     private func titleOf(_ entry: GroupQueueEntry) -> String {
         switch entry {
         case .recording(let id): library?.recordings.first { $0.id == id }?.title ?? id
-        case .video(let id): library?.pastVideos.first { $0.videoID == id }?.title ?? id
+        case .video(let id): library?.pastVideos.first { $0.videoID == id }.map { "\($0.title) · \($0.publishedAt.formatted(date: .abbreviated, time: .omitted))" } ?? id
         }
     }
 
@@ -596,6 +612,7 @@ struct GroupLiveStarter: View {
     private func delete(_ recording: GroupRecording) async {
         guard !working && !uploading else { return }
         working = true
+        error = nil
         defer { working = false }
         do {
             try await service.deleteRecording(recording.id, in: groupID)

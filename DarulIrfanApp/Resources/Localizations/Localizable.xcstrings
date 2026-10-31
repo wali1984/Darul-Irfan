@@ -33278,6 +33278,54 @@
           }
         }
       }
+    },
+    "Delete recording": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete recording"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریکارڈنگ حذف کریں"
+          }
+        }
+      }
+    },
+    "Delete this recording?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this recording?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ ریکارڈنگ حذف کریں؟"
+          }
+        }
+      }
+    },
+    "This removes the recording from the group's library. This cannot be undone.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This removes the recording from the group's library. This cannot be undone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ ریکارڈنگ حلقے کی لائبریری سے حذف ہو جائے گی۔ اسے واپس نہیں لایا جا سکتا۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
