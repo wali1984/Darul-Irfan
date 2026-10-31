@@ -48,8 +48,35 @@ final class SmokeUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Local moon sighting"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Calculated Hijri date"].exists)
         XCTAssertTrue(app.staticTexts["Your local date"].exists)
-        XCTAssertTrue(app.steppers.firstMatch.exists)
-        XCTAssertTrue(app.buttons["Use calculated date"].exists)
+        // Date correction uses the shared raised adjustment buttons, not a
+        // system Stepper. Exercise their behavior as well as their presence.
+        let decrease = app.buttons["- Date correction"]
+        let increase = app.buttons["+ Date correction"]
+        let reset = app.buttons["Use calculated date"]
+        XCTAssertTrue(decrease.waitForExistence(timeout: 5))
+        XCTAssertTrue(increase.exists)
+        XCTAssertTrue(reset.exists)
+        XCTAssertGreaterThanOrEqual(decrease.frame.height, 48)
+        XCTAssertGreaterThanOrEqual(increase.frame.height, 48)
+        func waitEnabled(_ element: XCUIElement, _ enabled: Bool) {
+            let expectation = XCTNSPredicateExpectation(
+                predicate: NSPredicate(format: "enabled == %@", NSNumber(value: enabled)), object: element
+            )
+            XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: 10), .completed)
+        }
+        if reset.isEnabled { reset.tap() }
+        waitEnabled(reset, false)
+        increase.tap()
+        waitEnabled(reset, true)
+        decrease.tap()
+        waitEnabled(reset, false)
+        increase.tap()
+        waitEnabled(reset, true)
+        increase.tap()
+        waitEnabled(increase, false)
+        reset.tap()
+        waitEnabled(reset, false)
+        waitEnabled(increase, true)
     }
 
     func testPersonalZikrOpensFromZikrAndKeepsShajraInTheSamePage() {
