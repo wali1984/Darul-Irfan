@@ -117,7 +117,7 @@ struct HadithCatalog: Codable, Sendable, Equatable {
 struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
     var id: String { canonicalID }
 
-    /// `bookID|displayNumber|sourceSequence`, e.g. `bukhari|402.2|403`.
+    /// Immutable creation identity (book, original number, original sequence), e.g. `bukhari|402.2|403`.
     /// Primary key of `hadith_entries`; stable across content rebuilds.
     var canonicalID: String
     var bookID: String

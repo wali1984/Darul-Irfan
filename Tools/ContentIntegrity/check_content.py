@@ -119,6 +119,23 @@ def load_muslim_references() -> dict[str, dict[str, Any]]:
     return json.loads(MUSLIM_REFERENCES.read_text(encoding="utf-8"))["records"]
 
 
+def load_restored_reading_order() -> dict[str, dict[str, Any]]:
+    path = IOS_ROOT / "Tools/Hadith/restored_reading_order.json"
+    return json.loads(path.read_text(encoding="utf-8"))["records"] if path.exists() else {}
+
+
+def restored_identity_errors(record: dict, reference: dict) -> list[str]:
+    """Reading order may change when a lost source block is restored; bookmark IDs may not."""
+    errors = []
+    for field in ("sourceSequence", "displayNumber"):
+        if record.get(field) != reference.get(field):
+            errors.append(f"{record.get('canonicalID')}: {field} differs from source restoration ledger")
+    expected = f"{record.get('bookID')}|{reference['displayNumber']}|{reference['identitySequence']}"
+    if record.get("canonicalID") != expected:
+        errors.append(f"{record.get('canonicalID')}: restored bookmark identity changed")
+    return errors
+
+
 # Byte sequences that appear when UTF-8 has been decoded as Latin-1/CP1252 and
 # re-encoded. Any of these in sacred text means the pipeline mangled it.
 MOJIBAKE = [
@@ -357,6 +374,7 @@ def check_hadith(seed: Path, report: Report) -> None:
     total_duplicates = 0
     known_defects = load_known_defects()
     muslim_refs = load_muslim_references()
+    restored_order = load_restored_reading_order()
     new_defects: list[str] = []
     inherited_defects = 0
 
@@ -393,7 +411,8 @@ def check_hadith(seed: Path, report: Report) -> None:
 
             number = record.get("displayNumber")
             ref = muslim_refs.get(cid) if book_id == "muslim" else None
-            if number in display and book_id not in PER_BOOK_NUMBERED and not (ref and ref.get("shared")):
+            restored = restored_order.get(cid)
+            if number in display and book_id not in PER_BOOK_NUMBERED and not (ref and ref.get("shared")) and not (restored and restored.get("sharedPrintedNumber")):
                 # For the core collections a repeated printed number IS
                 # corruption — the integer-keyed schema once lost 103
                 # narrations to exactly that. But some sources restart their
@@ -409,7 +428,10 @@ def check_hadith(seed: Path, report: Report) -> None:
             # number is the recorded fawazahmed0 one and the shown number must
             # be the recorded reference (HAD-004).
             created = ref["legacy"] if ref else number
-            expected = f"{book_id}|{created}|{record.get('sourceSequence')}"
+            identity_sequence = restored["identitySequence"] if restored else record.get("sourceSequence")
+            expected = f"{book_id}|{created}|{identity_sequence}"
+            if restored:
+                malformed.extend(restored_identity_errors(record, restored))
             if cid != expected:
                 malformed.append(f"{cid} != {expected}")
             if ref and ref["display"] != number:
@@ -464,6 +486,10 @@ def check_hadith(seed: Path, report: Report) -> None:
                      f"'{book_id}': {len(malformed)} malformed identifiers: {malformed[:5]}")
         report.check(len(sequences) == len(records),
                      f"'{book_id}': sourceSequence is not unique across the pack")
+        recorded_restoration = {cid for cid in restored_order if cid.startswith(book_id + "|")}
+        if recorded_restoration:
+            report.check(recorded_restoration == canonical,
+                         f"'{book_id}': restored source inventory differs from identity ledger")
         # Every recorded Muslim narration must still be in the pack under the
         # canonicalID it was recorded with. An id that is not recorded is held
         # to the plain round-trip above, so without this a rebuild that made

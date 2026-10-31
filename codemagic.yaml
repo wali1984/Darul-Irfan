@@ -110,6 +110,7 @@ workflows:
           # Counts, bounds, unique keys, encoding, block sizes, and byte-for-byte
           # parity across the four platform seeds. The unit tests ran above, so
           # the migration result is known by the time this writes the report.
+          python3 -m unittest discover -s Tools/ContentIntegrity -p test_restored_identity.py
           python3 Tools/ContentIntegrity/check_content.py \
             --migration-status passed \
             --report build/CONTENT_INTEGRITY.md
@@ -272,6 +273,7 @@ workflows:
             2>&1 | tee build/logs/xcodebuild-release-tests.log | xcbeautify
       - name: Content integrity gate
         script: |
+          python3 -m unittest discover -s Tools/ContentIntegrity -p test_restored_identity.py
           python3 Tools/ContentIntegrity/check_content.py \
             --migration-status passed \
             --report build/CONTENT_INTEGRITY.md
@@ -406,6 +408,7 @@ workflows:
             --out "$CM_BUILD_DIR/build/hadith"
       - name: Content integrity gate
         script: |
+          python3 -m unittest discover -s Tools/ContentIntegrity -p test_restored_identity.py
           python3 Tools/ContentIntegrity/check_content.py \
             --report "$CM_BUILD_DIR/build/CONTENT_INTEGRITY.md"
       - name: Hadith content gate
