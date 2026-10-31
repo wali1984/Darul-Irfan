@@ -1,0 +1,31 @@
+{
+  "canonicalID": "hisn|75a|268",
+  "sourceURN": "1520751",
+  "sourceReference": "Hisn al-Muslim 75a",
+  "sourceURL": "https://sunnah.com/hisn",
+  "source": {
+    "url": "https://sunnah.com/hisn",
+    "retrievedAt": "2026-10-31T16:33:52.166669+00:00",
+    "sha256": "a1b2f9884276a8bf437d965312b8b2393d335936e312ee9913ce0bfb738afd31"
+  },
+  "reason": "Old dictionary parser overwrote the first of two entries mapped to display number 75. Parser is already lossless, but bundled content was not restored.",
+  "identityPolicy": "Append sourceSequence 268, preserving all 267 existing canonical bookmark IDs; preserve the source printed reference 75a distinctly from 75.",
+  "record": {
+    "canonicalID": "hisn|75a|268",
+    "bookID": "hisn",
+    "displayNumber": "75a",
+    "numberMajor": 75,
+    "numberMinor": 1,
+    "sourceSequence": 268,
+    "text_ar": "الْحَمْدُ لِلَّهِ وَحْدَهُ، وَالصَّلاَةُ وَالسَّلاَمُ عَلَى مَنْ لاَ نَبِيَّ بَعْدَهُ",
+    "text_en": "Alḥamdulillahi waḥdah waṣ-ṣalatu was-salam `alā man lā nabiyya ba`dah. All praise is due to Allah alone, and peace and blessings be upon him after whom there is no other Prophet. Reference: Anas (RA) said that he heard the Prophet (ﷺ) say: \"That I sit with people remembering Almighty Allah from the morning (Fajr) prayer until sunrise is more beloved to me than freeing four slaves from among the Children of Isma'il. That I sit with people remembering Allah from the afternoon ('Asr) prayer, until the sun sets, is more beloved to me than freeing four slaves from among the Children of Isma'il.\" This was reported by Abu Dawud (no. 3667). Al-Albani graded it good in Sahih Abu Dawud 2/698.",
+    "arabicSegments": [
+      {
+        "type": "matn",
+        "text": "الْحَمْدُ لِلَّهِ وَحْدَهُ، وَالصَّلاَةُ وَالسَّلاَمُ عَلَى مَنْ لاَ نَبِيَّ بَعْدَهُ"
+      }
+    ],
+    "chapterTitleEnglish": "Chapter: In the morning and evening",
+    "chapterTitleArabic": "أذكار الصباح والمساء"
+  }
+}

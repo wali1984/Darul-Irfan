@@ -14,5 +14,102 @@
     "sourcePDF": "Akram-ut-Tarajum-Parah01.pdf",
     "sourcePDFPage": 1,
     "sourceURL": "https://www.naqshbandiaowaisiah.org/uploads/262/Akram-ut-Tarajum-Parah01.pdf"
+  },
+  {
+    "editionID": "akram-ut-tarajum-ur",
+    "surahNumber": 2,
+    "ayahNumber": 16,
+    "before": "انہوں نے ہدایت کے بدلے گمراہی خریدی تو نہ تو ان کی تجارت نے (انہیں) نفع دیا اور نہ ہی وہ ہدایت پاسکے۔",
+    "after": "انہوں نے ہدایت کے بدلے گمراہی خریدی تو نہ تو ان کی تجارت نے (انہیں) نفع دیا اور نہ ہی ہدایت پاسکے۔",
+    "sourcePDF": "Akram-ut-Tarajum-Parah01.pdf",
+    "sourceURL": "https://www.naqshbandiaowaisiah.org/uploads/262/Akram-ut-Tarajum-Parah01.pdf",
+    "sourcePages": [
+      {
+        "sourceImage": "quran-scans/p01-003.jpg",
+        "printedPage": 5,
+        "pdf": "/mnt/sata1tb/Darul Irfan/Akram-ut-Tarajum — Quran Urdu translation/Akram-ut-Tarajum-Parah01.pdf",
+        "pdfPage": 3,
+        "imageSHA256": "3fb0b4cbbb504e382695356336aa8398f14c284ab50abcfb692f916f50279eb6"
+      },
+      {
+        "sourceImage": "quran-scans/p01-004.jpg",
+        "printedPage": 6,
+        "pdf": "/mnt/sata1tb/Darul Irfan/Akram-ut-Tarajum — Quran Urdu translation/Akram-ut-Tarajum-Parah01.pdf",
+        "pdfPage": 4,
+        "imageSHA256": "b50a801c3e3f046e4e7b10ff76b5c8c3781c82f76a17a4426c6794feac47ee97"
+      }
+    ],
+    "review": "Prior independent readings plus direct visual comparison to printed pages; only confirmed wording changes applied."
+  },
+  {
+    "editionID": "akram-ut-tarajum-ur",
+    "surahNumber": 2,
+    "ayahNumber": 26,
+    "before": "یقیناً اللہ مچھر یا اس سے اُوپر کی (کم تر) کسی شے کی مثال دینے سے نہیں شرماتے ہاں پس جو مومن ہیں وہ جانتے ہیں کہ یہ ان کے پروردگار نے حق کہا ہے (یعنی سچی بات اور بر موقع ہے) اور جو کافر ہیں تو وہ کہتے ہیں کہ اس مثال سے اللہ کی کیا مراد ہے؟ اکثر لوگوں کو وہ (اللہ) اس سے گمراہ کرتے ہیں اور اکثر کو اس سے ہدایت بخشتے ہیں اور وہ اس سے صرف نافرمانوں کو گمراہ کرتے ہیں۔",
+    "after": "یقیناً اللہ مچھر یا اس سے بڑی کسی شے کی مثال دینے سے نہیں شرماتے ہاں پس جو مومن ہیں وہ جانتے ہیں کہ یہ ان کے پروردگار نے حق کہا ہے (یعنی سچی بات اور بر موقع ہے) اور جو کافر ہیں تو وہ کہتے ہیں کہ اس مثال سے اللہ کی کیا مراد ہے؟ اکثر لوگوں کو وہ اس سے گمراہ کرتے ہیں اور اکثر کو اس سے ہدایت بخشتے ہیں اور وہ اس سے صرف نافرمانوں کو گمراہ کرتے ہیں۔",
+    "sourcePDF": "Akram-ut-Tarajum-Parah01.pdf",
+    "sourceURL": "https://www.naqshbandiaowaisiah.org/uploads/262/Akram-ut-Tarajum-Parah01.pdf",
+    "sourcePages": [
+      {
+        "sourceImage": "quran-scans/p01-006.jpg",
+        "printedPage": 8,
+        "pdf": "/mnt/sata1tb/Darul Irfan/Akram-ut-Tarajum — Quran Urdu translation/Akram-ut-Tarajum-Parah01.pdf",
+        "pdfPage": 6,
+        "imageSHA256": "5fc8d1710b4346daeb650f4a095e8cac589ab1d01a8b7f76aba1e9da2b0b9567"
+      },
+      {
+        "sourceImage": "quran-scans/p01-007.jpg",
+        "printedPage": 9,
+        "pdf": "/mnt/sata1tb/Darul Irfan/Akram-ut-Tarajum — Quran Urdu translation/Akram-ut-Tarajum-Parah01.pdf",
+        "pdfPage": 7,
+        "imageSHA256": "e3dd3fefef0a07879f60e7d1bbaebf643479aadd92451e9c14c48136e12a574c"
+      }
+    ],
+    "review": "Prior independent readings plus direct visual comparison to printed pages; only confirmed wording changes applied."
+  },
+  {
+    "editionID": "akram-ut-tarajum-ur",
+    "surahNumber": 2,
+    "ayahNumber": 42,
+    "before": "اور حق کو جھوٹ سے آمیز نہ کرو اور تم حق کو چھپاتے ہو اور یہ تم جانتے ہو۔",
+    "after": "اور حق کو جھوٹ سے آمیز نہ کرو اور حق کو مت چھپاؤ اور یہ تم جانتے ہو۔",
+    "sourcePDF": "Akram-ut-Tarajum-Parah01.pdf",
+    "sourceURL": "https://www.naqshbandiaowaisiah.org/uploads/262/Akram-ut-Tarajum-Parah01.pdf",
+    "sourcePages": [
+      {
+        "sourceImage": "quran-scans/p01-010.jpg",
+        "printedPage": 12,
+        "pdf": "/mnt/sata1tb/Darul Irfan/Akram-ut-Tarajum — Quran Urdu translation/Akram-ut-Tarajum-Parah01.pdf",
+        "pdfPage": 10,
+        "imageSHA256": "1287034830bf9eb7b699ba65ed9862bffc91dbe5d04acb112a005498f66d7d43"
+      },
+      {
+        "sourceImage": "quran-scans/p01-011.jpg",
+        "printedPage": 13,
+        "pdf": "/mnt/sata1tb/Darul Irfan/Akram-ut-Tarajum — Quran Urdu translation/Akram-ut-Tarajum-Parah01.pdf",
+        "pdfPage": 11,
+        "imageSHA256": "b1772fd4a807c2b51d9c4d4002d09f8b034653d9513f388152299ec4b02f2776"
+      }
+    ],
+    "review": "Prior independent readings plus direct visual comparison to printed pages; only confirmed wording changes applied."
+  },
+  {
+    "editionID": "akram-ut-tarajum-ur",
+    "surahNumber": 2,
+    "ayahNumber": 45,
+    "before": "اور صبر اور صلوٰۃ سے مدد حاصل کرو اور بے شک یہ دشوار ہے مگر ان کے لیئے نہیں جن کے دلوں میں خشوع ہے۔",
+    "after": "اور صبر اور صلوٰۃ سے مدد حاصل کرو اور بے شک یہ دشوار ہے مگر جن کے دلوں میں خشوع ہے ان کے لیے نہیں۔",
+    "sourcePDF": "Akram-ut-Tarajum-Parah01.pdf",
+    "sourceURL": "https://www.naqshbandiaowaisiah.org/uploads/262/Akram-ut-Tarajum-Parah01.pdf",
+    "sourcePages": [
+      {
+        "sourceImage": "quran-scans/p01-011.jpg",
+        "printedPage": 13,
+        "pdf": "/mnt/sata1tb/Darul Irfan/Akram-ut-Tarajum — Quran Urdu translation/Akram-ut-Tarajum-Parah01.pdf",
+        "pdfPage": 11,
+        "imageSHA256": "b1772fd4a807c2b51d9c4d4002d09f8b034653d9513f388152299ec4b02f2776"
+      }
+    ],
+    "review": "Prior independent readings plus direct visual comparison to printed pages; only confirmed wording changes applied."
   }
 ]
