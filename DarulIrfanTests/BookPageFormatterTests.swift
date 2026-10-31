@@ -5,6 +5,14 @@ import XCTest
 /// contents pages folded, and sentences carried across a page break.
 final class BookPageFormatterTests: XCTestCase {
 
+    func testReviewedZikrAndTazkiyahReferencesRemainArticleSpecific() {
+        let source = "(13: 28) - 7:198. - 15:42. - 62:2. - 9:100. - 39:23. - 73:8. - 3:191, - 18:24. - 39:23."
+        XCTAssertEqual(BookPageFormatter.reviewedArticleReferences(itemID: "the-need-for-zikr", text: source).count, 9)
+        XCTAssertEqual(BookPageFormatter.reviewedArticleReferences(itemID: "what-is-tazkiyah", text: "(5:32) (33: 35)").count, 2)
+        XCTAssertTrue(BookPageFormatter.reviewedArticleReferences(itemID: "what-is-tazkiyah", text: source).isEmpty)
+        XCTAssertTrue(BookPageFormatter.reviewedArticleReferences(itemID: "the-need-for-zikr", text: "13:28-9999 113:28 13:2800").isEmpty)
+    }
+
     func testReviewedArticleCitationsAddExactBundledArabicWithoutReplacingSource() {
         let source = "By the declining day, Lo! Man is in state of loss. (103:1-2)."
         let page = BookPageFormatter.articleParagraph(source, itemID: "what-is-tasawwuf")

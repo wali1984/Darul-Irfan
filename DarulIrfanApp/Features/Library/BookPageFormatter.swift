@@ -58,15 +58,25 @@ enum BookPageFormatter {
         let end: Int
     }
 
-    /// References reviewed against the official what-is-tasawwuf article.
+    /// References reviewed against the official Silsila teaching articles.
     /// Numeric references elsewhere are not automatically treated as Quran.
     static func reviewedArticleReferences(itemID: String?, text: String) -> [ArticleReference] {
-        guard itemID == "what-is-tasawwuf",
-              let regex = try? NSRegularExpression(pattern: #"\((\d+)\s*:\s*(\d+)(?:\s*[-–]\s*(\d+))?\)"#) else { return [] }
-        let reviewed = [ArticleReference(surah: 2,start: 137,end: 137),
+        guard let regex = try? NSRegularExpression(pattern: #"\b(\d{1,3})\s*:\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?(?![\d:]|\s*[-–])"#) else { return [] }
+        let reviewed: [ArticleReference]
+        switch itemID {
+        case "what-is-tasawwuf":
+            reviewed = [ArticleReference(surah: 2,start: 137,end: 137),
             ArticleReference(surah: 49,start: 3,end: 3), ArticleReference(surah: 8,start: 4,end: 4),
             ArticleReference(surah: 9,start: 100,end: 100), ArticleReference(surah: 103,start: 1,end: 2),
             ArticleReference(surah: 103,start: 3,end: 3)]
+        case "what-is-tazkiyah":
+            reviewed = [ArticleReference(surah: 5,start: 32,end: 32), ArticleReference(surah: 33,start: 35,end: 35)]
+        case "the-need-for-zikr":
+            reviewed = [(13,28), (7,198), (15,42), (62,2), (9,100), (39,23), (73,8), (3,191), (18,24)].map {
+                ArticleReference(surah: $0.0,start: $0.1,end: $0.1)
+            }
+        default: return []
+        }
         let ns = text as NSString
         var result: [ArticleReference] = []
         for match in regex.matches(in: text, range: NSRange(location: 0,length: ns.length)) {
