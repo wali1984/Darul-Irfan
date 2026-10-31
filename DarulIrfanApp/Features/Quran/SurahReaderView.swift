@@ -1077,44 +1077,56 @@ private struct AyahCardView: View {
     // MARK: Header (per-ayah toolbar)
 
     private var header: some View {
-        HStack(spacing: DISpacing.md) {
-            ayahNumberBadge
-            if let para = QuranDivisions.juzStarting(surah: ayah.surahNumber, ayah: ayah.ayahNumber) {
-                DIPillBadge(text: String(localized: "Parah \(para)"), color: DIColor.accent)
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            HStack(spacing: DISpacing.sm) {
+                ayahNumberBadge
+                if let para = QuranDivisions.juzStarting(surah: ayah.surahNumber, ayah: ayah.ayahNumber) {
+                    DIPillBadge(text: String(localized: "Parah \(para)"), color: DIColor.accent)
+                }
             }
-            playButton
-            Spacer(minLength: 0)
-            // Either tafsir, in either language, for this ayah alone.
-            Button {
-                showsTafsir = true
-            } label: {
-                Label("Tafsir", systemImage: "text.book.closed")
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, DISpacing.sm)
-                    .padding(.vertical, 4)
-                    .background(Capsule().fill(DIColor.primary.opacity(0.12)))
-                    .foregroundStyle(DIColor.primary)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: DISpacing.sm) { toolbarActions }
+                    .fixedSize(horizontal: true, vertical: false)
+                VStack(alignment: .leading, spacing: DISpacing.sm) { toolbarActions }
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Tafsir of Ayah \(ayah.ayahNumber)"))
-            Button {
-                Task { await viewModel.toggleBookmark(ayahNumber: ayah.ayahNumber) }
-            } label: {
-                Image(systemName: viewModel.isBookmarked(ayah.ayahNumber) ? "bookmark.fill" : "bookmark")
-                    .foregroundStyle(viewModel.isBookmarked(ayah.ayahNumber) ? DIColor.accent : DIColor.textMuted)
-            }
-            .accessibilityLabel(
-                viewModel.isBookmarked(ayah.ayahNumber)
-                    ? Text("Remove bookmark from Ayah \(ayah.ayahNumber)")
-                    : Text("Bookmark Ayah \(ayah.ayahNumber)")
-            )
-
-            ShareLink(item: viewModel.shareReference(for: ayah.ayahNumber)) {
-                Image(systemName: "square.and.arrow.up")
-                    .foregroundStyle(DIColor.textMuted)
-            }
-            .accessibilityLabel(Text("Share reference to Ayah \(ayah.ayahNumber)"))
+            .font(.system(size: 22))
+            .buttonStyle(AyahToolbarButtonStyle())
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private var toolbarActions: some View {
+        playButton
+        // Either tafsir, in either language, for this ayah alone.
+        Button {
+            showsTafsir = true
+        } label: {
+            Label("Tafsir", systemImage: "text.book.closed")
+                .font(.caption.weight(.semibold))
+                .padding(.horizontal, DISpacing.sm)
+                .foregroundStyle(DIColor.primary)
+        }
+        .accessibilityLabel(Text("Tafsir of Ayah \(ayah.ayahNumber)"))
+        Button {
+            Task { await viewModel.toggleBookmark(ayahNumber: ayah.ayahNumber) }
+        } label: {
+            Image(systemName: viewModel.isBookmarked(ayah.ayahNumber) ? "bookmark.fill" : "bookmark")
+                .foregroundStyle(DIColor.actionForeground)
+        }
+        .buttonStyle(AyahToolbarButtonStyle(isSelected: viewModel.isBookmarked(ayah.ayahNumber)))
+        .accessibilityAddTraits(viewModel.isBookmarked(ayah.ayahNumber) ? .isSelected : [])
+        .accessibilityLabel(
+            viewModel.isBookmarked(ayah.ayahNumber)
+                ? Text("Remove bookmark from Ayah \(ayah.ayahNumber)")
+                : Text("Bookmark Ayah \(ayah.ayahNumber)")
+        )
+
+        ShareLink(item: viewModel.shareReference(for: ayah.ayahNumber)) {
+            Image(systemName: "square.and.arrow.up")
+                .foregroundStyle(DIColor.textMuted)
+        }
+        .accessibilityLabel(Text("Share reference to Ayah \(ayah.ayahNumber)"))
     }
 
     @ViewBuilder
@@ -1475,5 +1487,24 @@ private extension ReaderFontScale {
         case .large: return "Large"
         case .extraLarge: return "Extra Large"
         }
+    }
+}
+
+private struct AyahToolbarButtonStyle: ButtonStyle {
+    var isSelected = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.horizontal, 10)
+            .frame(minWidth: 48, minHeight: 48)
+            .background(LinearGradient(colors: [DIColor.surface,
+                isSelected ? DIColor.accent.opacity(0.28) : DIColor.sandstone],
+                startPoint: .top, endPoint: .bottom), in: RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(isSelected ? DIColor.accent : DIColor.border, lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: 14))
+            .opacity(configuration.isPressed ? 0.78 : 1)
+            .shadow(color: DIColor.primaryDeep.opacity(0.14), radius: configuration.isPressed ? 1 : 3, y: 2)
+            .scaleEffect(!reduceMotion && configuration.isPressed ? 0.96 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: configuration.isPressed)
     }
 }
