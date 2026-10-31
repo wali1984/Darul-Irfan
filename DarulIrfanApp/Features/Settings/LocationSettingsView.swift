@@ -163,6 +163,16 @@ struct LocationSettingsView: View {
             }
             .listRowBackground(DIColor.surface)
 
+            Button {
+                DIHaptics.soft()
+                Task { await viewModel.search() }
+            } label: {
+                Label("Search", systemImage: "magnifyingglass")
+            }
+            .buttonStyle(DISecondaryButtonStyle())
+            .disabled(viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isSearching)
+            .listRowBackground(DIColor.surface)
+
             ForEach(viewModel.results, id: \.self) { place in
                 placeRow(place)
             }
@@ -228,7 +238,17 @@ struct LocationSettingsView: View {
 final class LocationSettingsViewModel {
     private let location: any LocationServicing
 
-    var query: String = ""
+    private var searchRevision = 0
+    var query: String = "" {
+        didSet {
+            guard query != oldValue else { return }
+            searchRevision += 1
+            results = []
+            isSearching = false
+            searchFailed = false
+            hasSearched = false
+        }
+    }
     private(set) var results: [PlaceCoordinate] = []
     private(set) var isSearching = false
     private(set) var searchFailed = false
@@ -248,18 +268,27 @@ final class LocationSettingsViewModel {
     }
 
     func search() async {
+        searchRevision += 1
+        let request = searchRevision
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        results = []
+        hasSearched = false
+        searchFailed = false
         guard !trimmed.isEmpty else {
-            results = []
-            hasSearched = false
+            isSearching = false
             return
         }
         isSearching = true
-        searchFailed = false
         do {
-            results = try await location.searchPlaces(matching: trimmed)
+            let found = try await location.searchPlaces(matching: trimmed)
+            guard request == searchRevision else { return }
+            results = found
+        } catch is CancellationError {
+            guard request == searchRevision else { return }
+            isSearching = false
+            return
         } catch {
-            results = []
+            guard request == searchRevision else { return }
             searchFailed = true
         }
         hasSearched = true
