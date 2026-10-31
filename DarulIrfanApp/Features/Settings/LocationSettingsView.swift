@@ -103,7 +103,7 @@ struct LocationSettingsView: View {
                 } label: {
                     Label("Open Settings to Allow Location", systemImage: "gear")
                 }
-                .foregroundStyle(DIColor.actionForeground)
+                .buttonStyle(DISecondaryButtonStyle())
                 .listRowBackground(DIColor.surface)
             } else {
                 Button {
@@ -118,7 +118,7 @@ struct LocationSettingsView: View {
                     }
                 }
                 .disabled(isRefreshingDevicePlace)
-                .foregroundStyle(DIColor.actionForeground)
+                .buttonStyle(DISecondaryButtonStyle())
                 .listRowBackground(DIColor.surface)
             }
             if deviceUpdateFailed && viewModel.authorization != .denied {
@@ -245,6 +245,7 @@ struct LocationSettingsView: View {
                 }
             }
         }
+        .frame(minHeight: 48)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .listRowBackground(DIColor.surface)
     }
