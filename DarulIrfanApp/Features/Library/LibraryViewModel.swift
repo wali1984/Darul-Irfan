@@ -182,13 +182,13 @@ final class LibraryViewModel {
     /// The Qur'an's translation and tafsir volumes are kept in Qur'an order
     /// instead (`quranOrder`); undated items are ordered by title the way a
     /// person reads numbers ("Parah 2" before "Parah 10").
-    func items(in category: ContentCategory) async -> [ContentItem] {
-        let fetched = (try? await contentRepository.items(
+    func items(in category: ContentCategory) async throws -> [ContentItem] {
+        let fetched = try await contentRepository.items(
             category: category,
             type: typeFilter,
             language: languageFilter,
             limit: 500
-        )) ?? []
+        )
         if category == .quranTafsir || category == .quranTranslation {
             return fetched.sorted { lhs, rhs in
                 let left = Self.quranOrder(lhs), right = Self.quranOrder(rhs)
@@ -201,13 +201,13 @@ final class LibraryViewModel {
 
     /// Items of several categories listed together (the Books shelf
     /// "Courses and documents"), with the active filters, newest first.
-    func items(in categories: [ContentCategory]) async -> [ContentItem] {
+    func items(in categories: [ContentCategory]) async throws -> [ContentItem] {
         if categories.count == 1, let only = categories.first {
-            return await items(in: only)
+            return try await items(in: only)
         }
         var all: [ContentItem] = []
         for category in categories {
-            let found = await items(in: category)
+            let found = try await items(in: category)
             all.append(contentsOf: found)
         }
         return Self.newestFirst(all)

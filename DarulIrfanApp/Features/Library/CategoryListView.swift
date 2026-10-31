@@ -13,6 +13,8 @@ struct CategoryListView: View {
 
     @State private var items: [ContentItem] = []
     @State private var isLoading = true
+    @State private var loadFailed = false
+    @State private var attempt = 0
 
     private var categories: [ContentCategory] {
         [category] + alsoListing
@@ -31,7 +33,7 @@ struct CategoryListView: View {
         let language = viewModel.languageFilter ?? "all"
         let type = viewModel.typeFilter?.rawValue ?? "all"
         let listed = categories.map(\.rawValue).joined(separator: ",")
-        return "\(listed)|\(language)|\(type)"
+        return "\(listed)|\(language)|\(type)|\(attempt)"
     }
 
     var body: some View {
@@ -40,6 +42,15 @@ struct CategoryListView: View {
                 ProgressView()
                     .tint(DIColor.primary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    DIEmptyState(systemImage: "book", titleKey: "Something went wrong",
+                        messageKey: "Please try again in a moment.")
+                    Button("Retry") { attempt += 1 }
+                        .buttonStyle(.bordered)
+                        .tint(DIColor.primary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if items.isEmpty {
                 emptyState
             } else {
@@ -69,8 +80,17 @@ struct CategoryListView: View {
         }
         .task(id: reloadKey) {
             isLoading = true
-            items = await viewModel.items(in: categories)
-            isLoading = false
+            loadFailed = false
+            defer { isLoading = false }
+            do {
+                let loaded = try await viewModel.items(in: categories)
+                try Task.checkCancellation()
+                items = loaded
+            } catch is CancellationError {
+                return
+            } catch {
+                loadFailed = true
+            }
         }
     }
 

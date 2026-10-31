@@ -158,6 +158,25 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testCategoryReadFailureIsDistinctFromFilterEmptyAndRetries() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertItems([libraryItem("category-test", category: .books)])
+        let model = LibraryViewModel(contentRepository: repository)
+        try await database.connection.execute("ALTER TABLE content_items RENAME TO unavailable_content_items")
+        do {
+            _ = try await model.items(in: [.books, .importantDocuments])
+            XCTFail("A failed category read must expose Retry")
+        } catch { }
+        try await database.connection.execute("ALTER TABLE unavailable_content_items RENAME TO content_items")
+        let recovered = try await model.items(in: [.books, .importantDocuments])
+        XCTAssertEqual(recovered.map(\.id), ["category-test"])
+        model.languageFilter = "ar"
+        let filtered = try await model.items(in: .books)
+        XCTAssertTrue(filtered.isEmpty)
+    }
+
+    @MainActor
     func testFavoriteListFailuresAreNotEmptyAndCanRetry() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)
@@ -219,7 +238,7 @@ final class ReadRedesignTests: XCTestCase {
         let courses = try shelf("courses")
         XCTAssertEqual(viewModel.count(for: courses), 2)
         XCTAssertEqual(viewModel.target(for: courses), .shelf, "Each category has one, but the shelf has two")
-        let listed = await viewModel.items(in: courses.categories)
+        let listed = try await viewModel.items(in: courses.categories)
         XCTAssertEqual(Set(listed.map(\.id)), ["course-1", "document-1"])
     }
 
