@@ -33358,6 +33358,38 @@
           }
         }
       }
+    },
+    "Your personal records could not be read. Please try again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your personal records could not be read. Please try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کا ذاتی ریکارڈ پڑھا نہیں جا سکا۔ براہ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "An unreadable personal-data file was kept safely aside. New records can be saved on this phone.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An unreadable personal-data file was kept safely aside. New records can be saved on this phone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ناقابل مطالعہ ذاتی ریکارڈ کی فائل محفوظ طور پر الگ رکھ دی گئی ہے۔ اس فون پر نیا ریکارڈ محفوظ کیا جا سکتا ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

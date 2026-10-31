@@ -11,6 +11,9 @@ final class MyDayStore {
 
     private(set) var document = MyDayDocument()
     private(set) var hasLoaded = false
+    private(set) var loadFailed = false
+    private(set) var recoveredFile = false
+    var canRead: Bool { hasLoaded && !loadFailed }
 
     @ObservationIgnored private let fileURL: URL
     /// Set when the file could not be decoded and could not be moved aside
@@ -34,25 +37,33 @@ final class MyDayStore {
     /// restart) is tried again later, and one that does not decode is kept
     /// beside the new one rather than overwritten.
     func loadIfNeeded() {
-        guard !hasLoaded else { return }
+        guard !hasLoaded || saveBlocked else { return }
         let manager = FileManager.default
         guard manager.fileExists(atPath: fileURL.path) else {
             hasLoaded = true
+            loadFailed = false
+            saveBlocked = false
             return
         }
-        guard let data = try? Data(contentsOf: fileURL) else { return }
+        guard let data = try? Data(contentsOf: fileURL) else { loadFailed = true; return }
         hasLoaded = true
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         do {
             document = try decoder.decode(MyDayDocument.self, from: data)
+            saveBlocked = false
+            loadFailed = false
         } catch {
             let aside = fileURL.deletingLastPathComponent()
                 .appendingPathComponent("my_day.unreadable-\(Int(Date().timeIntervalSince1970)).json")
             do {
                 try manager.moveItem(at: fileURL, to: aside)
+                recoveredFile = true
+                saveBlocked = false
+                loadFailed = false
             } catch {
                 saveBlocked = true
+                loadFailed = true
             }
         }
     }

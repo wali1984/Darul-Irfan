@@ -53,6 +53,7 @@ struct NotesView: View {
                 }
             }
         }
+        .myDayReadState(store)
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -143,5 +144,36 @@ struct NoteEditorView: View {
                 .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
+    }
+}
+
+private struct MyDayReadStateModifier: ViewModifier {
+    let store: MyDayStore
+    func body(content: Content) -> some View {
+        VStack(spacing: DISpacing.sm) {
+            if !store.canRead || store.recoveredFile {
+                DICard {
+                    VStack(spacing: DISpacing.sm) {
+                        Text(store.recoveredFile ?
+                             "An unreadable personal-data file was kept safely aside. New records can be saved on this phone." :
+                             store.loadFailed ? "Your personal records could not be read. Please try again." : "Loading...")
+                            .font(.subheadline)
+                            .foregroundStyle(DIColor.textMuted)
+                        if store.loadFailed {
+                            Button("Retry") { store.loadIfNeeded() }
+                                .buttonStyle(DISecondaryButtonStyle())
+                        }
+                    }
+                }
+                .padding(.horizontal, DISpacing.md)
+            }
+            if store.canRead { content } else { Spacer() }
+        }
+    }
+}
+
+extension View {
+    func myDayReadState(_ store: MyDayStore) -> some View {
+        modifier(MyDayReadStateModifier(store: store))
     }
 }

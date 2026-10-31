@@ -65,6 +65,7 @@ struct MyDayView: View {
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
+        .myDayReadState(store)
         .diScreenBackground()
         .alert("Could not save. Please try again.", isPresented: $saveFailed) {
             Button("OK", role: .cancel) { }

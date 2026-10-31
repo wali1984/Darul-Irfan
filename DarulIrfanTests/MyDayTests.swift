@@ -53,6 +53,28 @@ final class MyDayTests: XCTestCase {
         XCTAssertEqual(reloaded.document.fasts, fasts)
     }
 
+    @MainActor
+    func testUnreadableExistingFileIsNotEmptyAndRetries() throws {
+        let manager = FileManager.default
+        let folder = manager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let file = folder.appendingPathComponent("my_day.json")
+        try manager.createDirectory(at: file, withIntermediateDirectories: true)
+        defer { try? manager.removeItem(at: folder) }
+        let store = MyDayStore(fileURL: file)
+        store.loadIfNeeded()
+        XCTAssertTrue(store.loadFailed)
+        XCTAssertFalse(store.canRead)
+        XCTAssertFalse(store.upsert(DayNote(text: "must not publish")))
+        XCTAssertTrue(store.document.notes.isEmpty)
+        try manager.removeItem(at: file)
+        let writer = MyDayStore(fileURL: file)
+        XCTAssertTrue(writer.upsert(DayNote(text: "recovered access")))
+        store.loadIfNeeded()
+        XCTAssertFalse(store.loadFailed)
+        XCTAssertTrue(store.canRead)
+        XCTAssertEqual(store.document.notes.first?.text, "recovered access")
+    }
+
     private var calendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TestDates.karachi

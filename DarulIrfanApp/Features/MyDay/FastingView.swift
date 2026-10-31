@@ -28,6 +28,7 @@ struct FastingView: View {
             }
             .padding(DISpacing.md)
         }
+        .myDayReadState(store)
         .diScreenBackground()
         .alert("Could not save. Please try again.", isPresented: $saveFailed) {
             Button("OK", role: .cancel) { }
