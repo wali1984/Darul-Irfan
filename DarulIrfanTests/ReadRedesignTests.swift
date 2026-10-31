@@ -135,6 +135,29 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testArticleReadFailureCanRetryAndMissingItemRemainsDistinct() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        let downloads = DownloadsRepository(database: database)
+        try await repository.upsertItems([libraryItem("article-test", category: .tasawwuf)])
+        let model = ContentItemDetailViewModel(itemID: "article-test", contentRepository: repository,
+            downloadsRepository: downloads, downloadManager: DownloadManager(downloadsRepository: downloads))
+        try await database.connection.execute("ALTER TABLE content_items RENAME TO unavailable_content_items")
+        await model.load()
+        XCTAssertTrue(model.loadFailed)
+        XCTAssertFalse(model.isLoading)
+        try await database.connection.execute("ALTER TABLE unavailable_content_items RENAME TO content_items")
+        await model.load()
+        XCTAssertFalse(model.loadFailed)
+        XCTAssertEqual(model.item?.id, "article-test")
+        try await repository.deleteItems(ids: ["article-test"])
+        await model.load()
+        XCTAssertFalse(model.loadFailed)
+        XCTAssertNil(model.item)
+        XCTAssertFalse(model.isLoading)
+    }
+
+    @MainActor
     func testAShelfOfTwoCategoriesListsBothOnceItHoldsMore() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)

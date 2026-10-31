@@ -22,6 +22,7 @@ final class ContentItemDetailViewModel {
 
     private(set) var item: ContentItem?
     private(set) var isLoading = true
+    private(set) var loadFailed = false
     /// Plain-text paragraphs of the body; empty when native text is unavailable.
     private(set) var bodyParagraphs: [String] = []
     /// Saved scroll fraction from a previous reading session (0...1).
@@ -66,10 +67,16 @@ final class ContentItemDetailViewModel {
 
     func load() async {
         isLoading = true
+        loadFailed = false
+        defer { isLoading = false }
         do {
             item = try await contentRepository.item(id: itemID)
+        } catch is CancellationError {
+            return
         } catch {
-            item = nil
+            guard !Task.isCancelled else { return }
+            loadFailed = true
+            return
         }
         if let item {
             await Task.detached(priority: .utility) { QuranQuotation.warmUp() }.value

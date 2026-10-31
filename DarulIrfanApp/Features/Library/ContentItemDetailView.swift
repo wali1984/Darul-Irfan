@@ -59,6 +59,16 @@ struct ContentItemDetailView: View {
                 ProgressView()
                     .tint(DIColor.primary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    Text("The archive could not be loaded right now. Please try again in a moment.")
+                        .foregroundStyle(DIColor.textPrimary)
+                    Button("Retry") { Task { await viewModel.load() } }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }
+                .padding(DISpacing.md)
+                .diResponsiveWidth()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let item = viewModel.item {
                 detailContent(for: item)
             } else {
