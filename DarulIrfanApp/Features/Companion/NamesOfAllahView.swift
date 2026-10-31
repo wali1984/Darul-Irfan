@@ -9,8 +9,8 @@ final class NamesOfAllahViewModel {
     private(set) var names: [NameOfAllah] = []
     private(set) var isLoaded = false
 
-    func load() {
-        guard !isLoaded else { return }
+    func load(force: Bool = false) {
+        guard force || !isLoaded else { return }
         names = SeedBundle.namesOfAllah()
         isLoaded = true
     }
@@ -42,14 +42,18 @@ struct NamesOfAllahView: View {
 
     var body: some View {
         ScrollView {
-            if viewModel.isLoaded && viewModel.names.isEmpty {
+            if !viewModel.isLoaded {
+                ProgressView("Loading").padding(DISpacing.lg)
+            } else if viewModel.names.isEmpty {
                 DIElevatedCard {
-                    DIEmptyState(
-                        systemImage: "sparkles",
-                        titleKey: "Names not available",
-                        messageKey: "The 99 Names of Allah could not be loaded. Updating or reinstalling the app should restore them."
-                    )
-                    .diOctagramWatermark(size: 220, opacity: 0.06)
+                    VStack(spacing: DISpacing.md) {
+                        DIEmptyState(
+                            systemImage: "sparkles",
+                            titleKey: "Names not available"
+                        )
+                        .diOctagramWatermark(size: 220, opacity: 0.06)
+                        Button("Retry") { viewModel.load(force: true) }.buttonStyle(DISecondaryButtonStyle())
+                    }
                 }
                 .padding(DISpacing.md)
             } else {
@@ -183,6 +187,7 @@ private struct NameOfAllahCell: View {
 // MARK: - Enlarged detail
 
 private struct NameOfAllahDetailView: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     private var readsUrdu: Bool { DIBrand.readsUrdu(locale) }
     let name: NameOfAllah
@@ -190,8 +195,6 @@ private struct NameOfAllahDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: DISpacing.lg) {
-                DIPillBadge(text: String(localized: "Name \(name.id) of 99"))
-
                 ZStack {
                     Circle()
                         .fill(DIGradient.auraGold)
@@ -201,6 +204,7 @@ private struct NameOfAllahDetailView: View {
                         .foregroundStyle(DIColor.scripture)
                         .diGoldGlow(radius: 16, opacity: 0.5)
                         .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.top, DISpacing.sm)
 
@@ -228,6 +232,15 @@ private struct NameOfAllahDetailView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(DISpacing.xl)
+        }
+        .safeAreaInset(edge: .top) {
+            HStack {
+                DIPillBadge(text: String(localized: "Name \(name.id) of 99"))
+                Spacer(minLength: DISpacing.sm)
+                Button("Done") { dismiss() }.buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+            }
+            .padding(.horizontal, DISpacing.md).padding(.vertical, DISpacing.sm)
+            .background(DIColor.background)
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
