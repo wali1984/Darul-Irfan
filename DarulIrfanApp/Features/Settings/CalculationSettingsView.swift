@@ -129,17 +129,39 @@ struct CalculationSettingsView: View {
 
     private var juristicSection: some View {
         Section {
-            Picker("Asr Method", selection: asrBinding) {
-                ForEach(AsrMethodChoice.allCases) { method in
-                    Text(LocalizedStringKey(method.englishName)).tag(method)
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text("Asr Method").foregroundStyle(DIColor.textPrimary)
+                Menu {
+                    Picker("Asr Method", selection: asrBinding) {
+                        ForEach(AsrMethodChoice.allCases) { method in
+                            Text(LocalizedStringKey(method.englishName)).tag(method)
+                        }
+                    }
+                } label: {
+                    Label(LocalizedStringKey(calculation.asrMethod.englishName), systemImage: "chevron.up.chevron.down")
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .buttonStyle(DISecondaryButtonStyle())
+                .accessibilityLabel(Text("Asr Method"))
+                .accessibilityValue(Text(LocalizedStringKey(calculation.asrMethod.englishName)))
             }
             .listRowBackground(DIColor.surface)
 
-            Picker("High Latitude Rule", selection: highLatitudeBinding) {
-                ForEach(HighLatitudeRuleChoice.allCases) { rule in
-                    Text(LocalizedStringKey(rule.englishName)).tag(rule)
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text("High Latitude Rule").foregroundStyle(DIColor.textPrimary)
+                Menu {
+                    Picker("High Latitude Rule", selection: highLatitudeBinding) {
+                        ForEach(HighLatitudeRuleChoice.allCases) { rule in
+                            Text(LocalizedStringKey(rule.englishName)).tag(rule)
+                        }
+                    }
+                } label: {
+                    Label(LocalizedStringKey(calculation.highLatitudeRule.englishName), systemImage: "chevron.up.chevron.down")
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .buttonStyle(DISecondaryButtonStyle())
+                .accessibilityLabel(Text("High Latitude Rule"))
+                .accessibilityValue(Text(LocalizedStringKey(calculation.highLatitudeRule.englishName)))
             }
             .listRowBackground(DIColor.surface)
         } header: {
