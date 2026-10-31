@@ -284,7 +284,10 @@ private struct PersonalZikrHistoryCard: View {
                         VStack(alignment: .leading, spacing: 4) { sessionDetails(entry) }
                     }.font(.footnote)
                 }
-                if entries.count > 7 { Button(all ? "Show less" : "Show all sessions") { all.toggle() }.font(.footnote) }
+                if entries.count > 7 {
+                    Button(all ? "Show less" : "Show all sessions") { all.toggle() }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }
                 } label: { Text("Your last 3 months").font(.subheadline.weight(.semibold)) }
             }
         }
