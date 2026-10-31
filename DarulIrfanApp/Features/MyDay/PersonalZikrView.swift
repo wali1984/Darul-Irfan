@@ -114,7 +114,7 @@ struct PersonalZikrView: View {
                 HStack(spacing: 12) { controls }
                 VStack(spacing: 12) { controls }
             }
-            if run != nil { Button("Discard session") { store.discard(); ended = false }.buttonStyle(.bordered) }
+            if run != nil { Button("Discard session") { store.discard(); ended = false }.buttonStyle(ZikrTimerButtonStyle()) }
             if ended { Text("Your personal Zikr session is complete.").font(.footnote).foregroundStyle(Color(hex: 0xF4D889)) }
         }
         .tint(Color(hex: 0xE9CE86))
@@ -129,17 +129,17 @@ struct PersonalZikrView: View {
 
     @ViewBuilder private var controls: some View {
         if store.run?.startedAt != nil {
-            Button("Pause") { store.pause() }.buttonStyle(.bordered)
+            Button("Pause") { store.pause() }.buttonStyle(ZikrTimerButtonStyle())
         } else {
             Button(store.run == nil ? "Start" : "Resume") {
                 store.start(); ended = false; DIHaptics.light()
                 Task { denied = !(await store.requestAlerts()) }
             }
-            .buttonStyle(.borderedProminent).tint(DIColor.primary).disabled(store.plan.isEmpty || store.historyReadFailed)
+            .buttonStyle(ZikrTimerButtonStyle(prominent: true)).disabled(store.plan.isEmpty || store.historyReadFailed)
         }
         if store.run != nil {
             Button("Finish & save") { ended = store.finish(); if ended { DIHaptics.success() } }
-                .buttonStyle(.bordered).disabled(store.historyReadFailed)
+                .buttonStyle(ZikrTimerButtonStyle()).disabled(store.historyReadFailed)
         }
     }
 
@@ -253,6 +253,30 @@ struct PersonalZikrLink: View {
         }
         .buttonStyle(DIPressableStyle())
         .accessibilityIdentifier("personal-zikr-entry")
+    }
+}
+
+private struct ZikrTimerButtonStyle: ButtonStyle {
+    var prominent = false
+    @Environment(\.isEnabled) private var enabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    func makeBody(configuration: Configuration) -> some View {
+        let colors: [Color] = !enabled
+            ? [Color(hex: 0xD9D6C9), Color(hex: 0xC4C4B8)]
+            : prominent ? [Color(hex: 0xFFE3A0), Color(hex: 0xDDB65F)]
+            : [Color(hex: 0xFCF9F0), Color(hex: 0xEDE5D4)]
+        let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
+        configuration.label
+            .font(.headline).multilineTextAlignment(.center)
+            .foregroundStyle(Color(hex: 0x163D2D))
+            .padding(.horizontal, 16).padding(.vertical, 10)
+            .frame(minWidth: 48, minHeight: 48)
+            .background(LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing))
+            .clipShape(shape)
+            .overlay(shape.strokeBorder(Color(hex: 0xE9CE86).opacity(enabled ? 0.7 : 0.25), lineWidth: 1))
+            .shadow(color: .black.opacity(enabled && !configuration.isPressed ? 0.14 : 0), radius: 4, y: 2)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: configuration.isPressed)
     }
 }
 
