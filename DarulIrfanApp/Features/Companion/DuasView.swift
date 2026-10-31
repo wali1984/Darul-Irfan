@@ -9,8 +9,8 @@ final class DuasViewModel {
     private(set) var duas: [Dua] = []
     private(set) var isLoaded = false
 
-    func load() {
-        guard !isLoaded else { return }
+    func load(force: Bool = false) {
+        guard force || !isLoaded else { return }
         duas = SeedBundle.duas()
         isLoaded = true
     }
@@ -51,14 +51,18 @@ struct DuasView: View {
 
     var body: some View {
         ScrollView {
-            if viewModel.isLoaded && viewModel.duas.isEmpty {
+            if !viewModel.isLoaded {
+                ProgressView("Loading").padding(DISpacing.lg)
+            } else if viewModel.duas.isEmpty {
                 DIElevatedCard {
-                    DIEmptyState(
-                        systemImage: "hands.sparkles",
-                        titleKey: "Duas not available",
-                        messageKey: "The duas could not be loaded. Updating or reinstalling the app should restore them."
-                    )
-                    .diOctagramWatermark(size: 220, opacity: 0.06)
+                    VStack(spacing: DISpacing.md) {
+                        DIEmptyState(
+                            systemImage: "hands.sparkles",
+                            titleKey: "Duas not available"
+                        )
+                        .diOctagramWatermark(size: 220, opacity: 0.06)
+                        Button("Retry") { viewModel.load(force: true) }.buttonStyle(DISecondaryButtonStyle())
+                    }
                 }
                 .padding(DISpacing.md)
             } else {
