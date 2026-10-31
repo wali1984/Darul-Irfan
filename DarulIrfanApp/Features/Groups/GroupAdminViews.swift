@@ -650,7 +650,7 @@ struct GroupMeetingScheduler: View {
                         Text("\(duration) minutes")
                     }
                 } footer: {
-                    Text("Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before.")
+                    Text("Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before.").foregroundStyle(DIColor.textMuted)
                 }
                 if let error {
                     Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
@@ -736,6 +736,7 @@ struct GroupZikrEditor: View {
                     Text(timing == .clock
                          ? "The time is in your own time zone; members see it in theirs."
                          : "Follows the prayer time at Dar-ul-Irfan each day.")
+                        .foregroundStyle(DIColor.textMuted)
                 }
                 if timing == .clock && (loadingLibrary || libraryFailed) {
                     Section {
@@ -760,7 +761,7 @@ struct GroupZikrEditor: View {
                             }
                         }
                     } footer: {
-                        Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.")
+                        Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.").foregroundStyle(DIColor.textMuted)
                     }
                 }
                 Section("Days") {
