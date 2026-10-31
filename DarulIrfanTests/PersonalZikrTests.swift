@@ -55,4 +55,12 @@ final class PersonalZikrTests: XCTestCase {
         let text = service.hijriDateText(for: date, offsetDays: 0, locale: Locale(identifier: "en"), timeZone: TimeZone(secondsFromGMT: 0)!)
         XCTAssertTrue(text.contains("Jumada al-Awwal"), text)
     }
+    func testReminderPickerKeepsSevenAMWhenDaylightSavingEnds() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/New_York")!
+        let day = ISO8601DateFormatter().date(from: "2026-11-01T12:00:00Z")!
+        let reminder = PersonalZikrReminder(minuteOfDay: 420)
+        XCTAssertEqual(reminder.date(on: day, calendar: calendar), day)
+        XCTAssertEqual(calendar.component(.hour, from: reminder.date(on: day, calendar: calendar)), 7)
+    }
 }

@@ -81,6 +81,9 @@ struct PersonalZikrEntry: Codable, Equatable, Identifiable {
 struct PersonalZikrReminder: Codable, Equatable {
     var enabled = false
     var minuteOfDay: Int
+    func date(on day: Date, calendar: Calendar = .current) -> Date {
+        calendar.date(bySettingHour: minuteOfDay / 60, minute: minuteOfDay % 60, second: 0, of: day) ?? day
+    }
 }
 
 enum PersonalZikrHistory {

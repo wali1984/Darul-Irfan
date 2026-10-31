@@ -194,7 +194,7 @@ struct PersonalZikrView: View {
                             }
                         }))
                         DatePicker("Time", selection: Binding(get: {
-                            Calendar.current.startOfDay(for: .now).addingTimeInterval(Double(store.reminders[index].minuteOfDay * 60))
+                            store.reminders[index].date(on: .now)
                         }, set: { date in
                             let c = Calendar.current.dateComponents([.hour, .minute], from: date)
                             var reminder = store.reminders[index]; reminder.minuteOfDay = (c.hour ?? 0) * 60 + (c.minute ?? 0); store.setReminder(index, reminder)
