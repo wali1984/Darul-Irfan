@@ -95,8 +95,8 @@ struct FastingView: View {
                 }
                 let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
                 LazyVGrid(columns: columns, spacing: 6) {
-                    ForEach(calendar.veryShortWeekdaySymbols.indices, id: \.self) { index in
-                        Text(verbatim: calendar.veryShortWeekdaySymbols[(index + calendar.firstWeekday - 1) % 7])
+                    ForEach(calendar.shortWeekdaySymbols.indices, id: \.self) { index in
+                        Text(verbatim: calendar.shortWeekdaySymbols[(index + calendar.firstWeekday - 1) % 7])
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(DIColor.textMuted)
                     }
