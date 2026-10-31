@@ -57,7 +57,7 @@ struct QuranTabView: View {
         NavigationStack(path: $navigationPath) {
             content
                 .diScreenBackground()
-                .diPageHeading(readerSelection == nil ? "Quran" : "Read")
+                .diPageHeading("Quran", hidden: readerSelection != nil)
                 .toolbar {
                     // Under Read, Saved holds the bookmarks.
                     if readerSelection == nil {

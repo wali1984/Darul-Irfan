@@ -50,7 +50,7 @@ struct MyDayView: View {
                 NavigationLink {
                     FocusTimerView(dependencies: dependencies, appState: appState)
                 } label: {
-                    Label("Focus timer", systemImage: "timer")
+                    Label("Your Daily Personal Zikr", systemImage: "timer")
                 }
                 NavigationLink {
                     FastingView(dependencies: dependencies, appState: appState)

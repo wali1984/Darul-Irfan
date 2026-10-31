@@ -9,10 +9,11 @@ import SwiftUI
 /// so screens don't need to thread the language setting through themselves.
 private struct DIPageHeading: ViewModifier {
     let title: LocalizedStringKey
+    var hidden = false
     @Environment(\.locale) private var locale
 
     func body(content: Content) -> some View {
-        if locale.language.languageCode?.identifier == "ur" {
+        if hidden || locale.language.languageCode?.identifier == "ur" {
             content
                 .navigationTitle("")
                 .navigationBarTitleDisplayMode(.inline)
@@ -23,7 +24,7 @@ private struct DIPageHeading: ViewModifier {
 }
 
 extension View {
-    func diPageHeading(_ title: LocalizedStringKey) -> some View {
-        modifier(DIPageHeading(title: title))
+    func diPageHeading(_ title: LocalizedStringKey, hidden: Bool = false) -> some View {
+        modifier(DIPageHeading(title: title, hidden: hidden))
     }
 }

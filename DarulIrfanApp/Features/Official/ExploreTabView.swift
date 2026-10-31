@@ -131,7 +131,7 @@ struct ExploreTabView: View {
                 .diResponsiveWidth()
             }
             .diScreenBackground()
-            .diPageHeading("Discover")
+            .navigationTitle("").navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {

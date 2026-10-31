@@ -15,6 +15,7 @@ struct ZikrHomeView: View {
     @State private var isSearchPresented = false
     /// What a notification or a link asked this screen to show.
     @State private var focus: Focus?
+    @State private var personalZikr = false
     @Environment(\.scenePhase) private var scenePhase
     private let dependencies: AppDependencies
     private let appState: AppState
@@ -101,6 +102,7 @@ struct ZikrHomeView: View {
                     .diAppear()
 
                 // The Shajra, one tap under the ayah (owner).
+                PersonalZikrLink()
                 ZikrShajraLink()
                     .diAppear(delay: 0.03)
 
@@ -146,7 +148,15 @@ struct ZikrHomeView: View {
             .padding(DISpacing.md)
             .diResponsiveWidth()
         }
-        .diPageHeading("Zikr")
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $personalZikr) { PersonalZikrView() }
+        .onAppear {
+            if DeepLinkRouter.shared.pending == .personalZikr {
+                DeepLinkRouter.shared.clear(.personalZikr)
+                personalZikr = true
+            }
+        }
         .diScreenBackground()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

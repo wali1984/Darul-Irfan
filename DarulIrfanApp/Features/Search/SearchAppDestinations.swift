@@ -41,7 +41,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .names: return ["99 Names", "99 Names of Allah"]
         case .islamicDays: return ["Islamic days"]
         case .myDay: return ["My Day"]
-        case .focus: return ["Focus timer"]
+        case .focus: return ["Your Daily Personal Zikr", "Focus timer"]
         case .notes: return ["Private notes"]
         case .fasting: return ["Fasting record"]
         case .timetable: return ["Monthly timetable"]

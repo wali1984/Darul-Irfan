@@ -111,6 +111,17 @@ enum ShajraPalette {
 
 /// The Shajra of Silsila Naqshbandia Owaisiah, drawn in the app's theme.
 @MainActor
+struct ShajraInlineContent: View {
+    var body: some View {
+        VStack(spacing: DISpacing.lg) {
+            ShajraHeader()
+            ShajraChain()
+            ShajraClosingDua()
+        }
+    }
+}
+
+@MainActor
 struct ShajraView: View {
     var body: some View {
         ScrollView {

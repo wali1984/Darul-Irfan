@@ -32,6 +32,7 @@ enum AppRoute: Equatable, Sendable {
     case zikr(session: String?)
     /// The official Daily Zikr broadcast, on the Zikr tab.
     case live
+    case personalZikr
     /// The Halqah tab.
     case groups
     /// One Halqah.
@@ -71,6 +72,8 @@ enum AppRoute: Equatable, Sendable {
             self = .hadith
         case "zikr":
             self = .zikr(session: second?.lowercased())
+        case "personal-zikr":
+            self = .personalZikr
         case "live":
             self = .live
         case "groups", "group", "halqah":

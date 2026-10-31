@@ -370,6 +370,7 @@ struct TodayUnderstandCard: View {
 struct TodayUpcomingCard: View {
     let dependencies: AppDependencies
     let appState: AppState
+    var liveShown = false
     @Environment(\.scenePhase) private var scenePhase
     /// The official schedule, as the Zikr tab and the reminders follow it.
     @State private var sessions: [ZikrSession] = []
@@ -383,7 +384,7 @@ struct TodayUpcomingCard: View {
     var body: some View {
         // Re-read every minute, so a session that has ended gives way to
         // the next one while Today stays open.
-        TimelineView(.everyMinute) { context in
+        TimelineView(.periodic(from: .now, by: 1)) { context in
             content(at: context.date)
         }
         .task { await load() }
@@ -401,12 +402,12 @@ struct TodayUpcomingCard: View {
         if zikr != nil || event != nil {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    DISectionHeader(titleKey: "Upcoming", systemImage: "calendar.badge.clock")
+                    DISectionHeader(titleKey: zikr.map { DailyZikrBanner.phase(start: $0.startsAt, end: $0.endsAt, now: now) == .live } == true ? "LIVE NOW" : "Upcoming", systemImage: "calendar.badge.clock")
                     if let zikr {
                         Button {
                             DeepLinkRouter.shared.open(route(for: zikr))
                         } label: {
-                            line(icon: "sparkles", title: zikr.title, when: Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.startsAt))"))
+                            line(icon: "sparkles", title: String(localized: String.LocalizationValue(DailyZikrBanner.title)), when: Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.startsAt))"))
                         }
                         .buttonStyle(.plain)
                     }
@@ -439,11 +440,11 @@ struct TodayUpcomingCard: View {
     /// The session in progress, or else the next one.
     private func nextZikr(at now: Date) -> WidgetZikrSession? {
         ZikrOccurrences.widgetSessions(
-            for: sessions,
+            for: sessions.filter { $0.id == "zikr-after-isha" },
             reference: now,
             perSession: 2,
             calculator: dependencies.prayerCalculation
-        ).first
+        ).first { !liveShown && DailyZikrBanner.phase(start: $0.startsAt, end: $0.endsAt, now: now) != nil }
     }
 
     /// The first program on or after the person's today.

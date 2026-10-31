@@ -75,7 +75,7 @@ struct LibraryTabView: View {
                 .diResponsiveWidth()
             }
             .diScreenBackground()
-            .diPageHeading(readerSelection == nil ? "Library" : "Read")
+            .diPageHeading("Library", hidden: readerSelection != nil)
             .toolbar {
                 // Under Read, the reader's toolbar has Saved and Search.
                 if readerSelection == nil {

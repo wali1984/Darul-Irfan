@@ -15,7 +15,7 @@ struct TodayHeroView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
-    @ScaledMetric(relativeTo: .largeTitle) private var prayerNameSize: CGFloat = 40
+    @ScaledMetric(relativeTo: .largeTitle) private var prayerNameSize: CGFloat = 28
 
     private var timeZone: TimeZone {
         appState.activePlace?.timeZone ?? .current
@@ -23,7 +23,7 @@ struct TodayHeroView: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .center, spacing: 12) {
                 header(at: context.date)
                 if !viewModel.hasLoaded {
                     ProgressView()
@@ -44,80 +44,78 @@ struct TodayHeroView: View {
                 if viewModel.hasLoaded {
                     footer
                 }
+                Text(DIBrand.anchorVerseArabic)
+                    .font(DIFont.quranArabic(scale: 1.08))
+                    .lineSpacing(8)
+                    .environment(\.layoutDirection, .rightToLeft)
+                    .diGoldTextShimmer(highlight: Color(hex: 0xFFF7DA))
+                    .foregroundStyle(Color(hex: 0xFFE3A0))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 4)
             }
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background { TodayHeroSurface() }
+            .background { TodayHeroSurface(date: context.date, timeZone: timeZone) }
         }
     }
 
     // MARK: - Header
 
     private func header(at date: Date) -> some View {
-        HStack(alignment: .top, spacing: DISpacing.md) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text("DARUL IRFAN")
-                    .font(.caption2.weight(.heavy))
-                    .tracking(DIBrand.readsUrdu(locale) ? 0 : 2.6)
-                    .foregroundStyle(Color(hex: 0xFFE3A0))
-                    .diGoldGlow(radius: 5, opacity: 0.55)
-                Text(LocalizedStringKey(DIGradient.greeting(for: date, timeZone: timeZone)))
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(.white)
-                    .fixedSize(horizontal: false, vertical: true)
-                if let placeName = appState.activePlace?.name {
-                    Label(placeName, systemImage: "location.fill")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .padding(.leading, 9)
-                        .padding(.trailing, 11)
-                        .padding(.vertical, 5)
-                        .background(Color.white.opacity(0.13), in: Capsule())
-                        .overlay(Capsule().stroke(Color.white.opacity(0.22), lineWidth: 1))
-                        .fixedSize(horizontal: false, vertical: true)
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("DARUL IRFAN")
+                        .font(.caption2.weight(.heavy))
+                        .tracking(DIBrand.readsUrdu(locale) ? 0 : 3)
+                        .foregroundStyle(Color(hex: 0xFFE3A0))
+                        .diGoldGlow(radius: 5, opacity: 0.55)
+                    Text(LocalizedStringKey(DIGradient.greeting(for: date, timeZone: timeZone)))
+                        .font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.88))
+                }
+                Spacer(minLength: 0)
+                DILivingSealMark(diameter: dynamicTypeSize.isAccessibilitySize ? 52 : 68).accessibilityHidden(true)
+            }
+            .environment(\.layoutDirection, .leftToRight)
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(verbatim: viewModel.gregorianShortText).font(.footnote).foregroundStyle(.white.opacity(0.92))
+                    Text(verbatim: viewModel.hijriDateText).font(.caption).foregroundStyle(Color(hex: 0xE9CE86))
+                }.fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(date, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.headline.weight(.medium)).monospacedDigit().foregroundStyle(.white)
+                    if let place = appState.activePlace?.name { Text(verbatim: place).font(.caption).foregroundStyle(.white.opacity(0.78)) }
                 }
             }
-            Spacer(minLength: 0)
-            // The Silsila's seal stays on Today, now living: a white plate,
-            // a breathing gold halo and one slow glint.
-            DILivingSealMark(diameter: dynamicTypeSize.isAccessibilitySize ? 48 : 64)
-                .accessibilityHidden(true)
         }
     }
 
-    // MARK: - Next prayer
-
     private func nextPrayerRow(_ next: NextPrayerInfo, now: Date) -> some View {
-        let name = String(localized: String.LocalizationValue(next.prayer.englishName))
-        let stacked = dynamicTypeSize.isAccessibilitySize
-        let layout = stacked
-            ? AnyLayout(VStackLayout(alignment: .leading, spacing: DISpacing.md))
-            : AnyLayout(HStackLayout(alignment: .center, spacing: 12))
-        return layout {
-            VStack(alignment: .leading, spacing: 3) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Next prayer")
-                        .font(.footnote.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.82))
-                    Text(verbatim: name)
-                        .font(.system(size: prayerNameSize, weight: .heavy))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+        VStack(spacing: 8) {
+            Text("Next prayer").font(.footnote.weight(.medium)).foregroundStyle(.white.opacity(0.82))
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 10) { prayerName(next); prayerTime(next) }
+                VStack(spacing: 4) { prayerName(next); prayerTime(next) }
+            }
+            countdownLine(to: next.time, now: now)
+            GeometryReader { geometry in
+                let fraction = min(1, max(0, viewModel.nextPrayerProgress(at: now)))
+                ZStack(alignment: .leading) {
+                    Capsule().fill(.white.opacity(0.14))
+                    Capsule().fill(Color(hex: 0xE9CE86)).frame(width: geometry.size.width * fraction)
                 }
-                .accessibilityElement(children: .combine)
-                countdownLine(to: next.time, now: now)
-                    .padding(.top, 3)
             }
-            if !stacked {
-                Spacer(minLength: 0)
-            }
-            TodayPrayerRing(
-                progress: viewModel.nextPrayerProgress(at: now),
-                time: next.time,
-                timeZone: timeZone
-            )
+            .frame(height: 2).padding(.horizontal, 18)
         }
+        .frame(maxWidth: .infinity).padding(.vertical, 6)
+    }
+    private func prayerName(_ next: NextPrayerInfo) -> some View {
+        Text(LocalizedStringKey(next.prayer.englishName)).font(.system(size: prayerNameSize, weight: .semibold)).foregroundStyle(.white)
+    }
+    private func prayerTime(_ next: NextPrayerInfo) -> some View {
+        Text(next.time, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.subheadline).monospacedDigit().foregroundStyle(Color(hex: 0xE9CE86))
     }
 
     /// The live countdown to the next prayer; in Ramadan, to the end of
@@ -137,13 +135,11 @@ struct TodayHeroView: View {
                 .font(.subheadline.weight(.semibold))
                 timer(to: ramadan.time, now: now)
             } else {
-                Image(systemName: "hourglass")
                 timer(to: time, now: now)
             }
         }
-        .font(.title3.weight(.semibold))
-        .foregroundStyle(DIColor.goldGlow)
-        .diGoldGlow(radius: 7, opacity: 0.75)
+        .font(.system(size: viewModel.ramadanCountdown == nil ? 40 : 24, weight: .light))
+        .foregroundStyle(.white)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
         .accessibilityHidden(true)
@@ -288,7 +284,7 @@ struct TodayHeroPrayerChips: View {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .stroke(isNext ? DIColor.goldGlow.opacity(0.85) : Color.white.opacity(0.16), lineWidth: 1)
             )
-            .shadow(color: isNext ? DIColor.goldGlow.opacity(0.4) : Color.clear, radius: 9)
+            .shadow(color: isNext ? DIColor.goldGlow.opacity(0.18) : Color.clear, radius: 9)
             .contentShape(Rectangle())
         }
         .buttonStyle(DIPressableStyle())
@@ -301,7 +297,7 @@ struct TodayHeroPrayerChips: View {
         if isNext {
             return AnyShapeStyle(
                 LinearGradient(
-                    colors: [Color.white.opacity(0.30), Color.white.opacity(0.10)],
+                    colors: [Color.white.opacity(0.18), Color.white.opacity(0.06)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -367,12 +363,15 @@ struct TodayHeroLocationPrompt: View {
 /// The prayer card's surface: the emerald hero with its drifting aurora,
 /// and the gold octagram turning slowly at its corner.
 struct TodayHeroSurface: View {
+    var date = Date()
+    var timeZone = TimeZone.current
     var body: some View {
         ZStack {
-            DIHeroBackground(cornerRadius: 30)
-            TodayTurningOctagram(size: 250, color: DIColor.goldGlow, lineWidth: 2, period: 90)
-                .opacity(0.15)
-                .offset(x: 80, y: -80)
+            RoundedRectangle(cornerRadius: 30).fill(DIGradient.hero(for: date, timeZone: timeZone))
+                .overlay(RoundedRectangle(cornerRadius: 30).stroke(Color(hex: 0xE9CE86).opacity(0.25), lineWidth: 1))
+            TodayTurningOctagram(size: 180, color: DIColor.goldGlow, lineWidth: 2, period: 180)
+                .opacity(0.045)
+                .offset(x: 50, y: -50)
                 // Takes the card's size whatever the octagram's, so it never
                 // widens the surface; the clip trims it.
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topTrailing)

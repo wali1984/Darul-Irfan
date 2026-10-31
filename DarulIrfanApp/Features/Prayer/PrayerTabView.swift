@@ -28,7 +28,6 @@ struct PrayerTabView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.md) {
-                    dateLine
                     // A newer TestFlight or App Store build, while one is out.
                     TodayUpdateBanner()
                     // Only while Daily Zikr or the Tahajjud zikr is live.
@@ -38,6 +37,8 @@ struct PrayerTabView: View {
                     }
                     TodayHeroView(viewModel: viewModel, dependencies: dependencies, appState: appState)
                         .diAppear()
+                    TodayUpcomingCard(dependencies: dependencies, appState: appState, liveShown: liveModel.strip != nil)
+                    PersonalZikrLink()
                     TodayQuickTools(dependencies: dependencies, appState: appState)
                         .diAppear(delay: 0.05)
                     TodayDailySection(appState: appState, dependencies: dependencies)
@@ -50,7 +51,8 @@ struct PrayerTabView: View {
             }
             .background { TodayPageGlow() }
             .diScreenBackground()
-            .diPageHeading("Today")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 // The app language is one tap from the first screen, not
                 // three screens into Settings.
@@ -98,19 +100,6 @@ struct PrayerTabView: View {
             .onChange(of: appState.settings) {
                 Task { await viewModel.refresh() }
             }
-        }
-    }
-
-    /// "Friday, 30 October · 19 Jumada I 1448", under the large title.
-    @ViewBuilder
-    private var dateLine: some View {
-        let parts = [viewModel.gregorianShortText, viewModel.hijriDateText].filter { !$0.isEmpty }
-        if !parts.isEmpty {
-            Text(verbatim: parts.joined(separator: " · "))
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(DIColor.textMuted)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, -DISpacing.sm)
         }
     }
 

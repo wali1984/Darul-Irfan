@@ -28,7 +28,7 @@ struct ToolsView: View {
                 }
                 group("My Day", systemImage: "checklist") {
                     tool("My Day", "checklist") { MyDayView(dependencies: dependencies, appState: appState) }
-                    tool("Focus timer", "timer") { FocusTimerView(dependencies: dependencies, appState: appState) }
+                    tool("Your Daily Personal Zikr", "timer") { FocusTimerView(dependencies: dependencies, appState: appState) }
                     tool("Private notes", "note.text") { NotesView() }
                 }
             }

@@ -75,7 +75,7 @@ struct HadithHomeView: View {
             .diResponsiveWidth()
         }
         .diScreenBackground()
-        .diPageHeading(readActions == nil ? "Hadith" : "Read")
+        .diPageHeading("Hadith", hidden: readActions != nil)
         .onChange(of: searchText) { _, term in
             searchTask?.cancel()
             let query = term.trimmingCharacters(in: .whitespaces)

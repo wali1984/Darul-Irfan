@@ -55,7 +55,7 @@ struct MoreTabView: View {
                 .background { HalqahPageDecor() }
             }
             .diScreenBackground()
-            .diPageHeading("Halqah")
+            .navigationTitle("").navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {

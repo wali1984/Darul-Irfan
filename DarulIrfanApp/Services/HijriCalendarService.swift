@@ -23,6 +23,13 @@ struct HijriCalendarService: HijriCalendarServicing {
         let calendar = Self.makeCalendar(locale: locale, timeZone: timeZone)
         let adjusted = Self.adjusted(date, byDays: offsetDays, calendar: calendar)
 
+        if locale.language.languageCode?.identifier == "en" {
+            let c = calendar.dateComponents([.day, .month, .year], from: adjusted)
+            let names = ["Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani", "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhu al-Qa'dah", "Dhu al-Hijjah"]
+            if let day = c.day, let month = c.month, let year = c.year, (1...12).contains(month) {
+                return "\(day) \(names[month - 1]) \(year)"
+            }
+        }
         let formatter = DateFormatter()
         formatter.calendar = calendar
         formatter.locale = locale

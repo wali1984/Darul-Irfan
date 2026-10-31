@@ -95,7 +95,6 @@ struct TodayOfficialSection: View {
                     title
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
-                        .lineLimit(2)
                         .multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: DISpacing.sm)
@@ -131,8 +130,8 @@ struct TodayOfficialSection: View {
     @ViewBuilder
     private var title: some View {
         switch strip {
-        case .dailyZikr(let title, _):
-            Text(LocalizedStringKey(title))
+        case .dailyZikr:
+            Text(LocalizedStringKey(DailyZikrBanner.title))
         case .tahajjud:
             Text("Tahajjud Zikr")
         }
