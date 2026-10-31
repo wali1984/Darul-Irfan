@@ -63,6 +63,7 @@ struct NotesView: View {
                     isAdding = true
                 } label: {
                     Image(systemName: "square.and.pencil")
+                        .foregroundStyle(DIColor.actionForeground)
                 }
                 .accessibilityLabel("New note")
             }

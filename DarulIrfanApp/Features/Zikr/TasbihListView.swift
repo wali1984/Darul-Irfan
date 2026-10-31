@@ -81,6 +81,7 @@ struct TasbihListView: View {
                     isCreating = true
                 } label: {
                     Image(systemName: "plus")
+                        .foregroundStyle(DIColor.actionForeground)
                 }
                 .accessibilityLabel("New counter")
                 .accessibilityIdentifier("tasbih-new-counter")

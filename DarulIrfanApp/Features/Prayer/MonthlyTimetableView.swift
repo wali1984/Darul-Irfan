@@ -158,6 +158,7 @@ struct MonthlyTimetableView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     ShareLink(item: viewModel.shareText) {
                         Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(DIColor.actionForeground)
                     }
                     .accessibilityLabel(Text("Share this month's timetable"))
                 }

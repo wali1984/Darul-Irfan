@@ -73,6 +73,7 @@ struct MyDayView: View {
                     isAdding = true
                 } label: {
                     Image(systemName: "plus")
+                        .foregroundStyle(DIColor.actionForeground)
                 }
                 .accessibilityLabel("Add a task")
             }

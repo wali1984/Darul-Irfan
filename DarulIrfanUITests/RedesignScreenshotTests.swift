@@ -300,7 +300,7 @@ final class RedesignScreenshotTests: XCTestCase {
         guard seek("quick-tool-square.grid.2x2") else { return }
         shot("tools")
         for symbol in ["location.north.line", "calendar", "moon.haze", "star.circle", "hand.tap", "hands.and.sparkles", "sparkles", "square.grid.2x2", "checklist", "timer", "note.text"] {
-            if mode == "timezone" && !["location.north.line", "calendar", "moon.haze"].contains(symbol) { continue }
+            if mode == "timezone" && !["location.north.line", "calendar", "moon.haze", "hand.tap", "checklist", "note.text"].contains(symbol) { continue }
             scrollToTop()
             if seek("tool-" + symbol) {
                 pause(2)
