@@ -104,7 +104,7 @@ struct PersonalZikrView: View {
                     Text(verbatim: PersonalZikrMath.text(position?.remaining ?? 0))
                         .font(.system(size: 42, weight: .light).monospacedDigit()).foregroundStyle(.white)
                         .minimumScaleFactor(0.6).lineLimit(1)
-                    Text(run?.startedAt != nil ? "In progress" : run != nil ? "Paused" : "Ready when you are")
+                    Text(run != nil && remaining <= 0 ? "Completed" : run?.startedAt != nil ? "In progress" : run != nil ? "Paused" : "Ready when you are")
                         .font(.caption2).foregroundStyle(Color(hex: 0xE9CE86))
                 }
             }
