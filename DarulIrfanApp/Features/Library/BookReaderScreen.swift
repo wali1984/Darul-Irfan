@@ -462,7 +462,7 @@ struct BookReaderScreen: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(Capsule(style: .continuous).fill(.ultraThinMaterial))
+        .background(Capsule(style: .continuous).fill(ReadPalette.readerControlSurface))
         .overlay(Capsule(style: .continuous).stroke(ReadPalette.glassEdge, lineWidth: 1))
         .shadow(color: ReadPalette.softShadow, radius: 20, y: 14)
         .padding(.horizontal, 14)

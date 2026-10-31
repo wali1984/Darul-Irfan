@@ -16,6 +16,7 @@ struct MyDayView: View {
     }
 
     @State private var store = MyDayStore.shared
+    @Environment(\.locale) private var locale
     @State private var span: Span = .today
     @State private var editing: DayTask?
     @State private var isAdding = false
@@ -37,7 +38,7 @@ struct MyDayView: View {
                 daySection(Date(), header: nil)
             case .week:
                 ForEach(weekDays, id: \.self) { day in
-                    daySection(day, header: day.formatted(.dateTime.weekday(.wide).day().month()))
+                    daySection(day, header: day.formatted(.dateTime.weekday(.wide).day().month().locale(locale)))
                 }
             }
 

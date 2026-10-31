@@ -33,6 +33,8 @@ enum ReadPalette {
     static let softShadow = adaptive(light: 0x064B34, lightAlpha: 0.13, dark: 0x000000, darkAlpha: 0.45)
     /// The reader's page: paper by day, a warm dark page at night.
     static let paper = adaptive(light: 0xFFFDF7, dark: 0x1B1914)
+    /// Opaque backing keeps scrolling book text out of the page controls.
+    static let readerControlSurface = adaptive(light: 0xFCFAF3, dark: 0x181612)
     static let paperEdge = adaptive(light: 0xE0B75F, lightAlpha: 0.35, dark: 0xE0B75F, darkAlpha: 0.22)
     static let pageGlow = adaptive(light: 0xFBCE54, lightAlpha: 0.18, dark: 0xFBCE54, darkAlpha: 0.10)
 
