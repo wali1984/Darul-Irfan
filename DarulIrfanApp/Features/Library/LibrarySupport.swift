@@ -1,6 +1,38 @@
 import Foundation
 import SwiftUI
 
+struct LibraryFavoriteButton: View {
+    let isFavorite: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: isFavorite ? "star.fill" : "star")
+                .font(.system(size: 21, weight: .semibold))
+                .foregroundStyle(DIColor.actionForeground)
+                .frame(width: 48, height: 48)
+                .background(LinearGradient(colors: [DIColor.surface,
+                    isFavorite ? DIColor.accent.opacity(0.28) : DIColor.sandstone],
+                    startPoint: .top, endPoint: .bottom), in: Circle())
+                .overlay(Circle().stroke(isFavorite ? DIColor.accent : DIColor.border, lineWidth: 1))
+        }
+        .buttonStyle(LibraryFavoritePressStyle())
+        .accessibilityLabel(isFavorite ? Text("Remove from favorites") : Text("Add to favorites"))
+        .accessibilityAddTraits(isFavorite ? .isSelected : [])
+    }
+}
+
+private struct LibraryFavoritePressStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.78 : 1)
+            .shadow(color: DIColor.primaryDeep.opacity(0.14), radius: configuration.isPressed ? 1 : 3, y: 2)
+            .scaleEffect(!reduceMotion && configuration.isPressed ? 0.96 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: configuration.isPressed)
+    }
+}
+
 extension View {
     @MainActor
     func libraryFavoriteFailure(_ model: LibraryViewModel) -> some View {

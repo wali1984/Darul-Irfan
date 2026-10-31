@@ -214,17 +214,10 @@ struct ContentItemRow: View {
                 }
                 .buttonStyle(.plain)
 
-                Button {
+                LibraryFavoriteButton(isFavorite: isFavorite) {
                     DIHaptics.light()
                     onToggleFavorite()
-                } label: {
-                    Image(systemName: isFavorite ? "star.fill" : "star")
-                        .font(.body)
-                        .foregroundStyle(isFavorite ? DIColor.accent : DIColor.textMuted)
-                        .padding(DISpacing.xs)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(isFavorite ? Text("Remove from favorites") : Text("Add to favorites"))
             }
         }
     }

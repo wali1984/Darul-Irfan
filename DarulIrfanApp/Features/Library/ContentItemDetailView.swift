@@ -123,15 +123,11 @@ struct ContentItemDetailView: View {
     private var favoriteButton: some View {
         if let item = viewModel.item {
             let isFavorite = libraryViewModel.isFavorite(item.id)
-            Button {
+            LibraryFavoriteButton(isFavorite: isFavorite) {
                 Task {
                     await libraryViewModel.toggleFavorite(contentItemID: item.id)
                 }
-            } label: {
-                Image(systemName: isFavorite ? "star.fill" : "star")
-                    .foregroundStyle(isFavorite ? DIColor.accent : DIColor.primary)
             }
-            .accessibilityLabel(isFavorite ? Text("Remove from favorites") : Text("Add to favorites"))
         }
     }
 
