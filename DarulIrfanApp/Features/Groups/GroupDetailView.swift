@@ -24,6 +24,7 @@ struct GroupDetailView: View {
     @State private var drafts: [MemberGroupPost] = []
     @State private var isLoading = true
     @State private var failure: String?
+    @State private var actionFailure: String?
     /// Only one video plays at a time: a tapped video expands in place rather
     /// than every card loading a player at once.
     @State private var playingVideoID: String?
@@ -86,6 +87,7 @@ struct GroupDetailView: View {
                 }
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .diScreenBackground()
         .diPageHeading(LocalizedStringKey(group.name))
@@ -99,6 +101,11 @@ struct GroupDetailView: View {
             await followSession()
         }
         .refreshable { await load() }
+        .alert("Could not complete action", isPresented: Binding(
+            get: { actionFailure != nil }, set: { if !$0 { actionFailure = nil } }
+        )) {
+            Button("OK", role: .cancel) { actionFailure = nil }
+        } message: { Text(verbatim: actionFailure ?? "") }
         .fullScreenCover(item: $room) { pass in
             MeetingRoomView(pass: pass)
         }
@@ -113,6 +120,24 @@ struct GroupDetailView: View {
                 case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
                 case .history: GroupSessionHistoryView(groupID: group.id, service: service)
                 }
+            }
+        }
+    }
+
+    private func performChange(_ change: () async throws -> Void) async {
+        do {
+            try await change()
+            await load()
+        } catch is CancellationError {
+            return
+        } catch {
+            if let groupError = error as? MemberGroupError,
+               case .requestFailed = groupError {
+                actionFailure = String(localized: "The action could not be completed. Check your connection and try again.")
+            } else if error is MemberGroupError {
+                actionFailure = error.localizedDescription
+            } else {
+                actionFailure = String(localized: "The action could not be completed. Check your connection and try again.")
             }
         }
     }
@@ -230,8 +255,7 @@ struct GroupDetailView: View {
                     GroupZikrRow(session: session, groupID: group.id, dependencies: dependencies,
                                  canManage: detail?.canManage == true) {
                         Task {
-                            try? await service.removeZikrSession(session.id, in: group.id)
-                            await load()
+                            await performChange { try await service.removeZikrSession(session.id, in: group.id) }
                         }
                     }
                     .diScrollReveal()
@@ -301,8 +325,7 @@ struct GroupDetailView: View {
         if detail?.canManage == true {
             Button("Cancel meeting", role: .destructive) {
                 Task {
-                    try? await service.cancelMeeting(meeting.id, in: group.id)
-                    await load()
+                    await performChange { try await service.cancelMeeting(meeting.id, in: group.id) }
                 }
             }
             .buttonStyle(.bordered)
@@ -341,11 +364,9 @@ struct GroupDetailView: View {
                 DISectionHeader(titleKey: "Waiting for approval", systemImage: "tray.full")
                 ForEach(drafts) { draft in
                     GroupDraftCard(draft: draft) { title, body in
-                        try? await service.publishDraft(draft.id, in: group.id, title: title, body: body)
-                        await load()
+                        await performChange { try await service.publishDraft(draft.id, in: group.id, title: title, body: body) }
                     } onDiscard: {
-                        try? await service.removePost(draft.id, in: group.id)
-                        await load()
+                        await performChange { try await service.removePost(draft.id, in: group.id) }
                     }
                 }
             }
@@ -489,8 +510,7 @@ struct GroupDetailView: View {
                 if detail?.canManage == true {
                     Button("Remove", role: .destructive) {
                         Task {
-                            try? await service.removePost(post.id, in: group.id)
-                            await load()
+                            await performChange { try await service.removePost(post.id, in: group.id) }
                         }
                     }
                     .font(.footnote)
@@ -750,30 +770,40 @@ private struct GroupDraftCard: View {
                 }
                 TextField("Title", text: $title, axis: .vertical)
                     .font(.headline)
+                    .disabled(working)
                 TextField("Message", text: $bodyText, axis: .vertical)
                     .font(.subheadline)
                     .lineLimit(2...10)
-                HStack {
-                    Button {
-                        Task {
-                            working = true
-                            // Always sent: an emptied message is cleared, not
-                            // left out (which kept the forwarded text).
-                            await onPublish(title, bodyText)
-                            working = false
-                        }
-                    } label: {
-                        Label("Publish to the group", systemImage: "paperplane.fill")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(working || title.trimmingCharacters(in: .whitespaces).isEmpty)
-                    Button("Discard", role: .destructive) {
-                        Task { await onDiscard() }
-                    }
-                    .buttonStyle(.bordered)
+                    .disabled(working)
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: DISpacing.sm) { draftActions }
+                    VStack(alignment: .leading, spacing: DISpacing.sm) { draftActions }
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var draftActions: some View {
+        Button {
+            working = true
+            Task {
+                defer { working = false }
+                // Always sent: an emptied message is cleared, not
+                // left out (which kept the forwarded text).
+                await onPublish(title, bodyText)
+            }
+        } label: {
+            Label("Publish to the group", systemImage: "paperplane.fill")
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(working || title.trimmingCharacters(in: .whitespaces).isEmpty)
+        Button("Discard", role: .destructive) {
+            working = true
+            Task { defer { working = false }; await onDiscard() }
+        }
+        .buttonStyle(.bordered)
+        .disabled(working)
     }
 }
 
