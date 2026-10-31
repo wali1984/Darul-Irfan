@@ -419,20 +419,36 @@ struct GroupLiveStarter: View {
     private var orderSection: some View {
         Section("Plays in this order") {
             ForEach(Array(picked.enumerated()), id: \.element) { index, entry in
-                HStack {
-                    Text(verbatim: "\(index + 1). \(titleOf(entry))").lineLimit(1)
-                    Spacer(minLength: 0)
-                    Button {
-                        picked.removeAll { $0 == entry }
-                    } label: {
-                        Image(systemName: "minus.circle.fill").foregroundStyle(DIColor.danger)
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text(verbatim: "\(index + 1). \(titleOf(entry))")
+                        .foregroundStyle(DIColor.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    ViewThatFits(in: .horizontal) {
+                        HStack { orderActions(entry, index: index) }
+                        VStack(alignment: .leading) { orderActions(entry, index: index) }
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text("Remove"))
                 }
             }
             .onMove { from, to in picked.move(fromOffsets: from, toOffset: to) }
         }
+    }
+
+    @ViewBuilder
+    private func orderActions(_ entry: GroupQueueEntry, index: Int) -> some View {
+        Button("Move up") {
+            guard let at = picked.firstIndex(of: entry), at > 0 else { return }
+            picked.swapAt(at, at - 1)
+        }
+        .buttonStyle(DICompactButtonStyle())
+        .disabled(index == 0)
+        Button("Move down") {
+            guard let at = picked.firstIndex(of: entry), at < picked.count - 1 else { return }
+            picked.swapAt(at, at + 1)
+        }
+        .buttonStyle(DICompactButtonStyle())
+        .disabled(index == picked.count - 1)
+        Button("Remove") { picked.removeAll { $0 == entry } }
+            .buttonStyle(DICompactButtonStyle(destructive: true))
     }
 
     @ViewBuilder

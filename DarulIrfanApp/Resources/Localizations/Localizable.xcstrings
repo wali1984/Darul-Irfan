@@ -33246,6 +33246,38 @@
           }
         }
       }
+    },
+    "Move up": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move up"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اوپر کریں"
+          }
+        }
+      }
+    },
+    "Move down": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move down"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نیچے کریں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
