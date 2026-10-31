@@ -19,6 +19,8 @@ struct TodayHeroView: View {
     @State private var weatherSnapshot: CityWeatherSnapshot?
     @State private var weatherSnapshotGrid: String?
     @ScaledMetric(relativeTo: .largeTitle) private var prayerNameSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .headline) private var urduWordmarkSize: CGFloat = 18
+    private var readsUrdu: Bool { DIBrand.readsUrdu(locale) }
 
     private var timeZone: TimeZone {
         appState.activePlace?.timeZone ?? .current
@@ -88,37 +90,39 @@ struct TodayHeroView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("DARUL IRFAN")
-                        .font(.caption2.weight(.heavy))
-                        .tracking(DIBrand.readsUrdu(locale) ? 0 : 3)
-                        .foregroundStyle(Color(hex: 0xFFE3A0))
-                        .diGoldGlow(radius: 5, opacity: 0.55)
+                        .font(readsUrdu ? .system(size: urduWordmarkSize, weight: .semibold) : .footnote.weight(.semibold))
+                        .tracking(readsUrdu ? 0 : 2.4)
+                        .foregroundStyle(Color(hex: 0xFFFDF4))
                     Text(LocalizedStringKey(DIGradient.greeting(for: date, timeZone: timeZone)))
-                        .font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.88))
+                        .font(readsUrdu ? .callout : .subheadline).foregroundStyle(Color(hex: 0xF7F6ED).opacity(0.9))
                 }
                 Spacer(minLength: 0)
                 DILivingSealMark(diameter: dynamicTypeSize.isAccessibilitySize ? 52 : 68).accessibilityHidden(true)
             }
-            HStack(alignment: .center, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(verbatim: viewModel.gregorianShortText).font(.footnote).foregroundStyle(.white.opacity(0.92))
+            VStack(spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Text(verbatim: viewModel.gregorianShortText)
+                        .font(readsUrdu ? .subheadline : .footnote).foregroundStyle(Color(hex: 0xFFFDF4).opacity(0.96))
+                    Spacer(minLength: 0)
+                    Text(date, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone))
+                        .font(.headline.weight(.medium)).monospacedDigit().foregroundStyle(Color(hex: 0xF7F6ED))
+                }
+                HStack(spacing: 12) {
                     NavigationLink {
                         HijriSettingsView(dependencies: dependencies, appState: appState)
                     } label: {
                         HStack(spacing: 5) {
-                            Text(verbatim: viewModel.hijriDateText).font(.caption)
-                            Image(systemName: "pencil").font(.system(size: 11)).opacity(0.7)
+                            Text(verbatim: viewModel.hijriDateText).font(readsUrdu ? .subheadline.weight(.medium) : .caption.weight(.medium))
+                            Image(systemName: "pencil").font(.system(size: 11)).foregroundStyle(Color(hex: 0xE9CE86).opacity(0.65))
                         }
-                        .foregroundStyle(Color(hex: 0xE9CE86))
+                        .foregroundStyle(Color(hex: 0xFFFDF4).opacity(0.9))
                         .frame(minHeight: 32, alignment: .leading)
                     }
                     .buttonStyle(.plain)
                     .accessibilityHint(Text("Correct Islamic date"))
                     .accessibilityIdentifier("today.hijri-correction")
-                }.fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 0)
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text(date, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.headline.weight(.medium)).monospacedDigit().foregroundStyle(.white)
-                    if let place = appState.activePlace { Text(verbatim: place.name).font(.caption).foregroundStyle(.white.opacity(0.78)) }
+                    Spacer(minLength: 0)
+                    if let place = appState.activePlace { Text(verbatim: place.name).font(.caption).foregroundStyle(Color(hex: 0xF7F6ED).opacity(0.72)) }
                 }
             }
         }
@@ -144,10 +148,10 @@ struct TodayHeroView: View {
         .frame(maxWidth: .infinity).padding(.vertical, 6)
     }
     private func prayerName(_ next: NextPrayerInfo) -> some View {
-        Text(LocalizedStringKey(next.prayer.englishName)).font(.system(size: prayerNameSize, weight: .semibold)).foregroundStyle(.white)
+        Text(LocalizedStringKey(next.prayer.englishName)).font(.system(size: readsUrdu ? prayerNameSize * (30.0 / 28.0) : prayerNameSize, weight: .semibold)).foregroundStyle(.white)
     }
     private func prayerTime(_ next: NextPrayerInfo) -> some View {
-        Text(next.time, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.subheadline).monospacedDigit().foregroundStyle(Color(hex: 0xE9CE86))
+        Text(next.time, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.callout.weight(.medium)).monospacedDigit().foregroundStyle(Color(hex: 0xE9CE86))
     }
 
     /// The live countdown to the next prayer; in Ramadan, to the end of
@@ -251,9 +255,8 @@ struct TodayHeroView: View {
                     .font(.caption2.weight(.bold))
                     .accessibilityHidden(true)
             }
-            .font(.footnote.weight(.bold))
-            .foregroundStyle(Color(hex: 0xFFE3A0))
-            .diGoldGlow(radius: 5, opacity: 0.45)
+            .font(readsUrdu ? .subheadline.weight(.semibold) : .footnote.weight(.semibold))
+            .foregroundStyle(Color(hex: 0xE9CE86))
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
@@ -271,6 +274,7 @@ struct TodayHeroPrayerChips: View {
     let viewModel: PrayerViewModel
     let schedule: PrayerDaySchedule
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.locale) private var locale
 
     var body: some View {
         let layout = dynamicTypeSize.isAccessibilitySize
@@ -293,14 +297,14 @@ struct TodayHeroPrayerChips: View {
         } label: {
             VStack(spacing: 3) {
                 Text(LocalizedStringKey(prayer.englishName))
-                    .font(.caption2.weight(.semibold))
+                    .font(DIBrand.readsUrdu(locale) ? .footnote.weight(.medium) : .caption.weight(.medium))
                     .foregroundStyle(.white.opacity(isNext ? 1 : 0.8))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 if let time {
                     Text(verbatim: viewModel.timeText(time))
-                        .font(.footnote.weight(.bold).monospacedDigit())
-                        .foregroundStyle(isNext ? DIColor.goldGlow : Color.white)
+                        .font(.caption.weight(.semibold).monospacedDigit())
+                        .foregroundStyle(isNext ? Color(hex: 0xE9CE86) : Color(hex: 0xF7F6ED))
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                 }
@@ -314,7 +318,7 @@ struct TodayHeroPrayerChips: View {
             .background(chipFill(isNext), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(isNext ? DIColor.goldGlow.opacity(0.85) : Color.white.opacity(0.16), lineWidth: 1)
+                    .stroke(isNext ? Color(hex: 0xE9CE86).opacity(0.65) : Color.white.opacity(0.16), lineWidth: 1)
             )
             .shadow(color: isNext ? DIColor.goldGlow.opacity(0.18) : Color.clear, radius: 9)
             .contentShape(Rectangle())

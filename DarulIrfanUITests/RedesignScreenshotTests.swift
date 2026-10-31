@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -95,6 +95,7 @@ final class RedesignScreenshotTests: XCTestCase {
         // Today, then the Prayer times page it opens.
         selectTab(0)
         shot("today")
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "today" { return }
         scrollShots("today", count: 3)
         scrollToTop()
         if tap(button("All times and alerts")) {
