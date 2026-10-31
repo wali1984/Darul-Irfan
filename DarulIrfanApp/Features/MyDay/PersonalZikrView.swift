@@ -166,14 +166,18 @@ struct PersonalZikrView: View {
                 Toggle(step.localizedTitle, isOn: Binding(get: { selected }, set: { store.configure(step, enabled: $0) }))
                     .labelsHidden().disabled(store.run != nil)
             }
-            HStack(spacing: 8) {
-                Button { choosing = step } label: { Text("\(step.minutes) min") }
-                    .buttonStyle(.bordered).disabled(store.run != nil || !selected)
-                if step.customID != nil && store.run == nil {
-                    Button("Remove") { store.removeCustom(step.id) }.buttonStyle(.bordered)
-                }
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) { stageActions(step, selected: selected) }
+                VStack(alignment: .leading, spacing: 8) { stageActions(step, selected: selected) }
             }
             .padding(.leading, 40)
+        }
+    }
+    @ViewBuilder private func stageActions(_ step: PersonalZikrStep, selected: Bool) -> some View {
+        Button { choosing = step } label: { Text("\(step.minutes) min") }
+            .buttonStyle(.bordered).disabled(store.run != nil || !selected)
+        if step.customID != nil && store.run == nil {
+            Button("Remove") { store.removeCustom(step.id) }.buttonStyle(.bordered)
         }
     }
     private func durationSheet(_ step: PersonalZikrStep) -> some View {
@@ -259,10 +263,9 @@ private struct PersonalZikrHistoryCard: View {
     var body: some View {
         DICard {
             VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    if entries.count == 1 { Text("1 session") } else { Text("\(entries.count) sessions") }
-                    Spacer()
-                    Text("\(totalMinutes) min")
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 16) { summary; Spacer(minLength: 0) }
+                    VStack(alignment: .leading, spacing: 4) { summary }
                 }.font(.headline).foregroundStyle(DIColor.actionForeground)
                 DisclosureGroup(isExpanded: $expanded) {
                 let completed = Set(entries.map { Calendar.current.startOfDay(for: $0.endedAt) })
@@ -276,15 +279,22 @@ private struct PersonalZikrHistoryCard: View {
                 Text("Every filled day is time you made for Zikr.").font(.caption).foregroundStyle(DIColor.textMuted)
                 if entries.isEmpty { Text("Your completed sessions will appear here with their time and duration.").font(.footnote).foregroundStyle(DIColor.textMuted) }
                 ForEach(all ? entries : Array(entries.prefix(7))) { entry in
-                    HStack {
-                        Text(entry.endedAt, format: .dateTime.day().month(.abbreviated).hour().minute().locale(locale))
-                        Spacer()
-                        Text("\(minutes(entry)) min").foregroundStyle(DIColor.textMuted)
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 16) { sessionDetails(entry); Spacer(minLength: 0) }
+                        VStack(alignment: .leading, spacing: 4) { sessionDetails(entry) }
                     }.font(.footnote)
                 }
                 if entries.count > 7 { Button(all ? "Show less" : "Show all sessions") { all.toggle() }.font(.footnote) }
                 } label: { Text("Your last 3 months").font(.subheadline.weight(.semibold)) }
             }
         }
+    }
+    @ViewBuilder private var summary: some View {
+        if entries.count == 1 { Text("1 session") } else { Text("\(entries.count) sessions") }
+        Text("\(totalMinutes) min")
+    }
+    @ViewBuilder private func sessionDetails(_ entry: PersonalZikrEntry) -> some View {
+        Text(entry.endedAt, format: .dateTime.day().month(.abbreviated).hour().minute().locale(locale))
+        Text("\(minutes(entry)) min").foregroundStyle(DIColor.textMuted)
     }
 }
