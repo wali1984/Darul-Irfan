@@ -6,6 +6,15 @@ import XCTest
 /// against an in-memory store.
 final class EventsRepositoryTests: XCTestCase {
 
+    func testEventDatesUseRequestedUrduLocaleWithWesternDigits() {
+        let date = Date(timeIntervalSince1970: 1788652800) // 6 September 2026, UTC.
+        let text = CommunityEvent.dayText(date, .long, locale: Locale(identifier: "ur_PK@numbers=latn"))
+        XCTAssertTrue(text.contains("2026"))
+        XCTAssertTrue(text.contains("6"))
+        XCTAssertTrue(text.unicodeScalars.contains { (0x0600...0x06FF).contains($0.value) })
+        XCTAssertFalse(text.unicodeScalars.contains { (0x0660...0x0669).contains($0.value) || (0x06F0...0x06F9).contains($0.value) })
+    }
+
     private var database: AppDatabase!
     private var repository: EventsRepository!
 

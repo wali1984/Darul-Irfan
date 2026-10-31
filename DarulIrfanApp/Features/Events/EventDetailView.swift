@@ -138,7 +138,7 @@ struct EventDetailView: View {
         if let start = viewModel.event.startDate, viewModel.hasConcreteDates || viewModel.hasEnded {
             if let end = viewModel.event.endDate, end > start {
                 Label {
-                    Text("\(CommunityEvent.dayText(start, .long)) – \(CommunityEvent.dayText(end, .long))")
+                    Text("\(CommunityEvent.dayText(start, .long, locale: locale)) – \(CommunityEvent.dayText(end, .long, locale: locale))")
                 } icon: {
                     Image(systemName: "calendar")
                 }
@@ -146,7 +146,7 @@ struct EventDetailView: View {
                 .foregroundStyle(DIColor.goldGlow)
             } else {
                 Label {
-                    Text(CommunityEvent.dayText(start, .long))
+                    Text(CommunityEvent.dayText(start, .long, locale: locale))
                 } icon: {
                     Image(systemName: "calendar")
                 }

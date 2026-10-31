@@ -204,6 +204,7 @@ private struct ProgrammeRow: View {
 /// A programme's day or days. Approximate dates are not shown before the
 /// programme, only "Dates announced by Dar-ul-Irfan".
 private struct EventDatesLine: View {
+    @Environment(\.locale) private var locale
     let event: CommunityEvent
     /// A programme that has taken place shows its date, which approximate
     /// dates otherwise hide.
@@ -213,7 +214,7 @@ private struct EventDatesLine: View {
         if let start = event.startDate, !event.datesAreApproximate || isPast {
             if let end = event.endDate, end > start {
                 Label {
-                    Text("\(CommunityEvent.dayText(start, .abbreviated)) – \(CommunityEvent.dayText(end, .abbreviated))")
+                    Text("\(CommunityEvent.dayText(start, .abbreviated, locale: locale)) – \(CommunityEvent.dayText(end, .abbreviated, locale: locale))")
                 } icon: {
                     Image(systemName: "calendar")
                 }
@@ -221,7 +222,7 @@ private struct EventDatesLine: View {
                 .foregroundStyle(DIColor.primary)
             } else {
                 Label {
-                    Text(CommunityEvent.dayText(start, .abbreviated))
+                    Text(CommunityEvent.dayText(start, .abbreviated, locale: locale))
                 } icon: {
                     Image(systemName: "calendar")
                 }
@@ -268,8 +269,15 @@ private struct PastProgrammesView: View {
 
 /// One past programme in full: its kind, title, venue and dates.
 private struct EventRowCard: View {
+    @Environment(\.locale) private var locale
     let event: CommunityEvent
     var isPast = false
+
+    private var urduTitle: String? {
+        guard locale.language.languageCode?.identifier == "ur",
+              let title = event.titleUrdu, !title.isEmpty else { return nil }
+        return title
+    }
 
     var body: some View {
         DIElevatedCard(glow: event.kind.eventTint.opacity(0.7)) {
@@ -285,8 +293,8 @@ private struct EventRowCard: View {
                 .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     DIPillBadge(text: event.kind.eventDisplayName, color: event.kind.eventTint)
-                    Text(verbatim: event.title)
-                        .font(DIFont.subheading)
+                    Text(verbatim: urduTitle ?? event.title)
+                        .font(urduTitle == nil ? DIFont.subheading : DIFont.urduBody())
                         .foregroundStyle(DIColor.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                     if let venue = event.venue {

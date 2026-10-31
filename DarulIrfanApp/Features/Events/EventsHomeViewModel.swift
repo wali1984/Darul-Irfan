@@ -70,8 +70,8 @@ extension CommunityEvent {
     static let dayTimeZone = TimeZone(identifier: "UTC") ?? .current
 
     /// A program day as text, in the given date style.
-    static func dayText(_ date: Date, _ style: Date.FormatStyle.DateStyle) -> String {
-        date.formatted(Date.FormatStyle(date: style, time: .omitted, timeZone: dayTimeZone))
+    static func dayText(_ date: Date, _ style: Date.FormatStyle.DateStyle, locale: Locale = .current) -> String {
+        date.formatted(Date.FormatStyle(date: style, time: .omitted, locale: locale, timeZone: dayTimeZone))
     }
 
     /// Over: its last (or only) day is before the person's today, and a
