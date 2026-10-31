@@ -25,6 +25,7 @@ struct HijriSettingsView: View {
         .diScreenBackground()
         .navigationTitle("Local moon sighting")
         .navigationBarTitleDisplayMode(.inline)
+        .environment(\.timeZone, appState.activePlace?.timeZone ?? .current)
         .task {
             while !Task.isCancelled {
                 previewNow = Date(); refreshPreview()

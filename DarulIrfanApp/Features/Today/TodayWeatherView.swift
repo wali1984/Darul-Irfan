@@ -63,7 +63,9 @@ struct TodayWeatherView: View {
                     }
                     .navigationTitle("Local weather")
                     .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { showing = false } } }
-                }.presentationDetents([.medium, .large])
+                }
+                .environment(\.timeZone, timeZone)
+                .presentationDetents([.medium, .large])
             }
         }
     }

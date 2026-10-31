@@ -72,6 +72,9 @@ struct TodayHeroView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background { TodayHeroSurface(date: context.date, timeZone: timeZone) }
         }
+        // SwiftUI's date Text resolves the environment's zone when rendering.
+        // Scope the selected city here; personal Zikr reminders use device time.
+        .environment(\.timeZone, timeZone)
         .task(id: weatherReloadKey) {
             guard weatherEnabled, scenePhase == .active, let grid = weatherGrid else { weatherSnapshot = nil; return }
             while !Task.isCancelled {
