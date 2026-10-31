@@ -158,6 +158,29 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testFailedFavoriteRemovalPreservesConfirmedStateAndRetries() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertItems([libraryItem("favorite-test", category: .books)])
+        let model = LibraryViewModel(contentRepository: repository)
+        let added = await model.toggleFavorite(contentItemID: "favorite-test")
+        XCTAssertTrue(added)
+        try await database.connection.execute("ALTER TABLE favorites RENAME TO unavailable_favorites")
+        let removed = await model.toggleFavorite(contentItemID: "favorite-test")
+        XCTAssertFalse(removed)
+        XCTAssertTrue(model.favoriteChangeFailed)
+        XCTAssertTrue(model.isFavorite("favorite-test"))
+        await model.loadFavorites()
+        XCTAssertTrue(model.isFavorite("favorite-test"), "Failed refresh must not erase confirmed stars")
+        try await database.connection.execute("ALTER TABLE unavailable_favorites RENAME TO favorites")
+        let retried = await model.toggleFavorite(contentItemID: "favorite-test")
+        XCTAssertTrue(retried)
+        XCTAssertFalse(model.isFavorite("favorite-test"))
+        let stored = try await repository.favorites()
+        XCTAssertTrue(stored.isEmpty)
+    }
+
+    @MainActor
     func testAShelfOfTwoCategoriesListsBothOnceItHoldsMore() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)

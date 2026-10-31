@@ -132,7 +132,7 @@ final class LibraryViewModel {
     }
 
     func loadFavorites() async {
-        let all = (try? await contentRepository.favorites()) ?? []
+        guard let all = try? await contentRepository.favorites() else { return }
         var map: [String: Favorite] = [:]
         for favorite in all {
             if let contentItemID = favorite.contentItemID {
@@ -144,27 +144,27 @@ final class LibraryViewModel {
 
     // MARK: - Favorites
 
-    func toggleFavorite(contentItemID: String) async {
-        if let existing = favoritesByContentID[contentItemID] {
-            favoritesByContentID[contentItemID] = nil
-            do {
+    var favoriteChangeFailed = false
+    private var changingFavorites: Set<String> = []
+
+    @discardableResult
+    func toggleFavorite(contentItemID: String) async -> Bool {
+        guard changingFavorites.insert(contentItemID).inserted else { return false }
+        defer { changingFavorites.remove(contentItemID) }
+        do {
+            if let existing = favoritesByContentID[contentItemID] {
                 try await contentRepository.removeFavorite(id: existing.id)
-            } catch {
-                await loadFavorites()
-            }
-        } else {
-            let favorite = Favorite(
-                id: UUID(),
-                contentItemID: contentItemID,
-                mediaItemID: nil,
-                createdAt: Date()
-            )
-            favoritesByContentID[contentItemID] = favorite
-            do {
+                favoritesByContentID[contentItemID] = nil
+            } else {
+                let favorite = Favorite(id: UUID(), contentItemID: contentItemID,
+                    mediaItemID: nil, createdAt: Date())
                 try await contentRepository.addFavorite(favorite)
-            } catch {
-                await loadFavorites()
+                favoritesByContentID[contentItemID] = favorite
             }
+            return true
+        } catch {
+            favoriteChangeFailed = true
+            return false
         }
     }
 

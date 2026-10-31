@@ -59,6 +59,7 @@ struct CategoryListView: View {
             }
         }
         .diScreenBackground()
+        .libraryFavoriteFailure(viewModel)
         .navigationTitle(LocalizedStringKey(title))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

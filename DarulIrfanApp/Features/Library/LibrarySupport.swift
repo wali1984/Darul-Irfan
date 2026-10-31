@@ -1,6 +1,19 @@
 import Foundation
 import SwiftUI
 
+extension View {
+    @MainActor
+    func libraryFavoriteFailure(_ model: LibraryViewModel) -> some View {
+        alert("Something went wrong", isPresented: Binding(
+            get: { model.favoriteChangeFailed }, set: { model.favoriteChangeFailed = $0 }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Please try again in a moment.")
+        }
+    }
+}
+
 // Shared value types and small display helpers for the Library feature.
 // Everything here is UI-support only; domain models live in Models/.
 

@@ -81,6 +81,7 @@ struct ContentItemDetailView: View {
             }
         }
         .diScreenBackground()
+        .libraryFavoriteFailure(libraryViewModel)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
