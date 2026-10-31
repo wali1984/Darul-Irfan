@@ -107,6 +107,8 @@ struct FastingView: View {
                     ForEach(calendar.shortWeekdaySymbols.indices, id: \.self) { index in
                         Text(verbatim: calendar.shortWeekdaySymbols[(index + calendar.firstWeekday - 1) % 7])
                             .font(.caption2.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
                             .foregroundStyle(DIColor.textMuted)
                     }
                     ForEach(Array(cells.enumerated()), id: \.offset) { _, day in
@@ -200,6 +202,7 @@ private struct FastingCalendarButtonStyle: ButtonStyle {
         configuration.label
             .foregroundStyle(foreground)
             .background(background)
+            .background(DIColor.surface)
             .clipShape(shape)
             .overlay(shape.strokeBorder(outlined ? DIColor.accent : DIColor.border, lineWidth: outlined ? 2 : 1))
             .shadow(color: DIColor.primaryDeep.opacity(configuration.isPressed ? 0.04 : 0.12), radius: 2, x: 0, y: 1)
