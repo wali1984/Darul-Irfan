@@ -72,7 +72,7 @@ struct RootView: View {
                 .tabItem { Label("Halqah", systemImage: "person.3") }
                 .tag(AppTab.more)
         }
-        .tint(DIColor.primary)
+        .tint(DIColor.actionForeground)
         .environment(\.methodGuideReaderScale, appState.settings.readerFontScale.rawValue)
         // `safeAreaInset` adapts to compact/regular tab bars, iPad and future
         // system tab-bar sizes instead of relying on a fixed 49-point offset.
