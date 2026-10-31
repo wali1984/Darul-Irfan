@@ -170,87 +170,87 @@ struct GroupPeopleView: View {
                     Text("Code without a note")
                 }
                 Group {
-                        if invitation.kind == "email" {
-                            Text("Added when they sign in")
-                        } else if let expires = invitation.expiresAt {
-                            Text("Code, until \(expires.formatted(date: .abbreviated, time: .omitted))")
-                        }
-                    }
-                    .font(.caption)
-                    .foregroundStyle(DIColor.textMuted)
-                    VStack(alignment: .leading, spacing: DISpacing.xs) {
-                        if invitation.role != .member { roleBadge(invitation.role) }
-                        if invitation.role != .administrator || appointer {
-                            Button(role: .destructive) {
-                                Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
-                            } label: {
-                                Text("Withdraw")
-                            }
-                            .buttonStyle(DICompactButtonStyle(destructive: true))
-                        }
+                    if invitation.kind == "email" {
+                        Text("Added when they sign in")
+                    } else if let expires = invitation.expiresAt {
+                        Text("Code, until \(expires.formatted(date: .abbreviated, time: .omitted))")
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.caption)
+                .foregroundStyle(DIColor.textMuted)
+                VStack(alignment: .leading, spacing: DISpacing.xs) {
+                    if invitation.role != .member { roleBadge(invitation.role) }
+                    if invitation.role != .administrator || appointer {
+                        Button(role: .destructive) {
+                            Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
+                        } label: {
+                            Text("Withdraw")
+                        }
+                        .buttonStyle(DICompactButtonStyle(destructive: true))
+                    }
+                }
             }
-        }
-
-        private func load() async {
-            do {
-                people = try await service.people(in: groupID)
-                error = nil
-            } catch {
-                self.error = error.localizedDescription
-            }
-        }
-
-        private func act(_ change: () async throws -> Void) async {
-            guard !working else { return }
-            working = true
-            defer { working = false }
-            do {
-                try await change()
-                error = nil
-                await load()
-            } catch is CancellationError {
-                return
-            } catch {
-                self.error = error.localizedDescription
-            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    // MARK: - Adding someone
-
-    @MainActor
-    struct AddGroupPersonView: View {
-        let groupID: String
-        let groupName: String
-        let service: MemberGroupService
-        /// Administrators and the Super admin may also add Administrators.
-        var canAppointAdministrators = false
-
-        private enum Method: String, CaseIterable, Identifiable {
-            case email = "Email"
-            case phone = "Phone"
-            case code = "Code only"
-            var id: String { rawValue }
+    private func load() async {
+        do {
+            people = try await service.people(in: groupID)
+            error = nil
+        } catch {
+            self.error = error.localizedDescription
         }
+    }
 
-        @Environment(\.dismiss) private var dismiss
-        @Environment(\.openURL) private var openURL
-        @State private var method: Method = .email
-        @State private var email = ""
-        @State private var phone = ""
-        @State private var role: GroupRole = .member
-        @State private var days = 14
-        @State private var working = false
-        @State private var error: String?
-        @State private var result: AddPersonResult?
-        @State private var copied = false
+    private func act(_ change: () async throws -> Void) async {
+        guard !working else { return }
+        working = true
+        defer { working = false }
+        do {
+            try await change()
+            error = nil
+            await load()
+        } catch is CancellationError {
+            return
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+}
 
-        var body: some View {
-            Form {
-                Group {
+// MARK: - Adding someone
+
+@MainActor
+struct AddGroupPersonView: View {
+    let groupID: String
+    let groupName: String
+    let service: MemberGroupService
+    /// Administrators and the Super admin may also add Administrators.
+    var canAppointAdministrators = false
+
+    private enum Method: String, CaseIterable, Identifiable {
+        case email = "Email"
+        case phone = "Phone"
+        case code = "Code only"
+        var id: String { rawValue }
+    }
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @State private var method: Method = .email
+    @State private var email = ""
+    @State private var phone = ""
+    @State private var role: GroupRole = .member
+    @State private var days = 14
+    @State private var working = false
+    @State private var error: String?
+    @State private var result: AddPersonResult?
+    @State private var copied = false
+
+    var body: some View {
+        Form {
+            Group {
                 if let result {
                     resultSections(result)
                 } else {
