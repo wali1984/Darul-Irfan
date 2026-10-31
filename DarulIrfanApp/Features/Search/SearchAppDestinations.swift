@@ -55,7 +55,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .manualOffsets: return ["Manual Adjustments", "Per-Prayer Offsets"]
         case .notifications: return ["Notifications"]
         case .appearance: return ["Appearance"]
-        case .hijri: return ["Hijri Calendar"]
+        case .hijri: return ["Hijri Calendar", "Local moon sighting", "Correct Islamic date"]
         case .contentStorage: return ["Content & Storage"]
         case .officialAlerts: return ["Official Alerts & Privacy"]
         case .privacy: return ["Privacy"]

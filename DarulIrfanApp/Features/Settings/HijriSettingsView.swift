@@ -7,6 +7,8 @@ struct HijriSettingsView: View {
     private let dependencies: AppDependencies
     private let appState: AppState
     @State private var hijriPreview: String = ""
+    @State private var calculatedPreview: String = ""
+    @State private var previewNow = Date()
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
@@ -21,14 +23,18 @@ struct HijriSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
-        .navigationTitle("Hijri Calendar")
+        .navigationTitle("Local moon sighting")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            refreshPreview()
+        .task {
+            while !Task.isCancelled {
+                previewNow = Date(); refreshPreview()
+                do { try await Task.sleep(for: .seconds(60)) } catch { return }
+            }
         }
         .onChange(of: appState.settings.hijri.dayOffset) {
             refreshPreview()
         }
+        .onChange(of: appState.activePlace) { _, _ in refreshPreview() }
     }
 
     // MARK: - Today preview
@@ -36,11 +42,13 @@ struct HijriSettingsView: View {
     private var todaySection: some View {
         Section {
             LabeledContent("Gregorian") {
-                Text(Date.now, format: .dateTime.weekday(.wide).day().month(.wide).year())
+                Text(previewNow, format: Date.FormatStyle(date: .complete, time: .omitted, timeZone: appState.activePlace?.timeZone ?? .current))
             }
             .listRowBackground(DIColor.surface)
 
-            LabeledContent("Hijri") {
+            LabeledContent("Calculated Hijri date") { Text(calculatedPreview).multilineTextAlignment(.trailing) }
+                .listRowBackground(DIColor.surface)
+            LabeledContent("Your local date") {
                 Text(hijriPreview)
                     .foregroundStyle(DIColor.primary)
                     .multilineTextAlignment(.trailing)
@@ -57,7 +65,7 @@ struct HijriSettingsView: View {
         Section {
             Stepper(value: offsetBinding, in: -2...2) {
                 HStack {
-                    Text("Day Offset")
+                    Text("Date correction")
                         .foregroundStyle(DIColor.textPrimary)
                     Spacer(minLength: DISpacing.sm)
                     offsetLabel
@@ -67,8 +75,11 @@ struct HijriSettingsView: View {
                 }
             }
             .listRowBackground(DIColor.surface)
+            Button("Use calculated date") { offsetBinding.wrappedValue = 0 }
+                .disabled(appState.settings.hijri.dayOffset == 0)
+                .listRowBackground(DIColor.surface)
         } header: {
-            SettingsSectionHeader(titleKey: "Day Offset", systemImage: "plusminus.circle.fill")
+            SettingsSectionHeader(titleKey: "Local moon sighting", systemImage: "plusminus.circle.fill")
         } footer: {
             Text("Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. The Hijri dates and Islamic days across the app follow this setting.")
         }
@@ -96,10 +107,11 @@ struct HijriSettingsView: View {
 
     private func refreshPreview() {
         hijriPreview = dependencies.hijri.hijriDateText(
-            for: Date(),
+            for: previewNow,
             offsetDays: appState.settings.hijri.dayOffset,
             locale: LanguageManager.locale(for: appState.settings.language),
             timeZone: appState.activePlace?.timeZone ?? .current
         )
+        calculatedPreview = dependencies.hijri.hijriDateText(for: previewNow, offsetDays: 0, locale: LanguageManager.locale(for: appState.settings.language), timeZone: appState.activePlace?.timeZone ?? .current)
     }
 }

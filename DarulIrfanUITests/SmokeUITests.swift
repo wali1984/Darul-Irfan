@@ -39,6 +39,19 @@ final class SmokeUITests: XCTestCase {
 
     // MARK: - Tab bar
 
+    func testTodayOpensLocalMoonSightingCorrection() {
+        let app = makeApp()
+        app.launch()
+        let date = app.buttons["today.hijri-correction"]
+        XCTAssertTrue(date.waitForExistence(timeout: 60))
+        date.tap()
+        XCTAssertTrue(app.navigationBars["Local moon sighting"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Calculated Hijri date"].exists)
+        XCTAssertTrue(app.staticTexts["Your local date"].exists)
+        XCTAssertTrue(app.steppers.firstMatch.exists)
+        XCTAssertTrue(app.buttons["Use calculated date"].exists)
+    }
+
     func testPersonalZikrOpensFromZikrAndKeepsShajraInTheSamePage() {
         let app = makeApp()
         app.launch()

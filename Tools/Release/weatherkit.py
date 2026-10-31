@@ -84,7 +84,7 @@ def main() -> int:
             return 1
         if args.configure:
             command = ["cmd", "/d", "/c", "npx", "wrangler", "secret", "bulk"] if sys.platform == "win32" else ["npx", "wrangler", "secret", "bulk"]
-            result = subprocess.run(command, input=json.dumps(config), cwd=REPO / "Server", text=True, capture_output=True, timeout=120)
+            result = subprocess.run(command, input=json.dumps(config), cwd=REPO / "Server", text=True, encoding="utf-8", errors="replace", capture_output=True, timeout=120)
             if result.returncode:
                 print("Cloudflare secret configuration failed; check Wrangler account access. No credential values were logged.")
                 return 1

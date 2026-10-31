@@ -15,11 +15,19 @@ struct TodayHeroView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
+    @AppStorage("today.weather.enabled") private var weatherEnabled = true
+    @State private var weatherSnapshot: CityWeatherSnapshot?
+    @State private var weatherSnapshotGrid: String?
     @ScaledMetric(relativeTo: .largeTitle) private var prayerNameSize: CGFloat = 28
 
     private var timeZone: TimeZone {
         appState.activePlace?.timeZone ?? .current
     }
+    private var weatherGrid: WeatherCityGrid? {
+        guard let place = appState.activePlace else { return nil }
+        return WeatherCityGrid(latitude: place.latitude, longitude: place.longitude)
+    }
+    private var weatherReloadKey: String { "\(weatherGrid?.key ?? "")|\(weatherEnabled)|\(scenePhase == .active)" }
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
@@ -44,6 +52,10 @@ struct TodayHeroView: View {
                 if viewModel.hasLoaded {
                     footer
                 }
+                if weatherEnabled, let place = appState.activePlace, let grid = weatherGrid,
+                   weatherSnapshotGrid == grid.key, let snapshot = weatherSnapshot, snapshot.usable(at: context.date) {
+                    TodayWeatherView(snapshot: snapshot, city: place.name, timeZone: timeZone)
+                }
                 Text(DIBrand.anchorVerseArabic)
                     .font(DIFont.quranArabic(scale: 1.08))
                     .lineSpacing(8)
@@ -57,6 +69,15 @@ struct TodayHeroView: View {
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background { TodayHeroSurface(date: context.date, timeZone: timeZone) }
+        }
+        .task(id: weatherReloadKey) {
+            guard weatherEnabled, scenePhase == .active, let grid = weatherGrid else { weatherSnapshot = nil; return }
+            while !Task.isCancelled {
+                let value = await CityWeatherService.shared.current(for: grid)
+                guard !Task.isCancelled else { return }
+                weatherSnapshot = value; weatherSnapshotGrid = grid.key
+                do { try await Task.sleep(for: .seconds(600)) } catch { return }
+            }
         }
     }
 
@@ -81,18 +102,24 @@ struct TodayHeroView: View {
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(verbatim: viewModel.gregorianShortText).font(.footnote).foregroundStyle(.white.opacity(0.92))
-                    Text(verbatim: viewModel.hijriDateText).font(.caption).foregroundStyle(Color(hex: 0xE9CE86))
+                    NavigationLink {
+                        HijriSettingsView(dependencies: dependencies, appState: appState)
+                    } label: {
+                        HStack(spacing: 5) {
+                            Text(verbatim: viewModel.hijriDateText).font(.caption)
+                            Image(systemName: "pencil").font(.system(size: 11)).opacity(0.7)
+                        }
+                        .foregroundStyle(Color(hex: 0xE9CE86))
+                        .frame(minHeight: 32, alignment: .leading)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(Text("Correct Islamic date"))
+                    .accessibilityIdentifier("today.hijri-correction")
                 }.fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(date, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.headline.weight(.medium)).monospacedDigit().foregroundStyle(.white)
-                    if let place = appState.activePlace {
-                        HStack(alignment: .top, spacing: 6) {
-                            Text(verbatim: place.name).font(.caption).foregroundStyle(.white.opacity(0.78))
-                                .fixedSize(horizontal: false, vertical: true)
-                            TodayWeatherView(latitude: place.latitude, longitude: place.longitude, city: place.name, timeZone: timeZone)
-                        }
-                    }
+                    if let place = appState.activePlace { Text(verbatim: place.name).font(.caption).foregroundStyle(.white.opacity(0.78)) }
                 }
             }
         }
