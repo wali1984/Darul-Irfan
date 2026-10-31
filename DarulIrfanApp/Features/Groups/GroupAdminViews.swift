@@ -239,10 +239,8 @@ struct GroupLiveStarter: View {
             Group {
                 if !addingToSession {
                     Section {
-                        Picker("What is starting", selection: $kind) {
-                            ForEach(Kind.allCases) { kind in Text(LocalizedStringKey(kind.rawValue)).tag(kind) }
-                        }
-                        .pickerStyle(.segmented)
+                        DISegmentedControl(items: Kind.allCases, title: { LocalizedStringKey($0.rawValue) }, selection: $kind)
+                            .accessibilityLabel(Text("What is starting"))
                         .onChange(of: kind) { _, value in
                             title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
                         }
@@ -251,10 +249,8 @@ struct GroupLiveStarter: View {
                 }
                 if kind == .zikr || addingToSession {
                     Section {
-                        Picker("How the group joins", selection: $source) {
-                            ForEach(sources) { source in Text(LocalizedStringKey(source.rawValue)).tag(source) }
-                        }
-                        .pickerStyle(.segmented)
+                        DISegmentedControl(items: sources, title: { LocalizedStringKey($0.rawValue) }, selection: $source)
+                            .accessibilityLabel(Text("How the group joins"))
                     }
                     switch source {
                     case .room: roomSection

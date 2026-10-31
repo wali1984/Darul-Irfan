@@ -25,12 +25,8 @@ struct MyDayView: View {
     var body: some View {
         List {
             Section {
-                Picker("Show", selection: $span) {
-                    ForEach(Span.allCases) { span in
-                        Text(LocalizedStringKey(span.rawValue)).tag(span)
-                    }
-                }
-                .pickerStyle(.segmented)
+                DISegmentedControl(items: Span.allCases, title: { LocalizedStringKey($0.rawValue) }, selection: $span)
+                    .accessibilityLabel(Text("Show"))
                 .listRowBackground(Color.clear)
             }
 

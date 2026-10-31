@@ -32,12 +32,8 @@ struct AppearanceSettingsView: View {
 
     private var themeSection: some View {
         Section {
-            Picker("Theme", selection: themeBinding) {
-                ForEach(AppTheme.allCases) { theme in
-                    Text(LocalizedStringKey(theme.settingsDisplayName)).tag(theme)
-                }
-            }
-            .pickerStyle(.segmented)
+            DISegmentedControl(items: AppTheme.allCases, title: { LocalizedStringKey($0.settingsDisplayName) }, selection: themeBinding)
+                .accessibilityLabel(Text("Theme"))
             .listRowBackground(DIColor.surface)
         } header: {
             SettingsSectionHeader(titleKey: "Theme", systemImage: "circle.lefthalf.filled")

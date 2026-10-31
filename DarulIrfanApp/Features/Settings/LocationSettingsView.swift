@@ -54,11 +54,8 @@ struct LocationSettingsView: View {
 
     private var modeSection: some View {
         Section {
-            Picker("Location Mode", selection: modeBinding) {
-                Text("Device").tag(LocationMode.device)
-                Text("Manual").tag(LocationMode.manual)
-            }
-            .pickerStyle(.segmented)
+            DISegmentedControl(items: [LocationMode.device, .manual], title: { $0 == .device ? "Device" : "Manual" }, selection: modeBinding)
+                .accessibilityLabel(Text("Location Mode"))
             .listRowBackground(DIColor.surface)
         } header: {
             SettingsSectionHeader(titleKey: "Location Mode", systemImage: "location.viewfinder")

@@ -277,10 +277,8 @@ struct AddGroupPersonView: View {
     @ViewBuilder
     private var entrySections: some View {
         Section {
-            Picker("Add by", selection: $method) {
-                ForEach(Method.allCases) { method in Text(LocalizedStringKey(method.rawValue)).tag(method) }
-            }
-            .pickerStyle(.segmented)
+            DISegmentedControl(items: Method.allCases, title: { LocalizedStringKey($0.rawValue) }, selection: $method)
+                .accessibilityLabel(Text("Add by"))
             switch method {
             case .email:
                 TextField("Email address", text: $email)

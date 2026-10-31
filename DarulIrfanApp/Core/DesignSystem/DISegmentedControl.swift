@@ -48,12 +48,14 @@ struct DISegmentedControl<Item: Hashable>: View {
                 }
                 Text(title(item))
                     .font(.footnote.weight(.semibold))
-                    .lineLimit(1)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.center)
             }
             .foregroundStyle(labelColor(selected: selected))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .padding(.horizontal, 6)
+            .frame(minHeight: 48)
             .background {
                 if selected {
                     Capsule(style: .continuous)

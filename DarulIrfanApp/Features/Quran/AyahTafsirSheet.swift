@@ -61,17 +61,12 @@ struct AyahTafsirSheet: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                Picker("Tafsir", selection: workBinding) {
-                    ForEach(Self.works) { mode in
-                        Text(LocalizedStringKey(mode.shortTitle)).tag(mode.rawValue)
-                    }
-                }
-                .pickerStyle(.segmented)
-                Picker("Language", selection: languageBinding) {
-                    Text(verbatim: "اردو").tag("ur")
-                    Text(verbatim: "English").tag("en")
-                }
-                .pickerStyle(.segmented)
+                DISegmentedControl(items: Self.works.map { $0.rawValue }, title: { value in
+                    LocalizedStringKey(Self.works.first { $0.rawValue == value }?.shortTitle ?? value)
+                }, selection: workBinding)
+                .accessibilityLabel(Text("Tafsir"))
+                DISegmentedControl(items: ["ur", "en"], title: { $0 == "ur" ? "اردو" : "English" }, selection: languageBinding)
+                .accessibilityLabel(Text("Language"))
 
                 Text(ayah.textArabic)
                     .font(DIFont.quranArabic(scale: 0.85 * fontScale))
