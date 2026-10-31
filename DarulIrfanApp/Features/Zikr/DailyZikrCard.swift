@@ -144,7 +144,7 @@ struct DailyZikrCard: View {
                 Text("On air now")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.white)
-                Text(verbatim: DailyZikrPresentation.onAirDetail(startedAt: broadcast.startedAt))
+                Text(verbatim: DailyZikrPresentation.onAirDetail(startedAt: broadcast.startedAt, locale: locale))
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.white.opacity(0.85))
                     .fixedSize(horizontal: false, vertical: true)

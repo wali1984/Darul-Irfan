@@ -24,7 +24,7 @@ struct LaunchView: View {
                         .tracking(2)
                         .foregroundStyle(DIColor.onPrimary.opacity(0.95))
 
-                    Text(DIBrand.tagline)
+                    Text(LocalizedStringKey(DIBrand.tagline))
                         .font(.subheadline)
                         .foregroundStyle(DIColor.accent)
                 }

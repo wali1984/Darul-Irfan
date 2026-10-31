@@ -144,7 +144,7 @@ struct OnboardingWelcomeStep: View {
                     .foregroundStyle(DIColor.accent)
                     .environment(\.layoutDirection, .rightToLeft)
 
-                Text(DIBrand.tagline)
+                Text(LocalizedStringKey(DIBrand.tagline))
                     .font(.callout.italic())
                     .foregroundStyle(DIColor.onPrimary.opacity(0.85))
                     .multilineTextAlignment(.center)

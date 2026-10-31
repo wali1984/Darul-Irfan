@@ -187,6 +187,17 @@ final class ZikrTabTests: XCTestCase {
         XCTAssertNotEqual(began, plays)
     }
 
+    func testOnAirElapsedTimeUsesSelectedUrduLocaleAndWesternDigits() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let result = DailyZikrPresentation.onAirDetail(
+            startedAt: now.addingTimeInterval(-720), now: now,
+            locale: Locale(identifier: "ur-PK-u-nu-latn")
+        )
+        XCTAssertTrue(result.contains("12"))
+        XCTAssertFalse(result.contains("minutes ago"))
+        XCTAssertTrue(result.unicodeScalars.contains { (0x0600...0x06FF).contains($0.value) })
+    }
+
     // MARK: - Countdown and times
 
     func testRingFillsThroughTheDayThenThroughTheSession() {

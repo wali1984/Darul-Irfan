@@ -157,13 +157,17 @@ enum DailyZikrPresentation {
     }
 
     /// Under "On air now": when it began, and that it plays in the app.
-    static func onAirDetail(startedAt: Date?, now: Date = Date()) -> String {
+    static func onAirDetail(startedAt: Date?, now: Date = Date(), locale: Locale = .current) -> String {
         var parts: [String] = []
         if let startedAt, startedAt <= now {
-            let began = startedAt.formatted(.relative(presentation: .named))
-            parts.append(String(localized: "Began \(began)"))
+            let formatter = RelativeDateTimeFormatter()
+            formatter.locale = locale
+            formatter.dateTimeStyle = .named
+            formatter.unitsStyle = .full
+            let began = formatter.localizedString(for: startedAt, relativeTo: now)
+            parts.append(String(localized: "Began \(began)", locale: locale))
         }
-        parts.append(String(localized: "Plays here in the app"))
+        parts.append(String(localized: "Plays here in the app", locale: locale))
         return parts.joined(separator: " · ")
     }
 }
