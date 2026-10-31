@@ -91,13 +91,15 @@ struct FastingView: View {
         DICard {
             VStack(spacing: DISpacing.sm) {
                 HStack {
-                    Button { shiftMonth(-1) } label: { Image(systemName: "chevron.backward") }
+                    Button { shiftMonth(-1) } label: { Image(systemName: "chevron.backward").frame(width: 48, height: 48) }
+                        .buttonStyle(FastingCalendarButtonStyle(background: DIColor.surface, foreground: DIColor.actionForeground, outlined: true))
                         .accessibilityLabel("Previous month")
                     Spacer()
                     Text(month, format: .dateTime.month(.wide).year())
                         .font(.headline)
                     Spacer()
-                    Button { shiftMonth(1) } label: { Image(systemName: "chevron.forward") }
+                    Button { shiftMonth(1) } label: { Image(systemName: "chevron.forward").frame(width: 48, height: 48) }
+                        .buttonStyle(FastingCalendarButtonStyle(background: DIColor.surface, foreground: DIColor.actionForeground, outlined: true))
                         .accessibilityLabel("Next month")
                 }
                 let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
@@ -111,7 +113,7 @@ struct FastingView: View {
                         if let day {
                             dayCell(day)
                         } else {
-                            Color.clear.frame(height: 36)
+                            Color.clear.frame(height: 48)
                         }
                     }
                 }
@@ -130,13 +132,15 @@ struct FastingView: View {
         } label: {
             Text(verbatim: "\(calendar.component(.day, from: day))")
                 .font(.subheadline.weight(isToday ? .bold : .regular))
-                .frame(maxWidth: .infinity, minHeight: 36)
-                .background(
-                    Circle().fill(color(for: kind))
-                )
-                .foregroundStyle(kind == nil ? DIColor.textPrimary : DIColor.onPrimary)
+                .frame(maxWidth: .infinity, minHeight: 48)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FastingCalendarButtonStyle(
+            background: kind == .ramadan ? DIColor.primary :
+                kind == .qada ? DIColor.accent.opacity(0.28) :
+                kind == .voluntary ? DIColor.primary.opacity(0.12) : DIColor.surface,
+            foreground: kind == .ramadan ? DIColor.onPrimary : DIColor.textPrimary,
+            outlined: isToday
+        ))
         .accessibilityLabel(Text(day, format: .dateTime.day().month(.wide)))
         .accessibilityValue(kind.map { Text(LocalizedStringKey($0.title)) } ?? Text("No fast recorded"))
     }
@@ -183,5 +187,22 @@ struct FastingView: View {
                     .foregroundStyle(DIColor.textMuted)
             }
         }
+    }
+}
+
+private struct FastingCalendarButtonStyle: ButtonStyle {
+    let background: Color
+    let foreground: Color
+    var outlined = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 12, style: .continuous)
+        configuration.label
+            .foregroundStyle(foreground)
+            .background(background)
+            .clipShape(shape)
+            .overlay(shape.strokeBorder(outlined ? DIColor.accent : DIColor.border, lineWidth: outlined ? 2 : 1))
+            .shadow(color: DIColor.primaryDeep.opacity(configuration.isPressed ? 0.04 : 0.12), radius: 2, x: 0, y: 1)
+            .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
