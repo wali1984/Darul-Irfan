@@ -67,7 +67,8 @@ struct ReadSavedView: View {
                         savedRow(
                             systemImage: "note.text",
                             title: "Private notes",
-                            detail: Text("\(notes.document.notes.count) items"),
+                            detail: notes.canRead ? Text("\(notes.document.notes.count) items") :
+                                Text(notes.loadFailed ? "Your personal records could not be read. Please try again." : "Loading..."),
                             gold: false
                         )
                     }
