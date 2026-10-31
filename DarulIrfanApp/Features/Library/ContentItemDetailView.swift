@@ -16,6 +16,7 @@ import SwiftUI
 /// The library's Shajra page opens the app's own Shajra (`ShajraView`)
 /// instead, wherever it is reached.
 struct ContentItemDetailView: View {
+    @Environment(\.locale) private var locale
     private let appState: AppState
     private let dependencies: AppDependencies
     private let libraryViewModel: LibraryViewModel
@@ -339,9 +340,10 @@ struct ContentItemDetailView: View {
     }
 
     private func bookTitleBlock(for item: ContentItem) -> some View {
-        VStack(spacing: 6) {
-            Text(verbatim: item.title)
-                .font(.title2.weight(.heavy))
+        let urdu = locale.language.languageCode?.identifier == "ur" ? item.titleUrdu.flatMap { $0.isEmpty ? nil : $0 } : nil
+        return VStack(spacing: 6) {
+            Text(verbatim: urdu ?? item.title)
+                .font(urdu == nil ? .title2.weight(.heavy) : DIFont.urduBody(scale: 1.3).weight(.heavy))
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

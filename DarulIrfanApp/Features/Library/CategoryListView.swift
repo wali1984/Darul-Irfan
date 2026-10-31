@@ -140,6 +140,7 @@ struct CategoryListView: View {
 /// books/booklets/magazines), the title (with Urdu title trailing when present),
 /// author and year, type + language badges, and a favorite star.
 struct ContentItemRow: View {
+    @Environment(\.locale) private var locale
     let item: ContentItem
     let isFavorite: Bool
     let onToggleFavorite: () -> Void
@@ -170,17 +171,27 @@ struct ContentItemRow: View {
                             diameter: 44
                         )
                         VStack(alignment: .leading, spacing: DISpacing.xs) {
-                            HStack(alignment: .firstTextBaseline, spacing: DISpacing.sm) {
-                                Text(verbatim: item.title)
-                                    .font(.body.weight(.semibold))
-                                    .foregroundStyle(DIColor.textPrimary)
-                                    .multilineTextAlignment(.leading)
-                                Spacer(minLength: 0)
-                                if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
+                            VStack(alignment: .leading, spacing: DISpacing.xs) {
+                                if locale.language.languageCode?.identifier == "ur",
+                                   let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
                                     Text(verbatim: titleUrdu)
-                                        .font(DIFont.urduBody(scale: 0.9))
+                                        .font(DIFont.urduBody().weight(.semibold))
                                         .foregroundStyle(DIColor.textPrimary)
-                                        .multilineTextAlignment(.trailing)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Text(verbatim: item.title)
+                                        .font(.footnote)
+                                        .foregroundStyle(DIColor.textMuted)
+                                } else {
+                                    Text(verbatim: item.title)
+                                        .font(.body.weight(.semibold))
+                                        .foregroundStyle(DIColor.textPrimary)
+                                        .multilineTextAlignment(.leading)
+                                    if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
+                                        Text(verbatim: titleUrdu)
+                                            .font(DIFont.urduBody(scale: 0.9))
+                                            .foregroundStyle(DIColor.textMuted)
+                                            .multilineTextAlignment(.trailing)
+                                    }
                                 }
                             }
                             if !subtitleText.isEmpty {
