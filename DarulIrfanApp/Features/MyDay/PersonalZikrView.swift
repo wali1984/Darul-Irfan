@@ -41,6 +41,8 @@ struct PersonalZikrView: View {
             .diResponsiveWidth()
         }
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Your Daily Personal Zikr")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { store.screenActive = scenePhase == .active; store.settle(); store.refreshAlerts() }
@@ -61,6 +63,7 @@ struct PersonalZikrView: View {
                 .navigationTitle("Add a Muraqaba")
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { adding = false } } }
             }
+            .tint(DIColor.actionForeground)
             .presentationDetents([.medium])
         }
     }
@@ -104,6 +107,7 @@ struct PersonalZikrView: View {
             if run != nil { Button("Discard session") { store.discard(); ended = false }.buttonStyle(.bordered) }
             if ended { Text("Your personal Zikr session is complete.").font(.footnote).foregroundStyle(Color(hex: 0xF4D889)) }
         }
+        .tint(Color(hex: 0xE9CE86))
         .padding(22)
         .frame(maxWidth: .infinity)
         .background(LinearGradient(colors: [Color(hex: 0x0B7250), Color(hex: 0x043221)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
@@ -121,7 +125,7 @@ struct PersonalZikrView: View {
                 store.start(); ended = false; DIHaptics.light()
                 Task { denied = !(await store.requestAlerts()) }
             }
-            .buttonStyle(.borderedProminent).disabled(store.plan.isEmpty)
+            .buttonStyle(.borderedProminent).tint(DIColor.primary).disabled(store.plan.isEmpty)
         }
         if store.run != nil {
             Button("Finish & save") { store.finish(); ended = true; DIHaptics.success() }.buttonStyle(.bordered)
@@ -154,7 +158,7 @@ struct PersonalZikrView: View {
         let selected = store.plan.contains { $0.id == step.id }
         return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 10) {
-                Text(verbatim: "\(index + 1)").font(.caption).foregroundStyle(DIColor.primary)
+                Text(verbatim: "\(index + 1)").font(.caption).foregroundStyle(DIColor.actionForeground)
                     .frame(width: 30, height: 30).background(DIColor.accent.opacity(0.12), in: Circle())
                 Text(verbatim: step.localizedTitle).font(.subheadline.weight(.medium)).foregroundStyle(DIColor.textPrimary)
                 Spacer(minLength: 0)
@@ -183,6 +187,7 @@ struct PersonalZikrView: View {
             .navigationTitle(step.localizedTitle)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { choosing = nil } } }
         }
+        .tint(DIColor.actionForeground)
         .presentationDetents([.medium, .large])
     }
     private var reminders: some View {
@@ -239,6 +244,7 @@ struct PersonalZikrLink: View {
 @MainActor
 private struct PersonalZikrHistoryCard: View {
     let entries: [PersonalZikrEntry]
+    @Environment(\.locale) private var locale
     @State private var all = false
     private var days: [Date] {
         let calendar = Calendar.current
@@ -256,7 +262,7 @@ private struct PersonalZikrHistoryCard: View {
                     if entries.count == 1 { Text("1 session") } else { Text("\(entries.count) sessions") }
                     Spacer()
                     Text("\(totalMinutes) min")
-                }.font(.headline).foregroundStyle(DIColor.primary)
+                }.font(.headline).foregroundStyle(DIColor.actionForeground)
                 let completed = Set(entries.map { Calendar.current.startOfDay(for: $0.endedAt) })
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 14), spacing: 4) {
                     ForEach(days, id: \.self) { day in
@@ -269,7 +275,7 @@ private struct PersonalZikrHistoryCard: View {
                 if entries.isEmpty { Text("Your completed sessions will appear here with their time and duration.").font(.footnote).foregroundStyle(DIColor.textMuted) }
                 ForEach(all ? entries : Array(entries.prefix(7))) { entry in
                     HStack {
-                        Text(entry.endedAt, format: .dateTime.day().month(.abbreviated).hour().minute())
+                        Text(entry.endedAt, format: .dateTime.day().month(.abbreviated).hour().minute().locale(locale))
                         Spacer()
                         Text("\(minutes(entry)) min").foregroundStyle(DIColor.textMuted)
                     }.font(.footnote)
