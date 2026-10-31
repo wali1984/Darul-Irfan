@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -78,7 +78,7 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
-        if ["companion", "companion-fixes"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
+        if ["companion", "companion-fixes", "timezone"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             companionTour()
             return
         }
@@ -294,11 +294,13 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     private func companionTour() {
-        let focused = ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "companion-fixes"
+        let mode = ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""
+        let focused = mode != "companion"
         selectTab(0)
         guard seek("quick-tool-square.grid.2x2") else { return }
         shot("tools")
         for symbol in ["location.north.line", "calendar", "moon.haze", "star.circle", "hand.tap", "hands.and.sparkles", "sparkles", "square.grid.2x2", "checklist", "timer", "note.text"] {
+            if mode == "timezone" && !["location.north.line", "calendar", "moon.haze"].contains(symbol) { continue }
             scrollToTop()
             if seek("tool-" + symbol) {
                 pause(2)
@@ -333,7 +335,8 @@ final class RedesignScreenshotTests: XCTestCase {
         let value = app.staticTexts[identifier]
         XCTAssertTrue(value.waitForExistence(timeout: 5))
         let hourText = value.label.split(separator: ":").first.map(String.init) ?? ""
-        let hour = Int(hourText.trimmingCharacters(in: .whitespacesAndNewlines)) ?? -1
+        // Urdu date formatting may prefix the Western clock with an LRM.
+        let hour = Int(hourText.filter { $0.isASCII && $0.isNumber }) ?? -1
         XCTAssertTrue((3...6).contains(hour), "Selected-city Fajr must be morning, got \(value.label)")
     }
 

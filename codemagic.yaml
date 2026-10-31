@@ -203,6 +203,11 @@ workflows:
             (cd build && zip -qr Screens.xcresult.zip Screens.xcresult)
           fi
           cd build && zip -qr screens.zip screens
+      - name: Enforce screenshot test result after exporting diagnostics
+        script: |
+          # Preserve failure captures, but never report failed UI assertions
+          # as a successful workflow merely because export succeeded.
+          grep -Fq '** TEST SUCCEEDED **' build/logs/xcodebuild-screens.log
     artifacts:
       - build/screens.zip
       - build/Screens.xcresult.zip
