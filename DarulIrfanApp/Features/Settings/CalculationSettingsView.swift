@@ -36,12 +36,17 @@ struct CalculationSettingsView: View {
 
     private var methodSection: some View {
         Section {
-            Picker("Calculation Method", selection: methodBinding) {
-                ForEach(CalculationMethodChoice.allCases) { method in
-                    Text(LocalizedStringKey(method.englishName)).tag(method)
+            NavigationLink {
+                CalculationMethodChoicesView(appState: appState)
+            } label: {
+                HStack {
+                    Text("Calculation Method")
+                    Spacer(minLength: DISpacing.sm)
+                    Text(LocalizedStringKey(calculation.method.englishName))
+                        .foregroundStyle(DIColor.textMuted)
+                        .multilineTextAlignment(.trailing)
                 }
             }
-            .pickerStyle(.navigationLink)
             .listRowBackground(DIColor.surface)
         } header: {
             SettingsSectionHeader(titleKey: "Method", systemImage: "sun.and.horizon.fill")
@@ -194,5 +199,47 @@ struct CalculationSettingsView: View {
         Prayer.allCases.filter { prayer in
             calculation.adjustments.offset(for: prayer) != 0
         }.count
+    }
+}
+
+/// Branded choice list with an explicit accessible selected state.
+private struct CalculationMethodChoicesView: View {
+    let appState: AppState
+    @Environment(\.dismiss) private var dismiss
+    @State private var choosing = false
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: DISpacing.sm) {
+                ForEach(CalculationMethodChoice.allCases) { method in
+                    let selected = appState.settings.calculation.method == method
+                    Button {
+                        choosing = true
+                        DIHaptics.soft()
+                        Task {
+                            await appState.updateSettings { settings in
+                                settings.calculation.method = method
+                                settings.calculation.methodConfirmed = true
+                            }
+                            dismiss()
+                        }
+                    } label: {
+                        HStack(spacing: DISpacing.sm) {
+                            Text(LocalizedStringKey(method.englishName))
+                                .fixedSize(horizontal: false, vertical: true)
+                            if selected { Image(systemName: "checkmark").accessibilityHidden(true) }
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                    .disabled(choosing)
+                }
+            }
+            .padding(DISpacing.md)
+        }
+        .navigationTitle("Calculation Method")
+        .navigationBarTitleDisplayMode(.inline)
+        .diScreenBackground()
     }
 }
