@@ -157,7 +157,7 @@ struct GroupPeopleView: View {
     }
 
     private func invitationRow(_ invitation: GroupInvitation) -> some View {
-        HStack(spacing: DISpacing.sm) {
+        HStack(alignment: .top, spacing: DISpacing.sm) {
             Image(systemName: invitation.kind == "email" ? "envelope" : "number")
                 .foregroundStyle(DIColor.textMuted)
             VStack(alignment: .leading, spacing: 2) {
@@ -175,17 +175,19 @@ struct GroupPeopleView: View {
                 }
                 .font(.caption)
                 .foregroundStyle(DIColor.textMuted)
-            }
-            Spacer(minLength: DISpacing.sm)
-            if invitation.role != .member { roleBadge(invitation.role) }
-            if invitation.role != .administrator || appointer {
-                Button(role: .destructive) {
-                    Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
-                } label: {
-                    Text("Withdraw")
+                VStack(alignment: .leading, spacing: DISpacing.xs) {
+                    if invitation.role != .member { roleBadge(invitation.role) }
+                    if invitation.role != .administrator || appointer {
+                        Button(role: .destructive) {
+                            Task { await act { try await service.revokeInvitation(invitation.id, in: groupID) } }
+                        } label: {
+                            Text("Withdraw")
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
-                .buttonStyle(.borderless)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 

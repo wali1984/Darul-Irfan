@@ -33230,6 +33230,22 @@
           }
         }
       }
+    },
+    "Drafts could not be loaded. Try again to see posts waiting for approval.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drafts could not be loaded. Try again to see posts waiting for approval."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مسودے لوڈ نہیں ہو سکے۔ منظوری کے منتظر پیغامات دیکھنے کے لیے دوبارہ کوشش کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

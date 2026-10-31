@@ -22,6 +22,7 @@ struct GroupDetailView: View {
     @State private var detail: GroupDetail?
     @State private var posts: [MemberGroupPost] = []
     @State private var drafts: [MemberGroupPost] = []
+    @State private var draftsFailed = false
     @State private var isLoading = true
     @State private var failure: String?
     @State private var actionFailure: String?
@@ -360,7 +361,18 @@ struct GroupDetailView: View {
             if !whatsappReady {
                 IntegrationPendingNote("Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.")
             }
-            if !drafts.isEmpty {
+            if draftsFailed {
+                DICard {
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        Text("Drafts could not be loaded. Try again to see posts waiting for approval.")
+                            .font(.subheadline)
+                            .foregroundStyle(DIColor.textPrimary)
+                        Button("Try again") { Task { await load() } }
+                            .buttonStyle(.bordered)
+                    }
+                }
+            }
+            if !draftsFailed && !drafts.isEmpty {
                 DISectionHeader(titleKey: "Waiting for approval", systemImage: "tray.full")
                 ForEach(drafts) { draft in
                     GroupDraftCard(draft: draft) { title, body in
@@ -386,7 +398,7 @@ struct GroupDetailView: View {
     /// line beneath comes from what the page has already loaded.
     private var adminTiles: [HalqahTileItem] {
         let unreadCount = detail?.unreadDuaRequests ?? 0
-        let draftCount = drafts.count
+        let draftCount = draftsFailed ? 0 : drafts.count
         let postLine: Text = draftCount > 0 ? Text("Drafts waiting: \(draftCount)") : Text("Pictures, videos and messages")
         let duaLine: Text = unreadCount > 0 ? Text("\(unreadCount) new") : Text("No new requests")
         var tiles: [HalqahTileItem] = []
@@ -524,6 +536,8 @@ struct GroupDetailView: View {
     private func load() async {
         isLoading = true
         failure = nil
+        draftsFailed = false
+        defer { isLoading = false }
         do {
             var loaded = try await service.detail(of: group.id)
             // The group's clock counts from when the answer arrived here, so a
@@ -531,12 +545,23 @@ struct GroupDetailView: View {
             loaded.live?.playback?.at = Date()
             detail = loaded
             posts = try await service.posts(in: group.id)
-            drafts = loaded.canManage ? ((try? await service.posts(in: group.id, drafts: true)) ?? []) : []
+            if loaded.canManage {
+                do {
+                    drafts = try await service.posts(in: group.id, drafts: true)
+                } catch is CancellationError {
+                    return
+                } catch {
+                    draftsFailed = true
+                }
+            } else {
+                drafts = []
+            }
             officialLive = await dependencies?.officialPlatform.currentLiveBroadcast(forceRefresh: true)
+        } catch is CancellationError {
+            return
         } catch {
             failure = error.localizedDescription
         }
-        isLoading = false
     }
 
     /// A refresh that never replaces the page with an error, for the
