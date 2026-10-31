@@ -58,13 +58,21 @@ struct AppearanceSettingsView: View {
 
     private var readerScaleSection: some View {
         Section {
-            Picker(selection: readerScaleBinding) {
-                ForEach(ReaderFontScale.allCases) { scale in
-                    Text(LocalizedStringKey(scale.settingsDisplayName)).tag(scale)
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text("Reader Text Size").foregroundStyle(DIColor.textPrimary)
+                Menu {
+                    Picker("Reader Text Size", selection: readerScaleBinding) {
+                        ForEach(ReaderFontScale.allCases) { scale in
+                            Text(LocalizedStringKey(scale.settingsDisplayName)).tag(scale)
+                        }
+                    }
+                } label: {
+                    Label(LocalizedStringKey(readerScaleBinding.wrappedValue.settingsDisplayName), systemImage: "chevron.up.chevron.down")
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-            } label: {
-                Text("Reader Text Size")
-                    .foregroundStyle(DIColor.textPrimary)
+                .buttonStyle(DISecondaryButtonStyle())
+                .accessibilityLabel(Text("Reader Text Size"))
+                .accessibilityValue(Text(LocalizedStringKey(readerScaleBinding.wrappedValue.settingsDisplayName)))
             }
             .listRowBackground(DIColor.surface)
         } header: {
