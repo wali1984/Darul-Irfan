@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -78,6 +78,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "companion" {
+            companionTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "settings" {
             settingsTour()
             return
@@ -286,6 +290,30 @@ final class RedesignScreenshotTests: XCTestCase {
             app.swipeUp()
             pause(1.5)
             shot("\(name)-\(index + 1)")
+        }
+    }
+
+    private func companionTour() {
+        selectTab(0)
+        guard seek("quick-tool-square.grid.2x2") else { return }
+        shot("tools")
+        for symbol in ["location.north.line", "calendar", "moon.haze", "star.circle", "hand.tap", "hands.and.sparkles", "sparkles", "square.grid.2x2", "checklist", "timer", "note.text"] {
+            scrollToTop()
+            if seek("tool-" + symbol) {
+                pause(2)
+                shot("tool-" + symbol)
+                scrollShots("tool-" + symbol, count: 2)
+                goBack()
+            }
+        }
+        goBack()
+        selectTab(4)
+        for entry in ["appearance", "notifications", "hijriCalendar"] {
+            scrollToTop()
+            if seek("settings-" + entry) {
+                shot("contrast-" + entry)
+                goBack()
+            }
         }
     }
 

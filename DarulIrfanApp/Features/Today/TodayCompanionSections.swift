@@ -61,6 +61,7 @@ struct TodayQuickTools: View {
             DIToolOrb(titleKey: title, systemImage: systemImage, gold: gold)
         }
         .buttonStyle(DIPressableStyle())
+        .accessibilityIdentifier("quick-tool-" + systemImage)
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
     }
 }

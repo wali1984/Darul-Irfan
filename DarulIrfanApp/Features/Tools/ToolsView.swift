@@ -63,6 +63,7 @@ struct ToolsView: View {
             ToolTile(title: title, systemImage: systemImage)
         }
         .buttonStyle(DIPressableStyle())
+        .accessibilityIdentifier("tool-" + systemImage)
     }
 }
 
