@@ -26,6 +26,8 @@ struct CalculationSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Calculation")
         .navigationBarTitleDisplayMode(.inline)
     }

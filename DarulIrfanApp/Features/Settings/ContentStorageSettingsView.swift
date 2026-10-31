@@ -24,6 +24,8 @@ struct ContentStorageSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Content & Storage")
         .navigationBarTitleDisplayMode(.inline)
         .task {

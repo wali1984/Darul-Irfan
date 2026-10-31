@@ -23,6 +23,8 @@ struct HijriSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Local moon sighting")
         .navigationBarTitleDisplayMode(.inline)
         .environment(\.timeZone, appState.activePlace?.timeZone ?? .current)
@@ -51,7 +53,7 @@ struct HijriSettingsView: View {
                 .listRowBackground(DIColor.surface)
             LabeledContent("Your local date") {
                 Text(hijriPreview)
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
                     .multilineTextAlignment(.trailing)
             }
             .listRowBackground(DIColor.surface)

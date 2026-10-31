@@ -62,6 +62,8 @@ struct PrivacySettingsView: View {
             .padding(DISpacing.md)
         }
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Privacy")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -110,7 +112,7 @@ private struct PrivacyChoicesCard: View {
                             Text("Share anonymously").tag(DiagnosticsConsent.granted)
                         }
                         .pickerStyle(.menu)
-                        .tint(DIColor.primary)
+                        .tint(DIColor.actionForeground)
                     }
                     Text("Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.")
                         .font(.footnote)

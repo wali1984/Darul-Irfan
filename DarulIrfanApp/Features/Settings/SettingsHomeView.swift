@@ -213,6 +213,8 @@ struct SettingsHomeView: View {
                 .diResponsiveWidth()
         }
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Settings")
     }
 }

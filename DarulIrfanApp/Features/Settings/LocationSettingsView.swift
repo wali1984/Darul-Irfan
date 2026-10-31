@@ -33,6 +33,8 @@ struct LocationSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Location")
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -94,7 +96,7 @@ struct LocationSettingsView: View {
                 } label: {
                     Label("Open Settings to Allow Location", systemImage: "gear")
                 }
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             } else {
                 Button {
@@ -109,7 +111,7 @@ struct LocationSettingsView: View {
                     }
                 }
                 .disabled(isRefreshingDevicePlace)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             }
         } header: {
@@ -212,7 +214,7 @@ struct LocationSettingsView: View {
                 Spacer(minLength: DISpacing.sm)
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                         .accessibilityHidden(true)
                 }
             }

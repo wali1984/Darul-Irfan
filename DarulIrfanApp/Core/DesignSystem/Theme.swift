@@ -41,6 +41,8 @@ enum DIColor {
     static let scripture = Color(light: 0x064B34, dark: 0x86DAB4)
     /// Seal emerald; brand mark, primary actions, selected states.
     static let primary = Color(light: 0x0B7250, dark: 0x1E9068)
+    /// Emerald text and icons on paper surfaces; separate from filled controls.
+    static let actionForeground = Color(light: 0x0B7250, dark: 0x86DAB4)
     /// Forest emerald; seal ring, pressed states, gradients, hero fills.
     static let primaryDeep = Color(light: 0x064B34, dark: 0x0B6E4F)
     /// The site's true gold; highlights, dividers, current-prayer marker, accents.

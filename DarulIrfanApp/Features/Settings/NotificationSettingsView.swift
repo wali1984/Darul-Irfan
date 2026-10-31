@@ -55,6 +55,8 @@ struct NotificationSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Notifications")
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -142,7 +144,7 @@ struct NotificationSettingsView: View {
                     }
                 }
                 .disabled(viewModel.isRequestingPermission)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             case .denied:
                 Button {
@@ -152,7 +154,7 @@ struct NotificationSettingsView: View {
                 } label: {
                     Label("Open Settings to Allow Notifications", systemImage: "gear")
                 }
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             case .authorized, .unknown:
                 EmptyView()
@@ -169,7 +171,7 @@ struct NotificationSettingsView: View {
             switch viewModel.permission {
             case .authorized:
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
             case .denied:
                 Image(systemName: "bell.slash.fill")
                     .foregroundStyle(DIColor.danger)
@@ -487,7 +489,7 @@ struct NotificationSettingsView: View {
                 Label("Send a test reminder", systemImage: "bell.and.waves.left.and.right")
             }
             .disabled(viewModel.permission != .authorized)
-            .foregroundStyle(DIColor.primary)
+            .foregroundStyle(DIColor.actionForeground)
             .listRowBackground(DIColor.surface)
             if viewModel.testReminderSent {
                 Text("A test reminder will arrive in about five seconds. Lock the phone or leave the app to see it as you would a prayer alert.")
@@ -509,7 +511,7 @@ struct NotificationSettingsView: View {
             } label: {
                 Label("Preview Alert Sound", systemImage: "speaker.wave.2.fill")
             }
-            .foregroundStyle(DIColor.primary)
+            .foregroundStyle(DIColor.actionForeground)
             .listRowBackground(DIColor.surface)
 
             if viewModel.chimeUnavailable {
@@ -529,7 +531,7 @@ struct NotificationSettingsView: View {
                         Label("Play Full Azan", systemImage: "play.fill")
                     }
                 }
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             }
 
@@ -543,7 +545,7 @@ struct NotificationSettingsView: View {
                         Label("Play Fajr Azan", systemImage: "play.fill")
                     }
                 }
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             }
 

@@ -38,6 +38,8 @@ struct ManualOffsetsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Manual Adjustments")
         .navigationBarTitleDisplayMode(.inline)
     }

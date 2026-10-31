@@ -22,6 +22,8 @@ struct AppearanceSettingsView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Appearance")
         .navigationBarTitleDisplayMode(.inline)
     }
