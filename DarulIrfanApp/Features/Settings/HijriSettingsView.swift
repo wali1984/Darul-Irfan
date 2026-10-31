@@ -74,7 +74,8 @@ struct HijriSettingsView: View {
                 increase: { offsetBinding.wrappedValue = min(2, offsetBinding.wrappedValue + 1) }
             )
             .listRowBackground(DIColor.surface)
-            Button("Use calculated date") { offsetBinding.wrappedValue = 0 }
+            Button("Use calculated date") { DIHaptics.soft(); offsetBinding.wrappedValue = 0 }
+                .buttonStyle(DISecondaryButtonStyle())
                 .disabled(appState.settings.hijri.dayOffset == 0)
                 .listRowBackground(DIColor.surface)
         } header: {

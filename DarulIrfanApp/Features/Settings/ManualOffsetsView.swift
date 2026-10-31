@@ -24,13 +24,18 @@ struct ManualOffsetsView: View {
 
             if hasAnyOffset {
                 Section {
-                    Button("Reset All Offsets", role: .destructive) {
+                    Button(role: .destructive) {
+                        DIHaptics.soft()
                         Task {
                             await appState.updateSettings { settings in
                                 settings.calculation.adjustments = .none
                             }
                         }
+                    } label: {
+                        Text("Reset All Offsets").frame(maxWidth: .infinity)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
+                    .buttonStyle(DICompactButtonStyle(destructive: true, minimumHeight: 50))
                     .listRowBackground(DIColor.surface)
                 }
             }
