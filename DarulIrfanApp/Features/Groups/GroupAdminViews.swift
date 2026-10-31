@@ -115,6 +115,8 @@ struct GroupPostComposer: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("New post")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
@@ -286,6 +288,8 @@ struct GroupLiveStarter: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(addingToSession ? "Add to the session" : "Go live")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
@@ -596,6 +600,8 @@ struct GroupMeetingScheduler: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Schedule a meeting")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
@@ -629,6 +635,7 @@ struct GroupZikrEditor: View {
     }
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     @State private var title = String(localized: "Halqah Zikr")
     @State private var timing: Timing = .clock
     @State private var time = Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: Date()) ?? Date()
@@ -676,7 +683,7 @@ struct GroupZikrEditor: View {
                 }
             }
             Section("Days") {
-                let symbols = Calendar.current.weekdaySymbols
+                let symbols = weekdayNames
                 ForEach(1...7, id: \.self) { day in
                     Toggle(isOn: Binding(
                         get: { weekdays.contains(day) },
@@ -696,10 +703,18 @@ struct GroupZikrEditor: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Zikr time")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         .task { library = try? await service.recordings(in: groupID) }
+    }
+
+    private var weekdayNames: [String] {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        return calendar.weekdaySymbols
     }
 
     private func save() async {

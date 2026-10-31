@@ -20197,19 +20197,19 @@
         }
       }
     },
-    "%@ will be added to %@ when they sign in with Apple using this email.": {
+    "%@ will be added to %@ when they sign in using this email.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ will be added to %@ when they sign in with Apple using this email."
+            "value": "%@ will be added to %@ when they sign in using this email."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ کو %@ میں اس وقت شامل کر دیا جائے گا جب وہ اسی ای میل کے ساتھ ایپل سے سائن اِن کریں گے۔"
+            "value": "%@ کو %@ میں اس وقت شامل کر دیا جائے گا جب وہ اسی ای میل کے ساتھ سائن اِن کریں گے۔"
           }
         }
       }
@@ -20350,19 +20350,19 @@
         }
       }
     },
-    "Added when they sign in with Apple": {
+    "Added when they sign in": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Added when they sign in with Apple"
+            "value": "Added when they sign in"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "ایپل سے سائن اِن کرتے ہی شامل ہو جائیں گے"
+            "value": "سائن اِن کرتے ہی شامل ہو جائیں گے"
           }
         }
       }
@@ -20911,19 +20911,19 @@
         }
       }
     },
-    "They are added as soon as they sign in with Apple using this email, or at once if they already have. If they hide their email from apps, send a code instead.": {
+    "They are added as soon as they sign in using this email, or at once if they already have. If they hide their email from apps, send a code instead.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "They are added as soon as they sign in with Apple using this email, or at once if they already have. If they hide their email from apps, send a code instead."
+            "value": "They are added as soon as they sign in using this email, or at once if they already have. If they hide their email from apps, send a code instead."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "وہ اسی ای میل کے ساتھ ایپل سے سائن اِن کرتے ہی شامل ہو جائیں گے، یا اگر پہلے سے سائن اِن ہیں تو فوراً۔ اگر وہ ایپس سے اپنی ای میل چھپاتے ہیں تو اس کے بجائے کوڈ بھیجیں۔"
+            "value": "وہ اسی ای میل کے ساتھ سائن اِن کرتے ہی شامل ہو جائیں گے، یا اگر پہلے سے سائن اِن ہیں تو فوراً۔ اگر وہ ایپس سے اپنی ای میل چھپاتے ہیں تو اس کے بجائے کوڈ بھیجیں۔"
           }
         }
       }
@@ -25652,6 +25652,13 @@
             "value": "سائن اِن کرنے والے"
           }
         }
+      }
+    },
+    "Starts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "Starts" } },
+        "ur": { "stringUnit": { "state": "translated", "value": "آغاز" } }
       }
     },
     "Starts a zikr or meeting for the whole Halqah.": {

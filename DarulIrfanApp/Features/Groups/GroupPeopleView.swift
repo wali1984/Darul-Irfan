@@ -66,6 +66,8 @@ struct GroupPeopleView: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Members")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
@@ -166,7 +168,7 @@ struct GroupPeopleView: View {
                 }
                 Group {
                     if invitation.kind == "email" {
-                        Text("Added when they sign in with Apple")
+                        Text("Added when they sign in")
                     } else if let expires = invitation.expiresAt {
                         Text("Code, until \(expires.formatted(date: .abbreviated, time: .omitted))")
                     }
@@ -248,6 +250,8 @@ struct AddGroupPersonView: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Add people")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -283,7 +287,7 @@ struct AddGroupPersonView: View {
         } footer: {
             switch method {
             case .email:
-                Text("They are added as soon as they sign in with Apple using this email, or at once if they already have. If they hide their email from apps, send a code instead.")
+                Text("They are added as soon as they sign in using this email, or at once if they already have. If they hide their email from apps, send a code instead.")
             case .phone:
                 Text("A single-use code is made for them, and you send it from your phone by text message or another app.")
             case .code:
@@ -367,7 +371,7 @@ struct AddGroupPersonView: View {
         case "pending":
             Section {
                 Label {
-                    Text("\(email) will be added to \(groupName) when they sign in with Apple using this email.")
+                    Text("\(email) will be added to \(groupName) when they sign in using this email.")
                 } icon: {
                     Image(systemName: "clock.badge.checkmark").foregroundStyle(DIColor.primary)
                 }

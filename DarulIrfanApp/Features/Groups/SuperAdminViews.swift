@@ -38,6 +38,8 @@ struct HalqahEditor: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(halqah == nil ? "New Halqah" : "Edit Halqah")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
@@ -119,6 +121,8 @@ struct MemberDirectoryView: View {
         .searchable(text: $search, prompt: Text("Name, email or Halqah"))
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Everyone who has signed in")
         .navigationBarTitleDisplayMode(.inline)
         .task { await load() }
@@ -206,6 +210,8 @@ struct DirectoryPersonView: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(Text(verbatim: person.displayName))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(working)
