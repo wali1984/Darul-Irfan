@@ -75,7 +75,7 @@ struct AyahTafsirSheet: View {
 
                 Text(ayah.textArabic)
                     .font(DIFont.quranArabic(scale: 0.85 * fontScale))
-                    .foregroundStyle(DIColor.primaryDeep)
+                    .foregroundStyle(DIColor.scripture)
                     .multilineTextAlignment(.center)
                     .lineSpacing(6)
                     .frame(maxWidth: .infinity)

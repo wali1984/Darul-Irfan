@@ -1154,7 +1154,7 @@ private struct AyahCardView: View {
         Text(arabicAttributedText)
             .font(DIFont.quranArabic(scale: fontScale * 1.15))
             .lineSpacing(CGFloat(18 * fontScale))
-            .foregroundStyle(DIColor.textPrimary)
+            .foregroundStyle(DIColor.scripture)
             .diGoldGlow(radius: 5, opacity: 0.18)
             .textSelection(.enabled)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -1173,7 +1173,7 @@ private struct AyahCardView: View {
         }
         var word = AttributedString(pieces.word)
         word.backgroundColor = DIColor.accent.opacity(0.30)
-        word.foregroundColor = DIColor.primaryDeep
+        word.foregroundColor = DIColor.scripture
         var result = AttributedString(pieces.before)
         result += word
         result += AttributedString(pieces.after)

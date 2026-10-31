@@ -115,6 +115,7 @@ struct HifzView: View {
             } else {
                 Text(text)
                     .font(DIFont.quranArabic(scale: 1.15))
+                    .foregroundStyle(DIColor.scripture)
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .environment(\.layoutDirection, .rightToLeft)
