@@ -160,14 +160,14 @@ private struct FeaturedDuaCard: View {
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .environment(\.layoutDirection, .rightToLeft)
 
-                if let english = dua.translationEnglish {
-                    Text(verbatim: english)
-                        .font(.subheadline)
+                if let translation = DailyNoorText.translation(urdu: dua.translationUrdu, english: dua.translationEnglish, readsUrdu: DIBrand.readsUrdu(locale)) {
+                    Text(verbatim: translation)
+                        .font(DIBrand.readsUrdu(locale) ? DIFont.urduBody() : .subheadline)
                         .foregroundStyle(.white.opacity(0.92))
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Text(verbatim: dua.source)
+                Text(verbatim: DailyNoorText.reference(dua.source, urdu: DIBrand.readsUrdu(locale)))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIColor.goldGlow)
             }
@@ -193,7 +193,7 @@ private struct DuaCard: View {
 
                 Text(verbatim: dua.arabic)
                     .font(DIFont.quranArabic())
-                    .foregroundStyle(DIColor.textPrimary)
+                    .foregroundStyle(DIColor.scripture)
                     .diGoldGlow(radius: 6, opacity: 0.22)
                     .lineSpacing(8)
                     .fixedSize(horizontal: false, vertical: true)
@@ -205,7 +205,7 @@ private struct DuaCard: View {
                         .padding(.vertical, DISpacing.xs)
                 }
 
-                if let english = dua.translationEnglish {
+                if !DIBrand.readsUrdu(locale), let english = dua.translationEnglish {
                     Text(verbatim: english)
                         .font(.body)
                         .foregroundStyle(DIColor.textPrimary)
@@ -221,7 +221,7 @@ private struct DuaCard: View {
                         .environment(\.layoutDirection, .rightToLeft)
                 }
 
-                DIPillBadge(text: dua.source, color: DIColor.accent)
+                DIPillBadge(text: DailyNoorText.reference(dua.source, urdu: DIBrand.readsUrdu(locale)), color: DIColor.accent)
             }
         }
     }

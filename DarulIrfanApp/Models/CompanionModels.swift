@@ -11,6 +11,11 @@ struct NameOfAllah: Codable, Sendable, Identifiable, Equatable {
     var transliteration: String
     var meaningEnglish: String
     var meaningUrdu: String?
+
+    func meaning(urdu: Bool) -> String {
+        if urdu, let meaningUrdu, !meaningUrdu.isEmpty { return meaningUrdu }
+        return DailyNoorText.localized(meaningEnglish, urdu: urdu)
+    }
 }
 
 /// A dua with verified source (Quranic duas are public-domain Arabic text).

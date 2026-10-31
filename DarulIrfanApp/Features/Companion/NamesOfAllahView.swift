@@ -88,6 +88,8 @@ struct NamesOfAllahView: View {
 // MARK: - Featured "Name of the Day"
 
 private struct FeaturedNameCard: View {
+    @Environment(\.locale) private var locale
+    private var readsUrdu: Bool { DIBrand.readsUrdu(locale) }
     let name: NameOfAllah
     let onTap: () -> Void
 
@@ -123,8 +125,8 @@ private struct FeaturedNameCard: View {
                         .font(DIFont.subheading)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .center)
-                    Text(verbatim: name.meaningEnglish)
-                        .font(.subheadline)
+                    Text(verbatim: name.meaning(urdu: readsUrdu))
+                        .font(readsUrdu ? DIFont.urduBody() : .subheadline)
                         .foregroundStyle(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -137,7 +139,7 @@ private struct FeaturedNameCard: View {
         }
         .buttonStyle(DIPressableStyle())
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Name of the Day: \(name.transliteration), \(name.meaningEnglish)")
+        .accessibilityLabel("Name of the Day: \(name.transliteration), \(name.meaning(urdu: readsUrdu))")
         .accessibilityHint("Shows the name enlarged")
     }
 }
@@ -145,6 +147,8 @@ private struct FeaturedNameCard: View {
 // MARK: - Grid cell
 
 private struct NameOfAllahCell: View {
+    @Environment(\.locale) private var locale
+    private var readsUrdu: Bool { DIBrand.readsUrdu(locale) }
     let name: NameOfAllah
 
     var body: some View {
@@ -156,15 +160,15 @@ private struct NameOfAllahCell: View {
                     .frame(maxWidth: .infinity, alignment: .trailing)
                 Text(verbatim: name.arabic)
                     .font(DIFont.quranArabic())
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.scripture)
                     .diGoldGlow(radius: 7, opacity: 0.3)
                     .multilineTextAlignment(.center)
                 Text(verbatim: name.transliteration)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.center)
-                Text(verbatim: name.meaningEnglish)
-                    .font(.caption)
+                Text(verbatim: name.meaning(urdu: readsUrdu))
+                    .font(readsUrdu ? DIFont.urduBody(scale: 0.85) : .caption)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -179,6 +183,8 @@ private struct NameOfAllahCell: View {
 // MARK: - Enlarged detail
 
 private struct NameOfAllahDetailView: View {
+    @Environment(\.locale) private var locale
+    private var readsUrdu: Bool { DIBrand.readsUrdu(locale) }
     let name: NameOfAllah
 
     var body: some View {
@@ -192,7 +198,7 @@ private struct NameOfAllahDetailView: View {
                         .frame(width: 240, height: 240)
                     Text(verbatim: name.arabic)
                         .font(DIFont.quranArabic(scale: 2.2))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.scripture)
                         .diGoldGlow(radius: 16, opacity: 0.5)
                         .multilineTextAlignment(.center)
                 }
@@ -206,12 +212,12 @@ private struct NameOfAllahDetailView: View {
                 DIJaliDivider(height: 16, opacity: 0.4)
                     .padding(.horizontal, DISpacing.xl)
 
-                Text(verbatim: name.meaningEnglish)
-                    .font(.title3)
+                Text(verbatim: name.meaning(urdu: readsUrdu))
+                    .font(readsUrdu ? DIFont.urduBody(scale: 1.2) : .title3)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
-                if let meaningUrdu = name.meaningUrdu {
+                if !readsUrdu, let meaningUrdu = name.meaningUrdu {
                     Text(verbatim: meaningUrdu)
                         .font(DIFont.urduBody(scale: 1.2))
                         .foregroundStyle(DIColor.textPrimary)
