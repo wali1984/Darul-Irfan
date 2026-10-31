@@ -19,7 +19,7 @@ struct LaunchView: View {
                         .foregroundStyle(DIColor.onPrimary)
                         .diGoldGlow(radius: 14, opacity: 0.5)
 
-                    Text("Darul Irfan")
+                    Text(verbatim: "Darul Irfan")
                         .font(.system(.title, design: .serif).weight(.semibold))
                         .tracking(2)
                         .foregroundStyle(DIColor.onPrimary.opacity(0.95))
