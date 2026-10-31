@@ -31,7 +31,7 @@ struct CityWeatherSnapshot: Codable, Sendable {
     }
     static func temperature(_ celsius: Double, unit: String, locale: Locale = .current) -> String {
         let value = unit == "F" ? celsius * 9 / 5 + 32 : celsius
-        let format = NumberFormatter(); format.locale = locale; format.maximumFractionDigits = 0
+        let format = NumberFormatter(); format.locale = DisplayNumerals.locale(locale); format.maximumFractionDigits = 0
         return "\(format.string(from: NSNumber(value: value)) ?? "")°\(unit == "F" ? "F" : "C")"
     }
 }

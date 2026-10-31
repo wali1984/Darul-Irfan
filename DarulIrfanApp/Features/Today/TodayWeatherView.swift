@@ -45,7 +45,7 @@ struct TodayWeatherView: View {
                                     .font(.system(size: 44, weight: .light).monospacedDigit()).foregroundStyle(DIColor.primary)
                             }.frame(maxWidth: .infinity).padding(.vertical, 12)
                             LabeledContent("Feels like") { Text(verbatim: CityWeatherSnapshot.temperature(snapshot.feelsLikeCelsius, unit: unit, locale: locale)) }
-                            LabeledContent("Humidity") { Text(verbatim: "\(Int((snapshot.humidity * 100).rounded()))%") }
+                            LabeledContent("Humidity") { Text(verbatim: DisplayNumerals.text("\(Int((snapshot.humidity * 100).rounded()))%", locale: locale)) }
                             LabeledContent("Updated") { Text(snapshot.observedAt, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)) }
                         }
                         LabeledContent("Temperature unit") { Text("Follows phone settings") }

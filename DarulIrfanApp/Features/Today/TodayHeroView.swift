@@ -180,9 +180,11 @@ struct TodayHeroView: View {
     @ViewBuilder
     private func timer(to target: Date, now: Date) -> some View {
         if scenePhase == .active && target > now {
-            Text(timerInterval: now...target, countsDown: true)
-                .monospacedDigit()
-                .fixedSize()
+            TimelineView(.periodic(from: now, by: 1)) { context in
+                Text(verbatim: DisplayNumerals.countdown(target.timeIntervalSince(context.date), locale: locale))
+                    .monospacedDigit()
+                    .fixedSize()
+            }
         } else {
             Text("Prayer time")
                 .fixedSize(horizontal: false, vertical: true)

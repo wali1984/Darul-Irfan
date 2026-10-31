@@ -210,7 +210,7 @@ final class PrayerViewModel {
     func timeText(_ date: Date) -> String {
         let timeZone = appState.activePlace?.timeZone ?? TimeZone.current
         let style = Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)
-        return date.formatted(style)
+        return date.formatted(style.locale(LanguageManager.locale(for: appState.settings.language)))
     }
 
     /// True when this row is the upcoming prayer (matches both prayer and
