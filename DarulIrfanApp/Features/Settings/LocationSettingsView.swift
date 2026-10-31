@@ -9,6 +9,7 @@ struct LocationSettingsView: View {
     private let appState: AppState
     @State private var viewModel: LocationSettingsViewModel
     @State private var isRefreshingDevicePlace = false
+    @State private var deviceUpdateFailed = false
     @AppStorage("today.weather.enabled") private var weatherEnabled = true
     @Environment(\.openURL) private var openURL
 
@@ -26,6 +27,8 @@ struct LocationSettingsView: View {
             manualSection
             Section {
                 Toggle("Weather on Today", isOn: $weatherEnabled)
+                    .frame(minHeight: 48)
+                    .listRowBackground(DIColor.surface)
             } footer: {
                 Text("Apple Weather uses your selected city's approximate location. Precise device coordinates are not sent.")
             }
@@ -41,6 +44,7 @@ struct LocationSettingsView: View {
             await viewModel.refreshAuthorizationStatus()
         }
         .onChange(of: appState.settings.locationMode) { _, mode in
+            deviceUpdateFailed = false
             // A fresh fix rather than the last place this phone was found
             // at, which would otherwise drive the times until the app next
             // comes to the foreground.
@@ -111,6 +115,13 @@ struct LocationSettingsView: View {
                 .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             }
+            if deviceUpdateFailed && viewModel.authorization != .denied {
+                Text("We couldn't determine your location right now. Please try again in a moment, or choose your city manually below.")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .listRowBackground(DIColor.surface)
+            }
         } header: {
             SettingsSectionHeader(titleKey: "Current Location", systemImage: "location.fill")
         } footer: {
@@ -125,11 +136,13 @@ struct LocationSettingsView: View {
     private func updateDevicePlace() {
         guard !isRefreshingDevicePlace else { return }
         isRefreshingDevicePlace = true
+        deviceUpdateFailed = false
         Task {
             if viewModel.authorization == .notDetermined {
                 await viewModel.requestPermission()
             }
-            await appState.refreshDevicePlaceIfNeeded()
+            let succeeded = await appState.refreshDevicePlace()
+            deviceUpdateFailed = !succeeded && appState.settings.locationMode == .device
             await viewModel.refreshAuthorizationStatus()
             isRefreshingDevicePlace = false
         }

@@ -90,13 +90,19 @@ final class AppState {
     /// city precision (~1.1 km) before comparison and persistence, so the
     /// app never stores a precise location and unchanged fixes are no-ops.
     func refreshDevicePlaceIfNeeded() async {
-        guard settings.locationMode == .device else { return }
-        guard let place = try? await dependencies.location.currentPlace() else { return }
+        _ = await refreshDevicePlace()
+    }
+
+    /// User-initiated refreshes can report failure while background refreshes remain quiet.
+    func refreshDevicePlace() async -> Bool {
+        guard settings.locationMode == .device else { return false }
+        guard let place = try? await dependencies.location.currentPlace() else { return false }
+        // Do not apply a request after the user has switched to a manual city.
+        guard settings.locationMode == .device else { return false }
         let rounded = place.roundedToCityPrecision()
-        guard rounded != settings.lastKnownPlace else { return }
-        // updateSettings refreshes notifications/widgets via the
-        // lastKnownPlace change; nothing further needed.
+        guard rounded != settings.lastKnownPlace else { return true }
         await updateSettings { $0.lastKnownPlace = rounded }
+        return true
     }
 
     // MARK: - Side effects
