@@ -954,22 +954,26 @@ struct BookKeepOfflineRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "arrow.down.to.line")
-                .font(.title3)
-                .foregroundStyle(ReadPalette.goldLine)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 1) {
-                Text("Keep it on this phone")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(DIColor.textPrimary)
-                subtitle
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            HStack(spacing: 12) {
+                Image(systemName: "arrow.down.to.line")
+                    .font(.title3)
+                    .foregroundStyle(ReadPalette.goldLine)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Keep it on this phone")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(DIColor.textPrimary)
+                    subtitle
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            Spacer(minLength: DISpacing.sm)
-            trailingControls
+            HStack {
+                Spacer(minLength: 0)
+                trailingControls
+            }
         }
-        .padding(.horizontal, 12)
-        .frame(minHeight: 56)
+        .padding(12)
     }
 
     @ViewBuilder
