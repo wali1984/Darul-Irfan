@@ -176,17 +176,17 @@ struct HalqahListRowLabel: View {
     var body: some View {
         HStack(spacing: 12) {
             HalqahRowTile(systemImage: systemImage, tint: tint, mirrors: mirrorsSymbol)
-            Text(titleKey)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(tint == .danger ? DIColor.danger : DIColor.textPrimary)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: DISpacing.sm)
-            if let value {
-                value
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(DIColor.textMuted)
-                    .lineLimit(1)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: DISpacing.sm) {
+                    rowTitle.fixedSize()
+                    Spacer(minLength: DISpacing.sm)
+                    if let value { rowValue(value).fixedSize() }
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    rowTitle.fixedSize(horizontal: false, vertical: true)
+                    if let value { rowValue(value).fixedSize(horizontal: false, vertical: true) }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             if showsChevron {
                 Image(systemName: chevronSymbol)
@@ -200,6 +200,20 @@ struct HalqahListRowLabel: View {
         .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
         .contentShape(Rectangle())
     }
+
+    private var rowTitle: some View {
+        Text(titleKey)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(tint == .danger ? DIColor.danger : DIColor.textPrimary)
+            .multilineTextAlignment(.leading)
+    }
+
+    private func rowValue(_ value: Text) -> some View {
+        value.font(.subheadline.weight(.medium))
+            .foregroundStyle(DIColor.textMuted)
+            .multilineTextAlignment(.leading)
+    }
+
 }
 
 // MARK: - The turning star
