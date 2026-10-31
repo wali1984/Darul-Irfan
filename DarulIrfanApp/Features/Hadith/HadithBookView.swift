@@ -348,10 +348,7 @@ struct HadithBookView: View {
                     urduSplitView(entry)
                 } else if let text = entry.text(languageCode: languageCode) {
                     if languageCode == "ur" {
-                        Text(verbatim: text)
-                            .font(DIFont.urduBody(scale: fontScale))
-                            .lineSpacing(CGFloat(6 * fontScale))
-                            .foregroundStyle(DIColor.textPrimary)
+                        FormattedBookPage(page: BookPageFormatter.articleParagraph(text), scale: fontScale)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .environment(\.layoutDirection, .rightToLeft)
                             .textSelection(.enabled)
