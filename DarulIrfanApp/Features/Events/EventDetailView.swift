@@ -5,7 +5,14 @@ import SwiftUI
 /// exist), with all event information presented natively.
 @MainActor
 struct EventDetailView: View {
+    @Environment(\.locale) private var locale
     @State private var viewModel: EventDetailViewModel
+
+    private var urduTitle: String? {
+        guard locale.language.languageCode?.identifier == "ur",
+              let title = viewModel.event.titleUrdu, !title.isEmpty else { return nil }
+        return title
+    }
 
     init(event: CommunityEvent, notifications: any NotificationScheduling) {
         _viewModel = State(initialValue: EventDetailViewModel(event: event, notifications: notifications))
@@ -94,12 +101,12 @@ struct EventDetailView: View {
                     Spacer(minLength: 0)
                 }
 
-                Text(verbatim: viewModel.event.title)
-                    .font(DIFont.heading)
+                Text(verbatim: urduTitle ?? viewModel.event.title)
+                    .font(urduTitle == nil ? DIFont.heading : DIFont.urduBody(scale: 1.15).weight(.bold))
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if let titleUrdu = viewModel.event.titleUrdu {
+                if urduTitle == nil, let titleUrdu = viewModel.event.titleUrdu {
                     Text(verbatim: titleUrdu)
                         .font(DIFont.urduBody())
                         .foregroundStyle(.white.opacity(0.92))
