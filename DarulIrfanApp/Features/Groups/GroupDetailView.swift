@@ -689,6 +689,9 @@ private struct GroupZikrRow: View {
     let onRemove: () -> Void
 
     @State private var reminderOn = false
+    @State private var reminderBlocked = false
+    @State private var reminderWorking = false
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.locale) private var locale
     @ScaledMetric(relativeTo: .title3) private var iconBox: CGFloat = 40
@@ -730,9 +733,20 @@ private struct GroupZikrRow: View {
                         .font(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
-                Toggle("Remind me", isOn: $reminderOn)
+                Toggle("Remind me", isOn: Binding(
+                    get: { reminderOn },
+                    set: { on in Task { await setReminder(on) } }
+                ))
                     .tint(DIColor.primary)
-                    .onChange(of: reminderOn) { _, on in Task { await setReminder(on) } }
+                    .disabled(reminderWorking)
+                if reminderBlocked {
+                    Text("Notifications are off for Darul Irfan. Allow them in iOS Settings to receive Halqah notifications.")
+                        .font(.footnote).foregroundStyle(DIColor.textMuted)
+                    Button("Open Settings") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                    }
+                    .buttonStyle(DICompactButtonStyle())
+                }
                 if canManage {
                     Button("Remove this time", role: .destructive, action: onRemove)
                         .font(.footnote)
@@ -740,14 +754,28 @@ private struct GroupZikrRow: View {
             }
         }
         .halqahCard()
-        .onAppear { reminderOn = UserDefaults.standard.bool(forKey: reminderKey) }
+        .task(id: reminderKey) { await refreshReminder() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await refreshReminder() } }
+        }
     }
 
     /// A week of reminders, set again each time this row appears: one
     /// reminder used to fire once and then stay silent until the page was
     /// opened again.
-    private func setReminder(_ on: Bool) async {
-        UserDefaults.standard.set(on, forKey: reminderKey)
+    private func refreshReminder() async {
+        guard !reminderWorking else { return }
+        if let notifications = dependencies?.notifications, await notifications.notificationsAllowed() {
+            reminderBlocked = false
+        }
+        await setReminder(UserDefaults.standard.bool(forKey: reminderKey), clearBlocked: false)
+    }
+
+    private func setReminder(_ on: Bool, clearBlocked: Bool = true) async {
+        guard !reminderWorking else { return }
+        reminderWorking = true
+        defer { reminderWorking = false }
+        if clearBlocked { reminderBlocked = false }
         guard let notifications = dependencies?.notifications else { return }
         if on, await notifications.requestPermission() {
             await ZikrReminders.schedule(
@@ -757,9 +785,13 @@ private struct GroupZikrRow: View {
                 notifications: notifications,
                 calculator: dependencies?.prayerCalculation
             )
+            reminderOn = true
         } else {
+            if on { reminderBlocked = true }
+            reminderOn = false
             await notifications.cancelReminder(id: reminderKey)
         }
+        UserDefaults.standard.set(reminderOn, forKey: reminderKey)
     }
 }
 

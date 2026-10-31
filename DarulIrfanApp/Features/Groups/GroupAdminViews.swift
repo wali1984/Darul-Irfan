@@ -749,17 +749,16 @@ struct GroupZikrEditor: View {
                 }
                 if timing == .clock, let library, !(library.recordings.isEmpty && library.pastVideos.isEmpty) {
                     Section {
-                        Picker("Plays by itself", selection: $autoplay) {
-                            Text("Nothing: an admin starts it").tag(GroupQueueEntry?.none)
-                            ForEach(library.recordings) { recording in
-                                Text(verbatim: recording.title).tag(GroupQueueEntry?.some(.recording(recording.id)))
-                            }
-                            ForEach(library.pastVideos.prefix(20)) { video in
-                                Text(verbatim: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
-                                    .tag(GroupQueueEntry?.some(.video(video.videoID)))
+                        NavigationLink {
+                            GroupAutoplayChoices(library: library, selection: $autoplay)
+                        } label: {
+                            VStack(alignment: .leading, spacing: DISpacing.xs) {
+                                Text("Plays by itself").foregroundStyle(DIColor.textPrimary)
+                                Text(verbatim: autoplayTitle).font(.subheadline)
+                                    .foregroundStyle(DIColor.textMuted)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                         }
-                        .pickerStyle(.navigationLink)
                     } footer: {
                         Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.")
                     }
@@ -809,6 +808,16 @@ struct GroupZikrEditor: View {
         }
     }
 
+    private var autoplayTitle: String {
+        switch autoplay {
+        case .recording(let id): return library?.recordings.first { $0.id == id }?.title ?? id
+        case .video(let id): return library?.pastVideos.first { $0.videoID == id }.map {
+            "\($0.title) · \($0.publishedAt.formatted(date: .abbreviated, time: .omitted))"
+        } ?? id
+        case nil: return String(localized: "Nothing: an admin starts it")
+        }
+    }
+
     private var weekdayNames: [String] {
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = locale
@@ -843,5 +852,49 @@ struct GroupZikrEditor: View {
         } catch {
             self.error = error.localizedDescription
         }
+    }
+}
+
+/// Full titles stay readable at large text sizes while preserving the selected item.
+private struct GroupAutoplayChoices: View {
+    let library: GroupRecordingLibrary
+    @Binding var selection: GroupQueueEntry?
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            Group {
+                choice(nil, title: String(localized: "Nothing: an admin starts it"))
+                ForEach(library.recordings) { recording in
+                    choice(.recording(recording.id), title: recording.title)
+                }
+                ForEach(library.pastVideos.prefix(20)) { video in
+                    choice(.video(video.videoID), title: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
+                }
+            }
+            .listRowBackground(DIColor.surface)
+        }
+        .scrollContentBackground(.hidden)
+        .diScreenBackground()
+        .navigationTitle("Plays by itself")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func choice(_ entry: GroupQueueEntry?, title: String) -> some View {
+        Button {
+            selection = entry
+            dismiss()
+        } label: {
+            HStack {
+                Text(verbatim: title).foregroundStyle(DIColor.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: DISpacing.sm)
+                if entry == selection {
+                    Image(systemName: "checkmark").foregroundStyle(DIColor.actionForeground)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(entry == selection ? .isSelected : [])
     }
 }
