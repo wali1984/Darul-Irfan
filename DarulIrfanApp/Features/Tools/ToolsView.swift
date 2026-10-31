@@ -7,7 +7,10 @@ struct ToolsView: View {
     let dependencies: AppDependencies
     let appState: AppState
 
-    private let columns = [GridItem(.adaptive(minimum: 104), spacing: DISpacing.sm)]
+    @ScaledMetric(relativeTo: .caption) private var minimumTileWidth = 104.0
+    private var columns: [GridItem] {
+        [GridItem(.adaptive(minimum: max(104, minimumTileWidth)), spacing: DISpacing.sm)]
+    }
 
     var body: some View {
         ScrollView {
@@ -86,19 +89,20 @@ struct ToolTile: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .minimumScaleFactor(0.85)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, minHeight: 92)
         .padding(.vertical, DISpacing.sm)
+        .padding(.horizontal, DISpacing.xs)
         .background(
             RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
                 .fill(DIColor.surface)
         )
         .overlay(
             RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                .stroke(DIColor.border, lineWidth: 1)
+                .stroke(LinearGradient(colors: [DIColor.accent.opacity(0.45), DIColor.border], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
         )
+        .shadow(color: DIColor.primaryDeep.opacity(0.12), radius: 8, x: 0, y: 4)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
     }
