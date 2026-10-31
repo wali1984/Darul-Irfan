@@ -107,7 +107,7 @@ struct TopicDetailView: View {
                         of: "[0-9]+:[0-9]+(?:-[0-9]+)?", with: "\u{2066}$0\u{2069}", options: .regularExpression
                     ))
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                     Spacer()
                     Button {
                         DIHaptics.soft()
@@ -117,6 +117,7 @@ struct TopicDetailView: View {
                             .font(.caption.weight(.semibold))
                     }
                     .buttonStyle(.borderless)
+                    .tint(DIColor.actionForeground)
                 }
             }
         }
@@ -259,13 +260,14 @@ private struct TopicHadithCard: View {
                 HStack(spacing: DISpacing.sm) {
                     Text(verbatim: reference)
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                     Spacer()
                     Button(expanded ? "Show less" : "Read more") {
                         withAnimation { expanded.toggle() }
                     }
                     .font(.caption.weight(.semibold))
                     .buttonStyle(.borderless)
+                    .tint(DIColor.actionForeground)
                     if let book = books[item.bookID] {
                         NavigationLink {
                             HadithBookView(
@@ -279,6 +281,7 @@ private struct TopicHadithCard: View {
                                 .font(.caption.weight(.semibold))
                         }
                         .buttonStyle(.borderless)
+                    .tint(DIColor.actionForeground)
                     }
                 }
             }

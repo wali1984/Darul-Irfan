@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -78,7 +78,7 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
-        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "companion" {
+        if ["companion", "companion-fixes"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             companionTour()
             return
         }
@@ -294,6 +294,7 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     private func companionTour() {
+        let focused = ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "companion-fixes"
         selectTab(0)
         guard seek("quick-tool-square.grid.2x2") else { return }
         shot("tools")
@@ -301,12 +302,20 @@ final class RedesignScreenshotTests: XCTestCase {
             scrollToTop()
             if seek("tool-" + symbol) {
                 pause(2)
+                if symbol == "calendar" {
+                    let firstDay = app.staticTexts["timetable-first-day"]
+                    XCTAssertTrue(firstDay.waitForExistence(timeout: 5))
+                    XCTAssertTrue(firstDay.label.contains("01"), "Month must start on day 01 in the selected city's timezone")
+                    assertRawalpindiMorning("timetable-first-fajr")
+                }
+                if symbol == "moon.haze" { assertRawalpindiMorning("fasting-suhoor") }
                 shot("tool-" + symbol)
-                scrollShots("tool-" + symbol, count: 2)
+                if !focused || symbol == "timer" { scrollShots("tool-" + symbol, count: 2) }
                 goBack()
             }
         }
         goBack()
+        if focused { return }
         selectTab(4)
         for entry in ["appearance", "notifications", "hijriCalendar"] {
             scrollToTop()
@@ -315,6 +324,17 @@ final class RedesignScreenshotTests: XCTestCase {
                 goBack()
             }
         }
+    }
+
+    /// Rawalpindi Fajr is in the morning all year; UTC rendering moves it
+    /// to the previous evening/midnight. Assert the rendered SwiftUI label,
+    /// because testing Date.FormatStyle alone misses its environment override.
+    private func assertRawalpindiMorning(_ identifier: String) {
+        let value = app.staticTexts[identifier]
+        XCTAssertTrue(value.waitForExistence(timeout: 5))
+        let hourText = value.label.split(separator: ":").first.map(String.init) ?? ""
+        let hour = Int(hourText.trimmingCharacters(in: .whitespacesAndNewlines)) ?? -1
+        XCTAssertTrue((3...6).contains(hour), "Selected-city Fajr must be morning, got \(value.label)")
     }
 
     private func settingsTour() {

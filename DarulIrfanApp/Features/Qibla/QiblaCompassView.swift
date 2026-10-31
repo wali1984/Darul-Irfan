@@ -141,7 +141,7 @@ struct QiblaCompassView: View {
                         }
                     }
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
                 }
             }
         }
@@ -165,7 +165,7 @@ struct QiblaCompassView: View {
         } else if viewModel.isAligned {
             Label("You are facing the Qibla", systemImage: "checkmark.circle.fill")
                 .font(.headline)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
         } else if let offset = viewModel.relativeOffsetDegrees {
             let degrees = Int(abs(offset).rounded())
             Group {
@@ -219,7 +219,7 @@ struct QiblaCompassView: View {
                 if let bearing = viewModel.qiblaBearingRounded {
                     Text("Qibla: \(bearing)° from true north")
                         .font(.title3.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                         .monospacedDigit()
                 }
                 Text("Face true north, then turn clockwise by this bearing to face the Kaaba in Makkah. A magnetic compass points to magnetic north, which can be several degrees away from true north.")

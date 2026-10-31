@@ -28,6 +28,7 @@ struct FastingView: View {
             .padding(DISpacing.md)
         }
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
         .diPageHeading("Fasting record")
         .onAppear { store.loadIfNeeded() }
         .confirmationDialog(
@@ -62,12 +63,14 @@ struct FastingView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Suhoor ends").font(.caption).foregroundStyle(DIColor.textMuted)
-                            Text(fajr, format: Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone)).font(.title3.weight(.semibold))
+                            Text(verbatim: fajr.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).font(.title3.weight(.semibold))
+                                .accessibilityIdentifier("fasting-suhoor")
                         }
                         Spacer()
                         VStack(alignment: .trailing, spacing: 2) {
                             Text("Iftar").font(.caption).foregroundStyle(DIColor.textMuted)
-                            Text(maghrib, format: Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone)).font(.title3.weight(.semibold))
+                            Text(verbatim: maghrib.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).font(.title3.weight(.semibold))
+                                .accessibilityIdentifier("fasting-iftar")
                         }
                     }
                     Text("Suhoor ends at Fajr and iftar is at Maghrib, from your prayer settings.")

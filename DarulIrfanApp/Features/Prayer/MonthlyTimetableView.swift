@@ -150,6 +150,7 @@ struct MonthlyTimetableView: View {
             }
         }
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
         .navigationTitle("Monthly Timetable")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -176,7 +177,7 @@ struct MonthlyTimetableView: View {
             } label: {
                 Image(systemName: "chevron.backward")
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
@@ -195,7 +196,7 @@ struct MonthlyTimetableView: View {
             } label: {
                 Image(systemName: "chevron.forward")
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
@@ -225,9 +226,10 @@ struct MonthlyTimetableView: View {
                         .overlay(DIColor.border)
                     ForEach(viewModel.days) { row in
                         GridRow {
-                            Text(row.date, format: viewModel.dayLabelFormat)
+                            Text(verbatim: row.date.formatted(viewModel.dayLabelFormat))
+                                .accessibilityIdentifier(row.id.hasSuffix("-01") ? "timetable-first-day" : "timetable-day-\(row.id)")
                                 .font(.caption.monospacedDigit().weight(row.isToday ? .bold : .regular))
-                                .foregroundStyle(row.isToday ? DIColor.primary : DIColor.textPrimary)
+                                .foregroundStyle(row.isToday ? DIColor.actionForeground : DIColor.textPrimary)
                                 .gridColumnAlignment(.leading)
                             ForEach(Prayer.allCases) { prayer in
                                 timeCell(row: row, prayer: prayer)
@@ -243,12 +245,13 @@ struct MonthlyTimetableView: View {
     private func timeCell(row: MonthlyTimetableViewModel.DayRow, prayer: Prayer) -> some View {
         Group {
             if let time = row.times[prayer] {
-                Text(time, format: viewModel.timeFormat)
+                Text(verbatim: time.formatted(viewModel.timeFormat))
+                    .accessibilityIdentifier(row.id.hasSuffix("-01") && prayer == .fajr ? "timetable-first-fajr" : "timetable-\(row.id)-\(prayer.rawValue)")
             } else {
                 Text(verbatim: "—")
             }
         }
         .font(.caption.monospacedDigit().weight(row.isToday ? .semibold : .regular))
-        .foregroundStyle(row.isToday ? DIColor.primary : DIColor.textPrimary)
+        .foregroundStyle(row.isToday ? DIColor.actionForeground : DIColor.textPrimary)
     }
 }

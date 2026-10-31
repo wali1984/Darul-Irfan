@@ -65,6 +65,7 @@ struct MyDayView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
         .navigationTitle("My Day")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -160,7 +161,7 @@ struct DayTaskRow: View {
             Button(action: onToggle) {
                 Image(systemName: task.isDone(on: day) ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
-                    .foregroundStyle(task.isDone(on: day) ? DIColor.primary : DIColor.textMuted)
+                    .foregroundStyle(task.isDone(on: day) ? DIColor.actionForeground : DIColor.textMuted)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(task.isDone(on: day) ? Text("Mark as not done") : Text("Mark as done"))

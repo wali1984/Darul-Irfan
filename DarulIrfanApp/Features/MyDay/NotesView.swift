@@ -28,7 +28,7 @@ struct NotesView: View {
                                 Image(systemName: reference.kind == .ayah ? "book.closed" : "link")
                             }
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(DIColor.primary)
+                            .foregroundStyle(DIColor.actionForeground)
                         }
                         Text(verbatim: note.text)
                             .font(.body)
@@ -55,6 +55,7 @@ struct NotesView: View {
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
         .navigationTitle("Private notes")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -102,7 +103,7 @@ struct NoteEditorView: View {
                     } icon: {
                         Image(systemName: "book.closed")
                     }
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
                 }
             }
             Section {
@@ -114,6 +115,7 @@ struct NoteEditorView: View {
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
         .navigationTitle(note == nil ? "New note" : "Note")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

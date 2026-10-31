@@ -82,7 +82,7 @@ struct TopicsSection: View {
                     .accessibilityHidden(true)
             }
             .font(.subheadline.weight(.bold))
-            .foregroundStyle(DIColor.primary)
+            .foregroundStyle(DIColor.actionForeground)
             .frame(maxWidth: .infinity, minHeight: 44)
             .diGlassPanel(cornerRadius: 22)
             .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))

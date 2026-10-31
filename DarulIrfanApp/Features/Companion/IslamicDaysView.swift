@@ -191,7 +191,7 @@ private struct IslamicDayTimelineRow: View {
                     VStack(alignment: .trailing, spacing: DISpacing.xs) {
                         Text(verbatim: occurrence.hijriText)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(DIColor.primary)
+                            .foregroundStyle(DIColor.actionForeground)
                         if let eve = occurrence.eveDate {
                             let evening = eve.formatted(date: .abbreviated, time: .omitted)
                             Text("Night of ≈ \(evening)")

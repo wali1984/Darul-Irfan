@@ -79,7 +79,7 @@ struct DIStatPill: View {
                 Text(value)
                     .font(.headline.weight(.bold).monospacedDigit())
                     .foregroundStyle(DIColor.textPrimary)
-                Text(label)
+                Text(LocalizedStringKey(label))
                     .font(.caption2)
                     .foregroundStyle(DIColor.textMuted)
             }

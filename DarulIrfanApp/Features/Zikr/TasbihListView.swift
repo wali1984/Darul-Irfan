@@ -74,6 +74,7 @@ struct TasbihListView: View {
         }
         .navigationTitle("Tasbih")
         .diScreenBackground()
+        .tint(DIColor.actionForeground)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -180,7 +181,7 @@ private struct TasbihCounterRow: View {
             }
             Text("\(counter.count)")
                 .font(.system(.title3, design: .rounded).weight(.medium).monospacedDigit())
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
         }
         .frame(width: 52, height: 52)
         .accessibilityHidden(true)
