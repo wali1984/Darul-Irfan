@@ -36,6 +36,8 @@ struct TasbihEditorView: View {
                     Text("A per-session goal such as 100. Leave empty for open-ended counting.")
                 }
             }
+            .scrollContentBackground(.hidden)
+            .diScreenBackground()
             .navigationTitle(original == nil ? "New Counter" : "Edit Counter")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -63,13 +65,7 @@ struct TasbihEditorView: View {
         let name = trimmedTitle
         guard !name.isEmpty else { return }
 
-        let parsedTarget = Int(targetText.trimmingCharacters(in: .whitespaces))
-        let target: Int?
-        if let parsedTarget, parsedTarget > 0 {
-            target = parsedTarget
-        } else {
-            target = nil
-        }
+        let target = TasbihCounter.parseTarget(targetText)
 
         var counter = original ?? TasbihCounter(
             id: UUID(),

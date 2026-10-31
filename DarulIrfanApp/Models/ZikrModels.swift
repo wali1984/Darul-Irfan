@@ -88,6 +88,19 @@ struct TasbihCounter: Codable, Sendable, Identifiable, Equatable {
     /// Lifetime accumulated count across resets.
     var lifetimeCount: Int
     var updatedAt: Date
+
+    /// Accept targets typed with an Urdu/Arabic keyboard; display remains Western digits.
+    static func parseTarget(_ text: String) -> Int? {
+        let folded = text.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.map { scalar -> String in
+            switch scalar.value {
+            case 0x0660...0x0669: return String(scalar.value - 0x0660)
+            case 0x06F0...0x06F9: return String(scalar.value - 0x06F0)
+            default: return String(scalar)
+            }
+        }.joined()
+        guard let value = Int(folded), value > 0 else { return nil }
+        return value
+    }
 }
 
 /// One day's zikr habit record.

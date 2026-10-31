@@ -8,6 +8,15 @@ import XCTest
 /// this phone's time and Pakistan's, and the Tasbih tile.
 final class ZikrTabTests: XCTestCase {
 
+    func testTasbihTargetAcceptsUrduAndArabicKeyboardDigits() {
+        XCTAssertEqual(TasbihCounter.parseTarget(" 100 "), 100)
+        XCTAssertEqual(TasbihCounter.parseTarget("\u{0663}\u{0663}"), 33)
+        XCTAssertEqual(TasbihCounter.parseTarget("\u{06F9}\u{06F9}"), 99)
+        for input in ["", "0", "-5", "abc", "999999999999999999999999"] {
+            XCTAssertNil(TasbihCounter.parseTarget(input))
+        }
+    }
+
     private let https = URL(string: "https://example.com/live") ?? URL(fileURLWithPath: "/")
 
     private func session(id: String, title: String, hour: Int, minute: Int, anchor: String? = nil) -> ZikrSession {
