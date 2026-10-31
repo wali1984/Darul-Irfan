@@ -233,58 +233,67 @@ struct GroupLiveStarter: View {
 
     var body: some View {
         Form {
-            if !addingToSession {
+            Group {
+                if !addingToSession {
+                    Section {
+                        Picker("What is starting", selection: $kind) {
+                            ForEach(Kind.allCases) { kind in Text(LocalizedStringKey(kind.rawValue)).tag(kind) }
+                        }
+                        .pickerStyle(.segmented)
+                        .onChange(of: kind) { _, value in
+                            title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
+                        }
+                        TextField("Title", text: $title)
+                    }
+                }
+                if kind == .zikr || addingToSession {
+                    Section {
+                        Picker("How the group joins", selection: $source) {
+                            ForEach(sources) { source in Text(LocalizedStringKey(source.rawValue)).tag(source) }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+                    switch source {
+                    case .room: roomSection
+                    case .youtube: youtubeSections
+                    case .recording: recordingSections
+                    }
+                    if !picked.isEmpty && source != .room { orderSection }
+                } else {
+                    Section {
+                        if meetingsReady {
+                            Text("Members join with audio and video from the group page.")
+                                .foregroundStyle(DIColor.textMuted)
+                            Toggle("Record the meeting", isOn: $recordRoom)
+                        } else {
+                            Text("Video meetings: integration in progress. They open here once it is complete.")
+                                .foregroundStyle(DIColor.textMuted)
+                        }
+                    }
+                }
+                if libraryFailed {
+                    Section {
+                        Button("Try again") { Task { await loadLibrary() } }
+                            .buttonStyle(DICompactButtonStyle())
+                    }
+                }
+                if let error {
+                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                }
                 Section {
-                    Picker("What is starting", selection: $kind) {
-                        ForEach(Kind.allCases) { kind in Text(LocalizedStringKey(kind.rawValue)).tag(kind) }
+                    Button {
+                        Task { await start() }
+                    } label: {
+                        if addingToSession {
+                            Label("Add to the session", systemImage: "text.badge.plus")
+                        } else {
+                            Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
+                        }
                     }
-                    .pickerStyle(.segmented)
-                    .onChange(of: kind) { _, value in
-                        title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
-                    }
-                    TextField("Title", text: $title)
+                    .disabled(working || uploading || !canStart)
                 }
             }
-            if kind == .zikr || addingToSession {
-                Section {
-                    Picker("How the group joins", selection: $source) {
-                        ForEach(sources) { source in Text(LocalizedStringKey(source.rawValue)).tag(source) }
-                    }
-                    .pickerStyle(.segmented)
-                }
-                switch source {
-                case .room: roomSection
-                case .youtube: youtubeSections
-                case .recording: recordingSections
-                }
-                if !picked.isEmpty && source != .room { orderSection }
-            } else {
-                Section {
-                    if meetingsReady {
-                        Text("Members join with audio and video from the group page.")
-                            .foregroundStyle(DIColor.textMuted)
-                        Toggle("Record the meeting", isOn: $recordRoom)
-                    } else {
-                        Text("Video meetings: integration in progress. They open here once it is complete.")
-                            .foregroundStyle(DIColor.textMuted)
-                    }
-                }
-            }
-            if let error {
-                Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
-            }
-            Section {
-                Button {
-                    Task { await start() }
-                } label: {
-                    if addingToSession {
-                        Label("Add to the session", systemImage: "text.badge.plus")
-                    } else {
-                        Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
-                    }
-                }
-                .disabled(working || uploading || !canStart)
-            }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -372,6 +381,7 @@ struct GroupLiveStarter: View {
                     )
                     .swipeActions {
                         Button("Delete", role: .destructive) { Task { await delete(recording) } }
+                            .disabled(working || uploading)
                     }
                 }
             } else {
@@ -389,7 +399,7 @@ struct GroupLiveStarter: View {
                     Label("Upload a recording", systemImage: "square.and.arrow.up")
                 }
             }
-            .disabled(uploading || library == nil)
+            .disabled(uploading || working || library == nil)
         } header: {
             Text("The group's recordings")
         } footer: {
@@ -418,11 +428,7 @@ struct GroupLiveStarter: View {
 
     @ViewBuilder
     private var libraryStatus: some View {
-        if libraryFailed {
-            Button("Try again") { Task { await loadLibrary() } }
-        } else {
-            ProgressView()
-        }
+        if !libraryFailed { ProgressView() }
     }
 
     private func choiceRow(entry: GroupQueueEntry, title: String, detail: [String?]) -> some View {
@@ -481,6 +487,7 @@ struct GroupLiveStarter: View {
     }
 
     private func start() async {
+        guard !working && !uploading && canStart else { return }
         working = true
         defer { working = false }
         let title = title.trimmingCharacters(in: .whitespaces)
@@ -503,6 +510,8 @@ struct GroupLiveStarter: View {
                                             videoID: source == .youtube ? video : nil, room: false, queue: picked)
             }
             dismiss()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
@@ -514,12 +523,15 @@ struct GroupLiveStarter: View {
         libraryFailed = false
         do {
             library = try await service.recordings(in: groupID)
+        } catch is CancellationError {
+            return
         } catch {
             libraryFailed = true
         }
     }
 
     private func upload(_ file: URL) async {
+        guard !uploading && !working else { return }
         error = nil
         let types = ["mp3": "audio/mpeg", "m4a": "audio/mp4", "aac": "audio/aac", "wav": "audio/wav",
                      "mp4": "video/mp4", "m4v": "video/mp4", "mov": "video/quicktime"]
@@ -549,16 +561,23 @@ struct GroupLiveStarter: View {
             if let added = library?.recordings.first(where: { !before.contains($0.id) }) {
                 picked.append(.recording(added.id))
             }
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
     }
 
     private func delete(_ recording: GroupRecording) async {
+        guard !working && !uploading else { return }
+        working = true
+        defer { working = false }
         do {
             try await service.deleteRecording(recording.id, in: groupID)
             picked.removeAll { $0 == .recording(recording.id) }
             await loadLibrary()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
