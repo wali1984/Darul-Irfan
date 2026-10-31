@@ -54,29 +54,47 @@ struct DISectionHeader: View {
 
 // MARK: - Buttons
 
+private struct DIActionButtonSurface: ViewModifier {
+    let primary: Bool
+    let pressed: Bool
+    @Environment(\.isEnabled) private var enabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+        content
+            .font(.headline)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, DISpacing.md)
+            .padding(.vertical, DISpacing.sm)
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .foregroundStyle(primary ? DIColor.onPrimary : DIColor.actionForeground)
+            .background(LinearGradient(
+                colors: primary ? [DIColor.primary, DIColor.primaryDeep] : [DIColor.surface, DIColor.sandstone],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            ))
+            .clipShape(shape)
+            .overlay(shape.strokeBorder(
+                LinearGradient(colors: [DIColor.accent.opacity(0.65), DIColor.border.opacity(0.35)],
+                               startPoint: .top, endPoint: .bottom), lineWidth: 1
+            ).allowsHitTesting(false))
+            .shadow(color: DIColor.primaryDeep.opacity(enabled && !pressed ? 0.18 : 0.06),
+                    radius: pressed ? 2 : 6, x: 0, y: pressed ? 1 : 3)
+            .opacity(enabled ? (pressed ? 0.9 : 1) : 0.48)
+            .scaleEffect(pressed && !reduceMotion ? 0.98 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: pressed)
+    }
+}
+
 struct DIPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline)
-            .foregroundStyle(DIColor.onPrimary)
-            .frame(maxWidth: .infinity, minHeight: 50)
-            .background(DIColor.primary.opacity(configuration.isPressed ? 0.85 : 1.0))
-            .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
+        configuration.label.modifier(DIActionButtonSurface(primary: true, pressed: configuration.isPressed))
     }
 }
 
 struct DISecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline)
-            .foregroundStyle(DIColor.primary)
-            .frame(maxWidth: .infinity, minHeight: 50)
-            .background(DIColor.surface.opacity(configuration.isPressed ? 0.7 : 1.0))
-            .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
-                    .stroke(DIColor.primary, lineWidth: 1)
-            )
+        configuration.label.modifier(DIActionButtonSurface(primary: false, pressed: configuration.isPressed))
     }
 }
 
