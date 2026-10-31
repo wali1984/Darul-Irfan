@@ -399,19 +399,27 @@ struct TodayUpcomingCard: View {
     private func content(at now: Date) -> some View {
         let zikr = nextZikr(at: now)
         let event = nextEvent(at: now)
-        if zikr != nil || event != nil {
+        if let zikr {
+            Button {
+                DeepLinkRouter.shared.open(route(for: zikr))
+            } label: {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(DailyZikrBanner.phase(start: zikr.startsAt, end: zikr.endsAt, now: now) == .live ? "LIVE NOW" : "Upcoming")
+                        .font(.caption.weight(.bold)).foregroundStyle(Color(hex: 0xFFE3A0))
+                    Text(LocalizedStringKey(DailyZikrBanner.title))
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                    Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.startsAt))")
+                        .font(.footnote).foregroundStyle(Color(hex: 0xE9CE86))
+                }
+                .padding(18).frame(maxWidth: .infinity, alignment: .leading)
+                .background(LinearGradient(colors: [Color(hex: 0x0D7A55), Color(hex: 0x04321F)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 22))
+            }
+            .buttonStyle(DIPressableStyle())
+        }
+        if let event, let start = event.startDate {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    DISectionHeader(titleKey: zikr.map { DailyZikrBanner.phase(start: $0.startsAt, end: $0.endsAt, now: now) == .live } == true ? "LIVE NOW" : "Upcoming", systemImage: "calendar.badge.clock")
-                    if let zikr {
-                        Button {
-                            DeepLinkRouter.shared.open(route(for: zikr))
-                        } label: {
-                            line(icon: "sparkles", title: String(localized: String.LocalizationValue(DailyZikrBanner.title)), when: Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.startsAt))"))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    if let event, let start = event.startDate {
+                    DISectionHeader(titleKey: "Upcoming", systemImage: "calendar.badge.clock")
                         NavigationLink {
                             EventDetailView(event: event, notifications: dependencies.notifications)
                         } label: {
@@ -422,7 +430,6 @@ struct TodayUpcomingCard: View {
                             )
                         }
                         .buttonStyle(.plain)
-                    }
                 }
             }
         }

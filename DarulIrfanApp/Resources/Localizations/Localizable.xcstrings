@@ -29818,6 +29818,57 @@
           }
         }
       }
+    },
+    "1 session": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 session"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایک نشست"
+          }
+        }
+      }
+    },
+    "Allow precise alerts": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow precise alerts"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بروقت اطلاعات کی اجازت دیں"
+          }
+        }
+      }
+    },
+    "Allow precise alerts for stage chimes when your screen is locked.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow precise alerts for stage chimes when your screen is locked."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسکرین مقفل ہونے پر مراحل کی بروقت گھنٹی کے لیے درست وقت کی اطلاعات کی اجازت دیں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

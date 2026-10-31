@@ -43,7 +43,13 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        completionHandler([.banner, .list, .sound])
+        if notification.request.identifier.hasPrefix("personal-zikr.stage.") {
+            Task { @MainActor in
+                completionHandler(PersonalZikrStore.shared.screenActive ? [] : [.banner, .list, .sound])
+            }
+        } else {
+            completionHandler([.banner, .list, .sound])
+        }
     }
 
     func userNotificationCenter(

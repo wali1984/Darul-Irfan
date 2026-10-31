@@ -18,7 +18,7 @@ struct PersonalZikrView: View {
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     timer(at: context.date)
                         .onChange(of: store.run?.endsAt.map { $0 <= context.date } ?? false) { _, done in
-                            if done { store.settle(at: context.date); ended = true; DIHaptics.success() }
+                            if done { if scenePhase == .active { store.playChime() }; store.settle(at: context.date); ended = true; DIHaptics.success() }
                         }
                 }
                 Button { withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { shajra.toggle() } } label: {
@@ -36,8 +36,12 @@ struct PersonalZikrView: View {
         .diScreenBackground()
         .navigationTitle("Your Daily Personal Zikr")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { store.settle(); store.refreshAlerts() }
-        .onChange(of: scenePhase) { _, phase in if phase == .active { store.settle(); store.refreshAlerts() } }
+        .onAppear { store.screenActive = scenePhase == .active; store.settle(); store.refreshAlerts() }
+        .onDisappear { store.screenActive = false }
+        .onChange(of: scenePhase) { _, phase in
+            store.screenActive = phase == .active
+            if phase == .active { store.settle(); store.refreshAlerts() }
+        }
         .sheet(item: $choosing) { step in durationSheet(step) }
         .sheet(isPresented: $adding) {
             NavigationStack {
@@ -96,6 +100,9 @@ struct PersonalZikrView: View {
         .padding(22)
         .frame(maxWidth: .infinity)
         .background(LinearGradient(colors: [Color(hex: 0x0B7250), Color(hex: 0x043221)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
+        .onChange(of: position?.index) { old, next in
+            if old != nil, next != nil, run?.startedAt != nil, scenePhase == .active { store.playChime(); DIHaptics.soft() }
+        }
         .diAppear()
     }
 
@@ -238,7 +245,8 @@ private struct PersonalZikrHistoryCard: View {
             VStack(alignment: .leading, spacing: 14) {
                 DISectionHeader(titleKey: "Your last 3 months")
                 HStack {
-                    Text("\(entries.count) sessions"); Spacer()
+                    if entries.count == 1 { Text("1 session") } else { Text("\(entries.count) sessions") }
+                    Spacer()
                     Text("\(totalMinutes) min")
                 }.font(.headline).foregroundStyle(DIColor.primary)
                 let completed = Set(entries.map { Calendar.current.startOfDay(for: $0.endedAt) })

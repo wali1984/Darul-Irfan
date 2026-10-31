@@ -99,6 +99,7 @@ final class PersonalZikrStore {
     private(set) var run: PersonalZikrRun?
     private(set) var history: [PersonalZikrEntry] = []
     private(set) var reminders = [PersonalZikrReminder(minuteOfDay: 420), PersonalZikrReminder(minuteOfDay: 1200)]
+    var screenActive = false
     private var chime: AVAudioPlayer?
     private var alertRevision = 0
     private let defaults: UserDefaults

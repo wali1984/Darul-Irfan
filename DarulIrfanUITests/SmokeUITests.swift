@@ -39,6 +39,30 @@ final class SmokeUITests: XCTestCase {
 
     // MARK: - Tab bar
 
+    func testPersonalZikrOpensFromZikrAndKeepsShajraInTheSamePage() {
+        let app = makeApp()
+        app.launch()
+        let zikr = app.tabBars.buttons["Zikr"]
+        XCTAssertTrue(zikr.waitForExistence(timeout: 60))
+        zikr.tap()
+        let personal = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Your Daily Personal Zikr")).firstMatch
+        for _ in 0..<4 where !personal.isHittable { app.swipeUp() }
+        XCTAssertTrue(personal.waitForExistence(timeout: 10))
+        personal.tap()
+        XCTAssertTrue(app.staticTexts["1st Latifa"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Start"].exists)
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = "Your Daily Personal Zikr"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        let shajra = app.buttons["Read Shajra"]
+        for _ in 0..<3 where !shajra.isHittable { app.swipeUp() }
+        XCTAssertTrue(shajra.exists)
+        shajra.tap()
+        XCTAssertTrue(app.buttons["Close Shajra"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Your Daily Personal Zikr"].exists)
+    }
+
     /// Verifies all five tabs exist and are tappable. If the install is fresh
     /// it first walks onboarding defensively; when onboarding cannot be
     /// completed in this environment (no location/network), the test skips.
