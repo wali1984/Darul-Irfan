@@ -1,0 +1,18 @@
+[
+  {
+    "editionID": "akram-ut-tarajum-ur",
+    "surahNumber": 2,
+    "ayahNumber": 4,
+    "before": "اور وہ لوگ جو ایمان لاتے ہیں اس پر جو آپ پر نازل کیا گیا اور جو آپ سے پہلے نازل کیا گیا اور وہ آخرت پر یقین رکھتے ہیں۔",
+    "after": "اور جو لوگ ایمان لاتے ہیں اس پر جو آپ پر نازل کی گئی اور جو آپ سے پہلے نازل کی گئی اور وہ آخرت پر یقین رکھتے ہیں۔",
+    "sourceImage": "quran-scans/p01-001.jpg",
+    "printedPage": 3,
+    "reason": "Visually confirmed printed Urdu wording: the opening relative clause and both feminine nuzul phrases differ from the website transcription.",
+    "imageSHA256": "8bcf37d07b4c1baffbcebb0bb999e921ee5e8fb2e747b212455f844eeda750e4",
+    "evidence": "amd-tarajum-evidence\\adjudicated\\002004.json",
+    "review": "prior independent readings plus direct visual comparison to printed page",
+    "sourcePDF": "Akram-ut-Tarajum-Parah01.pdf",
+    "sourcePDFPage": 1,
+    "sourceURL": "https://www.naqshbandiaowaisiah.org/uploads/262/Akram-ut-Tarajum-Parah01.pdf"
+  }
+]

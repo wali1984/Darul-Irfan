@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "sourceImages": [
+    {
+      "url": "https://www.naqshbandiaowaisiah.org/assets/images/Method_of_Zikr_%20Eng.jpg",
+      "file": "method-source-0.jpg",
+      "sha256": "7a4dcd2b572f278837e73198c98a60ad1ed5d325900131655f3ba102ab0d536b"
+    },
+    {
+      "url": "https://www.naqshbandiaowaisiah.org/assets/images/Method_of_Zikr_Urdu.png",
+      "file": "method-source-1.png",
+      "sha256": "7198fd7253ca37858afcd7a27c20ac7bf897b27877b5deef0ac94eb5bb05c86d"
+    }
+  ],
+  "en": [
+    {
+      "id": "instruction-1",
+      "kind": "instruction",
+      "title": "1st Latifa",
+      "text": "With complete concentration and attention, breathing should be managed so that the Personal Name 'ALLAH' should descend into the depths of the heart (Qalb) with every breath going in, and the word 'HOO' should strike the Qalb with every breath coming out."
+    },
+    {
+      "id": "instruction-2",
+      "kind": "instruction",
+      "title": "2nd–5th Latifa",
+      "text": "When doing the Second Latifah, the Personal Name 'ALLAH' should descend into the depths of the Qalb with every breath going in and the word 'HOO' should strike the Second Latifah with every breath coming out. Similarly, when doing the Third, Fourth and the Fifth Latifah, the Personal Name 'ALLAH' should descend into the depths of the Qalb with every breath going in and the word 'HOO' should strike the respective Latifah under Zikr with every breath coming out."
+    },
+    {
+      "id": "instruction-3",
+      "kind": "instruction",
+      "title": "6th Latifa",
+      "text": "Sixth Latifah: The Personal Name Allah should descend into the depths of the Qalb with every breath going in and a flare of HOO should come out of the forehead with every breath coming out."
+    },
+    {
+      "id": "instruction-4",
+      "kind": "instruction",
+      "title": "7th Latifa",
+      "text": "Seventh Latifah: The Personal Name Allah should descend into the depths of the Qalb with every breath going in and a flare of HOO should come out of every cell and pore of the body with every breath coming out."
+    },
+    {
+      "id": "instruction-5",
+      "kind": "instruction",
+      "title": "Return to the 1st Latifa",
+      "text": "After doing the Zikr on the Seventh Latifah, the First Latifah is done again, whose method has already been described. During Zikr, breathing should be rapid and forceful, accompanied with the movement of the body, which starts automatically with rapid breathing. It should be borne in mind that no breath is left without Zikr. Attention should be focused on the Qalb and the continuity in Zikr should not break."
+    },
+    {
+      "id": "instruction-6",
+      "kind": "instruction",
+      "title": "Rabitah",
+      "text": "Rabitah: After doing Zikr on all the Seven Lata'if, Rabitah is practised. Its method is that after Zikr on the Seventh Latifah, Zikr is done on the First Latifah and then breathing is restored to its normal speed for Rabitah. Then, with every breath going in, the Personal Name 'ALLAH' should descend into the depths of the Qalb, and with every breath coming out the word 'HOO' should strike the Grand Arsh."
+    }
+  ],
+  "ur": [
+    {
+      "id": "quotation",
+      "kind": "quote",
+      "text": "ذکر کا فائدہ یہ ہے کہ بندے کو اپنے کچھ نہ ہونے اور اللہ کے سب کچھ ہونے کا احساس ہو جائے۔\nذاتِ باری کے معاملے میں اپنے نہ ہونے کا ادراک ہو جائے کہ میں کچھ بھی نہیں ہوں سب کچھ وہ ہے۔",
+      "attribution": "شیخ المکرم مولانا امیر محمد اکرم اعوان مدظلہ العالی"
+    },
+    {
+      "id": "opening",
+      "kind": "paragraph",
+      "text": "ذکر شروع کرنے سے پہلے یہ تسبیحات پڑھیں:"
+    },
+    {
+      "id": "tasbih",
+      "kind": "arabic",
+      "text": "سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيمِ"
+    },
+    {
+      "id": "istighfar",
+      "kind": "arabic",
+      "text": "أَسْتَغْفِرُ اللّٰهَ رَبِّي مِنْ كُلِّ ذَنْبٍ وَأَتُوبُ إِلَيْهِ"
+    },
+    {
+      "id": "shahadah",
+      "kind": "arabic",
+      "text": "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ"
+    },
+    {
+      "id": "taawwudh",
+      "kind": "arabic",
+      "text": "أَعُوذُ بِاللّٰهِ مِنَ الشَّيْطَانِ الرَّجِيمِ"
+    },
+    {
+      "id": "basmalah",
+      "kind": "arabic",
+      "text": "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ"
+    },
+    {
+      "id": "start",
+      "kind": "paragraph",
+      "text": "پھر ذکر شروع کریں طریقہ نیچے درج ہے۔"
+    },
+    {
+      "id": "latifa-1",
+      "kind": "instruction",
+      "title": "پہلا لطیفہ",
+      "text": "مکمل یکسوئی اور توجہ کے ساتھ، ہر سانس کی آمد و رفت پر اس طرح گرفت ہو کہ ہر داخل ہونے والی سانس کے ساتھ اسمِ ذات ”اللہ“ دل کی گہرائیوں میں اترتا چلا جائے اور ہر خارج ہونے والی سانس کے ساتھ ”ھو“ کی چوٹ قلب پر لگے۔"
+    },
+    {
+      "id": "latifa-2",
+      "kind": "instruction",
+      "title": "دوسرے لطیفے",
+      "text": "دوسرے لطیفے کو کرتے وقت ہر داخل ہونے والی سانس کے ساتھ اسمِ ذات ”اللہ“ دل کی گہرائیوں میں اترتا چلا جائے اور ہر خارج ہونے والی سانس کے ساتھ ”ھو“ کی چوٹ دوسرے لطیفے پر لگے۔"
+    },
+    {
+      "id": "latifa-3-5",
+      "kind": "instruction",
+      "title": "تیسرے، چوتھے اور پانچویں لطیفے",
+      "text": "اسی طرح تیسرے چوتھے اور پانچویں لطیفہ کو کرتے وقت، ہر داخل ہونے والی سانس کے ساتھ اللہ دل میں اترے اور خارج ہونے والی سانس کے ساتھ ”ھو“ کی چوٹ اس لطیفہ پر لگے جو کیا جا رہا ہو۔"
+    },
+    {
+      "id": "latifa-6",
+      "kind": "instruction",
+      "title": "چھٹا لطیفہ",
+      "text": "ہر داخل ہونے والی سانس کے ساتھ اسمِ ذات ”اللہ“ دل کی گہرائیوں میں اترتا چلا جائے اور ہر خارج ہونے والی سانس کے ساتھ ”ھو“ کا شعلہ پیشانی سے نکلے۔"
+    },
+    {
+      "id": "latifa-7",
+      "kind": "instruction",
+      "title": "ساتواں لطیفہ",
+      "text": "ہر داخل ہونے والی سانس کے ساتھ اسمِ ذات ”اللہ“ دل کی گہرائیوں میں اترتا چلا جائے اور ہر خارج ہونے والی سانس کے ساتھ ”ھو“ کا شعلہ پورے بدن کے ایک ایک مسام اور خلیے سے باہر نکلے۔"
+    },
+    {
+      "id": "return",
+      "kind": "instruction",
+      "text": "ساتویں لطیفہ کے بعد پھر پہلا لطیفہ کیا جاتا ہے جس کا طریقہ سب سے پہلے بیان ہوا ہے۔ ذکر کے دوران سانس تیزی اور قوت سے لیا جائے اور ساتھ ہی جسم کی حرکت جو سانس کے تیز عمل کے ساتھ خودبخود شروع ہو جاتی ہے۔ پورا خیال رہے کہ کوئی سانس اللہ کے ذکر سے خالی نہ ہو۔ توجہ قلب پر مرکوز اور ذکر کا تسلسل ٹوٹنے نہ پائے۔"
+    },
+    {
+      "id": "rabitah",
+      "kind": "instruction",
+      "title": "رابطہ",
+      "text": "ساتوں لطائف کے بعد رابطہ کیا جاتا ہے جس کا طریقہ یہ ہے کہ رابطہ کے لئے سانس کی رفتار کو طبعی انداز پر لا کر ہر داخل ہونے والی سانس کے ساتھ اسمِ ذات ”اللہ“ قلب کی گہرائیوں میں اترتا چلا جائے اور ہر خارج ہونے والی سانس کے ساتھ ”ھو“ کی چوٹ عرشِ عظیم سے جا ٹکرائے۔"
+    },
+    {
+      "id": "conclusion",
+      "kind": "paragraph",
+      "text": "ذکر کے بعد دعا مانگیں اور آخر میں شجرہ سلسلہ عالیہ پڑھیں جو اگلے صفحہ پر درج ہے۔"
+    }
+  ],
+  "diagramCaptionEn": "The numbered positions follow the original Method of Zikr illustration.",
+  "diagramCaptionUr": "دیئے گئے نقشے میں انسان کے سینے، ماتھے اور جسم پر لطائف کے مقامات بتائے گئے ہیں۔ جن کا خیال کر کے ذکر کیا جاتا ہے۔"
+}

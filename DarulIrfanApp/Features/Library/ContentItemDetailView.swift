@@ -527,8 +527,7 @@ struct ContentItemDetailView: View {
     private func keepOnPhonePanel(for item: ContentItem) -> some View {
         let primary = item.downloadUrls.first { $0.lowercased().hasSuffix(".pdf") }
         let others = item.downloadUrls.filter { $0 != primary }
-        let showsRights = item.rightsStatus == .permissionConfirmed
-        if primary != nil || !others.isEmpty || showsRights {
+        if primary != nil || !others.isEmpty {
             VStack(spacing: 0) {
                 if let primary {
                     BookKeepOfflineRow(urlString: primary, viewModel: viewModel)
@@ -539,24 +538,6 @@ struct ContentItemDetailView: View {
                     }
                     LibraryDownloadRow(urlString: urlString, viewModel: viewModel)
                         .padding(.horizontal, 12)
-                }
-                if showsRights {
-                    if primary != nil || !others.isEmpty {
-                        ReadRowRule()
-                    }
-                    HStack(spacing: 12) {
-                        Image(systemName: "checkmark.shield")
-                            .font(.title3)
-                            .foregroundStyle(ReadPalette.goldLine)
-                            .accessibilityHidden(true)
-                        Text("Shared with the Silsila's permission")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(DIColor.textPrimary)
-                            .multilineTextAlignment(.leading)
-                        Spacer(minLength: 0)
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(minHeight: 52)
                 }
             }
             .padding(6)
