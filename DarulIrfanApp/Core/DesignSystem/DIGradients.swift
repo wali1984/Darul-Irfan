@@ -75,7 +75,7 @@ enum DIGradient {
         calendar.timeZone = timeZone
         switch DayPhase.current(date, calendar: calendar) {
         case .dawn, .morning: return "Good morning"
-        case .midday: return "Good afternoon"
+        case .midday: return calendar.component(.hour, from: date) < 12 ? "Good morning" : "Good afternoon"
         case .afternoon: return "Good afternoon"
         case .dusk: return "Good evening"
         case .night: return "Peaceful night"

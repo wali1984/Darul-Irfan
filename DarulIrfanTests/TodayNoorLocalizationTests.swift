@@ -2,6 +2,18 @@ import XCTest
 @testable import DarulIrfan
 
 final class TodayNoorLocalizationTests: XCTestCase {
+    func testGreetingWaitsUntilNoonInTheSelectedCity() {
+        let zone = TimeZone(identifier: "Asia/Karachi")!
+        let parser = ISO8601DateFormatter()
+        for (instant, expected) in [("2026-10-31T05:00:00Z", "Good morning"),
+                                    ("2026-10-31T06:59:00Z", "Good morning"),
+                                    ("2026-10-31T07:00:00Z", "Good afternoon")] {
+            XCTAssertEqual(DIGradient.greeting(for: parser.date(from: instant)!, timeZone: zone), expected)
+        }
+        XCTAssertEqual(DIGradient.greeting(for: parser.date(from: "2026-10-31T07:00:00Z")!,
+                                           timeZone: TimeZone(identifier: "America/New_York")!), "Peaceful night")
+    }
+
     func testUrduInterfaceKeepsWesternDigits() {
         let locale = LanguageManager.locale(for: .urdu)
         XCTAssertEqual(locale.numberingSystem.identifier, "latn")
