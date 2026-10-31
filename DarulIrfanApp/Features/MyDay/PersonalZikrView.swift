@@ -68,6 +68,7 @@ struct PersonalZikrView: View {
                     TextField("Muraqaba name", text: $customName)
                         .onChange(of: customName) { _, value in customName = String(value.prefix(80)) }
                     Button("Add") { store.addCustom(customName); customName = ""; adding = false }
+                        .buttonStyle(DIPrimaryButtonStyle())
                         .disabled(customName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 .navigationTitle("Add a Muraqaba")
@@ -90,7 +91,7 @@ struct PersonalZikrView: View {
                 Spacer()
                 DILivingSealMark(diameter: 38).accessibilityHidden(true)
             }
-            Text(verbatim: position?.step.localizedTitle ?? String(localized: "Choose your stages"))
+            Text(verbatim: run != nil && remaining <= 0 ? String(localized: "Completed") : position?.step.localizedTitle ?? String(localized: "Choose your stages"))
                 .font(.title2.weight(.semibold)).foregroundStyle(.white).multilineTextAlignment(.center)
             if let position { Text("Stage \(position.index + 1) of \(plan.count)").font(.caption).foregroundStyle(.white.opacity(0.7)) }
             ZStack {
@@ -161,7 +162,7 @@ struct PersonalZikrView: View {
                 }
             }
             if store.run == nil {
-                Button("Add a Muraqaba") { adding = true }.buttonStyle(.bordered).disabled(store.customs.count >= 24)
+                Button("Add a Muraqaba") { adding = true }.buttonStyle(DISecondaryButtonStyle()).disabled(store.customs.count >= 24)
             }
         }
     }
@@ -185,9 +186,9 @@ struct PersonalZikrView: View {
     }
     @ViewBuilder private func stageActions(_ step: PersonalZikrStep, selected: Bool) -> some View {
         Button { choosing = step } label: { Text("\(step.minutes) min") }
-            .buttonStyle(.bordered).disabled(store.run != nil || !selected)
+            .buttonStyle(DICompactButtonStyle(minimumHeight: 48)).disabled(store.run != nil || !selected)
         if step.customID != nil && store.run == nil {
-            Button("Remove") { store.removeCustom(step.id) }.buttonStyle(.bordered)
+            Button("Remove") { store.removeCustom(step.id) }.buttonStyle(DICompactButtonStyle(destructive: true, minimumHeight: 48))
         }
     }
     private func durationSheet(_ step: PersonalZikrStep) -> some View {
@@ -196,9 +197,14 @@ struct PersonalZikrView: View {
                 Button {
                     var next = step; next.minutes = minutes; store.configure(next, enabled: true); choosing = nil
                 } label: {
-                    HStack { Text("\(minutes) min"); Spacer(); if step.minutes == minutes { Image(systemName: "checkmark") } }
+                    HStack { Text("\(minutes) min"); Spacer(); if step.minutes == minutes { Image(systemName: "checkmark").accessibilityHidden(true) } }
                 }
+                .buttonStyle(DISecondaryButtonStyle())
+                .accessibilityAddTraits(step.minutes == minutes ? .isSelected : [])
+                .listRowBackground(Color.clear)
             }
+            .scrollContentBackground(.hidden)
+            .diScreenBackground()
             .navigationTitle(step.localizedTitle)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { choosing = nil } } }
         }

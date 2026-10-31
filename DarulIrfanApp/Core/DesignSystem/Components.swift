@@ -59,6 +59,7 @@ private struct DIActionButtonSurface: ViewModifier {
     let pressed: Bool
     var compact = false
     var destructive = false
+    var minimumHeight: CGFloat? = nil
     @Environment(\.isEnabled) private var enabled
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -69,7 +70,7 @@ private struct DIActionButtonSurface: ViewModifier {
             .multilineTextAlignment(.center)
             .padding(.horizontal, DISpacing.md)
             .padding(.vertical, DISpacing.sm)
-            .frame(maxWidth: compact ? nil : .infinity, minHeight: compact ? 44 : 50)
+            .frame(maxWidth: compact ? nil : .infinity, minHeight: minimumHeight ?? (compact ? 44 : 50))
             .foregroundStyle(destructive ? DIColor.danger : (primary ? DIColor.onPrimary : DIColor.actionForeground))
             .background(LinearGradient(
                 colors: primary ? [DIColor.primary, DIColor.primaryDeep] : [DIColor.surface, DIColor.sandstone],
@@ -102,10 +103,11 @@ struct DISecondaryButtonStyle: ButtonStyle {
 
 struct DICompactButtonStyle: ButtonStyle {
     var destructive = false
+    var minimumHeight: CGFloat = 44
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.modifier(DIActionButtonSurface(
-            primary: false, pressed: configuration.isPressed, compact: true, destructive: destructive
+            primary: false, pressed: configuration.isPressed, compact: true, destructive: destructive, minimumHeight: minimumHeight
         ))
     }
 }
