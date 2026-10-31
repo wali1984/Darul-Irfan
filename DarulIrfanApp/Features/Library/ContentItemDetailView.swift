@@ -870,7 +870,7 @@ struct LibraryDownloadRow: View {
                     .font(.title3)
                     .foregroundStyle(DIColor.primary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(LibraryFileActionStyle())
             .accessibilityLabel(Text("Download file"))
         case .downloading:
             TimelineView(.periodic(from: .now, by: 0.5)) { _ in
@@ -890,7 +890,7 @@ struct LibraryDownloadRow: View {
                         Image(systemName: "xmark.circle")
                             .foregroundStyle(DIColor.textMuted)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(LibraryFileActionStyle())
                     .accessibilityLabel(Text("Cancel download"))
                 }
             }
@@ -917,7 +917,7 @@ struct LibraryDownloadRow: View {
                         .font(.subheadline)
                         .foregroundStyle(DIColor.danger)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(LibraryFileActionStyle())
                 .accessibilityLabel(Text("Remove download"))
             }
         case .failed:
@@ -1044,7 +1044,7 @@ struct BookKeepOfflineRow: View {
                         Image(systemName: "xmark.circle")
                             .foregroundStyle(DIColor.textMuted)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(LibraryFileActionStyle())
                     .accessibilityLabel(Text("Cancel download"))
                 }
             }
@@ -1067,7 +1067,7 @@ struct BookKeepOfflineRow: View {
                         .font(.subheadline)
                         .foregroundStyle(DIColor.danger)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(LibraryFileActionStyle())
                 .accessibilityLabel(Text("Remove download"))
             }
         case .failed:

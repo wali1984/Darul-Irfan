@@ -441,3 +441,20 @@ enum LibraryHTMLText {
         return text
     }
 }
+
+/// File-row icon controls share the library's raised surface and press response.
+struct LibraryFileActionStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(width: 48, height: 48)
+            .background(LinearGradient(colors: [DIColor.surface, DIColor.sandstone],
+                startPoint: .top, endPoint: .bottom), in: Circle())
+            .overlay(Circle().stroke(DIColor.border, lineWidth: 1))
+            .contentShape(Circle())
+            .opacity(configuration.isPressed ? 0.78 : 1)
+            .shadow(color: DIColor.primaryDeep.opacity(0.14), radius: configuration.isPressed ? 1 : 3, y: 2)
+            .scaleEffect(!reduceMotion && configuration.isPressed ? 0.96 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: configuration.isPressed)
+    }
+}
