@@ -93,9 +93,10 @@ struct TodayHeroView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("DARUL IRFAN")
-                        .font(readsUrdu ? .system(size: urduWordmarkSize, weight: .semibold) : .footnote.weight(.semibold))
+                        .font(readsUrdu ? .system(size: urduWordmarkSize, weight: .bold) : .footnote.weight(.bold))
                         .tracking(readsUrdu ? 0 : 2.4)
-                        .foregroundStyle(Color(hex: 0xFFFDF4))
+                        .foregroundStyle(Color(hex: 0xFFE3A0))
+                        .shadow(color: Color(hex: 0xFFE3A0).opacity(0.35), radius: 3)
                     Text(LocalizedStringKey(DIGradient.greeting(for: date, timeZone: timeZone)))
                         .font(readsUrdu ? .callout : .subheadline).foregroundStyle(Color(hex: 0xF7F6ED).opacity(0.9))
                 }
@@ -118,7 +119,7 @@ struct TodayHeroView: View {
                             Text(verbatim: viewModel.hijriDateText).font(readsUrdu ? .subheadline.weight(.medium) : .caption.weight(.medium))
                             Image(systemName: "pencil").font(.system(size: 11)).foregroundStyle(Color(hex: 0xE9CE86).opacity(0.65))
                         }
-                        .foregroundStyle(Color(hex: 0xFFFDF4).opacity(0.9))
+                        .foregroundStyle(Color(hex: 0xE9CE86))
                         .frame(minHeight: 32, alignment: .leading)
                     }
                     .buttonStyle(.plain)
