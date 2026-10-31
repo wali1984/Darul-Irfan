@@ -8,6 +8,7 @@ struct TasbihListView: View {
     @State private var isCreating = false
     @State private var editingCounter: TasbihCounter?
     @State private var counterPendingDeletion: TasbihCounter?
+    @State private var deleteFailed = false
     private let trackerRepository: any TrackerRepositoryProtocol
     private let devotionalMetrics: DevotionalMetricsSyncService
 
@@ -33,7 +34,19 @@ struct TasbihListView: View {
                     .diAppear()
 
                 DISectionHeader(titleKey: "Counters", systemImage: "hand.tap")
-                if viewModel.isLoaded && viewModel.counters.isEmpty {
+                if viewModel.loadFailed {
+                    DICard {
+                        VStack(alignment: .leading, spacing: DISpacing.sm) {
+                            Text("Unable to load counters").font(.headline)
+                            Text("Please try again to read your saved counters.")
+                                .font(.footnote).foregroundStyle(DIColor.textMuted)
+                            Button("Retry") { Task { await viewModel.load() } }
+                                .buttonStyle(DISecondaryButtonStyle())
+                        }
+                    }
+                }
+                if !viewModel.isLoaded { ProgressView().frame(maxWidth: .infinity) }
+                if viewModel.isLoaded && !viewModel.loadFailed && viewModel.counters.isEmpty {
                     DIElevatedCard {
                         DIEmptyState(
                             systemImage: "hand.tap",
@@ -110,7 +123,10 @@ struct TasbihListView: View {
         ) {
             Button("Delete", role: .destructive) {
                 if let counter = counterPendingDeletion {
-                    Task { await viewModel.delete(counter) }
+                    Task {
+                        do { try await viewModel.delete(counter) }
+                        catch { deleteFailed = true }
+                    }
                 }
                 counterPendingDeletion = nil
             }
@@ -119,6 +135,11 @@ struct TasbihListView: View {
             }
         } message: {
             Text("Its counts will be removed. This cannot be undone.")
+        }
+        .alert("Unable to delete counter", isPresented: $deleteFailed) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("The counter was not removed. Please try again.")
         }
     }
 

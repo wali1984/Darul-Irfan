@@ -33130,6 +33130,74 @@
           }
         }
       }
+    },
+    "Unable to load counters": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to load counters"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاؤنٹر لوڈ نہیں ہو سکے"
+          }
+        }
+      }
+    },
+    "Please try again to read your saved counters.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please try again to read your saved counters."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنے محفوظ شدہ کاؤنٹر دیکھنے کے لیے براہِ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "Unable to delete counter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to delete counter"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاؤنٹر حذف نہیں ہو سکا"
+          }
+        }
+      }
+    },
+    "The counter was not removed. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The counter was not removed. Please try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کاؤنٹر حذف نہیں ہوا۔ براہِ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

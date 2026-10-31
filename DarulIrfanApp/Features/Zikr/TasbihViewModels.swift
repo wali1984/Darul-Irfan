@@ -24,6 +24,7 @@ final class TasbihListViewModel {
     private(set) var counters: [TasbihCounter] = []
     private(set) var habitDays: [ZikrHabitDayItem] = []
     private(set) var isLoaded = false
+    private(set) var loadFailed = false
 
     init(
         trackerRepository: any TrackerRepositoryProtocol,
@@ -36,8 +37,9 @@ final class TasbihListViewModel {
     func load() async {
         do {
             counters = try await trackerRepository.tasbihCounters()
+            loadFailed = false
         } catch {
-            counters = []
+            loadFailed = true
         }
         await loadHabitStrip()
         await devotionalMetrics.refresh()
@@ -49,12 +51,8 @@ final class TasbihListViewModel {
         await load()
     }
 
-    func delete(_ counter: TasbihCounter) async {
-        do {
-            try await trackerRepository.deleteTasbihCounter(id: counter.id)
-        } catch {
-            // See note in save(_:).
-        }
+    func delete(_ counter: TasbihCounter) async throws {
+        try await trackerRepository.deleteTasbihCounter(id: counter.id)
         await load()
     }
 

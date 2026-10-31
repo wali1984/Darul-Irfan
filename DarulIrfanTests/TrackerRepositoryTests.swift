@@ -71,6 +71,46 @@ final class TrackerRepositoryTests: XCTestCase {
 
     // MARK: - Helpers
 
+    @MainActor
+    func testTasbihListLoadFailureKeepsLastKnownCountersAndCanRetry() async throws {
+        let draft = TasbihCounter(id: UUID(), title: "Saved", target: 100, count: 7, lifetimeCount: 21, updatedAt: Date())
+        try await repository.saveTasbihCounter(draft)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihListViewModel(trackerRepository: repository, devotionalMetrics: metrics)
+        await model.load()
+        XCTAssertFalse(model.loadFailed)
+        try await database.connection.executeScript("ALTER TABLE tasbih_counters RENAME TO unavailable_tasbih;")
+        await model.load()
+        XCTAssertTrue(model.loadFailed)
+        XCTAssertEqual(model.counters.first?.id, draft.id)
+        try await database.connection.executeScript("ALTER TABLE unavailable_tasbih RENAME TO tasbih_counters;")
+        await model.load()
+        XCTAssertFalse(model.loadFailed)
+        XCTAssertEqual(model.counters.first?.count, 7)
+    }
+
+    @MainActor
+    func testTasbihDeleteFailurePropagatesWithoutRemovingCounter() async throws {
+        let draft = TasbihCounter(id: UUID(), title: "Saved", target: 100, count: 7, lifetimeCount: 21, updatedAt: Date())
+        try await repository.saveTasbihCounter(draft)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihListViewModel(trackerRepository: repository, devotionalMetrics: metrics)
+        await model.load()
+        try await database.connection.executeScript("CREATE TRIGGER reject_tasbih_delete BEFORE DELETE ON tasbih_counters BEGIN SELECT RAISE(ABORT, 'test delete failure'); END;")
+        do {
+            try await model.delete(draft)
+            XCTFail("A failed delete must be reported")
+        } catch { }
+        XCTAssertEqual(model.counters.first?.id, draft.id)
+        let saved = try await repository.tasbihCounters()
+        XCTAssertEqual(saved.count, 1)
+        try await database.connection.executeScript("DROP TRIGGER reject_tasbih_delete;")
+        try await model.delete(draft)
+        XCTAssertTrue(model.counters.isEmpty)
+    }
+
     /// Marks every obligatory prayer of `dayKey` as fulfilled, mixing
     /// individual and congregation marks (both count toward completion).
     private func markDayComplete(_ dayKey: String) async throws {
