@@ -96,16 +96,13 @@ struct CalculationSettingsView: View {
     }
 
     private func angleStepper(_ titleKey: LocalizedStringKey, value: Binding<Double>) -> some View {
-        Stepper(value: value, in: 4.0...24.0, step: 0.5) {
-            HStack {
-                Text(titleKey)
-                    .foregroundStyle(DIColor.textPrimary)
-                Spacer(minLength: DISpacing.sm)
-                Text(verbatim: "\(value.wrappedValue.formatted(.number.precision(.fractionLength(1))))°")
-                    .foregroundStyle(DIColor.textMuted)
-                    .monospacedDigit()
-            }
-        }
+        SettingsAdjustmentRow(
+            title: Text(titleKey),
+            value: Text(verbatim: "\(value.wrappedValue.formatted(.number.precision(.fractionLength(1))))\u{00B0}"),
+            canDecrease: value.wrappedValue > 4, canIncrease: value.wrappedValue < 24,
+            decrease: { value.wrappedValue = max(4, value.wrappedValue - 0.5) },
+            increase: { value.wrappedValue = min(24, value.wrappedValue + 0.5) }
+        )
     }
 
     private var ishaIntervalStepper: some View {
@@ -114,21 +111,13 @@ struct CalculationSettingsView: View {
             get: { $0.calculation.customAngles.ishaIntervalMinutes },
             set: { settings, minutes in settings.calculation.customAngles.ishaIntervalMinutes = minutes }
         )
-        return Stepper(value: binding, in: 0...120, step: 5) {
-            HStack {
-                Text("Isha Interval")
-                    .foregroundStyle(DIColor.textPrimary)
-                Spacer(minLength: DISpacing.sm)
-                if binding.wrappedValue == 0 {
-                    Text("Off")
-                        .foregroundStyle(DIColor.textMuted)
-                } else {
-                    Text("\(binding.wrappedValue) min")
-                        .foregroundStyle(DIColor.textMuted)
-                        .monospacedDigit()
-                }
-            }
-        }
+        return SettingsAdjustmentRow(
+            title: Text("Isha Interval"),
+            value: binding.wrappedValue == 0 ? Text("Off") : Text("\(binding.wrappedValue) min"),
+            canDecrease: binding.wrappedValue > 0, canIncrease: binding.wrappedValue < 120,
+            decrease: { binding.wrappedValue = max(0, binding.wrappedValue - 5) },
+            increase: { binding.wrappedValue = min(120, binding.wrappedValue + 5) }
+        )
     }
 
     // MARK: - Asr & high latitude

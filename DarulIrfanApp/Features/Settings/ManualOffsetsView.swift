@@ -58,17 +58,12 @@ struct ManualOffsetsView: View {
                 settings.calculation.adjustments.setOffset(minutes, for: prayer)
             }
         )
-        return Stepper(value: binding, in: -30...30) {
-            HStack {
-                Text(LocalizedStringKey(prayer.englishName))
-                    .foregroundStyle(DIColor.textPrimary)
-                Spacer(minLength: DISpacing.sm)
-                offsetLabel(binding.wrappedValue)
-                    .font(.subheadline)
-                    .foregroundStyle(DIColor.textMuted)
-                    .monospacedDigit()
-            }
-        }
+        return SettingsAdjustmentRow(
+            title: Text(LocalizedStringKey(prayer.englishName)), value: offsetLabel(binding.wrappedValue),
+            canDecrease: binding.wrappedValue > -30, canIncrease: binding.wrappedValue < 30,
+            decrease: { binding.wrappedValue = max(-30, binding.wrappedValue - 1) },
+            increase: { binding.wrappedValue = min(30, binding.wrappedValue + 1) }
+        )
     }
 
     private func offsetLabel(_ minutes: Int) -> Text {

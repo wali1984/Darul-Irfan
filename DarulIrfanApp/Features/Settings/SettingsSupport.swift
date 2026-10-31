@@ -83,3 +83,39 @@ enum SettingsBinding {
         )
     }
 }
+
+/// Room for wrapping labels and values, with bounded, accessible adjustment actions.
+struct SettingsAdjustmentRow: View {
+    let title: Text
+    let value: Text
+    let canDecrease: Bool
+    let canIncrease: Bool
+    let decrease: () -> Void
+    let increase: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            title.foregroundStyle(DIColor.textPrimary).fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: DISpacing.sm) {
+                value.foregroundStyle(DIColor.textMuted).monospacedDigit()
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Button { DIHaptics.soft(); decrease() } label: {
+                    Image(systemName: "minus").frame(minWidth: 16)
+                }
+                .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+                .disabled(!canDecrease)
+                .accessibilityLabel(Text("- ") + title)
+                .accessibilityValue(value)
+                Button { DIHaptics.soft(); increase() } label: {
+                    Image(systemName: "plus").frame(minWidth: 16)
+                }
+                .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+                .disabled(!canIncrease)
+                .accessibilityLabel(Text("+ ") + title)
+                .accessibilityValue(value)
+            }
+        }
+        .accessibilityElement(children: .contain)
+    }
+}

@@ -66,17 +66,13 @@ struct HijriSettingsView: View {
 
     private var offsetSection: some View {
         Section {
-            Stepper(value: offsetBinding, in: -2...2) {
-                HStack {
-                    Text("Date correction")
-                        .foregroundStyle(DIColor.textPrimary)
-                    Spacer(minLength: DISpacing.sm)
-                    offsetLabel
-                        .font(.subheadline)
-                        .foregroundStyle(DIColor.textMuted)
-                        .monospacedDigit()
-                }
-            }
+            SettingsAdjustmentRow(
+                title: Text("Date correction"), value: offsetLabel,
+                canDecrease: offsetBinding.wrappedValue > -2,
+                canIncrease: offsetBinding.wrappedValue < 2,
+                decrease: { offsetBinding.wrappedValue = max(-2, offsetBinding.wrappedValue - 1) },
+                increase: { offsetBinding.wrappedValue = min(2, offsetBinding.wrappedValue + 1) }
+            )
             .listRowBackground(DIColor.surface)
             Button("Use calculated date") { offsetBinding.wrappedValue = 0 }
                 .disabled(appState.settings.hijri.dayOffset == 0)
