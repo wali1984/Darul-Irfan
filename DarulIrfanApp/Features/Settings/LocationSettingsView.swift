@@ -12,6 +12,7 @@ struct LocationSettingsView: View {
     @State private var deviceUpdateFailed = false
     @AppStorage("today.weather.enabled") private var weatherEnabled = true
     @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.appState = appState
@@ -42,6 +43,11 @@ struct LocationSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.refreshAuthorizationStatus()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task { await viewModel.refreshAuthorizationStatus() }
+            }
         }
         .onChange(of: appState.settings.locationMode) { _, mode in
             deviceUpdateFailed = false
