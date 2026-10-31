@@ -32977,6 +32977,23 @@
           }
         }
       }
+    },
+    "Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 at the top.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 at the top."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سامنے سے نظر آنے والا نمبر وار خاکہ: 1 نیچے دائیں، 2 نیچے بائیں، 3 درمیان میں دائیں، 4 درمیان میں بائیں، 5 مرکز میں، 6 اوپر مرکز میں، 7 سب سے اوپر۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

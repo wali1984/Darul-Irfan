@@ -118,7 +118,7 @@ private struct MethodLatifaDiagram: View {
         .frame(width: 220, height: 220)
         .environment(\.layoutDirection, .leftToRight)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Method of Zikr"))
+        .accessibilityLabel(Text("Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 at the top."))
     }
 }
 
