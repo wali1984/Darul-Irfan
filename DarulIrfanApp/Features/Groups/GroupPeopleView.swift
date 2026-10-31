@@ -201,15 +201,18 @@ struct GroupPeopleView: View {
     }
 
     private func act(_ change: () async throws -> Void) async {
+        guard !working else { return }
         working = true
         defer { working = false }
         do {
             try await change()
             error = nil
+            await load()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
-        await load()
     }
 }
 
