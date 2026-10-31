@@ -144,3 +144,25 @@ struct FastingLogEntry: Codable, Sendable, Identifiable, Equatable {
         case dayKey, fasted, updatedAt
     }
 }
+
+/// A bounded Quran citation used for contextual reader navigation.
+struct DuaQuranReference: Equatable {
+    let surah: Int
+    let firstAyah: Int
+    let lastAyah: Int
+
+    static func parse(_ source: String, ayahCounts: [Int: Int]) -> Self? {
+        let pattern = #"^\s*Qur'?an\s+([0-9]{1,3}):([0-9]{1,3})(?:\s*[-?]\s*([0-9]{1,3}))?\s*$"#
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+              let match = regex.firstMatch(in: source, range: NSRange(source.startIndex..., in: source)) else { return nil }
+        func number(_ index: Int) -> Int? {
+            guard let range = Range(match.range(at: index), in: source) else { return nil }
+            return Int(source[range])
+        }
+        guard let surah = number(1), let first = number(2) else { return nil }
+        let last = number(3) ?? first
+        guard (1...114).contains(surah), first >= 1, last >= first,
+              let count = ayahCounts[surah], last <= count else { return nil }
+        return Self(surah: surah, firstAyah: first, lastAyah: last)
+    }
+}

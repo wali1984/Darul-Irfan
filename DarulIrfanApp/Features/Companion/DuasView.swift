@@ -8,10 +8,15 @@ import SwiftUI
 final class DuasViewModel {
     private(set) var duas: [Dua] = []
     private(set) var isLoaded = false
+    private(set) var references: [String: DuaQuranReference] = [:]
 
     func load(force: Bool = false) {
         guard force || !isLoaded else { return }
         duas = SeedBundle.duas()
+        let counts = Dictionary(SeedBundle.quranSurahs().map { ($0.id, $0.ayahCount) }, uniquingKeysWith: { first, _ in first })
+        references = Dictionary(duas.compactMap { dua in
+            DuaQuranReference.parse(dua.source, ayahCounts: counts).map { (dua.id, $0) }
+        }, uniquingKeysWith: { first, _ in first })
         isLoaded = true
     }
 }
@@ -68,14 +73,14 @@ struct DuasView: View {
             } else {
                 VStack(alignment: .leading, spacing: DISpacing.lg) {
                     if let featuredDua {
-                        FeaturedDuaCard(dua: featuredDua)
+                        FeaturedDuaCard(dua: featuredDua, reference: viewModel.references[featuredDua.id])
                             .diAppear()
                     }
                     ForEach(groups) { group in
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
                             DuaGroupHeader(title: group.title)
                             ForEach(Array(group.duas.enumerated()), id: \.element.id) { index, dua in
-                                DuaCard(dua: dua)
+                                DuaCard(dua: dua, reference: viewModel.references[dua.id])
                                     .diAppear(delay: 0.04 * Double(index))
                             }
                         }
@@ -129,6 +134,7 @@ private struct DuaGroupHeader: View {
 
 private struct FeaturedDuaCard: View {
     let dua: Dua
+    let reference: DuaQuranReference?
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -171,9 +177,7 @@ private struct FeaturedDuaCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Text(verbatim: DailyNoorText.reference(dua.source, urdu: DIBrand.readsUrdu(locale)))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIColor.goldGlow)
+                DuaSource(source: dua.source, reference: reference)
             }
             .padding(DISpacing.lg)
         }
@@ -186,6 +190,7 @@ private struct FeaturedDuaCard: View {
 
 private struct DuaCard: View {
     let dua: Dua
+    let reference: DuaQuranReference?
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -225,8 +230,35 @@ private struct DuaCard: View {
                         .environment(\.layoutDirection, .rightToLeft)
                 }
 
-                DIPillBadge(text: DailyNoorText.reference(dua.source, urdu: DIBrand.readsUrdu(locale)), color: DIColor.accent)
+                DuaSource(source: dua.source, reference: reference)
             }
+        }
+    }
+}
+
+/// Ranges retain their citation; the reader opens at their first ayah.
+private struct DuaSource: View {
+    let source: String
+    let reference: DuaQuranReference?
+    @Environment(\.locale) private var locale
+
+    var body: some View {
+        let citation = DailyNoorText.reference(source, urdu: DIBrand.readsUrdu(locale))
+        if let reference {
+            Button {
+                DIHaptics.soft()
+                DeepLinkRouter.shared.open(.quranAyah(surah: reference.surah, ayah: reference.firstAyah))
+            } label: {
+                Label {
+                    Text("Open in the Quran") + Text(verbatim: " ? " + citation)
+                } icon: {
+                    Image(systemName: "book.closed")
+                }
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+        } else {
+            DIPillBadge(text: citation, color: DIColor.accent)
         }
     }
 }
