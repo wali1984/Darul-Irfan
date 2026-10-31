@@ -152,7 +152,7 @@ struct DuaQuranReference: Equatable {
     let lastAyah: Int
 
     static func parse(_ source: String, ayahCounts: [Int: Int]) -> Self? {
-        let pattern = #"^\s*Qur'?an\s+([0-9]{1,3}):([0-9]{1,3})(?:\s*[-?]\s*([0-9]{1,3}))?\s*$"#
+        let pattern = #"^\s*Qur'?an\s+([0-9]{1,3}):([0-9]{1,3})(?:\s*[-\u2013]\s*([0-9]{1,3}))?\s*$"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
               let match = regex.firstMatch(in: source, range: NSRange(source.startIndex..., in: source)) else { return nil }
         func number(_ index: Int) -> Int? {

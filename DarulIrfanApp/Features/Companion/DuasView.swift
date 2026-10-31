@@ -250,7 +250,7 @@ private struct DuaSource: View {
                 DeepLinkRouter.shared.open(.quranAyah(surah: reference.surah, ayah: reference.firstAyah))
             } label: {
                 Label {
-                    Text("Open in the Quran") + Text(verbatim: " ? " + citation)
+                    Text("Open in the Quran") + Text(verbatim: " - " + citation)
                 } icon: {
                     Image(systemName: "book.closed")
                 }
