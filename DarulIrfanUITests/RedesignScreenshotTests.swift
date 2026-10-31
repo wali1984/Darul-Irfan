@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -77,6 +77,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audit" {
+            auditTour()
+            return
+        }
 
         // DI_SCREENSHOTS=books: the Books section, a book page and the reader only.
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "books" {
@@ -265,6 +269,55 @@ final class RedesignScreenshotTests: XCTestCase {
             pause(1.5)
             shot("\(name)-\(index + 1)")
         }
+    }
+
+    private func auditTour() {
+        selectTab(0)
+        shot("audit-today")
+        if seek("personal-zikr-entry") {
+            shot("audit-personal-zikr")
+            let shajra = app.buttons["personal-zikr-shajra"]
+            XCTAssertTrue(shajra.waitForExistence(timeout: 10))
+            XCTAssertGreaterThanOrEqual(shajra.frame.height, 44)
+            if seek("personal-zikr-shajra") {
+                shot("audit-inline-shajra")
+                scrollShots("audit-inline-shajra", count: 1)
+            }
+            goBack()
+        }
+        selectTab(4)
+        if seek("silsila-teachings") {
+            shot("audit-teachings")
+            if seek("silsila-tasawwuf") {
+                pause(3)
+                shot("audit-article")
+                scrollShots("audit-article", count: 2)
+                goBack()
+            }
+            goBack()
+        }
+        if seek("silsila-about-app") {
+            shot("audit-about")
+            scrollShots("audit-about", count: 1)
+            goBack()
+        }
+    }
+
+    @discardableResult
+    private func seek(_ identifier: String) -> Bool {
+        for _ in 0..<8 {
+            let element = app.buttons[identifier]
+            if element.exists && element.isHittable {
+                element.tap()
+                pause(2)
+                return true
+            }
+            app.swipeUp()
+            pause(0.5)
+        }
+        XCTFail("Missing audit destination: \(identifier)")
+        shot("missing-" + identifier)
+        return false
     }
 
     private func scrollToTop() {

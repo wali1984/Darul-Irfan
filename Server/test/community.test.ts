@@ -711,6 +711,9 @@ describe("daily pictures", () => {
     expect((await upload(env, admin, "slot=aqwal&day=2026-10-30&publish=1")).status).toBe(403);
     expect((await upload(env, superAdmin, "slot=nowhere&day=2026-10-30")).status).toBe(400);
     expect((await upload(env, superAdmin, "slot=aqwal&publish=1")).status).toBe(400);
+    expect((await upload(env, superAdmin, "slot=quote&day=2026-02-31&publish=1")).status).toBe(400);
+    expect((await upload(env, superAdmin, "slot=announcement&day=2026-10-31&endDay=2026-10-30&publish=1")).status).toBe(400);
+    expect((await upload(env, superAdmin, "slot=announcement&day=2026-10-31&endDay=2026-11-31&publish=1")).status).toBe(400);
     const published = (await (await upload(env, superAdmin, "slot=aqwal&day=2026-10-30&publish=1&caption=Today")).json()) as { id: string };
     const draft = (await (await upload(env, superAdmin, "slot=quote&day=2026-10-30&popup=1")).json()) as { id: string };
     expect(media.stored.size).toBe(2);

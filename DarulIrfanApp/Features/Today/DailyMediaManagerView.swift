@@ -1,6 +1,8 @@
 import PhotosUI
 import SwiftUI
 import UIKit
+import ImageIO
+import UniformTypeIdentifiers
 
 // The Super admin's pictures for the Today page: drafts forwarded on WhatsApp
 // to approve, pictures added from the phone, and what is published for which
@@ -21,6 +23,9 @@ struct DailyMediaManagerView: View {
                 Button { adding = true } label: { Label("Add a picture", systemImage: "photo.badge.plus") }
             } footer: {
                 Text("Or forward a picture to the WhatsApp Business number with #ayah, #hadith, #aqwal, #quote or #announcement at the start of its caption, and a date such as 2026-11-02 if you like. It arrives here as a draft.")
+            }
+            if failed && items != nil {
+                Button("Try again") { Task { await load() } }
             }
             if let items {
                 let drafts = items.filter { $0.status == "draft" }
@@ -102,6 +107,8 @@ struct DailyMediaEditor: View {
     @State private var picture: Data?
     @State private var preview: UIImage?
     @State private var working = false
+    @State private var loadingPicture = false
+    @State private var choosingFile = false
     @State private var error: String?
 
     var body: some View {
@@ -116,16 +123,23 @@ struct DailyMediaEditor: View {
                     .frame(maxHeight: 260)
                 }
                 if item == nil {
-                    PhotosPicker(selection: $pick, matching: .images) {
+                    PhotosPicker(selection: $pick, matching: .images, preferredItemEncoding: .compatible) {
                         Label(preview == nil ? "Choose a picture" : "Choose another", systemImage: "photo.on.rectangle")
                     }
+                    .disabled(working || loadingPicture)
+                    Button { choosingFile = true } label: {
+                        Label("Choose from Files", systemImage: "folder")
+                    }
+                    .disabled(working || loadingPicture)
                 }
+                if loadingPicture { ProgressView("Loading picture…") }
             }
             Section {
                 Picker("Shows on", selection: $slot) {
                     ForEach(DailyMediaItem.Slot.allCases) { slot in Text(slot.title).tag(slot) }
                 }
                 DatePicker("Day", selection: $day, displayedComponents: .date)
+                    .onChange(of: day) { _, value in if endDay < value { endDay = value } }
                 if slot == .announcement {
                     Toggle("Runs several days", isOn: $hasEnd)
                     if hasEnd {
@@ -146,11 +160,12 @@ struct DailyMediaEditor: View {
                 Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
             }
             Section {
+                if working { ProgressView() }
                 Button(item?.status == "published" ? "Save" : "Publish") { Task { await save(publish: true) } }
-                    .disabled(working || (item == nil && picture == nil))
+                    .disabled(working || loadingPicture || (item == nil && picture == nil))
                 if item == nil {
                     Button("Save as a draft") { Task { await save(publish: false) } }
-                        .disabled(working || picture == nil)
+                        .disabled(working || loadingPicture || picture == nil)
                 }
                 if let item {
                     if item.status == "published" {
@@ -164,9 +179,17 @@ struct DailyMediaEditor: View {
         .diScreenBackground()
         .navigationTitle(item == nil ? "Add a picture" : "Picture")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(working) } }
         .onAppear(perform: fill)
-        .onChange(of: pick) { _, chosen in Task { await read(chosen) } }
+        .task(id: pick) { await read(pick) }
+        .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.image]) { result in
+            if case .success(let url) = result {
+                Task { await readFile(url) }
+            } else if case .failure = result {
+                error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
+            }
+        }
+        .interactiveDismissDisabled(working)
     }
 
     private static func dayKey(_ date: Date) -> String { DayKey.make(from: date, timeZone: .autoupdatingCurrent) }
@@ -190,21 +213,67 @@ struct DailyMediaEditor: View {
 
     /// The chosen picture, made a JPEG no larger than 2048 pixels across.
     private func read(_ chosen: PhotosPickerItem?) async {
-        guard let chosen, let data = try? await chosen.loadTransferable(type: Data.self), let image = UIImage(data: data) else { return }
-        // In pixels: a pasted picture may carry a scale of its own.
-        let pixels = CGSize(width: image.size.width * image.scale, height: image.size.height * image.scale)
-        let scale = min(1, 2048 / max(pixels.width, pixels.height, 1))
-        let size = CGSize(width: (pixels.width * scale).rounded(), height: (pixels.height * scale).rounded())
-        // At 1x, not the screen's scale, so the picture is the size intended.
-        let format = UIGraphicsImageRendererFormat.default()
-        format.scale = 1
-        let resized = UIGraphicsImageRenderer(size: size, format: format).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
-        preview = resized
-        picture = resized.jpegData(compressionQuality: 0.85)
+        guard let chosen else { return }
+        loadingPicture = true
+        error = nil
+        picture = nil
+        preview = nil
+        defer { loadingPicture = false; pick = nil }
+        do {
+            guard let data = try await chosen.loadTransferable(type: Data.self) else {
+                error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
+                return
+            }
+            try Task.checkCancellation()
+            prepare(data)
+        } catch is CancellationError {
+            return
+        } catch {
+            self.error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
+        }
+    }
+
+    private func readFile(_ url: URL) async {
+        loadingPicture = true
+        error = nil
+        picture = nil
+        preview = nil
+        defer { loadingPicture = false }
+        do {
+            let data = try await Task.detached(priority: .userInitiated) {
+                let granted = url.startAccessingSecurityScopedResource()
+                defer { if granted { url.stopAccessingSecurityScopedResource() } }
+                return try Data(contentsOf: url, options: .mappedIfSafe)
+            }.value
+            prepare(data)
+        } catch {
+            self.error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
+        }
+    }
+
+    private func prepare(_ data: Data) {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 2048,
+                kCGImageSourceShouldCacheImmediately: true,
+              ] as CFDictionary) else {
+            error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
+            return
+        }
+        let image = UIImage(cgImage: thumbnail)
+        guard let jpeg = image.jpegData(compressionQuality: 0.85) else {
+            error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
+            return
+        }
+        preview = image
+        picture = jpeg
     }
 
     private func save(publish: Bool) async {
         working = true
+        error = nil
         defer { working = false }
         let end = slot == .announcement && hasEnd ? Self.dayKey(endDay) : nil
         let showsOver = slot == .quote || popup

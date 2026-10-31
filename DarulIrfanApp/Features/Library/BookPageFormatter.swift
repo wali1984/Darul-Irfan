@@ -24,6 +24,21 @@ import Foundation
 /// own Arabic, never dressed as scripture.
 enum BookPageFormatter {
 
+    /// Articles already have deliberate paragraphs. Preserve them and their line
+    /// breaks; do not apply scanned-page heading/noise/column heuristics.
+    static func articleParagraph(_ text: String) -> Page {
+        let words = text.split(whereSeparator: \.isWhitespace).map(String.init)
+        let block: Block
+        if isQuranQuotation(text, check: .letters) {
+            block = .quran(text)
+        } else if words.count >= 3 && markQuranic(words).allSatisfy({ $0 }) {
+            block = .arabic(text)
+        } else {
+            block = .paragraph(proseRuns(text, check: .letters))
+        }
+        return Page(isContents: false, blocks: [block])
+    }
+
     struct Run: Equatable, Sendable {
         var text: String
         /// Qur'anic Arabic quoted inside the prose.

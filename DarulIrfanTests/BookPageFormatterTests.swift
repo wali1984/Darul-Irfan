@@ -5,6 +5,21 @@ import XCTest
 /// contents pages folded, and sentences carried across a page break.
 final class BookPageFormatterTests: XCTestCase {
 
+    func testArticleKeepsShortLinesAndUrduAsProse() {
+        let text = "اللہ\nیہ ایک عام اردو جملہ ہے۔\nContact: Darul Irfan"
+        let page = BookPageFormatter.articleParagraph(text)
+        XCTAssertFalse(page.isContents)
+        guard case .paragraph(let runs) = page.blocks.first else { return XCTFail("Article prose was misclassified") }
+        XCTAssertFalse(runs.contains { $0.isQuranic })
+        XCTAssertEqual(runs.map(\.text).joined(separator: "\n"), text)
+        XCTAssertEqual(runs.map(\.startsLine), [false, true, true])
+    }
+
+    func testArticleRecognizesQuranWithoutRewording() {
+        let text = SeedBundle.quranAyahs().first { $0.surahNumber == 2 && $0.ayahNumber == 255 }!.textArabic
+        XCTAssertEqual(BookPageFormatter.articleParagraph(text).blocks, [.quran(text)])
+    }
+
     func testLinesBrokenByTheColumnAreJoined() {
         let page = BookPageFormatter.format("جو شخص اپنے طریقے سے یا اپنے خیال کے مطابق\nاپنی رائے سے اصلاح کرنا چاہتا ہے وہ فساد پیدا کرتا ہے۔")
         XCTAssertEqual(page.blocks, [.paragraph([.init(

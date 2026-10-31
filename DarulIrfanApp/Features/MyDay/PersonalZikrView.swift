@@ -23,8 +23,15 @@ struct PersonalZikrView: View {
                 }
                 Button { withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { shajra.toggle() } } label: {
                     Label(shajra ? "Close Shajra" : "Read Shajra", systemImage: "point.3.connected.trianglepath.dotted")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(Color(hex: 0x163D2D))
+                        .frame(maxWidth: .infinity, minHeight: 60)
+                        .background(LinearGradient(colors: [Color(hex: 0xFFE3A0), Color(hex: 0xDDB65F)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                        .shadow(color: DIColor.goldGlow.opacity(0.22), radius: 10, y: 4)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(DIPressableStyle())
+                .accessibilityIdentifier("personal-zikr-shajra")
                 if shajra { ShajraInlineContent().transition(.opacity) }
                 PersonalZikrHistoryCard(entries: store.history)
                 sequence
@@ -225,6 +232,7 @@ struct PersonalZikrLink: View {
             .background(LinearGradient(colors: [Color(hex: 0x0B7250), Color(hex: 0x064B34)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 22))
         }
         .buttonStyle(DIPressableStyle())
+        .accessibilityIdentifier("personal-zikr-entry")
     }
 }
 

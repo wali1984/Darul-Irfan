@@ -80,6 +80,7 @@ struct SilsilaSection: View {
                     HalqahListRowLabel(titleKey: "Teachings", systemImage: "book.closed.fill")
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("silsila-teachings")
                 HalqahRowDivider()
                 NavigationLink {
                     AboutView()
@@ -87,6 +88,7 @@ struct SilsilaSection: View {
                     HalqahListRowLabel(titleKey: "About Darul Irfan", systemImage: "info.circle.fill")
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("silsila-about-app")
             }
         }
     }
@@ -111,6 +113,7 @@ private struct SilsilaEntryLink: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("silsila-" + entry.id)
     }
 
     /// The Shajra opens at once, drawn in the app; any other category opens
@@ -137,12 +140,25 @@ struct SilsilaTeachingsView: View {
 
     var body: some View {
         ScrollView {
-            HalqahGlassList {
+            VStack(spacing: DISpacing.lg) {
+                VStack(spacing: 12) {
+                    DILivingSealMark(diameter: 64).accessibilityHidden(true)
+                    Text("Teachings").font(.title2.bold()).foregroundStyle(Color(hex: 0xFFE3A0))
+                    Text("Silsila Naqshbandia Owaisiah").font(.subheadline).foregroundStyle(.white.opacity(0.85))
+                }
+                .multilineTextAlignment(.center)
+                .padding(28)
+                .frame(maxWidth: .infinity)
+                .background(DIGradient.emerald)
+                .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                .diAppear()
+                HalqahGlassList {
                 ForEach(Array(SilsilaEntry.teachings.enumerated()), id: \.element.id) { index, entry in
                     if index > 0 {
                         HalqahRowDivider()
                     }
                     SilsilaEntryLink(entry: entry, dependencies: dependencies, appState: appState, library: library)
+                }
                 }
             }
             .padding(DISpacing.md)

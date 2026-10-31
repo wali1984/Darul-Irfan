@@ -32623,6 +32623,54 @@
           }
         }
       }
+    },
+    "Loading picture…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading picture…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصویر لوڈ ہو رہی ہے…"
+          }
+        }
+      }
+    },
+    "The picture could not be opened. Download it to your phone and choose it again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The picture could not be opened. Download it to your phone and choose it again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصویر نہیں کھل سکی۔ اسے اپنے فون پر ڈاؤن لوڈ کر کے دوبارہ منتخب کریں۔"
+          }
+        }
+      }
+    },
+    "Choose from Files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose from Files"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فائلوں سے منتخب کریں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

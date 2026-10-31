@@ -466,7 +466,7 @@ struct FormattedBookPage: View {
         case .quran(let text):
             Text(verbatim: text)
                 .font(DIFont.quranArabic(scale: 0.8 * scale))
-                .foregroundStyle(DIColor.primaryDeep)
+                .foregroundStyle(DIColor.scripture)
                 .lineSpacing(8)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
@@ -515,7 +515,7 @@ struct FormattedBookPage: View {
     private func arabicQuotation(_ text: String) -> some View {
         Text(verbatim: text)
             .font(DIFont.quranArabic(scale: 0.75 * scale))
-            .foregroundStyle(DIColor.textPrimary)
+            .foregroundStyle(DIColor.scripture)
             .lineSpacing(CGFloat(8 * scale))
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
@@ -617,7 +617,7 @@ struct FormattedBookPage: View {
             if run.isQuranic {
                 text = text + Text(verbatim: run.text)
                     .font(DIFont.quranArabic(scale: 0.72 * scale))
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.scripture)
             } else {
                 text = text + Text(verbatim: run.text)
             }

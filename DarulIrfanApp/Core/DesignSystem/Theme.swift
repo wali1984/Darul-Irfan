@@ -37,6 +37,8 @@ private extension UIColor {
 
 /// Semantic color tokens. Use these — never raw hex — in feature code.
 enum DIColor {
+    /// Arabic quotations on paper: readable emerald in both appearances.
+    static let scripture = Color(light: 0x064B34, dark: 0x86DAB4)
     /// Seal emerald; brand mark, primary actions, selected states.
     static let primary = Color(light: 0x0B7250, dark: 0x1E9068)
     /// Forest emerald; seal ring, pressed states, gradients, hero fills.

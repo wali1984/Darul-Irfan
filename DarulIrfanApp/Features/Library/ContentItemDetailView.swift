@@ -137,6 +137,7 @@ struct ContentItemDetailView: View {
                         }
                     }
                     .padding(DISpacing.md)
+                    .diResponsiveWidth()
                     .background(scrollMetricsReader(viewportHeight: outer.size.height))
                 }
                 .coordinateSpace(.named("libraryDetailScroll"))
@@ -565,7 +566,7 @@ struct ContentItemDetailView: View {
 
     private func detailHeader(for item: ContentItem) -> some View {
         ZStack(alignment: .topLeading) {
-            DIGradient.hero()
+            DIGradient.emerald
             DIOctagram(innerRatio: 0.5)
                 .stroke(Color.white, lineWidth: 1.5)
                 .frame(width: 220, height: 220)
@@ -591,15 +592,15 @@ struct ContentItemDetailView: View {
 
                 Text(verbatim: item.title)
                     .font(DIFont.heading)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color(hex: 0xFFE3A0))
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
 
                 if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
                     Text(verbatim: titleUrdu)
                         .font(DIFont.urduBody())
-                        .foregroundStyle(.white)
-                        .diGoldGlow(radius: 8, opacity: 0.35)
+                        .foregroundStyle(Color(hex: 0xFFE3A0))
+                        .diGoldGlow(radius: 3, opacity: 0.25)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
@@ -677,12 +678,7 @@ struct ContentItemDetailView: View {
         DICard(padding: DISpacing.lg) {
             VStack(alignment: .leading, spacing: DISpacing.md) {
                 ForEach(Array(viewModel.bodyParagraphs.enumerated()), id: \.offset) { index, paragraph in
-                    Text(verbatim: paragraph)
-                        .font(bodyFont(for: item))
-                        .foregroundStyle(DIColor.textPrimary)
-                        .lineSpacing(5)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    FormattedBookPage(page: BookPageFormatter.articleParagraph(paragraph), scale: appState.settings.readerFontScale.rawValue)
                         .id("library-paragraph-\(index)")
                 }
             }

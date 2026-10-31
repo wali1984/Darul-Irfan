@@ -23,7 +23,8 @@ const notFound = () => json({ error: "Not found" }, { status: 404 });
 
 const slotOf = (value: unknown): Slot | null => SLOTS.includes(value as Slot) ? value as Slot : null;
 const dayOf = (value: unknown): string | null =>
-  typeof value === "string" && DAY.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) ? value : null;
+  typeof value === "string" && DAY.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`))
+    && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value ? value : null;
 
 /** A caption's leading #tag names its place: #ayah, #hadith, #aqwal,
  *  #quote or #announcement (Urdu and common spellings too). A date in it
@@ -112,13 +113,16 @@ export async function uploadDailyMedia(request: Request, env: Env, memberID: str
   const day = dayOf(url.searchParams.get("day"));
   const publish = url.searchParams.get("publish") === "1";
   if (publish && !day) return json({ error: "Choose the day it is for." }, { status: 400 });
+  const endDay = dayOf(url.searchParams.get("endDay"));
+  if (url.searchParams.has("endDay") && !endDay) return json({ error: "Choose a valid last day." }, { status: 400 });
+  if (endDay && day && endDay < day) return json({ error: "The last day cannot be before the first." }, { status: 400 });
   const id = `daily-${crypto.randomUUID().slice(0, 12)}`;
   const key = `daily/${id}.${extension}`;
   await env.MEDIA.put(key, request.body, { httpMetadata: { contentType } });
   const now = new Date().toISOString();
   await env.DB.prepare(`INSERT INTO daily_media(id,slot,day,end_day,media_key,caption,popup,status,source,created_by,created_at,updated_at,published_by,published_at)
     VALUES(?,?,?,?,?,?,?,?,'upload',?,?,?,?,?)`)
-    .bind(id, slot, day, dayOf(url.searchParams.get("endDay")), key, cleanText(url.searchParams.get("caption"), 600) ?? null,
+    .bind(id, slot, day, endDay, key, cleanText(url.searchParams.get("caption"), 600) ?? null,
       url.searchParams.get("popup") === "1" ? 1 : 0, publish ? "published" : "draft", `member:${memberID}`, now, now,
       publish ? `member:${memberID}` : null, publish ? now : null).run();
   return json({ ok: true, id }, { status: 201 });
@@ -133,6 +137,8 @@ export async function updateDailyMedia(env: Env, memberID: string, id: string, i
   if (!slot) return json({ error: "Choose where it shows." }, { status: 400 });
   const day = input.day === undefined ? row.day : dayOf(input.day);
   const endDay = input.endDay === undefined ? row.end_day : dayOf(input.endDay);
+  if (input.day != null && !day) return json({ error: "Choose the day it is for." }, { status: 400 });
+  if (input.endDay != null && !endDay) return json({ error: "Choose a valid last day." }, { status: 400 });
   const status = input.status === "published" || input.status === "hidden" || input.status === "draft" ? input.status : row.status;
   if (status === "published" && !day) return json({ error: "Choose the day it is for." }, { status: 400 });
   if (endDay && day && endDay < day) return json({ error: "The last day cannot be before the first." }, { status: 400 });

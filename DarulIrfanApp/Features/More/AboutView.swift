@@ -26,6 +26,7 @@ struct AboutView: View {
                     .diAppear(delay: 0.26)
             }
             .padding(DISpacing.md)
+            .diResponsiveWidth()
         }
         .diScreenBackground()
         .navigationTitle("About")
@@ -48,15 +49,10 @@ struct AboutView: View {
                 DISealEmblem(diameter: 96, glow: true)
                     .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 20)
 
-                Text(verbatim: "دارالعرفان")
-                    .font(DIFont.urduBody(scale: 1.6))
-                    .foregroundStyle(.white)
-                    .diGoldGlow(radius: 10, opacity: 0.4)
-                    .environment(\.layoutDirection, .rightToLeft)
-
-                Text("Darul Irfan")
-                    .font(DIFont.heading)
-                    .foregroundStyle(.white)
+                Text(verbatim: DIBrand.readsUrdu(locale) ? "دارالعرفان" : "Darul Irfan")
+                    .font(DIBrand.readsUrdu(locale) ? DIFont.urduBody(scale: 1.6).bold() : DIFont.heading.bold())
+                    .foregroundStyle(Color(hex: 0xFFE3A0))
+                    .diGoldGlow(radius: 3, opacity: 0.35)
 
                 Text("Light of Sacred Knowledge")
                     .font(.subheadline)
@@ -68,7 +64,7 @@ struct AboutView: View {
 
                 Text(DIBrand.anchorVerseArabic)
                     .font(DIFont.quranArabic(scale: 0.66))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color(hex: 0xFFE3A0))
                     .diGoldGlow(radius: 12, opacity: 0.5)
                     .environment(\.layoutDirection, .rightToLeft)
                     .multilineTextAlignment(.center)

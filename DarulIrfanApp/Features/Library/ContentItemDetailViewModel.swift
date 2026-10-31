@@ -72,6 +72,7 @@ final class ContentItemDetailViewModel {
             item = nil
         }
         if let item {
+            await Task.detached(priority: .utility) { QuranQuotation.warmUp() }.value
             if item.rightsStatus != .linkOnly {
                 let plain: String
                 if let bodyPlainText = item.bodyPlainText, !bodyPlainText.isEmpty {
