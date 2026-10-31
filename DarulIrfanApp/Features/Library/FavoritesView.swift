@@ -6,6 +6,8 @@ struct FavoritesView: View {
 
     @State private var items: [ContentItem] = []
     @State private var isLoading = true
+    @State private var loadFailed = false
+    @State private var attempt = 0
 
     var body: some View {
         Group {
@@ -13,6 +15,15 @@ struct FavoritesView: View {
                 ProgressView()
                     .tint(DIColor.primary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    DIEmptyState(systemImage: "heart", titleKey: "Something went wrong",
+                        messageKey: "Please try again in a moment.")
+                    Button("Retry") { attempt += 1 }
+                        .buttonStyle(.bordered)
+                        .tint(DIColor.primary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if items.isEmpty {
                 DIEmptyState(
                     systemImage: "heart",
@@ -41,9 +52,17 @@ struct FavoritesView: View {
         .diScreenBackground()
         .libraryFavoriteFailure(viewModel)
         .navigationTitle("Favorites")
-        .task {
-            items = await viewModel.favoriteItems()
-            isLoading = false
+        .task(id: attempt) {
+            isLoading = true
+            loadFailed = false
+            defer { isLoading = false }
+            do {
+                items = try await viewModel.favoriteItems()
+            } catch is CancellationError {
+                return
+            } catch {
+                loadFailed = true
+            }
         }
     }
 }

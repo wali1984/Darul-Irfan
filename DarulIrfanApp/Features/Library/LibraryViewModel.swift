@@ -253,20 +253,19 @@ final class LibraryViewModel {
     }
 
     /// Favorited content items, most recently favorited first.
-    func favoriteItems() async -> [ContentItem] {
-        await loadFavorites()
-        let ordered = favoritesByContentID.values.sorted { $0.createdAt > $1.createdAt }
+    func favoriteItems() async throws -> [ContentItem] {
+        let all = try await contentRepository.favorites()
+        let ordered = all.sorted { $0.createdAt > $1.createdAt }
         var items: [ContentItem] = []
+        var confirmed: [String: Favorite] = [:]
         for favorite in ordered {
             guard let contentItemID = favorite.contentItemID else { continue }
-            do {
-                if let item = try await contentRepository.item(id: contentItemID) {
-                    items.append(item)
-                }
-            } catch {
-                continue
+            confirmed[contentItemID] = favorite
+            if let item = try await contentRepository.item(id: contentItemID) {
+                items.append(item)
             }
         }
+        favoritesByContentID = confirmed
         return items
     }
 }

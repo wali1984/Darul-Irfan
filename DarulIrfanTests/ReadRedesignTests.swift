@@ -158,6 +158,31 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testFavoriteListFailuresAreNotEmptyAndCanRetry() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertItems([libraryItem("favorite-list-test", category: .books)])
+        let model = LibraryViewModel(contentRepository: repository)
+        let added = await model.toggleFavorite(contentItemID: "favorite-list-test")
+        XCTAssertTrue(added)
+        for table in ["favorites", "content_items"] {
+            try await database.connection.execute("ALTER TABLE \(table) RENAME TO unavailable_\(table)")
+            do {
+                _ = try await model.favoriteItems()
+                XCTFail("A failed favorite list read must expose Retry, not an empty list")
+            } catch { }
+            XCTAssertTrue(model.isFavorite("favorite-list-test"))
+            try await database.connection.execute("ALTER TABLE unavailable_\(table) RENAME TO \(table)")
+            let recovered = try await model.favoriteItems()
+            XCTAssertEqual(recovered.map(\.id), ["favorite-list-test"])
+        }
+        let removed = await model.toggleFavorite(contentItemID: "favorite-list-test")
+        XCTAssertTrue(removed)
+        let empty = try await model.favoriteItems()
+        XCTAssertTrue(empty.isEmpty)
+    }
+
+    @MainActor
     func testFailedFavoriteRemovalPreservesConfirmedStateAndRetries() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)
