@@ -19,6 +19,7 @@ struct DailyMediaManagerView: View {
 
     var body: some View {
         List {
+            Group {
             Section {
                 Button { adding = true } label: { Label("Add a picture", systemImage: "photo.badge.plus") }
             } footer: {
@@ -42,6 +43,8 @@ struct DailyMediaManagerView: View {
             } else {
                 ProgressView()
             }
+            }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -109,16 +112,22 @@ struct DailyMediaEditor: View {
     @State private var working = false
     @State private var loadingPicture = false
     @State private var choosingFile = false
+    @State private var confirmingDelete = false
     @State private var error: String?
 
     var body: some View {
         Form {
+            Group {
             Section {
                 if let preview {
                     Image(uiImage: preview).resizable().scaledToFit().frame(maxHeight: 260)
                 } else if let url = item?.imageURL {
                     AsyncImage(url: url) { phase in
-                        if case .success(let image) = phase { image.resizable().scaledToFit() } else { ProgressView() }
+                        switch phase {
+                        case .success(let image): image.resizable().scaledToFit()
+                        case .failure: Text("The picture could not be loaded. Close and reopen this page to try again.").font(.caption).foregroundStyle(DIColor.textMuted)
+                        default: ProgressView()
+                        }
                     }
                     .frame(maxHeight: 260)
                 }
@@ -162,18 +171,24 @@ struct DailyMediaEditor: View {
             Section {
                 if working { ProgressView() }
                 Button(item?.status == "published" ? "Save" : "Publish") { Task { await save(publish: true) } }
+                    .buttonStyle(DIPrimaryButtonStyle())
                     .disabled(working || loadingPicture || (item == nil && picture == nil))
                 if item == nil {
                     Button("Save as a draft") { Task { await save(publish: false) } }
+                        .buttonStyle(DISecondaryButtonStyle())
                         .disabled(working || loadingPicture || picture == nil)
                 }
                 if let item {
                     if item.status == "published" {
-                        Button("Hide it") { Task { await setStatus("hidden") } }.disabled(working)
+                        Button("Hide it") { Task { await setStatus("hidden") } }
+                            .buttonStyle(DISecondaryButtonStyle()).disabled(working)
                     }
-                    Button("Delete", role: .destructive) { Task { await delete(item) } }.disabled(working)
+                    Button("Delete", role: .destructive) { confirmingDelete = true }
+                        .buttonStyle(DISecondaryButtonStyle(destructive: true)).disabled(working)
                 }
             }
+            }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -190,6 +205,12 @@ struct DailyMediaEditor: View {
             }
         }
         .interactiveDismissDisabled(working)
+        .confirmationDialog("Delete this picture?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+            if let item { Button("Delete", role: .destructive) { Task { await delete(item) } } }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This removes the picture from the app. This cannot be undone.")
+        }
     }
 
     private static func dayKey(_ date: Date) -> String { DayKey.make(from: date, timeZone: .autoupdatingCurrent) }

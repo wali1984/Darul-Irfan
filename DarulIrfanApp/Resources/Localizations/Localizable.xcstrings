@@ -33458,6 +33458,57 @@
           }
         }
       }
+    },
+    "Delete this picture?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this picture?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کیا یہ تصویر حذف کرنی ہے؟"
+          }
+        }
+      }
+    },
+    "This removes the picture from the app. This cannot be undone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This removes the picture from the app. This cannot be undone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس سے تصویر ایپ سے حذف ہو جائے گی۔ اسے واپس نہیں لایا جا سکتا۔"
+          }
+        }
+      }
+    },
+    "The picture could not be loaded. Close and reopen this page to try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The picture could not be loaded. Close and reopen this page to try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصویر لوڈ نہیں ہو سکی۔ دوبارہ کوشش کے لیے یہ صفحہ بند کر کے دوبارہ کھولیں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
