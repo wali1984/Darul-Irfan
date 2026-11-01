@@ -1067,7 +1067,7 @@ private struct AyahCardView: View {
                     } label: {
                         Label("Commentary with ayat \(covering.ayahStart)–\(covering.ayahEnd)", systemImage: "arrow.up.doc")
                             .diInterfaceFont(.footnote, weight: .semibold)
-                            .foregroundStyle(DIColor.primary)
+                            .foregroundStyle(DIColor.actionForeground)
                     }
                     .buttonStyle(.plain)
                 }
@@ -1103,7 +1103,7 @@ private struct AyahCardView: View {
             HStack(spacing: DISpacing.sm) {
                 ayahNumberBadge
                 if let para = QuranDivisions.juzStarting(surah: ayah.surahNumber, ayah: ayah.ayahNumber) {
-                    DIPillBadge(text: String(localized: "Parah \(para)"), color: DIColor.accent)
+                    DIPillBadge(text: String(localized: "Parah \(para)"), color: DIColor.accent, foreground: DIColor.textPrimary)
                 }
             }
             ViewThatFits(in: .horizontal) {
@@ -1127,7 +1127,7 @@ private struct AyahCardView: View {
             Label("Tafsir", systemImage: "text.book.closed")
                 .diInterfaceFont(.caption, weight: .semibold)
                 .padding(.horizontal, DISpacing.sm)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
         }
         .accessibilityLabel(Text("Tafsir of Ayah \(ayah.ayahNumber)"))
         Button {
@@ -1162,7 +1162,7 @@ private struct AyahCardView: View {
                 }
             } label: {
                 Image(systemName: isSounding ? "pause.circle.fill" : "play.circle")
-                    .foregroundStyle(isSounding ? DIColor.accent : DIColor.primary)
+                    .foregroundStyle(isSounding ? DIColor.accent : DIColor.actionForeground)
             }
             .accessibilityLabel(isSounding ? Text("Pause") : Text("Play Ayah \(ayah.ayahNumber)"))
         }
@@ -1246,9 +1246,9 @@ private struct AyahCardView: View {
         } label: {
             Text(edition?.title ?? "Tafsir")
                 .diInterfaceFont(.footnote, weight: .semibold)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
         }
-        .tint(DIColor.primary)
+        .tint(DIColor.actionForeground)
     }
 
     // MARK: Listen and note
@@ -1404,7 +1404,7 @@ private struct AyahCardView: View {
         Label(LocalizedStringKey(label), systemImage: icon)
             .diInterfaceFont(.caption, weight: .semibold)
             .padding(.vertical, 8)
-            .foregroundStyle(enabled ? DIColor.primary : DIColor.textMuted)
+            .foregroundStyle(enabled ? DIColor.actionForeground : DIColor.textMuted)
     }
 
     // MARK: Language-aware body text
@@ -1468,7 +1468,7 @@ private struct BayanListSheet: View {
                             } label: {
                                 HStack(spacing: DISpacing.sm) {
                                     Image(systemName: "play.circle.fill")
-                                        .foregroundStyle(DIColor.primary)
+                                        .foregroundStyle(DIColor.actionForeground)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(verbatim: link.title)
                                             .diInterfaceFont(.subheadline, weight: .medium)

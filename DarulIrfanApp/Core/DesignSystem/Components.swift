@@ -147,6 +147,7 @@ struct DIEmptyState: View {
 struct DIPillBadge: View {
     let text: String
     var color: Color = DIColor.primary
+    var foreground: Color? = nil
 
     var body: some View {
         Text(text)
@@ -154,7 +155,7 @@ struct DIPillBadge: View {
             .padding(.horizontal, DISpacing.sm)
             .padding(.vertical, DISpacing.xs)
             .background(color.opacity(0.14))
-            .foregroundStyle(color)
+            .foregroundStyle(foreground ?? color)
             .clipShape(Capsule())
     }
 }
