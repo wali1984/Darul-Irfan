@@ -481,7 +481,7 @@ private struct SuggestionChip: View {
                 .minimumScaleFactor(0.7)
                 .padding(.horizontal, DISpacing.md)
                 .padding(.vertical, DISpacing.sm)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .background(Capsule().fill(DIColor.surface))
                 .overlay(Capsule().stroke(DIColor.accent.opacity(0.45), lineWidth: 1))
         }

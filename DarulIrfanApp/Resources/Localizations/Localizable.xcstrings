@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+  "Tazkiyah": {
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Tazkiyah"
+      }
+    },
+    "ur": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "تزکیہ"
+      }
+    }
+  }
+},
   "Hadith search could not be completed. Please try again.": {
   "extractionState": "manual",
   "localizations": {
