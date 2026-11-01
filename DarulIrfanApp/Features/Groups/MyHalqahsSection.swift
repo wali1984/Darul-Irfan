@@ -20,6 +20,7 @@ struct MyHalqahsSection: View {
     /// groups page); the tab offers it only until then.
     var explainsWhenJoined = false
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var inviteCode = ""
     /// The name a member joining by code gives.
     @State private var joinName = ""
@@ -347,10 +348,12 @@ struct MyHalqahsSection: View {
         } label: {
             Label("How private groups work", systemImage: "questionmark.circle")
                 .font(.headline)
+                .frame(minHeight: 48)
                 .foregroundStyle(DIColor.textPrimary)
         }
         .tint(DIColor.primary)
         .myHalqahsPanel()
+        .transaction { if reduceMotion { $0.animation = nil; $0.disablesAnimations = true } }
     }
 
     private func howStep(_ number: Int, _ title: LocalizedStringKey, _ detail: LocalizedStringKey) -> some View {
@@ -597,6 +600,7 @@ struct MyHalqahsSection: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityValue(isAddingCode ? Text("Expanded") : Text("Collapsed"))
             if isAddingCode {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     TextField("Invitation code", text: $inviteCode)
