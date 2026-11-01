@@ -122,7 +122,16 @@ final class GroupsModel {
             role = list.role ?? .member
             signedIn = list.signedIn
             phase = .ready
-            displayName = (try? await service.profile())?.displayName
+            do {
+                let profile = try await service.profile()
+                try Task.checkCancellation()
+                displayName = profile.displayName
+            } catch is CancellationError {
+                return
+            } catch {
+                // Keep the last known name when an optional profile refresh fails.
+            }
+            guard !Task.isCancelled else { return }
             // Not waited for: the token can take a few seconds to come, and
             // the page (and pull to refresh) should not.
             Task { await self.noticesModel.follow() }
@@ -252,6 +261,7 @@ struct GroupsHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
+                MethodOfZikrLink(compact: true)
                 MyHalqahsSection(model: model, dependencies: dependencies, explainsWhenJoined: true)
                 if model.showsAccount {
                     HalqahAccountSection(model: model)
@@ -265,6 +275,6 @@ struct GroupsHomeView: View {
             model.platform = dependencies?.officialPlatform
             await model.start()
         }
-        .refreshable { await model.refresh() }
+        .refreshable { await model.checkAgain() }
     }
 }

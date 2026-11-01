@@ -76,12 +76,14 @@ struct HalqahAccountSection: View {
 struct HalqahNameEditor: View {
     @Bindable var model: GroupsModel
     @State private var draft = ""
+    @State private var initializedDraft = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     TextField("Your name", text: $draft)
+                        .diInterfaceFont(.body)
                         .textFieldStyle(.roundedBorder)
                         .textContentType(.name)
                         .submitLabel(.done)
@@ -109,8 +111,14 @@ struct HalqahNameEditor: View {
         .diScreenBackground()
         .navigationTitle("Your name")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { if draft.isEmpty { draft = model.displayName ?? "" } }
-        .onChange(of: model.displayName) { _, name in draft = name ?? "" }
+        .onAppear {
+            guard !initializedDraft else { return }
+            draft = model.displayName ?? ""
+            initializedDraft = true
+        }
+        .onChange(of: model.displayName) { previous, name in
+            if draft == (previous ?? "") { draft = name ?? "" }
+        }
     }
 
     private var trimmedDraft: String { draft.trimmingCharacters(in: .whitespacesAndNewlines) }
