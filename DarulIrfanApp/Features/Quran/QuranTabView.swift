@@ -473,15 +473,14 @@ private struct QuranParaRow: View {
                 Text(verbatim: "\(para.surah.nameTransliterated) \(para.surah.id):\(para.ayah)")
                     .diInterfaceFont(.footnote, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
-            }
-            Spacer(minLength: DISpacing.sm)
-            if let opening {
-                Text(verbatim: opening)
-                    .font(DIFont.quranArabic(scale: 0.6))
-                    .foregroundStyle(ReadPalette.arabicInk)
-                    .lineLimit(1)
-                    .environment(\.layoutDirection, .rightToLeft)
-                    .frame(maxWidth: 170, alignment: .trailing)
+                if let opening {
+                    Text(verbatim: opening)
+                        .font(DIFont.quranArabic(scale: 0.6))
+                        .foregroundStyle(DIColor.scripture)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .environment(\.layoutDirection, .rightToLeft)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
             }
         }
         .padding(.horizontal, 12)
@@ -518,8 +517,8 @@ struct QuranParaListView: View {
                         if let opening = openings[para.number] {
                             Text(verbatim: opening)
                                 .font(DIFont.quranArabic(scale: 0.6))
-                                .foregroundStyle(DIColor.textMuted)
-                                .lineLimit(1)
+                                .foregroundStyle(DIColor.scripture)
+                                .fixedSize(horizontal: false, vertical: true)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                                 .environment(\.layoutDirection, .rightToLeft)
                         }
