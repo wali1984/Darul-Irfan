@@ -348,6 +348,7 @@ struct AddGroupPersonView: View {
     }
 
     private func save() async {
+        guard !working, canSave else { return }
         working = true
         defer { working = false }
         do {
