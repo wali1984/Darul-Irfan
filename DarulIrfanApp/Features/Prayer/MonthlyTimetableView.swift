@@ -172,37 +172,27 @@ struct MonthlyTimetableView: View {
     // MARK: - Month navigation
 
     private var monthSwitcher: some View {
-        HStack {
-            Button {
-                viewModel.goToPreviousMonth()
-            } label: {
-                Image(systemName: "chevron.backward")
-                    .diInterfaceFont(.body, weight: .semibold)
-                    .foregroundStyle(DIColor.actionForeground)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Previous month"))
-
-            Spacer()
+        VStack(spacing: DISpacing.sm) {
             Text(viewModel.monthTitle)
                 .diInterfaceFont(.headline, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
                 .accessibilityAddTraits(.isHeader)
-            Spacer()
-
-            Button {
-                viewModel.goToNextMonth()
-            } label: {
-                Image(systemName: "chevron.forward")
-                    .diInterfaceFont(.body, weight: .semibold)
-                    .foregroundStyle(DIColor.actionForeground)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
+            HStack {
+                Button(action: viewModel.goToPreviousMonth) {
+                    Image(systemName: "chevron.backward")
+                }
+                .buttonStyle(DICompactButtonStyle())
+                .accessibilityLabel(Text("Previous month"))
+                Spacer(minLength: DISpacing.sm)
+                Button("Today", action: viewModel.goToCurrentMonth)
+                    .buttonStyle(DICompactButtonStyle())
+                Spacer(minLength: DISpacing.sm)
+                Button(action: viewModel.goToNextMonth) {
+                    Image(systemName: "chevron.forward")
+                }
+                .buttonStyle(DICompactButtonStyle())
+                .accessibilityLabel(Text("Next month"))
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text("Next month"))
         }
     }
 
