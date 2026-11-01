@@ -138,6 +138,7 @@ final class MediaViewModel {
     private let audioPlayer: any AudioPlayerServicing
 
     private(set) var isLoading = false
+    private var loadInProgress = false
     private(set) var loadErrorMessage: String?
     private(set) var resumeEntries: [MediaResumeEntry] = []
     private(set) var categoryCounts: [MediaCategory: Int] = [:]
@@ -176,6 +177,9 @@ final class MediaViewModel {
     }
 
     func load() async {
+        guard !loadInProgress else { return }
+        loadInProgress = true
+        defer { loadInProgress = false; isLoading = false }
         if !hasLoadedOnce {
             isLoading = true
         }
@@ -205,10 +209,13 @@ final class MediaViewModel {
             }
             assetsByMediaItemID = byMediaID
             hasLoadedOnce = true
+        } catch is CancellationError {
+            return
         } catch {
-            loadErrorMessage = "The media library could not be loaded right now. Please try again in a moment."
+            if !Task.isCancelled {
+                loadErrorMessage = "The media library could not be loaded right now. Please try again in a moment."
+            }
         }
-        isLoading = false
     }
 
     /// Resumes a "Continue Listening" entry from its saved position.
