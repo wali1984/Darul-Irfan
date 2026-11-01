@@ -33,6 +33,7 @@ struct GroupLinkView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Done") { dismiss() }
+                    .buttonStyle(DICompactButtonStyle())
             }
         }
         .task {
