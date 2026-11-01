@@ -98,7 +98,7 @@ enum MediaTimeFormat {
 struct MediaTitleText: View {
     let item: MediaItem
     var latinFont: Font = .headline
-    var lineLimit: Int = 2
+    var lineLimit: Int? = 2
     /// The text colour: white on an emerald hero card.
     var color: Color = DIColor.textPrimary
 

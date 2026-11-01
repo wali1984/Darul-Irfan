@@ -308,7 +308,7 @@ struct MediaItemRow: View {
         HStack(alignment: .center, spacing: DISpacing.sm) {
             leadingAction
             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                MediaTitleText(item: item, latinFont: .headline, lineLimit: 2)
+                MediaTitleText(item: item, latinFont: .headline, lineLimit: nil)
                 metadataLine
                 if let speaker = item.speaker {
                     let rtl = ScriptDirection.isRightToLeft(speaker, fallbackLanguage: nil)
