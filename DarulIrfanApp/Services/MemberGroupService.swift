@@ -1,6 +1,18 @@
 import Foundation
 import Security
 
+protocol MemberSessionStore: Sendable {
+    func load() -> MemberSession?
+    func save(_ value: MemberSession)
+    func delete()
+}
+
+private struct KeychainMemberSessionStore: MemberSessionStore {
+    func load() -> MemberSession? { SecureMemberSession.load() }
+    func save(_ value: MemberSession) { SecureMemberSession.save(value) }
+    func delete() { SecureMemberSession.delete() }
+}
+
 enum MemberGroupError: LocalizedError {
     case signInRejected
     case notSignedIn
@@ -38,17 +50,21 @@ actor MemberGroupService {
     /// Recordings can take minutes to send; everything else stays short.
     private let uploads: URLSession
     private let decoder: JSONDecoder
+    private let savedSession: any MemberSessionStore
 
-    init(baseURL: URL = OfficialPlatformConfiguration.baseURL) {
+    init(baseURL: URL = OfficialPlatformConfiguration.baseURL,
+         session: URLSession? = nil, uploads: URLSession? = nil,
+         savedSession: (any MemberSessionStore)? = nil) {
         self.baseURL = baseURL
+        self.savedSession = savedSession ?? KeychainMemberSessionStore()
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 15
         configuration.timeoutIntervalForResource = 30
-        session = URLSession(configuration: configuration)
+        self.session = session ?? URLSession(configuration: configuration)
         let uploading = URLSessionConfiguration.ephemeral
         uploading.timeoutIntervalForRequest = 60
         uploading.timeoutIntervalForResource = 3_600
-        uploads = URLSession(configuration: uploading)
+        self.uploads = uploads ?? URLSession(configuration: uploading)
         // The server writes JavaScript's toISOString(), which carries
         // milliseconds ("2026-10-27T10:15:00.000Z"). The stock .iso8601
         // strategy rejects fractional seconds, which made every post and
@@ -56,8 +72,8 @@ actor MemberGroupService {
         decoder = JSONDecoder.darulIrfanServer()
     }
 
-    var isSignedIn: Bool { SecureMemberSession.load() != nil }
-    var memberID: String? { SecureMemberSession.load()?.memberID }
+    var isSignedIn: Bool { savedSession.load() != nil }
+    var memberID: String? { savedSession.load()?.memberID }
 
     /// Whether a member is signed in on this phone. Static, so it is read
     /// without the actor (by the push registration).
@@ -80,7 +96,7 @@ actor MemberGroupService {
               let value = try? decoder.decode(MemberSession.self, from: data) else {
             throw MemberGroupError.signInRejected
         }
-        SecureMemberSession.save(value)
+        savedSession.save(value)
         return value.memberID
     }
 
@@ -97,7 +113,7 @@ actor MemberGroupService {
         // Signed in already: the code is added to this same account. Without
         // the token the server cannot tell, and makes a new one-group account
         // that replaces this one on the phone.
-        if let saved = SecureMemberSession.load() {
+        if let saved = savedSession.load() {
             request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
         }
         var payload: [String: String] = ["code": code]
@@ -108,7 +124,7 @@ actor MemberGroupService {
         guard status == 201, let value = try? decoder.decode(MemberSession.self, from: data) else {
             throw status == 429 ? MemberGroupError.tooManyAttempts : MemberGroupError.inviteRejected
         }
-        SecureMemberSession.save(value)
+        savedSession.save(value)
         return value.memberID
     }
 
@@ -117,12 +133,12 @@ actor MemberGroupService {
     /// the next person to use the phone does not see them on the lock screen.
     /// The local session goes even when the server cannot be reached.
     func signOut() async {
-        if SecureMemberSession.load() != nil {
+        if savedSession.load() != nil {
             var payload: [String: Any] = [:]
             if let installation = SecureInstallationIdentity.load() { payload["installationID"] = installation.uuidString }
             _ = try? await send("POST", path: "v1/members/signout", payload: payload, expecting: [204])
         }
-        SecureMemberSession.delete()
+        savedSession.delete()
         HalqahNoticeChoice.isTurnedOff = false
     }
 
@@ -240,7 +256,7 @@ actor MemberGroupService {
     func uploadRecording(
         from file: URL, contentType: String, title: String, durationSeconds: Int?, in groupID: String
     ) async throws {
-        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var components = URLComponents(url: baseURL.appendingPathComponent("v1/groups/\(groupID)/recordings"), resolvingAgainstBaseURL: false)
         components?.queryItems = [URLQueryItem(name: "title", value: title)]
             + (durationSeconds.map { [URLQueryItem(name: "durationSeconds", value: String($0))] } ?? [])
@@ -252,7 +268,7 @@ actor MemberGroupService {
         let (data, response) = try await uploads.upload(for: request, fromFile: file)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            SecureMemberSession.delete()
+            savedSession.delete()
             throw MemberGroupError.notSignedIn
         }
         guard code == 201 else {
@@ -320,7 +336,7 @@ actor MemberGroupService {
     /// Sends one picture (as data) or video (as a file) for a post, and
     /// returns its key.
     func uploadPostMedia(picture: Data? = nil, video: URL? = nil, contentType: String, in groupID: String) async throws -> String {
-        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var request = URLRequest(url: baseURL.appendingPathComponent("v1/groups/\(groupID)/media"))
         request.httpMethod = "POST"
         request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
@@ -334,7 +350,7 @@ actor MemberGroupService {
         let (data, response) = result
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            SecureMemberSession.delete()
+            savedSession.delete()
             throw MemberGroupError.notSignedIn
         }
         let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -367,7 +383,7 @@ actor MemberGroupService {
         _ picture: Data, contentType: String, slot: DailyMediaItem.Slot, day: String?, endDay: String?,
         caption: String?, popup: Bool, publish: Bool
     ) async throws {
-        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var components = URLComponents(url: baseURL.appendingPathComponent("v1/daily-media/manage"), resolvingAgainstBaseURL: false)
         var query = [URLQueryItem(name: "slot", value: slot.rawValue), URLQueryItem(name: "popup", value: popup ? "1" : "0"),
                      URLQueryItem(name: "publish", value: publish ? "1" : "0")]
@@ -383,7 +399,7 @@ actor MemberGroupService {
         let (data, response) = try await uploads.upload(for: request, from: picture)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            SecureMemberSession.delete()
+            savedSession.delete()
             throw MemberGroupError.notSignedIn
         }
         guard code == 201 else {
@@ -458,7 +474,7 @@ actor MemberGroupService {
 
     @discardableResult
     private func send(_ method: String, path: String, payload: [String: Any]?, expecting codes: Set<Int>) async throws -> Data {
-        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = method
         request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
@@ -469,7 +485,7 @@ actor MemberGroupService {
         let (data, response) = try await session.data(for: request)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            SecureMemberSession.delete()
+            savedSession.delete()
             throw MemberGroupError.notSignedIn
         }
         guard codes.contains(code) else {
@@ -487,7 +503,7 @@ actor MemberGroupService {
     /// it. Published posts belong to the organisation, so nothing the silsila
     /// published is lost.
     func deleteAccount() async throws {
-        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var request = URLRequest(url: baseURL.appendingPathComponent("v1/members/me"))
         request.httpMethod = "DELETE"
         request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
@@ -496,12 +512,12 @@ actor MemberGroupService {
         // 401 means the session is already gone server-side; the local copy
         // should still go, so the member is not left signed in to nothing.
         guard code == 204 || code == 401 else { throw MemberGroupError.requestFailed }
-        SecureMemberSession.delete()
+        savedSession.delete()
         HalqahNoticeChoice.isTurnedOff = false
     }
 
     private func authorized<T: Decodable>(_ type: T.Type, path: String, query: String? = nil) async throws -> T {
-        guard let saved = SecureMemberSession.load() else { throw MemberGroupError.notSignedIn }
+        guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var url = baseURL.appendingPathComponent(path)
         if let query, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
             components.percentEncodedQuery = query
@@ -514,7 +530,7 @@ actor MemberGroupService {
         if code == 401 {
             // The session expired or was revoked; drop it so the UI asks for a
             // fresh sign-in instead of retrying a token that will never work.
-            SecureMemberSession.delete()
+            savedSession.delete()
             throw MemberGroupError.notSignedIn
         }
         guard code == 200, let value = try? decoder.decode(type, from: data) else {
