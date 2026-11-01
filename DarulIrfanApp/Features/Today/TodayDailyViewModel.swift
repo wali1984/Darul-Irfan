@@ -242,10 +242,10 @@ final class TodayDailyViewModel {
         if let silsila = silsilaAyah {
             return ShareableContent(badge: String(localized: "Ayah of the Day"), arabic: silsila.arabic,
                                     translation: silsila.translation,
-                                    attribution: "\(silsila.reference) · \(silsila.translationEdition)")
+                                    attribution: "\(silsila.reference) · \(silsila.translationEdition)", isQuran: true)
         }
         return ShareableContent(badge: String(localized: "Ayah of the Day"), arabic: ayah.arabic,
-                                translation: ayahTranslation(), attribution: ayah.reference)
+                                translation: ayahTranslation(), attribution: ayah.reference, isQuran: true)
     }
 
     func aqwalShare() -> ShareableContent? {

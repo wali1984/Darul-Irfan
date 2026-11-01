@@ -37,6 +37,9 @@ enum AppFonts {
          "AmiriQuran-Regular", "Amiri Quran", "AmiriQuran"]
     )
 
+    /// General Arabic prose and devotional text, distinct from Quran orthography.
+    static let generalArabicName = resolve(["AmiriQuran-Regular", "Amiri Quran", "AmiriQuran"])
+
     /// Apple's own Noto Nastaliq Urdu, when this device has it; nil otherwise.
     ///
     /// Google's OpenType Nastaliq (which this app used to bundle) relies on

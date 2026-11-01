@@ -8,6 +8,7 @@ struct ShareableContent: Equatable {
     var arabic: String?
     var translation: String?
     var attribution: String
+    var isQuran = false
 }
 
 /// A devotional card for sharing, 1080 wide: emerald "paper", octagram
@@ -21,16 +22,28 @@ struct ShareCardView: View {
     let content: ShareableContent
     var side: CGFloat = 1080
 
+    private func isRTL(_ text: String) -> Bool {
+        ScriptDirection.isRightToLeft(text, fallbackLanguage: nil)
+    }
+
+    private func proseFont(_ text: String, size: CGFloat, weight: Font.Weight,
+                           design: Font.Design = .default) -> Font {
+        if isRTL(text), let name = AppFonts.urduNastaliqName {
+            return .custom(name, fixedSize: size).weight(weight)
+        }
+        return .system(size: size, weight: weight, design: design)
+    }
+
     var body: some View {
         VStack(spacing: side * 0.045) {
             Text(content.badge.uppercased())
-                .font(.system(size: side * 0.028, weight: .semibold))
-                .tracking(side * 0.006)
+                .font(proseFont(content.badge, size: side * 0.028, weight: .semibold))
+                .tracking(isRTL(content.badge) ? 0 : side * 0.006)
                 .foregroundStyle(Color(hex: 0xE0B75F))
 
             if let arabic = content.arabic, !arabic.isEmpty {
                 Text(arabic)
-                    .font(.system(size: side * 0.062, weight: .regular))
+                    .font(.custom(content.isQuran ? AppFonts.quranArabicName : AppFonts.generalArabicName, fixedSize: side * 0.062))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .lineSpacing(side * 0.02)
@@ -44,7 +57,7 @@ struct ShareCardView: View {
 
             if let translation = content.translation, !translation.isEmpty {
                 Text(translation)
-                    .font(.system(size: side * 0.034, weight: .regular, design: .serif))
+                    .font(proseFont(translation, size: side * 0.034, weight: .regular, design: .serif))
                     .foregroundStyle(Color(hex: 0xF3EEE2))
                     .multilineTextAlignment(.center)
                     .lineSpacing(side * 0.008)
@@ -52,8 +65,8 @@ struct ShareCardView: View {
             }
 
             Text(content.attribution)
-                .font(.system(size: side * 0.026, weight: .medium))
-                .tracking(side * 0.003)
+                .font(proseFont(content.attribution, size: side * 0.026, weight: .medium))
+                .tracking(isRTL(content.attribution) ? 0 : side * 0.003)
                 .foregroundStyle(Color(hex: 0xE0B75F))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
