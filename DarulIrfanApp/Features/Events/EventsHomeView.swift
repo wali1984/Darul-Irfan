@@ -337,6 +337,7 @@ private struct EventRowCard: View {
 /// with the map and the number and address to copy.
 private struct DarulIrfanHeroCard: View {
     let place: DarulIrfanPlace
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.openURL) private var openURL
     @State private var linkFailed = false
 
@@ -349,7 +350,10 @@ private struct DarulIrfanHeroCard: View {
             }
             .buttonStyle(DIPressableStyle())
             .accessibilityHint(Text("Map showing the location of Dar-ul-Irfan"))
-            HStack(spacing: 10) {
+            let actionsLayout = dynamicTypeSize >= .xxLarge
+                ? AnyLayout(VStackLayout(spacing: 10))
+                : AnyLayout(HStackLayout(spacing: 10))
+            actionsLayout {
                 if let url = place.directionsURL {
                     Button { open(url) } label: { pill("Directions", gold: true) }
                 }
