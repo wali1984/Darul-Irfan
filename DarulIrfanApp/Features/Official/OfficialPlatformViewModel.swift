@@ -89,6 +89,24 @@ final class OfficialPlatformViewModel {
         }
     }
 
+    /// Resolve a notification without changing the visible feed or pagination cursor.
+    func findLinkedUpdate(id: String) async throws -> OfficialFeedItem? {
+        if let item = feedItems.first(where: { $0.id == id }) { return item }
+        guard isOfficialFeedEnabled else { throw OfficialPlatformError.invalidResponse }
+        var visited = Set<String?>()
+        var cursor: String?
+        while visited.insert(cursor).inserted {
+            try Task.checkCancellation()
+            let page = try await feedService.feed(after: cursor, forceRefresh: true)
+            try Task.checkCancellation()
+            if let item = page.items.first(where: { $0.id == id }) { return item }
+            guard !page.isFromCache else { throw OfficialPlatformError.noCachedContent }
+            guard let next = page.nextCursor else { return nil }
+            cursor = next
+        }
+        throw OfficialPlatformError.invalidResponse
+    }
+
     private static func deduplicated(_ items: [OfficialFeedItem]) -> [OfficialFeedItem] {
         var seen = Set<String>()
         return items.filter { seen.insert($0.id).inserted }

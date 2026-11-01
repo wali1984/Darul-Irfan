@@ -90,6 +90,8 @@ struct UpdatesSection: View {
     /// Needed to open a library item; a page without it lists them only.
     let appState: AppState?
     let followsLinks: Bool
+    @State private var linkAttempt = 0
+    @State private var linkFailure: String?
     @State private var presentedVideo: FeedVideo?
     @State private var presentedItem: OfficialFeedItem?
     /// For a library item opened from here: its favourite star.
@@ -118,6 +120,20 @@ struct UpdatesSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
+            if followsLinks, let route = DeepLinkRouter.shared.pending, route.updateID != nil {
+                DICard {
+                    VStack(spacing: DISpacing.sm) {
+                        if let linkFailure {
+                            Text(LocalizedStringKey(linkFailure)).diInterfaceFont(.callout)
+                            Button("Retry") { linkAttempt += 1 }.buttonStyle(DISecondaryButtonStyle())
+                        } else {
+                            ProgressView()
+                            Text("Opening update…").diInterfaceFont(.callout)
+                        }
+                        Button("Close") { DeepLinkRouter.shared.clear(route) }.buttonStyle(DISecondaryButtonStyle())
+                    }
+                }
+            }
             if feed.isShowingCachedContent {
                 Label("Showing saved updates", systemImage: "wifi.slash")
                     .diInterfaceFont(.caption)
@@ -155,13 +171,10 @@ struct UpdatesSection: View {
             if feed.feedItems.isEmpty && !feed.isLoading {
                 await feed.load()
             }
-            openLinkedUpdate()
         }
-        .onChange(of: feed.isLoading) { _, isLoading in
-            if !isLoading { openLinkedUpdate() }
+        .task(id: "\(DeepLinkRouter.shared.requestCount):\(linkAttempt):\(DeepLinkRouter.shared.pending?.updateID ?? "")") {
+            await openLinkedUpdate()
         }
-        .onChange(of: DeepLinkRouter.shared.requestCount) { _, _ in openLinkedUpdate() }
-        .onChange(of: feed.feedItems.map(\.id)) { _, _ in openLinkedUpdate() }
         .sheet(item: $presentedVideo) { video in
             YouTubePlayerSheet(videoID: video.id, title: video.title)
         }
@@ -172,17 +185,28 @@ struct UpdatesSection: View {
 
     /// A link to one update ("darulirfan://feed/<id>") opens it once the
     /// feed has loaded, when it is among the updates shown.
-    private func openLinkedUpdate() {
-        guard followsLinks, !feed.isLoading,
-              let route = DeepLinkRouter.shared.pending,
-              let id = route.updateID,
-              let item = feed.feedItems.first(where: { $0.id == id }) else { return }
-        // A later page or retry can still resolve the request; clear it only once the item exists.
-        DeepLinkRouter.shared.clear(route)
-        if item.source == .youtube, let videoID = item.videoID {
-            presentedVideo = FeedVideo(id: videoID, title: item.title)
-        } else {
-            presentedItem = item
+    private func openLinkedUpdate() async {
+        linkFailure = nil
+        guard followsLinks, let route = DeepLinkRouter.shared.pending,
+              let id = route.updateID else { return }
+        let request = DeepLinkRouter.shared.requestCount
+        do {
+            let item = try await feed.findLinkedUpdate(id: id)
+            try Task.checkCancellation()
+            guard DeepLinkRouter.shared.requestCount == request,
+                  DeepLinkRouter.shared.pending == route else { return }
+            guard let item else {
+                linkFailure = "This update is no longer available."
+                return
+            }
+            DeepLinkRouter.shared.clear(route)
+            open(item)
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled, DeepLinkRouter.shared.requestCount == request,
+                  DeepLinkRouter.shared.pending == route else { return }
+            linkFailure = "The action could not be completed. Check your connection and try again."
         }
     }
 

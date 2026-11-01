@@ -1,6 +1,40 @@
 {
   "sourceLanguage": "en",
   "strings": {
+  "Opening update…": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Opening update…"
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "اپ ڈیٹ کھولی جا رہی ہے…"
+        }
+      }
+    }
+  },
+  "This update is no longer available.": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This update is no longer available."
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "یہ اپ ڈیٹ اب دستیاب نہیں ہے۔"
+        }
+      }
+    }
+  },
   "Could not load videos.": {
   "extractionState": "manual",
   "localizations": {
