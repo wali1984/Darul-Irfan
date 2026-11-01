@@ -1,6 +1,40 @@
 {
   "sourceLanguage": "en",
   "strings": {
+  "Hadith search could not be completed. Please try again.": {
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Hadith search could not be completed. Please try again."
+      }
+    },
+    "ur": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "حدیث کی تلاش مکمل نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔"
+      }
+    }
+  }
+},
+  "Hadith collections could not be loaded. Please try again.": {
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Hadith collections could not be loaded. Please try again."
+      }
+    },
+    "ur": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "حدیث کے مجموعے لوڈ نہیں ہو سکے۔ براہ کرم دوبارہ کوشش کریں۔"
+      }
+    }
+  }
+},
   "The biography could not be loaded. Please try again.": {
     "extractionState": "manual",
     "localizations": {
@@ -13,7 +47,7 @@
       "ur": {
         "stringUnit": {
           "state": "translated",
-          "value": "????? ??? ???? ?? ???? ???? ??? ?????? ???? ?????"
+          "value": "سوانح حیات لوڈ نہیں ہو سکیں۔ براہ کرم دوبارہ کوشش کریں۔"
         }
       }
     }

@@ -20,7 +20,10 @@ struct HadithHomeView: View {
     @State private var matchCount: Int?
     @State private var isSearching = false
     /// Debounces typing so a long corpus scan does not run on every keystroke.
-    @State private var searchTask: Task<Void, Never>?
+    @State private var searchAttempt = 0
+    @State private var searchFailed = false
+    @State private var loadFailed = false
+    @State private var loadAttempt = 0
     /// The groups opened past their first few with "Show all".
     @State private var expandedGroups: Set<HadithCollectionGroup.Kind> = []
     /// The collection opened last and the narration it was left on.
@@ -47,7 +50,9 @@ struct HadithHomeView: View {
                     ReadSectionPicker(selection: selection)
                 }
                 ReadFindField(prompt: "Search hadith by word or topic", text: $searchText)
-                if hasQuery {
+                if loadFailed {
+                    failureCard("Hadith collections could not be loaded. Please try again.") { loadAttempt += 1 }
+                } else if hasQuery {
                     searchSection
                 } else if isLoading {
                     ProgressView()
@@ -76,26 +81,8 @@ struct HadithHomeView: View {
         }
         .diScreenBackground()
         .diPageHeading("Hadith", hidden: readActions != nil)
-        .onChange(of: searchText) { _, term in
-            searchTask?.cancel()
-            let query = term.trimmingCharacters(in: .whitespaces)
-            guard query.count >= 2 || HadithRepository.referenceNumber(query) != nil else {
-                results = []; matchCount = nil; isSearching = false; return
-            }
-            isSearching = true
-            searchTask = Task {
-                try? await Task.sleep(for: .milliseconds(350))
-                guard !Task.isCancelled else { return }
-                let repository = dependencies.hadithRepository
-                let found = (try? await repository.search(query, bookID: nil, limit: 100)) ?? []
-                let total = (try? await repository.searchCount(query, bookID: nil)) ?? nil
-                guard !Task.isCancelled else { return }
-                results = found
-                matchCount = total
-                isSearching = false
-            }
-        }
-        .task { await load() }
+        .task(id: "\(searchAttempt)|\(searchText)") { await search(searchText) }
+        .task(id: loadAttempt) { await load() }
         // Back from a collection, the narration it was left on has moved.
         // (The first appearance is covered by load.)
         .onAppear {
@@ -244,6 +231,8 @@ struct HadithHomeView: View {
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(DISpacing.xl)
+        } else if searchFailed {
+            failureCard("Hadith search could not be completed. Please try again.") { searchAttempt += 1 }
         } else if results.isEmpty {
             DIEmptyState(
                 systemImage: "magnifyingglass",
@@ -328,14 +317,55 @@ struct HadithHomeView: View {
         return nil
     }
 
+    private func failureCard(_ message: LocalizedStringKey, retry: @escaping () -> Void) -> some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text(message).diInterfaceFont(.body).foregroundStyle(DIColor.danger)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Retry", action: retry).buttonStyle(DISecondaryButtonStyle())
+            }
+        }
+    }
+
+    private func search(_ term: String) async {
+        let query = term.trimmingCharacters(in: .whitespaces)
+        searchFailed = false
+        guard query.count >= 2 || HadithRepository.referenceNumber(query) != nil else {
+            results = []; matchCount = nil; isSearching = false; return
+        }
+        isSearching = true
+        do {
+            try await Task.sleep(for: .milliseconds(350))
+            let repository = dependencies.hadithRepository
+            let found = try await repository.search(query, bookID: nil, limit: 100)
+            let total = try? await repository.searchCount(query, bookID: nil)
+            guard !Task.isCancelled else { return }
+            results = found
+            matchCount = total
+        } catch {
+            guard !Task.isCancelled else { return }
+            results = []; matchCount = nil; searchFailed = true
+        }
+        isSearching = false
+    }
+
     // MARK: - Loading
 
     private func load() async {
         // In reading order: the two Sahihs and the Sunan first, the
         // Arabic-only works after them (HadithRepository.collectionOrder).
-        books = (try? await dependencies.hadithRepository.books()) ?? []
+        isLoading = true
+        loadFailed = false
+        do {
+            let loaded = try await dependencies.hadithRepository.books()
+            guard !Task.isCancelled else { return }
+            books = loaded
+            await refreshResume()
+        } catch {
+            guard !Task.isCancelled else { return }
+            loadFailed = true
+        }
         isLoading = false
-        await refreshResume()
     }
 
     /// The collection opened last (recorded by the Read tab as it opens one)
