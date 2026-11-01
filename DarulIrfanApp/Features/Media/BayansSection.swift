@@ -113,10 +113,8 @@ struct BayansSection: View {
                 } label: {
                     Text("See all")
                         .diInterfaceFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(DIColor.primary)
-                        .frame(minHeight: 44)
-                        .contentShape(Rectangle())
                 }
+                .buttonStyle(DICompactButtonStyle())
             }
             .padding(.top, DISpacing.xs)
             ScrollView(.horizontal, showsIndicators: false) {
@@ -508,10 +506,12 @@ private struct BayanVideoRow: View {
             .clipShape(RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: item.title)
-                    .diInterfaceFont(.subheadline, weight: .semibold)
+                    .font(ScriptDirection.isRightToLeft(item.title, fallbackLanguage: nil) ? DIFont.urduBody(scale: 0.85) : .subheadline.weight(.semibold))
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(3)
                     .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .environment(\.layoutDirection, ScriptDirection.isRightToLeft(item.title, fallbackLanguage: nil) ? .rightToLeft : .leftToRight)
                 Text(item.publishedAt, format: .dateTime.day().month(.wide).year())
                     .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
