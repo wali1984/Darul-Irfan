@@ -17,6 +17,7 @@ struct ZikrHomeView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// What a notification or a link asked this screen to show.
     @State private var focus: Focus?
+    @State private var focusScrollTask: Task<Void, Never>?
     @State private var personalZikr = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -60,6 +61,10 @@ struct ZikrHomeView: View {
                     Task { await viewModel.refreshPractice() }
                 }
                 .onChange(of: viewModel.isLoaded) { _, _ in scrollToFocus(proxy) }
+                .onDisappear {
+                    focusScrollTask?.cancel()
+                    focusScrollTask = nil
+                }
         }
     }
 
@@ -75,6 +80,8 @@ struct ZikrHomeView: View {
     /// schedule, which arrives with the first load.
     private func scrollToFocus(_ proxy: ScrollViewProxy) {
         guard let focus else { return }
+        focusScrollTask?.cancel()
+        focusScrollTask = nil
         let target: String?
         switch focus {
         case .top:
@@ -91,7 +98,7 @@ struct ZikrHomeView: View {
         }
         self.focus = nil
         guard let target else { return }
-        Task { @MainActor in
+        focusScrollTask = Task { @MainActor in
             // Once the page is laid out.
             try? await Task.sleep(for: .milliseconds(300))
             guard !Task.isCancelled else { return }
