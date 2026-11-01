@@ -953,19 +953,19 @@
         }
       }
     },
-    "This archived audio format is not supported on iOS yet.": {
+    "This archived audio format cannot be played in the app.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This archived audio format is not supported on iOS yet."
+            "value": "This archived audio format cannot be played in the app."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "یہ محفوظ شدہ آڈیو فارمیٹ ابھی iOS پر معاون نہیں ہے۔"
+            "value": "یہ محفوظ شدہ آڈیو فارمیٹ ابھی ایپ میں معاون نہیں ہے۔"
           }
         }
       }

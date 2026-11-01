@@ -429,7 +429,7 @@ struct MediaItemRow: View {
     private var badgeLine: some View {
         if isWMAOnly {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                Text("This archived audio format is not supported on iOS yet.")
+                Text("This archived audio format cannot be played in the app.")
                     .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
