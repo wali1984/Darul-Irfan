@@ -282,13 +282,17 @@ struct TodayHeroPrayerChips: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.locale) private var locale
 
+    @ScaledMetric(relativeTo: .caption) private var minimumChipWidth: CGFloat = 58
+
     var body: some View {
-        let layout = dynamicTypeSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(spacing: 6))
-            : AnyLayout(HStackLayout(alignment: .top, spacing: 6))
-        layout {
-            ForEach(Prayer.obligatory) { prayer in
-                chip(prayer)
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(spacing: 6) {
+                ForEach(Prayer.obligatory) { prayer in chip(prayer) }
+            }
+        } else {
+            // Reflow before scaled times are forced into five narrow columns.
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: max(58, minimumChipWidth)), spacing: 6)], spacing: 6) {
+                ForEach(Prayer.obligatory) { prayer in chip(prayer) }
             }
         }
     }
