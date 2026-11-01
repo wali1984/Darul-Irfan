@@ -144,14 +144,14 @@ struct PostMediaView: View {
         if item.kind == "video" {
             PostVideoTile(url: item.url)
         } else {
-            PostPictureTile(url: item.url).id(item.url)
+            GroupPostImage(url: item.url).id(item.url)
         }
     }
 }
 
 /// Recreate only the failed image request; refreshing the post with the same URL
 /// does not reliably restart an existing AsyncImage.
-private struct PostPictureTile: View {
+struct GroupPostImage: View {
     let url: URL
     @State private var attempt = 0
 

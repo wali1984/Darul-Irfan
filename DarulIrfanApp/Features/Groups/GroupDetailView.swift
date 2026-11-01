@@ -890,29 +890,6 @@ private struct GroupDraftCard: View {
     }
 }
 
-/// A post's picture, full width, shown as it loads.
-private struct GroupPostImage: View {
-    let url: URL
-
-    var body: some View {
-        AsyncImage(url: url) { phase in
-            switch phase {
-            case .success(let image):
-                image.resizable().scaledToFit()
-            case .failure:
-                Label("The picture could not be loaded. Pull down to refresh.", systemImage: "photo")
-                    .diInterfaceFont(.caption)
-                    .foregroundStyle(DIColor.textMuted)
-            default:
-                ProgressView().frame(maxWidth: .infinity, minHeight: 160)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-        .accessibilityLabel(Text("Picture"))
-    }
-}
-
 /// A feature that waits on an outside service: said plainly, never a broken button.
 struct IntegrationPendingNote: View {
     let text: LocalizedStringKey
