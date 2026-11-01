@@ -130,6 +130,7 @@ struct DailyMediaEditor: View {
     @State private var loadingPicture = false
     @State private var choosingFile = false
     @State private var confirmingDelete = false
+    @State private var filled = false
     @State private var error: String?
 
     var body: some View {
@@ -249,6 +250,9 @@ struct DailyMediaEditor: View {
     }
 
     private func fill() {
+        // Returning from a picker must not replace this editor's unsaved fields.
+        guard !filled else { return }
+        filled = true
         guard let item else { return }
         slot = item.slot ?? .quote
         day = Self.date(item.day) ?? Date()
@@ -259,7 +263,7 @@ struct DailyMediaEditor: View {
 
     /// The chosen picture, made a JPEG no larger than 2048 pixels across.
     private func read(_ chosen: PhotosPickerItem?) async {
-        guard let chosen else { return }
+        guard let chosen, !working, !loadingPicture else { return }
         loadingPicture = true
         error = nil
         picture = nil
@@ -280,6 +284,7 @@ struct DailyMediaEditor: View {
     }
 
     private func readFile(_ url: URL) async {
+        guard !working, !loadingPicture else { return }
         loadingPicture = true
         error = nil
         picture = nil
@@ -291,7 +296,10 @@ struct DailyMediaEditor: View {
                 defer { if granted { url.stopAccessingSecurityScopedResource() } }
                 return try Data(contentsOf: url, options: .mappedIfSafe)
             }.value
+            try Task.checkCancellation()
             prepare(data)
+        } catch is CancellationError {
+            return
         } catch {
             self.error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
         }
