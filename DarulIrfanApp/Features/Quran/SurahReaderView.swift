@@ -5,6 +5,7 @@ import SwiftUI
 /// expandable tafsir (Asrar-at-Tanzil / Akram-ut-Tafaseer) selected from a
 /// segmented control.
 struct SurahReaderView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let appState: AppState
     private let onRequestNextSurah: () -> Void
     private let initialFocusAyah: Int?
@@ -284,19 +285,32 @@ struct SurahReaderView: View {
         }
         .onChange(of: pendingScrollAyah) { _, ayah in
             guard let ayah else { return }
-            withAnimation(.easeInOut(duration: 0.35)) { topAyah = ayah }
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.35)) { topAyah = ayah }
             pendingScrollAyah = nil
         }
         // The reader follows what is playing: each ayah is brought into
         // view as it starts, and a juz turns to the next surah.
-        .onChange(of: player.current) { _, current in
-            guard isOnScreen, let current, player.isPlaying else { return }
-            if current.surah == viewModel.surah.id {
-                withAnimation(.easeInOut(duration: 0.35)) { topAyah = current.ayah }
-            } else if current.surah == viewModel.surah.id + 1, player.scope == .juz, !isHandingOnJuz {
-                isHandingOnJuz = true
-                onRequestNextSurah()
+        .onChange(of: player.current) { _, _ in followPlayingAyah() }
+        .onChange(of: player.isPlaying) { _, playing in
+            if playing { followPlayingAyah() }
+        }
+        .onChange(of: isOnScreen) { _, visible in
+            if visible { followPlayingAyah() }
+        }
+    }
+
+    /// Resume and returning to the reader may keep the same ayah identity.
+    /// Follow those transitions too, rather than waiting for the next verse.
+    private func followPlayingAyah() {
+        guard isOnScreen, let current = player.current, player.isPlaying else { return }
+        if current.surah == viewModel.surah.id {
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.35)) {
+                topAyah = current.ayah
             }
+        } else if current.surah == viewModel.surah.id + 1,
+                  player.scope == .juz, !isHandingOnJuz {
+            isHandingOnJuz = true
+            onRequestNextSurah()
         }
     }
 

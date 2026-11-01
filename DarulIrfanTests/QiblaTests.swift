@@ -34,4 +34,53 @@ final class QiblaTests: XCTestCase {
             XCTAssertLessThan(bearing, 360.0)
         }
     }
+    @MainActor
+    func testInvalidHeadingClearsDirectionAndRecovers() {
+        let heading = QiblaHeadingFixture()
+        let model = QiblaViewModel(qiblaService: service, headingProvider: heading)
+        model.start(place: TestPlaces.newYork)
+        heading.emit(120)
+        XCTAssertTrue(model.hasHeading)
+        heading.emit(nil)
+        XCTAssertFalse(model.hasHeading)
+        XCTAssertNil(model.relativeOffsetDegrees)
+        XCTAssertFalse(model.isAligned)
+        heading.emit(200)
+        XCTAssertTrue(model.hasHeading)
+        XCTAssertEqual(model.displayHeading, 200, accuracy: 0.001)
+        heading.emit(.nan)
+        XCTAssertFalse(model.hasHeading)
+    }
+
+    @MainActor
+    func testCalibrationAndStopNeverKeepStaleNeedle() {
+        let heading = QiblaHeadingFixture()
+        let model = QiblaViewModel(qiblaService: service, headingProvider: heading)
+        model.start(place: TestPlaces.newYork)
+        heading.emit(120)
+        heading.needsCalibration = true
+        heading.emit(120)
+        XCTAssertFalse(model.hasHeading)
+        XCTAssertFalse(model.isAligned)
+        heading.needsCalibration = false
+        heading.emit(130)
+        XCTAssertTrue(model.hasHeading)
+        model.stop()
+        XCTAssertFalse(model.hasHeading)
+    }
+
+}
+
+
+@MainActor
+private final class QiblaHeadingFixture: HeadingProviding {
+    var currentHeading: Double?
+    var isHeadingAvailable = true
+    var isMagneticHeading = false
+    var canUseTrueNorth = true
+    var needsCalibration = false
+    private var callback: (@MainActor () -> Void)?
+    func startUpdates(onChange: @escaping @MainActor () -> Void) { callback = onChange }
+    func stopUpdates() { callback = nil }
+    func emit(_ heading: Double?) { currentHeading = heading; callback?() }
 }

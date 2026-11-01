@@ -7,6 +7,8 @@ import UIKit
 /// use without the device compass.
 @MainActor
 struct QiblaCompassView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var isVisible = false
     private let appState: AppState
     private let dependencies: AppDependencies
     @State private var viewModel: QiblaViewModel
@@ -41,16 +43,29 @@ struct QiblaCompassView: View {
         .navigationTitle("Qibla")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
+            isVisible = true
             if let place = appState.activePlace {
                 viewModel.start(place: place)
             }
         }
         .onDisappear {
+            isVisible = false
             viewModel.stop()
         }
+        .onChange(of: scenePhase) { _, phase in
+            guard isVisible else { return }
+            if phase == .active, let place = appState.activePlace {
+                viewModel.start(place: place)
+            } else {
+                viewModel.stop()
+            }
+        }
         .onChange(of: appState.activePlace) { _, newPlace in
+            guard isVisible, scenePhase == .active else { return }
             if let newPlace {
                 viewModel.start(place: newPlace)
+            } else {
+                viewModel.stop()
             }
         }
     }

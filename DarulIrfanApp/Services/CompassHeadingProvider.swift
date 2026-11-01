@@ -60,6 +60,8 @@ final class CompassHeadingProvider: NSObject, HeadingProviding, CLLocationManage
     func startUpdates(onChange: @escaping @MainActor () -> Void) {
         self.onChange = onChange
         isRunning = true
+        currentHeading = nil
+        needsCalibration = false
 
         guard CLLocationManager.headingAvailable() else { return }
 
@@ -125,7 +127,7 @@ final class CompassHeadingProvider: NSObject, HeadingProviding, CLLocationManage
             let usesTrueNorth = trueHeading >= 0
             let resolved = usesTrueNorth ? trueHeading : magneticHeading
             // Both headings negative means no usable reading at all.
-            self.currentHeading = resolved >= 0 ? resolved : nil
+            self.currentHeading = accuracy >= 0 && resolved.isFinite && resolved >= 0 ? resolved : nil
             self.isMagneticHeading = !usesTrueNorth
             self.onChange?()
         }

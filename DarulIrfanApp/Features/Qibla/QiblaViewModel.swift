@@ -58,6 +58,9 @@ final class QiblaViewModel {
         guard isRunning else { return }
         isRunning = false
         headingProvider.stopUpdates()
+        hasHeading = false
+        lastRawHeading = nil
+        wasAligned = false
     }
 
     // MARK: - Derived state
@@ -111,7 +114,12 @@ final class QiblaViewModel {
         needsCalibration = headingProvider.needsCalibration
         isMagneticHeading = headingProvider.isMagneticHeading
         canUseTrueNorth = headingProvider.canUseTrueNorth
-        guard let raw = headingProvider.currentHeading else { return }
+        guard !needsCalibration, let raw = headingProvider.currentHeading, raw.isFinite, raw >= 0 else {
+            hasHeading = false
+            lastRawHeading = nil
+            refreshAlignment()
+            return
+        }
         if let last = lastRawHeading {
             displayHeading += Self.signedOffset(raw - last)
         } else {
