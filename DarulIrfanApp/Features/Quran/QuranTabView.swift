@@ -512,7 +512,11 @@ private struct QuranParaRow: View {
         .padding(.vertical, 12)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("Parah \(para.number)"))
+        .accessibilityLabel(
+            Text("Parah \(para.number)")
+            + Text(verbatim: ", \(para.surah.nameTransliterated), ")
+            + Text("Ayah \(para.ayah)")
+        )
     }
 }
 
@@ -557,7 +561,11 @@ struct QuranParaListView: View {
                         }
                     }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel(Text("Parah \(para.number)"))
+                    .accessibilityLabel(
+                        Text("Parah \(para.number)")
+                        + Text(verbatim: ", \(para.surah.nameTransliterated), ")
+                        + Text("Ayah \(para.ayah)")
+                    )
                 }
                 .listRowBackground(DIColor.surface)
             }
