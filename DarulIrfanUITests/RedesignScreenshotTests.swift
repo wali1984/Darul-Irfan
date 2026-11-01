@@ -8,8 +8,8 @@ import XCTest
 /// Runs only when the test runner is given DI_SCREENSHOTS=1, as Codemagic's
 /// ios-screens workflow does (TEST_RUNNER_DI_SCREENSHOTS); the ordinary UI
 /// test run skips it. DI_SCREENSHOTS=books takes only Read's books, and
-/// DI_SCREENSHOTS=shajra only the Shajra. It asserts nothing: a step whose
-/// button is missing is skipped, and whatever is on screen is still kept.
+/// DI_SCREENSHOTS=shajra only the Shajra. Required routes and reading
+/// endpoints assert their presence; screenshots remain available on failure.
 final class RedesignScreenshotTests: XCTestCase {
 
     /// The labels the tour taps, in each language (Localizable.xcstrings).
@@ -59,6 +59,18 @@ final class RedesignScreenshotTests: XCTestCase {
     func testEnglishDark() { tour(language: "en", locale: "en_US", dark: true) }
     func testUrduLight() { tour(language: "ur", locale: "ur_PK", dark: false) }
     func testUrduDark() { tour(language: "ur", locale: "ur_PK", dark: true) }
+
+    /// Static reading text need not accept a tap. Its complete bounds must be
+    /// inside the app and above the tab bar, including on floating-tab systems.
+    private func prayerFitsReadingArea(_ prayer: XCUIElement) -> Bool {
+        guard prayer.exists else { return false }
+        let frame = prayer.frame
+        guard !frame.isEmpty, app.frame.contains(frame) else { return false }
+        let tabBar = app.tabBars.firstMatch
+        if tabBar.exists && frame.maxY > tabBar.frame.minY - 8 { return false }
+        let navigationBar = app.navigationBars.firstMatch
+        return !navigationBar.exists || frame.minY >= navigationBar.frame.maxY
+    }
 
     // MARK: - The tour
 
@@ -250,13 +262,20 @@ final class RedesignScreenshotTests: XCTestCase {
             // rather than treating a fixed swipe count as full-chain coverage.
             let closingPrayer = app.staticTexts["shajra.closingPrayer"]
             var endingSwipes = 0
-            while !(closingPrayer.exists && closingPrayer.isHittable && app.frame.contains(closingPrayer.frame)) && endingSwipes < 12 {
-                app.swipeUp()
+            while !prayerFitsReadingArea(closingPrayer) && endingSwipes < 12 {
+                // Keep the gesture inside the reader, away from the floating tab bar.
+                let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.70))
+                let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.30))
+                start.press(forDuration: 0.05, thenDragTo: end)
                 pause(1.5)
                 endingSwipes += 1
                 shot("shajra-ending-\(endingSwipes)")
             }
-            XCTAssertTrue(closingPrayer.exists && closingPrayer.isHittable && app.frame.contains(closingPrayer.frame), "Shajra closing prayer must be visible before leaving the page")
+            let geometry = XCTAttachment(string: "Prayer: \(closingPrayer.exists ? closingPrayer.frame.debugDescription : "missing"); tab bar: \(app.tabBars.firstMatch.frame); app: \(app.frame)")
+            geometry.name = "shajra-closing-geometry"
+            geometry.lifetime = .keepAlways
+            add(geometry)
+            XCTAssertTrue(prayerFitsReadingArea(closingPrayer), "Entire Shajra closing prayer must fit above navigation before leaving the page")
             shot("shajra-closing-prayer")
             goBack()
         } else {
