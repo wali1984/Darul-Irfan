@@ -12,6 +12,7 @@ struct GroupPeopleView: View {
     let groupName: String
     let service: MemberGroupService
 
+    @Environment(\.locale) private var locale
     @Environment(\.dismiss) private var dismiss
     @State private var people: GroupPeople?
     @State private var error: String?
@@ -173,7 +174,7 @@ struct GroupPeopleView: View {
                     if invitation.kind == "email" {
                         Text("Added when they sign in")
                     } else if let expires = invitation.expiresAt {
-                        Text("Code, until \(expires.formatted(date: .abbreviated, time: .omitted))")
+                        Text("Code, until \(GroupInvitationDate.text(expires, locale: locale))")
                     }
                 }
                 .diInterfaceFont(.caption)
@@ -236,6 +237,7 @@ struct AddGroupPersonView: View {
         var id: String { rawValue }
     }
 
+    @Environment(\.locale) private var locale
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @State private var method: Method = .email
@@ -425,7 +427,7 @@ struct AddGroupPersonView: View {
                 .textSelection(.enabled)
                 .environment(\.layoutDirection, .leftToRight)
             if let expires = result.expiresAt {
-                Text("Works once, until \(expires.formatted(date: .abbreviated, time: .shortened)).")
+                Text("Works once, until \(GroupInvitationDate.text(expires, locale: locale, includesTime: true)).")
                     .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
@@ -463,7 +465,7 @@ struct AddGroupPersonView: View {
     }
 
     private func invitationMessage(code: String, expires: Date?) -> String {
-        let until = expires?.formatted(date: .abbreviated, time: .omitted) ?? ""
+        let until = expires.map { GroupInvitationDate.text($0, locale: locale) } ?? ""
         return String(localized: "Assalamu alaikum. You are invited to the \(groupName) group in the Darul Irfan app. Open the app, go to Halqah, and enter this code: \(code). It works once, until \(until).")
     }
 
@@ -476,5 +478,26 @@ struct AddGroupPersonView: View {
         var components = URLComponents(string: "https://wa.me/\(phone)")
         components?.queryItems = [URLQueryItem(name: "text", value: message)]
         return components?.url
+    }
+}
+
+/// Invitation dates follow the selected interface language with Western digits.
+enum GroupInvitationDate {
+    static func text(_ date: Date, locale: Locale, includesTime: Bool = false,
+                     timeZone: TimeZone = .current) -> String {
+        var components = Locale.Components(locale: locale)
+        components.numberingSystem = Locale.NumberingSystem("latn")
+        let locale = Locale(components: components)
+        let dateText = date.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted,
+                                                      locale: locale, timeZone: timeZone))
+        let text: String
+        if includesTime {
+            let time = date.formatted(Date.FormatStyle(date: .omitted, time: .shortened,
+                                                      locale: locale, timeZone: timeZone))
+            text = "\(dateText) \u{00b7} \u{2066}\(time)\u{2069}"
+        } else {
+            text = dateText
+        }
+        return "\u{2068}\(text)\u{2069}"
     }
 }
