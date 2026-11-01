@@ -408,9 +408,19 @@ final class RedesignScreenshotTests: XCTestCase {
         guard seek(history) else { return }
         XCTAssertTrue(app.staticTexts[explanation].waitForExistence(timeout: 5))
         shot("resources-history-expanded")
-        // Return to the disclosure header even when its content extends below the screen.
-        scrollToTop()
-        guard seek(history) else { return }
+        // Keep the visible disclosure in place; only move upward if it is off screen.
+        let historyButton = app.buttons[history]
+        for _ in 0..<8 {
+            if historyButton.exists && historyButton.isHittable { break }
+            app.swipeDown()
+            pause(0.5)
+        }
+        guard tap(historyButton) else {
+            XCTFail("The expanded history disclosure must remain reachable")
+            shot("missing-history-collapse")
+            return
+        }
+        pause(1)
         XCTAssertFalse(app.staticTexts[explanation].exists, "History must collapse again")
         shot("resources-history-collapsed")
         goBack()
