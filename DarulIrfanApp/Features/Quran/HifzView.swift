@@ -21,6 +21,9 @@ struct HifzView: View {
     @State private var hidesText = false
     @State private var isRevealed = false
     @State private var isLoading = true
+    @State private var loadFailed = false
+    @State private var hasLoaded = false
+    @State private var loadAttempt = 0
 
     init(surah: QuranSurah, dependencies: AppDependencies) {
         self.surah = surah
@@ -32,6 +35,17 @@ struct HifzView: View {
             VStack(alignment: .leading, spacing: DISpacing.lg) {
                 if isLoading {
                     ProgressView().frame(maxWidth: .infinity).padding(.top, DISpacing.lg)
+                } else if loadFailed {
+                    DICard {
+                        VStack(spacing: DISpacing.sm) {
+                            Text("The action could not be completed. Check your connection and try again.")
+                                .diInterfaceFont(.callout)
+                                .foregroundStyle(DIColor.textPrimary)
+                            Button("Retry") { loadAttempt += 1 }
+                                .buttonStyle(DICompactButtonStyle())
+                                .disabled(isLoading)
+                        }
+                    }
                 } else if recitation == nil {
                     DICard {
                         Text("This surah has no recitation audio in the app, so it cannot be practised yet.")
@@ -48,10 +62,10 @@ struct HifzView: View {
         }
         .diScreenBackground()
         .diPageHeading("Memorise")
-        .task { await load() }
+        .task(id: loadAttempt) { await load() }
         .onDisappear {
-            player.stop()
             save()
+            player.stop()
         }
     }
 
@@ -85,7 +99,7 @@ struct HifzView: View {
                 } else if player.phase == .finished {
                     Label("Range complete", systemImage: "checkmark.seal")
                         .diInterfaceFont(.footnote)
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                 }
 
                 controls
@@ -109,7 +123,7 @@ struct HifzView: View {
                     Label("Reveal the text", systemImage: "eye")
                         .diInterfaceFont(.subheadline)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(DICompactButtonStyle())
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, DISpacing.md)
             } else {
@@ -131,7 +145,7 @@ struct HifzView: View {
             } label: {
                 Image(systemName: "backward.end.fill")
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(DICompactButtonStyle())
             .disabled((player.currentAyah ?? rangeStart) <= rangeStart)
             .accessibilityLabel("Previous ayah")
 
@@ -144,14 +158,14 @@ struct HifzView: View {
                 )
                 .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(DIPrimaryButtonStyle())
 
             Button {
                 step(by: 1)
             } label: {
                 Image(systemName: "forward.end.fill")
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(DICompactButtonStyle())
             .disabled((player.currentAyah ?? rangeStart) >= rangeEnd)
             .accessibilityLabel("Next ayah")
         }
@@ -165,6 +179,7 @@ struct HifzView: View {
                 DISectionHeader(titleKey: "Range", systemImage: "text.line.first.and.arrowtriangle.forward")
                 Stepper(value: $rangeStart, in: 1...surah.ayahCount) {
                     Text("From ayah \(rangeStart)")
+                        .diInterfaceFont(.body)
                 }
                 .onChange(of: rangeStart) { _, value in
                     if rangeEnd < value { rangeEnd = value }
@@ -172,6 +187,7 @@ struct HifzView: View {
                 }
                 Stepper(value: $rangeEnd, in: 1...surah.ayahCount) {
                     Text("To ayah \(rangeEnd)")
+                        .diInterfaceFont(.body)
                 }
                 .onChange(of: rangeEnd) { _, value in
                     if rangeStart > value { rangeStart = value }
@@ -190,9 +206,11 @@ struct HifzView: View {
                 DISectionHeader(titleKey: "Repetition", systemImage: "repeat")
                 Stepper(value: $repeats, in: 1...20) {
                     Text("Repeat each ayah \(repeats) times")
+                        .diInterfaceFont(.body)
                 }
                 Stepper(value: $pauseSeconds, in: 0...10, step: 0.5) {
                     Text("Pause \(pauseSeconds, specifier: "%.1f") seconds")
+                        .diInterfaceFont(.body)
                 }
                 Toggle("Hide the text", isOn: $hidesText)
                     .onChange(of: hidesText) { _, _ in isRevealed = false }
@@ -206,18 +224,36 @@ struct HifzView: View {
     // MARK: - Behaviour
 
     private func load() async {
-        ayahs = (try? await repository.ayahs(inSurah: surah.id)) ?? []
-        rangeEnd = surah.ayahCount
-        if let saved = HifzProgress.load(surah: surah.id) {
-            rangeStart = min(max(1, saved.start), surah.ayahCount)
-            rangeEnd = min(max(rangeStart, saved.end), surah.ayahCount)
-            repeats = saved.repeats
-            pauseSeconds = saved.pauseSeconds
+        isLoading = true
+        loadFailed = false
+        defer { isLoading = false }
+        do {
+            let loaded = try await repository.ayahs(inSurah: surah.id)
+            let available = Set(loaded.filter { !$0.textArabic.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }.map(\.ayahNumber))
+            guard surah.ayahCount > 0, (1...surah.ayahCount).allSatisfy({ available.contains($0) }) else {
+                throw HifzLoadError.missingText
+            }
+            await RecitationProvider.warmUp()
+            try Task.checkCancellation()
+            ayahs = loaded
+            rangeEnd = surah.ayahCount
+            if let saved = HifzProgress.load(surah: surah.id) {
+                rangeStart = min(max(1, saved.start), surah.ayahCount)
+                rangeEnd = min(max(rangeStart, saved.end), surah.ayahCount)
+                repeats = min(max(1, saved.repeats), 20)
+                pauseSeconds = saved.pauseSeconds.isFinite ? min(max(0, saved.pauseSeconds), 10) : 1.5
+            }
+            hasLoaded = true
+        } catch is CancellationError {
+        } catch {
+            if !Task.isCancelled { loadFailed = true }
         }
-        isLoading = false
     }
 
+    private enum HifzLoadError: Error { case missingText }
+
     private func save() {
+        guard hasLoaded else { return }
         HifzProgress.save(
             surah: surah.id,
             ayah: player.currentAyah ?? rangeStart,
