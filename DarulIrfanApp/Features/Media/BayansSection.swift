@@ -232,23 +232,27 @@ private struct BayansContinueHero: View {
     }
 
     private var detailLine: some View {
-        HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 2) {
             if let speaker = entry.item.speaker, !speaker.isEmpty {
+                let rtl = ScriptDirection.isRightToLeft(speaker, fallbackLanguage: nil)
                 Text(verbatim: speaker)
-                    .lineLimit(1)
-                Text(verbatim: "·")
+                    .font(rtl ? DIFont.urduBody(scale: 0.75) : .footnote.weight(.medium))
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .environment(\.layoutDirection, rtl ? .rightToLeft : .leftToRight)
             }
             if let minutesLeft {
                 Text("\(minutesLeft) min left")
-                    .lineLimit(1)
+                    .fixedSize(horizontal: false, vertical: true)
             } else {
                 Text("\(percent)% played")
-                    .lineLimit(1)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .diInterfaceFont(.footnote, weight: .medium)
         .foregroundStyle(Color.white.opacity(0.85))
     }
+
 }
 
 /// The hero's thin gold bar of what has played.
