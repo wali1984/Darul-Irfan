@@ -108,11 +108,10 @@ struct GroupPeopleView: View {
                 if let email = person.email, email != person.displayName {
                     Text(verbatim: email).diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 }
+                if person.role != .member { roleBadge(person.role) }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             Spacer(minLength: DISpacing.sm)
-            if person.role != .member {
-                roleBadge(person.role)
-            }
             if person.isChangeable(byAppointer: appointer) {
                 Menu {
                     if appointer && person.role != .administrator {
@@ -154,7 +153,7 @@ struct GroupPeopleView: View {
             Image(systemName: role.badgeSymbol)
         }
         .diInterfaceFont(.caption2, weight: .bold)
-        .foregroundStyle(DIColor.primary)
+        .foregroundStyle(DIColor.actionForeground)
         .padding(.horizontal, DISpacing.sm)
         .padding(.vertical, 2)
         .background(DIColor.primary.opacity(0.12), in: Capsule())
