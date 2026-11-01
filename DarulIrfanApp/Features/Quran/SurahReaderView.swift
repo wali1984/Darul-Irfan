@@ -511,7 +511,7 @@ struct SurahReaderView: View {
                         Image(systemName: "waveform")
                             .diInterfaceFont(.title3)
                             .foregroundStyle(DIColor.goldGlow)
-                            .symbolEffect(.variableColor.iterative, options: .repeating)
+                            .symbolEffect(.variableColor.iterative, isActive: !reduceMotion)
                     }
                     Button {
                         player.stop()
@@ -519,7 +519,7 @@ struct SurahReaderView: View {
                         Image(systemName: "stop.fill")
                             .diInterfaceFont(.footnote, weight: .bold)
                             .foregroundStyle(DIColor.onPrimary)
-                            .frame(width: 34, height: 34)
+                            .frame(width: 48, height: 48)
                             .background(Circle().fill(DIColor.onPrimary.opacity(0.14)))
                     }
                     .buttonStyle(.plain)
