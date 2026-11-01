@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "The code lasts 1 day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The code lasts 1 day"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوڈ 1 دن تک کارآمد رہے گا"
+          }
+        }
+      }
+    },
     "Show recent sessions": {
       "extractionState": "manual",
       "localizations": {

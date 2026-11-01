@@ -325,7 +325,11 @@ struct AddGroupPersonView: View {
         if method != .email {
             Section {
                 Stepper(value: $days, in: 1...90) {
-                    Text("The code lasts \(days) days")
+                    if days == 1 {
+                        Text("The code lasts 1 day")
+                    } else {
+                        Text("The code lasts \(days) days")
+                    }
                 }
             }
         }
