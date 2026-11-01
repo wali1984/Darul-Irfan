@@ -67,7 +67,14 @@ struct DailyPicture: View {
                     case .success(let image):
                         image.resizable().scaledToFit()
                     case .failure:
-                        EmptyView()
+                        VStack(spacing: DISpacing.sm) {
+                            Text("The picture could not be loaded. Please try again.")
+                                .font(.footnote)
+                                .foregroundStyle(DIColor.textMuted)
+                            Label("Open", systemImage: "photo")
+                                .foregroundStyle(DIColor.actionForeground)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 160)
                     default:
                         ProgressView().frame(maxWidth: .infinity, minHeight: 160)
                     }
@@ -75,7 +82,7 @@ struct DailyPicture: View {
                 .frame(maxWidth: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
             .accessibilityLabel(Text(verbatim: item.caption ?? String(localized: "Picture")))
             .fullScreenCover(isPresented: $enlarged) { DailyPictureViewer(item: item) }
         }
@@ -92,6 +99,7 @@ struct DailyPicture: View {
 struct DailyPictureViewer: View {
     let item: DailyMediaItem
     @Environment(\.dismiss) private var dismiss
+    @State private var imageAttempt = 0
 
     var body: some View {
         NavigationStack {
@@ -101,10 +109,19 @@ struct DailyPictureViewer: View {
                         AsyncImage(url: url) { phase in
                             if case .success(let image) = phase {
                                 image.resizable().scaledToFit()
+                            } else if case .failure = phase {
+                                VStack(spacing: DISpacing.md) {
+                                    Text("The picture could not be loaded. Please try again.")
+                                        .foregroundStyle(DIColor.textMuted)
+                                    Button("Retry") { imageAttempt += 1 }
+                                        .buttonStyle(DICompactButtonStyle())
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 300)
                             } else {
                                 ProgressView().frame(maxWidth: .infinity, minHeight: 300)
                             }
                         }
+                        .id(imageAttempt)
                         .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
                     }
                     if let caption = item.caption, !caption.isEmpty {
@@ -112,7 +129,7 @@ struct DailyPictureViewer: View {
                     }
                     if let url = item.imageURL {
                         ShareLink(item: url) { Label("Share", systemImage: "square.and.arrow.up") }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(DICompactButtonStyle())
                     }
                 }
                 .padding(DISpacing.md)

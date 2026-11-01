@@ -34070,6 +34070,23 @@
           }
         }
       }
+    },
+    "The picture could not be loaded. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The picture could not be loaded. Please try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تصویر لوڈ نہیں ہو سکی۔ براہِ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
