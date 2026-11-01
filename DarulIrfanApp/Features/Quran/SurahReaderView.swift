@@ -71,43 +71,9 @@ struct SurahReaderView: View {
             .diScreenBackground()
             .navigationTitle(viewModel.surah.nameTransliterated)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+            .safeAreaInset(edge: .top, spacing: 0) {
                 if viewModel.phase == .ready {
-                    // Deliberately its own toolbar item rather than a row in the
-                    // scroll view or a line inside the options menu: the header
-                    // selectors scroll away, and a reader has to be able to
-                    // change language at any point without hunting for it.
-                    if viewModel.availableReadingLanguages.count > 1 {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            readingLanguageMenu
-                        }
-                    }
-                    // The sheikhs' bayans on this surah, to choose from; the
-                    // ayat carry their own notes, so nothing is set above the
-                    // text.
-                    if !viewModel.bayans.isEmpty {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                showsBayanList = true
-                            } label: {
-                                Image(systemName: "waveform.circle")
-                            }
-                            .accessibilityLabel(Text("Bayans on this surah"))
-                        }
-                    }
-                    if viewModel.recitation != nil {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            NavigationLink {
-                                HifzView(surah: viewModel.surah, dependencies: dependencies)
-                            } label: {
-                                Image(systemName: "brain.head.profile")
-                            }
-                            .accessibilityLabel("Memorise this surah")
-                        }
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        readerOptionsMenu
-                    }
+                    readerControls
                 }
             }
             .alert("Go to ayah", isPresented: $showsGoToAyah) {
@@ -144,6 +110,44 @@ struct SurahReaderView: View {
                 let readerViewModel = viewModel
                 Task { await readerViewModel.flushLastRead() }
             }
+    }
+
+    /// Persistent quick actions have their own surface so long surah titles stay readable.
+    private var readerControls: some View {
+        DICard(padding: DISpacing.xs) {
+            HStack(spacing: DISpacing.sm) {
+                if viewModel.availableReadingLanguages.count > 1 {
+                    readingLanguageMenu
+                        .frame(maxWidth: .infinity)
+                }
+                if !viewModel.bayans.isEmpty {
+                    Button {
+                        showsBayanList = true
+                    } label: {
+                        Image(systemName: "waveform.circle")
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel(Text("Bayans on this surah"))
+                }
+                if viewModel.recitation != nil {
+                    NavigationLink {
+                        HifzView(surah: viewModel.surah, dependencies: dependencies)
+                    } label: {
+                        Image(systemName: "brain.head.profile")
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel("Memorise this surah")
+                }
+                readerOptionsMenu
+                    .frame(maxWidth: .infinity)
+            }
+            .tint(DIColor.actionForeground)
+        }
+        .padding(.horizontal, DISpacing.md)
+        .padding(.vertical, DISpacing.xs)
+        .diScreenBackground()
     }
 
     // MARK: - Phases
@@ -814,6 +818,8 @@ struct SurahReaderView: View {
                 Text(Self.readingLanguageShortName(viewModel.readingLanguage))
                     .diInterfaceFont(.footnote, weight: .semibold)
             }
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .contentShape(Rectangle())
         }
         .accessibilityLabel("Reading language")
         .accessibilityValue(Self.readingLanguageName(viewModel.readingLanguage))
@@ -877,6 +883,8 @@ struct SurahReaderView: View {
             }
         } label: {
             Image(systemName: "textformat.size")
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(Rectangle())
         }
         .accessibilityLabel("Reader options")
     }

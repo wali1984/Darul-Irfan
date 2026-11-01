@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -75,7 +75,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     /// Tap all 30 real rows and inspect each visible reader destination and Back.
     /// Expected starts are the approved IndoPak division, not the current UI labels.
-    private func parahTour() {
+    private func parahTour(checkControls: Bool = false) {
         selectTab(1)
         guard tap(button("Quran")) else { XCTFail("Quran selector missing"); return }
         let parahWord = language == "ur" ? "پارہ" : "Parah"
@@ -117,6 +117,7 @@ final class RedesignScreenshotTests: XCTestCase {
         ]
         for (index, target) in expected.enumerated() {
             let number = index + 1
+            if checkControls && ![3, 18, 27, 28].contains(number) { continue }
             let rowLabel = "\(parahWord) \(number), \(target.0), \(ayahWord) \(target.1)"
             let row = app.buttons.matching(NSPredicate(format: "label == %@", rowLabel)).firstMatch
             for _ in 0..<8 {
@@ -148,11 +149,39 @@ final class RedesignScreenshotTests: XCTestCase {
                 XCTFail("Expected \(target.0), ayah \(target.1)"); return
             }
             shot("parah-\(number)-reader")
+            if checkControls && !checkReaderMenus(number: number, title: title) { return }
             goBack()
             guard row.waitForExistence(timeout: 10), row.isHittable else {
                 shot("parah-\(number)-back-failure"); XCTFail("Back lost Parah \(number)"); return
             }
         }
+    }
+
+    /// Exercise the real contextual menus after the title/controls layout changes.
+    private func checkReaderMenus(number: Int, title: XCUIElement) -> Bool {
+        let reading = language == "ur" ? "پڑھنے کی زبان" : "Reading language"
+        let options = language == "ur" ? "مطالعے کے اختیارات" : "Reader options"
+        let goTo = language == "ur" ? "آیت پر جائیں" : "Go to ayah"
+        let cancel = language == "ur" ? "منسوخ کریں" : "Cancel"
+        guard tap(app.buttons[reading].firstMatch) else {
+            XCTFail("Reading-language action missing"); return false
+        }
+        guard app.descendants(matching: .any).matching(identifier: "English").firstMatch.waitForExistence(timeout: 5) else {
+            shot("reader-language-missing"); XCTFail("Language menu did not open"); return false
+        }
+        shot("parah-\(number)-language-menu")
+        // Tap the navigation title outside the menu; do not change the user's reading language.
+        title.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        guard tap(app.buttons[options].firstMatch), tap(app.buttons[goTo].firstMatch) else {
+            shot("reader-options-missing"); XCTFail("Go-to action missing from reader options"); return false
+        }
+        let alert = app.alerts.firstMatch
+        guard alert.waitForExistence(timeout: 5) else {
+            XCTFail("Go-to alert did not open"); return false
+        }
+        shot("parah-\(number)-go-to-alert")
+        guard tap(alert.buttons[cancel]) else { XCTFail("Go-to cancel missing"); return false }
+        return title.exists
     }
 
     // MARK: - The tour
@@ -176,6 +205,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-controls" {
+            parahTour(checkControls: true)
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "parahs" {
             parahTour()
             return
