@@ -165,6 +165,7 @@ struct NotificationSettingsView: View {
             SettingsSectionHeader(titleKey: "Permission", systemImage: "checkmark.shield.fill")
         } footer: {
             permissionFooter
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
