@@ -652,8 +652,14 @@ struct GroupMeetingScheduler: View {
                     Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
                 }
                 Section {
-                    Button("Schedule the meeting") { Task { await save() } }
-                        .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Button { Task { await save() } } label: {
+                        HStack(spacing: DISpacing.sm) {
+                            if working { ProgressView().tint(DIColor.onPrimary) }
+                            Text("Schedule the meeting")
+                        }
+                    }
+                    .buttonStyle(DIPrimaryButtonStyle())
+                    .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
             .listRowBackground(DIColor.surface)
@@ -664,7 +670,11 @@ struct GroupMeetingScheduler: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Schedule a meeting")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle())
+            }
+        }
     }
 
     private func save() async {
