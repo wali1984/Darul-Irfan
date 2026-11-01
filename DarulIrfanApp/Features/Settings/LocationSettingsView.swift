@@ -227,7 +227,7 @@ struct LocationSettingsView: View {
     }
 
     private func placeRow(_ place: PlaceCoordinate) -> some View {
-        let isSelected = appState.settings.manualPlace == place
+        let isSelected = appState.settings.locationMode == .manual && appState.settings.manualPlace?.isSameLocation(as: place) == true
         return Button {
             Task {
                 await appState.updateSettings { settings in
