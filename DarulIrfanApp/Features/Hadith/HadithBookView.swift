@@ -94,7 +94,7 @@ struct HadithBookView: View {
                                 .diInterfaceFont(.subheadline)
                                 .foregroundStyle(DIColor.textPrimary)
                         }
-                        .tint(DIColor.primary)
+                        .tint(DIColor.actionForeground)
                         .padding(.horizontal, DISpacing.xs)
 
                         if isLoadingEarlier {
@@ -312,7 +312,7 @@ struct HadithBookView: View {
                 HStack(spacing: DISpacing.sm) {
                     // The number exactly as the collection prints it, including
                     // sub-numbers such as 402.2 — never rounded to an integer.
-                    DIPillBadge(text: "#\(entry.displayNumber)", color: DIColor.primary)
+                    DIPillBadge(text: "#\(entry.displayNumber)", color: DIColor.actionForeground)
                     Spacer(minLength: 0)
                 }
 
@@ -327,7 +327,7 @@ struct HadithBookView: View {
                             .font(DIFont.quranArabic(scale: fontScale * 1.15))
                             .lineSpacing(CGFloat(18 * fontScale))
                             .foregroundStyle(DIColor.textPrimary)
-                            .tint(DIColor.primary)
+                            .tint(DIColor.actionForeground)
                             .diGoldGlow(radius: 5, opacity: 0.18)
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -571,7 +571,7 @@ struct HadithBookView: View {
                 if let heading = urdu ?? arabic {
                     Text(verbatim: heading)
                         .font(DIFont.urduBody(scale: 0.95))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
                 }
@@ -579,7 +579,7 @@ struct HadithBookView: View {
                 if let english {
                     Text(verbatim: english)
                         .diInterfaceFont(.footnote, weight: .semibold)
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                 }
                 if let arabic {
                     Text(verbatim: arabic)
