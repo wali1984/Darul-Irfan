@@ -261,6 +261,7 @@ struct MediaItemListView: View {
                     isDownloading: viewModel.isDownloading(item),
                     downloadProgress: viewModel.downloadProgress(for: item),
                     canPlay: viewModel.canPlay(item),
+                    isPlaying: dependencies.audioPlayer.nowPlaying?.mediaItemID == item.id && dependencies.audioPlayer.isPlaying,
                     prefersVideo: viewModel.filter.opensVideosFirst,
                     onPlay: { viewModel.play(item) },
                     onDownload: { viewModel.download(item) }
@@ -294,6 +295,7 @@ struct MediaItemRow: View {
     let isDownloading: Bool
     let downloadProgress: Double?
     let canPlay: Bool
+    let isPlaying: Bool
     /// The row's main action opens the video when there is one (Video
     /// Lectures); the audio stays in the menu.
     var prefersVideo = false
@@ -343,10 +345,10 @@ struct MediaItemRow: View {
                 DIHaptics.soft()
                 onPlay()
             } label: {
-                gradientMedallion("play.fill")
+                gradientMedallion(isPlaying ? "pause.fill" : "play.fill")
             }
             .buttonStyle(DIPressableStyle())
-            .accessibilityLabel(Text("Play \(item.title)"))
+            .accessibilityLabel(isPlaying ? Text("Pause") + Text(verbatim: ": \(item.title)") : Text("Play \(item.title)"))
         } else if let youtubeVideoID {
             videoButton(youtubeVideoID)
         } else {
@@ -475,7 +477,7 @@ struct MediaItemRow: View {
                 Button {
                     onPlay()
                 } label: {
-                    Label("Play", systemImage: "play.fill")
+                    Label(isPlaying ? "Pause" : "Play", systemImage: isPlaying ? "pause.fill" : "play.fill")
                 }
             }
             if item.downloadUrl != nil, !isDownloaded, !isWMAOnly {
