@@ -463,7 +463,7 @@ struct GroupDetailView: View {
                 DICard {
                     Text("Nothing has been posted to this group yet.")
                         .diInterfaceFont(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(DIColor.textMuted)
                 }
             }
             ForEach(posts) { post in
