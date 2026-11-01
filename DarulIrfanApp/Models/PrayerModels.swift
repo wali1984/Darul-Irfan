@@ -81,7 +81,7 @@ struct PlaceCoordinate: Codable, Sendable, Equatable, Hashable {
     /// Selection ignores translated display names and optional country metadata.
     /// Exact coordinates avoid marking distinct nearby results as selected.
     func isSameLocation(as other: PlaceCoordinate) -> Bool {
-        latitude == other.latitude && longitude == other.longitude && timeZoneIdentifier == other.timeZoneIdentifier
+        abs(latitude - other.latitude) < 1e-9 && abs(longitude - other.longitude) < 1e-9 && timeZoneIdentifier == other.timeZoneIdentifier
     }
 
     var timeZone: TimeZone {

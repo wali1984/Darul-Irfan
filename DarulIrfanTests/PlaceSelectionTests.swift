@@ -14,6 +14,13 @@ final class PlaceSelectionTests: XCTestCase {
         XCTAssertNotEqual(saved, translated)
     }
 
+    func testSerializationNoiseRetainsSelection() {
+        var other = saved
+        other.latitude = 31.550000000000004
+        other.longitude = 74.34000000000002
+        XCTAssertTrue(saved.isSameLocation(as: other))
+    }
+
     func testDistinctCoordinatesAndTimeZonesRemainDistinct() {
         var other = saved
         other.latitude = 31.5501

@@ -74,7 +74,7 @@ struct GroupDetailView: View {
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
                             Text(verbatim: failure).font(.subheadline)
                             Button("Try again") { Task { await load() } }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(DISecondaryButtonStyle())
                         }
                     }
                 } else {
@@ -329,7 +329,7 @@ struct GroupDetailView: View {
                     await performChange { try await service.cancelMeeting(meeting.id, in: group.id) }
                 }
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(DISecondaryButtonStyle(destructive: true))
         }
     }
 
@@ -368,7 +368,7 @@ struct GroupDetailView: View {
                             .font(.subheadline)
                             .foregroundStyle(DIColor.textPrimary)
                         Button("Try again") { Task { await load() } }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(DISecondaryButtonStyle())
                     }
                 }
             }
@@ -510,7 +510,7 @@ struct GroupDetailView: View {
                         } label: {
                             Label(post.kind == .zikr ? "Play the recorded zikr" : "Play the video", systemImage: "play.circle.fill")
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(DISecondaryButtonStyle())
                     }
                 }
                 if let linkURL = post.linkURL {
@@ -832,10 +832,7 @@ private struct GroupDraftCard: View {
                     .font(.subheadline)
                     .lineLimit(2...10)
                     .disabled(working)
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: DISpacing.sm) { draftActions }
-                    VStack(alignment: .leading, spacing: DISpacing.sm) { draftActions }
-                }
+                VStack(alignment: .leading, spacing: DISpacing.sm) { draftActions }
             }
         }
     }
@@ -853,13 +850,13 @@ private struct GroupDraftCard: View {
         } label: {
             Label("Publish to the group", systemImage: "paperplane.fill")
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(DIPrimaryButtonStyle())
         .disabled(working || title.trimmingCharacters(in: .whitespaces).isEmpty)
         Button("Discard", role: .destructive) {
             working = true
             Task { defer { working = false }; await onDiscard() }
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(DISecondaryButtonStyle(destructive: true))
         .disabled(working)
     }
 }
