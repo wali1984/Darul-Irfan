@@ -422,6 +422,7 @@ struct AddGroupPersonView: View {
             } label: {
                 Label("Add someone else", systemImage: "plus")
             }
+            .buttonStyle(DISecondaryButtonStyle())
         }
     }
 
@@ -449,21 +450,25 @@ struct AddGroupPersonView: View {
                 } label: {
                     Label("Send by text message", systemImage: "message")
                 }
+                .buttonStyle(DISecondaryButtonStyle())
                 Button {
                     openInvitationLink(whatsappURL(phone: phone, message: message))
                 } label: {
                     Label("Send on WhatsApp", systemImage: "phone.bubble")
                 }
+                .buttonStyle(DISecondaryButtonStyle())
             }
             ShareLink(item: message) {
                 Label("Send another way", systemImage: "square.and.arrow.up")
             }
+            .buttonStyle(DISecondaryButtonStyle())
             Button {
                 UIPasteboard.general.string = code
                 copied = true
             } label: {
                 Label(copied ? "Copied" : "Copy the code", systemImage: copied ? "checkmark" : "doc.on.doc")
             }
+            .buttonStyle(DISecondaryButtonStyle())
         }
     }
 
