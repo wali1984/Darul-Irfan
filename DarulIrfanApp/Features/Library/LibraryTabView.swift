@@ -332,7 +332,7 @@ struct LibraryFeaturedCard: View {
 
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text(titleKey)
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                     Text(subtitleKey)

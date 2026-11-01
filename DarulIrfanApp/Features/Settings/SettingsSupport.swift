@@ -45,7 +45,7 @@ struct SettingsBrandBanner: View {
                     .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 12)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(titleKey)
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(.white)
                     Text(subtitleKey)
                         .diInterfaceFont(.caption)

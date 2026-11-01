@@ -25,7 +25,7 @@ struct LaunchView: View {
                         .foregroundStyle(DIColor.onPrimary.opacity(0.95))
 
                     Text(LocalizedStringKey(DIBrand.tagline))
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.accent)
                 }
                 .multilineTextAlignment(.center)

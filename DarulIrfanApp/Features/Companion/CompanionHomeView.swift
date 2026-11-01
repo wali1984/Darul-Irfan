@@ -99,7 +99,7 @@ private struct CompanionHeroHeader: View {
             HStack(alignment: .center, spacing: DISpacing.md) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Companion")
-                        .font(DIFont.heading)
+                        .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                         .foregroundStyle(.white)
                     Text("Names, duas, and sacred days for the heart")
                         .diInterfaceFont(.subheadline, weight: .medium)
@@ -139,7 +139,7 @@ private struct CompanionHubCard: View {
                 .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text(titleKey)
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                     Text(subtitleKey)
                         .diInterfaceFont(.subheadline)

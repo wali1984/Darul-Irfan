@@ -33,7 +33,7 @@ struct LiveBroadcastCard: View {
                 // follows the app language; a title the server sends that is
                 // not in the catalogue shows exactly as sent.
                 Text(LocalizedStringKey(current.title))
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(fg)
                 Spacer(minLength: DISpacing.sm)
                 statusBadge

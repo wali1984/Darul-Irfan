@@ -144,7 +144,7 @@ private struct PrivacyCard: View {
                     .frame(width: 32, height: 32)
                     .accessibilityHidden(true)
                     Text(titleKey)
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                 }
                 .accessibilityAddTraits(.isHeader)

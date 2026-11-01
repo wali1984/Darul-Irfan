@@ -173,7 +173,7 @@ private struct TasbihCounterRow: View {
             countRing
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 Text(verbatim: counter.title)
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
                 if let target = counter.target {
                     DIPillBadge(text: String(localized: "Target \(target)"), color: DIColor.accent)
@@ -241,7 +241,7 @@ private struct ZikrHabitStripCard: View {
             VStack(alignment: .leading, spacing: DISpacing.md) {
                 HStack {
                     Text("Daily Zikr Habit")
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                     Spacer(minLength: 0)
                     DIStatPill(icon: "flame.fill", value: "\(currentStreak)", label: "Day streak")

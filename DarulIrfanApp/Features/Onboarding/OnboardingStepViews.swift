@@ -16,7 +16,7 @@ struct OnboardingStepHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.xs) {
             Text(titleKey)
-                .font(DIFont.heading)
+                .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
                 .accessibilityAddTraits(.isHeader)
             Text(subtitleKey)
@@ -496,7 +496,7 @@ struct OnboardingFinishStep: View {
 
             VStack(spacing: DISpacing.sm) {
                 Text("You're All Set")
-                    .font(DIFont.heading)
+                    .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
                     .accessibilityAddTraits(.isHeader)
                 Text("May Darul Irfan bring light and peace to your days.")

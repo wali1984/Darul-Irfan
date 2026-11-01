@@ -202,7 +202,7 @@ struct AboutView: View {
                 .foregroundStyle(DIColor.accent)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(DIFont.subheading)
+                .diInterfaceFont(.headline, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
         }
         .accessibilityAddTraits(.isHeader)

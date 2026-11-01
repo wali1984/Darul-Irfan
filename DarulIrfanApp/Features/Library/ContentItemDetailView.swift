@@ -237,7 +237,7 @@ struct ContentItemDetailView: View {
                         .foregroundStyle(DIColor.onPrimary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Read in App")
-                            .font(DIFont.subheading)
+                            .diInterfaceFont(.headline, design: .serif)
                             .foregroundStyle(DIColor.onPrimary)
                         Text("Read the pages here — offline after first open")
                             .diInterfaceFont(.caption)
@@ -272,7 +272,7 @@ struct ContentItemDetailView: View {
                     .foregroundStyle(DIColor.primary)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Read the text")
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                     Group {
                         if viewModel.machineReadPageCount >= viewModel.bookPageCount {
@@ -581,7 +581,7 @@ struct ContentItemDetailView: View {
                 }
 
                 Text(verbatim: item.title)
-                    .font(DIFont.heading)
+                    .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                     .foregroundStyle(Color(hex: 0xFFE3A0))
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -737,7 +737,7 @@ struct ContentItemDetailView: View {
                 HStack(spacing: DISpacing.md) {
                     LibraryMedallion(systemImage: "arrow.triangle.2.circlepath", diameter: 40, breathing: true)
                     Text("Archive record")
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                 }

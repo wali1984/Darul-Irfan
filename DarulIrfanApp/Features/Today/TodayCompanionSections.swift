@@ -346,7 +346,7 @@ struct TodayUnderstandCard: View {
                                     .frame(width: 36)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(verbatim: topic.name(for: appState.settings.language))
-                                        .font(DIFont.subheading)
+                                        .diInterfaceFont(.headline, design: .serif)
                                         .foregroundStyle(DIColor.textPrimary)
                                     Text("Verses, tafsir, books and bayans on this theme")
                                         .diInterfaceFont(.caption)

@@ -370,7 +370,7 @@ private struct LiveHalqahRow: View {
             DILivePulse(color: DIColor.primary, size: 9)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: group.name)
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
                 Text("Zikr is live in this halqah. Tap to join.")
                     .diInterfaceFont(.subheadline)

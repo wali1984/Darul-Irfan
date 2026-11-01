@@ -228,7 +228,7 @@ struct GlobalSearchView: View {
 
                 VStack(spacing: DISpacing.sm) {
                     Text("Search Darul Irfan")
-                        .font(DIFont.heading)
+                        .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.center)
                     Text("Find ayahs, tafsir, hadith, articles, the text of the books, lectures, and events. You can search in English, Urdu, or Arabic, with or without vowel marks.")
@@ -389,7 +389,7 @@ struct GlobalSearchView: View {
                 .accessibilityHidden(true)
 
             Text(titleKey)
-                .font(DIFont.subheading)
+                .diInterfaceFont(.headline, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
 
             Spacer(minLength: 0)

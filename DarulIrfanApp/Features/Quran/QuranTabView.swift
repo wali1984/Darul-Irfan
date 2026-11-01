@@ -235,7 +235,7 @@ struct QuranTabView: View {
                     .foregroundStyle(DIColor.accent)
                     .accessibilityHidden(true)
                 Text("Go to \(surah.nameTransliterated) \(surah.id):\(ayah)")
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
                 Spacer(minLength: 0)
             }

@@ -5,13 +5,14 @@ import UIKit
 private struct DIInterfaceTypography: ViewModifier {
     let style: Font.TextStyle
     let weight: Font.Weight?
+    let design: Font.Design
     @Environment(\.locale) private var locale
     @AppStorage(AppFonts.nastaliqPreferenceKey) private var nastaliq = true
 
     private var font: Font {
         guard locale.language.languageCode?.identifier == "ur", nastaliq,
               let name = AppFonts.appleNastaliqName else {
-            let base = Font.system(style)
+            let base = Font.system(style, design: design)
             return weight.map { base.weight($0) } ?? base
         }
         let uiStyle: UIFont.TextStyle
@@ -40,7 +41,8 @@ private struct DIInterfaceTypography: ViewModifier {
 }
 
 extension View {
-    func diInterfaceFont(_ style: Font.TextStyle, weight: Font.Weight? = nil) -> some View {
-        modifier(DIInterfaceTypography(style: style, weight: weight))
+    func diInterfaceFont(_ style: Font.TextStyle, weight: Font.Weight? = nil,
+                         design: Font.Design = .default) -> some View {
+        modifier(DIInterfaceTypography(style: style, weight: weight, design: design))
     }
 }

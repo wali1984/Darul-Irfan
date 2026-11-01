@@ -103,7 +103,7 @@ struct DarulIrfanCardView: View {
                 .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(LocalizedStringKey(place.name))
-                        .font(DIFont.subheading)
+                        .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
                     ForEach(place.addressLines.indices, id: \.self) { index in

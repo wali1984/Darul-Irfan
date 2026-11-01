@@ -72,7 +72,7 @@ struct NarratorBioSheet: View {
                 }
                 let localname = n.name(languageCode: languageCode)
                 Text(verbatim: localname)
-                    .font(DIFont.heading)
+                    .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
             }
 
@@ -168,7 +168,7 @@ struct NarratorBioSheet: View {
 
     private func sectionTitle(_ key: LocalizedStringKey) -> some View {
         Text(key)
-            .font(DIFont.subheading)
+            .diInterfaceFont(.headline, design: .serif)
             .foregroundStyle(DIColor.textPrimary)
             .padding(.top, DISpacing.xs)
     }

@@ -43,7 +43,7 @@ struct DISectionHeader: View {
                     .accessibilityHidden(true)
             }
             Text(titleKey)
-                .font(DIFont.subheading)
+                .diInterfaceFont(.headline, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
             Spacer(minLength: 0)
         }
@@ -127,7 +127,7 @@ struct DIEmptyState: View {
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(DIFont.subheading)
+                .diInterfaceFont(.headline, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.center)
             if let messageKey {

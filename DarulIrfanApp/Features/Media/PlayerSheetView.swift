@@ -247,7 +247,7 @@ struct PlayerSheetView: View {
             }
 
             Text(audioPlayer.nowPlaying?.title ?? "")
-                .font(DIFont.heading)
+                .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.center)
             if let subtitle = audioPlayer.nowPlaying?.subtitle {

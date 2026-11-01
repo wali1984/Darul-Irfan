@@ -32,7 +32,7 @@ struct OfficialFeedDetailView: View {
                     }
 
                     Text(item.title)
-                        .font(DIFont.heading)
+                        .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
 

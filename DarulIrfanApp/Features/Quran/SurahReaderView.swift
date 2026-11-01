@@ -773,7 +773,7 @@ struct SurahReaderView: View {
         return DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text("Tafsir availability")
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
                 Group {
                     if viewModel.contentMode == .akramTafaseer && viewModel.surah.id >= 92 {

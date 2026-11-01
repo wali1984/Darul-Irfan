@@ -187,7 +187,7 @@ struct MonthlyTimetableView: View {
 
             Spacer()
             Text(viewModel.monthTitle)
-                .font(DIFont.subheading)
+                .diInterfaceFont(.headline, design: .serif)
                 .foregroundStyle(DIColor.textPrimary)
                 .accessibilityAddTraits(.isHeader)
             Spacer()

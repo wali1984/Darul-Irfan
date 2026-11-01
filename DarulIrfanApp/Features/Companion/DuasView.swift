@@ -115,7 +115,7 @@ private struct DuaGroupHeader: View {
                     .foregroundStyle(DIColor.accent)
                     .accessibilityHidden(true)
                 Text(LocalizedStringKey(title))
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
                 Spacer(minLength: 0)
             }
@@ -158,7 +158,7 @@ private struct FeaturedDuaCard: View {
                     .background(Capsule().fill(Color.white.opacity(0.16)))
 
                 Text(verbatim: dua.displayTitle(urdu: DIBrand.readsUrdu(locale)))
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(.white)
 
                 Text(verbatim: dua.arabic)
@@ -197,7 +197,7 @@ private struct DuaCard: View {
         DIElevatedCard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text(verbatim: dua.displayTitle(urdu: DIBrand.readsUrdu(locale)))
-                    .font(DIFont.subheading)
+                    .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
 
                 Text(verbatim: dua.arabic)

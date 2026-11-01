@@ -199,7 +199,7 @@ struct HalqahCommandHeader: View {
                     }
                 }
                 Text(LocalizedStringKey(name))
-                    .font(DIFont.heading)
+                    .diInterfaceFont(.title2, weight: .semibold, design: .serif)
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
