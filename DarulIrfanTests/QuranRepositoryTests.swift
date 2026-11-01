@@ -86,6 +86,36 @@ final class QuranRepositoryTests: XCTestCase {
         XCTAssertEqual(withText, [1])
     }
 
+    @MainActor
+    func testParahOpeningMissingContentCanRecoverWithoutCachingPartialResults() async throws {
+        let entries = [QuranPara(number: 1, surah: fatihah(), ayah: 1)]
+        do {
+            _ = try await QuranParas.openings(for: entries, repository: repository)
+            XCTFail("Missing scripture must not become a successful empty opening")
+        } catch QuranParas.OpeningError.missingContent {
+            // The UI can offer Retry rather than silently omit the verse.
+        }
+        let arabic = "??? ???? ?????? ??????"
+        try await repository.upsertAyahs([QuranAyah(surahNumber: 1, ayahNumber: 1, textArabic: arabic)])
+        let recovered = try await QuranParas.openings(for: entries, repository: repository)
+        XCTAssertEqual(recovered, [1: arabic])
+    }
+
+    @MainActor
+    func testCancelledParahOpeningReadDoesNotReturnSuccessfulEmptyContent() async throws {
+        let entries = [QuranPara(number: 1, surah: fatihah(), ayah: 1)]
+        let repository = self.repository!
+        let task = Task { @MainActor in
+            try await QuranParas.openings(for: entries, repository: repository)
+        }
+        task.cancel()
+        do {
+            _ = try await task.value
+            XCTFail("Cancellation must propagate to the screen lifecycle")
+        } catch is CancellationError {
+        }
+    }
+
     // MARK: - Editions, translations, tafsir
 
     func testEditionTranslationAndTafsirRoundtrip() async throws {

@@ -37,6 +37,9 @@ struct QuranTabView: View {
     @State private var listMode: QuranListMode = .surah
     /// The first words of each parah's opening ayah, read once.
     @State private var paraOpenings: [Int: String] = [:]
+    @State private var paraOpeningsFailed = false
+    @State private var paraOpeningsLoading = false
+    @State private var paraAttempt = 0
 
     init(
         dependencies: AppDependencies,
@@ -322,6 +325,10 @@ struct QuranTabView: View {
     private var paraPanel: some View {
         let paras = QuranParas.list(surahs: viewModel.surahs)
         return LazyVStack(spacing: 0) {
+            if paraOpeningsLoading { ProgressView().padding() }
+            if paraOpeningsFailed {
+                ParahLoadFailure(loading: paraOpeningsLoading) { paraAttempt += 1 }
+            }
             ForEach(Array(paras.enumerated()), id: \.element.id) { index, para in
                 VStack(spacing: 0) {
                     if index > 0 {
@@ -336,13 +343,23 @@ struct QuranTabView: View {
         }
         .padding(6)
         .readGlassList(cornerRadius: 26)
-        .task { await loadParaOpenings(paras) }
+        .task(id: paraAttempt) { await loadParaOpenings(paras) }
     }
 
     @MainActor
     private func loadParaOpenings(_ paras: [QuranPara]) async {
-        guard paraOpenings.isEmpty, !paras.isEmpty else { return }
-        paraOpenings = await QuranParas.openings(for: paras, repository: dependencies.quranRepository)
+        guard paraOpenings.isEmpty, !paras.isEmpty, !paraOpeningsLoading else { return }
+        paraOpeningsLoading = true
+        paraOpeningsFailed = false
+        defer { paraOpeningsLoading = false }
+        do {
+            let found = try await QuranParas.openings(for: paras, repository: dependencies.quranRepository)
+            try Task.checkCancellation()
+            paraOpenings = found
+        } catch is CancellationError {
+        } catch {
+            if !Task.isCancelled { paraOpeningsFailed = true }
+        }
     }
 }
 
@@ -432,6 +449,7 @@ struct QuranPara: Identifiable, Hashable {
 
 /// The 30 parahs: the Silsila's printed divisions (`QuranDivisions.juzStarts`).
 enum QuranParas {
+    enum OpeningError: Error { case missingContent }
     static func list(surahs: [QuranSurah]) -> [QuranPara] {
         QuranDivisions.juzStarts.enumerated().compactMap { index, start in
             guard start.count > 1, let surah = surahs.first(where: { $0.id == start[0] }) else { return nil }
@@ -441,17 +459,19 @@ enum QuranParas {
 
     /// The first words of each parah's opening ayah, from the mushaf itself.
     @MainActor
-    static func openings(for paras: [QuranPara], repository: any QuranRepositoryProtocol) async -> [Int: String] {
+    static func openings(for paras: [QuranPara], repository: any QuranRepositoryProtocol) async throws -> [Int: String] {
         var bySurah: [Int: [Int: String]] = [:]
         var found: [Int: String] = [:]
         for para in paras {
             if bySurah[para.surah.id] == nil {
-                let ayahs = (try? await repository.ayahs(inSurah: para.surah.id)) ?? []
+                try Task.checkCancellation()
+                let ayahs = try await repository.ayahs(inSurah: para.surah.id)
                 bySurah[para.surah.id] = Dictionary(ayahs.map { ($0.ayahNumber, $0.textArabic) }, uniquingKeysWith: { first, _ in first })
             }
-            if let text = bySurah[para.surah.id]?[para.ayah] {
-                found[para.number] = text.split(separator: " ").prefix(4).joined(separator: " ")
+            guard let text = bySurah[para.surah.id]?[para.ayah], !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                throw OpeningError.missingContent
             }
+            found[para.number] = text.split(separator: " ").prefix(4).joined(separator: " ")
         }
         return found
     }
@@ -498,48 +518,87 @@ struct QuranParaListView: View {
     let dependencies: AppDependencies
     let surahs: [QuranSurah]
     @State private var openings: [Int: String] = [:]
+    @State private var loadedSurahs: [QuranSurah] = []
+    @State private var loading = true
+    @State private var failed = false
+    @State private var attempt = 0
 
-    private var paras: [QuranPara] { QuranParas.list(surahs: surahs) }
+    private var paras: [QuranPara] { QuranParas.list(surahs: loadedSurahs) }
 
     var body: some View {
-        List(paras) { para in
-            NavigationLink(value: QuranRoute.reader(surah: para.surah, focusAyah: para.ayah)) {
-                HStack(spacing: DISpacing.md) {
-                    Text("\(para.number)")
-                        .font(.subheadline.weight(.semibold).monospacedDigit())
-                        .foregroundStyle(DIColor.onPrimary)
-                        .frame(minWidth: 34, minHeight: 34)
-                        .background(Circle().fill(DIColor.primary))
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(verbatim: "\(para.surah.nameTransliterated) \(para.surah.id):\(para.ayah)")
-                            .diInterfaceFont(.subheadline, weight: .semibold)
-                            .foregroundStyle(DIColor.textPrimary)
-                        if let opening = openings[para.number] {
-                            Text(verbatim: opening)
-                                .font(DIFont.quranArabic(scale: 0.6))
-                                .foregroundStyle(DIColor.scripture)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                                .environment(\.layoutDirection, .rightToLeft)
+        List {
+            if loading { ProgressView().frame(maxWidth: .infinity) }
+            if failed { ParahLoadFailure(loading: loading) { attempt += 1 } }
+            ForEach(paras) { para in
+                NavigationLink(value: QuranRoute.reader(surah: para.surah, focusAyah: para.ayah)) {
+                    HStack(spacing: DISpacing.md) {
+                        Text("\(para.number)")
+                            .font(.subheadline.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(DIColor.onPrimary)
+                            .frame(minWidth: 34, minHeight: 34)
+                            .background(Circle().fill(DIColor.primary))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(verbatim: "\(para.surah.nameTransliterated) \(para.surah.id):\(para.ayah)")
+                                .diInterfaceFont(.subheadline, weight: .semibold)
+                                .foregroundStyle(DIColor.textPrimary)
+                            if let opening = openings[para.number] {
+                                Text(verbatim: opening)
+                                    .font(DIFont.quranArabic(scale: 0.6))
+                                    .foregroundStyle(DIColor.scripture)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .environment(\.layoutDirection, .rightToLeft)
+                            }
                         }
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(Text("Parah \(para.number)"))
                 }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(Text("Parah \(para.number)"))
+                .listRowBackground(DIColor.surface)
             }
-            .listRowBackground(DIColor.surface)
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
         .navigationTitle("Parahs")
         .navigationBarTitleDisplayMode(.inline)
-        .task { await loadOpenings() }
+        .task(id: attempt) { await loadOpenings() }
     }
 
     @MainActor
     private func loadOpenings() async {
         guard openings.isEmpty else { return }
-        openings = await QuranParas.openings(for: paras, repository: dependencies.quranRepository)
+        loading = true
+        failed = false
+        defer { loading = false }
+        do {
+            var metadata = surahs
+            if metadata.isEmpty { metadata = try await dependencies.quranRepository.allSurahs() }
+            let entries = QuranParas.list(surahs: metadata)
+            guard entries.count == QuranDivisions.juzStarts.count else { throw QuranParas.OpeningError.missingContent }
+            let found = try await QuranParas.openings(for: entries, repository: dependencies.quranRepository)
+            try Task.checkCancellation()
+            loadedSurahs = metadata
+            openings = found
+        } catch is CancellationError {
+        } catch {
+            if !Task.isCancelled { failed = true }
+        }
+    }
+}
+
+private struct ParahLoadFailure: View {
+    let loading: Bool
+    let retry: () -> Void
+
+    var body: some View {
+        VStack(spacing: DISpacing.sm) {
+            Text("The action could not be completed. Check your connection and try again.")
+                .diInterfaceFont(.callout)
+                .foregroundStyle(DIColor.textPrimary)
+            Button("Retry", action: retry)
+                .buttonStyle(DICompactButtonStyle())
+                .disabled(loading)
+        }.padding(DISpacing.md)
     }
 }
