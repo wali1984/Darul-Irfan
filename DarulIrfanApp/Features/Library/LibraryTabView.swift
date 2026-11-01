@@ -48,7 +48,7 @@ struct LibraryTabView: View {
                             Text("The library could not be refreshed. Your saved items are still available.")
                                 .font(.callout)
                             Button("Retry") { Task { await viewModel.reloadHome() } }
-                                .buttonStyle(.bordered)
+                                .buttonStyle(DISecondaryButtonStyle())
                                 .disabled(viewModel.isLoading)
                         }
                     }

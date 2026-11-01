@@ -20,7 +20,7 @@ struct FavoritesView: View {
                     DIEmptyState(systemImage: "heart", titleKey: "Something went wrong",
                         messageKey: "Please try again in a moment.")
                     Button("Retry") { attempt += 1 }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(DISecondaryButtonStyle())
                         .tint(DIColor.primary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
