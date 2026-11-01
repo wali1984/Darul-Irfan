@@ -104,7 +104,7 @@ struct HadithRepository: HadithRepositoryProtocol {
         )
         guard let json = rows.first?.text("payload_json"),
               let data = json.data(using: .utf8) else { return nil }
-        return try? JSONDecoder().decode(HadithNarrator.self, from: data)
+        return try JSONDecoder().decode(HadithNarrator.self, from: data)
     }
 
     func upsertNarrators(_ narrators: [HadithNarrator]) async throws {

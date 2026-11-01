@@ -16,6 +16,8 @@ struct NarratorBioSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var narrator: HadithNarrator?
     @State private var isLoading = true
+    @State private var failed = false
+    @State private var attempt = 0
 
     /// The content language: "System" on an Urdu phone reads in Urdu.
     private var languageCode: String { appState.settings.language.contentLanguageCode }
@@ -29,6 +31,18 @@ struct NarratorBioSheet: View {
                     ProgressView()
                         .frame(maxWidth: .infinity)
                         .padding(DISpacing.xl)
+                } else if failed {
+                    DICard {
+                        VStack(alignment: .leading, spacing: DISpacing.sm) {
+                            Text("The biography could not be loaded. Please try again.")
+                                .diInterfaceFont(.body)
+                                .foregroundStyle(DIColor.danger)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Button("Retry") { attempt += 1 }
+                                .buttonStyle(DISecondaryButtonStyle())
+                        }
+                    }
+                    .padding(DISpacing.md)
                 } else if let narrator {
                     content(narrator)
                         .padding(DISpacing.md)
@@ -52,8 +66,17 @@ struct NarratorBioSheet: View {
                 }
             }
         }
-        .task {
-            narrator = try? await repository.narrator(id: narratorId)
+        .task(id: "\(narratorId)-\(attempt)") {
+            isLoading = true
+            failed = false
+            do {
+                let loaded = try await repository.narrator(id: narratorId)
+                guard !Task.isCancelled else { return }
+                narrator = loaded
+            } catch {
+                guard !Task.isCancelled else { return }
+                failed = true
+            }
             isLoading = false
         }
     }

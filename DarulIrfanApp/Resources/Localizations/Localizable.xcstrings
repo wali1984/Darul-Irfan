@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+  "The biography could not be loaded. Please try again.": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "The biography could not be loaded. Please try again."
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "????? ??? ???? ?? ???? ???? ??? ?????? ???? ?????"
+        }
+      }
+    }
+  },
     "All 114 surahs with translation and tafsir": {
       "extractionState": "manual",
       "localizations": {

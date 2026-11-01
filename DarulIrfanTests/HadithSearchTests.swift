@@ -20,6 +20,23 @@ final class HadithSearchTests: XCTestCase {
         try await super.tearDown()
     }
 
+    func testCorruptNarratorIsAReadFailureRatherThanAnAbsentBiography() async throws {
+        let missing = try await repository.narrator(id: 98765)
+        XCTAssertNil(missing)
+        try await database.connection.execute(
+            "INSERT INTO hadith_narrators(id, payload_json) VALUES (?, ?)", [.int(98765), .text("{broken")]
+        )
+        do {
+            _ = try await repository.narrator(id: 98765)
+            XCTFail("Corrupt biography must be reported as a read failure")
+        } catch is DecodingError {
+            // The sheet can offer retry instead of claiming no biography exists.
+        }
+        try await database.connection.execute("DELETE FROM hadith_narrators WHERE id = ?", [.int(98765)])
+        let removed = try await repository.narrator(id: 98765)
+        XCTAssertNil(removed)
+    }
+
     private func entry(
         _ book: String, _ sequence: Int, arabic: String = "", english: String = "",
         sourceBook: Int? = nil, urduReviewState: String? = nil, urduSource: String? = nil
