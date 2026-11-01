@@ -272,7 +272,7 @@ struct HadithHomeView: View {
         return DICard {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 HStack(spacing: DISpacing.sm) {
-                    DIPillBadge(text: bookTitle, color: DIColor.primary)
+                    DIPillBadge(text: bookTitle, color: DIColor.actionForeground)
                     Text(verbatim: "#\(entry.displayNumber)")
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(DIColor.textMuted)

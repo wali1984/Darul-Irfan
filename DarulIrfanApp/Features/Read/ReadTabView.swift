@@ -300,6 +300,7 @@ struct ReaderSwitch: ViewModifier {
                         }
                         .diInterfaceFont(.subheadline, weight: .semibold)
                     }
+                    .tint(DIColor.actionForeground)
                     .accessibilityIdentifier("read.saved")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -309,6 +310,7 @@ struct ReaderSwitch: ViewModifier {
                     } label: {
                         Image(systemName: "magnifyingglass")
                     }
+                    .tint(DIColor.actionForeground)
                     .accessibilityLabel(Text("Search"))
                 }
             }
