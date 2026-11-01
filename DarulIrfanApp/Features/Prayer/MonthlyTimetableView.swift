@@ -37,6 +37,10 @@ final class MonthlyTimetableViewModel {
         Date.FormatStyle(locale: LanguageManager.locale(for: appState.settings.language), timeZone: placeTimeZone).day(.twoDigits).weekday(.abbreviated)
     }
 
+    var accessibleDateFormat: Date.FormatStyle {
+        Date.FormatStyle(date: .complete, time: .omitted, locale: LanguageManager.locale(for: appState.settings.language), timeZone: placeTimeZone)
+    }
+
     private var placeTimeZone: TimeZone {
         appState.activePlace?.timeZone ?? TimeZone.current
     }
@@ -244,5 +248,12 @@ struct MonthlyTimetableView: View {
         }
         .font(.caption.monospacedDigit().weight(row.isToday ? .semibold : .regular))
         .foregroundStyle(row.isToday ? DIColor.actionForeground : DIColor.textPrimary)
+        .accessibilityLabel(
+            Text(verbatim: row.date.formatted(viewModel.accessibleDateFormat))
+            + Text(verbatim: ", ")
+            + Text(LocalizedStringKey(prayer.englishName))
+            + Text(verbatim: ", ")
+            + Text(verbatim: row.times[prayer].map { $0.formatted(viewModel.timeFormat) } ?? "—")
+        )
     }
 }
