@@ -111,7 +111,7 @@ struct AboutView: View {
         let info = Bundle.main.infoDictionary
         let version = info?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = info?["CFBundleVersion"] as? String ?? "1"
-        return "\(version) (\(build))"
+        return "\u{2066}\(version) (\(build))\u{2069}"
     }
 
     // MARK: - Silsila
