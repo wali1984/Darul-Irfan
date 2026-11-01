@@ -202,14 +202,23 @@ struct GlobalSearchView: View {
                 resultsList
             }
         case .failed:
-            if appMatches.isEmpty {
-                brandedState(
-                    systemImage: "exclamationmark.circle",
-                    titleKey: "Search is unavailable right now",
-                    messageKey: "Please try again in a moment."
-                )
-            } else {
-                resultsList
+            VStack(spacing: DISpacing.sm) {
+                if appMatches.isEmpty {
+                    brandedState(
+                        systemImage: "exclamationmark.circle",
+                        titleKey: "Search is unavailable right now",
+                        messageKey: "Please try again in a moment."
+                    )
+                } else {
+                    resultsList
+                    Text("Search is unavailable right now")
+                        .diInterfaceFont(.body)
+                        .foregroundStyle(DIColor.danger)
+                        .padding(.horizontal, DISpacing.md)
+                }
+                Button("Retry") { viewModel.searchNow() }
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .padding(DISpacing.md)
             }
         }
     }
