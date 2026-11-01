@@ -128,6 +128,13 @@ struct CategoryListView: View {
 
     private var filterMenu: some View {
         Menu {
+            if hasActiveFilters {
+                Button("Clear filters") {
+                    viewModel.languageFilter = nil
+                    viewModel.typeFilter = nil
+                }
+            }
+            if hasActiveFilters { Divider() }
             Picker("Language", selection: $viewModel.languageFilter) {
                 Text("All languages").tag(nil as String?)
                 Text("English").tag("en" as String?)
@@ -138,12 +145,6 @@ struct CategoryListView: View {
                 Text("All types").tag(nil as ContentType?)
                 ForEach(ContentType.allCases, id: \.rawValue) { type in
                     Text(LocalizedStringKey(type.libraryDisplayName)).tag(type as ContentType?)
-                }
-            }
-            if hasActiveFilters {
-                Button("Clear filters") {
-                    viewModel.languageFilter = nil
-                    viewModel.typeFilter = nil
                 }
             }
         } label: {
@@ -233,7 +234,7 @@ struct ContentItemRow: View {
     }
     @ViewBuilder
     private var badges: some View {
-        DIPillBadge(text: String(localized: String.LocalizationValue(item.type.libraryDisplayName)), color: item.type.libraryAccent)
+        DIPillBadge(text: String(localized: String.LocalizationValue(item.type.libraryDisplayName)), color: item.type.isFeaturedPublication ? item.type.libraryAccent : DIColor.actionForeground)
         DIPillBadge(text: String(localized: String.LocalizationValue(LibraryLanguage.displayName(forCode: item.language))),
                     color: DIColor.textMuted)
     }
