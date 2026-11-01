@@ -161,6 +161,7 @@ struct UpdatesSection: View {
             if !isLoading { openLinkedUpdate() }
         }
         .onChange(of: DeepLinkRouter.shared.requestCount) { _, _ in openLinkedUpdate() }
+        .onChange(of: feed.feedItems.map(\.id)) { _, _ in openLinkedUpdate() }
         .sheet(item: $presentedVideo) { video in
             YouTubePlayerSheet(videoID: video.id, title: video.title)
         }
@@ -173,9 +174,12 @@ struct UpdatesSection: View {
     /// feed has loaded, when it is among the updates shown.
     private func openLinkedUpdate() {
         guard followsLinks, !feed.isLoading,
-              let id = DeepLinkRouter.shared.take(\.updateID) else { return }
-        guard let item = feed.feedItems.first(where: { $0.id == id }) else { return }
-        if let videoID = item.videoID {
+              let route = DeepLinkRouter.shared.pending,
+              let id = route.updateID,
+              let item = feed.feedItems.first(where: { $0.id == id }) else { return }
+        // A later page or retry can still resolve the request; clear it only once the item exists.
+        DeepLinkRouter.shared.clear(route)
+        if item.source == .youtube, let videoID = item.videoID {
             presentedVideo = FeedVideo(id: videoID, title: item.title)
         } else {
             presentedItem = item
