@@ -6,6 +6,7 @@ import Observation
 final class OfficialPlatformViewModel {
     private let feedService: any OfficialFeedServicing
     private let liveService: any LiveBroadcastServicing
+    private var generation = 0
 
     private(set) var bootstrap: AppBootstrap = .offline
     private(set) var feedItems: [OfficialFeedItem] = []
@@ -32,18 +33,25 @@ final class OfficialPlatformViewModel {
     func load(forceRefresh: Bool = false) async {
         guard !isLoading else { return }
         isLoading = true
+        generation += 1
         errorMessage = nil
         defer { isLoading = false }
 
-        bootstrap = await feedService.bootstrap(forceRefresh: forceRefresh)
+        let loadedBootstrap = await feedService.bootstrap(forceRefresh: forceRefresh)
+        guard !Task.isCancelled else { return }
+        bootstrap = loadedBootstrap
 
         if isOfficialFeedEnabled {
             do {
                 let page = try await feedService.feed(after: nil, forceRefresh: forceRefresh)
+                try Task.checkCancellation()
                 feedItems = Self.deduplicated(page.items)
                 nextCursor = page.nextCursor
                 isShowingCachedContent = page.isFromCache
+            } catch is CancellationError {
+                return
             } catch {
+                guard !Task.isCancelled else { return }
                 errorMessage = String(localized: "Official updates could not be refreshed. Please check your connection and try again.")
             }
         } else {
@@ -53,21 +61,30 @@ final class OfficialPlatformViewModel {
         }
 
         if isLiveHubEnabled {
-            live = await liveService.currentLiveBroadcast(forceRefresh: forceRefresh)
+            let current = await liveService.currentLiveBroadcast(forceRefresh: forceRefresh)
+            guard !Task.isCancelled else { return }
+            live = current
         } else {
             live = .offline
         }
     }
 
     func loadMore() async {
-        guard isOfficialFeedEnabled, !isLoadingMore, let cursor = nextCursor else { return }
+        guard isOfficialFeedEnabled, !isLoading, !isLoadingMore, let cursor = nextCursor else { return }
         isLoadingMore = true
+        let requestGeneration = generation
         defer { isLoadingMore = false }
         do {
             let page = try await feedService.feed(after: cursor, forceRefresh: true)
+            try Task.checkCancellation()
+            guard requestGeneration == generation else { return }
+            if errorMessage == String(localized: "More updates could not be loaded.") { errorMessage = nil }
             feedItems = Self.deduplicated(feedItems + page.items)
             nextCursor = page.nextCursor
+        } catch is CancellationError {
+            return
         } catch {
+            guard !Task.isCancelled, requestGeneration == generation else { return }
             errorMessage = String(localized: "More updates could not be loaded.")
         }
     }
