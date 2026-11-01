@@ -215,7 +215,10 @@ enum ZikrTimeLine {
         timeZone: TimeZone = .current,
         locale: Locale = .current
     ) -> String {
-        let local = ZikrScheduleMath.localTimeText(start, timeZone: timeZone, locale: locale)
+        let formattedLocal = ZikrScheduleMath.localTimeText(start, timeZone: timeZone, locale: locale)
+        // Keep the clock and GMT offset in reading order beside an Urdu weekday.
+        let local = locale.language.languageCode?.identifier == "ur"
+            ? "\u{2066}\(formattedLocal)\u{2069}" : formattedLocal
         let yours = String(localized: "Your time: \(local)")
         let announced = TimeZone(identifier: session.timeZoneIdentifier) ?? timeZone
         guard announced.secondsFromGMT(for: start) != timeZone.secondsFromGMT(for: start) else { return yours }
