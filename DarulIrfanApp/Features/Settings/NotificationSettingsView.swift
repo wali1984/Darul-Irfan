@@ -72,7 +72,7 @@ struct NotificationSettingsView: View {
             }
         }
         .onDisappear {
-            viewModel.stopFullAzan()
+            viewModel.stopAllPreviews()
         }
         .alert("Notifications are off", isPresented: $zikrReminders.permissionDenied) {
             Button("OK", role: .cancel) {}
@@ -143,6 +143,7 @@ struct NotificationSettingsView: View {
                         }
                     }
                 }
+                .buttonStyle(DISecondaryButtonStyle())
                 .disabled(viewModel.isRequestingPermission)
                 .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
@@ -154,6 +155,7 @@ struct NotificationSettingsView: View {
                 } label: {
                     Label("Open Settings to Allow Notifications", systemImage: "gear")
                 }
+                .buttonStyle(DISecondaryButtonStyle())
                 .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             case .authorized, .unknown:
@@ -488,6 +490,7 @@ struct NotificationSettingsView: View {
             } label: {
                 Label("Send a test reminder", systemImage: "bell.and.waves.left.and.right")
             }
+            .buttonStyle(DISecondaryButtonStyle())
             .disabled(viewModel.permission != .authorized)
             .foregroundStyle(DIColor.actionForeground)
             .listRowBackground(DIColor.surface)
@@ -511,6 +514,7 @@ struct NotificationSettingsView: View {
             } label: {
                 Label("Preview Alert Sound", systemImage: "speaker.wave.2.fill")
             }
+            .buttonStyle(DISecondaryButtonStyle())
             .foregroundStyle(DIColor.actionForeground)
             .listRowBackground(DIColor.surface)
 
@@ -531,6 +535,7 @@ struct NotificationSettingsView: View {
                         Label("Play Full Azan", systemImage: "play.fill")
                     }
                 }
+                .buttonStyle(DISecondaryButtonStyle())
                 .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             }
@@ -545,6 +550,7 @@ struct NotificationSettingsView: View {
                         Label("Play Fajr Azan", systemImage: "play.fill")
                     }
                 }
+                .buttonStyle(DISecondaryButtonStyle())
                 .foregroundStyle(DIColor.actionForeground)
                 .listRowBackground(DIColor.surface)
             }
@@ -654,6 +660,7 @@ final class NotificationSettingsViewModel {
     /// used by `NotificationScheduler`: `azan-short.caf` first, then the
     /// original `prayer-chime.wav`.
     func previewAlertSound() {
+        stopAllPreviews()
         chimeUnavailable = false
         let clipURL = Bundle.main.url(forResource: "azan-short", withExtension: "caf")
             ?? Bundle.main.url(forResource: "prayer-chime", withExtension: "wav")
@@ -687,7 +694,7 @@ final class NotificationSettingsViewModel {
             stopFullAzan()
             return
         }
-        stopFullAzan()
+        stopAllPreviews()
         guard let url = Bundle.main.url(forResource: resource, withExtension: "mp3") else {
             azanUnavailable = true
             return
@@ -714,7 +721,14 @@ final class NotificationSettingsViewModel {
         }
     }
 
-    /// Stops any full azan playback (also called when the view disappears).
+    /// A single preview may play at a time; leaving this screen stops both kinds.
+    func stopAllPreviews() {
+        chimePlayer?.stop()
+        chimePlayer = nil
+        stopFullAzan()
+    }
+
+    /// Stops any full azan playback.
     func stopFullAzan() {
         azanPlayer?.stop()
         azanPlayer = nil
