@@ -80,15 +80,15 @@ struct HalqahNameEditor: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack(spacing: DISpacing.sm) {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
                     TextField("Your name", text: $draft)
                         .textFieldStyle(.roundedBorder)
                         .textContentType(.name)
                         .submitLabel(.done)
                         .onSubmit(save)
+                        .disabled(model.isSavingName)
                     Button("Save", action: save)
-                        .buttonStyle(.bordered)
-                        .tint(DIColor.primary)
+                        .buttonStyle(DIPrimaryButtonStyle())
                         .disabled(model.isSavingName || trimmedDraft.isEmpty || trimmedDraft == (model.displayName ?? ""))
                 }
                 Text("Your name is shown to your Halqah's admins and in the meeting room.")
@@ -117,7 +117,7 @@ struct HalqahNameEditor: View {
 
     private func save() {
         let name = trimmedDraft
-        guard !name.isEmpty, name != model.displayName else { return }
+        guard !model.isSavingName, !name.isEmpty, name != model.displayName else { return }
         Task { await model.rename(name) }
     }
 }
