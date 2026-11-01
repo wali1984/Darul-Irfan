@@ -20,29 +20,30 @@ struct DailyMediaManagerView: View {
     var body: some View {
         List {
             Group {
-            Section {
-                Button { adding = true } label: { Label("Add a picture", systemImage: "photo.badge.plus") }
-            } footer: {
-                Text("Or forward a picture to the WhatsApp Business number with #ayah, #hadith, #aqwal, #quote or #announcement at the start of its caption, and a date such as 2026-11-02 if you like. It arrives here as a draft.")
-            }
-            if failed && items != nil {
-                Button("Try again") { Task { await load() } }
-            }
-            if let items {
-                let drafts = items.filter { $0.status == "draft" }
-                let rest = items.filter { $0.status != "draft" }
-                if !drafts.isEmpty {
-                    Section("Waiting for you") { ForEach(drafts) { row($0) } }
+                Section {
+                    Button { adding = true } label: { Label("Add a picture", systemImage: "photo.badge.plus") }
+                        .buttonStyle(DIPrimaryButtonStyle())
+                } footer: {
+                    Text("Or forward a picture to the WhatsApp Business number with #ayah, #hadith, #aqwal, #quote or #announcement at the start of its caption, and a date such as 2026-11-02 if you like. It arrives here as a draft.")
                 }
-                Section("Published and hidden") {
-                    if rest.isEmpty { Text("Nothing yet.").foregroundStyle(DIColor.textMuted) }
-                    ForEach(rest) { row($0) }
+                if failed && items != nil {
+                    Button("Try again") { Task { await load() } }
                 }
-            } else if failed {
-                Button("Try again") { Task { await load() } }
-            } else {
-                ProgressView()
-            }
+                if let items {
+                    let drafts = items.filter { $0.status == "draft" }
+                    let rest = items.filter { $0.status != "draft" }
+                    if !drafts.isEmpty {
+                        Section("Waiting for you") { ForEach(drafts) { row($0) } }
+                    }
+                    Section("Published and hidden") {
+                        if rest.isEmpty { Text("Nothing yet.").foregroundStyle(DIColor.textMuted) }
+                        ForEach(rest) { row($0) }
+                    }
+                } else if failed {
+                    Button("Try again") { Task { await load() } }
+                } else {
+                    ProgressView()
+                }
             }
             .listRowBackground(DIColor.surface)
         }
@@ -118,75 +119,82 @@ struct DailyMediaEditor: View {
     var body: some View {
         Form {
             Group {
-            Section {
-                if let preview {
-                    Image(uiImage: preview).resizable().scaledToFit().frame(maxHeight: 260)
-                } else if let url = item?.imageURL {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image): image.resizable().scaledToFit()
-                        case .failure: Text("The picture could not be loaded. Close and reopen this page to try again.").font(.caption).foregroundStyle(DIColor.textMuted)
-                        default: ProgressView()
+                Section {
+                    if let preview {
+                        Image(uiImage: preview).resizable().scaledToFit().frame(maxHeight: 260)
+                    } else if let url = item?.imageURL {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image): image.resizable().scaledToFit()
+                            case .failure: Text("The picture could not be loaded. Close and reopen this page to try again.").font(.caption).foregroundStyle(DIColor.textMuted)
+                            default: ProgressView()
+                            }
+                        }
+                        .frame(maxHeight: 260)
+                    }
+                    if item == nil {
+                        PhotosPicker(selection: $pick, matching: .images, preferredItemEncoding: .compatible) {
+                            Label(preview == nil ? "Choose a picture" : "Choose another", systemImage: "photo.on.rectangle")
+                        }
+                        .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(working || loadingPicture)
+                        Button { choosingFile = true } label: {
+                            Label("Choose from Files", systemImage: "folder")
+                        }
+                        .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(working || loadingPicture)
+                    }
+                    if loadingPicture { ProgressView("Loading picture…") }
+                }
+                Section {
+                    Picker("Shows on", selection: $slot) {
+                        ForEach(DailyMediaItem.Slot.allCases) { slot in Text(slot.title).tag(slot) }
+                    }
+                    DatePicker("Day", selection: $day, displayedComponents: .date)
+                        .onChange(of: day) { _, value in if endDay < value { endDay = value } }
+                    if slot == .announcement {
+                        Toggle("Runs several days", isOn: $hasEnd)
+                        if hasEnd {
+                            DatePicker("Last day", selection: $endDay, in: day..., displayedComponents: .date)
                         }
                     }
-                    .frame(maxHeight: 260)
-                }
-                if item == nil {
-                    PhotosPicker(selection: $pick, matching: .images, preferredItemEncoding: .compatible) {
-                        Label(preview == nil ? "Choose a picture" : "Choose another", systemImage: "photo.on.rectangle")
+                    if slot != .quote {
+                        Toggle("Also open it over the Today page", isOn: $popup)
                     }
-                    .disabled(working || loadingPicture)
-                    Button { choosingFile = true } label: {
-                        Label("Choose from Files", systemImage: "folder")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Caption (optional)").font(.caption).foregroundStyle(DIColor.textMuted)
+                        TextField("Caption (optional)", text: $caption, prompt: Text(""), axis: .vertical)
+                            .lineLimit(1...4)
+                            .accessibilityLabel("Caption (optional)")
+                            .disabled(working)
                     }
-                    .disabled(working || loadingPicture)
+                } footer: {
+                    Text(slot == .quote
+                         ? "The day's quote opens over the Today page once, the first time it is opened that day."
+                         : "On that day it takes its card's place on the Today page, in each reader's own time zone. Without a picture, the card shows the app's own ayah, hadith or saying for the day.")
                 }
-                if loadingPicture { ProgressView("Loading picture…") }
-            }
-            Section {
-                Picker("Shows on", selection: $slot) {
-                    ForEach(DailyMediaItem.Slot.allCases) { slot in Text(slot.title).tag(slot) }
+                if let error {
+                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
                 }
-                DatePicker("Day", selection: $day, displayedComponents: .date)
-                    .onChange(of: day) { _, value in if endDay < value { endDay = value } }
-                if slot == .announcement {
-                    Toggle("Runs several days", isOn: $hasEnd)
-                    if hasEnd {
-                        DatePicker("Last day", selection: $endDay, in: day..., displayedComponents: .date)
+                Section {
+                    if working { ProgressView() }
+                    Button(item?.status == "published" ? "Save" : "Publish") { Task { await save(publish: true) } }
+                        .buttonStyle(DIPrimaryButtonStyle())
+                        .disabled(working || loadingPicture || (item == nil && picture == nil))
+                    if item == nil {
+                        Button("Save as a draft") { Task { await save(publish: false) } }
+                            .buttonStyle(DISecondaryButtonStyle())
+                            .disabled(working || loadingPicture || picture == nil)
+                    }
+                    if let item {
+                        if item.status == "published" {
+                            Button("Hide it") { Task { await setStatus("hidden") } }
+                                .buttonStyle(DISecondaryButtonStyle()).disabled(working)
+                        }
+                        Button("Delete", role: .destructive) { confirmingDelete = true }
+                            .buttonStyle(DISecondaryButtonStyle(destructive: true)).disabled(working)
                     }
                 }
-                if slot != .quote {
-                    Toggle("Also open it over the Today page", isOn: $popup)
-                }
-                TextField("Caption (optional)", text: $caption, axis: .vertical)
-                    .lineLimit(1...4)
-            } footer: {
-                Text(slot == .quote
-                     ? "The day's quote opens over the Today page once, the first time it is opened that day."
-                     : "On that day it takes its card's place on the Today page, in each reader's own time zone. Without a picture, the card shows the app's own ayah, hadith or saying for the day.")
-            }
-            if let error {
-                Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
-            }
-            Section {
-                if working { ProgressView() }
-                Button(item?.status == "published" ? "Save" : "Publish") { Task { await save(publish: true) } }
-                    .buttonStyle(DIPrimaryButtonStyle())
-                    .disabled(working || loadingPicture || (item == nil && picture == nil))
-                if item == nil {
-                    Button("Save as a draft") { Task { await save(publish: false) } }
-                        .buttonStyle(DISecondaryButtonStyle())
-                        .disabled(working || loadingPicture || picture == nil)
-                }
-                if let item {
-                    if item.status == "published" {
-                        Button("Hide it") { Task { await setStatus("hidden") } }
-                            .buttonStyle(DISecondaryButtonStyle()).disabled(working)
-                    }
-                    Button("Delete", role: .destructive) { confirmingDelete = true }
-                        .buttonStyle(DISecondaryButtonStyle(destructive: true)).disabled(working)
-                }
-            }
             }
             .listRowBackground(DIColor.surface)
         }
