@@ -56,6 +56,7 @@ struct GroupPostComposer: View {
 
     var body: some View {
         Form {
+            Group {
             Section {
                 // The quickest route from a WhatsApp group: copy the message
                 // (or a picture) there, then paste it here.
@@ -121,6 +122,8 @@ struct GroupPostComposer: View {
             } footer: {
                 Text("Publishing notifies the group's members who have notifications on.")
             }
+            }
+            .listRowBackground(DIColor.surface)
         }
         .disabled(working || preparingMedia)
         .interactiveDismissDisabled(working || preparingMedia)
