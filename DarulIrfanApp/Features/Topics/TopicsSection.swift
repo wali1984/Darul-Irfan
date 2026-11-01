@@ -23,9 +23,12 @@ struct TopicsSection: View {
     let appState: AppState
     @State private var showsAll = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private static let previewCount = 10
-    private let columns = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 10), count: dynamicTypeSize >= .xxLarge ? 1 : 2)
+    }
 
     private var shownTopics: [Topic] {
         showsAll ? viewModel.topics : Array(viewModel.topics.prefix(Self.previewCount))
