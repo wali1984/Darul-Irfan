@@ -4,6 +4,27 @@ import XCTest
 
 @MainActor
 final class GroupsRefreshRaceTests: XCTestCase {
+    func testDelayedProfileCannotOverwriteSavedName() async {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [GroupsRaceProtocol.self]
+        let transport = URLSession(configuration: config)
+        defer { transport.invalidateAndCancel() }
+        let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+            session: transport, uploads: transport, savedSession: GroupsRaceSession())
+        let model = GroupsModel(service: service)
+        let pending = expectation(description: "Old profile held")
+        GroupsRaceProtocol.configure(holdFirst: false, holdProfile: true) { pending.fulfill() }
+        let refresh = Task { await model.refresh() }
+        await fulfillment(of: [pending], timeout: 5)
+        await model.rename("New name")
+        XCTAssertEqual(model.displayName, "New name")
+        GroupsRaceProtocol.releaseOlder()
+        await refresh.value
+        XCTAssertEqual(model.displayName, "New name")
+        XCTAssertFalse(model.isSavingName)
+        XCTAssertNil(model.nameError)
+    }
+
     func testProfileExpiryClearsAccountButTemporaryFailurePreservesName() async {
         for status in [503, 401] {
             let config = URLSessionConfiguration.ephemeral
@@ -88,14 +109,20 @@ private final class GroupsRaceProtocol: URLProtocol {
     private static var older: GroupsRaceProtocol?
     private static var onHeld: (() -> Void)?
     private static var profileStatus = 404
-    static func configure(holdFirst: Bool = true, profileStatus: Int = 404, _ onHeld: @escaping () -> Void) {
+    private static var holdProfile = false
+    private static var heldProfile = false
+    static func configure(holdFirst: Bool = true, profileStatus: Int = 404, holdProfile: Bool = false, _ onHeld: @escaping () -> Void) {
         lock.lock(); defer { lock.unlock() }
         first = holdFirst; older = nil; self.onHeld = onHeld
         self.profileStatus = profileStatus
+        self.holdProfile = holdProfile
+        heldProfile = false
     }
     static func releaseOlder() {
-        lock.lock(); let held = older; older = nil; lock.unlock()
-        held?.respond(200, "{\"role\":\"superadmin\",\"groups\":[],\"signedIn\":1}")
+        lock.lock(); let held = older; let profile = heldProfile; older = nil; lock.unlock()
+        held?.respond(200, profile
+            ? "{\"memberID\":\"fixture\",\"role\":\"member\",\"displayName\":\"Old name\"}"
+            : "{\"role\":\"superadmin\",\"groups\":[],\"signedIn\":1}")
     }
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -114,7 +141,19 @@ private final class GroupsRaceProtocol: URLProtocol {
         } else if request.url?.path == "/v1/members/signout" {
             respond(204, "")
         } else if request.url?.path == "/v1/members/me" {
-            Self.lock.lock(); let status = Self.profileStatus; Self.lock.unlock()
+            if request.httpMethod == "PUT" {
+                respond(200, "{\"memberID\":\"fixture\",\"role\":\"member\",\"displayName\":\"New name\"}")
+                return
+            }
+            Self.lock.lock()
+            if Self.holdProfile {
+                Self.holdProfile = false; Self.heldProfile = true; Self.older = self
+                let callback = Self.onHeld
+                Self.lock.unlock()
+                callback?()
+                return
+            }
+            let status = Self.profileStatus; Self.lock.unlock()
             respond(status, "{}")
         } else {
             respond(404, "{}")
