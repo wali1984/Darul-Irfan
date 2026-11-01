@@ -267,6 +267,31 @@ struct PersonalZikrLink: View {
     }
 }
 
+#if DEBUG
+/// Populated history coverage without starting timers or writing personal records.
+struct PersonalZikrHistoryAuditFixture: View {
+    private let entries: [PersonalZikrEntry] = (1...9).map { index in
+        let end = Calendar.current.date(byAdding: .day, value: -index, to: .now)!
+        let duration = Double(index * 60)
+        return PersonalZikrEntry(id: "audit-\(index)", startedAt: end.addingTimeInterval(-duration),
+                                 endedAt: end, duration: duration)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                PersonalZikrHistoryCard(entries: entries)
+                    .padding(DISpacing.md).diResponsiveWidth()
+            }
+            .diScreenBackground()
+            .tint(DIColor.actionForeground)
+            .navigationTitle("Your Daily Personal Zikr")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+#endif
+
 private struct ZikrTimerButtonStyle: ButtonStyle {
     var prominent = false
     @Environment(\.isEnabled) private var enabled

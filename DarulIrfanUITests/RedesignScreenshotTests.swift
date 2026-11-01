@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -206,7 +206,14 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
             app.launchArguments.append("--uitesting-halqah-resources")
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "personal-history" {
+            app.launchArguments.append("--uitesting-personal-history")
+        }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "personal-history" {
+            populatedHistoryTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
             halqahResourcesTour()
             return
@@ -528,6 +535,35 @@ final class RedesignScreenshotTests: XCTestCase {
                 goBack()
             }
         }
+    }
+
+    /// Uses the production history card with nine in-memory records, never the user's store.
+    private func populatedHistoryTour() {
+        let history = language == "ur" ? "آپ کے گزشتہ 3 ماہ" : "Your last 3 months"
+        let showAll = language == "ur" ? "تمام نشستیں دکھائیں" : "Show all sessions"
+        let showRecent = language == "ur" ? "حالیہ نشستیں دکھائیں" : "Show recent sessions"
+        let ninth = language == "ur" ? "9 منٹ" : "9 min"
+        XCTAssertTrue(app.buttons[history].waitForExistence(timeout: 180))
+        XCTAssertFalse(app.buttons[showAll].exists, "History must start collapsed")
+        XCTAssertFalse(app.staticTexts[ninth].exists)
+        shot("history-populated-collapsed")
+        guard seek(history) else { return }
+        XCTAssertFalse(app.staticTexts[ninth].exists, "Recent history must limit the list to seven sessions")
+        guard seek(showAll) else { return }
+        let last = app.staticTexts[ninth]
+        for _ in 0..<8 {
+            if last.exists && last.isHittable { break }
+            app.swipeUp(); pause(0.5)
+        }
+        XCTAssertTrue(last.exists && last.isHittable, "Show all must expose the ninth session")
+        shot("history-populated-all")
+        guard seek(showRecent) else { return }
+        XCTAssertFalse(last.exists, "Show recent must remove the older rows again")
+        scrollToTop()
+        guard seek(history) else { return }
+        XCTAssertFalse(app.buttons[showAll].exists, "The expanded history must collapse again")
+        XCTAssertFalse(last.exists)
+        shot("history-populated-recollapsed")
     }
 
     /// Actual contextual entry points, not a direct test-only destination.

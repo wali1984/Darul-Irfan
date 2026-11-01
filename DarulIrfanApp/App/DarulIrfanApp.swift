@@ -272,6 +272,8 @@ private struct ReadyRootView: View {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-resources") {
             HalqahAuditFixture()
+        } else if ProcessInfo.processInfo.arguments.contains("--uitesting-personal-history") {
+            PersonalZikrHistoryAuditFixture()
         } else {
             RootView(dependencies: dependencies, appState: appState)
         }
