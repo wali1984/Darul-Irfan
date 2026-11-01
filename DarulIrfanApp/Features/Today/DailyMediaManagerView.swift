@@ -220,7 +220,7 @@ struct DailyMediaEditor: View {
         .diScreenBackground()
         .navigationTitle(item == nil ? "Add a picture" : "Picture")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(working) } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()).disabled(working) } }
         .onAppear(perform: fill)
         .task(id: pick) { await read(pick) }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.image]) { result in
