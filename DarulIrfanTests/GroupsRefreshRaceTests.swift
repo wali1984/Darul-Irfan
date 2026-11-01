@@ -4,6 +4,29 @@ import XCTest
 
 @MainActor
 final class GroupsRefreshRaceTests: XCTestCase {
+    func testDelayedAccountDeletionPreservesReplacementSession() async {
+        for status in [204, 401] {
+            let config = URLSessionConfiguration.ephemeral
+            config.protocolClasses = [GroupsRaceProtocol.self]
+            let transport = URLSession(configuration: config)
+            defer { transport.invalidateAndCancel() }
+            let store = GroupsRaceSession()
+            let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+                session: transport, uploads: transport, savedSession: store)
+            let pending = expectation(description: "Old account deletion held")
+            GroupsRaceProtocol.configure(holdFirst: false, holdProfile: true) { pending.fulfill() }
+            let older = Task { try await service.deleteAccount() }
+            await fulfillment(of: [pending], timeout: 5)
+            store.save(.init(token: "replacement", expiresAt: .distantFuture, memberID: "new-member"))
+            GroupsRaceProtocol.releaseOlder(status: status)
+            do { try await older.value; XCTFail("Old completion must be discarded") }
+            catch is CancellationError { }
+            catch { XCTFail("Unexpected error: \(error)") }
+            XCTAssertEqual(store.load()?.token, "replacement")
+            XCTAssertEqual(store.load()?.memberID, "new-member")
+        }
+    }
+
     func testOldUnauthorizedResponseCannotDeleteReplacementSession() async {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [GroupsRaceProtocol.self]

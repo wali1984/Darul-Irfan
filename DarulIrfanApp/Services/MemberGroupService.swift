@@ -514,7 +514,7 @@ actor MemberGroupService {
         // 401 means the session is already gone server-side; the local copy
         // should still go, so the member is not left signed in to nothing.
         guard code == 204 || code == 401 else { throw MemberGroupError.requestFailed }
-        savedSession.delete()
+        guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
         HalqahNoticeChoice.isTurnedOff = false
     }
 
