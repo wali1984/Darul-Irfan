@@ -124,7 +124,23 @@ struct UpdatesSection: View {
                     .foregroundStyle(DIColor.textMuted)
             }
             if let error = feed.errorMessage {
-                DICard { Label(error, systemImage: "exclamationmark.triangle") }
+                DICard {
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        Label(error, systemImage: "exclamationmark.triangle")
+                            .diInterfaceFont(.body)
+                        Button("Retry") {
+                            Task {
+                                if error == String(localized: "More updates could not be loaded.") {
+                                    await feed.loadMore()
+                                } else {
+                                    await feed.load(forceRefresh: true)
+                                }
+                            }
+                        }
+                        .buttonStyle(DISecondaryButtonStyle())
+                        .disabled(feed.isLoading || feed.isLoadingMore)
+                    }
+                }
             }
             filterBar
             if filter == .announcements {
@@ -197,10 +213,11 @@ struct UpdatesSection: View {
         } label: {
             Text(LocalizedStringKey(candidate.rawValue))
                 .diInterfaceFont(.footnote, weight: .semibold)
-                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: true)
                 .foregroundStyle(selected ? Color.white : DIColor.textPrimary)
                 .padding(.horizontal, 14)
-                .frame(minHeight: 36)
+                .padding(.vertical, 6)
+                .frame(minHeight: 40)
                 .background(
                     Capsule().fill(selected ? AnyShapeStyle(DIGradient.emerald) : AnyShapeStyle(DIColor.primary.opacity(0.06)))
                 )
@@ -211,7 +228,7 @@ struct UpdatesSection: View {
                 .padding(.vertical, 4)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
