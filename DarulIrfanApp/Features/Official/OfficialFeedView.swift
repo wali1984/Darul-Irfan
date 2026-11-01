@@ -302,10 +302,22 @@ struct UpdatesSection: View {
     @ViewBuilder
     private var newsContent: some View {
         let entries = news.entries(feed: feed.feedItems)
-        if !news.isLoaded {
+        if news.loadFailed {
+            VStack(spacing: DISpacing.sm) {
+                Text("The action could not be completed. Check your connection and try again.")
+                    .diInterfaceFont(.callout)
+                    .foregroundStyle(DIColor.textPrimary)
+                Button("Retry") { Task { await news.load() } }
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(news.isLoading)
+            }.padding(DISpacing.md)
+        }
+        if !news.isLoaded && !news.loadFailed && entries.isEmpty {
             ProgressView()
                 .frame(maxWidth: .infinity)
                 .padding(DISpacing.xl)
+        } else if news.loadFailed && entries.isEmpty {
+            EmptyView()
         } else if entries.isEmpty {
             DIEmptyState(
                 systemImage: "megaphone",

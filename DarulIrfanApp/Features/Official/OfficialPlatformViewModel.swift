@@ -175,16 +175,35 @@ final class UpdatesNewsModel {
         await load()
     }
 
+    private(set) var isLoading = false
+    private(set) var loadFailed = false
+
     func load() async {
-        let announcements = (try? await contentRepository.items(
-            category: nil, type: .announcement, language: nil, limit: 200
-        )) ?? []
-        let pressReleases = (try? await contentRepository.items(
-            category: nil, type: .pressRelease, language: nil, limit: 200
-        )) ?? []
-        library = announcements + pressReleases
-        notes = (try? await eventsRepository.announcements(limit: 20)) ?? []
-        isLoaded = true
+        guard !isLoading else { return }
+        isLoading = true
+        loadFailed = false
+        defer { isLoading = false }
+        do {
+            let announcements = try await contentRepository.items(
+                category: nil, type: .announcement, language: nil, limit: 200
+            )
+            try Task.checkCancellation()
+            let pressReleases = try await contentRepository.items(
+                category: nil, type: .pressRelease, language: nil, limit: 200
+            )
+            try Task.checkCancellation()
+            let loadedNotes = try await eventsRepository.announcements(limit: 20)
+            try Task.checkCancellation()
+            // Publish a complete snapshot only after all sources succeed.
+            library = announcements + pressReleases
+            notes = loadedNotes
+            isLoaded = true
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled else { return }
+            loadFailed = true
+        }
     }
 
     /// The entries, with the feed's announcements among those loaded.
