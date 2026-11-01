@@ -195,44 +195,34 @@ struct ContentItemRow: View {
                             VStack(alignment: .leading, spacing: DISpacing.xs) {
                                 if locale.language.languageCode?.identifier == "ur",
                                    let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                                    Text(verbatim: titleUrdu)
-                                        .font(DIFont.urduBody().weight(.semibold))
+                                    LibraryCatalogueText(text: titleUrdu, latinFont: .body, bold: true)
                                         .foregroundStyle(DIColor.textPrimary)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Text(verbatim: item.title)
-                                        .diInterfaceFont(.footnote)
+                                    LibraryCatalogueText(text: item.title, latinFont: .footnote, urduScale: 0.75)
                                         .foregroundStyle(DIColor.textMuted)
                                 } else {
-                                    Text(verbatim: item.title)
-                                        .diInterfaceFont(.body, weight: .semibold)
+                                    LibraryCatalogueText(text: item.title, latinFont: .body, bold: true)
                                         .foregroundStyle(DIColor.textPrimary)
-                                        .multilineTextAlignment(.leading)
                                     if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                                        Text(verbatim: titleUrdu)
-                                            .font(DIFont.urduBody(scale: 0.9))
+                                        LibraryCatalogueText(text: titleUrdu, latinFont: .footnote, urduScale: 0.9)
                                             .foregroundStyle(DIColor.textMuted)
-                                            .multilineTextAlignment(.trailing)
                                     }
                                 }
                             }
                             if !subtitleText.isEmpty {
-                                Text(verbatim: subtitleText)
-                                    .diInterfaceFont(.footnote)
+                                LibraryCatalogueText(text: subtitleText, latinFont: .footnote, urduScale: 0.75)
                                     .foregroundStyle(DIColor.textMuted)
                             }
-                            HStack(spacing: DISpacing.sm) {
-                                DIPillBadge(text: String(localized: String.LocalizationValue(item.type.libraryDisplayName)), color: item.type.libraryAccent)
-                                DIPillBadge(
-                                    text: String(localized: String.LocalizationValue(LibraryLanguage.displayName(forCode: item.language))),
-                                    color: DIColor.textMuted
-                                )
+                            ViewThatFits(in: .horizontal) {
+                                HStack(spacing: DISpacing.sm) { badges }
+                                    .fixedSize(horizontal: true, vertical: false)
+                                VStack(alignment: .leading, spacing: DISpacing.xs) { badges }
                             }
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
 
                 LibraryFavoriteButton(isFavorite: isFavorite) {
                     DIHaptics.light()
@@ -240,5 +230,29 @@ struct ContentItemRow: View {
                 }
             }
         }
+    }
+    @ViewBuilder
+    private var badges: some View {
+        DIPillBadge(text: String(localized: String.LocalizationValue(item.type.libraryDisplayName)), color: item.type.libraryAccent)
+        DIPillBadge(text: String(localized: String.LocalizationValue(LibraryLanguage.displayName(forCode: item.language))),
+                    color: DIColor.textMuted)
+    }
+
+}
+
+private struct LibraryCatalogueText: View {
+    let text: String
+    let latinFont: Font
+    var bold = false
+    var urduScale: Double = 1
+
+    var body: some View {
+        let rtl = ScriptDirection.isRightToLeft(text, fallbackLanguage: nil)
+        let font = rtl ? DIFont.urduBody(scale: urduScale) : latinFont
+        Text(verbatim: text)
+            .font(bold ? font.weight(.semibold) : font)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .environment(\.layoutDirection, rtl ? .rightToLeft : .leftToRight)
     }
 }
