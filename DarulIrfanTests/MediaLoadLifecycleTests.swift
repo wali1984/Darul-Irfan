@@ -74,6 +74,67 @@ final class MediaLoadLifecycleTests: XCTestCase {
     }
 
     @MainActor
+    func testArchiveCancellationRetryAndFailedRefreshPreserveYears() async {
+        let repository = LifecycleMediaRepository(mode: .cancelled, exerciseYears: true)
+        let model = ArchiveBrowserViewModel(category: nil, mediaRepository: repository)
+        await model.load()
+        XCTAssertFalse(model.isLoading)
+        XCTAssertNil(model.loadErrorMessage)
+        await repository.setMode(.success)
+        await model.load()
+        XCTAssertEqual(model.years, [2026])
+        await repository.setMode(.failed)
+        await model.load()
+        XCTAssertEqual(model.years, [2026])
+        XCTAssertNotNil(model.loadErrorMessage)
+        XCTAssertFalse(model.isLoading)
+        await repository.setMode(.success)
+        await model.load()
+        XCTAssertNil(model.loadErrorMessage)
+    }
+
+    @MainActor
+    func testArchiveYearCancellationFailureAndRetry() async {
+        let repository = LifecycleMediaRepository(mode: .cancelled, exerciseItems: true)
+        let model = ArchiveYearViewModel(category: nil, year: 2026, mediaRepository: repository)
+        await model.load()
+        XCTAssertFalse(model.isLoading)
+        XCTAssertNil(model.loadErrorMessage)
+        await repository.setMode(.failed)
+        await model.load()
+        XCTAssertNotNil(model.loadErrorMessage)
+        await repository.setMode(.success)
+        await model.load()
+        XCTAssertNil(model.loadErrorMessage)
+        XCTAssertFalse(model.isLoading)
+        XCTAssertEqual(model.totalCount, 0)
+    }
+
+    @MainActor
+    func testArchiveModelsIgnoreOverlappingLoads() async {
+        let yearsRepository = LifecycleMediaRepository(mode: .blocked, exerciseYears: true)
+        let years = ArchiveBrowserViewModel(category: nil, mediaRepository: yearsRepository)
+        let first = Task { await years.load() }
+        await yearsRepository.waitForRead()
+        await years.load()
+        let yearReads = await yearsRepository.readCount
+        XCTAssertEqual(yearReads, 1)
+        await yearsRepository.releaseRead()
+        await first.value
+        XCTAssertFalse(years.isLoading)
+        let monthRepository = LifecycleMediaRepository(mode: .blocked, exerciseItems: true)
+        let months = ArchiveYearViewModel(category: nil, year: 2026, mediaRepository: monthRepository)
+        let second = Task { await months.load() }
+        await monthRepository.waitForRead()
+        await months.load()
+        let monthReads = await monthRepository.readCount
+        XCTAssertEqual(monthReads, 1)
+        await monthRepository.releaseRead()
+        await second.value
+        XCTAssertFalse(months.isLoading)
+    }
+
+    @MainActor
     private func makeListModel(_ repository: LifecycleMediaRepository) -> MediaListViewModel {
         MediaListViewModel(filter: .category(.audioLectures), mediaRepository: repository,
                            downloadsRepository: LifecycleDownloads(), downloadManager: LifecycleDownloadManager(),
@@ -94,7 +155,10 @@ private actor LifecycleMediaRepository: MediaRepositoryProtocol {
     private var readGate: CheckedContinuation<Void, Never>?
     private var startedGate: CheckedContinuation<Void, Never>?
     private let exerciseItems: Bool
-    init(mode: Mode, exerciseItems: Bool = false) { self.mode = mode; self.exerciseItems = exerciseItems }
+    private let exerciseYears: Bool
+    init(mode: Mode, exerciseItems: Bool = false, exerciseYears: Bool = false) {
+        self.mode = mode; self.exerciseItems = exerciseItems; self.exerciseYears = exerciseYears
+    }
     func setMode(_ value: Mode) { mode = value }
     func waitForRead() async {
         if readCount > 0 { return }
@@ -119,7 +183,10 @@ private actor LifecycleMediaRepository: MediaRepositoryProtocol {
         return []
     }
     func item(id: String) async throws -> MediaItem? { nil }
-    func availableYears(category: MediaCategory?) async throws -> [Int] { [] }
+    func availableYears(category: MediaCategory?) async throws -> [Int] {
+        if exerciseYears { _ = try await recentlyPlayed(limit: 1); return [2026] }
+        return []
+    }
     func playbackProgress(mediaItemID: String) async throws -> PlaybackProgress? { nil }
     func savePlaybackProgress(_ progress: PlaybackProgress) async throws {}
     func mediaBookmarks(mediaItemID: String?) async throws -> [MediaBookmark] { [] }

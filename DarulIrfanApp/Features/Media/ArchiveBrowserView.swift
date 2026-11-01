@@ -33,6 +33,7 @@ final class ArchiveBrowserViewModel {
     private(set) var isLoading = false
     private(set) var loadErrorMessage: String?
     private var hasLoadedOnce = false
+    private var loadInProgress = false
 
     init(category: MediaCategory?, mediaRepository: any MediaRepositoryProtocol) {
         self.category = category
@@ -40,17 +41,22 @@ final class ArchiveBrowserViewModel {
     }
 
     func load() async {
+        guard !loadInProgress else { return }
+        loadInProgress = true
+        defer { loadInProgress = false; isLoading = false }
         if !hasLoadedOnce {
             isLoading = true
         }
         loadErrorMessage = nil
         do {
-            years = try await mediaRepository.availableYears(category: category)
+            let loadedYears = try await mediaRepository.availableYears(category: category)
+            try Task.checkCancellation()
+            years = loadedYears
             hasLoadedOnce = true
         } catch {
+            if error is CancellationError || Task.isCancelled { return }
             loadErrorMessage = "The archive could not be loaded right now. Please try again in a moment."
         }
-        isLoading = false
     }
 }
 
@@ -75,20 +81,20 @@ struct ArchiveBrowserView: View {
             if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let message = viewModel.loadErrorMessage {
-                DIEmptyState(
-                    systemImage: "wifi.exclamationmark",
-                    titleKey: "Something went wrong",
-                    messageKey: LocalizedStringKey(message)
-                )
-                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else if viewModel.years.isEmpty {
-                DIEmptyState(
-                    systemImage: "calendar",
-                    titleKey: "No archive yet",
-                    messageKey: "Yearly lecture archives will appear here after the library syncs. Pull down to refresh."
-                )
-                .diOctagramWatermark(size: 260, opacity: 0.05)
+                ScrollView {
+                    VStack(spacing: DISpacing.md) {
+                        DIEmptyState(
+                            systemImage: viewModel.loadErrorMessage == nil ? "calendar" : "wifi.exclamationmark",
+                            titleKey: viewModel.loadErrorMessage == nil ? "No archive yet" : "Something went wrong",
+                            messageKey: LocalizedStringKey(viewModel.loadErrorMessage ?? "Yearly lecture archives will appear here after the library syncs. Pull down to refresh.")
+                        )
+                        .diOctagramWatermark(size: 260, opacity: 0.05)
+                        Button("Try Again") { Task { await viewModel.load() } }
+                            .buttonStyle(DICompactButtonStyle())
+                    }
+                    .padding(DISpacing.md)
+                }
             } else {
                 yearList
             }
@@ -106,6 +112,14 @@ struct ArchiveBrowserView: View {
 
     private var yearList: some View {
         List {
+            if let message = viewModel.loadErrorMessage {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text(LocalizedStringKey(message)).diInterfaceFont(.subheadline)
+                    Button("Try Again") { Task { await viewModel.load() } }
+                        .buttonStyle(DICompactButtonStyle())
+                }
+                .listRowBackground(DIColor.surface)
+            }
             ForEach(viewModel.years, id: \.self) { year in
                 NavigationLink {
                     ArchiveYearView(
@@ -154,6 +168,7 @@ final class ArchiveYearViewModel {
     private(set) var isLoading = false
     private(set) var loadErrorMessage: String?
     private var hasLoadedOnce = false
+    private var loadInProgress = false
 
     init(category: MediaCategory?, year: Int, mediaRepository: any MediaRepositoryProtocol) {
         self.category = category
@@ -162,6 +177,9 @@ final class ArchiveYearViewModel {
     }
 
     func load() async {
+        guard !loadInProgress else { return }
+        loadInProgress = true
+        defer { loadInProgress = false; isLoading = false }
         if !hasLoadedOnce {
             isLoading = true
         }
@@ -170,6 +188,7 @@ final class ArchiveYearViewModel {
             let items = try await mediaRepository.items(
                 category: category, year: year, month: nil, limit: 2000
             )
+            try Task.checkCancellation()
             totalCount = items.count
             var counts: [Int: Int] = [:]
             for item in items {
@@ -182,9 +201,9 @@ final class ArchiveYearViewModel {
                 .sorted { $0.month > $1.month }
             hasLoadedOnce = true
         } catch {
+            if error is CancellationError || Task.isCancelled { return }
             loadErrorMessage = "This year could not be loaded right now. Please try again in a moment."
         }
-        isLoading = false
     }
 }
 
@@ -210,20 +229,20 @@ struct ArchiveYearView: View {
             if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let message = viewModel.loadErrorMessage {
-                DIEmptyState(
-                    systemImage: "wifi.exclamationmark",
-                    titleKey: "Something went wrong",
-                    messageKey: LocalizedStringKey(message)
-                )
-                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else if viewModel.totalCount == 0 {
-                DIEmptyState(
-                    systemImage: "calendar",
-                    titleKey: "Nothing here yet",
-                    messageKey: "Items for this year will appear after the next library sync."
-                )
-                .diOctagramWatermark(size: 260, opacity: 0.05)
+                ScrollView {
+                    VStack(spacing: DISpacing.md) {
+                        DIEmptyState(
+                            systemImage: viewModel.loadErrorMessage == nil ? "calendar" : "wifi.exclamationmark",
+                            titleKey: viewModel.loadErrorMessage == nil ? "Nothing here yet" : "Something went wrong",
+                            messageKey: LocalizedStringKey(viewModel.loadErrorMessage ?? "Items for this year will appear after the next library sync.")
+                        )
+                        .diOctagramWatermark(size: 260, opacity: 0.05)
+                        Button("Try Again") { Task { await viewModel.load() } }
+                            .buttonStyle(DICompactButtonStyle())
+                    }
+                    .padding(DISpacing.md)
+                }
             } else {
                 monthList
             }
@@ -241,6 +260,14 @@ struct ArchiveYearView: View {
 
     private var monthList: some View {
         List {
+            if let message = viewModel.loadErrorMessage {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text(LocalizedStringKey(message)).diInterfaceFont(.subheadline)
+                    Button("Try Again") { Task { await viewModel.load() } }
+                        .buttonStyle(DICompactButtonStyle())
+                }
+                .listRowBackground(DIColor.surface)
+            }
             NavigationLink {
                 MediaItemListView(
                     filter: .year(category: viewModel.category, year: viewModel.year),
@@ -255,7 +282,7 @@ struct ArchiveYearView: View {
                     Spacer(minLength: 0)
                     Text("\(viewModel.totalCount) items")
                         .diInterfaceFont(.caption, weight: .medium)
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                 }
                 .padding(.vertical, DISpacing.xs)
             }
