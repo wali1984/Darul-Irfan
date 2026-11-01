@@ -138,6 +138,10 @@ final class GroupsModel {
                 if profileRevision == nameRevision && !isSavingName { displayName = profile.displayName }
             } catch is CancellationError {
                 return
+            } catch MemberGroupError.notSignedIn {
+                guard revision == refreshRevision else { return }
+                clearAccount()
+                return
             } catch {
                 // An optional profile failure preserves the last known name.
             }

@@ -4,6 +4,35 @@ import XCTest
 
 @MainActor
 final class GroupsRefreshRaceTests: XCTestCase {
+    func testProfileExpiryClearsAccountButTemporaryFailurePreservesName() async {
+        for status in [503, 401] {
+            let config = URLSessionConfiguration.ephemeral
+            config.protocolClasses = [GroupsRaceProtocol.self]
+            let transport = URLSession(configuration: config)
+            defer { transport.invalidateAndCancel() }
+            let store = GroupsRaceSession()
+            let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+                session: transport, uploads: transport, savedSession: store)
+            let model = GroupsModel(service: service)
+            model.displayName = "Saved name"
+            GroupsRaceProtocol.configure(holdFirst: false, profileStatus: status) { }
+            await model.refresh()
+            if status == 401 {
+                XCTAssertEqual(model.phase, .signedOut)
+                XCTAssertNil(model.displayName)
+                XCTAssertNil(model.memberID)
+                XCTAssertNil(model.signedIn)
+                XCTAssertTrue(model.groups.isEmpty)
+                XCTAssertEqual(model.role, .member)
+                XCTAssertNil(store.load())
+            } else {
+                XCTAssertEqual(model.phase, .ready)
+                XCTAssertEqual(model.displayName, "Saved name")
+                XCTAssertNotNil(store.load())
+            }
+        }
+    }
+
     func testLateRefreshCannotReplaceNewerRefreshOrSignedOutState() async throws {
         for signsOut in [false, true] {
             let config = URLSessionConfiguration.ephemeral
@@ -58,9 +87,11 @@ private final class GroupsRaceProtocol: URLProtocol {
     private static var first = true
     private static var older: GroupsRaceProtocol?
     private static var onHeld: (() -> Void)?
-    static func configure(_ onHeld: @escaping () -> Void) {
+    private static var profileStatus = 404
+    static func configure(holdFirst: Bool = true, profileStatus: Int = 404, _ onHeld: @escaping () -> Void) {
         lock.lock(); defer { lock.unlock() }
-        first = true; older = nil; self.onHeld = onHeld
+        first = holdFirst; older = nil; self.onHeld = onHeld
+        self.profileStatus = profileStatus
     }
     static func releaseOlder() {
         lock.lock(); let held = older; older = nil; lock.unlock()
@@ -82,6 +113,9 @@ private final class GroupsRaceProtocol: URLProtocol {
             respond(200, "{\"role\":\"member\",\"groups\":[],\"signedIn\":2}")
         } else if request.url?.path == "/v1/members/signout" {
             respond(204, "")
+        } else if request.url?.path == "/v1/members/me" {
+            Self.lock.lock(); let status = Self.profileStatus; Self.lock.unlock()
+            respond(status, "{}")
         } else {
             respond(404, "{}")
         }
