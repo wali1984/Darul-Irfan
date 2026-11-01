@@ -102,12 +102,12 @@ struct DarulIrfanCardView: View {
                 }
                 .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: place.name)
+                    Text(LocalizedStringKey(place.name))
                         .font(DIFont.subheading)
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
                     ForEach(place.addressLines.indices, id: \.self) { index in
-                        Text(verbatim: place.addressLines[index])
+                        Text(LocalizedStringKey(place.addressLines[index]))
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.85))
                             .fixedSize(horizontal: false, vertical: true)

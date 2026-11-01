@@ -33968,6 +33968,57 @@
           }
         }
       }
+    },
+    "Dar ul Irfan, Munara": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dar ul Irfan, Munara"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان، منارہ"
+          }
+        }
+      }
+    },
+    "Khushab Road, District Chakwal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khushab Road, District Chakwal"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خوشاب روڈ، ضلع چکوال"
+          }
+        }
+      }
+    },
+    "Punjab, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punjab, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پنجاب، پاکستان"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -394,7 +394,7 @@ private struct DarulIrfanHeroCard: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 ForEach(place.addressLines.indices, id: \.self) { index in
-                    Text(verbatim: place.addressLines[index])
+                    Text(LocalizedStringKey(place.addressLines[index]))
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
