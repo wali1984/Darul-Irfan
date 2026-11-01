@@ -6,7 +6,6 @@ import SwiftUI
 /// segmented control.
 struct SurahReaderView: View {
     private let appState: AppState
-    private let focusAyah: Int?
     private let onRequestNextSurah: () -> Void
     /// Needed to turn a linked bayan into something playable: the index stores
     /// only the media id, so the catalogue stays the one description of a
@@ -19,7 +18,6 @@ struct SurahReaderView: View {
     @State private var speaker = TranslationSpeaker()
     @AppStorage("quranListenContent") private var listenContent: QuranListenContent = .arabic
     @AppStorage("quranListenScope") private var listenScope: QuranListenScope = .surah
-    @State private var hasScrolledToFocus = false
     @State private var hasAutoAdvanced = false
     @State private var bayanError: String?
     @State private var showsBayanList = false
@@ -49,11 +47,14 @@ struct SurahReaderView: View {
         onRequestNextSurah: @escaping () -> Void
     ) {
         self.appState = appState
-        self.focusAyah = focusAyah
         self.onRequestNextSurah = onRequestNextSurah
         self.mediaRepository = dependencies.mediaRepository
         self.audioPlayer = dependencies.audioPlayer
         self.dependencies = dependencies
+        // Anchor the lazy layout by ayah identity from its first layout pass.
+        // A deferred proxy scroll can drift as long Arabic/translation cards
+        // replace estimated heights, landing several ayahs past a Parah start.
+        _topAyah = State(initialValue: focusAyah.flatMap { $0 > 1 ? $0 : nil })
         let langCode = SurahReaderViewModel.initialReadingLanguage(
             appLanguage: appState.settings.language.contentLanguageCode
         )
@@ -190,105 +191,93 @@ struct SurahReaderView: View {
     // MARK: - Reader
 
     private var readerScroll: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVStack(spacing: DISpacing.md) {
-                    surahHeader
-                    if showsBismillahHeader {
-                        bismillahHeader
-                    }
-                    if viewModel.recitation != nil || canPlayTranslation {
-                        listenBar
-                    }
-                    if appState.settings.quranReaderDisplayMode.showsTranslation {
-                        contentModeSelector
-                    }
-                    if appState.settings.quranReaderDisplayMode.showsTranslation
-                        && viewModel.contentMode.isTafsir
-                        && !viewModel.hasTafsirForMode {
-                        // No verse-by-verse commentary in this language: the
-                        // full printed volume comes first, then the other
-                        // language if it has the per-verse text.
-                        if !viewModel.fullVolumes.isEmpty {
-                            tafsirVolumesCard(isPrimary: true)
-                        }
-                        if !viewModel.readingLanguagesWithTafsirForMode.isEmpty {
-                            otherLanguageTafsirCard
-                        } else if viewModel.fullVolumes.isEmpty {
-                            tafsirMissingCard
-                        }
-                    }
-                    ForEach(viewModel.ayahs, id: \.ayahNumber) { ayah in
-                        AyahCardView(
-                            ayah: ayah,
-                            viewModel: viewModel,
-                            dependencies: dependencies,
-                            player: player,
-                            speaker: speaker,
-                            listen: { start(from: $0) },
-                            fontScale: appState.settings.readerFontScale.rawValue,
-                            displayMode: appState.settings.quranReaderDisplayMode,
-                            playBayan: { play($0) },
-                            scrollToAyah: { pendingScrollAyah = $0 }
-                        )
-                        .id(ayah.ayahNumber)
-                    }
-                    if appState.settings.quranReaderDisplayMode.showsTranslation
-                        && viewModel.contentMode.isTafsir
-                        && viewModel.hasTafsirForMode
-                        && !viewModel.fullVolumes.isEmpty {
-                        tafsirVolumesCard(isPrimary: false)
-                    }
-                    readerEndMarker
+        ScrollView {
+            LazyVStack(spacing: DISpacing.md) {
+                surahHeader
+                if showsBismillahHeader {
+                    bismillahHeader
                 }
-                .scrollTargetLayout()
-                .padding(.horizontal, DISpacing.md)
-                .padding(.top, DISpacing.sm)
-                .padding(.bottom, DISpacing.xl)
-            }
-            .scrollPosition(id: $topAyah, anchor: .top)
-            .alert("Bayan", isPresented: Binding(get: { bayanError != nil }, set: { if !$0 { bayanError = nil } })) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(bayanError ?? "")
-            }
-            .onChange(of: topAyah) { _, ayah in
-                guard let ayah else { return }
-                if ayah > 1 { hasScrolledIntoSurah = true }
-                viewModel.topAyahChanged(ayah)
-            }
-            .onAppear {
-                scrollToFocusIfNeeded(proxy: proxy)
-                // A juz carried into this surah: show the ayah it is on.
-                if let current = player.current, current.surah == viewModel.surah.id, player.isPlaying {
-                    DispatchQueue.main.async { proxy.scrollTo(current.ayah, anchor: .top) }
+                if viewModel.recitation != nil || canPlayTranslation {
+                    listenBar
                 }
-            }
-            .onChange(of: pendingScrollAyah) { _, ayah in
-                guard let ayah else { return }
-                withAnimation(.easeInOut(duration: 0.35)) { proxy.scrollTo(ayah, anchor: .top) }
-                pendingScrollAyah = nil
-            }
-            // The reader follows what is playing: each ayah is brought into
-            // view as it starts, and a juz turns to the next surah.
-            .onChange(of: player.current) { _, current in
-                guard isOnScreen, let current, player.isPlaying else { return }
-                if current.surah == viewModel.surah.id {
-                    withAnimation(.easeInOut(duration: 0.35)) { proxy.scrollTo(current.ayah, anchor: .top) }
-                } else if current.surah == viewModel.surah.id + 1, player.scope == .juz, !isHandingOnJuz {
-                    isHandingOnJuz = true
-                    onRequestNextSurah()
+                if appState.settings.quranReaderDisplayMode.showsTranslation {
+                    contentModeSelector
                 }
+                if appState.settings.quranReaderDisplayMode.showsTranslation
+                    && viewModel.contentMode.isTafsir
+                    && !viewModel.hasTafsirForMode {
+                    // No verse-by-verse commentary in this language: the
+                    // full printed volume comes first, then the other
+                    // language if it has the per-verse text.
+                    if !viewModel.fullVolumes.isEmpty {
+                        tafsirVolumesCard(isPrimary: true)
+                    }
+                    if !viewModel.readingLanguagesWithTafsirForMode.isEmpty {
+                        otherLanguageTafsirCard
+                    } else if viewModel.fullVolumes.isEmpty {
+                        tafsirMissingCard
+                    }
+                }
+                ForEach(viewModel.ayahs, id: \.ayahNumber) { ayah in
+                    AyahCardView(
+                        ayah: ayah,
+                        viewModel: viewModel,
+                        dependencies: dependencies,
+                        player: player,
+                        speaker: speaker,
+                        listen: { start(from: $0) },
+                        fontScale: appState.settings.readerFontScale.rawValue,
+                        displayMode: appState.settings.quranReaderDisplayMode,
+                        playBayan: { play($0) },
+                        scrollToAyah: { pendingScrollAyah = $0 }
+                    )
+                    .id(ayah.ayahNumber)
+                }
+                if appState.settings.quranReaderDisplayMode.showsTranslation
+                    && viewModel.contentMode.isTafsir
+                    && viewModel.hasTafsirForMode
+                    && !viewModel.fullVolumes.isEmpty {
+                    tafsirVolumesCard(isPrimary: false)
+                }
+                readerEndMarker
+            }
+            .scrollTargetLayout()
+            .padding(.horizontal, DISpacing.md)
+            .padding(.top, DISpacing.sm)
+            .padding(.bottom, DISpacing.xl)
+        }
+        .scrollPosition(id: $topAyah, anchor: .top)
+        .alert("Bayan", isPresented: Binding(get: { bayanError != nil }, set: { if !$0 { bayanError = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(bayanError ?? "")
+        }
+        .onChange(of: topAyah) { _, ayah in
+            guard let ayah else { return }
+            if ayah > 1 { hasScrolledIntoSurah = true }
+            viewModel.topAyahChanged(ayah)
+        }
+        .onAppear {
+            // A juz carried into this surah: show the ayah it is on.
+            if let current = player.current, current.surah == viewModel.surah.id, player.isPlaying {
+                topAyah = current.ayah
             }
         }
-    }
-
-    private func scrollToFocusIfNeeded(proxy: ScrollViewProxy) {
-        guard !hasScrolledToFocus else { return }
-        hasScrolledToFocus = true
-        guard let focusAyah, focusAyah > 1 else { return }
-        DispatchQueue.main.async {
-            proxy.scrollTo(focusAyah, anchor: .top)
+        .onChange(of: pendingScrollAyah) { _, ayah in
+            guard let ayah else { return }
+            withAnimation(.easeInOut(duration: 0.35)) { topAyah = ayah }
+            pendingScrollAyah = nil
+        }
+        // The reader follows what is playing: each ayah is brought into
+        // view as it starts, and a juz turns to the next surah.
+        .onChange(of: player.current) { _, current in
+            guard isOnScreen, let current, player.isPlaying else { return }
+            if current.surah == viewModel.surah.id {
+                withAnimation(.easeInOut(duration: 0.35)) { topAyah = current.ayah }
+            } else if current.surah == viewModel.surah.id + 1, player.scope == .juz, !isHandingOnJuz {
+                isHandingOnJuz = true
+                onRequestNextSurah()
+            }
         }
     }
 
