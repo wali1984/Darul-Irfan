@@ -51,10 +51,11 @@ struct ContentStorageSettingsView: View {
         Section {
             LabeledContent("Storage Used") {
                 if viewModel.loadFailed {
-                    Text(verbatim: "--")
+                    Text(verbatim: "--").foregroundStyle(DIColor.textMuted)
                 } else if viewModel.hasLoaded {
                     Text(viewModel.bytesUsed, format: .byteCount(style: .file))
                         .monospacedDigit()
+                        .foregroundStyle(DIColor.textMuted)
                 } else {
                     ProgressView()
                 }
@@ -63,10 +64,11 @@ struct ContentStorageSettingsView: View {
 
             LabeledContent("Downloaded Items") {
                 if viewModel.loadFailed {
-                    Text(verbatim: "--")
+                    Text(verbatim: "--").foregroundStyle(DIColor.textMuted)
                 } else if viewModel.hasLoaded {
                     Text(viewModel.assetCount, format: .number)
                         .monospacedDigit()
+                        .foregroundStyle(DIColor.textMuted)
                 } else {
                     ProgressView()
                 }

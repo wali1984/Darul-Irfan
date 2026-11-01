@@ -91,8 +91,9 @@ struct LocationSettingsView: View {
             LabeledContent("Detected City") {
                 if let place = appState.settings.lastKnownPlace {
                     Text(place.name)
+                        .foregroundStyle(DIColor.textMuted)
                 } else {
-                    Text("Not determined yet")
+                    Text("Not determined yet").foregroundStyle(DIColor.textMuted)
                 }
             }
             .listRowBackground(DIColor.surface)
@@ -164,7 +165,7 @@ struct LocationSettingsView: View {
         Section {
             if appState.settings.locationMode == .manual, let manual = appState.settings.manualPlace {
                 LabeledContent("Selected City") {
-                    Text(manual.name)
+                    Text(manual.name).foregroundStyle(DIColor.textMuted)
                 }
                 .listRowBackground(DIColor.surface)
             }

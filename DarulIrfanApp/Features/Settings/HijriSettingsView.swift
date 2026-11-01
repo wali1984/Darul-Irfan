@@ -46,10 +46,11 @@ struct HijriSettingsView: View {
         Section {
             LabeledContent("Gregorian") {
                 Text(previewNow, format: Date.FormatStyle(date: .complete, time: .omitted, timeZone: appState.activePlace?.timeZone ?? .current))
+                    .foregroundStyle(DIColor.textMuted)
             }
             .listRowBackground(DIColor.surface)
 
-            LabeledContent("Calculated Hijri date") { Text(calculatedPreview).multilineTextAlignment(.trailing) }
+            LabeledContent("Calculated Hijri date") { Text(calculatedPreview).foregroundStyle(DIColor.textMuted).multilineTextAlignment(.trailing) }
                 .listRowBackground(DIColor.surface)
             LabeledContent("Your local date") {
                 Text(hijriPreview)
