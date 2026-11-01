@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Discover â€º Bayans (the Media tab before): Continue listening, the lecture
+/// Discover › Bayans (the Media tab before): Continue listening, the lecture
 /// tiles, the channel's recent bayans and the archive by year. One name
 /// everywhere: Bayans. The Daily Zikr live card is on the Zikr tab.
 @MainActor
@@ -76,7 +76,7 @@ struct BayansSection: View {
         } else if media.isEmpty && media.loadErrorMessage == nil {
             DIEmptyState(
                 systemImage: "waveform",
-                titleKey: "Preparing the bayansâ€¦",
+                titleKey: "Preparing the bayans…",
                 messageKey: "Lectures and programs will appear here after the first content sync. Pull down to refresh."
             )
             .diOctagramWatermark(size: 260, opacity: 0.05)
@@ -238,7 +238,7 @@ private struct BayansContinueHero: View {
             if let speaker = entry.item.speaker, !speaker.isEmpty {
                 Text(verbatim: speaker)
                     .lineLimit(1)
-                Text(verbatim: "Â·")
+                Text(verbatim: "·")
             }
             if let minutesLeft {
                 Text("\(minutesLeft) min left")

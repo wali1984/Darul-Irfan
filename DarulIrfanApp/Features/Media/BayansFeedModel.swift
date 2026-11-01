@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// The channel's recent videos that are bayans, for Discover Ã¢â‚¬Âº Bayans:
+/// The channel's recent videos that are bayans, for Discover › Bayans:
 /// every video in the official feed except the daily zikr recordings, by the
 /// rule the Zikr tab's Recent Bayans use (`ZikrHomeViewModel.isZikrRecording`).
 /// The channel's uploads are mostly the daily zikr streams, so the feed is
