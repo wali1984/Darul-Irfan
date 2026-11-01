@@ -45,6 +45,7 @@ final class MediaListViewModel {
 
     private var inFlightDownloadIDs: Set<String> = []
     private var hasLoadedOnce = false
+    private var loadInProgress = false
 
     init(
         filter: MediaListFilter,
@@ -61,6 +62,9 @@ final class MediaListViewModel {
     }
 
     func load() async {
+        guard !loadInProgress else { return }
+        loadInProgress = true
+        defer { loadInProgress = false; isLoading = false }
         if !hasLoadedOnce {
             isLoading = true
         }
@@ -84,7 +88,7 @@ final class MediaListViewModel {
                 )
             }
             // Newest first; undated items last.
-            items = fetched.sorted { lhs, rhs in
+            let sortedItems = fetched.sorted { lhs, rhs in
                 switch (lhs.date, rhs.date) {
                 case (nil, nil): return lhs.title < rhs.title
                 case (nil, _): return false
@@ -100,12 +104,14 @@ final class MediaListViewModel {
                     byMediaID[mediaID] = asset
                 }
             }
+            try Task.checkCancellation()
+            items = sortedItems
             assetsByMediaItemID = byMediaID
             hasLoadedOnce = true
         } catch {
+            if error is CancellationError || Task.isCancelled { return }
             loadErrorMessage = "These items could not be loaded right now. Please try again in a moment."
         }
-        isLoading = false
     }
 
     // MARK: State lookups
@@ -194,20 +200,19 @@ struct MediaItemListView: View {
             if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let message = viewModel.loadErrorMessage {
-                DIEmptyState(
-                    systemImage: "wifi.exclamationmark",
-                    titleKey: "Something went wrong",
-                    messageKey: LocalizedStringKey(message)
-                )
-                .diOctagramWatermark(size: 260, opacity: 0.05)
             } else if viewModel.items.isEmpty {
-                DIEmptyState(
-                    systemImage: "waveform",
-                    titleKey: "Nothing here yet",
-                    messageKey: "Items will appear here after the next library sync. Pull down to refresh."
-                )
-                .diOctagramWatermark(size: 260, opacity: 0.05)
+                ScrollView {
+                    VStack(spacing: DISpacing.md) {
+                        DIEmptyState(
+                            systemImage: viewModel.loadErrorMessage == nil ? "waveform" : "wifi.exclamationmark",
+                            titleKey: viewModel.loadErrorMessage == nil ? "Nothing here yet" : "Something went wrong",
+                            messageKey: LocalizedStringKey(viewModel.loadErrorMessage ?? "Items will appear here after the next library sync. Pull down to refresh.")
+                        )
+                        .diOctagramWatermark(size: 260, opacity: 0.05)
+                        retryButton
+                    }
+                    .padding(DISpacing.md)
+                }
             } else {
                 itemList
             }
@@ -234,8 +239,21 @@ struct MediaItemListView: View {
         }
     }
 
+    private var retryButton: some View {
+        Button("Try Again") { Task { await viewModel.load() } }
+            .buttonStyle(DICompactButtonStyle())
+    }
+
     private var itemList: some View {
         List {
+            if let message = viewModel.loadErrorMessage {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text(LocalizedStringKey(message))
+                        .diInterfaceFont(.subheadline)
+                    retryButton
+                }
+                .listRowBackground(DIColor.surface)
+            }
             ForEach(viewModel.items) { item in
                 MediaItemRow(
                     item: item,

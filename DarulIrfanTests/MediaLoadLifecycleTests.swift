@@ -41,6 +41,46 @@ final class MediaLoadLifecycleTests: XCTestCase {
     }
 
     @MainActor
+    func testMediaListCancellationFailureAndRetryClearLoadingState() async {
+        let repository = LifecycleMediaRepository(mode: .cancelled, exerciseItems: true)
+        let model = makeListModel(repository)
+        await model.load()
+        XCTAssertFalse(model.isLoading)
+        XCTAssertNil(model.loadErrorMessage)
+        await repository.setMode(.failed)
+        await model.load()
+        XCTAssertFalse(model.isLoading)
+        XCTAssertNotNil(model.loadErrorMessage)
+        await repository.setMode(.success)
+        await model.load()
+        XCTAssertFalse(model.isLoading)
+        XCTAssertNil(model.loadErrorMessage)
+        XCTAssertTrue(model.items.isEmpty)
+    }
+
+    @MainActor
+    func testMediaListIgnoresOverlappingReload() async {
+        let repository = LifecycleMediaRepository(mode: .blocked, exerciseItems: true)
+        let model = makeListModel(repository)
+        let first = Task { await model.load() }
+        await repository.waitForRead()
+        XCTAssertTrue(model.isLoading)
+        await model.load()
+        let reads = await repository.readCount
+        XCTAssertEqual(reads, 1)
+        await repository.releaseRead()
+        await first.value
+        XCTAssertFalse(model.isLoading)
+    }
+
+    @MainActor
+    private func makeListModel(_ repository: LifecycleMediaRepository) -> MediaListViewModel {
+        MediaListViewModel(filter: .category(.audioLectures), mediaRepository: repository,
+                           downloadsRepository: LifecycleDownloads(), downloadManager: LifecycleDownloadManager(),
+                           audioPlayer: LifecycleAudioPlayer())
+    }
+
+    @MainActor
     private func makeModel(_ repository: LifecycleMediaRepository) -> MediaViewModel {
         MediaViewModel(mediaRepository: repository, downloadsRepository: LifecycleDownloads(),
                        downloadManager: LifecycleDownloadManager(), audioPlayer: LifecycleAudioPlayer())
@@ -53,7 +93,8 @@ private actor LifecycleMediaRepository: MediaRepositoryProtocol {
     private(set) var readCount = 0
     private var readGate: CheckedContinuation<Void, Never>?
     private var startedGate: CheckedContinuation<Void, Never>?
-    init(mode: Mode) { self.mode = mode }
+    private let exerciseItems: Bool
+    init(mode: Mode, exerciseItems: Bool = false) { self.mode = mode; self.exerciseItems = exerciseItems }
     func setMode(_ value: Mode) { mode = value }
     func waitForRead() async {
         if readCount > 0 { return }
@@ -73,7 +114,10 @@ private actor LifecycleMediaRepository: MediaRepositoryProtocol {
         }
         return []
     }
-    func items(category: MediaCategory?, year: Int?, month: Int?, limit: Int) async throws -> [MediaItem] { [] }
+    func items(category: MediaCategory?, year: Int?, month: Int?, limit: Int) async throws -> [MediaItem] {
+        if exerciseItems { _ = try await recentlyPlayed(limit: limit) }
+        return []
+    }
     func item(id: String) async throws -> MediaItem? { nil }
     func availableYears(category: MediaCategory?) async throws -> [Int] { [] }
     func playbackProgress(mediaItemID: String) async throws -> PlaybackProgress? { nil }
