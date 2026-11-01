@@ -33509,6 +33509,23 @@
           }
         }
       }
+    },
+    "The Method of Zikr guide could not be loaded. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Method of Zikr guide could not be loaded. Please try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طریقۂ ذکر کی رہنمائی لوڈ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

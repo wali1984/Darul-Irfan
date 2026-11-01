@@ -26,6 +26,7 @@ struct NativeMethodOfZikrView: View {
     @Environment(\.locale) private var locale
     @State private var guide: MethodGuide?
     @State private var isLoading = true
+    @State private var attempt = 0
     private var urdu: Bool { locale.language.languageCode?.identifier == "ur" }
 
     var body: some View {
@@ -48,8 +49,14 @@ struct NativeMethodOfZikrView: View {
                     .diGlassPanel(cornerRadius: 24)
                     ZikrShajraLink()
                 } else {
-                    DIEmptyState(systemImage: "book.pages", titleKey: "Method of Zikr is being prepared",
-                                 messageKey: "The verified native guide will appear after the next content refresh.")
+                    VStack(alignment: .leading, spacing: DISpacing.md) {
+                        Text("The Method of Zikr guide could not be loaded. Please try again.")
+                            .foregroundStyle(DIColor.textPrimary)
+                        Button("Retry") { isLoading = true; attempt += 1 }
+                            .buttonStyle(DISecondaryButtonStyle())
+                    }
+                    .padding(DISpacing.lg)
+                    .diGlassPanel(cornerRadius: 24)
                 }
             }
             .padding(DISpacing.md)
@@ -58,11 +65,14 @@ struct NativeMethodOfZikrView: View {
         .navigationTitle("Method of Zikr")
         .navigationBarTitleDisplayMode(.inline)
         .diScreenBackground()
-        .task {
-            guide = await Task.detached(priority: .userInitiated) {
+        .task(id: attempt) {
+            isLoading = true
+            let loaded = await Task.detached(priority: .userInitiated) {
                 QuranQuotation.warmUp()
                 return MethodGuide.load()
             }.value
+            guard !Task.isCancelled else { return }
+            guide = loaded
             isLoading = false
         }
     }
