@@ -10,9 +10,25 @@ struct BookmarksListView: View {
     /// the reader there would have no route to follow.
     var onOpen: ((QuranSurah, Int) -> Void)? = nil
 
+    @State private var attempt = 0
+
     var body: some View {
-        Group {
-            if viewModel.bookmarksBySurah.isEmpty {
+        VStack(spacing: DISpacing.md) {
+            if viewModel.bookmarksFailed {
+                VStack(spacing: DISpacing.sm) {
+                    Text("The action could not be completed. Check your connection and try again.")
+                        .diInterfaceFont(.callout)
+                        .foregroundStyle(DIColor.textPrimary)
+                    Button("Retry") { attempt += 1 }
+                        .buttonStyle(DICompactButtonStyle())
+                        .disabled(viewModel.bookmarksLoading)
+                }.padding(DISpacing.md)
+            }
+            if viewModel.bookmarksLoading && viewModel.bookmarksBySurah.isEmpty {
+                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.bookmarksFailed && viewModel.bookmarksBySurah.isEmpty {
+                Spacer()
+            } else if viewModel.bookmarksBySurah.isEmpty {
                 DIEmptyState(
                     systemImage: "bookmark",
                     titleKey: "No bookmarks yet",
@@ -26,7 +42,7 @@ struct BookmarksListView: View {
         .diScreenBackground()
         .navigationTitle("Bookmarks")
         .navigationBarTitleDisplayMode(.inline)
-        .task { await viewModel.refreshReaderState() }
+        .task(id: attempt) { await viewModel.refreshBookmarks() }
     }
 
     private var bookmarksList: some View {
@@ -49,7 +65,7 @@ struct BookmarksListView: View {
                                 }
                                 .contentShape(Rectangle())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(DIPressableStyle())
                         } else {
                             NavigationLink(
                                 value: QuranRoute.reader(surah: group.surah, focusAyah: bookmark.ayahNumber)

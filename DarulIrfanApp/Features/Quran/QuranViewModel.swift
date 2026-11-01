@@ -24,6 +24,8 @@ final class QuranViewModel {
     /// Global continue-reading position, if the user has read before.
     private(set) var lastRead: ReadingProgress?
     private(set) var bookmarks: [QuranBookmark] = []
+    private(set) var bookmarksLoading = false
+    private(set) var bookmarksFailed = false
 
     /// Local filter applied to the surah list (name or number).
     var searchText: String = ""
@@ -191,12 +193,35 @@ final class QuranViewModel {
         }
     }
 
+    func refreshBookmarks() async {
+        guard !bookmarksLoading else { return }
+        bookmarksLoading = true
+        bookmarksFailed = false
+        defer { bookmarksLoading = false }
+        do {
+            var allSurahs = surahs
+            if allSurahs.isEmpty { allSurahs = try await repository.allSurahs() }
+            let latest = try await repository.bookmarks()
+            try Task.checkCancellation()
+            surahs = allSurahs.sorted { $0.id < $1.id }
+            bookmarks = latest
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled else { return }
+            bookmarksFailed = true
+        }
+    }
+
     func removeBookmark(_ bookmark: QuranBookmark) async {
         do {
             try await repository.removeBookmark(id: bookmark.id)
             bookmarks.removeAll { $0.id == bookmark.id }
+        } catch is CancellationError {
+            return
         } catch {
-            // Keep the list unchanged; the row simply stays until a retry.
+            guard !Task.isCancelled else { return }
+            bookmarksFailed = true
         }
     }
 }
