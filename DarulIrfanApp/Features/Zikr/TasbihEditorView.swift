@@ -46,22 +46,29 @@ struct TasbihEditorView: View {
             .diScreenBackground()
             .navigationTitle(original == nil ? "New Counter" : "Edit Counter")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                VStack(spacing: DISpacing.sm) {
+                    Text(original == nil ? "New Counter" : "Edit Counter")
+                        .diInterfaceFont(.headline)
+                        .multilineTextAlignment(.center)
+                        .accessibilityAddTraits(.isHeader)
+                    HStack(alignment: .center, spacing: DISpacing.md) {
                     Button("Cancel") {
                         dismiss()
                     }
                     .accessibilityIdentifier("tasbih-editor-cancel")
-                    .buttonStyle(DICompactButtonStyle())
+                    .buttonStyle(DISecondaryButtonStyle())
                     .disabled(isSaving)
-                }
-                ToolbarItem(placement: .confirmationAction) {
                     Button(isSaving ? "Saving…" : "Save") {
                         save()
                     }
-                    .buttonStyle(DICompactButtonStyle())
+                    .buttonStyle(DISecondaryButtonStyle())
                     .disabled(trimmedTitle.isEmpty || isSaving)
+                    }
                 }
+                .padding(DISpacing.md)
+                .background(DIColor.background)
             }
         }
         .interactiveDismissDisabled(isSaving)
