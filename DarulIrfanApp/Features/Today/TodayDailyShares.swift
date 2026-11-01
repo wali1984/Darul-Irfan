@@ -27,7 +27,8 @@ extension TodayDailyViewModel {
             badge: String(localized: "Dua of the Day"),
             arabic: dua.arabic,
             translation: duaTranslation(),
-            attribution: DailyNoorText.reference(dua.source, urdu: readsUrdu)
+            attribution: DailyNoorText.reference(dua.source, urdu: readsUrdu),
+            isQuran: dua.source.range(of: #"^\s*Qur'?an\s+[0-9]"#, options: [.regularExpression, .caseInsensitive]) != nil
         )
     }
 
