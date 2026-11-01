@@ -271,7 +271,7 @@ final class RedesignScreenshotTests: XCTestCase {
                 endingSwipes += 1
                 shot("shajra-ending-\(endingSwipes)")
             }
-            let geometry = XCTAttachment(string: "Prayer: \(closingPrayer.exists ? closingPrayer.frame.debugDescription : "missing"); tab bar: \(app.tabBars.firstMatch.frame); app: \(app.frame)")
+            let geometry = XCTAttachment(string: "Prayer: \(closingPrayer.exists ? closingPrayer.frame.debugDescription : "missing"); tab bar: \(app.tabBars.firstMatch.frame); app: \(app.frame); navigation: \(app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame.debugDescription : "none")")
             geometry.name = "shajra-closing-geometry"
             geometry.lifetime = .keepAlways
             add(geometry)

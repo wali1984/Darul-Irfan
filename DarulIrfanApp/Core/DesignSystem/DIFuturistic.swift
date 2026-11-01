@@ -142,29 +142,25 @@ private struct GoldTextShimmer: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
-        content.overlay(
-            GeometryReader { geo in
-                if !reduceMotion {
-                    LinearGradient(
-                        colors: [.clear, highlight.opacity(0.85), .clear],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                    .frame(width: geo.size.width * 0.35)
-                    .offset(x: phase * geo.size.width * 1.4)
-                    .onAppear {
-                        withAnimation(.easeInOut(duration: 6.5).repeatForever(autoreverses: false).delay(delay)) {
-                            phase = 1.2
-                        }
+        content.overlay {
+            if !reduceMotion {
+                // Move the gradient's paint, not a view beyond the text bounds.
+                // A masked, offset view can still enlarge SwiftUI's AX frame.
+                LinearGradient(
+                    colors: [.clear, highlight.opacity(0.85), .clear],
+                    startPoint: UnitPoint(x: phase * 1.4, y: 0.5),
+                    endPoint: UnitPoint(x: phase * 1.4 + 0.35, y: 0.5)
+                )
+                .mask(content)
+                .accessibilityHidden(true)
+                .allowsHitTesting(false)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 6.5).repeatForever(autoreverses: false).delay(delay)) {
+                        phase = 1.2
                     }
                 }
             }
-            .mask(content)
-            // The moving highlight and its text mask are decorative. Exposing
-            // them expands the reading element's accessibility frame as it moves.
-            .accessibilityHidden(true)
-            .allowsHitTesting(false)
-        )
+        }
     }
 }
 
