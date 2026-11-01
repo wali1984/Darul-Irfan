@@ -204,6 +204,7 @@ struct SurahReaderView: View {
     // MARK: - Reader
 
     private var readerScroll: some View {
+        ScrollViewReader { proxy in
         ScrollView {
             LazyVStack(spacing: DISpacing.md) {
                 surahHeader
@@ -282,11 +283,13 @@ struct SurahReaderView: View {
             await Task.yield()
             guard !Task.isCancelled else { return }
             hasAppliedInitialFocus = true
-            if let target, target > 1 { topAyah = target }
+            if let target, target > 1 { proxy.scrollTo(target, anchor: .top) }
         }
         .onChange(of: pendingScrollAyah) { _, ayah in
             guard let ayah else { return }
-            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.35)) { topAyah = ayah }
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.35)) {
+                proxy.scrollTo(ayah, anchor: .top)
+            }
             pendingScrollAyah = nil
         }
         // The reader follows what is playing: each ayah is brought into
@@ -303,6 +306,7 @@ struct SurahReaderView: View {
             // the reader. Catch up even if the ayah has not changed again.
             if phase == .active { followPlayingAyah() }
         }
+        }
     }
 
     /// Resume and returning to the reader may keep the same ayah identity.
@@ -311,9 +315,9 @@ struct SurahReaderView: View {
         guard isOnScreen, scenePhase == .active,
               let current = player.current, player.isPlaying else { return }
         if current.surah == viewModel.surah.id {
-            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.35)) {
-                topAyah = current.ayah
-            }
+            // A scroll request is separate from the observed reading position.
+            // Reissuing the same ayah after resume must still move the viewport.
+            pendingScrollAyah = current.ayah
         } else if current.surah == viewModel.surah.id + 1,
                   player.scope == .juz, !isHandingOnJuz {
             isHandingOnJuz = true
