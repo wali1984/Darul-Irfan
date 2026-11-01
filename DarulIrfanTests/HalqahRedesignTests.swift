@@ -186,6 +186,33 @@ final class HalqahRedesignTests: XCTestCase {
 
     // MARK: - Event reminders
 
+    @MainActor
+    func testEventReminderFailureDoesNotSaveSuccessAndCanRetry() async {
+        let id = "audit-reminder-\(UUID().uuidString)"
+        let key = "eventReminder.\(id)"
+        defer { UserDefaults.standard.removeObject(forKey: key) }
+        let notifications = RecordingNotifications()
+        notifications.acceptsReminder = false
+        let model = EventDetailViewModel(
+            event: event(id: id, start: Date().addingTimeInterval(3 * 86_400)),
+            notifications: notifications
+        )
+        await model.toggleReminder()
+        XCTAssertFalse(model.isReminderScheduled)
+        XCTAssertFalse(UserDefaults.standard.bool(forKey: key))
+        XCTAssertTrue(model.reminderFailed)
+        XCTAssertFalse(model.reminderWorking)
+        notifications.acceptsReminder = true
+        await model.toggleReminder()
+        XCTAssertTrue(model.isReminderScheduled)
+        XCTAssertTrue(UserDefaults.standard.bool(forKey: key))
+        XCTAssertFalse(model.reminderFailed)
+        XCTAssertFalse(model.reminderWorking)
+        await model.toggleReminder()
+        XCTAssertFalse(model.isReminderScheduled)
+        XCTAssertFalse(UserDefaults.standard.bool(forKey: key))
+    }
+
     private func event(id: String, start: Date?) -> CommunityEvent {
         CommunityEvent(
             id: id,
@@ -258,6 +285,7 @@ final class HalqahRedesignTests: XCTestCase {
 /// request as told.
 private final class RecordingNotifications: NotificationScheduling, @unchecked Sendable {
     var granted = true
+    var acceptsReminder = true
     private(set) var scheduled: [String: [Date]] = [:]
     private(set) var cancelled: [String] = []
 
@@ -268,8 +296,10 @@ private final class RecordingNotifications: NotificationScheduling, @unchecked S
         preferences: PrayerNotificationPreferences
     ) async {}
 
-    func scheduleReminder(id: String, title: String, body: String, at date: Date) async {
+    func scheduleReminder(id: String, title: String, body: String, at date: Date) async -> Bool {
+        guard acceptsReminder else { return false }
         scheduled[id] = [date]
+        return true
     }
 
     func scheduleReminders(id: String, title: String, body: String, at dates: [Date]) async {

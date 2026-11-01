@@ -364,21 +364,27 @@ final class NotificationScheduler: NotificationScheduling {
 
     // MARK: Reminders (zikr sessions, events, My Day tasks)
 
-    func scheduleReminder(id: String, title: String, body: String, at date: Date) async {
-        guard date > Date() else { return }
+    @discardableResult
+    func scheduleReminder(id: String, title: String, body: String, at date: Date) async -> Bool {
+        guard date > Date() else { return false }
         let center = UNUserNotificationCenter.current()
         let base = Self.reminderIdentifier(id)
         let pending = await center.pendingNotificationRequests()
         // A recurring set for this id already holds this reminder; a one-off
         // beside it would arrive twice.
-        guard !pending.contains(where: { $0.identifier.hasPrefix(base + "|") }) else { return }
+        guard !pending.contains(where: { $0.identifier.hasPrefix(base + "|") }) else { return true }
 
         let request = UNNotificationRequest(
             identifier: base,
             content: Self.reminderContent(title: title, body: body),
             trigger: Self.reminderTrigger(at: date)
         )
-        try? await center.add(request)
+        do {
+            try await center.add(request)
+            return true
+        } catch {
+            return false
+        }
     }
 
     func scheduleReminders(id: String, title: String, body: String, at dates: [Date]) async {

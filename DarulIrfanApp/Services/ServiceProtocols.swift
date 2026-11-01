@@ -109,7 +109,8 @@ protocol NotificationScheduling: Sendable {
     /// Schedules a one-off reminder (event, focus session, test) at `date`.
     /// Does nothing when a recurring set for `id` is already pending, since
     /// that set holds this reminder too.
-    func scheduleReminder(id: String, title: String, body: String, at date: Date) async
+    @discardableResult
+    func scheduleReminder(id: String, title: String, body: String, at date: Date) async -> Bool
 
     /// Schedules one reminder per date under `id`, replacing every reminder
     /// already pending for it (a one-off or an earlier set). Each is its own

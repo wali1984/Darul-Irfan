@@ -23,6 +23,8 @@ final class EventDetailViewModel {
     private(set) var isReminderScheduled: Bool
     var showCalendarDeniedAlert = false
     var showNotificationsDeniedAlert = false
+    private(set) var reminderWorking = false
+    private(set) var reminderFailed = false
 
     init(event: CommunityEvent, notifications: any NotificationScheduling) {
         self.event = event
@@ -56,7 +58,7 @@ final class EventDetailViewModel {
     }
 
     func addToCalendar() async {
-        guard hasConcreteDates, let start = event.startDate else { return }
+        guard hasConcreteDates, calendarState != .working, calendarState != .added, let start = event.startDate else { return }
         // iOS terminates apps that request calendar access without the usage
         // string in Info.plist; degrade to the denied path instead of crashing
         // if the key is ever missing from a build.
@@ -88,6 +90,10 @@ final class EventDetailViewModel {
     }
 
     func toggleReminder() async {
+        guard !reminderWorking else { return }
+        reminderWorking = true
+        reminderFailed = false
+        defer { reminderWorking = false }
         let key = Self.reminderKey(for: event.id)
         if isReminderScheduled {
             await notifications.cancelReminder(id: key)
@@ -106,12 +112,16 @@ final class EventDetailViewModel {
             } else {
                 body = String(localized: "An upcoming Dar-ul-Irfan program.")
             }
-            await notifications.scheduleReminder(
+            let accepted = await notifications.scheduleReminder(
                 id: key,
                 title: event.title,
                 body: body,
                 at: fireDate
             )
+            guard accepted else {
+                reminderFailed = true
+                return
+            }
             isReminderScheduled = true
             UserDefaults.standard.set(true, forKey: key)
         }

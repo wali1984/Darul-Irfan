@@ -201,6 +201,14 @@ struct EventDetailView: View {
                         }
                     }
                     .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(viewModel.reminderWorking)
+
+                    if viewModel.reminderFailed {
+                        Text("The reminder could not be scheduled. Please try again.")
+                            .font(.footnote)
+                            .foregroundStyle(DIColor.danger)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
 
                     if viewModel.isReminderScheduled, let fireDate = viewModel.reminderFireDate {
                         Text("You will be reminded on \(fireDate.formatted(date: .abbreviated, time: .shortened)).")
