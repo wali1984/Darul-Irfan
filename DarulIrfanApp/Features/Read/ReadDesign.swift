@@ -346,6 +346,8 @@ struct ReadFindField: View {
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
             TextField(prompt, text: $text)
+                .diInterfaceFont(.body)
+                .accessibilityLabel(Text(prompt))
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
@@ -357,8 +359,10 @@ struct ReadFindField: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(DIColor.textMuted)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
                 .accessibilityLabel("Clear search text")
             }
         }
