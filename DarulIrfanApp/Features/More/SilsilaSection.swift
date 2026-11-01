@@ -66,6 +66,7 @@ struct SilsilaSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             HalqahSectionLabel(titleKey: "Silsila")
+            MethodOfZikrLink(compact: true)
             HalqahGlassList {
                 ForEach(Array(SilsilaEntry.about.enumerated()), id: \.element.id) { index, entry in
                     if index > 0 {
@@ -79,7 +80,7 @@ struct SilsilaSection: View {
                 } label: {
                     HalqahListRowLabel(titleKey: "Teachings", systemImage: "book.closed.fill")
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
                 .accessibilityIdentifier("silsila-teachings")
                 HalqahRowDivider()
                 NavigationLink {
@@ -87,7 +88,7 @@ struct SilsilaSection: View {
                 } label: {
                     HalqahListRowLabel(titleKey: "About Darul Irfan", systemImage: "info.circle.fill")
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
                 .accessibilityIdentifier("silsila-about-app")
             }
         }
@@ -113,7 +114,7 @@ private struct SilsilaEntryLink: View {
                 tint: entry.isGold ? .gold : .green
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .accessibilityIdentifier("silsila-" + entry.id)
     }
 
@@ -274,7 +275,7 @@ private struct SilsilaItemList: View {
                     } label: {
                         SilsilaItemRow(item: item)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                 }
             }
             .padding(DISpacing.md)

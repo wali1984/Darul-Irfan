@@ -17,6 +17,7 @@ struct MoreTabView: View {
     private let appState: AppState
 
     @State private var isSearchPresented = false
+    @State private var isRefreshing = false
     /// The member's private groups, shown at the root.
     @State private var groups = GroupsModel()
     /// The Silsila's pages: their favourites and their lists.
@@ -73,7 +74,12 @@ struct MoreTabView: View {
                 groups.platform = dependencies.officialPlatform
                 await groups.appear()
             }
-            .refreshable { await groups.checkAgain() }
+            .refreshable {
+                guard !isRefreshing else { return }
+                isRefreshing = true
+                defer { isRefreshing = false }
+                await groups.checkAgain()
+            }
         }
     }
 

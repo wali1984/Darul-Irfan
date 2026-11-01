@@ -188,7 +188,7 @@ private struct SettingsRowLink<Destination: View>: View {
                 tint: entry.isGold ? .gold : .green
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .accessibilityIdentifier("settings-" + entry.id)
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
     }
