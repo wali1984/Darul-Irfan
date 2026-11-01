@@ -35,10 +35,14 @@ struct NativeMethodOfZikrView: View {
                 SilsilaPageHeader(title: "Method of Zikr")
                 ZikrShajraLink()
                 if isLoading {
-                    ProgressView().frame(maxWidth: .infinity).padding(DISpacing.xl)
+                    ProgressView("Loading")
+                        .tint(DIColor.textMuted)
+                        .foregroundStyle(DIColor.textMuted)
+                        .frame(maxWidth: .infinity).padding(DISpacing.xl)
                 } else if let guide {
                     ForEach(urdu ? guide.ur : guide.en) { section in
                         sectionCard(section).diAppear()
+                            .accessibilityIdentifier("method-guide-section-" + section.id)
                     }
                     VStack(spacing: DISpacing.md) {
                         MethodLatifaDiagram()

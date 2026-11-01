@@ -429,6 +429,12 @@ final class RedesignScreenshotTests: XCTestCase {
         guard seek("method-of-zikr-shortcut") else { return }
         let guideTitle = language == "ur" ? "طریقۂ ذکر" : "Method of Zikr"
         XCTAssertTrue(app.navigationBars[guideTitle].waitForExistence(timeout: 10))
+        let firstSection = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "method-guide-section-")).firstMatch
+        guard firstSection.waitForExistence(timeout: 30) else {
+            XCTFail("The local Method of Zikr content must load before reviewing the guide")
+            return
+        }
         shot("resources-" + origin + "-guide")
         let shajra = onScreen(app.buttons.matching(NSPredicate(
             format: "label CONTAINS %@", label("Chain of Transmission"))))
