@@ -211,7 +211,7 @@ struct EventDetailView: View {
                     }
 
                     if viewModel.isReminderScheduled, let fireDate = viewModel.reminderFireDate {
-                        Text("You will be reminded on \(fireDate.formatted(date: .abbreviated, time: .shortened)).")
+                        Text("You will be reminded on \(fireDate.formatted(Date.FormatStyle(date: .abbreviated, time: .shortened, locale: locale))).")
                             .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.textMuted)
                             .fixedSize(horizontal: false, vertical: true)
