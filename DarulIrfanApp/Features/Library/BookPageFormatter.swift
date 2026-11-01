@@ -275,7 +275,8 @@ enum BookPageFormatter {
         for part in parts {
             switch part.kind {
             case .heading:
-                blocks.append(.heading(part.text))
+                let words = part.text.split(whereSeparator: \.isWhitespace).map(String.init)
+                blocks.append(QuranQuotation.isVerified(words, check: check) ? .quran(part.text) : .heading(part.text))
             case .paragraph:
                 blocks.append(.paragraph(proseRuns(part.text, check: check)))
             case .verse:

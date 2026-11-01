@@ -189,6 +189,14 @@ final class BookPageFormatterTests: XCTestCase {
                  unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test", layout: layout)
     }
 
+    func testVerifiedScriptureHeadingUsesQuranBlockWithoutChangingText() {
+        let bismillah = "بسم اللہ الرحمٰن الرحیم"
+        XCTAssertEqual(BookPageFormatter.format(page: laidOut([bismillah], layout: "h")).blocks, [.quran(bismillah)])
+        let ordinary = "باب اول"
+        XCTAssertEqual(BookPageFormatter.format(page: laidOut([ordinary], layout: "h")).blocks, [.heading(ordinary)])
+        XCTAssertEqual(BookPageFormatter.format(page: laidOut(["Introduction to remembrance"], layout: "h")).blocks, [.heading("Introduction to remembrance")])
+    }
+
     /// A re-read page is set out block by block as it was typed - nothing is
     /// guessed - and its footnote goes to the foot of the page.
     func testLaidOutPageIsSetOutAsTyped() {
