@@ -1,6 +1,13 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "This meeting was already scheduled with different details. Close this form and check the meetings list before scheduling another.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": { "stringUnit": { "state": "translated", "value": "This meeting was already scheduled with different details. Close this form and check the meetings list before scheduling another." } },
+        "ur": { "stringUnit": { "state": "translated", "value": "یہ میٹنگ پہلے ہی مختلف تفصیلات کے ساتھ طے ہو چکی ہے۔ یہ فارم بند کریں اور نئی میٹنگ طے کرنے سے پہلے میٹنگز کی فہرست دیکھیں۔" } }
+      }
+    },
     "The code lasts 1 day": {
       "extractionState": "manual",
       "localizations": {

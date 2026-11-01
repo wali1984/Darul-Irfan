@@ -239,3 +239,86 @@ describe("LIVE-032: a retired Halqah", () => {
     expect((await call(owner, "GET", "/v1/groups/usa")).status).toBe(404);
   });
 });
+
+
+describe("meeting creation retries", () => {
+  const path = "/v1/groups/usa/meetings";
+  const body = { requestID: "91ba7dfe-47d4-4dfe-b813-96b7573ab357", title: "Weekly meeting",
+    startsAt: "2030-11-01T15:00:00.000Z", durationMinutes: 60 };
+
+  it("acknowledges a committed request whose first response was lost without creating another meeting", async () => {
+    const { call, raw, admin } = await setup();
+    const first = await call(admin, "POST", path, body);
+    expect(first.status).toBe(201);
+    const retry = await call(admin, "POST", path, body);
+    expect(retry.status).toBe(201);
+    expect(await retry.json()).toEqual(await first.json());
+    expect(raw.prepare("SELECT count(*) AS n FROM group_meetings").get()).toEqual({ n: 1 });
+  });
+
+  it("atomically converges concurrent identical submissions on one meeting", async () => {
+    const { call, raw, admin } = await setup();
+    const responses = await Promise.all(Array.from({ length: 8 }, () => call(admin, "POST", path, body)));
+    expect(responses.map(r => r.status)).toEqual(Array(8).fill(201));
+    const results = await Promise.all(responses.map(r => r.json() as Promise<{ id: string }>));
+    expect(new Set(results.map(r => r.id)).size).toBe(1);
+    expect(raw.prepare("SELECT count(*) AS n FROM group_meetings").get()).toEqual({ n: 1 });
+  });
+
+  it.each([{ title: "Changed" }, { durationMinutes: 90 }, { startsAt: "2030-11-02T15:00:00.000Z" }])(
+    "refuses changed details under a committed request ID: %j", async change => {
+      const { call, raw, admin } = await setup();
+      expect((await call(admin, "POST", path, body)).status).toBe(201);
+      const conflict = await call(admin, "POST", path, { ...body, ...change });
+      expect(conflict.status).toBe(409);
+      expect(await conflict.json()).toMatchObject({ code: "meeting_request_conflict" });
+      expect(raw.prepare("SELECT title,duration_minutes,starts_at FROM group_meetings").all()).toEqual([
+        { title: body.title, duration_minutes: body.durationMinutes, starts_at: body.startsAt }]);
+    });
+
+  it("does not resurrect a cancelled meeting when its original creation is replayed", async () => {
+    const { call, raw, admin } = await setup();
+    const { id } = await (await call(admin, "POST", path, body)).json() as { id: string };
+    expect((await call(admin, "DELETE", `${path}/${id}`)).status).toBe(204);
+    expect((await call(admin, "POST", path, body)).status).toBe(201);
+    expect(raw.prepare("SELECT is_cancelled FROM group_meetings WHERE id=?").get(id)).toEqual({ is_cancelled: 1 });
+  });
+
+  it("keeps request IDs separate between authors and enforces permissions on every replay", async () => {
+    const { call, raw, admin, senior, member } = await setup();
+    expect((await call(admin, "POST", path, body)).status).toBe(201);
+    expect((await call(senior, "POST", path, body)).status).toBe(201);
+    expect((await call(member, "POST", path, body)).status).toBe(403);
+    raw.prepare("UPDATE member_group_members SET role='member' WHERE member_id=?").run(B);
+    expect((await call(admin, "POST", path, body)).status).toBe(403);
+    expect(raw.prepare("SELECT count(*) AS n FROM group_meetings").get()).toEqual({ n: 2 });
+  });
+
+  it("acknowledges creation even when push device lookup fails, and never repeats it on replay", async () => {
+    const { call, raw, env, admin } = await setup();
+    const prepare = env.DB.prepare.bind(env.DB);
+    let lookups = 0;
+    vi.spyOn(env.DB, "prepare").mockImplementation(sql => {
+      if (sql.includes("SELECT DISTINCT d.installation_id")) {
+        lookups++;
+        throw new Error("Push lookup unavailable");
+      }
+      return prepare(sql);
+    });
+    expect((await call(admin, "POST", path, body)).status).toBe(201);
+    expect((await call(admin, "POST", path, body)).status).toBe(201);
+    expect(lookups).toBe(1);
+    expect(raw.prepare("SELECT count(*) AS n FROM group_meetings").get()).toEqual({ n: 1 });
+  });
+
+  it("validates IDs but still supports clients that omit them", async () => {
+    const { call, raw, admin } = await setup();
+    for (const requestID of ["", "bad", null, 123]) {
+      expect((await call(admin, "POST", path, { ...body, requestID })).status).toBe(400);
+    }
+    const { requestID, ...legacy } = body;
+    expect((await call(admin, "POST", path, legacy)).status).toBe(201);
+    expect((await call(admin, "POST", path, legacy)).status).toBe(201);
+    expect(raw.prepare("SELECT count(*) AS n FROM group_meetings").get()).toEqual({ n: 2 });
+  });
+});

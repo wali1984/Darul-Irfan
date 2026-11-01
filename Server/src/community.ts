@@ -1,5 +1,5 @@
 import type { Env } from "./contracts";
-import { cleanText, json, validHTTPURL, validISODate } from "./util";
+import { cleanText, json, sha256, validHTTPURL, validISODate } from "./util";
 import { sendPushToInstallations } from "./apns";
 import { signedMediaURL } from "./media";
 import { youtubeVideos } from "./recordings";
@@ -388,11 +388,38 @@ export async function scheduleMeeting(env: Env, memberID: string, groupID: strin
   if (!title || !startsAt || !Number.isInteger(duration) || duration < 10 || duration > 480) {
     return json({ error: "A title, a start time and a duration of 10-480 minutes are required" }, { status: 400 });
   }
-  const id = newID("meeting");
-  await env.DB.prepare(`INSERT INTO group_meetings(id,group_id,title,starts_at,duration_minutes,created_by,updated_at)
-    VALUES(?,?,?,?,?,?,?)`).bind(id, groupID, title, startsAt, duration, memberID, new Date().toISOString()).run();
-  await notifyGroup(env, groupID, `meeting:${id}`, title, "A group meeting has been scheduled. See the time in Darul Irfan.",
-    `darulirfan://groups/${groupID}`);
+  // A form keeps this UUID across retries. Scope it to its author and group so
+  // another administrator cannot claim a request, and retain legacy clients.
+  const requestID = input.requestID;
+  if (requestID !== undefined && (typeof requestID !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestID))) {
+    return json({ error: "Invalid meeting request ID" }, { status: 400 });
+  }
+  const id = typeof requestID === "string"
+    ? `meeting_${await sha256(JSON.stringify([groupID, memberID, requestID.toLowerCase()]))}`
+    : newID("meeting");
+  // The unique key decides the winner even when requests arrive concurrently.
+  const inserted = await env.DB.prepare(`INSERT INTO group_meetings(id,group_id,title,starts_at,duration_minutes,created_by,updated_at)
+    VALUES(?,?,?,?,?,?,?) ON CONFLICT(group_id,id) DO NOTHING`)
+    .bind(id, groupID, title, startsAt, duration, memberID, new Date().toISOString()).run();
+  if (!inserted.meta.changes) {
+    const original = await env.DB.prepare(`SELECT title,starts_at,duration_minutes,created_by FROM group_meetings
+      WHERE group_id=? AND id=?`).bind(groupID, id)
+      .first<{ title: string; starts_at: string; duration_minutes: number; created_by: string }>();
+    if (!original || original.title !== title || original.starts_at !== startsAt ||
+        original.duration_minutes !== duration || original.created_by !== memberID) {
+      return json({ error: "This meeting request was already used with different details.", code: "meeting_request_conflict" }, { status: 409 });
+    }
+    // A replay acknowledges the original creation, including after cancellation.
+    // It must not restore a cancelled meeting or send another announcement.
+    return json({ ok: true, id }, { status: 201 });
+  }
+  // Push is best effort; failure after the committed insert must not look like
+  // failure to create the meeting (especially to older clients without IDs).
+  try {
+    await notifyGroup(env, groupID, `meeting:${id}`, title, "A group meeting has been scheduled. See the time in Darul Irfan.",
+      `darulirfan://groups/${groupID}`);
+  } catch { /* The meeting is committed even if device lookup is unavailable. */ }
   return json({ ok: true, id }, { status: 201 });
 }
 

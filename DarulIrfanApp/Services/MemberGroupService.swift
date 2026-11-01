@@ -20,6 +20,7 @@ enum MemberGroupError: LocalizedError {
     case notSignedIn
     case requestFailed
     case inviteRejected
+    case meetingRequestConflict
     case tooManyAttempts
     /// A refusal the server explained in words meant for the person.
     case server(String)
@@ -34,6 +35,7 @@ enum MemberGroupError: LocalizedError {
         // this: anything finer would help someone guess at codes.
         case .inviteRejected: String(localized: "That invitation code is not valid, or it has already been used. Please check it with the administrator who gave it to you.")
         case .tooManyAttempts: String(localized: "Too many attempts. Please wait a few minutes and try again.")
+        case .meetingRequestConflict: String(localized: "This meeting was already scheduled with different details. Close this form and check the meetings list before scheduling another.")
         case .server(let message): message
         }
     }
@@ -295,9 +297,9 @@ actor MemberGroupService {
         try await send("POST", path: "v1/groups/\(groupID)/live", payload: ["state": "offline"], expecting: [200])
     }
 
-    func scheduleMeeting(in groupID: String, title: String, startsAt: Date, durationMinutes: Int) async throws {
+    func scheduleMeeting(in groupID: String, title: String, startsAt: Date, durationMinutes: Int, requestID: UUID) async throws {
         try await send("POST", path: "v1/groups/\(groupID)/meetings", payload: [
-            "title": title, "startsAt": ServerDate.string(from: startsAt), "durationMinutes": durationMinutes,
+            "requestID": requestID.uuidString, "title": title, "startsAt": ServerDate.string(from: startsAt), "durationMinutes": durationMinutes,
         ], expecting: [201])
     }
 
@@ -501,6 +503,11 @@ actor MemberGroupService {
             throw MemberGroupError.notSignedIn
         }
         guard savedSession.load()?.token == saved.token else { throw CancellationError() }
+        if code == 409,
+           let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           body["code"] as? String == "meeting_request_conflict" {
+            throw MemberGroupError.meetingRequestConflict
+        }
         guard codes.contains(code) else {
             // The server's own plain message ("The meeting room opens ten
             // minutes before it starts.") is what the person should read.

@@ -630,6 +630,7 @@ struct GroupMeetingScheduler: View {
     let service: MemberGroupService
 
     @Environment(\.dismiss) private var dismiss
+    @State private var requestID = UUID()
     @State private var title = ""
     @State private var startsAt = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     @State private var duration = 60
@@ -684,7 +685,7 @@ struct GroupMeetingScheduler: View {
         defer { working = false }
         do {
             try await service.scheduleMeeting(in: groupID, title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-                                              startsAt: startsAt, durationMinutes: duration)
+                                              startsAt: startsAt, durationMinutes: duration, requestID: requestID)
             dismiss()
         } catch is CancellationError {
             return
