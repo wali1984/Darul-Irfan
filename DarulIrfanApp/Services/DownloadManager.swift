@@ -30,7 +30,8 @@ enum DownloadFileAccess {
         }
         let root = directory.resolvingSymlinksInPath().standardizedFileURL
         let file = root.appendingPathComponent(name).resolvingSymlinksInPath().standardizedFileURL
-        guard file.deletingLastPathComponent() == root else { throw CocoaError(.fileReadInvalidFileName) }
+        // URL equality includes directory hints/trailing slashes; compare canonical filesystem paths.
+        guard file.deletingLastPathComponent().path == root.path else { throw CocoaError(.fileReadInvalidFileName) }
         return file
     }
 }

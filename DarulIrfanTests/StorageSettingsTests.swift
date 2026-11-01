@@ -70,7 +70,10 @@ final class StorageSettingsTests: XCTestCase {
 
     func testInvalidStoredPathsCannotResolveOutsideDownloads() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("downloads", isDirectory: true)
-        XCTAssertEqual(try DownloadFileAccess.resolve(directory: directory, name: "valid.mp3").lastPathComponent, "valid.mp3")
+        for directoryHint in [true, false] {
+            let root = URL(fileURLWithPath: directory.path, isDirectory: directoryHint)
+            XCTAssertEqual(try DownloadFileAccess.resolve(directory: root, name: "valid.mp3").lastPathComponent, "valid.mp3")
+        }
         for name in ["../personal.json", "/tmp/personal.json", "nested/file", "nested\\file", ".", "..", ""] {
             XCTAssertThrowsError(try DownloadFileAccess.resolve(directory: directory, name: name), name)
         }
