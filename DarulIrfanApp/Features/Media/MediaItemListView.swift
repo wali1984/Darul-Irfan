@@ -357,7 +357,7 @@ struct MediaItemRow: View {
         } label: {
             crimsonMedallion("play.rectangle.fill")
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .accessibilityLabel(Text("Play \(item.title) in Darul Irfan"))
     }
 
@@ -369,7 +369,7 @@ struct MediaItemRow: View {
                 .font(.system(size: 15, weight: .bold))
                 .foregroundStyle(.white)
         }
-        .frame(width: 40, height: 40)
+        .frame(width: 44, height: 44)
         .shadow(color: MediaStyle.accent(item.category).opacity(0.3), radius: 5, y: 2)
     }
 
@@ -380,7 +380,7 @@ struct MediaItemRow: View {
                 .font(.system(size: 15, weight: .bold))
                 .foregroundStyle(.white)
         }
-        .frame(width: 40, height: 40)
+        .frame(width: 44, height: 44)
         .shadow(color: DIColor.crimson.opacity(0.3), radius: 5, y: 2)
     }
 
@@ -391,7 +391,7 @@ struct MediaItemRow: View {
                 .font(.system(size: 15, weight: .regular))
                 .foregroundStyle(DIColor.textMuted)
         }
-        .frame(width: 40, height: 40)
+        .frame(width: 44, height: 44)
         .accessibilityHidden(true)
     }
 
@@ -461,7 +461,7 @@ struct MediaItemRow: View {
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel(Text("Downloading"))
-        } else {
+        } else if canPlay || youtubeVideoID != nil || (item.downloadUrl != nil && !isDownloaded && !isWMAOnly) {
             actionsMenu
         }
     }
@@ -492,8 +492,11 @@ struct MediaItemRow: View {
         } label: {
             Image(systemName: "ellipsis.circle")
                 .diInterfaceFont(.title3)
-                .foregroundStyle(DIColor.textMuted)
+                .foregroundStyle(DIColor.actionForeground)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(DIPressableStyle())
         .accessibilityLabel(Text("More actions for \(item.title)"))
     }
 }
