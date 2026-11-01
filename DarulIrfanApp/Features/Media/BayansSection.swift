@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Discover › Bayans (the Media tab before): Continue listening, the lecture
+/// Discover â€º Bayans (the Media tab before): Continue listening, the lecture
 /// tiles, the channel's recent bayans and the archive by year. One name
 /// everywhere: Bayans. The Daily Zikr live card is on the Zikr tab.
 @MainActor
@@ -76,7 +76,7 @@ struct BayansSection: View {
         } else if media.isEmpty && media.loadErrorMessage == nil {
             DIEmptyState(
                 systemImage: "waveform",
-                titleKey: "Preparing the bayans…",
+                titleKey: "Preparing the bayansâ€¦",
                 messageKey: "Lectures and programs will appear here after the first content sync. Pull down to refresh."
             )
             .diOctagramWatermark(size: 260, opacity: 0.05)
@@ -100,6 +100,7 @@ struct BayansSection: View {
 
     @ViewBuilder
     private var recentOnYouTube: some View {
+        if feed.loadFailed { BayanFeedErrorCard(model: feed) }
         if !feed.videos.isEmpty {
             HStack(alignment: .firstTextBaseline) {
                 Text("Recent on YouTube")
@@ -237,7 +238,7 @@ private struct BayansContinueHero: View {
             if let speaker = entry.item.speaker, !speaker.isEmpty {
                 Text(verbatim: speaker)
                     .lineLimit(1)
-                Text(verbatim: "·")
+                Text(verbatim: "Â·")
             }
             if let minutesLeft {
                 Text("\(minutesLeft) min left")
@@ -465,11 +466,12 @@ struct BayanVideosListView: View {
                     .buttonStyle(DIPressableStyle())
                     .accessibilityHint(Text("Plays in Darul Irfan"))
                     .task {
-                        if item.id == model.videos.last?.id, model.nextCursor != nil {
+                        if item.id == model.videos.last?.id, model.nextCursor != nil, !model.loadFailed {
                             await model.loadMore()
                         }
                     }
                 }
+                if model.loadFailed { BayanFeedErrorCard(model: model) }
                 if model.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
@@ -520,5 +522,21 @@ private struct BayanVideoRow: View {
         .diGlassPanel(cornerRadius: 20)
         .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct BayanFeedErrorCard: View {
+    let model: BayansFeedModel
+    var body: some View {
+        DICard {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
+                Text("Could not load videos.")
+                    .diInterfaceFont(.subheadline)
+                    .foregroundStyle(DIColor.textPrimary)
+                Button("Try Again") { Task { await model.retry() } }
+                    .buttonStyle(DICompactButtonStyle())
+                    .disabled(model.isLoading)
+            }
+        }
     }
 }

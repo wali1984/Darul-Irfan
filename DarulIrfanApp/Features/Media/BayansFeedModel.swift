@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// The channel's recent videos that are bayans, for Discover › Bayans:
+/// The channel's recent videos that are bayans, for Discover Ã¢â‚¬Âº Bayans:
 /// every video in the official feed except the daily zikr recordings, by the
 /// rule the Zikr tab's Recent Bayans use (`ZikrHomeViewModel.isZikrRecording`).
 /// The channel's uploads are mostly the daily zikr streams, so the feed is
@@ -35,6 +35,14 @@ final class BayansFeedModel {
         items.filter { $0.videoID != nil && !ZikrHomeViewModel.isZikrRecording($0) }
     }
 
+    private(set) var loadFailed = false
+
+    private var retryFromStart = true
+
+    func retry() async {
+        if !retryFromStart, nextCursor != nil { await loadMore() } else { await load(forceRefresh: true) }
+    }
+
     func loadIfNeeded() async {
         guard !hasLoaded else { return }
         await load()
@@ -45,8 +53,10 @@ final class BayansFeedModel {
     func load(forceRefresh: Bool = false) async {
         guard !isLoading else { return }
         isLoading = true
+        loadFailed = false
         defer { isLoading = false }
 
+        retryFromStart = true
         let bootstrap = await feed.bootstrap(forceRefresh: forceRefresh)
         isFeedEnabled = bootstrap.generatedAt == .distantPast || bootstrap.featureFlags.officialFeed
         guard isFeedEnabled else {
@@ -55,32 +65,48 @@ final class BayansFeedModel {
             hasLoaded = true
             return
         }
-        if let found = await read(from: nil, forceRefresh: forceRefresh) {
-            videos = found.videos
-            nextCursor = found.cursor
-        }
-        hasLoaded = true
+        do {
+            if let found = try await read(from: nil, forceRefresh: forceRefresh) {
+                videos = found.videos
+                nextCursor = found.cursor
+                retryFromStart = false
+                hasLoaded = true
+            }
+        } catch { /* Cancellation leaves the displayed feed intact. */ }
     }
 
     /// The next pages, for the full list.
     func loadMore() async {
         guard !isLoading, isFeedEnabled, let cursor = nextCursor else { return }
         isLoading = true
+        loadFailed = false
         defer { isLoading = false }
-        guard let found = await read(from: cursor, forceRefresh: true) else { return }
-        var seen = Set(videos.map(\.id))
-        videos += found.videos.filter { seen.insert($0.id).inserted }
-        nextCursor = found.cursor
+        retryFromStart = false
+        do {
+            guard let found = try await read(from: cursor, forceRefresh: true) else { return }
+            var seen = Set(videos.map(\.id))
+            videos += found.videos.filter { seen.insert($0.id).inserted }
+            nextCursor = found.cursor
+        } catch { /* Cancellation leaves the displayed feed intact. */ }
     }
 
     /// Pages from `start` on, until `carouselCount` bayans or the end of
     /// the feed; nil when not even the first page loads.
-    private func read(from start: String?, forceRefresh: Bool) async -> (videos: [OfficialFeedItem], cursor: String?)? {
+    private func read(from start: String?, forceRefresh: Bool) async throws -> (videos: [OfficialFeedItem], cursor: String?)? {
         var found: [OfficialFeedItem] = []
         var cursor = start
         var readAny = false
         for _ in 0..<Self.pagesPerRead {
-            guard let page = try? await feed.feed(after: cursor, forceRefresh: forceRefresh) else { break }
+            let page: OfficialFeedPage
+            do {
+                try Task.checkCancellation()
+                page = try await feed.feed(after: cursor, forceRefresh: forceRefresh)
+                try Task.checkCancellation()
+            } catch {
+                if error is CancellationError || Task.isCancelled { throw CancellationError() }
+                loadFailed = true
+                break
+            }
             readAny = true
             found += Self.bayanVideos(in: page.items)
             cursor = page.nextCursor

@@ -231,6 +231,42 @@ final class DiscoverRedesignTests: XCTestCase {
         XCTAssertTrue(model.videos.isEmpty)
     }
 
+    @MainActor
+    func testFailedBayanRequestsRetryTheCorrectPage() async {
+        let first = (1...8).map { feedItem("bayan-\($0)", .youtube, "Bayan", video: "b\($0)", at: Date()) }
+        let feed = RecoverableBayanFeed(pages: [
+            "": OfficialFeedPage(items: first, nextCursor: "next"),
+            "next": OfficialFeedPage(items: [feedItem("bayan-9", .youtube, "Bayan", video: "b9", at: Date())], nextCursor: nil)
+        ])
+        let model = BayansFeedModel(feed: feed)
+        await feed.setFailing(true)
+        await model.load()
+        XCTAssertTrue(model.loadFailed)
+        XCTAssertFalse(model.hasLoaded)
+        XCTAssertFalse(model.isLoading)
+        await feed.setFailing(false)
+        await model.retry()
+        XCTAssertEqual(model.videos.count, 8)
+        XCTAssertFalse(model.loadFailed)
+        await feed.setFailing(true)
+        await model.loadMore()
+        XCTAssertTrue(model.loadFailed)
+        XCTAssertEqual(model.nextCursor, "next")
+        XCTAssertEqual(model.videos.count, 8)
+        await feed.setFailing(false)
+        await model.retry()
+        XCTAssertEqual(model.videos.count, 9)
+        XCTAssertFalse(model.loadFailed)
+        await model.load()
+        await feed.setFailing(true)
+        await model.load(forceRefresh: true)
+        await feed.setFailing(false)
+        await model.retry()
+        XCTAssertEqual(model.videos.count, 8)
+        let last = await feed.lastCursor
+        XCTAssertEqual(last, "")
+    }
+
     /// A bayan's card shows the name, and under it what follows the
     /// channel's " | ". Nothing is reworded.
     func testBayanTitleSplitsAtTheChannelsBar() {
@@ -257,6 +293,20 @@ private struct StubFeed: OfficialFeedServicing {
 
     func feed(after cursor: String?, forceRefresh: Bool) async throws -> OfficialFeedPage {
         guard let page = pages[cursor ?? ""] else { throw OfficialPlatformError.invalidResponse }
+        return page
+    }
+}
+
+private actor RecoverableBayanFeed: OfficialFeedServicing {
+    let pages: [String: OfficialFeedPage]
+    var failing = false
+    private(set) var lastCursor = ""
+    init(pages: [String: OfficialFeedPage]) { self.pages = pages }
+    func setFailing(_ value: Bool) { failing = value }
+    func bootstrap(forceRefresh: Bool) async -> AppBootstrap { .offline }
+    func feed(after cursor: String?, forceRefresh: Bool) async throws -> OfficialFeedPage {
+        lastCursor = cursor ?? ""
+        guard !failing, let page = pages[lastCursor] else { throw OfficialPlatformError.invalidResponse }
         return page
     }
 }

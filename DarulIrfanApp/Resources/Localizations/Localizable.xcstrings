@@ -1,6 +1,23 @@
 {
   "sourceLanguage": "en",
   "strings": {
+  "Could not load videos.": {
+  "extractionState": "manual",
+  "localizations": {
+    "en": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "Could not load videos."
+      }
+    },
+    "ur": {
+      "stringUnit": {
+        "state": "translated",
+        "value": "ویڈیوز لوڈ نہیں ہو سکیں۔"
+      }
+    }
+  }
+},
   "Tazkiyah": {
   "extractionState": "manual",
   "localizations": {
