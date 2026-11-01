@@ -137,7 +137,12 @@ struct DailyPictureViewer: View {
             .diScreenBackground()
             .navigationTitle(item.slot?.title ?? "Today")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                        .buttonStyle(DICompactButtonStyle())
+                }
+            }
         }
     }
 }
