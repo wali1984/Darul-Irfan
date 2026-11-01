@@ -786,7 +786,13 @@ struct GroupZikrEditor: View {
                     Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
                 }
                 Section {
-                    Button("Save zikr time") { Task { await save() } }
+                    Button { Task { await save() } } label: {
+                        HStack(spacing: DISpacing.sm) {
+                            if working { ProgressView().tint(DIColor.onPrimary) }
+                            Text("Save zikr time")
+                        }
+                    }
+                        .buttonStyle(DIPrimaryButtonStyle())
                         .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
@@ -798,7 +804,7 @@ struct GroupZikrEditor: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Zikr time")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
         .task { await loadLibrary() }
     }
 
