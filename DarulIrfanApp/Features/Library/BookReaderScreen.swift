@@ -678,6 +678,8 @@ struct BookTextSearchView: View {
     /// The words `results` were found for; the field may already say more.
     @State private var resultTerm = ""
     @State private var isPreparing = true
+    @State private var preparationFailed = false
+    @State private var prepareAttempt = 0
     @State private var searchTask: Task<Void, Never>?
 
     init(item: ContentItem, dependencies: AppDependencies, onPick: @escaping (Int) -> Void) {
@@ -711,7 +713,8 @@ struct BookTextSearchView: View {
         .tint(DIColor.actionForeground)
         .onAppear { isFieldFocused = true }
         .onChange(of: query) { _, _ in scheduleSearch() }
-        .task { await prepare() }
+        .task(id: prepareAttempt) { await prepare() }
+        .onDisappear { searchTask?.cancel() }
     }
 
     private var field: some View {
@@ -757,7 +760,15 @@ struct BookTextSearchView: View {
 
     @ViewBuilder
     private var content: some View {
-        if isPreparing {
+        if preparationFailed {
+            VStack(spacing: DISpacing.md) {
+                DIEmptyState(systemImage: "magnifyingglass", titleKey: "Something went wrong",
+                    messageKey: "The search could not be completed. Please check your connection and try again.")
+                Button("Try Again") { prepareAttempt += 1 }
+                    .buttonStyle(DICompactButtonStyle())
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        } else if isPreparing {
             ProgressView()
                 .tint(DIColor.actionForeground)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -819,26 +830,35 @@ struct BookTextSearchView: View {
 
     /// The book's pages, folded once for comparing, off the main thread.
     private func prepare() async {
-        guard isPreparing else { return }
-        let loaded = (try? await dependencies.contentRepository.bookPages(bookID: item.id)) ?? []
-        let readable = loaded.filter { !$0.text.isEmpty }
-        let folded = await Task.detached(priority: .userInitiated) {
-            BookTextSearch.index(readable)
-        }.value
-        var texts: [Int: String] = [:]
-        for page in readable {
-            texts[page.page] = page.text
+        preparationFailed = false
+        isPreparing = true
+        defer { isPreparing = false }
+        do {
+            let loaded = try await dependencies.contentRepository.bookPages(bookID: item.id)
+            try Task.checkCancellation()
+            let readable = loaded.filter { !$0.text.isEmpty }
+            let folded = await Task.detached(priority: .userInitiated) {
+                BookTextSearch.index(readable)
+            }.value
+            try Task.checkCancellation()
+            var texts: [Int: String] = [:]
+            for page in readable { texts[page.page] = page.text }
+            pagesByNumber = texts
+            entries = folded
+            isPreparing = false
+            scheduleSearch()
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled else { return }
+            preparationFailed = true
         }
-        pagesByNumber = texts
-        entries = folded
-        isPreparing = false
-        scheduleSearch()
     }
 
     private func scheduleSearch() {
         searchTask?.cancel()
         let term = trimmedQuery
-        guard !isPreparing, term.count >= 2 else {
+        guard !isPreparing, !preparationFailed, term.count >= 2 else {
             results = []
             resultTerm = ""
             return
