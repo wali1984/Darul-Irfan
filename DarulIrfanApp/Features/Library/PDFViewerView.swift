@@ -35,16 +35,20 @@ struct PDFViewerView: View {
         .navigationTitle(Text(verbatim: title))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: fileURL) {
-                    Image(systemName: "square.and.arrow.up")
+            if document != nil {
+                ToolbarItem(placement: .topBarTrailing) {
+                    ShareLink(item: fileURL) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .accessibilityLabel(Text("Share file"))
                 }
-                .accessibilityLabel(Text("Share file"))
             }
         }
         .task {
             if document == nil {
-                document = PDFDocument(url: fileURL)
+                let opened = PDFDocument(url: fileURL)
+                guard !Task.isCancelled else { return }
+                document = opened.flatMap { $0.pageCount > 0 ? $0 : nil }
                 didFinishLoading = true
             }
         }
@@ -57,6 +61,7 @@ struct PDFKitView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> PDFView {
         let view = PDFView()
+        view.backgroundColor = UIColor(DIColor.background)
         view.autoScales = true
         view.displayMode = .singlePageContinuous
         view.displayDirection = .vertical
@@ -65,6 +70,7 @@ struct PDFKitView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: PDFView, context: Context) {
+        uiView.backgroundColor = UIColor(DIColor.background)
         if uiView.document !== document {
             uiView.document = document
         }
