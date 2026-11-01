@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -72,6 +72,77 @@ final class RedesignScreenshotTests: XCTestCase {
         return !navigationBar.exists || frame.minY >= navigationBar.frame.maxY
     }
 
+
+    /// Tap all 30 real rows and inspect each visible reader destination and Back.
+    /// Expected starts are the approved IndoPak division, not the current UI labels.
+    private func parahTour() {
+        selectTab(1)
+        guard tap(button("Quran")) else { XCTFail("Quran selector missing"); return }
+        let parahWord = language == "ur" ? "پارہ" : "Parah"
+        let ayahWord = language == "ur" ? "آیت" : "Ayah"
+        guard tap(app.buttons[parahWord].firstMatch) else {
+            shot("parahs-selector-missing"); XCTFail("Parah selector missing"); return
+        }
+        let expected: [(String, Int)] = [
+            ("Al-Faatiha", 1),
+            ("Al-Baqara", 142),
+            ("Al-Baqara", 253),
+            ("Aal-i-Imraan", 92),
+            ("An-Nisaa", 24),
+            ("An-Nisaa", 148),
+            ("Al-Maaida", 83),
+            ("Al-An'aam", 111),
+            ("Al-A'raaf", 88),
+            ("Al-Anfaal", 41),
+            ("At-Tawba", 94),
+            ("Hud", 6),
+            ("Yusuf", 53),
+            ("Al-Hijr", 2),
+            ("Al-Israa", 1),
+            ("Al-Kahf", 75),
+            ("Al-Anbiyaa", 1),
+            ("Al-Muminoon", 1),
+            ("Al-Furqaan", 21),
+            ("An-Naml", 60),
+            ("Al-Ankaboot", 45),
+            ("Al-Ahzaab", 31),
+            ("Yaseen", 22),
+            ("Az-Zumar", 32),
+            ("Fussilat", 47),
+            ("Al-Ahqaf", 1),
+            ("Adh-Dhaariyat", 31),
+            ("Al-Mujaadila", 1),
+            ("Al-Mulk", 1),
+            ("An-Naba", 1)
+        ]
+        for (index, target) in expected.enumerated() {
+            let number = index + 1
+            let rowLabel = "\(parahWord) \(number), \(target.0), \(ayahWord) \(target.1)"
+            let row = app.buttons.matching(NSPredicate(format: "label == %@", rowLabel)).firstMatch
+            for _ in 0..<8 {
+                if row.exists && row.isHittable { break }
+                app.swipeUp(); pause(0.4)
+            }
+            guard row.exists && row.isHittable else {
+                shot("parah-\(number)-row-missing"); XCTFail("Missing row: \(rowLabel)"); return
+            }
+            shot("parah-\(number)-row")
+            row.tap()
+            let title = app.navigationBars[target.0]
+            let ayah = app.staticTexts["\(ayahWord) \(target.1)"].firstMatch
+            guard title.waitForExistence(timeout: 15), ayah.waitForExistence(timeout: 15),
+                  ayah.isHittable else {
+                shot("parah-\(number)-destination-failure")
+                XCTFail("Expected \(target.0), ayah \(target.1)"); return
+            }
+            shot("parah-\(number)-reader")
+            goBack()
+            guard row.waitForExistence(timeout: 10), row.isHittable else {
+                shot("parah-\(number)-back-failure"); XCTFail("Back lost Parah \(number)"); return
+            }
+        }
+    }
+
     // MARK: - The tour
 
     private func tour(language: String, locale: String, dark: Bool) {
@@ -93,6 +164,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "parahs" {
+            parahTour()
+            return
+        }
         if ["resources", "guide-recovery"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             contextualResourcesTour()
             return
