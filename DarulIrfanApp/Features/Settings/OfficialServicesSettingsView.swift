@@ -20,6 +20,7 @@ struct OfficialServicesSettingsView: View {
             } header: { Text("Official Alerts") }
             footer: {
                 Text("When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.")
+                    .foregroundStyle(DIColor.textMuted)
             }
 
             if appState.settings.push.isEnabled {
@@ -40,6 +41,7 @@ struct OfficialServicesSettingsView: View {
             } header: { Text("Diagnostics") }
             footer: {
                 Text("Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.")
+                    .foregroundStyle(DIColor.textMuted)
             }
         }
         .navigationTitle("Official Alerts & Privacy")

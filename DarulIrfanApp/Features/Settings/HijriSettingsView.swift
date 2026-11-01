@@ -82,6 +82,7 @@ struct HijriSettingsView: View {
             SettingsSectionHeader(titleKey: "Local moon sighting", systemImage: "plusminus.circle.fill")
         } footer: {
             Text("Adjust by up to two days if your local moon sighting differs from the calculated Umm al-Qura calendar. The Hijri dates and Islamic days across the app follow this setting.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 

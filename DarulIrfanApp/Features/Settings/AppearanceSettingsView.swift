@@ -39,6 +39,7 @@ struct AppearanceSettingsView: View {
             SettingsSectionHeader(titleKey: "Theme", systemImage: "circle.lefthalf.filled")
         } footer: {
             Text("System follows your device's light or dark appearance.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
@@ -75,6 +76,7 @@ struct AppearanceSettingsView: View {
             SettingsSectionHeader(titleKey: "Reading", systemImage: "textformat.size")
         } footer: {
             Text("Applies to the Quran and Library reading screens, on top of your system text size.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
@@ -91,6 +93,7 @@ struct AppearanceSettingsView: View {
             .listRowBackground(DIColor.surface)
         } footer: {
             Text("Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 

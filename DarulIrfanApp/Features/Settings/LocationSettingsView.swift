@@ -32,6 +32,7 @@ struct LocationSettingsView: View {
                     .listRowBackground(DIColor.surface)
             } footer: {
                 Text("Apple Weather uses your selected city's approximate location. Precise device coordinates are not sent.")
+                    .foregroundStyle(DIColor.textMuted)
             }
         }
         .listStyle(.insetGrouped)
@@ -71,6 +72,7 @@ struct LocationSettingsView: View {
             SettingsSectionHeader(titleKey: "Location Mode", systemImage: "location.viewfinder")
         } footer: {
             Text("Device mode uses your location only on this phone to calculate prayer times. Manual mode uses a city you choose.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
@@ -133,8 +135,10 @@ struct LocationSettingsView: View {
         } footer: {
             if viewModel.authorization == .denied {
                 Text("Location access is currently off for Darul Irfan. You can allow it in the Settings app, or choose a city manually below.")
+                    .foregroundStyle(DIColor.textMuted)
             } else {
                 Text("Your precise location is never stored — only the resolved city name and approximate, city-level coordinates are kept so prayer times work offline.")
+                    .foregroundStyle(DIColor.textMuted)
             }
         }
     }
@@ -216,6 +220,7 @@ struct LocationSettingsView: View {
             SettingsSectionHeader(titleKey: "Manual City", systemImage: "map.fill")
         } footer: {
             Text("Choosing a city switches to manual mode, which keeps prayer times accurate while travelling or offline.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 

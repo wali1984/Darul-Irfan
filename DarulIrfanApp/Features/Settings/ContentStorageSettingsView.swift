@@ -97,6 +97,7 @@ struct ContentStorageSettingsView: View {
             SettingsSectionHeader(titleKey: "Storage", systemImage: "internaldrive.fill")
         } footer: {
             storageFooter
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 

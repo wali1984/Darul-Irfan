@@ -20,6 +20,7 @@ struct ManualOffsetsView: View {
                 SettingsSectionHeader(titleKey: "Per-Prayer Offsets", systemImage: "slider.horizontal.3")
             } footer: {
                 Text("Offsets shift each calculated time by up to 30 minutes either way. Notifications and widgets update automatically.")
+                    .foregroundStyle(DIColor.textMuted)
             }
 
             if hasAnyOffset {

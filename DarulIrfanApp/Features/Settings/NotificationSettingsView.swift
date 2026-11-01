@@ -233,6 +233,7 @@ struct NotificationSettingsView: View {
             SettingsSectionHeader(titleKey: "Prayer Alerts", systemImage: "bell.badge.fill")
         } footer: {
             Text("Silent shows a banner without sound. Azan Clip plays the opening of the azan with the alert.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
@@ -261,6 +262,7 @@ struct NotificationSettingsView: View {
             SettingsSectionHeader(titleKey: "Pre-Prayer Reminder", systemImage: "clock.badge")
         } footer: {
             Text("A gentle heads-up before Fajr, Dhuhr, Asr, Maghrib and Isha.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
@@ -302,6 +304,7 @@ struct NotificationSettingsView: View {
             SettingsSectionHeader(titleKey: "Iqamah Reminders", systemImage: "person.2.fill")
         } footer: {
             Text("Set how long after the azan your iqamah usually is. You are reminded five minutes before it, whatever the azan alert is set to.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
@@ -427,6 +430,7 @@ struct NotificationSettingsView: View {
             SettingsSectionHeader(titleKey: "Official Alerts", systemImage: "dot.radiowaves.left.and.right")
         } footer: {
             Text("When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 
@@ -565,6 +569,7 @@ struct NotificationSettingsView: View {
             SettingsSectionHeader(titleKey: "Sound", systemImage: "speaker.wave.2.fill")
         } footer: {
             Text("Alerts play a short azan clip so they stay within the iOS notification sound limit. The full azan can be played here inside the app.")
+                .foregroundStyle(DIColor.textMuted)
         }
     }
 }
