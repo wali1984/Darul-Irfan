@@ -373,13 +373,13 @@ private struct LiveHalqahRow: View {
                     .font(DIFont.subheading)
                     .foregroundStyle(DIColor.textPrimary)
                 Text("Zikr is live in this halqah. Tap to join.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
             Image(systemName: "chevron.forward")
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }

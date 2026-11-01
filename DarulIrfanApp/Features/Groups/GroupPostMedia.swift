@@ -101,13 +101,13 @@ struct PostAttachmentStrip: View {
                         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                         .overlay {
                             if attachment.isVideo {
-                                Image(systemName: "play.circle.fill").font(.title2).foregroundStyle(.white).shadow(radius: 2)
+                                Image(systemName: "play.circle.fill").diInterfaceFont(.title2).foregroundStyle(.white).shadow(radius: 2)
                             }
                         }
                         Button {
                             attachments.removeAll { $0.id == attachment.id }
                         } label: {
-                            Image(systemName: "xmark.circle.fill").font(.title3).symbolRenderingMode(.palette)
+                            Image(systemName: "xmark.circle.fill").diInterfaceFont(.title3).symbolRenderingMode(.palette)
                                 .foregroundStyle(.white, Color.black.opacity(0.6))
                         }
                         .buttonStyle(.plain)
@@ -148,7 +148,7 @@ struct PostMediaView: View {
                 case .success(let image): image.resizable().scaledToFit()
                 case .failure:
                     Label("The picture could not be loaded. Pull down to refresh.", systemImage: "photo")
-                        .font(.caption).foregroundStyle(DIColor.textMuted)
+                        .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 default: ProgressView().frame(maxWidth: .infinity, minHeight: 160)
                 }
             }
@@ -178,7 +178,7 @@ private struct PostVideoTile: View {
                     ZStack {
                         Rectangle().fill(Color.black.opacity(0.85))
                         Label("Play the video", systemImage: "play.circle.fill")
-                            .font(.headline).foregroundStyle(.white)
+                            .diInterfaceFont(.headline).foregroundStyle(.white)
                     }
                 }
                 .buttonStyle(.plain)

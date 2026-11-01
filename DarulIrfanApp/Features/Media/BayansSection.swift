@@ -165,7 +165,7 @@ struct BayansSection: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Label {
                     Text(LocalizedStringKey(message))
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textPrimary)
                 } icon: {
                     Image(systemName: "wifi.exclamationmark")
@@ -291,7 +291,7 @@ private struct BayansResumeCard: View {
                     MediaIconMedallion(category: entry.item.category, diameter: 34, glyph: "waveform")
                     Spacer(minLength: 0)
                     Image(systemName: "play.circle.fill")
-                        .font(.title3)
+                        .diInterfaceFont(.title3)
                         .foregroundStyle(DIColor.primary)
                         .accessibilityHidden(true)
                 }
@@ -497,7 +497,7 @@ private struct BayanVideoRow: View {
             ZStack {
                 BayanThumbnail(url: item.imageURL, width: 104, height: 62)
                 Image(systemName: "play.circle.fill")
-                    .font(.title2)
+                    .diInterfaceFont(.title2)
                     .foregroundStyle(.white)
                     .shadow(color: .black.opacity(0.4), radius: 4)
                     .accessibilityHidden(true)
@@ -511,7 +511,7 @@ private struct BayanVideoRow: View {
                     .lineLimit(3)
                     .multilineTextAlignment(.leading)
                 Text(item.publishedAt, format: .dateTime.day().month(.wide).year())
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

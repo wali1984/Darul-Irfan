@@ -152,7 +152,7 @@ struct PrayerTrackerDetailView: View {
                 .font(.title2.weight(.semibold).monospacedDigit())
                 .foregroundStyle(DIColor.primary)
             label
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
                 .multilineTextAlignment(.center)
         }
@@ -164,15 +164,15 @@ struct PrayerTrackerDetailView: View {
     private func gentleLine(_ summary: PrayerStreakSummary) -> some View {
         if summary.currentStreakDays >= 2 {
             Text("MashaAllah — \(summary.currentStreakDays) days of consistent prayer.")
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.primary)
         } else if summary.currentStreakDays == 1 {
             Text("MashaAllah — a full day of prayer. Keep going gently.")
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.primary)
         } else {
             Text("Every prayer you mark is a fresh beginning.")
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -267,7 +267,7 @@ struct PrayerTrackerDetailView: View {
             .frame(width: 14, height: 14)
             .accessibilityHidden(true)
             label
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textPrimary)
         }
     }

@@ -14,7 +14,7 @@ struct NotesView: View {
         List {
             if store.document.notes.isEmpty {
                 Text("No notes yet. Write one here, or from any ayah in the Quran reader.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                     .listRowBackground(DIColor.surface)
             }
@@ -34,12 +34,12 @@ struct NotesView: View {
                             .foregroundStyle(DIColor.actionForeground)
                         }
                         Text(verbatim: note.text)
-                            .font(.body)
+                            .diInterfaceFont(.body)
                             .foregroundStyle(DIColor.textPrimary)
                             .lineLimit(4)
                             .multilineTextAlignment(.leading)
                         Text(note.updatedAt, format: .dateTime.day().month().year())
-                            .font(.caption2)
+                            .diInterfaceFont(.caption2)
                             .foregroundStyle(DIColor.textMuted)
                     }
                     .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
@@ -169,7 +169,7 @@ private struct MyDayReadStateModifier: ViewModifier {
                         Text(store.recoveredFile ?
                              "An unreadable personal-data file was kept safely aside. New records can be saved on this phone." :
                              store.loadFailed ? "Your personal records could not be read. Please try again." : "Loading...")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textMuted)
                         if store.loadFailed {
                             Button("Retry") { store.loadIfNeeded() }

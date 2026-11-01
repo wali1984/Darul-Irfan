@@ -126,7 +126,7 @@ struct TodayHeroView: View {
                     .accessibilityHint(Text("Correct Islamic date"))
                     .accessibilityIdentifier("today.hijri-correction")
                     Spacer(minLength: 0)
-                    if let place = appState.activePlace { Text(verbatim: place.name).font(.caption).foregroundStyle(Color(hex: 0xF7F6ED).opacity(0.72)) }
+                    if let place = appState.activePlace { Text(verbatim: place.name).diInterfaceFont(.caption).foregroundStyle(Color(hex: 0xF7F6ED).opacity(0.72)) }
                 }
             }
         }
@@ -202,10 +202,10 @@ struct TodayHeroView: View {
     private var unavailable: some View {
         VStack(alignment: .leading, spacing: 6) {
             Label("Prayer times unavailable", systemImage: "sun.horizon")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(.white)
             Text("Times could not be calculated for this location today. A different high-latitude rule in Settings may help.")
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(.white.opacity(0.85))
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -358,11 +358,11 @@ struct TodayHeroLocationPrompt: View {
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             Label("Set your location to see prayer times", systemImage: "location.circle")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
             Text("Prayer times are calculated privately on your device once a location is set.")
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(.white.opacity(0.85))
                 .fixedSize(horizontal: false, vertical: true)
             Button {
@@ -391,7 +391,7 @@ struct TodayHeroLocationPrompt: View {
                     Text("Prefer a specific city? You can choose one anytime in the Halqah tab under Settings.")
                 }
             }
-            .font(.footnote)
+            .diInterfaceFont(.footnote)
             .foregroundStyle(.white.opacity(0.8))
             .fixedSize(horizontal: false, vertical: true)
         }

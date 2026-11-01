@@ -85,7 +85,7 @@ private struct ZikrTasbihRing: View {
                     .padding(7)
             } else {
                 Image(systemName: "hand.tap.fill")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.primary)
             }
         }

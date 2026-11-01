@@ -144,7 +144,7 @@ struct BookReaderView: View {
             ProgressView().tint(DIColor.primary)
             if phase == .downloading {
                 Text("Preparing pages for offline reading…")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
             }
@@ -175,7 +175,7 @@ struct BookReaderView: View {
     private var pageBar: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "book.pages")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.accent)
             Text("Page \(currentPage) of \(pageCount)")
                 .font(.caption.weight(.medium).monospacedDigit())

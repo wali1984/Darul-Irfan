@@ -27,7 +27,7 @@ struct EventDetailView: View {
                 if let details = viewModel.event.details {
                     DIElevatedCard {
                         Text(LocalizedStringKey(details))
-                            .font(.body)
+                            .diInterfaceFont(.body)
                             .foregroundStyle(DIColor.textPrimary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -36,7 +36,7 @@ struct EventDetailView: View {
 
                 if viewModel.hasEnded {
                     Text("This program has taken place.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .padding(.horizontal, DISpacing.xs)
                 } else if viewModel.hasConcreteDates {
@@ -44,7 +44,7 @@ struct EventDetailView: View {
                         .diAppear(delay: 0.1)
                 } else {
                     Text("Dates are announced by Dar-ul-Irfan closer to the time and may vary with moon sighting.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .padding(.horizontal, DISpacing.xs)
                         .fixedSize(horizontal: false, vertical: true)
@@ -88,7 +88,7 @@ struct EventDetailView: View {
                             .fill(Color.white.opacity(0.16))
                             .frame(width: 44, height: 44)
                         Image(systemName: viewModel.event.kind.eventSymbolName)
-                            .font(.title3)
+                            .diInterfaceFont(.title3)
                             .foregroundStyle(.white)
                     }
                     .accessibilityHidden(true)
@@ -121,7 +121,7 @@ struct EventDetailView: View {
                     } icon: {
                         Image(systemName: "mappin.and.ellipse")
                     }
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(.white.opacity(0.85))
                 }
 
@@ -159,7 +159,7 @@ struct EventDetailView: View {
             } icon: {
                 Image(systemName: "calendar")
             }
-            .font(.subheadline)
+            .diInterfaceFont(.subheadline)
             .italic()
             .foregroundStyle(.white.opacity(0.75))
         }
@@ -185,7 +185,7 @@ struct EventDetailView: View {
 
                 if viewModel.calendarState == .failed {
                     Text("The event could not be added to your calendar. Please try again.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.danger)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -205,14 +205,14 @@ struct EventDetailView: View {
 
                     if viewModel.reminderFailed {
                         Text("The reminder could not be scheduled. Please try again.")
-                            .font(.footnote)
+                            .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.danger)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
                     if viewModel.isReminderScheduled, let fireDate = viewModel.reminderFireDate {
                         Text("You will be reminded on \(fireDate.formatted(date: .abbreviated, time: .shortened)).")
-                            .font(.footnote)
+                            .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.textMuted)
                             .fixedSize(horizontal: false, vertical: true)
                     }

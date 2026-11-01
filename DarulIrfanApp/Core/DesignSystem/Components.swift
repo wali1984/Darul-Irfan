@@ -66,7 +66,7 @@ private struct DIActionButtonSurface: ViewModifier {
     func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
         content
-            .font(.headline)
+            .diInterfaceFont(.headline)
             .multilineTextAlignment(.center)
             .padding(.horizontal, DISpacing.md)
             .padding(.vertical, DISpacing.sm)
@@ -132,7 +132,7 @@ struct DIEmptyState: View {
                 .multilineTextAlignment(.center)
             if let messageKey {
                 Text(messageKey)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
             }

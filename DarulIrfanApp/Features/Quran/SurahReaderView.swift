@@ -351,7 +351,7 @@ struct SurahReaderView: View {
                         color: viewModel.surah.revelationPlace == .makkah ? DIColor.primary : DIColor.accent
                     )
                     Text("\(viewModel.surah.ayahCount) ayahs")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -469,10 +469,10 @@ struct SurahReaderView: View {
                 .accessibilityLabel(isPlaying ? Text("Pause") : Text("Play"))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Listen")
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.onPrimary)
                     Text(listenSubtitle)
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.onPrimary.opacity(0.75))
                         .lineLimit(1)
                 }
@@ -480,7 +480,7 @@ struct SurahReaderView: View {
                 if isHere {
                     if isPlaying {
                         Image(systemName: "waveform")
-                            .font(.title3)
+                            .diInterfaceFont(.title3)
                             .foregroundStyle(DIColor.goldGlow)
                             .symbolEffect(.variableColor.iterative, options: .repeating)
                     }
@@ -657,13 +657,13 @@ struct SurahReaderView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 if viewModel.fullVolumes.isEmpty {
                     Text("\(viewModel.contentMode.localizedTitle) is not in this language")
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                     Text("This commentary has not been prepared in the language you are reading. It is available in:")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
                     Text("Verse by verse, this commentary is available in:")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 HStack(spacing: DISpacing.sm) {
@@ -688,11 +688,11 @@ struct SurahReaderView: View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text(isPrimary ? "Read the full commentary" : "Continue in the full volume")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                 Text(isPrimary
                      ? "Verse-by-verse commentary is not available for this surah in this language. The complete printed text is available below, opened where this surah begins."
                      : "The complete printed commentary, opened where this surah begins.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(.secondary)
                 ForEach(viewModel.fullVolumes) { volume in
                     volumeLink(volume, title: volumeTitle(volume))
@@ -701,7 +701,7 @@ struct SurahReaderView: View {
                 // volumes re-read from the scan carry no such notice.
                 if viewModel.fullVolumes.contains(where: { machineReadVolumeIDs.contains($0.bookID) }) {
                     Text("Machine-read from the printed book and not yet proofread.")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -782,11 +782,11 @@ struct SurahReaderView: View {
                         Text("This commentary is not in the app for this surah.")
                     }
                 }
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textMuted)
                 if otherHasVerses || !otherVolumes.isEmpty {
                     Text("The Silsila's other tafsir is available:")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                     if otherHasVerses {
                         Button {
@@ -1025,7 +1025,7 @@ private struct AyahCardView: View {
                 } else if displayMode.showsTranslation, viewModel.isAsrarTranslationWithheld(ayah.ayahNumber) {
                     if displayMode.showsArabic { Divider() }
                     Text("Asrar-at-Tanzil's translation of this ayah is still being checked and is not shown yet.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .italic()
                         .foregroundStyle(DIColor.textMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1367,7 +1367,7 @@ private struct AyahCardView: View {
             }
             if available {
                 Image(systemName: "play.fill")
-                    .font(.caption2)
+                    .diInterfaceFont(.caption2)
                     .foregroundStyle(DIColor.accent)
             }
         }
@@ -1453,7 +1453,7 @@ private struct BayanListSheet: View {
                                             .foregroundStyle(DIColor.textPrimary)
                                             .multilineTextAlignment(.leading)
                                         Text(LocalizedStringKey("Ayat \(link.ayahStart)-\(link.ayahEnd)"))
-                                            .font(.caption)
+                                            .diInterfaceFont(.caption)
                                             .foregroundStyle(DIColor.textMuted)
                                     }
                                 }

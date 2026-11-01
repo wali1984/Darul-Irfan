@@ -45,7 +45,7 @@ struct ZikrSessionPanel: View {
             }
             if let note = session.displayAvailabilityNote(urdu: inUrdu) {
                 Text(verbatim: note)
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .italic()
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)

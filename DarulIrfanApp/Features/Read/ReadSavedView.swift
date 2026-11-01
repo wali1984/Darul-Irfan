@@ -114,7 +114,7 @@ struct ReadSavedView: View {
             ReadOrb(systemImage: systemImage, gold: gold)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.textPrimary)
                 detail
                     .font(.caption.weight(.medium))

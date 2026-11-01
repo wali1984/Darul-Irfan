@@ -117,7 +117,7 @@ struct ArchiveBrowserView: View {
                     HStack(spacing: DISpacing.md) {
                         archiveIcon("calendar")
                         Text(verbatim: String(year))
-                            .font(.headline)
+                            .diInterfaceFont(.headline)
                             .foregroundStyle(DIColor.textPrimary)
                     }
                     .padding(.vertical, DISpacing.xs)
@@ -250,7 +250,7 @@ struct ArchiveYearView: View {
                 HStack(spacing: DISpacing.md) {
                     archiveIcon("square.stack.fill")
                     Text("All of \(String(viewModel.year))")
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                     Spacer(minLength: 0)
                     Text("\(viewModel.totalCount) items")
@@ -275,7 +275,7 @@ struct ArchiveYearView: View {
                     HStack(spacing: DISpacing.md) {
                         archiveIcon("calendar")
                         Text(verbatim: MediaTimeFormat.monthName(bucket.month))
-                            .font(.headline)
+                            .diInterfaceFont(.headline)
                             .foregroundStyle(DIColor.textPrimary)
                         Spacer(minLength: 0)
                         Text("\(bucket.count) items")

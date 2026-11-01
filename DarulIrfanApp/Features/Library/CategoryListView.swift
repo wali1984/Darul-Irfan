@@ -200,7 +200,7 @@ struct ContentItemRow: View {
                                         .foregroundStyle(DIColor.textPrimary)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     Text(verbatim: item.title)
-                                        .font(.footnote)
+                                        .diInterfaceFont(.footnote)
                                         .foregroundStyle(DIColor.textMuted)
                                 } else {
                                     Text(verbatim: item.title)
@@ -217,7 +217,7 @@ struct ContentItemRow: View {
                             }
                             if !subtitleText.isEmpty {
                                 Text(verbatim: subtitleText)
-                                    .font(.footnote)
+                                    .diInterfaceFont(.footnote)
                                     .foregroundStyle(DIColor.textMuted)
                             }
                             HStack(spacing: DISpacing.sm) {

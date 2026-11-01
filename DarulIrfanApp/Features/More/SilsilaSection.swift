@@ -173,7 +173,7 @@ struct SilsilaPageHeader: View {
         VStack(spacing: 12) {
             DILivingSealMark(diameter: 64).accessibilityHidden(true)
             Text(title).font(.title2.bold()).foregroundStyle(Color(hex: 0xFFE3A0))
-            Text("Silsila Naqshbandia Owaisiah").font(.subheadline).foregroundStyle(.white.opacity(0.85))
+            Text("Silsila Naqshbandia Owaisiah").diInterfaceFont(.subheadline).foregroundStyle(.white.opacity(0.85))
         }
         .multilineTextAlignment(.center)
         .padding(28)

@@ -129,7 +129,7 @@ struct MyHalqahsSection: View {
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
                         HalqahRoleBadge(role: .superadmin, onGlass: true)
                         Text(roleSummary)
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(Color.white.opacity(0.88))
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -193,10 +193,10 @@ struct MyHalqahsSection: View {
             }
             .diAppear(delay: 0.1)
             Text("Tap ⋯ on a Halqah, or press and hold it, to rename or retire it.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
             if let retireError {
-                Text(verbatim: retireError).font(.footnote).foregroundStyle(DIColor.danger)
+                Text(verbatim: retireError).diInterfaceFont(.footnote).foregroundStyle(DIColor.danger)
             }
         }
     }
@@ -251,12 +251,12 @@ struct MyHalqahsSection: View {
             HStack(spacing: DISpacing.md) {
                 cardSymbol("lock.shield.fill")
                 Text("Members only")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
             }
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isHeader)
             Text("These groups are for members of Silsila Naqshbandia Owaisiah. Enter the invitation code an administrator gave you.")
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(.secondary)
 
             // How the member is known to the Halqah's admins, in the
@@ -268,7 +268,7 @@ struct MyHalqahsSection: View {
                 .submitLabel(.next)
                 .onSubmit { isCodeFocused = true }
             Text("Your name is shown to your Halqah's admins and in the meeting room.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(.secondary)
 
             // The code is the primary way in: it needs nothing from Apple,
@@ -292,13 +292,13 @@ struct MyHalqahsSection: View {
             }
             if let inviteError = model.inviteError {
                 Text(inviteError)
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(.secondary)
             }
 
             if MemberGroupsFeature.appleSignInAvailable {
                 Text("Or sign in, then ask an administrator to add you.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(.secondary)
                 SignInWithAppleButton(.signIn) { request in
                     // The name tells an administrator who you are; the
@@ -319,7 +319,7 @@ struct MyHalqahsSection: View {
     /// A card's symbol in an emerald circle, beside its heading.
     private func cardSymbol(_ name: String) -> some View {
         Image(systemName: name)
-            .font(.headline)
+            .diInterfaceFont(.headline)
             .foregroundStyle(DIColor.onPrimary)
             .frame(width: symbolBox, height: symbolBox)
             .background(Circle().fill(DIGradient.emerald))
@@ -347,7 +347,7 @@ struct MyHalqahsSection: View {
             .padding(.top, DISpacing.sm)
         } label: {
             Label("How private groups work", systemImage: "questionmark.circle")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .frame(minHeight: 48)
                 .foregroundStyle(DIColor.textPrimary)
         }
@@ -369,7 +369,7 @@ struct MyHalqahsSection: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(DIColor.textPrimary)
                 Text(detail)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -404,7 +404,7 @@ struct MyHalqahsSection: View {
             )) {
                 HStack(spacing: DISpacing.md) {
                     Image(systemName: noticesSymbol)
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(model.notices == .on ? DIColor.onPrimary : DIColor.primary)
                         .contentTransition(.symbolEffect(.replace))
                         .frame(width: symbolBox, height: symbolBox)
@@ -420,7 +420,7 @@ struct MyHalqahsSection: View {
                         Text("Halqah notifications")
                             .font(.subheadline.weight(.semibold))
                         Text("Posts, zikr and meetings from your Halqah, on this phone.")
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -429,7 +429,7 @@ struct MyHalqahsSection: View {
             .disabled(model.isChangingNotices)
             if model.notices == .blocked {
                 Text("Notifications are off for Darul Irfan. Allow them in iOS Settings to receive Halqah notifications.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(.secondary)
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
@@ -453,12 +453,12 @@ struct MyHalqahsSection: View {
             HStack(spacing: DISpacing.md) {
                 cardSymbol("hourglass")
                 Text("Waiting to be added")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
             }
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isHeader)
             Text("You are signed in, but you are not in a group yet. Send the identifier below to an administrator and they will add you to your region's group.")
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(.secondary)
             if let memberID = model.memberID {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
@@ -537,7 +537,7 @@ struct MyHalqahsSection: View {
             Button("Retire this Halqah", systemImage: "archivebox", role: .destructive) { retiring = group }
         } label: {
             Image(systemName: "ellipsis.circle.fill")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(Color.white)
                 .frame(width: 44, height: 44)
@@ -553,13 +553,13 @@ struct MyHalqahsSection: View {
         let role = GroupRole(rawValue: model.role.rawValue) ?? .member
         return HStack(alignment: .top, spacing: DISpacing.md) {
             Image(systemName: role.badgeSymbol)
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(DIColor.goldGlow)
                 .frame(width: symbolBox, height: symbolBox)
                 .background(Circle().fill(DIGradient.emerald))
                 .accessibilityHidden(true)
             Text(roleSummary)
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
@@ -620,7 +620,7 @@ struct MyHalqahsSection: View {
                 }
                 if let inviteError = model.inviteError {
                     Text(verbatim: inviteError)
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -634,7 +634,7 @@ struct MyHalqahsSection: View {
     private func failureCard(_ message: String) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             Text(message)
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
             Button("Try again") { Task { await model.refresh() } }
                 .buttonStyle(DISecondaryButtonStyle())
         }
@@ -685,7 +685,7 @@ struct HalqahHeroCardLabel: View {
         let layout = typeSize.halqahRowLayout(spacing: 12)
         return layout {
             Image(systemName: "person.3.fill")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(Color.white)
                 .frame(width: iconSide, height: iconSide)
                 .background(Circle().fill(Color.white.opacity(0.14)))

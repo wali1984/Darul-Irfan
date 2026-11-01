@@ -133,7 +133,7 @@ private struct CompanionHubCard: View {
                         .fill(tint.opacity(0.14))
                         .frame(width: 46, height: 46)
                     Image(systemName: systemImage)
-                        .font(.title3)
+                        .diInterfaceFont(.title3)
                         .foregroundStyle(tint)
                 }
                 .accessibilityHidden(true)
@@ -142,13 +142,13 @@ private struct CompanionHubCard: View {
                         .font(DIFont.subheading)
                         .foregroundStyle(DIColor.textPrimary)
                     Text(subtitleKey)
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }

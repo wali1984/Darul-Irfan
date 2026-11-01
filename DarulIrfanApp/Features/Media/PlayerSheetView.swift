@@ -127,7 +127,7 @@ struct PlayerSheetView: View {
                     VStack(spacing: 0) {
                         if let error = audioPlayer.playbackError {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text(LocalizedStringKey(error)).font(.callout)
+                                Text(LocalizedStringKey(error)).diInterfaceFont(.callout)
                                 Button("Retry") { audioPlayer.togglePlayPause() }.buttonStyle(DICompactButtonStyle())
                             }.padding().frame(maxWidth: .infinity, alignment: .leading)
                         } else if audioPlayer.isBuffering {
@@ -252,7 +252,7 @@ struct PlayerSheetView: View {
                 .multilineTextAlignment(.center)
             if let subtitle = audioPlayer.nowPlaying?.subtitle {
                 Text(subtitle)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
             }
@@ -308,7 +308,7 @@ struct PlayerSheetView: View {
                 HStack(spacing: DISpacing.sm) {
                     MediaLivePill()
                     Text("Live stream — seeking is unavailable")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             } else {
@@ -318,7 +318,7 @@ struct PlayerSheetView: View {
                     ProgressView()
                         .controlSize(.small)
                     Text("Loading")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -376,7 +376,7 @@ struct PlayerSheetView: View {
     ) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.title2)
+                .diInterfaceFont(.title2)
                 .foregroundStyle(DIColor.textPrimary)
         }
         .buttonStyle(.plain)
@@ -388,7 +388,7 @@ struct PlayerSheetView: View {
     private var speedRow: some View {
         HStack {
             Label("Playback speed", systemImage: "speedometer")
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textMuted)
             Spacer(minLength: 0)
             Menu {
@@ -440,7 +440,7 @@ struct PlayerSheetView: View {
 
                     if viewModel.bookmarks.isEmpty {
                         Text("No bookmarks yet. Save a moment to return to it later.")
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.textMuted)
                     } else {
                         ForEach(viewModel.bookmarks) { bookmark in
@@ -463,12 +463,12 @@ struct PlayerSheetView: View {
                         .foregroundStyle(accent)
                     if let note = bookmark.note {
                         Text(note)
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textPrimary)
                             .lineLimit(2)
                     } else {
                         Text("Bookmark")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }
@@ -482,7 +482,7 @@ struct PlayerSheetView: View {
                 Task { await viewModel.deleteBookmark(bookmark) }
             } label: {
                 Image(systemName: "trash")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.danger)
             }
             .buttonStyle(.plain)
@@ -520,7 +520,7 @@ struct PlayerSheetView: View {
             }
             if window.moreCount > 0 {
                 Text("\(window.moreCount) more in the queue")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -535,7 +535,7 @@ struct PlayerSheetView: View {
         } label: {
             HStack(spacing: DISpacing.sm) {
                 Image(systemName: isCurrent ? "waveform" : "music.note")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(isCurrent ? DIColor.accent : DIColor.textMuted)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
@@ -545,7 +545,7 @@ struct PlayerSheetView: View {
                         .lineLimit(1)
                     if let subtitle = entry.subtitle {
                         Text(subtitle)
-                            .font(.caption2)
+                            .diInterfaceFont(.caption2)
                             .foregroundStyle(DIColor.textMuted)
                             .lineLimit(1)
                     }

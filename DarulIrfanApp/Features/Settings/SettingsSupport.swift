@@ -48,7 +48,7 @@ struct SettingsBrandBanner: View {
                         .font(DIFont.subheading)
                         .foregroundStyle(.white)
                     Text(subtitleKey)
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(.white.opacity(0.85))
                 }
                 Spacer(minLength: 0)

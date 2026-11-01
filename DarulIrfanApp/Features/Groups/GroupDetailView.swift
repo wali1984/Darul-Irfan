@@ -72,7 +72,7 @@ struct GroupDetailView: View {
                 } else if let failure {
                     DICard {
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
-                            Text(verbatim: failure).font(.subheadline)
+                            Text(verbatim: failure).diInterfaceFont(.subheadline)
                             Button("Try again") { Task { await load() } }
                                 .buttonStyle(DISecondaryButtonStyle())
                         }
@@ -289,12 +289,12 @@ struct GroupDetailView: View {
             layout {
                 HalqahDateTile(date: meeting.startsAt)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
-                    Text(verbatim: meeting.title).font(.headline)
+                    Text(verbatim: meeting.title).diInterfaceFont(.headline)
                     Text("Your time: \(ZikrScheduleMath.localTimeText(meeting.startsAt))")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.primary)
                     Text(meeting.startsAt, style: .relative)
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 .fixedSize(horizontal: false, vertical: true)
@@ -307,7 +307,7 @@ struct GroupDetailView: View {
                 IntegrationPendingNote("Video meetings: integration in progress. The time is kept, and the room opens here once it is complete.")
             } else if !meeting.isOpen() {
                 Text("The room opens ten minutes before the meeting starts.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -365,7 +365,7 @@ struct GroupDetailView: View {
                 DICard {
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
                         Text("Drafts could not be loaded. Try again to see posts waiting for approval.")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textPrimary)
                         Button("Try again") { Task { await load() } }
                             .buttonStyle(DISecondaryButtonStyle())
@@ -462,7 +462,7 @@ struct GroupDetailView: View {
             if posts.isEmpty {
                 DICard {
                     Text("Nothing has been posted to this group yet.")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -481,12 +481,12 @@ struct GroupDetailView: View {
                     // A post of pictures alone may have no title.
                     if !post.title.isEmpty {
                         Text(verbatim: post.title)
-                            .font(.headline)
+                            .diInterfaceFont(.headline)
                     }
                     Spacer(minLength: 0)
                 }
                 Text(post.publishedAt, format: .dateTime.day().month(.wide).year())
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(.secondary)
                 if let media = post.media, !media.isEmpty {
                     PostMediaView(media: media)
@@ -496,7 +496,7 @@ struct GroupDetailView: View {
                 }
                 if let body = post.body, body != post.title {
                     Text(verbatim: body)
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                 }
                 if let videoID = post.youtubeVideoID {
                     if playingVideoID == videoID {
@@ -620,13 +620,13 @@ private struct HalqahNextZikrCard: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIColor.accent)
                     Text(verbatim: upcoming.session.displayTitle(urdu: DIBrand.readsUrdu(locale)))
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                     Text("Your time: \(ZikrScheduleMath.localTimeText(upcoming.start))")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.primary)
                     scheduleLine
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 .multilineTextAlignment(.leading)
@@ -643,7 +643,7 @@ private struct HalqahNextZikrCard: View {
             .disabled(true)
             .accessibilityHint(Text("Opens here when the Halqah goes live."))
             Text("Opens here when the Halqah goes live.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
             HalqahTile(item: duaTile, axis: .horizontal)
@@ -710,29 +710,29 @@ private struct GroupZikrRow: View {
         let layout = typeSize.halqahRowLayout(alignment: .top)
         layout {
             Image(systemName: session.zikrAnchor == nil ? "clock.fill" : "moon.stars.fill")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(DIColor.primary)
                 .frame(width: iconBox, height: iconBox)
                 .background(Circle().fill(DIColor.primary.opacity(0.12)))
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                Text(verbatim: session.displayTitle(urdu: DIBrand.readsUrdu(locale))).font(.headline)
+                Text(verbatim: session.displayTitle(urdu: DIBrand.readsUrdu(locale))).diInterfaceFont(.headline)
                 if let start = ZikrScheduleMath.currentOrNextOccurrence(of: current, at: Date()) {
                     Text("Your time: \(ZikrScheduleMath.localTimeText(start))")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.primary)
                 }
                 if let announcement = ZikrAnchorResolver.announcement(for: session) {
-                    Text(verbatim: announcement).font(.caption).foregroundStyle(DIColor.textMuted)
+                    Text(verbatim: announcement).diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 } else if ZikrScheduleMath.isDaily(session.weekdays) {
-                    Text("Daily").font(.caption).foregroundStyle(DIColor.textMuted)
+                    Text("Daily").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 } else {
                     Text(verbatim: ZikrScheduleMath.shortWeekdaySymbols(for: session.weekdays).joined(separator: " · "))
-                        .font(.caption).foregroundStyle(DIColor.textMuted)
+                        .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 }
                 if let autoplay = session.autoplayTitle {
                     Label("Plays by itself: \(autoplay)", systemImage: "play.circle")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Toggle("Remind me", isOn: Binding(
@@ -743,7 +743,7 @@ private struct GroupZikrRow: View {
                     .disabled(reminderWorking)
                 if reminderBlocked {
                     Text("Notifications are off for Darul Irfan. Allow them in iOS Settings to receive Halqah notifications.")
-                        .font(.footnote).foregroundStyle(DIColor.textMuted)
+                        .diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
                     Button("Open Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
                     }
@@ -828,10 +828,10 @@ private struct GroupDraftCard: View {
                     GroupPostImage(url: imageURL)
                 }
                 TextField("Title", text: $title, axis: .vertical)
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .disabled(working)
                 TextField("Message", text: $bodyText, axis: .vertical)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .lineLimit(2...10)
                     .disabled(working)
                 VStack(alignment: .leading, spacing: DISpacing.sm) { draftActions }
@@ -874,7 +874,7 @@ private struct GroupPostImage: View {
                 image.resizable().scaledToFit()
             case .failure:
                 Label("The picture could not be loaded. Pull down to refresh.", systemImage: "photo")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             default:
                 ProgressView().frame(maxWidth: .infinity, minHeight: 160)
@@ -893,7 +893,7 @@ struct IntegrationPendingNote: View {
 
     var body: some View {
         Label(text, systemImage: "hourglass")
-            .font(.caption)
+            .diInterfaceFont(.caption)
             .foregroundStyle(DIColor.textMuted)
             .fixedSize(horizontal: false, vertical: true)
     }

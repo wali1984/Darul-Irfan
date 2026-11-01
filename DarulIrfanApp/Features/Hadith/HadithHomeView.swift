@@ -259,7 +259,7 @@ struct HadithHomeView: View {
                     Text("Matches: \(results.count)")
                 }
             }
-            .font(.caption)
+            .diInterfaceFont(.caption)
             .foregroundStyle(DIColor.textMuted)
             ForEach(results) { entry in
                 // A result must open the exact narration in its collection, not

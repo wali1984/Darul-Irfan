@@ -5,7 +5,7 @@ import SwiftUI
 @MainActor
 struct AppearanceSettingsView: View {
     private let appState: AppState
-    @AppStorage(AppFonts.nastaliqPreferenceKey) private var urduNastaliq = false
+    @AppStorage(AppFonts.nastaliqPreferenceKey) private var urduNastaliq = true
 
     init(appState: AppState) {
         self.appState = appState

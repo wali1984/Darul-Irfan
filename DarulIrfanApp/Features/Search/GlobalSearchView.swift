@@ -95,7 +95,7 @@ struct GlobalSearchView: View {
                     viewModel.clearQuery()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.body)
+                        .diInterfaceFont(.body)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 .accessibilityLabel("Clear search text")
@@ -232,7 +232,7 @@ struct GlobalSearchView: View {
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.center)
                     Text("Find ayahs, tafsir, hadith, articles, the text of the books, lectures, and events. You can search in English, Urdu, or Arabic, with or without vowel marks.")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, DISpacing.lg)

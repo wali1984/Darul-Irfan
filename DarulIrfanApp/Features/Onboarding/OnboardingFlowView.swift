@@ -161,7 +161,7 @@ struct OnboardingFlowView: View {
                 viewModel.advance()
             } label: {
                 Text("Get Started")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.primaryDeep)
                     .frame(maxWidth: .infinity, minHeight: 52)
                     .background(

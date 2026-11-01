@@ -477,7 +477,7 @@ struct GroupLiveStarter: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(verbatim: title).foregroundStyle(DIColor.textPrimary).lineLimit(2)
                     Text(verbatim: detail.compactMap { $0 }.joined(separator: " · "))
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)
@@ -751,7 +751,7 @@ struct GroupZikrEditor: View {
                         } label: {
                             VStack(alignment: .leading, spacing: DISpacing.xs) {
                                 Text("Plays by itself").foregroundStyle(DIColor.textPrimary)
-                                Text(verbatim: autoplayTitle).font(.subheadline)
+                                Text(verbatim: autoplayTitle).diInterfaceFont(.subheadline)
                                     .foregroundStyle(DIColor.textMuted)
                                     .fixedSize(horizontal: false, vertical: true)
                             }

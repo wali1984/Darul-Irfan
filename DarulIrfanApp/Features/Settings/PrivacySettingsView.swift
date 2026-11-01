@@ -55,7 +55,7 @@ struct PrivacySettingsView: View {
                 .diAppear(delay: 0.24)
 
                 Text("Network access refreshes official public content and live status, and streams or downloads content you request. Precise location is never included.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .padding(.horizontal, DISpacing.xs)
             }
@@ -115,7 +115,7 @@ private struct PrivacyChoicesCard: View {
                         .tint(DIColor.actionForeground)
                     }
                     Text("Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -150,7 +150,7 @@ private struct PrivacyCard: View {
                 .accessibilityAddTraits(.isHeader)
 
                 Text(bodyKey)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
             }
         }

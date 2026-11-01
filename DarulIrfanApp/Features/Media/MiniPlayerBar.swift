@@ -74,7 +74,7 @@ struct MiniPlayerBar: View {
                         audioPlayer.togglePlayPause()
                     } label: {
                         Image(systemName: (audioPlayer.isPlaying || audioPlayer.isBuffering) ? "pause.fill" : "play.fill")
-                            .font(.title3)
+                            .diInterfaceFont(.title3)
                             .foregroundStyle(accent)
                             .frame(width: 44, height: 44)
                             .contentTransition(.symbolEffect(.replace))
@@ -143,14 +143,14 @@ struct MiniPlayerBar: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                 if audioPlayer.playbackError != nil {
-                    Text("Audio unavailable · Tap play to retry").font(.caption).foregroundStyle(DIColor.textMuted)
+                    Text("Audio unavailable · Tap play to retry").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 } else if audioPlayer.isBuffering {
-                    Text("Buffering…").font(.caption).foregroundStyle(DIColor.textMuted)
+                    Text("Buffering…").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 } else if isLiveStream {
                     MediaLivePill()
                 } else if let subtitle = nowPlaying.subtitle {
                     Text(subtitle)
-                        .font(.caption2)
+                        .diInterfaceFont(.caption2)
                         .foregroundStyle(DIColor.textMuted)
                         .lineLimit(1)
                         .truncationMode(.tail)

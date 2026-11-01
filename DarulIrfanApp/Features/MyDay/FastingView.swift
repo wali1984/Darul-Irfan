@@ -67,19 +67,19 @@ struct FastingView: View {
                     DISectionHeader(titleKey: "Today", systemImage: "sun.horizon")
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Suhoor ends").font(.caption).foregroundStyle(DIColor.textMuted)
+                            Text("Suhoor ends").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                             Text(verbatim: fajr.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).font(.title3.weight(.semibold))
                                 .accessibilityIdentifier("fasting-suhoor")
                         }
                         Spacer()
                         VStack(alignment: .trailing, spacing: 2) {
-                            Text("Iftar").font(.caption).foregroundStyle(DIColor.textMuted)
+                            Text("Iftar").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                             Text(verbatim: maghrib.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).font(.title3.weight(.semibold))
                                 .accessibilityIdentifier("fasting-iftar")
                         }
                     }
                     Text("Suhoor ends at Fajr and iftar is at Maghrib, from your prayer settings.")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -97,7 +97,7 @@ struct FastingView: View {
                         .accessibilityLabel("Previous month")
                     Spacer()
                     Text(month, format: .dateTime.month(.wide).year())
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                     Spacer()
                     Button { shiftMonth(1) } label: { Image(systemName: "chevron.forward").frame(width: 48, height: 48) }
                         .buttonStyle(FastingCalendarButtonStyle(background: DIColor.surface, foreground: DIColor.actionForeground, outlined: true))
@@ -121,7 +121,7 @@ struct FastingView: View {
                     }
                 }
                 Text("Tap a day to record or clear a fast.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -183,10 +183,10 @@ struct FastingView: View {
                         Text(verbatim: "\(store.fastCount(inYearOf: month, kind: kind))")
                             .monospacedDigit()
                     }
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                 }
                 Text("This record is private and stays on this phone.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
         }

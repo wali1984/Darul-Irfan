@@ -120,7 +120,7 @@ struct UpdatesSection: View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             if feed.isShowingCachedContent {
                 Label("Showing saved updates", systemImage: "wifi.slash")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
             if let error = feed.errorMessage {
@@ -453,7 +453,7 @@ struct DiscoverUpdateRow: View {
                 }
                 if let detail, !detail.isEmpty, detail != title {
                     Text(verbatim: detail)
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)

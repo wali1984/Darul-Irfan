@@ -232,10 +232,10 @@ struct SearchAppDestinationRow: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(destination.titleKey)
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                     Text(destination.areaKey)
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)

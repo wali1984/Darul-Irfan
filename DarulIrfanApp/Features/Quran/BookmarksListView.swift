@@ -84,15 +84,15 @@ struct BookmarksListView: View {
     private func bookmarkRow(_ bookmark: QuranBookmark) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.xs) {
             Text("Ayah \(bookmark.ayahNumber)")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(DIColor.textPrimary)
             if let note = bookmark.note, !note.isEmpty {
                 Text(note)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
             }
             Text("Saved \(bookmark.createdAt.formatted(date: .abbreviated, time: .omitted))")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
         }
         .padding(.vertical, DISpacing.xs)

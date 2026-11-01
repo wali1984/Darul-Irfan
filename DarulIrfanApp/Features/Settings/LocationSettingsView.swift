@@ -126,7 +126,7 @@ struct LocationSettingsView: View {
             }
             if deviceUpdateFailed && viewModel.authorization != .denied {
                 Text("We couldn't determine your location right now. Please try again in a moment, or choose your city manually below.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
                     .listRowBackground(DIColor.surface)
@@ -205,7 +205,7 @@ struct LocationSettingsView: View {
             if viewModel.hasSearched && viewModel.results.isEmpty && !viewModel.isSearching {
                 if viewModel.searchFailed {
                     Text("The search could not be completed. Please check your connection and try again.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .listRowBackground(DIColor.surface)
                 } else {
@@ -241,7 +241,7 @@ struct LocationSettingsView: View {
                     Text(place.name)
                         .foregroundStyle(DIColor.textPrimary)
                     Text(place.timeZoneIdentifier)
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: DISpacing.sm)

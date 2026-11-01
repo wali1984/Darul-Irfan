@@ -80,7 +80,7 @@ struct DIStatPill: View {
                     .font(.headline.weight(.bold).monospacedDigit())
                     .foregroundStyle(DIColor.textPrimary)
                 Text(LocalizedStringKey(label))
-                    .font(.caption2)
+                    .diInterfaceFont(.caption2)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -132,7 +132,7 @@ struct PrayerCountdownRing: View {
                     .foregroundStyle(.white)
                     .contentTransition(.numericText())
                 Text("until adhan")
-                    .font(.caption2)
+                    .diInterfaceFont(.caption2)
                     .foregroundStyle(.white.opacity(0.7))
             }
         }

@@ -69,7 +69,7 @@ struct DailyPicture: View {
                     case .failure:
                         VStack(spacing: DISpacing.sm) {
                             Text("The picture could not be loaded. Please try again.")
-                                .font(.footnote)
+                                .diInterfaceFont(.footnote)
                                 .foregroundStyle(DIColor.textMuted)
                             Label("Open", systemImage: "photo")
                                 .foregroundStyle(DIColor.actionForeground)
@@ -88,7 +88,7 @@ struct DailyPicture: View {
         }
         if let caption = item.caption, !caption.isEmpty {
             Text(verbatim: caption)
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textPrimary)
         }
     }
@@ -125,7 +125,7 @@ struct DailyPictureViewer: View {
                         .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
                     }
                     if let caption = item.caption, !caption.isEmpty {
-                        Text(verbatim: caption).font(.body).frame(maxWidth: .infinity, alignment: .leading)
+                        Text(verbatim: caption).diInterfaceFont(.body).frame(maxWidth: .infinity, alignment: .leading)
                     }
                     if let url = item.imageURL {
                         ShareLink(item: url) { Label("Share", systemImage: "square.and.arrow.up") }

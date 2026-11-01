@@ -173,16 +173,16 @@ struct BookTextPagesView: View {
                 .foregroundStyle(DIColor.textPrimary)
                 if mixesReviewStates {
                     Text("\(machineReadPageCount) of \(pages.count) pages are still machine-read and have not been checked by a person; they are marked. Read the PDF for the authoritative text.")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 } else {
                     Text("Scanned and machine-corrected from the printed book. It has not been checked by a person. Read the PDF for the authoritative text.")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 if unresolvedPageCount > 0 {
                     Text("\(unresolvedPageCount) of \(pages.count) pages have passages the checker could not settle; those are marked.")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -221,7 +221,7 @@ struct BookTextPagesView: View {
             if mixesReviewStates && page.isMachineProvisional {
                 Label {
                     Text("machine-read, not yet proofread")
-                        .font(.caption2)
+                        .diInterfaceFont(.caption2)
                 } icon: {
                     Image(systemName: "doc.text.magnifyingglass")
                 }
@@ -230,7 +230,7 @@ struct BookTextPagesView: View {
             if page.isMachineProvisional && !page.isFullyResolved {
                 Label {
                     Text("unchecked passages")
-                        .font(.caption2)
+                        .diInterfaceFont(.caption2)
                 } icon: {
                     Image(systemName: "exclamationmark.triangle")
                 }

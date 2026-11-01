@@ -58,7 +58,7 @@ struct HalqahAccountSection: View {
                 .disabled(model.isDeleting)
             }
             Text("Deleting removes your sign-in and your place in every group. Nothing the silsila published is affected.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, DISpacing.xs)
         }
@@ -92,11 +92,11 @@ struct HalqahNameEditor: View {
                         .disabled(model.isSavingName || trimmedDraft.isEmpty || trimmedDraft == (model.displayName ?? ""))
                 }
                 Text("Your name is shown to your Halqah's admins and in the meeting room.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(.secondary)
                 if let nameError = model.nameError {
                     Text(verbatim: nameError)
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.danger)
                 }
             }

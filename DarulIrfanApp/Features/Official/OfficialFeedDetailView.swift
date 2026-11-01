@@ -27,7 +27,7 @@ struct OfficialFeedDetailView: View {
                             .foregroundStyle(DIColor.primary)
                         Spacer()
                         Text(item.publishedAt, format: .dateTime.day().month().year())
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.textMuted)
                     }
 
@@ -39,7 +39,7 @@ struct OfficialFeedDetailView: View {
                     if let body = item.body, !body.isEmpty, body != item.title {
                         DICard(padding: DISpacing.lg) {
                             Text(body)
-                                .font(.body)
+                                .diInterfaceFont(.body)
                                 .foregroundStyle(DIColor.textPrimary)
                                 .lineSpacing(5)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -62,7 +62,7 @@ struct OfficialFeedDetailView: View {
     private var artwork: some View {
         ZStack {
             DIGradient.emerald
-            Image(systemName: sourceIcon).font(.largeTitle).foregroundStyle(.white)
+            Image(systemName: sourceIcon).diInterfaceFont(.largeTitle).foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity, minHeight: 180)
     }

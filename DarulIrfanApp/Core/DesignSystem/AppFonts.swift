@@ -54,7 +54,9 @@ enum AppFonts {
     /// The Nastaliq face to use for Urdu, or nil for the system face, whose
     /// Naskh letters always join.
     static var urduNastaliqName: String? {
-        guard UserDefaults.standard.bool(forKey: nastaliqPreferenceKey) else { return nil }
+        // Default to traditional Urdu lettering; preserve an explicit reader choice.
+        let enabled = UserDefaults.standard.object(forKey: nastaliqPreferenceKey) as? Bool ?? true
+        guard enabled else { return nil }
         return appleNastaliqName
     }
 

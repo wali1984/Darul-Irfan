@@ -90,7 +90,7 @@ private struct ZikrBayanCard: View {
 
     private var playMark: some View {
         Image(systemName: "play.fill")
-            .font(.subheadline)
+            .diInterfaceFont(.subheadline)
             .foregroundStyle(.white)
             .frame(width: 44, height: 44)
             .background(.ultraThinMaterial, in: Circle())

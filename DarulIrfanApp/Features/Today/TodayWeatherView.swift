@@ -17,7 +17,7 @@ struct TodayWeatherView: View {
                 Button { showing = true } label: {
                     HStack(spacing: 10) {
                         Text("Local weather").font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.9))
-                        Text(verbatim: "·").font(.subheadline).foregroundStyle(Color(hex: 0xFFE3A0).opacity(0.65))
+                        Text(verbatim: "·").diInterfaceFont(.subheadline).foregroundStyle(Color(hex: 0xFFE3A0).opacity(0.65))
                         Text(verbatim: CityWeatherSnapshot.temperature(snapshot.temperatureCelsius, unit: unit, locale: locale)).font(.headline.weight(.semibold)).foregroundStyle(Color(hex: 0xFFE3A0))
                     }.monospacedDigit().padding(.horizontal, 14).padding(.vertical, 6).frame(maxWidth: .infinity, minHeight: 44)
                         .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 14))
@@ -40,7 +40,7 @@ struct TodayWeatherView: View {
                     Form {
                         Section {
                             VStack(spacing: 10) {
-                                Text(verbatim: city).font(.headline)
+                                Text(verbatim: city).diInterfaceFont(.headline)
                                 Text(verbatim: CityWeatherSnapshot.temperature(snapshot.temperatureCelsius, unit: unit, locale: locale))
                                     .font(.system(size: 44, weight: .light).monospacedDigit()).foregroundStyle(DIColor.primary)
                             }.frame(maxWidth: .infinity).padding(.vertical, 12)
@@ -53,7 +53,7 @@ struct TodayWeatherView: View {
                             Link(destination: Self.legal) {
                                 HStack(spacing: 16) {
                                     Image("AppleWeatherMark").renderingMode(.original).resizable().scaledToFit().frame(width: 77, height: 14)
-                                    Text("Apple Weather data sources").font(.caption).foregroundStyle(.white)
+                                    Text("Apple Weather data sources").diInterfaceFont(.caption).foregroundStyle(.white)
                                 }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
                                     .background(Color(hex: 0x086B50), in: RoundedRectangle(cornerRadius: 12))
                             }.accessibilityLabel(Text("Apple Weather data sources"))

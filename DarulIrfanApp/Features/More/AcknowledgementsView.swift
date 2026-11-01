@@ -33,7 +33,7 @@ struct AcknowledgementsView: View {
                 ackHeader("adhan-swift", systemImage: "chevron.left.forwardslash.chevron.right")
 
                 Text("Prayer times are calculated entirely on this device using the open-source adhan-swift library by Batoul Apps, used under the MIT License.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://github.com/batoulapps/adhan-swift") {
@@ -49,7 +49,7 @@ struct AcknowledgementsView: View {
                 ackHeader("Typography", systemImage: "textformat")
 
                 Text("Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text uses the iPhone's own typefaces. Amiri Quran is bundled as a fallback for the Qur'an (SIL Open Font License 1.1).")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://fonts.google.com/specimen/Amiri+Quran") {
@@ -66,12 +66,12 @@ struct AcknowledgementsView: View {
                 ackHeader("Qur'an Translation", systemImage: "text.quote")
 
                 Text("The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
                 // Higgs TTS 3's Creator Use Grant asks for this credit with the audio.
                 Text("The Urdu narration of the translation and tafsir was created with Boson AI's Higgs Audio, in a voice modelled on recordings of Shamshad Ali Khan, used with permission.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -83,11 +83,11 @@ struct AcknowledgementsView: View {
                 ackHeader("Content & Artwork", systemImage: "photo.artframe")
 
                 Text("Library articles, lectures, publications, tafsir, and organizational information are provided by Silsila Naqshbandia Owaisiah, which retains all rights to its content. The app icon and visual identity are used with the organization's permission.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
                 Text("Official archive content is included in the app with the owner's permission. Source addresses are retained privately for verification and synchronization, while reading and playback are presented natively.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -99,7 +99,7 @@ struct AcknowledgementsView: View {
                 ackHeader("Azan Recordings", systemImage: "waveform")
 
                 Text("The azan notification clip and the full azan playback use the recording “Beautiful adhan” by Adam-synagda, from Wikimedia Commons, dedicated to the public domain under CC0 1.0.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg") {
@@ -107,7 +107,7 @@ struct AcknowledgementsView: View {
                 }
 
                 Text("The Fajr azan recording is by Islamic Center Malmö, from Wikimedia Commons, used under the Creative Commons Attribution 3.0 license. The audio was extracted from the original video and converted for playback in the app.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
 
                 if let url = URL(string: "https://commons.wikimedia.org/wiki/File:Eid_al-Fitr_Fajr_azan_at_Malm%C3%B6_Mosque_-_19_August_2012.webm") {
@@ -123,7 +123,7 @@ struct AcknowledgementsView: View {
                 ackHeader("Notification Chime", systemImage: "bell.badge")
 
                 Text("The short prayer chime is an original recording created for this app, kept as a fallback alert sound.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
             }
         }

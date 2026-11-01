@@ -85,7 +85,7 @@ struct QiblaCompassView: View {
                 manualBearingCard
 
                 Text("Compass accuracy can vary near metal objects, magnets, or cases.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, DISpacing.lg)
@@ -121,7 +121,7 @@ struct QiblaCompassView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.textPrimary)
                     Text("Move your iPhone in a figure-eight motion until the reading settles.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -141,7 +141,7 @@ struct QiblaCompassView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DIColor.textPrimary)
                     Text("Magnetic north can differ by several degrees from true north, which the Qibla bearing is measured from. Allow location access while using the app for an exact direction.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                     Button("Open Settings") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -166,13 +166,13 @@ struct QiblaCompassView: View {
                         .foregroundStyle(DIColor.accent)
                         .accessibilityHidden(true)
                     Text("This device doesn't provide live compass headings. Use the bearing below with any physical compass.")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textPrimary)
                 }
             }
         } else if viewModel.isAligned {
             Label("You are facing the Qibla", systemImage: "checkmark.circle.fill")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(DIColor.actionForeground)
         } else if let offset = viewModel.relativeOffsetDegrees {
             let degrees = Int(abs(offset).rounded())
@@ -183,14 +183,14 @@ struct QiblaCompassView: View {
                     Text("Qibla is \(degrees)° to your left")
                 }
             }
-            .font(.headline)
+            .diInterfaceFont(.headline)
             .foregroundStyle(DIColor.textPrimary)
             .monospacedDigit()
         } else {
             HStack(spacing: DISpacing.sm) {
                 ProgressView()
                 Text("Finding north…")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -231,7 +231,7 @@ struct QiblaCompassView: View {
                         .monospacedDigit()
                 }
                 Text("Face true north, then turn clockwise by this bearing to face the Kaaba in Makkah. A magnetic compass points to magnetic north, which can be several degrees away from true north.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }

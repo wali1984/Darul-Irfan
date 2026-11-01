@@ -36,7 +36,7 @@ struct GroupSessionCard: View {
             if let notice = live.notice {
                 HStack(alignment: .top, spacing: DISpacing.sm) {
                     Image(systemName: "megaphone.fill").foregroundStyle(DIColor.primary)
-                    Text(verbatim: notice.text).font(.subheadline)
+                    Text(verbatim: notice.text).diInterfaceFont(.subheadline)
                 }
                 .padding(DISpacing.sm)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -53,7 +53,7 @@ struct GroupSessionCard: View {
             }
             if live.roomRecording == true {
                 Label("Recording. The session is kept in the group's recordings.", systemImage: "record.circle")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.danger)
             }
             if live.hasRoom {
@@ -66,18 +66,18 @@ struct GroupSessionCard: View {
                 Text(live.isMeeting
                      ? "You join with your microphone and camera off; turn them on when you want to speak."
                      : "You join with your microphone off and listen as the zikr is led.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
             if let joinError {
-                Text(verbatim: joinError).font(.footnote).foregroundStyle(DIColor.danger)
+                Text(verbatim: joinError).diInterfaceFont(.footnote).foregroundStyle(DIColor.danger)
             }
             if !live.isMeeting {
                 HalqahTile(item: duaTile, axis: .horizontal)
             }
             if canManage { adminControls }
             if let controlError {
-                Text(verbatim: controlError).font(.footnote).foregroundStyle(DIColor.danger)
+                Text(verbatim: controlError).diInterfaceFont(.footnote).foregroundStyle(DIColor.danger)
             }
         }
         .padding(DISpacing.md)
@@ -103,7 +103,7 @@ struct GroupSessionCard: View {
     private var header: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: live.isMeeting ? "person.2.wave.2.fill" : "dot.radiowaves.left.and.right")
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(DIColor.onPrimary)
                 .symbolEffect(.variableColor.iterative, isActive: !reduceMotion)
                 .frame(width: 38, height: 38)
@@ -111,10 +111,10 @@ struct GroupSessionCard: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: live.title ?? (live.isMeeting ? String(localized: "Group meeting") : String(localized: "Halqah Zikr")))
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                 if let listeners = live.listeners, listeners > 0 {
                     Label("\(listeners) listening", systemImage: "person.2.fill")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -161,11 +161,11 @@ struct GroupSessionCard: View {
             Text(canManage
                  ? "Everything has played. Add more, or end the session when the zikr is over."
                  : "The recording has finished. The session stays open until the admin closes it.")
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textMuted)
         } else if let item = live.currentItem {
             Text("A recording is playing to the group. It plays from where the group is now, so everyone hears the same part.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
             GroupSessionPlayer(
                 item: item, upNext: Array((live.queue ?? []).dropFirst(playback.index + 1)),
@@ -193,7 +193,7 @@ struct GroupSessionCard: View {
                 .lineLimit(1)
             Spacer(minLength: 0)
             if let length = Self.clock(item.durationSeconds.map(Double.init)) {
-                Text(verbatim: length).font(.caption).monospacedDigit().foregroundStyle(DIColor.textMuted)
+                Text(verbatim: length).diInterfaceFont(.caption).monospacedDigit().foregroundStyle(DIColor.textMuted)
             }
         }
         .contentShape(Rectangle())
@@ -232,7 +232,7 @@ struct GroupSessionCard: View {
             .padding(DISpacing.xs)
             .background(Capsule(style: .continuous).fill(DIColor.sandstone.opacity(0.7)))
             Text(playback.paused ? "Paused for everyone." : "These controls move playback for everyone listening.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
         }
         HalqahTileGrid(items: sessionTiles)
@@ -423,12 +423,12 @@ struct GroupSessionPlayer: View {
             }
             if playback.paused {
                 Label("Paused by the admin", systemImage: "pause.circle")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 Text(progress(at: context.date))
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(DIColor.textMuted)
             }
@@ -733,7 +733,7 @@ struct GroupAttendeeRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: person.name)
                 Text("Joined \(person.firstSeenAt.formatted(date: .omitted, time: .shortened))")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: 0)
@@ -781,7 +781,7 @@ struct GroupDuaRequestsView: View {
                                 Text(verbatim: "·")
                                 Text(verbatim: request.createdAt.formatted(date: .abbreviated, time: .shortened))
                             }
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.textMuted)
                             if !request.isRead {
                                 Button("Mark as read") { Task { await markRead(request) } }
@@ -867,10 +867,10 @@ struct GroupSessionHistoryView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
                                     Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .shortened))
-                                        .font(.caption)
+                                        .diInterfaceFont(.caption)
                                         .foregroundStyle(DIColor.textMuted)
                                     Text("\(session.attendees) attended")
-                                        .font(.caption)
+                                        .diInterfaceFont(.caption)
                                         .foregroundStyle(DIColor.textMuted)
                                 }
                             }

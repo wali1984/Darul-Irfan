@@ -39,7 +39,7 @@ struct TasbihCounterView: View {
                             .transition(.scale.combined(with: .opacity))
                     }
                     Text("Tap anywhere to count")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -134,11 +134,11 @@ struct TasbihCounterView: View {
                     .scaleEffect(countBump)
                 if let target = viewModel.counter.target {
                     Text("of \(target)")
-                        .font(.title3)
+                        .diInterfaceFont(.title3)
                         .foregroundStyle(DIColor.textMuted)
                 } else {
                     Image(systemName: "circle.hexagongrid")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.accent.opacity(0.7))
                         .accessibilityHidden(true)
                 }
@@ -160,7 +160,7 @@ struct TasbihCounterView: View {
                 viewModel.decrement()
             } label: {
                 Image(systemName: "minus.circle")
-                    .font(.title2)
+                    .diInterfaceFont(.title2)
                     .foregroundStyle(DIColor.textMuted)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -179,7 +179,7 @@ struct TasbihCounterView: View {
                 showResetDialog = true
             } label: {
                 Image(systemName: "arrow.counterclockwise.circle")
-                    .font(.title2)
+                    .diInterfaceFont(.title2)
                     .foregroundStyle(DIColor.textMuted)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())

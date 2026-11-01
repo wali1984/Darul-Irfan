@@ -339,7 +339,7 @@ struct NotificationSettingsView: View {
                         Text(verbatim: session.displayTitle(urdu: DIBrand.readsUrdu(locale)))
                             .foregroundStyle(DIColor.textPrimary)
                         Text("\(ZikrReminders.leadMinutes) minutes before")
-                            .font(.footnote)
+                            .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }
@@ -381,7 +381,7 @@ struct NotificationSettingsView: View {
                         Text("Halqah notifications")
                             .foregroundStyle(DIColor.textPrimary)
                         Text("Posts, zikr and meetings from your Halqah, on this phone.")
-                            .font(.footnote)
+                            .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }
@@ -390,7 +390,7 @@ struct NotificationSettingsView: View {
                 .listRowBackground(DIColor.surface)
                 if halqahNotices.status == .blocked {
                     Text("Notifications are off for Darul Irfan. Allow them in iOS Settings to receive Halqah notifications.")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .listRowBackground(DIColor.surface)
                 }
@@ -464,7 +464,7 @@ struct NotificationSettingsView: View {
                                 .foregroundStyle(DIColor.textPrimary)
                             if let start = event.startDate {
                                 Text(verbatim: CommunityEvent.dayText(start, .abbreviated))
-                                    .font(.footnote)
+                                    .diInterfaceFont(.footnote)
                                     .foregroundStyle(DIColor.textMuted)
                             }
                         }
@@ -500,7 +500,7 @@ struct NotificationSettingsView: View {
             .listRowBackground(DIColor.surface)
             if viewModel.testReminderSent {
                 Text("A test reminder will arrive in about five seconds. Lock the phone or leave the app to see it as you would a prayer alert.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .listRowBackground(DIColor.surface)
             }
@@ -524,7 +524,7 @@ struct NotificationSettingsView: View {
 
             if viewModel.chimeUnavailable {
                 Text("The chime preview could not be played right now.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .listRowBackground(DIColor.surface)
             }
@@ -561,7 +561,7 @@ struct NotificationSettingsView: View {
 
             if viewModel.azanUnavailable {
                 Text("The azan could not be played right now.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .listRowBackground(DIColor.surface)
             }

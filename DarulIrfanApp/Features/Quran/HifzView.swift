@@ -35,7 +35,7 @@ struct HifzView: View {
                 } else if recitation == nil {
                     DICard {
                         Text("This surah has no recitation audio in the app, so it cannot be practised yet.")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                 } else {
@@ -66,7 +66,7 @@ struct HifzView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack {
                     Text(verbatim: "\(surah.nameTransliterated) \(surah.id):\(player.currentAyah ?? rangeStart)")
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                     Spacer()
                     if player.isPlaying {
                         Text(verbatim: "\(player.repetition)/\(repeats)")
@@ -80,11 +80,11 @@ struct HifzView: View {
 
                 if player.phase == .pausing {
                     Label("Recall it now", systemImage: "ear")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.accent)
                 } else if player.phase == .finished {
                     Label("Range complete", systemImage: "checkmark.seal")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.primary)
                 }
 
@@ -107,7 +107,7 @@ struct HifzView: View {
                     DIHaptics.light()
                 } label: {
                     Label("Reveal the text", systemImage: "eye")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                 }
                 .buttonStyle(.bordered)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -178,7 +178,7 @@ struct HifzView: View {
                     restartIfPlaying()
                 }
                 Text("\(rangeEnd - rangeStart + 1) of \(surah.ayahCount) ayat")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(.secondary)
             }
         }
@@ -197,7 +197,7 @@ struct HifzView: View {
                 Toggle("Hide the text", isOn: $hidesText)
                     .onChange(of: hidesText) { _, _ in isRevealed = false }
                 Text("Hiding the text lets you recite from memory; reveal it when you need to check.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(.secondary)
             }
         }

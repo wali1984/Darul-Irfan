@@ -38,7 +38,7 @@ struct TopicsSection: View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             if viewModel.failed {
                 Text("Topics could not be loaded. Please try again.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.danger)
                     .fixedSize(horizontal: false, vertical: true)
                 Button("Retry") { viewModel.load() }

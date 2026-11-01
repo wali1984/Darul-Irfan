@@ -221,7 +221,7 @@ struct TodayAyahCard: View {
                     if let silsila {
                         Text(verbatim: [silsila.surahNameArabic, silsila.translationEdition]
                             .filter { !$0.isEmpty }.joined(separator: " · "))
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }

@@ -46,7 +46,7 @@ struct LibraryTabView: View {
                     if viewModel.loadFailed {
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
                             Text("The library could not be refreshed. Your saved items are still available.")
-                                .font(.callout)
+                                .diInterfaceFont(.callout)
                             Button("Retry") { Task { await viewModel.reloadHome() } }
                                 .buttonStyle(DISecondaryButtonStyle())
                                 .disabled(viewModel.isLoading)
@@ -336,7 +336,7 @@ struct LibraryFeaturedCard: View {
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                     Text(subtitleKey)
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.leading)
                 }

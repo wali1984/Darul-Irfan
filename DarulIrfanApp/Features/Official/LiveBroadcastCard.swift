@@ -43,7 +43,7 @@ struct LiveBroadcastCard: View {
                 cueBanner(cue)
             }
             if let details = current.details, !details.isEmpty {
-                Text(details).font(.subheadline).foregroundStyle(fgMuted)
+                Text(details).diInterfaceFont(.subheadline).foregroundStyle(fgMuted)
             }
             if let start = current.scheduledStart, current.state == .scheduled {
                 Label(start.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
@@ -73,11 +73,11 @@ struct LiveBroadcastCard: View {
             // the zikr has begun before its live video is on air.
             if displaySources.isEmpty {
                 Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
-                    .font(.footnote).foregroundStyle(fgMuted)
+                    .diInterfaceFont(.footnote).foregroundStyle(fgMuted)
             }
             if current.updatedAt != .distantPast {
                 Text("Updated \(current.updatedAt.formatted(.relative(presentation: .named)))")
-                    .font(.caption2).foregroundStyle(fgMuted)
+                    .diInterfaceFont(.caption2).foregroundStyle(fgMuted)
             }
             if !recordings.isEmpty {
                 recordingsList
@@ -136,13 +136,13 @@ struct LiveBroadcastCard: View {
                     } label: {
                         HStack(spacing: DISpacing.sm) {
                             Image(systemName: "play.fill")
-                                .font(.caption2)
+                                .diInterfaceFont(.caption2)
                                 .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.onPrimary)
                                 .frame(width: 26, height: 26)
                                 .background(Circle().fill(isLive ? AnyShapeStyle(DIGradient.goldSheen) : AnyShapeStyle(DIColor.primary)))
                                 .accessibilityHidden(true)
                             Text(item.publishedAt, format: .dateTime.weekday(.wide).day().month(.wide))
-                                .font(.subheadline)
+                                .diInterfaceFont(.subheadline)
                                 .foregroundStyle(fg)
                             Spacer(minLength: DISpacing.sm)
                             Text(item.publishedAt, format: .dateTime.hour().minute())
@@ -171,14 +171,14 @@ struct LiveBroadcastCard: View {
     private func cueBanner(_ cue: LiveCue) -> some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "bell.and.waves.left.and.right.fill")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(DIColor.primaryDeep)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: cue.text)
                     .font(.title3.weight(.bold))
                     .foregroundStyle(DIColor.primaryDeep)
                 Text("Now in the zikr · \(cue.at.formatted(.relative(presentation: .named)))")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.primaryDeep.opacity(0.75))
             }
             Spacer(minLength: 0)

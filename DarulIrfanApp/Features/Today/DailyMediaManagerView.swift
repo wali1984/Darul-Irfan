@@ -78,7 +78,7 @@ struct DailyMediaManagerView: View {
                     Text(item.slot?.title ?? "Picture").foregroundStyle(DIColor.textPrimary)
                     Text(verbatim: [item.day.map { day in item.endDay.map { "\(day) – \($0)" } ?? day }, item.caption]
                         .compactMap { $0 }.joined(separator: " · "))
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                         .lineLimit(2)
                     if item.status == "hidden" {
@@ -142,7 +142,7 @@ struct DailyMediaEditor: View {
                         AsyncImage(url: url) { phase in
                             switch phase {
                             case .success(let image): image.resizable().scaledToFit()
-                            case .failure: Text("The picture could not be loaded. Close and reopen this page to try again.").font(.caption).foregroundStyle(DIColor.textMuted)
+                            case .failure: Text("The picture could not be loaded. Close and reopen this page to try again.").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                             default: ProgressView()
                             }
                         }
@@ -178,7 +178,7 @@ struct DailyMediaEditor: View {
                         Toggle("Also open it over the Today page", isOn: $popup)
                     }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Caption (optional)").font(.caption).foregroundStyle(DIColor.textMuted)
+                        Text("Caption (optional)").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                         TextField("Caption (optional)", text: $caption, prompt: Text(""), axis: .vertical)
                             .lineLimit(1...4)
                             .accessibilityLabel("Caption (optional)")

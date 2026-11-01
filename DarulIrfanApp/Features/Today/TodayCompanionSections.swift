@@ -124,7 +124,7 @@ struct TodayMyDayCard: View {
                 }
                 if open.isEmpty {
                     Text("Nothing left for today. Add a task, or plan one for after a prayer.")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 ForEach(Array(open.prefix(3))) { entry in
@@ -341,7 +341,7 @@ struct TodayUnderstandCard: View {
                             DISectionHeader(titleKey: "Understand something today", systemImage: "lightbulb")
                             HStack(spacing: DISpacing.sm) {
                                 Image(systemName: topic.systemIcon)
-                                    .font(.title2)
+                                    .diInterfaceFont(.title2)
                                     .foregroundStyle(DIColor.accent)
                                     .frame(width: 36)
                                 VStack(alignment: .leading, spacing: 2) {
@@ -349,11 +349,11 @@ struct TodayUnderstandCard: View {
                                         .font(DIFont.subheading)
                                         .foregroundStyle(DIColor.textPrimary)
                                     Text("Verses, tafsir, books and bayans on this theme")
-                                        .font(.caption)
+                                        .diInterfaceFont(.caption)
                                         .foregroundStyle(DIColor.textMuted)
                                 }
                                 Spacer(minLength: 0)
-                                Image(systemName: "chevron.forward").font(.footnote).foregroundStyle(DIColor.textMuted)
+                                Image(systemName: "chevron.forward").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
                             }
                         }
                     }
@@ -417,7 +417,7 @@ struct TodayUpcomingCard: View {
                     Text(LocalizedStringKey(DailyZikrBanner.title))
                         .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
                     Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.startsAt))")
-                        .font(.footnote).foregroundStyle(Color(hex: 0xE9CE86))
+                        .diInterfaceFont(.footnote).foregroundStyle(Color(hex: 0xE9CE86))
                 }
                 .padding(18).frame(maxWidth: .infinity, alignment: .leading)
                 .background(LinearGradient(colors: [Color(hex: 0x0D7A55), Color(hex: 0x04321F)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 22))
@@ -478,10 +478,10 @@ struct TodayUpcomingCard: View {
             Image(systemName: icon).foregroundStyle(DIColor.primary).frame(width: 30)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: title).font(.subheadline.weight(.semibold)).foregroundStyle(DIColor.textPrimary)
-                when.font(.caption).foregroundStyle(DIColor.textMuted)
+                when.diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: 0)
-            Image(systemName: "chevron.forward").font(.footnote).foregroundStyle(DIColor.textMuted)
+            Image(systemName: "chevron.forward").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
         }
         .contentShape(Rectangle())
     }
@@ -591,7 +591,7 @@ struct TodayMethodSuggestion: View {
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(TodayPalette.goldText)
                 Text("Times are calculated with \(current). Around \(place.name), \(suggested) is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
                 VStack(alignment: .leading, spacing: DISpacing.sm) {

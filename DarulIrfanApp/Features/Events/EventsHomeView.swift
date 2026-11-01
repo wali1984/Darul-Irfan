@@ -242,7 +242,7 @@ private struct EventDatesLine: View {
             }
         } else {
             Text("Dates announced by Dar-ul-Irfan")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .italic()
                 .foregroundStyle(DIColor.textMuted)
         }
@@ -298,7 +298,7 @@ private struct EventRowCard: View {
                         .fill(event.kind.eventTint.opacity(0.14))
                         .frame(width: 46, height: 46)
                     Image(systemName: event.kind.eventSymbolName)
-                        .font(.title3)
+                        .diInterfaceFont(.title3)
                         .foregroundStyle(event.kind.eventTint)
                 }
                 .accessibilityHidden(true)
@@ -314,14 +314,14 @@ private struct EventRowCard: View {
                         } icon: {
                             Image(systemName: "mappin.and.ellipse")
                         }
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                     }
                     EventDatesLine(event: event, isPast: isPast)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }

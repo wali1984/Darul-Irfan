@@ -142,7 +142,7 @@ struct IslamicDaysView: View {
                 }
 
                 Text("Islamic dates are approximate and may vary with local moon sighting.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .padding(.horizontal, DISpacing.xs)
                     .fixedSize(horizontal: false, vertical: true)
@@ -192,12 +192,12 @@ private struct IslamicDayTimelineRow: View {
                             DIPillBadge(text: String(localized: "Next"), color: DIColor.accent)
                         }
                         Text(verbatim: occurrence.day.displayTitle(urdu: urdu))
-                            .font(.headline)
+                            .diInterfaceFont(.headline)
                             .foregroundStyle(DIColor.textPrimary)
                             .fixedSize(horizontal: false, vertical: true)
                         if let note = occurrence.day.displayNote(urdu: urdu) {
                             Text(verbatim: note)
-                                .font(.caption)
+                                .diInterfaceFont(.caption)
                                 .foregroundStyle(DIColor.textMuted)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -210,12 +210,12 @@ private struct IslamicDayTimelineRow: View {
                         if let eve = occurrence.eveDate {
                             let evening = eve.formatted(date: .abbreviated, time: .omitted)
                             Text("Night of ≈ \(evening)")
-                                .font(.caption)
+                                .diInterfaceFont(.caption)
                                 .foregroundStyle(DIColor.textMuted)
                         } else {
                             let day = occurrence.gregorianDate.formatted(date: .abbreviated, time: .omitted)
                             Text("≈ \(day)")
-                                .font(.caption)
+                                .diInterfaceFont(.caption)
                                 .foregroundStyle(DIColor.textMuted)
                         }
                     }

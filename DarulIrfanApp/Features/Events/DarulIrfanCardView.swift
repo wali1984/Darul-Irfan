@@ -52,12 +52,12 @@ struct DarulIrfanCardView: View {
                         VStack(alignment: .leading, spacing: DISpacing.xs) {
                             if let phone = place.phone {
                                 Text(verbatim: phone)
-                                    .font(.caption)
+                                    .diInterfaceFont(.caption)
                                     .foregroundStyle(DIColor.textMuted)
                             }
                             if let email = place.email {
                                 Text(verbatim: email)
-                                    .font(.caption)
+                                    .diInterfaceFont(.caption)
                                     .foregroundStyle(DIColor.textMuted)
                             }
                         }
@@ -97,7 +97,7 @@ struct DarulIrfanCardView: View {
                         .fill(Color.white.opacity(0.14))
                         .frame(width: 44, height: 44)
                     Image(systemName: "building.columns.fill")
-                        .font(.title3)
+                        .diInterfaceFont(.title3)
                         .foregroundStyle(.white)
                 }
                 .accessibilityHidden(true)
@@ -108,7 +108,7 @@ struct DarulIrfanCardView: View {
                         .fixedSize(horizontal: false, vertical: true)
                     ForEach(place.addressLines.indices, id: \.self) { index in
                         Text(LocalizedStringKey(place.addressLines[index]))
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(.white.opacity(0.85))
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -123,7 +123,7 @@ struct DarulIrfanCardView: View {
         Button { open(url) } label: {
             VStack(spacing: DISpacing.xs) {
                 Image(systemName: systemImage)
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.primary)
                 Text(title)
                     .font(.caption.weight(.medium))

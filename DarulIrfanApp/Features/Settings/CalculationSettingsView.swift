@@ -203,11 +203,11 @@ struct CalculationSettingsView: View {
                     Spacer(minLength: DISpacing.sm)
                     if adjustedPrayerCount == 0 {
                         Text("None")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textMuted)
                     } else {
                         Text("\(adjustedPrayerCount) set")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }

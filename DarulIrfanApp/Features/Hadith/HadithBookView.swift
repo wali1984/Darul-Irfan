@@ -90,7 +90,7 @@ struct HadithBookView: View {
                     } else {
                         Toggle(isOn: $showsArabic) {
                             Text("Show Arabic")
-                                .font(.subheadline)
+                                .diInterfaceFont(.subheadline)
                                 .foregroundStyle(DIColor.textPrimary)
                         }
                         .tint(DIColor.primary)
@@ -272,17 +272,17 @@ struct HadithBookView: View {
                     .multilineTextAlignment(.center)
                 VStack(spacing: DISpacing.xs) {
                     Text("\(book.hadithCount) narrations")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(.white.opacity(0.75))
                     if book.sectionCount > 0 {
                         Text("\(book.sectionCount) books")
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(.white.opacity(0.6))
                     }
                 }
                 Spacer()
                 Text("Tap to continue")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(.white.opacity(0.45))
                     .padding(.bottom, DISpacing.xl)
             }
@@ -393,7 +393,7 @@ struct HadithBookView: View {
                 // not the stand-in number it is stored under.
                 let bookLabel = book.section(number: refBook)?.displayNumber ?? String(refBook)
                 Text("In-book reference: Book \(bookLabel), Hadith \(hadithNumber)")
-                    .font(.caption2)
+                    .diInterfaceFont(.caption2)
                     .foregroundStyle(DIColor.textMuted)
             }
             if let grades = entry.grades, !grades.isEmpty {
@@ -403,7 +403,7 @@ struct HadithBookView: View {
                     .padding(.top, 2)
                 ForEach(grades, id: \.self) { grade in
                     Text(verbatim: grade)
-                        .font(.caption2)
+                        .diInterfaceFont(.caption2)
                         .foregroundStyle(DIColor.textMuted)
                         .environment(\.layoutDirection, .leftToRight)
                 }
@@ -609,7 +609,7 @@ struct HadithBookView: View {
     /// leaving the page.
     private var machineDraftNote: some View {
         Label("Machine translation — pending scholarly review", systemImage: "exclamationmark.triangle")
-            .font(.caption2)
+            .diInterfaceFont(.caption2)
             .foregroundStyle(DIColor.textMuted)
             .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
@@ -618,14 +618,14 @@ struct HadithBookView: View {
     /// (the provisional Urdu of Mishkat and part of Sunan an-Nasa'i).
     private var provisionalNote: some View {
         Label("Provisional translation — pending scholarly review", systemImage: "exclamationmark.triangle")
-            .font(.caption2)
+            .diInterfaceFont(.caption2)
             .foregroundStyle(DIColor.textMuted)
             .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
 
     private var missingTranslationNote: some View {
         Text(missingTranslationKey)
-            .font(.footnote)
+            .diInterfaceFont(.footnote)
             .italic()
             .foregroundStyle(DIColor.textMuted)
             .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
@@ -831,7 +831,7 @@ private struct HadithContentsView: View {
                                                 .environment(\.layoutDirection, .rightToLeft)
                                         }
                                         Text("\(section.hadithCount) narrations")
-                                            .font(.caption)
+                                            .diInterfaceFont(.caption)
                                             .foregroundStyle(DIColor.textMuted)
                                     }
                                 }

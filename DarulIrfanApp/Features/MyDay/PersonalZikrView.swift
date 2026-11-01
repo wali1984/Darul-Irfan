@@ -92,13 +92,13 @@ struct PersonalZikrView: View {
         let progress = position.map { 1 - $0.remaining / Double($0.step.minutes * 60) } ?? 0
         return VStack(spacing: 14) {
             HStack {
-                Text("A moment of connection").font(.footnote).foregroundStyle(Color(hex: 0xE9CE86))
+                Text("A moment of connection").diInterfaceFont(.footnote).foregroundStyle(Color(hex: 0xE9CE86))
                 Spacer()
                 DILivingSealMark(diameter: 38).accessibilityHidden(true)
             }
             Text(verbatim: run != nil && remaining <= 0 ? String(localized: "Completed") : position?.step.localizedTitle ?? String(localized: "Choose your stages"))
                 .font(.title2.weight(.semibold)).foregroundStyle(.white).multilineTextAlignment(.center)
-            if let position { Text("Stage \(position.index + 1) of \(plan.count)").font(.caption).foregroundStyle(.white.opacity(0.7)) }
+            if let position { Text("Stage \(position.index + 1) of \(plan.count)").diInterfaceFont(.caption).foregroundStyle(.white.opacity(0.7)) }
             ZStack {
                 Circle().stroke(Color(hex: 0xE9CE86).opacity(0.12), lineWidth: 1)
                 Circle().stroke(.white.opacity(0.12), lineWidth: 4).padding(8)
@@ -111,17 +111,17 @@ struct PersonalZikrView: View {
                         .font(.system(size: 42, weight: .light).monospacedDigit()).foregroundStyle(.white)
                         .minimumScaleFactor(0.6).lineLimit(1)
                     Text(run != nil && remaining <= 0 ? "Completed" : run?.startedAt != nil ? "In progress" : run != nil ? "Paused" : "Ready when you are")
-                        .font(.caption2).foregroundStyle(Color(hex: 0xE9CE86))
+                        .diInterfaceFont(.caption2).foregroundStyle(Color(hex: 0xE9CE86))
                 }
             }
             .frame(width: 184, height: 184)
-            Text("Total remaining: \(PersonalZikrMath.text(remaining))").font(.footnote).foregroundStyle(.white.opacity(0.8))
+            Text("Total remaining: \(PersonalZikrMath.text(remaining))").diInterfaceFont(.footnote).foregroundStyle(.white.opacity(0.8))
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 12) { controls }
                 VStack(spacing: 12) { controls }
             }
             if run != nil { Button("Discard session") { confirmingDiscard = true }.buttonStyle(ZikrTimerButtonStyle()) }
-            if ended { Text("Your personal Zikr session is complete.").font(.footnote).foregroundStyle(Color(hex: 0xF4D889)) }
+            if ended { Text("Your personal Zikr session is complete.").diInterfaceFont(.footnote).foregroundStyle(Color(hex: 0xF4D889)) }
         }
         .tint(Color(hex: 0xE9CE86))
         .padding(22)
@@ -157,7 +157,7 @@ struct PersonalZikrView: View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             DISectionHeader(titleKey: store.run == nil ? "Your Zikr sequence" : "Current sequence")
             Text("Choose your stages. Set 1–60 minutes each; a soft chime marks every change.")
-                .font(.footnote).foregroundStyle(DIColor.textMuted)
+                .diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
             DICard {
                 VStack(spacing: 12) {
                     ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
@@ -175,7 +175,7 @@ struct PersonalZikrView: View {
         let selected = store.plan.contains { $0.id == step.id }
         return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 10) {
-                Text(verbatim: "\(index + 1)").font(.caption).foregroundStyle(DIColor.actionForeground)
+                Text(verbatim: "\(index + 1)").diInterfaceFont(.caption).foregroundStyle(DIColor.actionForeground)
                     .frame(width: 30, height: 30).background(DIColor.accent.opacity(0.12), in: Circle())
                 Text(verbatim: step.localizedTitle).font(.subheadline.weight(.medium)).foregroundStyle(DIColor.textPrimary)
                 Spacer(minLength: 0)
@@ -219,7 +219,7 @@ struct PersonalZikrView: View {
     private var reminders: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             DISectionHeader(titleKey: "Daily reminders")
-            Text("Choose two gentle reminders in your local time.").font(.footnote).foregroundStyle(DIColor.textMuted)
+            Text("Choose two gentle reminders in your local time.").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
             ForEach(0..<2, id: \.self) { index in
                 DICard {
                     VStack(spacing: 8) {
@@ -241,7 +241,7 @@ struct PersonalZikrView: View {
                     .foregroundStyle(DIColor.textPrimary)
                 }
             }
-            if denied { Text("Enable notifications in Settings to receive Zikr alerts.").font(.footnote).foregroundStyle(DIColor.textMuted) }
+            if denied { Text("Enable notifications in Settings to receive Zikr alerts.").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted) }
         }
     }
 }
@@ -253,8 +253,8 @@ struct PersonalZikrLink: View {
             HStack(spacing: 14) {
                 DILivingSealMark(diameter: 42).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Your Daily Personal Zikr").font(.headline).foregroundStyle(Color(hex: 0xFFE3A0))
-                    Text("Your sequence · Your time · Your progress").font(.caption).foregroundStyle(.white.opacity(0.85))
+                    Text("Your Daily Personal Zikr").diInterfaceFont(.headline).foregroundStyle(Color(hex: 0xFFE3A0))
+                    Text("Your sequence · Your time · Your progress").diInterfaceFont(.caption).foregroundStyle(.white.opacity(0.85))
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward").foregroundStyle(Color(hex: 0xFFE3A0))
@@ -278,7 +278,7 @@ private struct ZikrTimerButtonStyle: ButtonStyle {
             : [Color(hex: 0xFCF9F0), Color(hex: 0xEDE5D4)]
         let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
         configuration.label
-            .font(.headline).multilineTextAlignment(.center)
+            .diInterfaceFont(.headline).multilineTextAlignment(.center)
             .foregroundStyle(Color(hex: 0x163D2D))
             .padding(.horizontal, 16).padding(.vertical, 10)
             .frame(minWidth: 48, minHeight: 48)
@@ -311,7 +311,7 @@ private struct PersonalZikrHistoryCard: View {
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 16) { summary; Spacer(minLength: 0) }
                     VStack(alignment: .leading, spacing: 4) { summary }
-                }.font(.headline).foregroundStyle(DIColor.actionForeground)
+                }.diInterfaceFont(.headline).foregroundStyle(DIColor.actionForeground)
                 DisclosureGroup(isExpanded: $expanded) {
                 let completed = Set(entries.map { Calendar.current.startOfDay(for: $0.endedAt) })
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 14), spacing: 4) {
@@ -321,13 +321,13 @@ private struct PersonalZikrHistoryCard: View {
                             .accessibilityValue(completed.contains(day) ? Text("Completed") : Text("No session"))
                     }
                 }
-                Text("Every filled day is time you made for Zikr.").font(.caption).foregroundStyle(DIColor.textMuted)
-                if entries.isEmpty { Text("Your completed sessions will appear here with their time and duration.").font(.footnote).foregroundStyle(DIColor.textMuted) }
+                Text("Every filled day is time you made for Zikr.").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
+                if entries.isEmpty { Text("Your completed sessions will appear here with their time and duration.").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted) }
                 ForEach(all ? entries : Array(entries.prefix(7))) { entry in
                     ViewThatFits(in: .horizontal) {
                         HStack(spacing: 16) { sessionDetails(entry); Spacer(minLength: 0) }
                         VStack(alignment: .leading, spacing: 4) { sessionDetails(entry) }
-                    }.font(.footnote)
+                    }.diInterfaceFont(.footnote)
                 }
                 if entries.count > 7 {
                     Button(all ? "Show less" : "Show all sessions") { all.toggle() }

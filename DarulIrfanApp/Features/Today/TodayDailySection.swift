@@ -279,7 +279,7 @@ struct DISectionHeaderInline: View {
     var body: some View {
         HStack(spacing: DISpacing.xs) {
             Image(systemName: systemImage)
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.accent)
                 .accessibilityHidden(true)
             Text(title)

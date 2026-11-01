@@ -88,7 +88,7 @@ struct NarratorBioSheet: View {
                                     .foregroundStyle(DIColor.textMuted)
                                     .frame(width: 96, alignment: .leading)
                                 Text(verbatim: value)
-                                    .font(.subheadline)
+                                    .diInterfaceFont(.subheadline)
                                     .foregroundStyle(DIColor.textPrimary)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -111,7 +111,7 @@ struct NarratorBioSheet: View {
                 localizedProse(desc)
             } else if isUrdu, (n.needsUrdu ?? false) {
                 Text("An Urdu biography is being prepared.")
-                    .font(.footnote).italic()
+                    .diInterfaceFont(.footnote).italic()
                     .foregroundStyle(DIColor.textMuted)
             }
 
@@ -185,7 +185,7 @@ struct NarratorBioSheet: View {
                 .fixedSize(horizontal: false, vertical: true)
         } else {
             Text(verbatim: text)
-                .font(.body)
+                .diInterfaceFont(.body)
                 .foregroundStyle(DIColor.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
         }

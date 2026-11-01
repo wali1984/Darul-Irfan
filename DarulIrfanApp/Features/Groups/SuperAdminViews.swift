@@ -109,7 +109,7 @@ struct MemberDirectoryView: View {
                             Text(verbatim: person.halqahs.isEmpty
                                  ? String(localized: "Not in a Halqah yet")
                                  : person.halqahs.map(\.groupName).joined(separator: " · "))
-                                .font(.caption)
+                                .diInterfaceFont(.caption)
                                 .foregroundStyle(DIColor.textMuted)
                         }
                     }

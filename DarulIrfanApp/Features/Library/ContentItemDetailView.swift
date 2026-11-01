@@ -233,14 +233,14 @@ struct ContentItemDetailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
                 HStack(spacing: DISpacing.md) {
                     Image(systemName: "book.pages.fill")
-                        .font(.title2)
+                        .diInterfaceFont(.title2)
                         .foregroundStyle(DIColor.onPrimary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Read in App")
                             .font(DIFont.subheading)
                             .foregroundStyle(DIColor.onPrimary)
                         Text("Read the pages here — offline after first open")
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.onPrimary.opacity(0.85))
                     }
                     Spacer(minLength: 0)
@@ -268,7 +268,7 @@ struct ContentItemDetailView: View {
         } label: {
             HStack(spacing: DISpacing.md) {
                 Image(systemName: "text.book.closed")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.primary)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Read the text")
@@ -284,7 +284,7 @@ struct ContentItemDetailView: View {
                             Text("\(viewModel.bookPageCount) pages — searchable text")
                         }
                     }
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)
@@ -395,7 +395,7 @@ struct ContentItemDetailView: View {
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: "book")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(Color(hex: 0xFFE9A8))
                     .frame(width: 46, height: 46)
                     .background(Circle().fill(Color(hex: 0x064B34)))
@@ -509,7 +509,7 @@ struct ContentItemDetailView: View {
     private func readingTile(systemImage: String, titleKey: LocalizedStringKey, detail: Text) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(ReadPalette.emeraldInk)
                 .accessibilityHidden(true)
             Text(titleKey)
@@ -568,7 +568,7 @@ struct ContentItemDetailView: View {
                     ZStack {
                         Circle().fill(Color.white.opacity(0.16))
                         Image(systemName: item.type.libraryIcon)
-                            .font(.headline)
+                            .diInterfaceFont(.headline)
                             .foregroundStyle(.white)
                     }
                     .frame(width: 44, height: 44)
@@ -625,7 +625,7 @@ struct ContentItemDetailView: View {
     private func headerBadge(_ text: String, systemImage: String?) -> some View {
         HStack(spacing: DISpacing.xs) {
             if let systemImage {
-                Image(systemName: systemImage).font(.caption2)
+                Image(systemName: systemImage).diInterfaceFont(.caption2)
             }
             Text(text).font(.caption.weight(.semibold))
         }
@@ -638,12 +638,12 @@ struct ContentItemDetailView: View {
     private func headerMetaRow(systemImage: String, text: Text) -> some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(.white.opacity(0.75))
                 .frame(width: 16)
                 .accessibilityHidden(true)
             text
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(.white.opacity(0.9))
                 .multilineTextAlignment(.leading)
         }
@@ -723,7 +723,7 @@ struct ContentItemDetailView: View {
                         .foregroundStyle(DIColor.textMuted)
                         .textCase(.uppercase)
                     Text(verbatim: excerpt)
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                 }
@@ -742,7 +742,7 @@ struct ContentItemDetailView: View {
                         .multilineTextAlignment(.leading)
                 }
                 Text("This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -778,15 +778,15 @@ struct ContentItemDetailView: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 if let publishedAt = item.publishedAt {
                     Text("Published \(publishedAt, format: Date.FormatStyle(timeZone: .gmt).day().month().year())")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 } else if let updatedAt = item.updatedAt {
                     Text("Last updated \(updatedAt, format: .dateTime.day().month().year())")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 } else {
                     Text("Last updated date unavailable")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -813,7 +813,7 @@ struct LibraryDownloadRow: View {
     var body: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "doc")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(DIColor.primary)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
@@ -834,25 +834,25 @@ struct LibraryDownloadRow: View {
         switch state {
         case .notDownloaded:
             Text("Available to download")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
         case .downloading:
             Text("Downloading…")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
         case .downloaded(let asset, _):
             if asset.byteSize > 0 {
                 Text(verbatim: asset.byteSize.formatted(.byteCount(style: .file)))
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             } else {
                 Text("Downloaded")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
         case .failed:
             Text("The download didn't finish. Please try again.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.danger)
         }
     }
@@ -867,7 +867,7 @@ struct LibraryDownloadRow: View {
                 }
             } label: {
                 Image(systemName: "arrow.down.circle")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.primary)
             }
             .buttonStyle(LibraryFileActionStyle())
@@ -914,7 +914,7 @@ struct LibraryDownloadRow: View {
                     }
                 } label: {
                     Image(systemName: "trash")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.danger)
                 }
                 .buttonStyle(LibraryFileActionStyle())
@@ -957,7 +957,7 @@ struct BookKeepOfflineRow: View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             HStack(spacing: 12) {
                 Image(systemName: "arrow.down.to.line")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(ReadPalette.goldLine)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 1) {
@@ -999,7 +999,7 @@ struct BookKeepOfflineRow: View {
             }
         case .failed:
             Text("The download didn't finish. Please try again.")
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.danger)
         }
     }
@@ -1068,7 +1068,7 @@ struct BookKeepOfflineRow: View {
                     }
                 } label: {
                     Image(systemName: "trash")
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.danger)
                 }
                 .buttonStyle(LibraryFileActionStyle())

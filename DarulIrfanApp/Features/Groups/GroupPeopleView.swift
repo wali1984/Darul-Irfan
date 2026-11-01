@@ -105,7 +105,7 @@ struct GroupPeopleView: View {
                     }
                 }
                 if let email = person.email, email != person.displayName {
-                    Text(verbatim: email).font(.caption).foregroundStyle(DIColor.textMuted)
+                    Text(verbatim: email).diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 }
             }
             Spacer(minLength: DISpacing.sm)
@@ -176,7 +176,7 @@ struct GroupPeopleView: View {
                         Text("Code, until \(expires.formatted(date: .abbreviated, time: .omitted))")
                     }
                 }
-                .font(.caption)
+                .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     if invitation.role != .member { roleBadge(invitation.role) }
@@ -415,7 +415,7 @@ struct AddGroupPersonView: View {
                 .environment(\.layoutDirection, .leftToRight)
             if let expires = result.expiresAt {
                 Text("Works once, until \(expires.formatted(date: .abbreviated, time: .shortened)).")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         } footer: {

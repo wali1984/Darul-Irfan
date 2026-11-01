@@ -231,7 +231,7 @@ struct QuranTabView: View {
         NavigationLink(value: QuranRoute.reader(surah: surah, focusAyah: ayah)) {
             HStack(spacing: DISpacing.md) {
                 Image(systemName: "arrow.forward.circle.fill")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.accent)
                     .accessibilityHidden(true)
                 Text("Go to \(surah.nameTransliterated) \(surah.id):\(ayah)")
@@ -371,10 +371,10 @@ private struct SurahRow: View {
                         .environment(\.layoutDirection, .rightToLeft)
                 } else {
                     Text(surah.nameTransliterated)
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                     Text(surah.nameEnglish)
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 HStack(spacing: 6) {
@@ -383,7 +383,7 @@ private struct SurahRow: View {
                         color: surah.revelationPlace == .makkah ? ReadPalette.makkahInk : ReadPalette.madinahInk
                     )
                     Text("\(surah.ayahCount) ayahs")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 .padding(.top, 3)
@@ -400,7 +400,7 @@ private struct SurahRow: View {
                 }
                 if isAvailableOffline {
                     Image(systemName: "arrow.down.circle.fill")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(ReadPalette.emeraldInk)
                         .accessibilityLabel("Available offline")
                 }
@@ -468,7 +468,7 @@ private struct QuranParaRow: View {
             ReadOctagramBadge(number: para.number)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Parah \(para.number)")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.textPrimary)
                 Text(verbatim: "\(para.surah.nameTransliterated) \(para.surah.id):\(para.ayah)")
                     .font(.footnote.weight(.medium))

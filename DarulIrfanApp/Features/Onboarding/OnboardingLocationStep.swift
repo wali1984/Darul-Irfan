@@ -39,7 +39,7 @@ struct OnboardingLocationStep: View {
 
             if !viewModel.hasSelectedPlace {
                 Text("Choose one of the options above to continue.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .padding(.top, DISpacing.xs)
             }
@@ -53,11 +53,11 @@ struct OnboardingLocationStep: View {
         DIElevatedCard {
             HStack(alignment: .top, spacing: DISpacing.sm) {
                 Image(systemName: "lock.shield.fill")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.primary)
                     .accessibilityHidden(true)
                 Text("Your location stays on this device. It is used only to calculate prayer times and the Qibla direction, and is never sent to any server.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -100,7 +100,7 @@ struct OnboardingLocationStep: View {
                         .foregroundStyle(DIColor.textPrimary)
                 }
                 Text("That's completely fine — you can choose your city below instead, or allow access in the iPhone Settings app.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                 Button("Open iPhone Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -121,7 +121,7 @@ struct OnboardingLocationStep: View {
                     .foregroundStyle(DIColor.accent)
                     .accessibilityHidden(true)
                 Text("We couldn't determine your location right now. Please try again in a moment, or choose your city manually below.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -138,17 +138,17 @@ struct OnboardingLocationStep: View {
                         .fill(DIColor.primary.opacity(0.15))
                         .frame(width: 44, height: 44)
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.title2)
+                        .diInterfaceFont(.title2)
                         .foregroundStyle(DIColor.primary)
                 }
                 .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 10)
                 .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text("Prayer times will be calculated for")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                     Text(verbatim: name)
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                 }
                 Spacer(minLength: 0)
@@ -199,16 +199,16 @@ struct OnboardingLocationStep: View {
                 HStack(spacing: DISpacing.sm) {
                     ProgressView()
                     Text("Searching…")
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 }
             } else if viewModel.citySearchFailed {
                 Text("The search didn't go through. Please check your connection and try again.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.danger)
             } else if viewModel.hasSearchedCities && viewModel.citySearchResults.isEmpty {
                 Text("No matching places found. Try a nearby larger city.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
 
@@ -227,7 +227,7 @@ struct OnboardingLocationStep: View {
         } label: {
             HStack(spacing: DISpacing.sm) {
                 Image(systemName: "mappin.circle.fill")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.accent)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
@@ -235,12 +235,12 @@ struct OnboardingLocationStep: View {
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(DIColor.textPrimary)
                     Text(verbatim: place.timeZoneIdentifier)
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }

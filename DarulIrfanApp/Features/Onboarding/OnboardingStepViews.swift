@@ -20,7 +20,7 @@ struct OnboardingStepHeader: View {
                 .foregroundStyle(DIColor.textPrimary)
                 .accessibilityAddTraits(.isHeader)
             Text(subtitleKey)
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textMuted)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,10 +50,10 @@ private struct OnboardingChoiceCard<Leading: View>: View {
                 leading()
                 VStack(alignment: .leading, spacing: 2) {
                     title
-                        .font(.headline)
+                        .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                     subtitle
-                        .font(.footnote)
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)
@@ -159,7 +159,7 @@ struct OnboardingWelcomeStep: View {
                 .diAppear(delay: 0.35)
 
             Text("Accurate prayer times, the Holy Quran with translation and tafsir, lectures and books from the Naqshbandia Owaisiah library, and guidance for daily zikr — together in one calm companion.")
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.onPrimary.opacity(0.82))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, DISpacing.sm)
@@ -253,7 +253,7 @@ struct OnboardingLanguageStep: View {
             switch language {
             case .system:
                 Image(systemName: "gearshape.fill")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.primary)
             case .english:
                 Text(verbatim: "A")
@@ -322,7 +322,7 @@ struct OnboardingCalculationStep: View {
                 .tint(DIColor.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 Text(methodExplanationKey)
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .animation(.easeInOut(duration: 0.2), value: viewModel.selectedMethod)
             }
@@ -352,7 +352,7 @@ struct OnboardingCalculationStep: View {
     private func asrBadge(_ method: AsrMethodChoice) -> some View {
         OnboardingBadge(tint: DIColor.accent) {
             Image(systemName: method == .hanafi ? "sun.min.fill" : "sun.max.fill")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(DIColor.accent)
         }
     }
@@ -420,12 +420,12 @@ struct OnboardingNotificationsStep: View {
                 .accessibilityHidden(true)
 
                 Text("Darul Irfan can play a short, gentle azan clip when each prayer time arrives.")
-                    .font(.body)
+                    .diInterfaceFont(.body)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.center)
 
                 Text("By default, Fajr, Dhuhr, Asr, Maghrib, and Isha each use the azan clip, and sunrise stays silent. You can adjust every prayer's alert in Settings.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
             }
@@ -473,11 +473,11 @@ struct OnboardingNotificationsStep: View {
         DIElevatedCard(glow: glow ? DIColor.primary : nil) {
             HStack(alignment: .top, spacing: DISpacing.sm) {
                 Image(systemName: systemImage)
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .foregroundStyle(tint)
                     .accessibilityHidden(true)
                 Text(messageKey)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
             }
         }
@@ -500,7 +500,7 @@ struct OnboardingFinishStep: View {
                     .foregroundStyle(DIColor.textPrimary)
                     .accessibilityAddTraits(.isHeader)
                 Text("May Darul Irfan bring light and peace to your days.")
-                    .font(.callout)
+                    .diInterfaceFont(.callout)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
             }
@@ -573,12 +573,12 @@ struct OnboardingFinishStep: View {
     private func summaryRow(systemImage: String, titleKey: LocalizedStringKey, value: Text) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.accent)
                 .frame(width: 24)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textMuted)
             Spacer(minLength: DISpacing.sm)
             value

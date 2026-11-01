@@ -40,7 +40,7 @@ struct TopicDetailView: View {
                 } else {
                     if viewModel.failed {
                         Text("Topics could not be loaded. Please try again.")
-                            .font(.footnote)
+                            .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.danger)
                             .fixedSize(horizontal: false, vertical: true)
                         Button("Retry") { Task { await viewModel.load(retry: true) } }
@@ -162,7 +162,7 @@ struct TopicDetailView: View {
         DICard(padding: DISpacing.sm) {
             HStack(spacing: DISpacing.sm) {
                 Image(systemName: item.domain == .library ? "books.vertical" : "play.circle")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.accent)
                     .frame(width: 32)
                 VStack(alignment: .leading, spacing: 2) {
@@ -173,14 +173,14 @@ struct TopicDetailView: View {
                         .lineLimit(2)
                     if let subtitle = item.subtitle, !subtitle.isEmpty {
                         Text(verbatim: subtitle)
-                            .font(.caption)
+                            .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.textMuted)
                             .lineLimit(1)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 Image(systemName: item.domain == .library ? "chevron.forward" : "play.fill")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -227,7 +227,7 @@ private struct TopicTranslationText: View {
                 .environment(\.layoutDirection, .rightToLeft)
         } else {
             Text(verbatim: text)
-                .font(.body)
+                .diInterfaceFont(.body)
                 .foregroundStyle(DIColor.textPrimary)
                 .lineLimit(lineLimit)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -257,7 +257,7 @@ private struct TopicHadithCard: View {
                     TopicTranslationText(text: translation, lineLimit: expanded ? nil : 6)
                     if isUrdu && !item.translationIsUrdu {
                         Text("This collection has no Urdu translation; English is shown.")
-                            .font(.caption2)
+                            .diInterfaceFont(.caption2)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }

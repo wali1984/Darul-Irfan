@@ -81,7 +81,7 @@ struct HalqahLiveChip: View {
                     .font(.caption.weight(.bold))
             } else {
                 Image(systemName: "moon.stars")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .accessibilityHidden(true)
                 Text("No session now")
                     .font(.caption.weight(.medium))
@@ -205,7 +205,7 @@ struct HalqahCommandHeader: View {
                     .accessibilityAddTraits(.isHeader)
                 if let description, !description.isEmpty {
                     Text(verbatim: description)
-                        .font(.subheadline)
+                        .diInterfaceFont(.subheadline)
                         .foregroundStyle(Color.white.opacity(0.82))
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -410,11 +410,11 @@ struct HalqahTileLabel: View {
     private var texts: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(titleKey)
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .foregroundStyle(DIColor.textPrimary)
             if let subtitle {
                 subtitle
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(isAlive ? tint : DIColor.textMuted)
             }
         }
@@ -572,7 +572,7 @@ struct HalqahHeroTileLabel: View {
                     .font(.title3.weight(.bold))
                     .foregroundStyle(.white)
                 subtitle
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(Color.white.opacity(0.85))
             }
             .multilineTextAlignment(.leading)
@@ -580,7 +580,7 @@ struct HalqahHeroTileLabel: View {
             Spacer(minLength: 0)
             if !typeSize.isAccessibilitySize {
                 Image(systemName: "chevron.forward")
-                    .font(.headline)
+                    .diInterfaceFont(.headline)
                     .foregroundStyle(Color.white.opacity(0.7))
                     .accessibilityHidden(true)
             }
@@ -694,7 +694,7 @@ private struct HalqahLiveButtonBody: View {
         let shape = RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
         let lit = isLive && isEnabled
         configuration.label
-            .font(.headline)
+            .diInterfaceFont(.headline)
             .foregroundStyle(isEnabled ? DIColor.onPrimary : DIColor.textMuted)
             .multilineTextAlignment(.center)
             .padding(.horizontal, DISpacing.md)

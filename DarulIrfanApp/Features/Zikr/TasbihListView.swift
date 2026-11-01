@@ -37,9 +37,9 @@ struct TasbihListView: View {
                 if viewModel.loadFailed {
                     DICard {
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
-                            Text("Unable to load counters").font(.headline)
+                            Text("Unable to load counters").diInterfaceFont(.headline)
                             Text("Please try again to read your saved counters.")
-                                .font(.footnote).foregroundStyle(DIColor.textMuted)
+                                .diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
                             Button("Retry") { Task { await viewModel.load() } }
                                 .buttonStyle(DISecondaryButtonStyle())
                         }
@@ -73,7 +73,7 @@ struct TasbihListView: View {
                                 .contextMenu { counterActions(counter) }
                                 Menu { counterActions(counter) } label: {
                                     Image(systemName: "ellipsis.circle")
-                                        .font(.title3)
+                                        .diInterfaceFont(.title3)
                                         .foregroundStyle(DIColor.actionForeground)
                                         .frame(width: 44, height: 44)
                                         .background(DIColor.accent.opacity(0.12), in: Circle())
@@ -181,12 +181,12 @@ private struct TasbihCounterRow: View {
                     DIPillBadge(text: String(localized: "Open-ended"))
                 }
                 Text("Lifetime: \(counter.lifetimeCount + counter.count)")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: 0)
             Image(systemName: "chevron.forward")
-                .font(.footnote)
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }
@@ -251,7 +251,7 @@ private struct ZikrHabitStripCard: View {
                     ForEach(days) { day in
                         VStack(spacing: DISpacing.xs) {
                             Text(day.date.formatted(Date.FormatStyle(locale: locale).weekday(.abbreviated)))
-                                .font(.caption2)
+                                .diInterfaceFont(.caption2)
                                 .foregroundStyle(DIColor.textMuted)
                             ZStack {
                                 Circle()
@@ -276,7 +276,7 @@ private struct ZikrHabitStripCard: View {
                 }
 
                 Text("\(weekTotal) completed this week. Each time a counter reaches its target, that day is marked here.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }

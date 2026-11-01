@@ -133,7 +133,7 @@ struct AyahTafsirSheet: View {
                         Text("This tafsir has no verse-by-verse commentary on this ayah in this language. The printed volume is below, opened where the surah begins.")
                     }
                 }
-                .font(.subheadline)
+                .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textPrimary)
                 if !entries(language: otherLanguage).isEmpty {
                     Button {

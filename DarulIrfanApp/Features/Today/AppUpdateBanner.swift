@@ -26,15 +26,15 @@ struct AppUpdateBanner: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack(alignment: .top, spacing: DISpacing.sm) {
                     Image(systemName: "arrow.down.app.fill")
-                        .font(.title2)
+                        .diInterfaceFont(.title2)
                         .foregroundStyle(DIColor.primary)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: DISpacing.xs) {
                         Text("A newer version is available")
-                            .font(.headline)
+                            .diInterfaceFont(.headline)
                             .foregroundStyle(DIColor.textPrimary)
                         message
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textMuted)
                     }
                     Spacer(minLength: 0)

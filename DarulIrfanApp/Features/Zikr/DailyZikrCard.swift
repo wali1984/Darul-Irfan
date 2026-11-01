@@ -53,7 +53,7 @@ struct DailyZikrCard: View {
             }
             if let note = DailyZikrPresentation.note(for: broadcast) {
                 Text(verbatim: note)
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(.white.opacity(0.82))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -137,7 +137,7 @@ struct DailyZikrCard: View {
     private var onAirPanel: some View {
         HStack(spacing: 10) {
             Image(systemName: "dot.radiowaves.left.and.right")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(DIColor.goldGlow)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
@@ -345,7 +345,7 @@ private struct ZikrCountdownRing: View {
                 .rotationEffect(.degrees(shown * 360))
                 .environment(\.layoutDirection, .leftToRight)
             Image(systemName: active ? "dot.radiowaves.left.and.right" : "moon.fill")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(DIColor.goldGlow)
         }
         .frame(width: diameter, height: diameter)
@@ -434,7 +434,7 @@ private struct ZikrCueBanner: View {
     var body: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "bell.and.waves.left.and.right.fill")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(DIColor.primaryDeep)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
@@ -442,7 +442,7 @@ private struct ZikrCueBanner: View {
                     .font(.title3.weight(.bold))
                     .foregroundStyle(DIColor.primaryDeep)
                 Text("Now in the zikr · \(cue.at.formatted(.relative(presentation: .named)))")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.primaryDeep.opacity(0.75))
             }
             Spacer(minLength: 0)
@@ -463,7 +463,7 @@ private struct ZikrRecordingRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "play.fill")
-                .font(.caption2)
+                .diInterfaceFont(.caption2)
                 .foregroundStyle(Color(hex: 0x064B34))
                 .frame(width: 28, height: 28)
                 .background(

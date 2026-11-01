@@ -154,7 +154,7 @@ struct DayTaskEditorView: View {
                     .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isAddingToCalendar)
                     if let calendarMessage {
                         Text(calendarMessage)
-                            .font(.footnote)
+                            .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }

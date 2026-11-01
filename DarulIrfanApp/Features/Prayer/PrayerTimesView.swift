@@ -273,11 +273,11 @@ struct PrayerRamadanCard: View {
                 HStack(alignment: .firstTextBaseline) {
                     if target.kind == .suhoorEnds {
                         Text("Suhoor ends in")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textPrimary)
                     } else {
                         Text("Iftar in")
-                            .font(.subheadline)
+                            .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textPrimary)
                     }
                     Spacer()
@@ -289,13 +289,13 @@ struct PrayerRamadanCard: View {
             HStack {
                 if let fajr = schedule.time(for: .fajr) {
                     Text("Suhoor ends: \(viewModel.timeText(fajr))")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer()
                 if let maghrib = schedule.time(for: .maghrib) {
                     Text("Iftar: \(viewModel.timeText(maghrib))")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -337,12 +337,12 @@ struct PrayerLocationNeededCard: View {
 
             if viewModel.locationRequestFailed {
                 Text("We couldn't determine your location. You can allow location access in iOS Settings, or choose a city in the Halqah tab under Settings.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
             } else {
                 Text("Prefer a specific city? You can choose one anytime in the Halqah tab under Settings.")
-                    .font(.footnote)
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.center)
             }
@@ -382,7 +382,7 @@ struct PrayerTimesShortcuts: View {
     private func shortcut(titleKey: LocalizedStringKey, systemImage: String, gold: Bool) -> some View {
         HStack(spacing: 10) {
             Image(systemName: systemImage)
-                .font(.headline)
+                .diInterfaceFont(.headline)
                 .accessibilityHidden(true)
             Text(titleKey)
                 .font(.subheadline.weight(.bold))

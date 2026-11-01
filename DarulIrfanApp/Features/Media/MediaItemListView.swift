@@ -294,7 +294,7 @@ struct MediaItemRow: View {
                 metadataLine
                 if let speaker = item.speaker {
                     Text(speaker)
-                        .font(.caption2)
+                        .diInterfaceFont(.caption2)
                         .foregroundStyle(DIColor.textMuted)
                         .lineLimit(1)
                 }
@@ -386,18 +386,18 @@ struct MediaItemRow: View {
                 // The catalogue gives a lecture's day as midnight UTC: read it
                 // in UTC, or west of Greenwich every lecture shows a day early.
                 Text(date, format: Date.FormatStyle(date: .abbreviated, time: .omitted, timeZone: .gmt))
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
             if let duration = item.durationSeconds, duration > 0 {
                 if item.date != nil {
                     Text(verbatim: "·")
-                        .font(.caption)
+                        .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                         .accessibilityHidden(true)
                 }
                 Text(verbatim: MediaTimeFormat.duration(duration))
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityLabel(Text("Duration \(MediaTimeFormat.duration(duration))"))
             }
@@ -409,7 +409,7 @@ struct MediaItemRow: View {
         if isWMAOnly {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 Text("This archived audio format is not supported on iOS yet.")
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -420,7 +420,7 @@ struct MediaItemRow: View {
                 }
                 if item.mediaType == .youtube {
                     Text("Plays in Darul Irfan")
-                        .font(.caption2)
+                        .diInterfaceFont(.caption2)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -473,7 +473,7 @@ struct MediaItemRow: View {
             }
         } label: {
             Image(systemName: "ellipsis.circle")
-                .font(.title3)
+                .diInterfaceFont(.title3)
                 .foregroundStyle(DIColor.textMuted)
         }
         .accessibilityLabel(Text("More actions for \(item.title)"))

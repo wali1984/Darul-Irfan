@@ -216,7 +216,7 @@ private struct DuaCard: View {
 
                 if !DIBrand.readsUrdu(locale), let english = dua.translationEnglish {
                     Text(verbatim: english)
-                        .font(.body)
+                        .diInterfaceFont(.body)
                         .foregroundStyle(DIColor.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                 }

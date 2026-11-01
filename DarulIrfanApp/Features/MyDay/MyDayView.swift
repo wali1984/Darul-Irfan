@@ -122,7 +122,7 @@ struct MyDayView: View {
         Section {
             if entries.isEmpty {
                 Text(span == .today ? "Nothing planned for today. Tap + to add a task." : "Nothing planned.")
-                    .font(.subheadline)
+                    .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textMuted)
             }
             ForEach(entries) { entry in
@@ -177,7 +177,7 @@ struct DayTaskRow: View {
         HStack(spacing: DISpacing.sm) {
             Button(action: onToggle) {
                 Image(systemName: task.isDone(on: day) ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
+                    .diInterfaceFont(.title3)
                     .frame(width: 48, height: 48)
                     .contentShape(Rectangle())
                     .foregroundStyle(task.isDone(on: day) ? DIColor.actionForeground : DIColor.textMuted)
@@ -188,7 +188,7 @@ struct DayTaskRow: View {
             Button(action: onOpen) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(verbatim: task.title)
-                        .font(.body)
+                        .diInterfaceFont(.body)
                         .strikethrough(task.isDone(on: day))
                         .foregroundStyle(task.isDone(on: day) ? DIColor.textMuted : DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
@@ -204,7 +204,7 @@ struct DayTaskRow: View {
                             Image(systemName: "bell.fill")
                         }
                     }
-                    .font(.caption)
+                    .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
                 }
                 .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
