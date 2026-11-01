@@ -56,8 +56,10 @@ struct NativeMethodOfZikrView: View {
                     VStack(alignment: .leading, spacing: DISpacing.md) {
                         Text("The Method of Zikr guide could not be loaded. Please try again.")
                             .foregroundStyle(DIColor.textPrimary)
+                            .accessibilityIdentifier("method-guide-load-error")
                         Button("Retry") { isLoading = true; attempt += 1 }
                             .buttonStyle(DISecondaryButtonStyle())
+                            .accessibilityIdentifier("method-guide-retry")
                     }
                     .padding(DISpacing.lg)
                     .diGlassPanel(cornerRadius: 24)
@@ -71,9 +73,15 @@ struct NativeMethodOfZikrView: View {
         .diScreenBackground()
         .task(id: attempt) {
             isLoading = true
+            #if DEBUG
+            // Exercise recovery through real contextual links, without changing bundled files.
+            let simulateReadFailure = attempt == 0 && ProcessInfo.processInfo.arguments.contains("--uitesting-method-guide-failure")
+            #else
+            let simulateReadFailure = false
+            #endif
             let loaded = await Task.detached(priority: .userInitiated) {
                 QuranQuotation.warmUp()
-                return MethodGuide.load()
+                return simulateReadFailure ? nil : MethodGuide.load()
             }.value
             guard !Task.isCancelled else { return }
             guide = loaded

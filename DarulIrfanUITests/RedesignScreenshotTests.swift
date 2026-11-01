@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -82,6 +82,9 @@ final class RedesignScreenshotTests: XCTestCase {
             "-AppleLanguages", "(\(language))", "-AppleLocale", locale,
             "--uitesting-complete-onboarding", dark ? "--uitesting-theme-dark" : "--uitesting-theme-light",
         ]
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "guide-recovery" {
+            app.launchArguments.append("--uitesting-method-guide-failure")
+        }
         app.launch()
         guard app.tabBars.buttons.firstMatch.waitForExistence(timeout: 180) else {
             shot("no-tab-bar")
@@ -90,7 +93,7 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
-        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "resources" {
+        if ["resources", "guide-recovery"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             contextualResourcesTour()
             return
         }
@@ -441,10 +444,21 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertTrue(app.navigationBars[guideTitle].waitForExistence(timeout: 10))
         let firstSection = app.descendants(matching: .any).matching(
             NSPredicate(format: "identifier BEGINSWITH %@", "method-guide-section-")).firstMatch
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "guide-recovery" {
+            let error = app.staticTexts["method-guide-load-error"]
+            XCTAssertTrue(error.waitForExistence(timeout: 30), "Injected read failure must be visible")
+            XCTAssertFalse(firstSection.exists, "A failed load must not show stale guide content")
+            shot("resources-" + origin + "-load-error")
+            guard tap(app.buttons["method-guide-retry"]) else {
+                XCTFail("Failed guide must offer Retry")
+                return
+            }
+        }
         guard firstSection.waitForExistence(timeout: 30) else {
             XCTFail("The local Method of Zikr content must load before reviewing the guide")
             return
         }
+        XCTAssertFalse(app.staticTexts["method-guide-load-error"].exists, "Successful retry must clear the error")
         shot("resources-" + origin + "-guide")
         let shajra = onScreen(app.buttons.matching(NSPredicate(
             format: "label CONTAINS %@", label("Chain of Transmission"))))
