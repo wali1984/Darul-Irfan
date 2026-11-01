@@ -328,13 +328,17 @@ struct AddGroupPersonView: View {
             Button {
                 Task { await save() }
             } label: {
-                if working {
-                    ProgressView()
-                } else {
-                    Label(method == .email ? "Add to the group" : "Make the code",
-                          systemImage: method == .email ? "person.badge.plus" : "key")
+                HStack(spacing: DISpacing.sm) {
+                    if working {
+                        ProgressView().tint(DIColor.onPrimary)
+                    } else {
+                        Image(systemName: method == .email ? "person.badge.plus" : "key")
+                            .accessibilityHidden(true)
+                    }
+                    Text(method == .email ? "Add to the group" : "Make the code")
                 }
             }
+            .buttonStyle(DIPrimaryButtonStyle())
             .disabled(working || !canSave)
         }
     }
