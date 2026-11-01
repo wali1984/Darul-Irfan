@@ -231,7 +231,7 @@ final class ZikrTabTests: XCTestCase {
 
         XCTAssertEqual(
             ZikrTimeLine.text(for: start, session: daily, timeZone: TestDates.newYork, locale: locale),
-            [String(localized: "Your time: \(newYorkTime)"), String(localized: "In Pakistan: \(pakistanTime)")].joined(separator: " · ")
+            [String(localized: "Your time: \(newYorkTime)"), String(localized: "In Pakistan: \(pakistanTime)")].joined(separator: "\n")
         )
         XCTAssertEqual(
             ZikrTimeLine.text(for: start, session: daily, timeZone: TestDates.karachi, locale: locale),

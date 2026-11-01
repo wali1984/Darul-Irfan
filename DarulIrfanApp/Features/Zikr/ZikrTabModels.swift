@@ -223,7 +223,7 @@ enum ZikrTimeLine {
         let pakistan = session.zikrAnchor == nil
             ? String(localized: "In Pakistan: \(there)")
             : String(localized: "In Pakistan: about \(there)")
-        return [yours, pakistan].joined(separator: " · ")
+        return [yours, pakistan].joined(separator: "\n")
     }
 }
 
