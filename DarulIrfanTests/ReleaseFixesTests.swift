@@ -122,6 +122,27 @@ final class ReleaseFixesTests: XCTestCase {
         XCTAssertNil(VideoLink.id(from: "hello"))
     }
 
+    func testUnrelatedSitesAndNonWebLinksAreNotYouTubeVideos() {
+        let id = "dQw4w9WgXcQ"
+        for link in [
+            "https://example.com/watch?v=\(id)",
+            "https://notyoutu.be/\(id)",
+            "https://youtube.com.example.com/live/\(id)",
+            "https://example.com/embed/\(id)",
+            "ftp://youtube.com/watch?v=\(id)",
+            "https://youtube.com@example.com/watch?v=\(id)"
+        ] {
+            XCTAssertNil(VideoLink.id(from: link), link)
+        }
+        for link in [
+            "HTTPS://M.YOUTUBE.COM/watch?v=\(id)",
+            "https://youtube.com/shorts/\(id)",
+            "https://www.youtube-nocookie.com/embed/\(id)"
+        ] {
+            XCTAssertEqual(VideoLink.id(from: link), id, link)
+        }
+    }
+
     /// The server writes timestamps with milliseconds; the group screens must
     /// read them (the stock ISO-8601 decoder does not).
     func testGroupPostsDecodeServerTimestamps() throws {

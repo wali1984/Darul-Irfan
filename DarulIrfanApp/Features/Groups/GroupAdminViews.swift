@@ -15,9 +15,14 @@ enum VideoLink {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.range(of: #"^[A-Za-z0-9_-]{11}$"#, options: .regularExpression) != nil { return trimmed }
         guard let url = URL(string: trimmed), let host = url.host?.lowercased() else { return nil }
+        guard let scheme = url.scheme?.lowercased(), ["http", "https"].contains(scheme) else { return nil }
+        let shortLink = host == "youtu.be" || host.hasSuffix(".youtu.be")
+        let videoHost = host == "youtube.com" || host.hasSuffix(".youtube.com")
+            || host == "youtube-nocookie.com" || host.hasSuffix(".youtube-nocookie.com")
+        guard shortLink || videoHost else { return nil }
         let parts = url.pathComponents.filter { $0 != "/" }
         var candidate: String?
-        if host.hasSuffix("youtu.be") {
+        if shortLink {
             candidate = parts.first
         } else if let v = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "v" })?.value {
             candidate = v
