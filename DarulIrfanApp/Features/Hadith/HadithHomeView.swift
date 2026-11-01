@@ -143,7 +143,7 @@ struct HadithHomeView: View {
                     NavigationLink(value: HadithRoute.collection(book)) {
                         collectionRow(book, showsNote: group.kind != .arabicOnly)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                 }
                 if group.isFoldable {
                     ReadRowRule()
@@ -152,7 +152,7 @@ struct HadithHomeView: View {
                     } label: {
                         showAllRow(expanded: expanded, count: group.books.count)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                 }
             }
             .padding(6)
@@ -182,7 +182,7 @@ struct HadithHomeView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 11)
-        .frame(minHeight: 44)
+        .frame(minHeight: 48)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
@@ -202,7 +202,7 @@ struct HadithHomeView: View {
         .diInterfaceFont(.subheadline, weight: .bold)
         .foregroundStyle(ReadPalette.emeraldInk)
         .padding(.horizontal, 12)
-        .frame(minHeight: 44)
+        .frame(minHeight: 48)
         .contentShape(Rectangle())
     }
 
