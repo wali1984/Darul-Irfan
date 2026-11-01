@@ -7,6 +7,8 @@ import SwiftUI
 struct SurahReaderView: View {
     private let appState: AppState
     private let onRequestNextSurah: () -> Void
+    private let initialFocusAyah: Int?
+    @State private var hasAppliedInitialFocus = false
     /// Needed to turn a linked bayan into something playable: the index stores
     /// only the media id, so the catalogue stays the one description of a
     /// lecture.
@@ -51,10 +53,10 @@ struct SurahReaderView: View {
         self.mediaRepository = dependencies.mediaRepository
         self.audioPlayer = dependencies.audioPlayer
         self.dependencies = dependencies
-        // Anchor the lazy layout by ayah identity from its first layout pass.
-        // A deferred proxy scroll can drift as long Arabic/translation cards
-        // replace estimated heights, landing several ayahs past a Parah start.
-        _topAyah = State(initialValue: focusAyah.flatMap { $0 > 1 ? $0 : nil })
+        self.initialFocusAyah = focusAyah
+        // Apply the destination once the loaded reader has installed its targets.
+        // An initial binding value can be cleared during the loading/layout transition.
+        _topAyah = State(initialValue: nil)
         let langCode = SurahReaderViewModel.initialReadingLanguage(
             appLanguage: appState.settings.language.contentLanguageCode
         )
@@ -147,7 +149,12 @@ struct SurahReaderView: View {
         }
         .padding(.horizontal, DISpacing.md)
         .padding(.vertical, DISpacing.xs)
-        .diScreenBackground()
+        .background {
+            ZStack {
+                DIColor.background
+                DIPatternTexture(tint: DIColor.accent, opacity: 0.04)
+            }
+        }
     }
 
     // MARK: - Phases
@@ -261,11 +268,19 @@ struct SurahReaderView: View {
             if ayah > 1 { hasScrolledIntoSurah = true }
             viewModel.topAyahChanged(ayah)
         }
-        .onAppear {
-            // A juz carried into this surah: show the ayah it is on.
+        .task {
+            guard !hasAppliedInitialFocus else { return }
+            let target: Int?
             if let current = player.current, current.surah == viewModel.surah.id, player.isPlaying {
-                topAyah = current.ayah
+                target = current.ayah
+            } else {
+                target = initialFocusAyah
             }
+            // Let the ready-state ScrollView install its target layout before requesting a jump.
+            await Task.yield()
+            guard !Task.isCancelled else { return }
+            hasAppliedInitialFocus = true
+            if let target, target > 1 { topAyah = target }
         }
         .onChange(of: pendingScrollAyah) { _, ayah in
             guard let ayah else { return }

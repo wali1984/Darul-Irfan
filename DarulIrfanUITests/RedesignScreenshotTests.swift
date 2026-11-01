@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -75,7 +75,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     /// Tap all 30 real rows and inspect each visible reader destination and Back.
     /// Expected starts are the approved IndoPak division, not the current UI labels.
-    private func parahTour(checkControls: Bool = false) {
+    private func parahTour(checkControls: Bool = false, allDestinations: Bool = false) {
         selectTab(1)
         guard tap(button("Quran")) else { XCTFail("Quran selector missing"); return }
         let parahWord = language == "ur" ? "پارہ" : "Parah"
@@ -117,7 +117,7 @@ final class RedesignScreenshotTests: XCTestCase {
         ]
         for (index, target) in expected.enumerated() {
             let number = index + 1
-            if checkControls && ![3, 18, 27, 28].contains(number) { continue }
+            if checkControls && !allDestinations && ![3, 18, 27, 28].contains(number) { continue }
             let rowLabel = "\(parahWord) \(number), \(target.0), \(ayahWord) \(target.1)"
             let row = app.buttons.matching(NSPredicate(format: "label == %@", rowLabel)).firstMatch
             for _ in 0..<8 {
@@ -149,7 +149,7 @@ final class RedesignScreenshotTests: XCTestCase {
                 XCTFail("Expected \(target.0), ayah \(target.1)"); return
             }
             shot("parah-\(number)-reader")
-            if checkControls && !checkReaderMenus(number: number, title: title) { return }
+            if checkControls && [3, 18, 27, 28].contains(number) && !checkReaderMenus(number: number, title: title) { return }
             goBack()
             guard row.waitForExistence(timeout: 10), row.isHittable else {
                 shot("parah-\(number)-back-failure"); XCTFail("Back lost Parah \(number)"); return
@@ -205,6 +205,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-audit" {
+            parahTour(checkControls: true, allDestinations: true)
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-controls" {
             parahTour(checkControls: true)
             return
