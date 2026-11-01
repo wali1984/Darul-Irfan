@@ -91,7 +91,7 @@ struct ToolTile: View {
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .frame(maxWidth: .infinity, minHeight: 92)
+        .frame(maxWidth: .infinity, minHeight: 92, maxHeight: .infinity)
         .padding(.vertical, DISpacing.sm)
         .padding(.horizontal, DISpacing.xs)
         .background(
