@@ -43,7 +43,13 @@ struct TasbihCounterView: View {
                 viewModel.increment()
             } label: {
                 VStack(spacing: DISpacing.lg) {
-                    countingRing
+                    if viewModel.saveFailed {
+                        Text("\(viewModel.counter.count)")
+                            .font(.system(size: 44, weight: .light, design: .rounded).monospacedDigit())
+                            .foregroundStyle(DIColor.textPrimary)
+                    } else {
+                        countingRing
+                    }
                     if viewModel.hasReachedTarget {
                         Label("Target reached — Alhamdulillah", systemImage: "sparkles")
                             .diInterfaceFont(.subheadline, weight: .semibold)
