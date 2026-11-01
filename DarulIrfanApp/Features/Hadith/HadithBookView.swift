@@ -794,7 +794,13 @@ private struct HadithContentsView: View {
                         select(nil)
                     } label: {
                         Label("Start from the beginning", systemImage: "text.book.closed")
+                            .diInterfaceFont(.body, weight: .semibold)
+                            .foregroundStyle(DIColor.accent)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, DISpacing.xs)
                     }
+                    .buttonStyle(DIPressableStyle())
+                    .listRowBackground(DIColor.surface.opacity(0.90).diGlassPanel(cornerRadius: 10))
                 }
 
                 if sections.isEmpty, !(book.sections ?? []).isEmpty {
@@ -836,11 +842,14 @@ private struct HadithContentsView: View {
                                     }
                                 }
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(DIPressableStyle())
+                            .listRowBackground(DIColor.surface.opacity(0.90).diGlassPanel(cornerRadius: 10))
                         }
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .diScreenBackground()
             .navigationTitle("Contents")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $query, prompt: "Search books")
