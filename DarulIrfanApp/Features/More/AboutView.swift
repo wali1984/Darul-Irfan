@@ -223,8 +223,16 @@ struct DIExternalResourceLink: View {
             openURL(destination) { accepted in failed = !accepted }
         } label: {
             Label {
-                Text(verbatim: title)
-                    .multilineTextAlignment(.center)
+                Group {
+                    if title.unicodeScalars.allSatisfy({ $0.value < 0x0600 }) {
+                        Text(verbatim: title)
+                            .font(.system(.headline, design: .default).weight(.semibold))
+                            .environment(\.layoutDirection, .leftToRight)
+                    } else {
+                        Text(verbatim: title)
+                    }
+                }
+                .multilineTextAlignment(.center)
             } icon: {
                 Image(systemName: systemImage).accessibilityHidden(true)
             }
