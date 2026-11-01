@@ -52,7 +52,8 @@ final class HifzPlayer {
         recitation: SurahRecitation,
         range: ClosedRange<Int>,
         repeats: Int,
-        pauseSeconds: Double
+        pauseSeconds: Double,
+        startingAyah: Int? = nil
     ) {
         stop()
         guard let url = URL(string: recitation.audioUrl) else { return }
@@ -88,9 +89,10 @@ final class HifzPlayer {
             Task { @MainActor in self?.observe(ms: ms) }
         }
 
-        currentAyah = range.lowerBound
+        let first = min(max(startingAyah ?? range.lowerBound, range.lowerBound), range.upperBound)
+        currentAyah = first
         repetition = 1
-        recite(ayah: range.lowerBound)
+        recite(ayah: first)
     }
 
     func pause() {

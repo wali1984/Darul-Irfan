@@ -16,6 +16,7 @@ struct HifzView: View {
     @State private var ayahs: [QuranAyah] = []
     @State private var rangeStart = 1
     @State private var rangeEnd = 1
+    @State private var selectedAyah = 1
     @State private var repeats = 3
     @State private var pauseSeconds = 1.5
     @State private var hidesText = false
@@ -63,6 +64,10 @@ struct HifzView: View {
         .diScreenBackground()
         .diPageHeading("Memorise")
         .task(id: loadAttempt) { await load() }
+        .onChange(of: player.currentAyah) { _, ayah in
+            if let ayah { selectedAyah = ayah }
+            isRevealed = false
+        }
         .onDisappear {
             save()
             player.stop()
@@ -79,7 +84,7 @@ struct HifzView: View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 HStack {
-                    Text(verbatim: "\(surah.nameTransliterated) \(surah.id):\(player.currentAyah ?? rangeStart)")
+                    Text(verbatim: "\(surah.nameTransliterated) \(surah.id):\(player.currentAyah ?? selectedAyah)")
                         .diInterfaceFont(.headline)
                     Spacer()
                     if player.isPlaying {
@@ -109,7 +114,7 @@ struct HifzView: View {
 
     @ViewBuilder
     private var ayahText: some View {
-        let ayahNumber = player.currentAyah ?? rangeStart
+        let ayahNumber = player.currentAyah ?? selectedAyah
         let text = ayahs.first { $0.ayahNumber == ayahNumber }?.textArabic
         if let text {
             if hidesText && !isRevealed {
@@ -146,7 +151,7 @@ struct HifzView: View {
                 Image(systemName: "backward.end.fill")
             }
             .buttonStyle(DICompactButtonStyle())
-            .disabled((player.currentAyah ?? rangeStart) <= rangeStart)
+            .disabled((player.currentAyah ?? selectedAyah) <= rangeStart)
             .accessibilityLabel("Previous ayah")
 
             Button {
@@ -166,7 +171,7 @@ struct HifzView: View {
                 Image(systemName: "forward.end.fill")
             }
             .buttonStyle(DICompactButtonStyle())
-            .disabled((player.currentAyah ?? rangeStart) >= rangeEnd)
+            .disabled((player.currentAyah ?? selectedAyah) >= rangeEnd)
             .accessibilityLabel("Next ayah")
         }
     }
@@ -183,7 +188,7 @@ struct HifzView: View {
                 }
                 .onChange(of: rangeStart) { _, value in
                     if rangeEnd < value { rangeEnd = value }
-                    restartIfPlaying()
+                    applyPracticeSettings()
                 }
                 Stepper(value: $rangeEnd, in: 1...surah.ayahCount) {
                     Text("To ayah \(rangeEnd)")
@@ -191,7 +196,7 @@ struct HifzView: View {
                 }
                 .onChange(of: rangeEnd) { _, value in
                     if rangeStart > value { rangeStart = value }
-                    restartIfPlaying()
+                    applyPracticeSettings()
                 }
                 Text("\(rangeEnd - rangeStart + 1) of \(surah.ayahCount) ayat")
                     .diInterfaceFont(.caption)
@@ -208,10 +213,12 @@ struct HifzView: View {
                     Text("Repeat each ayah \(repeats) times")
                         .diInterfaceFont(.body)
                 }
+                .onChange(of: repeats) { _, _ in applyPracticeSettings() }
                 Stepper(value: $pauseSeconds, in: 0...10, step: 0.5) {
                     Text("Pause \(pauseSeconds, specifier: "%.1f") seconds")
                         .diInterfaceFont(.body)
                 }
+                .onChange(of: pauseSeconds) { _, _ in applyPracticeSettings() }
                 Toggle("Hide the text", isOn: $hidesText)
                     .onChange(of: hidesText) { _, _ in isRevealed = false }
                 Text("Hiding the text lets you recite from memory; reveal it when you need to check.")
@@ -240,6 +247,7 @@ struct HifzView: View {
             if let saved = HifzProgress.load(surah: surah.id) {
                 rangeStart = min(max(1, saved.start), surah.ayahCount)
                 rangeEnd = min(max(rangeStart, saved.end), surah.ayahCount)
+                selectedAyah = min(max(saved.ayah, rangeStart), rangeEnd)
                 repeats = min(max(1, saved.repeats), 20)
                 pauseSeconds = saved.pauseSeconds.isFinite ? min(max(0, saved.pauseSeconds), 10) : 1.5
             }
@@ -256,7 +264,7 @@ struct HifzView: View {
         guard hasLoaded else { return }
         HifzProgress.save(
             surah: surah.id,
-            ayah: player.currentAyah ?? rangeStart,
+            ayah: player.currentAyah ?? selectedAyah,
             repeats: repeats,
             pauseSeconds: pauseSeconds,
             start: rangeStart,
@@ -272,11 +280,13 @@ struct HifzView: View {
             save()
         } else if player.currentAyah == nil || player.phase == .finished {
             isRevealed = false
+            if player.phase == .finished { selectedAyah = rangeStart }
             player.start(
                 recitation: recitation,
                 range: rangeStart...rangeEnd,
                 repeats: repeats,
-                pauseSeconds: pauseSeconds
+                pauseSeconds: pauseSeconds,
+                startingAyah: selectedAyah
             )
         } else {
             player.resume()
@@ -285,26 +295,35 @@ struct HifzView: View {
 
     private func step(by offset: Int) {
         guard let recitation else { return }
-        let target = (player.currentAyah ?? rangeStart) + offset
+        let target = (player.currentAyah ?? selectedAyah) + offset
         guard target >= rangeStart, target <= rangeEnd else { return }
         isRevealed = false
         DIHaptics.light()
+        selectedAyah = target
         if player.currentAyah == nil {
-            player.start(recitation: recitation, range: rangeStart...rangeEnd, repeats: repeats, pauseSeconds: pauseSeconds)
+            player.start(recitation: recitation, range: rangeStart...rangeEnd, repeats: repeats, pauseSeconds: pauseSeconds, startingAyah: target)
+        } else {
+            player.practise(ayah: target)
         }
-        player.practise(ayah: target)
     }
 
-    /// A range change while practising takes effect immediately rather than at
-    /// the next ayah, which is what someone narrowing their range expects.
-    private func restartIfPlaying() {
-        guard player.isPlaying, let recitation else { return }
+    /// Apply every setting to the next verse attempt, including a paused session.
+    private func applyPracticeSettings() {
+        guard hasLoaded, !isLoading else { return }
+        selectedAyah = min(max(player.currentAyah ?? selectedAyah, rangeStart), rangeEnd)
         isRevealed = false
-        player.start(
-            recitation: recitation,
-            range: rangeStart...rangeEnd,
-            repeats: repeats,
-            pauseSeconds: pauseSeconds
-        )
+        guard let recitation else { return }
+        if player.isPlaying {
+            player.start(
+                recitation: recitation,
+                range: rangeStart...rangeEnd,
+                repeats: repeats,
+                pauseSeconds: pauseSeconds,
+                startingAyah: selectedAyah
+            )
+        } else {
+            player.stop()
+        }
+        save()
     }
 }
