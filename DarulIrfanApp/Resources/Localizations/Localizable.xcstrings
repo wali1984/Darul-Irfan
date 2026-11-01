@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"The picture could not be loaded.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "The picture could not be loaded."}}, "ur": {"stringUnit": {"state": "translated", "value": "تصویر لوڈ نہیں ہو سکی۔"}}}},
 "Remove attachment %lld": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Remove attachment %lld"}}, "ur": {"stringUnit": {"state": "translated", "value": "منسلکہ فائل %lld ہٹائیں"}}}},
 "Some photos or videos could not be opened. Download them to your phone and choose them again.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Some photos or videos could not be opened. Download them to your phone and choose them again."}}, "ur": {"stringUnit": {"state": "translated", "value": "کچھ تصاویر یا ویڈیوز نہیں کھل سکیں۔ انہیں اپنے فون پر ڈاؤن لوڈ کر کے دوبارہ منتخب کریں۔"}}}},
 "The Parah list could not be loaded. Please try again.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "The Parah list could not be loaded. Please try again."}}, "ur": {"stringUnit": {"state": "translated", "value": "پاروں کی فہرست لوڈ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔"}}}},

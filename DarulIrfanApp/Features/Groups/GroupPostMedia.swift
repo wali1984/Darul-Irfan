@@ -144,19 +144,34 @@ struct PostMediaView: View {
         if item.kind == "video" {
             PostVideoTile(url: item.url)
         } else {
-            AsyncImage(url: item.url) { phase in
-                switch phase {
-                case .success(let image): image.resizable().scaledToFit()
-                case .failure:
-                    Label("The picture could not be loaded. Pull down to refresh.", systemImage: "photo")
-                        .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
-                default: ProgressView().frame(maxWidth: .infinity, minHeight: 160)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-            .accessibilityLabel(Text("Picture"))
+            PostPictureTile(url: item.url).id(item.url)
         }
+    }
+}
+
+/// Recreate only the failed image request; refreshing the post with the same URL
+/// does not reliably restart an existing AsyncImage.
+private struct PostPictureTile: View {
+    let url: URL
+    @State private var attempt = 0
+
+    var body: some View {
+        AsyncImage(url: url) { phase in
+            switch phase {
+            case .success(let image): image.resizable().scaledToFit().accessibilityLabel(Text("Picture"))
+            case .failure:
+                VStack(spacing: DISpacing.sm) {
+                    Label("The picture could not be loaded.", systemImage: "photo")
+                        .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
+                    Button("Retry") { attempt += 1 }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }.padding(DISpacing.sm)
+            default: ProgressView().frame(maxWidth: .infinity, minHeight: 160)
+            }
+        }
+        .id(attempt)
+        .frame(maxWidth: .infinity)
+        .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
     }
 }
 
