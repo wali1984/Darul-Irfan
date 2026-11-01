@@ -250,7 +250,7 @@ private struct ReadyRootView: View {
 
     var body: some View {
         let language = appState.settings.language
-        let root = RootView(dependencies: dependencies, appState: appState)
+        let root = content
             .preferredColorScheme(appState.settings.theme.colorScheme)
             // Re-apply the bundle-level language and rebuild the tree so every
             // localized string re-resolves when the user switches language.
@@ -266,6 +266,18 @@ private struct ReadyRootView: View {
         } else {
             root
         }
+    }
+
+    @ViewBuilder private var content: some View {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-resources") {
+            HalqahAuditFixture()
+        } else {
+            RootView(dependencies: dependencies, appState: appState)
+        }
+        #else
+        RootView(dependencies: dependencies, appState: appState)
+        #endif
     }
 }
 

@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -197,7 +197,14 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "guide-recovery" {
             app.launchArguments.append("--uitesting-method-guide-failure")
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
+            app.launchArguments.append("--uitesting-halqah-resources")
+        }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
+            halqahResourcesTour()
+            return
+        }
         guard app.tabBars.buttons.firstMatch.waitForExistence(timeout: 180) else {
             shot("no-tab-bar")
             XCTFail("The app did not reach its navigation tabs")
@@ -559,6 +566,34 @@ final class RedesignScreenshotTests: XCTestCase {
         contextualGuideRoundTrip(origin: "tasbih")
         XCTAssertEqual(app.navigationBars.firstMatch.identifier, originTitle, "Back must return to Tasbih")
         shot("resources-tasbih-return")
+    }
+
+    /// The actual Halqah detail view, with local HTTP responses and no live account.
+    private func halqahResourcesTour() {
+        for role in ["member", "admin"] {
+            let entry = app.buttons["halqah-audit-" + role]
+            guard entry.waitForExistence(timeout: 180), tap(entry) else {
+                XCTFail("Missing isolated Halqah entry"); return
+            }
+            let error = app.staticTexts["halqah-detail-error"]
+            XCTAssertTrue(error.waitForExistence(timeout: 30), "First detail request must show the injected failure")
+            XCTAssertTrue(app.buttons["method-of-zikr-shortcut"].isHittable,
+                          "Newcomer resources must remain available when the Halqah cannot load")
+            shot("halqah-" + role + "-error")
+            guard tap(app.buttons["halqah-detail-retry"]) else {
+                XCTFail("The Halqah error must offer Retry"); return
+            }
+            let posts = app.descendants(matching: .any).matching(identifier: "halqah-detail-posts").firstMatch
+            XCTAssertTrue(posts.waitForExistence(timeout: 30), "Retry must load the real detail content")
+            XCTAssertFalse(error.exists, "Successful retry must clear the error")
+            shot("halqah-" + role + "-loaded")
+            contextualGuideRoundTrip(origin: "halqah-" + role)
+            XCTAssertTrue(app.buttons["method-of-zikr-shortcut"].waitForExistence(timeout: 10),
+                          "Back must return to the same Halqah detail")
+            shot("halqah-" + role + "-return")
+            goBack()
+            XCTAssertTrue(entry.waitForExistence(timeout: 10), "Back must return to the fixture list")
+        }
     }
 
     private func contextualGuideRoundTrip(origin: String) {

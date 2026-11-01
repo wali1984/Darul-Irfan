@@ -78,8 +78,10 @@ struct GroupDetailView: View {
                     DICard {
                         VStack(alignment: .leading, spacing: DISpacing.sm) {
                             Text(verbatim: failure).diInterfaceFont(.subheadline)
+                                .accessibilityIdentifier("halqah-detail-error")
                             Button("Try again") { Task { await load() } }
                                 .buttonStyle(DISecondaryButtonStyle())
+                                .accessibilityIdentifier("halqah-detail-retry")
                         }
                     }
                 } else {
@@ -90,6 +92,7 @@ struct GroupDetailView: View {
                     zikrSection
                     meetingsSection
                     postsSection
+                        .accessibilityIdentifier("halqah-detail-posts")
                 }
             }
             .padding(DISpacing.md)
