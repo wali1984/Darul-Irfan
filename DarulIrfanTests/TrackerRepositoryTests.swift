@@ -21,6 +21,32 @@ final class TrackerRepositoryTests: XCTestCase {
     }
 
     @MainActor
+    func testTasbihCountSaveFailureRetainsCountAndRetryPersistsOnce() async throws {
+        let initial = TasbihCounter(id: UUID(), title: "Counter", target: nil, count: 7, lifetimeCount: 9, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        try await database.connection.executeScript("CREATE TRIGGER reject_tasbih BEFORE INSERT ON tasbih_counters BEGIN SELECT RAISE(ABORT, 'test write failure'); END;")
+        model.increment()
+        await model.retrySave()
+        XCTAssertTrue(model.saveFailed)
+        XCTAssertFalse(model.isRetryingSave)
+        XCTAssertEqual(model.counter.count, 8)
+        let beforeRetry = try await repository.tasbihCounters()
+        XCTAssertEqual(beforeRetry.first?.count, 7)
+        try await database.connection.executeScript("DROP TRIGGER reject_tasbih;")
+        await model.retrySave()
+        await model.retrySave()
+        XCTAssertFalse(model.saveFailed)
+        XCTAssertFalse(model.isRetryingSave)
+        let saved = try await repository.tasbihCounters()
+        XCTAssertEqual(saved.count, 1)
+        XCTAssertEqual(saved.first?.count, 8)
+        XCTAssertEqual(saved.first?.lifetimeCount, 9)
+    }
+
+    @MainActor
     func testTasbihEditorSaveFailurePropagatesAndRetryKeepsOneCounter() async throws {
         let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
                                                   trackerRepository: repository, watchSync: WatchSyncService())

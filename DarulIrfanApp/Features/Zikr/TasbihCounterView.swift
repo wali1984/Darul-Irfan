@@ -26,6 +26,19 @@ struct TasbihCounterView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if viewModel.saveFailed {
+                DIElevatedCard {
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        Text("Unable to save counter").diInterfaceFont(.headline)
+                        Text("Your changes are still here. Please try saving again.")
+                            .diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
+                        Button("Retry") { Task { await viewModel.retrySave() } }
+                            .buttonStyle(DISecondaryButtonStyle())
+                            .disabled(viewModel.isRetryingSave)
+                    }
+                }
+                .padding(DISpacing.md)
+            }
             Button {
                 viewModel.increment()
             } label: {

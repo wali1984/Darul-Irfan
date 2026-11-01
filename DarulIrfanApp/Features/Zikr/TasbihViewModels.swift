@@ -93,6 +93,8 @@ final class TasbihCounterViewModel {
     private let devotionalMetrics: DevotionalMetricsSyncService
 
     private(set) var counter: TasbihCounter
+    private(set) var saveFailed = false
+    private(set) var isRetryingSave = false
 
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var hasRecordedTargetThisSession = false
@@ -168,6 +170,7 @@ final class TasbihCounterViewModel {
         saved.updatedAt = Date()
         try await trackerRepository.saveTasbihCounter(saved)
         counter = saved
+        saveFailed = false
         if let target = counter.target, target > 0, counter.count < target {
             hasRecordedTargetThisSession = false
         }
@@ -190,6 +193,15 @@ final class TasbihCounterViewModel {
         }
     }
 
+    func retrySave() async {
+        guard !isRetryingSave else { return }
+        isRetryingSave = true
+        defer { isRetryingSave = false }
+        saveTask?.cancel()
+        await saveTask?.value
+        await persist()
+    }
+
     // MARK: - Private
 
     private func scheduleSave() {
@@ -208,9 +220,12 @@ final class TasbihCounterViewModel {
         let snapshot = counter
         do {
             try await trackerRepository.saveTasbihCounter(snapshot)
+            if counter.updatedAt == snapshot.updatedAt { saveFailed = false }
             await devotionalMetrics.refresh(reference: snapshot.updatedAt)
+        } catch is CancellationError {
+            // A newer save owns the current count.
         } catch {
-            // Local persistence failure; the next save attempt retries.
+            if counter.updatedAt == snapshot.updatedAt { saveFailed = true }
         }
     }
 
