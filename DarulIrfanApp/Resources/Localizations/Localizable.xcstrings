@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Some photos or videos could not be opened. Download them to your phone and choose them again.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Some photos or videos could not be opened. Download them to your phone and choose them again."}}, "ur": {"stringUnit": {"state": "translated", "value": "کچھ تصاویر یا ویڈیوز نہیں کھل سکیں۔ انہیں اپنے فون پر ڈاؤن لوڈ کر کے دوبارہ منتخب کریں۔"}}}},
 "The Parah list could not be loaded. Please try again.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "The Parah list could not be loaded. Please try again."}}, "ur": {"stringUnit": {"state": "translated", "value": "پاروں کی فہرست لوڈ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔"}}}},
 "No Bayans found on these pages yet. Load more to check earlier videos.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "No Bayans found on these pages yet. Load more to check earlier videos."}}, "ur": {"stringUnit": {"state": "translated", "value": "ان صفحات پر ابھی کوئی بیان نہیں ملا۔ پرانی ویڈیوز دیکھنے کے لیے مزید لوڈ کریں۔"}}}},
 "No Bayan videos are available right now.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "No Bayan videos are available right now."}}, "ur": {"stringUnit": {"state": "translated", "value": "اس وقت بیانات کی ویڈیوز دستیاب نہیں ہیں۔"}}}},

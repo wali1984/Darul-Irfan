@@ -49,6 +49,7 @@ struct GroupPostComposer: View {
     @State private var picks: [PhotosPickerItem] = []
     @State private var progress: String?
     @State private var working = false
+    @State private var preparingMedia = false
     @State private var error: String?
 
     private static let maxAttachments = 10
@@ -105,6 +106,9 @@ struct GroupPostComposer: View {
                     }
                 }
             }
+            if preparingMedia {
+                Section { ProgressView("Loading") }
+            }
             Section {
                 Button {
                     Task { await save(publish: true) }
@@ -118,20 +122,30 @@ struct GroupPostComposer: View {
                 Text("Publishing notifies the group's members who have notifications on.")
             }
         }
+        .disabled(working || preparingMedia)
+        .interactiveDismissDisabled(working || preparingMedia)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
         .tint(DIColor.actionForeground)
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("New post")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) {
+            Button("Cancel") { dismiss() }.disabled(working || preparingMedia)
+        } }
         .onChange(of: picks) { _, chosen in
-            guard !chosen.isEmpty else { return }
+            guard !chosen.isEmpty, !working, !preparingMedia else { return }
+            preparingMedia = true
+            error = nil
             Task {
+                defer { preparingMedia = false; picks = [] }
                 for item in chosen where attachments.count < Self.maxAttachments {
-                    if let attachment = await PostMediaPreparation.load(item) { attachments.append(attachment) }
+                    if let attachment = await PostMediaPreparation.load(item) {
+                        attachments.append(attachment)
+                    } else {
+                        error = String(localized: "Some photos or videos could not be opened. Download them to your phone and choose them again.")
+                    }
                 }
-                picks = []
             }
         }
     }
@@ -140,11 +154,12 @@ struct GroupPostComposer: View {
     private var canSave: Bool {
         let hasTitle = !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let hasVideo = VideoLink.id(from: videoLink) != nil
-        return !working && (hasTitle || !attachments.isEmpty || hasVideo)
+        return !working && !preparingMedia && (hasTitle || !attachments.isEmpty || hasVideo)
             && (videoLink.isEmpty || hasVideo)
     }
 
     private func paste() {
+        guard !working, !preparingMedia else { return }
         // Pictures copied from WhatsApp, Photos or a browser.
         for image in UIPasteboard.general.images ?? [] where attachments.count < Self.maxAttachments {
             if let prepared = PostMediaPreparation.picture(from: image) {
@@ -163,7 +178,10 @@ struct GroupPostComposer: View {
     }
 
     private func save(publish: Bool) async {
+        guard canSave else { return }
         working = true
+        error = nil
+        progress = String(localized: "Saving…")
         defer { working = false; progress = nil }
         do {
             // Each file goes up first; the post then names them, in order.
@@ -177,6 +195,7 @@ struct GroupPostComposer: View {
                     keys.append(try await service.uploadPostMedia(video: url, contentType: PostMediaPreparation.videoType(url), in: groupID))
                 }
             }
+            progress = String(localized: "Saving…")
             try await service.createPost(
                 in: groupID,
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines),
