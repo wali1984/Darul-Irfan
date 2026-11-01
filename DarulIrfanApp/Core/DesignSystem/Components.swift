@@ -96,8 +96,9 @@ struct DIPrimaryButtonStyle: ButtonStyle {
 }
 
 struct DISecondaryButtonStyle: ButtonStyle {
+    var destructive = false
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.modifier(DIActionButtonSurface(primary: false, pressed: configuration.isPressed))
+        configuration.label.modifier(DIActionButtonSurface(primary: false, pressed: configuration.isPressed, destructive: destructive))
     }
 }
 

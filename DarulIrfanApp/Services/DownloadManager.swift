@@ -22,6 +22,19 @@ enum DownloadManagerError: LocalizedError {
     }
 }
 
+/// A stored filename must remain a direct child of the downloads directory.
+enum DownloadFileAccess {
+    static func resolve(directory: URL, name: String) throws -> URL {
+        guard !name.isEmpty, name != ".", name != "..", !name.contains("/"), !name.contains("\\") else {
+            throw CocoaError(.fileReadInvalidFileName)
+        }
+        let root = directory.resolvingSymlinksInPath().standardizedFileURL
+        let file = root.appendingPathComponent(name).resolvingSymlinksInPath().standardizedFileURL
+        guard file.deletingLastPathComponent() == root else { throw CocoaError(.fileReadInvalidFileName) }
+        return file
+    }
+}
+
 // MARK: - DownloadManager
 
 /// Live implementation of `DownloadManaging`.
@@ -51,8 +64,12 @@ final class DownloadManager: DownloadManaging {
     @ObservationIgnored
     private var inFlightTasks: [String: Task<DownloadedAsset, Error>] = [:]
 
-    init(downloadsRepository: any DownloadsRepositoryProtocol) {
+    private let removeFile: (URL) throws -> Void
+
+    init(downloadsRepository: any DownloadsRepositoryProtocol,
+         removeFile: @escaping (URL) throws -> Void = { try FileManager.default.removeItem(at: $0) }) {
         self.downloadsRepository = downloadsRepository
+        self.removeFile = removeFile
     }
 
     // MARK: - DownloadManaging
@@ -150,19 +167,45 @@ final class DownloadManager: DownloadManaging {
     }
 
     func deleteAsset(_ asset: DownloadedAsset) async throws {
-        // Remove the file first (tolerating an already-missing file), then
-        // the database row so orphaned rows never outlive their files.
-        if let fileURL = localURL(for: asset) {
-            try? FileManager.default.removeItem(at: fileURL)
-        }
+        let directory = try DownloadManager.downloadsDirectory()
+        let fileURL = try DownloadFileAccess.resolve(directory: directory, name: asset.relativeFilePath)
+        try removeDownloadFile(fileURL)
         try await downloadsRepository.deleteAsset(id: asset.id)
     }
 
+    private func removeDownloadFile(_ fileURL: URL) throws {
+        do {
+            if FileManager.default.fileExists(atPath: fileURL.path) {
+                let values = try fileURL.resourceValues(forKeys: [.isRegularFileKey])
+                guard values.isRegularFile == true else { throw CocoaError(.fileWriteNoPermission) }
+            }
+            try removeFile(fileURL)
+        } catch {
+            let failure = error as NSError
+            guard failure.domain == NSCocoaErrorDomain && failure.code == NSFileNoSuchFileError else { throw error }
+            // A previously removed file still needs its stale database record removed.
+        }
+    }
+
     func localURL(for asset: DownloadedAsset) -> URL? {
-        guard let directory = try? DownloadManager.downloadsDirectory() else { return nil }
-        let fileURL = directory.appendingPathComponent(asset.relativeFilePath, isDirectory: false)
-        guard FileManager.default.fileExists(atPath: fileURL.path) else { return nil }
+        guard let directory = try? DownloadManager.downloadsDirectory(),
+              let fileURL = try? DownloadFileAccess.resolve(directory: directory, name: asset.relativeFilePath),
+              (try? fileURL.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true else { return nil }
         return fileURL
+    }
+
+    /// Clears files orphaned by older versions, preserving every still-recorded asset.
+    func clearOrphanedFiles() async throws -> Int {
+        let names = Set(try await downloadsRepository.allAssets().map(\.relativeFilePath))
+        let directory = try DownloadManager.downloadsDirectory()
+        let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles])
+        var failed = 0
+        for file in files where !names.contains(file.lastPathComponent) && !file.lastPathComponent.hasSuffix(".part") {
+            do {
+                try removeDownloadFile(DownloadFileAccess.resolve(directory: directory, name: file.lastPathComponent))
+            } catch { failed += 1 }
+        }
+        return failed
     }
 
     func totalBytesUsed() async -> Int64 {

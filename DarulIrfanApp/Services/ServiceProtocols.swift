@@ -201,6 +201,11 @@ protocol DownloadManaging: AnyObject {
     func localURL(for asset: DownloadedAsset) -> URL?
     /// Total bytes used by downloads (storage controls in Settings).
     func totalBytesUsed() async -> Int64
+    func clearOrphanedFiles() async throws -> Int
+}
+
+extension DownloadManaging {
+    func clearOrphanedFiles() async throws -> Int { 0 }
 }
 
 // MARK: - Content sync

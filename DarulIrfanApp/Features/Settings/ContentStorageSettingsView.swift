@@ -50,7 +50,9 @@ struct ContentStorageSettingsView: View {
     private var storageSection: some View {
         Section {
             LabeledContent("Storage Used") {
-                if viewModel.hasLoaded {
+                if viewModel.loadFailed {
+                    Text(verbatim: "--")
+                } else if viewModel.hasLoaded {
                     Text(viewModel.bytesUsed, format: .byteCount(style: .file))
                         .monospacedDigit()
                 } else {
@@ -60,7 +62,9 @@ struct ContentStorageSettingsView: View {
             .listRowBackground(DIColor.surface)
 
             LabeledContent("Downloaded Items") {
-                if viewModel.hasLoaded {
+                if viewModel.loadFailed {
+                    Text(verbatim: "--")
+                } else if viewModel.hasLoaded {
                     Text(viewModel.assetCount, format: .number)
                         .monospacedDigit()
                 } else {
@@ -80,8 +84,15 @@ struct ContentStorageSettingsView: View {
                     }
                 }
             }
-            .disabled(viewModel.assetCount == 0 || viewModel.isClearing || !viewModel.hasLoaded)
+            .buttonStyle(DISecondaryButtonStyle(destructive: true))
+            .disabled((viewModel.assetCount == 0 && viewModel.bytesUsed == 0) || viewModel.loadFailed || viewModel.isClearing || !viewModel.hasLoaded)
             .listRowBackground(DIColor.surface)
+            if viewModel.loadFailed {
+                Button("Retry") { Task { await viewModel.load() } }
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(viewModel.isClearing)
+                    .listRowBackground(DIColor.surface)
+            }
         } header: {
             SettingsSectionHeader(titleKey: "Storage", systemImage: "internaldrive.fill")
         } footer: {
@@ -95,7 +106,7 @@ struct ContentStorageSettingsView: View {
             Text("Some files could not be removed. Please try again.")
         } else if viewModel.loadFailed {
             Text("Storage details could not be loaded right now.")
-        } else if viewModel.hasLoaded && viewModel.assetCount == 0 {
+        } else if viewModel.hasLoaded && viewModel.assetCount == 0 && viewModel.bytesUsed == 0 {
             Text("You have no downloaded content yet. Lectures and publications you download for offline use will appear here.")
         } else {
             Text("Removing downloads frees space on this device; everything remains available to stream or download again.")
@@ -152,8 +163,9 @@ final class StorageSettingsViewModel {
                     failedDeletions += 1
                 }
             }
+            failedDeletions += try await downloadManager.clearOrphanedFiles()
         } catch {
-            loadFailed = true
+            failedDeletions += 1
         }
         isClearing = false
         await load()
