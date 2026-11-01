@@ -88,7 +88,7 @@ struct PostAttachmentStrip: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: DISpacing.sm) {
-                ForEach(attachments) { attachment in
+                ForEach(Array(attachments.enumerated()), id: \.element.id) { index, attachment in
                     ZStack(alignment: .topTrailing) {
                         Group {
                             if let preview = attachment.preview {
@@ -109,10 +109,11 @@ struct PostAttachmentStrip: View {
                         } label: {
                             Image(systemName: "xmark.circle.fill").diInterfaceFont(.title3).symbolRenderingMode(.palette)
                                 .foregroundStyle(.white, Color.black.opacity(0.6))
+                                .frame(width: 48, height: 48)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .padding(4)
-                        .accessibilityLabel(Text("Remove"))
+                        .accessibilityLabel(Text("Remove attachment \(index + 1)"))
                     }
                 }
             }
