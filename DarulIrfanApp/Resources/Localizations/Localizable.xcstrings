@@ -33390,6 +33390,40 @@
           }
         }
       }
+    },
+    "Location and local weather": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Location and local weather"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقام اور مقامی موسم"
+          }
+        }
+      }
+    },
+    "Prayer times and Qibla are calculated on this device. When Weather on Today is enabled, the selected city's approximate coordinates, rounded to a 0.1-degree grid, are sent to our weather service. The app keeps no location history.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer times and Qibla are calculated on this device. When Weather on Today is enabled, the selected city's approximate coordinates, rounded to a 0.1-degree grid, are sent to our weather service. The app keeps no location history."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کے اوقات اور قبلے کی سمت کا حساب اسی ڈیوائس پر ہوتا ہے۔ آج کے صفحے پر موسم فعال ہونے کی صورت میں منتخب شہر کے اندازاً مختصات، 0.1 درجے کے گرڈ تک گول کر کے، ہماری موسم کی سروس کو بھیجے جاتے ہیں۔ ایپ مقام کی سابقہ تفصیلات محفوظ نہیں کرتی۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

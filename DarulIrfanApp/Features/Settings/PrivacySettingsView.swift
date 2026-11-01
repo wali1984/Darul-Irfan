@@ -24,8 +24,8 @@ struct PrivacySettingsView: View {
 
                 PrivacyCard(
                     systemImage: "location.fill",
-                    titleKey: "Location stays on this device",
-                    bodyKey: "Prayer times and the Qibla direction are calculated locally. Your coordinates are never sent to a server, and no location history is kept — only the city used for calculations is saved, with its coordinates rounded to city-level accuracy."
+                    titleKey: "Location and local weather",
+                    bodyKey: "Prayer times and Qibla are calculated on this device. When Weather on Today is enabled, the selected city's approximate coordinates, rounded to a 0.1-degree grid, are sent to our weather service. The app keeps no location history."
                 )
                 .diAppear(delay: 0.06)
 
