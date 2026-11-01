@@ -130,6 +130,18 @@ final class RedesignScreenshotTests: XCTestCase {
             row.tap()
             let title = app.navigationBars[target.0]
             let ayah = app.staticTexts["\(ayahWord) \(target.1)"].firstMatch
+            guard title.waitForExistence(timeout: 15) else {
+                shot("parah-\(number)-title-failure"); XCTFail("Wrong surah for Parah \(number)"); return
+            }
+            if target.1 == 1 {
+                // A new surah begins with its heading and listening options.
+                // Enlarged text can put the first ayah below those controls.
+                shot("parah-\(number)-landing")
+                for _ in 0..<6 {
+                    if ayah.exists && ayah.isHittable { break }
+                    app.swipeUp(); pause(0.4)
+                }
+            }
             guard title.waitForExistence(timeout: 15), ayah.waitForExistence(timeout: 15),
                   ayah.isHittable else {
                 shot("parah-\(number)-destination-failure")
