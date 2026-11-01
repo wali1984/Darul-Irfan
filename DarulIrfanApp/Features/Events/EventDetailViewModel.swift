@@ -18,6 +18,9 @@ final class EventDetailViewModel {
 
     let event: CommunityEvent
     private let notifications: any NotificationScheduling
+    private let now: () -> Date
+    private var reminderRevision = 0
+    private(set) var scheduledReminderDate: Date?
 
     private(set) var calendarState: CalendarAddState = .idle
     private(set) var isReminderScheduled: Bool
@@ -26,9 +29,10 @@ final class EventDetailViewModel {
     private(set) var reminderWorking = false
     private(set) var reminderFailed = false
 
-    init(event: CommunityEvent, notifications: any NotificationScheduling) {
+    init(event: CommunityEvent, notifications: any NotificationScheduling, now: @escaping () -> Date = Date.init) {
         self.event = event
         self.notifications = notifications
+        self.now = now
         self.isReminderScheduled = UserDefaults.standard.bool(forKey: Self.reminderKey(for: event.id))
     }
 
@@ -45,7 +49,7 @@ final class EventDetailViewModel {
     /// already begun (the reminder action is hidden then).
     var reminderFireDate: Date? {
         guard let start = event.startDate else { return nil }
-        let now = Date()
+        let now = now()
         let dayBefore = start.addingTimeInterval(-24 * 3_600)
         if dayBefore > now { return dayBefore }
         let hourBefore = start.addingTimeInterval(-3_600)
@@ -55,6 +59,17 @@ final class EventDetailViewModel {
 
     var canOfferReminder: Bool {
         hasConcreteDates && (isReminderScheduled || reminderFireDate != nil)
+    }
+
+    /// Resolve saved flags against real pending requests; never invent a new fire date.
+    func refreshReminderStatus() async {
+        guard !reminderWorking else { return }
+        let revision = reminderRevision
+        let pending = await notifications.pendingReminderDate(id: Self.reminderKey(for: event.id))
+        guard !reminderWorking, revision == reminderRevision else { return }
+        scheduledReminderDate = pending.flatMap { $0 > now() ? $0 : nil }
+        isReminderScheduled = scheduledReminderDate != nil
+        UserDefaults.standard.set(isReminderScheduled, forKey: Self.reminderKey(for: event.id))
     }
 
     func addToCalendar() async {
@@ -91,12 +106,14 @@ final class EventDetailViewModel {
 
     func toggleReminder() async {
         guard !reminderWorking else { return }
+        reminderRevision += 1
         reminderWorking = true
         reminderFailed = false
         defer { reminderWorking = false }
         let key = Self.reminderKey(for: event.id)
         if isReminderScheduled {
             await notifications.cancelReminder(id: key)
+            scheduledReminderDate = nil
             isReminderScheduled = false
             UserDefaults.standard.set(false, forKey: key)
         } else {
@@ -122,8 +139,11 @@ final class EventDetailViewModel {
                 reminderFailed = true
                 return
             }
-            isReminderScheduled = true
-            UserDefaults.standard.set(true, forKey: key)
+            let pending = await notifications.pendingReminderDate(id: key)
+            scheduledReminderDate = pending.flatMap { $0 > now() ? $0 : nil }
+            isReminderScheduled = scheduledReminderDate != nil
+            reminderFailed = !isReminderScheduled
+            UserDefaults.standard.set(isReminderScheduled, forKey: key)
         }
     }
 

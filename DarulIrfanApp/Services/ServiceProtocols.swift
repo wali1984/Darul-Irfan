@@ -126,6 +126,9 @@ protocol NotificationScheduling: Sendable {
 
     /// Count of currently pending requests (used by tests/diagnostics).
     func pendingCount() async -> Int
+
+    /// Earliest actual pending trigger for this reminder, including legacy saved choices.
+    func pendingReminderDate(id: String) async -> Date?
 }
 
 // MARK: - Hijri calendar

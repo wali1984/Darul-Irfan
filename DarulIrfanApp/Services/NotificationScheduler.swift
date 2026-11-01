@@ -457,6 +457,15 @@ final class NotificationScheduler: NotificationScheduling {
 
     // MARK: Diagnostics
 
+    func pendingReminderDate(id: String) async -> Date? {
+        let base = Self.reminderIdentifier(id)
+        let requests = await UNUserNotificationCenter.current().pendingNotificationRequests()
+        let now = Date()
+        return requests.filter { Self.belongs($0.identifier, to: base) }
+            .compactMap { $0.trigger?.nextTriggerDate() }
+            .filter { $0 > now }.min()
+    }
+
     func pendingCount() async -> Int {
         await UNUserNotificationCenter.current().pendingNotificationRequests().count
     }

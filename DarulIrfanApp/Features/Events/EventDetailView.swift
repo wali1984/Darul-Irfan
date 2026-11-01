@@ -56,6 +56,13 @@ struct EventDetailView: View {
         .navigationTitle(viewModel.event.kind.eventDisplayNameKey)
         .navigationBarTitleDisplayMode(.inline)
         .diScreenBackground()
+        .task {
+            while !Task.isCancelled {
+                await viewModel.refreshReminderStatus()
+                do { try await Task.sleep(for: .seconds(30)) }
+                catch { return }
+            }
+        }
         .alert("Calendar access needed", isPresented: $viewModel.showCalendarDeniedAlert) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -210,7 +217,7 @@ struct EventDetailView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    if viewModel.isReminderScheduled, let fireDate = viewModel.reminderFireDate {
+                    if viewModel.isReminderScheduled, let fireDate = viewModel.scheduledReminderDate {
                         Text("You will be reminded on \(fireDate.formatted(Date.FormatStyle(date: .abbreviated, time: .shortened, locale: locale))).")
                             .diInterfaceFont(.footnote)
                             .foregroundStyle(DIColor.textMuted)

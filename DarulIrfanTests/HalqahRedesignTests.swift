@@ -230,6 +230,38 @@ final class HalqahRedesignTests: XCTestCase {
         XCTAssertFalse(UserDefaults.standard.bool(forKey: key))
     }
 
+    @MainActor
+    func testEventConfirmationUsesPendingDateAcrossDayBeforeBoundary() async {
+        let id = "audit-date-\(UUID().uuidString)"
+        let key = "eventReminder.\(id)"
+        defer { UserDefaults.standard.removeObject(forKey: key) }
+        var clock = Date()
+        let start = clock.addingTimeInterval(3 * 86_400)
+        let actual = start.addingTimeInterval(-86_400)
+        let notifications = RecordingNotifications()
+        let model = EventDetailViewModel(event: event(id: id, start: start), notifications: notifications, now: { clock })
+        await model.toggleReminder()
+        XCTAssertEqual(model.scheduledReminderDate, actual)
+        // Reopening migrates the old Boolean using the scheduler's actual trigger.
+        let reopened = EventDetailViewModel(event: event(id: id, start: start), notifications: notifications, now: { clock })
+        await reopened.refreshReminderStatus()
+        XCTAssertEqual(reopened.scheduledReminderDate, actual)
+        clock = actual.addingTimeInterval(1)
+        XCTAssertEqual(reopened.reminderFireDate, start.addingTimeInterval(-3_600))
+        await reopened.refreshReminderStatus()
+        XCTAssertNil(reopened.scheduledReminderDate)
+        XCTAssertFalse(reopened.isReminderScheduled)
+        XCTAssertFalse(UserDefaults.standard.bool(forKey: key))
+        XCTAssertTrue(reopened.canOfferReminder)
+        // A new user-requested reminder is required to schedule the hour-before time.
+        await reopened.toggleReminder()
+        XCTAssertEqual(reopened.scheduledReminderDate, start.addingTimeInterval(-3_600))
+        await reopened.toggleReminder()
+        XCTAssertNil(reopened.scheduledReminderDate)
+        let cancelledDate = await notifications.pendingReminderDate(id: key)
+        XCTAssertNil(cancelledDate)
+    }
+
     private func event(id: String, start: Date?) -> CommunityEvent {
         CommunityEvent(
             id: id,
@@ -306,6 +338,8 @@ private final class RecordingNotifications: NotificationScheduling, @unchecked S
     private(set) var scheduled: [String: [Date]] = [:]
     private(set) var cancelled: [String] = []
 
+    func pendingReminderDate(id: String) async -> Date? { scheduled[id]?.min() }
+
     func requestPermission() async -> Bool { granted }
 
     func reschedulePrayerNotifications(
@@ -325,6 +359,7 @@ private final class RecordingNotifications: NotificationScheduling, @unchecked S
 
     func cancelReminder(id: String) async {
         cancelled.append(id)
+        scheduled.removeValue(forKey: id)
     }
 
     func notificationsAllowed() async -> Bool { granted }
