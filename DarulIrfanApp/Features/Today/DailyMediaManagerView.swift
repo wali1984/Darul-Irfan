@@ -272,6 +272,7 @@ struct DailyMediaEditor: View {
     }
 
     private func save(publish: Bool) async {
+        guard !working, !loadingPicture, item != nil || picture != nil else { return }
         working = true
         error = nil
         defer { working = false }
@@ -292,29 +293,38 @@ struct DailyMediaEditor: View {
                 )
             }
             dismiss()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
     }
 
     private func setStatus(_ status: String) async {
-        guard let item else { return }
+        guard !working, !loadingPicture, let item else { return }
         working = true
+        error = nil
         defer { working = false }
         do {
             try await service.updateDailyMedia(item.id, ["status": status])
             dismiss()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
     }
 
     private func delete(_ item: DailyMediaItem) async {
+        guard !working, !loadingPicture else { return }
         working = true
+        error = nil
         defer { working = false }
         do {
             try await service.deleteDailyMedia(item.id)
             dismiss()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
