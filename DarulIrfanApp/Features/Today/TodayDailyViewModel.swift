@@ -25,7 +25,10 @@ final class TodayDailyViewModel {
 
     private(set) var hadith: HadithOfTheDay?
     /// What the Super admin published for today.
-    private(set) var media: [DailyMediaItem] = []
+    private let mediaState = TodayMediaState()
+    var media: [DailyMediaItem] { mediaState.items }
+    var mediaFailed: Bool { mediaState.failed }
+    var mediaLoading: Bool { mediaState.loading }
 
     /// The day's ayah as the reader shows it: the mushaf's own Arabic, the
     /// Silsila's Akram-ut-Tarajum in the reading language, a full reference,
@@ -79,7 +82,9 @@ final class TodayDailyViewModel {
 
     /// Today's pictures, for the phone's local day. Quietly nothing offline.
     func loadMedia(on date: Date = Date()) async {
-        media = (try? await mediaService.dailyMedia(day: DayKey.make(from: date, timeZone: .autoupdatingCurrent))) ?? []
+        await mediaState.load(day: DayKey.make(from: date, timeZone: .autoupdatingCurrent)) { day in
+            try await mediaService.dailyMedia(day: day)
+        }
     }
 
     /// Picks the day's hadith, preferring one short enough for the card and
@@ -285,4 +290,35 @@ struct DailyDhikr: Codable, Sendable, Identifiable, Equatable {
                    transliteration: "Allahumma salli 'ala Muhammad",
                    meaning: "O Allah, send blessings upon Muhammad ﷺ", count: 100, source: "Sahih Muslim 408"),
     ]
+}
+
+@Observable
+@MainActor
+final class TodayMediaState {
+    private(set) var items: [DailyMediaItem] = []
+    private(set) var failed = false
+    private(set) var loading = false
+    private var day: String?
+    private var generation = 0
+
+    func load(day requestDay: String, loader: (String) async throws -> [DailyMediaItem]) async {
+        generation += 1
+        let request = generation
+        if day != requestDay { items = [] }
+        day = requestDay
+        failed = false
+        loading = true
+        defer { if generation == request { loading = false } }
+        do {
+            let loaded = try await loader(requestDay)
+            try Task.checkCancellation()
+            guard generation == request else { return }
+            items = loaded
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled, generation == request else { return }
+            failed = true
+        }
+    }
 }

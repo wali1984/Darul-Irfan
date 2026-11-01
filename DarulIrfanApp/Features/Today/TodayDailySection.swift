@@ -23,10 +23,10 @@ struct TodayDailySection: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(appState: AppState, dependencies: AppDependencies? = nil) {
+    init(appState: AppState, dependencies: AppDependencies? = nil, viewModel: TodayDailyViewModel? = nil) {
         self.appState = appState
         self.dependencies = dependencies
-        _viewModel = State(initialValue: TodayDailyViewModel(
+        _viewModel = State(initialValue: viewModel ?? TodayDailyViewModel(
             appState: appState,
             quranRepository: dependencies?.quranRepository,
             hadithRepository: dependencies?.hadithRepository
@@ -36,6 +36,12 @@ struct TodayDailySection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             if viewModel.isLoaded {
+                if viewModel.mediaFailed {
+                    Text("The action could not be completed. Check your connection and try again.").diInterfaceFont(.callout)
+                    Button("Retry") { Task { await viewModel.loadMedia() } }
+                        .buttonStyle(DISecondaryButtonStyle())
+                        .disabled(viewModel.mediaLoading)
+                }
                 ForEach(viewModel.announcements) { item in
                     announcementCard(item)
                 }

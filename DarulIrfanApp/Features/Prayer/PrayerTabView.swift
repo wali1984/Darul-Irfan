@@ -14,12 +14,15 @@ struct PrayerTabView: View {
     @State private var viewModel: PrayerViewModel
     @State private var liveModel: TodayLiveModel
     @State private var isSearchPresented = false
+    @State private var isRefreshing = false
+    @State private var dailyModel: TodayDailyViewModel
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.dependencies = dependencies
         self.appState = appState
+        _dailyModel = State(initialValue: TodayDailyViewModel(appState: appState, quranRepository: dependencies.quranRepository, hadithRepository: dependencies.hadithRepository))
         _viewModel = State(initialValue: PrayerViewModel(dependencies: dependencies, appState: appState))
         _liveModel = State(initialValue: TodayLiveModel(platform: dependencies.officialPlatform))
     }
@@ -41,7 +44,7 @@ struct PrayerTabView: View {
                     PersonalZikrLink()
                     TodayQuickTools(dependencies: dependencies, appState: appState)
                         .diAppear(delay: 0.05)
-                    TodayDailySection(appState: appState, dependencies: dependencies)
+                    TodayDailySection(appState: appState, dependencies: dependencies, viewModel: dailyModel)
                         .diAppear(delay: 0.10)
                     TodayContinueCard(dependencies: dependencies)
                 }
@@ -90,7 +93,11 @@ struct PrayerTabView: View {
                 await liveModel.follow()
             }
             .refreshable {
+                guard !isRefreshing else { return }
+                isRefreshing = true
+                defer { isRefreshing = false }
                 await viewModel.refresh()
+                await dailyModel.loadMedia()
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
