@@ -13,7 +13,9 @@ struct YouTubePlayerSheet: View {
                 .navigationTitle(title)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Done") { dismiss() }.buttonStyle(DICompactButtonStyle())
+                    }
                 }
         }
     }
