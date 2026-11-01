@@ -462,7 +462,15 @@ final class NotificationScheduler: NotificationScheduling {
         let requests = await UNUserNotificationCenter.current().pendingNotificationRequests()
         let now = Date()
         return requests.filter { Self.belongs($0.identifier, to: base) }
-            .compactMap { $0.trigger?.nextTriggerDate() }
+            .compactMap { request -> Date? in
+                if let trigger = request.trigger as? UNCalendarNotificationTrigger {
+                    return trigger.nextTriggerDate()
+                }
+                if let trigger = request.trigger as? UNTimeIntervalNotificationTrigger {
+                    return trigger.nextTriggerDate()
+                }
+                return nil
+            }
             .filter { $0 > now }.min()
     }
 
