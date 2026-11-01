@@ -940,24 +940,46 @@ struct TafsirVolumeDestination: View {
     var fontScale: Double = 1
     @State private var item: ContentItem?
     @State private var hasNoPages = false
+    @State private var failed = false
+    @State private var attempt = 0
 
     var body: some View {
         Group {
             if let item {
                 BookTextReaderView(item: item, dependencies: dependencies, startPage: volume.page, fontScale: fontScale)
+                    .id(volume.id)
+            } else if failed {
+                VStack(spacing: DISpacing.sm) {
+                    Text("The action could not be completed. Check your connection and try again.")
+                        .diInterfaceFont(.callout)
+                        .foregroundStyle(DIColor.textPrimary)
+                    Button("Retry") { attempt += 1 }
+                        .buttonStyle(DICompactButtonStyle())
+                }.padding(DISpacing.md)
             } else if hasNoPages {
                 DIEmptyState(systemImage: "text.book.closed", titleKey: "No text for this book yet")
             } else {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .task {
-            let pageCount = (try? await dependencies.contentRepository.bookPageCount(bookID: volume.bookID)) ?? 0
+        .diScreenBackground()
+        .task(id: "\(volume.id)|\(attempt)") { await load() }
+    }
+
+    @MainActor
+    private func load() async {
+        item = nil
+        hasNoPages = false
+        failed = false
+        do {
+            let pageCount = try await dependencies.contentRepository.bookPageCount(bookID: volume.bookID)
+            try Task.checkCancellation()
             guard pageCount > 0 else {
                 hasNoPages = true
                 return
             }
             let stored = try? await dependencies.contentRepository.item(id: volume.bookID)
+            try Task.checkCancellation()
             item = stored ?? ContentItem(
                 id: volume.bookID,
                 sourceUrl: "",
@@ -977,6 +999,9 @@ struct TafsirVolumeDestination: View {
                 checksum: nil,
                 rightsStatus: .permissionConfirmed
             )
+        } catch is CancellationError {
+        } catch {
+            if !Task.isCancelled { failed = true }
         }
     }
 }
