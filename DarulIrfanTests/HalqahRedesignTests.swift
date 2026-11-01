@@ -187,6 +187,23 @@ final class HalqahRedesignTests: XCTestCase {
     // MARK: - Event reminders
 
     @MainActor
+    func testTopicsReadFailureCanRetryAndDistinguishesEmptyCatalogue() {
+        var rejects = true
+        let model = TopicsBrowseViewModel(loader: {
+            if rejects { throw CocoaError(.fileReadCorruptFile) }
+            return []
+        })
+        model.load()
+        XCTAssertTrue(model.failed)
+        XCTAssertFalse(model.loaded)
+        rejects = false
+        model.load()
+        XCTAssertFalse(model.failed)
+        XCTAssertTrue(model.loaded)
+        XCTAssertTrue(model.topics.isEmpty)
+    }
+
+    @MainActor
     func testEventReminderFailureDoesNotSaveSuccessAndCanRetry() async {
         let id = "audit-reminder-\(UUID().uuidString)"
         let key = "eventReminder.\(id)"

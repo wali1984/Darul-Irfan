@@ -36,6 +36,17 @@ struct TopicsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
+            if viewModel.failed {
+                Text("Topics could not be loaded. Please try again.")
+                    .font(.footnote)
+                    .foregroundStyle(DIColor.danger)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Retry") { viewModel.load() }
+                    .buttonStyle(DISecondaryButtonStyle())
+            } else if viewModel.loaded && viewModel.topics.isEmpty {
+                Text("No topics available yet.")
+                    .foregroundStyle(DIColor.textMuted)
+            }
             if let theme = ThemeOfTheDay.topic(from: viewModel.topics) {
                 NavigationLink {
                     TopicDetailView(topic: theme, dependencies: dependencies, appState: appState)
@@ -61,7 +72,7 @@ struct TopicsSection: View {
             }
         }
         .task {
-            if viewModel.topics.isEmpty { viewModel.load() }
+            if !viewModel.loaded { viewModel.load() }
         }
     }
 

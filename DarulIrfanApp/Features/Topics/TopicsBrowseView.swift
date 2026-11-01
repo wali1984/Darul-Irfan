@@ -25,5 +25,26 @@ struct TopicsBrowseView: View {
 @MainActor
 final class TopicsBrowseViewModel {
     private(set) var topics: [Topic] = []
-    func load() { topics = SeedBundle.topics() }
+    private(set) var failed = false
+    private(set) var loaded = false
+    private let loader: () throws -> [Topic]
+
+    init(loader: @escaping () throws -> [Topic] = {
+        guard SeedBundle.url(forFile: "topics") != nil else {
+            throw SeedBundle.LoadError.unreadable(file: "topics", reason: "Missing catalogue")
+        }
+        return try SeedBundle.strictArray(Topic.self, fromFile: "topics")
+    }) {
+        self.loader = loader
+    }
+
+    func load() {
+        failed = false
+        do {
+            topics = try loader()
+            loaded = true
+        } catch {
+            failed = true
+        }
+    }
 }
