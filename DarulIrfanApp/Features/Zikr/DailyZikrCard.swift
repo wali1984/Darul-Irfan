@@ -286,7 +286,7 @@ private struct DailyZikrCountdown: View {
                 HStack(spacing: DISpacing.md) {
                     ZikrCountdownRing(progress: ZikrCountdown.ringProgress(window, at: context.date), active: active)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(active ? "Zikr in progress" : "Zikr begins in")
+                        Text(active ? "Zikr in progress" : "Next Zikr begins in")
                             .diInterfaceFont(.footnote, weight: .medium)
                             .foregroundStyle(.white.opacity(0.82))
                         Text(active ? window.end : window.start, style: .timer)

@@ -84,7 +84,7 @@ struct ZikrSessionPanel: View {
             if let window {
                 let active = window.isActive(at: now)
                 VStack(alignment: .trailing, spacing: 1) {
-                    Text(active ? "Zikr in progress" : "Zikr begins in")
+                    Text(active ? "Zikr in progress" : "Next Zikr begins in")
                         .diInterfaceFont(.caption2, weight: .semibold)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.trailing)

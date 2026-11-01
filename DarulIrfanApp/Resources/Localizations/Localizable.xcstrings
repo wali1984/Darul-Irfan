@@ -34121,6 +34121,23 @@
           }
         }
       }
+    },
+    "Next Zikr begins in": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Zikr begins in"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلا ذکر شروع ہونے میں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
