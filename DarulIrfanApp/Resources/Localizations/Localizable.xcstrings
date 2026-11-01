@@ -33526,6 +33526,23 @@
           }
         }
       }
+    },
+    "Discard this session?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard this session?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کیا اس سیشن کو ختم کر کے ضائع کر دیں؟"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

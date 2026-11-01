@@ -8,6 +8,7 @@ struct PersonalZikrView: View {
     @State private var customName = ""
     @State private var choosing: PersonalZikrStep?
     @State private var ended = false
+    @State private var confirmingDiscard = false
     @State private var denied = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -60,6 +61,10 @@ struct PersonalZikrView: View {
         .onChange(of: scenePhase) { _, phase in
             store.screenActive = phase == .active
             if phase == .active { store.settle(); store.refreshAlerts() }
+        }
+        .confirmationDialog("Discard this session?", isPresented: $confirmingDiscard, titleVisibility: .visible) {
+            Button("Discard session", role: .destructive) { store.discard(); ended = false }
+            Button("Cancel", role: .cancel) { }
         }
         .sheet(item: $choosing) { step in durationSheet(step) }
         .sheet(isPresented: $adding) {
@@ -115,7 +120,7 @@ struct PersonalZikrView: View {
                 HStack(spacing: 12) { controls }
                 VStack(spacing: 12) { controls }
             }
-            if run != nil { Button("Discard session") { store.discard(); ended = false }.buttonStyle(ZikrTimerButtonStyle()) }
+            if run != nil { Button("Discard session") { confirmingDiscard = true }.buttonStyle(ZikrTimerButtonStyle()) }
             if ended { Text("Your personal Zikr session is complete.").font(.footnote).foregroundStyle(Color(hex: 0xF4D889)) }
         }
         .tint(Color(hex: 0xE9CE86))
