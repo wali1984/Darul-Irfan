@@ -97,6 +97,7 @@ struct SilsilaSection: View {
 /// A row that opens one of the Silsila's categories.
 @MainActor
 private struct SilsilaEntryLink: View {
+    @Environment(\.methodGuideReaderScale) private var readerScale
     let entry: SilsilaEntry
     let dependencies: AppDependencies
     let appState: AppState
@@ -122,6 +123,8 @@ private struct SilsilaEntryLink: View {
     private var destination: some View {
         if entry.opensShajra {
             ShajraView()
+        } else if entry.category == .methodOfZikr {
+            NativeMethodOfZikrView(readerFontScale: readerScale)
         } else {
             SilsilaCategoryDestination(entry: entry, dependencies: dependencies, appState: appState, library: library)
         }
