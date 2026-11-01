@@ -160,6 +160,9 @@ private struct GoldTextShimmer: ViewModifier {
                 }
             }
             .mask(content)
+            // The moving highlight and its text mask are decorative. Exposing
+            // them expands the reading element's accessibility frame as it moves.
+            .accessibilityHidden(true)
             .allowsHitTesting(false)
         )
     }
