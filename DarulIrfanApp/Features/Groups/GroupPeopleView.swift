@@ -19,6 +19,7 @@ struct GroupPeopleView: View {
     @State private var adding = false
     @State private var working = false
     @State private var removing: GroupPerson?
+    @State private var loadGeneration = 0
 
     private var appointer: Bool { people?.canAppointAdministrators == true }
 
@@ -77,7 +78,7 @@ struct GroupPeopleView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         .task { await load() }
-        .refreshable { await load() }
+        .refreshable { if !working { await load() } }
         .disabled(working)
         .sheet(isPresented: $adding, onDismiss: { Task { await load() } }) {
             NavigationStack {
@@ -196,10 +197,17 @@ struct GroupPeopleView: View {
     }
 
     private func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         do {
-            people = try await service.people(in: groupID)
+            let loaded = try await service.people(in: groupID)
+            guard !Task.isCancelled, generation == loadGeneration else { return }
+            people = loaded
             error = nil
+        } catch is CancellationError {
+            return
         } catch {
+            guard !Task.isCancelled, generation == loadGeneration else { return }
             self.error = error.localizedDescription
         }
     }
@@ -207,6 +215,8 @@ struct GroupPeopleView: View {
     private func act(_ change: () async throws -> Void) async {
         guard !working else { return }
         working = true
+        // Invalidate reads that could restore roles or invitations from before the action.
+        loadGeneration += 1
         defer { working = false }
         do {
             try await change()
