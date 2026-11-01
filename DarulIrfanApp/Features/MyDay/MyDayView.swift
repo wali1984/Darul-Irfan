@@ -44,19 +44,32 @@ struct MyDayView: View {
                     NotesView()
                 } label: {
                     Label("Private notes", systemImage: "note.text")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(DISecondaryButtonStyle())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
                 NavigationLink {
                     FocusTimerView(dependencies: dependencies, appState: appState)
                 } label: {
                     Label("Your Daily Personal Zikr", systemImage: "timer")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(DISecondaryButtonStyle())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
                 NavigationLink {
                     FastingView(dependencies: dependencies, appState: appState)
                 } label: {
                     Label("Fasting record", systemImage: "moon.haze")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(DISecondaryButtonStyle())
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
             } footer: {
                 Text("Your tasks, notes and fasts stay on this phone. They are not part of any account and are never sent anywhere.")
+                    .foregroundStyle(DIColor.textMuted)
             }
         }
         .listStyle(.insetGrouped)
