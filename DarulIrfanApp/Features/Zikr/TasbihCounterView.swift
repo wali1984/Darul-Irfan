@@ -59,12 +59,13 @@ struct TasbihCounterView: View {
             withAnimation(.spring(response: 0.16, dampingFraction: 0.5)) { countBump = 1.10 }
             withAnimation(.spring(response: 0.34, dampingFraction: 0.6).delay(0.07)) { countBump = 1.0 }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.hasReachedTarget)
+        .animation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: viewModel.hasReachedTarget)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Edit") {
                     isEditing = true
                 }
+                .buttonStyle(DICompactButtonStyle())
             }
         }
         .sheet(isPresented: $isEditing) {
@@ -117,7 +118,7 @@ struct TasbihCounterView: View {
                     .rotationEffect(.degrees(-90))
                     .environment(\.layoutDirection, .leftToRight)
                     .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 12)
-                    .animation(.spring(response: 0.5, dampingFraction: 0.8), value: viewModel.progress)
+                    .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.8), value: viewModel.progress)
             } else {
                 // Open-ended: a quiet emerald ring so the surface still feels alive.
                 Circle()
@@ -193,9 +194,10 @@ struct TasbihCounterView: View {
 // MARK: - Tap feedback style
 
 private struct TasbihTapButtonStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.22, dampingFraction: 0.55), value: configuration.isPressed)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1.0)
+            .animation(reduceMotion ? nil : .spring(response: 0.22, dampingFraction: 0.55), value: configuration.isPressed)
     }
 }

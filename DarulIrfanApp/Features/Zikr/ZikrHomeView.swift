@@ -17,6 +17,7 @@ struct ZikrHomeView: View {
     @State private var focus: Focus?
     @State private var personalZikr = false
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private let dependencies: AppDependencies
     private let appState: AppState
     private let groupService = MemberGroupService()
@@ -338,7 +339,10 @@ struct ZikrHomeView: View {
 
     /// "Recent Bayans", with See all to Discover › Bayans (the `media` route).
     private var bayansHeader: some View {
-        HStack(spacing: DISpacing.sm) {
+        let layout = dynamicTypeSize >= .xxLarge
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: DISpacing.sm))
+            : AnyLayout(HStackLayout(spacing: DISpacing.sm))
+        return layout {
             DISectionHeader(titleKey: "Recent Bayans", systemImage: "play.rectangle.on.rectangle")
             Button {
                 DIHaptics.soft()
@@ -346,11 +350,10 @@ struct ZikrHomeView: View {
             } label: {
                 Text("See all")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(DIColor.primary)
                     .frame(minHeight: 44)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DICompactButtonStyle())
         }
     }
 }
