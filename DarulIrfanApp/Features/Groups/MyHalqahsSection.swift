@@ -297,6 +297,12 @@ struct MyHalqahsSection: View {
             }
 
             if MemberGroupsFeature.appleSignInAvailable {
+                // The system control can render only its symbol in some locales.
+                // Keep its purpose visible without altering Apple's native button.
+                Text("Sign in with Apple to see your private group")
+                    .diInterfaceFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(DIColor.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text("Or sign in, then ask an administrator to add you.")
                     .diInterfaceFont(.footnote)
                     .foregroundStyle(.secondary)
