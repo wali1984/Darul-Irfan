@@ -120,9 +120,9 @@ struct TodayHeroView: View {
                             Image(systemName: "pencil").font(.system(size: 11)).foregroundStyle(Color(hex: 0xE9CE86).opacity(0.65))
                         }
                         .foregroundStyle(Color(hex: 0xE9CE86))
-                        .frame(minHeight: 32, alignment: .leading)
+                        .frame(minHeight: 48, alignment: .leading)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                     .accessibilityHint(Text("Correct Islamic date"))
                     .accessibilityIdentifier("today.hijri-correction")
                     Spacer(minLength: 0)
@@ -266,7 +266,7 @@ struct TodayHeroView: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
     }
 }
 

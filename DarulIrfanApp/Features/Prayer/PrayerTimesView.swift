@@ -12,6 +12,7 @@ struct PrayerTimesView: View {
     let viewModel: PrayerViewModel
     let dependencies: AppDependencies
     let appState: AppState
+    @State private var isRefreshing = false
 
     var body: some View {
         ScrollView {
@@ -37,6 +38,9 @@ struct PrayerTimesView: View {
         }
         .task { await viewModel.reloadTrackerWeek() }
         .refreshable {
+            guard !isRefreshing else { return }
+            isRefreshing = true
+            defer { isRefreshing = false }
             await viewModel.refresh()
             await viewModel.reloadTrackerWeek()
         }
@@ -61,7 +65,7 @@ struct PrayerTimesView: View {
                     .frame(minHeight: 44)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
             Spacer(minLength: 0)
         }
         .padding(.top, -DISpacing.sm)
@@ -227,7 +231,7 @@ struct PrayerAlertBell: View {
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .accessibilityLabel(Text("\(name) alert: \(styleName)"))
         .accessibilityHint(Text("Double tap to change the alert style."))
     }

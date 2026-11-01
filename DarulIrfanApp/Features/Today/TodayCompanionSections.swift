@@ -531,7 +531,7 @@ struct TodayReminderStatus: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .task { allowed = await dependencies.notifications.notificationsAllowed() }
         // Coming back from the Settings app with notifications allowed must
         // not leave "Notifications are off" on screen.
