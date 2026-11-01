@@ -28,6 +28,13 @@ final class PrayerTrackerDetailViewModel {
     private(set) var summary: PrayerStreakSummary?
     private(set) var hasAnyEntries = false
     private(set) var isLoading = true
+    private(set) var failed = false
+    private(set) var loadedWindow: Window?
+    private var generation = 0
+
+    init(trackerRepository: any TrackerRepositoryProtocol) {
+        self.trackerRepository = trackerRepository
+    }
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.trackerRepository = dependencies.trackerRepository
@@ -37,10 +44,15 @@ final class PrayerTrackerDetailViewModel {
     }
 
     func reload() async {
+        generation += 1
+        let request = generation
+        let selectedWindow = window
         isLoading = true
+        failed = false
+        defer { if generation == request { isLoading = false } }
         let now = Date()
         let todayKey = DayKey.make(from: now)
-        let keys = DayKey.trailing(window.rawValue, endingAt: now)
+        let keys = DayKey.trailing(selectedWindow.rawValue, endingAt: now)
         do {
             let entries = try await trackerRepository.prayerLog(dayKeys: keys)
             var byDay: [String: [Prayer: PrayerCompletion]] = [:]
@@ -61,16 +73,22 @@ final class PrayerTrackerDetailViewModel {
                     )
                 )
             }
+            let loadedSummary = try await trackerRepository.streakSummary(
+                endingAt: todayKey,
+                windowDays: selectedWindow.rawValue
+            )
+            try Task.checkCancellation()
+            guard generation == request, selectedWindow == window else { return }
             rows = builtRows
             hasAnyEntries = entries.contains { $0.completion != .unmarked }
-            summary = try await trackerRepository.streakSummary(
-                endingAt: todayKey,
-                windowDays: window.rawValue
-            )
+            summary = loadedSummary
+            loadedWindow = selectedWindow
+        } catch is CancellationError {
+            return
         } catch {
-            // Keep whatever was shown before; the tracker is non-critical.
+            guard !Task.isCancelled, generation == request, selectedWindow == window else { return }
+            failed = true
         }
-        isLoading = false
     }
 }
 
@@ -79,6 +97,7 @@ final class PrayerTrackerDetailViewModel {
 /// dashboard; this screen is for reflection.
 struct PrayerTrackerDetailView: View {
     @State private var viewModel: PrayerTrackerDetailViewModel
+    @State private var attempt = 0
 
     init(dependencies: AppDependencies, appState: AppState) {
         _viewModel = State(initialValue: PrayerTrackerDetailViewModel(dependencies: dependencies, appState: appState))
@@ -93,18 +112,22 @@ struct PrayerTrackerDetailView: View {
                     selection: $viewModel.window
                 )
 
-                if let summary = viewModel.summary {
-                    summaryCard(summary)
+                if viewModel.failed {
+                    Text("The action could not be completed. Check your connection and try again.").diInterfaceFont(.callout)
+                    Button("Retry") { attempt += 1 }
+                        .buttonStyle(DISecondaryButtonStyle())
+                        .disabled(viewModel.isLoading)
                 }
-
-                if !viewModel.hasAnyEntries && !viewModel.isLoading {
-                    DIEmptyState(
-                        systemImage: "circle.dashed",
-                        titleKey: "No prayers marked yet",
-                        messageKey: "Tap the circles on the Prayer tab to record each prayer — gently, at your own pace."
-                    )
-                } else {
-                    historyCard
+                if viewModel.isLoading { ProgressView().frame(maxWidth: .infinity) }
+                if viewModel.loadedWindow == viewModel.window {
+                    if let summary = viewModel.summary { summaryCard(summary) }
+                    if !viewModel.hasAnyEntries {
+                        DIEmptyState(
+                            systemImage: "circle.dashed",
+                            titleKey: "No prayers marked yet",
+                            messageKey: "Tap the circles on the Prayer tab to record each prayer \u{2014} gently, at your own pace."
+                        )
+                    } else { historyCard }
                 }
 
                 legendCard
@@ -114,11 +137,8 @@ struct PrayerTrackerDetailView: View {
         .diScreenBackground()
         .navigationTitle("Prayer History")
         .navigationBarTitleDisplayMode(.inline)
-        .task {
+        .task(id: "\(viewModel.window.rawValue):\(attempt)") {
             await viewModel.reload()
-        }
-        .onChange(of: viewModel.window) {
-            Task { await viewModel.reload() }
         }
     }
 

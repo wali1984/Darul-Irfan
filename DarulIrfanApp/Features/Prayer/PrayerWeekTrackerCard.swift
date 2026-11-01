@@ -151,7 +151,7 @@ struct PrayerWeekTrackerCard: View {
             .shadow(color: selected ? Color(hex: 0x0B7250).opacity(0.35) : Color.clear, radius: 9, y: 6)
             .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .disabled(!markable)
         .opacity(markable ? 1 : 0.35)
         .accessibilityLabel(Text(day, format: .dateTime.weekday(.wide).day().month(.wide)))
@@ -288,7 +288,7 @@ struct PrayerWeekTrackerCard: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .padding(.top, DISpacing.xs)
         .overlay(alignment: .top) {
             Rectangle()
