@@ -8,10 +8,12 @@ import UIKit
 @MainActor
 struct QiblaCompassView: View {
     private let appState: AppState
+    private let dependencies: AppDependencies
     @State private var viewModel: QiblaViewModel
 
     init(dependencies: AppDependencies, appState: AppState) {
         self.appState = appState
+        self.dependencies = dependencies
         _viewModel = State(initialValue: QiblaViewModel(
             qiblaService: dependencies.qibla,
             headingProvider: CompassHeadingProvider()
@@ -23,11 +25,15 @@ struct QiblaCompassView: View {
             if let place = appState.activePlace {
                 compassContent(for: place)
             } else {
-                DIEmptyState(
-                    systemImage: "location.slash",
-                    titleKey: "Set your location to find the Qibla",
-                    messageKey: "Allow location access or choose your city in Settings, and the compass will point toward the Kaaba."
-                )
+                VStack(spacing: DISpacing.lg) {
+                    DIEmptyState(
+                        systemImage: "location.slash",
+                        titleKey: "Set your location to find the Qibla",
+                        messageKey: "Allow location access or choose your city in Settings, and the compass will point toward the Kaaba."
+                    )
+                    locationLink()
+                }
+                .padding(DISpacing.md)
                 .frame(maxHeight: .infinity)
             }
         }
@@ -54,7 +60,7 @@ struct QiblaCompassView: View {
     private func compassContent(for place: PlaceCoordinate) -> some View {
         ScrollView {
             VStack(spacing: DISpacing.lg) {
-                placeRow(for: place)
+                locationLink(place)
 
                 if viewModel.needsCalibration && viewModel.isHeadingAvailable {
                     calibrationBanner
@@ -90,16 +96,18 @@ struct QiblaCompassView: View {
         }
     }
 
-    private func placeRow(for place: PlaceCoordinate) -> some View {
-        HStack(spacing: DISpacing.xs) {
-            Image(systemName: "mappin.and.ellipse")
-                .font(.footnote)
-                .foregroundStyle(DIColor.accent)
-                .accessibilityHidden(true)
-            Text(verbatim: place.name)
-                .font(.subheadline)
-                .foregroundStyle(DIColor.textMuted)
+    private func locationLink(_ place: PlaceCoordinate? = nil) -> some View {
+        NavigationLink {
+            LocationSettingsView(dependencies: dependencies, appState: appState)
+        } label: {
+            Label {
+                Text("Location") + Text(verbatim: place.map { " - " + $0.name } ?? "")
+            } icon: {
+                Image(systemName: "mappin.and.ellipse")
+            }
         }
+        .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+        .accessibilityIdentifier("qibla-location")
     }
 
     private var calibrationBanner: some View {
