@@ -34,6 +34,7 @@ struct SearchResultRow: View {
                         .environment(\.layoutDirection, .rightToLeft)
                 } else {
                     textBlock
+                        .environment(\.layoutDirection, .leftToRight)
                 }
             }
         }
@@ -51,7 +52,7 @@ struct SearchResultRow: View {
     private var domainCrest: some View {
         Image(systemName: result.domain.iconName)
             .diInterfaceFont(.subheadline, weight: .semibold)
-            .foregroundStyle(DIColor.primary)
+            .foregroundStyle(DIColor.actionForeground)
             .frame(width: 34, height: 34)
             .background(
                 RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
@@ -93,7 +94,7 @@ struct SearchResultRow: View {
             .filter { $0.inlinePresentationIntent?.contains(.stronglyEmphasized) == true }
             .map { $0.range }
         for range in matchRanges {
-            attributed[range].foregroundColor = DIColor.primary
+            attributed[range].foregroundColor = DIColor.actionForeground
         }
         return attributed
     }
