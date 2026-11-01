@@ -10,6 +10,7 @@ struct TasbihCounterView: View {
     @State private var showResetDialog = false
     @State private var isEditing = false
     @State private var countBump: CGFloat = 1.0
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(
@@ -106,6 +107,9 @@ struct TasbihCounterView: View {
         }
         .onDisappear {
             viewModel.persistOnExit()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { viewModel.persistOnExit() }
         }
     }
 

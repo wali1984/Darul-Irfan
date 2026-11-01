@@ -177,20 +177,17 @@ final class TasbihCounterViewModel {
         await devotionalMetrics.refresh(reference: saved.updatedAt)
     }
 
-    /// Called when the screen disappears so no taps are lost.
-    func persistOnExit() {
-        saveTask?.cancel()
-        let snapshot = counter
-        let repository = trackerRepository
-        let metrics = devotionalMetrics
-        Task {
-            do {
-                try await repository.saveTasbihCounter(snapshot)
-                await metrics.refresh(reference: snapshot.updatedAt)
-            } catch {
-                // Local persistence failure; nothing actionable mid-dismissal.
-            }
+    /// Flush when backgrounded or dismissed, retaining an actionable failure.
+    @discardableResult
+    func persistOnExit() -> Task<Void, Never> {
+        let previous = saveTask
+        previous?.cancel()
+        let task = Task {
+            await previous?.value
+            await self.persist()
         }
+        saveTask = task
+        return task
     }
 
     func retrySave() async {
