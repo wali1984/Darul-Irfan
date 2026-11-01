@@ -330,7 +330,7 @@ private struct PersonalZikrHistoryCard: View {
                     }.diInterfaceFont(.footnote)
                 }
                 if entries.count > 7 {
-                    Button(all ? "Show less" : "Show all sessions") { all.toggle() }
+                    Button(all ? "Show recent sessions" : "Show all sessions") { all.toggle() }
                         .buttonStyle(DISecondaryButtonStyle())
                 }
                 } label: { Text("Your last 3 months").diInterfaceFont(.subheadline, weight: .semibold) }
