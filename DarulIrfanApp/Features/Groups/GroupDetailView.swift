@@ -67,6 +67,9 @@ struct GroupDetailView: View {
                 )
                 .diAppear()
                 MethodOfZikrLink(compact: true)
+                if isLoading && detail != nil {
+                    ProgressView().frame(maxWidth: .infinity)
+                }
                 if isLoading && detail == nil {
                     ProgressView().frame(maxWidth: .infinity).padding(.top, DISpacing.lg)
                 } else if let failure {
@@ -545,8 +548,11 @@ struct GroupDetailView: View {
             // The group's clock counts from when the answer arrived here, so a
             // phone whose clock is wrong still plays in step.
             loaded.live?.playback?.at = Date()
+            let loadedPosts = try await service.posts(in: group.id)
+            try Task.checkCancellation()
+            // Do not publish an empty announcement list while it is unresolved.
             detail = loaded
-            posts = try await service.posts(in: group.id)
+            posts = loadedPosts
             if loaded.canManage {
                 do {
                     drafts = try await service.posts(in: group.id, drafts: true)
