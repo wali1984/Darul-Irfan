@@ -38,6 +38,14 @@ struct TopicDetailView: View {
                 if viewModel.isLoading {
                     ProgressView().frame(maxWidth: .infinity).padding(.top, DISpacing.xl)
                 } else {
+                    if viewModel.failed {
+                        Text("Topics could not be loaded. Please try again.")
+                            .font(.footnote)
+                            .foregroundStyle(DIColor.danger)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Button("Retry") { Task { await viewModel.load(retry: true) } }
+                            .buttonStyle(DISecondaryButtonStyle())
+                    }
                     if !viewModel.verses.isEmpty {
                         DISectionHeader(titleKey: "From the Qur'an", systemImage: "book.closed")
                         ForEach(showsAllVerses ? viewModel.verses : Array(viewModel.verses.prefix(Self.previewCount))) { verse in
@@ -58,7 +66,7 @@ struct TopicDetailView: View {
                             relatedRow(item)
                         }
                     }
-                    if viewModel.verses.isEmpty && viewModel.hadith.isEmpty && viewModel.related.isEmpty {
+                    if !viewModel.failed && viewModel.verses.isEmpty && viewModel.hadith.isEmpty && viewModel.related.isEmpty {
                         DIEmptyState(systemImage: "sparkles",
                                      titleKey: "Nothing linked yet",
                                      messageKey: "Related content will appear here as the library grows.")
@@ -338,6 +346,9 @@ final class TopicDetailViewModel {
     private(set) var books: [String: HadithBook] = [:]
     private(set) var related: [RelatedItem] = []
     private(set) var isLoading = true
+    private(set) var failed = false
+    private var loading = false
+    private var loaded = false
     /// One library state for the related works, with the favourites loaded,
     /// so a work's star is right and starring it twice cannot add it twice.
     let libraryViewModel: LibraryViewModel
@@ -349,25 +360,36 @@ final class TopicDetailViewModel {
         self.libraryViewModel = LibraryViewModel(contentRepository: dependencies.contentRepository)
     }
 
-    func load() async {
-        guard isLoading else { return }
-        await resolveVerses()
-        await resolveHadith()
-        await findRelated()
-        await libraryViewModel.loadFavorites()
-        isLoading = false
+    func load(retry: Bool = false) async {
+        guard !loading, !loaded || retry else { return }
+        loading = true
+        isLoading = true
+        failed = false
+        defer { loading = false; isLoading = false }
+        do {
+            try await resolveVerses()
+            try await resolveHadith()
+            try await findRelated()
+            try Task.checkCancellation()
+            await libraryViewModel.loadFavorites()
+            loaded = true
+        } catch is CancellationError {
+            return
+        } catch {
+            if !Task.isCancelled { failed = true }
+        }
     }
 
     /// Urdu content, including "System" on an Urdu phone.
     private var isUrdu: Bool { language.contentLanguageCode == "ur" }
 
-    private func resolveVerses() async {
+    private func resolveVerses() async throws {
         let refs = topic.ayahRefs.compactMap { AyahRef($0) }
         guard !refs.isEmpty else { return }
         let repository = dependencies.quranRepository
 
         // Choose an offline translation edition matching the language.
-        let editions = (try? await repository.editions()) ?? []
+        let editions = try await repository.editions()
         let langCode = language.contentLanguageCode
         // The Silsila's own Akram-ut-Tarajum first, as in the reader.
         let edition = editions.first { $0.id == "akram-ut-tarajum-\(langCode)" }
@@ -381,11 +403,11 @@ final class TopicDetailViewModel {
         var items: [VerseItem] = []
         for ref in refs {
             if ayahCache[ref.surah] == nil {
-                let rows = (try? await repository.ayahs(inSurah: ref.surah)) ?? []
+                let rows = try await repository.ayahs(inSurah: ref.surah)
                 ayahCache[ref.surah] = Dictionary(rows.map { ($0.ayahNumber, $0.textArabic) },
                                                   uniquingKeysWith: { a, _ in a })
                 if let edition {
-                    let t = (try? await repository.translations(editionID: edition.id, surahNumber: ref.surah)) ?? []
+                    let t = try await repository.translations(editionID: edition.id, surahNumber: ref.surah)
                     transCache[ref.surah] = Dictionary(t.map { ($0.ayahNumber, $0.text) },
                                                        uniquingKeysWith: { a, _ in a })
                 }
@@ -400,13 +422,13 @@ final class TopicDetailViewModel {
         verses = items
     }
 
-    private func resolveHadith() async {
+    private func resolveHadith() async throws {
         let refs = topic.hadithRefs ?? []
         guard !refs.isEmpty else { return }
         let repository = dependencies.hadithRepository
-        let catalogue = (try? await repository.books()) ?? []
+        let catalogue = try await repository.books()
         books = Dictionary(catalogue.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        let entries = (try? await repository.entries(canonicalIDs: refs)) ?? []
+        let entries = try await repository.entries(canonicalIDs: refs)
         hadith = entries.map { entry in
             let urdu = entry.textUrdu.flatMap { $0.isEmpty ? nil : $0 }
             let english = entry.textEnglish.flatMap { $0.isEmpty ? nil : $0 }
@@ -426,11 +448,11 @@ final class TopicDetailViewModel {
     /// "tawhid oneness unity of Allah" - so almost every topic came back
     /// empty and showed "Nothing linked yet". In Urdu, Urdu works come first
     /// and a work's Urdu title is shown where it has one.
-    private func findRelated() async {
+    private func findRelated() async throws {
         var seen = Set<String>()
         var merged: [SearchResult] = []
         for term in topic.searchTerms where !term.trimmingCharacters(in: .whitespaces).isEmpty {
-            let results = (try? await dependencies.searchIndex.search(term, domains: [.library, .media], limit: 12)) ?? []
+            let results = try await dependencies.searchIndex.search(term, domains: [.library, .media], limit: 12)
             for result in results {
                 // A matching page of a book stands for the book itself: the
                 // related list names works, not pages.
