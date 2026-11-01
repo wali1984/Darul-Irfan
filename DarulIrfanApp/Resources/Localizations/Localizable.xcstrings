@@ -23620,13 +23620,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Or forward a picture to the WhatsApp Business number with #ayah, #hadith, #aqwal, #quote or #announcement at the start of its caption, and a date such as 2026-11-02 if you like. It arrives here as a draft."
+            "value": "Or forward a picture to the WhatsApp Business number with ⁦#ayah⁩, ⁦#hadith⁩, ⁦#aqwal⁩, ⁦#quote⁩ or ⁦#announcement⁩ at the start of its caption, and a date such as ⁦2026-11-02⁩ if you like. It arrives here as a draft."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "یا واٹس ایپ بزنس نمبر پر تصویر فارورڈ کریں، جس کے عنوان کے شروع میں #ayah، #hadith، #aqwal، #quote یا #announcement ہو، اور چاہیں تو تاریخ بھی جیسے 2026-11-02۔ یہ یہاں مسودے کے طور پر آ جائے گی۔"
+            "value": "یا واٹس ایپ بزنس نمبر پر تصویر فارورڈ کریں، جس کے عنوان کے شروع میں ⁦#ayah⁩، ⁦#hadith⁩، ⁦#aqwal⁩، ⁦#quote⁩ یا ⁦#announcement⁩ ہو، اور چاہیں تو تاریخ بھی جیسے ⁦2026-11-02⁩۔ یہ یہاں مسودے کے طور پر آ جائے گی۔"
           }
         }
       }
@@ -33557,6 +33557,414 @@
           "stringUnit": {
             "state": "translated",
             "value": "پروگرام لوڈ نہیں ہو سکے۔ براہ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "The monthly congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The monthly congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں سلسلہ نقشبندیہ اویسیہ کا ماہانہ اجتماع۔"
+          }
+        }
+      }
+    },
+    "The annual congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The annual congregational gathering of Silsila Naqshbandia Owaisiah at Dar-ul-Irfan."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان میں سلسلہ نقشبندیہ اویسیہ کا سالانہ اجتماع۔"
+          }
+        }
+      }
+    },
+    "Collective Aitekaaf observed at Dar-ul-Irfan during Ramadan. Dates follow the Islamic lunar calendar.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collective Aitekaaf observed at Dar-ul-Irfan during Ramadan. Dates follow the Islamic lunar calendar."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رمضان المبارک میں دارالعرفان میں اجتماعی اعتکاف ہوتا ہے۔ تاریخیں اسلامی قمری تقویم کے مطابق ہوتی ہیں۔"
+          }
+        }
+      }
+    },
+    "Dar-ul-Irfan, Munara, District Chakwal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dar-ul-Irfan, Munara, District Chakwal"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان، منارہ، ضلع چکوال"
+          }
+        }
+      }
+    },
+    "Ajax, Canada": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajax, Canada"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایجیکس، کینیڈا"
+          }
+        }
+      }
+    },
+    "Bahawalpur, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahawalpur, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بہاولپور، پاکستان"
+          }
+        }
+      }
+    },
+    "Baltimore, United States (US)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baltimore, United States (US)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بالٹی مور، امریکہ"
+          }
+        }
+      }
+    },
+    "Brampton, Canada": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brampton, Canada"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "برامپٹن، کینیڈا"
+          }
+        }
+      }
+    },
+    "Catonsville, United States (US)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catonsville, United States (US)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کیٹنزویل، امریکہ"
+          }
+        }
+      }
+    },
+    "Chester, United States (US)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chester, United States (US)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چیسٹر، امریکہ"
+          }
+        }
+      }
+    },
+    "Chicago, United States (US)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chicago, United States (US)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شکاگو، امریکہ"
+          }
+        }
+      }
+    },
+    "Faisalabad, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faisalabad, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فیصل آباد، پاکستان"
+          }
+        }
+      }
+    },
+    "Gujranwala, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gujranwala, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گوجرانوالہ، پاکستان"
+          }
+        }
+      }
+    },
+    "Islamabad, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Islamabad, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسلام آباد، پاکستان"
+          }
+        }
+      }
+    },
+    "Keansburg, United States (US)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keansburg, United States (US)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کینزبرگ، امریکہ"
+          }
+        }
+      }
+    },
+    "Kot Addu, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kot Addu, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوٹ ادو، پاکستان"
+          }
+        }
+      }
+    },
+    "Lahore, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lahore, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لاہور، پاکستان"
+          }
+        }
+      }
+    },
+    "London, United Kingdom (UK)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "London, United Kingdom (UK)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لندن، برطانیہ"
+          }
+        }
+      }
+    },
+    "Mississauga, Canada": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mississauga, Canada"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مسی ساگا، کینیڈا"
+          }
+        }
+      }
+    },
+    "Multan, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multan, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ملتان، پاکستان"
+          }
+        }
+      }
+    },
+    "Munara, Chakwal, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Munara, Chakwal, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منارہ، چکوال، پاکستان"
+          }
+        }
+      }
+    },
+    "Sargodha, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sargodha, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سرگودھا، پاکستان"
+          }
+        }
+      }
+    },
+    "Vehari, Pakistan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vehari, Pakistan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وہاڑی، پاکستان"
+          }
+        }
+      }
+    },
+    "Vernon, United States (US)": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vernon, United States (US)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ورنن، امریکہ"
           }
         }
       }

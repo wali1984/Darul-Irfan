@@ -26,7 +26,7 @@ struct EventDetailView: View {
 
                 if let details = viewModel.event.details {
                     DIElevatedCard {
-                        Text(verbatim: details)
+                        Text(LocalizedStringKey(details))
                             .font(.body)
                             .foregroundStyle(DIColor.textPrimary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -117,7 +117,7 @@ struct EventDetailView: View {
 
                 if let venue = viewModel.event.venue {
                     Label {
-                        Text(verbatim: venue)
+                        Text(LocalizedStringKey(venue))
                     } icon: {
                         Image(systemName: "mappin.and.ellipse")
                     }

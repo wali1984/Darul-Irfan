@@ -310,7 +310,7 @@ private struct EventRowCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                     if let venue = event.venue {
                         Label {
-                            Text(verbatim: venue)
+                            Text(LocalizedStringKey(venue))
                         } icon: {
                             Image(systemName: "mappin.and.ellipse")
                         }
