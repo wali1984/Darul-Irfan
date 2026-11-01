@@ -134,14 +134,21 @@ actor MemberGroupService {
     /// this session and stops sending the member's Halqah notices here, so
     /// the next person to use the phone does not see them on the lock screen.
     /// The local session goes even when the server cannot be reached.
-    func signOut() async {
-        if savedSession.load() != nil {
+    @discardableResult
+    func signOut() async -> Bool {
+        if let saved = savedSession.load() {
             var payload: [String: Any] = [:]
             if let installation = SecureInstallationIdentity.load() { payload["installationID"] = installation.uuidString }
-            _ = try? await send("POST", path: "v1/members/signout", payload: payload, expecting: [204])
+            var request = URLRequest(url: baseURL.appendingPathComponent("v1/members/signout"))
+            request.httpMethod = "POST"
+            request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
+            request.setValue("application/json", forHTTPHeaderField: "content-type")
+            request.httpBody = try? JSONSerialization.data(withJSONObject: payload)
+            _ = try? await session.data(for: request)
+            guard savedSession.deleteIfCurrent(token: saved.token) else { return false }
         }
-        savedSession.delete()
         HalqahNoticeChoice.isTurnedOff = false
+        return true
     }
 
     /// The member's own name, as their Halqah's admins, the attendance and the

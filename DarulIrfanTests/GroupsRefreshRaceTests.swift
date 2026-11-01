@@ -4,6 +4,29 @@ import XCTest
 
 @MainActor
 final class GroupsRefreshRaceTests: XCTestCase {
+    func testDelayedSignOutPreservesReplacementSessionAndModel() async {
+        for status in [204, 401, 503] {
+            let config = URLSessionConfiguration.ephemeral
+            config.protocolClasses = [GroupsRaceProtocol.self]
+            let transport = URLSession(configuration: config)
+            defer { transport.invalidateAndCancel() }
+            let store = GroupsRaceSession()
+            let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+                session: transport, uploads: transport, savedSession: store)
+            let model = GroupsModel(service: service)
+            let pending = expectation(description: "Old signout held")
+            GroupsRaceProtocol.configure(holdFirst: false, holdSignOut: true) { pending.fulfill() }
+            let older = Task { await model.signOut() }
+            await fulfillment(of: [pending], timeout: 5)
+            store.save(.init(token: "replacement", expiresAt: .distantFuture, memberID: "new-member"))
+            model.displayName = "Replacement name"
+            GroupsRaceProtocol.releaseOlder(status: status)
+            await older.value
+            XCTAssertEqual(store.load()?.token, "replacement")
+            XCTAssertEqual(model.displayName, "Replacement name")
+        }
+    }
+
     func testDelayedAccountDeletionPreservesReplacementSession() async {
         for status in [204, 401] {
             let config = URLSessionConfiguration.ephemeral
@@ -159,12 +182,14 @@ private final class GroupsRaceProtocol: URLProtocol {
     private static var older: GroupsRaceProtocol?
     private static var onHeld: (() -> Void)?
     private static var profileStatus = 404
+    private static var holdSignOut = false
     private static var holdProfile = false
     private static var heldProfile = false
-    static func configure(holdFirst: Bool = true, profileStatus: Int = 404, holdProfile: Bool = false, _ onHeld: @escaping () -> Void) {
+    static func configure(holdFirst: Bool = true, profileStatus: Int = 404, holdProfile: Bool = false, holdSignOut: Bool = false, _ onHeld: @escaping () -> Void) {
         lock.lock(); defer { lock.unlock() }
         first = holdFirst; older = nil; self.onHeld = onHeld
         self.profileStatus = profileStatus
+        self.holdSignOut = holdSignOut
         self.holdProfile = holdProfile
         heldProfile = false
     }
@@ -189,6 +214,15 @@ private final class GroupsRaceProtocol: URLProtocol {
             Self.lock.unlock()
             respond(200, "{\"role\":\"member\",\"groups\":[],\"signedIn\":2}")
         } else if request.url?.path == "/v1/members/signout" {
+            Self.lock.lock()
+            if Self.holdSignOut {
+                Self.holdSignOut = false; Self.older = self
+                let callback = Self.onHeld
+                Self.lock.unlock()
+                callback?()
+                return
+            }
+            Self.lock.unlock()
             respond(204, "")
         } else if request.url?.path == "/v1/members/me" {
             if request.httpMethod == "PUT" {

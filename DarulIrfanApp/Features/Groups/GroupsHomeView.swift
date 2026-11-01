@@ -216,7 +216,7 @@ final class GroupsModel {
         refreshRevision += 1
         accountRevision += 1
         defer { refreshRevision += 1; endingSession = false }
-        await service.signOut()
+        guard await service.signOut() else { return }
         clearAccount()
         noticesModel.reset()
     }
