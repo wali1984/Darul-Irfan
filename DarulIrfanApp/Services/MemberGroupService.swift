@@ -5,12 +5,14 @@ protocol MemberSessionStore: Sendable {
     func load() -> MemberSession?
     func save(_ value: MemberSession)
     func delete()
+    func deleteIfCurrent(token: String) -> Bool
 }
 
 private struct KeychainMemberSessionStore: MemberSessionStore {
     func load() -> MemberSession? { SecureMemberSession.load() }
     func save(_ value: MemberSession) { SecureMemberSession.save(value) }
     func delete() { SecureMemberSession.delete() }
+    func deleteIfCurrent(token: String) -> Bool { SecureMemberSession.deleteIfCurrent(token: token) }
 }
 
 enum MemberGroupError: LocalizedError {
@@ -268,7 +270,7 @@ actor MemberGroupService {
         let (data, response) = try await uploads.upload(for: request, fromFile: file)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            savedSession.delete()
+            guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
         guard code == 201 else {
@@ -350,7 +352,7 @@ actor MemberGroupService {
         let (data, response) = result
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            savedSession.delete()
+            guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
         let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -399,7 +401,7 @@ actor MemberGroupService {
         let (data, response) = try await uploads.upload(for: request, from: picture)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            savedSession.delete()
+            guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
         guard code == 201 else {
@@ -485,7 +487,7 @@ actor MemberGroupService {
         let (data, response) = try await session.data(for: request)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
-            savedSession.delete()
+            guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
         guard codes.contains(code) else {
@@ -530,7 +532,7 @@ actor MemberGroupService {
         if code == 401 {
             // The session expired or was revoked; drop it so the UI asks for a
             // fresh sign-in instead of retrying a token that will never work.
-            savedSession.delete()
+            guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
         guard code == 200, let value = try? decoder.decode(type, from: data) else {
@@ -559,10 +561,12 @@ enum HalqahNoticeChoice {
 /// The member's bearer token, kept in the keychain rather than user defaults:
 /// it is a credential, and it stays on this device only.
 private enum SecureMemberSession {
+    private static let lock = NSRecursiveLock()
     private static let service = "us.naqshbaniaowaisiah.member"
     private static let account = "member-session"
 
     static func save(_ session: MemberSession) {
+        lock.lock(); defer { lock.unlock() }
         delete()
         // The matching read decodes ISO-8601, so the write has to produce it:
         // the default strategy writes a number and the session would never be
@@ -581,6 +585,7 @@ private enum SecureMemberSession {
     }
 
     static func load() -> MemberSession? {
+        lock.lock(); defer { lock.unlock() }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -599,7 +604,15 @@ private enum SecureMemberSession {
         return session.expiresAt > Date() ? session : nil
     }
 
+    static func deleteIfCurrent(token: String) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        if let current = load(), current.token != token { return false }
+        delete()
+        return true
+    }
+
     static func delete() {
+        lock.lock(); defer { lock.unlock() }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

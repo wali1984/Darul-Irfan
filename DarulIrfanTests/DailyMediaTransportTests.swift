@@ -69,6 +69,12 @@ private final class MemoryMemberSession: MemberSessionStore, @unchecked Sendable
     func load() -> MemberSession? { lock.lock(); defer { lock.unlock() }; return value }
     func save(_ value: MemberSession) { lock.lock(); defer { lock.unlock() }; self.value = value }
     func delete() { lock.lock(); defer { lock.unlock() }; value = nil }
+    func deleteIfCurrent(token: String) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        if let current = value, current.token != token { return false }
+        value = nil
+        return true
+    }
 }
 
 private final class DailyMediaProtocol: URLProtocol {

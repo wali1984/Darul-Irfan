@@ -4,6 +4,27 @@ import XCTest
 
 @MainActor
 final class GroupsRefreshRaceTests: XCTestCase {
+    func testOldUnauthorizedResponseCannotDeleteReplacementSession() async {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [GroupsRaceProtocol.self]
+        let transport = URLSession(configuration: config)
+        defer { transport.invalidateAndCancel() }
+        let store = GroupsRaceSession()
+        let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+            session: transport, uploads: transport, savedSession: store)
+        let pending = expectation(description: "Old-token request held")
+        GroupsRaceProtocol.configure { pending.fulfill() }
+        let older = Task { try await service.groups() }
+        await fulfillment(of: [pending], timeout: 5)
+        store.save(.init(token: "replacement", expiresAt: .distantFuture, memberID: "new-member"))
+        GroupsRaceProtocol.releaseOlder(status: 401)
+        do { _ = try await older.value; XCTFail("Old response must be discarded") }
+        catch is CancellationError { }
+        catch { XCTFail("Unexpected error: \(error)") }
+        XCTAssertEqual(store.load()?.token, "replacement")
+        XCTAssertEqual(store.load()?.memberID, "new-member")
+    }
+
     func testDelayedProfileCannotOverwriteSavedName() async {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [GroupsRaceProtocol.self]
@@ -101,6 +122,12 @@ private final class GroupsRaceSession: MemberSessionStore, @unchecked Sendable {
     func load() -> MemberSession? { lock.lock(); defer { lock.unlock() }; return session }
     func save(_ value: MemberSession) { lock.lock(); defer { lock.unlock() }; session = value }
     func delete() { lock.lock(); defer { lock.unlock() }; session = nil }
+    func deleteIfCurrent(token: String) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        if let current = session, current.token != token { return false }
+        session = nil
+        return true
+    }
 }
 
 private final class GroupsRaceProtocol: URLProtocol {
@@ -118,9 +145,9 @@ private final class GroupsRaceProtocol: URLProtocol {
         self.holdProfile = holdProfile
         heldProfile = false
     }
-    static func releaseOlder() {
+    static func releaseOlder(status: Int = 200) {
         lock.lock(); let held = older; let profile = heldProfile; older = nil; lock.unlock()
-        held?.respond(200, profile
+        held?.respond(status, profile
             ? "{\"memberID\":\"fixture\",\"role\":\"member\",\"displayName\":\"Old name\"}"
             : "{\"role\":\"superadmin\",\"groups\":[],\"signedIn\":1}")
     }
