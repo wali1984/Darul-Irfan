@@ -343,7 +343,7 @@ struct SurahReaderView: View {
                     .diInterfaceFont(.subheadline, weight: .semibold)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(DISecondaryButtonStyle())
             .padding(.vertical, DISpacing.md)
             .onAppear {
                 guard appState.settings.quranAutoAdvanceSurah, hasScrolledIntoSurah else { return }
@@ -352,7 +352,7 @@ struct SurahReaderView: View {
         } else {
             Label("Quran reading complete", systemImage: "checkmark.seal.fill")
                 .diInterfaceFont(.subheadline, weight: .semibold)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, DISpacing.md)
         }
@@ -369,7 +369,7 @@ struct SurahReaderView: View {
             VStack(spacing: DISpacing.sm) {
                 Text(viewModel.surah.nameArabic)
                     .font(DIFont.quranArabic(scale: 1.15))
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.scripture)
                     .diGoldGlow(radius: 7, opacity: 0.28)
                 Text(surahMeaning)
                     .font(viewModel.readingLanguage == "ur" ? DIFont.urduBody() : DIFont.subheading)
@@ -377,7 +377,8 @@ struct SurahReaderView: View {
                 HStack(spacing: DISpacing.sm) {
                     DIPillBadge(
                         text: revelationPlaceName,
-                        color: viewModel.surah.revelationPlace == .makkah ? DIColor.primary : DIColor.accent
+                        color: viewModel.surah.revelationPlace == .makkah ? DIColor.primary : DIColor.accent,
+                        foreground: viewModel.surah.revelationPlace == .makkah ? DIColor.actionForeground : DIColor.textPrimary
                     )
                     Text("\(viewModel.surah.ayahCount) ayahs")
                         .diInterfaceFont(.caption)
@@ -417,7 +418,7 @@ struct SurahReaderView: View {
             DICard {
                 Text(verbatim: text)
                     .font(DIFont.quranArabic(scale: appState.settings.readerFontScale.rawValue))
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.scripture)
                     .diGoldGlow(radius: 6, opacity: 0.25)
                     .multilineTextAlignment(.center)
                     .environment(\.layoutDirection, .rightToLeft)
@@ -611,7 +612,7 @@ struct SurahReaderView: View {
             VStack(spacing: 6) {
                 Image(systemName: Self.symbol(for: mode))
                     .diInterfaceFont(.title3, weight: .semibold)
-                    .foregroundStyle(selected ? DIColor.goldGlow : DIColor.primary)
+                    .foregroundStyle(selected ? DIColor.goldGlow : DIColor.actionForeground)
                     .frame(width: 40, height: 40)
                     .background(Circle().fill(selected ? Color.white.opacity(0.14) : DIColor.primary.opacity(0.10)))
                 Text(LocalizedStringKey(mode.shortTitle))
