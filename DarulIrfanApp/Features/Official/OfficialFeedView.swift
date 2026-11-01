@@ -468,7 +468,7 @@ struct DiscoverUpdateRow: View {
         .accessibilityElement(children: .combine)
     }
 
-    private func caption(_ text: Text) -> Text {
+    private func caption(_ text: Text) -> some View {
         text
             .diInterfaceFont(.caption2, weight: .heavy)
             .tracking(DiscoverStyle.tracking(1.2, in: locale))
