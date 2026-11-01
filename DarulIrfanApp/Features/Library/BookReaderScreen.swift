@@ -708,7 +708,7 @@ struct BookTextSearchView: View {
                 }
             }
         }
-        .tint(DIColor.primary)
+        .tint(DIColor.actionForeground)
         .onAppear { isFieldFocused = true }
         .onChange(of: query) { _, _ in scheduleSearch() }
         .task { await prepare() }
@@ -718,7 +718,7 @@ struct BookTextSearchView: View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "magnifyingglass")
                 .diInterfaceFont(.body, weight: .semibold)
-                .foregroundStyle(isFieldFocused ? DIColor.primary : DIColor.textMuted)
+                .foregroundStyle(isFieldFocused ? DIColor.actionForeground : DIColor.textMuted)
                 .accessibilityHidden(true)
             TextField("Search in this book", text: $query)
                 .focused($isFieldFocused)
@@ -732,9 +732,11 @@ struct BookTextSearchView: View {
                     query = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(DIColor.textMuted)
+                        .foregroundStyle(DIColor.actionForeground)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
                 .accessibilityLabel("Clear search text")
             }
         }
@@ -757,7 +759,7 @@ struct BookTextSearchView: View {
     private var content: some View {
         if isPreparing {
             ProgressView()
-                .tint(DIColor.primary)
+                .tint(DIColor.actionForeground)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if trimmedQuery.count < 2 {
             DIEmptyState(systemImage: "text.magnifyingglass", titleKey: "Search in this book")
@@ -774,7 +776,7 @@ struct BookTextSearchView: View {
                         } label: {
                             resultRow(page)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(DIPressableStyle())
                         .listRowBackground(DIColor.surface)
                     }
                 } header: {
@@ -793,7 +795,7 @@ struct BookTextSearchView: View {
         return VStack(alignment: .leading, spacing: DISpacing.xs) {
             Text("Page \(page)")
                 .diInterfaceFont(.caption, weight: .semibold)
-                .foregroundStyle(ReadPalette.emeraldInk)
+                .foregroundStyle(DIColor.actionForeground)
             if let passage {
                 Text(verbatim: passage)
                     .font(rightToLeft ? DIFont.urduBody(scale: 0.9) : .subheadline)
