@@ -25,6 +25,7 @@ struct TasbihEditorView: View {
             Form {
                 Section {
                     TextField("Title", text: $title)
+                        .listRowBackground(DIColor.surface)
                 } header: {
                     Text("Name")
                 } footer: {
@@ -33,6 +34,7 @@ struct TasbihEditorView: View {
                 Section {
                     TextField("Target (optional)", text: $targetText)
                         .keyboardType(.numberPad)
+                        .listRowBackground(DIColor.surface)
                 } header: {
                     Text("Target")
                 } footer: {
@@ -50,12 +52,14 @@ struct TasbihEditorView: View {
                         dismiss()
                     }
                     .accessibilityIdentifier("tasbih-editor-cancel")
+                    .buttonStyle(DICompactButtonStyle())
                     .disabled(isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(isSaving ? "Saving…" : "Save") {
                         save()
                     }
+                    .buttonStyle(DICompactButtonStyle())
                     .disabled(trimmedTitle.isEmpty || isSaving)
                 }
             }
