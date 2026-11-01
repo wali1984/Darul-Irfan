@@ -166,9 +166,9 @@ final class GroupsModel {
     /// Redeems an administrator's invitation code. On success the member is
     /// already in their group, so the list is simply reloaded. `name` is how
     /// a member who joins by code is known to their Halqah's admins.
-    func redeemInvite(_ rawCode: String, name: String? = nil) async {
+    func redeemInvite(_ rawCode: String, name: String? = nil) async -> Bool {
         let code = rawCode.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !code.isEmpty else { return }
+        guard !isRedeeming, !code.isEmpty else { return false }
         isRedeeming = true
         inviteError = nil
         defer { isRedeeming = false }
@@ -177,8 +177,10 @@ final class GroupsModel {
             memberID = try await service.redeemInvite(code: code, displayName: given?.isEmpty == false ? given : nil)
             await refresh()
             await offerNoticesOnce()
+            return true
         } catch {
             inviteError = error.localizedDescription
+            return false
         }
     }
 

@@ -273,7 +273,7 @@ struct MyHalqahsSection: View {
             // The code is the primary way in: it needs nothing from Apple,
             // so it works the same on every platform, and admission stays an
             // administrator's decision.
-            HStack(spacing: DISpacing.sm) {
+            VStack(alignment: .leading, spacing: DISpacing.sm) {
                 TextField("Invitation code", text: $inviteCode)
                     .textFieldStyle(.roundedBorder)
                     .textInputAutocapitalization(.characters)
@@ -281,12 +281,12 @@ struct MyHalqahsSection: View {
                     .focused($isCodeFocused)
                     .submitLabel(.join)
                     .onSubmit { redeem() }
+                    .disabled(model.isRedeeming)
                     .accessibilityLabel("Invitation code")
                 Button(action: redeem) {
                     if model.isRedeeming { ProgressView() } else { Text("Join") }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(DIColor.primary)
+                .buttonStyle(DIPrimaryButtonStyle())
                 .disabled(inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.isRedeeming)
             }
             if let inviteError = model.inviteError {
@@ -381,8 +381,7 @@ struct MyHalqahsSection: View {
         // A second code is added to this account, which keeps its name.
         let name = model.phase == .signedOut ? joinName : nil
         Task {
-            await model.redeemInvite(code, name: name)
-            if model.inviteError == nil {
+            if await model.redeemInvite(code, name: name) {
                 inviteCode = ""
                 isAddingCode = false
             }
@@ -432,7 +431,7 @@ struct MyHalqahsSection: View {
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(DISecondaryButtonStyle())
             }
         }
         .myHalqahsPanel()
@@ -459,18 +458,17 @@ struct MyHalqahsSection: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             if let memberID = model.memberID {
-                HStack {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
                     Text(memberID)
                         .font(.system(.footnote, design: .monospaced))
                         .textSelection(.enabled)
-                    Spacer()
                     Button {
                         UIPasteboard.general.string = memberID
                         DIHaptics.light()
                     } label: {
                         Label("Copy", systemImage: "doc.on.doc")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(DISecondaryButtonStyle())
                 }
                 .padding(DISpacing.sm)
                 .background(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous).fill(DIColor.sandstone.opacity(0.6)))
@@ -600,17 +598,18 @@ struct MyHalqahsSection: View {
             }
             .buttonStyle(.plain)
             if isAddingCode {
-                HStack(spacing: DISpacing.sm) {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
                     TextField("Invitation code", text: $inviteCode)
                         .textFieldStyle(.roundedBorder)
                         .textInputAutocapitalization(.characters)
                         .autocorrectionDisabled()
                         .submitLabel(.join)
                         .onSubmit { redeem() }
+                    .disabled(model.isRedeeming)
                     Button(action: redeem) {
                         if model.isRedeeming { ProgressView() } else { Text("Join") }
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(DISecondaryButtonStyle())
                     .tint(DIColor.primary)
                     .disabled(inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.isRedeeming)
                 }
@@ -632,7 +631,7 @@ struct MyHalqahsSection: View {
             Text(message)
                 .font(.subheadline)
             Button("Try again") { Task { await model.refresh() } }
-                .buttonStyle(.bordered)
+                .buttonStyle(DISecondaryButtonStyle())
         }
         .halqahCard(tint: DIColor.danger)
     }
