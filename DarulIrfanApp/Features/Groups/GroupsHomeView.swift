@@ -51,9 +51,12 @@ final class GroupsModel {
 
     /// Whether the Halqah tab has shown the groups yet (see `appear`).
     @ObservationIgnored private var hasAppeared = false
+    @ObservationIgnored private var refreshRevision = 0
+    @ObservationIgnored private var nameRevision = 0
+    @ObservationIgnored private var accountRevision = 0
+    @ObservationIgnored private var endingSession = false
 
-    init() {
-        let service = MemberGroupService()
+    init(service: MemberGroupService = MemberGroupService()) {
         self.service = service
         noticesModel = HalqahNoticesModel(service: service)
     }
@@ -77,13 +80,7 @@ final class GroupsModel {
         }
     }
 
-    func start() async {
-        guard await service.isSignedIn else {
-            phase = .signedOut
-            return
-        }
-        await refresh()
-    }
+    func start() async { await refresh() }
 
     /// For the Halqah tab, which shows the groups at its root. The first
     /// appearance loads them; each return checks again quietly, so the top
@@ -99,47 +96,63 @@ final class GroupsModel {
 
     /// Checks again without emptying the page: signed out stays signed out
     /// with no spinner, and a loaded list stays while it is checked.
-    func checkAgain() async {
-        guard await service.isSignedIn else {
-            groups = []
-            signedIn = nil
-            phase = .signedOut
-            return
-        }
-        await refresh(quietly: true)
-    }
+    func checkAgain() async { await refresh(quietly: true) }
 
     /// Loads the member's groups. `quietly` keeps a loaded list on screen
     /// while it is checked, and keeps it when the check fails; otherwise the
     /// page shows its spinner and any failure, as it always has.
+    private func clearAccount() {
+        groups = []
+        signedIn = nil
+        memberID = nil
+        displayName = nil
+        role = .member
+        offerNotices = false
+        phase = .signedOut
+    }
+
     func refresh(quietly: Bool = false) async {
+        guard !endingSession else { return }
+        refreshRevision += 1
+        let revision = refreshRevision
         let keepsList = quietly && phase == .ready
         if !keepsList { phase = .loading }
-        memberID = await service.memberID
         do {
+            let currentMember = await service.memberID
+            try Task.checkCancellation()
+            guard revision == refreshRevision else { return }
+            guard let currentMember else { clearAccount(); return }
+            memberID = currentMember
             let list = try await service.groups()
+            try Task.checkCancellation()
+            guard revision == refreshRevision else { return }
             groups = list.groups
             role = list.role ?? .member
             signedIn = list.signedIn
             phase = .ready
+            let profileRevision = nameRevision
             do {
                 let profile = try await service.profile()
                 try Task.checkCancellation()
-                displayName = profile.displayName
+                guard revision == refreshRevision else { return }
+                if profileRevision == nameRevision && !isSavingName { displayName = profile.displayName }
             } catch is CancellationError {
                 return
             } catch {
-                // Keep the last known name when an optional profile refresh fails.
+                // An optional profile failure preserves the last known name.
             }
-            guard !Task.isCancelled else { return }
-            // Not waited for: the token can take a few seconds to come, and
-            // the page (and pull to refresh) should not.
-            Task { await self.noticesModel.follow() }
+            guard !Task.isCancelled, revision == refreshRevision else { return }
+            Task {
+                guard revision == self.refreshRevision else { return }
+                await self.noticesModel.follow()
+            }
+        } catch is CancellationError {
+            return
         } catch MemberGroupError.notSignedIn {
-            groups = []
-            signedIn = nil
-            phase = .signedOut
+            guard revision == refreshRevision else { return }
+            clearAccount()
         } catch {
+            guard !Task.isCancelled, revision == refreshRevision else { return }
             if !keepsList { phase = .failed(error.localizedDescription) }
         }
     }
@@ -194,25 +207,32 @@ final class GroupsModel {
     }
 
     func signOut() async {
+        guard !endingSession else { return }
+        endingSession = true
+        refreshRevision += 1
+        accountRevision += 1
+        defer { refreshRevision += 1; endingSession = false }
         await service.signOut()
-        groups = []
-        signedIn = nil
-        memberID = nil
-        displayName = nil
+        clearAccount()
         noticesModel.reset()
-        phase = .signedOut
     }
 
     func rename(_ raw: String) async {
         let name = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !isSavingName, !name.isEmpty, name != displayName else { return }
+        guard !endingSession, !isSavingName, !name.isEmpty, name != displayName else { return }
+        let account = accountRevision
+        nameRevision += 1
         isSavingName = true
         nameError = nil
-        defer { isSavingName = false }
+        defer { nameRevision += 1; isSavingName = false }
         do {
-            displayName = try await service.rename(to: name).displayName
+            let profile = try await service.rename(to: name)
+            try Task.checkCancellation()
+            if account == accountRevision { displayName = profile.displayName }
+        } catch is CancellationError {
+            return
         } catch {
-            nameError = error.localizedDescription
+            if !Task.isCancelled, account == accountRevision { nameError = error.localizedDescription }
         }
     }
 
@@ -234,20 +254,23 @@ final class GroupsModel {
     }
 
     func deleteAccount() async {
+        guard !endingSession else { return }
+        endingSession = true
+        refreshRevision += 1
+        accountRevision += 1
         isDeleting = true
-        defer { isDeleting = false }
+        defer { refreshRevision += 1; endingSession = false; isDeleting = false }
         do {
             try await service.deleteAccount()
-            groups = []
-            signedIn = nil
-            memberID = nil
-            displayName = nil
+            clearAccount()
             noticesModel.reset()
-            phase = .signedOut
+        } catch is CancellationError {
+            return
         } catch {
-            phase = .failed(error.localizedDescription)
+            if !Task.isCancelled { phase = .failed(error.localizedDescription) }
         }
     }
+
 }
 
 /// The private groups on a page of their own: where a Halqah notification
