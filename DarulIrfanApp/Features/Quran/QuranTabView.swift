@@ -35,6 +35,7 @@ struct QuranTabView: View {
     private let onShowAllReaders: (() -> Void)?
     /// Surah or Parah, for the session.
     @State private var listMode: QuranListMode = .surah
+    @Environment(\.dynamicTypeSize) private var listTextSize
     /// The first words of each parah's opening ayah, read once.
     @State private var paraOpenings: [Int: String] = [:]
     @State private var paraOpeningsFailed = false
@@ -202,14 +203,18 @@ struct QuranTabView: View {
             continueReadingCard(progress: progress, surah: surah)
                 .diAppear()
         }
-        HStack(spacing: 10) {
-            ReadChipToggle(
-                items: QuranListMode.allCases,
-                title: { $0 == .surah ? "Surah" : "Parah" },
-                selection: $listMode
-            )
-            .frame(width: 170)
-            ReadFindField(prompt: "Name, number, 2:255", text: searchBinding)
+        ViewThatFits(in: .horizontal) {
+            if listTextSize <= .large {
+                HStack(spacing: 10) {
+                    ReadChipToggle(items: QuranListMode.allCases, title: { $0 == .surah ? "Surah" : "Parah" }, selection: $listMode)
+                        .frame(width: 170)
+                    ReadFindField(prompt: "Name, number, 2:255", text: searchBinding).frame(minWidth: 180)
+                }
+            }
+            VStack(spacing: 10) {
+                ReadChipToggle(items: QuranListMode.allCases, title: { $0 == .surah ? "Surah" : "Parah" }, selection: $listMode)
+                ReadFindField(prompt: "Name, number, 2:255", text: searchBinding)
+            }
         }
         if let typed = viewModel.typedAyah {
             goToAyahCard(surah: typed.surah, ayah: typed.ayah)

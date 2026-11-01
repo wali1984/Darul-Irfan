@@ -13,6 +13,8 @@ struct ZikrHomeView: View {
     @State private var presentedVideo: ZikrPresentedVideo?
     @State private var liveAlertsDenied = false
     @State private var isSearchPresented = false
+    @State private var isRefreshing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// What a notification or a link asked this screen to show.
     @State private var focus: Focus?
     @State private var personalZikr = false
@@ -92,7 +94,9 @@ struct ZikrHomeView: View {
         Task { @MainActor in
             // Once the page is laid out.
             try? await Task.sleep(for: .milliseconds(300))
-            withAnimation(.easeInOut) { proxy.scrollTo(target, anchor: .top) }
+            guard !Task.isCancelled else { return }
+            if reduceMotion { proxy.scrollTo(target, anchor: .top) }
+            else { withAnimation(.easeInOut) { proxy.scrollTo(target, anchor: .top) } }
         }
     }
 
@@ -181,6 +185,9 @@ struct ZikrHomeView: View {
             await viewModel.followLive()
         }
         .refreshable {
+            guard !isRefreshing else { return }
+            isRefreshing = true
+            defer { isRefreshing = false }
             await viewModel.load(forceRefresh: true)
             await viewModel.refreshLiveGroups(service: groupService)
         }
