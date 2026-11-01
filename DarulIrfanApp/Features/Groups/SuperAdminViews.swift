@@ -93,6 +93,7 @@ struct MemberDirectoryView: View {
             if people != nil {
                 if shown.isEmpty {
                     Text("No one matches.").foregroundStyle(DIColor.textMuted)
+                        .listRowBackground(DIColor.surface)
                 }
                 ForEach(shown) { person in
                     NavigationLink {
@@ -113,13 +114,22 @@ struct MemberDirectoryView: View {
                         }
                     }
                 }
+                .listRowBackground(DIColor.surface)
             } else if failed {
-                Text("The member directory could not be loaded. Please try again.")
-                    .foregroundStyle(DIColor.textMuted)
-                Button("Try again") { Task { await load() } }
-                    .buttonStyle(DICompactButtonStyle())
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text("The member directory could not be loaded. Please try again.")
+                        .foregroundStyle(DIColor.textMuted)
+                    Button("Try again") { Task { await load() } }
+                        .buttonStyle(DICompactButtonStyle())
+                }
+                .padding(DISpacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .diGlassPanel()
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             } else {
                 ProgressView()
+                    .listRowBackground(DIColor.surface)
             }
         }
         .searchable(text: $search, prompt: Text("Name, email or Halqah"))
