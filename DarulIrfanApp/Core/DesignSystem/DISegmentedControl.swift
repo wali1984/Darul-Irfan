@@ -12,19 +12,28 @@ struct DISegmentedControl<Item: Hashable>: View {
     /// On a dark (emerald) surface the track and labels turn light and the
     /// chosen pill gold, so the control reads against it.
     var onDark = false
+    var wrapsForLargeText = false
 
     @Namespace private var namespace
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(items, id: \.self) { item in
-                segment(item)
+        let wrapped = wrapsForLargeText && items.count > 2 && dynamicTypeSize >= .xxLarge
+        Group {
+            if wrapped {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 4) {
+                    ForEach(items, id: \.self) { item in segment(item) }
+                }
+            } else {
+                HStack(spacing: 4) {
+                    ForEach(items, id: \.self) { item in segment(item) }
+                }
             }
         }
         .padding(4)
-        .background(Capsule(style: .continuous).fill(onDark ? Color.white.opacity(0.10) : DIColor.sandstone.opacity(0.55)))
-        .overlay(Capsule(style: .continuous).stroke(onDark ? Color.white.opacity(0.18) : DIColor.border, lineWidth: 1))
+        .background(RoundedRectangle(cornerRadius: wrapped ? 24 : 1000).fill(onDark ? Color.white.opacity(0.10) : DIColor.sandstone.opacity(0.55)))
+        .overlay(RoundedRectangle(cornerRadius: wrapped ? 24 : 1000).stroke(onDark ? Color.white.opacity(0.18) : DIColor.border, lineWidth: 1))
     }
 
     private func labelColor(selected: Bool) -> Color {

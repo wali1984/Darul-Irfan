@@ -121,7 +121,8 @@ struct ExploreTabView: View {
                     DISegmentedControl(
                         items: DiscoverSection.allCases,
                         title: { $0.titleKey },
-                        selection: sectionBinding
+                        selection: sectionBinding,
+                        wrapsForLargeText: true
                     )
                     .diGlassPanel(cornerRadius: 24)
 
