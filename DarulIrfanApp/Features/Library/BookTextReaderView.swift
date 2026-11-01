@@ -48,6 +48,8 @@ struct BookTextPagesView: View {
     /// Pages set out into headings, paragraphs, poetry and quotations.
     @State private var formatted: [String: BookPageFormatter.Page] = [:]
     @State private var isLoading = true
+    @State private var loadFailed = false
+    @State private var loadAttempt = 0
     @State private var hasScrolledToStart = false
     /// The printed page at the top of the screen.
     @State private var topPage: Int?
@@ -76,6 +78,13 @@ struct BookTextPagesView: View {
                 ProgressView()
                     .tint(DIColor.primary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    DIEmptyState(systemImage: "text.book.closed", titleKey: "Something went wrong",
+                        messageKey: "The pages could not be loaded. Check your connection and try again ? once opened, it stays available offline.")
+                    Button("Try Again") { loadAttempt += 1 }
+                        .buttonStyle(DICompactButtonStyle())
+                }
             } else if pages.isEmpty {
                 DIEmptyState(
                     systemImage: "text.book.closed",
@@ -155,7 +164,7 @@ struct BookTextPagesView: View {
             pendingPage = requested
             session?.requestedPage = nil
         }
-        .task {
+        .task(id: loadAttempt) {
             await load()
         }
     }
@@ -289,24 +298,31 @@ struct BookTextPagesView: View {
 
     private func load() async {
         isLoading = true
-        let loaded = (try? await dependencies.contentRepository.bookPages(bookID: item.id)) ?? []
-        let language = item.language
-        formatted = await Task.detached(priority: .userInitiated) {
-            // A re-read page is set out from its own layout in either script;
-            // an original OCR page is laid out only when it is Urdu.
-            BookPageFormatter.format(pages: loaded.filter {
-                BookPageFormatter.laidOutParts(of: $0) != nil
-                    || ScriptDirection.isRightToLeft($0.text, fallbackLanguage: language)
-            })
-        }.value
-        // A cover or blank page re-read from the scan carries no text.
-        pages = loaded.filter { !$0.text.isEmpty }
-        session?.pageNumbers = pages.map(\.page)
-        if let first = pages.first?.page {
-            session?.currentPage = first
+        loadFailed = false
+        defer { isLoading = false }
+        do {
+            let loaded = try await dependencies.contentRepository.bookPages(bookID: item.id)
+            try Task.checkCancellation()
+            let language = item.language
+            let prepared = await Task.detached(priority: .userInitiated) {
+                BookPageFormatter.format(pages: loaded.filter {
+                    BookPageFormatter.laidOutParts(of: $0) != nil
+                        || ScriptDirection.isRightToLeft($0.text, fallbackLanguage: language)
+                })
+            }.value
+            try Task.checkCancellation()
+            formatted = prepared
+            pages = loaded.filter { !$0.text.isEmpty }
+            session?.pageNumbers = pages.map(\.page)
+            if let first = pages.first?.page { session?.currentPage = first }
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled else { return }
+            loadFailed = true
         }
-        isLoading = false
     }
+
 }
 
 /// Reads a book's text in the app's one reader, at a page when one is given.
