@@ -113,13 +113,13 @@ private struct MethodLatifaDiagram: View {
                     path.addCurve(to: CGPoint(x: w * 0.70, y: h * 0.36), control1: CGPoint(x: w * 0.30, y: h * 0.10), control2: CGPoint(x: w * 0.70, y: h * 0.10))
                     path.addQuadCurve(to: CGPoint(x: w * 0.88, y: h * 0.48), control: CGPoint(x: w * 0.88, y: h * 0.36))
                     path.addLine(to: CGPoint(x: w * 0.88, y: h * 0.94))
-                }.stroke(DIColor.primary.opacity(0.5), lineWidth: 2)
+                }.stroke(DIColor.actionForeground.opacity(0.5), lineWidth: 2)
                 ForEach(0..<positions.count, id: \.self) { index in
                     Text(verbatim: String(index + 1))
                         .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                         .frame(width: 30, height: 30)
-                        .background(Circle().fill(DIColor.primary.opacity(0.10)))
+                        .background(Circle().fill(DIColor.actionForeground.opacity(0.10)))
                         .position(x: geometry.size.width * positions[index].0,
                                   y: geometry.size.height * positions[index].1)
                 }
