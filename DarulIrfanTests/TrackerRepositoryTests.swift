@@ -21,6 +21,88 @@ final class TrackerRepositoryTests: XCTestCase {
     }
 
     @MainActor
+    func testTasbihHabitFailureRollsBackCounterAndRetryCommitsOnce() async throws {
+        let day = DayKey.make(from: Date())
+        let initial = TasbihCounter(id: UUID(), title: "Target", target: 8, count: 7, lifetimeCount: 9, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        try await repository.saveZikrHabit(ZikrHabitEntry(dayKey: day, completedCount: 2, updatedAt: Date()))
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        try await database.connection.executeScript("CREATE TRIGGER reject_habit BEFORE UPDATE ON zikr_habit BEGIN SELECT RAISE(ABORT, 'habit failure'); END;")
+        model.increment()
+        await model.persistOnExit().value
+        XCTAssertTrue(model.saveFailed)
+        XCTAssertEqual(model.counter.count, 8)
+        let failedCounters = try await repository.tasbihCounters()
+        let failedHabits = try await repository.zikrHabit(dayKeys: [day])
+        XCTAssertEqual(failedCounters.first?.count, 7)
+        XCTAssertEqual(failedHabits.first?.completedCount, 2)
+        try await database.connection.executeScript("DROP TRIGGER reject_habit;")
+        await model.retrySave()
+        await model.retrySave()
+        XCTAssertFalse(model.saveFailed)
+        let counters = try await repository.tasbihCounters()
+        let habits = try await repository.zikrHabit(dayKeys: [day])
+        XCTAssertEqual(counters.first?.count, 8)
+        XCTAssertEqual(counters.first?.lifetimeCount, 9)
+        XCTAssertEqual(habits.first?.completedCount, 3)
+    }
+
+    @MainActor
+    func testTasbihTargetResetBeforeDebounceKeepsBothCompletions() async throws {
+        let initial = TasbihCounter(id: UUID(), title: "Target", target: 1, count: 0, lifetimeCount: 0, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        model.increment()
+        await model.reset()
+        model.increment()
+        await model.persistOnExit().value
+        await model.retrySave()
+        let counters = try await repository.tasbihCounters()
+        let habits = try await repository.zikrHabit(dayKeys: [DayKey.make(from: Date())])
+        XCTAssertEqual(counters.first?.count, 1)
+        XCTAssertEqual(counters.first?.lifetimeCount, 1)
+        XCTAssertEqual(habits.first?.completedCount, 2)
+        XCTAssertFalse(model.saveFailed)
+    }
+
+    func testTasbihNewHabitFailureRollsBackCounter() async throws {
+        let initial = TasbihCounter(id: UUID(), title: "Target", target: 1, count: 0, lifetimeCount: 0, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        var reached = initial
+        reached.count = 1
+        try await database.connection.executeScript("CREATE TRIGGER reject_habit BEFORE INSERT ON zikr_habit BEGIN SELECT RAISE(ABORT, 'habit failure'); END;")
+        do {
+            try await repository.saveTasbihProgress(reached, completions: ["2026-11-01": 1])
+            XCTFail("Both writes must roll back")
+        } catch { }
+        let counters = try await repository.tasbihCounters()
+        let habits = try await repository.zikrHabit(dayKeys: ["2026-11-01"])
+        XCTAssertEqual(counters.first?.count, 0)
+        XCTAssertTrue(habits.isEmpty)
+    }
+
+    func testConcurrentTasbihTargetsAddRatherThanOverwriteDailyTotal() async throws {
+        let repo = repository!
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for _ in 0..<12 {
+                group.addTask {
+                    let counter = TasbihCounter(id: UUID(), title: "Target", target: 1, count: 1, lifetimeCount: 0, updatedAt: Date())
+                    try await repo.saveTasbihProgress(counter, completions: ["2026-11-01": 1])
+                }
+            }
+            try await group.waitForAll()
+        }
+        let habits = try await repository.zikrHabit(dayKeys: ["2026-11-01"])
+        let counters = try await repository.tasbihCounters()
+        XCTAssertEqual(habits.first?.completedCount, 12)
+        XCTAssertEqual(counters.count, 12)
+    }
+
+    @MainActor
     func testTasbihBackgroundFlushFailureRemainsRetryable() async throws {
         let initial = TasbihCounter(id: UUID(), title: "Counter", target: nil, count: 7, lifetimeCount: 9, updatedAt: Date())
         try await repository.saveTasbihCounter(initial)

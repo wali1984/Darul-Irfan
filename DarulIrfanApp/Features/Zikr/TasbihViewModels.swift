@@ -97,6 +97,8 @@ final class TasbihCounterViewModel {
     private(set) var isRetryingSave = false
 
     @ObservationIgnored private var saveTask: Task<Void, Never>?
+    @ObservationIgnored private var persistenceTask: Task<Void, Never>?
+    @ObservationIgnored private var pendingCompletions: [String: Int] = [:]
     @ObservationIgnored private var hasRecordedTargetThisSession = false
     @ObservationIgnored private let tapFeedback = UIImpactFeedbackGenerator(style: .light)
     @ObservationIgnored private let targetFeedback = UINotificationFeedbackGenerator()
@@ -138,7 +140,7 @@ final class TasbihCounterViewModel {
            counter.count >= target, !hasRecordedTargetThisSession {
             hasRecordedTargetThisSession = true
             targetFeedback.notificationOccurred(.success)
-            Task { await self.recordHabitCompletion() }
+            pendingCompletions[DayKey.make(from: Date()), default: 0] += 1
         }
         scheduleSave()
     }
@@ -164,6 +166,8 @@ final class TasbihCounterViewModel {
     func apply(_ updated: TasbihCounter) async throws {
         saveTask?.cancel()
         await saveTask?.value
+        await persist()
+        if saveFailed { throw CocoaError(.fileWriteUnknown) }
         var saved = counter
         saved.title = updated.title
         saved.target = updated.target
@@ -214,30 +218,37 @@ final class TasbihCounterViewModel {
     }
 
     private func persist() async {
-        let snapshot = counter
-        do {
-            try await trackerRepository.saveTasbihCounter(snapshot)
-            if counter.updatedAt == snapshot.updatedAt { saveFailed = false }
-            await devotionalMetrics.refresh(reference: snapshot.updatedAt)
-        } catch is CancellationError {
-            // A newer save owns the current count.
-        } catch {
-            if counter.updatedAt == snapshot.updatedAt { saveFailed = true }
+        if let pending = persistenceTask {
+            await pending.value
+            return
         }
-    }
-
-    private func recordHabitCompletion() async {
-        let key = DayKey.make(from: Date())
-        var completed = 0
-        if let existing = (try? await trackerRepository.zikrHabit(dayKeys: [key]))?.first {
-            completed = existing.completedCount
+        // Keep the write alive when a debounce is canceled. A committed
+        // completion must be acknowledged before another write can retry it.
+        let task = Task { @MainActor in
+            while true {
+                let snapshot = self.counter
+                let completions = self.pendingCompletions
+                do {
+                    try await self.trackerRepository.saveTasbihProgress(snapshot, completions: completions)
+                    for (day, saved) in completions {
+                        let remaining = self.pendingCompletions[day, default: 0] - saved
+                        if remaining > 0 { self.pendingCompletions[day] = remaining }
+                        else { self.pendingCompletions.removeValue(forKey: day) }
+                    }
+                    if self.counter == snapshot && self.pendingCompletions.isEmpty {
+                        self.saveFailed = false
+                        await self.devotionalMetrics.refresh(reference: snapshot.updatedAt)
+                        // Taps may arrive while refreshing metrics.
+                        if self.counter == snapshot && self.pendingCompletions.isEmpty { break }
+                    }
+                } catch {
+                    self.saveFailed = true
+                    break
+                }
+            }
         }
-        let entry = ZikrHabitEntry(dayKey: key, completedCount: completed + 1, updatedAt: Date())
-        do {
-            try await trackerRepository.saveZikrHabit(entry)
-            await devotionalMetrics.refresh(reference: entry.updatedAt)
-        } catch {
-            // Habit record is best-effort; the counter itself is preserved.
-        }
+        persistenceTask = task
+        await task.value
+        persistenceTask = nil
     }
 }

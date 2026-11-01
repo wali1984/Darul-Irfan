@@ -226,7 +226,12 @@ struct TrackerRepository: TrackerRepositoryProtocol {
     }
 
     func saveTasbihCounter(_ counter: TasbihCounter) async throws {
-        try await database.connection.execute(
+        try await saveTasbihProgress(counter, completions: [:])
+    }
+
+    /// A failed habit write must also roll back the counter that reached it.
+    func saveTasbihProgress(_ counter: TasbihCounter, completions: [String: Int]) async throws {
+        var statements: [(sql: String, parameters: [SQLValue])] = [(
             """
             INSERT INTO tasbih_counters (id, title, target, count, lifetime_count, updated_at)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -245,7 +250,20 @@ struct TrackerRepository: TrackerRepositoryProtocol {
                 .int(counter.lifetimeCount),
                 .date(counter.updatedAt),
             ]
-        )
+        )]
+        for (day, count) in completions {
+            precondition(count > 0)
+            statements.append((
+                """
+                INSERT INTO zikr_habit (day_key, completed_count, updated_at) VALUES (?, ?, ?)
+                ON CONFLICT(day_key) DO UPDATE SET
+                    completed_count = zikr_habit.completed_count + excluded.completed_count,
+                    updated_at = excluded.updated_at
+                """,
+                [.text(day), .int(count), .date(counter.updatedAt)]
+            ))
+        }
+        try await database.connection.executeBatch(statements)
     }
 
     func deleteTasbihCounter(id: UUID) async throws {

@@ -175,6 +175,7 @@ protocol TrackerRepositoryProtocol: Sendable {
 
     func tasbihCounters() async throws -> [TasbihCounter]
     func saveTasbihCounter(_ counter: TasbihCounter) async throws
+    func saveTasbihProgress(_ counter: TasbihCounter, completions: [String: Int]) async throws
     func deleteTasbihCounter(id: UUID) async throws
 
     func zikrHabit(dayKeys: [String]) async throws -> [ZikrHabitEntry]
