@@ -384,7 +384,7 @@ struct BookReaderScreen: View {
         } label: {
             Text(verbatim: "Aa")
                 .diInterfaceFont(.body, weight: .heavy)
-                .foregroundStyle(ReadPalette.emeraldInk)
+                .foregroundStyle(DIColor.actionForeground)
         }
         .accessibilityLabel(Text("Text Size"))
     }
@@ -443,9 +443,9 @@ struct BookReaderScreen: View {
                         showsGoToPage = true
                     } label: {
                         Text("Go to page")
-                            .foregroundStyle(ReadPalette.emeraldInk)
+                            .foregroundStyle(DIColor.actionForeground)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DICompactButtonStyle())
                     Spacer(minLength: DISpacing.xs)
                     Text(verbatim: "\(numbers.last ?? 1)")
                 }
@@ -481,11 +481,12 @@ struct BookReaderScreen: View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .diInterfaceFont(.footnote, weight: .bold)
-                .foregroundStyle(ReadPalette.emeraldInk)
+                .foregroundStyle(DIColor.actionForeground)
                 .frame(width: 44, height: 44)
                 .background(Circle().fill(ReadPalette.chipTrack))
+                .overlay(Circle().stroke(ReadPalette.glassEdge, lineWidth: 1))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .disabled(!isEnabled)
         .opacity(isEnabled ? 1 : 0.4)
         .accessibilityLabel(Text(label))
