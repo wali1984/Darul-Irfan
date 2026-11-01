@@ -26,7 +26,7 @@ enum ReadPalette {
     /// The track under a small toggle, a find field or a chip.
     static let chipTrack = adaptive(light: 0x0B7250, lightAlpha: 0.08, dark: 0xFFFFFF, darkAlpha: 0.08)
     /// The chosen side of a small toggle.
-    static let chipOn = adaptive(light: 0xFFFFFF, dark: 0xFFFFFF, darkAlpha: 0.16)
+    static let chipOn = adaptive(light: 0xFFF4DF, dark: 0xFFFFFF, darkAlpha: 0.16)
     /// The light edge of glass.
     static let glassEdge = adaptive(light: 0xFFFFFF, lightAlpha: 0.85, dark: 0xFFFFFF, darkAlpha: 0.10)
     /// The soft shadow under glass: emerald by day, black at night.
@@ -287,7 +287,7 @@ struct ReadSectionPicker: View {
 }
 
 /// A small two-way toggle on the chip track (Surah | Parah): the chosen side
-/// is a white pill.
+/// is a cream pill.
 struct ReadChipToggle<Item: Hashable>: View {
     let items: [Item]
     let title: (Item) -> LocalizedStringKey
@@ -315,11 +315,11 @@ struct ReadChipToggle<Item: Hashable>: View {
             }
         } label: {
             Text(title(item))
-                .font(.subheadline.weight(selected ? .bold : .semibold))
+                .diInterfaceFont(.subheadline, weight: selected ? .bold : .semibold)
                 .foregroundStyle(selected ? DIColor.textPrimary : DIColor.textMuted)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity, minHeight: 38)
+                .frame(maxWidth: .infinity, minHeight: 48)
                 .background {
                     if selected {
                         Capsule(style: .continuous)
@@ -329,7 +329,7 @@ struct ReadChipToggle<Item: Hashable>: View {
                 }
                 .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
