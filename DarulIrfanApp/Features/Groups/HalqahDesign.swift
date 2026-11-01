@@ -357,6 +357,10 @@ struct HalqahTileLabel: View {
     @ScaledMetric(relativeTo: .body) private var rowMinHeight: CGFloat = 56
     @State private var bounces = 0
 
+    private var foregroundTint: Color {
+        tint == DIColor.primary ? DIColor.actionForeground : tint
+    }
+
     var body: some View {
         Group {
             if axis == .horizontal {
@@ -399,7 +403,7 @@ struct HalqahTileLabel: View {
     private var symbol: some View {
         Image(systemName: systemImage)
             .diInterfaceFont(.title3, weight: .semibold)
-            .foregroundStyle(tint)
+            .foregroundStyle(foregroundTint)
             .symbolEffect(.bounce, value: reduceMotion ? 0 : bounces)
             .symbolEffect(.pulse, isActive: isAlive && !reduceMotion)
             .frame(width: iconBox, height: iconBox)
@@ -415,7 +419,7 @@ struct HalqahTileLabel: View {
             if let subtitle {
                 subtitle
                     .diInterfaceFont(.footnote)
-                    .foregroundStyle(isAlive ? tint : DIColor.textMuted)
+                    .foregroundStyle(isAlive ? foregroundTint : DIColor.textMuted)
             }
         }
         .multilineTextAlignment(.leading)
