@@ -48,7 +48,8 @@ struct YouTubePlayerView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        guard context.coordinator.loadedVideoID != videoID else {
+        guard Self.needsReload(loadedID: context.coordinator.loadedVideoID,
+                               previousSync: context.coordinator.sync, videoID: videoID, sync: sync) else {
             // Same video: pass on a pause, resume or move by the admin.
             if let sync, sync != context.coordinator.sync {
                 context.coordinator.sync = sync
@@ -106,6 +107,11 @@ struct YouTubePlayerView: UIViewRepresentable {
             """
         }
         webView.loadHTMLString(html, baseURL: URL(string: "https://www.youtube-nocookie.com"))
+    }
+
+    /// Mode changes require a different page; pause/seek updates preserve the existing player.
+    static func needsReload(loadedID: String?, previousSync: YouTubeSync?, videoID: String, sync: YouTubeSync?) -> Bool {
+        loadedID != videoID || (previousSync == nil) != (sync == nil)
     }
 
     private static func script(_ sync: YouTubeSync) -> String {
