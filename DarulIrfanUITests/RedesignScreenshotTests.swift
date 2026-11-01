@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -90,6 +90,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "resources" {
+            contextualResourcesTour()
+            return
+        }
         if ["companion", "companion-fixes", "timezone"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             companionTour()
             return
@@ -384,6 +388,59 @@ final class RedesignScreenshotTests: XCTestCase {
                 goBack()
             }
         }
+    }
+
+    /// Actual contextual entry points, not a direct test-only destination.
+    /// The fresh CI simulator has no personal records; this tour never starts a timer.
+    private func contextualResourcesTour() {
+        selectTab(0)
+        guard seek("personal-zikr-entry") else { return }
+        let personalTitle = language == "ur" ? "آپ کا روزانہ ذاتی ذکر" : "Your Daily Personal Zikr"
+        XCTAssertTrue(app.navigationBars[personalTitle].waitForExistence(timeout: 10))
+        contextualGuideRoundTrip(origin: "personal")
+        XCTAssertTrue(app.navigationBars[personalTitle].exists)
+
+        let history = language == "ur" ? "آپ کے گزشتہ 3 ماہ" : "Your last 3 months"
+        let explanation = language == "ur"
+            ? "ہر نمایاں دن آپ کے ذکر کے لیے مختص وقت کی علامت ہے۔"
+            : "Every filled day is time you made for Zikr."
+        XCTAssertFalse(app.staticTexts[explanation].exists, "History should begin collapsed")
+        guard seek(history) else { return }
+        XCTAssertTrue(app.staticTexts[explanation].waitForExistence(timeout: 5))
+        shot("resources-history-expanded")
+        // Return to the disclosure header even when its content extends below the screen.
+        scrollToTop()
+        guard seek(history) else { return }
+        XCTAssertFalse(app.staticTexts[explanation].exists, "History must collapse again")
+        shot("resources-history-collapsed")
+        goBack()
+
+        selectTab(2)
+        scrollToTop()
+        guard seek("zikr-tasbih") else { return }
+        let originTitle = app.navigationBars.firstMatch.identifier
+        contextualGuideRoundTrip(origin: "tasbih")
+        XCTAssertEqual(app.navigationBars.firstMatch.identifier, originTitle, "Back must return to Tasbih")
+        shot("resources-tasbih-return")
+    }
+
+    private func contextualGuideRoundTrip(origin: String) {
+        scrollToTop()
+        guard seek("method-of-zikr-shortcut") else { return }
+        let guideTitle = language == "ur" ? "طریقۂ ذکر" : "Method of Zikr"
+        XCTAssertTrue(app.navigationBars[guideTitle].waitForExistence(timeout: 10))
+        shot("resources-" + origin + "-guide")
+        let shajra = onScreen(app.buttons.matching(NSPredicate(
+            format: "label CONTAINS %@", label("Chain of Transmission"))))
+        guard tap(shajra) else {
+            XCTFail("The guide must expose its prominent Shajra shortcut")
+            return
+        }
+        XCTAssertTrue(app.navigationBars[label("Shajra")].waitForExistence(timeout: 10))
+        shot("resources-" + origin + "-shajra")
+        goBack()
+        XCTAssertTrue(app.navigationBars[guideTitle].exists, "Back must return to the guide")
+        goBack()
     }
 
     private func practiceTour() {
