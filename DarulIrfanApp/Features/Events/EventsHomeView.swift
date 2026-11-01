@@ -337,6 +337,8 @@ private struct EventRowCard: View {
 /// with the map and the number and address to copy.
 private struct DarulIrfanHeroCard: View {
     let place: DarulIrfanPlace
+    @Environment(\.openURL) private var openURL
+    @State private var linkFailed = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -345,19 +347,20 @@ private struct DarulIrfanHeroCard: View {
             } label: {
                 header
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
             .accessibilityHint(Text("Map showing the location of Dar-ul-Irfan"))
             HStack(spacing: 10) {
                 if let url = place.directionsURL {
-                    Link(destination: url) { pill("Directions", gold: true) }
+                    Button { open(url) } label: { pill("Directions", gold: true) }
                 }
                 if let url = place.phoneURL {
-                    Link(destination: url) { pill("Call", gold: false) }
+                    Button { open(url) } label: { pill("Call", gold: false) }
                 }
                 if let url = place.emailURL {
-                    Link(destination: url) { pill("Email", gold: false) }
+                    Button { open(url) } label: { pill("Email", gold: false) }
                 }
             }
+            .buttonStyle(DIPressableStyle())
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -366,6 +369,15 @@ private struct DarulIrfanHeroCard: View {
             DILivingSealMark(diameter: 48)
                 .padding(14)
         }
+        .alert("Unable to open link", isPresented: $linkFailed) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("No app could open this link. Please check that a suitable app is installed.")
+        }
+    }
+
+    private func open(_ url: URL) {
+        openURL(url) { accepted in linkFailed = !accepted }
     }
 
     private var header: some View {
@@ -397,10 +409,12 @@ private struct DarulIrfanHeroCard: View {
     private func pill(_ title: LocalizedStringKey, gold: Bool) -> some View {
         Text(title)
             .font(.subheadline.weight(.bold))
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, DISpacing.sm)
+            .padding(.vertical, DISpacing.sm)
             .foregroundStyle(gold ? Color(hex: 0x064B34) : Color.white)
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .frame(maxWidth: .infinity, minHeight: 48)
             .background(
                 Capsule().fill(gold ? AnyShapeStyle(DiscoverStyle.goldButton) : AnyShapeStyle(Color.white.opacity(0.14)))
             )

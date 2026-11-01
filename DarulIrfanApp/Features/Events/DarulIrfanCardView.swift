@@ -6,6 +6,8 @@ import SwiftUI
 @MainActor
 struct DarulIrfanCardView: View {
     let place: DarulIrfanPlace
+    @Environment(\.openURL) private var openURL
+    @State private var linkFailed = false
 
     var body: some View {
         DIElevatedCard(padding: 0) {
@@ -30,7 +32,7 @@ struct DarulIrfanCardView: View {
                         .accessibilityLabel("Map showing the location of Dar-ul-Irfan")
 
                         if let directionsUrl {
-                            Link(destination: directionsUrl) {
+                            Button { open(directionsUrl) } label: {
                                 Label("Directions", systemImage: "arrow.triangle.turn.up.right.circle")
                             }
                             .buttonStyle(DIPrimaryButtonStyle())
@@ -64,6 +66,15 @@ struct DarulIrfanCardView: View {
                 .padding(DISpacing.md)
             }
         }
+        .alert("Unable to open link", isPresented: $linkFailed) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("No app could open this link. Please check that a suitable app is installed.")
+        }
+    }
+
+    private func open(_ url: URL) {
+        openURL(url) { accepted in linkFailed = !accepted }
     }
 
     // MARK: - Crest header
@@ -109,7 +120,7 @@ struct DarulIrfanCardView: View {
     }
 
     private func contactChip(url: URL, title: LocalizedStringKey, systemImage: String) -> some View {
-        Link(destination: url) {
+        Button { open(url) } label: {
             VStack(spacing: DISpacing.xs) {
                 Image(systemName: systemImage)
                     .font(.headline)
@@ -118,7 +129,7 @@ struct DarulIrfanCardView: View {
                     .font(.caption.weight(.medium))
                     .foregroundStyle(DIColor.textPrimary)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, minHeight: 48)
             .padding(.vertical, DISpacing.sm)
             .background(
                 RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
@@ -129,6 +140,7 @@ struct DarulIrfanCardView: View {
                     .stroke(DIColor.primary.opacity(0.25), lineWidth: 1)
             )
         }
+        .buttonStyle(DIPressableStyle())
     }
 
     // MARK: - Derived values
