@@ -20,9 +20,12 @@ struct MeetingRoomView: View {
                 .background(Color(red: 0.04, green: 0.17, blue: 0.13))
                 .navigationTitle("Darul Irfan")
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(DIColor.background, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Leave") { dismiss() }
+                            .buttonStyle(DICompactButtonStyle())
                     }
                 }
         }

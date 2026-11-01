@@ -24,7 +24,7 @@ struct TasbihEditorView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Title", text: $title)
+                    TextField("Title", text: $title, prompt: Text("Title").foregroundColor(DIColor.textMuted))
                         .listRowBackground(DIColor.surface)
                 } header: {
                     Text("Name")
@@ -32,7 +32,7 @@ struct TasbihEditorView: View {
                     Text("For example: SubhanAllah, Alhamdulillah, Allahu Akbar, or Durood Sharif.")
                 }
                 Section {
-                    TextField("Target (optional)", text: $targetText)
+                    TextField("Target (optional)", text: $targetText, prompt: Text("Target (optional)").foregroundColor(DIColor.textMuted))
                         .keyboardType(.numberPad)
                         .listRowBackground(DIColor.surface)
                 } header: {
