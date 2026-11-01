@@ -342,7 +342,11 @@ private struct PersonalZikrHistoryCard: View {
         Text("\(totalMinutes) min")
     }
     @ViewBuilder private func sessionDetails(_ entry: PersonalZikrEntry) -> some View {
-        Text(entry.endedAt, format: .dateTime.day().month(.abbreviated).hour().minute().locale(locale))
+        // Keep localized dates and clocks separate so RTL month names cannot
+        // reorder the Western time and its day-period marker.
+        Text(entry.endedAt, format: .dateTime.day().month(.abbreviated).locale(locale))
+        Text(entry.endedAt, format: .dateTime.hour().minute().locale(locale))
+            .environment(\.layoutDirection, .leftToRight)
         Text("\(minutes(entry)) min").foregroundStyle(DIColor.textMuted)
     }
 }
