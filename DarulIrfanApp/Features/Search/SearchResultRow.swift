@@ -22,7 +22,7 @@ struct SearchResultRow: View {
     }
 
     private var snippetFont: Font {
-        isRightToLeftContent ? DIFont.urduBody(scale: 0.85) : .subheadline
+        result.isQuranArabic ? DIFont.quranArabic(scale: 0.75) : (isRightToLeftContent ? DIFont.urduBody(scale: 0.85) : .subheadline)
     }
 
     var body: some View {
@@ -76,7 +76,7 @@ struct SearchResultRow: View {
             if let snippet = result.snippet, !snippet.isEmpty {
                 Text(highlightedSnippet(from: snippet))
                     .font(snippetFont)
-                    .foregroundStyle(DIColor.textMuted)
+                    .foregroundStyle(result.isQuranArabic ? DIColor.scripture : DIColor.textMuted)
                     .multilineTextAlignment(.leading)
                     .lineLimit(3)
             }

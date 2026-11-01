@@ -602,16 +602,40 @@ struct SearchIndexService: SearchIndexServicing {
             AppLog.search("Search query failed: \(error.localizedDescription)")
             return []
         }
-        return found.compactMap { row in
-            guard let itemID = row.text("item_id"), let title = row.text("display_title") else { return nil }
-            return SearchResult(
-                domain: domain,
-                itemID: itemID,
-                title: title,
-                snippet: row.text("display_body").flatMap { SearchSnippet.make(from: $0, terms: highlight) },
-                language: row.text("language")
-            )
+        var results: [SearchResult] = []
+        for row in found {
+            guard let itemID = row.text("item_id"), let title = row.text("display_title") else { continue }
+            let source = domain == .quran ? (try? await quranSnippet(itemID: itemID, highlight: highlight)) : nil
+            results.append(SearchResult(
+                domain: domain, itemID: itemID, title: title,
+                snippet: source?.snippet ?? row.text("display_body").flatMap { SearchSnippet.make(from: $0, terms: highlight) },
+                language: domain == .quran ? source?.language : row.text("language"),
+                isQuranArabic: source?.isQuranArabic == true
+            ))
         }
+        return results
+    }
+
+    /// Preserve the language and original-verse identity of the displayed snippet.
+    private func quranSnippet(itemID: String, highlight: [String]) async throws -> (snippet: String, language: String?, isQuranArabic: Bool)? {
+        let parts = itemID.split(separator: ":")
+        guard parts.count == 2, let surah = Int(parts[0]), let ayah = Int(parts[1]) else { return nil }
+        let rows = try await database.connection.query(
+            """
+            SELECT text_arabic AS text, 'ar' AS language, 1 AS original, '' AS edition_order
+            FROM quran_ayahs WHERE surah_number = ? AND ayah_number = ?
+            UNION ALL
+            SELECT t.text, e.language, 0, COALESCE(e.title, t.edition_id)
+            FROM quran_translations t LEFT JOIN quran_editions e ON e.id = t.edition_id
+            WHERE t.surah_number = ? AND t.ayah_number = ?
+            ORDER BY original DESC, edition_order ASC
+            """, [.int(surah), .int(ayah), .int(surah), .int(ayah)]
+        )
+        let candidates = rows.compactMap { row -> (snippet: String, language: String?, isQuranArabic: Bool)? in
+            guard let text = row.text("text"), let snippet = SearchSnippet.make(from: text, terms: highlight) else { return nil }
+            return (snippet, row.text("language"), row.int("original") == 1)
+        }
+        return candidates.first { $0.snippet.contains("\u{2039}") } ?? candidates.first
     }
 
     /// Per-ayah tafsir passages (Akram-ut-Tafaseer, Asrar-at-Tanzil English).

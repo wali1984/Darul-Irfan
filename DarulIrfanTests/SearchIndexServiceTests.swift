@@ -37,6 +37,34 @@ final class SearchIndexServiceTests: XCTestCase {
         database = nil
     }
 
+    func testQuranSnippetKeepsMatchedSourceLanguageAndScriptureIdentity() async throws {
+        try await seedAllDomains()
+        try await quranRepository.upsertEditions([
+            QuranEdition(id: "qa-en", title: "English", kind: .translation, language: "en", author: nil, sourceUrl: nil, rightsStatus: .publicDomain, isAvailableOffline: true, reviewState: nil),
+            QuranEdition(id: "qa-ur", title: "Urdu", kind: .translation, language: "ur", author: nil, sourceUrl: nil, rightsStatus: .publicDomain, isAvailableOffline: true, reviewState: nil)
+        ])
+        try await quranRepository.upsertTranslations([
+            QuranTranslation(editionID: "qa-en", surahNumber: 1, ayahNumber: 1, text: "In the name of Allah, the Beneficent"),
+            QuranTranslation(editionID: "qa-ur", surahNumber: 1, ayahNumber: 1, text: "اللہ کے نام سے")
+        ])
+        try await service.reindex(domains: [.quran])
+        let englishResults = try await service.search("Beneficent", domains: [.quran], limit: 20)
+        let english = try XCTUnwrap(englishResults.first { $0.itemID == "1:1" })
+        XCTAssertEqual(english.language, "en")
+        XCTAssertFalse(english.isQuranArabic)
+        XCTAssertFalse(english.snippet?.contains("اللہ") ?? true)
+        let urduResults = try await service.search("نام", domains: [.quran], limit: 20)
+        let urdu = try XCTUnwrap(urduResults.first { $0.itemID == "1:1" })
+        XCTAssertEqual(urdu.language, "ur")
+        XCTAssertFalse(urdu.isQuranArabic)
+        XCTAssertFalse(urdu.snippet?.contains("Beneficent") ?? true)
+        let arabicResults = try await service.search("بسم", domains: [.quran], limit: 20)
+        let arabic = try XCTUnwrap(arabicResults.first { $0.itemID == "1:1" })
+        XCTAssertEqual(arabic.language, "ar")
+        XCTAssertTrue(arabic.isQuranArabic)
+        XCTAssertFalse(arabic.snippet?.contains("Beneficent") ?? true)
+    }
+
     // MARK: - Seeding
 
     /// Seeds one row per domain:

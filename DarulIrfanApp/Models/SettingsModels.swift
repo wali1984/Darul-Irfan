@@ -186,4 +186,6 @@ struct SearchResult: Sendable, Identifiable, Equatable {
     /// Snippet with the match, for display.
     var snippet: String?
     var language: String?
+    /// True only for a snippet selected from the original Quran ayah.
+    var isQuranArabic: Bool = false
 }
