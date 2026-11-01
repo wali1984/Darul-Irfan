@@ -247,6 +247,7 @@ struct AddGroupPersonView: View {
     @State private var error: String?
     @State private var result: AddPersonResult?
     @State private var copied = false
+    @State private var linkFailed = false
 
     var body: some View {
         Form {
@@ -263,6 +264,11 @@ struct AddGroupPersonView: View {
         .diScreenBackground()
         .tint(DIColor.actionForeground)
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
+        .alert("Unable to open link", isPresented: $linkFailed) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("No app could open this link. Please check that a suitable app is installed.")
+        }
         .navigationTitle("Add people")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -429,12 +435,12 @@ struct AddGroupPersonView: View {
         Section {
             if let phone = result.phone {
                 Button {
-                    if let url = smsURL(phone: phone, message: message) { openURL(url) }
+                    openInvitationLink(smsURL(phone: phone, message: message))
                 } label: {
                     Label("Send by text message", systemImage: "message")
                 }
                 Button {
-                    if let url = whatsappURL(phone: phone, message: message) { openURL(url) }
+                    openInvitationLink(whatsappURL(phone: phone, message: message))
                 } label: {
                     Label("Send on WhatsApp", systemImage: "phone.bubble")
                 }
@@ -449,6 +455,11 @@ struct AddGroupPersonView: View {
                 Label(copied ? "Copied" : "Copy the code", systemImage: copied ? "checkmark" : "doc.on.doc")
             }
         }
+    }
+
+    private func openInvitationLink(_ url: URL?) {
+        guard let url else { linkFailed = true; return }
+        openURL(url) { accepted in linkFailed = !accepted }
     }
 
     private func invitationMessage(code: String, expires: Date?) -> String {
