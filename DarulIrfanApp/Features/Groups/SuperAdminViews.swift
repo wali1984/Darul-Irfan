@@ -75,6 +75,7 @@ struct MemberDirectoryView: View {
 
     @State private var people: [DirectoryPerson]?
     @State private var failed = false
+    @State private var loading = false
     @State private var search = ""
 
     private var shown: [DirectoryPerson] {
@@ -113,7 +114,10 @@ struct MemberDirectoryView: View {
                     }
                 }
             } else if failed {
+                Text("The member directory could not be loaded. Please try again.")
+                    .foregroundStyle(DIColor.textMuted)
                 Button("Try again") { Task { await load() } }
+                    .buttonStyle(DICompactButtonStyle())
             } else {
                 ProgressView()
             }
@@ -130,8 +134,13 @@ struct MemberDirectoryView: View {
     }
 
     private func load() async {
+        guard !loading else { return }
+        loading = true
+        defer { loading = false }
         failed = false
-        do { people = try await service.directory() } catch { failed = true }
+        do { people = try await service.directory() }
+        catch is CancellationError { }
+        catch { if !Task.isCancelled { failed = true } }
     }
 }
 

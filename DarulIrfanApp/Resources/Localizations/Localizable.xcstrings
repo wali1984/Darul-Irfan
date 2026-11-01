@@ -34087,6 +34087,40 @@
           }
         }
       }
+    },
+    "The member directory could not be loaded. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The member directory could not be loaded. Please try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اراکین کی فہرست لوڈ نہیں ہو سکی۔ براہِ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
+    },
+    "This person is no longer in the directory.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This person is no longer in the directory."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ شخص اب فہرست میں موجود نہیں ہے۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
