@@ -684,5 +684,6 @@ private struct ShajraClosingDua: View {
             .padding(.vertical, 22)
             .diGlassPanel(cornerRadius: 24)
             .diAppear(delay: ShajraMotion.closingDelay)
+            .accessibilityIdentifier("shajra.closingPrayer")
     }
 }

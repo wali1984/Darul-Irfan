@@ -231,7 +231,7 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     /// The Shajra: the Zikr tab's button under the ayah, the chain it opens
-    /// (the top and three screens down), then Halqah › Silsila's Shajra
+    /// (the top through the closing prayer), then Halqah › Silsila's Shajra
     /// row, which opens the same page.
     private func shajraTour() {
         selectTab(2)
@@ -246,9 +246,22 @@ final class RedesignScreenshotTests: XCTestCase {
             pause(4)
             shot("shajra")
             scrollShots("shajra", count: 3)
+            // Urdu wraps to more screens than English. Reach the actual end,
+            // rather than treating a fixed swipe count as full-chain coverage.
+            let closingPrayer = app.staticTexts["shajra.closingPrayer"]
+            var endingSwipes = 0
+            while !(closingPrayer.exists && closingPrayer.isHittable && app.frame.contains(closingPrayer.frame)) && endingSwipes < 12 {
+                app.swipeUp()
+                pause(1.5)
+                endingSwipes += 1
+                shot("shajra-ending-\(endingSwipes)")
+            }
+            XCTAssertTrue(closingPrayer.exists && closingPrayer.isHittable && app.frame.contains(closingPrayer.frame), "Shajra closing prayer must be visible before leaving the page")
+            shot("shajra-closing-prayer")
             goBack()
         } else {
             shot("no-shajra-button")
+            XCTFail("The Zikr Shajra shortcut must open the chain")
         }
 
         selectTab(4)
@@ -269,6 +282,7 @@ final class RedesignScreenshotTests: XCTestCase {
             goBack()
         } else {
             shot("no-shajra-row")
+            XCTFail("The Halqah Shajra row must open the chain")
         }
     }
 
