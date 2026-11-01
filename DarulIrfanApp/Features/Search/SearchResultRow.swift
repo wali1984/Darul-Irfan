@@ -17,8 +17,12 @@ struct SearchResultRow: View {
         ScriptDirection.isRightToLeft(result.snippet ?? result.title, fallbackLanguage: result.language)
     }
 
+    private var isRightToLeftTitle: Bool {
+        ScriptDirection.isRightToLeft(result.title, fallbackLanguage: result.language)
+    }
+
     private var titleFont: Font {
-        ScriptDirection.isRightToLeft(result.title, fallbackLanguage: result.language) ? DIFont.urduBody() : .headline
+        isRightToLeftTitle ? DIFont.urduBody() : .headline
     }
 
     private var snippetFont: Font {
@@ -29,13 +33,7 @@ struct SearchResultRow: View {
         DIElevatedCard(padding: DISpacing.md) {
             HStack(alignment: .top, spacing: DISpacing.md) {
                 domainCrest
-                if isRightToLeftContent {
-                    textBlock
-                        .environment(\.layoutDirection, .rightToLeft)
-                } else {
-                    textBlock
-                        .environment(\.layoutDirection, .leftToRight)
-                }
+                textBlock
             }
         }
         .contextMenu {
@@ -72,6 +70,8 @@ struct SearchResultRow: View {
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.leading)
                 .lineLimit(3)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, isRightToLeftTitle ? .rightToLeft : .leftToRight)
 
             if let snippet = result.snippet, !snippet.isEmpty {
                 Text(highlightedSnippet(from: snippet))
@@ -79,6 +79,8 @@ struct SearchResultRow: View {
                     .foregroundStyle(result.isQuranArabic ? DIColor.scripture : DIColor.textMuted)
                     .multilineTextAlignment(.leading)
                     .lineLimit(3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .environment(\.layoutDirection, isRightToLeftContent ? .rightToLeft : .leftToRight)
             }
 
         }

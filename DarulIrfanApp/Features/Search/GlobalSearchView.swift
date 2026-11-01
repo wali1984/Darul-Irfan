@@ -394,7 +394,7 @@ struct GlobalSearchView: View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: systemImage)
                 .diInterfaceFont(.footnote, weight: .semibold)
-                .foregroundStyle(DIColor.primary)
+                .foregroundStyle(DIColor.actionForeground)
                 .frame(width: 30, height: 30)
                 .background(
                     RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
