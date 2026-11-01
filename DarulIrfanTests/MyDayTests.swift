@@ -4,6 +4,21 @@ import XCTest
 
 /// My Day planning and the personal iqamah reminder.
 final class MyDayTests: XCTestCase {
+    func testOnlyValidSingleAyahNotesCanOpenReader() {
+        let counts = [2: 286, 114: 6]
+        func reference(_ id: String, kind: NoteReference.Kind = .ayah) -> DuaQuranReference? {
+            NoteReference(kind: kind, itemID: id, label: "Saved source").quranReference(ayahCounts: counts)
+        }
+        XCTAssertEqual(reference("2:255")?.firstAyah, 255)
+        XCTAssertEqual(reference("114:6")?.surah, 114)
+        for id in ["2:287", "114:7", "0:1", "115:1", "2:0", "2:255-256", "2:255\n", "2:255garbage", "1:1"] {
+            XCTAssertNil(reference(id), id)
+        }
+        XCTAssertNil(reference("2:255", kind: .media))
+        XCTAssertNil(reference("2:255", kind: .library))
+        XCTAssertNil(NoteReference(kind: .ayah, itemID: "2:255", label: "").quranReference(ayahCounts: [:]))
+    }
+
 
     @MainActor
     func testFailedWritesPreserveConfirmedStateAndRetry() throws {

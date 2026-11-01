@@ -108,6 +108,12 @@ struct NoteReference: Codable, Sendable, Equatable, Hashable {
     var itemID: String
     /// What to show, e.g. "Al-Baqarah 2:255".
     var label: String
+
+    func quranReference(ayahCounts: [Int: Int]) -> DuaQuranReference? {
+        guard kind == .ayah,
+              itemID.range(of: #"\A[0-9]{1,3}:[0-9]{1,3}\z"#, options: .regularExpression) != nil else { return nil }
+        return DuaQuranReference.parse("Quran " + itemID, ayahCounts: ayahCounts)
+    }
 }
 
 /// A recorded fast.

@@ -8,6 +8,7 @@ struct NotesView: View {
     @State private var saveFailed = false
     @State private var editing: DayNote?
     @State private var isAdding = false
+    private static let ayahCounts = Dictionary(SeedBundle.quranSurahs().map { ($0.id, $0.ayahCount) }, uniquingKeysWith: { first, _ in first })
 
     var body: some View {
         List {
@@ -18,6 +19,7 @@ struct NotesView: View {
                     .listRowBackground(DIColor.surface)
             }
             ForEach(store.document.notes) { note in
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Button {
                     editing = note
                 } label: {
@@ -40,9 +42,19 @@ struct NotesView: View {
                             .font(.caption2)
                             .foregroundStyle(DIColor.textMuted)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
                 }
                 .buttonStyle(.plain)
+                if let source = note.reference?.quranReference(ayahCounts: Self.ayahCounts) {
+                    Button {
+                        DeepLinkRouter.shared.open(.quranAyah(surah: source.surah, ayah: source.firstAyah))
+                    } label: {
+                        Label("Open in the Quran", systemImage: "book.closed")
+                    }
+                    .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+                    .accessibilityIdentifier("note-quran-source")
+                }
+                }
                 .listRowBackground(DIColor.surface)
                 .swipeActions {
                     Button(role: .destructive) {
