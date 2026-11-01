@@ -575,25 +575,33 @@ struct GroupNoticeComposer: View {
 
     var body: some View {
         Form {
-            Section {
-                TextField("For example: Dua in five minutes", text: $text, axis: .vertical)
-                    .lineLimit(2...5)
-                Toggle("Also send it as a notification", isOn: $notify)
-            } footer: {
-                Text("Shown on the session to everyone in the group.")
-            }
-            if let error {
-                Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
-            }
-            Section {
-                Button("Show to the group") { Task { await save(text) } }
-                    .disabled(working || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                if current != nil {
-                    Button("Remove the message", role: .destructive) { Task { await save("") } }
+            Group {
+                Section {
+                    TextField("For example: Dua in five minutes", text: $text, axis: .vertical)
+                        .lineLimit(2...5)
                         .disabled(working)
+                    Toggle("Also send it as a notification", isOn: $notify)
+                        .disabled(working)
+                } footer: {
+                    Text("Shown on the session to everyone in the group.")
+                }
+                if let error {
+                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                }
+                Section {
+                    Button("Show to the group") { Task { await save(text) } }
+                        .buttonStyle(DIPrimaryButtonStyle())
+                        .disabled(working || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    if current != nil {
+                        Button("Remove the message", role: .destructive) { Task { await save("") } }
+                            .buttonStyle(DISecondaryButtonStyle(destructive: true))
+                            .disabled(working)
+                    }
                 }
             }
+            .listRowBackground(DIColor.surface)
         }
+        .overlay { if working { ProgressView().padding().background(DIColor.surface, in: Capsule()) } }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
         .tint(DIColor.actionForeground)
@@ -605,11 +613,16 @@ struct GroupNoticeComposer: View {
     }
 
     private func save(_ value: String) async {
+        guard !working else { return }
+        let message = value.trimmingCharacters(in: .whitespacesAndNewlines)
         working = true
+        error = nil
         defer { working = false }
         do {
-            try await service.control("notice", ["text": value.trimmingCharacters(in: .whitespacesAndNewlines), "notify": notify && !value.isEmpty], in: groupID)
+            try await service.control("notice", ["text": message, "notify": notify && !message.isEmpty], in: groupID)
             dismiss()
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
@@ -631,28 +644,35 @@ struct GroupDuaComposer: View {
 
     var body: some View {
         Form {
-            if sent {
-                Section {
-                    Label("Your request was sent to the group's admins.", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(DIColor.primary)
-                }
-            } else {
-                Section {
-                    TextField("Your dua request", text: $text, axis: .vertical)
-                        .lineLimit(3...8)
-                    Toggle("Include my name", isOn: $showName)
-                } footer: {
-                    Text("Only the group's admins see it, and remember it in the dua at the end of the zikr.")
-                }
-                if let error {
-                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
-                }
-                Section {
-                    Button("Send") { Task { await send() } }
-                        .disabled(working || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Group {
+                if sent {
+                    Section {
+                        Label("Your request was sent to the group's admins.", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(DIColor.primary)
+                    }
+                } else {
+                    Section {
+                        TextField("Your dua request", text: $text, axis: .vertical)
+                            .lineLimit(3...8)
+                            .disabled(working)
+                        Toggle("Include my name", isOn: $showName)
+                            .disabled(working)
+                    } footer: {
+                        Text("Only the group's admins see it, and remember it in the dua at the end of the zikr.")
+                    }
+                    if let error {
+                        Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                    }
+                    Section {
+                        Button("Send") { Task { await send() } }
+                            .buttonStyle(DIPrimaryButtonStyle())
+                            .disabled(working || text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
                 }
             }
+            .listRowBackground(DIColor.surface)
         }
+        .overlay { if working { ProgressView().padding().background(DIColor.surface, in: Capsule()) } }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
         .tint(DIColor.actionForeground)
@@ -665,11 +685,16 @@ struct GroupDuaComposer: View {
     }
 
     private func send() async {
+        let request = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !working, !sent, !request.isEmpty else { return }
         working = true
+        error = nil
         defer { working = false }
         do {
-            try await service.requestDua(text.trimmingCharacters(in: .whitespacesAndNewlines), showName: showName, in: groupID)
+            try await service.requestDua(request, showName: showName, in: groupID)
             sent = true
+        } catch is CancellationError {
+            return
         } catch {
             self.error = error.localizedDescription
         }
