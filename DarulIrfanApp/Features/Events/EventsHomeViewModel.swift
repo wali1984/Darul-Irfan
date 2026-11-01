@@ -19,6 +19,8 @@ final class EventsHomeViewModel {
     private(set) var past: [CommunityEvent] = []
     private(set) var place: DarulIrfanPlace?
     private(set) var isLoaded = false
+    private(set) var failed = false
+    private(set) var loading = false
 
     /// `contentRepository` is no longer read here; the parameter stays so
     /// existing callers keep compiling.
@@ -28,11 +30,19 @@ final class EventsHomeViewModel {
     }
 
     func load() async {
+        guard !loading else { return }
+        loading = true
+        failed = false
+        defer { loading = false }
         let fetchedEvents: [CommunityEvent]
         do {
             fetchedEvents = try await eventsRepository.events()
+            try Task.checkCancellation()
+        } catch is CancellationError {
+            return
         } catch {
-            fetchedEvents = []
+            if !Task.isCancelled { failed = true }
+            return
         }
 
         // A program is upcoming until a day after its last day, whether or

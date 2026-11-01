@@ -33543,6 +33543,23 @@
           }
         }
       }
+    },
+    "Programmes could not be loaded. Please try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programmes could not be loaded. Please try again."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پروگرام لوڈ نہیں ہو سکے۔ براہ کرم دوبارہ کوشش کریں۔"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -46,11 +46,22 @@ struct EventsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
-            if !viewModel.isLoaded {
+            if viewModel.failed {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text("Programmes could not be loaded. Please try again.")
+                        .foregroundStyle(DIColor.textPrimary)
+                    Button("Try again") { Task { await viewModel.load() } }
+                        .buttonStyle(DISecondaryButtonStyle())
+                        .disabled(viewModel.loading)
+                }
+                .padding(DISpacing.md)
+                .diGlassPanel(cornerRadius: 24)
+            }
+            if !viewModel.isLoaded && !viewModel.failed {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding(DISpacing.xl)
-            } else {
+            } else if viewModel.isLoaded {
                 programmes
                 if let place = viewModel.place {
                     DarulIrfanHeroCard(place: place)

@@ -142,4 +142,43 @@ final class LiveAuditFixesTests: XCTestCase {
         XCTAssertEqual(model.regular.map(\.id), ["monthly-ijtema"])
         XCTAssertEqual(model.past.map(\.id), ["seminar-last-month", "seminar-2020"])
     }
+
+    @MainActor
+    func testEventsFailureRetainsLoadedProgramsAndRetryRecovers() async {
+        let repository = FailingEventsRepository()
+        let model = EventsHomeViewModel(eventsRepository: repository)
+        await model.load()
+        XCTAssertTrue(model.failed)
+        XCTAssertFalse(model.isLoaded)
+        XCTAssertFalse(model.loading)
+
+        await repository.setResult([event("monthly", start: nil)])
+        await model.load()
+        XCTAssertTrue(model.isLoaded)
+        XCTAssertFalse(model.failed)
+        XCTAssertEqual(model.regular.map(\.id), ["monthly"])
+
+        await repository.setResult(nil)
+        await model.load()
+        XCTAssertTrue(model.failed)
+        XCTAssertTrue(model.isLoaded)
+        XCTAssertEqual(model.regular.map(\.id), ["monthly"])
+
+        await repository.setResult([])
+        await model.load()
+        XCTAssertFalse(model.failed)
+        XCTAssertTrue(model.allEvents.isEmpty)
+    }
+}
+
+private actor FailingEventsRepository: EventsRepositoryProtocol {
+    private var result: [CommunityEvent]?
+    func setResult(_ value: [CommunityEvent]?) { result = value }
+    func events() async throws -> [CommunityEvent] {
+        guard let result else { throw NSError(domain: "EventsAudit", code: 1) }
+        return result
+    }
+    func announcements(limit: Int) async throws -> [Announcement] { [] }
+    func upsertEvents(_ events: [CommunityEvent]) async throws {}
+    func upsertAnnouncements(_ announcements: [Announcement]) async throws {}
 }
