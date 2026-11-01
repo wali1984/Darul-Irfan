@@ -220,7 +220,7 @@ struct DailyZikrCard: View {
                     } label: {
                         ZikrRecordingRow(item: item)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                     if item.id != recordings.last?.id {
                         Rectangle()
                             .fill(Color.white.opacity(0.12))
@@ -237,6 +237,8 @@ struct DailyZikrCard: View {
                     .accessibilityHidden(true)
                 Text("Recorded zikr")
                     .diInterfaceFont(.subheadline, weight: .bold)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
                 Spacer(minLength: DISpacing.sm)
                 if !showsRecordings {
                     Text(verbatim: "\(recordings.count)")
@@ -245,7 +247,7 @@ struct DailyZikrCard: View {
                 }
             }
             .foregroundStyle(.white)
-            .frame(minHeight: 44)
+            .frame(minHeight: 48)
         }
         .tint(Color.white.opacity(0.75))
     }
@@ -477,16 +479,20 @@ private struct ZikrRecordingRow: View {
                 )
                 .shadow(color: DIColor.goldGlow.opacity(0.35), radius: 6)
                 .accessibilityHidden(true)
-            Text(item.publishedAt, format: .dateTime.weekday(.wide).day().month(.wide))
-                .diInterfaceFont(.subheadline, weight: .semibold)
-            Spacer(minLength: DISpacing.sm)
-            Text(item.publishedAt, format: .dateTime.hour().minute())
-                .font(.footnote.monospacedDigit())
-                .opacity(0.75)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(item.publishedAt, format: .dateTime.weekday(.wide).day().month(.wide))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
+                Text(item.publishedAt, format: .dateTime.hour().minute())
+                    .diInterfaceFont(.footnote)
+                    .monospacedDigit()
+                    .opacity(0.85)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .foregroundStyle(.white)
         .padding(.vertical, 9)
-        .frame(minHeight: 44)
+        .frame(minHeight: 48)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
     }
