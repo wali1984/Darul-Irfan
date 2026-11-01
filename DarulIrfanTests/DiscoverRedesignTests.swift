@@ -232,6 +232,28 @@ final class DiscoverRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testPartialBayanReadRetriesWithoutLosingOrDuplicatingRows() async {
+        let one = feedItem("one", .youtube, "Bayan", video: "b1", at: Date())
+        let two = feedItem("two", .youtube, "Bayan", video: "b2", at: Date())
+        let feed = RecoverableBayanFeed(pages: ["": OfficialFeedPage(items: [one], nextCursor: "next")])
+        let model = BayansFeedModel(feed: feed)
+        await model.load()
+        XCTAssertTrue(model.loadFailed)
+        XCTAssertEqual(model.videos.map(\.id), ["one"])
+        XCTAssertEqual(model.nextCursor, "next")
+        await feed.setPage(OfficialFeedPage(items: [one, two], nextCursor: nil), cursor: "next")
+        await model.retry()
+        XCTAssertEqual(model.videos.map(\.id), ["one", "two"])
+        XCTAssertFalse(model.loadFailed)
+        XCTAssertNil(model.nextCursor)
+        await feed.setCancelled()
+        await model.load(forceRefresh: true)
+        XCTAssertEqual(model.videos.map(\.id), ["one", "two"])
+        XCTAssertFalse(model.loadFailed)
+        XCTAssertFalse(model.isLoading)
+    }
+
+    @MainActor
     func testFailedBayanRequestsRetryTheCorrectPage() async {
         let first = (1...8).map { feedItem("bayan-\($0)", .youtube, "Bayan", video: "b\($0)", at: Date()) }
         let feed = RecoverableBayanFeed(pages: [
@@ -298,14 +320,18 @@ private struct StubFeed: OfficialFeedServicing {
 }
 
 private actor RecoverableBayanFeed: OfficialFeedServicing {
-    let pages: [String: OfficialFeedPage]
+    var pages: [String: OfficialFeedPage]
+    var cancelled = false
     var failing = false
     private(set) var lastCursor = ""
     init(pages: [String: OfficialFeedPage]) { self.pages = pages }
+    func setCancelled() { cancelled = true }
+    func setPage(_ page: OfficialFeedPage, cursor: String) { pages[cursor] = page }
     func setFailing(_ value: Bool) { failing = value }
     func bootstrap(forceRefresh: Bool) async -> AppBootstrap { .offline }
     func feed(after cursor: String?, forceRefresh: Bool) async throws -> OfficialFeedPage {
         lastCursor = cursor ?? ""
+        if cancelled { throw CancellationError() }
         guard !failing, let page = pages[lastCursor] else { throw OfficialPlatformError.invalidResponse }
         return page
     }
