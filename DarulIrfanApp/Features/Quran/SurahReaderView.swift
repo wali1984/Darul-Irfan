@@ -206,7 +206,10 @@ struct SurahReaderView: View {
     private var readerScroll: some View {
         ScrollViewReader { proxy in
         ScrollView {
-            LazyVStack(spacing: DISpacing.md) {
+            // Ayahs have very different Arabic/translation heights. Lazy estimates
+            // moved distant destinations after scrollTo (142 landed at 148).
+            // Measure this chapter's cards before resolving an exact ayah anchor.
+            VStack(spacing: DISpacing.md) {
                 surahHeader
                 if showsBismillahHeader {
                     bismillahHeader

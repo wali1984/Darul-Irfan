@@ -138,11 +138,14 @@ final class RedesignScreenshotTests: XCTestCase {
                 // A new surah begins with its heading and listening options.
                 // Enlarged text can put the first ayah below those controls.
                 shot("parah-\(number)-landing")
+                let scroll = app.scrollViews.firstMatch
+                guard scroll.waitForExistence(timeout: 30) else {
+                    XCTFail("Reader content did not become ready"); return
+                }
                 for _ in 0..<16 {
                     if ayah.exists && ayah.isHittable { break }
                     // Small overlapping drags cannot jump past the first badge
                     // between a tall heading and a short first ayah.
-                    let scroll = app.scrollViews.firstMatch
                     scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
                         .press(forDuration: 0.1, thenDragTo: scroll.coordinate(
                             withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55)))
