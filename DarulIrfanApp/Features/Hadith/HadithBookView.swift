@@ -47,6 +47,7 @@ struct HadithBookView: View {
     /// Offset of the first loaded row: above it, earlier narrations are loaded
     /// when the reader scrolls up, so a jump into a book can be read back.
     @State private var firstOffset = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// The row to scroll to once it is loaded, then briefly highlight.
     @State private var pendingScrollTarget: String?
     @State private var highlightedID: String?
@@ -155,15 +156,15 @@ struct HadithBookView: View {
             }
             .onChange(of: pendingScrollTarget) { _, target in
                 guard let target else { return }
-                withAnimation(.easeInOut(duration: 0.4)) {
-                    proxy.scrollTo(target, anchor: .center)
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.4)) {
+                    proxy.scrollTo(target, anchor: .top)
                     highlightedID = target
                 }
                 // Clear the target so a later change re-triggers, and fade the
                 // highlight after a moment.
                 Task {
                     try? await Task.sleep(for: .seconds(2))
-                    withAnimation { highlightedID = nil }
+                    withAnimation(reduceMotion ? nil : .default) { highlightedID = nil }
                     pendingScrollTarget = nil
                 }
             }
