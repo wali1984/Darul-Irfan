@@ -24,6 +24,8 @@ struct GroupDetailView: View {
     @State private var drafts: [MemberGroupPost] = []
     @State private var draftsFailed = false
     @State private var isLoading = true
+    @State private var loadGeneration = 0
+    @State private var detailGeneration = 0
     @State private var failure: String?
     @State private var actionFailure: String?
     /// Only one video plays at a time: a tapped video expands in place rather
@@ -539,10 +541,14 @@ struct GroupDetailView: View {
     // MARK: Behaviour
 
     private func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
+        // A full refresh supersedes any in-flight quiet session poll.
+        detailGeneration += 1
         isLoading = true
         failure = nil
         draftsFailed = false
-        defer { isLoading = false }
+        defer { if generation == loadGeneration { isLoading = false } }
         do {
             var loaded = try await service.detail(of: group.id)
             // The group's clock counts from when the answer arrived here, so a
@@ -550,24 +556,32 @@ struct GroupDetailView: View {
             loaded.live?.playback?.at = Date()
             let loadedPosts = try await service.posts(in: group.id)
             try Task.checkCancellation()
+            guard generation == loadGeneration else { return }
             // Do not publish an empty announcement list while it is unresolved.
             detail = loaded
             posts = loadedPosts
             if loaded.canManage {
                 do {
-                    drafts = try await service.posts(in: group.id, drafts: true)
+                    let loadedDrafts = try await service.posts(in: group.id, drafts: true)
+                    try Task.checkCancellation()
+                    guard generation == loadGeneration else { return }
+                    drafts = loadedDrafts
                 } catch is CancellationError {
                     return
                 } catch {
+                    guard generation == loadGeneration else { return }
                     draftsFailed = true
                 }
             } else {
                 drafts = []
             }
-            officialLive = await dependencies?.officialPlatform.currentLiveBroadcast(forceRefresh: true)
+            let loadedOfficial = await dependencies?.officialPlatform.currentLiveBroadcast(forceRefresh: true)
+            guard generation == loadGeneration, !Task.isCancelled else { return }
+            officialLive = loadedOfficial
         } catch is CancellationError {
             return
         } catch {
+            guard generation == loadGeneration else { return }
             failure = error.localizedDescription
         }
     }
@@ -575,7 +589,11 @@ struct GroupDetailView: View {
     /// A refresh that never replaces the page with an error, for the
     /// session's own updates.
     private func refreshQuietly() async {
-        guard var loaded = try? await service.detail(of: group.id) else { return }
+        guard !isLoading else { return }
+        detailGeneration += 1
+        let generation = detailGeneration
+        guard var loaded = try? await service.detail(of: group.id),
+              generation == detailGeneration, !Task.isCancelled else { return }
         loaded.live?.playback?.at = Date()
         detail = loaded
     }
