@@ -77,24 +77,17 @@ struct DayTaskEditorView: View {
                 TextField("What do you want to do?", text: $title, axis: .vertical)
                 DatePicker("Day", selection: $day, displayedComponents: .date)
             }
+            .listRowBackground(DIColor.surface)
 
             Section {
-                Picker("When", selection: $timingKind) {
-                    ForEach(TimingKind.allCases) { kind in
-                        Text(LocalizedStringKey(kind.rawValue)).tag(kind)
-                    }
-                }
+                taskMenu("When", selection: $timingKind, options: TimingKind.allCases) { LocalizedStringKey($0.rawValue) }
                 switch timingKind {
                 case .anytime:
                     EmptyView()
                 case .clock:
                     DatePicker("Time", selection: $clock, displayedComponents: .hourAndMinute)
                 case .after, .before:
-                    Picker("Prayer", selection: $prayer) {
-                        ForEach(Prayer.obligatory, id: \.self) { prayer in
-                            Text(LocalizedStringKey(prayer.englishName)).tag(prayer)
-                        }
-                    }
+                    taskMenu("Prayer", selection: $prayer, options: Prayer.obligatory) { LocalizedStringKey($0.englishName) }
                     let minimumMinutes = timingKind == .before ? 5 : 0
                     let displayedMinutes = max(minimumMinutes, minutes)
                     Stepper(value: Binding(
@@ -107,27 +100,28 @@ struct DayTaskEditorView: View {
             } footer: {
                 if timingKind == .after || timingKind == .before {
                     Text("Follows your prayer times each day, so it moves with the seasons and your location.")
+                        .foregroundStyle(DIColor.textMuted)
                 }
             }
+            .listRowBackground(DIColor.surface)
 
             Section {
-                Picker("Repeat", selection: $repeatRule) {
-                    ForEach(DayTaskRepeat.allCases) { rule in
-                        Text(LocalizedStringKey(rule.title)).tag(rule)
-                    }
-                }
+                taskMenu("Repeat", selection: $repeatRule, options: DayTaskRepeat.allCases) { LocalizedStringKey($0.title) }
                 Toggle("Remind me", isOn: $remind)
                     .disabled(timingKind == .anytime)
             } footer: {
                 if timingKind == .anytime {
                     Text("Choose a time or a prayer to be reminded.")
+                        .foregroundStyle(DIColor.textMuted)
                 }
             }
+            .listRowBackground(DIColor.surface)
 
             Section("Note") {
                 TextField("Optional", text: $note, axis: .vertical)
                     .lineLimit(2...6)
             }
+            .listRowBackground(DIColor.surface)
 
             if timingKind != .anytime {
                 Section {
@@ -135,13 +129,16 @@ struct DayTaskEditorView: View {
                         Task { await addToCalendar() }
                     } label: {
                         Label("Add to Calendar", systemImage: "calendar.badge.plus")
+                            .frame(maxWidth: .infinity)
                     }
+                    .buttonStyle(DISecondaryButtonStyle())
                     if let calendarMessage {
                         Text(calendarMessage)
                             .font(.footnote)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }
+                .listRowBackground(DIColor.surface)
             }
 
             if let onDelete {
@@ -149,7 +146,9 @@ struct DayTaskEditorView: View {
                     Button("Delete task", role: .destructive) {
                         if onDelete() { dismiss() } else { saveFailed = true }
                     }
+                    .buttonStyle(DISecondaryButtonStyle(destructive: true))
                 }
+                .listRowBackground(DIColor.surface)
             }
         }
         .scrollContentBackground(.hidden)
@@ -169,6 +168,31 @@ struct DayTaskEditorView: View {
                 }
                 .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
+        }
+    }
+
+    private func taskMenu<Value: Hashable>(
+        _ title: LocalizedStringKey,
+        selection: Binding<Value>,
+        options: [Value],
+        label: @escaping (Value) -> LocalizedStringKey
+    ) -> some View {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            Text(title).foregroundStyle(DIColor.textPrimary)
+            Menu {
+                Picker(title, selection: selection) {
+                    ForEach(options, id: \.self) { option in
+                        Text(label(option)).tag(option)
+                    }
+                }
+            } label: {
+                Label(label(selection.wrappedValue), systemImage: "chevron.up.chevron.down")
+                    .frame(maxWidth: .infinity)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .buttonStyle(DISecondaryButtonStyle())
+            .accessibilityLabel(Text(title))
+            .accessibilityValue(Text(label(selection.wrappedValue)))
         }
     }
 
