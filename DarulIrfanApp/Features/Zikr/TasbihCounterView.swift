@@ -51,16 +51,18 @@ struct TasbihCounterView: View {
                     } else {
                         countingRing
                     }
-                    if viewModel.hasReachedTarget {
+                    if viewModel.hasReachedTarget && !viewModel.saveFailed {
                         Label("Target reached — Alhamdulillah", systemImage: "sparkles")
                             .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(DIColor.accent)
                             .diGoldGlow(radius: 8, opacity: 0.4)
                             .transition(.scale.combined(with: .opacity))
                     }
-                    Text("Tap anywhere to count")
-                        .diInterfaceFont(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
+                    if !viewModel.saveFailed {
+                        Text("Tap anywhere to count")
+                            .diInterfaceFont(.footnote)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
