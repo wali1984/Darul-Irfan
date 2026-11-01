@@ -478,6 +478,10 @@ struct BayanVideosListView: View {
                     }
                 }
                 if model.loadFailed { BayanFeedErrorCard(model: model) }
+                if !model.isLoading, !model.loadFailed, model.nextCursor != nil {
+                    Button("Load more videos") { Task { await model.loadMore() } }
+                        .buttonStyle(DICompactButtonStyle())
+                }
                 if model.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity)
