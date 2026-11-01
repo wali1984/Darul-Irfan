@@ -95,8 +95,13 @@ struct DayTaskEditorView: View {
                             Text(LocalizedStringKey(prayer.englishName)).tag(prayer)
                         }
                     }
-                    Stepper(value: $minutes, in: 0...180, step: 5) {
-                        Text(timingKind == .after ? "\(minutes) minutes after" : "\(minutes) minutes before")
+                    let minimumMinutes = timingKind == .before ? 5 : 0
+                    let displayedMinutes = max(minimumMinutes, minutes)
+                    Stepper(value: Binding(
+                        get: { max(minimumMinutes, minutes) },
+                        set: { minutes = $0 }
+                    ), in: minimumMinutes...180, step: 5) {
+                        Text(timingKind == .after ? "\(displayedMinutes) minutes after" : "\(displayedMinutes) minutes before")
                     }
                 }
             } footer: {

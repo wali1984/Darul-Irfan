@@ -178,9 +178,11 @@ struct DayTaskRow: View {
             Button(action: onToggle) {
                 Image(systemName: task.isDone(on: day) ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
+                    .frame(width: 48, height: 48)
+                    .contentShape(Rectangle())
                     .foregroundStyle(task.isDone(on: day) ? DIColor.actionForeground : DIColor.textMuted)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
             .accessibilityLabel(task.isDone(on: day) ? Text("Mark as not done") : Text("Mark as done"))
 
             Button(action: onOpen) {
@@ -205,11 +207,12 @@ struct DayTaskRow: View {
                     .font(.caption)
                     .foregroundStyle(DIColor.textMuted)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
+                .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .contain)
     }
 }
 
