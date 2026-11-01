@@ -204,7 +204,7 @@ struct ContentItemRow: View {
                                         .foregroundStyle(DIColor.textMuted)
                                 } else {
                                     Text(verbatim: item.title)
-                                        .font(.body.weight(.semibold))
+                                        .diInterfaceFont(.body, weight: .semibold)
                                         .foregroundStyle(DIColor.textPrimary)
                                         .multilineTextAlignment(.leading)
                                     if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {

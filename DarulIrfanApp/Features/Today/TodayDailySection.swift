@@ -283,7 +283,7 @@ struct DISectionHeaderInline: View {
                 .foregroundStyle(DIColor.accent)
                 .accessibilityHidden(true)
             Text(title)
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.textPrimary)
         }
         .accessibilityAddTraits(.isHeader)

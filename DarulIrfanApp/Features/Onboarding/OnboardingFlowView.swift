@@ -81,7 +81,7 @@ struct OnboardingFlowView: View {
                     viewModel.goBack()
                 } label: {
                     Image(systemName: "chevron.backward")
-                        .font(.body.weight(.semibold))
+                        .diInterfaceFont(.body, weight: .semibold)
                         .foregroundStyle(DIColor.textPrimary)
                         .frame(width: 44, height: 44)
                 }
@@ -93,7 +93,7 @@ struct OnboardingFlowView: View {
                     DIHaptics.light()
                     viewModel.advance()
                 }
-                .font(.subheadline.weight(.medium))
+                .diInterfaceFont(.subheadline, weight: .medium)
                 .foregroundStyle(DIColor.textMuted)
                 .padding(.horizontal, DISpacing.sm)
                 .frame(minHeight: 44)

@@ -84,7 +84,7 @@ struct NarratorBioSheet: View {
                         ForEach(facts, id: \.0) { label, value in
                             HStack(alignment: .top, spacing: DISpacing.sm) {
                                 Text(label)
-                                    .font(.caption.weight(.semibold))
+                                    .diInterfaceFont(.caption, weight: .semibold)
                                     .foregroundStyle(DIColor.textMuted)
                                     .frame(width: 96, alignment: .leading)
                                 Text(verbatim: value)
@@ -124,7 +124,7 @@ struct NarratorBioSheet: View {
                         VStack(alignment: .leading, spacing: DISpacing.xs) {
                             if let who = a.scholar ?? a.scholarArabic {
                                 Text(verbatim: who)
-                                    .font(.caption.weight(.semibold))
+                                    .diInterfaceFont(.caption, weight: .semibold)
                                     .foregroundStyle(DIColor.accent)
                             }
                             if let ar = a.textArabic, !ar.isEmpty {

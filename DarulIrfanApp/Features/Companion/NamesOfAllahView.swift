@@ -112,7 +112,7 @@ private struct FeaturedNameCard: View {
 
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     Text("Name of the Day")
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, DISpacing.sm)
                         .padding(.vertical, DISpacing.xs)
@@ -168,7 +168,7 @@ private struct NameOfAllahCell: View {
                     .diGoldGlow(radius: 7, opacity: 0.3)
                     .multilineTextAlignment(.center)
                 Text(verbatim: name.transliteration)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.center)
                 Text(verbatim: name.meaning(urdu: readsUrdu))

@@ -153,7 +153,7 @@ struct MethodOfZikrLink: View {
                     NativeMethodOfZikrView(readerFontScale: readerScale)
                 } label: {
                     Label("Method of Zikr", systemImage: "book.pages")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.actionForeground)
                         .padding(.horizontal, 14).frame(minHeight: 44)
                         .background(LinearGradient(colors: [DIColor.surface, DIColor.sandstone], startPoint: .top, endPoint: .bottom), in: Capsule())

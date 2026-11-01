@@ -166,7 +166,7 @@ struct BookTextPagesView: View {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 Label {
                     Text("Machine-read text — pending proofreading")
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                 } icon: {
                     Image(systemName: "info.circle")
                 }
@@ -425,7 +425,7 @@ struct FormattedBookPage: View {
                     }
                 } label: {
                     Label("Contents page", systemImage: "list.bullet")
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .foregroundStyle(DIColor.textMuted)
                 }
                 .tint(DIColor.primary)
@@ -491,7 +491,7 @@ struct FormattedBookPage: View {
         let rightToLeft = isRightToLeft(text)
         return Text(verbatim: text)
             .font(face(rightToLeft, size: 1.1).weight(.semibold))
-            .foregroundStyle(DIColor.primary)
+            .foregroundStyle(DIColor.actionForeground)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, DISpacing.xs)

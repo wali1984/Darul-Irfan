@@ -219,7 +219,7 @@ private struct ShajraHeader: View {
                 .diAppear(delay: 0.18)
             // Letter-spaced capitals: the title is always English.
             Text(verbatim: ShajraText.titleEnglish)
-                .font(.caption.weight(.heavy))
+                .diInterfaceFont(.caption, weight: .heavy)
                 .tracking(1.6)
                 .textCase(.uppercase)
                 .foregroundStyle(Color.white.opacity(0.75))
@@ -379,7 +379,7 @@ private struct ShajraRow: View {
     /// The website's English line, left to right whatever the app's language.
     private var englishLine: some View {
         Text(verbatim: entry.english)
-            .font(.footnote.weight(.medium))
+            .diInterfaceFont(.footnote, weight: .medium)
             .foregroundStyle(englishInk)
             .multilineTextAlignment(.leading)
             .fixedSize(horizontal: false, vertical: true)

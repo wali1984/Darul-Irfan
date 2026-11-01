@@ -151,7 +151,7 @@ private struct FeaturedDuaCard: View {
 
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text("Dua of the Day")
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, DISpacing.sm)
                     .padding(.vertical, DISpacing.xs)

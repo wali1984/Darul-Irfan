@@ -120,7 +120,7 @@ struct GroupSessionCard: View {
             }
             Spacer(minLength: 0)
             Text("LIVE")
-                .font(.caption2.weight(.bold))
+                .diInterfaceFont(.caption2, weight: .bold)
                 .padding(.horizontal, DISpacing.sm).padding(.vertical, 3)
                 .background(Capsule().fill(DIGradient.emerald))
                 .foregroundStyle(DIColor.onPrimary)
@@ -174,7 +174,7 @@ struct GroupSessionCard: View {
         }
         if let queue = live.queue, queue.count > 1 {
             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                Text("In this session").font(.caption.weight(.semibold)).foregroundStyle(DIColor.textMuted)
+                Text("In this session").diInterfaceFont(.caption, weight: .semibold).foregroundStyle(DIColor.textMuted)
                 ForEach(Array(queue.enumerated()), id: \.offset) { index, item in
                     queueRow(index: index, item: item, playback: playback)
                 }
@@ -215,7 +215,7 @@ struct GroupSessionCard: View {
     private var adminControls: some View {
         Divider()
         Label("Session controls", systemImage: "slider.horizontal.3")
-            .font(.caption.weight(.semibold))
+            .diInterfaceFont(.caption, weight: .semibold)
             .foregroundStyle(DIColor.textMuted)
         if live.isRecorded, let playback = live.playback {
             HStack(spacing: DISpacing.xs) {
@@ -387,7 +387,7 @@ struct GroupSessionPlayer: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            Text(verbatim: item.title).font(.subheadline.weight(.semibold))
+            Text(verbatim: item.title).diInterfaceFont(.subheadline, weight: .semibold)
             if item.isYouTube {
                 YouTubePlayerView(
                     videoID: item.videoID ?? item.id,
@@ -739,7 +739,7 @@ struct GroupAttendeeRow: View {
             Spacer(minLength: 0)
             if person.isHere == true {
                 Text("Here now")
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(DIColor.primary)
             }
         }

@@ -30,7 +30,7 @@ struct NotesView: View {
                             } icon: {
                                 Image(systemName: reference.kind == .ayah ? "book.closed" : "link")
                             }
-                            .font(.caption.weight(.semibold))
+                            .diInterfaceFont(.caption, weight: .semibold)
                             .foregroundStyle(DIColor.actionForeground)
                         }
                         Text(verbatim: note.text)

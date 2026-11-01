@@ -16,9 +16,9 @@ struct TodayWeatherView: View {
             if let snapshot {
                 Button { showing = true } label: {
                     HStack(spacing: 10) {
-                        Text("Local weather").font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.9))
+                        Text("Local weather").diInterfaceFont(.subheadline, weight: .medium).foregroundStyle(.white.opacity(0.9))
                         Text(verbatim: "·").diInterfaceFont(.subheadline).foregroundStyle(Color(hex: 0xFFE3A0).opacity(0.65))
-                        Text(verbatim: CityWeatherSnapshot.temperature(snapshot.temperatureCelsius, unit: unit, locale: locale)).font(.headline.weight(.semibold)).foregroundStyle(Color(hex: 0xFFE3A0))
+                        Text(verbatim: CityWeatherSnapshot.temperature(snapshot.temperatureCelsius, unit: unit, locale: locale)).diInterfaceFont(.headline, weight: .semibold).foregroundStyle(Color(hex: 0xFFE3A0))
                     }.monospacedDigit().padding(.horizontal, 14).padding(.vertical, 6).frame(maxWidth: .infinity, minHeight: 44)
                         .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 14))
                         .overlay { RoundedRectangle(cornerRadius: 14).strokeBorder(Color(hex: 0xFFE3A0).opacity(0.22), lineWidth: 1) }

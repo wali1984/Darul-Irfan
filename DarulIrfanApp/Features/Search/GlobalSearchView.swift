@@ -55,7 +55,7 @@ struct GlobalSearchView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                 }
             }
         }
@@ -71,7 +71,7 @@ struct GlobalSearchView: View {
     private var searchField: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "magnifyingglass")
-                .font(.body.weight(.semibold))
+                .diInterfaceFont(.body, weight: .semibold)
                 .foregroundStyle(isSearchFieldFocused ? DIColor.primary : DIColor.textMuted)
                 .accessibilityHidden(true)
 
@@ -243,7 +243,7 @@ struct GlobalSearchView: View {
 
                 VStack(spacing: DISpacing.md) {
                     Text("Try searching for")
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .foregroundStyle(DIColor.textMuted)
                         .textCase(.uppercase)
                         .kerning(0.5)
@@ -312,7 +312,7 @@ struct GlobalSearchView: View {
                 .controlSize(.small)
                 .tint(DIColor.primary)
             Text("Searching…")
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
         }
         .padding(.horizontal, DISpacing.md)
@@ -379,7 +379,7 @@ struct GlobalSearchView: View {
     private func sectionHeader(titleKey: LocalizedStringKey, systemImage: String, count: Int) -> some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.footnote.weight(.semibold))
+                .diInterfaceFont(.footnote, weight: .semibold)
                 .foregroundStyle(DIColor.primary)
                 .frame(width: 30, height: 30)
                 .background(
@@ -417,11 +417,11 @@ private struct DomainFilterChip: View {
             HStack(spacing: DISpacing.xs) {
                 if let systemImage {
                     Image(systemName: systemImage)
-                        .font(.caption2.weight(.semibold))
+                        .diInterfaceFont(.caption2, weight: .semibold)
                         .accessibilityHidden(true)
                 }
                 Text(titleKey)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
             }
             .padding(.horizontal, DISpacing.md)
             .padding(.vertical, DISpacing.sm)
@@ -461,7 +461,7 @@ private struct SuggestionChip: View {
     var body: some View {
         Button(action: action) {
             Text(LocalizedStringKey(text))
-                .font(.subheadline.weight(.medium))
+                .diInterfaceFont(.subheadline, weight: .medium)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .padding(.horizontal, DISpacing.md)

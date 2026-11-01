@@ -94,7 +94,7 @@ struct MediaLivePill: View {
                 .opacity(pulse ? 0.35 : 1.0)
                 .scaleEffect(pulse ? 0.7 : 1.0)
             Text(verbatim: "LIVE")
-                .font(.caption2.weight(.heavy))
+                .diInterfaceFont(.caption2, weight: .heavy)
                 .tracking(0.9)
                 .foregroundStyle(foreground)
         }

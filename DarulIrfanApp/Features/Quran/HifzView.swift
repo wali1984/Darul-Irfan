@@ -70,7 +70,7 @@ struct HifzView: View {
                     Spacer()
                     if player.isPlaying {
                         Text(verbatim: "\(player.repetition)/\(repeats)")
-                            .font(.footnote.weight(.semibold))
+                            .diInterfaceFont(.footnote, weight: .semibold)
                             .foregroundStyle(.secondary)
                             .accessibilityLabel("Repetition \(player.repetition) of \(repeats)")
                     }

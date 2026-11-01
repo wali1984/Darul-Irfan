@@ -50,7 +50,7 @@ struct SearchResultRow: View {
     // A rounded emerald crest for the domain, echoing the seal's medallion.
     private var domainCrest: some View {
         Image(systemName: result.domain.iconName)
-            .font(.subheadline.weight(.semibold))
+            .diInterfaceFont(.subheadline, weight: .semibold)
             .foregroundStyle(DIColor.primary)
             .frame(width: 34, height: 34)
             .background(

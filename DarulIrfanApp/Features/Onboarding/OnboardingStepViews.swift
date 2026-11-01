@@ -93,7 +93,7 @@ private struct OnboardingChoiceCard<Leading: View>: View {
                 .fill(DIColor.primary)
                 .opacity(isSelected ? 1 : 0)
             Image(systemName: "checkmark")
-                .font(.caption.weight(.bold))
+                .diInterfaceFont(.caption, weight: .bold)
                 .foregroundStyle(DIColor.onPrimary)
                 .opacity(isSelected ? 1 : 0)
                 .scaleEffect(isSelected ? 1 : 0.4)
@@ -211,7 +211,7 @@ struct OnboardingWelcomeStep: View {
             }
 
             Text(DIBrand.anchorVerseReference)
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.accent)
                 .tracking(0.5)
         }
@@ -307,7 +307,7 @@ struct OnboardingCalculationStep: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Label {
                     Text("Calculation Method")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.textPrimary)
                 } icon: {
                     Image(systemName: "globe.asia.australia.fill")
@@ -332,7 +332,7 @@ struct OnboardingCalculationStep: View {
     private var asrSection: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             Text("Asr Method")
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.textPrimary)
                 .padding(.horizontal, DISpacing.xs)
 
@@ -582,7 +582,7 @@ struct OnboardingFinishStep: View {
                 .foregroundStyle(DIColor.textMuted)
             Spacer(minLength: DISpacing.sm)
             value
-                .font(.subheadline.weight(.medium))
+                .diInterfaceFont(.subheadline, weight: .medium)
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.trailing)
         }

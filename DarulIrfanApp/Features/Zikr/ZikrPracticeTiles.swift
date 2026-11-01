@@ -36,11 +36,11 @@ private struct ZikrPracticeTile<Mark: View>: View {
             mark()
             VStack(alignment: .leading, spacing: 2) {
                 Text(titleKey)
-                    .font(.callout.weight(.heavy))
+                    .diInterfaceFont(.callout, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(subtitleKey)
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
                     .lineSpacing(2)
                     .fixedSize(horizontal: false, vertical: true)

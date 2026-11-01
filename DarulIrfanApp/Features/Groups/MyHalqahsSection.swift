@@ -366,7 +366,7 @@ struct MyHalqahsSection: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                 Text(detail)
                     .diInterfaceFont(.subheadline)
@@ -418,7 +418,7 @@ struct MyHalqahsSection: View {
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Halqah notifications")
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                         Text("Posts, zikr and meetings from your Halqah, on this phone.")
                             .diInterfaceFont(.caption)
                             .foregroundStyle(.secondary)
@@ -586,12 +586,12 @@ struct MyHalqahsSection: View {
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: isAddingCode ? "minus" : "plus")
-                        .font(.body.weight(.semibold))
+                        .diInterfaceFont(.body, weight: .semibold)
                         .foregroundStyle(DIColor.actionForeground)
                         .frame(width: 24)
                         .accessibilityHidden(true)
                     Text("Have another invitation code?")
-                        .font(.subheadline.weight(.bold))
+                        .diInterfaceFont(.subheadline, weight: .bold)
                         .foregroundStyle(DIColor.actionForeground)
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 0)
@@ -693,11 +693,11 @@ struct HalqahHeroCardLabel: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(group.name))
-                    .font(.title3.weight(.heavy))
+                    .diInterfaceFont(.title3, weight: .heavy)
                     .foregroundStyle(Color.white)
                 if let description = group.description, !description.isEmpty {
                     Text(verbatim: description)
-                        .font(.footnote.weight(.medium))
+                        .diInterfaceFont(.footnote, weight: .medium)
                         .foregroundStyle(Color.white.opacity(0.85))
                 }
                 if let role {
@@ -710,7 +710,7 @@ struct HalqahHeroCardLabel: View {
             Spacer(minLength: 0)
             if !leavesRoomForMenu && !typeSize.isAccessibilitySize {
                 Image(systemName: "chevron.forward")
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(Color.white.opacity(0.7))
                     .accessibilityHidden(true)
             }
@@ -723,11 +723,11 @@ struct HalqahHeroCardLabel: View {
         HStack(spacing: 10) {
             DILivePulse(color: Color(hex: 0xFF5C5C), size: 9)
             Text(group.liveKind == "meeting" ? "Meeting live" : "Zikr live")
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(Color.white)
             Spacer(minLength: DISpacing.sm)
             Text("Join")
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(Color(hex: 0x064B34))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 9)

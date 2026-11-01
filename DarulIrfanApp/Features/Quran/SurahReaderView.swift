@@ -311,7 +311,7 @@ struct SurahReaderView: View {
                 advanceToNextSurah()
             } label: {
                 Label("Next surah", systemImage: "arrow.forward.circle")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
@@ -322,7 +322,7 @@ struct SurahReaderView: View {
             }
         } else {
             Label("Quran reading complete", systemImage: "checkmark.seal.fill")
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.primary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, DISpacing.md)
@@ -488,7 +488,7 @@ struct SurahReaderView: View {
                         player.stop()
                     } label: {
                         Image(systemName: "stop.fill")
-                            .font(.footnote.weight(.bold))
+                            .diInterfaceFont(.footnote, weight: .bold)
                             .foregroundStyle(DIColor.onPrimary)
                             .frame(width: 34, height: 34)
                             .background(Circle().fill(DIColor.onPrimary.opacity(0.14)))
@@ -520,7 +520,7 @@ struct SurahReaderView: View {
             }
             VStack(alignment: .leading, spacing: 6) {
                 Text("Play to the end of")
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(DIColor.onPrimary.opacity(0.75))
                 DISegmentedControl(
                     items: QuranListenScope.allCases,
@@ -581,18 +581,18 @@ struct SurahReaderView: View {
         } label: {
             VStack(spacing: 6) {
                 Image(systemName: Self.symbol(for: mode))
-                    .font(.title3.weight(.semibold))
+                    .diInterfaceFont(.title3, weight: .semibold)
                     .foregroundStyle(selected ? DIColor.goldGlow : DIColor.primary)
                     .frame(width: 40, height: 40)
                     .background(Circle().fill(selected ? Color.white.opacity(0.14) : DIColor.primary.opacity(0.10)))
                 Text(LocalizedStringKey(mode.shortTitle))
-                    .font(.footnote.weight(.bold))
+                    .diInterfaceFont(.footnote, weight: .bold)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
                     .foregroundStyle(selected ? DIColor.onPrimary : DIColor.textPrimary)
                 Text(mode.isTafsir ? LocalizedStringKey("Tafsir") : LocalizedStringKey("Translation"))
-                    .font(.caption2.weight(.medium))
+                    .diInterfaceFont(.caption2, weight: .medium)
                     .foregroundStyle(selected ? DIColor.onPrimary.opacity(0.8) : DIColor.textMuted)
             }
             .frame(maxWidth: .infinity, minHeight: 112)
@@ -721,7 +721,7 @@ struct SurahReaderView: View {
         } label: {
             Label {
                 Text(title)
-                    .font(.subheadline.weight(.medium))
+                    .diInterfaceFont(.subheadline, weight: .medium)
                     .multilineTextAlignment(.leading)
             } icon: {
                 Image(systemName: "text.book.closed")
@@ -794,7 +794,7 @@ struct SurahReaderView: View {
                             viewModel.contentMode = otherWork
                         } label: {
                             Text("Read \(otherWork.localizedTitle)")
-                                .font(.subheadline.weight(.medium))
+                                .diInterfaceFont(.subheadline, weight: .medium)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .buttonStyle(.bordered)
@@ -823,7 +823,7 @@ struct SurahReaderView: View {
             HStack(spacing: 4) {
                 Image(systemName: "character.book.closed")
                 Text(Self.readingLanguageShortName(viewModel.readingLanguage))
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
             }
         }
         .accessibilityLabel("Reading language")
@@ -1044,7 +1044,7 @@ private struct AyahCardView: View {
                         scrollToAyah(covering.ayahStart)
                     } label: {
                         Label("Commentary with ayat \(covering.ayahStart)–\(covering.ayahEnd)", systemImage: "arrow.up.doc")
-                            .font(.footnote.weight(.semibold))
+                            .diInterfaceFont(.footnote, weight: .semibold)
                             .foregroundStyle(DIColor.primary)
                     }
                     .buttonStyle(.plain)
@@ -1103,7 +1103,7 @@ private struct AyahCardView: View {
             showsTafsir = true
         } label: {
             Label("Tafsir", systemImage: "text.book.closed")
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .padding(.horizontal, DISpacing.sm)
                 .foregroundStyle(DIColor.primary)
         }
@@ -1223,7 +1223,7 @@ private struct AyahCardView: View {
             .padding(.top, DISpacing.xs)
         } label: {
             Text(edition?.title ?? "Tafsir")
-                .font(.footnote.weight(.semibold))
+                .diInterfaceFont(.footnote, weight: .semibold)
                 .foregroundStyle(DIColor.primary)
         }
         .tint(DIColor.primary)
@@ -1353,15 +1353,15 @@ private struct AyahCardView: View {
         let available = !group.links.isEmpty
         return HStack(spacing: 6) {
             Image(systemName: "note.text")
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(available ? DIColor.accent : DIColor.textMuted)
             Text(LocalizedStringKey(group.sheikh.tafsirTitle))
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             if group.links.count > 1 {
                 Text(verbatim: "\(group.links.count)")
-                    .font(.caption2.weight(.bold))
+                    .diInterfaceFont(.caption2, weight: .bold)
                     .padding(.horizontal, 5)
                     .background(Capsule().fill(DIColor.accent.opacity(0.3)))
             }
@@ -1380,7 +1380,7 @@ private struct AyahCardView: View {
 
     private func shellChip(_ label: String, _ icon: String, enabled: Bool) -> some View {
         Label(LocalizedStringKey(label), systemImage: icon)
-            .font(.caption.weight(.semibold))
+            .diInterfaceFont(.caption, weight: .semibold)
             .padding(.vertical, 8)
             .foregroundStyle(enabled ? DIColor.primary : DIColor.textMuted)
     }
@@ -1449,7 +1449,7 @@ private struct BayanListSheet: View {
                                         .foregroundStyle(DIColor.primary)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(verbatim: link.title)
-                                            .font(.subheadline.weight(.medium))
+                                            .diInterfaceFont(.subheadline, weight: .medium)
                                             .foregroundStyle(DIColor.textPrimary)
                                             .multilineTextAlignment(.leading)
                                         Text(LocalizedStringKey("Ayat \(link.ayahStart)-\(link.ayahEnd)"))

@@ -483,7 +483,7 @@ struct GroupLiveStarter: View {
                 Spacer(minLength: 0)
                 if let position {
                     Text(verbatim: "\(position + 1)")
-                        .font(.caption.weight(.bold))
+                        .diInterfaceFont(.caption, weight: .bold)
                         .frame(width: 24, height: 24)
                         .background(Circle().fill(DIColor.primary))
                         .foregroundStyle(DIColor.onPrimary)

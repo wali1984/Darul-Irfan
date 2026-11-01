@@ -40,11 +40,11 @@ struct PrayerWeekTrackerCard: View {
         HStack(spacing: DISpacing.sm) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Prayer Tracker")
-                    .font(.title3.weight(.heavy))
+                    .diInterfaceFont(.title3, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                     .accessibilityAddTraits(.isHeader)
                 weekLabel(days: days)
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: DISpacing.sm)
@@ -82,7 +82,7 @@ struct PrayerWeekTrackerCard: View {
             action()
         } label: {
             Image(systemName: systemImage)
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(TodayPalette.emerald)
                 .frame(width: 44, height: 44)
                 .background(TodayPalette.chipFill, in: Circle())
@@ -120,7 +120,7 @@ struct PrayerWeekTrackerCard: View {
                         Text(day, format: .dateTime.weekday(.abbreviated))
                     }
                 }
-                .font(.caption2.weight(.bold))
+                .diInterfaceFont(.caption2, weight: .bold)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 Text(day, format: .dateTime.day())
@@ -183,11 +183,11 @@ struct PrayerWeekTrackerCard: View {
                     Text(day, format: .dateTime.weekday(.wide).day().month(.wide))
                 }
             }
-            .font(.headline.weight(.heavy))
+            .diInterfaceFont(.headline, weight: .heavy)
             .foregroundStyle(DIColor.textPrimary)
             Spacer(minLength: DISpacing.sm)
             Text("\(viewModel.prayedCount(on: day)) of 5 prayed")
-                .font(.footnote.weight(.semibold))
+                .diInterfaceFont(.footnote, weight: .semibold)
                 .foregroundStyle(TodayPalette.goldText)
         }
         .padding(.horizontal, 2)
@@ -216,7 +216,7 @@ struct PrayerWeekTrackerCard: View {
             VStack(spacing: 7) {
                 PrayerMarkBadge(mark: mark, surface: .glass, size: 30)
                 Text(LocalizedStringKey(prayer.englishName))
-                    .font(.caption.weight(.bold))
+                    .diInterfaceFont(.caption, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -265,7 +265,7 @@ struct PrayerWeekTrackerCard: View {
                 .frame(width: 9, height: 9)
                 .accessibilityHidden(true)
             label
-                .font(.caption2.weight(.semibold))
+                .diInterfaceFont(.caption2, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -278,10 +278,10 @@ struct PrayerWeekTrackerCard: View {
         } label: {
             HStack(spacing: DISpacing.sm) {
                 Text("Prayer history and streak")
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
-                    .font(.caption.weight(.bold))
+                    .diInterfaceFont(.caption, weight: .bold)
                     .accessibilityHidden(true)
             }
             .foregroundStyle(TodayPalette.emerald)

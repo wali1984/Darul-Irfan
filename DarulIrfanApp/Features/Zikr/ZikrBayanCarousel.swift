@@ -37,13 +37,13 @@ private struct ZikrBayanCard: View {
             thumbnail
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: item.title)
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(item.publishedAt, format: .dateTime.day().month(.wide))
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
             .padding(.horizontal, 2)

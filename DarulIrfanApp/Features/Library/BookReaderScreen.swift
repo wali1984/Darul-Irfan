@@ -314,7 +314,7 @@ struct BookReaderScreen: View {
                     .lineLimit(1)
             } else {
                 Text(verbatim: item.title)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .lineLimit(1)
             }
             pageCaption
@@ -383,7 +383,7 @@ struct BookReaderScreen: View {
             }
         } label: {
             Text(verbatim: "Aa")
-                .font(.body.weight(.heavy))
+                .diInterfaceFont(.body, weight: .heavy)
                 .foregroundStyle(ReadPalette.emeraldInk)
         }
         .accessibilityLabel(Text("Text Size"))
@@ -480,7 +480,7 @@ struct BookReaderScreen: View {
     ) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.footnote.weight(.bold))
+                .diInterfaceFont(.footnote, weight: .bold)
                 .foregroundStyle(ReadPalette.emeraldInk)
                 .frame(width: 44, height: 44)
                 .background(Circle().fill(ReadPalette.chipTrack))
@@ -703,7 +703,7 @@ struct BookTextSearchView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                 }
             }
         }
@@ -716,7 +716,7 @@ struct BookTextSearchView: View {
     private var field: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "magnifyingglass")
-                .font(.body.weight(.semibold))
+                .diInterfaceFont(.body, weight: .semibold)
                 .foregroundStyle(isFieldFocused ? DIColor.primary : DIColor.textMuted)
                 .accessibilityHidden(true)
             TextField("Search in this book", text: $query)
@@ -791,7 +791,7 @@ struct BookTextSearchView: View {
         let rightToLeft = ScriptDirection.isRightToLeft(passage ?? pageText, fallbackLanguage: item.language)
         return VStack(alignment: .leading, spacing: DISpacing.xs) {
             Text("Page \(page)")
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(ReadPalette.emeraldInk)
             if let passage {
                 Text(verbatim: passage)

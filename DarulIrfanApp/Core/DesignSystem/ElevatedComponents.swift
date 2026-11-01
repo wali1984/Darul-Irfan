@@ -73,7 +73,7 @@ struct DIStatPill: View {
     var body: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: icon)
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.accent)
             VStack(alignment: .leading, spacing: 0) {
                 Text(value)
@@ -125,7 +125,7 @@ struct PrayerCountdownRing: View {
                 .diBreathingGlow(color: DIColor.goldGlow, maxRadius: 14)
             VStack(spacing: 2) {
                 Text(prayerName)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(.white.opacity(0.9))
                 Text(target, style: .timer)
                     .font(.system(size: diameter * 0.20, weight: .light, design: .rounded).monospacedDigit())

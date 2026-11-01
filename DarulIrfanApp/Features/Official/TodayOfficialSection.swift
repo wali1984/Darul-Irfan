@@ -89,17 +89,17 @@ struct TodayOfficialSection: View {
                 DILivePulse(color: Color(hex: 0xFF5C5C), size: 10)
                 VStack(alignment: .leading, spacing: 1) {
                     Text("LIVE NOW")
-                        .font(.caption2.weight(.heavy))
+                        .diInterfaceFont(.caption2, weight: .heavy)
                         .tracking(DIBrand.readsUrdu(locale) ? 0 : 1.6)
                         .foregroundStyle(Color(hex: 0xFFE3A0))
                     title
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: DISpacing.sm)
                 Text("Join")
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(TodayGradients.onGold)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 9)

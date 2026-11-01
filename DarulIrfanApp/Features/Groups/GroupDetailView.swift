@@ -291,7 +291,7 @@ struct GroupDetailView: View {
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text(verbatim: meeting.title).diInterfaceFont(.headline)
                     Text("Your time: \(ZikrScheduleMath.localTimeText(meeting.startsAt))")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.primary)
                     Text(meeting.startsAt, style: .relative)
                         .diInterfaceFont(.caption)
@@ -617,13 +617,13 @@ private struct HalqahNextZikrCard: View {
                 HalqahCountdownRing(start: upcoming.start, since: upcoming.since, now: now)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text(underway ? "The zikr time has begun" : "Next zikr")
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .foregroundStyle(DIColor.accent)
                     Text(verbatim: upcoming.session.displayTitle(urdu: DIBrand.readsUrdu(locale)))
                         .diInterfaceFont(.headline)
                         .foregroundStyle(DIColor.textPrimary)
                     Text("Your time: \(ZikrScheduleMath.localTimeText(upcoming.start))")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.primary)
                     scheduleLine
                         .diInterfaceFont(.caption)
@@ -719,7 +719,7 @@ private struct GroupZikrRow: View {
                 Text(verbatim: session.displayTitle(urdu: DIBrand.readsUrdu(locale))).diInterfaceFont(.headline)
                 if let start = ZikrScheduleMath.currentOrNextOccurrence(of: current, at: Date()) {
                     Text("Your time: \(ZikrScheduleMath.localTimeText(start))")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.primary)
                 }
                 if let announcement = ZikrAnchorResolver.announcement(for: session) {
@@ -822,7 +822,7 @@ private struct GroupDraftCard: View {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Label(draft.source == "whatsapp" ? "Forwarded from WhatsApp" : (draft.source == "feed" ? "From the official feed" : "Saved draft"),
                       systemImage: "tray")
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(DIColor.accent)
                 if let imageURL = draft.imageURL {
                     GroupPostImage(url: imageURL)

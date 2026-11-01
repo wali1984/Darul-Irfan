@@ -349,7 +349,7 @@ struct ZikrHomeView: View {
                 DeepLinkRouter.shared.open(.media)
             } label: {
                 Text("See all")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .frame(minHeight: 44)
                     .contentShape(Rectangle())
             }

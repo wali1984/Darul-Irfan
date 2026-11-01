@@ -386,7 +386,7 @@ struct HadithBookView: View {
         Divider().overlay(DIColor.border)
         VStack(alignment: .leading, spacing: 2) {
             Text(verbatim: "\(book.title(languageCode: languageCode)) \(entry.displayNumber)")
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
             if let refBook = entry.sourceBook, let hadithNumber = entry.sourceHadith {
                 // The book as the source prints it: Sunan an-Nasa'i's "35b",
@@ -398,7 +398,7 @@ struct HadithBookView: View {
             }
             if let grades = entry.grades, !grades.isEmpty {
                 Text("Grading")
-                    .font(.caption2.weight(.semibold))
+                    .diInterfaceFont(.caption2, weight: .semibold)
                     .foregroundStyle(DIColor.accent)
                     .padding(.top, 2)
                 ForEach(grades, id: \.self) { grade in
@@ -535,7 +535,7 @@ struct HadithBookView: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let bookLabel = book.printedSectionNumber(number) {
                     Text("Book \(bookLabel)")
-                        .font(.caption.weight(.bold))
+                        .diInterfaceFont(.caption, weight: .bold)
                         .foregroundStyle(DIColor.accent)
                 }
                 if !title.isEmpty {
@@ -577,7 +577,7 @@ struct HadithBookView: View {
             } else {
                 if let english {
                     Text(verbatim: english)
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .foregroundStyle(DIColor.primary)
                 }
                 if let arabic {
@@ -819,7 +819,7 @@ private struct HadithContentsView: View {
                                         .frame(minWidth: 28, alignment: .leading)
                                     VStack(alignment: .leading, spacing: 3) {
                                         Text(verbatim: section.title(languageCode: languageCode))
-                                            .font(.body.weight(.semibold))
+                                            .diInterfaceFont(.body, weight: .semibold)
                                             .foregroundStyle(DIColor.textPrimary)
                                             .multilineTextAlignment(.leading)
                                         if languageCode != "ur", !section.titleArabic.isEmpty,

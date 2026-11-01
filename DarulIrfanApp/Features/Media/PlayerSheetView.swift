@@ -409,7 +409,7 @@ struct PlayerSheetView: View {
                 }
             } label: {
                 Text(verbatim: audioPlayer.playbackSpeed.label)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(accent)
                     .padding(.horizontal, DISpacing.md)
                     .padding(.vertical, DISpacing.xs)
@@ -433,7 +433,7 @@ struct PlayerSheetView: View {
                         viewModel.beginAddBookmark()
                     } label: {
                         Label("Add bookmark at current position", systemImage: "bookmark.fill")
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(accent)
                     }
                     .buttonStyle(.plain)

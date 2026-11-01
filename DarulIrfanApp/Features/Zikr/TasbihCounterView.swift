@@ -33,7 +33,7 @@ struct TasbihCounterView: View {
                     countingRing
                     if viewModel.hasReachedTarget {
                         Label("Target reached — Alhamdulillah", systemImage: "sparkles")
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(DIColor.accent)
                             .diGoldGlow(radius: 8, opacity: 0.4)
                             .transition(.scale.combined(with: .opacity))

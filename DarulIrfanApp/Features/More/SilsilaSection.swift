@@ -295,7 +295,7 @@ private struct SilsilaItemRow: View {
             HalqahRowTile(systemImage: "doc.text.fill")
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: item.title)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                 if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
                     Text(verbatim: titleUrdu)
@@ -307,7 +307,7 @@ private struct SilsilaItemRow: View {
             .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: DISpacing.sm)
             Image(systemName: "chevron.forward")
-                .font(.caption.weight(.bold))
+                .diInterfaceFont(.caption, weight: .bold)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }

@@ -77,13 +77,13 @@ struct QuickToolChip: View {
             ZStack {
                 Circle().fill(DIGradient.emerald)
                 Image(systemName: systemImage)
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                     .foregroundStyle(.white)
             }
             .frame(width: 46, height: 46)
             .accessibilityHidden(true)
             Text(title)
-                .font(.caption2.weight(.semibold))
+                .diInterfaceFont(.caption2, weight: .semibold)
                 .foregroundStyle(DIColor.textPrimary)
                 .lineLimit(1)
         }
@@ -119,7 +119,7 @@ struct TodayMyDayCard: View {
                         isAdding = true
                     } label: {
                         Label("Add", systemImage: "plus")
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                     }
                 }
                 if open.isEmpty {
@@ -140,7 +140,7 @@ struct TodayMyDayCard: View {
                     MyDayView(dependencies: dependencies, appState: appState)
                 } label: {
                     Text(open.count > 3 ? "View all \(open.count)" : "View all")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                 }
             }
         }
@@ -267,7 +267,7 @@ struct TodayContinueCard: View {
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                 detail
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -413,9 +413,9 @@ struct TodayUpcomingCard: View {
             } label: {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(DailyZikrBanner.phase(start: zikr.startsAt, end: zikr.endsAt, now: now) == .live ? "LIVE NOW" : "Upcoming")
-                        .font(.caption.weight(.bold)).foregroundStyle(Color(hex: 0xFFE3A0))
+                        .diInterfaceFont(.caption, weight: .bold).foregroundStyle(Color(hex: 0xFFE3A0))
                     Text(LocalizedStringKey(DailyZikrBanner.title))
-                        .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                        .diInterfaceFont(.subheadline, weight: .semibold).foregroundStyle(.white)
                     Text("Your time: \(ZikrScheduleMath.localTimeText(zikr.startsAt))")
                         .diInterfaceFont(.footnote).foregroundStyle(Color(hex: 0xE9CE86))
                 }
@@ -477,7 +477,7 @@ struct TodayUpcomingCard: View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: icon).foregroundStyle(DIColor.primary).frame(width: 30)
             VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: title).font(.subheadline.weight(.semibold)).foregroundStyle(DIColor.textPrimary)
+                Text(verbatim: title).diInterfaceFont(.subheadline, weight: .semibold).foregroundStyle(DIColor.textPrimary)
                 when.diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: 0)
@@ -511,7 +511,7 @@ struct TodayReminderStatus: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: allowed == false ? "bell.slash.fill" : "bell.badge.fill")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .accessibilityHidden(true)
                 Group {
                     if allowed == false {
@@ -520,10 +520,10 @@ struct TodayReminderStatus: View {
                         Text("Alerts on for \(enabledCount) of 5 prayers")
                     }
                 }
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .multilineTextAlignment(.leading)
                 Image(systemName: "chevron.forward")
-                    .font(.caption2.weight(.bold))
+                    .diInterfaceFont(.caption2, weight: .bold)
                     .accessibilityHidden(true)
                 Spacer(minLength: 0)
             }
@@ -564,7 +564,7 @@ struct TodayMethodLine: View {
         let asr = calculation.asrMethod == .hanafi ? String(localized: "Hanafi Asr") : String(localized: "Shafi Asr")
         let place = showsPlace ? (appState.activePlace?.name ?? "") : ""
         Text(verbatim: [method, asr, place].filter { !$0.isEmpty }.joined(separator: " · "))
-            .font(.footnote.weight(.medium))
+            .diInterfaceFont(.footnote, weight: .medium)
             .foregroundStyle(DIColor.textMuted)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
@@ -588,7 +588,7 @@ struct TodayMethodSuggestion: View {
             let suggested = String(localized: String.LocalizationValue(recommended.englishName))
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Label("Check your calculation method", systemImage: "exclamationmark.circle")
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(TodayPalette.goldText)
                 Text("Times are calculated with \(current). Around \(place.name), \(suggested) is in common use, and Fajr and Isha can differ between them by 15 to 30 minutes.")
                     .diInterfaceFont(.footnote)

@@ -150,7 +150,7 @@ struct DIPillBadge: View {
 
     var body: some View {
         Text(text)
-            .font(.caption.weight(.semibold))
+            .diInterfaceFont(.caption, weight: .semibold)
             .padding(.horizontal, DISpacing.sm)
             .padding(.vertical, DISpacing.xs)
             .background(color.opacity(0.14))

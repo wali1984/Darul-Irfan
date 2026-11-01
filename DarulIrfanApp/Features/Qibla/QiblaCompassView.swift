@@ -118,7 +118,7 @@ struct QiblaCompassView: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text("Compass calibration needed")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.textPrimary)
                     Text("Move your iPhone in a figure-eight motion until the reading settles.")
                         .diInterfaceFont(.footnote)
@@ -138,7 +138,7 @@ struct QiblaCompassView: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text("Pointing by magnetic north")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.textPrimary)
                     Text("Magnetic north can differ by several degrees from true north, which the Qibla bearing is measured from. Allow location access while using the app for an exact direction.")
                         .diInterfaceFont(.footnote)
@@ -148,7 +148,7 @@ struct QiblaCompassView: View {
                             UIApplication.shared.open(url)
                         }
                     }
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.actionForeground)
                 }
             }
@@ -221,12 +221,12 @@ struct QiblaCompassView: View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text("Without the compass")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                     .accessibilityAddTraits(.isHeader)
                 if let bearing = viewModel.qiblaBearingRounded {
                     Text("Qibla: \(bearing)° from true north")
-                        .font(.title3.weight(.semibold))
+                        .diInterfaceFont(.title3, weight: .semibold)
                         .foregroundStyle(DIColor.actionForeground)
                         .monospacedDigit()
                 }

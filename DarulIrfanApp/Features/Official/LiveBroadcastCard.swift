@@ -47,7 +47,7 @@ struct LiveBroadcastCard: View {
             }
             if let start = current.scheduledStart, current.state == .scheduled {
                 Label(start.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(fg)
             }
 
@@ -57,7 +57,7 @@ struct LiveBroadcastCard: View {
             Button { if let source { activate(source) } } label: {
                 Label("Join Daily Zikr with Sheikh-ul-Mukarram",
                       systemImage: source?.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(source == nil ? DIColor.textMuted : (isLive ? DIColor.primaryDeep : DIColor.onPrimary))
                     .frame(maxWidth: .infinity, minHeight: 46)
                     .background(
@@ -161,7 +161,7 @@ struct LiveBroadcastCard: View {
             .padding(.top, DISpacing.xs)
         } label: {
             Label("Recorded zikr", systemImage: "play.rectangle.on.rectangle")
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(fg)
         }
         .tint(fgMuted)
@@ -175,7 +175,7 @@ struct LiveBroadcastCard: View {
                 .foregroundStyle(DIColor.primaryDeep)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: cue.text)
-                    .font(.title3.weight(.bold))
+                    .diInterfaceFont(.title3, weight: .bold)
                     .foregroundStyle(DIColor.primaryDeep)
                 Text("Now in the zikr · \(cue.at.formatted(.relative(presentation: .named)))")
                     .diInterfaceFont(.caption)
@@ -203,7 +203,7 @@ struct LiveBroadcastCard: View {
 
     private var statusBadge: some View {
         Text(LocalizedStringKey(statusText))
-            .font(.caption2.weight(.bold))
+            .diInterfaceFont(.caption2, weight: .bold)
             .foregroundStyle(isLive ? DIColor.primaryDeep : DIColor.textMuted)
             .padding(.horizontal, DISpacing.sm)
             .padding(.vertical, DISpacing.xs)

@@ -48,7 +48,7 @@ struct DailyZikrCard: View {
             }
             if broadcast.state == .scheduled, let start = broadcast.scheduledStart {
                 Label(start.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(.white)
             }
             if let note = DailyZikrPresentation.note(for: broadcast) {
@@ -62,7 +62,7 @@ struct DailyZikrCard: View {
                 // Says only what the channel reports: nothing here claims the
                 // zikr is on before its live video is.
                 Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(.white.opacity(0.78))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
@@ -98,13 +98,13 @@ struct DailyZikrCard: View {
                 DILivePulse(color: Color(hex: 0xFF5C5C), size: 9)
             }
             Text("Daily Zikr")
-                .font(.caption.weight(.heavy))
+                .diInterfaceFont(.caption, weight: .heavy)
                 .tracking(inUrdu ? 0 : 1.7)
                 .textCase(.uppercase)
                 .foregroundStyle(Color(hex: 0xFFE3A0))
             Spacer(minLength: DISpacing.sm)
             Text(LocalizedStringKey(DailyZikrPresentation.statusKey(for: broadcast.state)))
-                .font(.caption2.weight(.heavy))
+                .diInterfaceFont(.caption2, weight: .heavy)
                 .tracking(inUrdu ? 0 : 0.6)
                 .foregroundStyle(isLive ? Color(hex: 0x064B34) : Color.white.opacity(0.85))
                 .padding(.horizontal, 10)
@@ -119,12 +119,12 @@ struct DailyZikrCard: View {
         let subtitle = DailyZikrPresentation.subtitle(host: name.host, durationMinutes: session?.durationMinutes)
         return VStack(alignment: .leading, spacing: 3) {
             Text(verbatim: name.title)
-                .font(.title3.weight(.heavy))
+                .diInterfaceFont(.title3, weight: .heavy)
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
             if let subtitle {
                 Text(verbatim: subtitle)
-                    .font(.footnote.weight(.medium))
+                    .diInterfaceFont(.footnote, weight: .medium)
                     .foregroundStyle(.white.opacity(0.82))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -142,10 +142,10 @@ struct DailyZikrCard: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Text("On air now")
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(.white)
                 Text(verbatim: DailyZikrPresentation.onAirDetail(startedAt: broadcast.startedAt, locale: locale))
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(.white.opacity(0.85))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -174,7 +174,7 @@ struct DailyZikrCard: View {
             join(source)
         } label: {
             Label("Join Daily Zikr", systemImage: source?.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(available ? Color(hex: 0x064B34) : Color.white.opacity(0.62))
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background { joinFill(available) }
@@ -233,14 +233,14 @@ struct DailyZikrCard: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "play.rectangle.on.rectangle")
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                     .accessibilityHidden(true)
                 Text("Recorded zikr")
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                 Spacer(minLength: DISpacing.sm)
                 if !showsRecordings {
                     Text(verbatim: "\(recordings.count)")
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .opacity(0.7)
                 }
             }
@@ -287,7 +287,7 @@ private struct DailyZikrCountdown: View {
                     ZikrCountdownRing(progress: ZikrCountdown.ringProgress(window, at: context.date), active: active)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(active ? "Zikr in progress" : "Zikr begins in")
-                            .font(.footnote.weight(.medium))
+                            .diInterfaceFont(.footnote, weight: .medium)
                             .foregroundStyle(.white.opacity(0.82))
                         Text(active ? window.end : window.start, style: .timer)
                             .font(.system(.title, design: .rounded).weight(.bold).monospacedDigit())
@@ -297,7 +297,7 @@ private struct DailyZikrCountdown: View {
                             .contentTransition(.numericText())
                             .diGoldGlow(radius: 10, opacity: 0.7)
                         Text(verbatim: ZikrTimeLine.text(for: window.start, session: session, locale: locale))
-                            .font(.caption.weight(.medium))
+                            .diInterfaceFont(.caption, weight: .medium)
                             .foregroundStyle(.white.opacity(0.85))
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -393,18 +393,18 @@ private struct DailyZikrRemindersMenu: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "bell")
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                     .accessibilityHidden(true)
                 Text("Reminders")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                 Spacer(minLength: DISpacing.sm)
                 HStack(spacing: 6) {
                     Text(verbatim: summary)
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .multilineTextAlignment(.trailing)
                         .lineLimit(2)
                     Image(systemName: "chevron.up.chevron.down")
-                        .font(.caption2.weight(.bold))
+                        .diInterfaceFont(.caption2, weight: .bold)
                         .opacity(0.8)
                         .accessibilityHidden(true)
                 }
@@ -439,7 +439,7 @@ private struct ZikrCueBanner: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: cue.text)
-                    .font(.title3.weight(.bold))
+                    .diInterfaceFont(.title3, weight: .bold)
                     .foregroundStyle(DIColor.primaryDeep)
                 Text("Now in the zikr · \(cue.at.formatted(.relative(presentation: .named)))")
                     .diInterfaceFont(.caption)
@@ -478,7 +478,7 @@ private struct ZikrRecordingRow: View {
                 .shadow(color: DIColor.goldGlow.opacity(0.35), radius: 6)
                 .accessibilityHidden(true)
             Text(item.publishedAt, format: .dateTime.weekday(.wide).day().month(.wide))
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
             Spacer(minLength: DISpacing.sm)
             Text(item.publishedAt, format: .dateTime.hour().minute())
                 .font(.footnote.monospacedDigit())

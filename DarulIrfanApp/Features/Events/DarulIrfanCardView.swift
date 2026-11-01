@@ -126,7 +126,7 @@ struct DarulIrfanCardView: View {
                     .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.primary)
                 Text(title)
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textPrimary)
             }
             .frame(maxWidth: .infinity, minHeight: 48)

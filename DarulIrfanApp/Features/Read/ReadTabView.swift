@@ -298,7 +298,7 @@ struct ReaderSwitch: ViewModifier {
                             Image(systemName: "bookmark")
                             Text("Saved")
                         }
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                     }
                     .accessibilityIdentifier("read.saved")
                 }

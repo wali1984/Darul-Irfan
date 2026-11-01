@@ -260,13 +260,13 @@ struct QuranTabView: View {
                             .lineLimit(1)
                     } else {
                         Text(verbatim: surah.nameTransliterated)
-                            .font(.title2.weight(.heavy))
+                            .diInterfaceFont(.title2, weight: .heavy)
                             .foregroundStyle(Color.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                     }
                     Text("Ayah \(progress.ayahNumber) of \(surah.ayahCount)")
-                        .font(.footnote.weight(.medium))
+                        .diInterfaceFont(.footnote, weight: .medium)
                         .foregroundStyle(Color.white.opacity(0.85))
                     ReadProgressLight(fraction: fraction)
                         .padding(.top, DISpacing.sm)
@@ -471,7 +471,7 @@ private struct QuranParaRow: View {
                     .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.textPrimary)
                 Text(verbatim: "\(para.surah.nameTransliterated) \(para.surah.id):\(para.ayah)")
-                    .font(.footnote.weight(.medium))
+                    .diInterfaceFont(.footnote, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: DISpacing.sm)
@@ -513,7 +513,7 @@ struct QuranParaListView: View {
                         .background(Circle().fill(DIColor.primary))
                     VStack(alignment: .leading, spacing: 2) {
                         Text(verbatim: "\(para.surah.nameTransliterated) \(para.surah.id):\(para.ayah)")
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(DIColor.textPrimary)
                         if let opening = openings[para.number] {
                             Text(verbatim: opening)

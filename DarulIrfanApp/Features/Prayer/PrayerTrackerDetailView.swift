@@ -185,12 +185,12 @@ struct PrayerTrackerDetailView: View {
                 Grid(horizontalSpacing: DISpacing.sm, verticalSpacing: DISpacing.sm) {
                     GridRow {
                         Text("Day")
-                            .font(.caption2.weight(.semibold))
+                            .diInterfaceFont(.caption2, weight: .semibold)
                             .foregroundStyle(DIColor.textMuted)
                             .gridColumnAlignment(.leading)
                         ForEach(Prayer.obligatory) { prayer in
                             Text(LocalizedStringKey(prayer.englishName))
-                                .font(.caption2.weight(.semibold))
+                                .diInterfaceFont(.caption2, weight: .semibold)
                                 .foregroundStyle(DIColor.textMuted)
                                 .lineLimit(1)
                         }

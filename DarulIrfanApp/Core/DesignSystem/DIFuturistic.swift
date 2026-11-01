@@ -197,7 +197,7 @@ struct DIToolOrb: View {
     var body: some View {
         VStack(spacing: 7) {
             Image(systemName: systemImage)
-                .font(.title3.weight(.semibold))
+                .diInterfaceFont(.title3, weight: .semibold)
                 .foregroundStyle(gold ? DIColor.primaryDeep : Color.white)
                 .frame(width: 56, height: 56)
                 .background(
@@ -216,7 +216,7 @@ struct DIToolOrb: View {
                 .shadow(color: (gold ? DIColor.accent : DIColor.primary).opacity(0.35), radius: 10, y: 6)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)

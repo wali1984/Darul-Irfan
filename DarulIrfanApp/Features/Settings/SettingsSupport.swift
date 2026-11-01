@@ -10,11 +10,11 @@ struct SettingsSectionHeader: View {
     var body: some View {
         HStack(spacing: DISpacing.xs) {
             Image(systemName: systemImage)
-                .font(.caption2.weight(.semibold))
+                .diInterfaceFont(.caption2, weight: .semibold)
                 .foregroundStyle(DIColor.accent)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(.footnote.weight(.semibold))
+                .diInterfaceFont(.footnote, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
         }
         .textCase(nil)

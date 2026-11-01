@@ -103,7 +103,7 @@ struct BayansSection: View {
         if !feed.videos.isEmpty {
             HStack(alignment: .firstTextBaseline) {
                 Text("Recent on YouTube")
-                    .font(.title3.weight(.heavy))
+                    .diInterfaceFont(.title3, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                     .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: DISpacing.sm)
@@ -111,7 +111,7 @@ struct BayansSection: View {
                     BayanVideosListView(model: feed)
                 } label: {
                     Text("See all")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.primary)
                         .frame(minHeight: 44)
                         .contentShape(Rectangle())
@@ -175,7 +175,7 @@ struct BayansSection: View {
                     Task { await media.load() }
                 } label: {
                     Text("Try Again")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                 }
                 .buttonStyle(DICompactButtonStyle())
             }
@@ -247,7 +247,7 @@ private struct BayansContinueHero: View {
                     .lineLimit(1)
             }
         }
-        .font(.footnote.weight(.medium))
+        .diInterfaceFont(.footnote, weight: .medium)
         .foregroundStyle(Color.white.opacity(0.85))
     }
 }
@@ -330,13 +330,13 @@ private struct BayansTile: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Text(LocalizedStringKey(category.englishName))
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
                     .minimumScaleFactor(0.85)
                 Text(count, format: .number)
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -372,7 +372,7 @@ private struct BayanVideoCard: View {
                     endPoint: .bottom
                 )
                 Text(verbatim: title.headline)
-                    .font(.callout.weight(.heavy))
+                    .diInterfaceFont(.callout, weight: .heavy)
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
@@ -396,12 +396,12 @@ private struct BayanVideoCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let detail = title.detail {
                     Text(verbatim: detail)
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .foregroundStyle(DIColor.textPrimary)
                         .lineLimit(1)
                 }
                 Text(item.publishedAt, format: .dateTime.day().month(.wide))
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
             .padding(.horizontal, 2)
@@ -506,7 +506,7 @@ private struct BayanVideoRow: View {
             .clipShape(RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous))
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: item.title)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(3)
                     .multilineTextAlignment(.leading)

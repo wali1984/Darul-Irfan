@@ -102,7 +102,7 @@ struct AyahTafsirSheet: View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             if entry.ayahStart != entry.ayahEnd {
                 Text("Commentary on ayat \(entry.ayahStart)–\(entry.ayahEnd)")
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
             }
             if language == "ur" {
@@ -174,7 +174,7 @@ struct AyahTafsirSheet: View {
         if !volumes.isEmpty {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Text("The full printed volume")
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
                 ForEach(volumes) { volume in
                     NavigationLink {

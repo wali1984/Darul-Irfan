@@ -40,7 +40,7 @@ struct AppUpdateBanner: View {
                     Spacer(minLength: 0)
                     Button(action: onClose) {
                         Image(systemName: "xmark")
-                            .font(.footnote.weight(.semibold))
+                            .diInterfaceFont(.footnote, weight: .semibold)
                             .foregroundStyle(DIColor.textMuted)
                             .padding(DISpacing.xs)
                     }

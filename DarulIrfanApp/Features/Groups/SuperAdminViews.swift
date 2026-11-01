@@ -103,7 +103,7 @@ struct MemberDirectoryView: View {
                             HStack(spacing: DISpacing.xs) {
                                 Text(verbatim: person.displayName)
                                 if person.isSuperAdmin {
-                                    Text("Super admin").font(.caption2.weight(.bold)).foregroundStyle(DIColor.primary)
+                                    Text("Super admin").diInterfaceFont(.caption2, weight: .bold).foregroundStyle(DIColor.primary)
                                 }
                             }
                             Text(verbatim: person.halqahs.isEmpty
@@ -202,7 +202,7 @@ struct DirectoryPersonView: View {
                                     Label("Remove from the Halqah", systemImage: "person.badge.minus")
                                 }
                             } label: {
-                                Text(place.role.title).font(.subheadline.weight(.semibold))
+                                Text(place.role.title).diInterfaceFont(.subheadline, weight: .semibold)
                             }
                         } else {
                             Text(place.role.title).foregroundStyle(DIColor.textMuted)

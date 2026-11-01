@@ -95,7 +95,7 @@ struct TopicDetailView: View {
                     Label("Show all \(total)", systemImage: "chevron.down")
                 }
             }
-            .font(.subheadline.weight(.semibold))
+            .diInterfaceFont(.subheadline, weight: .semibold)
             .buttonStyle(DICompactButtonStyle())
             .frame(maxWidth: .infinity)
         }
@@ -117,14 +117,14 @@ struct TopicDetailView: View {
                     Text(verbatim: verse.reference.replacingOccurrences(
                         of: "[0-9]+:[0-9]+(?:-[0-9]+)?", with: "\u{2066}$0\u{2069}", options: .regularExpression
                     ))
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .foregroundStyle(DIColor.actionForeground)
                     Button {
                         DIHaptics.soft()
                         DeepLinkRouter.shared.open(.quranAyah(surah: verse.surah, ayah: verse.ayah))
                     } label: {
                         Label("Open in the Quran", systemImage: "book.closed")
-                            .font(.caption.weight(.semibold))
+                            .diInterfaceFont(.caption, weight: .semibold)
                     }
                     .buttonStyle(DICompactButtonStyle())
                     .tint(DIColor.actionForeground)
@@ -271,13 +271,13 @@ private struct TopicHadithCard: View {
                 }
                 AnyLayout(dynamicTypeSize >= .xxLarge ? AnyLayout(VStackLayout(alignment: .leading, spacing: DISpacing.sm)) : AnyLayout(HStackLayout(spacing: DISpacing.sm))) {
                     Text(verbatim: reference)
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .foregroundStyle(DIColor.actionForeground)
                     Button(expanded ? "Show less" : "Read more") {
                         if reduceMotion { expanded.toggle() }
                         else { withAnimation { expanded.toggle() } }
                     }
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .buttonStyle(DICompactButtonStyle())
                     .tint(DIColor.actionForeground)
                     if let book = books[item.bookID] {
@@ -290,7 +290,7 @@ private struct TopicHadithCard: View {
                             )
                         } label: {
                             Label("Open", systemImage: "arrow.up.forward.square")
-                                .font(.caption.weight(.semibold))
+                                .diInterfaceFont(.caption, weight: .semibold)
                         }
                         .buttonStyle(DICompactButtonStyle())
                     .tint(DIColor.actionForeground)

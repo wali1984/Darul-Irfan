@@ -30,17 +30,17 @@ private struct ZikrShajraCard: View {
             ZikrShajraOrb()
             VStack(alignment: .leading, spacing: 2) {
                 Text("Chain of Transmission")
-                    .font(.headline.weight(.heavy))
+                    .diInterfaceFont(.headline, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                 Text("Shajra Silsila Naqshbandia Owaisiah")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(HalqahInk.goldText)
             }
             .multilineTextAlignment(.leading)
             .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: DISpacing.sm)
             Image(systemName: "chevron.forward")
-                .font(.footnote.weight(.bold))
+                .diInterfaceFont(.footnote, weight: .bold)
                 .foregroundStyle(HalqahInk.goldText)
                 .accessibilityHidden(true)
         }

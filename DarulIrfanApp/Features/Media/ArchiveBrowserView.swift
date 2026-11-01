@@ -11,7 +11,7 @@ private func archiveIcon(_ glyph: String) -> some View {
     ZStack {
         Circle().fill(DIGradient.emerald)
         Image(systemName: glyph)
-            .font(.subheadline.weight(.semibold))
+            .diInterfaceFont(.subheadline, weight: .semibold)
             .foregroundStyle(.white)
     }
     .frame(width: 38, height: 38)
@@ -254,7 +254,7 @@ struct ArchiveYearView: View {
                         .foregroundStyle(DIColor.textPrimary)
                     Spacer(minLength: 0)
                     Text("\(viewModel.totalCount) items")
-                        .font(.caption.weight(.medium))
+                        .diInterfaceFont(.caption, weight: .medium)
                         .foregroundStyle(DIColor.primary)
                 }
                 .padding(.vertical, DISpacing.xs)
@@ -279,7 +279,7 @@ struct ArchiveYearView: View {
                             .foregroundStyle(DIColor.textPrimary)
                         Spacer(minLength: 0)
                         Text("\(bucket.count) items")
-                            .font(.caption.weight(.medium))
+                            .diInterfaceFont(.caption, weight: .medium)
                             .foregroundStyle(DIColor.textMuted)
                     }
                     .padding(.vertical, DISpacing.xs)

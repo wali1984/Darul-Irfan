@@ -27,7 +27,7 @@ struct ZikrAyahBlock: View {
             translation
                 .diAppear(delay: 0.3)
             Text(DIBrand.anchorVerseReference)
-                .font(.caption2.weight(.heavy))
+                .diInterfaceFont(.caption2, weight: .heavy)
                 .tracking(inUrdu ? 0 : 1.8)
                 .textCase(.uppercase)
                 .foregroundStyle(isDark ? DIColor.accent : Color(hex: 0x7A5A14))
@@ -55,7 +55,7 @@ struct ZikrAyahBlock: View {
                 .fixedSize(horizontal: false, vertical: true)
         } else {
             Text(verbatim: DIBrand.anchorVerseEnglish)
-                .font(.subheadline.weight(.medium))
+                .diInterfaceFont(.subheadline, weight: .medium)
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)

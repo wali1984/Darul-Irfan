@@ -83,7 +83,7 @@ struct AboutView: View {
                 }
 
                 Text(verbatim: DIBrand.anchorVerseReference)
-                    .font(.caption2.weight(.semibold))
+                    .diInterfaceFont(.caption2, weight: .semibold)
                     .foregroundStyle(DIColor.goldGlow)
 
                 versionChip
@@ -99,7 +99,7 @@ struct AboutView: View {
 
     private var versionChip: some View {
         Text("Version \(appVersionText)")
-            .font(.caption.weight(.medium))
+            .diInterfaceFont(.caption, weight: .medium)
             .foregroundStyle(.white)
             .padding(.horizontal, DISpacing.sm)
             .padding(.vertical, DISpacing.xs)
@@ -182,10 +182,10 @@ struct AboutView: View {
             HStack(spacing: DISpacing.xs) {
                 Text("Credits and licences")
                 Image(systemName: "chevron.forward")
-                    .font(.caption2.weight(.bold))
+                    .diInterfaceFont(.caption2, weight: .bold)
                     .accessibilityHidden(true)
             }
-            .font(.footnote.weight(.semibold))
+            .diInterfaceFont(.footnote, weight: .semibold)
             .foregroundStyle(DIColor.actionForeground)
             .frame(maxWidth: .infinity, minHeight: 44)
             .contentShape(Rectangle())
@@ -198,7 +198,7 @@ struct AboutView: View {
     private func aboutHeader(_ titleKey: LocalizedStringKey, systemImage: String) -> some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.accent)
                 .accessibilityHidden(true)
             Text(titleKey)

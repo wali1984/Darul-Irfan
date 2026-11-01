@@ -163,7 +163,7 @@ struct IslamicDaysView: View {
 
     private func monthChip(_ title: String) -> some View {
         Text(verbatim: title)
-            .font(.subheadline.weight(.semibold))
+            .diInterfaceFont(.subheadline, weight: .semibold)
             .foregroundStyle(DIColor.onPrimary)
             .padding(.horizontal, DISpacing.md)
             .padding(.vertical, DISpacing.xs)
@@ -205,7 +205,7 @@ private struct IslamicDayTimelineRow: View {
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: DISpacing.xs) {
                         Text(verbatim: occurrence.hijriText)
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(DIColor.actionForeground)
                         if let eve = occurrence.eveDate {
                             let evening = eve.formatted(date: .abbreviated, time: .omitted)

@@ -80,13 +80,13 @@ struct ToolTile: View {
             ZStack {
                 Circle().fill(DIGradient.emerald)
                 Image(systemName: systemImage)
-                    .font(.title3.weight(.semibold))
+                    .diInterfaceFont(.title3, weight: .semibold)
                     .foregroundStyle(.white)
             }
             .frame(width: 44, height: 44)
             .accessibilityHidden(true)
             Text(title)
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

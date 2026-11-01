@@ -53,10 +53,10 @@ struct DISegmentedControl<Item: Hashable>: View {
         } label: {
             HStack(spacing: 6) {
                 if let symbol = icon(item) {
-                    Image(systemName: symbol).font(.caption2.weight(.semibold))
+                    Image(systemName: symbol).diInterfaceFont(.caption2, weight: .semibold)
                 }
                 Text(title(item))
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.center)
             }

@@ -102,7 +102,7 @@ private struct CompanionHeroHeader: View {
                         .font(DIFont.heading)
                         .foregroundStyle(.white)
                     Text("Names, duas, and sacred days for the heart")
-                        .font(.subheadline.weight(.medium))
+                        .diInterfaceFont(.subheadline, weight: .medium)
                         .foregroundStyle(.white.opacity(0.85))
                         .fixedSize(horizontal: false, vertical: true)
                 }

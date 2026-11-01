@@ -245,7 +245,7 @@ struct ContentItemDetailView: View {
                     }
                     Spacer(minLength: 0)
                     Image(systemName: "chevron.forward")
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .foregroundStyle(DIColor.onPrimary.opacity(0.85))
                 }
                 .padding(DISpacing.md)
@@ -289,7 +289,7 @@ struct ContentItemDetailView: View {
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
             }
             .padding(DISpacing.md)
@@ -356,7 +356,7 @@ struct ContentItemDetailView: View {
                 .fixedSize(horizontal: false, vertical: true)
             if let author = item.author, !author.isEmpty {
                 Text(verbatim: author)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(ReadPalette.goldInk)
                     .multilineTextAlignment(.center)
             }
@@ -374,7 +374,7 @@ struct ContentItemDetailView: View {
 
     private func bookChip(_ text: Text) -> some View {
         text
-            .font(.caption.weight(.bold))
+            .diInterfaceFont(.caption, weight: .bold)
             .foregroundStyle(ReadPalette.emeraldInk)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
@@ -403,7 +403,7 @@ struct ContentItemDetailView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     if let resume {
                         Text("Keep reading")
-                            .font(.headline.weight(.heavy))
+                            .diInterfaceFont(.headline, weight: .heavy)
                         Group {
                             if let count = resume.pageCount {
                                 Text("Page \(resume.page) of \(count)")
@@ -411,7 +411,7 @@ struct ContentItemDetailView: View {
                                 Text("Page \(resume.page)")
                             }
                         }
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .opacity(0.8)
                         if let fraction = resume.fraction {
                             ReadProgressLight(
@@ -425,7 +425,7 @@ struct ContentItemDetailView: View {
                         }
                     } else {
                         Text("Read in App")
-                            .font(.headline.weight(.heavy))
+                            .diInterfaceFont(.headline, weight: .heavy)
                         Group {
                             if hasReadablePDF(item) {
                                 Text("Read the pages here — offline after first open")
@@ -433,7 +433,7 @@ struct ContentItemDetailView: View {
                                 Text("\(viewModel.bookPageCount) pages — searchable text")
                             }
                         }
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .opacity(0.8)
                     }
                 }
@@ -513,11 +513,11 @@ struct ContentItemDetailView: View {
                 .foregroundStyle(ReadPalette.emeraldInk)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(.subheadline.weight(.heavy))
+                .diInterfaceFont(.subheadline, weight: .heavy)
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.leading)
             detail
-                .font(.caption.weight(.medium))
+                .diInterfaceFont(.caption, weight: .medium)
                 .foregroundStyle(DIColor.textMuted)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -574,7 +574,7 @@ struct ContentItemDetailView: View {
                     .frame(width: 44, height: 44)
                     .accessibilityHidden(true)
                     Text(LocalizedStringKey(item.category.englishName))
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .foregroundStyle(.white.opacity(0.85))
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 0)
@@ -627,7 +627,7 @@ struct ContentItemDetailView: View {
             if let systemImage {
                 Image(systemName: systemImage).diInterfaceFont(.caption2)
             }
-            Text(text).font(.caption.weight(.semibold))
+            Text(text).diInterfaceFont(.caption, weight: .semibold)
         }
         .foregroundStyle(.white)
         .padding(.horizontal, DISpacing.sm)
@@ -719,7 +719,7 @@ struct ContentItemDetailView: View {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text("Excerpt")
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .foregroundStyle(DIColor.textMuted)
                         .textCase(.uppercase)
                     Text(verbatim: excerpt)
@@ -818,7 +818,7 @@ struct LibraryDownloadRow: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: fileName)
-                    .font(.subheadline.weight(.medium))
+                    .diInterfaceFont(.subheadline, weight: .medium)
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(2)
                 subtitle
@@ -904,7 +904,7 @@ struct LibraryDownloadRow: View {
                     PDFViewerView(fileURL: localURL, title: fileName)
                 } label: {
                     Text("Open PDF")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.primary)
                 }
                 .buttonStyle(.plain)
@@ -927,7 +927,7 @@ struct LibraryDownloadRow: View {
                 }
             } label: {
                 Text("Try Again")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.primary)
             }
             .buttonStyle(.plain)
@@ -962,7 +962,7 @@ struct BookKeepOfflineRow: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Keep it on this phone")
-                        .font(.subheadline.weight(.bold))
+                        .diInterfaceFont(.subheadline, weight: .bold)
                         .foregroundStyle(DIColor.textPrimary)
                     subtitle
                 }
@@ -981,20 +981,20 @@ struct BookKeepOfflineRow: View {
         switch state {
         case .notDownloaded:
             Text("The PDF, for reading offline")
-                .font(.caption.weight(.medium))
+                .diInterfaceFont(.caption, weight: .medium)
                 .foregroundStyle(DIColor.textMuted)
         case .downloading:
             Text("Downloading…")
-                .font(.caption.weight(.medium))
+                .diInterfaceFont(.caption, weight: .medium)
                 .foregroundStyle(DIColor.textMuted)
         case .downloaded(let asset, _):
             if asset.byteSize > 0 {
                 Text(verbatim: asset.byteSize.formatted(.byteCount(style: .file)))
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             } else {
                 Text("Downloaded")
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
         case .failed:
@@ -1014,7 +1014,7 @@ struct BookKeepOfflineRow: View {
                 }
             } label: {
                 Text("Download")
-                    .font(.footnote.weight(.bold))
+                    .diInterfaceFont(.footnote, weight: .bold)
                     .foregroundStyle(Color.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 7)
@@ -1058,7 +1058,7 @@ struct BookKeepOfflineRow: View {
                     PDFViewerView(fileURL: localURL, title: fileName)
                 } label: {
                     Text("Open PDF")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(ReadPalette.emeraldInk)
                 }
                 .buttonStyle(.plain)
@@ -1081,7 +1081,7 @@ struct BookKeepOfflineRow: View {
                 }
             } label: {
                 Text("Try Again")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(ReadPalette.emeraldInk)
             }
             .buttonStyle(.plain)

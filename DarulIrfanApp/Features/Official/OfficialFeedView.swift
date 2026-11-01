@@ -196,7 +196,7 @@ struct UpdatesSection: View {
             filter = candidate
         } label: {
             Text(LocalizedStringKey(candidate.rawValue))
-                .font(.footnote.weight(.semibold))
+                .diInterfaceFont(.footnote, weight: .semibold)
                 .lineLimit(1)
                 .foregroundStyle(selected ? Color.white : DIColor.textPrimary)
                 .padding(.horizontal, 14)
@@ -439,7 +439,7 @@ struct DiscoverUpdateRow: View {
                 .textCase(.uppercase)
                 .foregroundStyle(DiscoverStyle.goldInk)
                 Text(verbatim: title)
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -470,7 +470,7 @@ struct DiscoverUpdateRow: View {
 
     private func caption(_ text: Text) -> Text {
         text
-            .font(.caption2.weight(.heavy))
+            .diInterfaceFont(.caption2, weight: .heavy)
             .tracking(DiscoverStyle.tracking(1.2, in: locale))
     }
 }

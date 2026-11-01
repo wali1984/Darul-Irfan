@@ -24,7 +24,7 @@ struct PersonalZikrView: View {
                 }
                 Button { withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { shajra.toggle() } } label: {
                     Label(shajra ? "Close Shajra" : "Read Shajra", systemImage: "point.3.connected.trianglepath.dotted")
-                        .font(.headline.weight(.bold))
+                        .diInterfaceFont(.headline, weight: .bold)
                         .foregroundStyle(Color(hex: 0x163D2D))
                         .frame(maxWidth: .infinity, minHeight: 60)
                         .background(LinearGradient(colors: [Color(hex: 0xFFE3A0), Color(hex: 0xDDB65F)], startPoint: .topLeading, endPoint: .bottomTrailing))
@@ -97,7 +97,7 @@ struct PersonalZikrView: View {
                 DILivingSealMark(diameter: 38).accessibilityHidden(true)
             }
             Text(verbatim: run != nil && remaining <= 0 ? String(localized: "Completed") : position?.step.localizedTitle ?? String(localized: "Choose your stages"))
-                .font(.title2.weight(.semibold)).foregroundStyle(.white).multilineTextAlignment(.center)
+                .diInterfaceFont(.title2, weight: .semibold).foregroundStyle(.white).multilineTextAlignment(.center)
             if let position { Text("Stage \(position.index + 1) of \(plan.count)").diInterfaceFont(.caption).foregroundStyle(.white.opacity(0.7)) }
             ZStack {
                 Circle().stroke(Color(hex: 0xE9CE86).opacity(0.12), lineWidth: 1)
@@ -177,7 +177,7 @@ struct PersonalZikrView: View {
             HStack(spacing: 10) {
                 Text(verbatim: "\(index + 1)").diInterfaceFont(.caption).foregroundStyle(DIColor.actionForeground)
                     .frame(width: 30, height: 30).background(DIColor.accent.opacity(0.12), in: Circle())
-                Text(verbatim: step.localizedTitle).font(.subheadline.weight(.medium)).foregroundStyle(DIColor.textPrimary)
+                Text(verbatim: step.localizedTitle).diInterfaceFont(.subheadline, weight: .medium).foregroundStyle(DIColor.textPrimary)
                 Spacer(minLength: 0)
                 Toggle(step.localizedTitle, isOn: Binding(get: { selected }, set: { store.configure(step, enabled: $0) }))
                     .labelsHidden().disabled(store.run != nil)
@@ -333,7 +333,7 @@ private struct PersonalZikrHistoryCard: View {
                     Button(all ? "Show less" : "Show all sessions") { all.toggle() }
                         .buttonStyle(DISecondaryButtonStyle())
                 }
-                } label: { Text("Your last 3 months").font(.subheadline.weight(.semibold)) }
+                } label: { Text("Your last 3 months").diInterfaceFont(.subheadline, weight: .semibold) }
             }
         }
     }

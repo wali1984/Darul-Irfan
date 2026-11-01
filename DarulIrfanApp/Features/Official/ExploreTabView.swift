@@ -260,7 +260,7 @@ struct DiscoverCaption: View {
 
     var body: some View {
         Text(key)
-            .font(.caption2.weight(.heavy))
+            .diInterfaceFont(.caption2, weight: .heavy)
             .tracking(DiscoverStyle.tracking(1.6, in: locale))
             .textCase(.uppercase)
             .foregroundStyle(color)
@@ -274,7 +274,7 @@ struct DiscoverSectionLabel: View {
 
     var body: some View {
         Text(key)
-            .font(.footnote.weight(.heavy))
+            .diInterfaceFont(.footnote, weight: .heavy)
             .tracking(DiscoverStyle.tracking(1.2, in: locale))
             .textCase(.uppercase)
             .foregroundStyle(DIColor.textMuted)
@@ -294,25 +294,25 @@ struct DiscoverLinkRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.title3.weight(.semibold))
+                .diInterfaceFont(.title3, weight: .semibold)
                 .foregroundStyle(DIColor.accent)
                 .frame(width: 28)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 title
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
                 if let subtitle {
                     subtitle
-                        .font(.caption.weight(.medium))
+                        .diInterfaceFont(.caption, weight: .medium)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.leading)
                 }
             }
             Spacer(minLength: 0)
             Image(systemName: "chevron.forward")
-                .font(.footnote.weight(.bold))
+                .diInterfaceFont(.footnote, weight: .bold)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }

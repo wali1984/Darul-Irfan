@@ -82,9 +82,9 @@ struct DailyMediaManagerView: View {
                         .foregroundStyle(DIColor.textMuted)
                         .lineLimit(2)
                     if item.status == "hidden" {
-                        Text("Hidden").font(.caption2.weight(.bold)).foregroundStyle(DIColor.textMuted)
+                        Text("Hidden").diInterfaceFont(.caption2, weight: .bold).foregroundStyle(DIColor.textMuted)
                     } else if item.source == "whatsapp" && item.status == "draft" {
-                        Text("From WhatsApp").font(.caption2.weight(.bold)).foregroundStyle(DIColor.primary)
+                        Text("From WhatsApp").diInterfaceFont(.caption2, weight: .bold).foregroundStyle(DIColor.primary)
                     }
                 }
             }

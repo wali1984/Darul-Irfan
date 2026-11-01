@@ -4,12 +4,16 @@ import UIKit
 /// Interface lettering follows the selected language without changing scripture fonts.
 private struct DIInterfaceTypography: ViewModifier {
     let style: Font.TextStyle
+    let weight: Font.Weight?
     @Environment(\.locale) private var locale
     @AppStorage(AppFonts.nastaliqPreferenceKey) private var nastaliq = true
 
     private var font: Font {
         guard locale.language.languageCode?.identifier == "ur", nastaliq,
-              let name = AppFonts.appleNastaliqName else { return .system(style) }
+              let name = AppFonts.appleNastaliqName else {
+            let base = Font.system(style)
+            return weight.map { base.weight($0) } ?? base
+        }
         let uiStyle: UIFont.TextStyle
         switch style {
         case .largeTitle: uiStyle = .largeTitle
@@ -28,6 +32,7 @@ private struct DIInterfaceTypography: ViewModifier {
         let size = UIFont.preferredFont(forTextStyle: uiStyle,
             compatibleWith: UITraitCollection(preferredContentSizeCategory: .large)).pointSize
         let result = Font.custom(name, size: size, relativeTo: style)
+        if let weight { return result.weight(weight) }
         return style == .headline ? result.weight(.semibold) : result
     }
 
@@ -35,7 +40,7 @@ private struct DIInterfaceTypography: ViewModifier {
 }
 
 extension View {
-    func diInterfaceFont(_ style: Font.TextStyle) -> some View {
-        modifier(DIInterfaceTypography(style: style))
+    func diInterfaceFont(_ style: Font.TextStyle, weight: Font.Weight? = nil) -> some View {
+        modifier(DIInterfaceTypography(style: style, weight: weight))
     }
 }

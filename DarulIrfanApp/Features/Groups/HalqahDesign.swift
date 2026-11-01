@@ -50,7 +50,7 @@ struct HalqahRoleBadge: View {
         } icon: {
             Image(systemName: role.badgeSymbol)
         }
-        .font(.caption.weight(.semibold))
+        .diInterfaceFont(.caption, weight: .semibold)
         .foregroundStyle(tint)
         .padding(.horizontal, DISpacing.sm)
         .padding(.vertical, DISpacing.xs)
@@ -78,13 +78,13 @@ struct HalqahLiveChip: View {
             if let liveIsMeeting {
                 DILivePulse(color: onGlass ? DIColor.goldGlow : DIColor.primary, size: 7)
                 Text(liveIsMeeting ? "Meeting live" : "Zikr live")
-                    .font(.caption.weight(.bold))
+                    .diInterfaceFont(.caption, weight: .bold)
             } else {
                 Image(systemName: "moon.stars")
                     .diInterfaceFont(.caption)
                     .accessibilityHidden(true)
                 Text("No session now")
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
             }
         }
         .foregroundStyle(foreground)
@@ -239,7 +239,7 @@ private struct HalqahFactRow: View {
         } icon: {
             Image(systemName: fact.systemImage)
         }
-        .font(.caption.weight(.medium))
+        .diInterfaceFont(.caption, weight: .medium)
         .foregroundStyle(Color.white.opacity(0.9))
         .padding(.horizontal, DISpacing.sm)
         .padding(.vertical, 5)
@@ -398,7 +398,7 @@ struct HalqahTileLabel: View {
 
     private var symbol: some View {
         Image(systemName: systemImage)
-            .font(.title3.weight(.semibold))
+            .diInterfaceFont(.title3, weight: .semibold)
             .foregroundStyle(tint)
             .symbolEffect(.bounce, value: reduceMotion ? 0 : bounces)
             .symbolEffect(.pulse, isActive: isAlive && !reduceMotion)
@@ -435,7 +435,7 @@ struct HalqahTileLabel: View {
         }
         if showsChevron {
             Image(systemName: "chevron.forward")
-                .font(.footnote.weight(.semibold))
+                .diInterfaceFont(.footnote, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }
@@ -559,7 +559,7 @@ struct HalqahHeroTileLabel: View {
         let layout = typeSize.halqahRowLayout()
         layout {
             Image(systemName: systemImage)
-                .font(.title2.weight(.semibold))
+                .diInterfaceFont(.title2, weight: .semibold)
                 .foregroundStyle(DIColor.goldGlow)
                 .symbolEffect(.variableColor.iterative, isActive: isLive && !reduceMotion)
                 .symbolEffect(.bounce, value: reduceMotion ? 0 : bounces)
@@ -569,7 +569,7 @@ struct HalqahHeroTileLabel: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 Text(titleKey)
-                    .font(.title3.weight(.bold))
+                    .diInterfaceFont(.title3, weight: .bold)
                     .foregroundStyle(.white)
                 subtitle
                     .diInterfaceFont(.subheadline)
@@ -770,11 +770,11 @@ struct HalqahCountdownRing: View {
         if start <= now {
             VStack(spacing: 2) {
                 Image(systemName: "sparkles")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                 // The ring's own word ("ابھی" in Urdu), not the app-wide
                 // "Now" that other screens use.
                 Text("Right now")
-                    .font(.caption.weight(.bold))
+                    .diInterfaceFont(.caption, weight: .bold)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
             }
@@ -788,10 +788,10 @@ struct HalqahCountdownRing: View {
         } else {
             VStack(spacing: 0) {
                 Text(start, format: .dateTime.weekday(.abbreviated))
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.primary)
                 Text(start, format: .dateTime.hour().minute())
-                    .font(.caption2.weight(.medium))
+                    .diInterfaceFont(.caption2, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
             .lineLimit(1)
@@ -818,7 +818,7 @@ struct HalqahDateTile: View {
     var body: some View {
         VStack(spacing: 0) {
             Text(date, format: .dateTime.weekday(.abbreviated))
-                .font(.caption2.weight(.bold))
+                .diInterfaceFont(.caption2, weight: .bold)
                 .textCase(.uppercase)
             Text(date, format: .dateTime.day())
                 .font(.title2.weight(.bold).monospacedDigit())
@@ -869,7 +869,7 @@ struct HalqahStat: View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: DISpacing.xs + 2) {
                 Image(systemName: systemImage)
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(DIColor.goldGlow)
                 if isLive {
                     DILivePulse(color: DIColor.goldGlow, size: 6)
@@ -880,7 +880,7 @@ struct HalqahStat: View {
                 .foregroundStyle(.white)
                 .contentTransition(.numericText())
             Text(labelKey)
-                .font(.caption2.weight(.medium))
+                .diInterfaceFont(.caption2, weight: .medium)
                 .foregroundStyle(Color.white.opacity(0.78))
                 .fixedSize(horizontal: false, vertical: true)
         }

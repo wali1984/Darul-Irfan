@@ -41,7 +41,7 @@ struct TodayLightCardHeader: View {
                 .shadow(color: TodayPalette.accent, radius: 4)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(.caption2.weight(.heavy))
+                .diInterfaceFont(.caption2, weight: .heavy)
                 .tracking(DIBrand.readsUrdu(locale) ? 0 : 1.7)
                 .textCase(.uppercase)
                 .foregroundStyle(TodayPalette.goldText)
@@ -50,7 +50,7 @@ struct TodayLightCardHeader: View {
             if let onShare {
                 Button(action: onShare) {
                     Image(systemName: "square.and.arrow.up")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(TodayPalette.emerald)
                         .frame(width: 44, height: 44)
                         .background(TodayPalette.glassFill, in: Circle())
@@ -148,7 +148,7 @@ private struct TodayReferenceText: View {
 
     var body: some View {
         Text(verbatim: DailyNoorText.reference(text, urdu: DIBrand.readsUrdu(locale)))
-            .font(.footnote.weight(.semibold))
+            .diInterfaceFont(.footnote, weight: .semibold)
             .foregroundStyle(TodayPalette.emerald)
             .fixedSize(horizontal: false, vertical: true)
     }
@@ -382,7 +382,7 @@ struct TodaySayingCard: View {
                 HStack(spacing: 10) {
                     TodayGoldMedallion()
                     Text(aqwal.attribution)
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .foregroundStyle(DIColor.textMuted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -437,7 +437,7 @@ struct TodayDuaCard: View {
             TodayLightCardHeader(titleKey: "Dua of the Day", onShare: onShare)
             if let dua {
                 Text(LocalizedStringKey(dua.displayTitle(urdu: readsUrdu)))
-                    .font(.title3.weight(.heavy))
+                    .diInterfaceFont(.title3, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(dua.arabic)
@@ -451,7 +451,7 @@ struct TodayDuaCard: View {
                     .environment(\.layoutDirection, .rightToLeft)
                 if let translation {
                     Text(translation)
-                        .font(.subheadline.weight(.medium))
+                        .diInterfaceFont(.subheadline, weight: .medium)
                         .foregroundStyle(DIColor.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -493,7 +493,7 @@ struct TodayZikrCard: View {
                     .id(isShown)
                     .padding(.top, 6)
                 if !DIBrand.readsUrdu(locale) {
-                    Text(dhikr.transliteration).font(.title3.weight(.heavy)).foregroundStyle(DIColor.textPrimary)
+                    Text(dhikr.transliteration).diInterfaceFont(.title3, weight: .heavy).foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                 }
                 TodayTranslationText(text: DailyNoorText.localized(dhikr.meaning, urdu: DIBrand.readsUrdu(locale)), urdu: DIBrand.readsUrdu(locale))
@@ -607,7 +607,7 @@ struct TodayNameCard: View {
                 }
                 .frame(width: 220, height: 220)
                 if !DIBrand.readsUrdu(locale) {
-                    Text(name.transliteration).font(.title2.weight(.heavy))
+                    Text(name.transliteration).diInterfaceFont(.title2, weight: .heavy)
                         .foregroundStyle(DIColor.textPrimary).multilineTextAlignment(.center)
                 }
                 if let meaning {

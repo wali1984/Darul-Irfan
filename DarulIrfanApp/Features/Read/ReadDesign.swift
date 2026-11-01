@@ -134,7 +134,7 @@ struct ReadCaps: View {
 
     var body: some View {
         Text(titleKey)
-            .font(.caption2.weight(.heavy))
+            .diInterfaceFont(.caption2, weight: .heavy)
             .tracking(readsUrdu ? 0 : 1.6)
             .textCase(.uppercase)
             .foregroundStyle(color)
@@ -150,7 +150,7 @@ struct ReadGroupTitle: View {
 
     var body: some View {
         Text(titleKey)
-            .font(.footnote.weight(.heavy))
+            .diInterfaceFont(.footnote, weight: .heavy)
             .tracking(readsUrdu ? 0 : 1.2)
             .textCase(.uppercase)
             .foregroundStyle(DIColor.textMuted)
@@ -342,7 +342,7 @@ struct ReadFindField: View {
     var body: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "magnifyingglass")
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
             TextField(prompt, text: $text)

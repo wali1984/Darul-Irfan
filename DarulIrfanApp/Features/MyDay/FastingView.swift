@@ -68,13 +68,13 @@ struct FastingView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Suhoor ends").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
-                            Text(verbatim: fajr.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).font(.title3.weight(.semibold))
+                            Text(verbatim: fajr.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).diInterfaceFont(.title3, weight: .semibold)
                                 .accessibilityIdentifier("fasting-suhoor")
                         }
                         Spacer()
                         VStack(alignment: .trailing, spacing: 2) {
                             Text("Iftar").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
-                            Text(verbatim: maghrib.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).font(.title3.weight(.semibold))
+                            Text(verbatim: maghrib.formatted(Date.FormatStyle(date: .omitted, time: .shortened, locale: locale, timeZone: schedule.location.timeZone))).diInterfaceFont(.title3, weight: .semibold)
                                 .accessibilityIdentifier("fasting-iftar")
                         }
                     }
@@ -107,7 +107,7 @@ struct FastingView: View {
                 LazyVGrid(columns: columns, spacing: 6) {
                     ForEach(calendar.shortWeekdaySymbols.indices, id: \.self) { index in
                         Text(verbatim: calendar.shortWeekdaySymbols[(index + calendar.firstWeekday - 1) % 7])
-                            .font(.caption2.weight(.semibold))
+                            .diInterfaceFont(.caption2, weight: .semibold)
                             .lineLimit(1)
                             .minimumScaleFactor(0.65)
                             .foregroundStyle(DIColor.textMuted)

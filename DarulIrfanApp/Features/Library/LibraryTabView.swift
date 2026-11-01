@@ -155,7 +155,7 @@ struct LibraryTabView: View {
                     bookTitle(last.item)
                     if let detail = detailLine(last) {
                         detail
-                            .font(.footnote.weight(.medium))
+                            .diInterfaceFont(.footnote, weight: .medium)
                             .foregroundStyle(Color.white.opacity(0.85))
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
@@ -183,7 +183,7 @@ struct LibraryTabView: View {
                 .environment(\.layoutDirection, .rightToLeft)
         } else {
             Text(verbatim: item.title)
-                .font(.headline.weight(.heavy))
+                .diInterfaceFont(.headline, weight: .heavy)
                 .foregroundStyle(Color.white)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
@@ -266,12 +266,12 @@ struct LibraryTabView: View {
             ReadOrb(systemImage: shelf.systemImage, gold: shelf.isGold)
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(shelf.title))
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
                 shelfCount(shelf)
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
@@ -344,7 +344,7 @@ struct LibraryFeaturedCard: View {
                 Spacer(minLength: 0)
 
                 Image(systemName: "chevron.forward")
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }
@@ -371,7 +371,7 @@ struct LibraryCategoryRow: View {
                 )
 
                 Text(LocalizedStringKey(category.englishName))
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
 
@@ -390,7 +390,7 @@ struct LibraryCategoryRow: View {
                 }
 
                 Image(systemName: "chevron.forward")
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }

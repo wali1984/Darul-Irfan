@@ -87,7 +87,7 @@ struct ReadSavedView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                 }
             }
             // A favourite opens its book page or article here, as a search
@@ -117,12 +117,12 @@ struct ReadSavedView: View {
                     .diInterfaceFont(.headline)
                     .foregroundStyle(DIColor.textPrimary)
                 detail
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: 0)
             Image(systemName: "chevron.forward")
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }

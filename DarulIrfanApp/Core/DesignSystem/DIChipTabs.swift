@@ -47,10 +47,10 @@ struct DIChipTabs<Item: Hashable>: View {
         } label: {
             HStack(spacing: 6) {
                 if let symbol = icon(item) {
-                    Image(systemName: symbol).font(.subheadline.weight(.semibold))
+                    Image(systemName: symbol).diInterfaceFont(.subheadline, weight: .semibold)
                 }
                 Text(title(item))
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .fixedSize()
             }
             .foregroundStyle(selected ? DIColor.onPrimary : DIColor.textPrimary)

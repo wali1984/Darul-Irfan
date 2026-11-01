@@ -43,7 +43,7 @@ struct BookmarksListView: View {
                                     bookmarkRow(bookmark)
                                     Spacer(minLength: 0)
                                     Image(systemName: "chevron.forward")
-                                        .font(.caption.weight(.semibold))
+                                        .diInterfaceFont(.caption, weight: .semibold)
                                         .foregroundStyle(DIColor.textMuted)
                                         .accessibilityHidden(true)
                                 }
@@ -72,7 +72,7 @@ struct BookmarksListView: View {
                     .listRowBackground(DIColor.surface)
                 } header: {
                     Text("\(group.surah.id). \(group.surah.nameTransliterated)")
-                        .font(.footnote.weight(.semibold))
+                        .diInterfaceFont(.footnote, weight: .semibold)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }

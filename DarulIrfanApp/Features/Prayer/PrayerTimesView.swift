@@ -49,14 +49,14 @@ struct PrayerTimesView: View {
     private var placeLine: some View {
         HStack(spacing: DISpacing.sm) {
             Text(verbatim: placeAndDate)
-                .font(.subheadline.weight(.medium))
+                .diInterfaceFont(.subheadline, weight: .medium)
                 .foregroundStyle(DIColor.textMuted)
                 .fixedSize(horizontal: false, vertical: true)
             NavigationLink {
                 LocationSettingsView(dependencies: dependencies, appState: appState)
             } label: {
                 Text("Change")
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(TodayPalette.emerald)
                     .frame(minHeight: 44)
                     .contentShape(Rectangle())
@@ -167,7 +167,7 @@ struct PrayerTimesListCard: View {
 
     private func badge(_ text: Text, ink: Color, fill: AnyShapeStyle) -> some View {
         text
-            .font(.caption2.weight(.heavy))
+            .diInterfaceFont(.caption2, weight: .heavy)
             .textCase(.uppercase)
             .foregroundStyle(ink)
             .padding(.horizontal, 8)
@@ -222,7 +222,7 @@ struct PrayerAlertBell: View {
             Task { await viewModel.cycleAlertStyle(for: prayer) }
         } label: {
             Image(systemName: Self.iconName(for: style))
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(onEmerald ? Color.white : Self.iconColor(for: style))
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
@@ -266,7 +266,7 @@ struct PrayerRamadanCard: View {
                     .foregroundStyle(TodayPalette.accent)
                     .accessibilityHidden(true)
                 Text("Ramadan")
-                    .font(.title3.weight(.heavy))
+                    .diInterfaceFont(.title3, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
             }
             if let target = viewModel.ramadanCountdown {
@@ -385,7 +385,7 @@ struct PrayerTimesShortcuts: View {
                 .diInterfaceFont(.headline)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)

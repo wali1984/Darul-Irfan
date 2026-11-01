@@ -96,7 +96,7 @@ struct OnboardingLocationStep: View {
                         .foregroundStyle(DIColor.textMuted)
                         .accessibilityHidden(true)
                     Text("Location access is currently off for Darul Irfan.")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.textPrimary)
                 }
                 Text("That's completely fine — you can choose your city below instead, or allow access in the iPhone Settings app.")
@@ -107,7 +107,7 @@ struct OnboardingLocationStep: View {
                         openURL(url)
                     }
                 }
-                .font(.footnote.weight(.semibold))
+                .diInterfaceFont(.footnote, weight: .semibold)
                 .foregroundStyle(DIColor.primary)
             }
         }
@@ -184,7 +184,7 @@ struct OnboardingLocationStep: View {
                     Task { await viewModel.searchCities() }
                 } label: {
                     Image(systemName: "magnifyingglass")
-                        .font(.body.weight(.semibold))
+                        .diInterfaceFont(.body, weight: .semibold)
                         .foregroundStyle(DIColor.onPrimary)
                         .frame(width: 46, height: 46)
                         .background(DIColor.primary)
@@ -232,7 +232,7 @@ struct OnboardingLocationStep: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     Text(verbatim: place.name)
-                        .font(.subheadline.weight(.medium))
+                        .diInterfaceFont(.subheadline, weight: .medium)
                         .foregroundStyle(DIColor.textPrimary)
                     Text(verbatim: place.timeZoneIdentifier)
                         .diInterfaceFont(.caption)

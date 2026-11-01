@@ -177,7 +177,7 @@ struct MonthlyTimetableView: View {
                 viewModel.goToPreviousMonth()
             } label: {
                 Image(systemName: "chevron.backward")
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                     .foregroundStyle(DIColor.actionForeground)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -196,7 +196,7 @@ struct MonthlyTimetableView: View {
                 viewModel.goToNextMonth()
             } label: {
                 Image(systemName: "chevron.forward")
-                    .font(.body.weight(.semibold))
+                    .diInterfaceFont(.body, weight: .semibold)
                     .foregroundStyle(DIColor.actionForeground)
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
@@ -214,12 +214,12 @@ struct MonthlyTimetableView: View {
                 Grid(horizontalSpacing: DISpacing.md, verticalSpacing: DISpacing.xs) {
                     GridRow {
                         Text("Date")
-                            .font(.caption.weight(.semibold))
+                            .diInterfaceFont(.caption, weight: .semibold)
                             .foregroundStyle(DIColor.textMuted)
                             .gridColumnAlignment(.leading)
                         ForEach(Prayer.allCases) { prayer in
                             Text(LocalizedStringKey(prayer.englishName))
-                                .font(.caption.weight(.semibold))
+                                .diInterfaceFont(.caption, weight: .semibold)
                                 .foregroundStyle(DIColor.textMuted)
                         }
                     }

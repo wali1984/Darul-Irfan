@@ -93,7 +93,7 @@ struct EventDetailView: View {
                     }
                     .accessibilityHidden(true)
                     Text(viewModel.event.kind.eventDisplayNameKey)
-                        .font(.caption.weight(.semibold))
+                        .diInterfaceFont(.caption, weight: .semibold)
                         .foregroundStyle(.white)
                         .padding(.horizontal, DISpacing.sm)
                         .padding(.vertical, DISpacing.xs)
@@ -142,7 +142,7 @@ struct EventDetailView: View {
                 } icon: {
                     Image(systemName: "calendar")
                 }
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.goldGlow)
             } else {
                 Label {
@@ -150,7 +150,7 @@ struct EventDetailView: View {
                 } icon: {
                     Image(systemName: "calendar")
                 }
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.goldGlow)
             }
         } else {

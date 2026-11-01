@@ -191,7 +191,7 @@ private struct ProgrammeRow: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: title)
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -201,7 +201,7 @@ private struct ProgrammeRow: View {
             }
             Spacer(minLength: 0)
             Image(systemName: "chevron.forward")
-                .font(.caption.weight(.bold))
+                .diInterfaceFont(.caption, weight: .bold)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }
@@ -229,7 +229,7 @@ private struct EventDatesLine: View {
                 } icon: {
                     Image(systemName: "calendar")
                 }
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.primary)
             } else {
                 Label {
@@ -237,7 +237,7 @@ private struct EventDatesLine: View {
                 } icon: {
                     Image(systemName: "calendar")
                 }
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.primary)
             }
         } else {
@@ -389,10 +389,10 @@ private struct DarulIrfanHeroCard: View {
             DiscoverCaption(key: "The centre")
             HStack(spacing: 6) {
                 Text(LocalizedStringKey(place.name))
-                    .font(.title2.weight(.heavy))
+                    .diInterfaceFont(.title2, weight: .heavy)
                     .foregroundStyle(.white)
                 Image(systemName: "chevron.forward")
-                    .font(.footnote.weight(.bold))
+                    .diInterfaceFont(.footnote, weight: .bold)
                     .foregroundStyle(Color.white.opacity(0.7))
                     .accessibilityHidden(true)
             }
@@ -402,7 +402,7 @@ private struct DarulIrfanHeroCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .font(.subheadline.weight(.medium))
+            .diInterfaceFont(.subheadline, weight: .medium)
             .foregroundStyle(Color.white.opacity(0.88))
         }
         .padding(.trailing, 72)
@@ -412,7 +412,7 @@ private struct DarulIrfanHeroCard: View {
 
     private func pill(_ title: LocalizedStringKey, gold: Bool) -> some View {
         Text(title)
-            .font(.subheadline.weight(.bold))
+            .diInterfaceFont(.subheadline, weight: .bold)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, DISpacing.sm)

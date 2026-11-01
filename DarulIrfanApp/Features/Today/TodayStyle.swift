@@ -155,11 +155,11 @@ struct TodaySectionTitle: View {
     var body: some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.headline.weight(.bold))
+                .diInterfaceFont(.headline, weight: .bold)
                 .foregroundStyle(TodayPalette.accent)
                 .accessibilityHidden(true)
             Text(titleKey)
-                .font(.title3.weight(.heavy))
+                .diInterfaceFont(.title3, weight: .heavy)
                 .foregroundStyle(DIColor.textPrimary)
             Spacer(minLength: 0)
         }
@@ -189,11 +189,11 @@ struct TodayPill: View {
         HStack(spacing: 6) {
             if let systemImage {
                 Image(systemName: systemImage)
-                    .font(.footnote.weight(.bold))
+                    .diInterfaceFont(.footnote, weight: .bold)
                     .accessibilityHidden(true)
             }
             Text(titleKey)
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
         }
@@ -303,7 +303,7 @@ struct TodayOrbIcon: View {
 
     var body: some View {
         Image(systemName: systemImage)
-            .font(.subheadline.weight(.bold))
+            .diInterfaceFont(.subheadline, weight: .bold)
             .foregroundStyle(gold ? TodayGradients.onGold : Color.white)
             .frame(width: diameter, height: diameter)
             .background(

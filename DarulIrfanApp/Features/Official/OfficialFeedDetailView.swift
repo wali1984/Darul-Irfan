@@ -23,7 +23,7 @@ struct OfficialFeedDetailView: View {
 
                     HStack {
                         Label(sourceName, systemImage: sourceIcon)
-                            .font(.caption.weight(.semibold))
+                            .diInterfaceFont(.caption, weight: .semibold)
                             .foregroundStyle(DIColor.primary)
                         Spacer()
                         Text(item.publishedAt, format: .dateTime.day().month().year())

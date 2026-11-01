@@ -264,7 +264,7 @@ private struct ZikrHabitStripCard: View {
                                         .strokeBorder(DIColor.accent.opacity(0.6), lineWidth: 1)
                                         .frame(width: 36, height: 36)
                                     Text("\(day.completedCount)")
-                                        .font(.caption.weight(.bold))
+                                        .diInterfaceFont(.caption, weight: .bold)
                                         .foregroundStyle(DIColor.onPrimary)
                                 }
                             }

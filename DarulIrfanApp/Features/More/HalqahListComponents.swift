@@ -49,13 +49,13 @@ struct HalqahBrandHeader: View {
             VStack(alignment: .leading, spacing: 3) {
                 // Darul Irfan in the reader's language (دارالعرفان in Urdu), as Today shows it.
                 Text("Darul Irfan")
-                    .font(.title3.weight(.heavy))
+                    .diInterfaceFont(.title3, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                 Text(LocalizedStringKey(DIBrand.tagline))
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(HalqahInk.goldText)
                 Text("Silsila Naqshbandia Owaisiah")
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
             .multilineTextAlignment(.leading)
@@ -82,7 +82,7 @@ struct HalqahSectionLabel: View {
 
     var body: some View {
         Text(titleKey)
-            .font(.footnote.weight(.heavy))
+            .diInterfaceFont(.footnote, weight: .heavy)
             .tracking(DIBrand.readsUrdu(locale) ? 0 : 1.2)
             .textCase(.uppercase)
             .foregroundStyle(DIColor.textMuted)
@@ -136,7 +136,7 @@ struct HalqahRowTile: View {
 
     var body: some View {
         Image(systemName: systemImage)
-            .font(.footnote.weight(.semibold))
+            .diInterfaceFont(.footnote, weight: .semibold)
             .foregroundStyle(foreground)
             .flipsForRightToLeftLayoutDirection(mirrors)
             .frame(width: side, height: side)
@@ -190,7 +190,7 @@ struct HalqahListRowLabel: View {
             }
             if showsChevron {
                 Image(systemName: chevronSymbol)
-                    .font(.caption.weight(.bold))
+                    .diInterfaceFont(.caption, weight: .bold)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }
@@ -203,13 +203,13 @@ struct HalqahListRowLabel: View {
 
     private var rowTitle: some View {
         Text(titleKey)
-            .font(.subheadline.weight(.semibold))
+            .diInterfaceFont(.subheadline, weight: .semibold)
             .foregroundStyle(tint == .danger ? DIColor.danger : DIColor.textPrimary)
             .multilineTextAlignment(.leading)
     }
 
     private func rowValue(_ value: Text) -> some View {
-        value.font(.subheadline.weight(.medium))
+        value.diInterfaceFont(.subheadline, weight: .medium)
             .foregroundStyle(DIColor.textMuted)
             .multilineTextAlignment(.leading)
     }

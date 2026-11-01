@@ -109,7 +109,7 @@ struct TodayHeroView: View {
                         .font(readsUrdu ? .subheadline : .footnote).foregroundStyle(Color(hex: 0xFFFDF4).opacity(0.96))
                     Spacer(minLength: 0)
                     Text(date, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone))
-                        .font(.headline.weight(.medium)).monospacedDigit().foregroundStyle(Color(hex: 0xF7F6ED))
+                        .diInterfaceFont(.headline, weight: .medium).monospacedDigit().foregroundStyle(Color(hex: 0xF7F6ED))
                 }
                 HStack(spacing: 12) {
                     NavigationLink {
@@ -134,7 +134,7 @@ struct TodayHeroView: View {
 
     private func nextPrayerRow(_ next: NextPrayerInfo, now: Date) -> some View {
         VStack(spacing: 8) {
-            Text("Next prayer").font(.footnote.weight(.medium)).foregroundStyle(.white.opacity(0.82))
+            Text("Next prayer").diInterfaceFont(.footnote, weight: .medium).foregroundStyle(.white.opacity(0.82))
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 10) { prayerName(next); prayerTime(next) }
                 VStack(spacing: 4) { prayerName(next); prayerTime(next) }
@@ -155,7 +155,7 @@ struct TodayHeroView: View {
         Text(LocalizedStringKey(next.prayer.englishName)).font(.system(size: readsUrdu ? prayerNameSize * (30.0 / 28.0) : prayerNameSize, weight: .semibold)).foregroundStyle(.white)
     }
     private func prayerTime(_ next: NextPrayerInfo) -> some View {
-        Text(next.time, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).font(.callout.weight(.medium)).monospacedDigit().foregroundStyle(Color(hex: 0xE9CE86))
+        Text(next.time, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).diInterfaceFont(.callout, weight: .medium).monospacedDigit().foregroundStyle(Color(hex: 0xE9CE86))
     }
 
     /// The live countdown to the next prayer; in Ramadan, to the end of
@@ -172,7 +172,7 @@ struct TodayHeroView: View {
                         Text("Iftar in")
                     }
                 }
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 timer(to: ramadan.time, now: now)
             } else {
                 timer(to: time, now: now)
@@ -242,7 +242,7 @@ struct TodayHeroView: View {
                 Text("\(count) of 5 prayed")
             }
         }
-        .font(.caption.weight(.medium))
+        .diInterfaceFont(.caption, weight: .medium)
         .foregroundStyle(.white.opacity(0.85))
         .fixedSize(horizontal: false, vertical: true)
     }
@@ -256,7 +256,7 @@ struct TodayHeroView: View {
             HStack(spacing: 4) {
                 Text("All times and alerts")
                 Image(systemName: "chevron.forward")
-                    .font(.caption2.weight(.bold))
+                    .diInterfaceFont(.caption2, weight: .bold)
                     .accessibilityHidden(true)
             }
             .font(readsUrdu ? .subheadline.weight(.semibold) : .footnote.weight(.semibold))
@@ -376,7 +376,7 @@ struct TodayHeroLocationPrompt: View {
                         Text("Use My Current Location")
                     }
                 }
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(TodayGradients.onGold)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .background(TodayGradients.gold, in: Capsule())

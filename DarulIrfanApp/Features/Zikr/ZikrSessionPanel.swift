@@ -39,7 +39,7 @@ struct ZikrSessionPanel: View {
             header(window: window, now: now)
             if let window {
                 Text(verbatim: ZikrTimeLine.text(for: window.start, session: session, locale: locale))
-                    .font(.footnote.weight(.medium))
+                    .diInterfaceFont(.footnote, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -52,7 +52,7 @@ struct ZikrSessionPanel: View {
             }
             if let room {
                 Label("Live on Paltalk now · \(room.listeners) listening", systemImage: "person.3.fill")
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.primary)
             }
             HStack(spacing: 10) {
@@ -73,10 +73,10 @@ struct ZikrSessionPanel: View {
             orb
             VStack(alignment: .leading, spacing: 1) {
                 Text(verbatim: session.displayTitle(urdu: inUrdu))
-                    .font(.headline.weight(.heavy))
+                    .diInterfaceFont(.headline, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                 Text(verbatim: ZikrSessionJoin.subtitle(for: session))
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -85,7 +85,7 @@ struct ZikrSessionPanel: View {
                 let active = window.isActive(at: now)
                 VStack(alignment: .trailing, spacing: 1) {
                     Text(active ? "Zikr in progress" : "Zikr begins in")
-                        .font(.caption2.weight(.semibold))
+                        .diInterfaceFont(.caption2, weight: .semibold)
                         .foregroundStyle(DIColor.textMuted)
                         .multilineTextAlignment(.trailing)
                     Text(active ? window.end : window.start, style: .timer)
@@ -103,7 +103,7 @@ struct ZikrSessionPanel: View {
     /// one for any other session.
     private var orb: some View {
         Image(systemName: joinsOnPaltalk ? "moon.fill" : "sparkles")
-            .font(.body.weight(.semibold))
+            .diInterfaceFont(.body, weight: .semibold)
             .foregroundStyle(DIColor.goldGlow)
             .frame(width: 42, height: 42)
             .background(
@@ -140,7 +140,7 @@ struct ZikrSessionPanel: View {
         } label: {
             Label(joinsOnPaltalk ? "Join Zikr on Paltalk" : "Join Zikr on YouTube",
                   systemImage: joinsOnPaltalk ? "headphones" : "play.rectangle.fill")
-                .font(.subheadline.weight(.bold))
+                .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(available ? Color.white : DIColor.textMuted)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .background { joinFill(available) }
@@ -180,7 +180,7 @@ struct ZikrSessionPanel: View {
             reminder.wrappedValue = !reminder.wrappedValue
         } label: {
             Image(systemName: isOn ? "bell.fill" : "bell")
-                .font(.body.weight(.semibold))
+                .diInterfaceFont(.body, weight: .semibold)
                 .foregroundStyle(isOn ? DIColor.accent : DIColor.textMuted)
                 .frame(width: 44, height: 44)
                 .background(Circle().fill(DIColor.accent.opacity(0.14)))

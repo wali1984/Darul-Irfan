@@ -89,7 +89,7 @@ private struct PrivacyChoicesCard: View {
                     }
                 )) {
                     Text("Next-prayer Live Activity")
-                        .font(.subheadline.weight(.semibold))
+                        .diInterfaceFont(.subheadline, weight: .semibold)
                         .foregroundStyle(DIColor.textPrimary)
                 }
                 .tint(DIColor.primary)
@@ -98,7 +98,7 @@ private struct PrivacyChoicesCard: View {
                     Divider()
                     HStack(spacing: DISpacing.sm) {
                         Text("Share diagnostics")
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(DIColor.textPrimary)
                         Spacer(minLength: DISpacing.sm)
                         Picker("Share diagnostics", selection: Binding(
@@ -138,7 +138,7 @@ private struct PrivacyCard: View {
                     ZStack {
                         Circle().fill(DIColor.accent.opacity(0.14))
                         Image(systemName: systemImage)
-                            .font(.subheadline.weight(.semibold))
+                            .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(DIColor.accent)
                     }
                     .frame(width: 32, height: 32)

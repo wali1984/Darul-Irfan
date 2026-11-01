@@ -124,7 +124,7 @@ struct MiniPlayerBar: View {
         ZStack {
             Circle().fill(isLiveStream ? MediaStyle.crimson : DIGradient.emerald)
             Image(systemName: isLiveStream ? "dot.radiowaves.left.and.right" : "waveform")
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(.white)
         }
         .frame(width: 34, height: 34)
@@ -138,7 +138,7 @@ struct MiniPlayerBar: View {
         } label: {
             VStack(alignment: .leading, spacing: 2) {
                 Text(nowPlaying.title)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.tail)
@@ -171,7 +171,7 @@ struct MiniPlayerBar: View {
     ) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.textPrimary)
                 .frame(width: 44, height: 44)
         }

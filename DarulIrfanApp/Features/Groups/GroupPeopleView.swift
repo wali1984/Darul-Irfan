@@ -152,7 +152,7 @@ struct GroupPeopleView: View {
         } icon: {
             Image(systemName: role.badgeSymbol)
         }
-        .font(.caption2.weight(.bold))
+        .diInterfaceFont(.caption2, weight: .bold)
         .foregroundStyle(DIColor.primary)
         .padding(.horizontal, DISpacing.sm)
         .padding(.vertical, 2)

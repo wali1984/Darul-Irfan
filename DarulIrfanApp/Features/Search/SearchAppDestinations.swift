@@ -225,7 +225,7 @@ struct SearchAppDestinationRow: View {
         DIElevatedCard(padding: DISpacing.md) {
             HStack(spacing: DISpacing.md) {
                 Image(systemName: destination.systemImage)
-                    .font(.subheadline.weight(.semibold))
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(Color.white)
                     .frame(width: 34, height: 34)
                     .background(Circle().fill(DiscoverStyle.orb(gold: false)))
@@ -240,7 +240,7 @@ struct SearchAppDestinationRow: View {
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
-                    .font(.footnote.weight(.semibold))
+                    .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }

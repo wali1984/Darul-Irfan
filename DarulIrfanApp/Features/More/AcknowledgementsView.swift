@@ -134,7 +134,7 @@ struct AcknowledgementsView: View {
     private func ackHeader(_ titleKey: LocalizedStringKey, systemImage: String) -> some View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: systemImage)
-                .font(.subheadline.weight(.semibold))
+                .diInterfaceFont(.subheadline, weight: .semibold)
                 .foregroundStyle(DIColor.accent)
                 .accessibilityHidden(true)
             Text(titleKey)

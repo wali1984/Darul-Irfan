@@ -115,18 +115,18 @@ struct HadithHomeView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     ReadCaps("Continue")
                     Text(verbatim: resume.book.title(languageCode: languageCode))
-                        .font(.headline.weight(.heavy))
+                        .diInterfaceFont(.headline, weight: .heavy)
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                     if let number = resume.number {
                         Text("Hadith \(number)")
-                            .font(.footnote.weight(.medium))
+                            .diInterfaceFont(.footnote, weight: .medium)
                             .foregroundStyle(DIColor.textMuted)
                     }
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
-                    .font(.caption.weight(.semibold))
+                    .diInterfaceFont(.caption, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
             }
@@ -177,11 +177,11 @@ struct HadithHomeView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: book.title(languageCode: languageCode))
-                    .font(.subheadline.weight(.bold))
+                    .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
                 Text("\(book.hadithCount) hadith")
-                    .font(.caption.weight(.medium))
+                    .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             }
             Spacer(minLength: DISpacing.sm)
@@ -189,7 +189,7 @@ struct HadithHomeView: View {
                 DIPillBadge(text: note, color: ReadPalette.madinahInk)
             }
             Image(systemName: "chevron.forward")
-                .font(.caption.weight(.semibold))
+                .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
                 .accessibilityHidden(true)
         }
@@ -208,11 +208,11 @@ struct HadithHomeView: View {
                 Text("Show all \(count)")
             }
             Image(systemName: expanded ? "chevron.up" : "chevron.down")
-                .font(.caption.weight(.bold))
+                .diInterfaceFont(.caption, weight: .bold)
                 .accessibilityHidden(true)
             Spacer(minLength: 0)
         }
-        .font(.subheadline.weight(.bold))
+        .diInterfaceFont(.subheadline, weight: .bold)
         .foregroundStyle(ReadPalette.emeraldInk)
         .padding(.horizontal, 12)
         .frame(minHeight: 44)
