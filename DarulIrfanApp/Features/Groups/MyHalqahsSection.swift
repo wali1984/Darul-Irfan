@@ -262,8 +262,8 @@ struct MyHalqahsSection: View {
             // How the member is known to the Halqah's admins, in the
             // attendance and in the meeting room; Apple gives no name to
             // someone who joins by code.
-            TextField("Your name", text: $joinName)
-                .textFieldStyle(.roundedBorder)
+            TextField("Your name", text: $joinName, prompt: Text("Your name").foregroundStyle(DIColor.textMuted))
+                .textFieldStyle(DIFormFieldStyle())
                 .textContentType(.name)
                 .submitLabel(.next)
                 .onSubmit { isCodeFocused = true }
@@ -276,7 +276,7 @@ struct MyHalqahsSection: View {
             // administrator's decision.
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 TextField("Invitation code", text: $inviteCode, prompt: Text("Invitation code").foregroundStyle(DIColor.textMuted))
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(DIFormFieldStyle())
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
                     .focused($isCodeFocused)
@@ -604,7 +604,7 @@ struct MyHalqahsSection: View {
             if isAddingCode {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
                     TextField("Invitation code", text: $inviteCode, prompt: Text("Invitation code").foregroundStyle(DIColor.textMuted))
-                        .textFieldStyle(.roundedBorder)
+                        .textFieldStyle(DIFormFieldStyle())
                         .accessibilityLabel("Invitation code")
                         .textInputAutocapitalization(.characters)
                         .autocorrectionDisabled()

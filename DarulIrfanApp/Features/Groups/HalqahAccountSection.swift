@@ -82,9 +82,9 @@ struct HalqahNameEditor: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    TextField("Your name", text: $draft)
+                    TextField("Your name", text: $draft, prompt: Text("Your name").foregroundStyle(DIColor.textMuted))
                         .diInterfaceFont(.body)
-                        .textFieldStyle(.roundedBorder)
+                        .textFieldStyle(DIFormFieldStyle())
                         .textContentType(.name)
                         .submitLabel(.done)
                         .onSubmit(save)

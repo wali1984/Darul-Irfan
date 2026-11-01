@@ -150,3 +150,20 @@ struct PrayerCountdownRing: View {
         }
     }
 }
+
+/// Standalone form entry that shares the app's cream/dark surface and gold edge.
+struct DIFormFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .textFieldStyle(.plain)
+            .diInterfaceFont(.body)
+            .foregroundStyle(DIColor.textPrimary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .frame(minHeight: 48)
+            .background(DIColor.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(DIColor.accent.opacity(0.3), lineWidth: 1))
+            .shadow(color: Color.black.opacity(0.06), radius: 8, y: 4)
+    }
+}
