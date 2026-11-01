@@ -275,7 +275,7 @@ struct MyHalqahsSection: View {
             // so it works the same on every platform, and admission stays an
             // administrator's decision.
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                TextField("Invitation code", text: $inviteCode)
+                TextField("Invitation code", text: $inviteCode, prompt: Text("Invitation code").foregroundStyle(DIColor.textMuted))
                     .textFieldStyle(.roundedBorder)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
@@ -587,12 +587,12 @@ struct MyHalqahsSection: View {
                 HStack(spacing: 12) {
                     Image(systemName: isAddingCode ? "minus" : "plus")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                         .frame(width: 24)
                         .accessibilityHidden(true)
                     Text("Have another invitation code?")
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 0)
                 }
@@ -603,8 +603,9 @@ struct MyHalqahsSection: View {
             .accessibilityValue(isAddingCode ? Text("Expanded") : Text("Collapsed"))
             if isAddingCode {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    TextField("Invitation code", text: $inviteCode)
+                    TextField("Invitation code", text: $inviteCode, prompt: Text("Invitation code").foregroundStyle(DIColor.textMuted))
                         .textFieldStyle(.roundedBorder)
+                        .accessibilityLabel("Invitation code")
                         .textInputAutocapitalization(.characters)
                         .autocorrectionDisabled()
                         .submitLabel(.join)
@@ -614,7 +615,7 @@ struct MyHalqahsSection: View {
                         if model.isRedeeming { ProgressView() } else { Text("Join") }
                     }
                     .buttonStyle(DISecondaryButtonStyle())
-                    .tint(DIColor.primary)
+                    .tint(DIColor.actionForeground)
                     .disabled(inviteCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.isRedeeming)
                 }
                 if let inviteError = model.inviteError {
