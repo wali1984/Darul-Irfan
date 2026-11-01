@@ -6,6 +6,7 @@ import SwiftUI
 /// segmented control.
 struct SurahReaderView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
     private let appState: AppState
     private let onRequestNextSurah: () -> Void
     private let initialFocusAyah: Int?
@@ -297,12 +298,18 @@ struct SurahReaderView: View {
         .onChange(of: isOnScreen) { _, visible in
             if visible { followPlayingAyah() }
         }
+        .onChange(of: scenePhase) { _, phase in
+            // Background audio can advance while SwiftUI is not laying out
+            // the reader. Catch up even if the ayah has not changed again.
+            if phase == .active { followPlayingAyah() }
+        }
     }
 
     /// Resume and returning to the reader may keep the same ayah identity.
     /// Follow those transitions too, rather than waiting for the next verse.
     private func followPlayingAyah() {
-        guard isOnScreen, let current = player.current, player.isPlaying else { return }
+        guard isOnScreen, scenePhase == .active,
+              let current = player.current, player.isPlaying else { return }
         if current.surah == viewModel.surah.id {
             withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.35)) {
                 topAyah = current.ayah
