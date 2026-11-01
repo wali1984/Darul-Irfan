@@ -128,6 +128,8 @@ struct LibraryTabView: View {
             }
             .refreshable {
                 await viewModel.reloadHome()
+                guard !Task.isCancelled else { return }
+                await refreshLastBook()
             }
         }
     }
