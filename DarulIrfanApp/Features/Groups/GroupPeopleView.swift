@@ -248,6 +248,7 @@ struct AddGroupPersonView: View {
     @State private var working = false
     @State private var error: String?
     @State private var result: AddPersonResult?
+    @State private var submittedEmail = ""
     @State private var copied = false
     @State private var linkFailed = false
 
@@ -366,11 +367,13 @@ struct AddGroupPersonView: View {
     private func save() async {
         guard !working, canSave else { return }
         working = true
+        let requestEmail = method == .email ? email.trimmingCharacters(in: .whitespaces) : nil
+        submittedEmail = requestEmail ?? ""
         defer { working = false }
         do {
             result = try await service.addPerson(
                 to: groupID,
-                email: method == .email ? email.trimmingCharacters(in: .whitespaces) : nil,
+                email: requestEmail,
                 phone: method == .phone ? phone : nil,
                 role: role,
                 codeDays: days
@@ -389,7 +392,7 @@ struct AddGroupPersonView: View {
         case "added":
             Section {
                 Label {
-                    Text("\(result.name ?? email) is now in \(groupName).")
+                    Text("\(result.name ?? submittedEmail) is now in \(groupName).")
                 } icon: {
                     Image(systemName: "checkmark.circle.fill").foregroundStyle(DIColor.primary)
                 }
@@ -397,7 +400,7 @@ struct AddGroupPersonView: View {
         case "pending":
             Section {
                 Label {
-                    Text("\(email) will be added to \(groupName) when they sign in using this email.")
+                    Text("\(submittedEmail) will be added to \(groupName) when they sign in using this email.")
                 } icon: {
                     Image(systemName: "clock.badge.checkmark").foregroundStyle(DIColor.primary)
                 }
@@ -412,6 +415,7 @@ struct AddGroupPersonView: View {
         Section {
             Button {
                 self.result = nil
+                submittedEmail = ""
                 email = ""
                 phone = ""
                 copied = false
