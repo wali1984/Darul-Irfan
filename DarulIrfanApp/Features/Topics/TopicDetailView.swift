@@ -13,6 +13,8 @@ struct TopicDetailView: View {
     @State private var showsAllVerses = false
     @State private var showsAllHadith = false
     @State private var video: TopicVideo?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private static let previewCount = 6
 
@@ -76,7 +78,8 @@ struct TopicDetailView: View {
     private func showAllButton(total: Int, expanded: Binding<Bool>) -> some View {
         if total > Self.previewCount {
             Button {
-                withAnimation { expanded.wrappedValue.toggle() }
+                if reduceMotion { expanded.wrappedValue.toggle() }
+                else { withAnimation { expanded.wrappedValue.toggle() } }
             } label: {
                 if expanded.wrappedValue {
                     Label("Show fewer", systemImage: "chevron.up")
@@ -85,7 +88,7 @@ struct TopicDetailView: View {
                 }
             }
             .font(.subheadline.weight(.semibold))
-            .buttonStyle(.bordered)
+            .buttonStyle(DICompactButtonStyle())
             .frame(maxWidth: .infinity)
         }
     }
@@ -102,13 +105,12 @@ struct TopicDetailView: View {
                     Rectangle().fill(DIColor.accent).frame(height: 1).opacity(0.4)
                     TopicTranslationText(text: translation)
                 }
-                HStack {
+                AnyLayout(dynamicTypeSize >= .xxLarge ? AnyLayout(VStackLayout(alignment: .leading, spacing: DISpacing.sm)) : AnyLayout(HStackLayout(spacing: DISpacing.sm))) {
                     Text(verbatim: verse.reference.replacingOccurrences(
                         of: "[0-9]+:[0-9]+(?:-[0-9]+)?", with: "\u{2066}$0\u{2069}", options: .regularExpression
                     ))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIColor.actionForeground)
-                    Spacer()
                     Button {
                         DIHaptics.soft()
                         DeepLinkRouter.shared.open(.quranAyah(surah: verse.surah, ayah: verse.ayah))
@@ -116,7 +118,7 @@ struct TopicDetailView: View {
                         Label("Open in the Quran", systemImage: "book.closed")
                             .font(.caption.weight(.semibold))
                     }
-                    .buttonStyle(.borderless)
+                    .buttonStyle(DICompactButtonStyle())
                     .tint(DIColor.actionForeground)
                 }
             }
@@ -137,14 +139,14 @@ struct TopicDetailView: View {
             } label: {
                 relatedLabel(item)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
         default:
             Button {
                 Task { await play(item) }
             } label: {
                 relatedLabel(item)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DIPressableStyle())
         }
     }
 
@@ -235,6 +237,8 @@ private struct TopicHadithCard: View {
     let appState: AppState
     let books: [String: HadithBook]
     @State private var expanded = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var isUrdu: Bool { appState.settings.language.contentLanguageCode == "ur" }
 
@@ -257,16 +261,16 @@ private struct TopicHadithCard: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .environment(\.layoutDirection, .rightToLeft)
                 }
-                HStack(spacing: DISpacing.sm) {
+                AnyLayout(dynamicTypeSize >= .xxLarge ? AnyLayout(VStackLayout(alignment: .leading, spacing: DISpacing.sm)) : AnyLayout(HStackLayout(spacing: DISpacing.sm))) {
                     Text(verbatim: reference)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIColor.actionForeground)
-                    Spacer()
                     Button(expanded ? "Show less" : "Read more") {
-                        withAnimation { expanded.toggle() }
+                        if reduceMotion { expanded.toggle() }
+                        else { withAnimation { expanded.toggle() } }
                     }
                     .font(.caption.weight(.semibold))
-                    .buttonStyle(.borderless)
+                    .buttonStyle(DICompactButtonStyle())
                     .tint(DIColor.actionForeground)
                     if let book = books[item.bookID] {
                         NavigationLink {
@@ -280,7 +284,7 @@ private struct TopicHadithCard: View {
                             Label("Open", systemImage: "arrow.up.forward.square")
                                 .font(.caption.weight(.semibold))
                         }
-                        .buttonStyle(.borderless)
+                        .buttonStyle(DICompactButtonStyle())
                     .tint(DIColor.actionForeground)
                     }
                 }
