@@ -174,7 +174,8 @@ struct LocationSettingsView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(DIColor.textMuted)
                     .accessibilityHidden(true)
-                TextField("Search for a city", text: $viewModel.query)
+                TextField("Search for a city", text: $viewModel.query,
+                          prompt: Text("Search for a city").foregroundStyle(DIColor.textMuted))
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
                     .submitLabel(.search)
