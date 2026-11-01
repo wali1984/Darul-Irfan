@@ -3,6 +3,32 @@ import XCTest
 @testable import DarulIrfan
 
 final class DailyMediaTransportTests: XCTestCase {
+    func testOldUploadAndUpdateResponsesAreDiscardedAfterAccountChange() async {
+        for upload in [false, true] {
+            let config = URLSessionConfiguration.ephemeral
+            config.protocolClasses = [DailyMediaProtocol.self]
+            let transport = URLSession(configuration: config)
+            defer { transport.invalidateAndCancel() }
+            let store = MemoryMemberSession()
+            let service = MemberGroupService(baseURL: URL(string: "https://daily-media.invalid")!,
+                session: transport, uploads: transport, savedSession: store)
+            DailyMediaProtocol.reset(statuses: [upload ? 201 : 200], beforeResponse: {
+                store.save(.init(token: "replacement", expiresAt: .distantFuture, memberID: "new-member"))
+            })
+            do {
+                if upload {
+                    try await service.uploadDailyMedia(Data([1, 2, 3]), contentType: "image/jpeg", slot: .quote, day: "2026-11-01",
+                        endDay: nil, caption: nil, popup: false, publish: false)
+                } else {
+                    try await service.updateDailyMedia("fixture", ["status": "hidden"])
+                }
+                XCTFail("Old successful mutation must not update the new account UI")
+            } catch is CancellationError { }
+            catch { XCTFail("Unexpected error: \(error)") }
+            XCTAssertEqual(store.load()?.token, "replacement")
+        }
+    }
+
     func testUploadRetryExpiredSessionAndManagementPayloads() async throws {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [DailyMediaProtocol.self]
@@ -83,9 +109,10 @@ private final class DailyMediaProtocol: URLProtocol {
     private static var captured: [Captured] = []
     private static var statuses: [Int] = []
     static var requests: [Captured] { lock.lock(); defer { lock.unlock() }; return captured }
-    static func reset(statuses: [Int]) {
+    private static var beforeResponse: (() -> Void)?
+    static func reset(statuses: [Int], beforeResponse: (() -> Void)? = nil) {
         lock.lock(); defer { lock.unlock() }
-        captured = []; self.statuses = statuses
+        captured = []; self.statuses = statuses; self.beforeResponse = beforeResponse
     }
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -103,7 +130,9 @@ private final class DailyMediaProtocol: URLProtocol {
         Self.lock.lock()
         Self.captured.append(Captured(request: request, body: body))
         let status = Self.statuses.isEmpty ? 500 : Self.statuses.removeFirst()
+        let callback = Self.beforeResponse
         Self.lock.unlock()
+        callback?()
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data("{\"error\":\"Try again later\"}".utf8))

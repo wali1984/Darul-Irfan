@@ -280,6 +280,7 @@ actor MemberGroupService {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
+        guard savedSession.load()?.token == saved.token else { throw CancellationError() }
         guard code == 201 else {
             let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? String
             throw message.map(MemberGroupError.server) ?? MemberGroupError.requestFailed
@@ -362,6 +363,7 @@ actor MemberGroupService {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
+        guard savedSession.load()?.token == saved.token else { throw CancellationError() }
         let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         guard code == 201, let key = body?["key"] as? String else {
             throw (body?["error"] as? String).map(MemberGroupError.server) ?? MemberGroupError.requestFailed
@@ -411,6 +413,7 @@ actor MemberGroupService {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
+        guard savedSession.load()?.token == saved.token else { throw CancellationError() }
         guard code == 201 else {
             let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? String
             throw message.map(MemberGroupError.server) ?? MemberGroupError.requestFailed
@@ -497,6 +500,7 @@ actor MemberGroupService {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
+        guard savedSession.load()?.token == saved.token else { throw CancellationError() }
         guard codes.contains(code) else {
             // The server's own plain message ("The meeting room opens ten
             // minutes before it starts.") is what the person should read.
@@ -542,6 +546,7 @@ actor MemberGroupService {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             throw MemberGroupError.notSignedIn
         }
+        guard savedSession.load()?.token == saved.token else { throw CancellationError() }
         guard code == 200, let value = try? decoder.decode(type, from: data) else {
             throw MemberGroupError.requestFailed
         }

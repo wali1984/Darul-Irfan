@@ -4,6 +4,27 @@ import XCTest
 
 @MainActor
 final class GroupsRefreshRaceTests: XCTestCase {
+    func testOldSuccessfulRefreshCannotPopulateReplacementAccount() async {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [GroupsRaceProtocol.self]
+        let transport = URLSession(configuration: config)
+        defer { transport.invalidateAndCancel() }
+        let store = GroupsRaceSession()
+        let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+            session: transport, uploads: transport, savedSession: store)
+        let model = GroupsModel(service: service)
+        let pending = expectation(description: "Old successful groups response held")
+        GroupsRaceProtocol.configure { pending.fulfill() }
+        let older = Task { await model.refresh() }
+        await fulfillment(of: [pending], timeout: 5)
+        store.save(.init(token: "replacement", expiresAt: .distantFuture, memberID: "new-member"))
+        GroupsRaceProtocol.releaseOlder(status: 200)
+        await older.value
+        XCTAssertEqual(store.load()?.token, "replacement")
+        XCTAssertNotEqual(model.role, .superadmin)
+        XCTAssertNotEqual(model.signedIn, 1)
+    }
+
     func testDelayedSignOutPreservesReplacementSessionAndModel() async {
         for status in [204, 401, 503] {
             let config = URLSessionConfiguration.ephemeral
