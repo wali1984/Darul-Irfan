@@ -811,20 +811,20 @@ struct LibraryDownloadRow: View {
     }
 
     var body: some View {
-        HStack(spacing: DISpacing.sm) {
-            Image(systemName: "doc")
-                .diInterfaceFont(.title3)
-                .foregroundStyle(DIColor.primary)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: fileName)
-                    .diInterfaceFont(.subheadline, weight: .medium)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .lineLimit(2)
-                subtitle
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            HStack(spacing: DISpacing.sm) {
+                Image(systemName: "doc")
+                    .diInterfaceFont(.title3)
+                    .foregroundStyle(DIColor.actionForeground)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    LibraryCatalogueText(text: fileName, latinFont: .subheadline, bold: true, urduScale: 0.8)
+                        .foregroundStyle(DIColor.textPrimary)
+                    subtitle
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            Spacer(minLength: DISpacing.sm)
-            trailingControls
+            trailingControls.frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.vertical, DISpacing.sm)
     }
@@ -868,7 +868,7 @@ struct LibraryDownloadRow: View {
             } label: {
                 Image(systemName: "arrow.down.circle")
                     .diInterfaceFont(.title3)
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
             }
             .buttonStyle(LibraryFileActionStyle())
             .accessibilityLabel(Text("Download file"))
@@ -905,9 +905,9 @@ struct LibraryDownloadRow: View {
                 } label: {
                     Text("Open PDF")
                         .diInterfaceFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(DIColor.primary)
+                        .foregroundStyle(DIColor.actionForeground)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DICompactButtonStyle())
                 Button(role: .destructive) {
                     Task {
                         await viewModel.deleteDownload(urlString: urlString)
@@ -928,9 +928,9 @@ struct LibraryDownloadRow: View {
             } label: {
                 Text("Try Again")
                     .diInterfaceFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(DIColor.primary)
+                    .foregroundStyle(DIColor.actionForeground)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DICompactButtonStyle())
             .accessibilityLabel(Text("Try downloading again"))
         }
     }
@@ -1015,20 +1015,8 @@ struct BookKeepOfflineRow: View {
             } label: {
                 Text("Download")
                     .diInterfaceFont(.footnote, weight: .bold)
-                    .foregroundStyle(Color.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 7)
-                    .background(
-                        Capsule().fill(
-                            LinearGradient(
-                                colors: [Color(hex: 0x13A06F), Color(hex: 0x0B7250)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                    )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DICompactButtonStyle())
             .accessibilityLabel(Text("Download file"))
         case .downloading:
             TimelineView(.periodic(from: .now, by: 0.5)) { _ in
@@ -1059,9 +1047,9 @@ struct BookKeepOfflineRow: View {
                 } label: {
                     Text("Open PDF")
                         .diInterfaceFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(ReadPalette.emeraldInk)
+                        .foregroundStyle(DIColor.actionForeground)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DICompactButtonStyle())
                 Button(role: .destructive) {
                     Task {
                         await viewModel.deleteDownload(urlString: urlString)
@@ -1082,9 +1070,9 @@ struct BookKeepOfflineRow: View {
             } label: {
                 Text("Try Again")
                     .diInterfaceFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(ReadPalette.emeraldInk)
+                    .foregroundStyle(DIColor.actionForeground)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DICompactButtonStyle())
             .accessibilityLabel(Text("Try downloading again"))
         }
     }

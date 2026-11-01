@@ -241,7 +241,7 @@ struct ContentItemRow: View {
 
 }
 
-private struct LibraryCatalogueText: View {
+struct LibraryCatalogueText: View {
     let text: String
     let latinFont: Font
     var bold = false
