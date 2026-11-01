@@ -92,6 +92,7 @@ final class RedesignScreenshotTests: XCTestCase {
             return
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "practice" {
+            shot("today-typography")
             practiceTour()
             return
         }

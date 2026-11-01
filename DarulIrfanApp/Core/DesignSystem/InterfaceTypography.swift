@@ -6,13 +6,16 @@ private struct DIInterfaceTypography: ViewModifier {
     let style: Font.TextStyle
     let weight: Font.Weight?
     let design: Font.Design
+    /// Already scaled by the caller's ScaledMetric; do not scale twice.
+    let scaledSize: CGFloat?
     @Environment(\.locale) private var locale
     @AppStorage(AppFonts.nastaliqPreferenceKey) private var nastaliq = true
 
     private var font: Font {
         guard locale.language.languageCode?.identifier == "ur", nastaliq,
               let name = AppFonts.appleNastaliqName else {
-            let base = Font.system(style, design: design)
+            let base = scaledSize.map { Font.system(size: $0, design: design) }
+                ?? Font.system(style, design: design)
             return weight.map { base.weight($0) } ?? base
         }
         let uiStyle: UIFont.TextStyle
@@ -32,7 +35,8 @@ private struct DIInterfaceTypography: ViewModifier {
         // Use the standard point size here; Font.custom applies Dynamic Type once.
         let size = UIFont.preferredFont(forTextStyle: uiStyle,
             compatibleWith: UITraitCollection(preferredContentSizeCategory: .large)).pointSize
-        let result = Font.custom(name, size: size, relativeTo: style)
+        let result = scaledSize.map { Font.custom(name, fixedSize: $0) }
+            ?? Font.custom(name, size: size, relativeTo: style)
         if let weight { return result.weight(weight) }
         return style == .headline ? result.weight(.semibold) : result
     }
@@ -42,7 +46,7 @@ private struct DIInterfaceTypography: ViewModifier {
 
 extension View {
     func diInterfaceFont(_ style: Font.TextStyle, weight: Font.Weight? = nil,
-                         design: Font.Design = .default) -> some View {
-        modifier(DIInterfaceTypography(style: style, weight: weight, design: design))
+                         design: Font.Design = .default, scaledSize: CGFloat? = nil) -> some View {
+        modifier(DIInterfaceTypography(style: style, weight: weight, design: design, scaledSize: scaledSize))
     }
 }

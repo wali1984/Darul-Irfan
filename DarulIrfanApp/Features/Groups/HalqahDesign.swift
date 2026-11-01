@@ -841,7 +841,7 @@ struct HalqahMonogram: View {
 
     var body: some View {
         Text(verbatim: initial)
-            .font(.system(.title3, design: .serif).weight(.bold))
+            .diInterfaceFont(.title3, weight: .bold, design: .serif)
             .foregroundStyle(DIColor.onPrimary)
             .frame(width: side, height: side)
             .background(DIOctagram(innerRatio: 0.72).fill(DIGradient.emerald))

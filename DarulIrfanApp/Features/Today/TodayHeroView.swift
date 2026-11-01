@@ -93,12 +93,12 @@ struct TodayHeroView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("DARUL IRFAN")
-                        .font(readsUrdu ? .system(size: urduWordmarkSize, weight: .bold) : .footnote.weight(.bold))
+                        .diInterfaceFont(.footnote, weight: .bold, scaledSize: readsUrdu ? urduWordmarkSize : nil)
                         .tracking(readsUrdu ? 0 : 2.4)
                         .foregroundStyle(Color(hex: 0xFFE3A0))
                         .shadow(color: Color(hex: 0xFFE3A0).opacity(0.35), radius: 3)
                     Text(LocalizedStringKey(DIGradient.greeting(for: date, timeZone: timeZone)))
-                        .font(readsUrdu ? .callout : .subheadline).foregroundStyle(Color(hex: 0xF7F6ED).opacity(0.9))
+                        .diInterfaceFont(readsUrdu ? .callout : .subheadline).foregroundStyle(Color(hex: 0xF7F6ED).opacity(0.9))
                 }
                 Spacer(minLength: 0)
                 DILivingSealMark(diameter: dynamicTypeSize.isAccessibilitySize ? 52 : 68).accessibilityHidden(true)
@@ -106,7 +106,7 @@ struct TodayHeroView: View {
             VStack(spacing: 2) {
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
                     Text(verbatim: viewModel.gregorianShortText)
-                        .font(readsUrdu ? .subheadline : .footnote).foregroundStyle(Color(hex: 0xFFFDF4).opacity(0.96))
+                        .diInterfaceFont(readsUrdu ? .subheadline : .footnote).foregroundStyle(Color(hex: 0xFFFDF4).opacity(0.96))
                     Spacer(minLength: 0)
                     Text(date, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone))
                         .diInterfaceFont(.headline, weight: .medium).monospacedDigit().foregroundStyle(Color(hex: 0xF7F6ED))
@@ -116,7 +116,7 @@ struct TodayHeroView: View {
                         HijriSettingsView(dependencies: dependencies, appState: appState)
                     } label: {
                         HStack(spacing: 5) {
-                            Text(verbatim: viewModel.hijriDateText).font(readsUrdu ? .subheadline.weight(.medium) : .caption.weight(.medium))
+                            Text(verbatim: viewModel.hijriDateText).diInterfaceFont(readsUrdu ? .subheadline : .caption, weight: .medium)
                             Image(systemName: "pencil").font(.system(size: 11)).foregroundStyle(Color(hex: 0xE9CE86).opacity(0.65))
                         }
                         .foregroundStyle(Color(hex: 0xE9CE86))
@@ -152,7 +152,9 @@ struct TodayHeroView: View {
         .frame(maxWidth: .infinity).padding(.vertical, 6)
     }
     private func prayerName(_ next: NextPrayerInfo) -> some View {
-        Text(LocalizedStringKey(next.prayer.englishName)).font(.system(size: readsUrdu ? prayerNameSize * (30.0 / 28.0) : prayerNameSize, weight: .semibold)).foregroundStyle(.white)
+        Text(LocalizedStringKey(next.prayer.englishName))
+            .diInterfaceFont(.largeTitle, weight: .semibold, scaledSize: readsUrdu ? prayerNameSize * (30.0 / 28.0) : prayerNameSize)
+            .foregroundStyle(.white)
     }
     private func prayerTime(_ next: NextPrayerInfo) -> some View {
         Text(next.time, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: timeZone)).diInterfaceFont(.callout, weight: .medium).monospacedDigit().foregroundStyle(Color(hex: 0xE9CE86))
@@ -259,7 +261,7 @@ struct TodayHeroView: View {
                     .diInterfaceFont(.caption2, weight: .bold)
                     .accessibilityHidden(true)
             }
-            .font(readsUrdu ? .subheadline.weight(.semibold) : .footnote.weight(.semibold))
+            .diInterfaceFont(readsUrdu ? .subheadline : .footnote, weight: .semibold)
             .foregroundStyle(Color(hex: 0xE9CE86))
             .frame(minHeight: 44)
             .contentShape(Rectangle())
@@ -301,7 +303,7 @@ struct TodayHeroPrayerChips: View {
         } label: {
             VStack(spacing: 3) {
                 Text(LocalizedStringKey(prayer.englishName))
-                    .font(DIBrand.readsUrdu(locale) ? .footnote.weight(.medium) : .caption.weight(.medium))
+                    .diInterfaceFont(DIBrand.readsUrdu(locale) ? .footnote : .caption, weight: .medium)
                     .foregroundStyle(.white.opacity(isNext ? 1 : 0.8))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
