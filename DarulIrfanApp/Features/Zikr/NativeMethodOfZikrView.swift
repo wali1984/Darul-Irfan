@@ -33,6 +33,7 @@ struct NativeMethodOfZikrView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: DISpacing.md) {
                 SilsilaPageHeader(title: "Method of Zikr")
+                ZikrShajraLink()
                 if isLoading {
                     ProgressView().frame(maxWidth: .infinity).padding(DISpacing.xl)
                 } else if let guide {
@@ -47,7 +48,6 @@ struct NativeMethodOfZikrView: View {
                     }
                     .padding(DISpacing.lg)
                     .diGlassPanel(cornerRadius: 24)
-                    ZikrShajraLink()
                 } else {
                     VStack(alignment: .leading, spacing: DISpacing.md) {
                         Text("The Method of Zikr guide could not be loaded. Please try again.")
