@@ -1,6 +1,9 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"No Bayans found on these pages yet. Load more to check earlier videos.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "No Bayans found on these pages yet. Load more to check earlier videos."}}, "ur": {"stringUnit": {"state": "translated", "value": "ان صفحات پر ابھی کوئی بیان نہیں ملا۔ پرانی ویڈیوز دیکھنے کے لیے مزید لوڈ کریں۔"}}}},
+"No Bayan videos are available right now.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "No Bayan videos are available right now."}}, "ur": {"stringUnit": {"state": "translated", "value": "اس وقت بیانات کی ویڈیوز دستیاب نہیں ہیں۔"}}}},
+
 "Load more videos": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Load more videos"}}, "ur": {"stringUnit": {"state": "translated", "value": "مزید ویڈیوز لوڈ کریں"}}}},
     "This meeting was already scheduled with different details. Close this form and check the meetings list before scheduling another.": {
       "extractionState": "manual",

@@ -461,6 +461,15 @@ struct BayanVideosListView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 10) {
+                if model.hasLoaded, !model.isLoading, !model.loadFailed, model.videos.isEmpty {
+                    DICard {
+                        Text(LocalizedStringKey(model.nextCursor != nil
+                            ? "No Bayans found on these pages yet. Load more to check earlier videos."
+                            : "No Bayan videos are available right now."))
+                            .diInterfaceFont(.body)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
+                }
                 ForEach(model.videos) { item in
                     Button {
                         guard let videoID = item.videoID else { return }
