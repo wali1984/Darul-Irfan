@@ -208,7 +208,7 @@ struct QuranTabView: View {
                 HStack(spacing: 10) {
                     ReadChipToggle(items: QuranListMode.allCases, title: { $0 == .surah ? "Surah" : "Parah" }, selection: $listMode)
                         .frame(width: 170)
-                    ReadFindField(prompt: "Name, number, 2:255", text: searchBinding).frame(minWidth: 180)
+                    ReadFindField(prompt: "Name, number, 2:255", text: searchBinding).frame(minWidth: 260)
                 }
             }
             VStack(spacing: 10) {
@@ -386,7 +386,7 @@ private struct SurahRow: View {
                     // mirroring the transliteration and English meaning.
                     Text(surah.nameArabic)
                         .font(DIFont.quranArabic(scale: 0.72))
-                        .foregroundStyle(DIColor.textPrimary)
+                        .foregroundStyle(ReadPalette.arabicInk)
                     Text(surah.nameUrdu ?? surah.nameEnglish)
                         .font(DIFont.urduBody(scale: 0.95))
                         .foregroundStyle(DIColor.textMuted)
