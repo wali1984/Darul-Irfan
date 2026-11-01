@@ -95,10 +95,7 @@ struct GroupSessionCard: View {
         }
         .confirmationDialog("End the session for everyone?", isPresented: $confirmEnd, titleVisibility: .visible) {
             Button("End session", role: .destructive) {
-                Task {
-                    try? await service.endLive(in: group.id)
-                    await onChange()
-                }
+                Task { await performSessionChange { try await service.endLive(in: group.id) } }
             }
         }
     }
@@ -245,8 +242,8 @@ struct GroupSessionCard: View {
             Label("End session", systemImage: "stop.circle")
                 .frame(maxWidth: .infinity, minHeight: 36)
         }
-        .buttonStyle(.bordered)
-        .tint(DIColor.danger)
+        .buttonStyle(DISecondaryButtonStyle(destructive: true))
+        .disabled(working)
     }
 
     /// The session's admin tiles: each does what its button always did, with
@@ -301,7 +298,7 @@ struct GroupSessionCard: View {
             Image(systemName: icon)
                 .font(prominent ? Font.title2.weight(.semibold) : Font.title3)
                 .foregroundStyle(prominent ? DIColor.onPrimary : DIColor.primary)
-                .frame(maxWidth: .infinity, minHeight: prominent ? 48 : 40)
+                .frame(maxWidth: .infinity, minHeight: 48)
                 .background {
                     if prominent {
                         Capsule(style: .continuous).fill(DIGradient.emerald)
@@ -318,12 +315,19 @@ struct GroupSessionCard: View {
     }
 
     private func control(_ action: String, _ extra: [String: Any] = [:]) async {
+        await performSessionChange { try await service.control(action, extra, in: group.id) }
+    }
+
+    private func performSessionChange(_ change: () async throws -> Void) async {
+        guard !working else { return }
         working = true
         controlError = nil
         defer { working = false }
         do {
-            try await service.control(action, extra, in: group.id)
+            try await change()
             await onChange()
+        } catch is CancellationError {
+            return
         } catch {
             controlError = error.localizedDescription
         }

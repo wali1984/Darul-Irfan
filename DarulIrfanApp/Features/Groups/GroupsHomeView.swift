@@ -194,7 +194,7 @@ final class GroupsModel {
 
     func rename(_ raw: String) async {
         let name = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !name.isEmpty else { return }
+        guard !isSavingName, !name.isEmpty, name != displayName else { return }
         isSavingName = true
         nameError = nil
         defer { isSavingName = false }
