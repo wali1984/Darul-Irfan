@@ -216,9 +216,17 @@ enum ZikrTimeLine {
         locale: Locale = .current
     ) -> String {
         let formattedLocal = ZikrScheduleMath.localTimeText(start, timeZone: timeZone, locale: locale)
-        // Keep the clock and GMT offset in reading order beside an Urdu weekday.
-        let local = locale.language.languageCode?.identifier == "ur"
-            ? "\u{2066}\(formattedLocal)\u{2069}" : formattedLocal
+        // The weekday is RTL prose; only the clock and zone form an LTR segment.
+        let local: String
+        if locale.language.languageCode?.identifier == "ur" {
+            let day = start.formatted(Date.FormatStyle(locale: locale, timeZone: timeZone).weekday(.abbreviated))
+            let clock = start.formatted(Date.FormatStyle(locale: locale, timeZone: timeZone).hour().minute())
+            let style: NSTimeZone.NameStyle = timeZone.isDaylightSavingTime(for: start) ? .shortDaylightSaving : .shortStandard
+            let zone = timeZone.localizedName(for: style, locale: locale) ?? timeZone.identifier
+            local = "\(day) \u{2066}\(clock) \(zone)\u{2069}"
+        } else {
+            local = formattedLocal
+        }
         let yours = String(localized: "Your time: \(local)")
         let announced = TimeZone(identifier: session.timeZoneIdentifier) ?? timeZone
         guard announced.secondsFromGMT(for: start) != timeZone.secondsFromGMT(for: start) else { return yours }
