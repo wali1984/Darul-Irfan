@@ -15,6 +15,7 @@ struct GlobalSearchView: View {
     private let dependencies: AppDependencies
     private let appState: AppState
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var isSearchFieldFocused: Bool
 
     /// Inviting starter topics shown on the idle prompt. Tapping one runs the
@@ -59,7 +60,7 @@ struct GlobalSearchView: View {
                 }
             }
         }
-        .tint(DIColor.primary)
+        .tint(DIColor.actionForeground)
         .onAppear {
             isSearchFieldFocused = true
         }
@@ -72,13 +73,14 @@ struct GlobalSearchView: View {
         HStack(spacing: DISpacing.sm) {
             Image(systemName: "magnifyingglass")
                 .diInterfaceFont(.body, weight: .semibold)
-                .foregroundStyle(isSearchFieldFocused ? DIColor.primary : DIColor.textMuted)
+                .foregroundStyle(isSearchFieldFocused ? DIColor.actionForeground : DIColor.textMuted)
                 .accessibilityHidden(true)
 
             TextField(
                 "Search Quran, hadith, library, media, and events",
                 text: queryBinding
             )
+            .diInterfaceFont(.body)
             .focused($isSearchFieldFocused)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
@@ -86,7 +88,7 @@ struct GlobalSearchView: View {
             .onSubmit {
                 viewModel.searchNow()
             }
-            .tint(DIColor.primary)
+            .tint(DIColor.actionForeground)
             .foregroundStyle(DIColor.textPrimary)
 
             if !viewModel.query.isEmpty {
@@ -97,9 +99,12 @@ struct GlobalSearchView: View {
                     Image(systemName: "xmark.circle.fill")
                         .diInterfaceFont(.body)
                         .foregroundStyle(DIColor.textMuted)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
                 }
+                .buttonStyle(DIPressableStyle())
                 .accessibilityLabel("Clear search text")
-                .transition(.scale.combined(with: .opacity))
+                .transition(reduceMotion ? .identity : .scale.combined(with: .opacity))
             }
         }
         .padding(.horizontal, DISpacing.md)
@@ -125,8 +130,8 @@ struct GlobalSearchView: View {
                 .opacity(isSearchFieldFocused ? 0.18 : 0.08),
             radius: isSearchFieldFocused ? 12 : 8, x: 0, y: 4
         )
-        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: isSearchFieldFocused)
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: viewModel.query.isEmpty)
+        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8), value: isSearchFieldFocused)
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.8), value: viewModel.query.isEmpty)
         .padding(.horizontal, DISpacing.md)
         .padding(.top, DISpacing.md)
         .padding(.bottom, DISpacing.xs)
@@ -310,7 +315,7 @@ struct GlobalSearchView: View {
         HStack(spacing: DISpacing.sm) {
             ProgressView()
                 .controlSize(.small)
-                .tint(DIColor.primary)
+                .tint(DIColor.actionForeground)
             Text("Searching…")
                 .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.textMuted)
@@ -407,6 +412,7 @@ struct GlobalSearchView: View {
 /// Selectable capsule chip with an emerald-gradient selected state and a
 /// spring press response.
 private struct DomainFilterChip: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let titleKey: LocalizedStringKey
     let systemImage: String?
     let isSelected: Bool
@@ -425,7 +431,7 @@ private struct DomainFilterChip: View {
             }
             .padding(.horizontal, DISpacing.md)
             .padding(.vertical, DISpacing.sm)
-            .foregroundStyle(isSelected ? DIColor.onPrimary : DIColor.primary)
+            .foregroundStyle(isSelected ? DIColor.onPrimary : DIColor.actionForeground)
             .background(chipBackground)
             .overlay(
                 Capsule()
@@ -437,7 +443,7 @@ private struct DomainFilterChip: View {
             )
         }
         .buttonStyle(DIPressableStyle())
-        .animation(.spring(response: 0.32, dampingFraction: 0.72), value: isSelected)
+        .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.72), value: isSelected)
         .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : [.isButton])
     }
 
