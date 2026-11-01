@@ -26,6 +26,12 @@ struct ShareCardView: View {
         ScriptDirection.isRightToLeft(text, fallbackLanguage: nil)
     }
 
+    // ImageRenderer has no parent screen locale; the localized badge identifies
+    // the share language even when the phone itself is configured in English.
+    private var wordmark: String {
+        String(localized: "Darul Irfan", locale: Locale(identifier: isRTL(content.badge) ? "ur" : "en"))
+    }
+
     private func proseFont(_ text: String, size: CGFloat, weight: Font.Weight,
                            design: Font.Design = .default) -> Font {
         if isRTL(text), let name = AppFonts.urduNastaliqName {
@@ -93,9 +99,10 @@ struct ShareCardView: View {
             HStack(spacing: side * 0.014) {
                 Image(systemName: "moon.stars.fill")
                     .font(.system(size: side * 0.026))
-                Text("Darul Irfan")
-                    .font(.system(size: side * 0.028, weight: .semibold, design: .serif))
+                Text(verbatim: wordmark)
+                    .font(proseFont(wordmark, size: side * 0.028, weight: .semibold, design: .serif))
             }
+            .environment(\.layoutDirection, isRTL(wordmark) ? .rightToLeft : .leftToRight)
             .foregroundStyle(.white.opacity(0.75))
             .padding(.bottom, side * 0.06)
         }
