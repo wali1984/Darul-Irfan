@@ -514,10 +514,12 @@ struct GroupDetailView: View {
                     }
                 }
                 if let linkURL = post.linkURL {
-                    Link(destination: linkURL) {
-                        Label("Open link", systemImage: "arrow.up.right.square")
-                    }
-                    .font(.subheadline)
+                    DIExternalResourceLink(
+                        destination: linkURL,
+                        title: String(localized: "Open link"),
+                        systemImage: "arrow.up.right.square",
+                        accessibilityTitle: "Open link"
+                    )
                 }
                 if detail?.canManage == true {
                     Button("Remove", role: .destructive) {
@@ -525,7 +527,7 @@ struct GroupDetailView: View {
                             await performChange { try await service.removePost(post.id, in: group.id) }
                         }
                     }
-                    .font(.footnote)
+                    .buttonStyle(DISecondaryButtonStyle(destructive: true))
                 }
             }
         }
@@ -749,7 +751,7 @@ private struct GroupZikrRow: View {
                 }
                 if canManage {
                     Button("Remove this time", role: .destructive, action: onRemove)
-                        .font(.footnote)
+                        .buttonStyle(DISecondaryButtonStyle(destructive: true))
                 }
             }
         }
