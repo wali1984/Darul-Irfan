@@ -598,7 +598,7 @@ private struct ParahLoadFailure: View {
 
     var body: some View {
         VStack(spacing: DISpacing.sm) {
-            Text("The action could not be completed. Check your connection and try again.")
+            Text("The Parah list could not be loaded. Please try again.")
                 .diInterfaceFont(.callout)
                 .foregroundStyle(DIColor.textPrimary)
             Button("Retry", action: retry)
