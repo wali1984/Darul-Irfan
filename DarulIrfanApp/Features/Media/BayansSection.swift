@@ -176,8 +176,8 @@ struct BayansSection: View {
                 } label: {
                     Text("Try Again")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(DIColor.primary)
                 }
+                .buttonStyle(DICompactButtonStyle())
             }
         }
     }

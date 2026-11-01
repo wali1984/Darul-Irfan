@@ -594,15 +594,9 @@ struct TodayMethodSuggestion: View {
                     .font(.footnote)
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: DISpacing.sm) {
-                        useButton(recommended: recommended, suggested: suggested)
-                        keepButton(current: current)
-                    }
-                    VStack(alignment: .leading, spacing: DISpacing.sm) {
-                        useButton(recommended: recommended, suggested: suggested)
-                        keepButton(current: current)
-                    }
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    useButton(recommended: recommended, suggested: suggested)
+                    keepButton(current: current)
                 }
             }
             .padding(12)
@@ -621,7 +615,7 @@ struct TodayMethodSuggestion: View {
                 }
             }
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(DIPrimaryButtonStyle())
         .tint(DIColor.primary)
     }
 
@@ -629,7 +623,7 @@ struct TodayMethodSuggestion: View {
         Button("Keep \(current)") {
             Task { await appState.updateSettings { $0.calculation.methodConfirmed = true } }
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(DISecondaryButtonStyle())
         .tint(DIColor.primary)
     }
 }

@@ -128,7 +128,7 @@ struct PlayerSheetView: View {
                         if let error = audioPlayer.playbackError {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(LocalizedStringKey(error)).font(.callout)
-                                Button("Retry") { audioPlayer.togglePlayPause() }.buttonStyle(.borderedProminent)
+                                Button("Retry") { audioPlayer.togglePlayPause() }.buttonStyle(DICompactButtonStyle())
                             }.padding().frame(maxWidth: .infinity, alignment: .leading)
                         } else if audioPlayer.isBuffering {
                             ProgressView("Buffering…").padding()
