@@ -32,6 +32,7 @@ struct DayTaskEditorView: View {
     @State private var repeatRule: DayTaskRepeat
     @State private var remind: Bool
     @State private var note: String
+    @State private var isAddingToCalendar = false
     @State private var calendarMessage: LocalizedStringKey?
 
     init(
@@ -90,11 +91,26 @@ struct DayTaskEditorView: View {
                     taskMenu("Prayer", selection: $prayer, options: Prayer.obligatory) { LocalizedStringKey($0.englishName) }
                     let minimumMinutes = timingKind == .before ? 5 : 0
                     let displayedMinutes = max(minimumMinutes, minutes)
-                    Stepper(value: Binding(
-                        get: { max(minimumMinutes, minutes) },
-                        set: { minutes = $0 }
-                    ), in: minimumMinutes...180, step: 5) {
-                        Text(timingKind == .after ? "\(displayedMinutes) minutes after" : "\(displayedMinutes) minutes before")
+                    let offsetLabel = Text(timingKind == .after ? "\(displayedMinutes) minutes after" : "\(displayedMinutes) minutes before")
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        offsetLabel.foregroundStyle(DIColor.textPrimary)
+                        HStack(spacing: DISpacing.sm) {
+                            Spacer(minLength: 0)
+                            Button { minutes = max(minimumMinutes, displayedMinutes - 5) } label: {
+                                Image(systemName: "minus").frame(minWidth: 16)
+                            }
+                            .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+                            .disabled(displayedMinutes <= minimumMinutes)
+                            .accessibilityLabel(Text("- ") + offsetLabel)
+                            .accessibilityValue(offsetLabel)
+                            Button { minutes = min(180, displayedMinutes + 5) } label: {
+                                Image(systemName: "plus").frame(minWidth: 16)
+                            }
+                            .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+                            .disabled(displayedMinutes >= 180)
+                            .accessibilityLabel(Text("+ ") + offsetLabel)
+                            .accessibilityValue(offsetLabel)
+                        }
                     }
                 }
             } footer: {
@@ -128,10 +144,14 @@ struct DayTaskEditorView: View {
                     Button {
                         Task { await addToCalendar() }
                     } label: {
-                        Label("Add to Calendar", systemImage: "calendar.badge.plus")
-                            .frame(maxWidth: .infinity)
+                        HStack {
+                            Label("Add to Calendar", systemImage: "calendar.badge.plus")
+                                .frame(maxWidth: .infinity)
+                            if isAddingToCalendar { ProgressView() }
+                        }
                     }
                     .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isAddingToCalendar)
                     if let calendarMessage {
                         Text(calendarMessage)
                             .font(.footnote)
@@ -226,6 +246,9 @@ struct DayTaskEditorView: View {
     /// asks to read the calendar. A prayer-relative task is placed at its
     /// first day's computed prayer time, and says so in its notes.
     private func addToCalendar() async {
+        guard !isAddingToCalendar, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        isAddingToCalendar = true
+        defer { isAddingToCalendar = false }
         guard Bundle.main.object(forInfoDictionaryKey: "NSCalendarsWriteOnlyAccessUsageDescription") != nil else {
             calendarMessage = "Calendar access is not available in this build."
             return
