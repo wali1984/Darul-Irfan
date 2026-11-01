@@ -179,6 +179,23 @@ final class DiscoverRedesignTests: XCTestCase {
 
     // MARK: - Bayans
 
+    @MainActor
+    func testOverlappingPagesCountDistinctBayansAndKeepFirstSeenOrder() async {
+        let now = Date()
+        let bayan = { (n: Int) in self.feedItem("bayan-\(n)", .youtube, "Bayan \(n)", video: "b\(n)", at: now) }
+        let first = bayan(1)
+        let feed = StubFeed(pages: [
+            "": OfficialFeedPage(items: Array(repeating: first, count: 8), nextCursor: "p2"),
+            "p2": OfficialFeedPage(items: [first, bayan(2)], nextCursor: "p3"),
+            "p3": OfficialFeedPage(items: (3...8).map(bayan), nextCursor: "p4"),
+        ])
+        let model = BayansFeedModel(feed: feed)
+        await model.load()
+        XCTAssertEqual(model.videos.map(\.id), (1...8).map { "bayan-\($0)" })
+        XCTAssertEqual(model.nextCursor, "p4")
+        XCTAssertEqual(model.videos.first?.title, first.title)
+    }
+
     /// Recent on YouTube lists the channel's videos that are not the daily
     /// zikr recordings, by the Zikr tab's own rule.
     @MainActor

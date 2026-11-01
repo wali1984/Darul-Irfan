@@ -94,6 +94,7 @@ final class BayansFeedModel {
     /// the feed; nil when not even the first page loads.
     private func read(from start: String?, forceRefresh: Bool) async throws -> (videos: [OfficialFeedItem], cursor: String?)? {
         var found: [OfficialFeedItem] = []
+        var seen = Set<String>()
         var cursor = start
         var readAny = false
         for _ in 0..<Self.pagesPerRead {
@@ -108,7 +109,7 @@ final class BayansFeedModel {
                 break
             }
             readAny = true
-            found += Self.bayanVideos(in: page.items)
+            found += Self.bayanVideos(in: page.items).filter { seen.insert($0.id).inserted }
             cursor = page.nextCursor
             if found.count >= Self.carouselCount || cursor == nil { break }
         }
