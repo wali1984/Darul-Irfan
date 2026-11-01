@@ -31,6 +31,7 @@ struct GroupPeopleView: View {
                     } label: {
                         Label("Add people", systemImage: "person.badge.plus")
                     }
+                    .buttonStyle(DIPrimaryButtonStyle())
                 } footer: {
                     Text("Add someone by email, or send an invitation code to their phone, as a member, an Admin or - if you may appoint them - an Administrator of this Halqah.")
                 }
