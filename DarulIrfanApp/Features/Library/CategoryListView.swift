@@ -170,7 +170,7 @@ struct ContentItemRow: View {
     private var subtitleText: String {
         var parts: [String] = []
         if let author = item.author, !author.isEmpty {
-            parts.append(author)
+            parts.append(String(localized: String.LocalizationValue(author), locale: locale))
         }
         if let publishedAt = item.publishedAt {
             // The catalogue gives the day as midnight UTC: read it in UTC, or

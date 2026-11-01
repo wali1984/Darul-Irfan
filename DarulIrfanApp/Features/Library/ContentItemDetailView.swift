@@ -355,7 +355,7 @@ struct ContentItemDetailView: View {
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
             if let author = item.author, !author.isEmpty {
-                Text(verbatim: author)
+                Text(LocalizedStringKey(author))
                     .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(ReadPalette.goldInk)
                     .multilineTextAlignment(.center)
@@ -605,7 +605,7 @@ struct ContentItemDetailView: View {
 
                 VStack(alignment: .leading, spacing: DISpacing.xs) {
                     if let author = item.author, !author.isEmpty {
-                        headerMetaRow(systemImage: "person", text: Text(verbatim: author))
+                        headerMetaRow(systemImage: "person", text: Text(LocalizedStringKey(author)))
                     }
                     if let publishedAt = item.publishedAt {
                         headerMetaRow(

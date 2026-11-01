@@ -9,6 +9,7 @@ struct BookCoverView: View {
     let item: ContentItem
     var width: CGFloat = 210
 
+    @Environment(\.locale) private var locale
     @State private var floating = false
     @State private var breathing = false
     @State private var turning = false
@@ -87,7 +88,7 @@ struct BookCoverView: View {
                     .padding(.top, 16)
                 Spacer(minLength: 0)
                 if let author = item.author, !author.isEmpty {
-                    authorText(author)
+                    authorText(String(localized: String.LocalizationValue(author), locale: locale))
                         .padding(.horizontal, 22)
                         .padding(.bottom, 30)
                 }
@@ -138,7 +139,7 @@ struct BookCoverView: View {
     private func authorText(_ author: String) -> some View {
         let isLatin = !ScriptDirection.isRightToLeft(author, fallbackLanguage: nil)
         return Text(verbatim: author)
-            .font(.system(size: 10, weight: .heavy))
+            .font(isLatin ? .system(size: 10, weight: .heavy) : DIFont.urduBody(scale: 0.7).weight(.semibold))
             .tracking(isLatin ? 1.6 : 0)
             .textCase(isLatin ? .uppercase : nil)
             .foregroundStyle(Color(hex: 0xFFE9A8).opacity(0.85))

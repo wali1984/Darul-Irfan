@@ -14,6 +14,7 @@ struct LibraryTabView: View {
     private let appState: AppState
     private let readerSelection: Binding<ReadSection>?
     private let onShowAllReaders: (() -> Void)?
+    @Environment(\.locale) private var locale
     @State private var viewModel: LibraryViewModel
     @State private var isShowingSearch = false
     /// The work read last, for Keep reading.
@@ -203,7 +204,7 @@ struct LibraryTabView: View {
             }
         }
         if let author = last.item.author, !author.isEmpty {
-            parts.append(author)
+            parts.append(String(localized: String.LocalizationValue(author), locale: locale))
         }
         return parts.isEmpty ? nil : Text(verbatim: parts.joined(separator: " · "))
     }
