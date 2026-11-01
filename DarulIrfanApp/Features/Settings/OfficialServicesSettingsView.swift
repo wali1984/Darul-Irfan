@@ -15,36 +15,48 @@ struct OfficialServicesSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Toggle("Official live and update alerts", isOn: pushBinding)
-                Toggle("Next-prayer Live Activity", isOn: liveActivityBinding)
-            } header: { Text("Official Alerts") }
+                Toggle(isOn: pushBinding) {
+                    Text("Official live and update alerts").diInterfaceFont(.body)
+                }.listRowBackground(DIColor.surface)
+                Toggle(isOn: liveActivityBinding) {
+                    Text("Next-prayer Live Activity").diInterfaceFont(.body)
+                }.listRowBackground(DIColor.surface)
+            } header: { SettingsSectionHeader(titleKey: "Official Alerts", systemImage: "bell.fill") }
             footer: {
                 Text("When enabled, a random installation identifier and Apple push token are registered. No account, precise location, prayer history, or reading activity is sent.")
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
 
             if appState.settings.push.isEnabled {
-                Section("Alert Topics") {
+                Section {
                     topicToggle("Live zikr", topic: .liveZikr)
                     topicToggle("Broadcasts", topic: .broadcasts)
                     topicToggle("Announcements", topic: .announcements)
                     topicToggle("Events", topic: .events)
-                }
+                } header: { SettingsSectionHeader(titleKey: "Alert Topics", systemImage: "list.bullet") }
             }
 
             Section {
-                Picker("Share diagnostics", selection: diagnosticsBinding) {
-                    Text("Ask me later").tag(DiagnosticsConsent.notAsked)
-                    Text("Do not share").tag(DiagnosticsConsent.declined)
-                    Text("Share anonymously").tag(DiagnosticsConsent.granted)
-                }
-            } header: { Text("Diagnostics") }
+                Picker(selection: diagnosticsBinding) {
+                    Text("Ask me later").diInterfaceFont(.body).tag(DiagnosticsConsent.notAsked)
+                    Text("Do not share").diInterfaceFont(.body).tag(DiagnosticsConsent.declined)
+                    Text("Share anonymously").diInterfaceFont(.body).tag(DiagnosticsConsent.granted)
+                } label: { Text("Share diagnostics").diInterfaceFont(.body) }
+                .listRowBackground(DIColor.surface)
+            } header: { SettingsSectionHeader(titleKey: "Diagnostics", systemImage: "chart.bar.fill") }
             footer: {
                 Text("Anonymous Apple MetricKit diagnostics are uploaded only after consent. Payloads exclude location, bookmarks, prayer history, names, and email addresses, and are retained for 30 days.")
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
+        .scrollContentBackground(.hidden)
+        .diScreenBackground()
+        .tint(DIColor.actionForeground)
+        .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Official Alerts & Privacy")
+        .navigationBarTitleDisplayMode(.inline)
         .alert("Notifications are disabled", isPresented: $permissionDenied) {
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
@@ -87,11 +99,12 @@ struct OfficialServicesSettingsView: View {
     /// `LocalizedStringKey`, so the topic names come from the catalogue: a
     /// `String` title is shown as written, in English.
     private func topicToggle(_ title: LocalizedStringKey, topic: PushTopic) -> some View {
-        Toggle(title, isOn: Binding(
+        Toggle(isOn: Binding(
             get: { appState.settings.push.topics.contains(topic) },
             set: { enabled in
                 Task { await OfficialAlertSwitches.setTopic(topic, enabled, appState: appState) }
             }
-        ))
+        )) { Text(title).diInterfaceFont(.body) }
+        .listRowBackground(DIColor.surface)
     }
 }
