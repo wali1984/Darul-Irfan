@@ -311,10 +311,13 @@ struct MediaItemRow: View {
                 MediaTitleText(item: item, latinFont: .headline, lineLimit: 2)
                 metadataLine
                 if let speaker = item.speaker {
-                    Text(speaker)
-                        .diInterfaceFont(.caption2)
+                    let rtl = ScriptDirection.isRightToLeft(speaker, fallbackLanguage: nil)
+                    Text(verbatim: speaker)
+                        .font(rtl ? DIFont.urduBody(scale: 0.65) : .caption2)
                         .foregroundStyle(DIColor.textMuted)
                         .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .environment(\.layoutDirection, rtl ? .rightToLeft : .leftToRight)
                 }
                 badgeLine
             }

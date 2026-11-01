@@ -375,13 +375,15 @@ private struct BayanVideoCard: View {
                     endPoint: .bottom
                 )
                 Text(verbatim: title.headline)
-                    .diInterfaceFont(.callout, weight: .heavy)
+                    .font(ScriptDirection.isRightToLeft(title.headline, fallbackLanguage: nil) ? DIFont.urduBody(scale: 0.85) : .callout.weight(.heavy))
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .shadow(color: .black.opacity(0.4), radius: 5, y: 2)
                     .padding(.horizontal, 14)
                     .padding(.bottom, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .environment(\.layoutDirection, ScriptDirection.isRightToLeft(title.headline, fallbackLanguage: nil) ? .rightToLeft : .leftToRight)
             }
             .frame(width: 236, height: 132)
             .overlay(alignment: .center) {
@@ -399,9 +401,11 @@ private struct BayanVideoCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 if let detail = title.detail {
                     Text(verbatim: detail)
-                        .diInterfaceFont(.footnote, weight: .semibold)
+                        .font(ScriptDirection.isRightToLeft(detail, fallbackLanguage: nil) ? DIFont.urduBody(scale: 0.75) : .footnote.weight(.semibold))
                         .foregroundStyle(DIColor.textPrimary)
                         .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .environment(\.layoutDirection, ScriptDirection.isRightToLeft(detail, fallbackLanguage: nil) ? .rightToLeft : .leftToRight)
                 }
                 Text(item.publishedAt, format: .dateTime.day().month(.wide))
                     .diInterfaceFont(.caption, weight: .medium)

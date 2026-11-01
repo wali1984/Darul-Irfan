@@ -115,12 +115,15 @@ struct MediaTitleText: View {
                 .font(DIFont.urduBody())
                 .foregroundStyle(color)
                 .lineLimit(lineLimit)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .environment(\.layoutDirection, .rightToLeft)
         } else {
             Text(item.title)
                 .font(latinFont)
                 .foregroundStyle(color)
                 .lineLimit(lineLimit)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .environment(\.layoutDirection, .leftToRight)
         }
     }
 }
