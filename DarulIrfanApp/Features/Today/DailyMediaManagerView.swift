@@ -16,6 +16,7 @@ struct DailyMediaManagerView: View {
     @State private var failed = false
     @State private var editing: DailyMediaItem?
     @State private var adding = false
+    @State private var loading = false
 
     var body: some View {
         List {
@@ -28,6 +29,8 @@ struct DailyMediaManagerView: View {
                 }
                 if failed && items != nil {
                     Button("Try again") { Task { await load() } }
+                        .buttonStyle(DISecondaryButtonStyle())
+                        .disabled(loading)
                 }
                 if let items {
                     let drafts = items.filter { $0.status == "draft" }
@@ -41,6 +44,8 @@ struct DailyMediaManagerView: View {
                     }
                 } else if failed {
                     Button("Try again") { Task { await load() } }
+                        .buttonStyle(DISecondaryButtonStyle())
+                        .disabled(loading)
                 } else {
                     ProgressView()
                 }
@@ -87,8 +92,19 @@ struct DailyMediaManagerView: View {
     }
 
     private func load() async {
+        guard !loading else { return }
+        loading = true
+        defer { loading = false }
         failed = false
-        do { items = try await service.manageDailyMedia() } catch { failed = true }
+        do {
+            let loaded = try await service.manageDailyMedia()
+            try Task.checkCancellation()
+            items = loaded
+        } catch is CancellationError {
+            return
+        } catch {
+            if !Task.isCancelled { failed = true }
+        }
     }
 }
 
