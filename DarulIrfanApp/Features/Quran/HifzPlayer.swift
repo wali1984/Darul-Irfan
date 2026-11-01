@@ -28,11 +28,14 @@ final class HifzPlayer {
     private(set) var currentAyah: Int?
     /// Which repetition of the current ayah is sounding, 1-based.
     private(set) var repetition = 1
+    private(set) var playbackFailed = false
 
     var isPlaying: Bool { phase == .reciting || phase == .pausing }
 
     @ObservationIgnored private var player: AVPlayer?
     @ObservationIgnored private var timeObserver: Any?
+    @ObservationIgnored private var itemStatusObserver: NSKeyValueObservation?
+    @ObservationIgnored private var failureObserver: NSObjectProtocol?
     @ObservationIgnored private var recitation: SurahRecitation?
     @ObservationIgnored private var pauseTask: Task<Void, Never>?
     @ObservationIgnored private var bayanObserver: NSObjectProtocol?
@@ -56,7 +59,11 @@ final class HifzPlayer {
         startingAyah: Int? = nil
     ) {
         stop()
-        guard let url = URL(string: recitation.audioUrl) else { return }
+        guard let url = URL(string: recitation.audioUrl) else {
+            currentAyah = min(max(startingAyah ?? range.lowerBound, range.lowerBound), range.upperBound)
+            playbackFailed = true
+            return
+        }
         self.recitation = recitation
         self.range = range
         self.repeats = max(1, repeats)
@@ -80,13 +87,34 @@ final class HifzPlayer {
         // ayah before or cuts the one being memorised.
         let newPlayer = AVPlayer(playerItem: QuranListenPlayer.recitationItem(url, durationMs: recitation.durationMs))
         player = newPlayer
+        if let item = newPlayer.currentItem {
+            itemStatusObserver = item.observe(\.status, options: [.initial, .new]) { [weak self, weak newPlayer] item, _ in
+                guard item.status == .failed else { return }
+                Task { @MainActor in
+                    guard let self, let newPlayer, self.player === newPlayer else { return }
+                    self.failPlayback()
+                }
+            }
+            failureObserver = NotificationCenter.default.addObserver(
+                forName: AVPlayerItem.failedToPlayToEndTimeNotification, object: item, queue: .main
+            ) { [weak self, weak newPlayer] _ in
+                Task { @MainActor in
+                    guard let self, let newPlayer, self.player === newPlayer else { return }
+                    self.failPlayback()
+                }
+            }
+        }
         // 20 Hz is enough to stop within a fiftieth of a second of a verse end,
         // which is below what a listener notices, and cheap.
         timeObserver = newPlayer.addPeriodicTimeObserver(
             forInterval: CMTime(value: 1, timescale: 20), queue: .main
-        ) { [weak self] time in
+        ) { [weak self, weak newPlayer] time in
+            guard time.seconds.isFinite else { return }
             let ms = Int(time.seconds * 1000)
-            Task { @MainActor in self?.observe(ms: ms) }
+            Task { @MainActor in
+                guard let self, let newPlayer, self.player === newPlayer else { return }
+                self.observe(ms: ms)
+            }
         }
 
         let first = min(max(startingAyah ?? range.lowerBound, range.lowerBound), range.upperBound)
@@ -114,6 +142,10 @@ final class HifzPlayer {
         pauseTask = nil
         if let timeObserver, let player { player.removeTimeObserver(timeObserver) }
         timeObserver = nil
+        itemStatusObserver?.invalidate()
+        itemStatusObserver = nil
+        if let failureObserver { NotificationCenter.default.removeObserver(failureObserver) }
+        failureObserver = nil
         if let bayanObserver { NotificationCenter.default.removeObserver(bayanObserver) }
         bayanObserver = nil
         seekToken += 1
@@ -121,9 +153,17 @@ final class HifzPlayer {
         player?.pause()
         player = nil
         recitation = nil
+        playbackFailed = false
         phase = .idle
         currentAyah = nil
         repetition = 1
+    }
+
+    private func failPlayback() {
+        let interruptedAyah = currentAyah
+        stop()
+        currentAyah = interruptedAyah
+        playbackFailed = true
     }
 
     /// Jumps straight to an ayah, resetting its repetition count.
@@ -152,7 +192,8 @@ final class HifzPlayer {
             Task { @MainActor in
                 guard let self, token == self.seekToken else { return }
                 self.isSeeking = false
-                guard finished, self.phase == .reciting else { return }
+                guard self.phase == .reciting else { return }
+                guard finished else { self.failPlayback(); return }
                 self.player?.play()
             }
         }

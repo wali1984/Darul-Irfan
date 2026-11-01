@@ -97,6 +97,11 @@ struct HifzView: View {
 
                 ayahText
 
+                if player.playbackFailed {
+                    Text("The action could not be completed. Check your connection and try again.")
+                        .diInterfaceFont(.callout)
+                        .foregroundStyle(DIColor.textPrimary)
+                }
                 if player.phase == .pausing {
                     Label("Recall it now", systemImage: "ear")
                         .diInterfaceFont(.footnote)
@@ -158,7 +163,7 @@ struct HifzView: View {
                 togglePlayback()
             } label: {
                 Label(
-                    player.isPlaying ? "Pause" : "Start",
+                    player.playbackFailed ? "Retry" : player.isPlaying ? "Pause" : "Start",
                     systemImage: player.isPlaying ? "pause.fill" : "play.fill"
                 )
                 .frame(maxWidth: .infinity)
@@ -278,9 +283,10 @@ struct HifzView: View {
         if player.isPlaying {
             player.pause()
             save()
-        } else if player.currentAyah == nil || player.phase == .finished {
+        } else if player.playbackFailed || player.currentAyah == nil || player.phase == .finished {
             isRevealed = false
             if player.phase == .finished { selectedAyah = rangeStart }
+            else { selectedAyah = player.currentAyah ?? selectedAyah }
             player.start(
                 recitation: recitation,
                 range: rangeStart...rangeEnd,
@@ -300,7 +306,7 @@ struct HifzView: View {
         isRevealed = false
         DIHaptics.light()
         selectedAyah = target
-        if player.currentAyah == nil {
+        if player.playbackFailed || player.currentAyah == nil {
             player.start(recitation: recitation, range: rangeStart...rangeEnd, repeats: repeats, pauseSeconds: pauseSeconds, startingAyah: target)
         } else {
             player.practise(ayah: target)

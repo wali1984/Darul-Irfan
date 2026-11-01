@@ -41,4 +41,29 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertNil(player.currentAyah)
         XCTAssertFalse(player.isPlaying)
     }
+    func testUnavailableAudioOffersRetryAndPreservesInterruptedVerse() async throws {
+        let player = HifzPlayer()
+        defer { player.stop() }
+        var missing = recitation
+        missing.audioUrl = FileManager.default.temporaryDirectory
+            .appendingPathComponent("missing-hifz-\(UUID().uuidString).m4a").absoluteString
+        player.start(recitation: missing, range: 1...7, repeats: 3, pauseSeconds: 1.5, startingAyah: 4)
+        let deadline = Date().addingTimeInterval(8)
+        while !player.playbackFailed && Date() < deadline {
+            try await Task.sleep(nanoseconds: 50_000_000)
+        }
+        XCTAssertTrue(player.playbackFailed, "A failed audio item must not keep showing active playback")
+        XCTAssertFalse(player.isPlaying)
+        XCTAssertEqual(player.currentAyah, 4)
+        player.start(recitation: missing, range: 1...7, repeats: 3, pauseSeconds: 1.5, startingAyah: 4)
+        XCTAssertFalse(player.playbackFailed, "Retry must clear the previous failure before preparing")
+        XCTAssertEqual(player.currentAyah, 4)
+        player.stop()
+        // Late KVO/notification/seek callbacks must not revive the stopped session.
+        try await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertFalse(player.playbackFailed)
+        XCTAssertNil(player.currentAyah)
+        XCTAssertFalse(player.isPlaying)
+    }
+
 }
