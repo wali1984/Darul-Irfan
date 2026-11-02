@@ -1199,12 +1199,12 @@ final class RedesignScreenshotTests: XCTestCase {
             for (index, label) in [zikrLabel, meetingLabel].enumerated() {
                 let remove = app.buttons[label]
                 guard reveal(remove), tap(remove) else { XCTFail("Missing schedule removal action"); return }
-                let confirm = app.sheets.buttons[label]
+                let confirm = app.alerts.buttons[label]
                 guard confirm.waitForExistence(timeout: 10) else { XCTFail("Missing confirmation"); return }
-                XCTAssertTrue(app.sheets.staticTexts[index == 0 ? "Audit recurring Zikr" : "Audit meeting"].exists,
+                XCTAssertTrue(app.alerts.staticTexts[index == 0 ? "Audit recurring Zikr" : "Audit meeting"].exists,
                               "Confirmation must identify the selected schedule")
                 shot("schedule-\(index)-confirmation")
-                guard tap(app.sheets.buttons[cancelLabel]) else { XCTFail("Missing Cancel"); return }
+                guard tap(app.alerts.buttons[cancelLabel]) else { XCTFail("Missing Cancel"); return }
                 XCTAssertEqual(count.label, String(index * 2), "Cancel must send no request")
                 guard tap(remove), tap(confirm) else { XCTFail("Confirmation not repeatable"); return }
                 let okay = app.alerts.buttons[okayLabel]

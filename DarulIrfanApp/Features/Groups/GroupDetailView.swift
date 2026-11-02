@@ -50,6 +50,7 @@ struct GroupDetailView: View {
     @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.colorScheme) private var colorScheme
 
     /// What the session follow runs for: the live session, while the app is
     /// in front or the member listens to the session with the phone locked.
@@ -118,6 +119,9 @@ struct GroupDetailView: View {
         .diPageHeading(LocalizedStringKey(group.name))
         // The glass header carries the name; the bar keeps it small.
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(DIColor.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(colorScheme, for: .navigationBar)
         .task { await load() }
         // Not while the app is in the background with other audio playing:
         // that was a request every 15 seconds for nothing.
@@ -144,9 +148,9 @@ struct GroupDetailView: View {
         } message: {
             Text("This removes the announcement from the Halqah. This cannot be undone.")
         }
-        .confirmationDialog(scheduleToRemove?.action ?? "Remove this time", isPresented: Binding(
+        .alert(scheduleToRemove?.action ?? "Remove this time", isPresented: Binding(
             get: { scheduleToRemove != nil }, set: { if !$0 { scheduleToRemove = nil } }
-        ), titleVisibility: .visible) {
+        )) {
             if let target = scheduleToRemove {
                 Button(target.action, role: .destructive) {
                     guard !removingSchedule, detail?.canManage == true else { return }
