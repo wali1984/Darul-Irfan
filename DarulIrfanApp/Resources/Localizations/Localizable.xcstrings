@@ -3,6 +3,8 @@
   "strings": {
     "Open Halqah" : { "localizations" : { "ur" : { "stringUnit" : { "state" : "translated", "value" : "حلقہ کھولیں" } } } },
     "Our Sheikh" : { "localizations" : { "ur" : { "stringUnit" : { "state" : "translated", "value" : "ہمارے شیخ" } } } },
+    "Start Daily Zikr" : { "localizations" : { "ur" : { "stringUnit" : { "state" : "translated", "value" : "روزانہ ذکر شروع کریں" } } } },
+    "Join Daily Zikr" : { "localizations" : { "ur" : { "stringUnit" : { "state" : "translated", "value" : "روزانہ ذکر میں شامل ہوں" } } } },
 "Guided Zikr": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Guided Zikr"}}, "ur": {"stringUnit": {"state": "translated", "value": "??????? ???"}}}},
 "Awaiting the next Zikr stage": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Awaiting the next Zikr stage"}}, "ur": {"stringUnit": {"state": "translated", "value": "??? ?? ???? ????? ?? ??????"}}}},
 "Follow the stage announced by your Sheikh.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Follow the stage announced by your Sheikh."}}, "ur": {"stringUnit": {"state": "translated", "value": "???? ??? ?? ????? ???? ????? ?? ????? ??? ?????"}}}},

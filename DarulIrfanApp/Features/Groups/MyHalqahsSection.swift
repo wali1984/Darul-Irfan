@@ -676,15 +676,23 @@ struct HalqahHeroCardLabel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
-            if group.isLive == true {
-                liveRow
-            } else if group.id == "our-sheikh" {
-                Text("Open Halqah")
+            if group.id == "our-sheikh" {
+                if group.isLive == true {
+                    HStack(spacing: 10) {
+                        DILivePulse(color: Color(hex: 0xFF5C5C), size: 9)
+                        Text(group.liveKind == "meeting" ? "Meeting live" : "Zikr live")
+                            .diInterfaceFont(.subheadline, weight: .bold)
+                            .foregroundStyle(Color.white)
+                    }
+                }
+                Text((group.canManage ?? [.admin, .administrator, .superadmin].contains(group.myRole ?? .member)) ? "Start Daily Zikr" : "Join Daily Zikr")
                     .diInterfaceFont(.headline, weight: .bold)
                     .foregroundStyle(Color(hex: 0x064B34))
                     .frame(maxWidth: .infinity).padding(14)
                     .background(RoundedRectangle(cornerRadius: 18).fill(Self.joinGold))
                     .diShimmer()
+            } else if group.isLive == true {
+                liveRow
             }
         }
         .padding(18)
