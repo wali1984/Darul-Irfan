@@ -44,7 +44,8 @@ final class AudioPlayerService: AudioPlayerServicing {
 
     private let mediaRepository: any MediaRepositoryProtocol
 
-    @ObservationIgnored private var player: AVPlayer?
+    private var player: AVPlayer?
+    var videoPresentationPlayer: AVPlayer? { player }
     @ObservationIgnored private var timeObserverToken: Any?
     @ObservationIgnored private var itemEndObserver: NSObjectProtocol?
     @ObservationIgnored private var interruptionObserver: NSObjectProtocol?
@@ -151,6 +152,7 @@ final class AudioPlayerService: AudioPlayerServicing {
             playerItem = AVPlayerItem(url: item.url)
         }
         let newPlayer = AVPlayer(playerItem: playerItem)
+        newPlayer.audiovisualBackgroundPlaybackPolicy = .continuesIfPossible
         newPlayer.defaultRate = Float(playbackSpeed.rawValue)
         player = newPlayer
         itemBecameReady = false

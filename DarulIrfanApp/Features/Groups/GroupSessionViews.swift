@@ -358,7 +358,10 @@ struct GroupSessionPlayer: View {
     let groupName: String
     let audioPlayer: (any AudioPlayerServicing)?
 
-    @State private var videoPlayer: AVPlayer?
+    @Environment(\.scenePhase) private var scenePhase
+    private var videoPlayer: AVPlayer? {
+        item.isVideoFile && playingThisItem ? audioPlayer?.videoPresentationPlayer : nil
+    }
     @State private var starting = false
     /// Paused because the admin paused, so resumed when the admin resumes; a
     /// member's own pause is left alone.
@@ -396,7 +399,7 @@ struct GroupSessionPlayer: View {
                 .frame(height: 210)
                 .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
             } else {
-                if let videoPlayer {
+                if scenePhase == .active, let videoPlayer {
                     VideoPlayer(player: videoPlayer)
                         .frame(height: 210)
                         .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
@@ -418,7 +421,7 @@ struct GroupSessionPlayer: View {
                     }
                     // A member's way into a recorded session: lit, as Join is.
                     .buttonStyle(HalqahLiveButtonStyle(isLive: true))
-                    .disabled(starting || item.url == nil)
+                    .disabled(starting || item.url == nil || audioPlayer == nil)
                 }
             }
             if playback.paused {
@@ -444,8 +447,6 @@ struct GroupSessionPlayer: View {
             // The group moved on; whoever was listening hears the next item,
             // also when their player stopped at the end of the last one.
             let wasListening = nowID == Self.prefix + previous || videoPlayer != nil || listening
-            videoPlayer?.pause()
-            videoPlayer = nil
             if wasListening && !item.isYouTube { Task { await listen() } }
             else if wasListening, nowID?.hasPrefix(Self.prefix) == true { audioPlayer?.stop() }
         }
@@ -454,7 +455,6 @@ struct GroupSessionPlayer: View {
             // member's choice; one that played to its end was not.
             if old == audioID, new == nil, !itemHasEnded { listening = false }
         }
-        .onDisappear { videoPlayer?.pause() }
     }
 
     private func progress(at date: Date) -> String {
@@ -470,25 +470,19 @@ struct GroupSessionPlayer: View {
         listening = true
         starting = true
         defer { starting = false }
-        if item.isVideoFile || audioPlayer == nil {
-            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-            try? AVAudioSession.sharedInstance().setActive(true)
-            let player = AVPlayer(url: url)
-            videoPlayer = player
-            await seekWhenReady(player)
-            if playback.paused { pausedBySession = true } else { player.play() }
-        } else if let audioPlayer {
+        if let audioPlayer {
             let current = AudioPlayableItem(id: audioID, title: item.title, subtitle: groupName, url: url, mediaItemID: nil)
-            // The recordings that follow, up to the next video, so the player
+            // The recordings that follow, up to the next YouTube item, so the player
             // moves on with the group by itself - with the phone locked too,
             // when this page is not asking the server.
             let following = upNext
-                .prefix(while: { !$0.isYouTube && !$0.isVideoFile && $0.url != nil })
+                .prefix(while: { !$0.isYouTube && $0.url != nil })
                 .compactMap { next in
                     next.url.map { AudioPlayableItem(id: Self.prefix + next.id, title: next.title, subtitle: groupName, url: $0, mediaItemID: nil) }
                 }
             audioPlayer.play(current, queue: [current] + following)
             await waitForAudio(audioPlayer)
+            guard audioPlayer.nowPlaying?.id == audioID else { return }
             audioPlayer.seek(to: playback.position())
             if playback.paused {
                 if audioPlayer.isPlaying || audioPlayer.isBuffering { audioPlayer.togglePlayPause() }
@@ -504,6 +498,7 @@ struct GroupSessionPlayer: View {
             if !playback.paused { videoPlayer.play() }
         } else if let audioPlayer, playingThisItem {
             await waitForAudio(audioPlayer)
+            guard audioPlayer.nowPlaying?.id == audioID else { return }
             audioPlayer.seek(to: playback.position())
             if !playback.paused && !audioPlayer.isPlaying && !audioPlayer.isBuffering { audioPlayer.togglePlayPause() }
         } else if inAudioPlayer {

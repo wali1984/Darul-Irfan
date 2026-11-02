@@ -1,4 +1,5 @@
 import Foundation
+import AVFoundation
 import CoreLocation
 
 // Protocol-first service layer. Every service has a live implementation in
@@ -169,6 +170,8 @@ struct AudioPlayableItem: Sendable, Equatable, Identifiable {
 
 @MainActor
 protocol AudioPlayerServicing: AnyObject {
+    /// Borrowed by video surfaces; the service retains playback ownership.
+    var videoPresentationPlayer: AVPlayer? { get }
     var nowPlaying: AudioPlayableItem? { get }
     var isPlaying: Bool { get }
     var isBuffering: Bool { get }
@@ -192,6 +195,9 @@ protocol AudioPlayerServicing: AnyObject {
 }
 
 // MARK: - Downloads
+extension AudioPlayerServicing {
+    var videoPresentationPlayer: AVPlayer? { nil }
+}
 
 @MainActor
 protocol DownloadManaging: AnyObject {
