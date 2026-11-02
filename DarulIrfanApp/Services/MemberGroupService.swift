@@ -26,6 +26,18 @@ enum MemberGroupError: LocalizedError {
     /// A refusal the server explained in words meant for the person.
     case server(String)
 
+    /// Mutations must not report a loading failure. Preserve actionable service
+    /// guidance, while connection and unspecified failures use the action copy.
+    static func actionDescription(for error: Error) -> String {
+        if let groupError = error as? MemberGroupError {
+            if case .requestFailed = groupError {
+                return String(localized: "The action could not be completed. Check your connection and try again.")
+            }
+            return groupError.localizedDescription
+        }
+        return String(localized: "The action could not be completed. Check your connection and try again.")
+    }
+
     var errorDescription: String? {
         switch self {
         case .signInRejected: String(localized: "Your Apple sign-in could not be verified. Please try again.")

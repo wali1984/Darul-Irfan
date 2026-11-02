@@ -842,7 +842,7 @@ struct GroupDuaRequestsView: View {
         } catch is CancellationError {
             return
         } catch {
-            actionError = error.localizedDescription
+            actionError = MemberGroupError.actionDescription(for: error)
         }
     }
 }
@@ -960,7 +960,7 @@ struct GroupSessionHistoryView: View {
         } catch is CancellationError {
             return
         } catch {
-            self.error = error.localizedDescription
+            self.error = MemberGroupError.actionDescription(for: error)
         }
     }
 }
