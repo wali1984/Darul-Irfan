@@ -220,15 +220,15 @@ struct NotificationSettingsView: View {
     private var alertStylesSection: some View {
         Section {
             ForEach(Prayer.allCases) { prayer in
-                Picker(selection: styleBinding(for: prayer)) {
+                NotificationChoiceRow(
+                    title: Text(LocalizedStringKey(prayer.englishName)),
+                    value: Text(LocalizedStringKey(styleBinding(for: prayer).wrappedValue.englishName)),
+                    selection: styleBinding(for: prayer)
+                ) {
                     ForEach(PrayerAlertStyle.allCases) { style in
                         Text(LocalizedStringKey(style.englishName)).tag(style)
                     }
-                } label: {
-                    Text(LocalizedStringKey(prayer.englishName))
-                        .foregroundStyle(DIColor.textPrimary)
                 }
-                .listRowBackground(DIColor.surface)
             }
         } header: {
             SettingsSectionHeader(titleKey: "Prayer Alerts", systemImage: "bell.badge.fill")
@@ -250,15 +250,15 @@ struct NotificationSettingsView: View {
 
     private var preReminderSection: some View {
         Section {
-            Picker(selection: preReminderBinding) {
+            NotificationChoiceRow(
+                title: Text("Remind Me Before Each Prayer"),
+                value: reminderLabel(preReminderBinding.wrappedValue),
+                selection: preReminderBinding
+            ) {
                 ForEach(PrePrayerReminder.allCases) { reminder in
                     reminderLabel(reminder).tag(reminder)
                 }
-            } label: {
-                Text("Remind Me Before Each Prayer")
-                    .foregroundStyle(DIColor.textPrimary)
             }
-            .listRowBackground(DIColor.surface)
         } header: {
             SettingsSectionHeader(titleKey: "Pre-Prayer Reminder", systemImage: "clock.badge")
         } footer: {
@@ -291,15 +291,15 @@ struct NotificationSettingsView: View {
     private var iqamahSection: some View {
         Section {
             ForEach(Prayer.obligatory, id: \.self) { prayer in
-                Picker(selection: iqamahBinding(for: prayer)) {
+                NotificationChoiceRow(
+                    title: Text(LocalizedStringKey(prayer.englishName)),
+                    value: iqamahLabel(iqamahBinding(for: prayer).wrappedValue),
+                    selection: iqamahBinding(for: prayer)
+                ) {
                     ForEach(PrayerNotificationPreferences.iqamahGapChoices, id: \.self) { minutes in
                         iqamahLabel(minutes).tag(minutes)
                     }
-                } label: {
-                    Text(LocalizedStringKey(prayer.englishName))
-                        .foregroundStyle(DIColor.textPrimary)
                 }
-                .listRowBackground(DIColor.surface)
             }
         } header: {
             SettingsSectionHeader(titleKey: "Iqamah Reminders", systemImage: "person.2.fill")
@@ -757,5 +757,54 @@ private final class AzanPlaybackDelegate: NSObject, AVAudioPlayerDelegate {
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         onFinish?()
+    }
+}
+
+
+/// A raised menu with its setting name included for VoiceOver. Long labels
+/// move below the title rather than truncating the selected value.
+private struct NotificationChoiceRow<Selection: Hashable, Options: View>: View {
+    let title: Text
+    let value: Text
+    @Binding var selection: Selection
+    let options: Options
+
+    init(title: Text, value: Text, selection: Binding<Selection>, @ViewBuilder options: () -> Options) {
+        self.title = title
+        self.value = value
+        self._selection = selection
+        self.options = options()
+    }
+
+    private var menu: some View {
+        Menu {
+            Picker(selection: $selection) { options } label: { title }
+        } label: {
+            HStack(spacing: 8) {
+                value.fixedSize(horizontal: false, vertical: true)
+                Image(systemName: "chevron.up.chevron.down").imageScale(.small).accessibilityHidden(true)
+            }
+        }
+        .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+        .accessibilityLabel(title)
+        .accessibilityValue(value)
+    }
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                title.fixedSize()
+                Spacer(minLength: 0)
+                menu.fixedSize()
+            }
+            VStack(alignment: .leading, spacing: 8) {
+                title.fixedSize(horizontal: false, vertical: true)
+                menu
+            }
+        }
+        .diInterfaceFont(.body)
+        .foregroundStyle(DIColor.textPrimary)
+        .padding(.vertical, 4)
+        .listRowBackground(DIColor.surface)
     }
 }
