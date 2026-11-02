@@ -123,7 +123,12 @@ struct GroupDetailView: View {
         .fullScreenCover(item: $room) { pass in
             if pass.roomID?.isEmpty == false {
                 NativeMeetingRoomView(pass: pass, groupID: group.id, service: service,
-                                      isLiveZikr: detail?.live?.kind == "zikr")
+                                      isLiveZikr: detail?.live?.kind == "zikr", prepareAudio: {
+                    QuranListenPlayer.shared.stop()
+                    HifzPlayer.active?.stop()
+                    NotificationCenter.default.post(name: .bayanAudioWillStart, object: nil)
+                    dependencies?.audioPlayer.stop()
+                })
             } else { MeetingRoomView(pass: pass) }
         }
         .sheet(item: $sheet, onDismiss: { Task { await load() } }) { sheet in

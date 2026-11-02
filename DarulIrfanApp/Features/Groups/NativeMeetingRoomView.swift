@@ -8,6 +8,7 @@ struct NativeMeetingRoomView: View {
     let service: MemberGroupService
     /// Supplied by the group's refreshed live-session state.
     let isLiveZikr: Bool
+    let prepareAudio: () -> Void
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @State private var rejected = false
@@ -80,7 +81,7 @@ struct NativeMeetingRoomView: View {
                     }
                 }
             }
-            .task { rejected = !owner.join(pass: pass, groupID: groupID); started = true }
+            .task { rejected = !owner.join(pass: pass, groupID: groupID, prepareAudio: prepareAudio); started = true }
             .alert("Could not complete action", isPresented: $attachmentFailed) {
                 Button("OK", role: .cancel) {}
             }

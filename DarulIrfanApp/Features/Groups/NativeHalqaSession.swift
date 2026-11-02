@@ -36,11 +36,14 @@ final class NativeHalqaSession {
     }
 
     @discardableResult
-    func join(pass: GroupRoomPass, groupID: String) -> Bool {
+    func join(pass: GroupRoomPass, groupID: String, prepareAudio: () -> Void) -> Bool {
         guard let roomID = pass.roomID, !roomID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
         if lifecycle.transport != nil && presentation?.groupID != groupID { return false }
         let started = lifecycle.start(sessionID: roomID) {
-            NativeMeetingTransport(authToken: pass.authToken)
+            // Only a fresh connection takes audio ownership. Returning to an
+            // existing room must not interrupt or reset its audio session.
+            prepareAudio()
+            return NativeMeetingTransport(authToken: pass.authToken)
         }
         if started { presentation = (groupID, pass) }
         return started
