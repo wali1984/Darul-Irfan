@@ -31,7 +31,7 @@ struct HalqahAuditFixture: View {
                 GroupLiveStarter(groupID: "admin", service: service, meetingsReady: false)
             } else if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
                 DirectoryPersonView(person: DirectoryPerson(
-                    id: "audit-person", name: "Audit member", email: nil, lastSeenAt: nil,
+                    id: "audit-person", name: "Audit member", email: nil, lastSeenAt: Date(timeIntervalSince1970: 1_700_000_000),
                     isSuperAdmin: false, isYou: false,
                     halqahs: [.init(groupID: "admin", groupName: "Before refresh", role: .member)]),
                     service: service, halqahs: [], onChange: {})

@@ -160,6 +160,7 @@ struct MemberDirectoryView: View {
 /// them out.
 @MainActor
 struct DirectoryPersonView: View {
+    @Environment(\.locale) private var locale
     @State var person: DirectoryPerson
     let service: MemberGroupService
     let halqahs: [MemberGroup]
@@ -182,7 +183,7 @@ struct DirectoryPersonView: View {
             Section {
                 if let email = person.email { LabeledContent("Email", value: email) }
                 if let seen = person.lastSeenAt {
-                    LabeledContent("Last seen", value: seen.formatted(date: .abbreviated, time: .shortened))
+                    LabeledContent("Last seen", value: GroupInvitationDate.text(seen, locale: locale, includesTime: true))
                 }
                 if person.isSuperAdmin {
                     Text("Super admin: everything, in every Halqah.").foregroundStyle(DIColor.textMuted)
