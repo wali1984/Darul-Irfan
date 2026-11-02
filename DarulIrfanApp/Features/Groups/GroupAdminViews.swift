@@ -233,6 +233,7 @@ struct GroupPostComposer: View {
 
 @MainActor
 struct GroupLiveStarter: View {
+    @Environment(\.locale) private var locale
     let groupID: String
     let service: MemberGroupService
     /// False while video meetings await their integration: no room can open.
@@ -418,7 +419,7 @@ struct GroupLiveStarter: View {
                     choiceRow(
                         entry: .video(video.videoID),
                         title: video.title,
-                        detail: [video.publishedAt.formatted(date: .abbreviated, time: .omitted), length(video.durationSeconds)]
+                        detail: [GroupInvitationDate.text(video.publishedAt, locale: locale), length(video.durationSeconds)]
                     )
                 }
 
@@ -547,7 +548,7 @@ struct GroupLiveStarter: View {
     private func titleOf(_ entry: GroupQueueEntry) -> String {
         switch entry {
         case .recording(let id): library?.recordings.first { $0.id == id }?.title ?? id
-        case .video(let id): library?.pastVideos.first { $0.videoID == id }.map { "\($0.title) · \($0.publishedAt.formatted(date: .abbreviated, time: .omitted))" } ?? id
+        case .video(let id): library?.pastVideos.first { $0.videoID == id }.map { "\($0.title) · \(GroupInvitationDate.text($0.publishedAt, locale: locale))" } ?? id
         }
     }
 
@@ -887,7 +888,7 @@ struct GroupZikrEditor: View {
         switch autoplay {
         case .recording(let id): return library?.recordings.first { $0.id == id }?.title ?? id
         case .video(let id): return library?.pastVideos.first { $0.videoID == id }.map {
-            "\($0.title) · \($0.publishedAt.formatted(date: .abbreviated, time: .omitted))"
+            "\($0.title) · \(GroupInvitationDate.text($0.publishedAt, locale: locale))"
         } ?? id
         case nil: return String(localized: "Nothing: an admin starts it")
         }
@@ -932,6 +933,7 @@ struct GroupZikrEditor: View {
 
 /// Full titles stay readable at large text sizes while preserving the selected item.
 private struct GroupAutoplayChoices: View {
+    @Environment(\.locale) private var locale
     let library: GroupRecordingLibrary
     @Binding var selection: GroupQueueEntry?
     @Environment(\.dismiss) private var dismiss
@@ -953,7 +955,7 @@ private struct GroupAutoplayChoices: View {
                     .accessibilityIdentifier("autoplay-expand-videos")
                 }
                 ForEach(library.pastVideos.prefix(showAllPastVideos ? library.pastVideos.count : 20)) { video in
-                    choice(.video(video.videoID), title: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
+                    choice(.video(video.videoID), title: "\(video.title) · \(GroupInvitationDate.text(video.publishedAt, locale: locale))")
                 }
             }
             .listRowBackground(DIColor.surface)
