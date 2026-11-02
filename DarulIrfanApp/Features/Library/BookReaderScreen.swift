@@ -724,6 +724,7 @@ struct BookTextSearchView: View {
                 .foregroundStyle(isFieldFocused ? DIColor.actionForeground : DIColor.textMuted)
                 .accessibilityHidden(true)
             TextField("Search in this book", text: $query)
+                .diInterfaceFont(.body)
                 .focused($isFieldFocused)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -765,6 +766,7 @@ struct BookTextSearchView: View {
                 DIEmptyState(systemImage: "magnifyingglass", titleKey: "Something went wrong",
                     messageKey: "The search could not be completed. Please check your connection and try again.")
                 Button("Try Again") { prepareAttempt += 1 }
+                    .diInterfaceFont(.subheadline, weight: .semibold)
                     .buttonStyle(DICompactButtonStyle())
             }
             .frame(maxHeight: .infinity, alignment: .top)
@@ -792,6 +794,7 @@ struct BookTextSearchView: View {
                     }
                 } header: {
                     Text("Matches: \(results.count)")
+                        .diInterfaceFont(.caption)
                 }
             }
             .listStyle(.insetGrouped)
