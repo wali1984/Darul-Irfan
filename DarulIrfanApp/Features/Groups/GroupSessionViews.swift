@@ -755,6 +755,7 @@ struct GroupDuaRequestsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var requests: [GroupDuaRequest]?
+    @State private var loadGeneration = 0
     @State private var failed = false
     @State private var actionError: String?
     @State private var working = false
@@ -813,13 +814,17 @@ struct GroupDuaRequestsView: View {
     }
 
     private func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         failed = false
         do {
-            requests = try await service.duaRequests(in: groupID)
+            let loaded = try await service.duaRequests(in: groupID)
+            guard generation == loadGeneration else { return }
+            requests = loaded
         } catch is CancellationError {
             return
         } catch {
-            failed = true
+            if generation == loadGeneration { failed = true }
         }
     }
 
@@ -829,6 +834,8 @@ struct GroupDuaRequestsView: View {
         defer { working = false }
         do {
             try await service.markDuaRead(request.id, in: groupID)
+            // Ignore refresh responses started before this confirmed write.
+            loadGeneration += 1
             // Retain the server-confirmed change if refreshing the list fails.
             requests = requests?.map { value in
                 var updated = value
