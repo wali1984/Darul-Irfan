@@ -198,6 +198,11 @@ workflows:
                           "-only-testing:DarulIrfanUITests/RedesignScreenshotTests/$DI_SCREENSHOT_CASE")
           fi
           touch build/audio-follow-started
+          READER_SAMPLER_PID=""
+          if [ "${DI_READER_PROFILE:-}" = "1" ]; then
+            python3 Tools/CI/sample_reader_process.py > build/logs/reader-process-sampler.log 2>&1 &
+            READER_SAMPLER_PID=$!
+          fi
           AUDIO_SAMPLER_PID=""
           if [ "${DI_SCREENSHOTS:-}" = "audio-transport" ]; then
             python3 Tools/CI/collect_audio_environment.py
@@ -217,6 +222,10 @@ workflows:
             touch build/audio-probe-sampling-stop
             wait "$AUDIO_SAMPLER_PID"
           fi
+          if [ -n "$READER_SAMPLER_PID" ]; then
+            touch build/reader-sampling-stop
+            wait "$READER_SAMPLER_PID"
+          fi
           echo "$RESULT" > build/logs/screens-exit-code.txt
           exit "$RESULT"
       - name: Export the screenshots
@@ -229,6 +238,9 @@ workflows:
             (cd build && zip -qr Screens.xcresult.zip Screens.xcresult)
           fi
           python3 Tools/CI/export_audio_follow_diagnostics.py
+          if [ -d build/reader-profile ]; then
+            cp -R build/reader-profile build/screens/reader-profile
+          fi
           cd build && zip -qr screens.zip screens
       - name: Enforce screenshot test result after exporting diagnostics
         script: |
