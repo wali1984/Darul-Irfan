@@ -12,6 +12,10 @@ final class NativeHalqaSession {
         (lifecycle.transport as? NativeMeetingTransport)?.client
     }
 
+    var chat: NativeMeetingChat? {
+        (lifecycle.transport as? NativeMeetingTransport)?.chat
+    }
+
     @discardableResult
     func join(sessionID: String, pass: GroupRoomPass) -> Bool {
         lifecycle.start(sessionID: sessionID) {

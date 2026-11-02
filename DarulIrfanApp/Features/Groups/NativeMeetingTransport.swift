@@ -6,6 +6,7 @@ import RealtimeKit
 @MainActor
 final class NativeMeetingTransport: HalqaSessionTransport {
     let client = NativeMeetingConfiguration.makeClient()
+    private(set) lazy var chat = NativeMeetingChat(client: client)
     private let info: RtkMeetingInfo
     var onEnded: (() -> Void)?
     var onConnectionChanged: ((HalqaConnectionStatus) -> Void)?
@@ -28,13 +29,19 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     }
 
     func join(completion: @escaping (Bool) -> Void) {
-        client.joinRoom(onSuccess: { Task { @MainActor in completion(true) } },
+        _ = chat // Attach before joining so initial history is observed.
+        client.joinRoom(onSuccess: { [weak self] in Task { @MainActor in
+            self?.chat.joined()
+            completion(true)
+        } },
                         onFailure: { _ in Task { @MainActor in completion(false) } })
     }
 
     func release(completion: @escaping (Bool) -> Void) {
+        chat.leaving()
         client.release(onSuccess: { [weak self] in Task { @MainActor in
             if let self {
+                self.chat.released()
                 self.client.removeMeetingRoomEventListener(meetingRoomEventListener: self.events)
                 self.client.removeSelfEventListener(selfEventListener: self.membershipEvents)
             }
