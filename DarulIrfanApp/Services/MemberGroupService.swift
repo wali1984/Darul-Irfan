@@ -77,7 +77,10 @@ actor MemberGroupService {
     }
 
     var isSignedIn: Bool { savedSession.load() != nil }
-    var memberID: String? { savedSession.load()?.memberID }
+    /// Synchronous identity snapshot for account-scoped SwiftUI persistence.
+    /// The immutable Sendable store serializes its own reads (Keychain lock
+    /// in production); no actor-isolated networking/decoder state is touched.
+    nonisolated var memberID: String? { savedSession.load()?.memberID }
 
     /// Public admission to Our Sheikh only. Optional email is contact data,
     /// never a sign-in identity. Existing Apple sessions retain their roles.
