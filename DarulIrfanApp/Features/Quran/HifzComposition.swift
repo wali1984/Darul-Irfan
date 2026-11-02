@@ -19,7 +19,8 @@ enum HifzComposition {
         guard let track = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             throw Failure.unavailableAudio
         }
-        for segment in timeline.segments {
+        for (index, segment) in timeline.segments.enumerated() {
+            if index.isMultiple(of: 64) { await Task.yield() }
             try Task.checkCancellation()
             let at = CMTime(value: segment.startMs, timescale: 1000)
             let length = CMTime(value: segment.durationMs, timescale: 1000)

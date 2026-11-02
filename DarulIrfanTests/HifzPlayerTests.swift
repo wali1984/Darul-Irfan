@@ -88,6 +88,24 @@ final class HifzPlayerTests: XCTestCase {
         return (recording, url)
     }
 
+    func testPauseAndStopDuringCompositionPreparationRemainAuthoritative() async throws {
+        let (recording, url) = try localAudio()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let player = HifzPlayer()
+        defer { player.stop() }
+        player.start(recitation: recording, range: 1...7, repeats: 2, pauseSeconds: 1, startingAyah: 4)
+        player.pause()
+        try await Task.sleep(for: .milliseconds(300))
+        XCTAssertFalse(player.isPlaying)
+        XCTAssertEqual(player.currentAyah, 4)
+        player.start(recitation: recording, range: 1...7, repeats: 2, pauseSeconds: 1, startingAyah: 5)
+        player.stop()
+        try await Task.sleep(for: .milliseconds(300))
+        XCTAssertFalse(player.isPlaying)
+        XCTAssertNil(player.currentAyah)
+        XCTAssertFalse(player.playbackFailed)
+    }
+
     func testCompositionContainsExactRecitationsAndRecallGaps() async throws {
         let (recording, url) = try localAudio()
         defer { try? FileManager.default.removeItem(at: url) }

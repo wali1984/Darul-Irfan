@@ -7,7 +7,7 @@ import Observation
 ///
 /// Deliberately separate from `RecitationPlayer` rather than an extension of it.
 /// That player streams a whole surah and reports where it has reached; this one
-/// holds a single verse's window and replays it. Keeping them apart means the
+/// assembles repeated verse windows and recall intervals. Keeping them apart means the
 /// reader's playback cannot regress because practice changed, and the two never
 /// fight over one AVPlayer.
 ///
@@ -36,8 +36,9 @@ final class HifzPlayer {
     @ObservationIgnored private var timeObserver: Any?
     @ObservationIgnored private var itemStatusObserver: NSKeyValueObservation?
     @ObservationIgnored private var failureObserver: NSObjectProtocol?
-    @ObservationIgnored private var recitation: SurahRecitation?
-    @ObservationIgnored private var pauseTask: Task<Void, Never>?
+    @ObservationIgnored private var preparationTask: Task<Void, Never>?
+    @ObservationIgnored private var timeline: HifzPlaybackTimeline?
+    @ObservationIgnored private var endObserver: NSObjectProtocol?
     @ObservationIgnored private var bayanObserver: NSObjectProtocol?
     @ObservationIgnored private var interruptionObserver: NSObjectProtocol?
     @ObservationIgnored private var routeObserver: NSObjectProtocol?
@@ -49,8 +50,6 @@ final class HifzPlayer {
     @ObservationIgnored private var isSeeking = false
 
     @ObservationIgnored private var range: ClosedRange<Int> = 1...1
-    @ObservationIgnored private var repeats = 3
-    @ObservationIgnored private var pauseSeconds: Double = 1.5
 
     /// Starts practice. `recitation` is the surah's bundled timing set; without
     /// one there is nothing to loop, so the caller should not offer practice.
@@ -68,10 +67,11 @@ final class HifzPlayer {
             return
         }
         installAudioSessionObservers()
-        self.recitation = recitation
         self.range = range
-        self.repeats = max(1, repeats)
-        self.pauseSeconds = max(0, pauseSeconds)
+        do {
+            timeline = try HifzPlaybackTimeline(recitation: recitation, range: range,
+                repeats: repeats, pauseSeconds: pauseSeconds)
+        } catch { failPlayback(); return }
 
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
         try? AVAudioSession.sharedInstance().setActive(true)
@@ -86,30 +86,26 @@ final class HifzPlayer {
             Task { @MainActor in self?.stop() }
         }
 
-        // The reader's exactly-timed item, with its offline copy: the file is
-        // variable bitrate, and a seek timed by estimate lands inside the
-        // ayah before or cuts the one being memorised.
-        let newPlayer = AVPlayer(playerItem: QuranListenPlayer.recitationItem(url, durationMs: recitation.durationMs))
+        let newPlayer = AVPlayer()
         player = newPlayer
-        if let item = newPlayer.currentItem {
-            itemStatusObserver = item.observe(\.status, options: [.initial, .new]) { [weak self, weak newPlayer] item, _ in
-                guard item.status == .failed else { return }
-                Task { @MainActor in
-                    guard let self, let newPlayer, self.player === newPlayer else { return }
-                    self.failPlayback()
-                }
-            }
-            failureObserver = NotificationCenter.default.addObserver(
-                forName: AVPlayerItem.failedToPlayToEndTimeNotification, object: item, queue: .main
-            ) { [weak self, weak newPlayer] _ in
-                Task { @MainActor in
-                    guard let self, let newPlayer, self.player === newPlayer else { return }
-                    self.failPlayback()
-                }
+        let sessionID = audioSessionID
+        preparationTask = Task { @MainActor [weak self, weak newPlayer] in
+            guard let self, let newPlayer, let timeline = self.timeline else { return }
+            do {
+                let source = QuranListenPlayer.recitationItem(url, durationMs: recitation.durationMs).asset
+                let composition = try await HifzComposition.make(asset: source, timeline: timeline)
+                guard !Task.isCancelled, self.audioSessionID == sessionID, self.player === newPlayer else { return }
+                newPlayer.replaceCurrentItem(with: AVPlayerItem(asset: composition))
+                self.installItemObservers(newPlayer)
+                if self.isPlaying, let ayah = self.currentAyah { self.recite(ayah: ayah) }
+            } catch is CancellationError { return }
+            catch {
+                guard self.audioSessionID == sessionID, self.player === newPlayer else { return }
+                self.failPlayback()
             }
         }
-        // 20 Hz is enough to stop within a fiftieth of a second of a verse end,
-        // which is below what a listener notices, and cheap.
+        // Observation updates the visible ayah; playback boundaries and recall
+        // intervals are now driven by the composition, independent of this timer.
         timeObserver = newPlayer.addPeriodicTimeObserver(
             forInterval: CMTime(value: 1, timescale: 20), queue: .main
         ) { [weak self, weak newPlayer] time in
@@ -128,8 +124,6 @@ final class HifzPlayer {
     }
 
     func pause() {
-        pauseTask?.cancel()
-        pauseTask = nil
         player?.pause()
         phase = .idle
     }
@@ -149,8 +143,11 @@ final class HifzPlayer {
         interruptionObserver = nil
         if let routeObserver { NotificationCenter.default.removeObserver(routeObserver) }
         routeObserver = nil
-        pauseTask?.cancel()
-        pauseTask = nil
+        preparationTask?.cancel()
+        preparationTask = nil
+        timeline = nil
+        if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
+        endObserver = nil
         if let timeObserver, let player { player.removeTimeObserver(timeObserver) }
         timeObserver = nil
         itemStatusObserver?.invalidate()
@@ -163,7 +160,6 @@ final class HifzPlayer {
         isSeeking = false
         player?.pause()
         player = nil
-        recitation = nil
         playbackFailed = false
         phase = .idle
         currentAyah = nil
@@ -217,17 +213,17 @@ final class HifzPlayer {
     /// the seek has landed; started at once, the end-of-verse check could act
     /// on the position before the seek and cut the repetition short.
     private func recite(ayah: Int) {
-        guard let player, let verse = recitation?.verse(ayah) else { return }
+        guard let player, let segment = timeline?.segments.first(where: {
+            $0.ayah == ayah && $0.repetition == repetition && $0.sourceStartMs != nil
+        }) else { return }
         phase = .reciting
+        guard player.currentItem != nil else { return } // preparation retains intent
         player.pause()
         seekToken += 1
         let token = seekToken
         isSeeking = true
-        player.seek(
-            to: CMTime(value: CMTimeValue(verse.fromMs), timescale: 1000),
-            toleranceBefore: .zero,
-            toleranceAfter: .zero
-        ) { [weak self] finished in
+        player.seek(to: CMTime(value: segment.startMs, timescale: 1000),
+                    toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
             Task { @MainActor in
                 guard let self, token == self.seekToken else { return }
                 self.isSeeking = false
@@ -239,41 +235,43 @@ final class HifzPlayer {
     }
 
     private func observe(ms: Int) {
-        guard phase == .reciting, !isSeeking, let ayah = currentAyah,
-              let verse = recitation?.verse(ayah), ms >= verse.toMs else { return }
-        player?.pause()
-        if repetition < repeats {
-            repetition += 1
-            waitThenContinue { [weak self] in
-                guard let self, let ayah = self.currentAyah else { return }
-                self.recite(ayah: ayah)
+        guard player?.currentItem != nil, isPlaying, !isSeeking,
+              let segment = timeline?.segment(at: Int64(ms)) else { return }
+        currentAyah = segment.ayah
+        repetition = segment.repetition
+        phase = segment.sourceStartMs == nil ? .pausing : .reciting
+    }
+
+    private func installItemObservers(_ newPlayer: AVPlayer) {
+        if let item = newPlayer.currentItem {
+            itemStatusObserver = item.observe(\.status, options: [.initial, .new]) { [weak self, weak newPlayer] item, _ in
+                guard item.status == .failed else { return }
+                Task { @MainActor in
+                    guard let self, let newPlayer, self.player === newPlayer else { return }
+                    self.failPlayback()
+                }
             }
-        } else if ayah < range.upperBound {
-            repetition = 1
-            currentAyah = ayah + 1
-            waitThenContinue { [weak self] in
-                guard let self, let next = self.currentAyah else { return }
-                self.recite(ayah: next)
+            failureObserver = NotificationCenter.default.addObserver(
+                forName: AVPlayerItem.failedToPlayToEndTimeNotification, object: item, queue: .main
+            ) { [weak self, weak newPlayer] _ in
+                Task { @MainActor in
+                    guard let self, let newPlayer, self.player === newPlayer else { return }
+                    self.failPlayback()
+                }
             }
-        } else {
-            phase = .finished
+        }
+        if let item = newPlayer.currentItem {
+            endObserver = NotificationCenter.default.addObserver(
+                forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main
+            ) { [weak self, weak newPlayer] _ in
+                Task { @MainActor in
+                    guard let self, let newPlayer, self.player === newPlayer else { return }
+                    self.phase = .finished
+                }
+            }
         }
     }
 
-    /// The silence between repetitions. Cancellable, so pausing or leaving the
-    /// screen during the gap does not start the next repetition afterwards.
-    private func waitThenContinue(_ next: @escaping @MainActor () -> Void) {
-        phase = .pausing
-        pauseTask?.cancel()
-        let seconds = pauseSeconds
-        pauseTask = Task { @MainActor [weak self] in
-            if seconds > 0 {
-                try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-            }
-            guard !Task.isCancelled, self?.phase == .pausing else { return }
-            next()
-        }
-    }
 }
 
 /// Where practice was left off, per surah, so returning resumes rather than
