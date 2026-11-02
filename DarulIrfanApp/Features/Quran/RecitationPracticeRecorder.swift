@@ -22,6 +22,8 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
     private(set) var phase = Phase.idle
     private(set) var failure: Failure?
     private(set) var hasClip = false
+    private(set) var clipReference: String?
+    @ObservationIgnored private var recordingReference: String?
     @ObservationIgnored private let files: RecitationPracticeFiles
     @ObservationIgnored private let audioReserved: @MainActor () -> Bool
     @ObservationIgnored private var recorder: AVAudioRecorder?
@@ -58,7 +60,7 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
         }
     }
 
-    func start(permission: (@escaping @MainActor (Bool) -> Void) -> Void,
+    func start(reference: String? = nil, permission: (@escaping @MainActor (Bool) -> Void) -> Void,
                prepareAudio: @escaping (@escaping @MainActor (Bool) -> Void) -> Void,
                allowedNow: @escaping () -> Bool) {
         guard !closed, phase == .idle else { return }
@@ -77,19 +79,20 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
                 guard ready, !self.audioReserved(), allowedNow(), UIApplication.shared.applicationState == .active else {
                     self.phase = .idle; self.failure = .audio; return
                 }
-                self.beginCapture()
+                self.beginCapture(reference: reference)
             }
         }
     }
 
     private func isCurrent(_ request: UUID) -> Bool { !closed && ticket == request && phase == .preparing }
 
-    private func beginCapture() {
+    private func beginCapture(reference: String?) {
         guard AVCaptureDevice.authorizationStatus(for: .audio) == .authorized else {
             phase = .idle; failure = .permission; return
         }
         do {
             let file = try files.begin()
+            recordingReference = reference
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
             try session.setActive(true)
@@ -123,6 +126,7 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
         do {
             let decoded = try AVAudioPlayer(contentsOf: recording.url)
             try files.accept(recording.url, decodedDuration: decoded.duration)
+            clipReference = recordingReference
             hasClip = true
         } catch { failure = .recording; discardPending() }
         if deactivateSession { deactivate() }
@@ -178,7 +182,7 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
 
     func deleteClip() {
         guard phase == .idle else { return }
-        do { try files.deleteCurrent(); hasClip = false; failure = nil }
+        do { try files.deleteCurrent(); hasClip = false; clipReference = nil; failure = nil }
         catch { failure = .storage }
     }
 
@@ -187,7 +191,7 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
         closed = true
         observers.forEach(NotificationCenter.default.removeObserver)
         observers.removeAll()
-        do { try files.close(); hasClip = false }
+        do { try files.close(); hasClip = false; clipReference = nil }
         catch { failure = .storage }
     }
 

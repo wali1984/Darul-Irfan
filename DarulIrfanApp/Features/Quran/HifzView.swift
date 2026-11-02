@@ -62,6 +62,7 @@ struct HifzView: View {
                 } else {
                     nowPractising
                     RecitationPracticeCard(recorder: recorder, audioPlayer: audioPlayer,
+                                           reference: "\(surah.id):\(player.currentAyah ?? selectedAyah)",
                                            allowedNow: { isPresented && scenePhase == .active })
                     rangeCard
                     repetitionCard

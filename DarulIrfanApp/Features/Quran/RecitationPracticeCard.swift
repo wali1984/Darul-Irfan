@@ -5,6 +5,7 @@ import SwiftUI
 struct RecitationPracticeCard: View {
     let recorder: RecitationPracticeRecorder?
     let audioPlayer: any AudioPlayerServicing
+    let reference: String
     let allowedNow: () -> Bool
 
     var body: some View {
@@ -16,6 +17,11 @@ struct RecitationPracticeCard: View {
                 Text("Your recording stays on this device and is deleted when you leave this page.")
                     .diInterfaceFont(.footnote).foregroundStyle(.secondary)
                 if let recorder {
+                    if let savedReference = recorder.clipReference, recorder.hasClip {
+                        Text("Recorded for ayah \(savedReference)")
+                            .diInterfaceFont(.footnote, weight: .semibold)
+                            .foregroundStyle(DIColor.actionForeground)
+                    }
                     if let failure = recorder.failure {
                         Text(LocalizedStringKey(message(failure)))
                             .diInterfaceFont(.callout).foregroundStyle(DIColor.textPrimary)
@@ -39,7 +45,7 @@ struct RecitationPracticeCard: View {
                         Button("Stop playback") { recorder.stopReplay() }.buttonStyle(DIPrimaryButtonStyle())
                     case .idle:
                         Button(recorder.hasClip ? "Record again" : "Record my recitation") {
-                            recorder.start(permission: { reply in
+                            recorder.start(reference: reference, permission: { reply in
                                 AVCaptureDevice.requestAccess(for: .audio) { granted in
                                     Task { @MainActor in reply(granted) }
                                 }

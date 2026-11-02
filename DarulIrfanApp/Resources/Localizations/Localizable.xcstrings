@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Recorded for ayah %@": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Recorded for ayah %@"}}, "ur": {"stringUnit": {"state": "translated", "value": "??? %@ ?? ??? ?????? ?? ???"}}}},
     "Your recitation": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your recitation"}}, "ur": {"stringUnit": {"state": "translated", "value": "آپ کی تلاوت"}}}},
     "Record up to 5 minutes, then listen and compare with the reciter. Ask your teacher to check your Tajweed.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Record up to 5 minutes, then listen and compare with the reciter. Ask your teacher to check your Tajweed."}}, "ur": {"stringUnit": {"state": "translated", "value": "5 منٹ تک اپنی تلاوت ریکارڈ کریں، پھر سن کر قاری کی تلاوت سے موازنہ کریں۔ تجوید کی جانچ اپنے استاد سے کروائیں۔"}}}},
     "Your recording stays on this device and is deleted when you leave this page.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your recording stays on this device and is deleted when you leave this page."}}, "ur": {"stringUnit": {"state": "translated", "value": "آپ کی ریکارڈنگ اسی آلے میں رہتی ہے اور یہ صفحہ بند کرنے پر حذف ہو جاتی ہے۔"}}}},
