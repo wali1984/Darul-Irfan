@@ -126,6 +126,8 @@ struct PostAttachmentStrip: View {
 /// A post's pictures and videos: one shown whole, several to swipe through.
 struct PostMediaView: View {
     let media: [PostAttachment]
+    let audioPlayer: (any AudioPlayerServicing)?
+    let title: String
 
     var body: some View {
         if media.count == 1, let only = media.first {
@@ -142,7 +144,7 @@ struct PostMediaView: View {
     @ViewBuilder
     private func tile(_ item: PostAttachment) -> some View {
         if item.kind == "video" {
-            PostVideoTile(url: item.url)
+            PostVideoTile(url: item.url, audioPlayer: audioPlayer, title: title)
         } else {
             GroupPostImage(url: item.url).id(item.url)
         }
@@ -178,18 +180,22 @@ struct GroupPostImage: View {
 /// A video that loads only when tapped, so a page of posts stays light.
 private struct PostVideoTile: View {
     let url: URL
-    @State private var player: AVPlayer?
+    let audioPlayer: (any AudioPlayerServicing)?
+    let title: String
+    @Environment(\.scenePhase) private var scenePhase
+    private var mediaID: String { "group-post:" + url.path }
+    private var player: AVPlayer? {
+        audioPlayer?.nowPlaying?.id == mediaID ? audioPlayer?.videoPresentationPlayer : nil
+    }
 
     var body: some View {
         Group {
-            if let player {
+            if scenePhase == .active, let player {
                 VideoPlayer(player: player)
             } else {
                 Button {
-                    try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
-                    let player = AVPlayer(url: url)
-                    self.player = player
-                    player.play()
+                    let item = AudioPlayableItem(id: mediaID, title: title, subtitle: nil, url: url, mediaItemID: nil)
+                    audioPlayer?.play(item, queue: [item])
                 } label: {
                     ZStack {
                         Rectangle().fill(Color.black.opacity(0.85))
@@ -198,10 +204,10 @@ private struct PostVideoTile: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .disabled(audioPlayer == nil)
             }
         }
         .frame(height: 230)
         .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
-        .onDisappear { player?.pause() }
     }
 }

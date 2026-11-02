@@ -498,7 +498,7 @@ struct GroupDetailView: View {
                     .diInterfaceFont(.caption)
                     .foregroundStyle(.secondary)
                 if let media = post.media, !media.isEmpty {
-                    PostMediaView(media: media)
+                    PostMediaView(media: media, audioPlayer: dependencies?.audioPlayer, title: post.title.isEmpty ? String(localized: "Play the video") : post.title)
                 }
                 if let imageURL = post.imageURL {
                     GroupPostImage(url: imageURL)
