@@ -171,12 +171,17 @@ final class QuranListenPlayer {
     @ObservationIgnored private var narratorEnd: NSObjectProtocol?
     @ObservationIgnored private var narratorItemWatch: NSKeyValueObservation?
     @ObservationIgnored private var bayanObserver: NSObjectProtocol?
+    @ObservationIgnored private var interruptionObserver: NSObjectProtocol?
+    @ObservationIgnored private var routeObserver: NSObjectProtocol?
+    @ObservationIgnored private var interruption = QuranInterruptionState()
+
 
     private init() {
 #if DEBUG
         startPlaybackAuditIfRequested()
 #endif
         narrator.actionAtItemEnd = .advance
+        installAudioSessionObservers()
         // A bayan started anywhere in the app ends the recitation, rather
         // than the two playing at once.
         bayanObserver = NotificationCenter.default.addObserver(
@@ -212,19 +217,26 @@ final class QuranListenPlayer {
     }
 
     func pause() {
+        interruption.cancel()
         reciter?.pause()
         narrator.pause()
         isPlaying = false
     }
 
     func resume() {
+        interruption.cancel()
         guard current != nil else { return }
+        // An interruption may deactivate the shared session. Resume only when
+        // the system accepts activation, keeping the UI paused if it cannot.
+        do { try AVAudioSession.sharedInstance().setActive(true) }
+        catch { return }
         NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
         if part == .translation { narrator.play() } else { reciter?.play() }
         isPlaying = true
     }
 
     func stop() {
+        interruption.cancel()
         session += 1
         partToken += 1
         afterPart = nil
@@ -253,6 +265,39 @@ final class QuranListenPlayer {
 
     func isActive(inSurah surah: Int) -> Bool {
         current?.surah == surah
+    }
+
+    // The lecture player also observes the shared audio session, but it is
+    // paused while Quran audio owns playback. These events belong to this
+    // player too, including narrated translations.
+    private func installAudioSessionObservers() {
+        interruptionObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance(), queue: .main
+        ) { [weak self] notification in
+            guard let raw = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt else { return }
+            let options = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+            Task { @MainActor in
+                guard let self, let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
+                switch type {
+                case .began:
+                    let wasPlaying = self.isPlaying
+                    self.pause()
+                    self.interruption.begin(session: self.session, wasPlaying: wasPlaying)
+                case .ended:
+                    let allowed = AVAudioSession.InterruptionOptions(rawValue: options).contains(.shouldResume)
+                    if self.interruption.end(session: self.session, shouldResume: allowed) { self.resume() }
+                @unknown default: break
+                }
+            }
+        }
+        routeObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main
+        ) { [weak self] notification in
+            guard let raw = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+                  AVAudioSession.RouteChangeReason(rawValue: raw) == .oldDeviceUnavailable else { return }
+            Task { @MainActor in self?.pause() }
+        }
     }
 
     // MARK: Steps
@@ -464,5 +509,22 @@ final class QuranListenPlayer {
             }
             nextIndex += 1
         }
+    }
+}
+
+/// Resume intent belongs to the interrupted recording, never to a later one.
+/// Explicit pause/stop and headphone disconnection cancel that intent.
+struct QuranInterruptionState {
+    private var interruptedSession: Int?
+
+    mutating func begin(session: Int, wasPlaying: Bool) {
+        interruptedSession = wasPlaying ? session : nil
+    }
+
+    mutating func cancel() { interruptedSession = nil }
+
+    mutating func end(session: Int, shouldResume: Bool) -> Bool {
+        defer { interruptedSession = nil }
+        return shouldResume && interruptedSession == session
     }
 }
