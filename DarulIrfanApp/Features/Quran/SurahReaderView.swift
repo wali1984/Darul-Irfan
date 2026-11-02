@@ -100,6 +100,11 @@ struct SurahReaderView: View {
                 await viewModel.load()
                 await NarrationCatalog.shared.load()
             }
+            .task {
+                #if DEBUG
+                await recordReaderResponsivenessIfRequested()
+                #endif
+            }
             .onAppear {
                 isOnScreen = true
                 isHandingOnJuz = false
@@ -115,6 +120,37 @@ struct SurahReaderView: View {
                 Task { await readerViewModel.flushLastRead() }
             }
     }
+
+    #if DEBUG
+    /// Opt-in CI evidence: records main-actor scheduling gaps without Quran text,
+    /// user notes, identifiers, or production telemetry.
+    @MainActor private func recordReaderResponsivenessIfRequested() async {
+        guard ProcessInfo.processInfo.arguments.contains("--uitesting-reader-diagnostics") else { return }
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("reader-audit-\(viewModel.surah.id).jsonl")
+        var output = Data()
+        var previous = ProcessInfo.processInfo.systemUptime
+        for _ in 0..<600 {
+            guard !Task.isCancelled else { return }
+            let now = ProcessInfo.processInfo.systemUptime
+            let sample: [String: Any] = [
+                "timestamp": Date().timeIntervalSince1970,
+                "mainActorGapSeconds": now - previous,
+                "loadedAyahs": viewModel.ayahs.count,
+                "requestedAyah": initialFocusAyah ?? 0,
+                "topAyah": topAyah ?? 0,
+                "visible": isOnScreen,
+                "ready": viewModel.phase == .ready,
+            ]
+            if let line = try? JSONSerialization.data(withJSONObject: sample, options: [.sortedKeys]) {
+                output.append(line); output.append(0x0a)
+                try? output.write(to: url, options: .atomic)
+            }
+            previous = now
+            do { try await Task.sleep(for: .seconds(1)) } catch { return }
+        }
+    }
+    #endif
 
     /// Persistent quick actions have their own surface so long surah titles stay readable.
     private var readerControls: some View {

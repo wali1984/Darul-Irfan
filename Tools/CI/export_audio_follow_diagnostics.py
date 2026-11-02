@@ -10,8 +10,10 @@ BUNDLE_ID = "us.naqshbaniaowaisiah"
 def export(devices: Path, destination: Path, since: float = 0) -> list[str]:
     destination.mkdir(parents=True, exist_ok=True)
     copied = []
-    pattern = "*/data/Containers/Data/Application/*/Documents/audio-follow-audit.jsonl"
-    for source in devices.glob(pattern):
+    base = "*/data/Containers/Data/Application/*/Documents/"
+    sources = list(devices.glob(base + "audio-follow-audit.jsonl"))
+    sources += list(devices.glob(base + "reader-audit-*.jsonl"))
+    for source in sources:
         if source.stat().st_mtime < since or source.stat().st_size == 0:
             continue
         container = source.parent.parent
@@ -24,7 +26,8 @@ def export(devices: Path, destination: Path, since: float = 0) -> list[str]:
         if identifier != BUNDLE_ID:
             continue
         device_id = source.relative_to(devices).parts[0]
-        name = f"audio-follow-{device_id}-{container.name}.jsonl"
+        prefix = "audio-follow" if source.name == "audio-follow-audit.jsonl" else source.stem
+        name = f"{prefix}-{device_id}-{container.name}.jsonl"
         shutil.copyfile(source, destination / name)
         copied.append(name)
     return sorted(copied)

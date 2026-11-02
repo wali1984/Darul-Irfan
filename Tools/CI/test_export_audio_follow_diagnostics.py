@@ -8,6 +8,20 @@ from export_audio_follow_diagnostics import BUNDLE_ID, export
 
 
 class ExportTelemetryTests(unittest.TestCase):
+    def test_reader_diagnostics_keep_each_surah_and_exclude_other_app(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for app in ("ours", "other"):
+                container = root / "device/data/Containers/Data/Application" / app
+                (container / "Documents").mkdir(parents=True)
+                with (container / ".com.apple.mobile_container_manager.metadata.plist").open("wb") as stream:
+                    plistlib.dump({"MCMMetadataIdentifier": BUNDLE_ID if app == "ours" else "other.app"}, stream)
+                for surah in (1, 2):
+                    (container / f"Documents/reader-audit-{surah}.jsonl").write_text('{"mainActorGapSeconds":1}\n')
+            result = export(root, root / "output")
+            self.assertEqual(result, ["reader-audit-1-device-ours.jsonl", "reader-audit-2-device-ours.jsonl"])
+            self.assertTrue(all((root / "output" / name).read_text() == '{"mainActorGapSeconds":1}\n' for name in result))
+
     def test_shutdown_clone_files_export_without_simctl_or_booted_device(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
