@@ -159,6 +159,10 @@ struct GroupDetailView: View {
                                 try await service.cancelMeeting(target.id, in: group.id)
                             } else {
                                 try await service.removeZikrSession(target.id, in: group.id)
+                                HalqahReminderState.shared.remove(groupID: group.id, sessionID: target.id)
+                                let key = HalqahReminderState.key(groupID: group.id, sessionID: target.id)
+                                UserDefaults.standard.removeObject(forKey: key)
+                                await dependencies?.notifications.cancelReminder(id: key)
                             }
                         }
                     }
@@ -624,6 +628,11 @@ struct GroupDetailView: View {
             try Task.checkCancellation()
             guard generation == loadGeneration else { return }
             // Do not publish an empty announcement list while it is unresolved.
+            if let notifications = dependencies?.notifications {
+                await HalqahReminderState.shared.reconcile(groupID: group.id,
+                    sessionIDs: Set(loaded.zikrSessions.map(\.id)), notifications: notifications)
+            }
+            guard generation == loadGeneration, !Task.isCancelled else { return }
             detail = loaded
             posts = loadedPosts
             if loaded.canManage {
@@ -661,6 +670,11 @@ struct GroupDetailView: View {
         guard var loaded = try? await service.detail(of: group.id),
               generation == detailGeneration, !Task.isCancelled else { return }
         loaded.live?.playback?.at = Date()
+        if let notifications = dependencies?.notifications {
+            await HalqahReminderState.shared.reconcile(groupID: group.id,
+                sessionIDs: Set(loaded.zikrSessions.map(\.id)), notifications: notifications)
+        }
+        guard generation == detailGeneration, !Task.isCancelled else { return }
         detail = loaded
     }
 
@@ -875,7 +889,8 @@ private struct GroupZikrRow: View {
         defer { reminderWorking = false }
         if clearBlocked { reminderBlocked = false }
         guard let notifications = dependencies?.notifications else { return }
-        if on, await notifications.requestPermission() {
+        if on, await notifications.requestPermission(),
+           HalqahReminderState.shared.permits(groupID: groupID, sessionID: session.id) {
             await ZikrReminders.schedule(
                 session,
                 id: reminderKey,
@@ -883,13 +898,20 @@ private struct GroupZikrRow: View {
                 notifications: notifications,
                 calculator: dependencies?.prayerCalculation
             )
-            reminderOn = true
+            // Permission and scheduling suspend; a successful delete/refresh may
+            // have invalidated this row while either operation was in flight.
+            reminderOn = HalqahReminderState.shared.permits(groupID: groupID, sessionID: session.id)
+            if !reminderOn { await notifications.cancelReminder(id: reminderKey) }
         } else {
             if on { reminderBlocked = true }
             reminderOn = false
             await notifications.cancelReminder(id: reminderKey)
         }
-        UserDefaults.standard.set(reminderOn, forKey: reminderKey)
+        if HalqahReminderState.shared.permits(groupID: groupID, sessionID: session.id) {
+            UserDefaults.standard.set(reminderOn, forKey: reminderKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: reminderKey)
+        }
     }
 }
 
