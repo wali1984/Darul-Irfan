@@ -17,6 +17,7 @@ struct DailyMediaManagerView: View {
     @State private var editing: DailyMediaItem?
     @State private var adding = false
     @State private var loading = false
+    @State private var reloadRequested = false
 
     var body: some View {
         List {
@@ -92,19 +93,23 @@ struct DailyMediaManagerView: View {
     }
 
     private func load() async {
-        guard !loading else { return }
+        guard !loading else { reloadRequested = true; return }
         loading = true
         defer { loading = false }
-        failed = false
-        do {
-            let loaded = try await service.manageDailyMedia()
-            try Task.checkCancellation()
-            items = loaded
-        } catch is CancellationError {
-            return
-        } catch {
-            if !Task.isCancelled { failed = true }
-        }
+        repeat {
+            reloadRequested = false
+            failed = false
+            do {
+                let loaded = try await service.manageDailyMedia()
+                try Task.checkCancellation()
+                // An editor may have saved while this earlier snapshot was in flight.
+                if !reloadRequested { items = loaded }
+            } catch is CancellationError {
+                return
+            } catch {
+                if !Task.isCancelled && !reloadRequested { failed = true }
+            }
+        } while reloadRequested && !Task.isCancelled
     }
 }
 
