@@ -49,6 +49,7 @@ final class NativeHalqaSession {
         let started = lifecycle.start(sessionID: roomID) {
             // Only a fresh connection takes audio ownership. Returning to an
             // existing room must not interrupt or reset its audio session.
+            RecitationPracticeRecorder.yieldToHalqah()
             prepareAudio()
             return NativeMeetingTransport(authToken: pass.authToken)
         }

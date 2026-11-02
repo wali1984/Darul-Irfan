@@ -8,6 +8,15 @@ import UIKit
 @Observable
 @MainActor
 final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
+    private static weak var active: RecitationPracticeRecorder?
+
+    /// Called synchronously before a new Halqah constructs its transport.
+    /// Also invalidates a microphone request still awaiting permission.
+    static func yieldToHalqah() {
+        active?.suspend()
+        active = nil
+    }
+
     enum Phase { case idle, preparing, recording, replaying }
     enum Failure { case permission, audio, recording, playback, storage }
     private(set) var phase = Phase.idle
@@ -54,6 +63,7 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
                allowedNow: @escaping () -> Bool) {
         guard !closed, phase == .idle else { return }
         guard !audioReserved(), allowedNow() else { failure = .audio; return }
+        claimPractice()
         failure = nil
         phase = .preparing
         ticket = UUID()
@@ -123,6 +133,7 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
     func play(prepareAudio: (@escaping @MainActor (Bool) -> Void) -> Void, allowedNow: @escaping () -> Bool) {
         guard !closed, phase == .idle, let file = files.current else { return }
         guard !audioReserved(), allowedNow() else { failure = .audio; return }
+        claimPractice()
         failure = nil
         phase = .preparing
         ticket = UUID()
@@ -157,6 +168,12 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
         if recorder != nil { stopRecording(deactivateSession: deactivateSession) }
         else if replay != nil { stopReplay(deactivateSession: deactivateSession) }
         phase = .idle
+        if Self.active === self { Self.active = nil }
+    }
+
+    private func claimPractice() {
+        if let previous = Self.active, previous !== self { previous.suspend() }
+        Self.active = self
     }
 
     func deleteClip() {
