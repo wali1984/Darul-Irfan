@@ -1125,16 +1125,18 @@ final class RedesignScreenshotTests: XCTestCase {
         let count = app.staticTexts["directory-removal-requests"]
         let role = app.buttons["directory-role-admin"]
         guard old.waitForExistence(timeout: 180) else { XCTFail("Missing directory detail fixture"); return }
-        let form = app.descendants(matching: .any).matching(identifier: "directory-detail-form").firstMatch
+        // SwiftUI propagates the identifier to the decorative background too.
+        // Select the actual scrolling Form rather than its first descendant.
+        let form = app.collectionViews.matching(identifier: "directory-detail-form").firstMatch
         let reads = app.staticTexts["directory-read-requests"]
         guard form.waitForExistence(timeout: 10), reads.waitForExistence(timeout: 10) else {
             XCTFail("Directory form or request diagnostic missing"); return
         }
         func refresh(expectedReads: String) -> Bool {
-            // Drag the actual Form, starting above its only membership row.
-            // A screen-wide swipe can miss this short form's scroll surface.
-            form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.12))
-                .press(forDuration: 0.15, thenDragTo: form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78)))
+            // The Form frame extends behind the navigation bar. Start inside
+            // its visible content, not at the old 12% point under that bar.
+            form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.35))
+                .press(forDuration: 0.15, thenDragTo: form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.82)))
             let sent = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", expectedReads), object: reads)
             guard XCTWaiter.wait(for: [sent], timeout: 15) == .completed else {
                 shot("directory-refresh-not-sent")
