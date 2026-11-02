@@ -959,7 +959,7 @@ final class RedesignScreenshotTests: XCTestCase {
             XCTFail("Dua race fixture failed to load"); return
         }
         guard tap(app.buttons[mark]) else { XCTFail("Mark action missing"); return }
-        let failure = language == "ur" ? "آپ کا گروپ لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔" : "Your group could not be loaded. Check your connection and try again."
+        let failure = language == "ur" ? "کارروائی مکمل نہیں ہو سکی۔ اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔" : "The action could not be completed. Check your connection and try again."
         XCTAssertTrue(app.staticTexts[failure].waitForExistence(timeout: 15))
         XCTAssertTrue(app.buttons[mark].exists, "First rejected write must retain action")
         let list = app.collectionViews.firstMatch
@@ -980,7 +980,7 @@ final class RedesignScreenshotTests: XCTestCase {
     private func halqahDuaRecoveryTour() {
         let retry = language == "ur" ? "دوبارہ کوشش کریں" : "Try again"
         let mark = language == "ur" ? "پڑھ لیا" : "Mark as read"
-        let failure = language == "ur" ? "آپ کا گروپ لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔" : "Your group could not be loaded. Check your connection and try again."
+        let failure = language == "ur" ? "کارروائی مکمل نہیں ہو سکی۔ اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔" : "The action could not be completed. Check your connection and try again."
         let entry = app.buttons["halqah-audit-admin"]
         guard entry.waitForExistence(timeout: 180), tap(entry), tap(app.buttons[retry]) else {
             XCTFail("Dua requests must recover from initial failure"); return
@@ -1017,7 +1017,7 @@ final class RedesignScreenshotTests: XCTestCase {
         let retry = language == "ur" ? "دوبارہ کوشش کریں" : "Try again"
         let delete = language == "ur" ? "حذف کریں" : "Delete"
         let cancel = language == "ur" ? "منسوخ کریں" : "Cancel"
-        let failure = language == "ur" ? "آپ کا گروپ لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔" : "Your group could not be loaded. Check your connection and try again."
+        let failure = language == "ur" ? "کارروائی مکمل نہیں ہو سکی۔ اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔" : "The action could not be completed. Check your connection and try again."
         for role in ["member", "admin"] {
             let entry = app.buttons["halqah-audit-" + role]
             guard entry.waitForExistence(timeout: 180), tap(entry), tap(app.buttons[retry]) else {
