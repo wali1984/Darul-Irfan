@@ -14,6 +14,7 @@ struct ReadSavedView: View {
     @State private var library: LibraryViewModel
     @State private var notes = MyDayStore.shared
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     init(
         dependencies: AppDependencies,
@@ -86,12 +87,15 @@ struct ReadSavedView: View {
             .diScreenBackground()
             .navigationTitle("Saved")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(DIColor.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(colorScheme, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") {
                         dismiss()
                     }
-                    .diInterfaceFont(.body, weight: .semibold)
+                    .buttonStyle(DIToolbarButtonStyle())
                 }
             }
             // A favourite opens its book page or article here, as a search
