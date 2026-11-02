@@ -697,6 +697,7 @@ struct GroupMeetingScheduler: View {
                     .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
+            .disabled(working)
             .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
@@ -830,6 +831,7 @@ struct GroupZikrEditor: View {
                         .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
+            .disabled(working)
             .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
