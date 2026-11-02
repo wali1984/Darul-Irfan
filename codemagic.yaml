@@ -217,6 +217,7 @@ workflows:
             echo "Exporting the attachments failed; keeping the result bundle instead."
             (cd build && zip -qr Screens.xcresult.zip Screens.xcresult)
           fi
+          python3 Tools/CI/export_audio_follow_diagnostics.py
           cd build && zip -qr screens.zip screens
       - name: Enforce screenshot test result after exporting diagnostics
         script: |

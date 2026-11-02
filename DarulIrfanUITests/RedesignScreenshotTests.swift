@@ -206,6 +206,9 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "guide-recovery" {
             app.launchArguments.append("--uitesting-method-guide-failure")
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-follow" {
+            app.launchArguments.append("--uitesting-audio-follow-diagnostics")
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
             app.launchArguments.append("--uitesting-halqah-resources")
         }
