@@ -56,13 +56,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Darul Irfan uses the microphone only when you join a Halqah meeting or Halqah zikr and choose to speak."
+            "value" : "Darul Irfan uses the microphone when you choose to speak in a Halqah or record your recitation for private memorization practice."
           }
         },
         "ur" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "دارالعرفان مائیکروفون صرف اس وقت استعمال کرتا ہے جب آپ حلقے کی میٹنگ یا حلقۂ ذکر میں شامل ہو کر بولنا چاہیں۔"
+            "value" : "دارالعرفان مائیکروفون اس وقت استعمال کرتا ہے جب آپ حلقے میں بولنا چاہیں یا حفظ کی ذاتی مشق کے لیے اپنی تلاوت ریکارڈ کریں۔"
           }
         }
       }

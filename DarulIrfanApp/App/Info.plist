@@ -48,7 +48,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Darul Irfan uses the microphone only when you join a group meeting or community zikr and choose to speak.</string>
+	<string>Darul Irfan uses the microphone when you choose to speak in a group meeting or record your recitation for private memorization practice.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Darul Irfan uses the camera only when you join a group meeting and turn your video on.</string>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>

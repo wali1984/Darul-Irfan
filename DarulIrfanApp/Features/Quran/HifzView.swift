@@ -11,6 +11,10 @@ import SwiftUI
 struct HifzView: View {
     let surah: QuranSurah
     private let repository: any QuranRepositoryProtocol
+    private let audioPlayer: any AudioPlayerServicing
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var recorder: RecitationPracticeRecorder?
+    @State private var isPresented = false
 
     @State private var player: HifzPlayer
     @State private var ayahs: [QuranAyah] = []
@@ -29,6 +33,7 @@ struct HifzView: View {
     init(surah: QuranSurah, dependencies: AppDependencies) {
         self.surah = surah
         self.repository = dependencies.quranRepository
+        self.audioPlayer = dependencies.audioPlayer
         self._player = State(initialValue: HifzPlayer.forSurah(surah.id))
     }
 
@@ -56,6 +61,8 @@ struct HifzView: View {
                     }
                 } else {
                     nowPractising
+                    RecitationPracticeCard(recorder: recorder, audioPlayer: audioPlayer,
+                                           allowedNow: { isPresented && scenePhase == .active })
                     rangeCard
                     repetitionCard
                 }
@@ -65,11 +72,23 @@ struct HifzView: View {
         .diScreenBackground()
         .diPageHeading("Memorise")
         .task(id: loadAttempt) { await load() }
+        .onAppear {
+            isPresented = true
+            if recorder == nil {
+                recorder = try? RecitationPracticeRecorder(cacheDirectory: FileManager.default.temporaryDirectory)
+            }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { recorder?.suspend() }
+        }
         .onChange(of: player.currentAyah) { _, ayah in
             if let ayah { selectedAyah = ayah }
             isRevealed = false
         }
         .onDisappear {
+            isPresented = false
+            recorder?.close()
+            recorder = nil
             save()
         }
     }
@@ -290,6 +309,7 @@ struct HifzView: View {
     }
 
     private func togglePlayback() {
+        recorder?.suspend()
         DIHaptics.light()
         guard let recitation else { return }
         if player.isPlaying {
@@ -313,6 +333,7 @@ struct HifzView: View {
     }
 
     private func step(by offset: Int) {
+        recorder?.suspend()
         guard let recitation else { return }
         let target = (player.currentAyah ?? selectedAyah) + offset
         guard target >= rangeStart, target <= rangeEnd else { return }
@@ -328,6 +349,7 @@ struct HifzView: View {
 
     /// Apply every setting to the next verse attempt, including a paused session.
     private func applyPracticeSettings() {
+        recorder?.suspend()
         guard hasLoaded, !isLoading else { return }
         selectedAyah = min(max(player.currentAyah ?? selectedAyah, rangeStart), rangeEnd)
         isRevealed = false
