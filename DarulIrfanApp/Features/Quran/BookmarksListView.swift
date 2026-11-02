@@ -11,6 +11,7 @@ struct BookmarksListView: View {
     var onOpen: ((QuranSurah, Int) -> Void)? = nil
 
     @State private var attempt = 0
+    @Environment(\.locale) private var locale
 
     var body: some View {
         VStack(spacing: DISpacing.md) {
@@ -87,9 +88,22 @@ struct BookmarksListView: View {
                     }
                     .listRowBackground(DIColor.surface)
                 } header: {
-                    Text("\(group.surah.id). \(group.surah.nameTransliterated)")
-                        .diInterfaceFont(.footnote, weight: .semibold)
-                        .foregroundStyle(DIColor.textMuted)
+                    if locale.language.languageCode?.identifier == "ur" {
+                        HStack(spacing: DISpacing.xs) {
+                            Text(verbatim: "\u{2066}\(group.surah.id).\u{2069}")
+                                .diInterfaceFont(.footnote, weight: .semibold)
+                                .foregroundStyle(DIColor.textMuted)
+                            Text(verbatim: group.surah.nameArabic)
+                                .font(DIFont.quranArabic(scale: 0.65))
+                                .foregroundStyle(ReadPalette.arabicInk)
+                        }
+                        .textCase(nil)
+                        .accessibilityElement(children: .combine)
+                    } else {
+                        Text("\(group.surah.id). \(group.surah.nameTransliterated)")
+                            .diInterfaceFont(.footnote, weight: .semibold)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
                 }
             }
         }
