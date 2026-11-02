@@ -80,7 +80,9 @@ struct DayTaskEditorView: View {
         Form {
             Section {
                 TextField("What do you want to do?", text: $title, axis: .vertical)
+                    .diInterfaceFont(.body)
                 DatePicker("Day", selection: $day, displayedComponents: .date)
+                    .diInterfaceFont(.body)
             }
             .listRowBackground(DIColor.surface)
 
@@ -91,13 +93,14 @@ struct DayTaskEditorView: View {
                     EmptyView()
                 case .clock:
                     DatePicker("Time", selection: $clock, displayedComponents: .hourAndMinute)
+                        .diInterfaceFont(.body)
                 case .after, .before:
                     taskMenu("Prayer", selection: $prayer, options: Prayer.obligatory) { LocalizedStringKey($0.englishName) }
                     let minimumMinutes = timingKind == .before ? 5 : 0
                     let displayedMinutes = max(minimumMinutes, minutes)
                     let offsetLabel = Text(timingKind == .after ? "\(displayedMinutes) minutes after" : "\(displayedMinutes) minutes before")
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
-                        offsetLabel.foregroundStyle(DIColor.textPrimary)
+                        offsetLabel.diInterfaceFont(.body).foregroundStyle(DIColor.textPrimary)
                         HStack(spacing: DISpacing.sm) {
                             Spacer(minLength: 0)
                             Button { minutes = max(minimumMinutes, displayedMinutes - 5) } label: {
@@ -120,6 +123,7 @@ struct DayTaskEditorView: View {
             } footer: {
                 if timingKind == .after || timingKind == .before {
                     Text("Follows your prayer times each day, so it moves with the seasons and your location.")
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -137,6 +141,7 @@ struct DayTaskEditorView: View {
                         requestingNotifications = false
                     }
                 }))
+                    .diInterfaceFont(.body)
                     .disabled(timingKind == .anytime || requestingNotifications)
                 if notificationDenied && timingKind != .anytime {
                     Text("Enable notifications in Settings to receive task reminders.")
@@ -148,6 +153,7 @@ struct DayTaskEditorView: View {
             } footer: {
                 if timingKind == .anytime {
                     Text("Choose a time or a prayer to be reminded.")
+                        .diInterfaceFont(.footnote)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }
@@ -156,6 +162,7 @@ struct DayTaskEditorView: View {
             Section("Note") {
                 TextField("Optional", text: $note, axis: .vertical)
                     .lineLimit(2...6)
+                    .diInterfaceFont(.body)
             }
             .listRowBackground(DIColor.surface)
 
@@ -204,12 +211,14 @@ struct DayTaskEditorView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }
+                    .buttonStyle(DICompactButtonStyle())
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     if onSave(builtTask) { dismiss() } else { saveFailed = true }
                 }
                 .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || requestingNotifications)
+                .buttonStyle(DICompactButtonStyle())
             }
         }
     }
@@ -227,11 +236,11 @@ struct DayTaskEditorView: View {
         label: @escaping (Value) -> LocalizedStringKey
     ) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            Text(title).foregroundStyle(DIColor.textPrimary)
+            Text(title).diInterfaceFont(.body).foregroundStyle(DIColor.textPrimary)
             Menu {
                 Picker(title, selection: selection) {
                     ForEach(options, id: \.self) { option in
-                        Text(label(option)).tag(option)
+                        Text(label(option)).diInterfaceFont(.body).tag(option)
                     }
                 }
             } label: {
