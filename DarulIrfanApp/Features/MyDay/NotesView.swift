@@ -44,7 +44,7 @@ struct NotesView: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
                 if let source = note.reference?.quranReference(ayahCounts: Self.ayahCounts) {
                     Button {
                         DeepLinkRouter.shared.open(.quranAyah(surah: source.surah, ayah: source.firstAyah))
@@ -83,6 +83,7 @@ struct NotesView: View {
                         .foregroundStyle(DIColor.actionForeground)
                 }
                 .accessibilityLabel("New note")
+                .buttonStyle(DICompactButtonStyle())
             }
         }
         .sheet(isPresented: $isAdding) {
@@ -124,13 +125,16 @@ struct NoteEditorView: View {
                         Image(systemName: "book.closed")
                     }
                     .foregroundStyle(DIColor.actionForeground)
+                    .diInterfaceFont(.subheadline)
                 }
             }
             Section {
                 TextField("Write your note", text: $text, axis: .vertical)
                     .lineLimit(6...20)
+                    .diInterfaceFont(.body)
             } footer: {
                 Text("Only you can see this note. It stays on this phone.")
+                    .diInterfaceFont(.footnote)
             }
         }
         .scrollContentBackground(.hidden)
@@ -144,6 +148,7 @@ struct NoteEditorView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }
+                    .buttonStyle(DICompactButtonStyle())
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
@@ -154,6 +159,7 @@ struct NoteEditorView: View {
                     if store.upsert(saved) { dismiss() } else { saveFailed = true }
                 }
                 .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .buttonStyle(DICompactButtonStyle())
             }
         }
     }
