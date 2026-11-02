@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -116,6 +116,8 @@ final class RedesignScreenshotTests: XCTestCase {
             ("An-Naba", 1)
         ]
         for (index, target) in expected.enumerated() {
+            let positionProbe = ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-position"
+            if positionProbe && index != 1 { continue }
             let number = index + 1
             let performanceProbe = ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-performance"
             if performanceProbe && ![2, 3].contains(number) { continue }
@@ -163,11 +165,62 @@ final class RedesignScreenshotTests: XCTestCase {
             shot("parah-\(number)-reader")
             if checkControls && [3, 18, 27, 28].contains(number) && !checkReaderMenus(number: number, title: title) { return }
             if performanceProbe { readerIdleWindow(number: number, phase: "after-controls") }
+            if positionProbe {
+                verifyManualReadingPosition()
+                return
+            }
             goBack()
             guard row.waitForExistence(timeout: 10), row.isHittable else {
                 shot("parah-\(number)-back-failure"); XCTFail("Back lost Parah \(number)"); return
             }
         }
+    }
+
+    /// Deliberately separate from startup profiling: prove that a manual scroll
+    /// updates the real Continue reading card and that reopening lands there.
+    private func verifyManualReadingPosition() {
+        let scroll = app.scrollViews.firstMatch
+        guard scroll.waitForExistence(timeout: 15) else {
+            XCTFail("Reader scroll view missing"); return
+        }
+        scroll.swipeUp(); pause(1)
+        scroll.swipeUp(); pause(3)
+        let badges = app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "Ayah [0-9]+"))
+        let visible = badges.allElementsBoundByIndex.filter { $0.isHittable }.compactMap {
+            Int($0.label.replacingOccurrences(of: "Ayah ", with: ""))
+        }.sorted()
+        guard let first = visible.first, let last = visible.last, last > 142 else {
+            shot("reader-position-no-visible-badge")
+            XCTFail("Manual scrolling did not expose later ayah badges"); return
+        }
+        print("READER_MANUAL_VISIBLE first=\(first) last=\(last)")
+        shot("reader-position-after-manual-scroll")
+        goBack()
+        scrollToTop()
+        let resume = app.buttons.matching(NSPredicate(
+            format: "label CONTAINS[c] %@ AND label CONTAINS %@", "Continue reading", "Al-Baqara"
+        )).firstMatch
+        guard resume.waitForExistence(timeout: 15), resume.isHittable else {
+            shot("reader-position-missing-resume")
+            XCTFail("The Quran list did not offer the saved Al-Baqara position"); return
+        }
+        let regex = try! NSRegularExpression(pattern: "Ayah ([0-9]+) of 286")
+        let text = resume.label as NSString
+        guard let match = regex.firstMatch(in: resume.label, range: NSRange(location: 0, length: text.length)),
+              let saved = Int(text.substring(with: match.range(at: 1))) else {
+            XCTFail("Continue reading did not expose its saved ayah: \(resume.label)"); return
+        }
+        // The preceding card can be partially visible with its badge above
+        // the viewport; any earlier/later saved ayah is outside this view.
+        XCTAssertGreaterThan(saved, 142)
+        XCTAssertGreaterThanOrEqual(saved, first - 1)
+        XCTAssertLessThanOrEqual(saved, last)
+        shot("reader-position-continue-card")
+        guard tap(resume) else { XCTFail("Continue reading could not open"); return }
+        let restored = app.staticTexts["Ayah \(saved)"].firstMatch
+        XCTAssertTrue(restored.waitForExistence(timeout: 30) && restored.isHittable,
+                      "Continue reading must land on its saved ayah")
+        shot("reader-position-restored")
     }
 
     /// No accessibility queries or screenshots inside this window. Compare the app's
@@ -218,7 +271,7 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "guide-recovery" {
             app.launchArguments.append("--uitesting-method-guide-failure")
         }
-        if ["reader-audit", "reader-performance"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
+        if ["reader-audit", "reader-performance", "reader-position"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             app.launchArguments.append("--uitesting-reader-diagnostics")
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-follow" {
@@ -299,7 +352,7 @@ final class RedesignScreenshotTests: XCTestCase {
             audioFollowTour()
             return
         }
-        if ["reader-audit", "reader-performance"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
+        if ["reader-audit", "reader-performance", "reader-position"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             parahTour(checkControls: true, allDestinations: true)
             return
         }
