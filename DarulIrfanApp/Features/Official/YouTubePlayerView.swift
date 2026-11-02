@@ -5,6 +5,8 @@ struct YouTubePlayerSheet: View {
     let videoID: String
     let title: String
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @State private var handoffFailed = false
 
     var body: some View {
         NavigationStack {
@@ -12,11 +14,32 @@ struct YouTubePlayerSheet: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .navigationTitle(title)
                 .navigationBarTitleDisplayMode(.inline)
+                .safeAreaInset(edge: .bottom) {
+                    Button("Open in YouTube") {
+                        var address = URLComponents()
+                        address.scheme = "https"
+                        address.host = "www.youtube.com"
+                        address.path = "/watch"
+                        address.queryItems = [URLQueryItem(name: "v", value: videoID)]
+                        guard let url = address.url else { handoffFailed = true; return }
+                        openURL(url) { accepted in
+                            if accepted { dismiss() } else { handoffFailed = true }
+                        }
+                    }
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .padding(DISpacing.md)
+                    .background(DIColor.background)
+                }
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Done") { dismiss() }.buttonStyle(DICompactButtonStyle())
                     }
                 }
+        }
+        .alert("Unable to open link", isPresented: $handoffFailed) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("No app could open this link. Please check that a suitable app is installed.")
         }
     }
 }
