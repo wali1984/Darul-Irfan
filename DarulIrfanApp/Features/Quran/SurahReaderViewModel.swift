@@ -518,13 +518,19 @@ final class SurahReaderViewModel {
     private func persistLastRead() async {
         guard phase == .ready, let ayahNumber = topAyahNumber else { return }
         guard ayahNumber != lastPersistedAyahNumber else { return }
-        lastPersistedAyahNumber = ayahNumber
         let progress = ReadingProgress(
             surahNumber: surah.id,
             ayahNumber: ayahNumber,
             updatedAt: Date()
         )
-        try? await repository.saveLastReadPosition(progress)
+        do {
+            try await repository.saveLastReadPosition(progress)
+        } catch {
+            // A transient storage failure must remain eligible for the next
+            // settled-position save or the final flush when leaving.
+            return
+        }
+        lastPersistedAyahNumber = ayahNumber
         await devotionalMetrics.refresh(reference: progress.updatedAt)
     }
 }

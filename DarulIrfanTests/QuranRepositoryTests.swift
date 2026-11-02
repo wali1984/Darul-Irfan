@@ -46,6 +46,34 @@ final class QuranRepositoryTests: XCTestCase {
 
     // MARK: - Surahs & ayahs
 
+    @MainActor
+    func testReaderRetriesSamePositionAfterFailedSave() async throws {
+        let surah = fatihah()
+        try await repository.upsertSurahs([surah])
+        try await repository.upsertAyahs([
+            QuranAyah(surahNumber: 1, ayahNumber: 1, textArabic: "Reader persistence fixture")
+        ])
+        let metrics = DevotionalMetricsSyncService(quranRepository: repository,
+            trackerRepository: TrackerRepository(database: database), watchSync: WatchSyncService())
+        let model = SurahReaderViewModel(surah: surah, repository: repository, devotionalMetrics: metrics)
+        await model.load()
+        XCTAssertEqual(model.phase, .ready)
+        model.topAyahChanged(1)
+        try await database.connection.executeScript("""
+            CREATE TRIGGER reject_reader_save BEFORE INSERT ON quran_reading_progress
+            BEGIN SELECT RAISE(ABORT, 'Injected storage failure'); END;
+            """)
+        await model.flushLastRead()
+        let failed = try await repository.lastReadPosition()
+        XCTAssertNil(failed)
+        try await database.connection.executeScript("DROP TRIGGER reject_reader_save;")
+        // No new scroll event: leaving again must retry the exact same ayah.
+        await model.flushLastRead()
+        let recovered = try await repository.lastReadPosition()
+        XCTAssertEqual(recovered?.surahNumber, 1)
+        XCTAssertEqual(recovered?.ayahNumber, 1)
+    }
+
     func testSurahUpsertAndFetchRoundtrip() async throws {
         try await repository.upsertSurahs([ikhlas(), fatihah()])
 
