@@ -135,6 +135,25 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testReturningToArticleKeepsLoadedContentButExplicitReloadStillWorks() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        let downloads = DownloadsRepository(database: database)
+        try await repository.upsertItems([libraryItem("article-return", category: .tasawwuf)])
+        let model = ContentItemDetailViewModel(itemID: "article-return", contentRepository: repository,
+            downloadsRepository: downloads, downloadManager: DownloadManager(downloadsRepository: downloads))
+        await model.loadIfNeeded()
+        XCTAssertEqual(model.item?.id, "article-return")
+        try await repository.deleteItems(ids: ["article-return"])
+        await model.loadIfNeeded()
+        XCTAssertEqual(model.item?.id, "article-return", "Navigation return must retain the current article")
+        XCTAssertFalse(model.isLoading)
+        XCTAssertFalse(model.loadFailed)
+        await model.load()
+        XCTAssertNil(model.item, "Explicit reload must still read current catalogue state")
+    }
+
+    @MainActor
     func testArticleReadFailureCanRetryAndMissingItemRemainsDistinct() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)

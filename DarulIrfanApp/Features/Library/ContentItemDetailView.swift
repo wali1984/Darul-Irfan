@@ -94,7 +94,7 @@ struct ContentItemDetailView: View {
             // from topics, whose library state had not read them, so a
             // starred work showed an empty star.
             await libraryViewModel.loadFavorites()
-            await viewModel.load()
+            await viewModel.loadIfNeeded()
             refreshResume()
         }
         // Back from the reader, the page it was left on has moved.

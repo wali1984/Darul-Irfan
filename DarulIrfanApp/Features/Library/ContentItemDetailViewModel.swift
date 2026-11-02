@@ -23,6 +23,7 @@ final class ContentItemDetailViewModel {
     private(set) var item: ContentItem?
     private(set) var isLoading = true
     private(set) var loadFailed = false
+    private var hasLoaded = false
     /// Plain-text paragraphs of the body; empty when native text is unavailable.
     private(set) var bodyParagraphs: [String] = []
     /// Saved scroll fraction from a previous reading session (0...1).
@@ -65,6 +66,16 @@ final class ContentItemDetailViewModel {
 
     // MARK: - Loading
 
+    /// Returning from a guide or reader must keep the existing ScrollView alive.
+    /// Refresh file availability without replacing the article with a spinner.
+    func loadIfNeeded() async {
+        if hasLoaded {
+            await refreshDownloadStates()
+        } else {
+            await load()
+        }
+    }
+
     func load() async {
         isLoading = true
         loadFailed = false
@@ -101,6 +112,7 @@ final class ContentItemDetailViewModel {
             }
             await refreshDownloadStates()
         }
+        if !Task.isCancelled { hasLoaded = true }
         isLoading = false
     }
 
