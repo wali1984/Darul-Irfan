@@ -353,6 +353,7 @@ struct GlobalSearchView: View {
                                     reference: viewModel.reference(for: result)
                                 )
                             }
+                            .disabled(viewModel.phase != .results)
                             .diAppear(delay: min(Double(groupIndex) * 0.06 + Double(rowIndex) * 0.04, 0.5))
                         }
                     }
