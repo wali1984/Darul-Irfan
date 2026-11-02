@@ -65,6 +65,7 @@ struct NativeMethodOfZikrView: View {
                     .diGlassPanel(cornerRadius: 24)
                 }
             }
+            .diInterfaceFont(.body)
             .padding(DISpacing.md)
             .diResponsiveWidth()
         }
