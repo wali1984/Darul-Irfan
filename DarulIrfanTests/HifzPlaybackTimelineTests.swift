@@ -34,7 +34,24 @@ final class HifzPlaybackTimelineTests: XCTestCase {
         XCTAssertThrowsError(try HifzPlaybackTimeline(recitation: recording, range: 1...3, repeats: 21, pauseSeconds: 0))
         XCTAssertThrowsError(try HifzPlaybackTimeline(recitation: recording, range: 1...4, repeats: 1, pauseSeconds: 0))
         var invalid = recording
-        invalid.durationMs = 500
+        invalid.verses[0].toMs = 0
         XCTAssertThrowsError(try HifzPlaybackTimeline(recitation: invalid, range: 1...1, repeats: 1, pauseSeconds: 0))
+    }
+
+    func testRoundedSummaryDoesNotRejectPreciseVerseEnd() throws {
+        var rounded = recording
+        rounded.durationMs = 2000
+        XCTAssertEqual(try HifzPlaybackTimeline(recitation: rounded, range: 1...3, repeats: 1, pauseSeconds: 0).durationMs, 3000)
+    }
+
+    func testEveryBundledSurahCanPrepareItsCompleteRange() throws {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "quran_word_timings", withExtension: "json"))
+        let data = try JSONDecoder().decode(RecitationData.self, from: Data(contentsOf: url))
+        XCTAssertEqual(data.surahs.count, 114)
+        for (surah, recording) in data.surahs {
+            let last = try XCTUnwrap(recording.verses.map(\.ayah).max())
+            let plan = try HifzPlaybackTimeline(recitation: recording, range: 1...last, repeats: 2, pauseSeconds: 1)
+            XCTAssertEqual(plan.segments.last?.ayah, last, "Surah \(surah)")
+        }
     }
 }

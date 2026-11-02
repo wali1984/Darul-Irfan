@@ -25,8 +25,10 @@ struct HifzPlaybackTimeline {
         var result: [Segment] = []
         var cursor: Int64 = 0
         for ayah in first...range.upperBound {
+            // Summary duration is rounded/stale in the provider data. Precise
+            // verse windows are authoritative; the player checks the actual asset.
             guard let verse = recitation.verse(ayah), verse.fromMs >= 0,
-                  verse.toMs > verse.fromMs, verse.toMs <= recitation.durationMs else { throw Invalid.timing }
+                  verse.toMs > verse.fromMs else { throw Invalid.timing }
             for repetition in 1...repeats {
                 let duration = Int64(verse.toMs - verse.fromMs)
                 result.append(Segment(ayah: ayah, repetition: repetition,
