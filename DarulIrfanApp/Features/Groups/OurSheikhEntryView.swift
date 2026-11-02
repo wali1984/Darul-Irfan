@@ -15,6 +15,7 @@ struct OurSheikhEntryView: View {
     @State private var offerNotices = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Group {
@@ -27,6 +28,7 @@ struct OurSheikhEntryView: View {
                         TextField("Name", text: $profile.name).textContentType(.name)
                         TextField("City", text: $profile.city).textContentType(.addressCity)
                         Button("Use my location") { Task { await suggestLocation() } }
+                            .buttonStyle(DISecondaryButtonStyle())
                             .disabled(busy || locating)
                         if locating { ProgressView() }
                         Picker("Country", selection: $profile.countryCode) {
@@ -35,6 +37,8 @@ struct OurSheikhEntryView: View {
                                 Text(verbatim: country(code)).tag(code)
                             }
                         }
+                        .pickerStyle(.menu)
+                        .buttonStyle(DISecondaryButtonStyle())
                         TextField("Email (optional)", text: $profile.email)
                             .textContentType(.emailAddress).keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never).autocorrectionDisabled()
@@ -43,26 +47,28 @@ struct OurSheikhEntryView: View {
                         } onCompletion: { result in
                             Task { await signIn(result) }
                         }
-                        .signInWithAppleButtonStyle(.black)
+                        .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
                         .frame(height: 48)
                         .disabled(busy || locating)
                         if let error { Text(verbatim: error).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true) }
                         if busy { ProgressView() }
                         Button("Join Daily Zikr") { Task { await join() } }
                             .buttonStyle(DIPrimaryButtonStyle())
-                            .disabled(busy || identity == nil || profile.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || profile.city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || profile.countryCode.isEmpty)
+                            .disabled(busy || locating || identity == nil || profile.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || profile.city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || profile.countryCode.isEmpty)
                         if identity == nil && !busy {
                             Button("Retry") { Task { await load() } }
+                                .buttonStyle(DISecondaryButtonStyle())
                         }
                     }
                     .disabled(busy)
+                    .diInterfaceFont(.body)
                     .textFieldStyle(.roundedBorder)
                     .padding(24)
                     .diGlassPanel(cornerRadius: 26)
                     .overlay(RoundedRectangle(cornerRadius: 26).stroke(DIColor.goldGlow.opacity(0.45), lineWidth: 1))
                     .padding(16)
                 }
-                .background(DIColor.background)
+                .diScreenBackground()
                 .navigationTitle("Our Sheikh")
             }
         }
