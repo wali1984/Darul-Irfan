@@ -723,7 +723,7 @@ final class RedesignScreenshotTests: XCTestCase {
         shot("appearance-auto-relaunch")
     }
 
-    /// Exercise reading settings and capture their effect after reopening Duas.
+    /// Exercise the actual file viewer with a local PDF and a damaged file.
     private func pdfControlsTour() {
         let valid = app.buttons["pdf-audit-valid"].firstMatch
         guard valid.waitForExistence(timeout: 180), tap(valid) else {
@@ -739,7 +739,7 @@ final class RedesignScreenshotTests: XCTestCase {
         for control in [enlarge, reduce, fit, share] {
             XCTAssertTrue(control.isHittable)
             XCTAssertTrue(app.frame.contains(control.frame))
-            XCTAssertGreaterThanOrEqual(control.frame.height, 44)
+            XCTAssertGreaterThanOrEqual(control.frame.height, 44, "Undersized control: \(control.label)")
         }
         shot("pdf-fitted")
         XCTAssertTrue(tap(enlarge)); pause(1)
@@ -755,8 +755,16 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertTrue(tap(share)); pause(2)
         shot("pdf-share-sheet")
         XCTAssertFalse(enlarge.isHittable, "Share did not present a modal sheet")
-        app.swipeDown(); pause(2)
-        XCTAssertTrue(enlarge.isHittable, "Share sheet did not dismiss")
+        // The current system presents sharing as a popover, not a draggable
+        // bottom sheet. Tap the uncovered PDF below it to dismiss.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)).tap()
+        let dismissed = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "hittable == true"), object: enlarge
+        )
+        guard XCTWaiter.wait(for: [dismissed], timeout: 10) == .completed else {
+            shot("pdf-share-dismiss-failure")
+            XCTFail("Share sheet did not dismiss"); return
+        }
         goBack()
         XCTAssertTrue(valid.waitForExistence(timeout: 10))
         XCTAssertTrue(tap(app.buttons["pdf-audit-damaged"].firstMatch))
