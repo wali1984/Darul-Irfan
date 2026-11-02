@@ -11,11 +11,20 @@ import WebKit
 @MainActor
 struct MeetingRoomView: View {
     let pass: GroupRoomPass
+    @State private var rendererFailed = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
-            MeetingWebView(url: roomURL) { dismiss() }
+            Group {
+                if rendererFailed {
+                    Text("Could not complete action")
+                        .padding().frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .diScreenBackground()
+                } else {
+                    MeetingWebView(url: roomURL, onLeave: { dismiss() }, onFailure: { rendererFailed = true })
+                }
+            }
                 .ignoresSafeArea(edges: .bottom)
                 .background(Color(red: 0.04, green: 0.17, blue: 0.13))
                 .navigationTitle("Darul Irfan")
@@ -41,11 +50,12 @@ struct MeetingRoomView: View {
     }
 }
 
-private struct MeetingWebView: UIViewRepresentable {
+struct MeetingWebView: UIViewRepresentable {
     let url: URL
     let onLeave: () -> Void
+    let onFailure: () -> Void
 
-    func makeCoordinator() -> Coordinator { Coordinator(onLeave: onLeave) }
+    func makeCoordinator() -> Coordinator { Coordinator(onLeave: onLeave, onFailure: onFailure) }
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -76,7 +86,15 @@ private struct MeetingWebView: UIViewRepresentable {
     final class Coordinator: NSObject, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
         var active = true
         let onLeave: () -> Void
-        init(onLeave: @escaping () -> Void) { self.onLeave = onLeave }
+        let onFailure: () -> Void
+        init(onLeave: @escaping () -> Void, onFailure: @escaping () -> Void) {
+            self.onLeave = onLeave; self.onFailure = onFailure
+        }
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            guard active else { return }
+            active = false
+            onFailure()
+        }
 
         /// Camera and microphone for the room page only; the system still asks
         /// the person the first time.

@@ -29,11 +29,40 @@ struct YouTubeSync: Equatable {
     var at: Date
 }
 
-struct YouTubePlayerView: UIViewRepresentable {
+struct YouTubePlayerView: View {
+    let videoID: String
+    var sync: YouTubeSync? = nil
+    @State private var failed = false
+    @State private var attempt = 0
+
+    var body: some View {
+        Group {
+            if failed {
+                VStack(spacing: DISpacing.md) {
+                    Text("Could not load videos.")
+                    Button("Try again") { attempt += 1; failed = false }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }.padding().frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .diScreenBackground()
+            } else {
+                YouTubeWebView(videoID: videoID, sync: sync) { failed = true }
+                    .id(attempt)
+            }
+        }
+        .onChange(of: videoID) { _, _ in failed = false; attempt += 1 }
+    }
+
+    static func needsReload(loadedID: String?, previousSync: YouTubeSync?, videoID: String, sync: YouTubeSync?) -> Bool {
+        YouTubeWebView.needsReload(loadedID: loadedID, previousSync: previousSync, videoID: videoID, sync: sync)
+    }
+}
+
+struct YouTubeWebView: UIViewRepresentable {
     let videoID: String
     /// For a past video played to a group: the group's place. Playback joins
     /// the group there, and follows the admin's pauses and moves.
     var sync: YouTubeSync? = nil
+    var onFailure: () -> Void
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -50,6 +79,7 @@ struct YouTubePlayerView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
+        guard context.coordinator.active else { return }
         guard Self.needsReload(loadedID: context.coordinator.loadedVideoID,
                                previousSync: context.coordinator.sync, videoID: videoID, sync: sync) else {
             // Same video: pass on a pause, resume or move by the admin.
@@ -120,12 +150,27 @@ struct YouTubePlayerView: UIViewRepresentable {
         "\(sync.position), \(sync.paused), \(sync.at.timeIntervalSince1970)"
     }
 
-    func makeCoordinator() -> Coordinator { Coordinator() }
+    static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
+        coordinator.active = false
+        webView.navigationDelegate = nil
+        webView.stopLoading()
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(onFailure: onFailure) }
 
     final class Coordinator: NSObject, WKNavigationDelegate {
+        var active = true
+        let onFailure: () -> Void
+        init(onFailure: @escaping () -> Void) { self.onFailure = onFailure }
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            guard active else { return }
+            active = false
+            onFailure()
+        }
         var loadedVideoID: String?
         var sync: YouTubeSync?
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            guard active else { decisionHandler(.cancel); return }
             guard let url = navigationAction.request.url else { decisionHandler(.cancel); return }
             if url.scheme == "about" || url.scheme == "data" { decisionHandler(.allow); return }
             guard let host = url.host?.lowercased() else { decisionHandler(.cancel); return }
