@@ -183,18 +183,31 @@ workflows:
         ignore_failure: true
         script: |
           set -o pipefail
+          set +e # Capture failure status so the following steps can export diagnostics.
           command -v xcbeautify >/dev/null || brew install xcbeautify
           mkdir -p build/logs
           DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
           echo "Using simulator: ${DEVICE}"
-          TEST_RUNNER_DI_SCREENSHOTS=${DI_SCREENSHOTS:-1} xcodebuild test \
+          TEST_FILTERS=(-only-testing:DarulIrfanUITests/RedesignScreenshotTests)
+          if [ -n "${DI_SCREENSHOT_CASE:-}" ]; then
+            case "$DI_SCREENSHOT_CASE" in
+              testEnglishLight|testEnglishDark|testUrduLight|testUrduDark) ;;
+              *) echo "Unsupported screenshot case"; exit 2 ;;
+            esac
+            TEST_FILTERS=(-only-testing:DarulIrfanUITests/RedesignScreenshotTests/test0Warmup
+                          "-only-testing:DarulIrfanUITests/RedesignScreenshotTests/$DI_SCREENSHOT_CASE")
+          fi
+          TEST_RUNNER_DI_SCREENSHOTS=${DI_SCREENSHOTS:-1} python3 Tools/CI/run_with_deadline.py --seconds 3000 -- xcodebuild test \
             -project DarulIrfan.xcodeproj \
             -scheme DarulIrfan \
             -destination "platform=iOS Simulator,name=${DEVICE}" \
-            -only-testing:DarulIrfanUITests/RedesignScreenshotTests \
+            "${TEST_FILTERS[@]}" \
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath build/Screens.xcresult \
             2>&1 | tee build/logs/xcodebuild-screens.log | xcbeautify
+          RESULT=$?
+          echo "$RESULT" > build/logs/screens-exit-code.txt
+          exit "$RESULT"
       - name: Export the screenshots
         script: |
           mkdir -p build/screens
@@ -209,11 +222,13 @@ workflows:
         script: |
           # Preserve failure captures, but never report failed UI assertions
           # as a successful workflow merely because export succeeded.
+          test "$(cat build/logs/screens-exit-code.txt)" -eq 0 || exit 1
           grep -Fq '** TEST SUCCEEDED **' build/logs/xcodebuild-screens.log
     artifacts:
       - build/screens.zip
       - build/Screens.xcresult.zip
       - build/logs/*.log
+      - build/logs/screens-exit-code.txt
 
   ios-testflight:
     name: iOS TestFlight release (signed)
