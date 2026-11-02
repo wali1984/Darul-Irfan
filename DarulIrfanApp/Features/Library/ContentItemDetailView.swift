@@ -62,6 +62,7 @@ struct ContentItemDetailView: View {
             } else if viewModel.loadFailed {
                 VStack(spacing: DISpacing.md) {
                     Text("The archive could not be loaded right now. Please try again in a moment.")
+                        .diInterfaceFont(.body)
                         .foregroundStyle(DIColor.textPrimary)
                     Button("Retry") { Task { await viewModel.load() } }
                         .buttonStyle(DISecondaryButtonStyle())
@@ -177,6 +178,9 @@ struct ContentItemDetailView: View {
             nativeMediaSection(for: item)
             if viewModel.showsBody {
                 readerCard(for: item)
+                if [ContentCategory.tasawwuf, .tazkiyahNafs, .zikrAllah, .baiat].contains(item.category) {
+                    MethodOfZikrLink(compact: true)
+                }
             } else {
                 excerptCard(for: item)
                 // Only when there is nothing to read here at all:
