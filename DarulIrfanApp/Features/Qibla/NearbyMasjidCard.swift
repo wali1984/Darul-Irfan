@@ -12,6 +12,7 @@ struct NearbyMasjidCard: View {
     @State private var items: [NearbyMasjid] = []
     @State private var loading = false
     @State private var searched = false
+    @State private var expanded = false
     @State private var errorKey: String?
     @State private var linkFailed = false
 
@@ -21,14 +22,14 @@ struct NearbyMasjidCard: View {
                 Label("Nearby masjids", systemImage: "mappin.and.ellipse").diInterfaceFont(.headline)
                 Text(verbatim: locationName).diInterfaceFont(.subheadline)
                 Text("Search within 10 km of your selected location.").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
-                Button("Search nearby") { loading = true; errorKey = nil; items = []; requestID = UUID() }
+                Button("Search nearby") { loading = true; errorKey = nil; items = []; expanded = false; requestID = UUID() }
                     .buttonStyle(DISecondaryButtonStyle()).disabled(loading)
                 if loading { ProgressView() }
                 if let errorKey { Text(LocalizedStringKey(errorKey)).diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted) }
                 if searched && !loading && errorKey == nil && items.isEmpty {
                     Text("No masjids found within 10 km.").diInterfaceFont(.footnote)
                 }
-                ForEach(items) { item in
+                ForEach(expanded ? items : Array(items.prefix(3))) { item in
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
                         Text(verbatim: item.name).diInterfaceFont(.headline)
                         if !item.address.isEmpty { Text(verbatim: item.address).diInterfaceFont(.footnote) }
@@ -43,6 +44,12 @@ struct NearbyMasjidCard: View {
                         }
                     }.frame(maxWidth: .infinity, alignment: .leading)
                     Divider()
+                }
+                if items.count > 3 {
+                    Button { expanded.toggle() } label: {
+                        if expanded { Text("Show less") } else { Text("Show all \(items.count)") }
+                    }.buttonStyle(DISecondaryButtonStyle())
+                    .accessibilityValue(expanded ? Text("Expanded") : Text("Collapsed"))
                 }
                 if searched && errorKey == nil && !loading {
                     Text(verbatim: "Google Maps").font(.system(size: 14, weight: .medium)).foregroundStyle(DIColor.textPrimary)
