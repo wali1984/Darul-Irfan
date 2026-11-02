@@ -73,6 +73,9 @@ struct NativeMethodOfZikrView: View {
         .navigationBarTitleDisplayMode(.inline)
         .diScreenBackground()
         .task(id: attempt) {
+            // Returning from Shajra must not replace the reading content with
+            // a spinner and collapse the ScrollView's current position.
+            guard guide == nil else { return }
             isLoading = true
             #if DEBUG
             // Exercise recovery through real contextual links, without changing bundled files.

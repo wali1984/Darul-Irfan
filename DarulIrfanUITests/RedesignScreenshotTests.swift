@@ -1219,6 +1219,7 @@ final class RedesignScreenshotTests: XCTestCase {
         shot("resources-" + origin + "-guide")
         let shajra = onScreen(app.buttons.matching(NSPredicate(
             format: "label CONTAINS %@", label("Chain of Transmission"))))
+        let originalGuideY = shajra.frame.minY
         guard tap(shajra) else {
             XCTFail("The guide must expose its prominent Shajra shortcut")
             return
@@ -1227,6 +1228,12 @@ final class RedesignScreenshotTests: XCTestCase {
         shot("resources-" + origin + "-shajra")
         goBack()
         XCTAssertTrue(app.navigationBars[guideTitle].exists, "Back must return to the guide")
+        XCTAssertTrue(firstSection.exists, "Returning from Shajra must retain the loaded guide")
+        XCTAssertFalse(app.staticTexts["method-guide-load-error"].exists)
+        XCTAssertTrue(shajra.isHittable, "The Shajra shortcut must remain reachable after Back")
+        XCTAssertEqual(shajra.frame.minY, originalGuideY, accuracy: 44,
+                       "The guide must retain its position after returning from Shajra")
+        shot("resources-" + origin + "-guide-return")
         goBack()
     }
 
