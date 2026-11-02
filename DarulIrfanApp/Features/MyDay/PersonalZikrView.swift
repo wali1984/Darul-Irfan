@@ -336,6 +336,7 @@ private struct ZikrTimerButtonStyle: ButtonStyle {
 private struct PersonalZikrHistoryCard: View {
     let entries: [PersonalZikrEntry]
     @Environment(\.locale) private var locale
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var all = false
     @State private var expanded = false
     private var days: [Date] {
@@ -353,7 +354,15 @@ private struct PersonalZikrHistoryCard: View {
                     HStack(spacing: 16) { summary; Spacer(minLength: 0) }
                     VStack(alignment: .leading, spacing: 4) { summary }
                 }.diInterfaceFont(.headline).foregroundStyle(DIColor.actionForeground)
-                DisclosureGroup(isExpanded: $expanded) {
+                Button {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) { expanded.toggle() }
+                } label: {
+                    Label("Your last 3 months", systemImage: expanded ? "chevron.up" : "chevron.down")
+                }
+                .buttonStyle(DISecondaryButtonStyle())
+                .accessibilityValue(expanded ? Text("Expanded") : Text("Collapsed"))
+                if expanded {
+                VStack(alignment: .leading, spacing: 14) {
                 let completed = Set(entries.map { Calendar.current.startOfDay(for: $0.endedAt) })
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 14), spacing: 4) {
                     ForEach(days, id: \.self) { day in
@@ -374,7 +383,9 @@ private struct PersonalZikrHistoryCard: View {
                     Button(all ? "Show recent sessions" : "Show all sessions") { all.toggle() }
                         .buttonStyle(DISecondaryButtonStyle())
                 }
-                } label: { Text("Your last 3 months").diInterfaceFont(.subheadline, weight: .semibold) }
+                }
+                .transition(reduceMotion ? .identity : .opacity.combined(with: .move(edge: .top)))
+                }
             }
         }
     }
