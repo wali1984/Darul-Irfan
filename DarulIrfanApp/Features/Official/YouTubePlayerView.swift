@@ -63,6 +63,8 @@ struct YouTubePlayerView: View {
             if failed {
                 VStack(spacing: DISpacing.md) {
                     Text("Could not load videos.")
+                        .diInterfaceFont(.body)
+                        .foregroundStyle(DIColor.textPrimary)
                     Button("Try again") { attempt += 1; failed = false }
                         .buttonStyle(DISecondaryButtonStyle())
                 }.padding().frame(maxWidth: .infinity, maxHeight: .infinity)
