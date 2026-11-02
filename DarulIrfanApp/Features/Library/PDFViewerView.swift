@@ -9,11 +9,15 @@ struct PDFViewerView: View {
 
     @State private var document: PDFDocument? = nil
     @State private var didFinishLoading = false
+    @State private var zoom = PDFZoomController()
 
     var body: some View {
         Group {
             if let document {
-                PDFKitView(document: document)
+                VStack(spacing: 0) {
+                    PDFZoomControls(controller: zoom)
+                    PDFKitView(document: document, zoom: zoom)
+                }
             } else if didFinishLoading {
                 DIEmptyState(
                     systemImage: "doc.richtext",
@@ -58,6 +62,7 @@ struct PDFViewerView: View {
 /// PDFKit PDFView wrapped for SwiftUI with continuous vertical scrolling.
 struct PDFKitView: UIViewRepresentable {
     let document: PDFDocument
+    let zoom: PDFZoomController
 
     func makeUIView(context: Context) -> PDFView {
         let view = PDFView()
@@ -66,6 +71,7 @@ struct PDFKitView: UIViewRepresentable {
         view.displayMode = .singlePageContinuous
         view.displayDirection = .vertical
         view.document = document
+        zoom.view = view
         return view
     }
 
@@ -74,5 +80,53 @@ struct PDFKitView: UIViewRepresentable {
         if uiView.document !== document {
             uiView.document = document
         }
+    }
+}
+
+/// Shared by downloaded-file and book readers. PDFKit retains its normal
+/// pinch gestures; these controls also work with VoiceOver and Switch Control.
+@MainActor
+final class PDFZoomController {
+    weak var view: PDFView?
+
+    func enlarge() { change(by: 1.25) }
+    func reduce() { change(by: 1 / 1.25) }
+    private func change(by multiplier: CGFloat) {
+        guard let view else { return }
+        let fitted = view.scaleFactorForSizeToFit
+        guard fitted.isFinite, fitted > 0 else { return }
+        let target = min(fitted * 4, max(fitted, view.scaleFactor * multiplier))
+        view.autoScales = false
+        view.scaleFactor = target
+    }
+    func fit() {
+        guard let view else { return }
+        view.autoScales = true
+        view.scaleFactor = view.scaleFactorForSizeToFit
+    }
+}
+
+struct PDFZoomControls: View {
+    let controller: PDFZoomController
+
+    var body: some View {
+        HStack(spacing: DISpacing.sm) {
+            zoomButton("Zoom out", symbol: "minus.magnifyingglass", action: controller.reduce)
+            zoomButton("Fit page", symbol: "arrow.up.left.and.arrow.down.right", action: controller.fit)
+            zoomButton("Zoom in", symbol: "plus.magnifyingglass", action: controller.enlarge)
+        }
+        .padding(.horizontal, DISpacing.sm)
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity)
+        .background(DIColor.background)
+    }
+
+    private func zoomButton(_ title: LocalizedStringKey, symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .frame(width: 20, height: 20)
+        }
+        .buttonStyle(DICompactButtonStyle())
+        .accessibilityLabel(Text(title))
     }
 }

@@ -27,6 +27,7 @@ struct BookReaderView: View {
     @State private var shareURL: URL?
     @State private var showsGoToPage = false
     @State private var goToPageText = ""
+    @State private var zoom = PDFZoomController()
 
     enum Phase: Equatable {
         case preparing
@@ -160,7 +161,8 @@ struct BookReaderView: View {
                 startPage: PDFReadingPosition.page(itemID: item.id) ?? 1,
                 requestedPage: $requestedPage,
                 pageCount: $pageCount,
-                currentPage: $currentPage
+                currentPage: $currentPage,
+                zoom: zoom
             )
             // Alone, the pages run under the home indicator; in the reader
             // they stop above its floating bar.
@@ -170,6 +172,7 @@ struct BookReaderView: View {
                 pageBar
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) { PDFZoomControls(controller: zoom) }
     }
 
     private var pageBar: some View {
@@ -286,6 +289,7 @@ private struct PDFReaderKit: UIViewRepresentable {
     @Binding var requestedPage: Int?
     @Binding var pageCount: Int
     @Binding var currentPage: Int
+    let zoom: PDFZoomController
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -297,6 +301,7 @@ private struct PDFReaderKit: UIViewRepresentable {
         view.usePageViewController(false)
         view.backgroundColor = .clear
         view.document = document
+        zoom.view = view
         let count = document.pageCount
         DispatchQueue.main.async { pageCount = count }
         if startPage > 1, let page = document.page(at: min(startPage, count) - 1) {
