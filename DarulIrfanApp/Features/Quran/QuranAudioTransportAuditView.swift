@@ -70,8 +70,14 @@ struct QuranAudioTransportAuditView: View {
             try? FileManager.default.removeItem(at: url)
         }
         do {
-            // Real seven-second local PCM asset, no network or reader layout.
-            let byteCount: UInt32 = 7 * 8000 * 2
+            // Match the CI host's observed 48 kHz output, avoiding the 8 kHz
+            // mono conversion path that stalled before the reader even ran.
+            // This is a diagnostic format experiment, not a production fix.
+            let sampleRate: UInt32 = 48_000
+            let channels: UInt16 = 2
+            let blockAlign = channels * 2 // 16-bit PCM
+            let byteRate = sampleRate * UInt32(blockAlign)
+            let byteCount: UInt32 = 7 * byteRate
             var data = Data()
             func text(_ value: String) { data.append(contentsOf: value.utf8) }
             func number<T: FixedWidthInteger>(_ value: T) {
@@ -79,11 +85,14 @@ struct QuranAudioTransportAuditView: View {
                 withUnsafeBytes(of: &little) { data.append(contentsOf: $0) }
             }
             text("RIFF"); number(UInt32(36) + byteCount); text("WAVEfmt ")
-            number(UInt32(16)); number(UInt16(1)); number(UInt16(1))
-            number(UInt32(8000)); number(UInt32(16000)); number(UInt16(2)); number(UInt16(16))
+            number(UInt32(16)); number(UInt16(1)); number(channels)
+            number(sampleRate); number(byteRate); number(blockAlign); number(UInt16(16))
             text("data"); number(byteCount); data.append(Data(count: Int(byteCount)))
             try data.write(to: url)
-            QuranAudioAuditCheckpoint.record(["checkpoint": "local-pcm-written"])
+            QuranAudioAuditCheckpoint.record(["checkpoint": "local-pcm-written",
+                                             "assetSampleRate": sampleRate,
+                                             "assetChannels": channels,
+                                             "assetBytes": byteCount])
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
             QuranAudioAuditCheckpoint.record(["checkpoint": "audio-category-set"])
             try AVAudioSession.sharedInstance().setActive(true)
