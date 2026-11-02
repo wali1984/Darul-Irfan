@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -117,6 +117,8 @@ final class RedesignScreenshotTests: XCTestCase {
         ]
         for (index, target) in expected.enumerated() {
             let number = index + 1
+            let performanceProbe = ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-performance"
+            if performanceProbe && ![2, 3].contains(number) { continue }
             if checkControls && !allDestinations && ![3, 18, 27, 28].contains(number) { continue }
             let rowLabel = "\(parahWord) \(number), \(target.0), \(ayahWord) \(target.1)"
             let row = app.buttons.matching(NSPredicate(format: "label == %@", rowLabel)).firstMatch
@@ -129,6 +131,7 @@ final class RedesignScreenshotTests: XCTestCase {
             }
             shot("parah-\(number)-row")
             row.tap()
+            if performanceProbe { readerIdleWindow(number: number, phase: "after-open") }
             let title = app.navigationBars[target.0]
             let ayah = app.staticTexts["\(ayahWord) \(target.1)"].firstMatch
             guard title.waitForExistence(timeout: 15) else {
@@ -159,11 +162,20 @@ final class RedesignScreenshotTests: XCTestCase {
             }
             shot("parah-\(number)-reader")
             if checkControls && [3, 18, 27, 28].contains(number) && !checkReaderMenus(number: number, title: title) { return }
+            if performanceProbe { readerIdleWindow(number: number, phase: "after-controls") }
             goBack()
             guard row.waitForExistence(timeout: 10), row.isHittable else {
                 shot("parah-\(number)-back-failure"); XCTFail("Back lost Parah \(number)"); return
             }
         }
+    }
+
+    /// No accessibility queries or screenshots inside this window. Compare the app's
+    /// heartbeat gaps here with its gaps while XCTest takes snapshots and opens menus.
+    private func readerIdleWindow(number: Int, phase: String) {
+        print("READER_IDLE_BEGIN parah=\(number) phase=\(phase) timestamp=\(Date().timeIntervalSince1970)")
+        pause(20)
+        print("READER_IDLE_END parah=\(number) phase=\(phase) timestamp=\(Date().timeIntervalSince1970)")
     }
 
     /// Exercise the real contextual menus after the title/controls layout changes.
@@ -206,7 +218,7 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "guide-recovery" {
             app.launchArguments.append("--uitesting-method-guide-failure")
         }
-        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-audit" {
+        if ["reader-audit", "reader-performance"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             app.launchArguments.append("--uitesting-reader-diagnostics")
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-follow" {
@@ -280,7 +292,7 @@ final class RedesignScreenshotTests: XCTestCase {
             audioFollowTour()
             return
         }
-        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-audit" {
+        if ["reader-audit", "reader-performance"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             parahTour(checkControls: true, allDestinations: true)
             return
         }
