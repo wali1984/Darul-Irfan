@@ -148,6 +148,7 @@ struct SheikhZikrPanel: View {
                     if let pending, pending.kind == "custom" {
                         Button("Retry pending action") { Task { await send(pending) } }
                             .buttonStyle(DIPrimaryButtonStyle()).disabled(busy)
+                            .accessibilityIdentifier("sheikh-stage-editor-retry")
                     }
                     if busy { ProgressView() }
                 }.padding(DISpacing.md)
@@ -183,7 +184,13 @@ struct SheikhZikrPanel: View {
             if let pending {
                 let id = pending.id.uuidString.lowercased()
                 if (pending.kind == "cue" && cues.contains(where: { $0.id == id })) ||
-                    (pending.kind == "custom" && stages.stages.contains(where: { $0.id == "custom-" + id })) { pendingJSON = "" }
+                    (pending.kind == "custom" && stages.stages.contains(where: { $0.id == "custom-" + id })) {
+                    pendingJSON = ""
+                    if pending.kind == "custom" {
+                        editorField = nil
+                        adding = false; title = ""; titleUr = ""
+                    }
+                }
             }
         } catch is CancellationError { return }
         catch { if ticket == generation { self.error = error.localizedDescription } }

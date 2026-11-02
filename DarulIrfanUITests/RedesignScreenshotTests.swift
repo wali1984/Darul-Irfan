@@ -960,7 +960,14 @@ final class RedesignScreenshotTests: XCTestCase {
             self.add(hierarchy)
             XCTFail("Custom stage save missing"); return
         }
+        let editorRetry = app.buttons["sheikh-stage-editor-retry"]
+        if editorRetry.waitForExistence(timeout: 3) {
+            shot("sheikh-custom-stage-pending")
+            guard tap(editorRetry) else { XCTFail("Saved stage retry unavailable"); return }
+        }
+        XCTAssertTrue(app.textFields[name].waitForNonExistence(timeout: 20), "Confirmed stage must close its editor")
         XCTAssertTrue(app.buttons["AuditMuraqaba"].waitForExistence(timeout: 15))
+        XCTAssertEqual(app.buttons.matching(identifier: "AuditMuraqaba").count, 1, "Lost response must not duplicate the custom stage")
         guard reveal(app.buttons["AuditMuraqaba"]), tap(app.buttons["AuditMuraqaba"]) else { XCTFail("Saved custom stage is unreachable"); return }
         shot("sheikh-custom-stage")
         goBack()

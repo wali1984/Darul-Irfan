@@ -172,7 +172,9 @@ private final class HalqahAuditProtocol: URLProtocol {
         if parts[4] == "zikr-stages" {
             if let existing = Self.customStages.first(where: { $0["id"] as? String == id }) { return answer(200, existing) }
             input["isCustom"] = true; Self.customStages.append(input)
-            return answer(201, input)
+            // The write committed but its response was lost. A retry with the
+            // original ID or a subsequent refresh must confirm one stage only.
+            return (503, "{}")
         }
         Self.stageAttempts += 1
         if Self.stageAttempts == 1 { Self.firstStageID = id; return (503, "{}") }
