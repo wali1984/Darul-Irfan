@@ -264,6 +264,7 @@ struct GroupLiveStarter: View {
     @State private var recordRoom = true
     @State private var library: GroupRecordingLibrary?
     @State private var libraryFailed = false
+    @State private var libraryLoadGeneration = 0
     @State private var showAllPastVideos = false
     /// What plays, in order: recordings and past zikr, picked from either list.
     @State private var picked: [GroupQueueEntry] = []
@@ -348,12 +349,12 @@ struct GroupLiveStarter: View {
         .navigationBarTitleDisplayMode(.inline)
         .interactiveDismissDisabled(working || uploading)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { if !working && !uploading { dismiss() } }.buttonStyle(DIToolbarButtonStyle()).disabled(working || uploading) } }
-        .confirmationDialog("Delete this recording?", isPresented: Binding(
+        .alert("Delete this recording?", isPresented: Binding(
             get: { deletingRecording != nil },
             set: { if !$0 { deletingRecording = nil } }
-        ), titleVisibility: .visible, presenting: deletingRecording) { recording in
+        ), presenting: deletingRecording) { recording in
             Button("Delete", role: .destructive) { Task { await delete(recording) } }
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) { deletingRecording = nil }
         } message: { recording in
             Text(verbatim: recording.title + "\n\n" + String(localized: "This removes the recording from the group's library. This cannot be undone."))
         }
@@ -605,12 +606,17 @@ struct GroupLiveStarter: View {
     // MARK: Recordings
 
     private func loadLibrary() async {
+        libraryLoadGeneration += 1
+        let generation = libraryLoadGeneration
         libraryFailed = false
         do {
-            library = try await service.recordings(in: groupID)
+            let loaded = try await service.recordings(in: groupID)
+            guard !Task.isCancelled, generation == libraryLoadGeneration else { return }
+            library = loaded
         } catch is CancellationError {
             return
         } catch {
+            guard !Task.isCancelled, generation == libraryLoadGeneration else { return }
             libraryFailed = true
         }
     }
@@ -658,6 +664,7 @@ struct GroupLiveStarter: View {
         do {
             try await service.deleteRecording(recording.id, in: groupID)
             picked.removeAll { $0 == .recording(recording.id) }
+            library?.recordings.removeAll { $0.id == recording.id }
             await loadLibrary()
         } catch is CancellationError {
             return
