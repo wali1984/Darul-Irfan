@@ -279,7 +279,7 @@ struct DirectoryPersonView: View {
         } catch is CancellationError { }
         catch {
             if !Task.isCancelled {
-                error = String(localized: "The member directory could not be loaded. Please try again.")
+                self.error = String(localized: "The member directory could not be loaded. Please try again.")
             }
         }
     }
