@@ -39,6 +39,37 @@ final class StorageSettingsTests: XCTestCase {
         XCTAssertEqual(model.assetCount, 0)
     }
 
+    func testStorageReadBlocksDuplicateRefreshAndClearUntilItFinishes() async throws {
+        let repository = StorageTestRepository([asset("keep")])
+        let manager = StorageTestManager(repository)
+        let entered = expectation(description: "Storage read suspended")
+        var resumeRead: CheckedContinuation<Void, Never>?
+        manager.beforeRead = {
+            await withCheckedContinuation { continuation in
+                resumeRead = continuation
+                entered.fulfill()
+            }
+        }
+        let model = StorageSettingsViewModel(downloadManager: manager, downloadsRepository: repository)
+        let pending = Task { await model.load() }
+        await fulfillment(of: [entered], timeout: 5)
+        XCTAssertTrue(model.isLoading)
+        await model.load()
+        await model.clearAllDownloads()
+        XCTAssertEqual(manager.readCalls, 1)
+        let retained = try await repository.allAssets()
+        XCTAssertEqual(retained.count, 1, "Clear must not race an outstanding summary read")
+        resumeRead?.resume()
+        await pending.value
+        XCTAssertFalse(model.isLoading)
+        XCTAssertTrue(model.hasLoaded)
+        XCTAssertEqual(model.assetCount, 1)
+        manager.beforeRead = nil
+        await model.clearAllDownloads()
+        XCTAssertFalse(model.isClearing)
+        XCTAssertEqual(model.assetCount, 0)
+    }
+
     func testReadFailureCanBeRetried() async {
         let repository = StorageTestRepository([asset("one")])
         await repository.failNextRead()
@@ -126,12 +157,18 @@ private actor StorageTestRepository: DownloadsRepositoryProtocol {
 private final class StorageTestManager: DownloadManaging {
     let repository: StorageTestRepository
     var failureID: String?
+    var beforeRead: (() async -> Void)?
+    var readCalls = 0
     var activeDownloads: [String: Double] = [:]
     init(_ repository: StorageTestRepository) { self.repository = repository }
     func download(url: URL, forContentItem contentItemID: String?, mediaItemID: String?) async throws -> DownloadedAsset { throw URLError(.unsupportedURL) }
     func cancelDownload(url: URL) {}
     func localURL(for asset: DownloadedAsset) -> URL? { nil }
-    func totalBytesUsed() async -> Int64 { 10 }
+    func totalBytesUsed() async -> Int64 {
+        readCalls += 1
+        await beforeRead?()
+        return 10
+    }
     func deleteAsset(_ asset: DownloadedAsset) async throws {
         if asset.id == failureID { throw CocoaError(.fileWriteNoPermission) }
         await repository.deleteAsset(id: asset.id)

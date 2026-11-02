@@ -87,12 +87,12 @@ struct ContentStorageSettingsView: View {
                 }
             }
             .buttonStyle(DISecondaryButtonStyle(destructive: true))
-            .disabled((viewModel.assetCount == 0 && viewModel.bytesUsed == 0) || viewModel.loadFailed || viewModel.isClearing || !viewModel.hasLoaded)
+            .disabled((viewModel.assetCount == 0 && viewModel.bytesUsed == 0) || viewModel.loadFailed || viewModel.isClearing || viewModel.isLoading || !viewModel.hasLoaded)
             .listRowBackground(DIColor.surface)
             if viewModel.loadFailed {
                 Button("Retry") { Task { await viewModel.load() } }
                     .buttonStyle(DISecondaryButtonStyle())
-                    .disabled(viewModel.isClearing)
+                    .disabled(viewModel.isClearing || viewModel.isLoading)
                     .listRowBackground(DIColor.surface)
             }
         } header: {
@@ -129,6 +129,7 @@ final class StorageSettingsViewModel {
     private(set) var assetCount = 0
     private(set) var hasLoaded = false
     private(set) var isClearing = false
+    private(set) var isLoading = false
     private(set) var failedDeletions = 0
     private(set) var loadFailed = false
 
@@ -141,21 +142,31 @@ final class StorageSettingsViewModel {
     }
 
     func load() async {
-        loadFailed = false
-        bytesUsed = await downloadManager.totalBytesUsed()
+        guard !isLoading else { return }
+        isLoading = true
+        defer { isLoading = false }
+        let bytes = await downloadManager.totalBytesUsed()
         do {
-            assetCount = try await downloadsRepository.allAssets().count
+            let count = try await downloadsRepository.allAssets().count
+            try Task.checkCancellation()
+            bytesUsed = bytes
+            assetCount = count
+            loadFailed = false
+            hasLoaded = true
+        } catch is CancellationError {
+            return
         } catch {
             loadFailed = true
+            hasLoaded = true
         }
-        hasLoaded = true
     }
 
     /// Deletes every downloaded asset, continuing past individual failures so
     /// one bad file does not block the rest.
     func clearAllDownloads() async {
-        guard !isClearing else { return }
+        guard !isClearing, !isLoading else { return }
         isClearing = true
+        defer { isClearing = false }
         failedDeletions = 0
         do {
             let assets = try await downloadsRepository.allAssets()
@@ -170,7 +181,6 @@ final class StorageSettingsViewModel {
         } catch {
             failedDeletions += 1
         }
-        isClearing = false
         await load()
     }
 }
