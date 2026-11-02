@@ -55,20 +55,48 @@ enum HifzComposition {
                 composition.insertEmptyTimeRange(CMTimeRange(start: at, duration: length))
             }
         }
-        // insertEmptyTimeRange does not retain a gap after the final media
-        // sample. Represent that tail explicitly so the player's duration
-        // still matches the repeat timeline, including an encoder overhang.
+        // AVFoundation excludes trailing empty segments from asset duration,
+        // even when explicitly assigned to track.segments. Use actual silent
+        // PCM samples at the end so repeat timing survives in AVPlayer.
         if let final = timeline.segments.last {
             let expectedEnd = CMTime(value: final.startMs + final.durationMs, timescale: 1000)
-            let actualEnd = CMTimeRangeGetEnd(track.timeRange)
+            let actualEnd = try await composition.load(.duration)
             if CMTimeCompare(actualEnd, expectedEnd) < 0 {
-                let tail = AVCompositionTrackSegment(timeRange: CMTimeRange(
-                    start: actualEnd, duration: CMTimeSubtract(expectedEnd, actualEnd)))
-                let segments = track.segments + [tail]
-                try track.validateSegments(segments)
-                track.segments = segments
+                let missing = CMTimeSubtract(expectedEnd, actualEnd)
+                guard missing.seconds <= 5 else { throw Failure.invalidSourceDuration }
+                let silence = AVURLAsset(url: try silenceURL())
+                guard let silentTrack = try await silence.loadTracks(withMediaType: .audio).first else {
+                    throw Failure.unavailableAudio
+                }
+                try Task.checkCancellation()
+                track.removeTimeRange(CMTimeRange(start: actualEnd, duration: missing))
+                try track.insertTimeRange(CMTimeRange(start: .zero, duration: missing), of: silentTrack, at: actualEnd)
             }
         }
         return composition
+    }
+
+    /// A small shared PCM file must outlive the composition reading it. Store
+    /// it in caches, never in user recordings or backup, and reuse valid bytes.
+    private static func silenceURL() throws -> URL {
+        let directory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("hifz-silence", isDirectory: true)
+        let url = directory.appendingPathComponent("pcm-8000-mono-5s.wav")
+        let byteCount: UInt32 = 5 * 8000 * 2
+        var data = Data()
+        func text(_ value: String) { data.append(contentsOf: value.utf8) }
+        func number<T: FixedWidthInteger>(_ value: T) {
+            var little = value.littleEndian
+            withUnsafeBytes(of: &little) { data.append(contentsOf: $0) }
+        }
+        text("RIFF"); number(UInt32(36) + byteCount); text("WAVEfmt ")
+        number(UInt32(16)); number(UInt16(1)); number(UInt16(1))
+        number(UInt32(8000)); number(UInt32(16000)); number(UInt16(2)); number(UInt16(16))
+        text("data"); number(byteCount); data.append(Data(count: Int(byteCount)))
+        if (try? Data(contentsOf: url)) != data {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try data.write(to: url, options: .atomic)
+        }
+        return url
     }
 }
