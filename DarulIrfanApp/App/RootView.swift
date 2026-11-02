@@ -77,10 +77,23 @@ struct RootView: View {
         // `safeAreaInset` adapts to compact/regular tab bars, iPad and future
         // system tab-bar sizes instead of relying on a fixed 49-point offset.
         .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 0) {
+            if let groupID = NativeHalqaSession.shared.activeGroupID {
+                Button {
+                    openFromScreen(.group(id: groupID))
+                } label: {
+                    Label("Meeting room", systemImage: "headphones")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(DIPrimaryButtonStyle())
+                .padding(.horizontal)
+                .padding(.vertical, DISpacing.xs)
+            }
             if dependencies.audioPlayer.nowPlaying != nil {
                 MiniPlayerBar(audioPlayer: dependencies.audioPlayer)
                     .environment(\.diMediaRepository, dependencies.mediaRepository)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
             }
         }
         .animation(.easeInOut(duration: 0.25), value: dependencies.audioPlayer.nowPlaying)

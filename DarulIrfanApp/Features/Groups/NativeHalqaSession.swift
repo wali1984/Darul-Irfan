@@ -11,6 +11,13 @@ final class NativeHalqaSession {
     private init() {}
     private var presentation: (groupID: String, pass: GroupRoomPass)?
 
+    var activeGroupID: String? {
+        let roomID = lifecycle.sessionID
+        guard lifecycle.transport != nil, let presentation,
+              roomID == presentation.pass.roomID else { return nil }
+        return presentation.groupID
+    }
+
     /// In-memory only; an expired or released connection is never recreated
     /// using the old participant token.
     func resumePass(groupID: String) -> GroupRoomPass? {
