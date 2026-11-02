@@ -128,7 +128,7 @@ struct SurahReaderView: View {
     @MainActor private func recordReaderResponsivenessIfRequested() async {
         guard ProcessInfo.processInfo.arguments.contains("--uitesting-reader-diagnostics") else { return }
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("reader-audit-\(viewModel.surah.id).jsonl")
+            .appendingPathComponent("reader-audit-\(viewModel.surah.id)-\(initialFocusAyah ?? 0)-\(UUID().uuidString).jsonl")
         var output = Data()
         var previous = ProcessInfo.processInfo.systemUptime
         for _ in 0..<600 {
