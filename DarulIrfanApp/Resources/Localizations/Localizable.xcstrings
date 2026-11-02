@@ -1,6 +1,8 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Guidance": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "رہنمائی"}}}},
+
 "Your camera": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "آپ کا کیمرہ"}}}},
 "Audio output": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "آواز کا آلہ"}}}},
 "Speaker": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "اسپیکر"}}}},

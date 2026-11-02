@@ -4,6 +4,10 @@ import SwiftUI
 @MainActor
 struct NativeMeetingRoomView: View {
     let pass: GroupRoomPass
+    let groupID: String
+    let service: MemberGroupService
+    /// Supplied by the group's refreshed live-session state.
+    let isLiveZikr: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @State private var rejected = false
@@ -43,6 +47,15 @@ struct NativeMeetingRoomView: View {
                         NativeMeetingPeopleView(participants: transport.participants) { action, id in
                             ownsRoom && transport.submit(action, participantID: id)
                         }.tabItem { Label("Participants", systemImage: "person.2") }
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: DISpacing.md) {
+                                MethodOfZikrLink(compact: true)
+                                if groupID == "our-sheikh" {
+                                    SheikhZikrPanel(groupID: groupID, service: service, isLiveZikr: isLiveZikr)
+                                }
+                            }.padding().diResponsiveWidth()
+                        }.diScreenBackground()
+                            .tabItem { Label("Guidance", systemImage: "book") }
                     }.id(ObjectIdentifier(transport))
                 } else if ownsRoom {
                     ProgressView().accessibilityLabel(Text("Meeting room")).padding()
