@@ -971,7 +971,15 @@ final class RedesignScreenshotTests: XCTestCase {
         let editorRetry = app.buttons["sheikh-stage-editor-retry"]
         if editorRetry.waitForExistence(timeout: 3) {
             shot("sheikh-custom-stage-pending")
-            guard tap(editorRetry) else { XCTFail("Saved stage retry unavailable"); return }
+            if !tap(editorRetry) {
+                // The periodic refresh can confirm the committed request and
+                // dismiss the sheet while the screenshot is being captured.
+                // A missing retry is valid only when that editor has closed;
+                // the unique saved stage and announcement are checked below.
+                guard app.textFields[name].waitForNonExistence(timeout: 5) else {
+                    XCTFail("Saved stage retry unavailable while editor remains open"); return
+                }
+            }
         }
         XCTAssertTrue(app.textFields[name].waitForNonExistence(timeout: 20), "Confirmed stage must close its editor")
         XCTAssertTrue(app.buttons["AuditMuraqaba"].waitForExistence(timeout: 15))
