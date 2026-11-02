@@ -17,6 +17,7 @@ export const fcmSendURL = (projectID: string): string =>
  *  which creates them; a notice names the one it is shown in. */
 export const FCM_CHANNELS = {
   halqah: "halqah_notifications",
+  zikrStages: "halqah_zikr_stages",
   dailyZikr: "daily_zikr_live",
   official: "official_alerts",
 } as const;
@@ -63,7 +64,7 @@ export interface FCMMessage {
     collapse_key?: string;
     notification: {
       channel_id: FCMChannel;
-      sound: "default";
+      sound: "default" | "zikr_soft_chime";
       /** A newer notice with the same tag replaces the older one in the tray. */
       tag?: string;
     };
@@ -80,7 +81,7 @@ export function fcmMessage(
 ): FCMMessage {
   const android: FCMMessage["android"] = {
     priority: "high",
-    notification: { channel_id: fcmChannel(topic), sound: "default" },
+    notification: { channel_id: options.sound ? FCM_CHANNELS.zikrStages : fcmChannel(topic), sound: options.sound ?? "default" },
   };
   if (options.ttlSeconds) android.ttl = `${Math.floor(options.ttlSeconds)}s`;
   if (options.collapseID) {

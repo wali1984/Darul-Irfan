@@ -158,6 +158,13 @@ describe("the Android channel of each notice", () => {
 });
 
 describe("the message an Android phone is sent", () => {
+  it("routes Sheikh stages to the bundled soft-chime channel with a bounded lifetime", () => {
+    const message = fcmMessage("t", "halqah-cue:1", "group:our-sheikh", "1st Latifa", "Stage",
+      "darulirfan://groups/our-sheikh", { sound: "zikr_soft_chime", ttlSeconds: 120, collapseID: "sheikh-zikr-stage" });
+    expect(message.android.notification).toEqual({ channel_id: "halqah_zikr_stages", sound: "zikr_soft_chime", tag: "sheikh-zikr-stage" });
+    expect(message.android.ttl).toBe("120s");
+  });
+
   it("carries the iPhone's title, body and deep link, high priority, in the Halqah channel", () => {
     expect(fcmMessage("token-1", "post:abc", "group:usa", "Friday", "After Isha", "darulirfan://groups/usa")).toEqual({
       token: "token-1",

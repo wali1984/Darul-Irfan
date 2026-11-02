@@ -126,7 +126,9 @@ final class GroupsModel {
             let list = try await service.groups()
             try Task.checkCancellation()
             guard revision == refreshRevision else { return }
-            groups = list.groups
+            // Pin the verified existing Halqa by immutable ID, preserving all other server ordering.
+            groups = list.groups.filter { $0.id == "our-sheikh" } +
+                list.groups.filter { $0.id != "our-sheikh" }
             role = list.role ?? .member
             signedIn = list.signedIn
             phase = .ready

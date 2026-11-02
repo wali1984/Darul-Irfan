@@ -5,6 +5,8 @@ import { base64url, inParallel } from "./util";
 /** Extra APNs headers for an alert that means nothing once its moment has
  *  passed. Posts and group notices send none of these. */
 export interface PushOptions {
+  /** Bundled soft stage chime; omitted for existing alerts. */
+  sound?: "zikr_soft_chime";
   /** How long APNs keeps trying a phone that is offline before dropping it. */
   ttlSeconds?: number;
   /** A newer alert with the same id replaces the older one on the phone. */
@@ -125,7 +127,7 @@ async function deliverAPNs(
   };
   if (options.ttlSeconds) headers["apns-expiration"] = String(Math.floor(Date.now() / 1000) + options.ttlSeconds);
   if (options.collapseID) headers["apns-collapse-id"] = options.collapseID;
-  const payload = JSON.stringify({ aps: { alert: { title, body }, sound: "default", "thread-id": topic }, path });
+  const payload = JSON.stringify({ aps: { alert: { title, body }, sound: options.sound ? `${options.sound}.wav` : "default", "thread-id": topic }, path });
   // Several phones at once, so a few hundred finish well inside one request.
   const sent = await inParallel(pending, SEND_CONCURRENCY, async device => {
     const host = device.environment === "sandbox" ? "api.sandbox.push.apple.com" : "api.push.apple.com";

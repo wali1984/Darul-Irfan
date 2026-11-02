@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history", "halqah-duas", "dua-race"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -221,7 +221,14 @@ final class RedesignScreenshotTests: XCTestCase {
                 app.launchArguments += ["--uitesting-dua-race"]
             }
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "sheikh-stage" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-sheikh-stage"]
+        }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "sheikh-stage" {
+            sheikhStageTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "dua-race" {
             halqahDuaRaceTour()
             return
@@ -888,6 +895,33 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     /// Real history/attendance screens with local transport, including recoverable failures.
+    private func sheikhStageTour() {
+        let lead = language == "ur" ? "??? ?? ??????? ????" : "Lead Zikr"
+        let first = language == "ur" ? "پہلا لطیفہ" : "1st Latifa"
+        let retry = language == "ur" ? "???? ????? ??? ?????? ????" : "Retry pending action"
+        let add = language == "ur" ? "?????? ???? ????" : "Add Muraqaba"
+        let name = language == "ur" ? "?????? ?? ???" : "Muraqaba name"
+        let save = language == "ur" ? "محفوظ کریں" : "Save"
+        let admin = app.buttons["halqah-audit-admin"]
+        guard admin.waitForExistence(timeout: 180), tap(admin), tap(app.buttons[lead]), tap(app.buttons[first]) else { XCTFail("Stage controls unavailable"); return }
+        XCTAssertTrue(app.buttons[retry].waitForExistence(timeout: 15))
+        shot("sheikh-stage-pending")
+        guard tap(app.buttons[retry]) else { XCTFail("Pending action retry unavailable"); return }
+        XCTAssertTrue(app.buttons[retry].waitForNonExistence(timeout: 15))
+        shot("sheikh-stage-confirmed")
+        guard tap(app.buttons[add]), tap(app.textFields[name]) else { XCTFail("Custom stage entry missing"); return }
+        app.textFields[name].typeText("AuditMuraqaba")
+        guard tap(app.buttons[save]) else { XCTFail("Custom stage save missing"); return }
+        XCTAssertTrue(app.buttons["AuditMuraqaba"].waitForExistence(timeout: 15))
+        guard tap(app.buttons["AuditMuraqaba"]) else { return }
+        shot("sheikh-custom-stage")
+        goBack()
+        guard tap(app.buttons["halqah-audit-member"]) else { XCTFail("Member entry missing"); return }
+        XCTAssertTrue(app.staticTexts["AuditMuraqaba"].firstMatch.waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons[lead].exists, "Members must not have broadcaster controls")
+        shot("sheikh-member-stage")
+    }
+
     private func halqahDuaRaceTour() {
         let retry = language == "ur" ? "?????? ???? ????" : "Try again"
         let mark = language == "ur" ? "??? ???" : "Mark as read"

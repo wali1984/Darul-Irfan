@@ -237,6 +237,30 @@ actor MemberGroupService {
         try await send("POST", path: "v1/groups/\(groupID)/duas", payload: ["text": text, "showName": showName], expecting: [201])
     }
 
+    func zikrStages(in groupID: String) async throws -> HalqaZikrStages {
+        try await authorized(HalqaZikrStages.self, path: "v1/groups/\(groupID)/zikr-stages")
+    }
+
+    func zikrCues(in groupID: String, afterSequence: Int64? = nil) async throws -> HalqaZikrCuePage {
+        try await authorized(HalqaZikrCuePage.self, path: "v1/groups/\(groupID)/zikr-cues",
+                             query: afterSequence.map { "after=\($0)" })
+    }
+
+    /// Retain requestID when retrying the same addition.
+    func addZikrStage(in groupID: String, requestID: UUID, title: String, titleUr: String?) async throws -> HalqaZikrStage {
+        var payload: [String: Any] = ["id": "custom-" + requestID.uuidString.lowercased(), "title": title]
+        if let titleUr { payload["titleUr"] = titleUr }
+        let data = try await send("POST", path: "v1/groups/\(groupID)/zikr-stages", payload: payload, expecting: [200, 201])
+        return try decoder.decode(HalqaZikrStage.self, from: data)
+    }
+
+    /// Retain eventID on retries; each new intentional selection gets a new ID.
+    func broadcastZikrStage(in groupID: String, stageID: String, eventID: UUID) async throws -> HalqaZikrCue {
+        let data = try await send("POST", path: "v1/groups/\(groupID)/zikr-cues",
+                                  payload: ["id": eventID.uuidString.lowercased(), "stageID": stageID], expecting: [200, 201])
+        return try decoder.decode(HalqaZikrCueResult.self, from: data).cue
+    }
+
     func duaRequests(in groupID: String) async throws -> [GroupDuaRequest] {
         try await authorized(GroupDuaRequestList.self, path: "v1/groups/\(groupID)/duas").requests
     }

@@ -422,3 +422,30 @@ struct AddPersonResult: Decodable, Sendable, Equatable {
     var phone: String?
     var role: GroupRole
 }
+
+
+struct HalqaZikrStage: Codable, Sendable, Identifiable, Equatable {
+    let id: String
+    let title: String
+    let titleUr: String?
+    let isCustom: Bool
+}
+struct HalqaZikrStages: Codable, Sendable {
+    let canBroadcast: Bool
+    let stages: [HalqaZikrStage]
+}
+struct HalqaZikrCue: Codable, Sendable, Identifiable, Equatable {
+    let sequence: Int64
+    let id: String
+    let stageID: String
+    let title: String
+    let titleUr: String?
+    let authorID: String
+    let createdAt: Date
+    let notificationState: String
+}
+struct HalqaZikrCuePage: Codable, Sendable {
+    let cues: [HalqaZikrCue]
+    let nextSequence: Int64
+}
+struct HalqaZikrCueResult: Codable, Sendable { let cue: HalqaZikrCue }

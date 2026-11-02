@@ -5,12 +5,16 @@ import Foundation
 /// Exercises the real detail screen without a Keychain session or live group requests.
 struct HalqahAuditFixture: View {
     private let service: MemberGroupService
+    private let sheikhAudit = ProcessInfo.processInfo.arguments.contains("--uitesting-sheikh-stage")
     private let historyAudit = ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-history")
     @State private var releasedOldRefresh = false
     private let raceAudit = ProcessInfo.processInfo.arguments.contains("--uitesting-dua-race")
     private let duaAudit = ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-duas")
 
     init() {
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-sheikh-stage") {
+            UserDefaults.standard.removePersistentDomain(forName: "sheikh-stage-audit")
+        }
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [HalqahAuditProtocol.self]
         service = MemberGroupService(
@@ -23,7 +27,10 @@ struct HalqahAuditFixture: View {
         NavigationStack {
             List(duaAudit ? ["admin"] : ["member", "admin"], id: \.self) { role in
                 NavigationLink {
-                    if duaAudit {
+                    if sheikhAudit {
+                        ScrollView { SheikhZikrPanel(groupID: role, service: service, pendingStore: UserDefaults(suiteName: "sheikh-stage-audit")!).padding(DISpacing.md) }
+                            .diScreenBackground().navigationTitle("Our Sheikh")
+                    } else if duaAudit {
                         GroupDuaRequestsView(groupID: role, service: service)
                             .safeAreaInset(edge: .bottom) {
                                 if raceAudit {
@@ -64,6 +71,10 @@ private final class HalqahAuditProtocol: URLProtocol {
     private static var historyAttempts: [String: Int] = [:]
     private static var deleted: Set<String> = []
     private static var failedAfterDelete: Set<String> = []
+    private static var stageAttempts = 0
+    private static var firstStageID: String?
+    private static var customStages: [[String: Any]] = []
+    private static var stageCues: [[String: Any]] = []
     private static var duaReads = 0
     private static var duaWrites = 0
     private static var duaMarkedRead = false
@@ -90,6 +101,12 @@ private final class HalqahAuditProtocol: URLProtocol {
         guard parts.count >= 4, parts[1] == "v1", parts[2] == "groups",
               ["member", "admin"].contains(parts[3]) else {
             respond(404, "{}")
+            return
+        }
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-sheikh-stage"),
+           parts.count == 5, ["zikr-stages", "zikr-cues"].contains(parts[4]) {
+            let result = stageResponse(parts: parts)
+            respond(result.0, result.1)
             return
         }
         if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-duas"),
@@ -127,6 +144,47 @@ private final class HalqahAuditProtocol: URLProtocol {
             respond(404, "{}")
         }
     }
+    private func stageResponse(parts: [String]) -> (Int, String) {
+        Self.lock.lock()
+        defer { Self.lock.unlock() }
+        let admin = parts[3] == "admin"
+        let stages = PersonalZikrStage.allCases.map { stage -> [String: Any] in
+            let id = stage.rawValue.hasPrefix("latifa") ? stage.rawValue.replacingOccurrences(of: "latifa", with: "latifa-") : stage.rawValue
+            return ["id": id, "title": stage.title, "titleUr": String(localized: String.LocalizationValue(stage.title)), "isCustom": false]
+        } + Self.customStages
+        func answer(_ code: Int, _ body: [String: Any]) -> (Int, String) {
+            guard let data = try? JSONSerialization.data(withJSONObject: body), let text = String(data: data, encoding: .utf8) else { return (500, "{}") }
+            return (code, text)
+        }
+        if request.httpMethod == "GET" {
+            return parts[4] == "zikr-stages" ? answer(200, ["canBroadcast": admin, "stages": stages]) : answer(200, ["cues": Self.stageCues, "nextSequence": Self.stageCues.count])
+        }
+        guard admin, request.httpMethod == "POST" else { return (403, "{}") }
+        let data: Data
+        if let body = request.httpBody { data = body }
+        else if let stream = request.httpBodyStream {
+            stream.open(); defer { stream.close() }
+            var content = Data(); var buffer = [UInt8](repeating: 0, count: 1024)
+            while stream.hasBytesAvailable { let count = stream.read(&buffer, maxLength: buffer.count); if count <= 0 { break }; content.append(buffer, count: count) }
+            data = content
+        } else { return (400, "{}") }
+        guard var input = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any], let id = input["id"] as? String else { return (400, "{}") }
+        if parts[4] == "zikr-stages" {
+            if let existing = Self.customStages.first(where: { $0["id"] as? String == id }) { return answer(200, existing) }
+            input["isCustom"] = true; Self.customStages.append(input)
+            return answer(201, input)
+        }
+        Self.stageAttempts += 1
+        if Self.stageAttempts == 1 { Self.firstStageID = id; return (503, "{}") }
+        if Self.stageAttempts == 2 && Self.firstStageID != id { return (409, "{}") }
+        if let existing = Self.stageCues.first(where: { $0["id"] as? String == id }) { return answer(200, ["cue": existing]) }
+        guard let stage = stages.first(where: { $0["id"] as? String == input["stageID"] as? String }) else { return (404, "{}") }
+        let cue: [String: Any] = ["id": id, "stageID": input["stageID"]!, "sequence": Self.stageCues.count + 1,
+            "title": stage["title"]!, "titleUr": stage["titleUr"] ?? stage["title"]!, "authorID": "audit", "createdAt": "2026-11-01T12:00:00Z", "notificationState": "complete"]
+        Self.stageCues.append(cue)
+        return answer(201, ["cue": cue])
+    }
+
     private func duaResponse(parts: [String]) -> (Int, String) {
         Self.lock.lock()
         defer { Self.lock.unlock() }
