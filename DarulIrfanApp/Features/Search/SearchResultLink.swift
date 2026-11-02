@@ -163,6 +163,8 @@ private struct SearchHadithDestination: View {
     let appState: AppState
     @State private var book: HadithBook?
     @State private var loaded = false
+    @State private var loadFailed = false
+    @State private var attempt = 0
 
     var body: some View {
         Group {
@@ -173,6 +175,13 @@ private struct SearchHadithDestination: View {
                     appState: appState,
                     initialHadith: canonicalID
                 )
+            } else if loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    DIEmptyState(systemImage: "text.book.closed", titleKey: "Could not complete action")
+                    Button("Try Again") { attempt += 1 }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }
+                .padding(DISpacing.md)
             } else if loaded {
                 DIEmptyState(systemImage: "text.book.closed", titleKey: "Hadith not found",
                              messageKey: "This narration is not among the collections in the app.")
@@ -180,10 +189,22 @@ private struct SearchHadithDestination: View {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .task {
-            let bookID = canonicalID.split(separator: "|").first.map(String.init) ?? canonicalID
-            book = (try? await dependencies.hadithRepository.books())?.first { $0.id == bookID }
-            loaded = true
+        .diScreenBackground()
+        .task(id: attempt) {
+            guard !loaded else { return }
+            loadFailed = false
+            do {
+                let bookID = canonicalID.split(separator: "|").first.map(String.init) ?? canonicalID
+                let books = try await dependencies.hadithRepository.books()
+                try Task.checkCancellation()
+                book = books.first { $0.id == bookID }
+                loaded = true
+            } catch is CancellationError {
+                return
+            } catch {
+                guard !Task.isCancelled else { return }
+                loadFailed = true
+            }
         }
     }
 }
