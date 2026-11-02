@@ -834,11 +834,19 @@ final class RedesignScreenshotTests: XCTestCase {
         app.swipeUp(); pause(1)
         shot("pdf-scrolled")
         XCTAssertTrue(tap(share))
+        // The popover can leave underlying PDF controls hittable. Observe an
+        // actual share action instead; this system label is English in both
+        // language configurations of the hosted simulator.
+        let saveToFiles = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label == %@", "Save to Files")).firstMatch
         let presented = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "hittable == false"), object: enlarge
+            predicate: NSPredicate(format: "exists == true AND hittable == true"), object: saveToFiles
         )
         guard XCTWaiter.wait(for: [presented], timeout: 10) == .completed else {
             shot("pdf-share-present-failure")
+            let hierarchy = XCTAttachment(string: app.debugDescription)
+            hierarchy.lifetime = .keepAlways
+            add(hierarchy)
             XCTFail("Share did not present a modal sheet"); return
         }
         pause(1)
@@ -847,12 +855,13 @@ final class RedesignScreenshotTests: XCTestCase {
         // bottom sheet. Tap the uncovered PDF below it to dismiss.
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)).tap()
         let dismissed = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "hittable == true"), object: enlarge
+            predicate: NSPredicate(format: "exists == false"), object: saveToFiles
         )
         guard XCTWaiter.wait(for: [dismissed], timeout: 10) == .completed else {
             shot("pdf-share-dismiss-failure")
             XCTFail("Share sheet did not dismiss"); return
         }
+        XCTAssertTrue(enlarge.isHittable, "PDF controls must be usable after sharing closes")
         goBack()
         XCTAssertTrue(valid.waitForExistence(timeout: 10))
         XCTAssertTrue(tap(app.buttons["pdf-audit-damaged"].firstMatch))
