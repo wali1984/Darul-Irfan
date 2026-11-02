@@ -12,11 +12,22 @@ function setup() {
       .run(id, id, id + "@example.com", "now", "now");
     if (id !== "outsider" && id !== "owner") raw.prepare("INSERT INTO member_group_members(group_id,member_id,added_at,added_by,role) VALUES('our-sheikh',?,'now','test',?)").run(id, role);
   }
+  raw.prepare("INSERT INTO group_live(group_id,state,kind,updated_at) VALUES('our-sheikh','live','zikr','now')").run();
   return { raw, env: { DB: db, SUPER_ADMIN_EMAILS: "owner@example.com" } as Env };
 }
 const draft = { id: "custom-12345678-1234-1234-1234-123456789abc", title: "Additional Muraqaba", titleUr: "???? ??????" };
 
 describe("Our Sheikh stage catalogue", () => {
+  it("hides controls and rejects stage writes offline or in a meeting, retaining history", async () => {
+    const { env, raw } = setup();
+    for (const [state, kind] of [["offline", "zikr"], ["live", "meeting"]] as const) {
+      raw.prepare("UPDATE group_live SET state=?,kind=?").run(state, kind);
+      expect((await (await zikrStages(env, "admin", "our-sheikh")).json() as any).canBroadcast).toBe(false);
+      expect((await broadcastZikrCue(env, "admin", "our-sheikh", cue)).status).toBe(409);
+      expect((await addZikrStage(env, "admin", "our-sheikh", draft)).status).toBe(409);
+      expect((await zikrCues(env, "member", "our-sheikh", null)).status).toBe(200);
+    }
+  });
   it("uses stable group identity and exposes 11 ordered defaults with member read-only access", async () => {
     const { env } = setup();
     const response = await zikrStages(env, "member", "our-sheikh");

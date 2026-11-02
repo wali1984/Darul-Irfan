@@ -74,6 +74,10 @@ export const DEFAULT_ZIKR_STAGES: ZikrStage[] = [
   }
 ];
 
+async function liveZikr(env: Env, groupID: string): Promise<boolean> {
+  return !!await env.DB.prepare("SELECT group_id FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'").bind(groupID).first();
+}
+
 async function access(env: Env, memberID: string, groupID: string, write: boolean): Promise<Response | boolean> {
   const role = await memberRole(env, memberID);
   if (groupID !== SHEIKH_HALQA_ID || !await canSee(env, memberID, role, groupID)) {
@@ -81,6 +85,7 @@ async function access(env: Env, memberID: string, groupID: string, write: boolea
   }
   const managing = await canManage(env, memberID, role, groupID);
   if (write && !managing) return json({ error: "Group admin role required" }, { status: 403 });
+  if (write && !await liveZikr(env, groupID)) return json({ error: "Stage controls are available during this Halqa’s live Zikr only." }, { status: 409 });
   return managing;
 }
 
@@ -89,7 +94,7 @@ export async function zikrStages(env: Env, memberID: string, groupID: string): P
   if (managing instanceof Response) return managing;
   const custom = await env.DB.prepare("SELECT id,title,title_ur FROM group_zikr_stages WHERE group_id=? ORDER BY created_at,id")
     .bind(groupID).all<{ id: string; title: string; title_ur: string | null }>();
-  return json({ canBroadcast: managing, stages: [...DEFAULT_ZIKR_STAGES, ...(custom.results ?? []).map(row => ({
+  return json({ canBroadcast: managing && await liveZikr(env, groupID), stages: [...DEFAULT_ZIKR_STAGES, ...(custom.results ?? []).map(row => ({
     id: row.id, title: row.title, titleUr: row.title_ur ?? undefined, isCustom: true,
   }))] });
 }
@@ -179,7 +184,7 @@ const CUE_MAX_AGE_MS = 5 * 60_000;
 export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void> {
   const timestamp = now.toISOString();
   await env.DB.prepare(`UPDATE group_zikr_cues SET notification_state='expired'
-    WHERE notification_state='pending' AND (created_at<? OR sequence < (
+    WHERE notification_state='pending' AND (NOT EXISTS (SELECT 1 FROM group_live l WHERE l.group_id=group_zikr_cues.group_id AND l.state='live' AND l.kind='zikr') OR created_at<? OR sequence < (
       SELECT MAX(newer.sequence) FROM group_zikr_cues newer WHERE newer.group_id=group_zikr_cues.group_id))`)
     .bind(new Date(now.getTime() - CUE_MAX_AGE_MS).toISOString()).run();
   const pending = await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE notification_state='pending'

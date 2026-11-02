@@ -85,7 +85,7 @@ struct GroupDetailView: View {
                         }
                     }
                 } else {
-                    if group.id == "our-sheikh" { SheikhZikrPanel(groupID: group.id, service: service) }
+                    if group.id == "our-sheikh" { SheikhZikrPanel(groupID: group.id, service: service, isLiveZikr: detail?.live?.kind == "zikr") }
                     officialLiveSection
                     liveSection
                     nextZikrSection

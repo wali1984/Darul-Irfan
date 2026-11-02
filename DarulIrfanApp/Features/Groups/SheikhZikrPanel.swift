@@ -12,11 +12,13 @@ private struct PendingSheikhStageAction: Codable {
 struct SheikhZikrPanel: View {
     let groupID: String
     let service: MemberGroupService
+    let isLiveZikr: Bool
     @AppStorage private var pendingJSON: String
 
-    init(groupID: String, service: MemberGroupService, pendingStore: UserDefaults = .standard) {
+    init(groupID: String, service: MemberGroupService, isLiveZikr: Bool, pendingStore: UserDefaults = .standard) {
         self.groupID = groupID
         self.service = service
+        self.isLiveZikr = isLiveZikr
         _pendingJSON = AppStorage(wrappedValue: "", "halqa.\(groupID).\(service.memberID ?? "signed-out").pending-stage-action", store: pendingStore)
     }
     @State private var catalogue: HalqaZikrStages?
@@ -58,7 +60,7 @@ struct SheikhZikrPanel: View {
                     Text(verbatim: error).diInterfaceFont(.subheadline).foregroundStyle(DIColor.danger)
                     Button("Try again") { Task { await load() } }.buttonStyle(DICompactButtonStyle()).disabled(busy)
                 } else if catalogue == nil { ProgressView() }
-                if catalogue?.canBroadcast == true {
+                if isLiveZikr && catalogue?.canBroadcast == true {
                     if let pending {
                         Text("An announcement is awaiting confirmation. Check the chat or retry.")
                             .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)

@@ -678,11 +678,19 @@ struct HalqahHeroCardLabel: View {
             header
             if group.isLive == true {
                 liveRow
+            } else if group.id == "our-sheikh" {
+                Text("Open Halqah")
+                    .diInterfaceFont(.headline, weight: .bold)
+                    .foregroundStyle(Color(hex: 0x064B34))
+                    .frame(maxWidth: .infinity).padding(14)
+                    .background(RoundedRectangle(cornerRadius: 18).fill(Self.joinGold))
+                    .diShimmer()
             }
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background { HalqahHeroBackdrop(isLive: group.isLive == true) }
+        .overlay { if group.id == "our-sheikh" { RoundedRectangle(cornerRadius: 28).strokeBorder(Color(hex: 0xE0B75F), lineWidth: 2).allowsHitTesting(false) } }
         .contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .accessibilityElement(children: .combine)
     }
@@ -699,8 +707,8 @@ struct HalqahHeroCardLabel: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(group.name))
-                    .diInterfaceFont(.title3, weight: .heavy)
-                    .foregroundStyle(Color.white)
+                    .diInterfaceFont(group.id == "our-sheikh" ? .title2 : .title3, weight: .heavy)
+                    .foregroundStyle(group.id == "our-sheikh" ? Color(hex: 0xFFE9A8) : Color.white)
                 if let description = group.description, !description.isEmpty {
                     Text(verbatim: description)
                         .diInterfaceFont(.footnote, weight: .medium)

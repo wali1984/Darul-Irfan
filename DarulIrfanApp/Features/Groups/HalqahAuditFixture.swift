@@ -28,7 +28,7 @@ struct HalqahAuditFixture: View {
             List(duaAudit ? ["admin"] : ["member", "admin"], id: \.self) { role in
                 NavigationLink {
                     if sheikhAudit {
-                        ScrollView { SheikhZikrPanel(groupID: role, service: service, pendingStore: UserDefaults(suiteName: "sheikh-stage-audit")!).padding(DISpacing.md) }
+                        ScrollView { SheikhZikrPanel(groupID: role, service: service, isLiveZikr: true, pendingStore: UserDefaults(suiteName: "sheikh-stage-audit")!).padding(DISpacing.md) }
                             .diScreenBackground().navigationTitle("Our Sheikh")
                     } else if duaAudit {
                         GroupDuaRequestsView(groupID: role, service: service)
