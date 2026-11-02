@@ -61,7 +61,7 @@ final class NativeMeetingMembershipEvents: NSObject, RtkSelfEventListener {
     func onScreenShareStartFailed(reason: String) {}
     func onScreenShareUpdate(isEnabled: Bool) {}
     func onUnpinned() {}
-    func onUpdate(participant_: RtkSelfParticipant) {}
+    func onUpdate(participant: RtkSelfParticipant) {}
     func onVideoDeviceChanged(videoDevice: VideoDevice) {}
     func onVideoUpdate(isEnabled: Bool) {}
 }
