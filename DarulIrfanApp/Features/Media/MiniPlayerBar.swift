@@ -32,6 +32,7 @@ struct MiniPlayerBar: View {
     private let audioPlayer: any AudioPlayerServicing
     @State private var showsFullPlayer = false
     @Environment(\.diMediaRepository) private var mediaRepository
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(audioPlayer: any AudioPlayerServicing) {
         self.audioPlayer = audioPlayer
@@ -77,7 +78,7 @@ struct MiniPlayerBar: View {
                             .diInterfaceFont(.title3)
                             .foregroundStyle(accent)
                             .frame(width: 44, height: 44)
-                            .contentTransition(.symbolEffect(.replace))
+                            .contentTransition(reduceMotion ? .identity : .symbolEffect(.replace))
                     }
                     .buttonStyle(DIPressableStyle())
                     .accessibilityLabel(Text(audioPlayer.playbackError != nil ? "Retry" : (audioPlayer.isPlaying || audioPlayer.isBuffering) ? "Pause" : "Play"))

@@ -13,6 +13,7 @@ struct RootView: View {
     private enum AppTab: String, Hashable { case today, read, zikr, explore, more }
     let dependencies: AppDependencies
     let appState: AppState
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// Scene storage, not `@State`: changing the language rebuilds this view
     /// with a new identity (`.id(language)` in `ReadyRootView`), and the tab
     /// the person was on must survive that.
@@ -92,11 +93,11 @@ struct RootView: View {
             if dependencies.audioPlayer.nowPlaying != nil {
                 MiniPlayerBar(audioPlayer: dependencies.audioPlayer)
                     .environment(\.diMediaRepository, dependencies.mediaRepository)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .transition(reduceMotion ? .identity : .move(edge: .bottom).combined(with: .opacity))
             }
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: dependencies.audioPlayer.nowPlaying)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: dependencies.audioPlayer.nowPlaying)
         // Notifications, widgets and links go through DeepLinkRouter, which
         // keeps a request made during the splash or onboarding for this.
         .onAppear(perform: followRouter)
