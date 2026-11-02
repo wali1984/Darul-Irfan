@@ -79,7 +79,7 @@ struct TasbihCounterView: View {
                             .diInterfaceFont(.subheadline, weight: .semibold)
                             .foregroundStyle(DIColor.accent)
                             .diGoldGlow(radius: 8, opacity: 0.4)
-                            .transition(.scale.combined(with: .opacity))
+                            .transition(reduceMotion ? .identity : .scale.combined(with: .opacity))
                     }
                     if !viewModel.saveFailed {
                         Text("Tap anywhere to count")
@@ -107,6 +107,13 @@ struct TasbihCounterView: View {
             withAnimation(.spring(response: 0.34, dampingFraction: 0.6).delay(0.07)) { countBump = 1.0 }
         }
         .animation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: viewModel.hasReachedTarget)
+        .onChange(of: reduceMotion) { _, reduced in
+            if reduced {
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) { countBump = 1 }
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { shortcutHelp = true } label: {
