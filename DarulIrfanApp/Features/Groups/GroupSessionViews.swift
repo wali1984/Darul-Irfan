@@ -978,8 +978,19 @@ struct GroupSessionAttendeesView: View {
         List {
             Group {
                 Section {
-                    Text(verbatim: "\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) – \(session.endedAt.formatted(date: .omitted, time: .shortened))")
-                        .foregroundStyle(DIColor.textMuted)
+                    VStack(alignment: .leading, spacing: DISpacing.xs) {
+                        Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .omitted))
+                        // Keep clock endpoints together in Western reading order,
+                        // independently of the surrounding Urdu date and layout.
+                        Text(verbatim: "\u{2066}\(session.startedAt.formatted(date: .omitted, time: .shortened)) \u{2013} \(session.endedAt.formatted(date: .omitted, time: .shortened))\u{2069}")
+                            .monospacedDigit()
+                        if !Calendar.current.isDate(session.startedAt, inSameDayAs: session.endedAt) {
+                            Text(verbatim: session.endedAt.formatted(date: .abbreviated, time: .omitted))
+                        }
+                    }
+                    .diInterfaceFont(.subheadline)
+                    .foregroundStyle(DIColor.textMuted)
+                    .accessibilityElement(children: .combine)
                 }
                 if failed {
                     Button { Task { await load() } } label: {
