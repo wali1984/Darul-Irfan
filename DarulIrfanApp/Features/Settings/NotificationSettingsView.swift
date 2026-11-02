@@ -625,9 +625,9 @@ final class NotificationSettingsViewModel {
 
     init(notifications: any NotificationScheduling) {
         self.notifications = notifications
-        azanPlaybackDelegate.onFinish = { [weak self] in
+        azanPlaybackDelegate.onFinish = { [weak self] completedPlayer in
             Task { @MainActor in
-                self?.azanPlaybackDidFinish()
+                self?.azanPlaybackDidFinish(completedPlayer)
             }
         }
     }
@@ -753,7 +753,8 @@ final class NotificationSettingsViewModel {
         playingAzanResource = nil
     }
 
-    private func azanPlaybackDidFinish() {
+    private func azanPlaybackDidFinish(_ completedPlayer: AVAudioPlayer) {
+        guard azanPlayer === completedPlayer else { return }
         azanPlayer = nil
         playingAzanResource = nil
     }
@@ -765,10 +766,10 @@ final class NotificationSettingsViewModel {
 /// when a full azan recording finishes (`AVAudioPlayerDelegate` requires an
 /// `NSObject` conformer). The callback hops to the main actor in the owner.
 private final class AzanPlaybackDelegate: NSObject, AVAudioPlayerDelegate {
-    var onFinish: (() -> Void)?
+    var onFinish: ((AVAudioPlayer) -> Void)?
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        onFinish?()
+        onFinish?(player)
     }
 }
 
