@@ -46,7 +46,7 @@ struct PersonalZikrView: View {
                 if store.historyReadFailed {
                     DICard {
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Your personal records could not be read. Please try again.").foregroundStyle(DIColor.textPrimary)
+                            Text("Your personal records could not be read. Please try again.").diInterfaceFont(.body).foregroundStyle(DIColor.textPrimary)
                             Button("Retry") { store.retryHistory() }.buttonStyle(DISecondaryButtonStyle())
                         }
                     }
@@ -83,18 +83,27 @@ struct PersonalZikrView: View {
         .sheet(item: $choosing) { step in durationSheet(step) }
         .sheet(isPresented: $adding) {
             NavigationStack {
-                Form {
-                    TextField("Muraqaba name", text: $customName)
-                        .onChange(of: customName) { _, value in customName = String(value.prefix(80)) }
-                    Button("Add") { store.addCustom(customName); customName = ""; adding = false }
-                        .buttonStyle(DIPrimaryButtonStyle())
-                        .disabled(customName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                ScrollView {
+                    VStack(spacing: DISpacing.lg) {
+                        DICard {
+                            TextField("Muraqaba name", text: $customName)
+                                .diInterfaceFont(.body)
+                                .foregroundStyle(DIColor.textPrimary)
+                                .onChange(of: customName) { _, value in customName = String(value.prefix(80)) }
+                        }
+                        Button("Add") { store.addCustom(customName); customName = ""; adding = false }
+                            .buttonStyle(DIPrimaryButtonStyle())
+                            .disabled(customName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .padding(DISpacing.md)
+                    .diResponsiveWidth()
                 }
+                .diScreenBackground()
                 .navigationTitle("Add a Muraqaba")
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { adding = false } } }
             }
             .tint(DIColor.actionForeground)
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
         }
     }
 
@@ -223,6 +232,7 @@ struct PersonalZikrView: View {
                 .listRowBackground(Color.clear)
             }
             .scrollContentBackground(.hidden)
+            .diInterfaceFont(.body)
             .diScreenBackground()
             .navigationTitle(step.localizedTitle)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { choosing = nil } } }
@@ -262,6 +272,7 @@ struct PersonalZikrView: View {
                             var reminder = store.reminders[index]; reminder.minuteOfDay = (c.hour ?? 0) * 60 + (c.minute ?? 0); store.setReminder(index, reminder)
                         }), displayedComponents: .hourAndMinute)
                     }
+                    .diInterfaceFont(.body)
                     .foregroundStyle(DIColor.textPrimary)
                 }
             }
