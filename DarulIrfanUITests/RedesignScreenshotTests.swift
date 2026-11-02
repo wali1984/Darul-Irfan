@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -246,6 +246,13 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         if ["companion", "companion-fixes", "timezone"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             companionTour()
+            return
+        }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "notification-choices" {
+            selectTab(4)
+            guard seek("settings-notifications") else { XCTFail("Notifications route missing"); return }
+            shot("notification-choices-top")
+            scrollShots("notification-choices", count: 6)
             return
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "appearance-controls" {
