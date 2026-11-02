@@ -164,6 +164,7 @@ struct DirectoryPersonView: View {
     let onChange: () async -> Void
 
     @State private var places: [DirectoryPerson.Place] = []
+    @State private var removing: DirectoryPerson.Place?
     @State private var newHalqah = ""
     @State private var newRole: GroupRole = .member
     @State private var working = false
@@ -198,7 +199,7 @@ struct DirectoryPersonView: View {
                                         Button { Task { await setRole(role, in: place) } } label: { Text(role.title) }
                                     }
                                 }
-                                Button(role: .destructive) { Task { await remove(from: place) } } label: {
+                                Button(role: .destructive) { removing = place } label: {
                                     Label("Remove from the Halqah", systemImage: "person.badge.minus")
                                 }
                             } label: {
@@ -235,9 +236,21 @@ struct DirectoryPersonView: View {
         .navigationBarTitleDisplayMode(.inline)
         .disabled(working)
         .onAppear { places = person.halqahs }
+        .confirmationDialog("Remove from the group?", isPresented: Binding(
+            get: { removing != nil }, set: { if !$0 { removing = nil } }
+        ), titleVisibility: .visible, presenting: removing) { place in
+            Button("Remove \(person.displayName)", role: .destructive) {
+                removing = nil
+                Task { await remove(from: place) }
+            }
+            Button("Cancel", role: .cancel) { removing = nil }
+        } message: { place in
+            Text(verbatim: place.groupName + "\n" + String(localized: "They keep their account and any other groups, and can be added again later."))
+        }
     }
 
     private func act(_ change: () async throws -> Void, then update: () -> Void) async {
+        guard !working, changeable else { return }
         working = true
         defer { working = false }
         do {
