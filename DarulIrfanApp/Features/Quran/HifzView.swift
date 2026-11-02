@@ -117,8 +117,11 @@ struct HifzView: View {
 
                 ayahText
 
+                if player.isPreparing {
+                    ProgressView("Loading")
+                }
                 if player.playbackFailed {
-                    Text("The action could not be completed. Check your connection and try again.")
+                    Text("Audio could not be loaded. Check your connection and tap Retry.")
                         .diInterfaceFont(.callout)
                         .foregroundStyle(DIColor.textPrimary)
                 }
