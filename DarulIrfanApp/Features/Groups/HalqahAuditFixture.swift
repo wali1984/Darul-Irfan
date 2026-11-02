@@ -76,8 +76,12 @@ struct HalqahAuditFixture: View {
             }
             if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
                 TimelineView(.periodic(from: .now, by: 0.25)) { _ in
-                    Text(verbatim: String(HalqahAuditProtocol.directoryRemovalRequests))
-                        .accessibilityIdentifier("directory-removal-requests")
+                    HStack {
+                        Text(verbatim: String(HalqahAuditProtocol.directoryRemovalRequests))
+                            .accessibilityIdentifier("directory-removal-requests")
+                        Text(verbatim: String(HalqahAuditProtocol.directoryReadRequests))
+                            .accessibilityIdentifier("directory-read-requests")
+                    }
                 }
             }
             if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-schedule-removal") {
@@ -134,6 +138,11 @@ private final class HalqahAuditProtocol: URLProtocol {
         lock.lock()
         defer { lock.unlock() }
         return recordingRemovals
+    }
+    static var directoryReadRequests: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return directoryReads
     }
     static var directoryRemovalRequests: Int {
         lock.lock()

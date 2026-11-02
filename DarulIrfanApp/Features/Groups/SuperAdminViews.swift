@@ -245,6 +245,7 @@ struct DirectoryPersonView: View {
             if !initialized { places = person.halqahs; initialized = true }
         }
         .refreshable { await refresh() }
+        .accessibilityIdentifier("directory-detail-form")
         .alert("Remove from the group?", isPresented: Binding(
             get: { removing != nil }, set: { if !$0 { removing = nil } }
         ), presenting: removing) { place in

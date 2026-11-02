@@ -1125,12 +1125,37 @@ final class RedesignScreenshotTests: XCTestCase {
         let count = app.staticTexts["directory-removal-requests"]
         let role = app.buttons["directory-role-admin"]
         guard old.waitForExistence(timeout: 180) else { XCTFail("Missing directory detail fixture"); return }
-        app.swipeDown()
-        XCTAssertTrue(error.waitForExistence(timeout: 20), "Refresh failure must be visible")
+        let form = app.descendants(matching: .any).matching(identifier: "directory-detail-form").firstMatch
+        let reads = app.staticTexts["directory-read-requests"]
+        guard form.waitForExistence(timeout: 10), reads.waitForExistence(timeout: 10) else {
+            XCTFail("Directory form or request diagnostic missing"); return
+        }
+        func refresh(expectedReads: String) -> Bool {
+            // Drag the actual Form, starting above its only membership row.
+            // A screen-wide swipe can miss this short form's scroll surface.
+            form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.12))
+                .press(forDuration: 0.15, thenDragTo: form.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.78)))
+            let sent = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", expectedReads), object: reads)
+            guard XCTWaiter.wait(for: [sent], timeout: 15) == .completed else {
+                shot("directory-refresh-not-sent")
+                let hierarchy = XCTAttachment(string: app.debugDescription)
+                hierarchy.name = "directory-refresh-hierarchy-" + language
+                hierarchy.lifetime = .keepAlways
+                add(hierarchy)
+                XCTFail("Form pull must send exactly the expected directory request")
+                return false
+            }
+            return true
+        }
+        XCTAssertEqual(reads.label, "0")
+        guard refresh(expectedReads: "1"), error.waitForExistence(timeout: 20) else {
+            XCTFail("Refresh failure must be visible"); return
+        }
         XCTAssertTrue(old.exists, "Refresh failure must retain confirmed membership")
         shot("directory-refresh-failed")
-        app.swipeDown()
-        XCTAssertTrue(fresh.waitForExistence(timeout: 20), "Successful refresh must update membership")
+        guard refresh(expectedReads: "2"), fresh.waitForExistence(timeout: 20) else {
+            XCTFail("Successful refresh must update membership"); return
+        }
         XCTAssertFalse(old.exists)
         XCTAssertFalse(error.exists)
         shot("directory-refresh-updated")
