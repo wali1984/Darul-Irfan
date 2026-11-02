@@ -34,6 +34,9 @@ struct DISegmentedControl<Item: Hashable>: View {
         .padding(4)
         .background(RoundedRectangle(cornerRadius: wrapped ? 24 : 1000).fill(onDark ? Color.white.opacity(0.10) : DIColor.sandstone.opacity(0.55)))
         .overlay(RoundedRectangle(cornerRadius: wrapped ? 24 : 1000).stroke(onDark ? Color.white.opacity(0.18) : DIColor.border, lineWidth: 1))
+        // A caller's group label must not replace each option's own name.
+        // Contain preserves separate actionable buttons and selected traits.
+        .accessibilityElement(children: .contain)
     }
 
     private func labelColor(selected: Bool) -> Color {
