@@ -32,9 +32,11 @@ struct LocationSettingsView: View {
                     .listRowBackground(DIColor.surface)
             } footer: {
                 Text("Apple Weather uses your selected city's approximate location. Precise device coordinates are not sent.")
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
+        .diInterfaceFont(.body)
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -72,6 +74,7 @@ struct LocationSettingsView: View {
             SettingsSectionHeader(titleKey: "Location Mode", systemImage: "location.viewfinder")
         } footer: {
             Text("Device mode uses your location only on this phone to calculate prayer times. Manual mode uses a city you choose.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -136,9 +139,11 @@ struct LocationSettingsView: View {
         } footer: {
             if viewModel.authorization == .denied {
                 Text("Location access is currently off for Darul Irfan. You can allow it in the Settings app, or choose a city manually below.")
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             } else {
                 Text("Your precise location is never stored — only the resolved city name and approximate, city-level coordinates are kept so prayer times work offline.")
+                    .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }
         }
@@ -222,6 +227,7 @@ struct LocationSettingsView: View {
             SettingsSectionHeader(titleKey: "Manual City", systemImage: "map.fill")
         } footer: {
             Text("Choosing a city switches to manual mode, which keeps prayer times accurate while travelling or offline.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }

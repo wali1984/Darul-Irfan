@@ -23,6 +23,7 @@ struct CalculationSettingsView: View {
             juristicSection
             offsetsSection
         }
+        .diInterfaceFont(.body)
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -52,6 +53,7 @@ struct CalculationSettingsView: View {
             SettingsSectionHeader(titleKey: "Method", systemImage: "sun.and.horizon.fill")
         } footer: {
             Text("Choose the convention used by your local community. University of Islamic Sciences, Karachi is common in Pakistan.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -98,6 +100,7 @@ struct CalculationSettingsView: View {
             SettingsSectionHeader(titleKey: "Custom Angles", systemImage: "angle")
         } footer: {
             Text("When the Isha interval is set, Isha is that many minutes after Maghrib and the Isha angle is not used.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -170,6 +173,7 @@ struct CalculationSettingsView: View {
             SettingsSectionHeader(titleKey: "Asr & High Latitude", systemImage: "moon.circle.fill")
         } footer: {
             Text("The high-latitude rule adjusts Fajr and Isha in places where twilight lasts unusually long. Automatic follows the recommended rule for your location.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -217,6 +221,7 @@ struct CalculationSettingsView: View {
             SettingsSectionHeader(titleKey: "Adjustments", systemImage: "slider.horizontal.3")
         } footer: {
             Text("Fine-tune each prayer by a few minutes to match your local mosque timetable.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
