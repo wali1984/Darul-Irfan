@@ -16,9 +16,19 @@ import Observation
 @Observable
 @MainActor
 final class HifzPlayer {
-    /// Weak registry for remote controls; this does not extend the lifetime of
-    /// the screen-owned player.
-    private(set) static weak var active: HifzPlayer?
+    /// One retained session owns practice until Stop or replacement. Views
+    /// reattach without restarting the current verse or recall interval.
+    private(set) static var active: HifzPlayer?
+    static func forSurah(_ surah: Int) -> HifzPlayer {
+        if let active, active.surahNumber == surah { return active }
+        return HifzPlayer()
+    }
+    struct Settings {
+        let range: ClosedRange<Int>
+        let repeats: Int
+        let pauseSeconds: Double
+    }
+    private(set) var settings: Settings?
     private(set) var surahNumber: Int?
     var ownsRemoteControls: Bool { currentAyah != nil && !playbackFailed && phase != .finished }
     enum Phase: Equatable {
@@ -70,6 +80,7 @@ final class HifzPlayer {
         stop()
         Self.active = self
         self.surahNumber = surahNumber
+        settings = Settings(range: range, repeats: repeats, pauseSeconds: pauseSeconds)
         guard let url = URL(string: recitation.audioUrl) else {
             currentAyah = min(max(startingAyah ?? range.lowerBound, range.lowerBound), range.upperBound)
             playbackFailed = true
@@ -153,6 +164,7 @@ final class HifzPlayer {
     func stop() {
         if Self.active === self { Self.active = nil }
         surahNumber = nil
+        settings = nil
         audioSessionID = UUID()
         if let interruptionObserver { NotificationCenter.default.removeObserver(interruptionObserver) }
         interruptionObserver = nil

@@ -12,7 +12,7 @@ struct HifzView: View {
     let surah: QuranSurah
     private let repository: any QuranRepositoryProtocol
 
-    @State private var player = HifzPlayer()
+    @State private var player: HifzPlayer
     @State private var ayahs: [QuranAyah] = []
     @State private var rangeStart = 1
     @State private var rangeEnd = 1
@@ -29,6 +29,7 @@ struct HifzView: View {
     init(surah: QuranSurah, dependencies: AppDependencies) {
         self.surah = surah
         self.repository = dependencies.quranRepository
+        self._player = State(initialValue: HifzPlayer.forSurah(surah.id))
     }
 
     var body: some View {
@@ -70,7 +71,6 @@ struct HifzView: View {
         }
         .onDisappear {
             save()
-            player.stop()
         }
     }
 
@@ -113,6 +113,11 @@ struct HifzView: View {
                 }
 
                 controls
+                if player.currentAyah != nil {
+                    Button("Stop") { save(); player.stop() }
+                        .buttonStyle(DICompactButtonStyle())
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
             }
         }
     }
@@ -255,6 +260,13 @@ struct HifzView: View {
                 selectedAyah = min(max(saved.ayah, rangeStart), rangeEnd)
                 repeats = min(max(1, saved.repeats), 20)
                 pauseSeconds = saved.pauseSeconds.isFinite ? min(max(0, saved.pauseSeconds), 10) : 1.5
+            }
+            if let settings = player.settings, let ayah = player.currentAyah {
+                rangeStart = settings.range.lowerBound
+                rangeEnd = settings.range.upperBound
+                repeats = settings.repeats
+                pauseSeconds = settings.pauseSeconds
+                selectedAyah = ayah
             }
             hasLoaded = true
         } catch is CancellationError {

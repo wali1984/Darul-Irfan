@@ -46,6 +46,33 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertFalse(second.ownsRemoteControls)
     }
 
+    func testReturningToPracticeReattachesToRetainedSessionAndSettings() {
+        weak var retained: HifzPlayer?
+        do {
+            let screenPlayer = HifzPlayer.forSurah(1)
+            screenPlayer.start(recitation: recitation, range: 2...7, repeats: 4,
+                pauseSeconds: 2.5, startingAyah: 5, surahNumber: 1)
+            screenPlayer.pause()
+            retained = screenPlayer
+        }
+        XCTAssertNotNil(retained, "Leaving the view must not release the active session")
+        let returned = HifzPlayer.forSurah(1)
+        defer { returned.stop() }
+        XCTAssertTrue(returned === retained)
+        XCTAssertEqual(returned.currentAyah, 5)
+        XCTAssertEqual(returned.settings?.range, 2...7)
+        XCTAssertEqual(returned.settings?.repeats, 4)
+        XCTAssertEqual(returned.settings?.pauseSeconds, 2.5)
+        XCTAssertFalse(returned.isPlaying, "Reopening the page must preserve an explicit pause")
+        let otherPage = HifzPlayer.forSurah(2)
+        XCTAssertFalse(otherPage === returned)
+        XCTAssertTrue(HifzPlayer.active === returned, "Browsing another surah must not stop practice")
+        otherPage.stop()
+        XCTAssertTrue(HifzPlayer.active === returned)
+        returned.stop()
+        XCTAssertNil(HifzPlayer.active)
+    }
+
     func testRestartWithNarrowerRangeClampsSavedVerseAndRejectsOldRange() {
         let player = HifzPlayer()
         defer { player.stop() }
