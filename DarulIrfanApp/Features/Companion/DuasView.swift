@@ -29,6 +29,7 @@ final class DuasViewModel {
 @MainActor
 struct DuasView: View {
     @State private var viewModel: DuasViewModel
+    @Environment(\.colorScheme) private var colorScheme
 
     init() {
         _viewModel = State(initialValue: DuasViewModel())
@@ -93,6 +94,7 @@ struct DuasView: View {
         // Keep scrolling Arabic and translations from competing with the title.
         .toolbarBackground(DIColor.background, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(colorScheme, for: .navigationBar)
         .diScreenBackground()
         .task { viewModel.load() }
     }
