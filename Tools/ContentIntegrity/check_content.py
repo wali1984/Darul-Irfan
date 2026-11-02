@@ -222,6 +222,26 @@ def check_encoding(seed: Path, report: Report) -> None:
 # Quran
 # ---------------------------------------------------------------------------
 
+def ayah_coverage_errors(bounds: dict[int, int], rows: list[dict], text_field: str) -> list[str]:
+    expected = {(surah, ayah) for surah, count in bounds.items() for ayah in range(1, count + 1)}
+    seen: set[tuple[int, int]] = set()
+    errors: list[str] = []
+    for row in rows:
+        key = (row.get("surahNumber"), row.get("ayahNumber"))
+        if key not in expected:
+            errors.append(f"invalid ayah {key}")
+        if key in seen:
+            errors.append(f"duplicate ayah {key}")
+        seen.add(key)
+        text = row.get(text_field)
+        if not isinstance(text, str) or not text.strip():
+            errors.append(f"blank text at {key}")
+    missing = expected - seen
+    if missing:
+        errors.append(f"{len(missing)} missing ayahs")
+    return errors
+
+
 def check_quran(seed: Path, report: Report) -> None:
     surahs = load(seed, "quran_surahs") or []
     ayahs = load(seed, "quran_ayahs") or []
@@ -302,6 +322,10 @@ def check_quran(seed: Path, report: Report) -> None:
     report.check(not unknown_edition,
                  f"translations reference undeclared editions: {sorted(unknown_edition)}")
     report.facts["translationEditions"] = per_edition
+    for edition in ("akram-ut-tarajum-ur", "akram-ut-tarajum-en"):
+        errors = ayah_coverage_errors(bounds,
+            [row for row in translations if row["editionID"] == edition], "text")
+        report.check(not errors, f"{edition} complete unique nonempty coverage: {errors[:5]}")
 
     # Tafsir: unique per (edition, surah, ayahStart), ranges well formed.
     tafsir_keys: set[tuple[str, int, int]] = set()
