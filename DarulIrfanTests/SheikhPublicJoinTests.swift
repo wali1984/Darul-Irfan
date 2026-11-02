@@ -3,6 +3,25 @@ import XCTest
 @testable import DarulIrfan
 
 final class SheikhPublicJoinTests: XCTestCase {
+    func testSavedAdmissionIsBoundToIdentityAndProvider() {
+        var visitor = SheikhVisitorIdentity(guestSecret: "secret", profile: .init(), admitted: true, admittedMemberID: "guest", admittedAsGuest: true)
+        XCTAssertTrue(visitor.canResume(as: "guest"))
+        XCTAssertTrue(visitor.canResume(as: nil))
+        XCTAssertFalse(visitor.canResume(as: "another-member"))
+        visitor.admittedAsGuest = false
+        XCTAssertFalse(visitor.canResume(as: nil))
+        XCTAssertTrue(visitor.canResume(as: "guest"))
+        visitor.admitted = false
+        XCTAssertFalse(visitor.canResume(as: "guest"))
+    }
+
+    func testLegacyProfileDoesNotAutomaticallyAssumeGuestAdmission() throws {
+        let data = Data(#"{"guestSecret":"secret","profile":{"name":"Visitor","city":"Lahore","countryCode":"PK","email":""},"admitted":true}"#.utf8)
+        let visitor = try JSONDecoder().decode(SheikhVisitorIdentity.self, from: data)
+        XCTAssertEqual(visitor.profile.name, "Visitor")
+        XCTAssertFalse(visitor.canResume(as: nil))
+        XCTAssertFalse(visitor.canResume(as: "other"))
+    }
     func testGuestAdmissionStoresReturnedSession() async throws {
         let store = SheikhJoinTestSession()
         let transport = makeTransport()

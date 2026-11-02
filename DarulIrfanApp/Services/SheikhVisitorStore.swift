@@ -13,6 +13,14 @@ struct SheikhVisitorIdentity: Codable, Sendable {
     var profile: SheikhVisitorProfile
     /// Set only after server admission succeeds; a saved draft skips no form.
     var admitted = false
+    var admittedMemberID: String? = nil
+    var admittedAsGuest: Bool? = nil
+
+    func canResume(as memberID: String?) -> Bool {
+        guard admitted else { return false }
+        if let memberID { return memberID == admittedMemberID }
+        return admittedAsGuest == true
+    }
 }
 
 /// Device-only Keychain item, separate from verified Apple member sessions.

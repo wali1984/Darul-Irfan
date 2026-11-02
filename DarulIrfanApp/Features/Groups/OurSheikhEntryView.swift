@@ -11,6 +11,9 @@ struct OurSheikhEntryView: View {
     @State private var busy = true
     @State private var locating = false
     @State private var error: String?
+    @State private var notices = HalqahNoticesModel()
+    @State private var offerNotices = false
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -63,6 +66,23 @@ struct OurSheikhEntryView: View {
             }
         }
         .task { await load() }
+        .task(id: "\(group?.id ?? "")-\(scenePhase)") {
+            guard group != nil, scenePhase == .active else { return }
+            notices.platform = dependencies.officialPlatform
+            await notices.follow()
+            if !HalqahNoticeChoice.isTurnedOff,
+               !UserDefaults.standard.bool(forKey: "halqah.notices.asked"),
+               await NotificationPermission.current() == .notAsked {
+                UserDefaults.standard.set(true, forKey: "halqah.notices.asked")
+                offerNotices = true
+            }
+        }
+        .alert("Turn on Halqah notifications?", isPresented: $offerNotices) {
+            Button("Turn on") { Task { await notices.set(true) } }
+            Button("Not now", role: .cancel) { }
+        } message: {
+            Text("Your Halqah's posts, zikr and meetings will be shown on this phone.")
+        }
     }
 
     private func country(_ code: String) -> String { locale.localizedString(forRegionCode: code) ?? code }
@@ -108,7 +128,8 @@ struct OurSheikhEntryView: View {
             }
             let saved = try SheikhVisitorStore.loadOrCreate()
             identity = saved; profile = saved.profile
-            if saved.admitted { await join() }
+            let currentMember = await service.memberID
+            if saved.canResume(as: currentMember) { await join() }
         } catch { self.error = error.localizedDescription }
     }
 
@@ -119,9 +140,13 @@ struct OurSheikhEntryView: View {
         do {
             saved.profile = profile
             try SheikhVisitorStore.save(saved)
-            _ = try await service.joinOurSheikh(name: profile.name, city: profile.city, countryCode: profile.countryCode,
+            let previousMember = await service.memberID
+            let joiningAsGuest = previousMember == nil || (saved.admittedAsGuest == true && previousMember == saved.admittedMemberID)
+            let admittedMember = try await service.joinOurSheikh(name: profile.name, city: profile.city, countryCode: profile.countryCode,
                 email: profile.email, guestSecret: saved.guestSecret)
             saved.admitted = true
+            saved.admittedMemberID = admittedMember
+            saved.admittedAsGuest = joiningAsGuest
             try SheikhVisitorStore.save(saved)
             identity = saved
             guard let joined = try await service.groups().groups.first(where: { $0.id == "our-sheikh" }) else { throw MemberGroupError.requestFailed }
