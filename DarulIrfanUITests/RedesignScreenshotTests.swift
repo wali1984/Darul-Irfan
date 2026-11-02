@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -253,6 +253,10 @@ final class RedesignScreenshotTests: XCTestCase {
             guard seek("settings-notifications") else { XCTFail("Notifications route missing"); return }
             shot("notification-choices-top")
             scrollShots("notification-choices", count: 6)
+            return
+        }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reading-controls" {
+            readingControlsTour()
             return
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "tasbih-preset" {
@@ -620,6 +624,51 @@ final class RedesignScreenshotTests: XCTestCase {
         let automatic = app.buttons[choices[3]].firstMatch
         XCTAssertTrue(automatic.isSelected, "Auto choice must survive relaunch")
         shot("appearance-auto-relaunch")
+    }
+
+    /// Exercise reading settings and capture their effect after reopening Duas.
+    private func readingControlsTour() {
+        let sizeLabel = language == "ur" ? "مطالعے کے متن کا سائز" : "Reader Text Size"
+        let fontLabel = language == "ur" ? "اردو نستعلیق میں" : "Urdu in Nastaliq"
+        let choices = language == "ur" ? ["چھوٹا", "معیاری", "بڑا", "بہت بڑا"] : ["Small", "Standard", "Large", "Extra Large"]
+        selectTab(4)
+        guard seek("settings-appearance") else { return }
+        let sizeMenu = app.buttons[sizeLabel].firstMatch
+        for (index, choice) in choices.enumerated() {
+            guard tap(sizeMenu), tap(app.buttons[choice].firstMatch) else {
+                XCTFail("Reader size choice missing: \(choice)"); return
+            }
+            expectation(for: NSPredicate(format: "value == %@", choice), evaluatedWith: sizeMenu)
+            waitForExpectations(timeout: 10)
+            shot("reading-size-\(index)")
+        }
+        for enabled in [false, true] {
+            let toggle = app.switches[fontLabel].firstMatch
+            XCTAssertTrue(toggle.waitForExistence(timeout: 10))
+            let value = enabled ? "1" : "0"
+            if (toggle.value as? String) != value { toggle.tap() }
+            expectation(for: NSPredicate(format: "value == %@", value), evaluatedWith: toggle)
+            waitForExpectations(timeout: 10)
+            shot("reading-font-setting-\(enabled)")
+            goBack()
+            selectTab(0)
+            guard seek("quick-tool-hands.and.sparkles") else { return }
+            shot("reading-font-duas-\(enabled)")
+            app.swipeUp()
+            shot("reading-font-duas-body-\(enabled)")
+            goBack()
+            selectTab(4)
+            guard seek("settings-appearance") else { return }
+        }
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons.firstMatch.waitForExistence(timeout: 180))
+        closePopup()
+        selectTab(4)
+        guard seek("settings-appearance") else { return }
+        XCTAssertEqual(app.buttons[sizeLabel].firstMatch.value as? String, choices[3])
+        XCTAssertEqual(app.switches[fontLabel].firstMatch.value as? String, "1")
+        shot("reading-settings-relaunch")
     }
 
     private func settingsTour() {
