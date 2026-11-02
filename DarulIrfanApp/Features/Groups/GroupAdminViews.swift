@@ -981,10 +981,13 @@ private struct GroupAutoplayChoices: View {
                 Spacer(minLength: DISpacing.sm)
                 if entry == selection {
                     Image(systemName: "checkmark").foregroundStyle(DIColor.actionForeground)
+                        .accessibilityHidden(true)
                 }
             }
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .accessibilityAddTraits(entry == selection ? .isSelected : [])
         .accessibilityIdentifier("autoplay-choice-" + (entry?.payload.values.first ?? "none"))
     }
