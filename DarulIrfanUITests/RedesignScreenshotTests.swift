@@ -949,7 +949,7 @@ final class RedesignScreenshotTests: XCTestCase {
             let hierarchy = XCTAttachment(string: app.debugDescription)
             hierarchy.name = "sheikh-custom-stage-save-hierarchy"
             hierarchy.lifetime = .keepAlways
-            add(hierarchy)
+            self.add(hierarchy)
             XCTFail("Custom stage save missing"); return
         }
         XCTAssertTrue(app.buttons["AuditMuraqaba"].waitForExistence(timeout: 15))
