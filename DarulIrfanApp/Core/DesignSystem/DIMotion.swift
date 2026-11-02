@@ -30,9 +30,19 @@ private struct DIAppear: ViewModifier {
             .opacity(shown || reduceMotion ? 1 : 0)
             .offset(y: shown || reduceMotion ? 0 : 16)
             .onAppear {
-                guard !reduceMotion else { return }
-                withAnimation(.spring(response: 0.55, dampingFraction: 0.85).delay(delay)) {
+                guard !shown else { return }
+                if reduceMotion { shown = true; return }
+                // Long lists must not leave later rows invisible for seconds.
+                let boundedDelay = delay.isFinite ? min(max(delay, 0), 0.4) : 0
+                withAnimation(.spring(response: 0.55, dampingFraction: 0.85).delay(boundedDelay)) {
                     shown = true
+                }
+            }
+            .onChange(of: reduceMotion) { _, reduced in
+                if reduced {
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) { shown = true }
                 }
             }
     }
