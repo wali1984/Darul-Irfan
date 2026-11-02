@@ -928,13 +928,13 @@ struct GroupSessionHistoryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
         .task { await load() }
-        .confirmationDialog(
+        .alert(
             "Delete this session?",
             isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
-            titleVisibility: .visible,
             presenting: deleting
         ) { session in
             Button("Delete", role: .destructive) { Task { await delete(session) } }
+            Button("Cancel", role: .cancel) { deleting = nil }
         } message: { _ in
             Text("Its attendance and the dua requests sent during it are deleted too.")
         }
