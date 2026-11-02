@@ -134,7 +134,7 @@ struct GroupPostComposer: View {
         .navigationTitle("New post")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) {
-            Button("Cancel") { dismiss() }.disabled(working || preparingMedia)
+            Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()).disabled(working || preparingMedia)
         } }
         .onChange(of: picks) { _, chosen in
             guard !chosen.isEmpty, !working, !preparingMedia else { return }
@@ -334,7 +334,7 @@ struct GroupLiveStarter: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(addingToSession ? "Add to the session" : "Go live")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
         .confirmationDialog("Delete this recording?", isPresented: Binding(
             get: { deletingRecording != nil },
             set: { if !$0 { deletingRecording = nil } }

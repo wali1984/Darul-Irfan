@@ -603,7 +603,7 @@ struct GroupNoticeComposer: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Message the group")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
         .onAppear { text = current ?? "" }
     }
 
@@ -675,7 +675,7 @@ struct GroupDuaComposer: View {
         .navigationTitle("Dua request")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) { Button(sent ? "Done" : "Cancel") { dismiss() } }
+            ToolbarItem(placement: .cancellationAction) { Button(sent ? "Done" : "Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()) }
         }
     }
 
@@ -716,7 +716,7 @@ struct GroupListenersView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Who is listening")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
     }
 }
 
@@ -803,7 +803,7 @@ struct GroupDuaRequestsView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Dua requests")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
         .task { await load() }
         .refreshable { await load() }
     }
@@ -921,7 +921,7 @@ struct GroupSessionHistoryView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Past sessions")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
         .task { await load() }
         .alert(
             "Delete this session?",

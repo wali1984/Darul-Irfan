@@ -42,7 +42,7 @@ struct HalqahEditor: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(halqah == nil ? "New Halqah" : "Edit Halqah")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
         .onAppear {
             name = halqah?.name ?? ""
             description = halqah?.description ?? ""
