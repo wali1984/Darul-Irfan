@@ -630,16 +630,13 @@ struct GroupLiveStarter: View {
         do {
             let duration = try? await AVURLAsset(url: file).load(.duration).seconds
             let name = file.deletingPathExtension().lastPathComponent
-            try await service.uploadRecording(
+            let uploadedID = try await service.uploadRecording(
                 from: file, contentType: contentType, title: name,
                 durationSeconds: duration.flatMap { $0.isFinite && $0 > 0 ? Int($0.rounded()) : nil }, in: groupID
             )
-            let before = Set(library?.recordings.map(\.id) ?? [])
+            // The response identifies this upload even if another admin uploads concurrently.
+            picked.append(.recording(uploadedID))
             await loadLibrary()
-            // What was just uploaded joins the order.
-            if let added = library?.recordings.first(where: { !before.contains($0.id) }) {
-                picked.append(.recording(added.id))
-            }
         } catch is CancellationError {
             return
         } catch {

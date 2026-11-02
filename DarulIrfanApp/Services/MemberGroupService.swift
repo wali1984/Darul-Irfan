@@ -361,7 +361,7 @@ actor MemberGroupService {
     /// read as it is sent.
     func uploadRecording(
         from file: URL, contentType: String, title: String, durationSeconds: Int?, in groupID: String
-    ) async throws {
+    ) async throws -> String {
         guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var components = URLComponents(url: baseURL.appendingPathComponent("v1/groups/\(groupID)/recordings"), resolvingAgainstBaseURL: false)
         components?.queryItems = [URLQueryItem(name: "title", value: title)]
@@ -383,6 +383,11 @@ actor MemberGroupService {
             let message = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? String
             throw message.map(MemberGroupError.server) ?? MemberGroupError.requestFailed
         }
+        guard let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let id = body["id"] as? String, !id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw MemberGroupError.requestFailed
+        }
+        return id
     }
 
     func deleteRecording(_ recordingID: String, in groupID: String) async throws {
