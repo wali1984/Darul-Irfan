@@ -17,7 +17,7 @@ final class HalqaSessionLifecycle {
     enum Phase { case idle, initializing, joining, joined, leaving, failed }
     private(set) var phase: Phase = .idle
     private(set) var sessionID: String?
-    private var transport: (any HalqaSessionTransport)?
+    private(set) var transport: (any HalqaSessionTransport)?
     private var generation = 0
 
     @discardableResult
