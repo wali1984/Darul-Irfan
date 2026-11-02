@@ -8,6 +8,32 @@ import XCTest
 final class TrackerRepositoryTests: XCTestCase {
 
     @MainActor
+    func testRetainedTasbihReadRetryAndDeletionDoNotWriteStaleProgress() async throws {
+        let initial = TasbihCounter(id: UUID(), title: "Retained counter", target: 100, count: 3, lifetimeCount: 20, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        try await database.connection.executeScript("ALTER TABLE tasbih_counters RENAME TO tasbih_refresh_fixture;")
+        await model.refresh()
+        XCTAssertTrue(model.loadFailed)
+        XCTAssertFalse(model.missing)
+        model.increment()
+        XCTAssertEqual(model.counter.count, 3)
+        try await database.connection.executeScript("ALTER TABLE tasbih_refresh_fixture RENAME TO tasbih_counters;")
+        await model.refresh()
+        XCTAssertFalse(model.loadFailed)
+        XCTAssertEqual(model.counter.count, 3)
+        try await repository.deleteTasbihCounter(id: initial.id)
+        await model.refresh()
+        XCTAssertTrue(model.missing)
+        model.increment()
+        await model.persistOnExit().value
+        let saved = try await repository.tasbihCounters()
+        XCTAssertTrue(saved.isEmpty, "A retained screen must not recreate a deleted counter")
+    }
+
+    @MainActor
     func testReturningTasbihScreenAdoptsOtherTabProgressWithoutOverwritingIt() async throws {
         let initial = TasbihCounter(id: UUID(), title: "Shared counter", target: 100, count: 3, lifetimeCount: 20, updatedAt: Date())
         try await repository.saveTasbihCounter(initial)
