@@ -17,6 +17,7 @@ final class PlayerSheetViewModel {
     private(set) var pendingBookmarkPosition: Double = 0
     private var pendingBookmarkMediaID: String?
     private var bookmarkLoadGeneration = 0
+    private var displayedBookmarkMediaID: String?
 
     var noteDraft = ""
     var showsAddBookmarkPrompt = false
@@ -42,8 +43,11 @@ final class PlayerSheetViewModel {
         guard let repository = mediaRepository,
               let mediaItemID = audioPlayer.nowPlaying?.mediaItemID else {
             bookmarks = []
+            displayedBookmarkMediaID = nil
             return
         }
+        if displayedBookmarkMediaID != mediaItemID { bookmarks = [] }
+        displayedBookmarkMediaID = mediaItemID
         do {
             let loaded = try await repository.mediaBookmarks(mediaItemID: mediaItemID)
             guard generation == bookmarkLoadGeneration,
@@ -95,6 +99,7 @@ final class PlayerSheetViewModel {
     }
 
     func jump(to bookmark: MediaBookmark) {
+        guard audioPlayer.nowPlaying?.mediaItemID == bookmark.mediaItemID else { return }
         audioPlayer.seek(to: bookmark.positionSeconds)
     }
 }

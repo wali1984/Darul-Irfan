@@ -28,6 +28,19 @@ final class PlayerBookmarkIdentityTests: XCTestCase {
         model.beginAddBookmark()
         XCTAssertFalse(model.showsAddBookmarkPrompt)
     }
+
+    @MainActor
+    func testStaleBookmarkTapCannotSeekNextRecording() {
+        let player = BookmarkTestPlayer()
+        player.nowPlaying = AudioPlayableItem(id: "second", title: "Second", url: URL(fileURLWithPath: "/second.m4a"), mediaItemID: "second")
+        let model = PlayerSheetViewModel(audioPlayer: player, mediaRepository: BookmarkTestRepository())
+        let old = MediaBookmark(id: UUID(), mediaItemID: "first", positionSeconds: 42, note: nil, createdAt: Date())
+        model.jump(to: old)
+        XCTAssertNil(player.lastSeek)
+        let current = MediaBookmark(id: UUID(), mediaItemID: "second", positionSeconds: 12, note: nil, createdAt: Date())
+        model.jump(to: current)
+        XCTAssertEqual(player.lastSeek, 12)
+    }
 }
 
 private actor BookmarkTestRepository: MediaRepositoryProtocol {
@@ -59,7 +72,8 @@ private final class BookmarkTestPlayer: AudioPlayerServicing {
     var queue: [AudioPlayableItem] { [] }
     func play(_ item: AudioPlayableItem, queue: [AudioPlayableItem]) { XCTFail("Bookmark editing must not start playback") }
     func togglePlayPause() {}
-    func seek(to seconds: Double) {}
+    var lastSeek: Double?
+    func seek(to seconds: Double) { lastSeek = seconds }
     func skipForward(_ seconds: Double) {}
     func skipBackward(_ seconds: Double) {}
     func playNext() {}
