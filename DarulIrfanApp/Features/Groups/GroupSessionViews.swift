@@ -854,6 +854,7 @@ struct GroupSessionHistoryView: View {
     let service: MemberGroupService
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @State private var sessions: [GroupSessionRecord]?
     @State private var canDelete = false
     @State private var deleting: GroupSessionRecord?
@@ -927,6 +928,9 @@ struct GroupSessionHistoryView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Past sessions")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(DIColor.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(colorScheme, for: .navigationBar)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() }.buttonStyle(DIToolbarButtonStyle()) } }
         .task { await load() }
         .alert(
@@ -979,6 +983,7 @@ struct GroupSessionAttendeesView: View {
     let groupID: String
     let session: GroupSessionRecord
     let service: MemberGroupService
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var attendees: [GroupAttendee]?
     @State private var failed = false
@@ -1030,6 +1035,9 @@ struct GroupSessionAttendeesView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(Text(verbatim: session.title ?? String(localized: "Halqah Zikr")))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(DIColor.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(colorScheme, for: .navigationBar)
         .task { await load() }
     }
 
