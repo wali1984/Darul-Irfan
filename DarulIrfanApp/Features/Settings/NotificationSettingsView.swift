@@ -608,6 +608,7 @@ final class NotificationSettingsViewModel {
     private var chimePlayer: AVAudioPlayer?
     private var azanPlayer: AVAudioPlayer?
     private let azanPlaybackDelegate = AzanPlaybackDelegate()
+    private let chimePlaybackDelegate = AzanPlaybackDelegate()
 
     private(set) var permission: PermissionState = .unknown
     private(set) var pendingCount: Int?
@@ -625,9 +626,16 @@ final class NotificationSettingsViewModel {
 
     init(notifications: any NotificationScheduling) {
         self.notifications = notifications
-        azanPlaybackDelegate.onFinish = { [weak self] completedPlayer in
+        azanPlaybackDelegate.onFinish = { [weak self] completedPlayer, successful in
             Task { @MainActor in
-                self?.azanPlaybackDidFinish(completedPlayer)
+                self?.azanPlaybackDidFinish(completedPlayer, successful: successful)
+            }
+        }
+        chimePlaybackDelegate.onFinish = { [weak self] completedPlayer, successful in
+            Task { @MainActor in
+                guard let self, self.chimePlayer === completedPlayer else { return }
+                self.chimePlayer = nil
+                self.chimeUnavailable = !successful
             }
         }
     }
@@ -692,6 +700,7 @@ final class NotificationSettingsViewModel {
             try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try? AVAudioSession.sharedInstance().setActive(true)
             let player = try AVAudioPlayer(contentsOf: url)
+            player.delegate = chimePlaybackDelegate
             player.prepareToPlay()
             if player.play() {
                 chimePlayer = player
@@ -753,8 +762,9 @@ final class NotificationSettingsViewModel {
         playingAzanResource = nil
     }
 
-    private func azanPlaybackDidFinish(_ completedPlayer: AVAudioPlayer) {
+    private func azanPlaybackDidFinish(_ completedPlayer: AVAudioPlayer, successful: Bool) {
         guard azanPlayer === completedPlayer else { return }
+        azanUnavailable = !successful
         azanPlayer = nil
         playingAzanResource = nil
     }
@@ -766,10 +776,14 @@ final class NotificationSettingsViewModel {
 /// when a full azan recording finishes (`AVAudioPlayerDelegate` requires an
 /// `NSObject` conformer). The callback hops to the main actor in the owner.
 private final class AzanPlaybackDelegate: NSObject, AVAudioPlayerDelegate {
-    var onFinish: ((AVAudioPlayer) -> Void)?
+    var onFinish: ((AVAudioPlayer, Bool) -> Void)?
 
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        onFinish?(player)
+        onFinish?(player, flag)
+    }
+
+    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+        onFinish?(player, false)
     }
 }
 
