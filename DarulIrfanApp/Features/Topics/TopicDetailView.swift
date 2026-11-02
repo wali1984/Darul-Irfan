@@ -13,6 +13,8 @@ struct TopicDetailView: View {
     @State private var showsAllVerses = false
     @State private var showsAllHadith = false
     @State private var video: TopicVideo?
+    @State private var playbackFailure: String?
+    @State private var startingPlayback = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -80,6 +82,10 @@ struct TopicDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.load() }
         .sheet(item: $video) { video in YouTubePlayerSheet(videoID: video.id, title: video.title) }
+        .alert("Could not complete action", isPresented: Binding(
+            get: { playbackFailure != nil }, set: { if !$0 { playbackFailure = nil } }
+        )) { Button("OK", role: .cancel) { playbackFailure = nil } }
+        message: { Text(verbatim: playbackFailure ?? "") }
     }
 
     @ViewBuilder
@@ -188,20 +194,32 @@ struct TopicDetailView: View {
 
     /// A bayan plays in the app's own player; a video bayan opens its player.
     private func play(_ item: TopicDetailViewModel.RelatedItem) async {
-        guard let media = try? await dependencies.mediaRepository.item(id: item.itemID) else { return }
-        if let videoID = media.youtubeId, !videoID.isEmpty, media.streamUrl == nil {
-            video = TopicVideo(id: videoID, title: media.title)
+        guard !startingPlayback else { return }
+        startingPlayback = true
+        playbackFailure = nil
+        defer { startingPlayback = false }
+        do {
+            guard let media = try await dependencies.mediaRepository.item(id: item.itemID) else {
+                playbackFailure = String(localized: "This bayan is not in the offline catalogue yet.")
+                return
+            }
+            let assets = try await dependencies.downloadsRepository.allAssets()
+            try Task.checkCancellation()
+            if let playable = MediaPlayback.playableItem(for: media,
+                asset: assets.first { $0.mediaItemID == media.id }, downloadManager: dependencies.downloadManager) {
+                DIHaptics.soft()
+                dependencies.audioPlayer.play(playable, queue: [])
+            } else if let videoID = media.youtubeId, !videoID.isEmpty {
+                video = TopicVideo(id: videoID, title: media.title)
+            } else {
+                playbackFailure = String(localized: "This bayan has no playable audio source.")
+            }
+        } catch is CancellationError {
             return
+        } catch {
+            guard !Task.isCancelled else { return }
+            playbackFailure = String(localized: "Could not complete action")
         }
-        guard let url = media.streamUrl.flatMap({ URL(string: $0) }) else {
-            if let videoID = media.youtubeId, !videoID.isEmpty { video = TopicVideo(id: videoID, title: media.title) }
-            return
-        }
-        DIHaptics.soft()
-        dependencies.audioPlayer.play(
-            AudioPlayableItem(id: media.id, title: media.title, subtitle: media.speaker, url: url, mediaItemID: media.id),
-            queue: []
-        )
     }
 }
 
