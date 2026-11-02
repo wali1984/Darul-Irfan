@@ -325,15 +325,19 @@ struct GroupLiveStarter: View {
                     Button {
                         Task { await start() }
                     } label: {
-                        if addingToSession {
-                            Label("Add to the session", systemImage: "text.badge.plus")
-                        } else {
-                            Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
+                        HStack(spacing: DISpacing.sm) {
+                            if working { ProgressView() }
+                            if addingToSession {
+                                Label("Add to the session", systemImage: "text.badge.plus")
+                            } else {
+                                Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
+                            }
                         }
                     }
                     .disabled(working || uploading || !canStart)
                 }
             }
+            .disabled(working || uploading)
             .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
@@ -342,7 +346,8 @@ struct GroupLiveStarter: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(addingToSession ? "Add to the session" : "Go live")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DIToolbarButtonStyle()) } }
+        .interactiveDismissDisabled(working || uploading)
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { if !working && !uploading { dismiss() } }.buttonStyle(DIToolbarButtonStyle()).disabled(working || uploading) } }
         .confirmationDialog("Delete this recording?", isPresented: Binding(
             get: { deletingRecording != nil },
             set: { if !$0 { deletingRecording = nil } }
@@ -568,6 +573,7 @@ struct GroupLiveStarter: View {
     private func start() async {
         guard !working && !uploading && canStart else { return }
         working = true
+        error = nil
         defer { working = false }
         let title = title.trimmingCharacters(in: .whitespaces)
         let video = VideoLink.id(from: videoLink)
