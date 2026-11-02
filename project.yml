@@ -18,6 +18,9 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "5.9"
+    # RealtimeKit 3.3.0 ships arm64 device and simulator slices only.
+    # Generic simulator builds must not attempt an unsupported Intel slice.
+    "EXCLUDED_ARCHS[sdk=iphonesimulator*]": x86_64
     DEVELOPMENT_LANGUAGE: en
     MARKETING_VERSION: "1.11.1"
     CURRENT_PROJECT_VERSION: "45"
