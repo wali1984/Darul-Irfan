@@ -127,6 +127,23 @@ final class StorageSettingsTests: XCTestCase {
         XCTAssertEqual(attempts, 2)
     }
 
+    func testEmptySuccessfulDownloadIsNotSavedAndCanRetry() async throws {
+        let repository = StorageTestRepository([])
+        let manager = DownloadManager(downloadsRepository: repository, fetcher: EmptyDownloadFetcher())
+        let url = try XCTUnwrap(URL(string: "https://example.invalid/empty.mp3"))
+        for _ in 0..<2 {
+            do {
+                _ = try await manager.download(url: url, forContentItem: nil, mediaItemID: nil)
+                XCTFail("An empty success response must not become an offline asset")
+            } catch {
+                XCTAssertEqual((error as? URLError)?.code, .zeroByteResource)
+            }
+            XCTAssertNil(manager.activeDownloads[url.absoluteString])
+            let saved = try await repository.allAssets()
+            XCTAssertTrue(saved.isEmpty)
+        }
+    }
+
     func testInvalidStoredPathsCannotResolveOutsideDownloads() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("downloads", isDirectory: true)
         for directoryHint in [true, false] {
@@ -191,5 +208,13 @@ private actor DelayedCancellationDownloadFetcher: DownloadFetching {
     }
     func failAttempt(_ attempt: Int) {
         pending.removeValue(forKey: attempt)?.resume(throwing: URLError(.cancelled))
+    }
+}
+
+private struct EmptyDownloadFetcher: DownloadFetching {
+    func fetch(_ url: URL, progress: @escaping @Sendable (Double) -> Void) async throws -> (URL, URLResponse) {
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try Data().write(to: file)
+        return (file, HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!)
     }
 }

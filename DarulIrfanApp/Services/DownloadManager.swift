@@ -24,6 +24,11 @@ enum DownloadManagerError: LocalizedError {
 
 /// A stored filename must remain a direct child of the downloads directory.
 enum DownloadFileAccess {
+    static func isUsable(_ file: URL) -> Bool {
+        guard let values = try? file.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]) else { return false }
+        return values.isRegularFile == true && (values.fileSize ?? 0) > 0
+    }
+
     static func resolve(directory: URL, name: String) throws -> URL {
         guard !name.isEmpty, name != ".", name != "..", !name.contains("/"), !name.contains("\\") else {
             throw CocoaError(.fileReadInvalidFileName)
@@ -123,6 +128,11 @@ final class DownloadManager: DownloadManaging {
                 throw DownloadManagerError.serverError(statusCode: httpResponse.statusCode)
             }
 
+            guard DownloadFileAccess.isUsable(temporaryURL) else {
+                try? FileManager.default.removeItem(at: temporaryURL)
+                throw URLError(.zeroByteResource)
+            }
+
             // A captive portal answers any address with its own page and a
             // success status; kept, that page would open as the book.
             if DownloadManager.fileExtension(for: url) == "pdf", !DownloadManager.looksLikePDF(at: temporaryURL) {
@@ -210,7 +220,7 @@ final class DownloadManager: DownloadManaging {
     func localURL(for asset: DownloadedAsset) -> URL? {
         guard let directory = try? DownloadManager.downloadsDirectory(),
               let fileURL = try? DownloadFileAccess.resolve(directory: directory, name: asset.relativeFilePath),
-              (try? fileURL.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true else { return nil }
+              DownloadFileAccess.isUsable(fileURL) else { return nil }
         return fileURL
     }
 
