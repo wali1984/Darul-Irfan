@@ -106,10 +106,13 @@ final class PersonalZikrStore {
     var screenActive = false
     private var chime: AVAudioPlayer?
     private var alertRevision = 0
+    @ObservationIgnored private var alertTask: Task<Void, Never>?
+    private let alertCenter: any PersonalZikrAlertCenter
     private let defaults: UserDefaults
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, alertCenter: (any PersonalZikrAlertCenter)? = nil) {
         self.defaults = defaults
+        self.alertCenter = alertCenter ?? SystemPersonalZikrAlertCenter()
         if let saved: [PersonalZikrStep] = decode("personalZikr.plan"), saved.isEmpty || PersonalZikrMath.valid(saved) { plan = saved }
         customs = decode("personalZikr.customs") ?? []
         if let saved: PersonalZikrRun = decode("personalZikr.run"), PersonalZikrMath.valid(saved.plan), saved.elapsedBeforeRun >= 0 { run = saved }
@@ -205,13 +208,20 @@ final class PersonalZikrStore {
         guard let url = Bundle.main.url(forResource: "zikr_soft_chime", withExtension: "wav") else { return }
         chime = try? AVAudioPlayer(contentsOf: url); chime?.volume = 0.28; chime?.play()
     }
+    func waitForAlertRefresh() async { await alertTask?.value }
+
     func refreshAlerts() {
         alertRevision += 1
         let revision = alertRevision
         let current = run
         let reminders = reminders
-        Task { @MainActor in
-            let center = UNUserNotificationCenter.current()
+        let previous = alertTask
+        alertTask = Task { @MainActor in
+            // An earlier add may still be awaiting Apple's completion. Wait for it
+            // before reading/removing requests so Off cannot leave a stale alert.
+            await previous?.value
+            guard revision == alertRevision else { return }
+            let center = alertCenter
             let pending = await center.pendingNotificationRequests()
             guard revision == alertRevision else { return }
             center.removePendingNotificationRequests(withIdentifiers: pending.map(\.identifier).filter { $0.hasPrefix("personal-zikr.") || $0 == "reminder|focus-session" })
@@ -239,5 +249,25 @@ final class PersonalZikrStore {
                 }
             }
         }
+    }
+}
+
+
+@MainActor
+protocol PersonalZikrAlertCenter {
+    func pendingNotificationRequests() async -> [UNNotificationRequest]
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String])
+    func add(_ request: UNNotificationRequest) async throws
+}
+
+struct SystemPersonalZikrAlertCenter: PersonalZikrAlertCenter {
+    func pendingNotificationRequests() async -> [UNNotificationRequest] {
+        await UNUserNotificationCenter.current().pendingNotificationRequests()
+    }
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String]) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+    func add(_ request: UNNotificationRequest) async throws {
+        try await UNUserNotificationCenter.current().add(request)
     }
 }
