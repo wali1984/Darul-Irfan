@@ -6,8 +6,8 @@ import UIKit
 /// Zikr, Name). Each card keeps its content and Share and gains one way on:
 /// the ayah to the Qur'an, its Tafsir sheet and its bayan; the hadith to
 /// the narration in full; the dua to Duas; the zikr to the Tasbih counters;
-/// the Name to all 99. The cards are one height, so the page never jumps
-/// when they are switched. A picture the Super admin published for a card
+/// the Name to all 99. Each card fits its own content without reserving
+/// space for hidden cards. A picture the Super admin published for a card
 /// takes its content's place and keeps its way on; the day's quote opens
 /// over the page once. Self-contained; embedded in the Today tab's scroll.
 struct TodayDailySection: View {
@@ -117,19 +117,16 @@ struct TodayDailySection: View {
 
     // MARK: - Cards
 
-    /// All six cards share one frame, as tall as the tallest, and the one
-    /// chosen rises into view. The others stay laid out but unseen, so the
-    /// page keeps its length when the card changes.
+    /// Only the selected card contributes height; long hidden Urdu text
+    /// must not stretch a short Zikr card and separate its footer from its text.
     private var cards: some View {
         ZStack(alignment: .top) {
             ForEach(TodayLightKind.allCases) { kind in
-                let shown = kind == selection
-                card(kind)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    .opacity(shown ? 1 : 0)
-                    .offset(y: shown || reduceMotion ? 0 : 10)
-                    .allowsHitTesting(shown)
-                    .accessibilityHidden(!shown)
+                if kind == selection {
+                    card(kind)
+                        .frame(maxWidth: .infinity, alignment: .top)
+                        .transition(reduceMotion ? .identity : .opacity.combined(with: .offset(y: 10)))
+                }
             }
         }
         .fixedSize(horizontal: false, vertical: true)

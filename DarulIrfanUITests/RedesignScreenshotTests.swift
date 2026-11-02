@@ -584,7 +584,18 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertEqual(counter.value as? String, String(initial + 3))
         shot("tasbih-preset-counted")
         goBack()
-        guard seek("today-zikr-counter-link") else { return }
+        let footer = app.buttons["today-zikr-counter-link"]
+        for _ in 0..<10 {
+            if footer.exists && footer.isHittable { break }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.65))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.50)))
+        }
+        let meaning = app.staticTexts["today-zikr-meaning"]
+        XCTAssertTrue(meaning.exists)
+        XCTAssertLessThanOrEqual(footer.frame.minY - meaning.frame.maxY, 80,
+                                 "Hidden daily cards must not stretch the Zikr footer away from its meaning")
+        shot("tasbih-preset-compact-footer")
+        guard tap(footer) else { XCTFail("Counter footer missing"); return }
         XCTAssertTrue(counter.waitForExistence(timeout: 20))
         XCTAssertEqual(counter.value as? String, String(initial + 3), "Footer must reuse the same progress")
         shot("tasbih-preset-reopened")

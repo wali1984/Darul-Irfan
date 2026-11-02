@@ -519,6 +519,7 @@ struct TodayZikrCard: View {
                         .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                 }
                 TodayTranslationText(text: DailyNoorText.localized(dhikr.meaning, urdu: DIBrand.readsUrdu(locale)), urdu: DIBrand.readsUrdu(locale))
+                    .accessibilityIdentifier("today-zikr-meaning")
                 Spacer(minLength: 0)
                 TodayCardFooter(reference: dhikr.source) {
                     if let dependencies {
