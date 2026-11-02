@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Directions to %@": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "%@ تک راستہ"}}}},
 "Nearby masjids": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "قریبی مساجد"}}}},
 "Search within 10 km of your selected location.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "اپنے منتخب کردہ مقام کے 10 کلومیٹر کے اندر تلاش کریں۔"}}}},
 "Search nearby": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "قریب تلاش کریں"}}}},

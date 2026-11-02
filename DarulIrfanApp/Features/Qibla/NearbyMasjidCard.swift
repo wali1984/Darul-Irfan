@@ -35,8 +35,10 @@ struct NearbyMasjidCard: View {
                         if !item.address.isEmpty { Text(verbatim: item.address).diInterfaceFont(.footnote) }
                         let meters = CLLocation(latitude: latitude, longitude: longitude).distance(from: CLLocation(latitude: item.latitude, longitude: item.longitude))
                         Text(verbatim: String(format: "%.1f km", locale: Locale(identifier: "en_US_POSIX"), meters / 1000)).diInterfaceFont(.footnote)
+                            .environment(\.layoutDirection, .leftToRight)
                         Text("Straight-line distance").diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                         Button("Directions") { directions(item) }.buttonStyle(DICompactButtonStyle())
+                            .accessibilityLabel(Text("Directions to \(item.name)"))
                         ForEach(Array(item.attributions.enumerated()), id: \.offset) { _, attribution in
                             if let value = attribution.uri, let url = URL(string: value), url.scheme == "https" {
                                 Button { open(url) } label: { Text(verbatim: attribution.provider) }.buttonStyle(DICompactButtonStyle())
