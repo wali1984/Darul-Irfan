@@ -903,19 +903,25 @@ final class RedesignScreenshotTests: XCTestCase {
             }
             return prayerFitsReadingArea(element)
         }
-        let letteringHelp = app.staticTexts[language == "ur" ? "بند ہو تو اردو معیاری رسم الخط میں دکھائی جاتی ہے، جس میں حروف ہمیشہ جڑے رہتے ہیں۔ نستعلیق کے لیے اسے آن کریں؛ تبدیلی دیکھنے کے لیے صفحہ دوبارہ کھولیں۔" : "Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change."].firstMatch
+        let letteringHelp = app.staticTexts["appearance-lettering-explanation"].firstMatch
         let sizeLabel = language == "ur" ? "مطالعے کے متن کا سائز" : "Reader Text Size"
         let fontLabel = language == "ur" ? "اردو نستعلیق میں" : "Urdu in Nastaliq"
         let choices = language == "ur" ? ["چھوٹا", "معیاری", "بڑا", "بہت بڑا"] : ["Small", "Standard", "Large", "Extra Large"]
         selectTab(4)
         guard seek("settings-appearance") else { return }
-        let sizeMenu = app.buttons[sizeLabel].firstMatch
+        let sizeMenu = app.buttons["appearance-reader-size"].firstMatch
         for (index, choice) in choices.enumerated() {
             guard tap(sizeMenu), tap(app.buttons[choice].firstMatch) else {
                 XCTFail("Reader size choice missing: \(choice)"); return
             }
             expectation(for: NSPredicate(format: "value == %@", choice), evaluatedWith: sizeMenu)
             waitForExpectations(timeout: 10)
+            if (sizeMenu.value as? String) != choice {
+                let diagnostic = XCTAttachment(string: app.debugDescription)
+                diagnostic.name = "reader-size-selection-\(index)"
+                diagnostic.lifetime = .keepAlways
+                add(diagnostic)
+            }
             shot("reading-size-\(index)")
         }
         for enabled in [false, true] {
@@ -953,7 +959,7 @@ final class RedesignScreenshotTests: XCTestCase {
         closePopup()
         selectTab(4)
         guard seek("settings-appearance") else { return }
-        XCTAssertEqual(app.buttons[sizeLabel].firstMatch.value as? String, choices[3])
+        XCTAssertEqual(app.buttons["appearance-reader-size"].firstMatch.value as? String, choices[3])
         XCTAssertEqual(app.switches[fontLabel].firstMatch.value as? String, "1")
         shot("reading-settings-relaunch")
     }

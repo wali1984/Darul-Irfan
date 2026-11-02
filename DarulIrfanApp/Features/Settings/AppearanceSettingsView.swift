@@ -72,6 +72,7 @@ struct AppearanceSettingsView: View {
                 .buttonStyle(DISecondaryButtonStyle())
                 .accessibilityLabel(Text("Reader Text Size"))
                 .accessibilityValue(Text(LocalizedStringKey(readerScaleBinding.wrappedValue.settingsDisplayName)))
+                .accessibilityIdentifier("appearance-reader-size")
             }
             .listRowBackground(DIColor.surface)
         } header: {
@@ -98,6 +99,7 @@ struct AppearanceSettingsView: View {
             Text("Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change.")
                 .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
+                .accessibilityIdentifier("appearance-lettering-explanation")
         }
     }
 
