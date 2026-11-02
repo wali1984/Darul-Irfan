@@ -60,8 +60,10 @@ struct NotificationSettingsView: View {
         .navigationTitle("Notifications")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            await viewModel.refresh()
             await loadGathered()
+        }
+        .task(id: appState.notificationScheduleRevision) {
+            await viewModel.refresh()
         }
         .onChange(of: scenePhase) {
             if scenePhase == .active {
@@ -334,7 +336,10 @@ struct NotificationSettingsView: View {
             ForEach(zikrReminders.sessions) { session in
                 Toggle(isOn: Binding(
                     get: { zikrReminders.isOn(session) },
-                    set: { on in Task { await zikrReminders.set(on, for: session) } }
+                    set: { on in Task {
+                        await zikrReminders.set(on, for: session)
+                        await viewModel.refresh()
+                    } }
                 )) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(verbatim: session.displayTitle(urdu: DIBrand.readsUrdu(locale)))

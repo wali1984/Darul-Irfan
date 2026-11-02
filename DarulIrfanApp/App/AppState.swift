@@ -11,6 +11,9 @@ import WidgetKit
 final class AppState {
     private(set) var settings: AppSettings = .default
     private(set) var isLoaded = false
+    /// Advances after scheduling finishes, so visible diagnostics can re-read
+    /// the system's pending requests rather than the previous schedule.
+    private(set) var notificationScheduleRevision = 0
 
     /// The onboarding page in view, kept here rather than in the flow's own
     /// state: choosing a language rebuilds the view tree so every string
@@ -126,6 +129,7 @@ final class AppState {
             await previous?.value
             guard generation == self.refreshGeneration else { return }
             await self.performRefresh()
+            self.notificationScheduleRevision += 1
         }
         refreshTask = task
         await task.value
