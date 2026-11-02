@@ -1501,6 +1501,22 @@ final class RedesignScreenshotTests: XCTestCase {
             if diagram.exists && viewport.contains(diagram.frame) {
                 XCTAssertTrue(unseen.isEmpty,
                               "Guide sections never reached the viewport: \(unseen.sorted())")
+                let footer = app.buttons["method-guide-shajra-footer"]
+                for _ in 0..<5 {
+                    if footer.exists && viewport.contains(footer.frame) { break }
+                    scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.70))
+                        .press(forDuration: 0.05, thenDragTo:
+                            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45)))
+                }
+                XCTAssertTrue(footer.exists && viewport.contains(footer.frame),
+                              "The complete closing Shajra shortcut must be reachable")
+                shot("resources-guide-closing-shajra")
+                guard tap(footer) else { XCTFail("Closing Shajra shortcut must open"); return }
+                XCTAssertTrue(app.navigationBars[label("Shajra")].waitForExistence(timeout: 10))
+                goBack()
+                XCTAssertTrue(footer.waitForExistence(timeout: 10))
+                XCTAssertTrue(footer.isHittable, "Back must preserve the end-of-guide position")
+                shot("resources-guide-closing-return")
                 return
             }
             scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))

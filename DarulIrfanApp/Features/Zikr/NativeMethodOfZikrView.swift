@@ -52,6 +52,8 @@ struct NativeMethodOfZikrView: View {
                     }
                     .padding(DISpacing.lg)
                     .diGlassPanel(cornerRadius: 24)
+                    ZikrShajraLink()
+                        .accessibilityIdentifier("method-guide-shajra-footer")
                 } else {
                     VStack(alignment: .leading, spacing: DISpacing.md) {
                         Text("The Method of Zikr guide could not be loaded. Please try again.")
