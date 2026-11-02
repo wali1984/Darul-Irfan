@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Your session has expired. Sign in again, or tap Join Daily Zikr to continue as a guest.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your session has expired. Sign in again, or tap Join Daily Zikr to continue as a guest."}}, "ur": {"stringUnit": {"state": "translated", "value": "آپ کا سیشن ختم ہو گیا ہے۔ دوبارہ سائن اِن کریں، یا مہمان کے طور پر شامل ہونے کے لیے روزانہ ذکر میں شامل ہوں دبائیں۔"}}}},
 "Location unavailable. Enter your city and country manually.": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مقام دستیاب نہیں۔ اپنا شہر اور ملک خود درج کریں۔"}}}},
 "Use my location": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "میرا مقام استعمال کریں"}}}},
 "Email (optional)": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "ای میل (اختیاری)"}}}},

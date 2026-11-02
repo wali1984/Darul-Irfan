@@ -60,6 +60,36 @@ final class SheikhPublicJoinTests: XCTestCase {
         }
     }
 
+    func testExpiredAdmissionClearsOnlyTheRejectedSessionAndOffersRecovery() async {
+        let store = SheikhJoinTestSession()
+        store.save(.init(token: "original", expiresAt: .distantFuture, memberID: "member"))
+        let transport = makeTransport()
+        defer { transport.invalidateAndCancel() }
+        let service = MemberGroupService(baseURL: URL(string: "https://expired.sheikh-test.invalid")!, session: transport, savedSession: store)
+        do {
+            _ = try await service.joinOurSheikh(name: "Visitor", city: "Lahore", countryCode: "PK", email: nil, guestSecret: "unused")
+            XCTFail("Expired admission must fail, without silently joining as guest")
+        } catch MemberGroupError.publicSessionExpired { }
+        catch { XCTFail("Unexpected recovery error: \(error)") }
+        XCTAssertNil(store.load(), "A rejected token must not trap subsequent retries")
+    }
+
+    func testLateExpiredAdmissionDoesNotClearReplacementAccount() async {
+        let replacement = MemberSession(token: "replacement", expiresAt: .distantFuture, memberID: "other-member")
+        let store = SheikhJoinTestSession(replacementAfterSnapshot: replacement)
+        store.save(.init(token: "original", expiresAt: .distantFuture, memberID: "member"))
+        let transport = makeTransport()
+        defer { transport.invalidateAndCancel() }
+        let service = MemberGroupService(baseURL: URL(string: "https://expired.sheikh-test.invalid")!, session: transport, savedSession: store)
+        do {
+            _ = try await service.joinOurSheikh(name: "Visitor", city: "Lahore", countryCode: "PK", email: nil, guestSecret: "unused")
+            XCTFail("An old request must not affect the replacement account")
+        } catch MemberGroupError.requestFailed { }
+        catch { XCTFail("Unexpected stale-response error: \(error)") }
+        XCTAssertEqual(store.load()?.token, "replacement")
+        XCTAssertEqual(store.load()?.memberID, "other-member")
+    }
+
     private func makeTransport() -> URLSession {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [SheikhJoinTestProtocol.self]
@@ -70,7 +100,16 @@ final class SheikhPublicJoinTests: XCTestCase {
 private final class SheikhJoinTestSession: MemberSessionStore, @unchecked Sendable {
     private let lock = NSLock()
     private var value: MemberSession?
-    func load() -> MemberSession? { lock.lock(); defer { lock.unlock() }; return value }
+    private let replacementAfterSnapshot: MemberSession?
+    private var reads = 0
+    init(replacementAfterSnapshot: MemberSession? = nil) { self.replacementAfterSnapshot = replacementAfterSnapshot }
+    func load() -> MemberSession? {
+        lock.lock(); defer { lock.unlock() }
+        reads += 1
+        // Simulate a sign-in after the request captured its original token.
+        if reads == 2, let replacementAfterSnapshot { value = replacementAfterSnapshot }
+        return value
+    }
     func save(_ session: MemberSession) { lock.lock(); defer { lock.unlock() }; value = session }
     func delete() { lock.lock(); defer { lock.unlock() }; value = nil }
     func deleteIfCurrent(token: String) -> Bool {
@@ -111,7 +150,8 @@ private final class SheikhJoinTestProtocol: URLProtocol {
                 if request.value(forHTTPHeaderField: "authorization") == "Bearer original", payload["guestSecret"] == nil {
                     status = 200; body = ["memberID": "member", "groupID": "our-sheikh"]
                 }
-            case "denied": status = 401
+            case "denied": status = 403
+            case "expired": status = 401
             case "limited": status = 429
             case "wrong-member": status = 200; body = ["memberID": "different", "groupID": "our-sheikh"]
             default: break

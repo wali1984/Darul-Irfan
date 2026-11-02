@@ -139,14 +139,20 @@ struct OurSheikhEntryView: View {
         defer { busy = false }
         do {
             // Existing members/admins enter with authoritative server roles.
-            if await service.isSignedIn, let existing = try await service.groups().groups.first(where: { $0.id == "our-sheikh" }) {
-                group = existing
-                return
+            var sessionExpired = false
+            if await service.isSignedIn {
+                do {
+                    if let existing = try await service.groups().groups.first(where: { $0.id == "our-sheikh" }) {
+                        group = existing
+                        return
+                    }
+                } catch MemberGroupError.notSignedIn { sessionExpired = true }
             }
             let saved = try SheikhVisitorStore.loadOrCreate()
             identity = saved; profile = saved.profile
             let currentMember = await service.memberID
             if saved.canResume(as: currentMember) { await join() }
+            else if sessionExpired { error = MemberGroupError.publicSessionExpired.localizedDescription }
         } catch { self.error = error.localizedDescription }
     }
 

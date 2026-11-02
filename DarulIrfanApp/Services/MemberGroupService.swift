@@ -17,6 +17,7 @@ private struct KeychainMemberSessionStore: MemberSessionStore {
 
 enum MemberGroupError: LocalizedError {
     case signInRejected
+    case publicSessionExpired
     case notSignedIn
     case requestFailed
     case inviteRejected
@@ -28,6 +29,7 @@ enum MemberGroupError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .signInRejected: String(localized: "Your Apple sign-in could not be verified. Please try again.")
+        case .publicSessionExpired: String(localized: "Your session has expired. Sign in again, or tap Join Daily Zikr to continue as a guest.")
         case .notSignedIn: String(localized: "Enter your invitation code to see your group.")
         case .requestFailed: String(localized: "Your group could not be loaded. Check your connection and try again.")
         // Deliberately one message for every refusal. The server does not say
@@ -98,7 +100,10 @@ actor MemberGroupService {
         guard savedSession.load()?.token == original?.token else { throw MemberGroupError.requestFailed }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         if status == 429 { throw MemberGroupError.tooManyAttempts }
-        if status == 401 { throw MemberGroupError.signInRejected }
+        if status == 401 {
+            if let original, !savedSession.deleteIfCurrent(token: original.token) { throw CancellationError() }
+            throw MemberGroupError.publicSessionExpired
+        }
         if status == 201, original == nil {
             let value = try decoder.decode(MemberSession.self, from: data)
             savedSession.save(value)
