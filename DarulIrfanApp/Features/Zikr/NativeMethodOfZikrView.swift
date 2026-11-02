@@ -24,6 +24,7 @@ struct MethodGuide: Decodable, Sendable {
 struct NativeMethodOfZikrView: View {
     var readerFontScale: Double = 1
     @Environment(\.locale) private var locale
+    @Environment(\.colorScheme) private var colorScheme
     @State private var guide: MethodGuide?
     @State private var isLoading = true
     @State private var attempt = 0
@@ -73,6 +74,9 @@ struct NativeMethodOfZikrView: View {
         }
         .navigationTitle("Method of Zikr")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(DIColor.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(colorScheme, for: .navigationBar)
         .diScreenBackground()
         .task(id: attempt) {
             // Returning from Shajra must not replace the reading content with
