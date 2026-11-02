@@ -200,6 +200,7 @@ workflows:
           touch build/audio-follow-started
           AUDIO_SAMPLER_PID=""
           if [ "${DI_SCREENSHOTS:-}" = "audio-transport" ]; then
+            python3 Tools/CI/collect_audio_environment.py
             python3 Tools/CI/sample_audio_probe.py > build/logs/audio-probe-sampler.log 2>&1 &
             AUDIO_SAMPLER_PID=$!
           fi
