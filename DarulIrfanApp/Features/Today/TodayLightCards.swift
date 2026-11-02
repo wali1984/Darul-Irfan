@@ -174,7 +174,9 @@ private struct TodayCardFooter<Action: View>: View {
             if !stacked {
                 Spacer(minLength: DISpacing.sm)
             }
-            action()
+            // Match Android's weighted reference: preserve the action label
+            // before allocating the remaining width to wrapping source text.
+            action().layoutPriority(1)
         }
     }
 }
