@@ -25,6 +25,9 @@ struct HalqahAuditFixture: View {
 
     var body: some View {
         NavigationStack {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-picture-refresh") {
+                DailyPictureRefreshAudit()
+            } else {
             List(duaAudit ? ["admin"] : ["member", "admin"], id: \.self) { role in
                 NavigationLink {
                     if sheikhAudit {
@@ -52,6 +55,7 @@ struct HalqahAuditFixture: View {
                 .accessibilityIdentifier("halqah-audit-" + role)
             }
             .navigationTitle("Halqah audit")
+            }
         }
         .safeAreaInset(edge: .bottom) {
             if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-schedule-removal") {

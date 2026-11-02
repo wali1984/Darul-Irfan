@@ -25,6 +25,7 @@ struct DailyMediaManagerView: View {
                 Section {
                     Button { adding = true } label: { Label("Add a picture", systemImage: "photo.badge.plus") }
                         .buttonStyle(DIPrimaryButtonStyle())
+                        .accessibilityIdentifier("daily-picture-add")
                 } footer: {
                     Text("Or forward a picture to the WhatsApp Business number with #ayah, #hadith, #aqwal, #quote or #announcement at the start of its caption, and a date such as 2026-11-02 if you like. It arrives here as a draft.")
                 }
@@ -225,7 +226,7 @@ struct DailyMediaEditor: View {
         .diScreenBackground()
         .navigationTitle(item == nil ? "Add a picture" : "Picture")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()).disabled(working) } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()).disabled(working).accessibilityIdentifier("daily-picture-editor-cancel") } }
         .onAppear(perform: fill)
         .task(id: pick) { await read(pick) }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.image]) { result in

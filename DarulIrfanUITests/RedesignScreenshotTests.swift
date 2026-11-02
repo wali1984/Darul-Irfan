@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule", "picture-refresh"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -287,6 +287,9 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-transport" {
             app.launchArguments.append("--uitesting-audio-transport")
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "picture-refresh" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-picture-refresh"]
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-schedule" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-schedule-removal"]
         }
@@ -312,6 +315,10 @@ final class RedesignScreenshotTests: XCTestCase {
             app.launchArguments.append("--uitesting-pdf-controls")
         }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "picture-refresh" {
+            pictureRefreshTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-schedule" {
             halqahScheduleTour()
             return
@@ -1075,6 +1082,31 @@ final class RedesignScreenshotTests: XCTestCase {
 
     /// The actual Halqah detail view, with local HTTP responses and no live account.
     /// The real schedule controls use an isolated transport; no production writes.
+    private func pictureRefreshTour() {
+        let count = app.staticTexts["picture-list-request-count"]
+        XCTAssertTrue(count.waitForExistence(timeout: 20))
+        expectation(for: NSPredicate(format: "label == %@", "1"), evaluatedWith: count)
+        waitForExpectations(timeout: 15)
+        // Two editor dismissals must coalesce while the first GET is held.
+        for _ in 0..<2 {
+            guard tap(app.buttons["daily-picture-add"]) else { XCTFail("Add picture missing"); return }
+            XCTAssertTrue(app.buttons["daily-picture-editor-cancel"].waitForExistence(timeout: 10))
+            guard tap(app.buttons["daily-picture-editor-cancel"]) else { XCTFail("Editor Cancel missing"); return }
+            XCTAssertTrue(app.buttons["daily-picture-add"].waitForExistence(timeout: 10))
+            expectation(for: NSPredicate(format: "exists == false"),
+                        evaluatedWith: app.buttons["daily-picture-editor-cancel"])
+            waitForExpectations(timeout: 10)
+        }
+        XCTAssertEqual(count.label, "1", "List requests must not overlap")
+        shot("picture-refresh-held-after-editor")
+        guard tap(app.buttons["release-picture-list"]) else { XCTFail("Release fixture missing"); return }
+        XCTAssertTrue(app.staticTexts["Fresh picture list"].waitForExistence(timeout: 15),
+                      "Closing the editor must trigger a fresh list after the older request")
+        XCTAssertEqual(count.label, "2", "Pending refreshes should coalesce")
+        XCTAssertFalse(app.staticTexts["Older picture list"].exists)
+        shot("picture-refresh-new-list")
+    }
+
     private func halqahScheduleTour() {
         let meetingLabel = language == "ur" ? "میٹنگ منسوخ کریں" : "Cancel meeting"
         let zikrLabel = language == "ur" ? "یہ وقت ہٹائیں" : "Remove this time"
