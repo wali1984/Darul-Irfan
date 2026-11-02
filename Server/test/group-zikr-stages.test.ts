@@ -139,6 +139,7 @@ describe("stage delivery retry and recipient isolation", () => {
     expect(sender).toHaveBeenCalledTimes(2); // English and Urdu cohorts, each once.
     expect(sender.mock.calls.flatMap(call => call[3]).sort()).toEqual(["EN", "UR"]);
     expect(sender.mock.calls.map(call => call[4])).toEqual(["1st Latifa", "????? 1"]);
+    expect(sender.mock.calls.map(call => call[5])).toEqual(["Our Sheikh: current Zikr stage", "ہمارے شیخ: ذکر کا موجودہ مرحلہ"]);
     expect(sender.mock.calls[0]?.[7]).toMatchObject({ sound: "zikr_soft_chime", collapseID: "sheikh-zikr-stage" });
     expect(raw.prepare("SELECT notification_state FROM group_zikr_cues").get()).toEqual({ notification_state: "complete" });
     await dispatchZikrCues(env, now);

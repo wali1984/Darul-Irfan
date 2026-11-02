@@ -210,7 +210,7 @@ export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void
         if (!ids.length) continue;
         await sendPushToInstallations(env, eventID, `group:${SHEIKH_HALQA_ID}`, ids,
           urdu && cue.title_ur ? cue.title_ur : cue.title,
-          urdu ? "????? ??? ? ??? ?? ?????? ?????" : "Our Sheikh ? current Zikr stage",
+          urdu ? "ہمارے شیخ: ذکر کا موجودہ مرحلہ" : "Our Sheikh: current Zikr stage",
           `darulirfan://groups/${SHEIKH_HALQA_ID}`,
           { sound: "zikr_soft_chime", ttlSeconds: Math.max(1, Math.floor((Date.parse(cue.created_at) + CUE_MAX_AGE_MS - now.getTime()) / 1000)),
             collapseID: "sheikh-zikr-stage" });
