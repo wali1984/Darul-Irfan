@@ -906,6 +906,10 @@ final class RedesignScreenshotTests: XCTestCase {
                 guard tap(remove), tap(app.buttons[delete]) else { XCTFail("Delete retry missing"); return }
                 XCTAssertTrue(first.waitForNonExistence(timeout: 15), "Successful delete must remove the record")
                 XCTAssertFalse(app.staticTexts[failure].exists)
+                XCTAssertTrue(app.buttons[retry].waitForExistence(timeout: 15), "Injected refresh failure must offer Retry")
+                shot("history-confirmed-delete-refresh-failed")
+                guard tap(app.buttons[retry]) else { XCTFail("Post-delete refresh Retry missing"); return }
+                XCTAssertFalse(first.exists, "Refresh must not restore the deleted record")
             }
             let last = app.staticTexts["Audit session 9"].firstMatch
             for _ in 0..<12 {

@@ -824,6 +824,12 @@ struct GroupDuaRequestsView: View {
         defer { working = false }
         do {
             try await service.markDuaRead(request.id, in: groupID)
+            // Retain the server-confirmed change if refreshing the list fails.
+            requests = requests?.map { value in
+                var updated = value
+                if updated.id == request.id { updated.isRead = true }
+                return updated
+            }
             actionError = nil
             await load()
         } catch is CancellationError {
@@ -936,6 +942,7 @@ struct GroupSessionHistoryView: View {
         defer { working = false }
         do {
             try await service.deleteSessionRecord(session.id, in: groupID)
+            sessions?.removeAll { $0.id == session.id }
             error = nil
             await load()
         } catch is CancellationError {

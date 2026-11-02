@@ -51,6 +51,7 @@ private final class HalqahAuditProtocol: URLProtocol {
     private static var failedGroups: Set<String> = []
     private static var historyAttempts: [String: Int] = [:]
     private static var deleted: Set<String> = []
+    private static var failedAfterDelete: Set<String> = []
 
     // This session never falls through to the network, including unexpected requests.
     override class func canInit(with request: URLRequest) -> Bool { true }
@@ -107,6 +108,9 @@ private final class HalqahAuditProtocol: URLProtocol {
         if attempt == 1 { return (503, "{}") }
         let body: [String: Any]
         if parts.count == 5 {
+            if !Self.deleted.isEmpty, Self.failedAfterDelete.insert(role).inserted {
+                return (503, "{}")
+            }
             let records: [[String: Any]] = (1...9).compactMap { number in
                 let id = "history-\(number)"
                 guard !Self.deleted.contains(id) else { return nil }
