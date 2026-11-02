@@ -869,6 +869,10 @@ struct GroupSessionHistoryView: View {
                     Text(verbatim: error).foregroundStyle(DIColor.danger)
                 }
                 if failed {
+                    Text("Past sessions could not be loaded. Please try again.")
+                        .diInterfaceFont(.subheadline)
+                        .foregroundStyle(DIColor.danger)
+                        .accessibilityIdentifier("halqah-history-load-error")
                     Button { Task { await load() } } label: {
                         Label("Try again", systemImage: "arrow.clockwise")
                     }
@@ -999,6 +1003,10 @@ struct GroupSessionAttendeesView: View {
                     .accessibilityElement(children: .combine)
                 }
                 if failed {
+                    Text("Attendance could not be loaded. Please try again.")
+                        .diInterfaceFont(.subheadline)
+                        .foregroundStyle(DIColor.danger)
+                        .accessibilityIdentifier("halqah-attendance-load-error")
                     Button { Task { await load() } } label: {
                         Label("Try again", systemImage: "arrow.clockwise")
                     }

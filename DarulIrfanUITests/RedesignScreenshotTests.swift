@@ -1258,16 +1258,28 @@ final class RedesignScreenshotTests: XCTestCase {
         let failure = language == "ur" ? "کارروائی مکمل نہیں ہو سکی۔ اپنا انٹرنیٹ کنکشن چیک کریں اور دوبارہ کوشش کریں۔" : "The action could not be completed. Check your connection and try again."
         for role in ["member", "admin"] {
             let entry = app.buttons["halqah-audit-" + role]
-            guard entry.waitForExistence(timeout: 180), tap(entry), tap(app.buttons[retry]) else {
+            guard entry.waitForExistence(timeout: 180), tap(entry) else {
+                XCTFail("History entry missing"); return
+            }
+            let historyError = app.staticTexts["halqah-history-load-error"]
+            XCTAssertTrue(historyError.waitForExistence(timeout: 15))
+            shot("history-" + role + "-load-failure")
+            guard tap(app.buttons[retry]) else {
                 XCTFail("History must offer Retry after an injected load failure"); return
             }
             let first = app.staticTexts["Audit session 1"].firstMatch
             XCTAssertTrue(first.waitForExistence(timeout: 15))
             shot("history-" + role + "-loaded")
-            guard tap(first), tap(app.buttons[retry]) else {
+            XCTAssertFalse(historyError.exists, "Successful loading must clear its explanation")
+            guard tap(first) else { XCTFail("Attendance entry missing"); return }
+            let attendanceError = app.staticTexts["halqah-attendance-load-error"]
+            XCTAssertTrue(attendanceError.waitForExistence(timeout: 15))
+            shot("history-" + role + "-attendance-failure")
+            guard tap(app.buttons[retry]) else {
                 XCTFail("Attendance must offer Retry after an injected load failure"); return
             }
             XCTAssertTrue(app.staticTexts["Audit attendee 2"].waitForExistence(timeout: 15))
+            XCTAssertFalse(attendanceError.exists)
             shot("history-" + role + "-attendees")
             goBack()
             let remove = app.buttons[delete + ": Audit session 1"]
@@ -1284,6 +1296,7 @@ final class RedesignScreenshotTests: XCTestCase {
                 XCTAssertTrue(first.waitForNonExistence(timeout: 15), "Successful delete must remove the record")
                 XCTAssertFalse(app.staticTexts[failure].exists)
                 XCTAssertTrue(app.buttons[retry].waitForExistence(timeout: 15), "Injected refresh failure must offer Retry")
+                XCTAssertTrue(historyError.exists, "Refresh failure must explain why Retry is shown")
                 shot("history-confirmed-delete-refresh-failed")
                 guard tap(app.buttons[retry]) else { XCTFail("Post-delete refresh Retry missing"); return }
                 XCTAssertFalse(first.exists, "Refresh must not restore the deleted record")

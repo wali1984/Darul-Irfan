@@ -1,6 +1,40 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Past sessions could not be loaded. Please try again.": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Past sessions could not be loaded. Please try again."
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "گزشتہ نشستیں لوڈ نہیں ہو سکیں۔ براہ کرم دوبارہ کوشش کریں۔"
+        }
+      }
+    }
+  },
+  "Attendance could not be loaded. Please try again.": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Attendance could not be loaded. Please try again."
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "حاضری کی تفصیل لوڈ نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔"
+        }
+      }
+    }
+  },
 "Remove this announcement?": {
     "extractionState": "manual",
     "localizations": {
