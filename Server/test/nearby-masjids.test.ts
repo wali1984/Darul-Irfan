@@ -6,6 +6,34 @@ import { sqliteD1 } from "./sqlite-d1";
 const request = (query = "lat=31.52&lon=74.35&lang=ur") => new Request(`https://example.test/v1/masjids/nearby?${query}`);
 afterEach(() => vi.unstubAllGlobals());
 describe("nearby masjid provider", () => {
+  it("distinguishes valid empty results from malformed bodies and duplicate place identities", async () => {
+    const { db, raw } = sqliteD1();
+    const env = { DB: db, PLACES_ENABLED: "true", PLACES_API_KEY: "test",
+      PLACES_DAILY_LIMIT: "20", PLACES_MONTHLY_LIMIT: "20" } as Env;
+    const place = { id: "same", displayName: { text: "Masjid" }, location: { latitude: 31, longitude: 74 } };
+    const bodies = [null, [], { places: "invalid" }, { places: [{ ...place, location: { latitude: 91, longitude: 0 } }] },
+      { places: [place, place] }, {}, { places: [] }];
+    const fetcher = vi.fn(async () => Response.json(bodies.shift()));
+    vi.stubGlobal("fetch", fetcher);
+    try {
+      for (let i = 0; i < 5; i++) expect((await nearbyMasjids(request(), env, async () => true)).status).toBe(503);
+      for (let i = 0; i < 2; i++) {
+        const result = await nearbyMasjids(request(), env, async () => true);
+        expect(result.status).toBe(200);
+        expect(await result.json()).toMatchObject({ items: [], attribution: "Google Maps" });
+      }
+    } finally { raw.close(); }
+  });
+  it("does not spend the shared allowance when the caller rate limit denies access", async () => {
+    const { db, raw } = sqliteD1();
+    const fetcher = vi.fn(); vi.stubGlobal("fetch", fetcher);
+    try {
+      const result = await nearbyMasjids(request(), { DB: db, PLACES_ENABLED: "true", PLACES_API_KEY: "test",
+        PLACES_DAILY_LIMIT: "1", PLACES_MONTHLY_LIMIT: "1" } as Env, async () => false);
+      expect(result.status).toBe(429); expect(fetcher).not.toHaveBeenCalled();
+      expect(raw.prepare("SELECT COUNT(*) AS count FROM nearby_request_budget").get()).toMatchObject({ count: 0 });
+    } finally { raw.close(); }
+  });
   it("makes no upstream request for disabled service or invalid coordinates", async () => {
     const fetcher = vi.fn(); vi.stubGlobal("fetch", fetcher);
     expect((await nearbyMasjids(request(), {} as Env, async () => true)).status).toBe(503);

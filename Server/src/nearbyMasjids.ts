@@ -45,7 +45,7 @@ export async function nearbyMasjids(request: Request, env: Env,
     });
     if (!upstream.ok) return unavailable();
     const payload = await upstream.json() as { places?: unknown };
-    if (!payload || typeof payload !== "object" ||
+    if (!payload || typeof payload !== "object" || Array.isArray(payload) ||
         (payload.places !== undefined && !Array.isArray(payload.places))) return unavailable();
     const places = (payload.places ?? []) as Record<string, any>[];
     const items = places.slice(0, 20).flatMap(place => {
@@ -64,7 +64,8 @@ export async function nearbyMasjids(request: Request, env: Env,
         address: typeof place.formattedAddress === "string" ? place.formattedAddress : "",
         latitude: place.location.latitude, longitude: place.location.longitude, attributions }];
     });
-    if (places.length && !items.length) return unavailable();
+    if ((places.length && !items.length) || new Set(items.map(item => item.id)).size !== items.length)
+      return unavailable();
     return response({ items, radiusMeters: 10_000, attribution: "Google Maps" });
   } catch { return unavailable(); }
 }
