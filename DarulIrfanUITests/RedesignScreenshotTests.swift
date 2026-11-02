@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history", "halqah-duas"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history", "halqah-duas", "dua-race"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -215,10 +215,17 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-history" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-history"]
         }
-        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-duas" {
+        if ["halqah-duas", "dua-race"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-duas"]
+            if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "dua-race" {
+                app.launchArguments += ["--uitesting-dua-race"]
+            }
         }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "dua-race" {
+            halqahDuaRaceTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-duas" {
             halqahDuaRecoveryTour()
             return
@@ -881,6 +888,32 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     /// Real history/attendance screens with local transport, including recoverable failures.
+    private func halqahDuaRaceTour() {
+        let retry = language == "ur" ? "?????? ???? ????" : "Try again"
+        let mark = language == "ur" ? "??? ???" : "Mark as read"
+        let entry = app.buttons["halqah-audit-admin"]
+        guard entry.waitForExistence(timeout: 180), tap(entry), tap(app.buttons[retry]) else {
+            XCTFail("Dua race fixture failed to load"); return
+        }
+        guard tap(app.buttons[mark]) else { XCTFail("Mark action missing"); return }
+        let failure = language == "ur" ? "?? ?? ???? ??? ???? ?? ???? ????? ???? ?? ?????? ???? ?????" : "Your group could not be loaded. Check your connection and try again."
+        XCTAssertTrue(app.staticTexts[failure].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons[mark].exists, "First rejected write must retain action")
+        let list = app.collectionViews.firstMatch
+        let surface = list.exists ? list : app.scrollViews.firstMatch
+        surface.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
+            .press(forDuration: 0.1, thenDragTo: surface.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)))
+        guard tap(app.buttons[mark]) else { XCTFail("Retry mark action missing"); return }
+        XCTAssertTrue(app.buttons[mark].waitForNonExistence(timeout: 15))
+        shot("dua-race-newer-read-state")
+        guard tap(app.buttons["release-older-refresh"]) else { XCTFail("Release control missing"); return }
+        XCTAssertTrue(app.buttons["Older response released"].waitForExistence(timeout: 15),
+                      "Pull refresh must have captured an older pending response")
+        XCTAssertFalse(app.buttons[mark].exists, "Older response must not restore unread state")
+        XCTAssertTrue(app.staticTexts["Audit dua request"].exists)
+        shot("dua-race-after-older-response")
+    }
+
     private func halqahDuaRecoveryTour() {
         let retry = language == "ur" ? "دوبارہ کوشش کریں" : "Try again"
         let mark = language == "ur" ? "پڑھ لیا" : "Mark as read"
