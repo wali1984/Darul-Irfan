@@ -28,11 +28,18 @@ final class NativeMeetingChat {
         refresh()
     }
 
+    func conversation(peerID: String?) -> [ChatMessage] {
+        guard let peerID else { return messages }
+        _ = privateMessages // Observe private-chat updates before reading SDK filtering.
+        guard let person = client.participants.joined.first(where: { $0.id == peerID }) else { return [] }
+        return client.chat.getPrivateChatMessages(participant: person)
+    }
+
     /// A false result leaves the draft with the presenter for explicit retry.
     /// SDK permission and rate-limit checks remain authoritative.
     func send(_ draft: String, recipients: [String] = []) -> Bool {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard active, canSend, !text.isEmpty else { return false }
+        guard active, canSend, !text.isEmpty, recipientsAvailable(recipients) else { return false }
         return client.chat.sendTextMessage(message: text, peerIds: recipients) == nil
     }
 
@@ -40,7 +47,7 @@ final class NativeMeetingChat {
     /// IDs are captured at submission, never taken from a later UI selection.
     func sendAttachment(_ url: URL, image: Bool, recipients: [String] = [],
                         completion: @escaping (Bool) -> Void) {
-        guard url.isFileURL else { completion(false); return }
+        guard url.isFileURL, recipientsAvailable(recipients) else { completion(false); return }
         perform(completion: completion) { done in
             if image {
                 client.chat.sendImageMessage(imageURL: url, peerIds: recipients) { done($0 == nil) }
@@ -78,6 +85,11 @@ final class NativeMeetingChat {
                 completion(success)
             }
         }
+    }
+
+    private func recipientsAvailable(_ ids: [String]) -> Bool {
+        let joined = Set(client.participants.joined.map(\.id))
+        return ids.allSatisfy { !$0.isEmpty && joined.contains($0) }
     }
 
     func leaving() { active = false; canSend = false }

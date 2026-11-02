@@ -1,6 +1,12 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Everyone in the session": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست میں سب کے لیے"}}}},
+"Private conversation": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نجی گفتگو"}}}},
+"This participant has left. Choose a recipient to continue.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "یہ شریک نشست سے جا چکے ہیں۔ جاری رکھنے کے لیے وصول کنندہ منتخب کریں۔"}}}},
+"Open image": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "تصویر کھولیں"}}}},
+"Open attachment": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "منسلک فائل کھولیں"}}}},
+"Attachment unavailable": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "منسلک فائل دستیاب نہیں"}}}},
 "Waiting to join": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "شمولیت کے منتظر"}}}},
 "Participants": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "شرکاء"}}}},
 "No other participants yet.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "ابھی کوئی اور شریک نہیں ہے۔"}}}},
