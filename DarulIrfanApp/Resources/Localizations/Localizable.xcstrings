@@ -1,6 +1,18 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Waiting to join": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "شمولیت کے منتظر"}}}},
+"Participants": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "شرکاء"}}}},
+"No other participants yet.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "ابھی کوئی اور شریک نہیں ہے۔"}}}},
+"Admit": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "شامل کریں"}}}},
+"Reject": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "منظور نہ کریں"}}}},
+"Microphone on": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مائیکروفون کھلا ہے"}}}},
+"Microphone off": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مائیکروفون بند ہے"}}}},
+"Mute microphone": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مائیکروفون بند کریں"}}}},
+"Stop camera": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "کیمرہ بند کریں"}}}},
+"Remove from session": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست سے نکالیں"}}}},
+"Remove from session?": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست سے نکال دیں؟"}}}},
+"Controls": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "اختیارات"}}}},
 "Your session has expired. Sign in again, or tap Join Daily Zikr to continue as a guest.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your session has expired. Sign in again, or tap Join Daily Zikr to continue as a guest."}}, "ur": {"stringUnit": {"state": "translated", "value": "آپ کا سیشن ختم ہو گیا ہے۔ دوبارہ سائن اِن کریں، یا مہمان کے طور پر شامل ہونے کے لیے روزانہ ذکر میں شامل ہوں دبائیں۔"}}}},
 "Location unavailable. Enter your city and country manually.": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مقام دستیاب نہیں۔ اپنا شہر اور ملک خود درج کریں۔"}}}},
 "Use my location": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "میرا مقام استعمال کریں"}}}},
