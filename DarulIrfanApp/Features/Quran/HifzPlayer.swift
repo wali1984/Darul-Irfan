@@ -44,6 +44,7 @@ final class HifzPlayer {
     /// Which repetition of the current ayah is sounding, 1-based.
     private(set) var repetition = 1
     private(set) var playbackFailed = false
+    private(set) var isPreparing = false
 
     var isPlaying: Bool { phase == .reciting || phase == .pausing }
 
@@ -113,11 +114,14 @@ final class HifzPlayer {
         let newPlayer = AVPlayer()
         player = newPlayer
         let sessionID = audioSessionID
+        isPreparing = true
         preparationTask = Task { @MainActor [weak self, weak newPlayer] in
             guard let self, let newPlayer, let timeline = self.timeline else { return }
+            defer { if self.audioSessionID == sessionID { self.isPreparing = false } }
             do {
-                try HifzComposition.requireReadableLocalAudio(url)
-                let source = QuranListenPlayer.recitationItem(url, durationMs: recitation.durationMs).asset
+                let local = try await HifzAudioSource.localURL(for: url)
+                try Task.checkCancellation()
+                let source = AVURLAsset(url: local, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
                 let composition = try await HifzComposition.make(asset: source, timeline: timeline)
                 guard !Task.isCancelled, self.audioSessionID == sessionID, self.player === newPlayer else { return }
                 newPlayer.replaceCurrentItem(with: AVPlayerItem(asset: composition))
@@ -173,6 +177,7 @@ final class HifzPlayer {
         routeObserver = nil
         preparationTask?.cancel()
         preparationTask = nil
+        isPreparing = false
         timeline = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         endObserver = nil
