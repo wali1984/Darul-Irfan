@@ -26,8 +26,11 @@ struct DailyZikrCard: View {
     let join: (LiveSource) -> Void
     /// Plays one recording.
     let playRecording: (OfficialFeedItem) -> Void
+    var openSheikh: (() -> Void)? = nil
 
     @State private var showsRecordings = false
+    @State private var canLeadSheikh = false
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
 
     private var isLive: Bool { broadcast.state == .live }
@@ -37,7 +40,9 @@ struct DailyZikrCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
-            headline
+            if openSheikh != nil {
+                Text("Our Sheikh").diInterfaceFont(.title2, weight: .heavy).foregroundStyle(DIColor.goldGlow)
+            } else { headline }
             if isLive {
                 onAirPanel
                 if let cue = broadcast.cue {
@@ -58,6 +63,21 @@ struct DailyZikrCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             joinButton
+            if let openSheikh {
+                Button {
+                    DIHaptics.light()
+                    openSheikh()
+                } label: {
+                    VStack(spacing: 2) {
+                        Text("Our Sheikh").diInterfaceFont(.caption, weight: .semibold)
+                        Text(canLeadSheikh ? "Start Daily Zikr" : "Join Daily Zikr").diInterfaceFont(.subheadline, weight: .bold)
+                    }
+                    .foregroundStyle(Color(hex: 0x064B34))
+                    .frame(maxWidth: .infinity, minHeight: 56)
+                    .background { joinFill(true) }
+                }
+                .buttonStyle(DIPressableStyle())
+            }
             if source == nil {
                 // Says only what the channel reports: nothing here claims the
                 // zikr is on before its live video is.
@@ -80,6 +100,16 @@ struct DailyZikrCard: View {
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
+        .task(id: scenePhase) {
+            guard openSheikh != nil, scenePhase == .active else { return }
+            canLeadSheikh = false
+            let service = MemberGroupService()
+            if await service.isSignedIn,
+               let groups = try? await service.groups(),
+               let group = groups.groups.first(where: { $0.id == "our-sheikh" }) {
+                canLeadSheikh = group.canManage ?? (group.myRole == .admin || group.myRole == .administrator || groups.role == .superadmin)
+            }
+        }
         .onChange(of: broadcast.cue) { old, new in
             // A new latifa or muraqaba while the card is on screen: a chime
             // over the stream, since the mic may have dropped as it changed.

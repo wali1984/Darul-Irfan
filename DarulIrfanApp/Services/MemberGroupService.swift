@@ -79,6 +79,37 @@ actor MemberGroupService {
     var isSignedIn: Bool { savedSession.load() != nil }
     var memberID: String? { savedSession.load()?.memberID }
 
+    /// Public admission to Our Sheikh only. Optional email is contact data,
+    /// never a sign-in identity. Existing Apple sessions retain their roles.
+    func joinOurSheikh(name: String, city: String, countryCode: String, email: String?, guestSecret: String) async throws -> String {
+        let original = savedSession.load()
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/our-sheikh/join"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        if let original { request.setValue("Bearer \(original.token)", forHTTPHeaderField: "authorization") }
+        var payload = ["name": name, "city": city, "countryCode": countryCode]
+        if original == nil { payload["guestSecret"] = guestSecret }
+        if let email, !email.isEmpty { payload["email"] = email }
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let (data, response) = try await session.data(for: request)
+        guard savedSession.load()?.token == original?.token else { throw MemberGroupError.requestFailed }
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if status == 429 { throw MemberGroupError.tooManyAttempts }
+        if status == 401 { throw MemberGroupError.signInRejected }
+        if status == 201, original == nil {
+            let value = try decoder.decode(MemberSession.self, from: data)
+            savedSession.save(value)
+            return value.memberID
+        }
+        if status == 200, let original {
+            struct Admission: Decodable { let memberID: String; let groupID: String }
+            let result = try decoder.decode(Admission.self, from: data)
+            guard result.memberID == original.memberID, result.groupID == "our-sheikh" else { throw MemberGroupError.requestFailed }
+            return original.memberID
+        }
+        throw MemberGroupError.requestFailed
+    }
+
     /// Whether a member is signed in on this phone. Static, so it is read
     /// without the actor (by the push registration).
     static var hasSavedSession: Bool { SecureMemberSession.load() != nil }
@@ -150,6 +181,7 @@ actor MemberGroupService {
             guard savedSession.deleteIfCurrent(token: saved.token) else { return false }
         }
         HalqahNoticeChoice.isTurnedOff = false
+        try? SheikhVisitorStore.delete()
         return true
     }
 
@@ -558,6 +590,7 @@ actor MemberGroupService {
         guard code == 204 || code == 401 else { throw MemberGroupError.requestFailed }
         guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
         HalqahNoticeChoice.isTurnedOff = false
+        try SheikhVisitorStore.delete()
     }
 
     private func authorized<T: Decodable>(_ type: T.Type, path: String, query: String? = nil) async throws -> T {

@@ -1,4 +1,5 @@
 import { zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues } from "./groupZikrStages";
+import { joinOurSheikh } from "./sheikhPublicJoin";
 import type { AndroidDeviceRegistration, DeviceRegistration, Env } from "./contracts";
 import { refreshPaltalkRoom } from "./paltalkRoom";
 import { liveAudioFile, liveCue, listenerConfig } from "./liveRelay";
@@ -68,6 +69,10 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (request.method === "POST" && path === "/v1/members/session") {
     if (!await withinWriteLimit(request, env, "member-session", 20)) return json({ error: "Too many requests" }, { status: 429 });
     return createSession(request, env);
+  }
+  if (request.method === "POST" && path === "/v1/our-sheikh/join") {
+    if (!await withinWriteLimit(request, env, "sheikh-public-join", 60)) return json({ error: "Too many requests" }, { status: 429 });
+    return joinOurSheikh(request, env);
   }
   if (request.method === "POST" && path === "/v1/members/invite") {
     // This one takes a secret that could otherwise be guessed at, so wrong

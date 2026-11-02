@@ -1,6 +1,10 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Location unavailable. Enter your city and country manually.": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مقام دستیاب نہیں۔ اپنا شہر اور ملک خود درج کریں۔"}}}},
+"Use my location": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "میرا مقام استعمال کریں"}}}},
+"Email (optional)": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "ای میل (اختیاری)"}}}},
+"Select country": {"localizations": {"ur": {"stringUnit": {"state": "translated", "value": "ملک منتخب کریں"}}}},
     "Open Halqah" : { "localizations" : { "ur" : { "stringUnit" : { "state" : "translated", "value" : "حلقہ کھولیں" } } } },
     "Our Sheikh" : { "localizations" : { "ur" : { "stringUnit" : { "state" : "translated", "value" : "ہمارے شیخ" } } } },
     "Start Daily Zikr" : { "localizations" : { "ur" : { "stringUnit" : { "state" : "translated", "value" : "روزانہ ذکر شروع کریں" } } } },

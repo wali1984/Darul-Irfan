@@ -108,7 +108,7 @@ export async function createSession(request: Request, env: Env, resolveKey?: JWT
 
 /** A new bearer token for the member - the one answer both sign-ins give:
  *  {token, expiresAt, memberID}, 201. */
-async function startSession(env: Env, memberID: string, now: Date): Promise<Response> {
+export async function startSession(env: Env, memberID: string, now: Date): Promise<Response> {
   const nowISO = now.toISOString();
   const expires = new Date(now.getTime() + SESSION_DAYS * 86_400_000).toISOString();
   const token = hexOf(crypto.getRandomValues(new Uint8Array(32)));

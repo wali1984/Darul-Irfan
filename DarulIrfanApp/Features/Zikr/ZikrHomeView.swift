@@ -19,6 +19,7 @@ struct ZikrHomeView: View {
     @State private var focus: Focus?
     @State private var focusScrollTask: Task<Void, Never>?
     @State private var personalZikr = false
+    @State private var showOurSheikh = false
     @State private var linkedTasbihID: UUID?
     @State private var showLinkedTasbih = false
     @Environment(\.scenePhase) private var scenePhase
@@ -115,11 +116,6 @@ struct ZikrHomeView: View {
                 ZikrAyahBlock()
                     .diAppear()
 
-                // The Shajra, one tap under the ayah (owner).
-                PersonalZikrLink()
-                ZikrShajraLink()
-                    .diAppear(delay: 0.03)
-
                 dailyZikrCard
                     .id(Self.liveAnchor)
                     .diAppear(delay: 0.06)
@@ -139,7 +135,20 @@ struct ZikrHomeView: View {
                     )
                     .id(session.id)
                     .diAppear(delay: 0.1 + 0.04 * Double(index))
+
+                    if session.id == viewModel.otherSessions.first(where: { ZikrReminders.isTahajjud($0) })?.id {
+                        ZikrShajraLink()
+                            .diAppear(delay: 0.14)
+                    }
                 }
+
+                // Keep the chain available even if the published schedule omits Tahajjud.
+                if !viewModel.otherSessions.contains(where: { ZikrReminders.isTahajjud($0) }) {
+                    ZikrShajraLink()
+                        .diAppear(delay: 0.14)
+                }
+
+                PersonalZikrLink()
 
                 liveHalqahs
 
@@ -165,6 +174,9 @@ struct ZikrHomeView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $personalZikr) { PersonalZikrView() }
+        .navigationDestination(isPresented: $showOurSheikh) {
+            OurSheikhEntryView(service: groupService, dependencies: dependencies)
+        }
         .navigationDestination(isPresented: $showLinkedTasbih) {
             if let id = linkedTasbihID {
                 SavedTasbihView(id: id, trackerRepository: dependencies.trackerRepository, devotionalMetrics: dependencies.devotionalMetrics)
@@ -245,7 +257,8 @@ struct ZikrHomeView: View {
                 if let videoID = item.videoID {
                     presentedVideo = ZikrPresentedVideo(id: videoID, title: item.title)
                 }
-            }
+            },
+            openSheikh: { showOurSheikh = true }
         )
     }
 
