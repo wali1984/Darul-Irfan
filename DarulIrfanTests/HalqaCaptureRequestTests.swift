@@ -3,6 +3,42 @@ import XCTest
 
 final class HalqaCaptureRequestTests: XCTestCase {
     @MainActor
+    func testForegroundOrRoleLossDuringEnableStopsCaptureBeforeCompletion() {
+        let gate = HalqaCaptureRequest()
+        var allowed = true
+        var enabled: ((Bool) -> Void)?
+        var cleanup: ((Bool) -> Void)?
+        var result: Bool?
+        gate.request(permission: { $0(true) }, allowedNow: { allowed }, enable: { enabled = $0 },
+                     disableLateCapture: { cleanup = $0 }, completion: { result = $0 })
+        allowed = false
+        enabled?(true)
+        XCTAssertNotNil(cleanup)
+        XCTAssertTrue(gate.pending)
+        XCTAssertNil(result, "Wait for the SDK to stop capture before reporting completion")
+        cleanup?(true)
+        XCTAssertEqual(result, false)
+        XCTAssertFalse(gate.pending)
+        allowed = true
+        gate.request(permission: { $0(true) }, allowedNow: { allowed }, enable: { $0(true) },
+                     disableLateCapture: { _ in XCTFail() }, completion: { XCTAssertTrue($0) })
+    }
+
+    @MainActor
+    func testFailedLateCaptureCleanupBlocksFurtherEnables() {
+        let gate = HalqaCaptureRequest()
+        var allowed = true
+        var enabled: ((Bool) -> Void)?
+        gate.request(permission: { $0(true) }, allowedNow: { allowed }, enable: { enabled = $0 },
+                     disableLateCapture: { $0(false) }, completion: { XCTAssertFalse($0) })
+        allowed = false
+        enabled?(true)
+        allowed = true
+        gate.request(permission: { _ in XCTFail() }, allowedNow: { allowed }, enable: { _ in XCTFail() },
+                     disableLateCapture: { _ in XCTFail() }, completion: { XCTAssertFalse($0) })
+    }
+
+    @MainActor
     func testMuteCancelsPendingEnableButLaterExplicitUnmuteStillWorks() {
         let gate = HalqaCaptureRequest()
         var firstEnable: ((Bool) -> Void)?

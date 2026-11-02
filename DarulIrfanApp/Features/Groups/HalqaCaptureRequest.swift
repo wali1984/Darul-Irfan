@@ -34,7 +34,9 @@ final class HalqaCaptureRequest {
                 return
             }
             enable { [self] success in
-                if (closed || ticket != generation) && success {
+                // The SDK may finish after the app backgrounds or the host
+                // revokes publishing permission. Recheck after enable too.
+                if success && (closed || ticket != generation || !allowedNow()) {
                     disableLateCapture { [self] stopped in
                         if !stopped { closed = true }
                         requestPending = false
