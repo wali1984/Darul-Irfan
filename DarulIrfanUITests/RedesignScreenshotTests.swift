@@ -1216,7 +1216,18 @@ final class RedesignScreenshotTests: XCTestCase {
             if remove.exists && remove.isHittable { break }
             app.swipeUp()
         }
-        guard tap(remove), tap(app.buttons[cancelLabel]) else {
+        shot("halqah-removal-before-tap")
+        guard tap(remove) else {
+            XCTFail("Announcement Remove must be reachable"); return
+        }
+        let cancel = app.buttons[cancelLabel]
+        let cancelAppeared = cancel.waitForExistence(timeout: 10)
+        shot("halqah-removal-after-tap")
+        let hierarchy = XCTAttachment(string: app.debugDescription)
+        hierarchy.name = "halqah-removal-presentation-" + language
+        hierarchy.lifetime = .keepAlways
+        add(hierarchy)
+        guard cancelAppeared, tap(cancel) else {
             XCTFail("Removal confirmation must offer Cancel"); return
         }
         XCTAssertEqual(count.label, "0", "Cancel must send no mutation")
