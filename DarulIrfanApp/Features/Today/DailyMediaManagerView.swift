@@ -135,6 +135,7 @@ struct DailyMediaEditor: View {
     @State private var working = false
     @State private var loadingPicture = false
     @State private var choosingFile = false
+    @State private var fileLoadTask: Task<Void, Never>?
     @State private var confirmingDelete = false
     @State private var filled = false
     @State private var error: String?
@@ -231,10 +232,15 @@ struct DailyMediaEditor: View {
         .task(id: pick) { await read(pick) }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.image]) { result in
             if case .success(let url) = result {
-                Task { await readFile(url) }
+                fileLoadTask?.cancel()
+                fileLoadTask = Task { await readFile(url) }
             } else if case .failure = result {
                 error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
             }
+        }
+        .onDisappear {
+            fileLoadTask?.cancel()
+            fileLoadTask = nil
         }
         .interactiveDismissDisabled(working)
         .confirmationDialog("Delete this picture?", isPresented: $confirmingDelete, titleVisibility: .visible) {
@@ -287,6 +293,7 @@ struct DailyMediaEditor: View {
         } catch is CancellationError {
             return
         } catch {
+            guard !Task.isCancelled else { return }
             self.error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
         }
     }
@@ -308,6 +315,7 @@ struct DailyMediaEditor: View {
         } catch is CancellationError {
             return
         } catch {
+            guard !Task.isCancelled else { return }
             self.error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
         }
     }
