@@ -209,7 +209,14 @@ struct GroupPostComposer: View {
             )
             dismiss()
         } catch {
-            self.error = error.localizedDescription
+            if let groupError = error as? MemberGroupError, case .requestFailed = groupError {
+                self.error = String(localized: "The action could not be completed. Check your connection and try again.")
+            } else if error is MemberGroupError {
+                // Preserve sign-in, validation and rate-limit guidance from the service.
+                self.error = error.localizedDescription
+            } else {
+                self.error = String(localized: "The action could not be completed. Check your connection and try again.")
+            }
         }
     }
 }
