@@ -143,14 +143,18 @@ struct NoteEditorView: View {
             Button("OK", role: .cancel) { }
         }
         .tint(DIColor.actionForeground)
-        .navigationTitle(note == nil ? "New note" : "Note")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
+        .toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            VStack(spacing: DISpacing.sm) {
+                Text(note == nil ? "New note" : "Note")
+                    .diInterfaceFont(.headline)
+                    .foregroundStyle(DIColor.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                HStack(spacing: DISpacing.md) {
                 Button("Cancel") { dismiss() }
-                    .buttonStyle(DICompactButtonStyle())
-            }
-            ToolbarItem(placement: .confirmationAction) {
+                    .buttonStyle(DISecondaryButtonStyle())
                 Button("Save") {
                     store.loadIfNeeded()
                     var saved = note ?? DayNote(id: newNoteID, text: "", reference: reference)
@@ -159,8 +163,13 @@ struct NoteEditorView: View {
                     if store.upsert(saved) { dismiss() } else { saveFailed = true }
                 }
                 .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .buttonStyle(DICompactButtonStyle())
+                .buttonStyle(DISecondaryButtonStyle())
+                }
             }
+            .padding(DISpacing.md)
+            .diResponsiveWidth()
+            .frame(maxWidth: .infinity)
+            .background(DIColor.background)
         }
     }
 }
