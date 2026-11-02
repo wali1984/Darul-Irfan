@@ -26,5 +26,22 @@ final class GroupInvitationDateTests: XCTestCase {
         let urdu = GroupInvitationDate.text(date, locale: Locale(identifier: "ur"), timeZone: zone)
         XCTAssertNotEqual(english, urdu)
         XCTAssertNotEqual(urdu, GroupInvitationDate.text(date, locale: Locale(identifier: "ur"), includesTime: true, timeZone: zone))
+
+        // Preserve native Foundation output for the mixed-direction date seen
+        // in the playback-choice screenshots, without guessing from pixels.
+        let fixtureDate = ISO8601DateFormatter().date(from: "2026-11-01T12:00:00Z")!
+        let diagnostic = ["en", "ur", "ur-PK"].map { language in
+            let value = GroupInvitationDate.text(fixtureDate, locale: Locale(identifier: language), timeZone: zone)
+            return ["language": language, "text": value,
+                    "scalars": value.unicodeScalars.map { String(format: "U+%04X", $0.value) }.joined(separator: " ")]
+        }
+        if let data = try? JSONSerialization.data(withJSONObject: diagnostic, options: [.sortedKeys]),
+           let text = String(data: data, encoding: .utf8) {
+            print("GROUP_DATE_PROBE " + text)
+            let attachment = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
+            attachment.name = "playback-fixture-date-output"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
     }
 }
