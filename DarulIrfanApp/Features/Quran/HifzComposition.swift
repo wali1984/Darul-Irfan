@@ -6,8 +6,20 @@ import AVFoundation
 enum HifzComposition {
     enum Failure: Error { case unavailableAudio, invalidSourceDuration }
 
+    /// Missing local downloads cannot recover by buffering. Reject them before
+    /// entering AVFoundation, whose asset-loading failure may be delayed.
+    static func requireReadableLocalAudio(_ url: URL) throws {
+        guard url.isFileURL else { return }
+        var directory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &directory),
+              !directory.boolValue, FileManager.default.isReadableFile(atPath: url.path) else {
+            throw Failure.unavailableAudio
+        }
+    }
+
     static func make(asset: AVAsset, timeline: HifzPlaybackTimeline) async throws -> AVMutableComposition {
         try Task.checkCancellation()
+        if let source = asset as? AVURLAsset { try requireReadableLocalAudio(source.url) }
         guard let source = try await asset.loadTracks(withMediaType: .audio).first else {
             throw Failure.unavailableAudio
         }

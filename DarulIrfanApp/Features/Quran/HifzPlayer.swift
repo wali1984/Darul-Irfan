@@ -116,6 +116,7 @@ final class HifzPlayer {
         preparationTask = Task { @MainActor [weak self, weak newPlayer] in
             guard let self, let newPlayer, let timeline = self.timeline else { return }
             do {
+                try HifzComposition.requireReadableLocalAudio(url)
                 let source = QuranListenPlayer.recitationItem(url, durationMs: recitation.durationMs).asset
                 let composition = try await HifzComposition.make(asset: source, timeline: timeline)
                 guard !Task.isCancelled, self.audioSessionID == sessionID, self.player === newPlayer else { return }
