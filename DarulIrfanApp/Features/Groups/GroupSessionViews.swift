@@ -722,12 +722,16 @@ struct GroupListenersView: View {
 
 struct GroupAttendeeRow: View {
     let person: GroupAttendee
+    @Environment(\.locale) private var locale
+    private var joinedTime: String {
+        "\u{2066}\(GroupInvitationDate.clock(person.firstSeenAt, locale: locale))\u{2069}"
+    }
 
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(verbatim: person.name)
-                Text("Joined \(person.firstSeenAt.formatted(date: .omitted, time: .shortened))")
+                Text("Joined \(joinedTime)")
                     .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             }
@@ -745,6 +749,7 @@ struct GroupAttendeeRow: View {
 /// The group's dua requests, for its admins: unread first.
 @MainActor
 struct GroupDuaRequestsView: View {
+    @Environment(\.locale) private var locale
     let groupID: String
     let service: MemberGroupService
 
@@ -780,7 +785,7 @@ struct GroupDuaRequestsView: View {
                                     Text("Without a name")
                                 }
                                 Text(verbatim: "·")
-                                Text(verbatim: request.createdAt.formatted(date: .abbreviated, time: .shortened))
+                                Text(verbatim: GroupInvitationDate.text(request.createdAt, locale: locale, includesTime: true))
                             }
                             .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.textMuted)

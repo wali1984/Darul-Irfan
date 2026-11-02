@@ -52,7 +52,7 @@ struct SheikhZikrPanel: View {
                     .diInterfaceFont(.headline).foregroundStyle(DIColor.textPrimary)
                 if let current = cues.last {
                     Text(verbatim: cueTitle(current)).diInterfaceFont(.title3).bold().foregroundStyle(DIColor.scripture)
-                    Text(verbatim: current.createdAt.formatted(date: .abbreviated, time: .shortened))
+                    Text(verbatim: GroupInvitationDate.text(current.createdAt, locale: locale, includesTime: true))
                         .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 } else {
                     Text("Awaiting the next Zikr stage").diInterfaceFont(.title3).bold().foregroundStyle(DIColor.scripture)
@@ -80,7 +80,7 @@ struct SheikhZikrPanel: View {
                     ForEach(cues.reversed()) { cue in
                         VStack(alignment: .leading, spacing: DISpacing.xs) {
                             Text(verbatim: cueTitle(cue)).diInterfaceFont(.headline)
-                            Text(verbatim: cue.createdAt.formatted(date: .abbreviated, time: .shortened))
+                            Text(verbatim: GroupInvitationDate.text(cue.createdAt, locale: locale, includesTime: true))
                                 .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                         }
                     }
