@@ -517,6 +517,7 @@ struct SurahReaderView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(isPlaying ? Text("Pause") : Text("Play"))
+                .accessibilityIdentifier("quran-listen-toggle")
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Listen")
                         .diInterfaceFont(.headline)
@@ -1222,6 +1223,7 @@ private struct AyahCardView: View {
                     .foregroundStyle(isSounding ? DIColor.accent : DIColor.actionForeground)
             }
             .accessibilityLabel(isSounding ? Text("Pause") : Text("Play Ayah \(ayah.ayahNumber)"))
+            .accessibilityIdentifier("quran-ayah-play-\(ayah.ayahNumber)")
         }
     }
 

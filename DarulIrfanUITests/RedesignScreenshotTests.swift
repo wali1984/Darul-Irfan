@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -228,6 +228,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         pause(6)
         closePopup()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-follow" {
+            audioFollowTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "reader-audit" {
             parahTour(checkControls: true, allDestinations: true)
             return
@@ -669,6 +673,73 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertEqual(app.buttons[sizeLabel].firstMatch.value as? String, choices[3])
         XCTAssertEqual(app.switches[fontLabel].firstMatch.value as? String, "1")
         shot("reading-settings-relaunch")
+    }
+
+    /// Real AVPlayer recitation; no injected player state or synthetic ayah changes.
+    private func audioFollowTour() {
+        let pauseLabel = (language == "ur" ? "روکیں" : "Pause")
+        let parah = language == "ur" ? "پارہ" : "Parah"
+        let ayahWord = language == "ur" ? "آیت" : "Ayah"
+        selectTab(1)
+        guard tap(button("Quran")), tap(app.buttons[parah].firstMatch) else {
+            XCTFail("Quran Parah selector missing"); return
+        }
+        let row = app.buttons["\(parah) 2, Al-Baqara, \(ayahWord) 142"]
+        guard tap(row) else { XCTFail("Parah 2 missing"); return }
+        XCTAssertTrue(app.navigationBars["Al-Baqara"].waitForExistence(timeout: 20))
+        let first = app.buttons["quran-ayah-play-142"]
+        guard tap(first) else { XCTFail("Ayah 142 playback control missing"); return }
+        let next = app.buttons["quran-ayah-play-143"]
+        expectation(for: NSPredicate(format: "label == %@", pauseLabel), evaluatedWith: next)
+        waitForExpectations(timeout: 180)
+        XCTAssertTrue(next.isHittable, "Playing ayah 143 must be brought into view")
+        shot("audio-follow-next-ayah")
+        guard tap(next) else { XCTFail("Playing ayah pause is not reachable"); return }
+        expectation(for: NSPredicate(format: "label != %@", pauseLabel), evaluatedWith: next)
+        waitForExpectations(timeout: 10)
+
+        // Move away while paused, then resume through the main listening control.
+        guard tap(app.buttons[(language == "ur" ? "مطالعے کے اختیارات" : "Reader options")].firstMatch),
+              tap(app.buttons[(language == "ur" ? "آیت پر جائیں" : "Go to ayah")].firstMatch) else {
+            XCTFail("Reader go-to control missing"); return
+        }
+        let alert = app.alerts.firstMatch
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        let field = alert.textFields.firstMatch
+        field.tap(); field.typeText("1")
+        guard tap(alert.buttons[(language == "ur" ? "جائیں" : "Go")]) else { XCTFail("Go action missing"); return }
+        for _ in 0..<5 {
+            if app.buttons["quran-listen-toggle"].isHittable { break }
+            app.swipeDown()
+        }
+        guard tap(app.buttons["quran-listen-toggle"]) else { XCTFail("Resume control missing"); return }
+        expectation(for: NSPredicate(format: "hittable == true AND label == %@", pauseLabel), evaluatedWith: next)
+        waitForExpectations(timeout: 15)
+        shot("audio-follow-resume")
+
+        // Audio continues while another tab is selected and while the app is backgrounded.
+        selectTab(0)
+        pause(3)
+        selectTab(1)
+        assertPlayingAyahVisible(pauseLabel: pauseLabel)
+        shot("audio-follow-tab-return")
+        XCUIDevice.shared.press(.home)
+        pause(5)
+        app.activate()
+        XCTAssertTrue(app.tabBars.buttons.firstMatch.waitForExistence(timeout: 20))
+        assertPlayingAyahVisible(pauseLabel: pauseLabel)
+        shot("audio-follow-foreground")
+        let active = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label == %@", "quran-ayah-play-", pauseLabel)).firstMatch
+        guard tap(active) else { XCTFail("Final pause unavailable"); return }
+    }
+
+    private func assertPlayingAyahVisible(pauseLabel: String) {
+        let active = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@ AND label == %@", "quran-ayah-play-", pauseLabel)).firstMatch
+        XCTAssertTrue(active.waitForExistence(timeout: 10), "Recitation must still be active")
+        expectation(for: NSPredicate(format: "hittable == true"), evaluatedWith: active)
+        waitForExpectations(timeout: 15)
+        XCTAssertGreaterThanOrEqual(active.frame.minY, app.navigationBars.firstMatch.frame.maxY)
+        XCTAssertLessThanOrEqual(active.frame.maxY, app.tabBars.firstMatch.frame.minY)
     }
 
     private func settingsTour() {
