@@ -15,6 +15,7 @@ struct PersonalZikrView: View {
     @State private var isVisible = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         ScrollView {
@@ -64,6 +65,9 @@ struct PersonalZikrView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Your Daily Personal Zikr")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(DIColor.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(colorScheme, for: .navigationBar)
         .onAppear { isVisible = true; store.screenActive = scenePhase == .active; store.settle(); store.refreshAlerts() }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
@@ -311,6 +315,7 @@ struct PersonalZikrLink: View {
 #if DEBUG
 /// Populated history coverage without starting timers or writing personal records.
 struct PersonalZikrHistoryAuditFixture: View {
+    @Environment(\.colorScheme) private var colorScheme
     private let entries: [PersonalZikrEntry] = (1...9).map { index in
         let end = Calendar.current.date(byAdding: .day, value: -index, to: .now)!
         let duration = Double(index * 60)
@@ -328,6 +333,9 @@ struct PersonalZikrHistoryAuditFixture: View {
             .tint(DIColor.actionForeground)
             .navigationTitle("Your Daily Personal Zikr")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(DIColor.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(colorScheme, for: .navigationBar)
         }
     }
 }
