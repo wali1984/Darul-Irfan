@@ -32,6 +32,7 @@ enum AppRoute: Equatable, Sendable {
     case zikr(session: String?)
     /// The official Daily Zikr broadcast, on the Zikr tab.
     case live
+    case tasbih(id: UUID)
     case personalZikr
     /// The Halqah tab.
     case groups
@@ -72,6 +73,9 @@ enum AppRoute: Equatable, Sendable {
             self = .hadith
         case "zikr":
             self = .zikr(session: second?.lowercased())
+        case "tasbih":
+            guard parts.count == 2, let rawID = second, let id = UUID(uuidString: rawID) else { return nil }
+            self = .tasbih(id: id)
         case "personal-zikr":
             self = .personalZikr
         case "live":

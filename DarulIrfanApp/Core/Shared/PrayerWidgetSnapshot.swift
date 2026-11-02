@@ -52,6 +52,7 @@ struct WidgetDevotionalMetrics: Codable, Sendable, Equatable {
     var prayerCompletionRate: Double
     var quranSurahNumber: Int?
     var quranAyahNumber: Int?
+    var tasbihCounterID: UUID? = nil
     var tasbihTitle: String?
     var tasbihCount: Int
     var tasbihTarget: Int?

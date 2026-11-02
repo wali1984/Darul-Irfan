@@ -41,6 +41,7 @@ final class DevotionalMetricsSyncService {
             prayerCompletionRate: min(max(summary?.completionRate ?? 0, 0), 1),
             quranSurahNumber: lastRead?.surahNumber,
             quranAyahNumber: lastRead?.ayahNumber,
+            tasbihCounterID: activeCounter?.id,
             tasbihTitle: activeCounter?.title,
             tasbihCount: activeCounter?.count ?? 0,
             tasbihTarget: activeCounter?.target,

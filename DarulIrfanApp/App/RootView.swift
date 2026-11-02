@@ -131,7 +131,7 @@ struct RootView: View {
             router.clear(route)
         case .quran, .hadith, .library:
             selectedTab = .read
-        case .zikr, .live, .personalZikr:
+        case .zikr, .live, .personalZikr, .tasbih:
             // A fresh Zikr screen, which shows the session asked for.
             zikrStack = UUID()
             selectedTab = .zikr

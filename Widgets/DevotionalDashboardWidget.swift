@@ -304,7 +304,11 @@ private struct DevotionalDashboardWidgetView: View {
         switch entry.configuration.focus {
         case .overview, .prayer: return URL(string: "darulirfan://today")
         case .quran: return URL(string: "darulirfan://quran")
-        case .zikr: return URL(string: "darulirfan://zikr")
+        case .zikr:
+            if let id = entry.snapshot?.devotionalMetrics?.tasbihCounterID {
+                return URL(string: "darulirfan://tasbih/\(id.uuidString)")
+            }
+            return URL(string: "darulirfan://zikr")
         }
     }
 }

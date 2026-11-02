@@ -19,6 +19,8 @@ struct ZikrHomeView: View {
     @State private var focus: Focus?
     @State private var focusScrollTask: Task<Void, Never>?
     @State private var personalZikr = false
+    @State private var linkedTasbihID: UUID?
+    @State private var showLinkedTasbih = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private let dependencies: AppDependencies
@@ -163,7 +165,17 @@ struct ZikrHomeView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $personalZikr) { PersonalZikrView() }
+        .navigationDestination(isPresented: $showLinkedTasbih) {
+            if let id = linkedTasbihID {
+                SavedTasbihView(id: id, trackerRepository: dependencies.trackerRepository, devotionalMetrics: dependencies.devotionalMetrics)
+            }
+        }
         .onAppear {
+            if case .tasbih(let id) = DeepLinkRouter.shared.pending {
+                DeepLinkRouter.shared.clear(.tasbih(id: id))
+                linkedTasbihID = id
+                showLinkedTasbih = true
+            }
             if DeepLinkRouter.shared.pending == .personalZikr {
                 DeepLinkRouter.shared.clear(.personalZikr)
                 personalZikr = true
