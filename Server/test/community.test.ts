@@ -544,6 +544,34 @@ describe("recorded zikr", () => {
     expect(raw.prepare("SELECT started_by FROM group_live_history").get()).toMatchObject({ started_by: "schedule" });
   });
 
+  it("returns playback choices beyond the former native 20 and 40 item cutoffs", async () => {
+    const lookedUp: string[][] = [];
+    vi.stubGlobal("fetch", async (url: string) => {
+      const ids = new URL(url).searchParams.get("id")?.split(",") ?? [];
+      lookedUp.push(ids);
+      return new Response(JSON.stringify({ items: ids.map(id => ({
+        id, snippet: { liveBroadcastContent: "none" }, contentDetails: { duration: "PT10M" },
+      })) }), { status: 200 });
+    });
+    const { raw, call, admin, member } = await setup({ YOUTUBE_API_KEY: "k" } as Partial<Env>);
+    const ids = Array.from({ length: 45 }, (_, i) => `past${String(i + 1).padStart(7, "0")}`);
+    const insert = raw.prepare(`INSERT INTO feed_items(id,source,kind,title,source_url,video_id,published_at,updated_at)
+      VALUES(?,'youtube','video',?,?,?,?,?)`);
+    ids.forEach((id, i) => {
+      const published = new Date(Date.UTC(2026, 10, 1) - i * 86_400_000).toISOString();
+      insert.run(`youtube:${id}`, `Past Zikr ${i + 1}`, `https://www.youtube.com/watch?v=${id}`, id, published, published);
+    });
+    expect((await call(member, "GET", "/v1/groups/usa/recordings")).status).toBe(403);
+    expect(lookedUp).toEqual([]);
+    const response = await call(admin, "GET", "/v1/groups/usa/recordings");
+    expect(response.status).toBe(200);
+    const library = await response.json() as { pastVideos: { videoID: string; durationSeconds: number }[] };
+    expect(library.pastVideos.map(video => video.videoID)).toEqual(ids);
+    expect(library.pastVideos[20]).toMatchObject({ videoID: ids[20], durationSeconds: 600 });
+    expect(library.pastVideos[40]).toMatchObject({ videoID: ids[40], durationSeconds: 600 });
+    expect(lookedUp).toEqual([ids]);
+  });
+
   it("offers the channel's past zikr and plays one as a recording, but a live video as live", async () => {
     vi.stubGlobal("fetch", async (url: string) => {
       const ids = new URL(url).searchParams.get("id")?.split(",") ?? [];
