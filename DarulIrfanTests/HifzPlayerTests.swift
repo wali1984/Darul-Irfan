@@ -26,6 +26,26 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertTrue(player.isPlaying)
     }
 
+    func testRemoteOwnerFollowsReplacementAndRetainsPausedPractice() {
+        let first = HifzPlayer()
+        let second = HifzPlayer()
+        defer { first.stop(); second.stop() }
+        first.start(recitation: recitation, range: 1...7, repeats: 2, pauseSeconds: 1, surahNumber: 1)
+        XCTAssertTrue(HifzPlayer.active === first)
+        first.pause()
+        XCTAssertTrue(first.ownsRemoteControls)
+        second.start(recitation: recitation, range: 2...7, repeats: 2, pauseSeconds: 1, surahNumber: 2)
+        XCTAssertNil(first.currentAyah)
+        XCTAssertFalse(first.ownsRemoteControls)
+        XCTAssertTrue(HifzPlayer.active === second)
+        XCTAssertEqual(second.surahNumber, 2)
+        first.stop()
+        XCTAssertTrue(HifzPlayer.active === second, "Stale cleanup must not clear the replacement")
+        second.stop()
+        XCTAssertNil(HifzPlayer.active)
+        XCTAssertFalse(second.ownsRemoteControls)
+    }
+
     func testRestartWithNarrowerRangeClampsSavedVerseAndRejectsOldRange() {
         let player = HifzPlayer()
         defer { player.stop() }
@@ -176,6 +196,20 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertTrue(player.isPlaying)
         XCTAssertFalse(player.playbackFailed)
         XCTAssertEqual(player.currentAyah, 5)
+    }
+
+    func testQueuedBayanNotificationCannotStopReplacementPractice() async throws {
+        let (recording, url) = try localAudio()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let player = HifzPlayer()
+        defer { player.stop() }
+        player.start(recitation: recording, range: 1...7, repeats: 3, pauseSeconds: 1, startingAyah: 2)
+        NotificationCenter.default.post(name: .bayanAudioWillStart, object: nil)
+        player.start(recitation: recording, range: 1...7, repeats: 3, pauseSeconds: 1, startingAyah: 5)
+        try await Task.sleep(for: .milliseconds(100))
+        XCTAssertTrue(HifzPlayer.active === player)
+        XCTAssertEqual(player.currentAyah, 5)
+        XCTAssertFalse(player.playbackFailed)
     }
 
 }

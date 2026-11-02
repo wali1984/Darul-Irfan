@@ -16,6 +16,11 @@ import Observation
 @Observable
 @MainActor
 final class HifzPlayer {
+    /// Weak registry for remote controls; this does not extend the lifetime of
+    /// the screen-owned player.
+    private(set) static weak var active: HifzPlayer?
+    private(set) var surahNumber: Int?
+    var ownsRemoteControls: Bool { currentAyah != nil && !playbackFailed && phase != .finished }
     enum Phase: Equatable {
         case idle
         case reciting
@@ -58,9 +63,13 @@ final class HifzPlayer {
         range: ClosedRange<Int>,
         repeats: Int,
         pauseSeconds: Double,
-        startingAyah: Int? = nil
+        startingAyah: Int? = nil,
+        surahNumber: Int? = nil
     ) {
+        if let previous = Self.active, previous !== self { previous.stop() }
         stop()
+        Self.active = self
+        self.surahNumber = surahNumber
         guard let url = URL(string: recitation.audioUrl) else {
             currentAyah = min(max(startingAyah ?? range.lowerBound, range.lowerBound), range.upperBound)
             playbackFailed = true
@@ -80,10 +89,14 @@ final class HifzPlayer {
         // bayan player pauses; a bayan started later ends the practice.
         QuranListenPlayer.shared.stop()
         NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
+        let observerSessionID = audioSessionID
         bayanObserver = NotificationCenter.default.addObserver(
             forName: .bayanAudioWillStart, object: nil, queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in self?.stop() }
+            Task { @MainActor in
+                guard let self, self.audioSessionID == observerSessionID else { return }
+                self.stop()
+            }
         }
 
         let newPlayer = AVPlayer()
@@ -138,6 +151,8 @@ final class HifzPlayer {
     }
 
     func stop() {
+        if Self.active === self { Self.active = nil }
+        surahNumber = nil
         audioSessionID = UUID()
         if let interruptionObserver { NotificationCenter.default.removeObserver(interruptionObserver) }
         interruptionObserver = nil

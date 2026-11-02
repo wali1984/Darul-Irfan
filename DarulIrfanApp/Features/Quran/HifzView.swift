@@ -292,7 +292,8 @@ struct HifzView: View {
                 range: rangeStart...rangeEnd,
                 repeats: repeats,
                 pauseSeconds: pauseSeconds,
-                startingAyah: selectedAyah
+                startingAyah: selectedAyah,
+                surahNumber: surah.id
             )
         } else {
             player.resume()
@@ -307,7 +308,7 @@ struct HifzView: View {
         DIHaptics.light()
         selectedAyah = target
         if player.playbackFailed || player.currentAyah == nil {
-            player.start(recitation: recitation, range: rangeStart...rangeEnd, repeats: repeats, pauseSeconds: pauseSeconds, startingAyah: target)
+            player.start(recitation: recitation, range: rangeStart...rangeEnd, repeats: repeats, pauseSeconds: pauseSeconds, startingAyah: target, surahNumber: surah.id)
         } else {
             player.practise(ayah: target)
         }
@@ -325,7 +326,8 @@ struct HifzView: View {
                 range: rangeStart...rangeEnd,
                 repeats: repeats,
                 pauseSeconds: pauseSeconds,
-                startingAyah: selectedAyah
+                startingAyah: selectedAyah,
+                surahNumber: surah.id
             )
         } else {
             player.stop()

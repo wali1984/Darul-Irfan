@@ -215,6 +215,7 @@ final class QuranListenPlayer {
         }
         index = 0
         guard !steps.isEmpty else { return }
+        HifzPlayer.active?.stop()
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
         try? AVAudioSession.sharedInstance().setActive(true)
         NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
@@ -236,6 +237,7 @@ final class QuranListenPlayer {
         // the system accepts activation, keeping the UI paused if it cannot.
         do { try AVAudioSession.sharedInstance().setActive(true) }
         catch { return }
+        HifzPlayer.active?.stop()
         NotificationCenter.default.post(name: .quranAudioWillStart, object: nil)
         if part == .translation { narrator.play() } else { reciter?.play() }
         isPlaying = true

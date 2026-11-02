@@ -582,9 +582,17 @@ final class AudioPlayerService: AudioPlayerServicing {
             Task { @MainActor in
                 guard let self else { return }
                 if self.isPlaying || self.isBuffering { self.pausePlayback() }
+                // A new practice player needs its own observation even when
+                // the prior Quran owner has not delivered its callback yet.
+                self.recitationTracked = false
                 self.followRecitation()
             }
         }
+    }
+
+    private var practice: HifzPlayer? {
+        guard let player = HifzPlayer.active, player.ownsRemoteControls else { return nil }
+        return player
     }
 
     /// The recitation under way, playing or paused, if there is one.
@@ -597,7 +605,15 @@ final class AudioPlayerService: AudioPlayerServicing {
     /// come back.
     private func followRecitation() {
         let listen = QuranListenPlayer.shared
-        if let ayah = listen.current {
+        let practice = self.practice
+        if let practice, let ayah = practice.currentAyah {
+            showsRecitation = true
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = [
+                MPMediaItemPropertyTitle: String(localized: "Memorise"),
+                MPMediaItemPropertyArtist: practice.surahNumber.map { "\($0):\(ayah)" } ?? "\(ayah)",
+                MPNowPlayingInfoPropertyPlaybackRate: practice.isPlaying ? 1.0 : 0.0,
+            ]
+        } else if let ayah = listen.current {
             showsRecitation = true
             MPNowPlayingInfoCenter.default().nowPlayingInfo = [
                 MPMediaItemPropertyTitle: String(localized: "Quran"),
@@ -614,6 +630,9 @@ final class AudioPlayerService: AudioPlayerServicing {
         withObservationTracking {
             _ = listen.current
             _ = listen.isPlaying
+            _ = practice?.currentAyah
+            _ = practice?.phase
+            _ = practice?.playbackFailed
         } onChange: { [weak self] in
             Task { @MainActor in
                 self?.recitationTracked = false
@@ -656,6 +675,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.playCommand.isEnabled = true
         center.playCommand.addTarget { [weak self] _ in
             Task { @MainActor in
+                if let practice = self?.practice { practice.resume(); return }
                 if let recitation = self?.recitation {
                     recitation.resume()
                     return
@@ -670,6 +690,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.pauseCommand.isEnabled = true
         center.pauseCommand.addTarget { [weak self] _ in
             Task { @MainActor in
+                if let practice = self?.practice { practice.pause(); return }
                 if let recitation = self?.recitation {
                     recitation.pause()
                     return
@@ -683,6 +704,10 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.togglePlayPauseCommand.isEnabled = true
         center.togglePlayPauseCommand.addTarget { [weak self] _ in
             Task { @MainActor in
+                if let practice = self?.practice {
+                    if practice.isPlaying { practice.pause() } else { practice.resume() }
+                    return
+                }
                 if let recitation = self?.recitation {
                     if recitation.isPlaying { recitation.pause() } else { recitation.resume() }
                     return
@@ -698,7 +723,7 @@ final class AudioPlayerService: AudioPlayerServicing {
             let interval = (event as? MPSkipIntervalCommandEvent)?.interval ?? 30
             Task { @MainActor in
                 // Not the paused bayan under a recitation.
-                guard self?.recitation == nil else { return }
+                guard self?.recitation == nil, self?.practice == nil else { return }
                 self?.skipForward(interval)
             }
             return .success
@@ -709,7 +734,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         center.skipBackwardCommand.addTarget { [weak self] event in
             let interval = (event as? MPSkipIntervalCommandEvent)?.interval ?? 15
             Task { @MainActor in
-                guard self?.recitation == nil else { return }
+                guard self?.recitation == nil, self?.practice == nil else { return }
                 self?.skipBackward(interval)
             }
             return .success
@@ -722,7 +747,7 @@ final class AudioPlayerService: AudioPlayerServicing {
             }
             let position = positionEvent.positionTime
             Task { @MainActor in
-                guard self?.recitation == nil else { return }
+                guard self?.recitation == nil, self?.practice == nil else { return }
                 self?.seek(to: position)
             }
             return .success
