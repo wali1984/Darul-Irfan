@@ -28,6 +28,8 @@ struct GroupDetailView: View {
     @State private var detailGeneration = 0
     @State private var failure: String?
     @State private var actionFailure: String?
+    @State private var postToRemove: MemberGroupPost?
+    @State private var removingPost = false
     /// Only one video plays at a time: a tapped video expands in place rather
     /// than every card loading a player at once.
     @State private var playingVideoID: String?
@@ -115,6 +117,24 @@ struct GroupDetailView: View {
             await followSession()
         }
         .refreshable { await load() }
+        .confirmationDialog("Remove this announcement?", isPresented: Binding(
+            get: { postToRemove != nil }, set: { if !$0 { postToRemove = nil } }
+        ), titleVisibility: .visible) {
+            if let post = postToRemove {
+                Button("Remove", role: .destructive) {
+                    guard !removingPost, detail?.canManage == true else { return }
+                    removingPost = true
+                    postToRemove = nil
+                    Task {
+                        defer { removingPost = false }
+                        await performChange { try await service.removePost(post.id, in: group.id) }
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { postToRemove = nil }
+        } message: {
+            Text("This removes the announcement from the Halqah. This cannot be undone.")
+        }
         .alert("Could not complete action", isPresented: Binding(
             get: { actionFailure != nil }, set: { if !$0 { actionFailure = nil } }
         )) {
@@ -543,12 +563,11 @@ struct GroupDetailView: View {
                     )
                 }
                 if detail?.canManage == true {
-                    Button("Remove", role: .destructive) {
-                        Task {
-                            await performChange { try await service.removePost(post.id, in: group.id) }
-                        }
+                    Button(removingPost ? LocalizedStringKey("Removing") : LocalizedStringKey("Remove"), role: .destructive) {
+                        postToRemove = post
                     }
                     .buttonStyle(DISecondaryButtonStyle(destructive: true))
+                    .disabled(removingPost)
                 }
             }
         }

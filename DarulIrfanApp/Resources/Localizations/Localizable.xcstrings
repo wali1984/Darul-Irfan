@@ -1,6 +1,57 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Remove this announcement?": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Remove this announcement?"
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "کیا یہ اعلان ہٹانا ہے؟"
+        }
+      }
+    }
+  },
+  "This removes the announcement from the Halqah. This cannot be undone.": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "This removes the announcement from the Halqah. This cannot be undone."
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "اس سے اعلان حلقے سے ہٹ جائے گا۔ یہ عمل واپس نہیں ہو سکتا۔"
+        }
+      }
+    }
+  },
+  "Removing": {
+    "extractionState": "manual",
+    "localizations": {
+      "en": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "Removing"
+        }
+      },
+      "ur": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ہٹایا جا رہا ہے"
+        }
+      }
+    }
+  },
     "Zoom in": {
       "extractionState": "manual",
       "localizations": {
