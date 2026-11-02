@@ -43,9 +43,9 @@ struct PDFViewerView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     ShareLink(item: fileURL) {
                         Image(systemName: "square.and.arrow.up")
-                            .frame(minWidth: 44, minHeight: 44)
-                            .contentShape(Rectangle())
+                            .frame(width: 20, height: 20)
                     }
+                    .buttonStyle(DIToolbarButtonStyle())
                     .accessibilityLabel(Text("Share file"))
                 }
             }
