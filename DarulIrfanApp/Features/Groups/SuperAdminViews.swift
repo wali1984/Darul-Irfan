@@ -28,13 +28,17 @@ struct HalqahEditor: View {
                      ? "A new Halqah starts empty. Add its first Administrator from its Members screen, or from Everyone who has signed in."
                      : "Members see the new name straight away.")
             }
+            .listRowBackground(DIColor.surface)
             if let error {
                 Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                    .listRowBackground(DIColor.surface)
             }
             Section {
                 Button(halqah == nil ? "Make the Halqah" : "Save") { Task { await save() } }
-                    .disabled(working || name.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(working || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
+            .listRowBackground(DIColor.surface)
         }
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -50,9 +54,10 @@ struct HalqahEditor: View {
     }
 
     private func save() async {
+        guard !working, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         working = true
         defer { working = false }
-        let name = name.trimmingCharacters(in: .whitespaces)
+        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let description = description.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
             if let halqah {
@@ -189,6 +194,7 @@ struct DirectoryPersonView: View {
                     Text("Super admin: everything, in every Halqah.").foregroundStyle(DIColor.textMuted)
                 }
             }
+            .listRowBackground(DIColor.surface)
             Section("Halqahs") {
                 if places.isEmpty {
                     Text("Not in a Halqah yet").foregroundStyle(DIColor.textMuted)
@@ -218,6 +224,7 @@ struct DirectoryPersonView: View {
                     }
                 }
             }
+            .listRowBackground(DIColor.surface)
             if changeable && !open.isEmpty {
                 Section("Add to a Halqah") {
                     Picker("Halqah", selection: $newHalqah) {
@@ -228,12 +235,15 @@ struct DirectoryPersonView: View {
                         ForEach([GroupRole.member, .admin, .administrator], id: \.self) { role in Text(role.title).tag(role) }
                     }
                     Button("Add") { Task { await add() } }
+                        .buttonStyle(DISecondaryButtonStyle())
                         .disabled(working || newHalqah.isEmpty)
                 }
+                .listRowBackground(DIColor.surface)
             }
             if let error {
                 Section { Text(verbatim: error).foregroundStyle(DIColor.danger)
                     .accessibilityIdentifier("directory-detail-error") }
+                    .listRowBackground(DIColor.surface)
             }
         }
         .scrollContentBackground(.hidden)
