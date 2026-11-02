@@ -15,11 +15,31 @@ function field(value: unknown, maximum: number): string | null {
  *  Verified Apple/Google callers use their existing bearer session instead. */
 export async function joinOurSheikh(request: Request, env: Env): Promise<Response> {
   let input: Record<string, unknown>;
+  // Public and unauthenticated: bound actual UTF-8 bytes, not a caller's
+  // Content-Length header. A complete native profile is far below 16 KiB.
+  const reader = request.body?.getReader();
   try {
-    const value: unknown = await request.json();
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+    let bytes = 0;
+    let text = "";
+    if (reader) {
+      while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        bytes += chunk.value.byteLength;
+        if (bytes > 16_384) {
+          await reader.cancel();
+          return json({ error: "Profile is too large" }, { status: 413 });
+        }
+        text += decoder.decode(chunk.value, { stream: true });
+      }
+    }
+    text += decoder.decode();
+    const value: unknown = JSON.parse(text);
     if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error();
     input = value as Record<string, unknown>;
   } catch { return json({ error: "Invalid profile" }, { status: 400 }); }
+  finally { reader?.releaseLock(); }
   const name = field(input.name, 80);
   const city = field(input.city, 100);
   const country = field(input.countryCode, 2)?.toUpperCase();
