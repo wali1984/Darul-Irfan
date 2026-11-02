@@ -202,6 +202,33 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testSavedFavoriteCountReportsReadFailureAndRecovers() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertItems([libraryItem("saved-count", category: .books)])
+        let model = LibraryViewModel(contentRepository: repository)
+        XCTAssertTrue(model.favoritesLoading)
+        await model.loadFavorites()
+        XCTAssertFalse(model.favoritesLoading)
+        XCTAssertFalse(model.favoritesFailed)
+        XCTAssertEqual(model.favoritesCount, 0)
+        let added = await model.toggleFavorite(contentItemID: "saved-count")
+        XCTAssertTrue(added)
+        try await database.connection.execute("ALTER TABLE favorites RENAME TO unavailable_favorites")
+        await model.loadFavorites()
+        XCTAssertTrue(model.favoritesFailed)
+        XCTAssertFalse(model.favoritesLoading)
+        XCTAssertEqual(model.favoritesCount, 1, "A failed read preserves the confirmed count")
+        try await database.connection.execute("ALTER TABLE unavailable_favorites RENAME TO favorites")
+        _ = try await model.favoriteItems()
+        XCTAssertFalse(model.favoritesFailed, "Opening Favorites can recover the Saved summary")
+        XCTAssertEqual(model.favoritesCount, 1)
+        await model.loadFavorites()
+        XCTAssertFalse(model.favoritesFailed)
+        XCTAssertFalse(model.favoritesLoading)
+    }
+
+    @MainActor
     func testFailedFavoriteRemovalPreservesConfirmedStateAndRetries() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)

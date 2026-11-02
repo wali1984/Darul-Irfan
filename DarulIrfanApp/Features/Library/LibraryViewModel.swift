@@ -18,6 +18,8 @@ final class LibraryViewModel {
 
     /// Favorites keyed by content item ID for O(1) star lookups.
     private(set) var favoritesByContentID: [String: Favorite] = [:]
+    private(set) var favoritesLoading = true
+    private(set) var favoritesFailed = false
 
     /// The one item of each category that holds exactly one, so its shelf
     /// opens the item itself instead of a list of one.
@@ -132,14 +134,24 @@ final class LibraryViewModel {
     }
 
     func loadFavorites() async {
-        guard let all = try? await contentRepository.favorites() else { return }
-        var map: [String: Favorite] = [:]
-        for favorite in all {
-            if let contentItemID = favorite.contentItemID {
-                map[contentItemID] = favorite
+        favoritesLoading = true
+        defer { favoritesLoading = false }
+        do {
+            let all = try await contentRepository.favorites()
+            try Task.checkCancellation()
+            var map: [String: Favorite] = [:]
+            for favorite in all {
+                if let contentItemID = favorite.contentItemID {
+                    map[contentItemID] = favorite
+                }
             }
+            favoritesByContentID = map
+            favoritesFailed = false
+        } catch is CancellationError {
+            return
+        } catch {
+            favoritesFailed = true
         }
-        favoritesByContentID = map
     }
 
     // MARK: - Favorites
@@ -266,6 +278,7 @@ final class LibraryViewModel {
             }
         }
         favoritesByContentID = confirmed
+        favoritesFailed = false
         return items
     }
 }

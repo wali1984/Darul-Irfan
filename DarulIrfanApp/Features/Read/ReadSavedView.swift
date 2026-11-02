@@ -55,7 +55,9 @@ struct ReadSavedView: View {
                         savedRow(
                             systemImage: "star.fill",
                             title: "Favorites",
-                            detail: Text("\(library.favoritesCount) items"),
+                            detail: library.favoritesLoading ? Text("Loading...") :
+                                library.favoritesFailed ? Text("Your personal records could not be read. Please try again.") :
+                                Text("\(library.favoritesCount) items"),
                             gold: true
                         )
                     }
