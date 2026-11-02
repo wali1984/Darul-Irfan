@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 @MainActor
 struct PersonalZikrView: View {
@@ -57,6 +58,10 @@ struct PersonalZikrView: View {
         .navigationTitle("Your Daily Personal Zikr")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { store.screenActive = scenePhase == .active; store.settle(); store.refreshAlerts() }
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            await refreshAlertAccess()
+        }
         .onDisappear { store.screenActive = false }
         .onChange(of: scenePhase) { _, phase in
             store.screenActive = phase == .active
@@ -216,6 +221,12 @@ struct PersonalZikrView: View {
         .tint(DIColor.actionForeground)
         .presentationDetents([.medium, .large])
     }
+    private func refreshAlertAccess() async {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        guard !Task.isCancelled else { return }
+        denied = settings.authorizationStatus == .denied
+    }
+
     private var reminders: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             DISectionHeader(titleKey: "Daily reminders")
@@ -227,7 +238,7 @@ struct PersonalZikrView: View {
                             Task {
                                 let allowed: Bool
                                 if enabled { allowed = await store.requestAlerts() } else { allowed = true }
-                                denied = !allowed
+                                await refreshAlertAccess()
                                 var reminder = store.reminders[index]; reminder.enabled = enabled && allowed; store.setReminder(index, reminder)
                             }
                         }))
@@ -241,7 +252,12 @@ struct PersonalZikrView: View {
                     .foregroundStyle(DIColor.textPrimary)
                 }
             }
-            if denied { Text("Enable notifications in Settings to receive Zikr alerts.").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted) }
+            if denied {
+                Text("Enable notifications in Settings to receive Zikr alerts.").diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                }.buttonStyle(DISecondaryButtonStyle())
+            }
         }
     }
 }
