@@ -941,6 +941,14 @@ final class RedesignScreenshotTests: XCTestCase {
         guard reveal(app.buttons[add]), tap(app.buttons[add]), reveal(app.textFields[name]), tap(app.textFields[name]) else { XCTFail("Custom stage entry missing"); return }
         app.textFields[name].typeText("AuditMuraqaba")
         shot("sheikh-custom-stage-editing")
+        let cancel = language == "ur" ? "منسوخ کریں" : "Cancel"
+        guard tap(app.buttons[cancel]) else { XCTFail("Custom stage cancel unavailable above keyboard"); return }
+        XCTAssertTrue(app.textFields[name].waitForNonExistence(timeout: 5))
+        guard reveal(app.buttons[add]), tap(app.buttons[add]), app.textFields[name].waitForExistence(timeout: 5) else {
+            XCTFail("Custom stage editor could not reopen"); return
+        }
+        XCTAssertTrue((app.textFields[name].value as? String)?.contains("AuditMuraqaba") == true, "Cancel must preserve the unsent draft")
+        guard tap(app.textFields[name]) else { XCTFail("Custom stage field unreachable on return"); return }
         guard reveal(app.buttons[save]), tap(app.buttons[save]) else {
             shot("sheikh-custom-stage-save-unreachable")
             // The automatic UI snapshots only exported the application root.

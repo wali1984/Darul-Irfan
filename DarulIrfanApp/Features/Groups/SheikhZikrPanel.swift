@@ -31,6 +31,8 @@ struct SheikhZikrPanel: View {
     @State private var adding = false
     @State private var title = ""
     @State private var titleUr = ""
+    private enum EditorField: Hashable { case name, urduName }
+    @FocusState private var editorField: EditorField?
     @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -89,6 +91,7 @@ struct SheikhZikrPanel: View {
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: controls)
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: history)
         }
+        .sheet(isPresented: $adding) { stageEditor }
         .diAppear()
         .diBreathingGlow(maxRadius: 8)
         .task(id: scenePhase) {
@@ -111,17 +114,62 @@ struct SheikhZikrPanel: View {
                 }
             }
             Button("Add Muraqaba") { adding.toggle() }.buttonStyle(DISecondaryButtonStyle()).disabled(busy || pending != nil)
-            if adding {
-                Text("Muraqaba name").diInterfaceFont(.caption)
-                TextField("Muraqaba name", text: $title).padding(DISpacing.sm).background(DIColor.background, in: RoundedRectangle(cornerRadius: 10)).disabled(busy)
-                Text("Urdu name (optional)").diInterfaceFont(.caption)
-                TextField("Urdu name (optional)", text: $titleUr).padding(DISpacing.sm).background(DIColor.background, in: RoundedRectangle(cornerRadius: 10)).disabled(busy)
-                Button("Save") {
-                    Task { await send(PendingSheikhStageAction(kind: "custom", id: UUID(), title: title.trimmingCharacters(in: .whitespacesAndNewlines), titleUr: titleUr.trimmingCharacters(in: .whitespacesAndNewlines))) }
-                }.buttonStyle(DIPrimaryButtonStyle())
-                    .disabled(busy || pending != nil || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || title.count > 100 || titleUr.count > 100)
+
+        }
+    }
+
+    private var canSaveStage: Bool {
+        !busy && pending == nil && !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && title.count <= 100 && titleUr.count <= 100
+    }
+
+    private var stageEditor: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: DISpacing.md) {
+                    DICard {
+                        VStack(alignment: .leading, spacing: DISpacing.sm) {
+                            Text("Muraqaba name").diInterfaceFont(.caption)
+                            TextField("Muraqaba name", text: $title)
+                                .diInterfaceFont(.body)
+                                .focused($editorField, equals: .name).submitLabel(.next)
+                                .onSubmit { editorField = .urduName }
+                                .autocorrectionDisabled()
+                                .padding(DISpacing.sm).background(DIColor.background, in: RoundedRectangle(cornerRadius: 10))
+                            Text("Urdu name (optional)").diInterfaceFont(.caption)
+                            TextField("Urdu name (optional)", text: $titleUr)
+                                .diInterfaceFont(.body)
+                                .focused($editorField, equals: .urduName).submitLabel(.done)
+                                .onSubmit { editorField = nil }
+                                .autocorrectionDisabled()
+                                .padding(DISpacing.sm).background(DIColor.background, in: RoundedRectangle(cornerRadius: 10))
+                        }.disabled(busy || pending != nil)
+                    }
+                    if let error { Text(verbatim: error).diInterfaceFont(.subheadline).foregroundStyle(DIColor.danger) }
+                    if let pending, pending.kind == "custom" {
+                        Button("Retry pending action") { Task { await send(pending) } }
+                            .buttonStyle(DIPrimaryButtonStyle()).disabled(busy)
+                    }
+                    if busy { ProgressView() }
+                }.padding(DISpacing.md)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .diScreenBackground()
+            .navigationTitle("Add Muraqaba")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { editorField = nil; adding = false }.disabled(busy)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        editorField = nil
+                        Task { await send(PendingSheikhStageAction(kind: "custom", id: UUID(), title: title.trimmingCharacters(in: .whitespacesAndNewlines), titleUr: titleUr.trimmingCharacters(in: .whitespacesAndNewlines))) }
+                    }.disabled(!canSaveStage)
+                }
             }
         }
+        .presentationDetents([.large])
+        .interactiveDismissDisabled(busy)
     }
 
     private func load() async {
