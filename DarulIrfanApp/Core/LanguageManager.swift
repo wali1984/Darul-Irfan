@@ -67,5 +67,8 @@ enum DailyNoorText {
             .replacingOccurrences(of: "Quran", with: "قرآن")
             .replacingOccurrences(of: "Sahih al-Bukhari", with: "صحیح بخاری")
             .replacingOccurrences(of: "Sahih Muslim", with: "صحیح مسلم")
+            // Isolate numeric citations from surrounding RTL prose, including ranges.
+            .replacingOccurrences(of: #"[0-9]+(?:[:\-–][0-9]+)+"#,
+                                  with: "\u{2066}$0\u{2069}", options: .regularExpression)
     }
 }

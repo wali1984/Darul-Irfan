@@ -48,7 +48,9 @@ final class TodayNoorLocalizationTests: XCTestCase {
     func testMissingUrduDoesNotSilentlyBecomeEnglish() {
         XCTAssertNil(DailyNoorText.translation(urdu: " ", english: "English", readsUrdu: true))
         XCTAssertEqual(DailyNoorText.translation(urdu: "اردو", english: "English", readsUrdu: true), "اردو")
-        XCTAssertEqual(DailyNoorText.reference("Quran 2:201", urdu: true), "قرآن 2:201")
+        XCTAssertEqual(DailyNoorText.reference("Quran 2:201", urdu: true), "قرآن \u{2066}2:201\u{2069}")
+        XCTAssertEqual(DailyNoorText.reference("Quran 10:85-86", urdu: true), "قرآن \u{2066}10:85-86\u{2069}")
+        XCTAssertEqual(DailyNoorText.reference("Quran 10:85-86", urdu: false), "Quran 10:85-86")
         XCTAssertEqual(DailyNoorText.reference("Sahih al-Bukhari 843", urdu: true), "صحیح بخاری 843")
     }
 }
