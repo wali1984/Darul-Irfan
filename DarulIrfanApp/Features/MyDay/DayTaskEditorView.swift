@@ -1,5 +1,6 @@
 import EventKit
 import SwiftUI
+import UserNotifications
 
 /// Adds or edits one task: what, which day, when (a clock time or relative
 /// to a prayer), how it repeats, and whether to be reminded.
@@ -23,6 +24,9 @@ struct DayTaskEditorView: View {
     @State private var newTaskID = UUID()
     @State private var saveFailed = false
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var notificationDenied = false
+    @State private var requestingNotifications = false
     @State private var title: String
     @State private var day: Date
     @State private var timingKind: TimingKind
@@ -123,8 +127,24 @@ struct DayTaskEditorView: View {
 
             Section {
                 taskMenu("Repeat", selection: $repeatRule, options: DayTaskRepeat.allCases) { LocalizedStringKey($0.title) }
-                Toggle("Remind me", isOn: $remind)
-                    .disabled(timingKind == .anytime)
+                Toggle("Remind me", isOn: Binding(get: { remind }, set: { enabled in
+                    guard enabled else { remind = false; return }
+                    requestingNotifications = true
+                    Task {
+                        let allowed = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+                        remind = allowed
+                        await refreshNotificationAccess()
+                        requestingNotifications = false
+                    }
+                }))
+                    .disabled(timingKind == .anytime || requestingNotifications)
+                if notificationDenied && timingKind != .anytime {
+                    Text("Enable notifications in Settings to receive task reminders.")
+                        .diInterfaceFont(.footnote).foregroundStyle(DIColor.textMuted)
+                    Button("Open Settings") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                    }.buttonStyle(DICompactButtonStyle())
+                }
             } footer: {
                 if timingKind == .anytime {
                     Text("Choose a time or a prayer to be reminded.")
@@ -178,6 +198,9 @@ struct DayTaskEditorView: View {
         }
         .navigationTitle(original == nil ? "New task" : "Edit task")
         .navigationBarTitleDisplayMode(.inline)
+        .task(id: scenePhase) {
+            if scenePhase == .active { await refreshNotificationAccess() }
+        }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }
@@ -186,9 +209,15 @@ struct DayTaskEditorView: View {
                 Button("Save") {
                     if onSave(builtTask) { dismiss() } else { saveFailed = true }
                 }
-                .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || requestingNotifications)
             }
         }
+    }
+
+    private func refreshNotificationAccess() async {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        guard !Task.isCancelled else { return }
+        notificationDenied = settings.authorizationStatus == .denied
     }
 
     private func taskMenu<Value: Hashable>(
