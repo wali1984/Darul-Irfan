@@ -1175,6 +1175,9 @@ private struct AyahCardView: View {
                 shellsRow
             }
         }
+        // Keep an ayah's text and actions together without merging or hiding controls.
+        // A flat eager surah otherwise makes accessibility sort thousands of siblings.
+        .accessibilityElement(children: .contain)
         .sheet(isPresented: $showsTafsir) {
             NavigationStack {
                 AyahTafsirSheet(ayah: ayah, viewModel: viewModel, dependencies: dependencies, fontScale: fontScale)
