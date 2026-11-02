@@ -241,6 +241,37 @@ describe("LIVE-032: a retired Halqah", () => {
 });
 
 
+describe("post publication push failures", () => {
+  it.each([false, true])("acknowledges the committed post when push lookup fails (draft first: %s)", async draftFirst => {
+    const { call, raw, env, admin } = await setup();
+    const prepare = env.DB.prepare.bind(env.DB);
+    let lookups = 0;
+    vi.spyOn(env.DB, "prepare").mockImplementation(sql => {
+      if (sql.includes("SELECT DISTINCT d.installation_id")) {
+        lookups++;
+        throw new Error("Push lookup unavailable");
+      }
+      return prepare(sql);
+    });
+    const created = await call(admin, "POST", "/v1/groups/usa/posts", {
+      title: "Audit announcement", body: "Preserve this post", publish: !draftFirst,
+    });
+    expect(created.status).toBe(201);
+    const { id } = await created.json() as { id: string };
+    if (draftFirst) {
+      expect(lookups).toBe(0);
+      const published = await call(admin, "POST", `/v1/groups/usa/posts/${id}/publish`, {
+        title: "Audit announcement", body: "Preserve this post",
+      });
+      expect(published.status).toBe(200);
+    }
+    expect(lookups).toBe(1);
+    expect(raw.prepare("SELECT title,body,status FROM member_group_posts WHERE id=?").get(id)).toEqual({
+      title: "Audit announcement", body: "Preserve this post", status: "published",
+    });
+  });
+});
+
 describe("meeting creation retries", () => {
   const path = "/v1/groups/usa/meetings";
   const body = { requestID: "91ba7dfe-47d4-4dfe-b813-96b7573ab357", title: "Weekly meeting",

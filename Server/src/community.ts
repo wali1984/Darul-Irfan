@@ -242,7 +242,11 @@ export async function createPost(env: Env, memberID: string, groupID: string, in
       now, `member:${memberID}`, now, publish ? "published" : "draft", attachments.length ? JSON.stringify(attachments) : null).run();
   if (publish) {
     const pictures = attachments.length ? (attachments.some(item => item.kind === "video") ? "A new post with a video." : "A new post with pictures.") : "";
-    await notifyGroup(env, groupID, `post:${id}`, title || "New post", cleanText(input.body, 140) ?? pictures, `darulirfan://groups/${groupID}`);
+    // The post is committed. A notification failure must not invite the
+    // author to submit it again as though creation had failed.
+    try {
+      await notifyGroup(env, groupID, `post:${id}`, title || "New post", cleanText(input.body, 140) ?? pictures, `darulirfan://groups/${groupID}`);
+    } catch { /* Delivery is best effort, as for scheduled meetings. */ }
   }
   return json({ ok: true, id, published: publish }, { status: 201 });
 }
@@ -261,7 +265,9 @@ export async function publishDraft(env: Env, memberID: string, groupID: string, 
   const now = new Date().toISOString();
   await env.DB.prepare(`UPDATE member_group_posts SET status='published',title=?,body=?,published_at=?,updated_at=?
     WHERE id=? AND group_id=?`).bind(title, body, now, now, postID, groupID).run();
-  await notifyGroup(env, groupID, `post:${postID}`, title, (body ?? "").slice(0, 140), `darulirfan://groups/${groupID}`);
+  try {
+    await notifyGroup(env, groupID, `post:${postID}`, title, (body ?? "").slice(0, 140), `darulirfan://groups/${groupID}`);
+  } catch { /* The draft has already been published successfully. */ }
   return json({ ok: true, id: postID, published: true });
 }
 
