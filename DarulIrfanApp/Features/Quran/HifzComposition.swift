@@ -55,6 +55,20 @@ enum HifzComposition {
                 composition.insertEmptyTimeRange(CMTimeRange(start: at, duration: length))
             }
         }
+        // insertEmptyTimeRange does not retain a gap after the final media
+        // sample. Represent that tail explicitly so the player's duration
+        // still matches the repeat timeline, including an encoder overhang.
+        if let final = timeline.segments.last {
+            let expectedEnd = CMTime(value: final.startMs + final.durationMs, timescale: 1000)
+            let actualEnd = CMTimeRangeGetEnd(track.timeRange)
+            if CMTimeCompare(actualEnd, expectedEnd) < 0 {
+                let tail = AVCompositionTrackSegment(timeRange: CMTimeRange(
+                    start: actualEnd, duration: CMTimeSubtract(expectedEnd, actualEnd)))
+                let segments = track.segments + [tail]
+                try track.validateSegments(segments)
+                track.segments = segments
+            }
+        }
         return composition
     }
 }
