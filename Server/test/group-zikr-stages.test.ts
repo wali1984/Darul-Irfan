@@ -166,4 +166,14 @@ describe("stage delivery retry and recipient isolation", () => {
     expect(raw.prepare("SELECT notification_state FROM group_zikr_cues ORDER BY sequence").all())
       .toEqual([{ notification_state: "expired" }, { notification_state: "expired" }, { notification_state: "complete" }]);
   });
+  it("does not send a pending chime after the Halqa ends its Zikr", async () => {
+    const { env, raw } = setup(); linkedDevices(raw);
+    const now = new Date(); pendingCue(raw, cue.id, now);
+    raw.prepare("UPDATE group_live SET state='offline'").run();
+    const sender = acceptPushes(raw);
+    await dispatchZikrCues(env, now);
+    expect(sender).not.toHaveBeenCalled();
+    expect(raw.prepare("SELECT notification_state FROM group_zikr_cues").get()).toEqual({ notification_state: "expired" });
+    expect((await (await zikrCues(env, "member", "our-sheikh", null)).json() as any).cues).toHaveLength(1);
+  });
 });
