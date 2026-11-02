@@ -3,6 +3,27 @@ import XCTest
 
 final class HalqaSessionLifecycleTests: XCTestCase {
     @MainActor
+    func testHostEndReleasesRoomAndLateEventCannotEndReplacement() {
+        let model = HalqaSessionLifecycle()
+        let first = FakeHalqaTransport()
+        model.start(sessionID: "one") { first }
+        first.initialized?(true)
+        first.joined?(true)
+        let lateEnd = first.onEnded
+        first.onEnded?()
+        XCTAssertEqual(model.phase, .leaving)
+        first.released?(true)
+        XCTAssertNil(first.onEnded)
+        let second = FakeHalqaTransport()
+        model.start(sessionID: "two") { second }
+        second.initialized?(true)
+        second.joined?(true)
+        lateEnd?()
+        XCTAssertEqual(model.phase, .joined)
+        XCTAssertEqual(model.sessionID, "two")
+    }
+
+    @MainActor
     func testReopenReusesConnectionAndOtherRoomWaitsForLeave() {
         let model = HalqaSessionLifecycle()
         let transport = FakeHalqaTransport()
@@ -50,6 +71,7 @@ final class HalqaSessionLifecycleTests: XCTestCase {
 
 @MainActor
 private final class FakeHalqaTransport: HalqaSessionTransport {
+    var onEnded: (() -> Void)?
     var initialized: ((Bool) -> Void)?
     var joined: ((Bool) -> Void)?
     var released: ((Bool) -> Void)?

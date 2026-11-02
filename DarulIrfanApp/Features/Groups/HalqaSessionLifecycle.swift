@@ -3,6 +3,7 @@ import Observation
 
 @MainActor
 protocol HalqaSessionTransport: AnyObject {
+    var onEnded: (() -> Void)? { get set }
     func initialize(completion: @escaping (Bool) -> Void)
     func join(completion: @escaping (Bool) -> Void)
     func release(completion: @escaping (Bool) -> Void)
@@ -30,6 +31,10 @@ final class HalqaSessionLifecycle {
         transport = connection
         self.sessionID = sessionID
         phase = .initializing
+        connection.onEnded = { [weak self] in
+            guard let self, self.generation == ticket else { return }
+            self.close(failed: false)
+        }
         connection.initialize { [weak self] success in
             guard let self, self.generation == ticket, self.phase == .initializing else { return }
             guard success else { self.close(failed: true); return }
@@ -52,6 +57,7 @@ final class HalqaSessionLifecycle {
         connection.release { [weak self] released in
             guard let self, self.generation == ticket else { return }
             if released {
+                connection.onEnded = nil
                 self.transport = nil
                 self.sessionID = nil
             }
