@@ -55,46 +55,52 @@ struct TasbihCounterView: View {
                 }
                 .padding(DISpacing.md)
             }
-            Button {
-                viewModel.increment()
-            } label: {
-                VStack(spacing: DISpacing.lg) {
-                    if showFullText {
-                        Text(verbatim: viewModel.counter.title)
-                            .font(DIFont.quranArabic(scale: 1))
-                            .foregroundStyle(DIColor.actionForeground)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal, DISpacing.md)
+            // Preserve the full-height tap target while allowing long preset
+            // text and the ring to scroll above the fixed resource/control bar.
+            GeometryReader { geometry in
+                ScrollView {
+                    Button {
+                        viewModel.increment()
+                    } label: {
+                        VStack(spacing: DISpacing.lg) {
+                            if showFullText {
+                                Text(verbatim: viewModel.counter.title)
+                                    .font(DIFont.quranArabic(scale: 1))
+                                    .foregroundStyle(DIColor.actionForeground)
+                                    .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .padding(.horizontal, DISpacing.md)
+                            }
+                            if viewModel.saveFailed {
+                                Text("\(viewModel.counter.count)")
+                                    .font(.system(size: 44, weight: .light, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(DIColor.textPrimary)
+                            } else {
+                                countingRing
+                            }
+                            if viewModel.hasReachedTarget && !viewModel.saveFailed {
+                                Label("Target reached — Alhamdulillah", systemImage: "sparkles")
+                                    .diInterfaceFont(.subheadline, weight: .semibold)
+                                    .foregroundStyle(DIColor.accent)
+                                    .diGoldGlow(radius: 8, opacity: 0.4)
+                                    .transition(reduceMotion ? .identity : .scale.combined(with: .opacity))
+                            }
+                            if !viewModel.saveFailed {
+                                Text("Tap anywhere to count")
+                                    .diInterfaceFont(.footnote)
+                                    .foregroundStyle(DIColor.textMuted)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, minHeight: geometry.size.height)
+                        .contentShape(Rectangle())
                     }
-                    if viewModel.saveFailed {
-                        Text("\(viewModel.counter.count)")
-                            .font(.system(size: 44, weight: .light, design: .rounded).monospacedDigit())
-                            .foregroundStyle(DIColor.textPrimary)
-                    } else {
-                        countingRing
-                    }
-                    if viewModel.hasReachedTarget && !viewModel.saveFailed {
-                        Label("Target reached — Alhamdulillah", systemImage: "sparkles")
-                            .diInterfaceFont(.subheadline, weight: .semibold)
-                            .foregroundStyle(DIColor.accent)
-                            .diGoldGlow(radius: 8, opacity: 0.4)
-                            .transition(reduceMotion ? .identity : .scale.combined(with: .opacity))
-                    }
-                    if !viewModel.saveFailed {
-                        Text("Tap anywhere to count")
-                            .diInterfaceFont(.footnote)
-                            .foregroundStyle(DIColor.textMuted)
-                    }
+                    .disabled(viewModel.loadFailed || viewModel.missing)
+                    .buttonStyle(TasbihTapButtonStyle())
+                    .accessibilityLabel("Add one count")
+                    .accessibilityValue(Text("\(viewModel.counter.count)"))
+                    .accessibilityIdentifier("tasbih-count")
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .contentShape(Rectangle())
             }
-            .disabled(viewModel.loadFailed || viewModel.missing)
-            .buttonStyle(TasbihTapButtonStyle())
-            .accessibilityLabel("Add one count")
-            .accessibilityValue(Text("\(viewModel.counter.count)"))
-            .accessibilityIdentifier("tasbih-count")
 
             MethodOfZikrLink(compact: true)
                 .padding(.vertical, DISpacing.sm)
