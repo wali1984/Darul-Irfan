@@ -763,7 +763,12 @@ struct GroupDuaRequestsView: View {
         List {
             Group {
                 if let actionError { Text(verbatim: actionError).foregroundStyle(DIColor.danger) }
-                if failed { Button("Try again") { Task { await load() } } }
+                if failed {
+                    Button { Task { await load() } } label: {
+                        Label("Try again", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(DICompactButtonStyle())
+                }
                 if let requests {
                     if requests.isEmpty {
                         Text("No dua requests.").foregroundStyle(DIColor.textMuted)
@@ -860,7 +865,12 @@ struct GroupSessionHistoryView: View {
                 if let error {
                     Text(verbatim: error).foregroundStyle(DIColor.danger)
                 }
-                if failed { Button("Try again") { Task { await load() } } }
+                if failed {
+                    Button { Task { await load() } } label: {
+                        Label("Try again", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(DICompactButtonStyle())
+                }
                 if let sessions {
                     if sessions.isEmpty {
                         Text("No sessions yet. Each one appears here when it ends.").foregroundStyle(DIColor.textMuted)
@@ -969,7 +979,12 @@ struct GroupSessionAttendeesView: View {
                     Text(verbatim: "\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) – \(session.endedAt.formatted(date: .omitted, time: .shortened))")
                         .foregroundStyle(DIColor.textMuted)
                 }
-                if failed { Button("Try again") { Task { await load() } } }
+                if failed {
+                    Button { Task { await load() } } label: {
+                        Label("Try again", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(DICompactButtonStyle())
+                }
                 if let attendees {
                     if attendees.isEmpty {
                         Text("No one joined in the app.").foregroundStyle(DIColor.textMuted)
