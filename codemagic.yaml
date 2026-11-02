@@ -198,6 +198,11 @@ workflows:
                           "-only-testing:DarulIrfanUITests/RedesignScreenshotTests/$DI_SCREENSHOT_CASE")
           fi
           touch build/audio-follow-started
+          AUDIO_SAMPLER_PID=""
+          if [ "${DI_SCREENSHOTS:-}" = "audio-transport" ]; then
+            python3 Tools/CI/sample_audio_probe.py > build/logs/audio-probe-sampler.log 2>&1 &
+            AUDIO_SAMPLER_PID=$!
+          fi
           TEST_RUNNER_DI_SCREENSHOTS=${DI_SCREENSHOTS:-1} python3 Tools/CI/run_with_deadline.py --seconds 3000 -- xcodebuild test \
             -project DarulIrfan.xcodeproj \
             -scheme DarulIrfan \
@@ -207,6 +212,10 @@ workflows:
             -resultBundlePath build/Screens.xcresult \
             2>&1 | tee build/logs/xcodebuild-screens.log | xcbeautify
           RESULT=$?
+          if [ -n "$AUDIO_SAMPLER_PID" ]; then
+            touch build/audio-probe-sampling-stop
+            wait "$AUDIO_SAMPLER_PID"
+          fi
           echo "$RESULT" > build/logs/screens-exit-code.txt
           exit "$RESULT"
       - name: Export the screenshots
