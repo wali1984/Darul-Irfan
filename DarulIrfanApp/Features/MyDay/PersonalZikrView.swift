@@ -11,6 +11,7 @@ struct PersonalZikrView: View {
     @State private var ended = false
     @State private var confirmingDiscard = false
     @State private var denied = false
+    @State private var requestingReminder = false
     @State private var isVisible = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -243,13 +244,17 @@ struct PersonalZikrView: View {
                 DICard {
                     VStack(spacing: 8) {
                         Toggle(index == 0 ? "First reminder" : "Second reminder", isOn: Binding(get: { store.reminders[index].enabled }, set: { enabled in
+                            guard !requestingReminder else { return }
+                            requestingReminder = true
                             Task {
+                                defer { requestingReminder = false }
                                 let allowed: Bool
                                 if enabled { allowed = await store.requestAlerts() } else { allowed = true }
                                 await refreshAlertAccess()
                                 var reminder = store.reminders[index]; reminder.enabled = enabled && allowed; store.setReminder(index, reminder)
                             }
                         }))
+                        .disabled(requestingReminder)
                         DatePicker("Time", selection: Binding(get: {
                             store.reminders[index].date(on: .now)
                         }, set: { date in
