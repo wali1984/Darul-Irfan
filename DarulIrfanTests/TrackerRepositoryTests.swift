@@ -21,6 +21,29 @@ final class TrackerRepositoryTests: XCTestCase {
     }
 
     @MainActor
+    func testTasbihShortcutCountsVisibleCounterAndStopsAfterLeaving() async throws {
+        let initial = TasbihCounter(id: UUID(), title: "Shortcut", target: 1, count: 0, lifetimeCount: 0, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let model = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        TasbihShortcutTarget.install(model)
+        defer { TasbihShortcutTarget.remove(model) }
+        try await TasbihShortcutTarget.increment()
+        XCTAssertEqual(model.counter.count, 1)
+        let counters = try await repository.tasbihCounters()
+        let habits = try await repository.zikrHabit(dayKeys: [DayKey.make(from: Date())])
+        XCTAssertEqual(counters.first?.count, 1)
+        XCTAssertEqual(habits.first?.completedCount, 1)
+        TasbihShortcutTarget.remove(model)
+        do {
+            try await TasbihShortcutTarget.increment()
+            XCTFail("A shortcut must not count after leaving the counter")
+        } catch { }
+        XCTAssertEqual(model.counter.count, 1)
+    }
+
+    @MainActor
     func testTasbihHabitFailureRollsBackCounterAndRetryCommitsOnce() async throws {
         let day = DayKey.make(from: Date())
         let initial = TasbihCounter(id: UUID(), title: "Target", target: 8, count: 7, lifetimeCount: 9, updatedAt: Date())

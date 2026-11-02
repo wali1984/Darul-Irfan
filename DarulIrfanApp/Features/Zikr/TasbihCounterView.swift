@@ -9,6 +9,7 @@ struct TasbihCounterView: View {
     @State private var viewModel: TasbihCounterViewModel
     @State private var showResetDialog = false
     @State private var isEditing = false
+    @State private var shortcutHelp = false
     @State private var countBump: CGFloat = 1.0
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -84,6 +85,12 @@ struct TasbihCounterView: View {
         .animation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: viewModel.hasReachedTarget)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                Button { shortcutHelp = true } label: {
+                    Label("Action button and Shortcuts", systemImage: "info.circle")
+                }
+                .buttonStyle(DICompactButtonStyle())
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("Edit") {
                     isEditing = true
                 }
@@ -94,6 +101,11 @@ struct TasbihCounterView: View {
             TasbihEditorView(counter: viewModel.counter) { updated in
                 try await viewModel.apply(updated)
             }
+        }
+        .alert("Action button and Shortcuts", isPresented: $shortcutHelp) {
+            Button("Done", role: .cancel) {}
+        } message: {
+            Text("In Shortcuts, create a shortcut using Darul Irfan's Add one Tasbih count action. On an iPhone with an Action button, choose that shortcut in Settings > Action Button > Shortcut. Keep this counter open, then press and hold the Action button to add one count. You can also run the shortcut without an Action button.")
         }
         .confirmationDialog(
             "Reset this counter?",
@@ -107,7 +119,13 @@ struct TasbihCounterView: View {
         } message: {
             Text("Your current count will be added to the lifetime total.")
         }
+        .onAppear { TasbihShortcutTarget.install(viewModel) }
+        .onChange(of: isEditing || showResetDialog || shortcutHelp) { _, covered in
+            if covered { TasbihShortcutTarget.remove(viewModel) }
+            else { TasbihShortcutTarget.install(viewModel) }
+        }
         .onDisappear {
+            TasbihShortcutTarget.remove(viewModel)
             viewModel.persistOnExit()
         }
         .onChange(of: scenePhase) { _, phase in
