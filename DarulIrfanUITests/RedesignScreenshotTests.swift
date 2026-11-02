@@ -1302,11 +1302,17 @@ final class RedesignScreenshotTests: XCTestCase {
                 XCTAssertFalse(first.exists, "Refresh must not restore the deleted record")
             }
             let last = app.staticTexts["Audit session 9"].firstMatch
+            let lastCell = app.cells.containing(.staticText, identifier: "Audit session 9").firstMatch
+            func completeLastRowVisible() -> Bool {
+                last.exists && last.isHittable && lastCell.exists
+                    && lastCell.frame.minY >= app.navigationBars.firstMatch.frame.maxY
+                    && lastCell.frame.maxY <= app.frame.maxY - 34
+            }
             for _ in 0..<12 {
-                if last.exists && last.isHittable { break }
+                if completeLastRowVisible() { break }
                 app.swipeUp(); pause(0.3)
             }
-            XCTAssertTrue(last.exists && last.isHittable, "Last history row must be reachable")
+            XCTAssertTrue(completeLastRowVisible(), "The entire last history row, including attendance, must be visible")
             shot("history-" + role + "-last-row")
             guard tap(button("Done")) else { XCTFail("History Done missing"); return }
             XCTAssertTrue(entry.waitForExistence(timeout: 15), "Done must return to the history entry")
