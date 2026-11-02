@@ -173,7 +173,7 @@ struct SilsilaPageHeader: View {
     var body: some View {
         VStack(spacing: 12) {
             DILivingSealMark(diameter: 64).accessibilityHidden(true)
-            Text(title).font(.title2.bold()).foregroundStyle(Color(hex: 0xFFE3A0))
+            Text(title).diInterfaceFont(.title2, weight: .bold).foregroundStyle(Color(hex: 0xFFE3A0))
             Text("Silsila Naqshbandia Owaisiah").diInterfaceFont(.subheadline).foregroundStyle(.white.opacity(0.85))
         }
         .multilineTextAlignment(.center)
@@ -202,6 +202,7 @@ struct SilsilaCategoryDestination: View {
             if loadFailed {
                 VStack(spacing: DISpacing.md) {
                     Text("The archive could not be loaded right now. Please try again in a moment.")
+                        .diInterfaceFont(.body)
                         .foregroundStyle(DIColor.textPrimary)
                     Button("Retry") {
                         loadFailed = false
@@ -290,16 +291,24 @@ private struct SilsilaItemList: View {
 /// One page of a category: its title, and its Urdu title when it has one.
 private struct SilsilaItemRow: View {
     let item: ContentItem
+    @Environment(\.locale) private var locale
 
     var body: some View {
+        let urduTitle = item.titleUrdu.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
+        let prefersUrdu = locale.language.languageCode?.identifier == "ur" && urduTitle != nil
         HStack(spacing: 12) {
             HalqahRowTile(systemImage: "doc.text.fill")
             VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: item.title)
+                Text(verbatim: prefersUrdu ? (urduTitle ?? item.title) : item.title)
                     .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
-                if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                    Text(verbatim: titleUrdu)
+                if prefersUrdu {
+                    Text(verbatim: item.title)
+                        .font(.footnote)
+                        .foregroundStyle(DIColor.textMuted)
+                        .environment(\.layoutDirection, .leftToRight)
+                } else if let urduTitle {
+                    Text(verbatim: urduTitle)
                         .font(DIFont.urduBody(scale: 0.85))
                         .foregroundStyle(DIColor.textMuted)
                 }
