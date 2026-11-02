@@ -57,7 +57,7 @@ struct SearchResultLink<RowContent: View>: View {
                 Button { Task { await play() } } label: { label() }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(DIPressableStyle())
         .sheet(item: $video) { video in YouTubePlayerSheet(videoID: video.id, title: video.title) }
         .alert("Could not complete action", isPresented: Binding(
             get: { playbackFailure != nil }, set: { if !$0 { playbackFailure = nil } }

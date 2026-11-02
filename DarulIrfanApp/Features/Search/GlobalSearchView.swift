@@ -376,7 +376,7 @@ struct GlobalSearchView: View {
                 } label: {
                     SearchAppDestinationRow(destination: destination)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(DIPressableStyle())
                 .diAppear(delay: min(Double(index) * 0.04, 0.3))
             }
         }
