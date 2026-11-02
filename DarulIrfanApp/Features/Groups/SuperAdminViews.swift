@@ -90,6 +90,20 @@ struct MemberDirectoryView: View {
 
     var body: some View {
         List {
+            if failed {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text("The member directory could not be loaded. Please try again.")
+                        .foregroundStyle(DIColor.textMuted)
+                    Button("Try again") { Task { await load() } }
+                        .buttonStyle(DICompactButtonStyle())
+                        .disabled(loading)
+                }
+                .padding(DISpacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .diGlassPanel()
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
             if people != nil {
                 if shown.isEmpty {
                     Text("No one matches.").foregroundStyle(DIColor.textMuted)
@@ -115,19 +129,7 @@ struct MemberDirectoryView: View {
                     }
                 }
                 .listRowBackground(DIColor.surface)
-            } else if failed {
-                VStack(alignment: .leading, spacing: DISpacing.sm) {
-                    Text("The member directory could not be loaded. Please try again.")
-                        .foregroundStyle(DIColor.textMuted)
-                    Button("Try again") { Task { await load() } }
-                        .buttonStyle(DICompactButtonStyle())
-                }
-                .padding(DISpacing.md)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .diGlassPanel()
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(Color.clear)
-            } else {
+            } else if !failed {
                 ProgressView()
                     .listRowBackground(DIColor.surface)
             }
