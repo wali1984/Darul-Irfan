@@ -5,11 +5,19 @@ import RealtimeKit
 @MainActor
 struct NativeMeetingGalleryView: View {
     let participants: NativeMeetingParticipants
+    let localParticipant: RtkMeetingParticipant
 
     var body: some View {
         let revision = participants.revision
         ScrollView {
             LazyVStack(spacing: DISpacing.md) {
+                if participants.localMedia.cameraEnabled {
+                    VStack(alignment: .leading, spacing: DISpacing.sm) {
+                        Text("Your camera").font(.headline)
+                        NativeMeetingVideo(participant: localParticipant, revision: revision)
+                            .aspectRatio(16 / 9, contentMode: .fit)
+                    }.padding().background(DIColor.surface, in: RoundedRectangle(cornerRadius: 20))
+                }
                 ForEach(participants.screenShares, id: \.id) { person in
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
                         Text(verbatim: person.name).font(.headline)

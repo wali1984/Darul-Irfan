@@ -12,6 +12,13 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     let cameraRequest = HalqaCaptureRequest()
     private var joined = false
 
+    /// Submission only; the SDK's device event confirms the selected route.
+    func selectAudioDevice(id: String) -> Bool {
+        guard joined, let device = client.localUser.getAudioDevices().first(where: { $0.id == id }) else { return false }
+        client.localUser.setAudioDevice(rtkAudioDevice: device)
+        return true
+    }
+
     /// True means the SDK accepted submission, not that a remote participant
     /// has already changed state. Participant events remain authoritative.
     func submit(_ action: NativeParticipantAction, participantID: String) -> Bool {
@@ -138,8 +145,8 @@ final class NativeMeetingMembershipEvents: NSObject, RtkSelfEventListener {
     func onWaitListStatusUpdate(waitListStatus: RealtimeKit.WaitListStatus) {
         if waitListStatus == .rejected { Task { @MainActor in ended?() } }
     }
-    func onAudioDeviceChanged(audioDevice: AudioDevice) {}
-    func onAudioDevicesUpdated(devices: [AudioDevice]) {}
+    func onAudioDeviceChanged(audioDevice: AudioDevice) { refresh() }
+    func onAudioDevicesUpdated(devices: [AudioDevice]) { refresh() }
     func onAudioUpdate(isEnabled: Bool) { refresh() }
     func onMeetingRoomJoinedWithoutCameraPermission() {}
     func onMeetingRoomJoinedWithoutMicPermission() {}

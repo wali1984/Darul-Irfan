@@ -33,8 +33,9 @@ struct NativeMeetingRoomView: View {
                     }
                     NativeMeetingCaptureControls(transport: transport, joined: owner.lifecycle.phase == .joined)
                         .padding(.horizontal)
+                    NativeMeetingAudioOutputView(transport: transport, joined: owner.lifecycle.phase == .joined)
                     TabView {
-                        NativeMeetingGalleryView(participants: transport.participants)
+                        NativeMeetingGalleryView(participants: transport.participants, localParticipant: transport.client.localUser)
                             .tabItem { Label("Video", systemImage: "video") }
                         NativeMeetingConversationView(chat: transport.chat, participants: transport.participants,
                                                       openAttachment: openAttachment)

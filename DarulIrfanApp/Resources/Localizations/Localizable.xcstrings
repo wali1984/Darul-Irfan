@@ -1,6 +1,13 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Your camera": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "آپ کا کیمرہ"}}}},
+"Audio output": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "آواز کا آلہ"}}}},
+"Speaker": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "اسپیکر"}}}},
+"Earpiece": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "فون کا ایئر پیس"}}}},
+"Headset": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "ہیڈ سیٹ"}}}},
+"Bluetooth": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "بلوٹوتھ"}}}},
+
 "Minimize": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "چھوٹا کریں"}}}},
 "Connecting to the session…": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست سے رابطہ ہو رہا ہے…"}}}},
 "Reconnecting to the session…": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست سے دوبارہ رابطہ ہو رہا ہے…"}}}},

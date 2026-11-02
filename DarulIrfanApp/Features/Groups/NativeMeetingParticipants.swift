@@ -26,6 +26,8 @@ final class NativeMeetingParticipants {
     private(set) var screenShares: [RtkRemoteParticipant] = []
     private(set) var speakerID: String?
     private(set) var localMedia = NativeLocalMediaState()
+    private(set) var audioDevices: [AudioDevice] = []
+    private(set) var selectedAudioDeviceID: String?
     // SDK participant objects can change in place. Renderers observe revision
     // as well as membership so mute/video/pin changes always invalidate rows.
     private(set) var revision = 0
@@ -47,6 +49,8 @@ final class NativeMeetingParticipants {
         screenShares = client.participants.screenShares
         speakerID = client.participants.lastActiveSpeaker?.id
         let local = client.localUser
+        audioDevices = local.getAudioDevices()
+        selectedAudioDeviceID = local.getSelectedAudioDevice()?.id
         localMedia = NativeLocalMediaState(microphoneEnabled: local.audioEnabled,
                                           cameraEnabled: local.videoEnabled,
                                           microphoneAllowed: local.permissions.media.canPublishAudio,
@@ -67,6 +71,7 @@ final class NativeMeetingParticipants {
         joined = []; waiting = []; visible = []; screenShares = []
         speakerID = nil
         localMedia = NativeLocalMediaState()
+        audioDevices = []; selectedAudioDeviceID = nil
         revision &+= 1
     }
 }
