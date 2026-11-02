@@ -905,6 +905,18 @@ final class RedesignScreenshotTests: XCTestCase {
         let add = language == "ur" ? "مراقبہ شامل کریں" : "Add Muraqaba"
         let name = language == "ur" ? "مراقبے کا نام" : "Muraqaba name"
         let save = language == "ur" ? "محفوظ کریں" : "Save"
+        // Stage rows and the custom form extend below the viewport, especially
+        // with Nastaliq and while the keyboard is open. Exercise real scrolling.
+        func reveal(_ element: XCUIElement) -> Bool {
+            for _ in 0..<10 {
+                if element.exists && element.isHittable { return true }
+                let scroll = app.scrollViews.firstMatch
+                guard scroll.exists else { return false }
+                scroll.swipeUp()
+                pause(0.3)
+            }
+            return element.exists && element.isHittable
+        }
         let admin = app.buttons["halqah-audit-admin"]
         guard admin.waitForExistence(timeout: 180), tap(admin), tap(app.buttons[lead]), tap(app.buttons[first]) else { XCTFail("Stage controls unavailable"); return }
         XCTAssertTrue(app.buttons[retry].waitForExistence(timeout: 15))
@@ -912,11 +924,11 @@ final class RedesignScreenshotTests: XCTestCase {
         guard tap(app.buttons[retry]) else { XCTFail("Pending action retry unavailable"); return }
         XCTAssertTrue(app.buttons[retry].waitForNonExistence(timeout: 15))
         shot("sheikh-stage-confirmed")
-        guard tap(app.buttons[add]), tap(app.textFields[name]) else { XCTFail("Custom stage entry missing"); return }
+        guard reveal(app.buttons[add]), tap(app.buttons[add]), reveal(app.textFields[name]), tap(app.textFields[name]) else { XCTFail("Custom stage entry missing"); return }
         app.textFields[name].typeText("AuditMuraqaba")
-        guard tap(app.buttons[save]) else { XCTFail("Custom stage save missing"); return }
+        guard reveal(app.buttons[save]), tap(app.buttons[save]) else { XCTFail("Custom stage save missing"); return }
         XCTAssertTrue(app.buttons["AuditMuraqaba"].waitForExistence(timeout: 15))
-        guard tap(app.buttons["AuditMuraqaba"]) else { return }
+        guard reveal(app.buttons["AuditMuraqaba"]), tap(app.buttons["AuditMuraqaba"]) else { XCTFail("Saved custom stage is unreachable"); return }
         shot("sheikh-custom-stage")
         goBack()
         guard tap(app.buttons["halqah-audit-member"]) else { XCTFail("Member entry missing"); return }
