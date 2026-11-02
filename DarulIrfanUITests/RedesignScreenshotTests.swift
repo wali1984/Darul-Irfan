@@ -580,6 +580,19 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertTrue(counter.waitForExistence(timeout: 20))
         XCTAssertEqual(counter.value as? String, String(initial + 3), "Footer must reuse the same progress")
         shot("tasbih-preset-reopened")
+        selectTab(2)
+        guard seek("zikr-tasbih") else { XCTFail("Recent counter tile missing"); return }
+        XCTAssertTrue(counter.waitForExistence(timeout: 20))
+        counter.tap()
+        XCTAssertEqual(counter.value as? String, String(initial + 4))
+        selectTab(0)
+        XCTAssertTrue(counter.waitForExistence(timeout: 20))
+        let refreshed = NSPredicate(format: "value == %@", String(initial + 4))
+        expectation(for: refreshed, evaluatedWith: counter)
+        waitForExpectations(timeout: 10)
+        counter.tap()
+        XCTAssertEqual(counter.value as? String, String(initial + 5), "Returning tab must preserve the other tab's increment")
+        shot("tasbih-preset-cross-tab")
         goBack()
     }
 
