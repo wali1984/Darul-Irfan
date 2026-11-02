@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -246,6 +246,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         if ["companion", "companion-fixes", "timezone"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? "") {
             companionTour()
+            return
+        }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "appearance-controls" {
+            appearanceControlsTour()
             return
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "settings" {
@@ -526,6 +530,32 @@ final class RedesignScreenshotTests: XCTestCase {
         // Urdu date formatting may prefix the Western clock with an LRM.
         let hour = Int(hourText.filter { $0.isASCII && $0.isNumber }) ?? -1
         XCTAssertTrue((3...6).contains(hour), "Selected-city Fajr must be morning, got \(value.label)")
+    }
+
+    private func appearanceControlsTour() {
+        selectTab(4)
+        guard seek("settings-appearance") else { XCTFail("Appearance route missing"); return }
+        let choices = language == "ur" ? ["روشن", "تاریک", "سسٹم", "خودکار"] : ["Light", "Dark", "System", "Auto"]
+        for (index, label) in choices.enumerated() {
+            let option = app.buttons[label].firstMatch
+            guard tap(option) else { XCTFail("Theme choice missing: \(label)"); return }
+            let selected = NSPredicate(format: "selected == true")
+            expectation(for: selected, evaluatedWith: option)
+            waitForExpectations(timeout: 10)
+            XCTAssertTrue(option.isHittable)
+            shot("appearance-choice-\(index)")
+        }
+        // The final Auto choice must persist without the test's initial forced theme.
+        app.terminate()
+        app.launchArguments.removeAll { $0 == "--uitesting-theme-dark" || $0 == "--uitesting-theme-light" }
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons.firstMatch.waitForExistence(timeout: 180))
+        closePopup()
+        selectTab(4)
+        guard seek("settings-appearance") else { XCTFail("Appearance route missing after relaunch"); return }
+        let automatic = app.buttons[choices[3]].firstMatch
+        XCTAssertTrue(automatic.isSelected, "Auto choice must survive relaunch")
+        shot("appearance-auto-relaunch")
     }
 
     private func settingsTour() {
