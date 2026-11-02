@@ -13,6 +13,7 @@ struct NativeMeetingConversationView: View {
     @State private var editDraft = ""
     @State private var deleting: ChatMessage?
     @State private var attachmentBusy = false
+    @State private var positionedConversation: String?
 
     private var draftKey: String { peerID.map { "peer:\($0)" } ?? "public" }
 
@@ -34,29 +35,51 @@ struct NativeMeetingConversationView: View {
                 }
             }.buttonStyle(DISecondaryButtonStyle()).disabled(attachmentBusy)
             if unavailable { Text("This participant has left. Choose a recipient to continue.").foregroundStyle(DIColor.textMuted) }
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: DISpacing.md) {
-                    ForEach(rows, id: \.id) { message in
-                        VStack(alignment: .leading, spacing: DISpacing.xs) {
-                            Text(verbatim: message.displayName).bold()
-                            if let text = message as? TextMessage { Text(verbatim: text.message).textSelection(.enabled) }
-                            if let image = message as? ImageMessage { attachment(image.link, label: "Open image") }
-                            if let file = message as? FileMessage {
-                                Text(verbatim: file.name)
-                                attachment(file.link, label: "Open attachment")
-                            }
-                            if chat.canModify(message.id) {
-                                Menu("Controls") {
-                                    if let text = message as? TextMessage {
-                                        Button("Edit message") { failed = false; editDraft = text.message; editing = text }
+            ScrollViewReader { proxy in
+                VStack(spacing: DISpacing.xs) {
+                    ScrollView {
+                        LazyVStack(alignment: .leading, spacing: DISpacing.md) {
+                            ForEach(rows, id: \.id) { message in
+                                VStack(alignment: .leading, spacing: DISpacing.xs) {
+                                    Text(verbatim: message.displayName).bold()
+                                    if let text = message as? TextMessage { Text(verbatim: text.message).textSelection(.enabled) }
+                                    if let image = message as? ImageMessage { attachment(image.link, label: "Open image") }
+                                    if let file = message as? FileMessage {
+                                        Text(verbatim: file.name)
+                                        attachment(file.link, label: "Open attachment")
                                     }
-                                    Button("Delete message", role: .destructive) { deleting = message }
-                                }.buttonStyle(DICompactButtonStyle()).disabled(chat.operationPending)
+                                    if chat.canModify(message.id) {
+                                        Menu("Controls") {
+                                            if let text = message as? TextMessage {
+                                                Button("Edit message") { failed = false; editDraft = text.message; editing = text }
+                                            }
+                                            Button("Delete message", role: .destructive) { deleting = message }
+                                        }.buttonStyle(DICompactButtonStyle()).disabled(chat.operationPending)
+                                    }
+                                }.padding().frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(DIColor.surface, in: RoundedRectangle(cornerRadius: 16))
+                                    .id(message.id)
                             }
-                        }.padding().frame(maxWidth: .infinity, alignment: .leading)
-                            .background(DIColor.surface, in: RoundedRectangle(cornerRadius: 16))
+                        }
+                    }
+                    if let latest = rows.last?.id {
+                        Button { proxy.scrollTo(latest, anchor: .bottom) } label: {
+                            Label("Latest messages", systemImage: "arrow.down")
+                        }.buttonStyle(DICompactButtonStyle())
                     }
                 }
+            .onChange(of: rows.last?.id, initial: true) { _, latest in
+                guard positionedConversation != draftKey, let latest else { return }
+                positionedConversation = draftKey
+                proxy.scrollTo(latest, anchor: .bottom)
+            }
+            .onChange(of: draftKey) { _, key in
+                positionedConversation = nil
+                if let latest = rows.last?.id {
+                    positionedConversation = key
+                    proxy.scrollTo(latest, anchor: .bottom)
+                }
+            }
             }
             NativeChatAttachmentPicker(chat: chat, recipients: peerID.map { [$0] } ?? [], recipientName: person?.name,
                                        enabled: chat.canSend && !unavailable, lockRecipient: { attachmentBusy = $0 })
