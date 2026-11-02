@@ -245,9 +245,9 @@ struct DirectoryPersonView: View {
             if !initialized { places = person.halqahs; initialized = true }
         }
         .refreshable { await refresh() }
-        .confirmationDialog("Remove from the group?", isPresented: Binding(
+        .alert("Remove from the group?", isPresented: Binding(
             get: { removing != nil }, set: { if !$0 { removing = nil } }
-        ), titleVisibility: .visible, presenting: removing) { place in
+        ), presenting: removing) { place in
             Button("Remove \(person.displayName)", role: .destructive) {
                 removing = nil
                 Task { await remove(from: place) }

@@ -85,7 +85,7 @@ struct GroupPeopleView: View {
                 AddGroupPersonView(groupID: groupID, groupName: groupName, service: service, canAppointAdministrators: appointer)
             }
         }
-        .confirmationDialog(
+        .alert(
             "Remove from the group?",
             isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
             presenting: removing
@@ -93,6 +93,7 @@ struct GroupPeopleView: View {
             Button("Remove \(person.displayName)", role: .destructive) {
                 Task { await act { try await service.remove(person.id, from: groupID) } }
             }
+            Button("Cancel", role: .cancel) { removing = nil }
         } message: { _ in
             Text("They keep their account and any other groups, and can be added again later.")
         }

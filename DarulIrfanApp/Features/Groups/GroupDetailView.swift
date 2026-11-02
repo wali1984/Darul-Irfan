@@ -130,9 +130,9 @@ struct GroupDetailView: View {
             await followSession()
         }
         .refreshable { await load() }
-        .confirmationDialog("Remove this announcement?", isPresented: Binding(
+        .alert("Remove this announcement?", isPresented: Binding(
             get: { postToRemove != nil }, set: { if !$0 { postToRemove = nil } }
-        ), titleVisibility: .visible) {
+        )) {
             if let post = postToRemove {
                 Button("Remove", role: .destructive) {
                     guard !removingPost, detail?.canManage == true else { return }

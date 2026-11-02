@@ -1118,16 +1118,16 @@ final class RedesignScreenshotTests: XCTestCase {
         let cancel = language == "ur" ? "منسوخ کریں" : "Cancel"
         func showConfirmation() -> Bool {
             guard tap(role), tap(app.buttons[removeMenu]) else { return false }
-            return app.sheets.firstMatch.waitForExistence(timeout: 10)
+            return app.alerts.firstMatch.waitForExistence(timeout: 10)
         }
         XCTAssertEqual(count.label, "0")
         guard showConfirmation() else { XCTFail("Removal confirmation missing"); return }
         shot("directory-removal-confirmation")
-        guard tap(app.sheets.buttons[cancel]) else { XCTFail("Confirmation Cancel missing"); return }
+        guard tap(app.alerts.buttons[cancel]) else { XCTFail("Confirmation Cancel missing"); return }
         XCTAssertEqual(count.label, "0", "Cancel must not remove membership")
         XCTAssertTrue(fresh.exists)
         guard showConfirmation() else { XCTFail("Removal must remain available after Cancel"); return }
-        let confirm = app.sheets.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Audit member")).firstMatch
+        let confirm = app.alerts.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Audit member")).firstMatch
         guard tap(confirm) else { XCTFail("Named removal action missing"); return }
         XCTAssertTrue(error.waitForExistence(timeout: 20), "Failed removal must show an error")
         XCTAssertEqual(count.label, "1")
@@ -1292,7 +1292,7 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertTrue(post.exists)
         guard tap(remove) else { XCTFail("Removal must remain available after Cancel"); return }
         shot("halqah-removal-confirmation")
-        let confirm = onScreen(app.sheets.buttons.matching(NSPredicate(format: "label == %@", removeLabel)))
+        let confirm = onScreen(app.alerts.buttons.matching(NSPredicate(format: "label == %@", removeLabel)))
         guard tap(confirm) else { XCTFail("Explicit removal confirmation missing"); return }
         let okay = app.alerts.buttons[okayLabel]
         guard okay.waitForExistence(timeout: 15) else { XCTFail("Injected removal failure must be visible"); return }
