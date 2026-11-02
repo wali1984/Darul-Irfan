@@ -262,6 +262,40 @@ final class HalqahRedesignTests: XCTestCase {
         XCTAssertNil(cancelledDate)
     }
 
+    @MainActor
+    func testEventReminderRecalculatesAfterPermissionCrossesDayBeforeCutoff() async {
+        let id = "permission-cutoff-\(UUID().uuidString)"
+        let key = "eventReminder.\(id)"
+        defer { UserDefaults.standard.removeObject(forKey: key) }
+        var clock = Date(timeIntervalSince1970: 1_800_000_000)
+        let start = clock.addingTimeInterval(86_401)
+        let notifications = RecordingNotifications()
+        notifications.onPermission = { clock = clock.addingTimeInterval(2) }
+        let model = EventDetailViewModel(event: event(id: id, start: start), notifications: notifications, now: { clock })
+        await model.toggleReminder()
+        XCTAssertEqual(notifications.scheduled[key], [start.addingTimeInterval(-3_600)])
+        XCTAssertTrue(model.isReminderScheduled)
+        XCTAssertFalse(model.reminderFailed)
+    }
+
+    @MainActor
+    func testEventReminderDoesNotScheduleExpiredTimeAfterPermission() async {
+        let id = "permission-expired-\(UUID().uuidString)"
+        let key = "eventReminder.\(id)"
+        defer { UserDefaults.standard.removeObject(forKey: key) }
+        var clock = Date(timeIntervalSince1970: 1_800_000_000)
+        let start = clock.addingTimeInterval(3_601)
+        let notifications = RecordingNotifications()
+        notifications.onPermission = { clock = clock.addingTimeInterval(2) }
+        let model = EventDetailViewModel(event: event(id: id, start: start), notifications: notifications, now: { clock })
+        await model.toggleReminder()
+        XCTAssertNil(notifications.scheduled[key])
+        XCTAssertFalse(model.isReminderScheduled)
+        XCTAssertFalse(UserDefaults.standard.bool(forKey: key))
+        XCTAssertTrue(model.reminderFailed)
+        XCTAssertFalse(model.reminderWorking)
+    }
+
     private func event(id: String, start: Date?) -> CommunityEvent {
         CommunityEvent(
             id: id,
@@ -333,6 +367,7 @@ final class HalqahRedesignTests: XCTestCase {
 /// Records what is scheduled and cancelled, and answers the permission
 /// request as told.
 private final class RecordingNotifications: NotificationScheduling, @unchecked Sendable {
+    var onPermission: (@MainActor () -> Void)?
     var granted = true
     var acceptsReminder = true
     private(set) var scheduled: [String: [Date]] = [:]
@@ -340,7 +375,10 @@ private final class RecordingNotifications: NotificationScheduling, @unchecked S
 
     func pendingReminderDate(id: String) async -> Date? { scheduled[id]?.min() }
 
-    func requestPermission() async -> Bool { granted }
+    func requestPermission() async -> Bool {
+        await onPermission?()
+        return granted
+    }
 
     func reschedulePrayerNotifications(
         schedules: [PrayerDaySchedule],

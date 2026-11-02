@@ -117,10 +117,17 @@ final class EventDetailViewModel {
             isReminderScheduled = false
             UserDefaults.standard.set(false, forKey: key)
         } else {
-            guard let fireDate = reminderFireDate else { return }
+            guard reminderFireDate != nil else { return }
             let granted = await notifications.requestPermission()
             guard granted else {
                 showNotificationsDeniedAlert = true
+                return
+            }
+            // The permission prompt can remain open across a reminder cutoff.
+            // Match Android's callback: calculate from the current clock only
+            // after permission returns, never submit a stale trigger.
+            guard let fireDate = reminderFireDate else {
+                reminderFailed = true
                 return
             }
             let body: String
