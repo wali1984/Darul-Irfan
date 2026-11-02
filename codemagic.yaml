@@ -197,6 +197,7 @@ workflows:
             TEST_FILTERS=(-only-testing:DarulIrfanUITests/RedesignScreenshotTests/test0Warmup
                           "-only-testing:DarulIrfanUITests/RedesignScreenshotTests/$DI_SCREENSHOT_CASE")
           fi
+          touch build/audio-follow-started
           TEST_RUNNER_DI_SCREENSHOTS=${DI_SCREENSHOTS:-1} python3 Tools/CI/run_with_deadline.py --seconds 3000 -- xcodebuild test \
             -project DarulIrfan.xcodeproj \
             -scheme DarulIrfan \

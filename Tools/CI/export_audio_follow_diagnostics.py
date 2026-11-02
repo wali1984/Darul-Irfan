@@ -1,20 +1,44 @@
-"""Export only opt-in playback telemetry, including after a failed UI tour."""
+"""Export opt-in telemetry even after XCTest shuts down its simulator clone."""
 import json
 from pathlib import Path
+import plistlib
 import shutil
-import subprocess
 
-result = subprocess.run(["xcrun", "simctl", "list", "devices", "booted", "-j"], capture_output=True, text=True)
-if result.returncode == 0:
-    devices = json.loads(result.stdout).get("devices", {})
-    for group in devices.values():
-        for device in group:
-            container = subprocess.run(["xcrun", "simctl", "get_app_container", device["udid"], "us.naqshbaniaowaisiah", "data"], capture_output=True, text=True)
-            if container.returncode != 0:
-                continue
-            source = Path(container.stdout.strip()) / "Documents/audio-follow-audit.jsonl"
-            if source.is_file():
-                target = Path("build/screens") / ("audio-follow-" + device["udid"] + ".jsonl")
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(source, target)
-                print("Exported playback telemetry:", target.name)
+BUNDLE_ID = "us.naqshbaniaowaisiah"
+
+
+def export(devices: Path, destination: Path, since: float = 0) -> list[str]:
+    destination.mkdir(parents=True, exist_ok=True)
+    copied = []
+    pattern = "*/data/Containers/Data/Application/*/Documents/audio-follow-audit.jsonl"
+    for source in devices.glob(pattern):
+        if source.stat().st_mtime < since or source.stat().st_size == 0:
+            continue
+        container = source.parent.parent
+        metadata = container / ".com.apple.mobile_container_manager.metadata.plist"
+        try:
+            with metadata.open("rb") as stream:
+                identifier = plistlib.load(stream).get("MCMMetadataIdentifier")
+        except (OSError, ValueError, plistlib.InvalidFileException):
+            continue
+        if identifier != BUNDLE_ID:
+            continue
+        device_id = source.relative_to(devices).parts[0]
+        name = f"audio-follow-{device_id}-{container.name}.jsonl"
+        shutil.copyfile(source, destination / name)
+        copied.append(name)
+    return sorted(copied)
+
+
+def main():
+    marker = Path("build/audio-follow-started")
+    since = marker.stat().st_mtime - 2 if marker.exists() else 0
+    destination = Path("build/screens")
+    copied = export(Path.home() / "Library/Developer/CoreSimulator/Devices", destination, since)
+    result = {"files": copied, "captured": bool(copied), "currentRunMarker": marker.exists()}
+    (destination / "audio-follow-export.json").write_text(json.dumps(result, indent=2))
+    print("Playback telemetry export:", json.dumps(result))
+
+
+if __name__ == "__main__":
+    main()
