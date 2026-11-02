@@ -330,7 +330,7 @@ struct GroupLiveStarter: View {
                         Task { await start() }
                     } label: {
                         HStack(spacing: DISpacing.sm) {
-                            if working { ProgressView() }
+                            if working { ProgressView().tint(.white) }
                             if addingToSession {
                                 Label("Add to the session", systemImage: "text.badge.plus")
                             } else {
@@ -338,6 +338,7 @@ struct GroupLiveStarter: View {
                             }
                         }
                     }
+                    .buttonStyle(DIPrimaryButtonStyle())
                     .disabled(working || uploading || !canStart)
                 }
             }
