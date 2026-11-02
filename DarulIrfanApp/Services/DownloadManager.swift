@@ -64,6 +64,8 @@ final class DownloadManager: DownloadManaging {
     /// the existing transfer instead of starting a second one.
     @ObservationIgnored
     private var inFlightTasks: [String: Task<DownloadedAsset, Error>] = [:]
+    @ObservationIgnored
+    private var transferIDs: [String: UUID] = [:]
 
     private let removeFile: (URL) throws -> Void
 
@@ -94,9 +96,10 @@ final class DownloadManager: DownloadManaging {
         }
 
         let repository = downloadsRepository
+        let transferID = UUID()
         let transfer = Task { () throws -> DownloadedAsset in
             let (temporaryURL, response) = try await DownloadManager.fetch(url) { [weak self] fraction in
-                Task { @MainActor in self?.reportProgress(fraction, for: key) }
+                Task { @MainActor in self?.reportProgress(fraction, for: key, transferID: transferID) }
             }
 
             if let httpResponse = response as? HTTPURLResponse,
@@ -139,30 +142,31 @@ final class DownloadManager: DownloadManaging {
         }
 
         inFlightTasks[key] = transfer
+        transferIDs[key] = transferID
         activeDownloads[key] = 0
 
-        do {
-            let asset = try await transfer.value
-            inFlightTasks[key] = nil
-            activeDownloads[key] = nil
-            return asset
-        } catch {
-            inFlightTasks[key] = nil
-            activeDownloads[key] = nil
-            throw error
+        defer {
+            // A canceled transfer may finish after its replacement has started.
+            if transferIDs[key] == transferID {
+                inFlightTasks[key] = nil
+                transferIDs[key] = nil
+                activeDownloads[key] = nil
+            }
         }
+        return try await transfer.value
     }
 
     /// Progress from the transfer, dropped once it has finished or been
     /// cancelled.
-    private func reportProgress(_ fraction: Double, for key: String) {
-        guard inFlightTasks[key] != nil else { return }
+    private func reportProgress(_ fraction: Double, for key: String, transferID: UUID) {
+        guard transferIDs[key] == transferID else { return }
         activeDownloads[key] = min(max(fraction, 0), 1)
     }
 
     func cancelDownload(url: URL) {
         let key = url.absoluteString
         inFlightTasks[key]?.cancel()
+        transferIDs[key] = nil
         inFlightTasks[key] = nil
         activeDownloads[key] = nil
     }
