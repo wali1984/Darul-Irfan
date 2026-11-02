@@ -11,6 +11,7 @@ struct PersonalZikrView: View {
     @State private var ended = false
     @State private var confirmingDiscard = false
     @State private var denied = false
+    @State private var isVisible = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
 
@@ -20,7 +21,12 @@ struct PersonalZikrView: View {
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     timer(at: context.date)
                         .onChange(of: store.run?.endsAt.map { $0 <= context.date } ?? false) { _, done in
-                            if done { if scenePhase == .active { store.playChime() }; store.settle(at: context.date); ended = store.run == nil; if ended { DIHaptics.success() } }
+                            if done && isVisible && scenePhase == .active {
+                                store.playChime()
+                                store.settle(at: context.date)
+                                ended = store.run == nil
+                                if ended { DIHaptics.success() }
+                            }
                         }
                 }
                 Button { withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { shajra.toggle() } } label: {
@@ -57,15 +63,17 @@ struct PersonalZikrView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Your Daily Personal Zikr")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { store.screenActive = scenePhase == .active; store.settle(); store.refreshAlerts() }
+        .onAppear { isVisible = true; store.screenActive = scenePhase == .active; store.settle(); store.refreshAlerts() }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             await refreshAlertAccess()
         }
-        .onDisappear { store.screenActive = false }
+        .onDisappear { isVisible = false; store.screenActive = false }
         .onChange(of: scenePhase) { _, phase in
-            store.screenActive = phase == .active
-            if phase == .active { store.settle(); store.refreshAlerts() }
+            // Navigation keeps this view alive behind Method of Zikr. A scene
+            // resume alone must not silence alerts for that hidden timer.
+            store.screenActive = isVisible && phase == .active
+            if isVisible && phase == .active { store.settle(); store.refreshAlerts() }
         }
         .confirmationDialog("Discard this session?", isPresented: $confirmingDiscard, titleVisibility: .visible) {
             Button("Discard session", role: .destructive) { store.discard(); ended = false }
@@ -133,7 +141,7 @@ struct PersonalZikrView: View {
         .frame(maxWidth: .infinity)
         .background(LinearGradient(colors: [Color(hex: 0x0B7250), Color(hex: 0x043221)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
         .onChange(of: position?.index) { old, next in
-            if old != nil, next != nil, run?.startedAt != nil, scenePhase == .active { store.playChime(); DIHaptics.soft() }
+            if old != nil, next != nil, run?.startedAt != nil, isVisible, scenePhase == .active { store.playChime(); DIHaptics.soft() }
         }
         .diAppear()
     }
