@@ -12,6 +12,7 @@ struct NativeMeetingConversationView: View {
     @State private var editing: TextMessage?
     @State private var editDraft = ""
     @State private var deleting: ChatMessage?
+    @State private var attachmentBusy = false
 
     private var draftKey: String { peerID.map { "peer:\($0)" } ?? "public" }
 
@@ -31,7 +32,7 @@ struct NativeMeetingConversationView: View {
                     Text(peerID == nil ? LocalizedStringKey("Everyone in the session") : LocalizedStringKey("Private conversation"))
                     if let person { Text(verbatim: person.name) }
                 }
-            }.buttonStyle(DISecondaryButtonStyle())
+            }.buttonStyle(DISecondaryButtonStyle()).disabled(attachmentBusy)
             if unavailable { Text("This participant has left. Choose a recipient to continue.").foregroundStyle(DIColor.textMuted) }
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: DISpacing.md) {
@@ -57,6 +58,8 @@ struct NativeMeetingConversationView: View {
                     }
                 }
             }
+            NativeChatAttachmentPicker(chat: chat, recipients: peerID.map { [$0] } ?? [], recipientName: person?.name,
+                                       enabled: chat.canSend && !unavailable, lockRecipient: { attachmentBusy = $0 })
             TextField("Message", text: Binding(get: { drafts[draftKey] ?? "" }, set: { drafts[draftKey] = $0 }), axis: .vertical)
                 .lineLimit(1...5).textFieldStyle(.roundedBorder)
             Button("Send") {

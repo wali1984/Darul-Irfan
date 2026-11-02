@@ -1,6 +1,9 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Attach file": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "فائل منسلک کریں"}}}},
+"Send attachment": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "منسلک فائل بھیجیں"}}}},
+"Could not prepare attachment. Choose a readable file up to 20 MB.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "فائل تیار نہیں ہو سکی۔ ایسی قابلِ مطالعہ فائل منتخب کریں جس کا حجم 20 MB تک ہو۔"}}}},
 "Edit message": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "پیغام میں ترمیم کریں"}}}},
 "Delete message": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "پیغام حذف کریں"}}}},
 "Delete this message?": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "یہ پیغام حذف کر دیں؟"}}}},
