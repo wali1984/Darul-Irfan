@@ -54,6 +54,12 @@ struct HalqahAuditFixture: View {
             .navigationTitle("Halqah audit")
         }
         .safeAreaInset(edge: .bottom) {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-schedule-removal") {
+                TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+                    Text(verbatim: String(HalqahAuditProtocol.scheduleRemovalRequests))
+                        .accessibilityIdentifier("audit-schedule-removal-requests")
+                }
+            }
             if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-post-removal") {
                 TimelineView(.periodic(from: .now, by: 0.25)) { _ in
                     Text(verbatim: String(HalqahAuditProtocol.removalRequests))
@@ -87,6 +93,12 @@ private final class HalqahAuditProtocol: URLProtocol {
     private static var duaWrites = 0
     private static var duaMarkedRead = false
     private static var olderRefresh: (() -> Void)?
+    private static var scheduleAttempts: [String: Int] = [:]
+    static var scheduleRemovalRequests: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return scheduleAttempts.values.reduce(0, +)
+    }
     private static var postRemovalAttempts = 0
     static var removalRequests: Int {
         lock.lock()
@@ -159,7 +171,34 @@ private final class HalqahAuditProtocol: URLProtocol {
             respond(result.0, result.1)
             return
         }
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-schedule-removal"),
+           parts.count == 6, ["meetings", "zikr"].contains(parts[4]), request.httpMethod == "DELETE" {
+            guard parts[3] == "admin" else { respond(403, "{}"); return }
+            Self.lock.lock()
+            let attempts = (Self.scheduleAttempts[parts[4]] ?? 0) + 1
+            Self.scheduleAttempts[parts[4]] = attempts
+            Self.lock.unlock()
+            respond(attempts == 1 ? 503 : 204, "{}")
+            return
+        }
         guard request.httpMethod == "GET" else { respond(403, "{}"); return }
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-schedule-removal"), parts.count == 4 {
+            Self.lock.lock()
+            let meetingGone = (Self.scheduleAttempts["meetings"] ?? 0) >= 2
+            let zikrGone = (Self.scheduleAttempts["zikr"] ?? 0) >= 2
+            Self.lock.unlock()
+            let meeting: [String: Any] = ["id": "audit-meeting", "title": "Audit meeting",
+                "startsAt": ISO8601DateFormatter().string(from: Date().addingTimeInterval(86400)), "durationMinutes": 60]
+            let zikr: [String: Any] = ["id": "audit-zikr", "title": "Audit recurring Zikr",
+                "weekdays": [1, 2, 3, 4, 5, 6, 7], "startHour": 20, "startMinute": 0,
+                "durationMinutes": 30, "timeZoneIdentifier": "Asia/Karachi"]
+            let body: [String: Any] = ["group": ["id": parts[3], "name": "Audit Halqah"],
+                "canManage": parts[3] == "admin", "memberCount": 3,
+                "meetings": meetingGone ? [] : [meeting], "zikrSessions": zikrGone ? [] : [zikr]]
+            let data = try! JSONSerialization.data(withJSONObject: body)
+            respond(200, String(decoding: data, as: UTF8.self))
+            return
+        }
         if parts.count == 5 && parts[4] == "posts" {
             respond(200, "{\"groupID\":\"\(parts[3])\",\"posts\":[]}")
         } else if parts.count == 4 {

@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -287,6 +287,9 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-transport" {
             app.launchArguments.append("--uitesting-audio-transport")
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-schedule" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-schedule-removal"]
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-post-removal"]
         }
@@ -309,6 +312,10 @@ final class RedesignScreenshotTests: XCTestCase {
             app.launchArguments.append("--uitesting-pdf-controls")
         }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-schedule" {
+            halqahScheduleTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "pdf-controls" {
             pdfControlsTour()
             return
@@ -1049,6 +1056,64 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     /// The actual Halqah detail view, with local HTTP responses and no live account.
+    /// The real schedule controls use an isolated transport; no production writes.
+    private func halqahScheduleTour() {
+        let meetingLabel = language == "ur" ? "میٹنگ منسوخ کریں" : "Cancel meeting"
+        let zikrLabel = language == "ur" ? "یہ وقت ہٹائیں" : "Remove this time"
+        let cancelLabel = language == "ur" ? "منسوخ کریں" : "Cancel"
+        let okayLabel = language == "ur" ? "ٹھیک ہے" : "OK"
+        let count = app.staticTexts["audit-schedule-removal-requests"]
+        func reveal(_ element: XCUIElement) -> Bool {
+            for _ in 0..<16 {
+                if element.exists && element.isHittable { return true }
+                app.swipeUp()
+                pause(0.3)
+            }
+            return element.exists && element.isHittable
+        }
+        for role in ["member", "admin"] {
+            let entry = app.buttons["halqah-audit-" + role]
+            guard entry.waitForExistence(timeout: 180), tap(entry) else { XCTFail("Missing fixture entry"); return }
+            let posts = app.descendants(matching: .any).matching(identifier: "halqah-detail-posts").firstMatch
+            guard posts.waitForExistence(timeout: 30) else { XCTFail("Schedule fixture did not load"); return }
+            if role == "member" {
+                for label in [zikrLabel, meetingLabel] {
+                    XCTAssertFalse(app.buttons[label].exists, "Members must not see removal controls")
+                }
+                XCTAssertTrue(reveal(app.staticTexts["Audit meeting"].firstMatch))
+                XCTAssertFalse(app.buttons[meetingLabel].exists)
+                XCTAssertFalse(app.buttons[zikrLabel].exists)
+                XCTAssertEqual(count.label, "0")
+                shot("schedule-member")
+                goBack()
+                continue
+            }
+            for (index, label) in [zikrLabel, meetingLabel].enumerated() {
+                let remove = app.buttons[label]
+                guard reveal(remove), tap(remove) else { XCTFail("Missing schedule removal action"); return }
+                let confirm = app.sheets.buttons[label]
+                guard confirm.waitForExistence(timeout: 10) else { XCTFail("Missing confirmation"); return }
+                XCTAssertTrue(app.sheets.staticTexts[index == 0 ? "Audit recurring Zikr" : "Audit meeting"].exists,
+                              "Confirmation must identify the selected schedule")
+                shot("schedule-\(index)-confirmation")
+                guard tap(app.sheets.buttons[cancelLabel]) else { XCTFail("Missing Cancel"); return }
+                XCTAssertEqual(count.label, String(index * 2), "Cancel must send no request")
+                guard tap(remove), tap(confirm) else { XCTFail("Confirmation not repeatable"); return }
+                let okay = app.alerts.buttons[okayLabel]
+                guard okay.waitForExistence(timeout: 15) else { XCTFail("Failed removal must show feedback"); return }
+                XCTAssertEqual(count.label, String(index * 2 + 1))
+                shot("schedule-\(index)-failure")
+                guard tap(okay) else { XCTFail("Missing failure acknowledgment"); return }
+                XCTAssertTrue(remove.exists, "Failed removal must retain the selected schedule")
+                guard tap(remove), tap(confirm) else { XCTFail("Removal must allow retry"); return }
+                XCTAssertTrue(remove.waitForNonExistence(timeout: 20))
+                XCTAssertEqual(count.label, String(index * 2 + 2))
+                if index == 0 { XCTAssertTrue(app.buttons[meetingLabel].exists, "Removing Zikr must retain the meeting") }
+                shot("schedule-\(index)-removed")
+            }
+        }
+    }
+
     private func halqahResourcesTour() {
         for role in ["member", "admin"] {
             let entry = app.buttons["halqah-audit-" + role]
