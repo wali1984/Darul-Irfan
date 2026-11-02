@@ -777,6 +777,11 @@ struct BookTextSearchView: View {
         } else if trimmedQuery.count < 2 {
             DIEmptyState(systemImage: "text.magnifyingglass", titleKey: "Search in this book")
                 .frame(maxHeight: .infinity, alignment: .top)
+        } else if resultTerm != trimmedQuery {
+            ProgressView("Searching…")
+                .diInterfaceFont(.subheadline)
+                .tint(DIColor.actionForeground)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if results.isEmpty {
             DIEmptyState(systemImage: "magnifyingglass", titleKey: "No matches in this book")
                 .frame(maxHeight: .infinity, alignment: .top)
@@ -826,6 +831,7 @@ struct BookTextSearchView: View {
     }
 
     private func pick(_ page: Int) {
+        guard resultTerm == trimmedQuery, results.contains(page) else { return }
         DIHaptics.soft()
         onPick(page)
         dismiss()
