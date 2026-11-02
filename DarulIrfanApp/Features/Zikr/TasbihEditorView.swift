@@ -25,20 +25,26 @@ struct TasbihEditorView: View {
             Form {
                 Section {
                     TextField("Title", text: $title, prompt: Text("Title").foregroundColor(DIColor.textMuted))
+                        .diInterfaceFont(.body)
                         .listRowBackground(DIColor.surface)
                 } header: {
                     Text("Name")
+                        .diInterfaceFont(.footnote)
                 } footer: {
                     Text("For example: SubhanAllah, Alhamdulillah, Allahu Akbar, or Durood Sharif.")
+                        .diInterfaceFont(.footnote)
                 }
                 Section {
                     TextField("Target (optional)", text: $targetText, prompt: Text("Target (optional)").foregroundColor(DIColor.textMuted))
+                        .diInterfaceFont(.body)
                         .keyboardType(.numberPad)
                         .listRowBackground(DIColor.surface)
                 } header: {
                     Text("Target")
+                        .diInterfaceFont(.footnote)
                 } footer: {
                     Text("A per-session goal such as 100. Leave empty for open-ended counting.")
+                        .diInterfaceFont(.footnote)
                 }
             }
             .disabled(isSaving)

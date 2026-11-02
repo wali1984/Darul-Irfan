@@ -252,6 +252,7 @@ struct TasbihCounterView: View {
                     .contentShape(Rectangle())
             }
             .accessibilityLabel("Remove one count")
+            .buttonStyle(DIPressableStyle())
 
             Spacer(minLength: 0)
 
@@ -271,6 +272,7 @@ struct TasbihCounterView: View {
                     .contentShape(Rectangle())
             }
             .accessibilityLabel("Reset count")
+            .buttonStyle(DIPressableStyle())
         }
         .padding(.horizontal, DISpacing.lg)
         .padding(.bottom, DISpacing.lg)
