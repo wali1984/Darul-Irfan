@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history", "halqah-duas"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -215,7 +215,14 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-history" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-history"]
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-duas" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-duas"]
+        }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-duas" {
+            halqahDuaRecoveryTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-history" {
             halqahHistoryTour()
             return
@@ -874,6 +881,42 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     /// Real history/attendance screens with local transport, including recoverable failures.
+    private func halqahDuaRecoveryTour() {
+        let retry = language == "ur" ? "دوبارہ کوشش کریں" : "Try again"
+        let mark = language == "ur" ? "پڑھ لیا" : "Mark as read"
+        let failure = language == "ur" ? "آپ کا گروپ لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔" : "Your group could not be loaded. Check your connection and try again."
+        let entry = app.buttons["halqah-audit-admin"]
+        guard entry.waitForExistence(timeout: 180), tap(entry), tap(app.buttons[retry]) else {
+            XCTFail("Dua requests must recover from initial failure"); return
+        }
+        let request = app.staticTexts["Audit dua request"].firstMatch
+        XCTAssertTrue(request.waitForExistence(timeout: 15))
+        shot("dua-requests-loaded")
+        guard tap(app.buttons[mark]) else { XCTFail("Unread request must offer Mark as read"); return }
+        XCTAssertTrue(app.staticTexts[failure].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons[mark].exists, "Failed mark must retain unread state")
+        shot("dua-mark-failed")
+        guard tap(app.buttons[mark]) else { XCTFail("Mark retry missing"); return }
+        XCTAssertTrue(app.buttons[retry].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.buttons[mark].exists, "Confirmed mark must survive failed refresh")
+        XCTAssertTrue(request.exists, "Failed refresh must retain populated content")
+        shot("dua-confirmed-mark-refresh-failed")
+        guard tap(app.buttons[retry]) else { XCTFail("Refresh retry missing"); return }
+        XCTAssertTrue(app.buttons[retry].waitForNonExistence(timeout: 15))
+        XCTAssertFalse(app.buttons[mark].exists)
+        let list = app.collectionViews.firstMatch
+        let refreshSurface = list.exists ? list : app.scrollViews.firstMatch
+        XCTAssertTrue(refreshSurface.exists, "Dua requests must expose a scrolling surface")
+        refreshSurface.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
+            .press(forDuration: 0.1, thenDragTo: refreshSurface.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)))
+        XCTAssertTrue(app.buttons[retry].waitForExistence(timeout: 15), "Injected pull refresh failure must offer Retry")
+        XCTAssertTrue(request.exists)
+        XCTAssertFalse(app.buttons[mark].exists)
+        shot("dua-pull-refresh-failed")
+        guard tap(app.buttons[retry]), tap(button("Done")) else { XCTFail("Refresh or Done missing"); return }
+        XCTAssertTrue(entry.waitForExistence(timeout: 15), "Done must return to fixture entry")
+    }
+
     private func halqahHistoryTour() {
         let retry = language == "ur" ? "دوبارہ کوشش کریں" : "Try again"
         let delete = language == "ur" ? "حذف کریں" : "Delete"

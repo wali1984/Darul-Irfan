@@ -6,6 +6,7 @@ import Foundation
 struct HalqahAuditFixture: View {
     private let service: MemberGroupService
     private let historyAudit = ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-history")
+    private let duaAudit = ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-duas")
 
     init() {
         let configuration = URLSessionConfiguration.ephemeral
@@ -18,9 +19,11 @@ struct HalqahAuditFixture: View {
 
     var body: some View {
         NavigationStack {
-            List(["member", "admin"], id: \.self) { role in
+            List(duaAudit ? ["admin"] : ["member", "admin"], id: \.self) { role in
                 NavigationLink {
-                    if historyAudit {
+                    if duaAudit {
+                        GroupDuaRequestsView(groupID: role, service: service)
+                    } else if historyAudit {
                         GroupSessionHistoryView(groupID: role, service: service)
                     } else {
                     GroupDetailView(group: MemberGroup(
@@ -52,6 +55,9 @@ private final class HalqahAuditProtocol: URLProtocol {
     private static var historyAttempts: [String: Int] = [:]
     private static var deleted: Set<String> = []
     private static var failedAfterDelete: Set<String> = []
+    private static var duaReads = 0
+    private static var duaWrites = 0
+    private static var duaMarkedRead = false
 
     // This session never falls through to the network, including unexpected requests.
     override class func canInit(with request: URLRequest) -> Bool { true }
@@ -65,6 +71,12 @@ private final class HalqahAuditProtocol: URLProtocol {
         guard parts.count >= 4, parts[1] == "v1", parts[2] == "groups",
               ["member", "admin"].contains(parts[3]) else {
             respond(404, "{}")
+            return
+        }
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-duas"),
+           parts.count >= 5, parts[4] == "duas" {
+            let result = duaResponse(parts: parts)
+            respond(result.0, result.1)
             return
         }
         if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-history"),
@@ -89,6 +101,28 @@ private final class HalqahAuditProtocol: URLProtocol {
         } else {
             respond(404, "{}")
         }
+    }
+    private func duaResponse(parts: [String]) -> (Int, String) {
+        Self.lock.lock()
+        defer { Self.lock.unlock() }
+        guard parts[3] == "admin" else { return (403, "{}") }
+        if request.httpMethod == "POST", parts.count == 7,
+           parts[5] == "dua-unread", parts[6] == "read" {
+            Self.duaWrites += 1
+            if Self.duaWrites == 1 { return (503, "{}") }
+            Self.duaMarkedRead = true
+            return (204, "{}")
+        }
+        guard request.httpMethod == "GET", parts.count == 5 else { return (403, "{}") }
+        Self.duaReads += 1
+        if [1, 3, 5].contains(Self.duaReads) { return (503, "{}") }
+        let records: [[String: Any]] = [
+            ["id": "dua-unread", "text": "Audit dua request", "createdAt": "2026-10-30T12:00:00Z", "isRead": Self.duaMarkedRead],
+            ["id": "dua-read", "text": "Audit previously read request", "createdAt": "2026-10-29T12:00:00Z", "isRead": true, "name": "Audit member"]
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: ["requests": records]),
+              let json = String(data: data, encoding: .utf8) else { return (500, "{}") }
+        return (200, json)
     }
     private func historyResponse(parts: [String]) -> (Int, String) {
         Self.lock.lock()
