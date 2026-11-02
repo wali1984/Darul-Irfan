@@ -198,6 +198,9 @@ struct DarulIrfanApp: App {
             if appState.settings.hasCompletedOnboarding {
                 await appState.refreshDevicePlaceIfNeeded()
                 await appState.refreshScheduledNotificationsAndWidgets()
+                if !appState.settings.push.isEnabled {
+                    await dependencies.officialPlatform.unregisterFromPush()
+                }
                 // Keeps the token the server holds current, for official
                 // alerts and for a signed-in member's Halqah notices alike.
                 if appState.settings.push.isEnabled || HalqahNoticeChoice.isWanted {
@@ -217,7 +220,7 @@ struct DarulIrfanApp: App {
     /// alerts were last scheduled.
     @MainActor
     private func refreshAfterActivation(force: Bool) {
-        guard case .ready(_, let appState) = launchState else { return }
+        guard case .ready(let dependencies, let appState) = launchState else { return }
         guard appState.settings.hasCompletedOnboarding else { return }
 
         let now = Date()
@@ -234,6 +237,9 @@ struct DarulIrfanApp: App {
             // some later activation.
             if throttled {
                 guard await appState.notificationPermissionChangedSinceLastRefresh() else { return }
+            }
+            if !appState.settings.push.isEnabled {
+                await dependencies.officialPlatform.unregisterFromPush()
             }
             await appState.refreshDevicePlaceIfNeeded()
             await appState.refreshScheduledNotificationsAndWidgets()

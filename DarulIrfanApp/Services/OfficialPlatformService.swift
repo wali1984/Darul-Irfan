@@ -168,21 +168,21 @@ actor OfficialPlatformService:
     func unregisterFromPush() async {
         guard let identity = SecureInstallationIdentity.load(),
               let token = SecurePushToken.load() else { return }
+        // Retain both the token and last accepted topics until the server
+        // confirms the change. Offline failures can then retry on activation.
+        if HalqahNoticeChoice.isWanted {
+            guard (try? await sendRegistration(token: token, topics: [])) != nil else { return }
+        } else {
+            var request = URLRequest(url: baseURL.appendingPathComponent("v1/devices/\(identity.uuidString)"))
+            request.httpMethod = "DELETE"
+            request.setValue(token, forHTTPHeaderField: "X-APNS-Token")
+            guard await PushUnregistration.send(request, session: session) else { return }
+            SecurePushToken.delete()
+        }
         try? await database.connection.execute(
             "DELETE FROM push_registration_state WHERE installation_id=?",
             [.text(identity.uuidString)]
         )
-        // Halqah notices still need the phone registered: keep it, with no
-        // official topic, rather than removing it and silencing the group.
-        if HalqahNoticeChoice.isWanted {
-            _ = try? await sendRegistration(token: token, topics: [])
-            return
-        }
-        var request = URLRequest(url: baseURL.appendingPathComponent("v1/devices/\(identity.uuidString)"))
-        request.httpMethod = "DELETE"
-        request.setValue(token, forHTTPHeaderField: "X-APNS-Token")
-        _ = try? await session.data(for: request)
-        SecurePushToken.delete()
     }
 
     func setConsent(_ consent: DiagnosticsConsent) async {
@@ -373,5 +373,15 @@ private enum SecurePushToken {
             kSecAttrAccount as String: account,
         ]
         SecItemDelete(query as CFDictionary)
+    }
+}
+
+/// A missing registration is already unsubscribed; other failures must retain
+/// local credentials so the next foreground pass can retry.
+enum PushUnregistration {
+    static func send(_ request: URLRequest, session: URLSession) async -> Bool {
+        guard let (_, response) = try? await session.data(for: request),
+              let http = response as? HTTPURLResponse else { return false }
+        return (200...299).contains(http.statusCode) || http.statusCode == 404
     }
 }
