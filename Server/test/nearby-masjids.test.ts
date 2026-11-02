@@ -6,6 +6,23 @@ import { sqliteD1 } from "./sqlite-d1";
 const request = (query = "lat=31.52&lon=74.35&lang=ur") => new Request(`https://example.test/v1/masjids/nearby?${query}`);
 afterEach(() => vi.unstubAllGlobals());
 describe("nearby masjid provider", () => {
+  it("cancels oversized streamed responses without retrying or refunding capacity", async () => {
+    const { db, raw } = sqliteD1();
+    const cancel = vi.fn();
+    const fetcher = vi.fn(async () => new Response(new ReadableStream({
+      pull(controller) { controller.enqueue(new Uint8Array(64 * 1024)); }, cancel,
+    }), { headers: { "Content-Length": "2" } }));
+    vi.stubGlobal("fetch", fetcher);
+    const env = { DB: db, PLACES_ENABLED: "true", PLACES_API_KEY: "test",
+      PLACES_DAILY_LIMIT: "1", PLACES_MONTHLY_LIMIT: "1" } as Env;
+    try {
+      const result = await nearbyMasjids(request(), env, async () => true);
+      expect(result.status).toBe(503);
+      expect(cancel).toHaveBeenCalledTimes(1);
+      expect((await nearbyMasjids(request(), env, async () => true)).status).toBe(429);
+      expect(fetcher).toHaveBeenCalledTimes(1);
+    } finally { raw.close(); }
+  });
   it("distinguishes valid empty results from malformed bodies and duplicate place identities", async () => {
     const { db, raw } = sqliteD1();
     const env = { DB: db, PLACES_ENABLED: "true", PLACES_API_KEY: "test",

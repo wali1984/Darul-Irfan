@@ -10,6 +10,30 @@ const response = (body: unknown, status = 200) => {
 };
 const unavailable = () => response({ error: "nearby_unavailable" }, 503);
 
+// Bound streamed/decompressed data rather than trusting Content-Length.
+async function providerJSON(upstream: Response): Promise<unknown> {
+  if (!upstream.body) throw new Error("missing_provider_body");
+  const reader = upstream.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let length = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      length += value.byteLength;
+      if (length > 512 * 1024) {
+        await reader.cancel();
+        throw new Error("provider_body_too_large");
+      }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+}
+
 export function nearbyCoordinates(url: URL): { latitude: number; longitude: number } | null {
   const coordinate = (name: string, limit: number) => {
     const value = url.searchParams.get(name);
@@ -43,8 +67,8 @@ export async function nearbyMasjids(request: Request, env: Env,
         rankPreference: "DISTANCE", languageCode: url.searchParams.get("lang") === "ur" ? "ur" : "en",
         locationRestriction: { circle: { center, radius: 10_000 } } }),
     });
-    if (!upstream.ok) return unavailable();
-    const payload = await upstream.json() as { places?: unknown };
+    if (!upstream.ok) { await upstream.body?.cancel(); return unavailable(); }
+    const payload = await providerJSON(upstream) as { places?: unknown };
     if (!payload || typeof payload !== "object" || Array.isArray(payload) ||
         (payload.places !== undefined && !Array.isArray(payload.places))) return unavailable();
     const places = (payload.places ?? []) as Record<string, any>[];
