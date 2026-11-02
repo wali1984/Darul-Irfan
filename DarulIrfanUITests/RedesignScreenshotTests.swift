@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule", "picture-refresh"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule", "picture-refresh", "directory-detail"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -290,6 +290,9 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "picture-refresh" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-picture-refresh"]
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "directory-detail" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-directory-detail"]
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-schedule" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-schedule-removal"]
         }
@@ -315,6 +318,10 @@ final class RedesignScreenshotTests: XCTestCase {
             app.launchArguments.append("--uitesting-pdf-controls")
         }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "directory-detail" {
+            directoryDetailTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "picture-refresh" {
             pictureRefreshTour()
             return
@@ -1082,6 +1089,48 @@ final class RedesignScreenshotTests: XCTestCase {
 
     /// The actual Halqah detail view, with local HTTP responses and no live account.
     /// The real schedule controls use an isolated transport; no production writes.
+    private func directoryDetailTour() {
+        let old = app.staticTexts["Before refresh"]
+        let fresh = app.staticTexts["After refresh"]
+        let error = app.staticTexts["directory-detail-error"]
+        let count = app.staticTexts["directory-removal-requests"]
+        let role = app.buttons["directory-role-admin"]
+        guard old.waitForExistence(timeout: 180) else { XCTFail("Missing directory detail fixture"); return }
+        app.swipeDown()
+        XCTAssertTrue(error.waitForExistence(timeout: 20), "Refresh failure must be visible")
+        XCTAssertTrue(old.exists, "Refresh failure must retain confirmed membership")
+        shot("directory-refresh-failed")
+        app.swipeDown()
+        XCTAssertTrue(fresh.waitForExistence(timeout: 20), "Successful refresh must update membership")
+        XCTAssertFalse(old.exists)
+        XCTAssertFalse(error.exists)
+        shot("directory-refresh-updated")
+        let removeMenu = language == "ur" ? "حلقے سے نکالیں" : "Remove from the Halqah"
+        let cancel = language == "ur" ? "منسوخ کریں" : "Cancel"
+        func showConfirmation() -> Bool {
+            guard tap(role), tap(app.buttons[removeMenu]) else { return false }
+            return app.sheets.firstMatch.waitForExistence(timeout: 10)
+        }
+        XCTAssertEqual(count.label, "0")
+        guard showConfirmation() else { XCTFail("Removal confirmation missing"); return }
+        shot("directory-removal-confirmation")
+        guard tap(app.sheets.buttons[cancel]) else { XCTFail("Confirmation Cancel missing"); return }
+        XCTAssertEqual(count.label, "0", "Cancel must not remove membership")
+        XCTAssertTrue(fresh.exists)
+        guard showConfirmation() else { XCTFail("Removal must remain available after Cancel"); return }
+        let confirm = app.sheets.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Audit member")).firstMatch
+        guard tap(confirm) else { XCTFail("Named removal action missing"); return }
+        XCTAssertTrue(error.waitForExistence(timeout: 20), "Failed removal must show an error")
+        XCTAssertEqual(count.label, "1")
+        XCTAssertTrue(fresh.exists, "Failed removal must retain membership")
+        shot("directory-removal-failed")
+        guard showConfirmation(), tap(confirm) else { XCTFail("Removal retry unavailable"); return }
+        XCTAssertTrue(fresh.waitForNonExistence(timeout: 20), "Successful removal must update the detail")
+        XCTAssertEqual(count.label, "2", "Only explicit confirmations may send removal requests")
+        XCTAssertFalse(error.exists)
+        shot("directory-removal-complete")
+    }
+
     private func pictureRefreshTour() {
         let count = app.staticTexts["picture-list-request-count"]
         XCTAssertTrue(count.waitForExistence(timeout: 20))

@@ -25,7 +25,13 @@ struct HalqahAuditFixture: View {
 
     var body: some View {
         NavigationStack {
-            if ProcessInfo.processInfo.arguments.contains("--uitesting-picture-refresh") {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
+                DirectoryPersonView(person: DirectoryPerson(
+                    id: "audit-person", name: "Audit member", email: nil, lastSeenAt: nil,
+                    isSuperAdmin: false, isYou: false,
+                    halqahs: [.init(groupID: "admin", groupName: "Before refresh", role: .member)]),
+                    service: service, halqahs: [], onChange: {})
+            } else if ProcessInfo.processInfo.arguments.contains("--uitesting-picture-refresh") {
                 DailyPictureRefreshAudit()
             } else {
             List(duaAudit ? ["admin"] : ["member", "admin"], id: \.self) { role in
@@ -58,6 +64,12 @@ struct HalqahAuditFixture: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
+                TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+                    Text(verbatim: String(HalqahAuditProtocol.directoryRemovalRequests))
+                        .accessibilityIdentifier("directory-removal-requests")
+                }
+            }
             if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-schedule-removal") {
                 TimelineView(.periodic(from: .now, by: 0.25)) { _ in
                     Text(verbatim: String(HalqahAuditProtocol.scheduleRemovalRequests))
@@ -104,6 +116,13 @@ private final class HalqahAuditProtocol: URLProtocol {
         return scheduleAttempts.values.reduce(0, +)
     }
     private static var postRemovalAttempts = 0
+    private static var directoryReads = 0
+    private static var directoryRemovals = 0
+    static var directoryRemovalRequests: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return directoryRemovals
+    }
     static var removalRequests: Int {
         lock.lock()
         defer { lock.unlock() }
@@ -128,6 +147,23 @@ private final class HalqahAuditProtocol: URLProtocol {
             return
         }
         let parts = url.pathComponents
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
+            Self.lock.lock()
+            let result: (Int, String)
+            if url.path == "/v1/members", request.httpMethod == "GET" {
+                Self.directoryReads += 1
+                result = Self.directoryReads == 1 ? (503, "{}") : (200,
+                    "{\"members\":[{\"id\":\"audit-person\",\"name\":\"Audit member\",\"isSuperAdmin\":false,\"isYou\":false,\"halqahs\":[{\"groupID\":\"admin\",\"groupName\":\"After refresh\",\"role\":\"admin\"}]}]}")
+            } else if url.path == "/v1/groups/admin/people/audit-person", request.httpMethod == "DELETE" {
+                Self.directoryRemovals += 1
+                result = (Self.directoryRemovals == 1 ? 503 : 204, "{}")
+            } else {
+                result = (403, "{}")
+            }
+            Self.lock.unlock()
+            respond(result.0, result.1)
+            return
+        }
         guard parts.count >= 4, parts[1] == "v1", parts[2] == "groups",
               ["member", "admin"].contains(parts[3]) else {
             respond(404, "{}")

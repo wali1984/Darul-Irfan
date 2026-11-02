@@ -209,6 +209,7 @@ struct DirectoryPersonView: View {
                             } label: {
                                 Text(place.role.title).diInterfaceFont(.subheadline, weight: .semibold)
                             }
+                            .accessibilityIdentifier("directory-role-" + place.groupID)
                         } else {
                             Text(place.role.title).foregroundStyle(DIColor.textMuted)
                         }
@@ -229,7 +230,8 @@ struct DirectoryPersonView: View {
                 }
             }
             if let error {
-                Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                Section { Text(verbatim: error).foregroundStyle(DIColor.danger)
+                    .accessibilityIdentifier("directory-detail-error") }
             }
         }
         .scrollContentBackground(.hidden)
