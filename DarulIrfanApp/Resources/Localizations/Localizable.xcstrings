@@ -1,6 +1,12 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Minimize": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "چھوٹا کریں"}}}},
+"Connecting to the session…": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست سے رابطہ ہو رہا ہے…"}}}},
+"Reconnecting to the session…": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست سے دوبارہ رابطہ ہو رہا ہے…"}}}},
+"Session ended": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست ختم ہو گئی"}}}},
+"Chat": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "گفتگو"}}}},
+
 "Turn on microphone": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مائیکروفون چلائیں"}}}},
 "Turn on camera": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "کیمرہ چلائیں"}}}},
 
