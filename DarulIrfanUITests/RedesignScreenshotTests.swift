@@ -940,7 +940,18 @@ final class RedesignScreenshotTests: XCTestCase {
         shot("sheikh-stage-confirmed")
         guard reveal(app.buttons[add]), tap(app.buttons[add]), reveal(app.textFields[name]), tap(app.textFields[name]) else { XCTFail("Custom stage entry missing"); return }
         app.textFields[name].typeText("AuditMuraqaba")
-        guard reveal(app.buttons[save]), tap(app.buttons[save]) else { XCTFail("Custom stage save missing"); return }
+        shot("sheikh-custom-stage-editing")
+        guard reveal(app.buttons[save]), tap(app.buttons[save]) else {
+            shot("sheikh-custom-stage-save-unreachable")
+            // The automatic UI snapshots only exported the application root.
+            // Capture the actual hierarchy at failure to distinguish a covered
+            // button, a disabled form and a changed accessibility label.
+            let hierarchy = XCTAttachment(string: app.debugDescription)
+            hierarchy.name = "sheikh-custom-stage-save-hierarchy"
+            hierarchy.lifetime = .keepAlways
+            add(hierarchy)
+            XCTFail("Custom stage save missing"); return
+        }
         XCTAssertTrue(app.buttons["AuditMuraqaba"].waitForExistence(timeout: 15))
         guard reveal(app.buttons["AuditMuraqaba"]), tap(app.buttons["AuditMuraqaba"]) else { XCTFail("Saved custom stage is unreachable"); return }
         shot("sheikh-custom-stage")
