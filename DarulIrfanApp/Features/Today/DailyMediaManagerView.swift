@@ -277,7 +277,7 @@ struct DailyMediaEditor: View {
                 return
             }
             try Task.checkCancellation()
-            prepare(data)
+            await prepare(data)
         } catch is CancellationError {
             return
         } catch {
@@ -298,7 +298,7 @@ struct DailyMediaEditor: View {
                 return try Data(contentsOf: url, options: .mappedIfSafe)
             }.value
             try Task.checkCancellation()
-            prepare(data)
+            await prepare(data)
         } catch is CancellationError {
             return
         } catch {
@@ -306,19 +306,12 @@ struct DailyMediaEditor: View {
         }
     }
 
-    private func prepare(_ data: Data) {
-        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-              let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, [
-                kCGImageSourceCreateThumbnailFromImageAlways: true,
-                kCGImageSourceCreateThumbnailWithTransform: true,
-                kCGImageSourceThumbnailMaxPixelSize: 2048,
-                kCGImageSourceShouldCacheImmediately: true,
-              ] as CFDictionary) else {
-            error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
-            return
-        }
-        let image = UIImage(cgImage: thumbnail)
-        guard let jpeg = image.jpegData(compressionQuality: 0.85) else {
+    private func prepare(_ data: Data) async {
+        let prepared = await Task.detached(priority: .userInitiated) {
+            DailyPicturePreparation.jpeg(from: data)
+        }.value
+        guard !Task.isCancelled else { return }
+        guard let jpeg = prepared, let image = UIImage(data: jpeg) else {
             error = String(localized: "The picture could not be opened. Download it to your phone and choose it again.")
             return
         }
@@ -383,5 +376,26 @@ struct DailyMediaEditor: View {
         } catch {
             self.error = error.localizedDescription
         }
+    }
+}
+
+/// Decode, orient and compress the source away from the UI actor. Only the
+/// bounded JPEG crosses back to the editor; failed replacements keep its draft.
+enum DailyPicturePreparation {
+    nonisolated static func jpeg(from data: Data) -> Data? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 2048,
+                kCGImageSourceShouldCacheImmediately: true,
+              ] as CFDictionary) else { return nil }
+        let output = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(output, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, thumbnail, [
+            kCGImageDestinationLossyCompressionQuality: 0.85
+        ] as CFDictionary)
+        guard CGImageDestinationFinalize(destination) else { return nil }
+        return output as Data
     }
 }
