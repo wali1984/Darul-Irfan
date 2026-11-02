@@ -11,6 +11,7 @@ final class NativeMeetingChat {
     private(set) var messages: [ChatMessage] = []
     private(set) var privateMessages: [ChatMessage] = []
     private(set) var canSend = false
+    private(set) var operationPending = false
     private let client: RealtimeKitClient
     private let events = NativeMeetingChatEvents()
     private var active = true
@@ -33,6 +34,50 @@ final class NativeMeetingChat {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard active, canSend, !text.isEmpty else { return false }
         return client.chat.sendTextMessage(message: text, peerIds: recipients) == nil
+    }
+
+    /// The presenter keeps a readable local copy until completion. Recipient
+    /// IDs are captured at submission, never taken from a later UI selection.
+    func sendAttachment(_ url: URL, image: Bool, recipients: [String] = [],
+                        completion: @escaping (Bool) -> Void) {
+        guard url.isFileURL else { completion(false); return }
+        perform(completion: completion) { done in
+            if image {
+                client.chat.sendImageMessage(imageURL: url, peerIds: recipients) { done($0 == nil) }
+            } else {
+                client.chat.sendFileMessage(fileURL: url, peerIds: recipients) { done($0 == nil) }
+            }
+        }
+    }
+
+    func edit(messageID: String, draft: String, completion: @escaping (Bool) -> Void) {
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !messageID.isEmpty, !text.isEmpty else { completion(false); return }
+        perform(completion: completion) { done in
+            client.chat.editTextMessage(messageId: messageID, newMessage: text) { done($0 == nil) }
+        }
+    }
+
+    func delete(messageID: String, completion: @escaping (Bool) -> Void) {
+        guard !messageID.isEmpty else { completion(false); return }
+        perform(completion: completion) { done in
+            client.chat.deleteMessage(messageId: messageID) { done($0 == nil) }
+        }
+    }
+
+    private func perform(completion: @escaping (Bool) -> Void,
+                         operation: (@escaping (Bool) -> Void) -> Void) {
+        guard active, canSend, !operationPending else { completion(false); return }
+        operationPending = true
+        operation { [self] success in
+            Task { @MainActor in
+                operationPending = false
+                if success { refresh() }
+                // Report the actual outcome even after Leave. A completed send
+                // must not look failed and encourage sending a duplicate.
+                completion(success)
+            }
+        }
     }
 
     func leaving() { active = false; canSend = false }
