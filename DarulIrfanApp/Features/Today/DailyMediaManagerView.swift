@@ -244,7 +244,9 @@ struct DailyMediaEditor: View {
     private static func date(_ key: String?) -> Date? {
         guard let key else { return nil }
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = .autoupdatingCurrent
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.date(from: key)
     }
@@ -256,7 +258,8 @@ struct DailyMediaEditor: View {
         guard let item else { return }
         slot = item.slot ?? .quote
         day = Self.date(item.day) ?? Date()
-        if let end = Self.date(item.endDay) { hasEnd = true; endDay = end }
+        endDay = day
+        if let end = Self.date(item.endDay) { hasEnd = true; endDay = max(day, end) }
         caption = item.caption ?? ""
         popup = item.popup
     }
@@ -328,7 +331,7 @@ struct DailyMediaEditor: View {
         working = true
         error = nil
         defer { working = false }
-        let end = slot == .announcement && hasEnd ? Self.dayKey(endDay) : nil
+        let end = slot == .announcement && hasEnd ? Self.dayKey(max(day, endDay)) : nil
         let showsOver = slot == .quote || popup
         do {
             if let item {
