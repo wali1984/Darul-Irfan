@@ -487,7 +487,7 @@ struct PlayerSheetView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
             .accessibilityLabel(Text("Jump to \(MediaTimeFormat.duration(bookmark.positionSeconds))"))
 
             Button {
@@ -497,7 +497,7 @@ struct PlayerSheetView: View {
                     .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.danger)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(DICompactButtonStyle(destructive: true, minimumHeight: 48))
             .accessibilityLabel(Text("Delete bookmark"))
         }
         .padding(.vertical, DISpacing.xs)
