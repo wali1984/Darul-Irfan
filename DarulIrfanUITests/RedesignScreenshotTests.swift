@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -209,6 +209,9 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-follow" {
             app.launchArguments.append("--uitesting-audio-follow-diagnostics")
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-transport" {
+            app.launchArguments.append("--uitesting-audio-transport")
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
             app.launchArguments.append("--uitesting-halqah-resources")
         }
@@ -228,6 +231,17 @@ final class RedesignScreenshotTests: XCTestCase {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-sheikh-stage"]
         }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-transport" {
+            let phase = app.staticTexts["transport-phase"]
+            XCTAssertTrue(phase.waitForExistence(timeout: 180))
+            expectation(for: NSPredicate(format: "label == %@ OR label == %@", "Done", "Error"), evaluatedWith: phase)
+            waitForExpectations(timeout: 150)
+            shot("audio-transport-isolation")
+            XCTAssertEqual(phase.label, "Done")
+            XCTAssertEqual(app.staticTexts["transport-local"].label, "PASS", "Local audio clock did not advance")
+            XCTAssertEqual(app.staticTexts["transport-quran"].label, "PASS", "Production transport did not reach ayah 143 without reader layout")
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "sheikh-stage" {
             sheikhStageTour()
             return

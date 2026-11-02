@@ -270,7 +270,9 @@ private struct ReadyRootView: View {
 
     @ViewBuilder private var content: some View {
         #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-resources") {
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-audio-transport") {
+            QuranAudioTransportAuditView()
+        } else if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-resources") {
             HalqahAuditFixture()
         } else if ProcessInfo.processInfo.arguments.contains("--uitesting-personal-history") {
             PersonalZikrHistoryAuditFixture()

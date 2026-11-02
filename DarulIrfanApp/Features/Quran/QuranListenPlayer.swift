@@ -111,6 +111,33 @@ final class QuranListenPlayer {
     @ObservationIgnored private var playbackAuditTask: Task<Void, Never>?
 
     /// Opt-in simulator evidence only. No audio, text, member data or credentials.
+    func playbackAuditSample() -> [String: Any] {
+        let player = self.reciter
+        let item = player?.currentItem
+        let seconds = player?.currentTime().seconds
+        return [
+            "timestamp": Date().timeIntervalSince1970,
+            "session": self.session,
+            "partToken": self.partToken,
+            "currentSurah": self.current?.surah ?? -1,
+            "currentAyah": self.current?.ayah ?? -1,
+            "word": self.currentWordPosition ?? -1,
+            "requestedPlaying": self.isPlaying,
+            "seconds": seconds?.isFinite == true ? seconds! : -1,
+            "rate": player?.rate ?? 0,
+            "timeControlStatus": player?.timeControlStatus.rawValue ?? -1,
+            "waitingReason": player?.reasonForWaitingToPlay?.rawValue ?? "none",
+            "itemStatus": item?.status.rawValue ?? -1,
+            "itemErrorCode": (item?.error as NSError?)?.code ?? 0,
+            "bufferEmpty": item?.isPlaybackBufferEmpty ?? false,
+            "likelyToKeepUp": item?.isPlaybackLikelyToKeepUp ?? false,
+            "loadedRanges": item?.loadedTimeRanges.map {
+                let range = $0.timeRangeValue
+                return ["start": range.start.seconds, "duration": range.duration.seconds]
+            } ?? [],
+        ]
+    }
+
     private func startPlaybackAuditIfRequested() {
         guard ProcessInfo.processInfo.arguments.contains("--uitesting-audio-follow-diagnostics") else { return }
         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -119,28 +146,7 @@ final class QuranListenPlayer {
             var output = Data()
             for _ in 0..<360 {
                 guard !Task.isCancelled, let self else { return }
-                let player = self.reciter
-                let item = player?.currentItem
-                let seconds = player?.currentTime().seconds
-                let sample: [String: Any] = [
-                    "timestamp": Date().timeIntervalSince1970,
-                    "currentSurah": self.current?.surah ?? -1,
-                    "currentAyah": self.current?.ayah ?? -1,
-                    "word": self.currentWordPosition ?? -1,
-                    "requestedPlaying": self.isPlaying,
-                    "seconds": seconds?.isFinite == true ? seconds! : -1,
-                    "rate": player?.rate ?? 0,
-                    "timeControlStatus": player?.timeControlStatus.rawValue ?? -1,
-                    "waitingReason": player?.reasonForWaitingToPlay?.rawValue ?? "none",
-                    "itemStatus": item?.status.rawValue ?? -1,
-                    "itemErrorCode": (item?.error as NSError?)?.code ?? 0,
-                    "bufferEmpty": item?.isPlaybackBufferEmpty ?? false,
-                    "likelyToKeepUp": item?.isPlaybackLikelyToKeepUp ?? false,
-                    "loadedRanges": item?.loadedTimeRanges.map {
-                        let range = $0.timeRangeValue
-                        return ["start": range.start.seconds, "duration": range.duration.seconds]
-                    } ?? [],
-                ]
+                let sample = self.playbackAuditSample()
                 if let line = try? JSONSerialization.data(withJSONObject: sample, options: [.sortedKeys]) {
                     output.append(line); output.append(0x0a)
                     try? output.write(to: url, options: .atomic)
