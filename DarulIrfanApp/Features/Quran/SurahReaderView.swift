@@ -24,6 +24,7 @@ struct SurahReaderView: View {
     @AppStorage("quranListenScope") private var listenScope: QuranListenScope = .surah
     @State private var hasAutoAdvanced = false
     @State private var bayanError: String?
+    @State private var startingBayan = false
     @State private var showsBayanList = false
     /// The ayah at the top of the screen; it is where the reader is.
     @State private var topAyah: Int?
@@ -709,30 +710,35 @@ struct SurahReaderView: View {
     /// controls the rest of the app already uses. The recitation and any
     /// narration stop first: one recording at a time.
     private func play(_ link: AyahBayanLink) {
+        guard !startingBayan else { return }
+        startingBayan = true
         let repository = mediaRepository
         let bayanPlayer = audioPlayer
-        player.stop()
-        speaker.stop()
         Task {
-            guard let item = try? await repository.item(id: link.mediaID) else {
-                bayanError = String(localized: "This bayan is not in the offline catalogue yet.")
+            defer { startingBayan = false }
+            do {
+                guard let item = try await repository.item(id: link.mediaID) else {
+                    bayanError = String(localized: "This bayan is not in the offline catalogue yet.")
+                    return
+                }
+                let assets = try await dependencies.downloadsRepository.allAssets()
+                try Task.checkCancellation()
+                guard let playable = MediaPlayback.playableItem(for: item,
+                    asset: assets.first { $0.mediaItemID == item.id }, downloadManager: dependencies.downloadManager) else {
+                    bayanError = String(localized: "This bayan has no playable audio source.")
+                    return
+                }
+                // Do not interrupt recitation until the requested recording resolves.
+                player.stop()
+                speaker.stop()
+                bayanError = nil
+                bayanPlayer.play(playable, queue: [])
+            } catch is CancellationError {
                 return
+            } catch {
+                guard !Task.isCancelled else { return }
+                bayanError = String(localized: "Could not complete action")
             }
-            guard let stream = item.streamUrl, let url = URL(string: stream) else {
-                bayanError = String(localized: "This bayan has no playable audio source.")
-                return
-            }
-            bayanError = nil
-            bayanPlayer.play(
-                AudioPlayableItem(
-                    id: item.id,
-                    title: item.title,
-                    subtitle: item.speaker,
-                    url: url,
-                    mediaItemID: item.id
-                ),
-                queue: []
-            )
         }
     }
 
