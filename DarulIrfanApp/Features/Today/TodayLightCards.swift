@@ -316,7 +316,7 @@ struct TodayHadithCard: View {
                 if let arabic = hadith.arabic, !arabic.isEmpty {
                     Text(verbatim: arabic)
                         .font(DIFont.quranArabic(scale: 0.7))
-                        .foregroundStyle(TodayPalette.arabicSoft)
+                        .foregroundStyle(DIColor.scripture)
                         .lineLimit(3)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
