@@ -69,6 +69,10 @@ struct GroupDetailView: View {
                 )
                 .diAppear()
                 MethodOfZikrLink(compact: true)
+                if let activePass = NativeHalqaSession.shared.resumePass(groupID: group.id) {
+                    Button("Return to session") { room = activePass }
+                        .buttonStyle(DIPrimaryButtonStyle())
+                }
                 if isLoading && detail != nil {
                     ProgressView().frame(maxWidth: .infinity)
                 }
@@ -117,7 +121,10 @@ struct GroupDetailView: View {
             Button("OK", role: .cancel) { actionFailure = nil }
         } message: { Text(verbatim: actionFailure ?? "") }
         .fullScreenCover(item: $room) { pass in
-            MeetingRoomView(pass: pass)
+            if pass.roomID?.isEmpty == false {
+                NativeMeetingRoomView(pass: pass, groupID: group.id, service: service,
+                                      isLiveZikr: detail?.live?.kind == "zikr")
+            } else { MeetingRoomView(pass: pass) }
         }
         .sheet(item: $sheet, onDismiss: { Task { await load() } }) { sheet in
             NavigationStack {
@@ -603,6 +610,10 @@ struct GroupDetailView: View {
     }
 
     private func join(meetingID: String?) async {
+        if NativeHalqaSession.shared.lifecycle.transport != nil {
+            joinError = String(localized: "Return to your current session or leave it before joining another.")
+            return
+        }
         joining = true
         joinError = nil
         defer { joining = false }

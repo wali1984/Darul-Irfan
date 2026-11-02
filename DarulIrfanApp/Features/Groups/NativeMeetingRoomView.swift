@@ -80,7 +80,7 @@ struct NativeMeetingRoomView: View {
                     }
                 }
             }
-            .task { rejected = !owner.join(pass: pass); started = true }
+            .task { rejected = !owner.join(pass: pass, groupID: groupID); started = true }
             .alert("Could not complete action", isPresented: $attachmentFailed) {
                 Button("OK", role: .cancel) {}
             }

@@ -1,6 +1,9 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Return to session": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست میں واپس جائیں"}}}},
+"Return to your current session or leave it before joining another.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "اپنی موجودہ نشست میں واپس جائیں یا دوسری نشست میں شامل ہونے سے پہلے اسے چھوڑ دیں۔"}}}},
+
 "Guidance": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "رہنمائی"}}}},
 
 "Your camera": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "آپ کا کیمرہ"}}}},

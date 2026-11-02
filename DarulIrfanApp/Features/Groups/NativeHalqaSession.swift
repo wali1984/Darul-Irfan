@@ -9,6 +9,19 @@ final class NativeHalqaSession {
     static let shared = NativeHalqaSession()
     let lifecycle = HalqaSessionLifecycle()
     private init() {}
+    private var presentation: (groupID: String, pass: GroupRoomPass)?
+
+    /// In-memory only; an expired or released connection is never recreated
+    /// using the old participant token.
+    func resumePass(groupID: String) -> GroupRoomPass? {
+        // Read observable lifecycle even before presentation exists so a
+        // newly joined/minimized session invalidates the group's return link.
+        let roomID = lifecycle.sessionID
+        let transport = lifecycle.transport
+        guard let presentation, presentation.groupID == groupID,
+              transport != nil, roomID == presentation.pass.roomID else { return nil }
+        return presentation.pass
+    }
 
     var client: RealtimeKitClient? {
         (lifecycle.transport as? NativeMeetingTransport)?.client
@@ -23,11 +36,14 @@ final class NativeHalqaSession {
     }
 
     @discardableResult
-    func join(pass: GroupRoomPass) -> Bool {
+    func join(pass: GroupRoomPass, groupID: String) -> Bool {
         guard let roomID = pass.roomID, !roomID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
-        return lifecycle.start(sessionID: roomID) {
+        if lifecycle.transport != nil && presentation?.groupID != groupID { return false }
+        let started = lifecycle.start(sessionID: roomID) {
             NativeMeetingTransport(authToken: pass.authToken)
         }
+        if started { presentation = (groupID, pass) }
+        return started
     }
 
     func leave() { lifecycle.leave() }
