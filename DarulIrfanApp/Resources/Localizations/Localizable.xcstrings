@@ -1,6 +1,9 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Turn on microphone": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "مائیکروفون چلائیں"}}}},
+"Turn on camera": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "کیمرہ چلائیں"}}}},
+
 "Attach file": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "فائل منسلک کریں"}}}},
 "Send attachment": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "منسلک فائل بھیجیں"}}}},
 "Could not prepare attachment. Choose a readable file up to 20 MB.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "فائل تیار نہیں ہو سکی۔ ایسی قابلِ مطالعہ فائل منتخب کریں جس کا حجم 20 MB تک ہو۔"}}}},
