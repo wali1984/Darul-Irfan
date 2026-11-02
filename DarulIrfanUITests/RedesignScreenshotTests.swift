@@ -1294,7 +1294,56 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertEqual(shajra.frame.minY, originalGuideY, accuracy: 44,
                        "The guide must retain its position after returning from Shajra")
         shot("resources-" + origin + "-guide-return")
+        if origin == "personal" {
+            inspectCompleteMethodGuide()
+        }
         goBack()
+    }
+
+    /// Traverse real content with overlapping captures, rather than treating
+    /// a screenshot of the first card as coverage of the whole guide.
+    private func inspectCompleteMethodGuide() {
+        let sectionIDs = language == "ur"
+            ? ["quotation", "opening", "tasbih", "istighfar", "shahadah", "taawwudh",
+               "basmalah", "start", "latifa-1", "latifa-2", "latifa-3-5", "latifa-6",
+               "latifa-7", "return", "rabitah", "conclusion"]
+            : (1...6).map { "instruction-\($0)" }
+        var unseen = Set(sectionIDs)
+        let diagramLabel = language == "ur"
+            ? "سامنے سے نظر آنے والا نمبر وار خاکہ:"
+            : "Numbered diagram, viewed from the front:"
+        let diagram = app.descendants(matching: .any).matching(
+            NSPredicate(format: "label BEGINSWITH %@", diagramLabel)).firstMatch
+        let scroll = app.scrollViews.firstMatch
+        guard scroll.exists else {
+            XCTFail("Method guide must provide a scrollable reading surface")
+            return
+        }
+        let top = app.navigationBars.firstMatch.frame.maxY
+        let bottom = app.tabBars.firstMatch.exists
+            ? app.tabBars.firstMatch.frame.minY : app.frame.maxY
+        let viewport = CGRect(x: app.frame.minX, y: top,
+                              width: app.frame.width, height: bottom - top)
+        for step in 0..<32 {
+            for id in unseen {
+                let section = app.descendants(matching: .any)
+                    .matching(identifier: "method-guide-section-" + id).firstMatch
+                if section.exists && section.frame.intersection(viewport).height > 44 {
+                    unseen.remove(id)
+                }
+            }
+            shot("resources-personal-guide-depth-\(step)")
+            if diagram.exists && viewport.contains(diagram.frame) {
+                XCTAssertTrue(unseen.isEmpty,
+                              "Guide sections never reached the viewport: \(unseen.sorted())")
+                return
+            }
+            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+                .press(forDuration: 0.05, thenDragTo:
+                    scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.30)))
+            pause(0.5)
+        }
+        XCTFail("The complete numbered diagram must be reachable below every guide section")
     }
 
     private func practiceTour() {
