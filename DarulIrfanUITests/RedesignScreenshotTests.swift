@@ -812,9 +812,16 @@ final class RedesignScreenshotTests: XCTestCase {
         shot("pdf-reset-to-fit")
         app.swipeUp(); pause(1)
         shot("pdf-scrolled")
-        XCTAssertTrue(tap(share)); pause(2)
+        XCTAssertTrue(tap(share))
+        let presented = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "hittable == false"), object: enlarge
+        )
+        guard XCTWaiter.wait(for: [presented], timeout: 10) == .completed else {
+            shot("pdf-share-present-failure")
+            XCTFail("Share did not present a modal sheet"); return
+        }
+        pause(1)
         shot("pdf-share-sheet")
-        XCTAssertFalse(enlarge.isHittable, "Share did not present a modal sheet")
         // The current system presents sharing as a popover, not a draggable
         // bottom sheet. Tap the uncovered PDF below it to dismiss.
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85)).tap()
