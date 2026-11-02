@@ -304,7 +304,7 @@ struct NotificationSettingsView: View {
         } header: {
             SettingsSectionHeader(titleKey: "Iqamah Reminders", systemImage: "person.2.fill")
         } footer: {
-            Text("Set how long after the azan your iqamah usually is. You are reminded five minutes before it, whatever the azan alert is set to.")
+            Text("Set the time from azan to iqamah. Reminders arrive five minutes before iqamah, or at iqamah for a five-minute gap, even if the azan alert is off.")
                 .foregroundStyle(DIColor.textMuted)
         }
     }

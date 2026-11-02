@@ -18145,19 +18145,19 @@
         }
       }
     },
-    "Set how long after the azan your iqamah usually is. You are reminded five minutes before it, whatever the azan alert is set to.": {
+    "Set the time from azan to iqamah. Reminders arrive five minutes before iqamah, or at iqamah for a five-minute gap, even if the azan alert is off.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Set how long after the azan your iqamah usually is. You are reminded five minutes before it, whatever the azan alert is set to."
+            "value": "Set the time from azan to iqamah. Reminders arrive five minutes before iqamah, or at iqamah for a five-minute gap, even if the azan alert is off."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "بتائیں کہ اذان کے کتنی دیر بعد آپ کی اقامت ہوتی ہے۔ آپ کو اس سے پانچ منٹ پہلے یاد دلایا جائے گا، اذان کی اطلاع جیسی بھی ترتیب ہو۔"
+            "value": "???? ?? ????? ?? ?? ???? ???? ????? ???????? ????? ?? ???? ??? ???? ??? ??? ??? ???? ???? ??? ?? ?? ???????? ????? ?? ??? ??? ??? ???? ???? ?? ????? ??? ???"
           }
         }
       }
