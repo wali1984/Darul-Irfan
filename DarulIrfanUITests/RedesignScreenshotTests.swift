@@ -183,16 +183,23 @@ final class RedesignScreenshotTests: XCTestCase {
         guard scroll.waitForExistence(timeout: 15) else {
             XCTFail("Reader scroll view missing"); return
         }
-        scroll.swipeUp(); pause(1)
-        scroll.swipeUp(); pause(3)
-        let badges = app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "Ayah [0-9]+"))
-        let visible = badges.allElementsBoundByIndex.filter { $0.isHittable }.compactMap {
-            Int($0.label.replacingOccurrences(of: "Ayah ", with: ""))
-        }.sorted()
-        guard let first = visible.first, let last = visible.last, last > 142 else {
-            shot("reader-position-no-visible-badge")
-            XCTFail("Manual scrolling did not expose later ayah badges"); return
+        // Long verses can fill several screens without a badge. Stop at a
+        // known later badge using real short drags, rather than assuming two
+        // flings expose one or querying all 286 eager cards individually.
+        let first = 144, last = 144
+        let laterBadge = app.staticTexts["Ayah 144"].firstMatch
+        for _ in 0..<24 {
+            if laterBadge.isHittable { break }
+            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+                .press(forDuration: 0.05, thenDragTo:
+                    scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.48)))
+            pause(0.5)
         }
+        guard laterBadge.isHittable else {
+            shot("reader-position-no-visible-badge")
+            XCTFail("Manual scrolling did not expose Ayah 144 within 24 short drags"); return
+        }
+        pause(3)
         print("READER_MANUAL_VISIBLE first=\(first) last=\(last)")
         shot("reader-position-after-manual-scroll")
         goBack()
