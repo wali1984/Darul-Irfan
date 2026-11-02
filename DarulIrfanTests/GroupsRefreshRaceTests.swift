@@ -4,6 +4,42 @@ import XCTest
 
 @MainActor
 final class GroupsRefreshRaceTests: XCTestCase {
+    func testNewLoginDuringNativeCleanupPreservesReplacementAccount() async {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [GroupsRaceProtocol.self]
+        let transport = URLSession(configuration: config)
+        defer { transport.invalidateAndCancel() }
+        let store = GroupsRaceSession()
+        let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+            session: transport, uploads: transport, savedSession: store,
+            onSessionInvalidated: {
+                store.save(.init(token: "replacement", expiresAt: .distantFuture, memberID: "new-member"))
+            })
+        GroupsRaceProtocol.configure(holdFirst: false) {}
+        let result = await service.signOut()
+        XCTAssertFalse(result)
+        XCTAssertEqual(store.load()?.token, "replacement")
+    }
+
+    func testSignoutReleasesNativeSessionIncludingWhenLoginAlreadyGone() async {
+        for hasLogin in [true, false] {
+            let config = URLSessionConfiguration.ephemeral
+            config.protocolClasses = [GroupsRaceProtocol.self]
+            let transport = URLSession(configuration: config)
+            defer { transport.invalidateAndCancel() }
+            let store = GroupsRaceSession()
+            if !hasLogin, let saved = store.load() { _ = store.deleteIfCurrent(token: saved.token) }
+            let probe = NativeCleanupProbe()
+            let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
+                session: transport, uploads: transport, savedSession: store,
+                onSessionInvalidated: { await probe.record() })
+            GroupsRaceProtocol.configure(holdFirst: false) {}
+            let result = await service.signOut()
+            XCTAssertTrue(result)
+            XCTAssertEqual(probe.count, 1)
+        }
+    }
+
     func testOldSuccessfulRefreshCannotPopulateReplacementAccount() async {
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [GroupsRaceProtocol.self]
@@ -32,8 +68,10 @@ final class GroupsRefreshRaceTests: XCTestCase {
             let transport = URLSession(configuration: config)
             defer { transport.invalidateAndCancel() }
             let store = GroupsRaceSession()
+            let probe = NativeCleanupProbe()
             let service = MemberGroupService(baseURL: URL(string: "https://groups-race.invalid")!,
-                session: transport, uploads: transport, savedSession: store)
+                session: transport, uploads: transport, savedSession: store,
+                onSessionInvalidated: { await probe.record() })
             let model = GroupsModel(service: service)
             let pending = expectation(description: "Old signout held")
             GroupsRaceProtocol.configure(holdFirst: false, holdSignOut: true) { pending.fulfill() }
@@ -43,6 +81,7 @@ final class GroupsRefreshRaceTests: XCTestCase {
             model.displayName = "Replacement name"
             GroupsRaceProtocol.releaseOlder(status: status)
             await older.value
+            XCTAssertEqual(probe.count, 0)
             XCTAssertEqual(store.load()?.token, "replacement")
             XCTAssertEqual(model.displayName, "Replacement name")
         }
@@ -271,4 +310,10 @@ private final class GroupsRaceProtocol: URLProtocol {
         client?.urlProtocolDidFinishLoading(self)
     }
     override func stopLoading() { }
+}
+
+@MainActor
+private final class NativeCleanupProbe {
+    var count = 0
+    func record() { count += 1 }
 }

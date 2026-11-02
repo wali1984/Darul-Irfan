@@ -69,10 +69,15 @@ actor MemberGroupService {
     private let uploads: URLSession
     private let decoder: JSONDecoder
     private let savedSession: any MemberSessionStore
+    private let onSessionInvalidated: @Sendable () async -> Void
 
     init(baseURL: URL = OfficialPlatformConfiguration.baseURL,
          session: URLSession? = nil, uploads: URLSession? = nil,
-         savedSession: (any MemberSessionStore)? = nil) {
+         savedSession: (any MemberSessionStore)? = nil,
+         onSessionInvalidated: @escaping @Sendable () async -> Void = {
+             await MainActor.run { NativeHalqaSession.shared.leave() }
+         }) {
+        self.onSessionInvalidated = onSessionInvalidated
         self.baseURL = baseURL
         self.savedSession = savedSession ?? KeychainMemberSessionStore()
         let configuration = URLSessionConfiguration.ephemeral
@@ -88,6 +93,12 @@ actor MemberGroupService {
         // strategy rejects fractional seconds, which made every post and
         // meeting fail to decode; both forms are accepted (ServerDate).
         decoder = JSONDecoder.darulIrfanServer()
+    }
+
+    private func storeSession(_ value: MemberSession) async {
+        let previousMemberID = savedSession.load()?.memberID
+        savedSession.save(value)
+        if previousMemberID != value.memberID { await onSessionInvalidated() }
     }
 
     var isSignedIn: Bool { savedSession.load() != nil }
@@ -113,12 +124,15 @@ actor MemberGroupService {
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         if status == 429 { throw MemberGroupError.tooManyAttempts }
         if status == 401 {
-            if let original, !savedSession.deleteIfCurrent(token: original.token) { throw CancellationError() }
+            if let original {
+                guard savedSession.deleteIfCurrent(token: original.token) else { throw CancellationError() }
+                await onSessionInvalidated()
+            }
             throw MemberGroupError.publicSessionExpired
         }
         if status == 201, original == nil {
             let value = try decoder.decode(MemberSession.self, from: data)
-            savedSession.save(value)
+            await storeSession(value)
             return value.memberID
         }
         if status == 200, let original {
@@ -151,7 +165,7 @@ actor MemberGroupService {
               let value = try? decoder.decode(MemberSession.self, from: data) else {
             throw MemberGroupError.signInRejected
         }
-        savedSession.save(value)
+        await storeSession(value)
         return value.memberID
     }
 
@@ -179,7 +193,7 @@ actor MemberGroupService {
         guard status == 201, let value = try? decoder.decode(MemberSession.self, from: data) else {
             throw status == 429 ? MemberGroupError.tooManyAttempts : MemberGroupError.inviteRejected
         }
-        savedSession.save(value)
+        await storeSession(value)
         return value.memberID
     }
 
@@ -200,6 +214,8 @@ actor MemberGroupService {
             _ = try? await session.data(for: request)
             guard savedSession.deleteIfCurrent(token: saved.token) else { return false }
         }
+        await onSessionInvalidated()
+        guard savedSession.load() == nil else { return false }
         HalqahNoticeChoice.isTurnedOff = false
         try? SheikhVisitorStore.delete()
         return true
@@ -356,6 +372,7 @@ actor MemberGroupService {
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
+            await onSessionInvalidated()
             throw MemberGroupError.notSignedIn
         }
         guard savedSession.load()?.token == saved.token else { throw CancellationError() }
@@ -439,6 +456,7 @@ actor MemberGroupService {
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
+            await onSessionInvalidated()
             throw MemberGroupError.notSignedIn
         }
         guard savedSession.load()?.token == saved.token else { throw CancellationError() }
@@ -489,6 +507,7 @@ actor MemberGroupService {
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
+            await onSessionInvalidated()
             throw MemberGroupError.notSignedIn
         }
         guard savedSession.load()?.token == saved.token else { throw CancellationError() }
@@ -576,6 +595,7 @@ actor MemberGroupService {
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
+            await onSessionInvalidated()
             throw MemberGroupError.notSignedIn
         }
         guard savedSession.load()?.token == saved.token else { throw CancellationError() }
@@ -609,6 +629,8 @@ actor MemberGroupService {
         // should still go, so the member is not left signed in to nothing.
         guard code == 204 || code == 401 else { throw MemberGroupError.requestFailed }
         guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
+        await onSessionInvalidated()
+        guard savedSession.load() == nil else { throw CancellationError() }
         HalqahNoticeChoice.isTurnedOff = false
         try SheikhVisitorStore.delete()
     }
@@ -628,6 +650,7 @@ actor MemberGroupService {
             // The session expired or was revoked; drop it so the UI asks for a
             // fresh sign-in instead of retrying a token that will never work.
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
+            await onSessionInvalidated()
             throw MemberGroupError.notSignedIn
         }
         guard savedSession.load()?.token == saved.token else { throw CancellationError() }
