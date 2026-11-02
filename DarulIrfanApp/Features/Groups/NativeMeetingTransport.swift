@@ -8,6 +8,9 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     let client = NativeMeetingConfiguration.makeClient()
     private(set) lazy var chat = NativeMeetingChat(client: client)
     private(set) lazy var participants = NativeMeetingParticipants(client: client)
+    let microphoneRequest = HalqaCaptureRequest()
+    let cameraRequest = HalqaCaptureRequest()
+    private var joined = false
     private let info: RtkMeetingInfo
     var onEnded: (() -> Void)?
     var onConnectionChanged: ((HalqaConnectionStatus) -> Void)?
@@ -33,6 +36,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
         _ = chat // Attach before joining so initial history is observed.
         _ = participants
         client.joinRoom(onSuccess: { [weak self] in Task { @MainActor in
+            self?.joined = true
             self?.chat.joined()
             self?.participants.refresh()
             completion(true)
@@ -41,6 +45,9 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     }
 
     func release(completion: @escaping (Bool) -> Void) {
+        joined = false
+        microphoneRequest.close()
+        cameraRequest.close()
         chat.leaving()
         participants.leaving()
         client.release(onSuccess: { [weak self] in Task { @MainActor in
@@ -53,6 +60,29 @@ final class NativeMeetingTransport: HalqaSessionTransport {
             completion(true)
         } },
                        onFailure: { _ in Task { @MainActor in completion(false) } })
+    }
+
+    /// Presenter supplies an explicit permission request and foreground check.
+    /// This is never invoked by join, reconnect or a background transition.
+    func requestCapture(_ kind: HalqaCaptureKind,
+                        permission: (@escaping (Bool) -> Void) -> Void,
+                        foreground: @escaping () -> Bool,
+                        completion: @escaping (Bool) -> Void) {
+        let gate = kind == .microphone ? microphoneRequest : cameraRequest
+        gate.request(permission: permission, allowedNow: { [self] in
+            guard joined, foreground() else { return false }
+            let media = client.localUser.permissions.media
+            return kind == .microphone ? media.canPublishAudio : media.canPublishVideo
+        }, enable: { [self] done in
+            if kind == .microphone {
+                client.localUser.enableAudio { error in Task { @MainActor in done(error == nil) } }
+            } else {
+                client.localUser.enableVideo { error in Task { @MainActor in done(error == nil) } }
+            }
+        }, disableLateCapture: { [self] in
+            if kind == .microphone { client.localUser.disableAudio { _ in } }
+            else { client.localUser.disableVideo { _ in } }
+        }, completion: completion)
     }
 }
 

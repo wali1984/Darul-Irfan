@@ -73,7 +73,11 @@ final class TrackerRepositoryTests: XCTestCase {
     @MainActor
     func testContextualTasbihReusesMatchingProgressAndKeepsDifferentTargetsSeparate() async throws {
         let title = "Preset \(UUID().uuidString)"
-        let existing = TasbihCounter(id: UUID(), title: title, target: 100, count: 23, lifetimeCount: 200, updatedAt: Date())
+        // An exactly representable fractional timestamp keeps whole-value
+        // equality meaningful across Foundation's 2001 epoch and SQLite's
+        // Unix-epoch Double. Date() can lose a sub-microsecond in that conversion.
+        let existing = TasbihCounter(id: UUID(), title: title, target: 100, count: 23, lifetimeCount: 200,
+                                    updatedAt: Date(timeIntervalSince1970: 1_700_000_000.25))
         try await repository.saveTasbihCounter(existing)
         let reopened = try await TasbihPresetResolver.resolve(title: title, target: 100, repository: repository)
         XCTAssertEqual(reopened, existing)
