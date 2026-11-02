@@ -167,6 +167,22 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertEqual(segments.filter { !$0.isEmpty }.map { $0.timeMapping.source.start.seconds }, [1, 1, 2, 2])
     }
 
+    func testCompositionPadsSmallEndMarkerOverrunWithoutReadingBeyondEOF() async throws {
+        let (recording, url) = try localAudio()
+        defer { try? FileManager.default.removeItem(at: url) }
+        var finalVerse = recording
+        finalVerse.verses = [RecitationVerse(ayah: 1, fromMs: 6000, toMs: 7100, words: [])]
+        let plan = try HifzPlaybackTimeline(recitation: finalVerse, range: 1...1, repeats: 2, pauseSeconds: 1)
+        let composition = try await HifzComposition.make(asset: AVURLAsset(url: url), timeline: plan)
+        let duration = try await composition.load(.duration)
+        XCTAssertEqual(duration.seconds, 3.2, accuracy: 0.001)
+        let tracks = try await composition.loadTracks(withMediaType: .audio)
+        let segments = try await XCTUnwrap(tracks.first).load(.segments)
+        let audio = segments.filter { !$0.isEmpty }
+        XCTAssertEqual(audio.count, 2)
+        XCTAssertTrue(audio.allSatisfy { $0.timeMapping.source.end.seconds <= 7 })
+    }
+
     func testCompositionRejectsTimingsBeyondActualFile() async throws {
         let (recording, url) = try localAudio()
         defer { try? FileManager.default.removeItem(at: url) }

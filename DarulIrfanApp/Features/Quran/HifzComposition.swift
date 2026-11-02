@@ -38,10 +38,19 @@ enum HifzComposition {
             let length = CMTime(value: segment.durationMs, timescale: 1000)
             if let offset = segment.sourceStartMs {
                 let start = CMTime(value: Int64(offset), timescale: 1000)
-                guard CMTimeCompare(CMTimeAdd(start, length), duration) <= 0 else {
+                let available = CMTimeSubtract(duration, start)
+                let excess = CMTimeSubtract(length, available)
+                // The bundled end markers include a short encoder/tail overhang
+                // (up to ~2.91s in the current source). Never request samples
+                // beyond EOF; retain the timeline with silence for that tail.
+                guard CMTimeCompare(available, .zero) > 0, excess.seconds <= 5 else {
                     throw Failure.invalidSourceDuration
                 }
-                try track.insertTimeRange(CMTimeRange(start: start, duration: length), of: source, at: at)
+                let playable = CMTimeMinimum(length, available)
+                try track.insertTimeRange(CMTimeRange(start: start, duration: playable), of: source, at: at)
+                if CMTimeCompare(playable, length) < 0 {
+                    composition.insertEmptyTimeRange(CMTimeRange(start: CMTimeAdd(at, playable), duration: CMTimeSubtract(length, playable)))
+                }
             } else {
                 composition.insertEmptyTimeRange(CMTimeRange(start: at, duration: length))
             }
