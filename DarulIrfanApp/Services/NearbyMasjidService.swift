@@ -49,6 +49,10 @@ enum NearbyMasjidService {
         guard let response = response as? HTTPURLResponse else { throw NearbyMasjidError.invalidResponse }
         if response.statusCode == 429 { throw NearbyMasjidError.limitReached }
         guard response.statusCode == 200 else { throw NearbyMasjidError.unavailable }
+        return try decodeResults(data)
+    }
+
+    static func decodeResults(_ data: Data) throws -> [NearbyMasjid] {
         guard data.count <= 512_000 else { throw NearbyMasjidError.invalidResponse }
         let payload = try JSONDecoder().decode(Payload.self, from: data)
         guard payload.attribution == "Google Maps", payload.items.count <= 20,
