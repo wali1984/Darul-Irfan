@@ -2,11 +2,12 @@ import SwiftUI
 import UIKit
 
 /// Onboarding page 3: the one step that cannot be skipped. Offers a one-shot
-/// device location (privacy-first, on-device only) with a manual city search
+/// device location with a manual city search
 /// fallback that also carries users through permission denial.
 struct OnboardingLocationStep: View {
     @Bindable var viewModel: OnboardingViewModel
     @Environment(\.openURL) private var openURL
+    @FocusState private var citySearchFocused: Bool
 
     var body: some View {
         VStack(spacing: DISpacing.md) {
@@ -163,10 +164,12 @@ struct OnboardingLocationStep: View {
 
             HStack(spacing: DISpacing.sm) {
                 TextField("Search for a city", text: $viewModel.citySearchQuery)
+                    .focused($citySearchFocused)
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
                     .submitLabel(.search)
                     .onSubmit {
+                        citySearchFocused = false
                         Task { await viewModel.searchCities() }
                     }
                     .padding(.horizontal, DISpacing.md)
@@ -180,6 +183,7 @@ struct OnboardingLocationStep: View {
 
                 Button {
                     DIHaptics.light()
+                    citySearchFocused = false
                     Task { await viewModel.searchCities() }
                 } label: {
                     Image(systemName: "magnifyingglass")
@@ -222,6 +226,7 @@ struct OnboardingLocationStep: View {
     private func resultRow(_ place: PlaceCoordinate) -> some View {
         Button {
             DIHaptics.soft()
+            citySearchFocused = false
             Task { await viewModel.chooseManualPlace(place) }
         } label: {
             HStack(spacing: DISpacing.sm) {

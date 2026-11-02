@@ -48,7 +48,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
 final class NativeMeetingMembershipEvents: NSObject, RtkSelfEventListener {
     var ended: (@MainActor () -> Void)?
     func onRemovedFromMeeting() { Task { @MainActor in ended?() } }
-    func onWaitListStatusUpdate(waitListStatus: WaitListStatus) {
+    func onWaitListStatusUpdate(waitListStatus: RealtimeKit.WaitListStatus) {
         if waitListStatus == .rejected { Task { @MainActor in ended?() } }
     }
     func onAudioDeviceChanged(audioDevice: AudioDevice) {}
