@@ -54,7 +54,7 @@ struct NativeChatAttachmentPicker: View {
                     let copy = try await Task.detached { try NativeChatAttachment.prepare(url) }.value
                     if visible { selected = copy } else { copy.discard() }
                 } catch {
-                    if visible { error = "Could not prepare attachment. Choose a readable file up to 20 MB." }
+                    if visible { self.error = "Could not prepare attachment. Choose a readable file up to 20 MB." }
                 }
                 preparing = false
             }
