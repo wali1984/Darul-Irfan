@@ -858,6 +858,7 @@ struct GroupSessionHistoryView: View {
     @State private var canDelete = false
     @State private var deleting: GroupSessionRecord?
     @State private var working = false
+    @State private var loading = false
     @State private var failed = false
     @State private var error: String?
 
@@ -872,6 +873,7 @@ struct GroupSessionHistoryView: View {
                         Label("Try again", systemImage: "arrow.clockwise")
                     }
                     .buttonStyle(DICompactButtonStyle())
+                    .disabled(loading || working)
                 }
                 if let sessions {
                     if sessions.isEmpty {
@@ -898,14 +900,14 @@ struct GroupSessionHistoryView: View {
                                     Image(systemName: "trash")
                                 }
                                 .buttonStyle(DICompactButtonStyle(destructive: true))
-                                .disabled(working)
+                                .disabled(working || loading)
                                 .accessibilityLabel(Text(verbatim: String(localized: "Delete") + ": " + (session.title ?? String(localized: "Halqah Zikr"))))
                             }
                         }
                         .swipeActions {
                             if canDelete {
                                 Button("Delete", role: .destructive) { deleting = session }
-                                    .disabled(working)
+                                    .disabled(working || loading)
                             }
                         }
                     }
@@ -935,7 +937,10 @@ struct GroupSessionHistoryView: View {
         }
     }
 
-    private func load() async {
+    private func load(afterDelete: Bool = false) async {
+        guard !loading, !working || afterDelete else { return }
+        loading = true
+        defer { loading = false }
         failed = false
         do {
             let history = try await service.sessionHistory(in: groupID)
@@ -949,14 +954,14 @@ struct GroupSessionHistoryView: View {
     }
 
     private func delete(_ session: GroupSessionRecord) async {
-        guard !working else { return }
+        guard !working, !loading, canDelete else { return }
         working = true
         defer { working = false }
         do {
             try await service.deleteSessionRecord(session.id, in: groupID)
             sessions?.removeAll { $0.id == session.id }
             error = nil
-            await load()
+            await load(afterDelete: true)
         } catch is CancellationError {
             return
         } catch {
@@ -973,6 +978,7 @@ struct GroupSessionAttendeesView: View {
 
     @State private var attendees: [GroupAttendee]?
     @State private var failed = false
+    @State private var loading = false
 
     var body: some View {
         List {
@@ -997,6 +1003,7 @@ struct GroupSessionAttendeesView: View {
                         Label("Try again", systemImage: "arrow.clockwise")
                     }
                     .buttonStyle(DICompactButtonStyle())
+                    .disabled(loading)
                 }
                 if let attendees {
                     if attendees.isEmpty {
@@ -1019,6 +1026,9 @@ struct GroupSessionAttendeesView: View {
     }
 
     private func load() async {
+        guard !loading else { return }
+        loading = true
+        defer { loading = false }
         failed = false
         do {
             attendees = try await service.attendees(of: session.id, in: groupID)
