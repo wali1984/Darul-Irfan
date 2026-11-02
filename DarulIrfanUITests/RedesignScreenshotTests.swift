@@ -1318,6 +1318,22 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertFalse(remove.exists)
         XCTAssertEqual(count.label, "2", "Refresh retry must not send another deletion")
         shot("recordings-refresh-recovered")
+        // This isolated fixture rejects session POSTs: no real broadcast occurs.
+        let choice = app.buttons["recording-choice-keep"]
+        guard reveal(choice), tap(choice) else { XCTFail("Retained recording must remain selectable"); return }
+        let start = app.buttons["session-start-action"]
+        for attempt in 1...2 {
+            guard reveal(start), start.isEnabled, tap(start) else {
+                XCTFail("Session start must remain available for retry"); return
+            }
+            XCTAssertTrue(failure.waitForExistence(timeout: 15))
+            XCTAssertTrue(failure.isHittable, "Session failure must be visible")
+            shot("recordings-start-failed-\(attempt)")
+            guard tap(okay) else { XCTFail("Session error must be dismissible"); return }
+            XCTAssertTrue(start.exists, "Failed start must retain the editor")
+            XCTAssertEqual(count.label, "2", "Starting a session must not delete recordings")
+        }
+
     }
 
     private func halqahScheduleTour() {

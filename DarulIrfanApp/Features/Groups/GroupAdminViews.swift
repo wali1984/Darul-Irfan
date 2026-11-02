@@ -275,7 +275,6 @@ struct GroupLiveStarter: View {
     @State private var error: String?
 
     @State private var deletingRecording: GroupRecording?
-    @State private var deletionError: String?
 
     private var sources: [Source] { addingToSession ? [.youtube, .recording] : Source.allCases }
 
@@ -322,10 +321,6 @@ struct GroupLiveStarter: View {
                             .accessibilityIdentifier("recording-library-retry")
                     }
                 }
-                if let error {
-                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger)
-                        .accessibilityIdentifier("recording-library-action-error") }
-                }
                 Section {
                     Button {
                         Task { await start() }
@@ -340,6 +335,7 @@ struct GroupLiveStarter: View {
                         }
                     }
                     .buttonStyle(DIPrimaryButtonStyle())
+                    .accessibilityIdentifier("session-start-action")
                     .disabled(working || uploading || !canStart)
                 }
             }
@@ -363,13 +359,13 @@ struct GroupLiveStarter: View {
         } message: { recording in
             Text(verbatim: recording.title + "\n\n" + String(localized: "This removes the recording from the group's library. This cannot be undone."))
         }
-        .alert("Delete recording", isPresented: Binding(
-            get: { deletionError != nil },
-            set: { if !$0 { deletionError = nil } }
+        .alert(addingToSession ? "Add to the session" : "Go live", isPresented: Binding(
+            get: { error != nil },
+            set: { if !$0 { error = nil } }
         )) {
-            Button("OK", role: .cancel) { deletionError = nil }
+            Button("OK", role: .cancel) { error = nil }
         } message: {
-            Text(verbatim: deletionError ?? "")
+            Text(verbatim: error ?? "")
                 .accessibilityIdentifier("recording-library-action-error")
         }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.audio, .movie]) { result in
@@ -458,6 +454,7 @@ struct GroupLiveStarter: View {
                             title: recording.title,
                             detail: [length(recording.durationSeconds), ByteCountFormatter.string(fromByteCount: Int64(recording.byteSize), countStyle: .file)]
                         )
+                        .accessibilityIdentifier("recording-choice-" + recording.id)
                         Button("Delete recording") { deletingRecording = recording }
                             .buttonStyle(DICompactButtonStyle(destructive: true))
                             .disabled(working || uploading)
@@ -614,7 +611,7 @@ struct GroupLiveStarter: View {
         } catch is CancellationError {
             return
         } catch {
-            self.error = error.localizedDescription
+            self.error = actionErrorMessage(error)
         }
     }
 
@@ -667,7 +664,7 @@ struct GroupLiveStarter: View {
         } catch is CancellationError {
             return
         } catch {
-            self.error = error.localizedDescription
+            self.error = actionErrorMessage(error)
         }
     }
 
@@ -675,7 +672,6 @@ struct GroupLiveStarter: View {
         guard !working && !uploading else { return }
         working = true
         error = nil
-        deletionError = nil
         defer { working = false }
         do {
             try await service.deleteRecording(recording.id, in: groupID)
@@ -685,15 +681,18 @@ struct GroupLiveStarter: View {
         } catch is CancellationError {
             return
         } catch {
-            if let groupError = error as? MemberGroupError, case .requestFailed = groupError {
-                deletionError = String(localized: "The action could not be completed. Check your connection and try again.")
-            } else if error is MemberGroupError {
-                deletionError = error.localizedDescription
-            } else {
-                deletionError = String(localized: "The action could not be completed. Check your connection and try again.")
-            }
+            self.error = actionErrorMessage(error)
         }
     }
+
+    private func actionErrorMessage(_ failure: Error) -> String {
+        if let groupError = failure as? MemberGroupError, case .requestFailed = groupError {
+            return String(localized: "The action could not be completed. Check your connection and try again.")
+        }
+        if failure is MemberGroupError { return failure.localizedDescription }
+        return String(localized: "The action could not be completed. Check your connection and try again.")
+    }
+
 }
 
 // MARK: - Schedule a meeting
