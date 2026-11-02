@@ -471,7 +471,9 @@ export async function joinRoom(env: Env, memberID: string, groupID: string, inpu
     .first<{ display_name: string | null }>())?.display_name ?? "Member";
   const token = await addParticipant(env, roomID, memberID, name, managing);
   if (token instanceof Response) return token;
-  return json({ authToken: token, pageURL: `${env.PUBLIC_BASE_URL}/v1/meet` });
+  // Identify the authorized room independently of a participant token, which
+  // may rotate when the person returns to an already connected native session.
+  return json({ authToken: token, pageURL: `${env.PUBLIC_BASE_URL}/v1/meet`, roomID });
 }
 
 /** Which outside services are connected yet. The app marks the rest

@@ -268,6 +268,9 @@ struct GroupIntegrations: Codable, Sendable, Equatable {
 struct GroupRoomPass: Codable, Sendable {
     var authToken: String
     var pageURL: URL
+    /// Absent on older servers. Native session reuse must never use the token
+    /// or group title as a substitute for this stable authorized room identity.
+    var roomID: String? = nil
 }
 
 struct MemberProfile: Codable, Sendable {

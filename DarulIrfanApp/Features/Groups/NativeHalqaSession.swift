@@ -23,8 +23,9 @@ final class NativeHalqaSession {
     }
 
     @discardableResult
-    func join(sessionID: String, pass: GroupRoomPass) -> Bool {
-        lifecycle.start(sessionID: sessionID) {
+    func join(pass: GroupRoomPass) -> Bool {
+        guard let roomID = pass.roomID, !roomID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return false }
+        return lifecycle.start(sessionID: roomID) {
             NativeMeetingTransport(authToken: pass.authToken)
         }
     }

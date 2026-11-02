@@ -150,11 +150,34 @@ describe("community groups", () => {
     const { call, member, admin } = await setup({ REALTIME_ACCOUNT_ID: "acct", REALTIME_APP_ID: "app", REALTIME_API_TOKEN: "secret" } as Partial<Env>);
     expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", room: true })).status).toBe(200);
     const joined = (await (await call(member, "POST", "/v1/groups/usa/join", {})).json()) as { authToken: string; pageURL: string };
-    expect(joined).toEqual({ authToken: "participant-token", pageURL: "https://api.example.com/v1/meet" });
+    expect(joined).toEqual({ authToken: "participant-token", pageURL: "https://api.example.com/v1/meet", roomID: "room-1" });
     expect(calls).toEqual([
       "POST https://api.cloudflare.com/client/v4/accounts/acct/realtime/kit/app/meetings",
       "POST https://api.cloudflare.com/client/v4/accounts/acct/realtime/kit/app/meetings/room-1/participants",
     ]);
+    const returning = await (await call(member, "POST", "/v1/groups/usa/join", {})).json();
+    expect(returning).toMatchObject({ roomID: "room-1" });
+    expect(calls.filter(url => url.endsWith("/meetings"))).toHaveLength(1);
+  });
+
+  it("returns the persisted scheduled room identity across repeated joins", async () => {
+    let rooms = 0;
+    let participants = 0;
+    vi.stubGlobal("fetch", async (url: string) => {
+      const body = String(url).endsWith("/participants")
+        ? { data: { token: `token-${++participants}` } }
+        : { data: { id: `scheduled-${++rooms}` } };
+      return new Response(JSON.stringify(body), { status: 201, headers: { "content-type": "application/json" } });
+    });
+    const { call, member, admin } = await setup({ REALTIME_ACCOUNT_ID: "a", REALTIME_APP_ID: "b", REALTIME_API_TOKEN: "c" } as Partial<Env>);
+    const meeting = await (await call(admin, "POST", "/v1/groups/usa/meetings", {
+      title: "Scheduled Zikr", startsAt: new Date(Date.now() + 60_000).toISOString(),
+    })).json() as { id: string };
+    const first = await (await call(member, "POST", "/v1/groups/usa/join", { meetingID: meeting.id })).json();
+    const second = await (await call(member, "POST", "/v1/groups/usa/join", { meetingID: meeting.id })).json();
+    expect(first).toMatchObject({ roomID: "scheduled-1", authToken: "token-1" });
+    expect(second).toMatchObject({ roomID: "scheduled-1", authToken: "token-2" });
+    expect(rooms).toBe(1);
   });
 
   it("opens a scheduled meeting's room to members only from ten minutes before", async () => {
