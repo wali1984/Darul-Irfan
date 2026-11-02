@@ -43,7 +43,7 @@ struct NativeMeetingRoomView: View {
                         NativeMeetingGalleryView(participants: transport.participants, localParticipant: transport.client.localUser)
                             .tabItem { Label("Video", systemImage: "video") }
                         NativeMeetingConversationView(chat: transport.chat, participants: transport.participants,
-                                                      openAttachment: openAttachment)
+                                                      openAttachment: openAttachment, draftState: transport.conversationDrafts)
                             .tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
                         NativeMeetingPeopleView(participants: transport.participants) { action, id in
                             ownsRoom && transport.submit(action, participantID: id)

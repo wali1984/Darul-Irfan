@@ -6,6 +6,7 @@ import RealtimeKit
 @MainActor
 final class NativeMeetingTransport: HalqaSessionTransport {
     let client = NativeMeetingConfiguration.makeClient()
+    let conversationDrafts = NativeConversationDrafts()
     private var chatStorage: NativeMeetingChat?
     private var participantsStorage: NativeMeetingParticipants?
     var chat: NativeMeetingChat {
@@ -93,6 +94,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
 
     func release(completion: @escaping (Bool) -> Void) {
         joined = false
+        conversationDrafts.clear()
         microphoneRequest.close()
         cameraRequest.close()
         // Initialization may have failed before either observer was created.

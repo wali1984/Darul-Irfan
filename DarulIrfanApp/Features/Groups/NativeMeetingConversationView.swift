@@ -1,13 +1,33 @@
 import SwiftUI
 import RealtimeKit
+import Observation
+
+/// Session-owned, memory-only composition state survives minimizing the room.
+@Observable @MainActor
+final class NativeConversationDrafts {
+    var peerID: String?
+    var drafts: [String: String] = [:]
+
+    func clear() {
+        peerID = nil
+        drafts.removeAll()
+    }
+}
 
 @MainActor
 struct NativeMeetingConversationView: View {
     let chat: NativeMeetingChat
     let participants: NativeMeetingParticipants
     let openAttachment: (URL) -> Void
-    @State private var peerID: String?
-    @State private var drafts: [String: String] = [:]
+    let draftState: NativeConversationDrafts
+    private var peerID: String? {
+        get { draftState.peerID }
+        nonmutating set { draftState.peerID = newValue }
+    }
+    private var drafts: [String: String] {
+        get { draftState.drafts }
+        nonmutating set { draftState.drafts = newValue }
+    }
     @State private var failed = false
     @State private var editing: TextMessage?
     @State private var editDraft = ""
