@@ -186,8 +186,8 @@ workflows:
           set +e # Capture failure status so the following steps can export diagnostics.
           command -v xcbeautify >/dev/null || brew install xcbeautify
           mkdir -p build/logs
-          DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
-          echo "Using simulator: ${DEVICE}"
+          # Keep iPhone as the default; targeted tablet audits opt into iPad.
+          DEVICE=$(python3 Tools/CI/select_simulator.py --family "${DI_SIMULATOR_FAMILY:-iPhone}") || exit 2
           TEST_FILTERS=(-only-testing:DarulIrfanUITests/RedesignScreenshotTests)
           if [ -n "${DI_SCREENSHOT_CASE:-}" ]; then
             case "$DI_SCREENSHOT_CASE" in
@@ -212,7 +212,7 @@ workflows:
           TEST_RUNNER_DI_SCREENSHOTS=${DI_SCREENSHOTS:-1} python3 Tools/CI/run_with_deadline.py --seconds 3000 -- xcodebuild test \
             -project DarulIrfan.xcodeproj \
             -scheme DarulIrfan \
-            -destination "platform=iOS Simulator,name=${DEVICE}" \
+            -destination "platform=iOS Simulator,id=${DEVICE}" \
             "${TEST_FILTERS[@]}" \
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath build/Screens.xcresult \
