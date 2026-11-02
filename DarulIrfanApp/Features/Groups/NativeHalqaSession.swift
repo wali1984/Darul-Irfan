@@ -32,6 +32,12 @@ final class NativeHalqaSession {
 
     func leave() { lifecycle.leave() }
 
+    func submit(_ action: NativeParticipantAction, participantID: String) -> Bool {
+        guard lifecycle.phase == .joined,
+              let transport = lifecycle.transport as? NativeMeetingTransport else { return false }
+        return transport.submit(action, participantID: participantID)
+    }
+
     /// Call only from the room's explicit microphone/camera button.
     func requestCapture(_ kind: HalqaCaptureKind, completion: @escaping (Bool) -> Void) {
         guard lifecycle.phase == .joined,

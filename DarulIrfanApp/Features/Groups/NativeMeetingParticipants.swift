@@ -2,11 +2,17 @@ import Foundation
 import Observation
 import RealtimeKit
 
+enum NativeParticipantAction { case muteAudio, muteVideo, remove, admit, reject }
+
 struct NativeLocalMediaState: Equatable {
     var microphoneEnabled = false
     var cameraEnabled = false
     var microphoneAllowed = false
     var cameraAllowed = false
+    var canMuteParticipants = false
+    var canStopParticipantVideo = false
+    var canRemoveParticipants = false
+    var canAdmitParticipants = false
 }
 
 /// Session-owned participant state. Presentation may disappear without
@@ -44,7 +50,11 @@ final class NativeMeetingParticipants {
         localMedia = NativeLocalMediaState(microphoneEnabled: local.audioEnabled,
                                           cameraEnabled: local.videoEnabled,
                                           microphoneAllowed: local.permissions.media.canPublishAudio,
-                                          cameraAllowed: local.permissions.media.canPublishVideo)
+                                          cameraAllowed: local.permissions.media.canPublishVideo,
+                                          canMuteParticipants: local.permissions.host.canMuteAudio,
+                                          canStopParticipantVideo: local.permissions.host.canMuteVideo,
+                                          canRemoveParticipants: local.permissions.host.canKickParticipant,
+                                          canAdmitParticipants: local.permissions.host.canAcceptRequests)
         revision &+= 1
     }
 

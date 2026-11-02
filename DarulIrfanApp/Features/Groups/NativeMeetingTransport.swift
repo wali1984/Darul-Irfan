@@ -11,6 +11,29 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     let microphoneRequest = HalqaCaptureRequest()
     let cameraRequest = HalqaCaptureRequest()
     private var joined = false
+
+    /// True means the SDK accepted submission, not that a remote participant
+    /// has already changed state. Participant events remain authoritative.
+    func submit(_ action: NativeParticipantAction, participantID: String) -> Bool {
+        guard joined else { return false }
+        let permissions = client.localUser.permissions.host
+        switch action {
+        case .admit, .reject:
+            guard permissions.canAcceptRequests,
+                  client.participants.waitlisted.contains(where: { $0.id == participantID }) else { return false }
+            if action == .admit { client.participants.acceptWaitingRoomRequest(id: participantID) }
+            else { client.participants.rejectWaitingRoomRequest(id: participantID) }
+            return true
+        case .muteAudio, .muteVideo, .remove:
+            guard let person = client.participants.joined.first(where: { $0.id == participantID }) else { return false }
+            switch action {
+            case .muteAudio: return permissions.canMuteAudio && person.disableAudio() == nil
+            case .muteVideo: return permissions.canMuteVideo && person.disableVideo() == nil
+            case .remove: return permissions.canKickParticipant && person.kick() == nil
+            default: return false
+            }
+        }
+    }
     private let info: RtkMeetingInfo
     var onEnded: (() -> Void)?
     var onConnectionChanged: ((HalqaConnectionStatus) -> Void)?
