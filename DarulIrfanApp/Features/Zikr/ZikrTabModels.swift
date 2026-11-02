@@ -263,6 +263,7 @@ struct ZikrPracticeSummary: Equatable {
     let count: Int
     /// Towards its target, 0 to 1; nil for an open-ended counter.
     let progress: Double?
+    var counter: TasbihCounter? = nil
 
     static func latest(from counters: [TasbihCounter]) -> ZikrPracticeSummary? {
         guard let counter = counters.max(by: { $0.updatedAt < $1.updatedAt }) else { return nil }
@@ -270,6 +271,6 @@ struct ZikrPracticeSummary: Equatable {
         if let target = counter.target, target > 0 {
             progress = min(1, Double(max(counter.count, 0)) / Double(target))
         }
-        return ZikrPracticeSummary(count: counter.count, progress: progress)
+        return ZikrPracticeSummary(count: counter.count, progress: progress, counter: counter)
     }
 }

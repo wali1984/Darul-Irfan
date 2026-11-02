@@ -328,27 +328,42 @@ struct ZikrHomeView: View {
 
     /// Tasbih (the counters) and the illustrated Method of Zikr.
     private var practiceTiles: some View {
-        HStack(alignment: .top, spacing: 10) {
-            NavigationLink {
-                TasbihListView(
-                    trackerRepository: dependencies.trackerRepository,
-                    devotionalMetrics: dependencies.devotionalMetrics
-                )
-            } label: {
-                ZikrTasbihTile(practice: viewModel.practice)
-            }
-            .buttonStyle(DIPressableStyle())
-            .accessibilityIdentifier("zikr-tasbih")
+        VStack(spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                NavigationLink {
+                    if let counter = viewModel.practice?.counter {
+                        TasbihCounterView(counter: counter,
+                            trackerRepository: dependencies.trackerRepository,
+                            devotionalMetrics: dependencies.devotionalMetrics)
+                    } else {
+                        TasbihListView(
+                            trackerRepository: dependencies.trackerRepository,
+                            devotionalMetrics: dependencies.devotionalMetrics
+                        )
+                    }
+                } label: {
+                    ZikrTasbihTile(practice: viewModel.practice)
+                }
+                .buttonStyle(DIPressableStyle())
+                .accessibilityIdentifier("zikr-tasbih")
 
-            NavigationLink {
-                NativeMethodOfZikrView(readerFontScale: appState.settings.readerFontScale.rawValue)
-            } label: {
-                ZikrMethodTile()
+                NavigationLink {
+                    NativeMethodOfZikrView(readerFontScale: appState.settings.readerFontScale.rawValue)
+                } label: {
+                    ZikrMethodTile()
+                }
+                .buttonStyle(DIPressableStyle())
+                .accessibilityIdentifier("zikr-method")
             }
-            .buttonStyle(DIPressableStyle())
-            .accessibilityIdentifier("zikr-method")
+            .fixedSize(horizontal: false, vertical: true)
+            if viewModel.practice?.counter != nil {
+                NavigationLink {
+                    TasbihListView(trackerRepository: dependencies.trackerRepository,
+                        devotionalMetrics: dependencies.devotionalMetrics)
+                } label: { Text("Counters") }
+                .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
+            }
         }
-        .fixedSize(horizontal: false, vertical: true)
     }
 
     /// "Recent Bayans", with See all to Discover › Bayans (the `media` route).

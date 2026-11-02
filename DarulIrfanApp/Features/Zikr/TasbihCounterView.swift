@@ -6,6 +6,7 @@ import SwiftUI
 /// The counting logic and persistence live in the view model, untouched.
 @MainActor
 struct TasbihCounterView: View {
+    private let showFullText: Bool
     @State private var viewModel: TasbihCounterViewModel
     @State private var showResetDialog = false
     @State private var isEditing = false
@@ -18,8 +19,10 @@ struct TasbihCounterView: View {
     init(
         counter: TasbihCounter,
         trackerRepository: any TrackerRepositoryProtocol,
-        devotionalMetrics: DevotionalMetricsSyncService
+        devotionalMetrics: DevotionalMetricsSyncService,
+        showFullText: Bool = false
     ) {
+        self.showFullText = showFullText
         _viewModel = State(initialValue: TasbihCounterViewModel(
             counter: counter,
             trackerRepository: trackerRepository,
@@ -46,6 +49,14 @@ struct TasbihCounterView: View {
                 viewModel.increment()
             } label: {
                 VStack(spacing: DISpacing.lg) {
+                    if showFullText {
+                        Text(verbatim: viewModel.counter.title)
+                            .font(DIFont.quranArabic(scale: 1))
+                            .foregroundStyle(DIColor.actionForeground)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, DISpacing.md)
+                    }
                     if viewModel.saveFailed {
                         Text("\(viewModel.counter.count)")
                             .font(.system(size: 44, weight: .light, design: .rounded).monospacedDigit())
@@ -72,10 +83,11 @@ struct TasbihCounterView: View {
             .buttonStyle(TasbihTapButtonStyle())
             .accessibilityLabel("Add one count")
             .accessibilityValue(Text("\(viewModel.counter.count)"))
+            .accessibilityIdentifier("tasbih-count")
 
             controlBar
         }
-        .navigationTitle(viewModel.counter.title)
+        .navigationTitle(showFullText ? String(localized: "Tasbih") : viewModel.counter.title)
         .navigationBarTitleDisplayMode(.inline)
         .diScreenBackground()
         .onChange(of: viewModel.counter.count) { _, _ in

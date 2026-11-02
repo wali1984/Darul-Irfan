@@ -488,10 +488,32 @@ struct TodayZikrCard: View {
         VStack(spacing: 12) {
             TodayLightCardHeader(titleKey: "Zikr of the Day", onShare: onShare)
             if let dhikr {
-                TodayZikrRing(arabic: dhikr.arabic, count: dhikr.count, turns: isShown)
+                TodayZikrRing(arabic: dhikr.arabic, turns: isShown)
                     // Built afresh when shown or hidden, so it starts or rests.
                     .id(isShown)
                     .padding(.top, 6)
+                if let dependencies {
+                    NavigationLink {
+                        TasbihPresetView(title: dhikr.arabic, target: dhikr.count,
+                            trackerRepository: dependencies.trackerRepository,
+                            devotionalMetrics: dependencies.devotionalMetrics)
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "hand.tap")
+                            Text(verbatim: "×\(dhikr.count)").monospacedDigit()
+                        }
+                        .diInterfaceFont(.subheadline, weight: .heavy)
+                        .foregroundStyle(TodayGradients.onGold)
+                        .padding(.horizontal, 16)
+                        .frame(minHeight: 44)
+                        .background(TodayGradients.gold, in: Capsule())
+                        .shadow(color: DIColor.goldGlow.opacity(0.4), radius: 8)
+                    }
+                    .buttonStyle(DIPressableStyle())
+                    .accessibilityLabel(Text("Count with Tasbih"))
+                    .accessibilityValue(Text(verbatim: "\(dhikr.count)"))
+                    .accessibilityIdentifier("today-zikr-count")
+                }
                 if !DIBrand.readsUrdu(locale) {
                     Text(dhikr.transliteration).diInterfaceFont(.title3, weight: .heavy).foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
@@ -501,7 +523,7 @@ struct TodayZikrCard: View {
                 TodayCardFooter(reference: dhikr.source) {
                     if let dependencies {
                         NavigationLink {
-                            TasbihListView(
+                            TasbihPresetView(title: dhikr.arabic, target: dhikr.count,
                                 trackerRepository: dependencies.trackerRepository,
                                 devotionalMetrics: dependencies.devotionalMetrics
                             )
@@ -509,6 +531,7 @@ struct TodayZikrCard: View {
                             TodayPill(titleKey: "Count with Tasbih", systemImage: "hand.tap", kind: .gold)
                         }
                         .buttonStyle(DIPressableStyle())
+                        .accessibilityIdentifier("today-zikr-counter-link")
                     }
                 }
             } else {
@@ -521,7 +544,6 @@ struct TodayZikrCard: View {
 /// The zikr's words in a gold ring that turns slowly, with the count below.
 struct TodayZikrRing: View {
     let arabic: String
-    let count: Int
     var turns = true
     @State private var turning = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -543,6 +565,7 @@ struct TodayZikrRing: View {
                 .accessibilityHidden(true)
             Text(arabic)
                 .font(DIFont.quranArabic(scale: 1.6))
+                .accessibilityIdentifier("today-zikr-arabic")
                 .foregroundStyle(TodayPalette.arabicInk)
                 .diGoldGlow(radius: 10, opacity: 0.4)
                 .multilineTextAlignment(.center)
@@ -550,17 +573,7 @@ struct TodayZikrRing: View {
                 .minimumScaleFactor(0.4)
                 .padding(.horizontal, 26)
                 .environment(\.layoutDirection, .rightToLeft)
-            VStack {
-                Spacer(minLength: 0)
-                Text(verbatim: "\u{00D7}\(count)")
-                    .font(.subheadline.weight(.heavy).monospacedDigit())
-                    .foregroundStyle(TodayGradients.onGold)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(TodayGradients.gold, in: Capsule())
-                    .shadow(color: DIColor.goldGlow.opacity(0.5), radius: 8)
-                    .padding(.bottom, 6)
-            }
+
         }
         .frame(width: 200, height: 200)
         .onAppear {

@@ -21,6 +21,36 @@ final class TrackerRepositoryTests: XCTestCase {
     }
 
     @MainActor
+    func testContextualTasbihReusesMatchingProgressAndKeepsDifferentTargetsSeparate() async throws {
+        let title = "Preset \(UUID().uuidString)"
+        let existing = TasbihCounter(id: UUID(), title: title, target: 100, count: 23, lifetimeCount: 200, updatedAt: Date())
+        try await repository.saveTasbihCounter(existing)
+        let reopened = try await TasbihPresetResolver.resolve(title: title, target: 100, repository: repository)
+        XCTAssertEqual(reopened, existing)
+        let otherTarget = try await TasbihPresetResolver.resolve(title: title, target: 33, repository: repository)
+        XCTAssertNotEqual(otherTarget.id, existing.id)
+        XCTAssertEqual(otherTarget.target, 33)
+        let saved = try await repository.tasbihCounters()
+        XCTAssertEqual(saved.count, 2)
+        XCTAssertEqual(saved.first(where: { $0.id == existing.id }), existing)
+    }
+
+    @MainActor
+    func testConcurrentContextualTasbihLinksCreateOnlyOneCounter() async throws {
+        let title = "Concurrent preset \(UUID().uuidString)"
+        let store = try XCTUnwrap(repository)
+        async let first = TasbihPresetResolver.resolve(title: title, target: 100, repository: store)
+        async let second = TasbihPresetResolver.resolve(title: title, target: 100, repository: store)
+        let pair = try await (first, second)
+        XCTAssertEqual(pair.0.id, pair.1.id)
+        let saved = try await store.tasbihCounters()
+        XCTAssertEqual(saved.count, 1)
+        XCTAssertEqual(saved.first?.title, title)
+        XCTAssertEqual(saved.first?.target, 100)
+        XCTAssertEqual(saved.first?.count, 0)
+    }
+
+    @MainActor
     func testTasbihShortcutCountsVisibleCounterAndStopsAfterLeaving() async throws {
         let initial = TasbihCounter(id: UUID(), title: "Shortcut", target: 1, count: 0, lifetimeCount: 0, updatedAt: Date())
         try await repository.saveTasbihCounter(initial)

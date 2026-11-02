@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -253,6 +253,10 @@ final class RedesignScreenshotTests: XCTestCase {
             guard seek("settings-notifications") else { XCTFail("Notifications route missing"); return }
             shot("notification-choices-top")
             scrollShots("notification-choices", count: 6)
+            return
+        }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "tasbih-preset" {
+            tasbihPresetTour()
             return
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "appearance-controls" {
@@ -537,6 +541,46 @@ final class RedesignScreenshotTests: XCTestCase {
         // Urdu date formatting may prefix the Western clock with an LRM.
         let hour = Int(hourText.filter { $0.isASCII && $0.isNumber }) ?? -1
         XCTAssertTrue((3...6).contains(hour), "Selected-city Fajr must be morning, got \(value.label)")
+    }
+
+    private func tasbihPresetTour() {
+        selectTab(0)
+        let zikrLabel = language == "ur" ? "ذکر" : "Zikr"
+        var selected = false
+        for _ in 0..<10 {
+            let choices = app.buttons.matching(NSPredicate(format: "label == %@", zikrLabel))
+            for choice in choices.allElementsBoundByIndex where choice.isHittable && choice.frame.maxY < app.tabBars.firstMatch.frame.minY {
+                choice.tap()
+                selected = true
+                break
+            }
+            if selected { break }
+            app.swipeUp()
+        }
+        guard selected else { XCTFail("Daily Zikr selector missing"); return }
+        let badge = app.buttons["today-zikr-count"]
+        for _ in 0..<8 {
+            if badge.exists && badge.isHittable { break }
+            app.swipeUp()
+        }
+        let arabic = app.staticTexts["today-zikr-arabic"]
+        XCTAssertTrue(arabic.exists)
+        XCTAssertTrue(badge.isHittable)
+        XCTAssertLessThanOrEqual(arabic.frame.maxY, badge.frame.minY, "Count must sit below Arabic, without overlap")
+        shot("tasbih-preset-today")
+        guard tap(badge) else { XCTFail("Count badge missing"); return }
+        let counter = app.buttons["tasbih-count"]
+        XCTAssertTrue(counter.waitForExistence(timeout: 20), "Badge must open a counter without an editor or list")
+        guard let initial = Int(counter.value as? String ?? "") else { XCTFail("Missing count value"); return }
+        for _ in 0..<3 { counter.tap() }
+        XCTAssertEqual(counter.value as? String, String(initial + 3))
+        shot("tasbih-preset-counted")
+        goBack()
+        guard seek("today-zikr-counter-link") else { return }
+        XCTAssertTrue(counter.waitForExistence(timeout: 20))
+        XCTAssertEqual(counter.value as? String, String(initial + 3), "Footer must reuse the same progress")
+        shot("tasbih-preset-reopened")
+        goBack()
     }
 
     private func appearanceControlsTour() {
