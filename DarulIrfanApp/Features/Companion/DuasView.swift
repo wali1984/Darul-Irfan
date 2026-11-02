@@ -90,6 +90,9 @@ struct DuasView: View {
             }
         }
         .navigationTitle("Duas")
+        // Keep scrolling Arabic and translations from competing with the title.
+        .toolbarBackground(DIColor.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .diScreenBackground()
         .task { viewModel.load() }
     }
