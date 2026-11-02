@@ -30,6 +30,14 @@ struct GroupDetailView: View {
     @State private var actionFailure: String?
     @State private var postToRemove: MemberGroupPost?
     @State private var removingPost = false
+    private struct ScheduleRemoval {
+        let id: String
+        let title: String
+        let isMeeting: Bool
+        var action: LocalizedStringKey { isMeeting ? "Cancel meeting" : "Remove this time" }
+    }
+    @State private var scheduleToRemove: ScheduleRemoval?
+    @State private var removingSchedule = false
     /// Only one video plays at a time: a tapped video expands in place rather
     /// than every card loading a player at once.
     @State private var playingVideoID: String?
@@ -39,6 +47,7 @@ struct GroupDetailView: View {
     @State private var sheet: AdminSheet?
     /// The official Daily Zikr, shown in every halqah while it is live.
     @State private var officialLive: LiveBroadcast?
+    @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var typeSize
 
@@ -134,6 +143,30 @@ struct GroupDetailView: View {
             Button("Cancel", role: .cancel) { postToRemove = nil }
         } message: {
             Text("This removes the announcement from the Halqah. This cannot be undone.")
+        }
+        .confirmationDialog(scheduleToRemove?.action ?? "Remove this time", isPresented: Binding(
+            get: { scheduleToRemove != nil }, set: { if !$0 { scheduleToRemove = nil } }
+        ), titleVisibility: .visible) {
+            if let target = scheduleToRemove {
+                Button(target.action, role: .destructive) {
+                    guard !removingSchedule, detail?.canManage == true else { return }
+                    removingSchedule = true
+                    scheduleToRemove = nil
+                    Task {
+                        defer { removingSchedule = false }
+                        await performChange {
+                            if target.isMeeting {
+                                try await service.cancelMeeting(target.id, in: group.id)
+                            } else {
+                                try await service.removeZikrSession(target.id, in: group.id)
+                            }
+                        }
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { scheduleToRemove = nil }
+        } message: {
+            Text(verbatim: scheduleToRemove?.title ?? "")
         }
         .alert("Could not complete action", isPresented: Binding(
             get: { actionFailure != nil }, set: { if !$0 { actionFailure = nil } }
@@ -295,10 +328,9 @@ struct GroupDetailView: View {
                 DISectionHeader(titleKey: "Halqah Zikr", systemImage: "sparkles")
                 ForEach(sessions) { session in
                     GroupZikrRow(session: session, groupID: group.id, dependencies: dependencies,
-                                 canManage: detail?.canManage == true) {
-                        Task {
-                            await performChange { try await service.removeZikrSession(session.id, in: group.id) }
-                        }
+                                 canManage: detail?.canManage == true, removing: removingSchedule) {
+                        scheduleToRemove = ScheduleRemoval(id: session.id,
+                            title: session.displayTitle(urdu: DIBrand.readsUrdu(locale)), isMeeting: false)
                     }
                     .diScrollReveal()
                 }
@@ -363,14 +395,13 @@ struct GroupDetailView: View {
             Label("Join the meeting", systemImage: "video.fill")
         }
         .buttonStyle(HalqahLiveButtonStyle(isLive: roomOpen))
-        .disabled(joining || !meetingsReady || !(meeting.isOpen() || detail?.canManage == true))
+        .disabled(joining || removingSchedule || !meetingsReady || !(meeting.isOpen() || detail?.canManage == true))
         if detail?.canManage == true {
             Button("Cancel meeting", role: .destructive) {
-                Task {
-                    await performChange { try await service.cancelMeeting(meeting.id, in: group.id) }
-                }
+                scheduleToRemove = ScheduleRemoval(id: meeting.id, title: meeting.title, isMeeting: true)
             }
             .buttonStyle(DISecondaryButtonStyle(destructive: true))
+            .disabled(removingSchedule)
         }
     }
 
@@ -751,6 +782,7 @@ private struct GroupZikrRow: View {
     let groupID: String
     let dependencies: AppDependencies?
     let canManage: Bool
+    let removing: Bool
     let onRemove: () -> Void
 
     @State private var reminderOn = false
@@ -815,6 +847,7 @@ private struct GroupZikrRow: View {
                 if canManage {
                     Button("Remove this time", role: .destructive, action: onRemove)
                         .buttonStyle(DISecondaryButtonStyle(destructive: true))
+                        .disabled(removing)
                 }
             }
         }
