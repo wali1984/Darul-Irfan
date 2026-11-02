@@ -93,10 +93,8 @@ struct OnboardingFlowView: View {
                     DIHaptics.light()
                     viewModel.advance()
                 }
-                .diInterfaceFont(.subheadline, weight: .medium)
-                .foregroundStyle(DIColor.textMuted)
+                .buttonStyle(DICompactButtonStyle())
                 .padding(.horizontal, DISpacing.sm)
-                .frame(minHeight: 44)
             }
         }
         .padding(.horizontal, DISpacing.sm)

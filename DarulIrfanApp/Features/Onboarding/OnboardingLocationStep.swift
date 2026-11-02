@@ -107,8 +107,7 @@ struct OnboardingLocationStep: View {
                         openURL(url)
                     }
                 }
-                .diInterfaceFont(.footnote, weight: .semibold)
-                .foregroundStyle(DIColor.primary)
+                .buttonStyle(DICompactButtonStyle())
             }
         }
         .transition(.opacity)
