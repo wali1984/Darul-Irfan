@@ -25,7 +25,9 @@ struct HalqahAuditFixture: View {
 
     var body: some View {
         NavigationStack {
-            if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-recording-library") {
+                GroupLiveStarter(groupID: "admin", service: service, meetingsReady: false)
+            } else if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
                 DirectoryPersonView(person: DirectoryPerson(
                     id: "audit-person", name: "Audit member", email: nil, lastSeenAt: nil,
                     isSuperAdmin: false, isYou: false,
@@ -64,6 +66,12 @@ struct HalqahAuditFixture: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-recording-library") {
+                TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+                    Text(verbatim: String(HalqahAuditProtocol.recordingRemovalRequests))
+                        .accessibilityIdentifier("recording-removal-requests")
+                }
+            }
             if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
                 TimelineView(.periodic(from: .now, by: 0.25)) { _ in
                     Text(verbatim: String(HalqahAuditProtocol.directoryRemovalRequests))
@@ -118,6 +126,13 @@ private final class HalqahAuditProtocol: URLProtocol {
     private static var postRemovalAttempts = 0
     private static var directoryReads = 0
     private static var directoryRemovals = 0
+    private static var recordingReads = 0
+    private static var recordingRemovals = 0
+    static var recordingRemovalRequests: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return recordingRemovals
+    }
     static var directoryRemovalRequests: Int {
         lock.lock()
         defer { lock.unlock() }
@@ -147,6 +162,33 @@ private final class HalqahAuditProtocol: URLProtocol {
             return
         }
         let parts = url.pathComponents
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-recording-library") {
+            Self.lock.lock()
+            let result: (Int, String)
+            if url.path == "/v1/groups/admin/recordings", request.httpMethod == "GET" {
+                Self.recordingReads += 1
+                if Self.recordingReads == 2 {
+                    result = (503, "{}")
+                } else {
+                    let ids = Self.recordingRemovals >= 2 ? ["keep"] : ["remove", "keep"]
+                    let recordings: [[String: Any]] = ids.map { id in
+                        ["id": id, "title": "Audit recording " + id, "contentType": "audio/mpeg",
+                         "byteSize": 1024, "durationSeconds": 60, "createdAt": "2026-11-01T12:00:00Z"]
+                    }
+                    let body: [String: Any] = ["recordings": recordings, "pastVideos": [], "maxUploadBytes": 99614720]
+                    let data = try! JSONSerialization.data(withJSONObject: body)
+                    result = (200, String(decoding: data, as: UTF8.self))
+                }
+            } else if url.path == "/v1/groups/admin/recordings/remove", request.httpMethod == "DELETE" {
+                Self.recordingRemovals += 1
+                result = (Self.recordingRemovals == 1 ? 503 : 204, "{}")
+            } else {
+                result = (403, "{}")
+            }
+            Self.lock.unlock()
+            respond(result.0, result.1)
+            return
+        }
         if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
             Self.lock.lock()
             let result: (Int, String)

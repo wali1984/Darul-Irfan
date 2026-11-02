@@ -317,10 +317,12 @@ struct GroupLiveStarter: View {
                     Section {
                         Button("Try again") { Task { await loadLibrary() } }
                             .buttonStyle(DICompactButtonStyle())
+                            .accessibilityIdentifier("recording-library-retry")
                     }
                 }
                 if let error {
-                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
+                    Section { Text(verbatim: error).foregroundStyle(DIColor.danger)
+                        .accessibilityIdentifier("recording-library-action-error") }
                 }
                 Section {
                     Button {
@@ -447,6 +449,7 @@ struct GroupLiveStarter: View {
                         Button("Delete recording") { deletingRecording = recording }
                             .buttonStyle(DICompactButtonStyle(destructive: true))
                             .disabled(working || uploading)
+                            .accessibilityIdentifier("recording-delete-" + recording.id)
                     }
                     .swipeActions {
                         Button("Delete", role: .destructive) { deletingRecording = recording }

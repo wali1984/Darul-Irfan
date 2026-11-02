@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule", "picture-refresh", "directory-detail"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule", "picture-refresh", "directory-detail", "recording-library"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -290,6 +290,9 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "picture-refresh" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-picture-refresh"]
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "recording-library" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-recording-library"]
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "directory-detail" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-directory-detail"]
         }
@@ -318,6 +321,10 @@ final class RedesignScreenshotTests: XCTestCase {
             app.launchArguments.append("--uitesting-pdf-controls")
         }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "recording-library" {
+            recordingLibraryTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "directory-detail" {
             directoryDetailTour()
             return
@@ -1163,6 +1170,62 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertEqual(count.label, "2", "Pending refreshes should coalesce")
         XCTAssertFalse(app.staticTexts["Older picture list"].exists)
         shot("picture-refresh-new-list")
+    }
+
+    private func recordingLibraryTour() {
+        let recording = app.buttons[language == "ur" ? "ریکارڈنگ" : "Recording"].firstMatch
+        guard recording.waitForExistence(timeout: 180), tap(recording) else {
+            XCTFail("Recording source must be available"); return
+        }
+        let remove = app.buttons["recording-delete-remove"]
+        let keep = app.buttons["recording-delete-keep"]
+        let count = app.staticTexts["recording-removal-requests"]
+        let failure = app.staticTexts["recording-library-action-error"]
+        let retry = app.buttons["recording-library-retry"]
+        func reveal(_ element: XCUIElement) -> Bool {
+            for _ in 0..<12 {
+                if element.exists && element.isHittable { return true }
+                app.swipeUp(); pause(0.3)
+            }
+            return element.exists && element.isHittable
+        }
+        guard remove.waitForExistence(timeout: 30), reveal(remove) else {
+            XCTFail("Populated recording library did not load"); return
+        }
+        XCTAssertTrue(keep.exists)
+        XCTAssertEqual(count.label, "0")
+        shot("recordings-populated")
+        let cancel = app.alerts.buttons[language == "ur" ? "منسوخ کریں" : "Cancel"]
+        let confirm = app.alerts.buttons[language == "ur" ? "حذف کریں" : "Delete"]
+        func openConfirmation() -> Bool {
+            guard reveal(remove), tap(remove) else { return false }
+            return confirm.waitForExistence(timeout: 10)
+        }
+        guard openConfirmation() else { XCTFail("Recording delete confirmation missing"); return }
+        XCTAssertTrue(app.alerts.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Audit recording remove")).firstMatch.exists)
+        shot("recordings-confirmation")
+        guard tap(cancel) else { XCTFail("Explicit Cancel missing"); return }
+        XCTAssertEqual(count.label, "0", "Cancel must not delete a recording")
+        XCTAssertTrue(remove.exists)
+        guard openConfirmation(), tap(confirm) else { XCTFail("Recording delete not repeatable"); return }
+        XCTAssertTrue(failure.waitForExistence(timeout: 15))
+        XCTAssertTrue(remove.exists, "Failed DELETE must retain the recording")
+        XCTAssertTrue(keep.exists)
+        XCTAssertEqual(count.label, "1")
+        shot("recordings-delete-failed")
+        guard openConfirmation(), tap(confirm) else { XCTFail("Recording retry not available"); return }
+        XCTAssertTrue(remove.waitForNonExistence(timeout: 20), "Successful delete must remove row even if reload fails")
+        XCTAssertTrue(retry.waitForExistence(timeout: 15), "Failed library reload needs Retry")
+        XCTAssertTrue(keep.exists, "Other recordings must remain available")
+        XCTAssertFalse(failure.exists)
+        XCTAssertEqual(count.label, "2")
+        shot("recordings-deleted-refresh-failed")
+        guard reveal(retry), tap(retry) else { XCTFail("Library retry unreachable"); return }
+        XCTAssertTrue(retry.waitForNonExistence(timeout: 15))
+        XCTAssertTrue(keep.exists)
+        XCTAssertFalse(remove.exists)
+        XCTAssertEqual(count.label, "2", "Refresh retry must not send another deletion")
+        shot("recordings-refresh-recovered")
     }
 
     private func halqahScheduleTour() {
