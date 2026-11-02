@@ -178,10 +178,10 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertEqual(duration.seconds, 3.2, accuracy: 0.001)
         let tracks = try await composition.loadTracks(withMediaType: .audio)
         let segments = try await XCTUnwrap(tracks.first).load(.segments)
-        let audio = segments.filter { !$0.isEmpty && $0.sourceURL == url }
+        let audio = segments.filter { !$0.isEmpty && ($0 as? AVCompositionTrackSegment)?.sourceURL == url }
         XCTAssertEqual(audio.count, 2)
         XCTAssertTrue(audio.allSatisfy { $0.timeMapping.source.end.seconds <= 7 })
-        let tail = try XCTUnwrap(segments.last)
+        let tail = try XCTUnwrap(segments.last as? AVCompositionTrackSegment)
         XCTAssertFalse(tail.isEmpty, "Final padding must contain silent media, not a discarded empty range")
         XCTAssertNotEqual(tail.sourceURL, url)
         XCTAssertEqual(tail.timeMapping.target.duration.seconds, 0.1, accuracy: 0.001)
