@@ -8,6 +8,8 @@ struct TodayWeatherView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var unit = CityWeatherSnapshot.deviceUnit()
     @State private var showing = false
+    @State private var linkFailed = false
+    @Environment(\.openURL) private var openURL
     @Environment(\.locale) private var locale
     private static let legal = URL(string: "https://weatherkit.apple.com/legal-attribution.html")!
 
@@ -50,18 +52,28 @@ struct TodayWeatherView: View {
                         }
                         LabeledContent("Temperature unit") { Text("Follows phone settings") }
                         Section {
-                            Link(destination: Self.legal) {
+                            Button {
+                                openURL(Self.legal) { accepted in linkFailed = !accepted }
+                            } label: {
                                 HStack(spacing: 16) {
                                     Image("AppleWeatherMark").renderingMode(.original).resizable().scaledToFit().frame(width: 77, height: 14)
                                     Text("Apple Weather data sources").diInterfaceFont(.caption).foregroundStyle(.white)
-                                }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
+                                }.frame(maxWidth: .infinity, alignment: .leading).padding(14).frame(minHeight: 44)
                                     .background(Color(hex: 0x086B50), in: RoundedRectangle(cornerRadius: 12))
                             }.accessibilityLabel(Text("Apple Weather data sources"))
                         } footer: {
                             Text("Apple Weather uses your selected city's approximate location. Precise device coordinates are not sent.")
                         }
                     }
+                    .diInterfaceFont(.body)
+                    .scrollContentBackground(.hidden)
+                    .diScreenBackground()
                     .navigationTitle("Local weather")
+                    .alert("Unable to open link", isPresented: $linkFailed) {
+                        Button("OK", role: .cancel) { }
+                    } message: {
+                        Text("No app could open this link. Please check that a suitable app is installed.")
+                    }
                     .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { showing = false } } }
                 }
                 .environment(\.timeZone, timeZone)
