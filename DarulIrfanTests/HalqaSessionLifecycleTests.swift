@@ -1,7 +1,32 @@
 import XCTest
+import RealtimeKit
 @testable import DarulIrfan
 
 final class HalqaSessionLifecycleTests: XCTestCase {
+    @MainActor
+    func testMembershipRemovalReleasesOnceAndCannotCompletePendingJoin() async {
+        let model = HalqaSessionLifecycle()
+        let transport = FakeHalqaTransport()
+        model.start(sessionID: "one") { transport }
+        let events = NativeMeetingMembershipEvents()
+        let terminalEvents = expectation(description: "Removal and rejection delivered")
+        terminalEvents.expectedFulfillmentCount = 2
+        terminalEvents.assertForOverFulfill = true
+        events.ended = { transport.onEnded?(); terminalEvents.fulfill() }
+        events.onWaitListStatusUpdate(waitListStatus: .none)
+        events.onWaitListStatusUpdate(waitListStatus: .waiting)
+        events.onWaitListStatusUpdate(waitListStatus: .accepted)
+        events.onRemovedFromMeeting()
+        events.onWaitListStatusUpdate(waitListStatus: .rejected)
+        await fulfillment(of: [terminalEvents], timeout: 2)
+        XCTAssertEqual(transport.releaseCalls, 1)
+        transport.initialized?(true)
+        XCTAssertEqual(transport.joinCalls, 0)
+        transport.released?(true)
+        XCTAssertNil(model.transport)
+        XCTAssertEqual(model.phase, .idle)
+    }
+
     @MainActor
     func testReconnectKeepsSessionAndLateNetworkEventsCannotChangeReplacement() {
         let model = HalqaSessionLifecycle()
@@ -103,7 +128,8 @@ private final class FakeHalqaTransport: HalqaSessionTransport {
     var joined: ((Bool) -> Void)?
     var released: ((Bool) -> Void)?
     var joinCalls = 0
+    var releaseCalls = 0
     func initialize(completion: @escaping (Bool) -> Void) { initialized = completion }
     func join(completion: @escaping (Bool) -> Void) { joinCalls += 1; joined = completion }
-    func release(completion: @escaping (Bool) -> Void) { released = completion }
+    func release(completion: @escaping (Bool) -> Void) { releaseCalls += 1; released = completion }
 }

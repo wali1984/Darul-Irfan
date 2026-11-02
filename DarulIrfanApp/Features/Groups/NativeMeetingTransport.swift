@@ -10,12 +10,15 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     var onEnded: (() -> Void)?
     var onConnectionChanged: ((HalqaConnectionStatus) -> Void)?
     private let events = NativeMeetingEvents()
+    private let membershipEvents = NativeMeetingMembershipEvents()
 
     init(authToken: String) {
         info = NativeMeetingConfiguration.meetingInfo(authToken: authToken)
         events.ended = { [weak self] in self?.onEnded?() }
         events.connectionChanged = { [weak self] status in self?.onConnectionChanged?(status) }
+        membershipEvents.ended = { [weak self] in self?.onEnded?() }
         client.addMeetingRoomEventListener(meetingRoomEventListener: events)
+        client.addSelfEventListener(selfEventListener: membershipEvents)
     }
 
     func initialize(completion: @escaping (Bool) -> Void) {
@@ -31,11 +34,36 @@ final class NativeMeetingTransport: HalqaSessionTransport {
 
     func release(completion: @escaping (Bool) -> Void) {
         client.release(onSuccess: { [weak self] in Task { @MainActor in
-            if let self { self.client.removeMeetingRoomEventListener(meetingRoomEventListener: self.events) }
+            if let self {
+                self.client.removeMeetingRoomEventListener(meetingRoomEventListener: self.events)
+                self.client.removeSelfEventListener(selfEventListener: self.membershipEvents)
+            }
             completion(true)
         } },
                        onFailure: { _ in Task { @MainActor in completion(false) } })
     }
+}
+
+/// A host removal/rejection is terminal, unlike a temporary network loss.
+final class NativeMeetingMembershipEvents: NSObject, RtkSelfEventListener {
+    var ended: (@MainActor () -> Void)?
+    func onRemovedFromMeeting() { Task { @MainActor in ended?() } }
+    func onWaitListStatusUpdate(waitListStatus: WaitListStatus) {
+        if waitListStatus == .rejected { Task { @MainActor in ended?() } }
+    }
+    func onAudioDeviceChanged(audioDevice: AudioDevice) {}
+    func onAudioDevicesUpdated(devices: [AudioDevice]) {}
+    func onAudioUpdate(isEnabled: Bool) {}
+    func onMeetingRoomJoinedWithoutCameraPermission() {}
+    func onMeetingRoomJoinedWithoutMicPermission() {}
+    func onPermissionsUpdated(permission: SelfPermissions) {}
+    func onPinned() {}
+    func onScreenShareStartFailed(reason: String) {}
+    func onScreenShareUpdate(isEnabled: Bool) {}
+    func onUnpinned() {}
+    func onUpdate(participant_: RtkSelfParticipant) {}
+    func onVideoDeviceChanged(videoDevice: VideoDevice) {}
+    func onVideoUpdate(isEnabled: Bool) {}
 }
 
 private final class NativeMeetingEvents: NSObject, RtkMeetingRoomEventListener {
