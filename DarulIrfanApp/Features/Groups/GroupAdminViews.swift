@@ -676,7 +676,8 @@ struct GroupMeetingScheduler: View {
             Group {
                 Section {
                     TextField("Title", text: $title)
-                    DatePicker("Starts", selection: $startsAt, in: Date()...)
+                    DatePicker("Starts", selection: $startsAt, in: Date()..., displayedComponents: .date)
+                    DatePicker("Time", selection: $startsAt, in: Date()..., displayedComponents: .hourAndMinute)
                     Stepper(value: $duration, in: 15...240, step: 15) {
                         Text("\(duration) minutes")
                     }
