@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule", "picture-refresh", "directory-detail", "recording-library"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "reader-position", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls", "halqah-schedule", "picture-refresh", "directory-detail", "recording-library", "playback-choices"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -290,6 +290,9 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "picture-refresh" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-picture-refresh"]
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "playback-choices" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-playback-choices"]
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "recording-library" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-recording-library"]
         }
@@ -321,6 +324,10 @@ final class RedesignScreenshotTests: XCTestCase {
             app.launchArguments.append("--uitesting-pdf-controls")
         }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "playback-choices" {
+            playbackChoicesTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "recording-library" {
             recordingLibraryTour()
             return
@@ -1170,6 +1177,57 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertEqual(count.label, "2", "Pending refreshes should coalesce")
         XCTAssertFalse(app.staticTexts["Older picture list"].exists)
         shot("picture-refresh-new-list")
+    }
+
+    private func playbackChoicesTour() {
+        let route = app.buttons["autoplay-choices"]
+        let expand = app.buttons["autoplay-expand-videos"]
+        func reveal(_ element: XCUIElement, upward: Bool = true) -> Bool {
+            for _ in 0..<22 {
+                if element.exists && element.isHittable { return true }
+                if upward { app.swipeUp() } else { app.swipeDown() }
+                pause(0.25)
+            }
+            return element.exists && element.isHittable
+        }
+        guard route.waitForExistence(timeout: 180), reveal(route), tap(route) else {
+            XCTFail("Scheduled playback choices must open"); return
+        }
+        guard expand.waitForExistence(timeout: 15), reveal(expand) else {
+            XCTFail("Older videos need a visible expansion control"); return
+        }
+        XCTAssertTrue(expand.label.contains("45"), "Show all must display the full returned count")
+        shot("playback-choices-collapsed")
+        guard tap(expand) else { XCTFail("Show all unavailable"); return }
+        for index in [21, 45] {
+            let choice = app.buttons[String(format: "autoplay-choice-past%07d", index)]
+            guard reveal(choice), tap(choice) else {
+                XCTFail("Returned video \(index) must be selectable"); return
+            }
+            XCTAssertTrue(route.waitForExistence(timeout: 15))
+            XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Audit video \(index)")).firstMatch.exists,
+                          "The editor must retain the selected title")
+            shot("playback-selected-\(index)")
+            guard reveal(route), tap(route), reveal(choice) else {
+                XCTFail("Later selection must remain reachable on reopening"); return
+            }
+            XCTAssertTrue(choice.isSelected)
+            shot("playback-reopened-\(index)")
+        }
+        guard reveal(expand, upward: false), tap(expand) else {
+            XCTFail("Expanded list must collapse"); return
+        }
+        XCTAssertTrue(expand.label.contains("45"))
+        shot("playback-collapsed-with-selection")
+        goBack()
+        XCTAssertTrue(route.waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Audit video 45")).firstMatch.exists)
+        guard reveal(route), tap(route) else { XCTFail("Picker must reopen after collapse"); return }
+        let last = app.buttons["autoplay-choice-past0000045"]
+        XCTAssertTrue(reveal(last))
+        XCTAssertTrue(last.isSelected, "Collapsing must preserve the selection")
+        shot("playback-final-selection")
+        goBack()
     }
 
     private func recordingLibraryTour() {

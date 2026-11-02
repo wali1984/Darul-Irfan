@@ -825,6 +825,7 @@ struct GroupZikrEditor: View {
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                         }
+                        .accessibilityIdentifier("autoplay-choices")
                     } footer: {
                         Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.").foregroundStyle(DIColor.textMuted)
                     }
@@ -949,6 +950,7 @@ private struct GroupAutoplayChoices: View {
                         else { Text("Show all \(library.pastVideos.count)") }
                     }
                     .buttonStyle(DICompactButtonStyle())
+                    .accessibilityIdentifier("autoplay-expand-videos")
                 }
                 ForEach(library.pastVideos.prefix(showAllPastVideos ? library.pastVideos.count : 20)) { video in
                     choice(.video(video.videoID), title: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
@@ -984,5 +986,6 @@ private struct GroupAutoplayChoices: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(entry == selection ? .isSelected : [])
+        .accessibilityIdentifier("autoplay-choice-" + (entry?.payload.values.first ?? "none"))
     }
 }

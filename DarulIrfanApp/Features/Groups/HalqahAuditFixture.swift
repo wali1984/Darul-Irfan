@@ -25,7 +25,9 @@ struct HalqahAuditFixture: View {
 
     var body: some View {
         NavigationStack {
-            if ProcessInfo.processInfo.arguments.contains("--uitesting-recording-library") {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-playback-choices") {
+                GroupZikrEditor(groupID: "admin", service: service)
+            } else if ProcessInfo.processInfo.arguments.contains("--uitesting-recording-library") {
                 GroupLiveStarter(groupID: "admin", service: service, meetingsReady: false)
             } else if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
                 DirectoryPersonView(person: DirectoryPerson(
@@ -162,6 +164,19 @@ private final class HalqahAuditProtocol: URLProtocol {
             return
         }
         let parts = url.pathComponents
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-playback-choices") {
+            guard url.path == "/v1/groups/admin/recordings", request.httpMethod == "GET" else {
+                respond(403, "{}"); return
+            }
+            let videos: [[String: Any]] = (1...45).map { index in
+                ["videoID": String(format: "past%07d", index), "title": "Audit video \(index)",
+                 "publishedAt": "2026-11-01T12:00:00Z", "durationSeconds": 600]
+            }
+            let body: [String: Any] = ["recordings": [], "pastVideos": videos, "maxUploadBytes": 99614720]
+            let data = try! JSONSerialization.data(withJSONObject: body)
+            respond(200, String(decoding: data, as: UTF8.self))
+            return
+        }
         if ProcessInfo.processInfo.arguments.contains("--uitesting-recording-library") {
             Self.lock.lock()
             let result: (Int, String)
