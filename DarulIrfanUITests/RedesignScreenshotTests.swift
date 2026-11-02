@@ -706,7 +706,15 @@ final class RedesignScreenshotTests: XCTestCase {
             let toggle = app.switches[fontLabel].firstMatch
             XCTAssertTrue(toggle.waitForExistence(timeout: 10))
             let value = enabled ? "1" : "0"
-            if (toggle.value as? String) != value { toggle.tap() }
+            if (toggle.value as? String) != value {
+                // SwiftUI exposes the labelled row as a Switch as well as the
+                // actual UISwitch. The row midpoint is empty space, not the
+                // control. Tap the visible switch at the trailing (RTL-aware)
+                // edge; keep the value assertion below to verify the mutation.
+                toggle.coordinate(withNormalizedOffset: CGVector(
+                    dx: language == "ur" ? 0.125 : 0.875, dy: 0.5
+                )).tap()
+            }
             expectation(for: NSPredicate(format: "value == %@", value), evaluatedWith: toggle)
             waitForExpectations(timeout: 10)
             shot("reading-font-setting-\(enabled)")
