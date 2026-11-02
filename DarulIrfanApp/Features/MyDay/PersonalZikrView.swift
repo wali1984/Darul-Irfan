@@ -103,8 +103,10 @@ struct PersonalZikrView: View {
                     .diResponsiveWidth()
                 }
                 .diScreenBackground()
-                .navigationTitle("Add a Muraqaba")
-                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { adding = false } } }
+                .toolbar(.hidden, for: .navigationBar)
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    editorHeader(title: Text("Add a Muraqaba"), action: "Cancel") { adding = false }
+                }
             }
             .tint(DIColor.actionForeground)
             .presentationDetents([.medium, .large])
@@ -239,12 +241,33 @@ struct PersonalZikrView: View {
             .scrollContentBackground(.hidden)
             .diInterfaceFont(.body)
             .diScreenBackground()
-            .navigationTitle(step.localizedTitle)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { choosing = nil } } }
+            .toolbar(.hidden, for: .navigationBar)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                editorHeader(title: Text(step.localizedTitle), action: "Done") { choosing = nil }
+            }
         }
         .tint(DIColor.actionForeground)
         .presentationDetents([.medium, .large])
     }
+    private func editorHeader(title: Text, action: LocalizedStringKey, onAction: @escaping () -> Void) -> some View {
+        VStack(spacing: DISpacing.sm) {
+            title
+                .diInterfaceFont(.headline)
+                .foregroundStyle(DIColor.textPrimary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+                .accessibilityAddTraits(.isHeader)
+            Button(action, action: onAction)
+                .buttonStyle(DISecondaryButtonStyle())
+        }
+        .padding(.horizontal, DISpacing.md)
+        .padding(.vertical, DISpacing.sm)
+        .diResponsiveWidth()
+        .frame(maxWidth: .infinity)
+        .background(DIColor.background)
+    }
+
     private func refreshAlertAccess() async {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
         guard !Task.isCancelled else { return }
