@@ -68,6 +68,34 @@ final class StorageSettingsTests: XCTestCase {
         XCTAssertTrue(after.isEmpty, "Missing files should permit stale-record cleanup")
     }
 
+    func testCanceledDownloadFinishingAfterRetryDoesNotClearReplacement() async throws {
+        let firstStarted = expectation(description: "First transfer started")
+        let retryStarted = expectation(description: "Replacement transfer started")
+        let transport = DelayedCancellationDownloadFetcher(started: [firstStarted, retryStarted])
+        let manager = DownloadManager(downloadsRepository: StorageTestRepository([]), fetcher: transport)
+        let url = try XCTUnwrap(URL(string: "https://example.invalid/cancel-retry.mp3"))
+        let first = Task { try await manager.download(url: url, forContentItem: nil, mediaItemID: nil) }
+        await fulfillment(of: [firstStarted], timeout: 5)
+        manager.cancelDownload(url: url)
+        XCTAssertNil(manager.activeDownloads[url.absoluteString])
+        let retry = Task { try await manager.download(url: url, forContentItem: nil, mediaItemID: nil) }
+        await fulfillment(of: [retryStarted], timeout: 5)
+        XCTAssertEqual(manager.activeDownloads[url.absoluteString], 0)
+
+        // Deliberately finish the canceled network request after the retry started.
+        await transport.failAttempt(0)
+        if case .success = await first.result { XCTFail("Canceled transfer must fail") }
+        XCTAssertEqual(manager.activeDownloads[url.absoluteString], 0,
+                       "Late cleanup from the canceled attempt must not hide the replacement")
+
+        manager.cancelDownload(url: url)
+        XCTAssertNil(manager.activeDownloads[url.absoluteString])
+        await transport.failAttempt(1)
+        if case .success = await retry.result { XCTFail("Canceled retry must fail") }
+        let attempts = await transport.attemptCount
+        XCTAssertEqual(attempts, 2)
+    }
+
     func testInvalidStoredPathsCannotResolveOutsideDownloads() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("downloads", isDirectory: true)
         for directoryHint in [true, false] {
@@ -107,5 +135,24 @@ private final class StorageTestManager: DownloadManaging {
     func deleteAsset(_ asset: DownloadedAsset) async throws {
         if asset.id == failureID { throw CocoaError(.fileWriteNoPermission) }
         await repository.deleteAsset(id: asset.id)
+    }
+}
+
+/// Holds cancellation completion until the test explicitly releases each attempt.
+private actor DelayedCancellationDownloadFetcher: DownloadFetching {
+    let started: [XCTestExpectation]
+    private var pending: [Int: CheckedContinuation<(URL, URLResponse), Error>] = [:]
+    private(set) var attemptCount = 0
+    init(started: [XCTestExpectation]) { self.started = started }
+    func fetch(_ url: URL, progress: @escaping @Sendable (Double) -> Void) async throws -> (URL, URLResponse) {
+        let attempt = attemptCount
+        attemptCount += 1
+        return try await withCheckedThrowingContinuation { continuation in
+            pending[attempt] = continuation
+            if attempt < started.count { started[attempt].fulfill() }
+        }
+    }
+    func failAttempt(_ attempt: Int) {
+        pending.removeValue(forKey: attempt)?.resume(throwing: URLError(.cancelled))
     }
 }

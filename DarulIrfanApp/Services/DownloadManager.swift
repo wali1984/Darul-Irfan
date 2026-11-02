@@ -36,6 +36,17 @@ enum DownloadFileAccess {
     }
 }
 
+/// Injectable transport allows cancellation races to be tested without network timing.
+protocol DownloadFetching: Sendable {
+    func fetch(_ url: URL, progress: @escaping @Sendable (Double) -> Void) async throws -> (URL, URLResponse)
+}
+
+struct URLSessionDownloadFetcher: DownloadFetching {
+    func fetch(_ url: URL, progress: @escaping @Sendable (Double) -> Void) async throws -> (URL, URLResponse) {
+        try await DownloadManager.fetch(url, progress: progress)
+    }
+}
+
 // MARK: - DownloadManager
 
 /// Live implementation of `DownloadManaging`.
@@ -68,10 +79,13 @@ final class DownloadManager: DownloadManaging {
     private var transferIDs: [String: UUID] = [:]
 
     private let removeFile: (URL) throws -> Void
+    private let fetcher: any DownloadFetching
 
     init(downloadsRepository: any DownloadsRepositoryProtocol,
+         fetcher: any DownloadFetching = URLSessionDownloadFetcher(),
          removeFile: @escaping (URL) throws -> Void = { try FileManager.default.removeItem(at: $0) }) {
         self.downloadsRepository = downloadsRepository
+        self.fetcher = fetcher
         self.removeFile = removeFile
     }
 
@@ -96,9 +110,10 @@ final class DownloadManager: DownloadManaging {
         }
 
         let repository = downloadsRepository
+        let fetcher = self.fetcher
         let transferID = UUID()
         let transfer = Task { () throws -> DownloadedAsset in
-            let (temporaryURL, response) = try await DownloadManager.fetch(url) { [weak self] fraction in
+            let (temporaryURL, response) = try await fetcher.fetch(url) { [weak self] fraction in
                 Task { @MainActor in self?.reportProgress(fraction, for: key, transferID: transferID) }
             }
 
@@ -237,7 +252,7 @@ final class DownloadManager: DownloadManaging {
     /// Downloads `url` to a temporary file the caller then owns, reporting
     /// the fraction received in steps of at least one percent. Cancelling the
     /// calling task cancels the transfer.
-    private nonisolated static func fetch(
+    fileprivate nonisolated static func fetch(
         _ url: URL,
         progress: @escaping @Sendable (Double) -> Void
     ) async throws -> (URL, URLResponse) {
