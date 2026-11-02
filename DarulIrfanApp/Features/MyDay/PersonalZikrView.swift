@@ -204,6 +204,7 @@ struct PersonalZikrView: View {
                 Spacer(minLength: 0)
                 Toggle(step.localizedTitle, isOn: Binding(get: { selected }, set: { store.configure(step, enabled: $0) }))
                     .labelsHidden().disabled(store.run != nil)
+                    .frame(minHeight: 48)
             }
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) { stageActions(step, selected: selected) }
