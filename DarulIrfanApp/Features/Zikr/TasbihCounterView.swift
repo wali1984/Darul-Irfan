@@ -96,6 +96,8 @@ struct TasbihCounterView: View {
             .accessibilityValue(Text("\(viewModel.counter.count)"))
             .accessibilityIdentifier("tasbih-count")
 
+            MethodOfZikrLink(compact: true)
+                .padding(.vertical, DISpacing.sm)
             controlBar.disabled(viewModel.loadFailed || viewModel.missing)
         }
         .navigationTitle(showFullText ? String(localized: "Tasbih") : viewModel.counter.title)

@@ -628,6 +628,17 @@ final class RedesignScreenshotTests: XCTestCase {
         for _ in 0..<3 { counter.tap() }
         XCTAssertEqual(counter.value as? String, String(initial + 3))
         shot("tasbih-preset-counted")
+        let method = app.buttons["method-of-zikr-shortcut"]
+        XCTAssertTrue(method.isHittable, "Guide must be available beside the counter controls")
+        guard tap(method) else { XCTFail("Counter guide missing"); return }
+        XCTAssertTrue(app.staticTexts["method-guide-load-error"].exists == false)
+        let guideSection = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "method-guide-section-")).firstMatch
+        XCTAssertTrue(guideSection.waitForExistence(timeout: 30), "Counter guide must load")
+        shot("tasbih-preset-method-guide")
+        goBack()
+        XCTAssertTrue(counter.waitForExistence(timeout: 10))
+        XCTAssertEqual(counter.value as? String, String(initial + 3), "Opening the guide must preserve the count")
         goBack()
         let footer = app.buttons["today-zikr-counter-link"]
         for _ in 0..<10 {
