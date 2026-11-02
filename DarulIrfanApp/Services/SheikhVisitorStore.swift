@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-struct SheikhVisitorProfile: Codable, Sendable {
+struct SheikhVisitorProfile: Codable, Sendable, Equatable {
     var name = ""
     var city = ""
     var countryCode = ""
@@ -58,6 +58,24 @@ enum SheikhVisitorStore {
         lock.lock(); defer { lock.unlock() }
         try write(identity)
         if identity.admitted { UserDefaults.standard.removeObject(forKey: signedOutKey) }
+    }
+
+    /// Update only the profile of an identity still present on this device.
+    /// A disappearing form must neither resurrect a signed-out visitor nor
+    /// overwrite admission metadata saved by a concurrent join.
+    static func saveDraft(_ profile: SheikhVisitorProfile, matching secret: String) throws {
+        lock.lock(); defer { lock.unlock() }
+        var lookup = query
+        lookup[kSecReturnData as String] = true
+        lookup[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(lookup as CFDictionary, &result)
+        if status == errSecItemNotFound { return }
+        guard status == errSecSuccess, let data = result as? Data else { throw MemberGroupError.requestFailed }
+        var current = try JSONDecoder().decode(SheikhVisitorIdentity.self, from: data)
+        guard current.guestSecret == secret, current.profile != profile else { return }
+        current.profile = profile
+        try write(current)
     }
 
     private static func write(_ identity: SheikhVisitorIdentity) throws {

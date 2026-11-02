@@ -55,6 +55,7 @@ struct OurSheikhEntryView: View {
                             Button("Retry") { Task { await load() } }
                         }
                     }
+                    .disabled(busy)
                     .textFieldStyle(.roundedBorder)
                     .padding(24)
                     .diGlassPanel(cornerRadius: 26)
@@ -66,6 +67,10 @@ struct OurSheikhEntryView: View {
             }
         }
         .task { await load() }
+        .onDisappear { saveDraft() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { saveDraft() }
+        }
         .task(id: "\(group?.id ?? "")-\(scenePhase)") {
             guard group != nil, scenePhase == .active else { return }
             notices.platform = dependencies.officialPlatform
@@ -86,6 +91,12 @@ struct OurSheikhEntryView: View {
     }
 
     private func country(_ code: String) -> String { locale.localizedString(forRegionCode: code) ?? code }
+
+    private func saveDraft() {
+        guard group == nil, let identity, profile != identity.profile else { return }
+        do { try SheikhVisitorStore.saveDraft(profile, matching: identity.guestSecret) }
+        catch { self.error = error.localizedDescription }
+    }
 
     private func signIn(_ result: Result<ASAuthorization, Error>) async {
         busy = true; error = nil
