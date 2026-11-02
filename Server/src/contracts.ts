@@ -116,6 +116,10 @@ export interface AndroidDeviceRegistration {
 
 export interface Env {
   WEATHERKIT_TEAM_ID?: string;
+  PLACES_API_KEY?: string;
+  PLACES_ENABLED?: string;
+  PLACES_DAILY_LIMIT?: string;
+  PLACES_MONTHLY_LIMIT?: string;
   WEATHERKIT_KEY_ID?: string;
   WEATHERKIT_SERVICE_ID?: string;
   WEATHERKIT_PRIVATE_KEY?: string;

@@ -18,6 +18,7 @@ import { serveMedia } from "./media";
 import { quranAudioFile, quranAudioManifest } from "./audio";
 import { appReleases } from "./releases";
 import { currentWeather } from "./weather";
+import { nearbyMasjids } from "./nearbyMasjids";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
@@ -110,6 +111,8 @@ async function route(request: Request, env: Env): Promise<Response> {
   if ((request.method === "GET" || request.method === "HEAD") && path === "/v1/app/releases") return appReleases(env);
   if (request.method === "GET" && path === "/v1/weather/current")
     return currentWeather(request, env, () => withinWriteLimit(request, env, "weather-misses", 120));
+  if (request.method === "GET" && path === "/v1/masjids/nearby")
+    return nearbyMasjids(request, env, () => withinWriteLimit(request, env, "nearby-masjids", 10));
   // Pictures and recordings, by signed and expiring link only.
   if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/media/")) {
     return serveMedia(request, env, path.slice("/v1/media/".length), url);
