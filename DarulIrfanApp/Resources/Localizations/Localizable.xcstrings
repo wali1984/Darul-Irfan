@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "This post was already saved with different details. Close this form and check the posts and drafts before posting again.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "This post was already saved with different details. Close this form and check the posts and drafts before posting again."}}, "ur": {"stringUnit": {"state": "translated", "value": "یہ پوسٹ مختلف تفصیلات کے ساتھ پہلے ہی محفوظ ہو چکی ہے۔ یہ فارم بند کریں اور دوبارہ پوسٹ کرنے سے پہلے پوسٹس اور مسودے دیکھ لیں۔"}}}},
 "Past sessions could not be loaded. Please try again.": {
     "extractionState": "manual",
     "localizations": {

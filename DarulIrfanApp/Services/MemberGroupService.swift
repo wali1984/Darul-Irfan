@@ -21,6 +21,7 @@ enum MemberGroupError: LocalizedError {
     case notSignedIn
     case requestFailed
     case inviteRejected
+    case postRequestConflict
     case meetingRequestConflict
     case tooManyAttempts
     /// A refusal the server explained in words meant for the person.
@@ -49,6 +50,7 @@ enum MemberGroupError: LocalizedError {
         // this: anything finer would help someone guess at codes.
         case .inviteRejected: String(localized: "That invitation code is not valid, or it has already been used. Please check it with the administrator who gave it to you.")
         case .tooManyAttempts: String(localized: "Too many attempts. Please wait a few minutes and try again.")
+        case .postRequestConflict: String(localized: "This post was already saved with different details. Close this form and check the posts and drafts before posting again.")
         case .meetingRequestConflict: String(localized: "This meeting was already scheduled with different details. Close this form and check the meetings list before scheduling another.")
         case .server(let message): message
         }
@@ -250,8 +252,9 @@ actor MemberGroupService {
     // MARK: Group admin actions
 
     /// `media` are keys from `uploadPostMedia`, in the order they show.
-    func createPost(in groupID: String, title: String, body: String?, videoID: String?, media: [String] = [], publish: Bool) async throws {
+    func createPost(in groupID: String, title: String, body: String?, videoID: String?, media: [String] = [], publish: Bool, requestID: UUID? = nil) async throws {
         var payload: [String: Any] = ["title": title, "kind": "announcement", "publish": publish]
+        if let requestID { payload["requestID"] = requestID.uuidString }
         if let body, !body.isEmpty { payload["body"] = body }
         if let videoID { payload["youtubeVideoID"] = videoID }
         if !media.isEmpty { payload["media"] = media }
@@ -599,6 +602,11 @@ actor MemberGroupService {
             throw MemberGroupError.notSignedIn
         }
         guard savedSession.load()?.token == saved.token else { throw CancellationError() }
+        if code == 409,
+           let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+           body["code"] as? String == "post_request_conflict" {
+            throw MemberGroupError.postRequestConflict
+        }
         if code == 409,
            let body = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
            body["code"] as? String == "meeting_request_conflict" {

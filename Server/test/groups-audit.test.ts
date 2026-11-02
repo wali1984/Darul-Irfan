@@ -241,6 +241,75 @@ describe("LIVE-032: a retired Halqah", () => {
 });
 
 
+describe("post creation retries", () => {
+  const path = "/v1/groups/usa/posts";
+  const body = { requestID: "91ba7dfe-47d4-4dfe-b813-96b7573ab357", title: "Retry-safe post", body: "Original", publish: true };
+
+  it("converges concurrent retries on one post and one notification lookup", async () => {
+    const { call, raw, env, admin } = await setup();
+    const prepare = env.DB.prepare.bind(env.DB);
+    let lookups = 0;
+    vi.spyOn(env.DB, "prepare").mockImplementation(sql => {
+      if (sql.includes("SELECT DISTINCT d.installation_id")) lookups++;
+      return prepare(sql);
+    });
+    const responses = await Promise.all(Array.from({ length: 8 }, () => call(admin, "POST", path, body)));
+    expect(responses.map(r => r.status)).toEqual(Array(8).fill(201));
+    const results = await Promise.all(responses.map(r => r.json() as Promise<{ id: string }>));
+    expect(new Set(results.map(r => r.id)).size).toBe(1);
+    expect(raw.prepare("SELECT count(*) AS n FROM member_group_posts WHERE source='admin'").get()).toEqual({ n: 1 });
+    expect(lookups).toBe(1);
+  });
+
+  it.each([{ title: "Changed" }, { body: "Changed" }, { publish: false }, { youtubeVideoID: "abcdefghijk" },
+    { linkURL: "https://example.com/changed" }])("rejects changed details without creating another post: %j", async change => {
+    const { call, raw, admin } = await setup();
+    expect((await call(admin, "POST", path, body)).status).toBe(201);
+    const conflict = await call(admin, "POST", path, { ...body, ...change });
+    expect(conflict.status).toBe(409);
+    expect(await conflict.json()).toMatchObject({ code: "post_request_conflict" });
+    expect(raw.prepare("SELECT count(*) AS n FROM member_group_posts WHERE source='admin'").get()).toEqual({ n: 1 });
+  });
+
+  it("reuses the same attachment keys and rejects changed attachment order on retry", async () => {
+    const { call, raw, media, admin } = await setup();
+    const firstKey = "posts/usa/11111111-1111-4111-8111-111111111111.jpg";
+    const secondKey = "posts/usa/22222222-2222-4222-8222-222222222222.jpg";
+    media.stored.set(firstKey, 123);
+    media.stored.set(secondKey, 456);
+    const input = { ...body, media: [firstKey, secondKey] };
+    const first = await call(admin, "POST", path, input);
+    expect(first.status).toBe(201);
+    const retry = await call(admin, "POST", path, input);
+    expect(retry.status).toBe(201);
+    expect(await retry.json()).toEqual(await first.json());
+    expect((await call(admin, "POST", path, { ...input, media: [secondKey, firstKey] })).status).toBe(409);
+    expect(raw.prepare("SELECT count(*) AS n FROM member_group_posts WHERE source='admin'").get()).toEqual({ n: 1 });
+  });
+
+  it("does not restore hidden posts and rechecks author permissions", async () => {
+    const { call, raw, admin, senior, member } = await setup();
+    const first = await call(admin, "POST", path, body);
+    const { id } = await first.json() as { id: string };
+    expect((await call(admin, "DELETE", `${path}/${id}`)).status).toBe(204);
+    expect((await call(admin, "POST", path, body)).status).toBe(201);
+    expect(raw.prepare("SELECT is_hidden FROM member_group_posts WHERE id=?").get(id)).toEqual({ is_hidden: 1 });
+    expect((await call(senior, "POST", path, body)).status).toBe(201);
+    expect((await call(member, "POST", path, body)).status).toBe(403);
+    raw.prepare("UPDATE member_group_members SET role='member' WHERE member_id=?").run(B);
+    expect((await call(admin, "POST", path, body)).status).toBe(403);
+  });
+
+  it("validates request identities and retains legacy clients", async () => {
+    const { call, admin } = await setup();
+    for (const requestID of ["", "bad", null, 123]) {
+      expect((await call(admin, "POST", path, { ...body, requestID })).status).toBe(400);
+    }
+    const { requestID, ...legacy } = body;
+    expect((await call(admin, "POST", path, legacy)).status).toBe(201);
+  });
+});
+
 describe("post publication push failures", () => {
   it.each([false, true])("acknowledges the committed post when push lookup fails (draft first: %s)", async draftFirst => {
     const { call, raw, env, admin } = await setup();

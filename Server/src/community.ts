@@ -234,12 +234,36 @@ export async function createPost(env: Env, memberID: string, groupID: string, in
   // A picture or video can stand on its own; anything else needs a title.
   const title = cleanText(input.title, 300) ?? "";
   if (!title && !attachments.length && !video) return json({ error: "Add a title, or a picture or video." }, { status: 400 });
-  const id = newID("post");
+  const requestID = input.requestID;
+  if (requestID !== undefined && (typeof requestID !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestID))) {
+    return json({ error: "Invalid post request ID" }, { status: 400 });
+  }
+  const id = typeof requestID === "string"
+    ? `post_${await sha256(JSON.stringify([groupID, memberID, requestID.toLowerCase()]))}`
+    : newID("post");
+  const body = cleanText(input.body, 8_000) ?? null;
+  const link = validHTTPURL(input.linkURL) ?? null;
+  const media = attachments.length ? JSON.stringify(attachments) : null;
+  const status = publish ? "published" : "draft";
   const now = new Date().toISOString();
-  await env.DB.prepare(`INSERT INTO member_group_posts(id,group_id,kind,title,body,youtube_video_id,link_url,published_at,author_email,is_hidden,updated_at,status,source,media_json)
-    VALUES(?,?,?,?,?,?,?,?,?,0,?,?,'admin',?)`)
-    .bind(id, groupID, kind, title, cleanText(input.body, 8_000) ?? null, video, validHTTPURL(input.linkURL) ?? null,
-      now, `member:${memberID}`, now, publish ? "published" : "draft", attachments.length ? JSON.stringify(attachments) : null).run();
+  const inserted = await env.DB.prepare(`INSERT INTO member_group_posts(id,group_id,kind,title,body,youtube_video_id,link_url,published_at,author_email,is_hidden,updated_at,status,source,media_json)
+    VALUES(?,?,?,?,?,?,?,?,?,0,?,?,'admin',?) ON CONFLICT(id) DO NOTHING`)
+    .bind(id, groupID, kind, title, body, video, link,
+      now, `member:${memberID}`, now, status, media).run();
+  if (!inserted.meta.changes) {
+    const original = await env.DB.prepare(`SELECT kind,title,body,youtube_video_id,link_url,status,media_json,author_email
+      FROM member_group_posts WHERE id=? AND group_id=?`).bind(id, groupID)
+      .first<{ kind: string; title: string; body: string | null; youtube_video_id: string | null;
+        link_url: string | null; status: string; media_json: string | null; author_email: string }>();
+    if (!original || original.kind !== kind || original.title !== title || original.body !== body ||
+        original.youtube_video_id !== video || original.link_url !== link || original.status !== status ||
+        original.media_json !== media || original.author_email !== `member:${memberID}`) {
+      return json({ error: "This post request was already used with different details.", code: "post_request_conflict" }, { status: 409 });
+    }
+    // Acknowledging a retry must neither unhide a removed post nor notify again.
+    return json({ ok: true, id, published: publish }, { status: 201 });
+  }
   if (publish) {
     const pictures = attachments.length ? (attachments.some(item => item.kind === "video") ? "A new post with a video." : "A new post with pictures.") : "";
     // The post is committed. A notification failure must not invite the

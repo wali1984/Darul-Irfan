@@ -46,6 +46,8 @@ struct GroupPostComposer: View {
     @State private var message = ""
     @State private var videoLink = ""
     @State private var attachments: [PostDraftAttachment] = []
+    @State private var postRequestID = UUID()
+    @State private var uploadedMedia: [UUID: String] = [:]
     @State private var picks: [PhotosPickerItem] = []
     @State private var progress: String?
     @State private var working = false
@@ -191,12 +193,17 @@ struct GroupPostComposer: View {
             var keys: [String] = []
             for (index, attachment) in attachments.enumerated() {
                 progress = String(localized: "Sending \(index + 1) of \(attachments.count)...")
+                if let key = uploadedMedia[attachment.id] {
+                    keys.append(key)
+                    continue
+                }
                 switch attachment.content {
                 case .picture(let data):
                     keys.append(try await service.uploadPostMedia(picture: data, contentType: "image/jpeg", in: groupID))
                 case .video(let url):
                     keys.append(try await service.uploadPostMedia(video: url, contentType: PostMediaPreparation.videoType(url), in: groupID))
                 }
+                uploadedMedia[attachment.id] = keys.last
             }
             progress = String(localized: "Saving…")
             try await service.createPost(
@@ -205,7 +212,8 @@ struct GroupPostComposer: View {
                 body: message.trimmingCharacters(in: .whitespacesAndNewlines),
                 videoID: VideoLink.id(from: videoLink),
                 media: keys,
-                publish: publish
+                publish: publish,
+                requestID: postRequestID
             )
             dismiss()
         } catch {
