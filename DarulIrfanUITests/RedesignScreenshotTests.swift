@@ -1480,13 +1480,23 @@ final class RedesignScreenshotTests: XCTestCase {
         let viewport = CGRect(x: app.frame.minX, y: top,
                               width: app.frame.width, height: bottom - top)
         for step in 0..<32 {
+            var sectionDiagnostics: [String] = []
             for id in unseen {
-                let section = app.descendants(matching: .any)
-                    .matching(identifier: "method-guide-section-" + id).firstMatch
-                if section.exists && section.frame.intersection(viewport).height > 44 {
+                // SwiftUI can expose a card identifier on several descendants.
+                // An offscreen/zero-frame first match is not the visible card.
+                let matches = app.descendants(matching: .any)
+                    .matching(identifier: "method-guide-section-" + id).allElementsBoundByIndex
+                sectionDiagnostics.append("\(id): " + matches.map {
+                    "type=\($0.elementType.rawValue) frame=\($0.frame) label=\($0.label.prefix(80))"
+                }.joined(separator: " | "))
+                if matches.contains(where: { $0.frame.intersection(viewport).height > 44 }) {
                     unseen.remove(id)
                 }
             }
+            let diagnostic = XCTAttachment(string: "viewport=\(viewport)\n" + sectionDiagnostics.joined(separator: "\n"))
+            diagnostic.name = "method-guide-section-frames-\(language)-\(step)"
+            diagnostic.lifetime = .keepAlways
+            add(diagnostic)
             shot("resources-personal-guide-depth-\(step)")
             if diagram.exists && viewport.contains(diagram.frame) {
                 XCTAssertTrue(unseen.isEmpty,
