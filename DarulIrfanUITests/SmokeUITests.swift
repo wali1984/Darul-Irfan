@@ -101,8 +101,11 @@ final class SmokeUITests: XCTestCase {
         zikr.tap()
         let personal = app.buttons["personal-zikr-entry"]
         XCTAssertTrue(personal.waitForExistence(timeout: 10))
-        // The entry is near the top. Wait for the tab transition instead of
-        // swiping it out of view while the destination is still appearing.
+        // The official Halqa and schedule now precede this entry. Wait for
+        // the tab transition, then reach it through the real scroll view.
+        let content = app.scrollViews.firstMatch
+        XCTAssertTrue(content.waitForExistence(timeout: 10))
+        for _ in 0..<10 where !personal.isHittable { content.swipeUp() }
         let ready = XCTNSPredicateExpectation(
             predicate: NSPredicate(format: "hittable == true"), object: personal
         )
