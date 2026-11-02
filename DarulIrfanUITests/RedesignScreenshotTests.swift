@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -313,6 +313,10 @@ final class RedesignScreenshotTests: XCTestCase {
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "tasbih-preset" {
             tasbihPresetTour()
+            return
+        }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "teaching-resources" {
+            teachingResourcesTour()
             return
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "appearance-controls" {
@@ -1177,6 +1181,41 @@ final class RedesignScreenshotTests: XCTestCase {
             }
             goBack()
         }
+    }
+
+    /// The contextual guide must return to the teaching text without losing the reader's place.
+    private func teachingResourcesTour() {
+        selectTab(4)
+        guard seek("silsila-teachings"), seek("silsila-tasawwuf") else { return }
+        let method = app.buttons["method-of-zikr-shortcut"]
+        // Teaching articles can span many screens; traverse their real content.
+        for _ in 0..<40 {
+            if method.exists && method.isHittable { break }
+            app.swipeUp()
+            pause(0.3)
+        }
+        guard method.exists && method.isHittable else {
+            shot("teaching-guide-missing")
+            XCTFail("Tasawwuf must offer the Method of Zikr after its text")
+            return
+        }
+        let originalY = method.frame.minY
+        shot("teaching-before-guide")
+        guard tap(method) else { XCTFail("Teaching guide could not open"); return }
+        let section = app.descendants(matching: .any).matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "method-guide-section-")).firstMatch
+        XCTAssertTrue(section.waitForExistence(timeout: 30))
+        // Existence precedes the entrance animation; capture settled text contrast.
+        pause(2)
+        XCTAssertFalse(app.staticTexts["method-guide-load-error"].exists)
+        shot("teaching-guide-settled")
+        goBack()
+        expectation(for: NSPredicate(format: "exists == true AND hittable == true"), evaluatedWith: method)
+        waitForExpectations(timeout: 15)
+        pause(2)
+        shot("teaching-after-guide")
+        XCTAssertEqual(method.frame.minY, originalY, accuracy: 44,
+                       "Returning from the guide must preserve the article's reading position")
     }
 
     private func silsilaTour() {
