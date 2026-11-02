@@ -18,7 +18,7 @@ struct NearbyMasjid: Decodable, Identifiable, Sendable {
     }
 }
 
-enum NearbyMasjidError: Error { case invalidLocation, unavailable, limitReached, invalidResponse }
+enum NearbyMasjidError: Error, Equatable { case invalidLocation, unavailable, limitReached, invalidResponse }
 
 /// Results exist only in the requesting screen's memory. Calling this service
 /// is an explicit search action, never a background refresh or prefetch.

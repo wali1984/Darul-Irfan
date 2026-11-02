@@ -99,6 +99,9 @@ struct QiblaCompassView: View {
 
                 manualBearingCard
 
+                NearbyMasjidCard(latitude: place.latitude, longitude: place.longitude, locationName: place.name)
+                    .id("\(place.latitude),\(place.longitude)")
+
                 Text("Compass accuracy can vary near metal objects, magnets, or cases.")
                     .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)

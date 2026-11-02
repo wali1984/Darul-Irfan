@@ -1,6 +1,14 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Nearby masjids": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "قریبی مساجد"}}}},
+"Search within 10 km of your selected location.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "اپنے منتخب کردہ مقام کے 10 کلومیٹر کے اندر تلاش کریں۔"}}}},
+"Search nearby": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "قریب تلاش کریں"}}}},
+"No masjids found within 10 km.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "10 کلومیٹر کے اندر کوئی مسجد نہیں ملی۔"}}}},
+"Straight-line distance": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "سیدھی لکیر کا فاصلہ"}}}},
+"Nearby search limit reached. Please try another day.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "قریبی مقامات کی تلاش کی حد پوری ہو گئی ہے۔ کسی اور دن دوبارہ کوشش کریں۔"}}}},
+"Nearby search is unavailable. Please try again later.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "قریبی مقامات کی تلاش فی الحال دستیاب نہیں۔ کچھ دیر بعد دوبارہ کوشش کریں۔"}}}},
+"Could not open link": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "لنک نہیں کھل سکا"}}}},
 "Latest messages": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "تازہ ترین پیغامات"}}}},
 "Return to session": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست میں واپس جائیں"}}}},
 "Return to your current session or leave it before joining another.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "اپنی موجودہ نشست میں واپس جائیں یا دوسری نشست میں شامل ہونے سے پہلے اسے چھوڑ دیں۔"}}}},
