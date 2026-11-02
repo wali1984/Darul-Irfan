@@ -6,8 +6,20 @@ import RealtimeKit
 @MainActor
 final class NativeMeetingTransport: HalqaSessionTransport {
     let client = NativeMeetingConfiguration.makeClient()
-    private(set) lazy var chat = NativeMeetingChat(client: client)
-    private(set) lazy var participants = NativeMeetingParticipants(client: client)
+    private var chatStorage: NativeMeetingChat?
+    private var participantsStorage: NativeMeetingParticipants?
+    var chat: NativeMeetingChat {
+        if let chatStorage { return chatStorage }
+        let value = NativeMeetingChat(client: client)
+        chatStorage = value
+        return value
+    }
+    var participants: NativeMeetingParticipants {
+        if let participantsStorage { return participantsStorage }
+        let value = NativeMeetingParticipants(client: client)
+        participantsStorage = value
+        return value
+    }
     let microphoneRequest = HalqaCaptureRequest()
     let cameraRequest = HalqaCaptureRequest()
     private var joined = false
@@ -52,7 +64,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
         events.ended = { [weak self] in self?.onEnded?() }
         events.connectionChanged = { [weak self] status in self?.onConnectionChanged?(status) }
         membershipEvents.ended = { [weak self] in self?.onEnded?() }
-        membershipEvents.changed = { [weak self] in self?.participants.refresh() }
+        membershipEvents.changed = { [weak self] in self?.participantsStorage?.refresh() }
         client.addMeetingRoomEventListener(meetingRoomEventListener: events)
         client.addSelfEventListener(selfEventListener: membershipEvents)
     }
@@ -79,12 +91,14 @@ final class NativeMeetingTransport: HalqaSessionTransport {
         joined = false
         microphoneRequest.close()
         cameraRequest.close()
-        chat.leaving()
-        participants.leaving()
+        // Initialization may have failed before either observer was created.
+        // Teardown must not instantiate new SDK state or attach listeners.
+        chatStorage?.leaving()
+        participantsStorage?.leaving()
         client.release(onSuccess: { [weak self] in Task { @MainActor in
             if let self {
-                self.chat.released()
-                self.participants.released()
+                self.chatStorage?.released()
+                self.participantsStorage?.released()
                 self.membershipEvents.changed = nil
                 self.client.removeMeetingRoomEventListener(meetingRoomEventListener: self.events)
                 self.client.removeSelfEventListener(selfEventListener: self.membershipEvents)
