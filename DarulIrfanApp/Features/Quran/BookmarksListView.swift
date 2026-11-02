@@ -17,7 +17,7 @@ struct BookmarksListView: View {
         VStack(spacing: DISpacing.md) {
             if viewModel.bookmarksFailed {
                 VStack(spacing: DISpacing.sm) {
-                    Text("The action could not be completed. Check your connection and try again.")
+                    Text("Your personal records could not be read. Please try again.")
                         .diInterfaceFont(.callout)
                         .foregroundStyle(DIColor.textPrimary)
                     Button("Retry") { attempt += 1 }
