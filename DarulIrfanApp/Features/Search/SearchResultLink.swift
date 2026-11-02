@@ -120,36 +120,56 @@ private struct BookPageDestination: View {
     let dependencies: AppDependencies
     let fontScale: Double
     @State private var item: ContentItem?
+    @State private var loadFailed = false
+    @State private var attempt = 0
 
     var body: some View {
         Group {
             if let item {
                 BookTextReaderView(item: item, dependencies: dependencies, startPage: page, fontScale: fontScale)
+            } else if loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    DIEmptyState(systemImage: "books.vertical", titleKey: "Could not complete action")
+                    Button("Try Again") { attempt += 1 }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }
+                .padding(DISpacing.md)
             } else {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .task {
-            let stored = try? await dependencies.contentRepository.item(id: bookID)
-            item = stored ?? ContentItem(
-                id: bookID,
-                sourceUrl: "",
-                type: .book,
-                title: bookID,
-                titleUrdu: nil,
-                language: "ur",
-                author: nil,
-                category: .books,
-                bodyHtml: nil,
-                bodyPlainText: nil,
-                excerpt: nil,
-                publishedAt: nil,
-                updatedAt: nil,
-                mediaUrls: [],
-                downloadUrls: [],
-                checksum: nil,
-                rightsStatus: .permissionConfirmed
-            )
+        .diScreenBackground()
+        .task(id: attempt) {
+            guard item == nil else { return }
+            loadFailed = false
+            do {
+                let stored = try await dependencies.contentRepository.item(id: bookID)
+                try Task.checkCancellation()
+                item = stored ?? ContentItem(
+                    id: bookID,
+                    sourceUrl: "",
+                    type: .book,
+                    title: bookID,
+                    titleUrdu: nil,
+                    language: "ur",
+                    author: nil,
+                    category: .books,
+                    bodyHtml: nil,
+                    bodyPlainText: nil,
+                    excerpt: nil,
+                    publishedAt: nil,
+                    updatedAt: nil,
+                    mediaUrls: [],
+                    downloadUrls: [],
+                    checksum: nil,
+                    rightsStatus: .permissionConfirmed
+                )
+            } catch is CancellationError {
+                return
+            } catch {
+                guard !Task.isCancelled else { return }
+                loadFailed = true
+            }
         }
     }
 }
