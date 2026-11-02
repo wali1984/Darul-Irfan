@@ -56,7 +56,7 @@ struct OnboardingLocationStep: View {
                     .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.primary)
                     .accessibilityHidden(true)
-                Text("Your location stays on this device. It is used only to calculate prayer times and the Qibla direction, and is never sent to any server.")
+                Text("Prayer times and Qibla are calculated on your device. For local weather, an approximate location is sent to our weather service.")
                     .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
             }

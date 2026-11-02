@@ -12440,19 +12440,19 @@
         }
       }
     },
-    "Your location stays on this device. It is used only to calculate prayer times and the Qibla direction, and is never sent to any server.": {
+    "Prayer times and Qibla are calculated on your device. For local weather, an approximate location is sent to our weather service.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your location stays on this device. It is used only to calculate prayer times and the Qibla direction, and is never sent to any server."
+            "value": "Prayer times and Qibla are calculated on your device. For local weather, an approximate location is sent to our weather service."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "آپ کا مقام اسی ڈیوائس پر رہتا ہے۔ یہ صرف نماز کے اوقات اور قبلے کی سمت کے حساب کے لیے استعمال ہوتا ہے اور کبھی کسی سرور کو نہیں بھیجا جاتا۔"
+            "value": "نماز کے اوقات اور قبلے کی سمت کا حساب آپ کی ڈیوائس پر ہوتا ہے۔ مقامی موسم کے لیے آپ کا اندازاً مقام ہماری موسمی معلومات کی سروس کو بھیجا جاتا ہے۔"
           }
         }
       }

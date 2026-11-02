@@ -54,7 +54,7 @@
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>Darul Irfan adds community events such as the Monthly Ijtema to your calendar only when you ask it to.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Darul Irfan uses your location to calculate accurate prayer times and Qibla direction for your area. Your location never leaves your device.</string>
+	<string>Darul Irfan uses your location for prayer times, Qibla and local weather. Approximate location is sent to our weather service.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
