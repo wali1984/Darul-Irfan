@@ -88,6 +88,35 @@ final class HifzPlayerTests: XCTestCase {
         return (recording, url)
     }
 
+    func testCompositionContainsExactRecitationsAndRecallGaps() async throws {
+        let (recording, url) = try localAudio()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let plan = try HifzPlaybackTimeline(recitation: recording, range: 2...3, repeats: 2, pauseSeconds: 1.5)
+        let composition = try await HifzComposition.make(asset: AVURLAsset(url: url), timeline: plan)
+        let duration = try await composition.load(.duration)
+        XCTAssertEqual(duration.seconds, 8.5, accuracy: 0.001)
+        let tracks = try await composition.loadTracks(withMediaType: .audio)
+        let segments = try await XCTUnwrap(tracks.first).load(.segments)
+        XCTAssertEqual(segments.filter { !$0.isEmpty }.count, 4)
+        XCTAssertEqual(segments.filter { $0.isEmpty }.count, 3)
+        XCTAssertEqual(segments.filter { !$0.isEmpty }.map { $0.timeMapping.source.start.seconds }, [1, 1, 2, 2])
+    }
+
+    func testCompositionRejectsTimingsBeyondActualFile() async throws {
+        let (recording, url) = try localAudio()
+        defer { try? FileManager.default.removeItem(at: url) }
+        var longer = recording
+        longer.durationMs = 9000
+        longer.verses = [RecitationVerse(ayah: 1, fromMs: 7000, toMs: 9000, words: [])]
+        let plan = try HifzPlaybackTimeline(recitation: longer, range: 1...1, repeats: 1, pauseSeconds: 0)
+        do {
+            _ = try await HifzComposition.make(asset: AVURLAsset(url: url), timeline: plan)
+            XCTFail("Out-of-file timing must fail before installing playback")
+        } catch HifzComposition.Failure.invalidSourceDuration {
+            // Expected; callers can retain their active playback until preparation succeeds.
+        }
+    }
+
     func testAudioInterruptionAndHeadphoneDisconnectPauseWithoutLosingVerse() async throws {
         let (recording, url) = try localAudio()
         defer { try? FileManager.default.removeItem(at: url) }
