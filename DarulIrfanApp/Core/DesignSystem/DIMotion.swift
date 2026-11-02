@@ -62,14 +62,14 @@ private struct BreathingGlow: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
+        // Keep the content's identity stable when the accessibility preference
+        // changes, so a decorative effect cannot reset controls or navigation.
         content
-            .shadow(color: color.opacity(on ? 0.6 : 0.25), radius: on ? maxRadius : maxRadius * 0.5)
-            .onAppear {
-                guard !reduceMotion else { return }
-                withAnimation(.easeInOut(duration: 2.6).repeatForever(autoreverses: true)) {
-                    on = true
-                }
-            }
+            .shadow(color: color.opacity(!reduceMotion && on ? 0.6 : 0.25),
+                    radius: !reduceMotion && on ? maxRadius : maxRadius * 0.5)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 2.6).repeatForever(autoreverses: true), value: on)
+            .onAppear { on = !reduceMotion }
+            .onChange(of: reduceMotion) { _, reduced in on = !reduced }
     }
 }
 
