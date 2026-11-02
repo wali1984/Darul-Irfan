@@ -8,6 +8,7 @@ final class RecitationPracticeFiles {
     enum Failure: Error { case closed, foreignFile, invalidSize, invalidDuration }
     static let maximumBytes: Int64 = 10 * 1024 * 1024
     static let maximumDuration: Double = 300
+    private static var cleanedRoots: Set<URL> = []
     private let directory: URL
     private let manager: FileManager
     private var pending: URL?
@@ -16,8 +17,9 @@ final class RecitationPracticeFiles {
 
     init(cacheDirectory: URL, manager: FileManager = .default) throws {
         self.manager = manager
-        directory = cacheDirectory.appendingPathComponent("recitation-practice", isDirectory: true)
-            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let root = cacheDirectory.appendingPathComponent("recitation-practice", isDirectory: true).standardizedFileURL
+        try Self.cleanPreviousProcessFiles(root, manager: manager)
+        directory = root.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try manager.createDirectory(at: directory, withIntermediateDirectories: true)
         var excluded = directory
         var values = URLResourceValues()
@@ -71,5 +73,27 @@ final class RecitationPracticeFiles {
 
     private func removeIfPresent(_ file: URL) throws {
         if manager.fileExists(atPath: file.path) { try manager.removeItem(at: file) }
+    }
+
+    /// Once per root/process, before any new screen owns a clip. Remove only
+    /// this feature's UUID session/clip names, never links or unknown contents.
+    private static func cleanPreviousProcessFiles(_ root: URL, manager: FileManager) throws {
+        guard !cleanedRoots.contains(root) else { return }
+        if manager.fileExists(atPath: root.path) {
+            guard try manager.attributesOfItem(atPath: root.path)[.type] as? FileAttributeType == .typeDirectory else {
+                throw Failure.foreignFile
+            }
+            for folder in try manager.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) {
+                guard UUID(uuidString: folder.lastPathComponent) != nil,
+                      try manager.attributesOfItem(atPath: folder.path)[.type] as? FileAttributeType == .typeDirectory else { continue }
+                for clip in try manager.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil) {
+                    guard clip.pathExtension == "m4a", UUID(uuidString: clip.deletingPathExtension().lastPathComponent) != nil,
+                          try manager.attributesOfItem(atPath: clip.path)[.type] as? FileAttributeType == .typeRegular else { continue }
+                    try manager.removeItem(at: clip)
+                }
+                if try manager.contentsOfDirectory(atPath: folder.path).isEmpty { try manager.removeItem(at: folder) }
+            }
+        }
+        cleanedRoots.insert(root)
     }
 }

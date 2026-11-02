@@ -3,6 +3,29 @@ import XCTest
 
 final class RecitationPracticeFilesTests: XCTestCase {
     @MainActor
+    func testFirstOpenRemovesCrashClipWithoutDeletingActiveOrUnknownFiles() throws {
+        let manager = FileManager.default
+        let root = manager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? manager.removeItem(at: root) }
+        let abandoned = root.appendingPathComponent("recitation-practice").appendingPathComponent(UUID().uuidString)
+        try manager.createDirectory(at: abandoned, withIntermediateDirectories: true)
+        let oldClip = abandoned.appendingPathComponent(UUID().uuidString + ".m4a")
+        let unknown = abandoned.appendingPathComponent("keep.txt")
+        try Data([1]).write(to: oldClip)
+        try Data([9]).write(to: unknown)
+        let first = try RecitationPracticeFiles(cacheDirectory: root)
+        defer { try? first.close() }
+        XCTAssertFalse(manager.fileExists(atPath: oldClip.path))
+        XCTAssertEqual(try Data(contentsOf: unknown), Data([9]))
+        let activeClip = try first.begin()
+        try Data([2]).write(to: activeClip)
+        let second = try RecitationPracticeFiles(cacheDirectory: root)
+        defer { try? second.close() }
+        XCTAssertEqual(try Data(contentsOf: activeClip), Data([2]))
+        XCTAssertEqual(try Data(contentsOf: unknown), Data([9]))
+    }
+
+    @MainActor
     func testFailedReplacementAndStaleCompletionPreserveAcceptedClip() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
