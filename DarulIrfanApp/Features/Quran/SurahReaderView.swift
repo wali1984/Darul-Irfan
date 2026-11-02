@@ -263,6 +263,18 @@ struct SurahReaderView: View {
             .padding(.top, DISpacing.sm)
             .padding(.bottom, DISpacing.xl)
         }
+        .background {
+            GeometryReader { geometry in
+                Color.clear.preference(key: ReaderVisibleFrames.self, value: ["viewport": geometry.frame(in: .global)])
+            }
+        }
+        .onPreferenceChange(ReaderVisibleFrames.self) { frames in
+            guard isOnScreen, scenePhase == .active,
+                  appState.settings.quranAutoAdvanceSurah, hasScrolledIntoSurah,
+                  let viewport = frames["viewport"], let end = frames["end"],
+                  ReaderVisibleFrames.endIsVisible(end, in: viewport) else { return }
+            advanceToNextSurah()
+        }
         .scrollPosition(id: $topAyah, anchor: .top)
         .alert("Bayan", isPresented: Binding(get: { bayanError != nil }, set: { if !$0 { bayanError = nil } })) {
             Button("OK", role: .cancel) {}
@@ -352,9 +364,10 @@ struct SurahReaderView: View {
             }
             .buttonStyle(DISecondaryButtonStyle())
             .padding(.vertical, DISpacing.md)
-            .onAppear {
-                guard appState.settings.quranAutoAdvanceSurah, hasScrolledIntoSurah else { return }
-                advanceToNextSurah()
+            .background {
+                GeometryReader { geometry in
+                    Color.clear.preference(key: ReaderVisibleFrames.self, value: ["end": geometry.frame(in: .global)])
+                }
             }
         } else {
             Label("Quran reading complete", systemImage: "checkmark.seal.fill")
@@ -1570,5 +1583,19 @@ private struct AyahToolbarButtonStyle: ButtonStyle {
             .shadow(color: DIColor.primaryDeep.opacity(0.14), radius: configuration.isPressed ? 1 : 3, y: 2)
             .scaleEffect(!reduceMotion && configuration.isPressed ? 0.96 : 1)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.14), value: configuration.isPressed)
+    }
+}
+
+
+/// Layout creation is not visibility: a measured VStack creates its end marker immediately.
+struct ReaderVisibleFrames: PreferenceKey {
+    static let defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, latest in latest })
+    }
+    static func endIsVisible(_ end: CGRect, in viewport: CGRect) -> Bool {
+        guard !end.isEmpty, !viewport.isEmpty else { return false }
+        let overlap = viewport.intersection(end)
+        return !overlap.isNull && overlap.height >= min(44, end.height)
     }
 }
