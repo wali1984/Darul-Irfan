@@ -852,6 +852,21 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     private func readingControlsTour() {
+        // A hittable midpoint does not prove text clears the floating tab bar.
+        func revealFully(_ element: XCUIElement) -> Bool {
+            let surface = app.scrollViews.firstMatch.exists ? app.scrollViews.firstMatch : app.collectionViews.firstMatch
+            guard surface.exists else { return false }
+            for _ in 0..<20 {
+                if prayerFitsReadingArea(element) { return true }
+                let above = element.exists && element.frame.minY < app.navigationBars.firstMatch.frame.maxY
+                surface.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: above ? 0.4 : 0.65))
+                    .press(forDuration: 0.05, thenDragTo:
+                        surface.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: above ? 0.65 : 0.4)))
+                pause(0.3)
+            }
+            return prayerFitsReadingArea(element)
+        }
+        let letteringHelp = app.staticTexts[language == "ur" ? "بند ہو تو اردو معیاری رسم الخط میں دکھائی جاتی ہے، جس میں حروف ہمیشہ جڑے رہتے ہیں۔ نستعلیق کے لیے اسے آن کریں؛ تبدیلی دیکھنے کے لیے صفحہ دوبارہ کھولیں۔" : "Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change."].firstMatch
         let sizeLabel = language == "ur" ? "مطالعے کے متن کا سائز" : "Reader Text Size"
         let fontLabel = language == "ur" ? "اردو نستعلیق میں" : "Urdu in Nastaliq"
         let choices = language == "ur" ? ["چھوٹا", "معیاری", "بڑا", "بہت بڑا"] : ["Small", "Standard", "Large", "Extra Large"]
@@ -882,11 +897,14 @@ final class RedesignScreenshotTests: XCTestCase {
             expectation(for: NSPredicate(format: "value == %@", value), evaluatedWith: toggle)
             waitForExpectations(timeout: 10)
             shot("reading-font-setting-\(enabled)")
+            XCTAssertTrue(revealFully(letteringHelp), "The complete lettering explanation must scroll above the tab bar")
+            shot("reading-font-setting-footer-\(enabled)")
             goBack()
             selectTab(0)
             guard seek("quick-tool-hands.and.sparkles") else { return }
             shot("reading-font-duas-\(enabled)")
-            app.swipeUp()
+            let firstCitation = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "2:127")).firstMatch
+            XCTAssertTrue(revealFully(firstCitation), "The first dua citation must be fully reachable above the tab bar")
             shot("reading-font-duas-body-\(enabled)")
             goBack()
             selectTab(4)
