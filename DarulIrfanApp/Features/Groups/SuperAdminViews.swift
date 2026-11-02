@@ -209,6 +209,7 @@ struct DirectoryPersonView: View {
                             } label: {
                                 Text(place.role.title).diInterfaceFont(.subheadline, weight: .semibold)
                             }
+                            .buttonStyle(DICompactButtonStyle())
                             .accessibilityIdentifier("directory-role-" + place.groupID)
                         } else {
                             Text(place.role.title).foregroundStyle(DIColor.textMuted)
