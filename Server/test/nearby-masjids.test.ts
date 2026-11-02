@@ -58,6 +58,28 @@ describe("nearby masjid provider", () => {
       expect((await nearbyMasjids(request(query), {} as Env, async () => true)).status).toBe(400);
     expect(fetcher).not.toHaveBeenCalled();
   });
+  it("rejects missing, fractional and over-ceiling allocations before spending or fetching", async () => {
+    const { db, raw } = sqliteD1();
+    const fetcher = vi.fn(); vi.stubGlobal("fetch", fetcher);
+    const allowed = vi.fn(async () => true);
+    const invalid = [
+      [undefined, "4500"], ["150", undefined], ["", "4500"], ["150", ""],
+      ["0", "4500"], ["150", "0"], ["151", "4500"], ["150", "4501"],
+      ["1.5", "4500"], ["150", "1.5"], ["NaN", "4500"], ["150", "Infinity"],
+    ];
+    try {
+      for (const [daily, monthly] of invalid) {
+        const result = await nearbyMasjids(
+          request("lat=31.52&lon=74.35&PLACES_DAILY_LIMIT=1&PLACES_MONTHLY_LIMIT=1"),
+          { DB: db, PLACES_ENABLED: "true", PLACES_API_KEY: "test",
+            PLACES_DAILY_LIMIT: daily, PLACES_MONTHLY_LIMIT: monthly } as Env, allowed);
+        expect(result.status).toBe(503);
+      }
+      expect(allowed).not.toHaveBeenCalled();
+      expect(fetcher).not.toHaveBeenCalled();
+      expect(raw.prepare("SELECT COUNT(*) AS count FROM nearby_request_budget").get()).toMatchObject({ count: 0 });
+    } finally { raw.close(); }
+  });
   it("reserves capacity before sending a fixed Pro-only request and returns attribution", async () => {
     const { db, raw } = sqliteD1();
     const env = { DB: db, PLACES_ENABLED: "true", PLACES_API_KEY: "secret-test",
@@ -65,7 +87,8 @@ describe("nearby masjid provider", () => {
     const fetcher = vi.fn(async (_url: unknown, init: RequestInit) => {
       expect(raw.prepare("SELECT month_used FROM nearby_request_budget").get()).toMatchObject({ month_used: 1 });
       expect(JSON.parse(init.body as string)).toMatchObject({ includedTypes: ["mosque"], rankPreference: "DISTANCE", languageCode: "ur" });
-      expect(new Headers(init.headers).get("X-Goog-FieldMask")).not.toContain("*");
+      expect(new Headers(init.headers).get("X-Goog-FieldMask")).toBe(
+        "places.id,places.displayName,places.formattedAddress,places.location,places.attributions");
       return Response.json({ places: [{ id: "place-one", displayName: { text: "Masjid" },
         location: { latitude: 31.52, longitude: 74.35 }, attributions: [{ provider: "Source", providerUri: "https://example.test" }] }] });
     });
