@@ -1200,11 +1200,7 @@ private struct AyahCardView: View {
                     DIPillBadge(text: String(localized: "Parah \(para)"), color: DIColor.accent, foreground: DIColor.textPrimary)
                 }
             }
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: DISpacing.sm) { toolbarActions }
-                    .fixedSize(horizontal: true, vertical: false)
-                VStack(alignment: .leading, spacing: DISpacing.sm) { toolbarActions }
-            }
+            AyahToolbarLayout { toolbarActions }
             .font(.system(size: 22))
             .buttonStyle(AyahToolbarButtonStyle())
         }
@@ -1602,6 +1598,32 @@ private extension ReaderFontScale {
         case .large: return "Large"
         case .extraLarge: return "Extra Large"
         }
+    }
+}
+
+/// Keep a single control/accessibility tree per ayah, including at large text
+/// sizes. ViewThatFits previously constructed both copies for every verse.
+private struct AyahToolbarLayout: Layout {
+    private func arrangement(proposal: ProposedViewSize, subviews: Subviews) -> AnyLayout {
+        let width = subviews.reduce(CGFloat.zero) { $0 + $1.sizeThatFits(.unspecified).width }
+            + CGFloat(max(0, subviews.count - 1)) * DISpacing.sm
+        if width <= (proposal.width ?? .infinity) {
+            return AnyLayout(HStackLayout(spacing: DISpacing.sm))
+        }
+        return AnyLayout(VStackLayout(alignment: .leading, spacing: DISpacing.sm))
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let layout = arrangement(proposal: proposal, subviews: subviews)
+        var layoutCache = layout.makeCache(subviews: subviews)
+        return layout.sizeThatFits(proposal: proposal, subviews: subviews, cache: &layoutCache)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let resolved = ProposedViewSize(width: bounds.width, height: proposal.height)
+        let layout = arrangement(proposal: resolved, subviews: subviews)
+        var layoutCache = layout.makeCache(subviews: subviews)
+        layout.placeSubviews(in: bounds, proposal: resolved, subviews: subviews, cache: &layoutCache)
     }
 }
 
