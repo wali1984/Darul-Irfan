@@ -27,6 +27,8 @@ struct DayTaskEditorView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var notificationDenied = false
     @State private var requestingNotifications = false
+    @State private var notificationRequestTask: Task<Void, Never>?
+    @State private var calendarRequestTask: Task<Void, Never>?
     @State private var title: String
     @State private var day: Date
     @State private var timingKind: TimingKind
@@ -134,11 +136,12 @@ struct DayTaskEditorView: View {
                 Toggle("Remind me", isOn: Binding(get: { remind }, set: { enabled in
                     guard enabled else { remind = false; return }
                     requestingNotifications = true
-                    Task {
+                    notificationRequestTask = Task {
+                        defer { requestingNotifications = false }
                         let allowed = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+                        guard !Task.isCancelled else { return }
                         remind = allowed
                         await refreshNotificationAccess()
-                        requestingNotifications = false
                     }
                 }))
                     .diInterfaceFont(.body)
@@ -169,7 +172,8 @@ struct DayTaskEditorView: View {
             if timingKind != .anytime {
                 Section {
                     Button {
-                        Task { await addToCalendar() }
+                        calendarRequestTask?.cancel()
+                        calendarRequestTask = Task { await addToCalendar() }
                     } label: {
                         HStack {
                             Label("Add to Calendar", systemImage: "calendar.badge.plus")
@@ -204,6 +208,10 @@ struct DayTaskEditorView: View {
             Button("OK", role: .cancel) { }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onDisappear {
+            notificationRequestTask?.cancel()
+            calendarRequestTask?.cancel()
+        }
         .task(id: scenePhase) {
             if scenePhase == .active { await refreshNotificationAccess() }
         }
@@ -293,7 +301,7 @@ struct DayTaskEditorView: View {
     /// asks to read the calendar. A prayer-relative task is placed at its
     /// first day's computed prayer time, and says so in its notes.
     private func addToCalendar() async {
-        guard !isAddingToCalendar, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard !Task.isCancelled, !isAddingToCalendar, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         isAddingToCalendar = true
         defer { isAddingToCalendar = false }
         guard Bundle.main.object(forInfoDictionaryKey: "NSCalendarsWriteOnlyAccessUsageDescription") != nil else {
@@ -333,7 +341,9 @@ struct DayTaskEditorView: View {
         }
         let store = EKEventStore()
         do {
-            guard try await store.requestWriteOnlyAccessToEvents() else {
+            let allowed = try await store.requestWriteOnlyAccessToEvents()
+            guard !Task.isCancelled else { return }
+            guard allowed else {
                 calendarMessage = "Allow calendar access in Settings to add tasks to your calendar."
                 return
             }
@@ -360,6 +370,7 @@ struct DayTaskEditorView: View {
             try store.save(event, span: .futureEvents)
             calendarMessage = "Added to your calendar."
         } catch {
+            guard !Task.isCancelled else { return }
             calendarMessage = "The task could not be added to your calendar."
         }
     }
