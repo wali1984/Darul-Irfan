@@ -410,11 +410,11 @@ struct GroupLiveStarter: View {
                 if videos.count > 5 {
                     Button { showAllPastVideos.toggle() } label: {
                         if showAllPastVideos { Text("Show less") }
-                        else { Text("Show all \(min(videos.count, 40))") }
+                        else { Text("Show all \(videos.count)") }
                     }
                     .buttonStyle(DICompactButtonStyle())
                 }
-                ForEach(videos.prefix(showAllPastVideos ? 40 : 5)) { video in
+                ForEach(videos.prefix(showAllPastVideos ? videos.count : 5)) { video in
                     choiceRow(
                         entry: .video(video.videoID),
                         title: video.title,
@@ -934,6 +934,7 @@ private struct GroupAutoplayChoices: View {
     let library: GroupRecordingLibrary
     @Binding var selection: GroupQueueEntry?
     @Environment(\.dismiss) private var dismiss
+    @State private var showAllPastVideos = false
 
     var body: some View {
         List {
@@ -942,7 +943,14 @@ private struct GroupAutoplayChoices: View {
                 ForEach(library.recordings) { recording in
                     choice(.recording(recording.id), title: recording.title)
                 }
-                ForEach(library.pastVideos.prefix(20)) { video in
+                if library.pastVideos.count > 20 {
+                    Button { showAllPastVideos.toggle() } label: {
+                        if showAllPastVideos { Text("Show less") }
+                        else { Text("Show all \(library.pastVideos.count)") }
+                    }
+                    .buttonStyle(DICompactButtonStyle())
+                }
+                ForEach(library.pastVideos.prefix(showAllPastVideos ? library.pastVideos.count : 20)) { video in
                     choice(.video(video.videoID), title: "\(video.title) · \(video.publishedAt.formatted(date: .abbreviated, time: .omitted))")
                 }
             }
@@ -952,6 +960,12 @@ private struct GroupAutoplayChoices: View {
         .diScreenBackground()
         .navigationTitle("Plays by itself")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            if case .video(let id) = selection,
+               let index = library.pastVideos.firstIndex(where: { $0.videoID == id }), index >= 20 {
+                showAllPastVideos = true
+            }
+        }
     }
 
     private func choice(_ entry: GroupQueueEntry?, title: String) -> some View {
