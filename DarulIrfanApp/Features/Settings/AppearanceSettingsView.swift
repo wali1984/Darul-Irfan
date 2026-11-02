@@ -19,6 +19,7 @@ struct AppearanceSettingsView: View {
                 urduLetteringSection
             }
         }
+        .diInterfaceFont(.body)
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -39,6 +40,7 @@ struct AppearanceSettingsView: View {
             SettingsSectionHeader(titleKey: "Theme", systemImage: "circle.lefthalf.filled")
         } footer: {
             Text("Auto uses sunrise and sunset at your selected location. Light or Dark stays on permanently. Without solar times, Auto follows your phone.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -76,6 +78,7 @@ struct AppearanceSettingsView: View {
             SettingsSectionHeader(titleKey: "Reading", systemImage: "textformat.size")
         } footer: {
             Text("Applies to the Quran and Library reading screens, on top of your system text size.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -93,6 +96,7 @@ struct AppearanceSettingsView: View {
             .listRowBackground(DIColor.surface)
         } footer: {
             Text("Off shows Urdu in the standard lettering, which always joins. Turn it on for Nastaliq; reopen a page to see the change.")
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
