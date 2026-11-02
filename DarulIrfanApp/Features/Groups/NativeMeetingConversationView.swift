@@ -9,6 +9,9 @@ struct NativeMeetingConversationView: View {
     @State private var peerID: String?
     @State private var drafts: [String: String] = [:]
     @State private var failed = false
+    @State private var editing: TextMessage?
+    @State private var editDraft = ""
+    @State private var deleting: ChatMessage?
 
     private var draftKey: String { peerID.map { "peer:\($0)" } ?? "public" }
 
@@ -41,6 +44,14 @@ struct NativeMeetingConversationView: View {
                                 Text(verbatim: file.name)
                                 attachment(file.link, label: "Open attachment")
                             }
+                            if chat.canModify(message.id) {
+                                Menu("Controls") {
+                                    if let text = message as? TextMessage {
+                                        Button("Edit message") { failed = false; editDraft = text.message; editing = text }
+                                    }
+                                    Button("Delete message", role: .destructive) { deleting = message }
+                                }.buttonStyle(DICompactButtonStyle()).disabled(chat.operationPending)
+                            }
                         }.padding().frame(maxWidth: .infinity, alignment: .leading)
                             .background(DIColor.surface, in: RoundedRectangle(cornerRadius: 16))
                     }
@@ -55,7 +66,37 @@ struct NativeMeetingConversationView: View {
             }.buttonStyle(DIPrimaryButtonStyle())
                 .disabled(!chat.canSend || unavailable || (drafts[draftKey] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }.padding().diScreenBackground()
-            .alert("Could not complete action", isPresented: $failed) { Button("OK", role: .cancel) {} }
+            .alert("Could not complete action", isPresented: Binding(get: { failed && editing == nil }, set: { failed = $0 })) { Button("OK", role: .cancel) {} }
+            .confirmationDialog("Delete this message?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }), presenting: deleting) { message in
+                Button("Delete message", role: .destructive) {
+                    chat.delete(messageID: message.id) { if !$0 { failed = true } }
+                    deleting = nil
+                }
+                Button("Cancel", role: .cancel) { deleting = nil }
+            }
+            .sheet(isPresented: Binding(get: { editing != nil }, set: { if !$0 { editing = nil; failed = false } })) {
+                NavigationStack {
+                    VStack {
+                        TextEditor(text: $editDraft).scrollContentBackground(.hidden)
+                        if failed { Text("Could not complete action").foregroundStyle(DIColor.danger) }
+                    }.padding().diScreenBackground().navigationTitle("Edit message")
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel") { editing = nil; failed = false }.buttonStyle(DIToolbarButtonStyle()).disabled(chat.operationPending)
+                            }
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Save") {
+                                    guard let message = editing else { return }
+                                    failed = false
+                                    chat.edit(messageID: message.id, draft: editDraft) { success in
+                                        if success { editing = nil } else { failed = true }
+                                    }
+                                }.buttonStyle(DIToolbarButtonStyle())
+                                    .disabled(chat.operationPending || editDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                            }
+                        }
+                }.interactiveDismissDisabled(chat.operationPending)
+            }
     }
 
     @ViewBuilder private func attachment(_ address: String, label: LocalizedStringKey) -> some View {

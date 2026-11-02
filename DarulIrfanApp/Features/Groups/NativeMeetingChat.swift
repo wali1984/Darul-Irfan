@@ -59,14 +59,14 @@ final class NativeMeetingChat {
 
     func edit(messageID: String, draft: String, completion: @escaping (Bool) -> Void) {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !messageID.isEmpty, !text.isEmpty else { completion(false); return }
+        guard !messageID.isEmpty, !text.isEmpty, canModify(messageID) else { completion(false); return }
         perform(completion: completion) { done in
             client.chat.editTextMessage(messageId: messageID, newMessage: text) { done($0 == nil) }
         }
     }
 
     func delete(messageID: String, completion: @escaping (Bool) -> Void) {
-        guard !messageID.isEmpty else { completion(false); return }
+        guard !messageID.isEmpty, canModify(messageID) else { completion(false); return }
         perform(completion: completion) { done in
             client.chat.deleteMessage(messageId: messageID) { done($0 == nil) }
         }
@@ -90,6 +90,13 @@ final class NativeMeetingChat {
     private func recipientsAvailable(_ ids: [String]) -> Bool {
         let joined = Set(client.participants.joined.map(\.id))
         return ids.allSatisfy { !$0.isEmpty && joined.contains($0) }
+    }
+
+    func canModify(_ messageID: String) -> Bool {
+        guard active, canSend else { return false }
+        return (client.chat.messages + client.chat.privateChatMessages).contains {
+            $0.id == messageID && $0.userId == client.localUser.userId
+        }
     }
 
     func leaving() { active = false; canSend = false }

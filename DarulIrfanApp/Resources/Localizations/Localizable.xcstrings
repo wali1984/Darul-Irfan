@@ -1,6 +1,9 @@
 {
   "sourceLanguage": "en",
   "strings": {
+"Edit message": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "پیغام میں ترمیم کریں"}}}},
+"Delete message": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "پیغام حذف کریں"}}}},
+"Delete this message?": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "یہ پیغام حذف کر دیں؟"}}}},
 "Everyone in the session": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نشست میں سب کے لیے"}}}},
 "Private conversation": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "نجی گفتگو"}}}},
 "This participant has left. Choose a recipient to continue.": {"extractionState": "manual", "localizations": {"ur": {"stringUnit": {"state": "translated", "value": "یہ شریک نشست سے جا چکے ہیں۔ جاری رکھنے کے لیے وصول کنندہ منتخب کریں۔"}}}},
