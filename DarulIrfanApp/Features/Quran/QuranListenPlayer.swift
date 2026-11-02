@@ -257,9 +257,18 @@ final class QuranListenPlayer {
             reciter = player
             reciterSurah = first.surah
             recitation = surahRecitation
-            tick = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 20), queue: .main) { [weak self] time in
-                let ms = Int(time.seconds * 1000)
-                Task { @MainActor in self?.follow(ms: ms) }
+            let observerSession = session
+            tick = player.addPeriodicTimeObserver(forInterval: CMTime(value: 1, timescale: 20), queue: .main) { [weak self, weak player] time in
+                let milliseconds = time.seconds * 1000
+                guard milliseconds.isFinite, milliseconds >= 0, milliseconds < Double(Int.max) else { return }
+                let ms = Int(milliseconds)
+                Task { @MainActor in
+                    // Removing an observer does not retract callbacks already queued.
+                    // A previous recording must not move the new recording's highlight.
+                    guard let self, let player, self.session == observerSession,
+                          self.reciter === player else { return }
+                    self.follow(ms: ms)
+                }
             }
         }
         guard let reciter else { return }
