@@ -10,6 +10,7 @@ struct TasbihCounterView: View {
     @State private var showResetDialog = false
     @State private var isEditing = false
     @State private var shortcutHelp = false
+    @State private var isVisible = false
     @State private var countBump: CGFloat = 1.0
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -119,12 +120,18 @@ struct TasbihCounterView: View {
         } message: {
             Text("Your current count will be added to the lifetime total.")
         }
-        .onAppear { TasbihShortcutTarget.install(viewModel) }
+        .onAppear {
+            isVisible = true
+            if !isEditing && !showResetDialog && !shortcutHelp {
+                TasbihShortcutTarget.install(viewModel)
+            }
+        }
         .onChange(of: isEditing || showResetDialog || shortcutHelp) { _, covered in
             if covered { TasbihShortcutTarget.remove(viewModel) }
-            else { TasbihShortcutTarget.install(viewModel) }
+            else if isVisible { TasbihShortcutTarget.install(viewModel) }
         }
         .onDisappear {
+            isVisible = false
             TasbihShortcutTarget.remove(viewModel)
             viewModel.persistOnExit()
         }
