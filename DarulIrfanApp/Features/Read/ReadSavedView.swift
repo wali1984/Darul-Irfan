@@ -39,7 +39,9 @@ struct ReadSavedView: View {
                         savedRow(
                             systemImage: "bookmark.fill",
                             title: "Bookmarks",
-                            detail: Text("\(quran.bookmarks.count) ayahs"),
+                            detail: quran.bookmarksLoading ? Text("Loading...") :
+                                quran.bookmarksFailed ? Text("Your personal records could not be read. Please try again.") :
+                                Text("\(quran.bookmarks.count) ayahs"),
                             gold: false
                         )
                     }
@@ -102,7 +104,7 @@ struct ReadSavedView: View {
             }
             .onAppear { notes.loadIfNeeded() }
             .task {
-                await quran.load()
+                await quran.refreshBookmarks()
                 await library.loadFavorites()
             }
         }
