@@ -15,6 +15,8 @@ final class PlayerSheetViewModel {
 
     private(set) var bookmarks: [MediaBookmark] = []
     private(set) var pendingBookmarkPosition: Double = 0
+    private var pendingBookmarkMediaID: String?
+    private var bookmarkLoadGeneration = 0
 
     var noteDraft = ""
     var showsAddBookmarkPrompt = false
@@ -35,6 +37,8 @@ final class PlayerSheetViewModel {
     }
 
     func refreshBookmarks() async {
+        bookmarkLoadGeneration += 1
+        let generation = bookmarkLoadGeneration
         guard let repository = mediaRepository,
               let mediaItemID = audioPlayer.nowPlaying?.mediaItemID else {
             bookmarks = []
@@ -42,8 +46,11 @@ final class PlayerSheetViewModel {
         }
         do {
             let loaded = try await repository.mediaBookmarks(mediaItemID: mediaItemID)
+            guard generation == bookmarkLoadGeneration,
+                  audioPlayer.nowPlaying?.mediaItemID == mediaItemID else { return }
             bookmarks = loaded.sorted { $0.positionSeconds < $1.positionSeconds }
         } catch {
+            guard generation == bookmarkLoadGeneration else { return }
             bookmarks = []
         }
     }
@@ -51,6 +58,8 @@ final class PlayerSheetViewModel {
     /// Captures the current position, then asks the view to prompt for an
     /// optional note (the position must not drift while the user types).
     func beginAddBookmark() {
+        guard supportsBookmarks, let mediaID = audioPlayer.nowPlaying?.mediaItemID else { return }
+        pendingBookmarkMediaID = mediaID
         pendingBookmarkPosition = audioPlayer.currentTime
         noteDraft = ""
         showsAddBookmarkPrompt = true
@@ -58,7 +67,7 @@ final class PlayerSheetViewModel {
 
     func confirmAddBookmark() async {
         guard let repository = mediaRepository,
-              let mediaItemID = audioPlayer.nowPlaying?.mediaItemID else { return }
+              let mediaItemID = pendingBookmarkMediaID else { return }
         let trimmedNote = noteDraft.trimmingCharacters(in: .whitespacesAndNewlines)
         let bookmark = MediaBookmark(
             id: UUID(),
@@ -433,10 +442,8 @@ struct PlayerSheetView: View {
                         viewModel.beginAddBookmark()
                     } label: {
                         Label("Add bookmark at current position", systemImage: "bookmark.fill")
-                            .diInterfaceFont(.subheadline, weight: .semibold)
-                            .foregroundStyle(accent)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DISecondaryButtonStyle())
 
                     if viewModel.bookmarks.isEmpty {
                         Text("No bookmarks yet. Save a moment to return to it later.")
