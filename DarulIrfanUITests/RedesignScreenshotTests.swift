@@ -1297,11 +1297,14 @@ final class RedesignScreenshotTests: XCTestCase {
         XCTAssertEqual(count.label, "0", "Cancel must not delete a recording")
         XCTAssertTrue(remove.exists)
         guard openConfirmation(), tap(confirm) else { XCTFail("Recording delete not repeatable"); return }
-        XCTAssertTrue(failure.waitForExistence(timeout: 15))
+        XCTAssertTrue(failure.waitForExistence(timeout: 15), "Failed deletion must show visible feedback")
+        XCTAssertTrue(failure.isHittable, "Error feedback must not be below the visible recording list")
+        shot("recordings-delete-failed")
+        let okay = app.alerts.buttons[language == "ur" ? "ٹھیک ہے" : "OK"]
+        guard tap(okay) else { XCTFail("Deletion error must be dismissible"); return }
         XCTAssertTrue(remove.exists, "Failed DELETE must retain the recording")
         XCTAssertTrue(keep.exists)
         XCTAssertEqual(count.label, "1")
-        shot("recordings-delete-failed")
         guard openConfirmation(), tap(confirm) else { XCTFail("Recording retry not available"); return }
         XCTAssertTrue(remove.waitForNonExistence(timeout: 20), "Successful delete must remove row even if reload fails")
         XCTAssertTrue(retry.waitForExistence(timeout: 15), "Failed library reload needs Retry")

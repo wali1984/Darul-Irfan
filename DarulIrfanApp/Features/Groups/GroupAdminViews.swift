@@ -275,6 +275,7 @@ struct GroupLiveStarter: View {
     @State private var error: String?
 
     @State private var deletingRecording: GroupRecording?
+    @State private var deletionError: String?
 
     private var sources: [Source] { addingToSession ? [.youtube, .recording] : Source.allCases }
 
@@ -361,6 +362,15 @@ struct GroupLiveStarter: View {
             Button("Cancel", role: .cancel) { deletingRecording = nil }
         } message: { recording in
             Text(verbatim: recording.title + "\n\n" + String(localized: "This removes the recording from the group's library. This cannot be undone."))
+        }
+        .alert("Delete recording", isPresented: Binding(
+            get: { deletionError != nil },
+            set: { if !$0 { deletionError = nil } }
+        )) {
+            Button("OK", role: .cancel) { deletionError = nil }
+        } message: {
+            Text(verbatim: deletionError ?? "")
+                .accessibilityIdentifier("recording-library-action-error")
         }
         .fileImporter(isPresented: $choosingFile, allowedContentTypes: [.audio, .movie]) { result in
             if case .success(let file) = result { Task { await upload(file) } }
@@ -665,6 +675,7 @@ struct GroupLiveStarter: View {
         guard !working && !uploading else { return }
         working = true
         error = nil
+        deletionError = nil
         defer { working = false }
         do {
             try await service.deleteRecording(recording.id, in: groupID)
@@ -674,7 +685,13 @@ struct GroupLiveStarter: View {
         } catch is CancellationError {
             return
         } catch {
-            self.error = error.localizedDescription
+            if let groupError = error as? MemberGroupError, case .requestFailed = groupError {
+                deletionError = String(localized: "The action could not be completed. Check your connection and try again.")
+            } else if error is MemberGroupError {
+                deletionError = error.localizedDescription
+            } else {
+                deletionError = String(localized: "The action could not be completed. Check your connection and try again.")
+            }
         }
     }
 }
