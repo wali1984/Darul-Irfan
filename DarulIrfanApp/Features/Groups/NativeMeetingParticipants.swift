@@ -2,6 +2,13 @@ import Foundation
 import Observation
 import RealtimeKit
 
+struct NativeLocalMediaState: Equatable {
+    var microphoneEnabled = false
+    var cameraEnabled = false
+    var microphoneAllowed = false
+    var cameraAllowed = false
+}
+
 /// Session-owned participant state. Presentation may disappear without
 /// disconnecting listeners or losing the SDK's current video participants.
 @MainActor
@@ -12,6 +19,7 @@ final class NativeMeetingParticipants {
     private(set) var visible: [RtkRemoteParticipant] = []
     private(set) var screenShares: [RtkRemoteParticipant] = []
     private(set) var speakerID: String?
+    private(set) var localMedia = NativeLocalMediaState()
     // SDK participant objects can change in place. Renderers observe revision
     // as well as membership so mute/video/pin changes always invalidate rows.
     private(set) var revision = 0
@@ -32,6 +40,11 @@ final class NativeMeetingParticipants {
         visible = client.participants.active
         screenShares = client.participants.screenShares
         speakerID = client.participants.lastActiveSpeaker?.id
+        let local = client.localUser
+        localMedia = NativeLocalMediaState(microphoneEnabled: local.audioEnabled,
+                                          cameraEnabled: local.videoEnabled,
+                                          microphoneAllowed: local.permissions.media.canPublishAudio,
+                                          cameraAllowed: local.permissions.media.canPublishVideo)
         revision &+= 1
     }
 
@@ -43,6 +56,7 @@ final class NativeMeetingParticipants {
         client.removeParticipantsEventListener(participantsEventListener: events)
         joined = []; waiting = []; visible = []; screenShares = []
         speakerID = nil
+        localMedia = NativeLocalMediaState()
         revision &+= 1
     }
 }

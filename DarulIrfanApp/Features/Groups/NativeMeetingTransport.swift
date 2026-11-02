@@ -22,6 +22,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
         events.ended = { [weak self] in self?.onEnded?() }
         events.connectionChanged = { [weak self] status in self?.onConnectionChanged?(status) }
         membershipEvents.ended = { [weak self] in self?.onEnded?() }
+        membershipEvents.changed = { [weak self] in self?.participants.refresh() }
         client.addMeetingRoomEventListener(meetingRoomEventListener: events)
         client.addSelfEventListener(selfEventListener: membershipEvents)
     }
@@ -54,6 +55,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
             if let self {
                 self.chat.released()
                 self.participants.released()
+                self.membershipEvents.changed = nil
                 self.client.removeMeetingRoomEventListener(meetingRoomEventListener: self.events)
                 self.client.removeSelfEventListener(selfEventListener: self.membershipEvents)
             }
@@ -107,23 +109,25 @@ final class NativeMeetingTransport: HalqaSessionTransport {
 /// A host removal/rejection is terminal, unlike a temporary network loss.
 final class NativeMeetingMembershipEvents: NSObject, RtkSelfEventListener {
     var ended: (@MainActor () -> Void)?
+    var changed: (@MainActor () -> Void)?
+    private func refresh() { Task { @MainActor in changed?() } }
     func onRemovedFromMeeting() { Task { @MainActor in ended?() } }
     func onWaitListStatusUpdate(waitListStatus: RealtimeKit.WaitListStatus) {
         if waitListStatus == .rejected { Task { @MainActor in ended?() } }
     }
     func onAudioDeviceChanged(audioDevice: AudioDevice) {}
     func onAudioDevicesUpdated(devices: [AudioDevice]) {}
-    func onAudioUpdate(isEnabled: Bool) {}
+    func onAudioUpdate(isEnabled: Bool) { refresh() }
     func onMeetingRoomJoinedWithoutCameraPermission() {}
     func onMeetingRoomJoinedWithoutMicPermission() {}
-    func onPermissionsUpdated(permission: SelfPermissions) {}
+    func onPermissionsUpdated(permission: SelfPermissions) { refresh() }
     func onPinned() {}
     func onScreenShareStartFailed(reason: String) {}
     func onScreenShareUpdate(isEnabled: Bool) {}
     func onUnpinned() {}
-    func onUpdate(participant: RtkSelfParticipant) {}
+    func onUpdate(participant: RtkSelfParticipant) { refresh() }
     func onVideoDeviceChanged(videoDevice: VideoDevice) {}
-    func onVideoUpdate(isEnabled: Bool) {}
+    func onVideoUpdate(isEnabled: Bool) { refresh() }
 }
 
 private final class NativeMeetingEvents: NSObject, RtkMeetingRoomEventListener {
