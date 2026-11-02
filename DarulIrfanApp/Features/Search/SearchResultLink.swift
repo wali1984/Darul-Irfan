@@ -194,11 +194,20 @@ private struct SearchEventDestination: View {
     let dependencies: AppDependencies
     @State private var event: CommunityEvent?
     @State private var loaded = false
+    @State private var loadFailed = false
+    @State private var attempt = 0
 
     var body: some View {
         Group {
             if let event {
                 EventDetailView(event: event, notifications: dependencies.notifications)
+            } else if loadFailed {
+                VStack(spacing: DISpacing.md) {
+                    DIEmptyState(systemImage: "calendar", titleKey: "Could not complete action")
+                    Button("Try Again") { attempt += 1 }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }
+                .padding(DISpacing.md)
             } else if loaded {
                 DIEmptyState(systemImage: "calendar", titleKey: "Event not found",
                              messageKey: "It may have ended or been removed.")
@@ -206,9 +215,21 @@ private struct SearchEventDestination: View {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .task {
-            event = (try? await dependencies.eventsRepository.events())?.first { $0.id == eventID }
-            loaded = true
+        .diScreenBackground()
+        .task(id: attempt) {
+            guard !loaded else { return }
+            loadFailed = false
+            do {
+                let events = try await dependencies.eventsRepository.events()
+                try Task.checkCancellation()
+                event = events.first { $0.id == eventID }
+                loaded = true
+            } catch is CancellationError {
+                return
+            } catch {
+                guard !Task.isCancelled else { return }
+                loadFailed = true
+            }
         }
     }
 }
