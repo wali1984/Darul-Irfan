@@ -53,6 +53,14 @@ struct HalqahAuditFixture: View {
             }
             .navigationTitle("Halqah audit")
         }
+        .safeAreaInset(edge: .bottom) {
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-post-removal") {
+                TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+                    Text(verbatim: String(HalqahAuditProtocol.removalRequests))
+                        .accessibilityIdentifier("audit-removal-requests")
+                }
+            }
+        }
     }
 }
 
@@ -79,6 +87,12 @@ private final class HalqahAuditProtocol: URLProtocol {
     private static var duaWrites = 0
     private static var duaMarkedRead = false
     private static var olderRefresh: (() -> Void)?
+    private static var postRemovalAttempts = 0
+    static var removalRequests: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return postRemovalAttempts
+    }
 
     static func releaseOlderRefresh() -> Bool {
         lock.lock()
@@ -124,6 +138,24 @@ private final class HalqahAuditProtocol: URLProtocol {
         if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-history"),
            parts.count >= 5, parts[4] == "history" {
             let result = historyResponse(parts: parts)
+            respond(result.0, result.1)
+            return
+        }
+        if ProcessInfo.processInfo.arguments.contains("--uitesting-halqah-post-removal"),
+           parts.count >= 5, parts[4] == "posts" {
+            Self.lock.lock()
+            let result: (Int, String)
+            if request.httpMethod == "DELETE", parts.count == 6, parts[3] == "admin" {
+                Self.postRemovalAttempts += 1
+                result = (Self.postRemovalAttempts == 1 ? 503 : 204, "{}")
+            } else if request.httpMethod == "GET" {
+                let empty = url.query?.contains("draft") == true || Self.postRemovalAttempts >= 2
+                let post = "{\"id\":\"audit-post\",\"kind\":\"announcement\",\"title\":\"Audit announcement\",\"publishedAt\":\"2026-11-01T12:00:00Z\"}"
+                result = (200, "{\"groupID\":\"\(parts[3])\",\"posts\":[\(empty ? "" : post)]}")
+            } else {
+                result = (403, "{}")
+            }
+            Self.lock.unlock()
             respond(result.0, result.1)
             return
         }

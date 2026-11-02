@@ -288,7 +288,7 @@ final class RedesignScreenshotTests: XCTestCase {
             app.launchArguments.append("--uitesting-audio-transport")
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-resources" {
-            app.launchArguments.append("--uitesting-halqah-resources")
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-post-removal"]
         }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "personal-history" {
             app.launchArguments.append("--uitesting-personal-history")
@@ -1064,9 +1064,55 @@ final class RedesignScreenshotTests: XCTestCase {
             XCTAssertTrue(app.buttons["method-of-zikr-shortcut"].waitForExistence(timeout: 10),
                           "Back must return to the same Halqah detail")
             shot("halqah-" + role + "-return")
+            inspectAnnouncementRemoval(role: role)
             goBack()
             XCTAssertTrue(entry.waitForExistence(timeout: 10), "Back must return to the fixture list")
         }
+    }
+
+    private func inspectAnnouncementRemoval(role: String) {
+        let post = app.staticTexts["Audit announcement"]
+        for _ in 0..<12 {
+            if post.exists && post.isHittable { break }
+            app.swipeUp()
+            pause(0.3)
+        }
+        guard post.exists && post.isHittable else {
+            XCTFail("Fixture announcement must be readable"); return
+        }
+        let removeLabel = language == "ur" ? "ہٹائیں" : "Remove"
+        let cancelLabel = language == "ur" ? "منسوخ کریں" : "Cancel"
+        let okayLabel = language == "ur" ? "ٹھیک ہے" : "OK"
+        let count = app.staticTexts["audit-removal-requests"]
+        XCTAssertEqual(count.label, "0")
+        if role == "member" {
+            XCTAssertFalse(app.buttons[removeLabel].exists, "Members cannot remove announcements")
+            return
+        }
+        let remove = app.buttons[removeLabel]
+        for _ in 0..<4 {
+            if remove.exists && remove.isHittable { break }
+            app.swipeUp()
+        }
+        guard tap(remove), tap(app.buttons[cancelLabel]) else {
+            XCTFail("Removal confirmation must offer Cancel"); return
+        }
+        XCTAssertEqual(count.label, "0", "Cancel must send no mutation")
+        XCTAssertTrue(post.exists)
+        guard tap(remove) else { XCTFail("Removal must remain available after Cancel"); return }
+        shot("halqah-removal-confirmation")
+        let confirm = onScreen(app.sheets.buttons.matching(NSPredicate(format: "label == %@", removeLabel)))
+        guard tap(confirm) else { XCTFail("Explicit removal confirmation missing"); return }
+        let okay = app.alerts.buttons[okayLabel]
+        guard okay.waitForExistence(timeout: 15) else { XCTFail("Injected removal failure must be visible"); return }
+        XCTAssertEqual(count.label, "1")
+        shot("halqah-removal-failure")
+        guard tap(okay) else { XCTFail("Failure acknowledgment missing"); return }
+        XCTAssertTrue(post.exists, "Failed removal must retain the post")
+        guard tap(remove), tap(confirm) else { XCTFail("Removal must be retryable"); return }
+        XCTAssertTrue(post.waitForNonExistence(timeout: 20), "Confirmed retry must refresh the announcement list")
+        XCTAssertEqual(count.label, "2", "Only the two confirmed attempts may mutate")
+        shot("halqah-removal-complete")
     }
 
     /// Real history/attendance screens with local transport, including recoverable failures.
