@@ -203,23 +203,32 @@ struct DayTaskEditorView: View {
         .alert("Could not save. Please try again.", isPresented: $saveFailed) {
             Button("OK", role: .cancel) { }
         }
-        .navigationTitle(original == nil ? "New task" : "Edit task")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
         .task(id: scenePhase) {
             if scenePhase == .active { await refreshNotificationAccess() }
         }
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
+        .safeAreaInset(edge: .top, spacing: 0) {
+            VStack(spacing: DISpacing.sm) {
+                Text(original == nil ? "New task" : "Edit task")
+                    .diInterfaceFont(.headline)
+                    .foregroundStyle(DIColor.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                HStack(spacing: DISpacing.md) {
                 Button("Cancel") { dismiss() }
-                    .buttonStyle(DICompactButtonStyle())
-            }
-            ToolbarItem(placement: .confirmationAction) {
+                    .buttonStyle(DISecondaryButtonStyle())
                 Button("Save") {
                     if onSave(builtTask) { dismiss() } else { saveFailed = true }
                 }
                 .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || requestingNotifications)
-                .buttonStyle(DICompactButtonStyle())
+                .buttonStyle(DISecondaryButtonStyle())
+                }
             }
+            .padding(DISpacing.md)
+            .diResponsiveWidth()
+            .frame(maxWidth: .infinity)
+            .background(DIColor.background)
         }
     }
 
