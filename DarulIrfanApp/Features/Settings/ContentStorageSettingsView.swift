@@ -21,6 +21,7 @@ struct ContentStorageSettingsView: View {
         List {
             storageSection
         }
+        .diInterfaceFont(.body)
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .diScreenBackground()
@@ -54,7 +55,7 @@ struct ContentStorageSettingsView: View {
                     Text(verbatim: "--").foregroundStyle(DIColor.textMuted)
                 } else if viewModel.hasLoaded {
                     Text(viewModel.bytesUsed, format: .byteCount(style: .file))
-                        .monospacedDigit()
+                        .font(.body.monospacedDigit())
                         .foregroundStyle(DIColor.textMuted)
                 } else {
                     ProgressView()
@@ -67,7 +68,7 @@ struct ContentStorageSettingsView: View {
                     Text(verbatim: "--").foregroundStyle(DIColor.textMuted)
                 } else if viewModel.hasLoaded {
                     Text(viewModel.assetCount, format: .number)
-                        .monospacedDigit()
+                        .font(.body.monospacedDigit())
                         .foregroundStyle(DIColor.textMuted)
                 } else {
                     ProgressView()
@@ -99,6 +100,7 @@ struct ContentStorageSettingsView: View {
             SettingsSectionHeader(titleKey: "Storage", systemImage: "internaldrive.fill")
         } footer: {
             storageFooter
+                .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
         }
     }
