@@ -39,6 +39,9 @@ final class HifzPlayer {
     @ObservationIgnored private var recitation: SurahRecitation?
     @ObservationIgnored private var pauseTask: Task<Void, Never>?
     @ObservationIgnored private var bayanObserver: NSObjectProtocol?
+    @ObservationIgnored private var interruptionObserver: NSObjectProtocol?
+    @ObservationIgnored private var routeObserver: NSObjectProtocol?
+    @ObservationIgnored private var audioSessionID = UUID()
     /// Bumped by each seek, so only the latest one starts playback.
     @ObservationIgnored private var seekToken = 0
     /// While a seek is under way the player still reports the old position;
@@ -64,6 +67,7 @@ final class HifzPlayer {
             playbackFailed = true
             return
         }
+        installAudioSessionObservers()
         self.recitation = recitation
         self.range = range
         self.repeats = max(1, repeats)
@@ -132,12 +136,19 @@ final class HifzPlayer {
 
     func resume() {
         guard let ayah = currentAyah else { return }
+        do { try AVAudioSession.sharedInstance().setActive(true) }
+        catch { return }
         // Restart the verse rather than resuming mid-word: a half-verse is not
         // useful for memorising.
         recite(ayah: ayah)
     }
 
     func stop() {
+        audioSessionID = UUID()
+        if let interruptionObserver { NotificationCenter.default.removeObserver(interruptionObserver) }
+        interruptionObserver = nil
+        if let routeObserver { NotificationCenter.default.removeObserver(routeObserver) }
+        routeObserver = nil
         pauseTask?.cancel()
         pauseTask = nil
         if let timeObserver, let player { player.removeTimeObserver(timeObserver) }
@@ -157,6 +168,34 @@ final class HifzPlayer {
         phase = .idle
         currentAyah = nil
         repetition = 1
+    }
+
+    // Practice pauses on an interruption or disconnected headphones. It keeps
+    // the verse/repetition for an explicit Resume, including during a recall gap.
+    // Queued notifications from a stopped/replaced session cannot pause a new one.
+    private func installAudioSessionObservers() {
+        let sessionID = audioSessionID
+        interruptionObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance(), queue: .main
+        ) { [weak self] notification in
+            guard let raw = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  AVAudioSession.InterruptionType(rawValue: raw) == .began else { return }
+            Task { @MainActor in
+                guard let self, self.audioSessionID == sessionID else { return }
+                self.pause()
+            }
+        }
+        routeObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main
+        ) { [weak self] notification in
+            guard let raw = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+                  AVAudioSession.RouteChangeReason(rawValue: raw) == .oldDeviceUnavailable else { return }
+            Task { @MainActor in
+                guard let self, self.audioSessionID == sessionID else { return }
+                self.pause()
+            }
+        }
     }
 
     private func failPlayback() {

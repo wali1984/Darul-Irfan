@@ -1,3 +1,4 @@
+import AVFoundation
 import XCTest
 @testable import DarulIrfan
 
@@ -64,6 +65,70 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertFalse(player.playbackFailed)
         XCTAssertNil(player.currentAyah)
         XCTAssertFalse(player.isPlaying)
+    }
+
+    // Real local PCM avoids both external traffic and missing-file KVO failures,
+    // so these tests exercise notification wiring rather than an unrelated error.
+    private func localAudio() throws -> (SurahRecitation, URL) {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("hifz-\(UUID().uuidString).wav")
+        let byteCount: UInt32 = 7 * 8000 * 2
+        var data = Data()
+        func text(_ value: String) { data.append(contentsOf: value.utf8) }
+        func number<T: FixedWidthInteger>(_ value: T) {
+            var little = value.littleEndian
+            withUnsafeBytes(of: &little) { data.append(contentsOf: $0) }
+        }
+        text("RIFF"); number(UInt32(36) + byteCount); text("WAVEfmt ")
+        number(UInt32(16)); number(UInt16(1)); number(UInt16(1))
+        number(UInt32(8000)); number(UInt32(16000)); number(UInt16(2)); number(UInt16(16))
+        text("data"); number(byteCount); data.append(Data(count: Int(byteCount)))
+        try data.write(to: url)
+        var recording = recitation
+        recording.audioUrl = url.absoluteString
+        return (recording, url)
+    }
+
+    func testAudioInterruptionAndHeadphoneDisconnectPauseWithoutLosingVerse() async throws {
+        let (recording, url) = try localAudio()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let player = HifzPlayer()
+        defer { player.stop() }
+        for headphones in [false, true] {
+            player.start(recitation: recording, range: 1...7, repeats: 3, pauseSeconds: 1.5, startingAyah: 4)
+            XCTAssertTrue(player.isPlaying)
+            if headphones {
+                NotificationCenter.default.post(name: AVAudioSession.routeChangeNotification, object: nil,
+                    userInfo: [AVAudioSessionRouteChangeReasonKey: AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue])
+            } else {
+                NotificationCenter.default.post(name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance(),
+                    userInfo: [AVAudioSessionInterruptionTypeKey: AVAudioSession.InterruptionType.began.rawValue])
+            }
+            let deadline = Date().addingTimeInterval(2)
+            while player.isPlaying && Date() < deadline { try await Task.sleep(nanoseconds: 10_000_000) }
+            XCTAssertFalse(player.isPlaying)
+            XCTAssertFalse(player.playbackFailed, "The notification must pause healthy audio")
+            XCTAssertEqual(player.currentAyah, 4)
+            XCTAssertEqual(player.repetition, 1)
+            player.resume()
+            XCTAssertTrue(player.isPlaying)
+            XCTAssertEqual(player.currentAyah, 4)
+        }
+    }
+
+    func testQueuedHeadphoneNotificationCannotPauseReplacementPractice() async throws {
+        let (recording, url) = try localAudio()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let player = HifzPlayer()
+        defer { player.stop() }
+        player.start(recitation: recording, range: 1...7, repeats: 3, pauseSeconds: 1.5, startingAyah: 2)
+        NotificationCenter.default.post(name: AVAudioSession.routeChangeNotification, object: nil,
+            userInfo: [AVAudioSessionRouteChangeReasonKey: AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue])
+        // The old observer queued a MainActor task; replace its session before it runs.
+        player.start(recitation: recording, range: 1...7, repeats: 3, pauseSeconds: 1.5, startingAyah: 5)
+        try await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertTrue(player.isPlaying)
+        XCTAssertFalse(player.playbackFailed)
+        XCTAssertEqual(player.currentAyah, 5)
     }
 
 }
