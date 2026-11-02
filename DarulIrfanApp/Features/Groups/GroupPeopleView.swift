@@ -76,7 +76,7 @@ struct GroupPeopleView: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Members")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
+        .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.buttonStyle(DIToolbarButtonStyle()) } }
         .task { await load() }
         .refreshable { if !working { await load() } }
         .disabled(working)
@@ -286,7 +286,7 @@ struct AddGroupPersonView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: result == nil ? .cancellationAction : .confirmationAction) {
-                Button(result == nil ? "Cancel" : "Done") { dismiss() }.buttonStyle(DICompactButtonStyle())
+                Button(result == nil ? "Cancel" : "Done") { dismiss() }.buttonStyle(DIToolbarButtonStyle())
             }
         }
     }

@@ -134,7 +134,7 @@ struct GroupPostComposer: View {
         .navigationTitle("New post")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) {
-            Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()).disabled(working || preparingMedia)
+            Button("Cancel") { dismiss() }.buttonStyle(DIToolbarButtonStyle()).disabled(working || preparingMedia)
         } }
         .onChange(of: picks) { _, chosen in
             guard !chosen.isEmpty, !working, !preparingMedia else { return }
@@ -334,7 +334,7 @@ struct GroupLiveStarter: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle(addingToSession ? "Add to the session" : "Go live")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DIToolbarButtonStyle()) } }
         .confirmationDialog("Delete this recording?", isPresented: Binding(
             get: { deletingRecording != nil },
             set: { if !$0 { deletingRecording = nil } }
@@ -707,7 +707,7 @@ struct GroupMeetingScheduler: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle())
+                Button("Cancel") { dismiss() }.buttonStyle(DIToolbarButtonStyle())
             }
         }
     }
@@ -838,7 +838,7 @@ struct GroupZikrEditor: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Zikr time")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DICompactButtonStyle()) } }
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DIToolbarButtonStyle()) } }
         .task { await loadLibrary() }
     }
 

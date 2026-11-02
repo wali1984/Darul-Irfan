@@ -113,6 +113,16 @@ struct DICompactButtonStyle: ButtonStyle {
     }
 }
 
+/// Navigation bars must measure the whole label plus its raised surface.
+/// Otherwise a compact toolbar proposal can consume all width in padding.
+struct DIToolbarButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .modifier(DIActionButtonSurface(primary: false, pressed: configuration.isPressed, compact: true))
+            .fixedSize(horizontal: true, vertical: false)
+    }
+}
+
 // MARK: - Empty & loading states
 
 struct DIEmptyState: View {
