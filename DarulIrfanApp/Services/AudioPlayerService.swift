@@ -59,6 +59,7 @@ final class AudioPlayerService: AudioPlayerServicing {
     @ObservationIgnored private var itemStateObserver: NSKeyValueObservation?
     @ObservationIgnored private var lastProgressSaveDate: Date = .distantPast
     @ObservationIgnored private var wasPlayingBeforeInterruption: Bool = false
+    @ObservationIgnored private var pausedForRecitation = false
     /// A seek asked for before the item could take one - a saved place, or
     /// Continue Listening - made once the item is ready. AVPlayerItem cancels
     /// a seek outside its seekable ranges, which stay empty until then.
@@ -96,6 +97,7 @@ final class AudioPlayerService: AudioPlayerServicing {
     // MARK: - AudioPlayerServicing
 
     func play(_ item: AudioPlayableItem, queue newQueue: [AudioPlayableItem]) {
+        pausedForRecitation = false
         let resolvedQueue: [AudioPlayableItem]
         if newQueue.contains(item) {
             resolvedQueue = newQueue
@@ -211,6 +213,14 @@ final class AudioPlayerService: AudioPlayerServicing {
         }
     }
 
+    func pauseForRecitation() {
+        pausedForRecitation = true
+        resumeTask?.cancel()
+        resumeTask = nil
+        wasPlayingBeforeInterruption = false
+        pausePlayback()
+    }
+
     func seek(to seconds: Double) {
         guard let player else { return }
         resumeTask?.cancel()
@@ -321,6 +331,7 @@ final class AudioPlayerService: AudioPlayerServicing {
 
     private func resumePlayback() {
         guard nowPlaying != nil, let player else { return }
+        pausedForRecitation = false
         guard activateAudioSession() else { return }
         NotificationCenter.default.post(name: .bayanAudioWillStart, object: nil)
         player.play()
@@ -353,6 +364,7 @@ final class AudioPlayerService: AudioPlayerServicing {
     }
 
     private func handleItemDidEnd() {
+        guard !pausedForRecitation else { return }
         if duration > 0 {
             currentTime = duration
         }
@@ -459,7 +471,7 @@ final class AudioPlayerService: AudioPlayerServicing {
         guard let player, ObjectIdentifier(player) == identity else { return }
         if player.currentItem?.status == .failed {
             // A file that never opened may be MPEG-4 audio named .mp3.
-            if let item = nowPlaying, !itemBecameReady, retriedAsMPEG4ID != item.id,
+            if !pausedForRecitation, let item = nowPlaying, !itemBecameReady, retriedAsMPEG4ID != item.id,
                item.url.pathExtension.lowercased() == "mp3" {
                 retryAsMPEG4(item)
                 return

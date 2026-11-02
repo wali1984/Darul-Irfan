@@ -183,6 +183,8 @@ protocol AudioPlayerServicing: AnyObject {
 
     func play(_ item: AudioPlayableItem, queue: [AudioPlayableItem])
     func togglePlayPause()
+    /// Explicit foreground microphone handoff; must not automatically resume.
+    func pauseForRecitation()
     func seek(to seconds: Double)
     func skipForward(_ seconds: Double)
     func skipBackward(_ seconds: Double)
@@ -197,6 +199,7 @@ protocol AudioPlayerServicing: AnyObject {
 // MARK: - Downloads
 extension AudioPlayerServicing {
     var videoPresentationPlayer: AVPlayer? { nil }
+    func pauseForRecitation() { stop() }
 }
 
 @MainActor

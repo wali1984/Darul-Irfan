@@ -141,6 +141,8 @@ final class NarrationCatalog {
 @Observable
 @MainActor
 final class TranslationSpeaker {
+    private static weak var active: TranslationSpeaker?
+    static func stopActive() { active?.stop() }
     private(set) var isSpeaking = false
     private(set) var currentSurah: Int?
     private(set) var currentAyah: Int?
@@ -165,7 +167,9 @@ final class TranslationSpeaker {
     }
 
     private func play(edition: String, kind: String, surah: Int, start: Int, end: Int) {
+        if let previous = Self.active, previous !== self { previous.stop() }
         stop()
+        Self.active = self
         let name = NarrationCatalog.name(surah: surah, start: start, end: end)
         let local = NarrationCatalog.localURL(edition: edition, kind: kind, name: name)
         let remote = NarrationCatalog.shared.remoteURL(edition: edition, kind: kind, name: name)
@@ -220,6 +224,7 @@ final class TranslationSpeaker {
     }
 
     func stop() {
+        if Self.active === self { Self.active = nil }
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         endObserver = nil
         if let bayanObserver { NotificationCenter.default.removeObserver(bayanObserver) }
