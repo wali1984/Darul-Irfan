@@ -11,6 +11,8 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
     case islamicDays
     case myDay
     case focus
+    case methodOfZikr
+    case shajra
     case notes
     case fasting
     case timetable
@@ -42,6 +44,8 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .islamicDays: return ["Islamic days"]
         case .myDay: return ["My Day"]
         case .focus: return ["Your Daily Personal Zikr", "Focus timer"]
+        case .methodOfZikr: return ["Method of Zikr"]
+        case .shajra: return ["Shajra", "Chain of Transmission"]
         case .notes: return ["Private notes"]
         case .fasting: return ["Fasting record"]
         case .timetable: return ["Monthly timetable"]
@@ -76,6 +80,8 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
         case .islamicDays: return "star.circle"
         case .myDay: return "checklist"
         case .focus: return "timer"
+        case .methodOfZikr: return "book.pages"
+        case .shajra: return "link"
         case .notes: return "note.text"
         case .fasting: return "moon.haze"
         case .timetable: return "calendar"
@@ -99,6 +105,8 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
     /// Where it lives, shown under its name.
     var areaKey: LocalizedStringKey {
         switch self {
+        case .methodOfZikr, .shajra:
+            return "Zikr"
         case .privateGroups, .about:
             return "Halqah"
         case .settings, .language, .location, .calculation, .manualOffsets, .notifications, .appearance,
@@ -159,6 +167,7 @@ enum SearchAppDestination: String, CaseIterable, Identifiable {
 /// The screen a destination names, built as its own button builds it.
 @MainActor
 struct SearchAppDestinationScreen: View {
+    @Environment(\.methodGuideReaderScale) private var readerScale
     let destination: SearchAppDestination
     let dependencies: AppDependencies
     let appState: AppState
@@ -179,6 +188,10 @@ struct SearchAppDestinationScreen: View {
             MyDayView(dependencies: dependencies, appState: appState)
         case .focus:
             FocusTimerView(dependencies: dependencies, appState: appState)
+        case .methodOfZikr:
+            NativeMethodOfZikrView(readerFontScale: readerScale)
+        case .shajra:
+            ShajraView()
         case .notes:
             NotesView()
         case .fasting:
