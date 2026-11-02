@@ -715,9 +715,10 @@ struct GroupMeetingScheduler: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Schedule a meeting")
         .navigationBarTitleDisplayMode(.inline)
+        .interactiveDismissDisabled(working)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") { dismiss() }.buttonStyle(DIToolbarButtonStyle())
+                Button("Cancel") { if !working { dismiss() } }.buttonStyle(DIToolbarButtonStyle()).disabled(working)
             }
         }
     }
@@ -849,7 +850,8 @@ struct GroupZikrEditor: View {
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Zikr time")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.buttonStyle(DIToolbarButtonStyle()) } }
+        .interactiveDismissDisabled(working)
+        .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { if !working { dismiss() } }.buttonStyle(DIToolbarButtonStyle()).disabled(working) } }
         .task { await loadLibrary() }
     }
 
