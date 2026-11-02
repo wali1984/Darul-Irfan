@@ -55,6 +55,7 @@ private struct MeetingWebView: UIViewRepresentable {
         configuration.userContentController.add(context.coordinator, name: "darulirfan")
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.uiDelegate = context.coordinator
+        webView.navigationDelegate = context.coordinator
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.accessibilityLabel = String(localized: "Meeting room")
@@ -65,11 +66,15 @@ private struct MeetingWebView: UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {}
 
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
+        coordinator.active = false
+        webView.uiDelegate = nil
+        webView.navigationDelegate = nil
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "darulirfan")
         webView.loadHTMLString("", baseURL: nil)
     }
 
-    final class Coordinator: NSObject, WKUIDelegate, WKScriptMessageHandler {
+    final class Coordinator: NSObject, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
+        var active = true
         let onLeave: () -> Void
         init(onLeave: @escaping () -> Void) { self.onLeave = onLeave }
 
@@ -82,14 +87,26 @@ private struct MeetingWebView: UIViewRepresentable {
             type: WKMediaCaptureType,
             decisionHandler: @escaping (WKPermissionDecision) -> Void
         ) {
-            let ours = OfficialPlatformConfiguration.baseURL.host == origin.host
+            let ours = active && frame.isMainFrame && MeetingOrigin.allows(
+                scheme: origin.protocol, host: origin.host, port: origin.port,
+                trusted: OfficialPlatformConfiguration.baseURL
+            )
             decisionHandler(ours ? .grant : .deny)
         }
 
+        func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
+                     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            guard active else { decisionHandler(.cancel); return }
+            if action.targetFrame?.isMainFrame == false { decisionHandler(.allow); return }
+            decisionHandler(MeetingOrigin.allows(action.request.url, trusted: OfficialPlatformConfiguration.baseURL) ? .allow : .cancel)
+        }
+
         func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
-            if message.body as? String == "left" {
-                DispatchQueue.main.async { self.onLeave() }
-            }
+            let origin = message.frameInfo.securityOrigin
+            guard active, message.frameInfo.isMainFrame, message.body as? String == "left",
+                  MeetingOrigin.allows(scheme: origin.protocol, host: origin.host, port: origin.port,
+                                       trusted: OfficialPlatformConfiguration.baseURL) else { return }
+            DispatchQueue.main.async { if self.active { self.onLeave() } }
         }
     }
 }
