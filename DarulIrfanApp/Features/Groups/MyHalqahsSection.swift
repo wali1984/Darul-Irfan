@@ -7,7 +7,7 @@ import UIKit
 /// falls back to.
 ///
 /// Signed out: the join card (name, invitation code, Sign in with Apple),
-/// with "How private groups work" folded. Signed in: the Super admin's
+/// with "How Halqahs work" folded. Signed in: the Super admin's
 /// dashboard on top for the Super admin (an Administrator's or Admin's role
 /// for them), each Halqah as a hero card with a live row and Join while its
 /// zikr or a meeting is live, or "Waiting to be added"; "Have another
@@ -16,7 +16,7 @@ import UIKit
 struct MyHalqahsSection: View {
     @Bindable var model: GroupsModel
     var dependencies: AppDependencies? = nil
-    /// Keeps "How private groups work" for a member already in a Halqah (the
+    /// Keeps "How Halqahs work" for a member already in a Halqah (the
     /// groups page); the tab offers it only until then.
     var explainsWhenJoined = false
 
@@ -337,22 +337,22 @@ struct MyHalqahsSection: View {
     private var howItWorksCard: some View {
         DisclosureGroup(isExpanded: $isShowingHowItWorks) {
             VStack(alignment: .leading, spacing: DISpacing.md) {
-                howStep(1, "Get your invitation code",
-                        "Ask the administrator of your region's group - Darul Irfan, United States or Canada - for an invitation code. Each code admits one person to one group and expires after 30 days.")
+                howStep(1, "Choose your Halqah",
+                        "Our Sheikh is open to everyone through Join Daily Zikr. Enter your name, city and country on your first visit. For a private regional Halqah, ask its administrator for an invitation code.")
                 howStep(2, "Join with the code",
-                        "Type the code in the box above and tap Join. You are added to your group straight away; there is nothing else to wait for.")
+                        "For an invited Halqah, enter your code and tap Join. Each code can be used once. If it has expired or already been used, ask the administrator for a new one.")
                 howStep(3, "Read and watch",
                         "Open your group to read its announcements and to watch recorded zikr inside the app. Pull down to check for new posts.")
                 howStep(4, "Join a meeting",
                         "When a group has a meeting, its link appears at the top of the group. Tap it to join the meeting.")
-                howStep(5, "Private by design",
-                        "Only members of a group can see it, and one region cannot see another's. Members read; administrators publish. Nothing you do here is shown to other members.")
+                howStep(5, "What others can see",
+                        "Private Halqahs require membership; Our Sheikh has public entry. Administrators publish group posts. In a live meeting, other participants can see your display name and messages you send in the meeting chat.")
                 howStep(6, "Leaving",
-                        "Delete my account removes your sign-in and your place in every group. To come back, ask for a new code.")
+                        "Delete my account removes your account and its Halqah memberships. To rejoin a private Halqah, ask its administrator for a new invitation code. Our Sheikh remains available through Join Daily Zikr.")
             }
             .padding(.top, DISpacing.sm)
         } label: {
-            Label("How private groups work", systemImage: "questionmark.circle")
+            Label("How Halqahs work", systemImage: "questionmark.circle")
                 .diInterfaceFont(.headline)
                 .frame(minHeight: 48)
                 .foregroundStyle(DIColor.textPrimary)

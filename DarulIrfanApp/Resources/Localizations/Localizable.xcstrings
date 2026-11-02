@@ -1,6 +1,125 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "How Halqahs work": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How Halqahs work"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حلقے کیسے کام کرتے ہیں"
+          }
+        }
+      }
+    },
+    "Choose your Halqah": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنا حلقہ منتخب کریں"
+          }
+        }
+      }
+    },
+    "Our Sheikh is open to everyone through Join Daily Zikr. Enter your name, city and country on your first visit. For a private regional Halqah, ask its administrator for an invitation code.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Our Sheikh is open to everyone through Join Daily Zikr. Enter your name, city and country on your first visit. For a private regional Halqah, ask its administrator for an invitation code."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہمارے شیخ کے حلقے میں سب لوگ روزانہ ذکر میں شامل ہوں کے ذریعے آ سکتے ہیں۔ پہلی بار اپنا نام، شہر اور ملک درج کریں۔ نجی علاقائی حلقے کے لیے اس کے منتظم سے دعوتی کوڈ حاصل کریں۔"
+          }
+        }
+      }
+    },
+    "For an invited Halqah, enter your code and tap Join. Each code can be used once. If it has expired or already been used, ask the administrator for a new one.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For an invited Halqah, enter your code and tap Join. Each code can be used once. If it has expired or already been used, ask the administrator for a new one."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوتی حلقے کے لیے اپنا کوڈ درج کریں اور شامل ہوں پر ٹیپ کریں۔ ہر کوڈ ایک بار استعمال ہوتا ہے۔ اگر اس کی مدت ختم ہو گئی ہو یا وہ پہلے استعمال ہو چکا ہو تو منتظم سے نیا کوڈ لیں۔"
+          }
+        }
+      }
+    },
+    "What others can see": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What others can see"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دوسرے کیا دیکھ سکتے ہیں"
+          }
+        }
+      }
+    },
+    "Private Halqahs require membership; Our Sheikh has public entry. Administrators publish group posts. In a live meeting, other participants can see your display name and messages you send in the meeting chat.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Private Halqahs require membership; Our Sheikh has public entry. Administrators publish group posts. In a live meeting, other participants can see your display name and messages you send in the meeting chat."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نجی حلقوں کے لیے رکنیت ضروری ہے؛ ہمارے شیخ کے حلقے میں سب شامل ہو سکتے ہیں۔ گروپ کی پوسٹس منتظمین شائع کرتے ہیں۔ براہ راست نشست میں دوسرے شرکا آپ کا نام اور نشست کی گفتگو میں بھیجے گئے پیغامات دیکھ سکتے ہیں۔"
+          }
+        }
+      }
+    },
+    "Delete my account removes your account and its Halqah memberships. To rejoin a private Halqah, ask its administrator for a new invitation code. Our Sheikh remains available through Join Daily Zikr.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete my account removes your account and its Halqah memberships. To rejoin a private Halqah, ask its administrator for a new invitation code. Our Sheikh remains available through Join Daily Zikr."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "میرا اکاؤنٹ حذف کریں سے آپ کا اکاؤنٹ اور اس کی حلقوں کی رکنیت ختم ہو جاتی ہے۔ نجی حلقے میں دوبارہ شامل ہونے کے لیے منتظم سے نیا دعوتی کوڈ لیں۔ ہمارے شیخ کے حلقے میں روزانہ ذکر میں شامل ہوں کے ذریعے دوبارہ آ سکتے ہیں۔"
+          }
+        }
+      }
+    },
     "Enable notifications in Settings to receive task reminders." : {
   "localizations": {
     "en": {
