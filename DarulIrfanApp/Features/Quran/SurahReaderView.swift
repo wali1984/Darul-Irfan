@@ -7,6 +7,7 @@ import SwiftUI
 struct SurahReaderView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
     private let appState: AppState
     private let onRequestNextSurah: () -> Void
     private let initialFocusAyah: Int?
@@ -76,6 +77,9 @@ struct SurahReaderView: View {
             .diScreenBackground()
             .navigationTitle(viewModel.surah.nameTransliterated)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(DIColor.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(colorScheme, for: .navigationBar)
             .safeAreaInset(edge: .top, spacing: 0) {
                 if viewModel.phase == .ready {
                     readerControls
