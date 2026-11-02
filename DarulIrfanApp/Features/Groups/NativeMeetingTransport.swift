@@ -79,10 +79,28 @@ final class NativeMeetingTransport: HalqaSessionTransport {
             } else {
                 client.localUser.enableVideo { error in Task { @MainActor in done(error == nil) } }
             }
-        }, disableLateCapture: { [self] in
-            if kind == .microphone { client.localUser.disableAudio { _ in } }
-            else { client.localUser.disableVideo { _ in } }
+        }, disableLateCapture: { [self] done in
+            disableCapture(kind) { [self] stopped in
+                if !stopped { onEnded?() }
+                done(stopped)
+            }
         }, completion: completion)
+    }
+
+    /// Mute/camera-off never needs a permission prompt. Cancel any pending
+    /// enable first, so granting an older prompt cannot undo this action.
+    func stopCapture(_ kind: HalqaCaptureKind, completion: @escaping (Bool) -> Void) {
+        let gate = kind == .microphone ? microphoneRequest : cameraRequest
+        guard joined else { gate.cancel(); completion(false); return }
+        gate.stop(disable: { [self] done in disableCapture(kind, completion: done) }, completion: completion)
+    }
+
+    private func disableCapture(_ kind: HalqaCaptureKind, completion: @escaping (Bool) -> Void) {
+        if kind == .microphone {
+            client.localUser.disableAudio { error in Task { @MainActor in completion(error == nil) } }
+        } else {
+            client.localUser.disableVideo { error in Task { @MainActor in completion(error == nil) } }
+        }
     }
 }
 

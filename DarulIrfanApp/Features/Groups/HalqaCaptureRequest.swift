@@ -9,35 +9,59 @@ enum HalqaCaptureKind { case microphone, camera }
 final class HalqaCaptureRequest {
     private(set) var pending = false
     private var closed = false
+    private var generation = 0
+    private var requestPending = false
+    private var stopsPending = 0
+    private func refreshPending() { pending = requestPending || stopsPending > 0 }
 
     func request(
         permission: (@escaping (Bool) -> Void) -> Void,
         allowedNow: @escaping () -> Bool,
         enable: @escaping (@escaping (Bool) -> Void) -> Void,
-        disableLateCapture: @escaping () -> Void,
+        disableLateCapture: @escaping (@escaping (Bool) -> Void) -> Void,
         completion: @escaping (Bool) -> Void
     ) {
         guard !closed, !pending, allowedNow() else { completion(false); return }
-        pending = true
+        requestPending = true
+        refreshPending()
+        generation &+= 1
+        let ticket = generation
         permission { [self] granted in
-            guard granted, !closed, allowedNow() else {
-                pending = false
+            guard granted, !closed, ticket == generation, allowedNow() else {
+                requestPending = false
+                refreshPending()
                 completion(false)
                 return
             }
             enable { [self] success in
-                pending = false
-                if closed {
-                    if success { disableLateCapture() }
-                    completion(false)
+                if (closed || ticket != generation) && success {
+                    disableLateCapture { [self] stopped in
+                        if !stopped { closed = true }
+                        requestPending = false
+                        refreshPending()
+                        completion(false)
+                    }
                 } else {
-                    completion(success)
+                    requestPending = false
+                    refreshPending()
+                    completion(success && !closed && ticket == generation)
                 }
             }
         }
     }
 
-    /// Terminal for this connection, including failed release/retry. A new
-    /// session gets new gates rather than reopening a stale permission request.
-    func close() { closed = true }
+    func stop(disable: (@escaping (Bool) -> Void) -> Void, completion: @escaping (Bool) -> Void) {
+        cancel()
+        stopsPending += 1
+        refreshPending()
+        disable { [self] success in
+            stopsPending -= 1
+            refreshPending()
+            completion(success)
+        }
+    }
+
+    func cancel() { generation &+= 1 }
+    /// A new connection gets a new gate; a late callback cannot reopen this one.
+    func close() { closed = true; cancel() }
 }

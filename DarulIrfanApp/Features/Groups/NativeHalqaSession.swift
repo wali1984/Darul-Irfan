@@ -1,4 +1,6 @@
 import RealtimeKit
+import AVFoundation
+import UIKit
 
 /// App-owned session: navigation and scene backgrounding do not release it.
 /// The native room presenter must use this owner instead of creating a client.
@@ -28,4 +30,26 @@ final class NativeHalqaSession {
     }
 
     func leave() { lifecycle.leave() }
+
+    /// Call only from the room's explicit microphone/camera button.
+    func requestCapture(_ kind: HalqaCaptureKind, completion: @escaping (Bool) -> Void) {
+        guard lifecycle.phase == .joined,
+              let transport = lifecycle.transport as? NativeMeetingTransport else {
+            completion(false); return
+        }
+        transport.requestCapture(kind, permission: { done in
+            let media: AVMediaType = kind == .microphone ? .audio : .video
+            switch AVCaptureDevice.authorizationStatus(for: media) {
+            case .authorized: done(true)
+            case .notDetermined:
+                AVCaptureDevice.requestAccess(for: media) { granted in Task { @MainActor in done(granted) } }
+            default: done(false)
+            }
+        }, foreground: { UIApplication.shared.applicationState == .active }, completion: completion)
+    }
+
+    func stopCapture(_ kind: HalqaCaptureKind, completion: @escaping (Bool) -> Void) {
+        guard let transport = lifecycle.transport as? NativeMeetingTransport else { completion(false); return }
+        transport.stopCapture(kind, completion: completion)
+    }
 }
