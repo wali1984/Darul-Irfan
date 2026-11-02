@@ -45,7 +45,7 @@ struct ReadSavedView: View {
                             gold: false
                         )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
 
                     ReadRowRule()
 
@@ -61,7 +61,7 @@ struct ReadSavedView: View {
                             gold: true
                         )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
 
                     ReadRowRule()
 
@@ -76,7 +76,7 @@ struct ReadSavedView: View {
                             gold: false
                         )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                 }
                 .padding(6)
                 .diGlassPanel(cornerRadius: 24)

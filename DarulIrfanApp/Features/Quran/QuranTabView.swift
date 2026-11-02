@@ -317,7 +317,7 @@ struct QuranTabView: View {
                             isUrdu: isUrdu
                         )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                 }
             }
         }
@@ -342,7 +342,7 @@ struct QuranTabView: View {
                     NavigationLink(value: QuranRoute.reader(surah: para.surah, focusAyah: para.ayah)) {
                         QuranParaRow(para: para, opening: paraOpenings[para.number])
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(DIPressableStyle())
                 }
             }
         }
