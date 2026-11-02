@@ -8,11 +8,13 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     let client = NativeMeetingConfiguration.makeClient()
     private let info: RtkMeetingInfo
     var onEnded: (() -> Void)?
+    var onConnectionChanged: ((HalqaConnectionStatus) -> Void)?
     private let events = NativeMeetingEvents()
 
     init(authToken: String) {
         info = NativeMeetingConfiguration.meetingInfo(authToken: authToken)
         events.ended = { [weak self] in self?.onEnded?() }
+        events.connectionChanged = { [weak self] status in self?.onConnectionChanged?(status) }
         client.addMeetingRoomEventListener(meetingRoomEventListener: events)
     }
 
@@ -38,6 +40,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
 
 private final class NativeMeetingEvents: NSObject, RtkMeetingRoomEventListener {
     var ended: (@MainActor () -> Void)?
+    var connectionChanged: (@MainActor (HalqaConnectionStatus) -> Void)?
     func onMeetingEnded() { Task { @MainActor in ended?() } }
     func onMeetingRoomLeaveCompleted() { Task { @MainActor in ended?() } }
     func onMeetingInitStarted() {}
@@ -49,5 +52,11 @@ private final class NativeMeetingEvents: NSObject, RtkMeetingRoomEventListener {
     func onMeetingRoomLeaveStarted() {}
     func onActiveTabUpdate(meeting: RealtimeKitClient, activeTab: ActiveTab) {}
     func onMediaConnectionUpdate(update: MediaConnectionUpdate) {}
-    func onSocketConnectionUpdate(newState: SocketConnectionState) {}
+    func onSocketConnectionUpdate(newState: SocketConnectionState) {
+        let status: HalqaConnectionStatus
+        if newState.socketState == .connected { status = .connected }
+        else if newState.socketState == .failed { status = .unavailable }
+        else { status = .reconnecting }
+        Task { @MainActor in connectionChanged?(status) }
+    }
 }

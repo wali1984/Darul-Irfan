@@ -1,9 +1,12 @@
 import Foundation
 import Observation
 
+enum HalqaConnectionStatus { case unknown, connected, reconnecting, unavailable }
+
 @MainActor
 protocol HalqaSessionTransport: AnyObject {
     var onEnded: (() -> Void)? { get set }
+    var onConnectionChanged: ((HalqaConnectionStatus) -> Void)? { get set }
     func initialize(completion: @escaping (Bool) -> Void)
     func join(completion: @escaping (Bool) -> Void)
     func release(completion: @escaping (Bool) -> Void)
@@ -15,6 +18,7 @@ protocol HalqaSessionTransport: AnyObject {
 @Observable
 final class HalqaSessionLifecycle {
     enum Phase { case idle, initializing, joining, joined, leaving, failed }
+    private(set) var connectionStatus: HalqaConnectionStatus = .unknown
     private(set) var phase: Phase = .idle
     private(set) var sessionID: String?
     private(set) var transport: (any HalqaSessionTransport)?
@@ -31,9 +35,15 @@ final class HalqaSessionLifecycle {
         transport = connection
         self.sessionID = sessionID
         phase = .initializing
+        connectionStatus = .unknown
         connection.onEnded = { [weak self] in
             guard let self, self.generation == ticket else { return }
             self.close(failed: false)
+        }
+        connection.onConnectionChanged = { [weak self] status in
+            guard let self, self.generation == ticket,
+                  [.initializing, .joining, .joined].contains(self.phase) else { return }
+            self.connectionStatus = status
         }
         connection.initialize { [weak self] success in
             guard let self, self.generation == ticket, self.phase == .initializing else { return }
@@ -58,9 +68,11 @@ final class HalqaSessionLifecycle {
             guard let self, self.generation == ticket else { return }
             if released {
                 connection.onEnded = nil
+                connection.onConnectionChanged = nil
                 self.transport = nil
                 self.sessionID = nil
             }
+            self.connectionStatus = .unknown
             // Retain a failed release so another room cannot create a duplicate
             // connection. Leave may be retried explicitly.
             self.phase = failed || !released ? .failed : .idle

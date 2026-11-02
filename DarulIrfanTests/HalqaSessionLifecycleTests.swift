@@ -3,6 +3,32 @@ import XCTest
 
 final class HalqaSessionLifecycleTests: XCTestCase {
     @MainActor
+    func testReconnectKeepsSessionAndLateNetworkEventsCannotChangeReplacement() {
+        let model = HalqaSessionLifecycle()
+        let first = FakeHalqaTransport()
+        model.start(sessionID: "one") { first }
+        first.initialized?(true)
+        first.joined?(true)
+        let late = first.onConnectionChanged
+        first.onConnectionChanged?(.reconnecting)
+        XCTAssertEqual(model.connectionStatus, .reconnecting)
+        XCTAssertEqual(model.phase, .joined)
+        XCTAssertTrue(model.start(sessionID: "one") { XCTFail("Must reuse transport"); return first })
+        XCTAssertEqual(first.joinCalls, 1)
+        first.onConnectionChanged?(.connected)
+        XCTAssertEqual(model.connectionStatus, .connected)
+        model.leave()
+        late?(.unavailable)
+        XCTAssertEqual(model.connectionStatus, .connected)
+        first.released?(true)
+        XCTAssertNil(first.onConnectionChanged)
+        model.start(sessionID: "two") { FakeHalqaTransport() }
+        late?(.unavailable)
+        XCTAssertEqual(model.connectionStatus, .unknown)
+        XCTAssertEqual(model.sessionID, "two")
+    }
+
+    @MainActor
     func testHostEndReleasesRoomAndLateEventCannotEndReplacement() {
         let model = HalqaSessionLifecycle()
         let first = FakeHalqaTransport()
@@ -72,6 +98,7 @@ final class HalqaSessionLifecycleTests: XCTestCase {
 @MainActor
 private final class FakeHalqaTransport: HalqaSessionTransport {
     var onEnded: (() -> Void)?
+    var onConnectionChanged: ((HalqaConnectionStatus) -> Void)?
     var initialized: ((Bool) -> Void)?
     var joined: ((Bool) -> Void)?
     var released: ((Bool) -> Void)?
