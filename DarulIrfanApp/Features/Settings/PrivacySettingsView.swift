@@ -50,9 +50,16 @@ struct PrivacySettingsView: View {
                 PrivacyCard(
                     systemImage: "internaldrive.fill",
                     titleKey: "Your data is yours",
-                    bodyKey: "Bookmarks, prayer records, tasbih counts, and downloads are stored only on this device. Deleting the app removes them completely."
+                    bodyKey: "Bookmarks, prayer records, tasbih counts, and downloads are stored locally. Your phone’s backup or device-transfer settings may retain a copy of some app data after the app is deleted."
                 )
                 .diAppear(delay: 0.24)
+
+                PrivacyCard(
+                    systemImage: "person.2.fill",
+                    titleKey: "Halqa participation",
+                    bodyKey: "When you join a Halqa, the profile details you provide, membership and attendance are stored by our community service. Messages and content you publish are shared with that Halqa."
+                )
+                .diAppear(delay: 0.27)
 
                 Text("Network access refreshes official public content and live status, and streams or downloads content you request. Precise location is never included.")
                     .diInterfaceFont(.footnote)
