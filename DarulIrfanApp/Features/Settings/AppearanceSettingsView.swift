@@ -32,7 +32,7 @@ struct AppearanceSettingsView: View {
 
     private var themeSection: some View {
         Section {
-            DISegmentedControl(items: AppTheme.allCases, title: { LocalizedStringKey($0.settingsDisplayName) }, selection: themeBinding)
+            DISegmentedControl(items: AppTheme.allCases, title: { LocalizedStringKey($0.settingsDisplayName) }, selection: themeBinding, wrapsForLargeText: true)
                 .accessibilityLabel(Text("Theme"))
             .listRowBackground(DIColor.surface)
         } header: {
