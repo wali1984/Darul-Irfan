@@ -1,6 +1,38 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Decrease": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decrease"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کم کریں"
+          }
+        }
+      }
+    },
+    "Increase": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Increase"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بڑھائیں"
+          }
+        }
+      }
+    },
     "Bookmarks, prayer records, tasbih counts, and downloads are stored locally. Your phone’s backup or device-transfer settings may retain a copy of some app data after the app is deleted.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Bookmarks, prayer records, tasbih counts, and downloads are stored locally. Your phone’s backup or device-transfer settings may retain a copy of some app data after the app is deleted."}}, "ur": {"stringUnit": {"state": "translated", "value": "بک مارکس، نماز کا ریکارڈ، تسبیح کی گنتی اور ڈاؤن لوڈز مقامی طور پر محفوظ ہوتے ہیں۔ آپ کے فون کی بیک اپ یا دوسرے آلے پر منتقلی کی ترتیبات کے مطابق، ایپ حذف کرنے کے بعد بھی اس کے بعض ڈیٹا کی نقل محفوظ رہ سکتی ہے۔"}}}},
     "Halqa participation": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Halqa participation"}}, "ur": {"stringUnit": {"state": "translated", "value": "حلقے میں شرکت"}}}},
     "When you join a Halqa, the profile details you provide, membership and attendance are stored by our community service. Messages and content you publish are shared with that Halqa.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "When you join a Halqa, the profile details you provide, membership and attendance are stored by our community service. Messages and content you publish are shared with that Halqa."}}, "ur": {"stringUnit": {"state": "translated", "value": "جب آپ کسی حلقے میں شامل ہوتے ہیں تو آپ کی فراہم کردہ پروفائل کی تفصیلات، رکنیت اور حاضری ہماری کمیونٹی سروس میں محفوظ ہوتی ہیں۔ آپ کے شائع کردہ پیغامات اور مواد اس حلقے کے ساتھ شیئر ہوتے ہیں۔"}}}},

@@ -110,14 +110,14 @@ struct DayTaskEditorView: View {
                             }
                             .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
                             .disabled(displayedMinutes <= minimumMinutes)
-                            .accessibilityLabel(Text("- ") + offsetLabel)
+                            .accessibilityLabel(Text("Decrease") + Text(": ") + offsetLabel)
                             .accessibilityValue(offsetLabel)
                             Button { minutes = min(180, displayedMinutes + 5) } label: {
                                 Image(systemName: "plus").frame(minWidth: 16)
                             }
                             .buttonStyle(DICompactButtonStyle(minimumHeight: 48))
                             .disabled(displayedMinutes >= 180)
-                            .accessibilityLabel(Text("+ ") + offsetLabel)
+                            .accessibilityLabel(Text("Increase") + Text(": ") + offsetLabel)
                             .accessibilityValue(offsetLabel)
                         }
                     }
