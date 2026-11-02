@@ -64,6 +64,7 @@ struct NativeMeetingRoomView: View {
                     Text("Session ended").padding()
                 }
             }
+            .diInterfaceFont(.body)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .diScreenBackground()
             .navigationTitle("Darul Irfan")
