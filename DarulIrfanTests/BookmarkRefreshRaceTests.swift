@@ -5,12 +5,37 @@ import XCTest
 final class BookmarkRefreshRaceTests: XCTestCase {
     @MainActor
     func testDeletionDuringHeldReadCannotRestoreDeletedBookmark() async {
+        await verifyDeletionDuringRead(entry: .bookmarks)
+    }
+
+    @MainActor
+    func testDeletionDuringInitialLoadCannotRestoreDeletedBookmark() async {
+        await verifyDeletionDuringRead(entry: .initialLoad)
+    }
+
+    @MainActor
+    func testDeletionDuringReaderRefreshCannotRestoreDeletedBookmark() async {
+        await verifyDeletionDuringRead(entry: .readerRefresh)
+    }
+
+    private enum Entry { case bookmarks, initialLoad, readerRefresh }
+
+    @MainActor
+    private func verifyDeletionDuringRead(entry: Entry) async {
         let began = expectation(description: "First bookmark snapshot captured")
         let bookmark = QuranBookmark(id: UUID(), surahNumber: 1, ayahNumber: 1,
                                      note: nil, createdAt: Date())
-        let repository = HeldBookmarkRepository(bookmark: bookmark) { began.fulfill() }
+        let heldRead = entry == .readerRefresh ? 2 : 1
+        let repository = HeldBookmarkRepository(bookmark: bookmark, heldRead: heldRead) { began.fulfill() }
         let model = QuranViewModel(repository: repository)
-        let read = Task { await model.refreshBookmarks() }
+        if entry == .readerRefresh { await model.load() }
+        let read = Task {
+            switch entry {
+            case .bookmarks: await model.refreshBookmarks()
+            case .initialLoad: await model.load()
+            case .readerRefresh: await model.refreshReaderState()
+            }
+        }
         await fulfillment(of: [began], timeout: 5)
         await model.removeBookmark(bookmark)
         await repository.releaseRead()
@@ -19,7 +44,7 @@ final class BookmarkRefreshRaceTests: XCTestCase {
         XCTAssertFalse(model.bookmarksLoading)
         XCTAssertFalse(model.bookmarksFailed)
         let reads = await repository.readCount
-        XCTAssertEqual(reads, 2, "Deletion must retain a fresh read after the in-flight snapshot")
+        XCTAssertEqual(reads, heldRead + 1, "Deletion must retain a fresh read after the in-flight snapshot")
     }
 }
 
@@ -27,15 +52,17 @@ private actor HeldBookmarkRepository: QuranRepositoryProtocol {
     private var saved: [QuranBookmark]
     private var held: CheckedContinuation<Void, Never>?
     private let began: @Sendable () -> Void
+    private let heldRead: Int
     private(set) var readCount = 0
-    init(bookmark: QuranBookmark, began: @escaping @Sendable () -> Void) {
+    init(bookmark: QuranBookmark, heldRead: Int, began: @escaping @Sendable () -> Void) {
         saved = [bookmark]
+        self.heldRead = heldRead
         self.began = began
     }
     func bookmarks() async throws -> [QuranBookmark] {
         readCount += 1
         let snapshot = saved
-        if readCount == 1 {
+        if readCount == heldRead {
             await withCheckedContinuation { continuation in
                 held = continuation
                 began()

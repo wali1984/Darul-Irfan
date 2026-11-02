@@ -54,9 +54,12 @@ final class QuranViewModel {
             searchKeys = Dictionary(surahs.map { ($0.id, Self.keys(for: $0)) }, uniquingKeysWith: { first, _ in first })
             offlineSurahNumbers = Set(numbersWithText)
             lastRead = try? await repository.lastReadPosition()
-            bookmarks = (try? await repository.bookmarks()) ?? []
+            await refreshBookmarks()
+            try Task.checkCancellation()
             hasLoadedOnce = true
             phase = .loaded
+        } catch is CancellationError {
+            return
         } catch {
             if !hasLoadedOnce {
                 phase = .failed
@@ -71,9 +74,7 @@ final class QuranViewModel {
         if let position = try? await repository.lastReadPosition() {
             lastRead = position
         }
-        if let latest = try? await repository.bookmarks() {
-            bookmarks = latest
-        }
+        await refreshBookmarks()
     }
 
     // MARK: - Derived list state
