@@ -3,6 +3,8 @@ import type { Env } from "../src/contracts";
 import { joinOurSheikh } from "../src/sheikhPublicJoin";
 import { authenticatedMember, startSession } from "../src/members";
 import { sqliteD1 } from "./sqlite-d1";
+import { communityGroups, groupDetail, memberRole, setLive } from "../src/community";
+import { addZikrStage } from "../src/groupZikrStages";
 
 const profile = { name: "Visitor", city: "Lahore", countryCode: "pk", guestSecret: "a".repeat(64) };
 function request(input: unknown = profile, token?: string) {
@@ -17,6 +19,27 @@ function setup() {
   return { raw, env: { DB: db, SUPER_ADMIN_EMAILS: "owner@example.com" } as Env };
 }
 describe("public Our Sheikh admission", () => {
+  it("keeps admitted guests out of private groups and all broadcast controls", async () => {
+    const { raw, env } = setup();
+    const admission = await (await joinOurSheikh(request({ ...profile, email: "owner@example.com" }), env)).json() as any;
+    expect(await memberRole(env, admission.memberID)).toBe("member");
+    const list = await (await communityGroups(env, admission.memberID)).json() as any;
+    expect(list.groups.map((group: any) => group.id)).toEqual(["our-sheikh"]);
+    expect(list.groups[0].canManage).toBe(false);
+    expect((await groupDetail(env, admission.memberID, "private")).status).toBe(404);
+    expect((await setLive(env, admission.memberID, "our-sheikh", { state: "live", kind: "zikr" })).status).toBe(403);
+    raw.prepare("INSERT INTO group_live(group_id,state,kind,updated_at) VALUES('our-sheikh','live','zikr','now')").run();
+    expect((await addZikrStage(env, admission.memberID, "our-sheikh", { id: "custom-12345678-1234-1234-1234-123456789abc", title: "Not authorized" })).status).toBe(403);
+  });
+
+  it("rolls back guest and profile creation if membership cannot be inserted", async () => {
+    const { raw, env } = setup();
+    raw.exec("CREATE TRIGGER reject_admission BEFORE INSERT ON member_group_members BEGIN SELECT RAISE(ABORT, 'test failure'); END");
+    await expect(joinOurSheikh(request(), env)).rejects.toThrow();
+    for (const table of ["members", "sheikh_public_profiles", "member_sessions"]) {
+      expect(raw.prepare(`SELECT count(*) AS n FROM ${table}`).get()).toEqual({ n: 0 });
+    }
+  });
   it("grants only member access to the fixed group and never trusts contact email", async () => {
     const { raw, env } = setup();
     const response = await joinOurSheikh(request({ ...profile, email: "owner@example.com", role: "administrator", groupID: "private", memberID: "owner" }), env);
