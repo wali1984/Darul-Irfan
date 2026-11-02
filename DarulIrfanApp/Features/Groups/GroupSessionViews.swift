@@ -850,6 +850,7 @@ struct GroupDuaRequestsView: View {
 /// Past sessions and how many attended; each opens its attendance.
 @MainActor
 struct GroupSessionHistoryView: View {
+    @Environment(\.locale) private var locale
     let groupID: String
     let service: MemberGroupService
 
@@ -891,7 +892,7 @@ struct GroupSessionHistoryView: View {
                             } label: {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
-                                    Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .shortened))
+                                    Text(verbatim: GroupInvitationDate.text(session.startedAt, locale: locale, includesTime: true))
                                         .diInterfaceFont(.caption)
                                         .foregroundStyle(DIColor.textMuted)
                                     Text("\(session.attendees) attended")
@@ -980,6 +981,7 @@ struct GroupSessionHistoryView: View {
 
 @MainActor
 struct GroupSessionAttendeesView: View {
+    @Environment(\.locale) private var locale
     let groupID: String
     let session: GroupSessionRecord
     let service: MemberGroupService
@@ -994,13 +996,13 @@ struct GroupSessionAttendeesView: View {
             Group {
                 Section {
                     VStack(alignment: .leading, spacing: DISpacing.xs) {
-                        Text(verbatim: session.startedAt.formatted(date: .abbreviated, time: .omitted))
+                        Text(verbatim: GroupInvitationDate.text(session.startedAt, locale: locale))
                         // Keep clock endpoints together in Western reading order,
                         // independently of the surrounding Urdu date and layout.
-                        Text(verbatim: "\u{2066}\(session.startedAt.formatted(date: .omitted, time: .shortened)) \u{2013} \(session.endedAt.formatted(date: .omitted, time: .shortened))\u{2069}")
+                        Text(verbatim: "\u{2066}\(GroupInvitationDate.clock(session.startedAt, locale: locale)) \u{2013} \(GroupInvitationDate.clock(session.endedAt, locale: locale))\u{2069}")
                             .monospacedDigit()
                         if !Calendar.current.isDate(session.startedAt, inSameDayAs: session.endedAt) {
-                            Text(verbatim: session.endedAt.formatted(date: .abbreviated, time: .omitted))
+                            Text(verbatim: GroupInvitationDate.text(session.endedAt, locale: locale))
                         }
                     }
                     .diInterfaceFont(.subheadline)

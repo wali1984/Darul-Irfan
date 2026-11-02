@@ -507,6 +507,13 @@ struct AddGroupPersonView: View {
 
 /// Invitation dates follow the selected interface language with Western digits.
 enum GroupInvitationDate {
+    static func clock(_ date: Date, locale: Locale, timeZone: TimeZone = .current) -> String {
+        var components = Locale.Components(locale: locale)
+        components.numberingSystem = Locale.NumberingSystem("latn")
+        return date.formatted(Date.FormatStyle(date: .omitted, time: .shortened,
+                                              locale: Locale(components: components), timeZone: timeZone))
+    }
+
     static func text(_ date: Date, locale: Locale, includesTime: Bool = false,
                      timeZone: TimeZone = .current) -> String {
         var components = Locale.Components(locale: locale)
