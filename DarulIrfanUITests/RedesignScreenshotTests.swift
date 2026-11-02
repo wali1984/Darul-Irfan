@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "reader-performance", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "teaching-resources", "reading-controls", "audio-follow", "audio-transport", "halqah-history", "halqah-duas", "dua-race", "sheikh-stage", "pdf-controls"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -245,7 +245,14 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "sheikh-stage" {
             app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-sheikh-stage"]
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "pdf-controls" {
+            app.launchArguments.append("--uitesting-pdf-controls")
+        }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "pdf-controls" {
+            pdfControlsTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "audio-transport" {
             let phase = app.staticTexts["transport-phase"]
             XCTAssertTrue(phase.waitForExistence(timeout: 180))
@@ -717,6 +724,51 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     /// Exercise reading settings and capture their effect after reopening Duas.
+    private func pdfControlsTour() {
+        let valid = app.buttons["pdf-audit-valid"].firstMatch
+        guard valid.waitForExistence(timeout: 180), tap(valid) else {
+            XCTFail("Local PDF fixture did not open"); return
+        }
+        let enlarge = app.buttons[language == "ur" ? "بڑا کریں" : "Zoom in"].firstMatch
+        let reduce = app.buttons[language == "ur" ? "چھوٹا کریں" : "Zoom out"].firstMatch
+        let fit = app.buttons[language == "ur" ? "صفحہ سکرین کے مطابق کریں" : "Fit page"].firstMatch
+        let share = app.buttons[language == "ur" ? "فائل شیئر کریں" : "Share file"].firstMatch
+        guard enlarge.waitForExistence(timeout: 30) else {
+            shot("pdf-missing-controls"); XCTFail("PDF did not expose localized zoom controls"); return
+        }
+        for control in [enlarge, reduce, fit, share] {
+            XCTAssertTrue(control.isHittable)
+            XCTAssertTrue(app.frame.contains(control.frame))
+            XCTAssertGreaterThanOrEqual(control.frame.height, 44)
+        }
+        shot("pdf-fitted")
+        XCTAssertTrue(tap(enlarge)); pause(1)
+        shot("pdf-enlarged-once")
+        XCTAssertTrue(tap(enlarge)); pause(1)
+        shot("pdf-enlarged-twice")
+        XCTAssertTrue(tap(reduce)); pause(1)
+        shot("pdf-reduced")
+        XCTAssertTrue(tap(fit)); pause(1)
+        shot("pdf-reset-to-fit")
+        app.swipeUp(); pause(1)
+        shot("pdf-scrolled")
+        XCTAssertTrue(tap(share)); pause(2)
+        shot("pdf-share-sheet")
+        XCTAssertFalse(enlarge.isHittable, "Share did not present a modal sheet")
+        app.swipeDown(); pause(2)
+        XCTAssertTrue(enlarge.isHittable, "Share sheet did not dismiss")
+        goBack()
+        XCTAssertTrue(valid.waitForExistence(timeout: 10))
+        XCTAssertTrue(tap(app.buttons["pdf-audit-damaged"].firstMatch))
+        let error = app.staticTexts[language == "ur" ? "یہ فائل نہیں کھل سکی" : "Unable to open this file"].firstMatch
+        XCTAssertTrue(error.waitForExistence(timeout: 15))
+        XCTAssertFalse(enlarge.exists)
+        XCTAssertFalse(share.exists)
+        shot("pdf-damaged-no-controls")
+        goBack()
+        XCTAssertTrue(valid.waitForExistence(timeout: 10))
+    }
+
     private func readingControlsTour() {
         let sizeLabel = language == "ur" ? "مطالعے کے متن کا سائز" : "Reader Text Size"
         let fontLabel = language == "ur" ? "اردو نستعلیق میں" : "Urdu in Nastaliq"
