@@ -38,7 +38,7 @@ final class RedesignScreenshotTests: XCTestCase {
 
     override func setUpWithError() throws {
         try XCTSkipUnless(
-            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
+            ["1", "books", "shajra", "today", "audit", "silsila", "practice", "pages", "settings", "companion", "companion-fixes", "timezone", "resources", "guide-recovery", "parahs", "reader-controls", "reader-audit", "halqah-resources", "personal-history", "appearance-controls", "notification-choices", "tasbih-preset", "reading-controls", "audio-follow", "halqah-history"].contains(ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] ?? ""),
             "Screenshots run only in the ios-screens workflow"
         )
         continueAfterFailure = true
@@ -212,7 +212,14 @@ final class RedesignScreenshotTests: XCTestCase {
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "personal-history" {
             app.launchArguments.append("--uitesting-personal-history")
         }
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-history" {
+            app.launchArguments += ["--uitesting-halqah-resources", "--uitesting-halqah-history"]
+        }
         app.launch()
+        if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "halqah-history" {
+            halqahHistoryTour()
+            return
+        }
         if ProcessInfo.processInfo.environment["DI_SCREENSHOTS"] == "personal-history" {
             populatedHistoryTour()
             return
@@ -863,6 +870,52 @@ final class RedesignScreenshotTests: XCTestCase {
             shot("halqah-" + role + "-return")
             goBack()
             XCTAssertTrue(entry.waitForExistence(timeout: 10), "Back must return to the fixture list")
+        }
+    }
+
+    /// Real history/attendance screens with local transport, including recoverable failures.
+    private func halqahHistoryTour() {
+        let retry = language == "ur" ? "دوبارہ کوشش کریں" : "Try again"
+        let delete = language == "ur" ? "حذف کریں" : "Delete"
+        let cancel = language == "ur" ? "منسوخ کریں" : "Cancel"
+        let failure = language == "ur" ? "آپ کا گروپ لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔" : "Your group could not be loaded. Check your connection and try again."
+        for role in ["member", "admin"] {
+            let entry = app.buttons["halqah-audit-" + role]
+            guard entry.waitForExistence(timeout: 180), tap(entry), tap(app.buttons[retry]) else {
+                XCTFail("History must offer Retry after an injected load failure"); return
+            }
+            let first = app.staticTexts["Audit session 1"].firstMatch
+            XCTAssertTrue(first.waitForExistence(timeout: 15))
+            shot("history-" + role + "-loaded")
+            guard tap(first), tap(app.buttons[retry]) else {
+                XCTFail("Attendance must offer Retry after an injected load failure"); return
+            }
+            XCTAssertTrue(app.staticTexts["Audit attendee 2"].waitForExistence(timeout: 15))
+            shot("history-" + role + "-attendees")
+            goBack()
+            let remove = app.buttons[delete + ": Audit session 1"]
+            if role == "member" {
+                XCTAssertFalse(remove.exists, "Read-only history must not expose Delete")
+            } else {
+                guard tap(remove), tap(app.buttons[cancel]) else { XCTFail("Delete Cancel missing"); return }
+                XCTAssertTrue(first.exists, "Cancel must preserve the record")
+                guard tap(remove), tap(app.buttons[delete]) else { XCTFail("Delete confirmation missing"); return }
+                XCTAssertTrue(app.staticTexts[failure].waitForExistence(timeout: 15))
+                XCTAssertTrue(first.exists, "Failed delete must preserve the record")
+                shot("history-delete-failure")
+                guard tap(remove), tap(app.buttons[delete]) else { XCTFail("Delete retry missing"); return }
+                XCTAssertTrue(first.waitForNonExistence(timeout: 15), "Successful delete must remove the record")
+                XCTAssertFalse(app.staticTexts[failure].exists)
+            }
+            let last = app.staticTexts["Audit session 9"].firstMatch
+            for _ in 0..<12 {
+                if last.exists && last.isHittable { break }
+                app.swipeUp(); pause(0.3)
+            }
+            XCTAssertTrue(last.exists && last.isHittable, "Last history row must be reachable")
+            shot("history-" + role + "-last-row")
+            guard tap(button("Done")) else { XCTFail("History Done missing"); return }
+            XCTAssertTrue(entry.waitForExistence(timeout: 15), "Done must return to the history entry")
         }
     }
 
