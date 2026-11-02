@@ -31,9 +31,15 @@ struct DarulIrfanApp: App {
     private static let foregroundRefreshInterval: TimeInterval = 60
 
     init() {
+        #if DEBUG
+        QuranAudioAuditCheckpoint.reset()
+        #endif
         // Register the bundled Amiri Quran + Noto Nastaliq fonts before any
         // view (and thus any Font.custom) is evaluated.
         AppFonts.registerBundledFonts()
+        #if DEBUG
+        QuranAudioAuditCheckpoint.record(["checkpoint": "fonts-registered"])
+        #endif
     }
 
     var body: some Scene {
@@ -106,11 +112,20 @@ struct DarulIrfanApp: App {
 
     @MainActor
     private func launch() async {
+        #if DEBUG
+        QuranAudioAuditCheckpoint.record(["checkpoint": "launch-task-entered"])
+        #endif
         let launchStart = Date()
         do {
             let dependencies = try await AppDependencies.live()
+            #if DEBUG
+            QuranAudioAuditCheckpoint.record(["checkpoint": "dependencies-created"])
+            #endif
             let appState = AppState(dependencies: dependencies)
             await appState.bootstrap()
+            #if DEBUG
+            QuranAudioAuditCheckpoint.record(["checkpoint": "bootstrap-complete"])
+            #endif
             #if DEBUG
             let launchArguments = ProcessInfo.processInfo.arguments
             if launchArguments.contains("--uitesting-complete-onboarding") {
