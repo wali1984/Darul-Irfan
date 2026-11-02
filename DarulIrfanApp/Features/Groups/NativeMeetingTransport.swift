@@ -23,6 +23,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     let microphoneRequest = HalqaCaptureRequest()
     let cameraRequest = HalqaCaptureRequest()
     private var joined = false
+    private let operations = HalqaTransportOperationGate()
 
     /// Submission only; the SDK's device event confirms the selected route.
     func selectAudioDevice(id: String) -> Bool {
@@ -70,21 +71,24 @@ final class NativeMeetingTransport: HalqaSessionTransport {
     }
 
     func initialize(completion: @escaping (Bool) -> Void) {
+        guard operations.begin() else { completion(false); return }
         client.doInit(meetingInfo: info,
-                      onSuccess: { Task { @MainActor in completion(true) } },
-                      onFailure: { _ in Task { @MainActor in completion(false) } })
+                      onSuccess: { [self] in Task { @MainActor in completion(operations.finish()) } },
+                      onFailure: { [self] _ in Task { @MainActor in _ = operations.finish(); completion(false) } })
     }
 
     func join(completion: @escaping (Bool) -> Void) {
+        guard operations.begin() else { completion(false); return }
         _ = chat // Attach before joining so initial history is observed.
         _ = participants
-        client.joinRoom(onSuccess: { [weak self] in Task { @MainActor in
-            self?.joined = true
-            self?.chat.joined()
-            self?.participants.refresh()
+        client.joinRoom(onSuccess: { [self] in Task { @MainActor in
+            guard operations.finish() else { completion(false); return }
+            joined = true
+            chat.joined()
+            participants.refresh()
             completion(true)
         } },
-                        onFailure: { _ in Task { @MainActor in completion(false) } })
+                        onFailure: { [self] _ in Task { @MainActor in _ = operations.finish(); completion(false) } })
     }
 
     func release(completion: @escaping (Bool) -> Void) {
@@ -95,6 +99,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
         // Teardown must not instantiate new SDK state or attach listeners.
         chatStorage?.leaving()
         participantsStorage?.leaving()
+        operations.close { [self] in
         client.release(onSuccess: { [weak self] in Task { @MainActor in
             if let self {
                 self.chatStorage?.released()
@@ -106,6 +111,7 @@ final class NativeMeetingTransport: HalqaSessionTransport {
             completion(true)
         } },
                        onFailure: { _ in Task { @MainActor in completion(false) } })
+        }
     }
 
     /// Presenter supplies an explicit permission request and foreground check.
