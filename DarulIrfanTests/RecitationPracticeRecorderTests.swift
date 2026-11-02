@@ -3,6 +3,23 @@ import XCTest
 
 final class RecitationPracticeRecorderTests: XCTestCase {
     @MainActor
+    func testHalqahOwnershipDuringPermissionPreventsAudioHandoff() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        var reserved = false
+        let recorder = try RecitationPracticeRecorder(cacheDirectory: root, audioReserved: { reserved })
+        defer { recorder.close() }
+        var answer: (@MainActor (Bool) -> Void)?
+        recorder.start(permission: { answer = $0 }, prepareAudio: { _ in XCTFail("Halqah audio must remain owned") }, allowedNow: { true })
+        reserved = true
+        answer?(true)
+        XCTAssertEqual(recorder.phase, .idle)
+        XCTAssertEqual(recorder.failure, .audio)
+        recorder.start(permission: { _ in XCTFail("Reserved audio must not request permission") }, prepareAudio: { _ in XCTFail("Reserved audio must not hand off") }, allowedNow: { true })
+        XCTAssertEqual(recorder.phase, .idle)
+    }
+
+    @MainActor
     func testPermissionGrantedAfterSuspendNeverRequestsAudioOrRecords() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

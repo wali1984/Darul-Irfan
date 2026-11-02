@@ -14,13 +14,17 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
     private(set) var failure: Failure?
     private(set) var hasClip = false
     @ObservationIgnored private let files: RecitationPracticeFiles
+    @ObservationIgnored private let audioReserved: @MainActor () -> Bool
     @ObservationIgnored private var recorder: AVAudioRecorder?
     @ObservationIgnored private var replay: AVAudioPlayer?
     @ObservationIgnored private var ticket = UUID()
     @ObservationIgnored private var closed = false
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
 
-    init(cacheDirectory: URL) throws {
+    init(cacheDirectory: URL, audioReserved: @escaping @MainActor () -> Bool = {
+        NativeHalqaSession.shared.lifecycle.transport != nil
+    }) throws {
+        self.audioReserved = audioReserved
         files = try RecitationPracticeFiles(cacheDirectory: cacheDirectory)
         super.init()
         for name in [UIApplication.didEnterBackgroundNotification, AVAudioSession.interruptionNotification,
@@ -48,18 +52,19 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
     func start(permission: (@escaping @MainActor (Bool) -> Void) -> Void,
                prepareAudio: @escaping (@escaping @MainActor (Bool) -> Void) -> Void,
                allowedNow: @escaping () -> Bool) {
-        guard !closed, phase == .idle, allowedNow() else { return }
+        guard !closed, phase == .idle else { return }
+        guard !audioReserved(), allowedNow() else { failure = .audio; return }
         failure = nil
         phase = .preparing
         ticket = UUID()
         let request = ticket
         permission { [weak self] granted in
             guard let self, self.isCurrent(request) else { return }
-            guard allowedNow() else { self.phase = .idle; self.failure = .audio; return }
+            guard !self.audioReserved(), allowedNow() else { self.phase = .idle; self.failure = .audio; return }
             guard granted else { self.phase = .idle; self.failure = .permission; return }
             prepareAudio { [weak self] ready in
                 guard let self, self.isCurrent(request) else { return }
-                guard ready, allowedNow(), UIApplication.shared.applicationState == .active else {
+                guard ready, !self.audioReserved(), allowedNow(), UIApplication.shared.applicationState == .active else {
                     self.phase = .idle; self.failure = .audio; return
                 }
                 self.beginCapture()
@@ -116,14 +121,15 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
     /// The same audio handoff is required for replay as for capture. It must not
     /// interrupt a retained Halqah or race a preparing reference player.
     func play(prepareAudio: (@escaping @MainActor (Bool) -> Void) -> Void, allowedNow: @escaping () -> Bool) {
-        guard !closed, phase == .idle, let file = files.current, allowedNow() else { return }
+        guard !closed, phase == .idle, let file = files.current else { return }
+        guard !audioReserved(), allowedNow() else { failure = .audio; return }
         failure = nil
         phase = .preparing
         ticket = UUID()
         let request = ticket
         prepareAudio { [weak self] ready in
             guard let self, self.isCurrent(request) else { return }
-            guard ready, allowedNow(), UIApplication.shared.applicationState == .active else {
+            guard ready, !self.audioReserved(), allowedNow(), UIApplication.shared.applicationState == .active else {
                 self.phase = .idle; self.failure = .audio; return
             }
             do {
