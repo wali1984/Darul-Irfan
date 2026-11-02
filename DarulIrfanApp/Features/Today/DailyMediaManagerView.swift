@@ -266,8 +266,7 @@ struct DailyMediaEditor: View {
         guard let chosen, !working, !loadingPicture else { return }
         loadingPicture = true
         error = nil
-        picture = nil
-        preview = nil
+        // Keep the valid draft until its replacement has decoded successfully.
         defer { loadingPicture = false; pick = nil }
         do {
             guard let data = try await chosen.loadTransferable(type: Data.self) else {
@@ -287,8 +286,7 @@ struct DailyMediaEditor: View {
         guard !working, !loadingPicture else { return }
         loadingPicture = true
         error = nil
-        picture = nil
-        preview = nil
+        // An unreadable replacement must not discard the selected draft.
         defer { loadingPicture = false }
         do {
             let data = try await Task.detached(priority: .userInitiated) {
