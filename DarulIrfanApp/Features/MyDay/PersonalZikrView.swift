@@ -42,6 +42,7 @@ struct PersonalZikrView: View {
                 }
                 .buttonStyle(DIPressableStyle())
                 .accessibilityIdentifier("personal-zikr-shajra")
+                .accessibilityValue(Text(shajra ? "Expanded" : "Collapsed"))
                 if shajra { ShajraInlineContent().transition(.opacity) }
                 MethodOfZikrLink()
                 if store.historyReadFailed {
