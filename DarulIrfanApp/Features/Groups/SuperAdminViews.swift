@@ -160,7 +160,7 @@ struct MemberDirectoryView: View {
 /// them out.
 @MainActor
 struct DirectoryPersonView: View {
-    let person: DirectoryPerson
+    @State var person: DirectoryPerson
     let service: MemberGroupService
     let halqahs: [MemberGroup]
     let onChange: () async -> Void
@@ -171,8 +171,10 @@ struct DirectoryPersonView: View {
     @State private var newRole: GroupRole = .member
     @State private var working = false
     @State private var error: String?
+    @State private var initialized = false
+    @State private var missing = false
 
-    private var changeable: Bool { !person.isYou && !person.isSuperAdmin }
+    private var changeable: Bool { !missing && !person.isYou && !person.isSuperAdmin }
     private var open: [MemberGroup] { halqahs.filter { halqah in !places.contains { $0.groupID == halqah.id } } }
 
     var body: some View {
@@ -237,7 +239,10 @@ struct DirectoryPersonView: View {
         .navigationTitle(Text(verbatim: person.displayName))
         .navigationBarTitleDisplayMode(.inline)
         .disabled(working)
-        .onAppear { places = person.halqahs }
+        .onAppear {
+            if !initialized { places = person.halqahs; initialized = true }
+        }
+        .refreshable { await refresh() }
         .confirmationDialog("Remove from the group?", isPresented: Binding(
             get: { removing != nil }, set: { if !$0 { removing = nil } }
         ), titleVisibility: .visible, presenting: removing) { place in
@@ -248,6 +253,32 @@ struct DirectoryPersonView: View {
             Button("Cancel", role: .cancel) { removing = nil }
         } message: { place in
             Text(verbatim: place.groupName + "\n" + String(localized: "They keep their account and any other groups, and can be added again later."))
+        }
+    }
+
+    private func refresh() async {
+        guard !working else { return }
+        working = true
+        defer { working = false }
+        do {
+            let directory = try await service.directory()
+            guard !Task.isCancelled else { return }
+            guard let updated = directory.first(where: { $0.id == person.id }) else {
+                missing = true
+                places = []
+                error = String(localized: "This person is no longer in the directory.")
+                return
+            }
+            person = updated
+            places = updated.halqahs
+            missing = false
+            newHalqah = ""
+            error = nil
+        } catch is CancellationError { }
+        catch {
+            if !Task.isCancelled {
+                error = String(localized: "The member directory could not be loaded. Please try again.")
+            }
         }
     }
 
