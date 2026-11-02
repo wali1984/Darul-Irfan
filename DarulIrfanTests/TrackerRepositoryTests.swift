@@ -7,6 +7,30 @@ import XCTest
 /// tracker tables, against an in-memory store.
 final class TrackerRepositoryTests: XCTestCase {
 
+    @MainActor
+    func testReturningTasbihScreenAdoptsOtherTabProgressWithoutOverwritingIt() async throws {
+        let initial = TasbihCounter(id: UUID(), title: "Shared counter", target: 100, count: 3, lifetimeCount: 20, updatedAt: Date())
+        try await repository.saveTasbihCounter(initial)
+        let metrics = DevotionalMetricsSyncService(quranRepository: QuranRepository(database: database),
+                                                  trackerRepository: repository, watchSync: WatchSyncService())
+        let today = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        let zikr = TasbihCounterViewModel(counter: initial, trackerRepository: repository, devotionalMetrics: metrics)
+        zikr.increment()
+        await zikr.persistOnExit().value
+        // Merely leaving an unchanged stale screen must not write its old 3.
+        await today.persistOnExit().value
+        var saved = try await repository.tasbihCounters()
+        XCTAssertEqual(saved.first?.count, 4)
+        await today.refresh()
+        XCTAssertEqual(today.counter.count, 4)
+        today.increment()
+        await today.persistOnExit().value
+        saved = try await repository.tasbihCounters()
+        XCTAssertEqual(saved.first?.count, 5)
+        XCTAssertEqual(saved.first?.lifetimeCount, 20)
+        XCTAssertEqual(saved.count, 1)
+    }
+
     private var database: AppDatabase!
     private var repository: TrackerRepository!
 

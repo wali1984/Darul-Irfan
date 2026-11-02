@@ -13,6 +13,7 @@ struct TasbihCounterView: View {
     @State private var shortcutHelp = false
     @State private var isVisible = false
     @State private var countBump: CGFloat = 1.0
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -32,6 +33,15 @@ struct TasbihCounterView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if viewModel.loadFailed {
+                DIElevatedCard {
+                    VStack(spacing: DISpacing.sm) {
+                        Text("Unable to load counters").diInterfaceFont(.headline)
+                        Button("Retry") { Task { await viewModel.refresh() } }
+                            .buttonStyle(DISecondaryButtonStyle())
+                    }
+                }.padding(DISpacing.md)
+            }
             if viewModel.saveFailed {
                 DIElevatedCard {
                     VStack(alignment: .leading, spacing: DISpacing.sm) {
@@ -80,12 +90,13 @@ struct TasbihCounterView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
             }
+            .disabled(viewModel.loadFailed || viewModel.missing)
             .buttonStyle(TasbihTapButtonStyle())
             .accessibilityLabel("Add one count")
             .accessibilityValue(Text("\(viewModel.counter.count)"))
             .accessibilityIdentifier("tasbih-count")
 
-            controlBar
+            controlBar.disabled(viewModel.loadFailed || viewModel.missing)
         }
         .navigationTitle(showFullText ? String(localized: "Tasbih") : viewModel.counter.title)
         .navigationBarTitleDisplayMode(.inline)
@@ -108,6 +119,7 @@ struct TasbihCounterView: View {
                     isEditing = true
                 }
                 .buttonStyle(DICompactButtonStyle())
+                .disabled(viewModel.loadFailed || viewModel.missing)
             }
         }
         .sheet(isPresented: $isEditing) {
@@ -132,6 +144,8 @@ struct TasbihCounterView: View {
         } message: {
             Text("Your current count will be added to the lifetime total.")
         }
+        .task { await viewModel.refresh() }
+        .onChange(of: viewModel.missing) { _, missing in if missing { dismiss() } }
         .onAppear {
             isVisible = true
             if !isEditing && !showResetDialog && !shortcutHelp {
@@ -149,6 +163,7 @@ struct TasbihCounterView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { viewModel.persistOnExit() }
+            if phase == .active { Task { await viewModel.refresh() } }
         }
     }
 

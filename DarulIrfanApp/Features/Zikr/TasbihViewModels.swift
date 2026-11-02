@@ -92,6 +92,9 @@ final class TasbihCounterViewModel {
     private let trackerRepository: any TrackerRepositoryProtocol
     private let devotionalMetrics: DevotionalMetricsSyncService
 
+    private(set) var loadFailed = false
+    private(set) var missing = false
+    @ObservationIgnored private var lastPersisted: TasbihCounter
     private(set) var counter: TasbihCounter
     private(set) var saveFailed = false
     private(set) var isRetryingSave = false
@@ -109,6 +112,7 @@ final class TasbihCounterViewModel {
         devotionalMetrics: DevotionalMetricsSyncService
     ) {
         self.counter = counter
+        self.lastPersisted = counter
         self.trackerRepository = trackerRepository
         self.devotionalMetrics = devotionalMetrics
         // Counts at/above target on arrival should not re-record the habit.
@@ -131,7 +135,27 @@ final class TasbihCounterViewModel {
         return counter.count >= target
     }
 
+    /// A retained tab must adopt progress saved through another entry point.
+    func refresh() async {
+        await saveTask?.value
+        await persist()
+        guard !saveFailed else { return }
+        let before = counter
+        do {
+            let latest = try await trackerRepository.tasbihCounters().first { $0.id == before.id }
+            guard counter == before, counter == lastPersisted, pendingCompletions.isEmpty else { return }
+            loadFailed = false
+            missing = latest == nil
+            if let latest {
+                counter = latest
+                lastPersisted = latest
+                hasRecordedTargetThisSession = latest.target.map { $0 > 0 && latest.count >= $0 } ?? false
+            }
+        } catch { if !Task.isCancelled { loadFailed = true } }
+    }
+
     func increment() {
+        guard !loadFailed && !missing else { return }
         counter.count += 1
         counter.updatedAt = Date()
         tapFeedback.impactOccurred()
@@ -174,6 +198,7 @@ final class TasbihCounterViewModel {
         saved.updatedAt = Date()
         try await trackerRepository.saveTasbihCounter(saved)
         counter = saved
+        lastPersisted = saved
         saveFailed = false
         if let target = counter.target, target > 0, counter.count < target {
             hasRecordedTargetThisSession = false
@@ -222,6 +247,8 @@ final class TasbihCounterViewModel {
             await pending.value
             return
         }
+        // Leaving a clean retained screen must never overwrite a newer counter.
+        guard counter != lastPersisted || !pendingCompletions.isEmpty else { return }
         // Keep the write alive when a debounce is canceled. A committed
         // completion must be acknowledged before another write can retry it.
         let task = Task { @MainActor in
@@ -230,6 +257,7 @@ final class TasbihCounterViewModel {
                 let completions = self.pendingCompletions
                 do {
                     try await self.trackerRepository.saveTasbihProgress(snapshot, completions: completions)
+                    self.lastPersisted = snapshot
                     for (day, saved) in completions {
                         let remaining = self.pendingCompletions[day, default: 0] - saved
                         if remaining > 0 { self.pendingCompletions[day] = remaining }
