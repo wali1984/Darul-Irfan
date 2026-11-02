@@ -899,11 +899,11 @@ final class RedesignScreenshotTests: XCTestCase {
 
     /// Real history/attendance screens with local transport, including recoverable failures.
     private func sheikhStageTour() {
-        let lead = language == "ur" ? "??? ?? ??????? ????" : "Lead Zikr"
+        let lead = language == "ur" ? "ذکر کی رہنمائی کریں" : "Lead Zikr"
         let first = language == "ur" ? "پہلا لطیفہ" : "1st Latifa"
-        let retry = language == "ur" ? "???? ????? ??? ?????? ????" : "Retry pending action"
-        let add = language == "ur" ? "?????? ???? ????" : "Add Muraqaba"
-        let name = language == "ur" ? "?????? ?? ???" : "Muraqaba name"
+        let retry = language == "ur" ? "زیرِ التوا کارروائی دوبارہ کریں" : "Retry pending action"
+        let add = language == "ur" ? "مراقبہ شامل کریں" : "Add Muraqaba"
+        let name = language == "ur" ? "مراقبے کا نام" : "Muraqaba name"
         let save = language == "ur" ? "محفوظ کریں" : "Save"
         let admin = app.buttons["halqah-audit-admin"]
         guard admin.waitForExistence(timeout: 180), tap(admin), tap(app.buttons[lead]), tap(app.buttons[first]) else { XCTFail("Stage controls unavailable"); return }
@@ -926,14 +926,14 @@ final class RedesignScreenshotTests: XCTestCase {
     }
 
     private func halqahDuaRaceTour() {
-        let retry = language == "ur" ? "?????? ???? ????" : "Try again"
-        let mark = language == "ur" ? "??? ???" : "Mark as read"
+        let retry = language == "ur" ? "دوبارہ کوشش کریں" : "Try again"
+        let mark = language == "ur" ? "پڑھ لیا" : "Mark as read"
         let entry = app.buttons["halqah-audit-admin"]
         guard entry.waitForExistence(timeout: 180), tap(entry), tap(app.buttons[retry]) else {
             XCTFail("Dua race fixture failed to load"); return
         }
         guard tap(app.buttons[mark]) else { XCTFail("Mark action missing"); return }
-        let failure = language == "ur" ? "?? ?? ???? ??? ???? ?? ???? ????? ???? ?? ?????? ???? ?????" : "Your group could not be loaded. Check your connection and try again."
+        let failure = language == "ur" ? "آپ کا گروپ لوڈ نہیں ہو سکا۔ کنکشن دیکھ کر دوبارہ کوشش کریں۔" : "Your group could not be loaded. Check your connection and try again."
         XCTAssertTrue(app.staticTexts[failure].waitForExistence(timeout: 15))
         XCTAssertTrue(app.buttons[mark].exists, "First rejected write must retain action")
         let list = app.collectionViews.firstMatch
