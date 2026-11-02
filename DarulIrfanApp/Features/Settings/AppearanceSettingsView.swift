@@ -38,7 +38,7 @@ struct AppearanceSettingsView: View {
         } header: {
             SettingsSectionHeader(titleKey: "Theme", systemImage: "circle.lefthalf.filled")
         } footer: {
-            Text("System follows your device's light or dark appearance.")
+            Text("Auto uses sunrise and sunset at your selected location. Light or Dark stays on permanently. Without solar times, Auto follows your phone.")
                 .foregroundStyle(DIColor.textMuted)
         }
     }
@@ -111,6 +111,7 @@ struct AppearanceSettingsView: View {
 private extension AppTheme {
     var settingsDisplayName: String {
         switch self {
+        case .automatic: return "Auto"
         case .system: return "System"
         case .light: return "Light"
         case .dark: return "Dark"

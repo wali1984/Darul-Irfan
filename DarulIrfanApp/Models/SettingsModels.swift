@@ -47,6 +47,7 @@ enum AppLanguage: String, Codable, Sendable, CaseIterable, Identifiable {
 }
 
 enum AppTheme: String, Codable, Sendable, CaseIterable, Identifiable {
+    case automatic
     case system
     case light
     case dark
@@ -90,7 +91,8 @@ enum QuranReaderDisplayMode: String, Codable, Sendable, CaseIterable, Identifiab
 struct AppSettings: Codable, Sendable, Equatable {
     // Identity & appearance
     var language: AppLanguage = .system
-    var theme: AppTheme = .system
+    var theme: AppTheme = .automatic
+    var themeScheduleVersion: Int = 1
     var readerFontScale: ReaderFontScale = .standard
     var quranReaderDisplayMode: QuranReaderDisplayMode = .arabicAndTranslation
     var quranAutoAdvanceSurah = false
@@ -128,6 +130,7 @@ struct AppSettings: Codable, Sendable, Equatable {
     static let `default` = AppSettings()
 
     private enum CodingKeys: String, CodingKey {
+        case themeScheduleVersion
         case language, theme, readerFontScale, quranReaderDisplayMode, quranAutoAdvanceSurah, locationMode, manualPlace
         case lastKnownPlace, calculation, prayerNotifications, hijri
         case hasCompletedOnboarding, autoDownloadOnWifi, push, diagnosticsConsent, liveActivitiesEnabled
@@ -140,7 +143,10 @@ struct AppSettings: Codable, Sendable, Equatable {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         language = try values.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .system
-        theme = try values.decodeIfPresent(AppTheme.self, forKey: .theme) ?? .system
+        theme = try values.decodeIfPresent(AppTheme.self, forKey: .theme) ?? .automatic
+        let previousThemeVersion = try values.decodeIfPresent(Int.self, forKey: .themeScheduleVersion) ?? 0
+        if previousThemeVersion == 0 && theme == .system { theme = .automatic }
+        themeScheduleVersion = 1
         readerFontScale = try values.decodeIfPresent(ReaderFontScale.self, forKey: .readerFontScale) ?? .standard
         quranReaderDisplayMode = try values.decodeIfPresent(QuranReaderDisplayMode.self, forKey: .quranReaderDisplayMode) ?? .arabicAndTranslation
         quranAutoAdvanceSurah = try values.decodeIfPresent(Bool.self, forKey: .quranAutoAdvanceSurah) ?? false

@@ -251,7 +251,7 @@ private struct ReadyRootView: View {
     var body: some View {
         let language = appState.settings.language
         let root = content
-            .preferredColorScheme(appState.settings.theme.colorScheme)
+            .modifier(LocalTimeThemeModifier(theme: appState.settings.theme, place: appState.activePlace))
             // Re-apply the bundle-level language and rebuild the tree so every
             // localized string re-resolves when the user switches language.
             .onChange(of: language) { _, newValue in

@@ -259,3 +259,16 @@ struct PrayerCalculationService: PrayerCalculationServicing, QiblaServicing {
         }
     }
 }
+
+
+extension PrayerCalculationService {
+    static func solarNight(at now: Date, place: PlaceCoordinate) -> Bool? {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = place.timeZone
+        let day = calendar.dateComponents([.year, .month, .day], from: now)
+        var parameters = Adhan.CalculationMethod.muslimWorldLeague.params
+        parameters.rounding = .none
+        guard let times = PrayerTimes(coordinates: Coordinates(latitude: place.latitude, longitude: place.longitude), date: day, calculationParameters: parameters) else { return nil }
+        return now < times.sunrise || now >= times.maghrib
+    }
+}

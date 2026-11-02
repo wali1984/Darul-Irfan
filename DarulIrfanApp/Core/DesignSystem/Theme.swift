@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import UIKit
 
 // Design language: reverent, classical, scholarly — derived from the
@@ -159,9 +160,34 @@ enum DIBrand {
 extension AppTheme {
     var colorScheme: ColorScheme? {
         switch self {
+        case .automatic: return nil
         case .system: return nil
         case .light: return .light
         case .dark: return .dark
         }
+    }
+}
+
+
+/// Uses astronomical sunrise/sunset, independently of prayer offsets.
+struct LocalTimeThemeModifier: ViewModifier {
+    let theme: AppTheme
+    let place: PlaceCoordinate?
+    @State private var now = Date()
+    @Environment(\.scenePhase) private var scenePhase
+    private let clock = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
+
+    private var automaticScheme: ColorScheme? {
+        guard let place, let night = PrayerCalculationService.solarNight(at: now, place: place) else { return nil }
+        return night ? .dark : .light
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .preferredColorScheme(theme == .automatic ? automaticScheme : theme.colorScheme)
+            .onReceive(clock) { date in if theme == .automatic { now = date } }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in now = Date() }
+            .onChange(of: scenePhase) { _, phase in if phase == .active { now = Date() } }
+            .onChange(of: theme) { _, _ in now = Date() }
     }
 }

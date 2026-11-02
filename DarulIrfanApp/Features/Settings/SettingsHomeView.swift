@@ -152,6 +152,7 @@ struct SettingsList: View {
 
     private var themeValue: Text {
         switch appState.settings.theme {
+        case .automatic: return Text("Auto")
         case .system: return Text("System")
         case .light: return Text("Light")
         case .dark: return Text("Dark")
