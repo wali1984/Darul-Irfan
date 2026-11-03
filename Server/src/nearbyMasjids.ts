@@ -59,8 +59,10 @@ export async function nearbyMasjids(request: Request, env: Env,
   try {
     if (!await allowed() || !await reserveNearbyRequest(env.DB, { daily, monthly }))
       return response({ error: "nearby_limit_reached" }, 429);
+    // Workers reject redirect: "error" (every call threw, so the route always
+    // answered 503); "manual" leaves a redirect as a non-ok response, refused below.
     const upstream = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
-      method: "POST", redirect: "error", signal: AbortSignal.timeout(10_000),
+      method: "POST", redirect: "manual", signal: AbortSignal.timeout(10_000),
       headers: { "Content-Type": "application/json", "X-Goog-Api-Key": env.PLACES_API_KEY,
         "X-Goog-FieldMask": fields },
       body: JSON.stringify({ includedTypes: ["mosque"], maxResultCount: 20,
