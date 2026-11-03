@@ -349,3 +349,5 @@ Token diff against the previous commit (whitespace-split tokens; ¶ = paragraph 
   replace: 'از جعج الی' -> '\ue01c ۖ\u200f ﴿۲۷﴾ ارْجِعِىْۤ اِلٰى'
 rows changed 17
 ```
+
+- **29:63 (later, 3 November):** the closing word of the du'a is **آمین**. Elsewhere Akram-ut-Tafaseer closes its du'as with آمین 31 times; this was its only امین, an OCR slip.
