@@ -33,6 +33,7 @@ final class HalqahRedesignTests: XCTestCase {
             "Prayer calculation",
             "Notifications",
             "Appearance",
+            "Widgets",
             "Hijri Calendar",
             "Content & Storage",
             "Privacy",

@@ -20,7 +20,11 @@ final class WatchSyncService: NSObject, WCSessionDelegate {
     }
 
     func send(_ snapshot: PrayerWidgetSnapshot) {
-        guard WCSession.isSupported(), let data = try? JSONEncoder().encode(snapshot) else { return }
+        // The Watch shows no Ayah of the Day: its text stays on the iPhone,
+        // keeping the transfer small.
+        var payload = snapshot
+        payload.dailyAyahs = nil
+        guard WCSession.isSupported(), let data = try? JSONEncoder().encode(payload) else { return }
         let context: [String: Any] = ["prayerSnapshot": data]
         try? WCSession.default.updateApplicationContext(context)
     }

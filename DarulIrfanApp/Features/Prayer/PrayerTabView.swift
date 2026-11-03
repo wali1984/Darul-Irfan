@@ -44,6 +44,8 @@ struct PrayerTabView: View {
                     PersonalZikrLink()
                     TodayQuickTools(dependencies: dependencies, appState: appState)
                         .diAppear(delay: 0.05)
+                    // Offered once: how to put the widgets on the Lock and Home Screens.
+                    TodayWidgetOffer(hasPlace: appState.activePlace != nil)
                     TodayDailySection(appState: appState, dependencies: dependencies, viewModel: dailyModel)
                         .diAppear(delay: 0.10)
                     TodayContinueCard(dependencies: dependencies)

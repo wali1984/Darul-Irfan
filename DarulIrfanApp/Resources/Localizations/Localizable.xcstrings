@@ -34748,6 +34748,567 @@
           }
         }
       }
+    },
+    "Add Darul Irfan to your Lock Screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Darul Irfan to your Lock Screen"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان کو اپنی لاک اسکرین پر لگائیں"
+          }
+        }
+      }
+    },
+    "See the next prayer and its countdown without opening the app.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See the next prayer and its countdown without opening the app."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایپ کھولے بغیر اگلی نماز اور اس کا باقی وقت دیکھیں۔"
+          }
+        }
+      }
+    },
+    "Show me how": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show me how"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طریقہ دکھائیں"
+          }
+        }
+      }
+    },
+    "Widgets": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widgets"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وجٹس"
+          }
+        }
+      }
+    },
+    "Prayer times at a glance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer times at a glance"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کے اوقات ایک نظر میں"
+          }
+        }
+      }
+    },
+    "Lock Screen and Home Screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Screen and Home Screen"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لاک اسکرین اور ہوم اسکرین"
+          }
+        }
+      }
+    },
+    "iPhone lets only you place widgets: no app can add one for you. These steps take a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone lets only you place widgets: no app can add one for you. These steps take a moment."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آئی فون پر وجٹ صرف آپ خود لگا سکتے ہیں؛ کوئی ایپ آپ کے لیے نہیں لگا سکتی۔ یہ چند لمحوں کا کام ہے۔"
+          }
+        }
+      }
+    },
+    "Lock Screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Screen"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لاک اسکرین"
+          }
+        }
+      }
+    },
+    "Home Screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home Screen"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہوم اسکرین"
+          }
+        }
+      }
+    },
+    "StandBy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "StandBy"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹینڈ بائی"
+          }
+        }
+      }
+    },
+    "Apple Watch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایپل واچ"
+          }
+        }
+      }
+    },
+    "Touch and hold the Lock Screen, then tap Customize and choose the Lock Screen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch and hold the Lock Screen, then tap Customize and choose the Lock Screen."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لاک اسکرین کو دبا کر رکھیں، پھر Customize پر ٹیپ کریں اور لاک اسکرین منتخب کریں۔"
+          }
+        }
+      }
+    },
+    "Tap the space under the clock, or the line above it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the space under the clock, or the line above it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گھڑی کے نیچے والی جگہ یا اس کے اوپر والی سطر پر ٹیپ کریں۔"
+          }
+        }
+      }
+    },
+    "Choose Darul Irfan: Next Prayer shows the countdown, Silsila Seal shows the seal.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Darul Irfan: Next Prayer shows the countdown, Silsila Seal shows the seal."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان منتخب کریں: اگلی نماز باقی وقت دکھاتا ہے اور سلسلہ کی مہر، مہر دکھاتی ہے۔"
+          }
+        }
+      }
+    },
+    "Touch and hold an empty part of the Home Screen, then tap Edit and Add Widget.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch and hold an empty part of the Home Screen, then tap Edit and Add Widget."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہوم اسکرین کے کسی خالی حصے کو دبا کر رکھیں، پھر Edit اور Add Widget پر ٹیپ کریں۔"
+          }
+        }
+      }
+    },
+    "Search for Darul Irfan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search for Darul Irfan."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دارالعرفان تلاش کریں۔"
+          }
+        }
+      }
+    },
+    "Choose Prayer Overview (small, medium or large), Ayah of the Day, Next Prayer or Today's Prayer Times.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Prayer Overview (small, medium or large), Ayah of the Day, Next Prayer or Today's Prayer Times."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نمازوں کا خلاصہ (چھوٹا، درمیانہ یا بڑا)، آج کی آیت، اگلی نماز یا آج کے نماز کے اوقات منتخب کریں۔"
+          }
+        }
+      }
+    },
+    "Charge your iPhone on its side while it is locked.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charge your iPhone on its side while it is locked."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آئی فون لاک ہو تو اسے پہلو کے بل رکھ کر چارج کریں۔"
+          }
+        }
+      }
+    },
+    "Swipe to the widgets, touch and hold, then add Prayer Overview.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swipe to the widgets, touch and hold, then add Prayer Overview."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وجٹس تک سوائپ کریں، دبا کر رکھیں، پھر نمازوں کا خلاصہ شامل کریں۔"
+          }
+        }
+      }
+    },
+    "Touch and hold the watch face, tap Edit, then choose a complication.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch and hold the watch face, tap Edit, then choose a complication."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واچ فیس کو دبا کر رکھیں، Edit پر ٹیپ کریں، پھر کمپلیکیشن منتخب کریں۔"
+          }
+        }
+      }
+    },
+    "Choose Next Prayer, Prayer Countdown, Silsila Seal or Next Zikr.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Next Prayer, Prayer Countdown, Silsila Seal or Next Zikr."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی نماز، نماز کا باقی وقت، سلسلہ کی مہر یا اگلا ذکر منتخب کریں۔"
+          }
+        }
+      }
+    },
+    "Open Darul Irfan on the watch to see the seal come to life.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Darul Irfan on the watch to see the seal come to life."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واچ پر دارالعرفان کھولیں تو مہر متحرک دکھائی دے گی۔"
+          }
+        }
+      }
+    },
+    "Apple Watch has no lock screen that apps can change. The seal animates in the app itself and rests, dimmed, when your wrist is down.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Watch has no lock screen that apps can change. The seal animates in the app itself and rests, dimmed, when your wrist is down."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایپل واچ کی لاک اسکرین کو کوئی ایپ نہیں بدل سکتی۔ مہر ایپ کے اندر متحرک ہوتی ہے، اور کلائی نیچے ہونے پر مدھم ہو کر ٹھہر جاتی ہے۔"
+          }
+        }
+      }
+    },
+    "Open Darul Irfan to load today's ayah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Darul Irfan to load today's ayah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آج کی آیت کے لیے دارالعرفان کھولیں۔"
+          }
+        }
+      }
+    },
+    "Prayer Overview": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer Overview"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نمازوں کا خلاصہ"
+          }
+        }
+      }
+    },
+    "The next prayer with a live countdown, today's five prayers, the Hijri date and the Ayah of the Day.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The next prayer with a live countdown, today's five prayers, the Hijri date and the Ayah of the Day."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی نماز اور اس کا باقی وقت، آج کی پانچ نمازیں، ہجری تاریخ اور آج کی آیت۔"
+          }
+        }
+      }
+    },
+    "Today's ayah with the Silsila's translation.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's ayah with the Silsila's translation."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آج کی آیت، سلسلہ کے ترجمے کے ساتھ۔"
+          }
+        }
+      }
+    },
+    "Silsila Seal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silsila Seal"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سلسلہ کی مہر"
+          }
+        }
+      }
+    },
+    "The Silsila's seal, for your Lock Screen or Home Screen.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Silsila's seal, for your Lock Screen or Home Screen."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سلسلہ کی مہر، لاک اسکرین یا ہوم اسکرین کے لیے۔"
+          }
+        }
+      }
+    },
+    "Prayer Countdown": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prayer Countdown"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نماز کا باقی وقت"
+          }
+        }
+      }
+    },
+    "The time left until the next prayer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The time left until the next prayer."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلی نماز تک باقی وقت۔"
+          }
+        }
+      }
+    },
+    "The Silsila's seal on your watch face. Tap it to open Darul Irfan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Silsila's seal on your watch face. Tap it to open Darul Irfan."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واچ فیس پر سلسلہ کی مہر۔ دارالعرفان کھولنے کے لیے اس پر ٹیپ کریں۔"
+          }
+        }
+      }
+    },
+    "Open Darul Irfan on iPhone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Darul Irfan on iPhone"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آئی فون پر دارالعرفان کھولیں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

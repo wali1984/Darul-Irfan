@@ -73,6 +73,10 @@ targets:
       - path: DarulIrfanApp/Resources/Images/Assets.xcassets
       - path: DarulIrfanApp/Resources/Localizations/Localizable.xcstrings
       - path: DarulIrfanApp/Core/Shared
+      # The mushaf face, so the Ayah of the Day widget draws the Arabic as
+      # the reader does (Widgets/WidgetShared.swift WidgetFonts).
+      - path: DarulIrfanApp/Resources/Fonts/AlQuran-IndoPak-QuranWBW.ttf
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: us.naqshbaniaowaisiah.widgets
@@ -88,6 +92,8 @@ targets:
         CFBundleDisplayName: Darul Irfan Widgets
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UIAppFonts:
+          - AlQuran-IndoPak-QuranWBW.ttf
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
 

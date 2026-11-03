@@ -100,6 +100,14 @@ struct PrayerWidgetSnapshot: Codable, Sendable, Equatable {
     /// "yyyy-MM-dd" in `timeZone`, so widgets turn the date over at midnight
     /// without the app running. Nil in snapshots from earlier builds.
     var hijriDates: [String: String]? = nil
+    /// The app's reading language ("en" or "ur") when the snapshot was
+    /// written, so the widgets speak the app's language rather than the
+    /// phone's. Nil in snapshots from earlier builds.
+    var languageCode: String? = nil
+    /// Ayah of the Day for each of the phone's days ahead, keyed "yyyy-MM-dd"
+    /// in the phone's time zone, as Today picks it. Kept on iPhone only: the
+    /// copy sent to Apple Watch leaves it out.
+    var dailyAyahs: [String: WidgetDailyAyah]? = nil
 
     /// The place's time zone (the phone's for older snapshots).
     var timeZone: TimeZone {

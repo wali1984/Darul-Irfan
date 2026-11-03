@@ -128,6 +128,7 @@ private struct DevotionalDashboardWidgetView: View {
                 WidgetEmptyStateView()
             }
         }
+        .widgetPlace(entry.snapshot)
         .containerBackground(for: .widget) {
             WidgetPalette.background(for: colorScheme)
         }
@@ -140,10 +141,7 @@ private struct DevotionalDashboardWidgetView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Image("BrandEmblem")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
+                WidgetSeal(size: 32)
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Devotional Dashboard")
                         .font(.headline)
@@ -156,7 +154,9 @@ private struct DevotionalDashboardWidgetView: View {
                 if let next = snapshot.nextPrayer(after: entry.date) {
                     VStack(alignment: .trailing, spacing: 0) {
                         Text(next.displayName).font(.caption.weight(.semibold))
-                        Text(next.time, style: .timer).font(.caption2.monospacedDigit())
+                        WidgetCountdown(interval: snapshot.countdownInterval(to: next, at: entry.date))
+                            .font(.caption2)
+                            .frame(maxWidth: 70, alignment: .trailing)
                     }
                 }
             }
@@ -175,10 +175,7 @@ private struct DevotionalDashboardWidgetView: View {
         metrics: WidgetDevotionalMetrics
     ) -> some View {
         VStack(spacing: 8) {
-            Image("BrandEmblem")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 40, height: 40)
+            WidgetSeal(size: 40)
             switch entry.configuration.focus {
             case .overview, .prayer:
                 focusMetric("Prayers", value: "\(prayersToday(metrics))/\(metrics.prayerGoal)", progress: prayerProgress(metrics))

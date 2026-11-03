@@ -264,11 +264,20 @@ final class AppState {
             zikrSessions: zikrSessions,
             devotionalMetrics: previousSnapshot?.devotionalMetrics,
             timeZoneIdentifier: place.timeZoneIdentifier,
-            hijriDates: hijriDates
+            hijriDates: hijriDates,
+            languageCode: settings.language.contentLanguageCode,
+            // Kept until WidgetAyahSync writes the days ahead again.
+            dailyAyahs: previousSnapshot?.dailyAyahs
         )
         snapshot.save()
         dependencies.watchSync.send(snapshot)
         Task { await dependencies.devotionalMetrics.refresh(reference: now) }
+        Task {
+            await WidgetAyahSync.refresh(
+                repository: dependencies.quranRepository,
+                language: settings.language.contentLanguageCode
+            )
+        }
         Task {
             await dependencies.prayerLiveActivity.update(
                 upcoming: upcoming,

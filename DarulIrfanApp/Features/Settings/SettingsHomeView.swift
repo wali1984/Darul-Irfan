@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Every setting, in the order the redesign lists them: Language first, then
 /// Location, Prayer calculation and Notifications (one screen for every
-/// alert and reminder); then Appearance, the Hijri calendar, Content and
-/// storage, and Privacy. The credits and licences, which must stay in the
+/// alert and reminder); then Appearance, Widgets (how to place them), the
+/// Hijri calendar, Content and storage, and Privacy. The credits and licences, which must stay in the
 /// app, are linked at the foot of About Darul Irfan (Halqah › Silsila).
 enum SettingsEntry: String, CaseIterable, Identifiable {
     case language
@@ -11,6 +11,7 @@ enum SettingsEntry: String, CaseIterable, Identifiable {
     case prayerCalculation
     case notifications
     case appearance
+    case widgets
     case hijriCalendar
     case contentStorage
     case privacy
@@ -25,6 +26,7 @@ enum SettingsEntry: String, CaseIterable, Identifiable {
         case .prayerCalculation: return "Prayer calculation"
         case .notifications: return "Notifications"
         case .appearance: return "Appearance"
+        case .widgets: return "Widgets"
         case .hijriCalendar: return "Hijri Calendar"
         case .contentStorage: return "Content & Storage"
         case .privacy: return "Privacy"
@@ -38,6 +40,7 @@ enum SettingsEntry: String, CaseIterable, Identifiable {
         case .prayerCalculation: return "clock.fill"
         case .notifications: return "bell.fill"
         case .appearance: return "circle.lefthalf.filled"
+        case .widgets: return "square.grid.2x2.fill"
         case .hijriCalendar: return "moon.stars.fill"
         case .contentStorage: return "internaldrive.fill"
         case .privacy: return "lock.shield.fill"
@@ -91,6 +94,10 @@ struct SettingsList: View {
         case .appearance:
             SettingsRowLink(entry: entry, value: themeValue) {
                 AppearanceSettingsView(appState: appState)
+            }
+        case .widgets:
+            SettingsRowLink(entry: entry, value: Text("Lock Screen and Home Screen")) {
+                WidgetGuideView()
             }
         case .hijriCalendar:
             SettingsRowLink(entry: entry, value: hijriValue) {

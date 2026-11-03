@@ -80,52 +80,13 @@ struct NextPrayerProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<NextPrayerEntry>) -> Void) {
-        let now = Date()
-
-        guard let snapshot = PrayerWidgetSnapshot.load() else {
-            // No snapshot yet — show the setup hint and try again later.
-            let entry = NextPrayerEntry(date: now, snapshot: nil, nextPrayer: nil)
-            completion(Timeline(entries: [entry], policy: .after(now.addingTimeInterval(30 * 60))))
-            return
-        }
-
-        let upcoming: [WidgetPrayerTime] = Array(
-            snapshot.upcomingTimes
-                .filter { $0.isObligatory && $0.time > now }
-                .prefix(12)
-        )
-
-        guard let first = upcoming.first else {
-            // Snapshot exhausted (app not opened for a long while).
-            let entry = NextPrayerEntry(date: now, snapshot: snapshot, nextPrayer: nil)
-            completion(Timeline(entries: [entry], policy: .after(now.addingTimeInterval(30 * 60))))
-            return
-        }
-
-        // One entry per prayer transition: entry i becomes visible when
-        // prayer i-1 arrives, and features prayer i.
-        var entries: [NextPrayerEntry] = [
-            NextPrayerEntry(date: now, snapshot: snapshot, nextPrayer: first)
-        ]
-        var index = 1
-        while index < upcoming.count {
-            entries.append(
-                NextPrayerEntry(
-                    date: upcoming[index - 1].time,
-                    snapshot: snapshot,
-                    nextPrayer: upcoming[index]
-                )
-            )
-            index += 1
-        }
-
-        // With a single entry, .atEnd would request an immediate reload loop
-        // (the timeline "ends" at its only entry, dated now) — wait for the
-        // featured prayer instead.
-        let policy: TimelineReloadPolicy = entries.count > 1
-            ? .atEnd
-            : .after(first.time)
-        completion(Timeline(entries: entries, policy: policy))
+        // An entry at each prayer (sunrise included, for the medium row of
+        // the rest of today), each zikr boundary and each midnight; each
+        // features the first obligatory prayer after its own date, so the
+        // widget flips to the new prayer exactly on time.
+        completion(PrayerTimelines.timeline { date, snapshot in
+            NextPrayerEntry(date: date, snapshot: snapshot, nextPrayer: snapshot?.nextPrayer(after: date))
+        })
     }
 }
 
@@ -165,11 +126,19 @@ struct NextPrayerWidgetView: View {
                 case .systemMedium:
                     NextPrayerMediumView(entry: entry, snapshot: snapshot, next: next)
                 case .accessoryCircular:
-                    NextPrayerCircularView(next: next)
+                    NextPrayerCircularView(next: next, interval: snapshot.countdownInterval(to: next, at: entry.date))
                 case .accessoryRectangular:
-                    NextPrayerRectangularView(next: next, moment: entry.ramadanMoment)
+                    NextPrayerRectangularView(
+                        next: next,
+                        interval: snapshot.countdownInterval(to: next, at: entry.date),
+                        moment: entry.ramadanMoment
+                    )
                 case .accessoryInline:
-                    Text("\(next.displayName) \(next.time, style: .time)")
+                    Label {
+                        Text("\(next.displayName) \(next.time, style: .time)")
+                    } icon: {
+                        Image(systemName: "moon.stars.fill")
+                    }
                 default:
                     NextPrayerSmallView(entry: entry, snapshot: snapshot, next: next)
                 }
@@ -177,8 +146,8 @@ struct NextPrayerWidgetView: View {
                 WidgetEmptyStateView()
             }
         }
-        // Times on the place's clock, as the app shows them.
-        .environment(\.timeZone, entry.snapshot?.timeZone ?? .current)
+        // Times on the place's clock, in the app's language.
+        .widgetPlace(entry.snapshot)
         .containerBackground(for: .widget) {
             WidgetPalette.background(for: colorScheme)
         }
@@ -217,11 +186,7 @@ private struct NextPrayerSmallView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 5) {
-                Image("BrandEmblem")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .accessibilityHidden(true)
+                WidgetSeal(size: 24)
                 Text("Next Prayer")
                     .font(.caption2)
                     .foregroundStyle(WidgetPalette.mutedTone(for: colorScheme))
@@ -234,9 +199,10 @@ private struct NextPrayerSmallView: View {
             Text(next.time, style: .time)
                 .font(.title3.weight(.medium))
                 .foregroundStyle(WidgetPalette.textTone(for: colorScheme))
-            Text(next.time, style: .timer)
-                .font(.caption.monospacedDigit())
+            WidgetCountdown(interval: snapshot.countdownInterval(to: next, at: entry.date))
+                .font(.caption)
                 .foregroundStyle(WidgetPalette.goldTone(for: colorScheme))
+                .widgetAccentable()
             if let moment = entry.ramadanMoment {
                 RamadanCaptionView(moment: moment)
             }
@@ -263,11 +229,7 @@ private struct NextPrayerMediumView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Image("BrandEmblem")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 28, height: 28)
-                            .accessibilityHidden(true)
+                        WidgetSeal(size: 28)
                         Text("Next Prayer")
                             .font(.caption2)
                             .foregroundStyle(WidgetPalette.mutedTone(for: colorScheme))
@@ -283,10 +245,11 @@ private struct NextPrayerMediumView: View {
                 }
                 Spacer(minLength: 8)
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text(next.time, style: .timer)
-                        .font(.title3.monospacedDigit().weight(.light))
+                    WidgetCountdown(interval: snapshot.countdownInterval(to: next, at: entry.date))
+                        .font(.title3.weight(.light))
                         .foregroundStyle(WidgetPalette.goldTone(for: colorScheme))
                         .multilineTextAlignment(.trailing)
+                        .widgetAccentable()
                     if let moment = entry.ramadanMoment {
                         RamadanCaptionView(moment: moment)
                     }
@@ -331,50 +294,64 @@ private struct NextPrayerMediumView: View {
     }
 }
 
+/// Lock Screen circular: a ring that empties as the prayer draws near,
+/// with the prayer's name and the time left inside.
 private struct NextPrayerCircularView: View {
     let next: WidgetPrayerTime
+    let interval: ClosedRange<Date>
 
     var body: some View {
         ZStack {
             AccessoryWidgetBackground()
+            WidgetCountdownRing(interval: interval)
             VStack(spacing: 0) {
                 Text(next.displayName)
-                    .font(.caption2)
+                    .font(.system(size: 10, weight: .semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
-                Text(next.time, style: .timer)
-                    .font(.system(.caption, design: .rounded).monospacedDigit())
+                WidgetCountdown(interval: interval)
+                    .font(.system(.caption2, design: .rounded))
                     .multilineTextAlignment(.center)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
             }
-            .padding(2)
+            .padding(9)
         }
         .accessibilityElement(children: .combine)
     }
 }
 
+/// Lock Screen rectangular: the seal beside the prayer, its time and the
+/// time left.
 private struct NextPrayerRectangularView: View {
     let next: WidgetPrayerTime
+    let interval: ClosedRange<Date>
     let moment: RamadanMoment?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            Text(next.displayName)
-                .font(.headline)
+        HStack(spacing: 6) {
+            WidgetSeal(size: 34)
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 4) {
+                    Text(next.displayName)
+                        .font(.headline)
+                        .widgetAccentable()
+                    Text(next.time, style: .time)
+                        .font(.caption)
+                }
                 .lineLimit(1)
-            Text(next.time, style: .time)
-                .font(.caption)
-            Text(next.time, style: .timer)
-                .font(.caption2.monospacedDigit())
-            if let moment {
-                switch moment.kind {
-                case .suhoorEnds:
-                    Text("Suhoor ends \(moment.time, style: .time)")
-                        .font(.caption2)
-                case .iftar:
-                    Text("Iftar \(moment.time, style: .time)")
-                        .font(.caption2)
+                WidgetCountdown(interval: interval)
+                    .font(.caption)
+                    .lineLimit(1)
+                if let moment {
+                    switch moment.kind {
+                    case .suhoorEnds:
+                        Text("Suhoor ends \(moment.time, style: .time)")
+                            .font(.caption2)
+                    case .iftar:
+                        Text("Iftar \(moment.time, style: .time)")
+                            .font(.caption2)
+                    }
                 }
             }
         }

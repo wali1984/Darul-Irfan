@@ -141,11 +141,19 @@ struct WatchRootView: View {
             }
             .tint(WatchTheme.gold)
         } else {
-            ContentUnavailableView(
-                "Open Darul Irfan",
-                systemImage: "iphone.and.arrow.forward",
-                description: Text("Set up prayer times on your iPhone to sync them here.")
-            )
+            ScrollView {
+                VStack(spacing: 10) {
+                    WatchLivingSeal(diameter: 64)
+                    Text("Open Darul Irfan")
+                        .font(.headline)
+                        .foregroundStyle(WatchTheme.gold)
+                    Text("Set up prayer times on your iPhone to sync them here.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+            }
         }
     }
 }
@@ -157,7 +165,7 @@ private struct WatchHomeView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
-                WatchLivingSeal(diameter: 58)
+                WatchLivingSeal(diameter: 72)
                     .padding(.top, 2)
 
                 Text("Darul Irfan")
@@ -271,6 +279,7 @@ private struct WatchDevotionalMetricsView: View {
 private struct WatchAzanCard: View {
     let snapshot: PrayerWidgetSnapshot
     let date: Date
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
 
     var body: some View {
         VStack(spacing: 3) {
@@ -278,9 +287,9 @@ private struct WatchAzanCard: View {
                 Label(next.displayName, systemImage: "moon.stars.fill")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(WatchTheme.gold)
-                Text(next.time, style: .timer)
+                // Stops at 0:00 at the azan rather than counting up.
+                Text(timerInterval: snapshot.countdownInterval(to: next, at: date), countsDown: true)
                     .font(.system(.title2, design: .rounded).weight(.medium).monospacedDigit())
-                    .contentTransition(.numericText())
                 Text("until azan · \(next.time.formatted(Date.FormatStyle(date: .omitted, time: .shortened, timeZone: snapshot.timeZone)))")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
@@ -294,7 +303,7 @@ private struct WatchAzanCard: View {
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(WatchTheme.deepEmerald.opacity(0.72))
+                .fill(WatchTheme.deepEmerald.opacity(isLuminanceReduced ? 0.3 : 0.72))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -389,61 +398,77 @@ private struct WatchSettingsView: View {
     }
 }
 
-private struct WatchLivingSeal: View {
+/// The Silsila's seal on the Watch app's own screen: it draws itself in
+/// with a ring of light, then breathes a gold halo while a glint travels its
+/// rim. Held still for Reduce Motion; held still and dimmed, without the
+/// bright disc and halo, while the wrist is down and the screen is Always
+/// On. Phases come from WatchSealMotion (shared, tested).
+struct WatchLivingSeal: View {
     let diameter: CGFloat
-    @State private var rotating = false
-    @State private var breathing = false
+    @State private var appeared = Date()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
+
+    private var motion: WatchSealMotion {
+        WatchSealMotion.resolve(reduceMotion: reduceMotion, luminanceReduced: isLuminanceReduced)
+    }
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [WatchTheme.gold.opacity(breathing ? 0.32 : 0.16), .clear],
-                        center: .center,
-                        startRadius: diameter * 0.35,
-                        endRadius: diameter * 0.82
+        TimelineView(.animation(minimumInterval: 1.0 / 20.0, paused: motion != .animated)) { context in
+            let phase = motion.phase(elapsed: context.date.timeIntervalSince(appeared))
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [WatchTheme.gold.opacity(phase.glow), .clear],
+                            center: .center,
+                            startRadius: diameter * 0.35,
+                            endRadius: diameter * 0.82
+                        )
                     )
-                )
-                .frame(width: diameter * 1.62, height: diameter * 1.62)
+                    .frame(width: diameter * 1.62, height: diameter * 1.62)
 
-            Circle()
-                .fill(Color.white.opacity(0.98))
-                .frame(width: diameter * 1.055, height: diameter * 1.055)
-                .overlay(Circle().stroke(WatchTheme.gold.opacity(0.75), lineWidth: 1))
-                .shadow(color: WatchTheme.gold.opacity(breathing ? 0.46 : 0.22), radius: breathing ? 8 : 4)
+                Circle()
+                    .fill(Color.white.opacity(motion == .dimmed ? 0 : 0.98))
+                    .frame(width: diameter * 1.055, height: diameter * 1.055)
+                    .shadow(color: WatchTheme.gold.opacity(phase.glow * 1.4), radius: 4 + 8 * phase.glow)
 
-            Image("BrandEmblem")
-                .resizable()
-                .interpolation(.high)
-                .scaledToFit()
-                .frame(width: diameter, height: diameter)
-                .clipShape(Circle())
+                Image("BrandEmblem")
+                    .resizable()
+                    .interpolation(.high)
+                    .scaledToFit()
+                    .frame(width: diameter, height: diameter)
+                    .clipShape(Circle())
+                    .scaleEffect(0.86 + 0.14 * phase.reveal)
+                    .opacity(phase.reveal)
 
-            Circle()
-                .trim(from: 0.02, to: 0.20)
-                .stroke(
-                    LinearGradient(
-                        colors: [.clear, .white, WatchTheme.gold, .clear],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
-                )
-                .frame(width: diameter * 1.10, height: diameter * 1.10)
-                .rotationEffect(.degrees(reduceMotion ? -35 : (rotating ? 325 : -35)))
+                // The ring of light that draws the seal in, then stays as its rim.
+                Circle()
+                    .trim(from: 0, to: phase.reveal)
+                    .stroke(WatchTheme.gold.opacity(0.75), lineWidth: 1)
+                    .frame(width: diameter * 1.055, height: diameter * 1.055)
+                    .rotationEffect(.degrees(-90))
+
+                if phase.showsSweep {
+                    Circle()
+                        .trim(from: 0.02, to: 0.20)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.clear, .white, WatchTheme.gold, .clear],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            style: StrokeStyle(lineWidth: 1.5, lineCap: .round)
+                        )
+                        .frame(width: diameter * 1.10, height: diameter * 1.10)
+                        .rotationEffect(.degrees(phase.sweepDegrees))
+                        .opacity(phase.reveal)
+                }
+            }
+            .opacity(phase.opacity)
         }
         .frame(width: diameter * 1.2, height: diameter * 1.2)
-        .onAppear {
-            guard !reduceMotion else { return }
-            withAnimation(.linear(duration: 12).repeatForever(autoreverses: false)) {
-                rotating = true
-            }
-            withAnimation(.easeInOut(duration: 2.6).repeatForever(autoreverses: true)) {
-                breathing = true
-            }
-        }
+        .onAppear { appeared = Date() }
         .accessibilityElement()
         .accessibilityLabel("Darul Irfan")
     }

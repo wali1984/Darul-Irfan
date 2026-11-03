@@ -31,29 +31,10 @@ struct TodayTimesProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<TodayTimesEntry>) -> Void) {
-        let now = Date()
-        let snapshot = PrayerWidgetSnapshot.load()
-
-        // One entry per remaining highlight transition today, each dated at a
-        // prayer's time: the view computes the highlight from `entry.date`, so
-        // it advances exactly on time even if iOS defers the reload below.
-        // "Today" is the place's day, as in the app.
-        var entries: [TodayTimesEntry] = [TodayTimesEntry(date: now, snapshot: snapshot)]
-        var refreshDate = now.addingTimeInterval(60 * 60)
-        if let snapshot {
-            for item in snapshot.times(onSameDayAs: now) where item.time > now {
-                entries.append(TodayTimesEntry(date: item.time, snapshot: snapshot))
-            }
-            // The new day's grid and Hijri date from its first moment, even
-            // if iOS defers the reload; the reload (capped at one hour) then
-            // picks up a fresh snapshot.
-            if let startOfTomorrow = snapshot.startOfNextDay(after: now), startOfTomorrow > now {
-                entries.append(TodayTimesEntry(date: startOfTomorrow, snapshot: snapshot))
-                refreshDate = min(refreshDate, startOfTomorrow)
-            }
-        }
-
-        completion(Timeline(entries: entries, policy: .after(refreshDate)))
+        // One entry per highlight change (each prayer, sunrise included) and
+        // at each midnight where the place is, so the grid and the Hijri
+        // date turn over on time even if iOS defers the reload.
+        completion(PrayerTimelines.timeline { TodayTimesEntry(date: $0, snapshot: $1) })
     }
 }
 
@@ -92,8 +73,8 @@ struct TodayTimesWidgetView: View {
                 WidgetEmptyStateView()
             }
         }
-        // Times on the place's clock, as the app shows them.
-        .environment(\.timeZone, entry.snapshot?.timeZone ?? .current)
+        // Times on the place's clock, in the app's language.
+        .widgetPlace(entry.snapshot)
         .containerBackground(for: .widget) {
             WidgetPalette.background(for: colorScheme)
         }

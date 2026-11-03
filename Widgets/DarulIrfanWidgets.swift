@@ -15,8 +15,11 @@ import WidgetKit
 @main
 struct DarulIrfanWidgets: WidgetBundle {
     var body: some Widget {
+        PrayerOverviewWidget()
         NextPrayerWidget()
         TodayTimesWidget()
+        AyahOfTheDayWidget()
+        SilsilaSealWidget()
         ZikrCountdownWidget()
         DevotionalDashboardWidget()
         PrayerActivityWidget()
@@ -81,8 +84,7 @@ struct WidgetEmptyStateView: View {
         case .accessoryCircular:
             ZStack {
                 AccessoryWidgetBackground()
-                Image(systemName: "moon.stars")
-                    .font(.title3)
+                WidgetSeal(size: 44)
             }
             .accessibilityLabel(Text("Open Darul Irfan to set up prayer times"))
         case .accessoryRectangular:
@@ -94,9 +96,7 @@ struct WidgetEmptyStateView: View {
             }
         default:
             VStack(spacing: 6) {
-                Image(systemName: "moon.stars")
-                    .font(.title2)
-                    .foregroundStyle(WidgetPalette.goldTone(for: colorScheme))
+                WidgetSeal(size: 40)
                 Text("Open Darul Irfan to set up prayer times")
                     .font(.footnote)
                     .multilineTextAlignment(.center)
