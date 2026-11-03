@@ -539,7 +539,7 @@ struct HadithRepository: HadithRepositoryProtocol {
             numberMinor: row.int("number_minor"),
             sourceSequence: sourceSequence,
             textArabic: row.text("text_ar"),
-            textEnglish: row.text("text_en"),
+            textEnglish: HadithEnglishText.spaced(row.text("text_en")),
             textUrdu: row.text("text_ur"),
             grades: (grades?.isEmpty ?? true) ? nil : grades,
             sourceBook: row.int("source_book"),

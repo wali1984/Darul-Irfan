@@ -1,5 +1,21 @@
 import Foundation
 
+/// Display fixes for the packs' English, applied where narrations are read.
+enum HadithEnglishText {
+    // The upstream English drops the space after a colon 33,770 times
+    // ("said:I", "reported:The"): a Latin letter, closing bracket or quote, a
+    // colon, then a Latin letter or opening quote. Digits ("2:255", "4:30")
+    // and URLs ("https://") never match.
+    private static let tightColon = try! NSRegularExpression(
+        pattern: "(?<=[\\p{Latin})\\]’'\"”]):(?=[\\p{Latin}“‘\"'(])")
+
+    static func spaced(_ text: String?) -> String? {
+        guard let text, text.contains(":") else { return text }
+        let range = NSRange(text.startIndex..., in: text)
+        return tightColon.stringByReplacingMatches(in: text, range: range, withTemplate: ": ")
+    }
+}
+
 /// One hadith collection (Sahih al-Bukhari, Sahih Muslim, …).
 ///
 /// The corpus is the public-domain (Unlicense) `hadith-api` data set; every

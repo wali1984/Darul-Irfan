@@ -154,6 +154,9 @@ TAG = re.compile(r"<[^<>]{0,80}>|</?(?:span|b|br|i|div|p|a)\b|>br>|[a-z]>[a-z]",
 URL = re.compile(r"https?\s*:\s*//|www\.|tanzil\.net", re.I)
 CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 PLACEHOLDER = re.compile(r"Hadith Translation Not Available", re.I)
+# Symbol-font code points (U+F020 for a space, U+E002 for an honorific) that
+# no app font draws: they show as empty boxes.
+PRIVATE_USE = re.compile("[-󰀀-􏿿]")
 DISPLAY_FIELDS = ("text_ar", "text_en", "text_ur", "urduSanad", "urduText",
                   "chapterTitleEnglish", "chapterTitleArabic", "chapterTitleUrdu")
 
@@ -170,6 +173,8 @@ def text_defects(s: str) -> list[str]:
         out.append("U+FFFC")
     if PLACEHOLDER.search(s):
         out.append("placeholder")
+    if PRIVATE_USE.search(s):
+        out.append("private-use character")
     return out
 
 
@@ -228,7 +233,7 @@ def check_pack(slug, records, *, known=None, verses=None, catalog_book=None,
             if "\ufffd" in s.get("text", ""):
                 fffd.append((cid, f"segment {k}", s["text"].count("\ufffd")))
     if txt:
-        fail.append(f"{slug}: {len(txt)} markup/URL/control/placeholder defects in displayed text: {txt[:5]}")
+        fail.append(f"{slug}: {len(txt)} markup/URL/control/placeholder/private-use defects in displayed text: {txt[:5]}")
     if fffd:
         fail.append(f"{slug}: {len(fffd)} U+FFFD not recorded in known_upstream_defects.json: {fffd[:5]}")
 
@@ -305,10 +310,12 @@ def selftest() -> None:
          "arabicSegments": [{"type": "matn", "text": "حَدَّثَنَا قُتَيْبَةُ عَنْ لَيْثٍ عَنْ يَزِيدَ عَنْ أَبِي الْخَيْرِ عَنْ عُقْبَةَ أَنَّهُ قَالَ"}]},
         {"canonicalID": "x|2|2", "sourceSequence": 2, "text_ar": "قَالَ النَّبِيُّ إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",
          "text_ur": "اعمال کا دارومدار نیتوں پر ہے</b>"},
+        {"canonicalID": "x|3|3", "sourceSequence": 3, "text_ar": "سُحْتٌ يَأْكُلُهَا [ صَاحِبُهَا ]"},
     ]
     f, _ = check_pack("x", recs)
     assert any("not their own narration" in m for m in f), f
     assert any("markup" in m for m in f), f
+    assert "private-use character" in str(f), f
     print("hadith_gate selftest: PASS")
 
 
