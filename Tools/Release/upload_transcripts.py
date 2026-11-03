@@ -91,6 +91,10 @@ def main() -> int:
     args = sys.argv[1:]
     dry_run = "--dry-run" in args
     folders = [a for a in args if a != "--dry-run"]
+    # A mistyped flag (--dryrun) must never be taken for a folder and upload.
+    if any(a.startswith("-") for a in folders) or len(folders) > 1:
+        print("usage: upload_transcripts.py [--dry-run] [folder]")
+        return 2
     folder = Path(folders[0]) if folders else DEFAULT_FOLDER
     catalogue = {item["id"] for item in json.loads(CATALOGUE.read_text(encoding="utf-8"))}
     files = sorted(folder.glob("*.json.gz"))
