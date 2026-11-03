@@ -241,6 +241,11 @@ enum BayanTranscriptStore {
         case failed
     }
 
+    /// Off by the owner's decision (2 Nov 2026): the transcripts are kept for
+    /// answering questions and perhaps a later text edition, not shown in
+    /// the player. Off, nothing is fetched and the player has no switch.
+    static let isEnabled = false
+
     static let refreshAfter: TimeInterval = 7 * 24 * 3600
 
     static var directory: URL {
@@ -356,7 +361,7 @@ final class BayanTranscriptModel {
         generation += 1
         let current = generation
         self.mediaItemID = mediaItemID
-        guard let mediaItemID, BayanTranscriptStore.isMediaID(mediaItemID) else {
+        guard BayanTranscriptStore.isEnabled, let mediaItemID, BayanTranscriptStore.isMediaID(mediaItemID) else {
             state = .idle
             return
         }
