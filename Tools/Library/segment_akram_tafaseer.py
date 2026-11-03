@@ -541,7 +541,7 @@ def correct_fragments(text: str, first, last, mushaf: Mushaf) -> tuple[str, int]
         if not hit:
             continue
         _, replacement, _ = hit
-        if replacement == fragment:
+        if replacement == fragment or len(letter_words(replacement)) < len(letter_words(fragment)):
             continue
         out.append(text[cursor:start])
         out.append(replacement)
@@ -622,6 +622,11 @@ def correct_citations(text: str, first, last, mushaf: Mushaf, row: str, report: 
         fragment = text[start:end]
         marker = MARKER_AFTER.match(text, end)
         found = mushaf.identify(fragment, first, last)
+        # A shorter reading would lose printed words: "اَعُوْذُ بِاللّٰہِ مِنَ
+        # الشَّیْطٰنِ الرَّجِیْمِ" must not become 16:98's words alone. Only the part
+        # that matches may take the mushaf's words, below.
+        if found and len(letter_words(found[0])) < len(letter_words(fragment)):
+            found = None
         span = (start, end)
         if not found:
             tokens = list(re.finditer(r"\S+", fragment))
@@ -630,6 +635,8 @@ def correct_citations(text: str, first, last, mushaf: Mushaf, row: str, report: 
                     continue
                 a, b = tokens[drop_first].start(), tokens[len(tokens) - 1 - drop_last].end()
                 found = mushaf.identify(fragment[a:b], first, last)
+                if found and len(letter_words(found[0])) < len(letter_words(fragment[a:b])):
+                    found = None
                 if found:
                     span = (start + a, start + b)
                     counts["edgeTrimmed"] += 1
@@ -1379,6 +1386,11 @@ def build(seed: Path, report: dict):
     # volume, but a link is only written once the book has pages, so the
     # reader never opens an empty book.
     if by_book.get(PART_TWO_BOOK):
+        # Read by Claude in November 2026, so it is cut per ayah like the rest.
+        pages = sorted(by_book[PART_TWO_BOOK], key=lambda p: p["page"])
+        part_two = Volume(30, pages, (92, 1), (114, counts[114]), counts, names, mushaf, translations, report)
+        part_two.book = PART_TWO_BOOK
+        rows.extend(part_two.rows())
         for surah, page in sorted(PART_TWO_STARTS.items()):
             volumes[surah].append({"edition": EDITION, "bookID": PART_TWO_BOOK, "page": page})
     else:
