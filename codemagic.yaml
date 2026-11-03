@@ -259,9 +259,10 @@ workflows:
       groups:
         # Codemagic env-var group holding CERTIFICATE_PRIVATE_KEY (a PEM RSA
         # private key). Used to create/reuse the iOS Distribution certificate.
+        # Also holds APP_STORE_CONNECT_ISSUER_ID, _KEY_IDENTIFIER and
+        # _PRIVATE_KEY (key HF3C3684KV): the new account (2 Nov 2026) has no
+        # App Store Connect integration, and the CLI tools read these directly.
         - ios_signing
-    integrations:
-      app_store_connect: ASC_API_KEY
     cache:
       cache_paths:
         - ~/Library/Caches/org.swift.swiftpm
@@ -364,7 +365,9 @@ workflows:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         # Internal testing only: upload the build (it becomes available to
         # internal testers once App Store Connect finishes processing) without
         # submitting for external beta review. External review requires the
