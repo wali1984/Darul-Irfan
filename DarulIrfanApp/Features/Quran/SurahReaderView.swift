@@ -75,7 +75,7 @@ struct SurahReaderView: View {
     var body: some View {
         content
             .diScreenBackground()
-            .navigationTitle(viewModel.surah.nameTransliterated)
+            .navigationTitle(appState.settings.language.contentLanguageCode == "ur" ? viewModel.surah.nameArabic : viewModel.surah.nameTransliterated)
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(DIColor.background, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -649,7 +649,7 @@ struct SurahReaderView: View {
     private var listenSubtitle: String {
         switch effectiveContent {
         case .arabic: return RecitationProvider.shared.reciterName
-        case .translation: return viewModel.translationEdition?.title ?? String(localized: "Translation")
+        case .translation: return String(localized: String.LocalizationValue(viewModel.translationEdition?.title ?? "Translation"))
         case .both: return String(localized: "Recitation, then translation, ayah by ayah")
         }
     }
@@ -1348,7 +1348,7 @@ private struct AyahCardView: View {
             }
             .padding(.top, DISpacing.xs)
         } label: {
-            Text(edition?.title ?? "Tafsir")
+            Text(LocalizedStringKey(edition?.title ?? "Tafsir"))
                 .diInterfaceFont(.footnote, weight: .semibold)
                 .foregroundStyle(DIColor.actionForeground)
         }

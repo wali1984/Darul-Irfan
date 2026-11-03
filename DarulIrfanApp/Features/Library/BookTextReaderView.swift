@@ -544,7 +544,7 @@ struct FormattedBookPage: View {
     /// as Urdu books set their verse.
     private func verse(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return Text(verbatim: text)
+        return keepingWaqfMarks(text)
             .font(face(rightToLeft))
             .foregroundStyle(DIColor.textPrimary)
             .lineSpacing(CGFloat((rightToLeft ? 12 : 6) * scale))
@@ -624,6 +624,23 @@ struct FormattedBookPage: View {
             .textSelection(.enabled)
     }
 
+    /// The mushaf's waqf signs are private-use characters only its font draws; a
+    /// quotation that reached the prose or verse face keeps them in that font.
+    private func keepingWaqfMarks(_ string: String) -> Text {
+        var text = Text(verbatim: "")
+        var plain = String.UnicodeScalarView()
+        for scalar in string.unicodeScalars {
+            if (0xE000...0xF8FF).contains(scalar.value) {
+                text = text + Text(verbatim: String(plain))
+                plain = String.UnicodeScalarView()
+                text = text + Text(verbatim: String(scalar)).font(DIFont.quranArabic(scale: (17.0 / 27.0) * scale))
+            } else {
+                plain.append(scalar)
+            }
+        }
+        return text + Text(verbatim: String(plain))
+    }
+
     /// Prose, with a short Qur'anic quotation kept inline in the Qur'an face
     /// and a printed line break kept where the paragraph had one.
     private func prose(_ runs: [BookPageFormatter.Run]) -> Text {
@@ -649,7 +666,7 @@ struct FormattedBookPage: View {
                         text = text + Text(verbatim: part)
                     }
                 } else {
-                    text = text + Text(verbatim: run.text)
+                    text = text + keepingWaqfMarks(run.text)
                 }
             }
         }

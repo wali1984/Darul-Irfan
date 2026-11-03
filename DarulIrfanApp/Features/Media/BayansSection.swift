@@ -336,7 +336,7 @@ private struct BayansTile: View {
                     .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(DIColor.textPrimary)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(2)
+                    .lineLimit(2, reservesSpace: true)
                     .minimumScaleFactor(0.85)
                 Text(count, format: .number)
                     .diInterfaceFont(.caption, weight: .medium)
