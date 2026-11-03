@@ -26,11 +26,6 @@ workflows:
     cache:
       cache_paths:
         - ~/Library/Caches/org.swift.swiftpm
-    triggering:
-      events:
-        - push
-        - pull_request
-      cancel_previous_builds: true
     scripts:
       - name: Install XcodeGen
         script: |
@@ -270,12 +265,6 @@ workflows:
     cache:
       cache_paths:
         - ~/Library/Caches/org.swift.swiftpm
-    triggering:
-      events:
-        - tag
-      tag_patterns:
-        - pattern: "v*"
-      cancel_previous_builds: true
     scripts:
       - name: Install XcodeGen
         script: |
@@ -359,12 +348,14 @@ workflows:
           echo "--- Provisioning profiles fetched:"
           ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || true
           xcode-project use-profiles --verbose
+      # This Codemagic app started counting at 1 on 2 November 2026; Apple has
+      # already seen build 87, so its first build here is 88.
       - name: Build signed archive
         script: |
           xcode-project build-ipa \
             --project DarulIrfan.xcodeproj \
             --scheme DarulIrfan \
-            --archive-xcargs "CURRENT_PROJECT_VERSION=${BUILD_NUMBER}"
+            --archive-xcargs "CURRENT_PROJECT_VERSION=$((BUILD_NUMBER + 87))"
     artifacts:
       - build/ios/ipa/*.ipa
       - build/CONTENT_INTEGRITY.md
