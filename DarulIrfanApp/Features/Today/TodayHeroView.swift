@@ -76,7 +76,9 @@ struct TodayHeroView: View {
         // Scope the selected city here; personal Zikr reminders use device time.
         .environment(\.timeZone, timeZone)
         .task(id: weatherReloadKey) {
-            guard weatherEnabled, scenePhase == .active, let grid = weatherGrid else { weatherSnapshot = nil; return }
+            guard weatherEnabled, let grid = weatherGrid else { weatherSnapshot = nil; return }
+            // Inactive or in the background: keep what is showing, and refresh on return.
+            guard scenePhase == .active else { return }
             while !Task.isCancelled {
                 let value = await CityWeatherService.shared.current(for: grid)
                 guard !Task.isCancelled else { return }
@@ -189,7 +191,9 @@ struct TodayHeroView: View {
 
     @ViewBuilder
     private func timer(to target: Date, now: Date) -> some View {
-        if scenePhase == .active && target > now {
+        // Not tied to scenePhase: swiping up makes the app inactive while it is
+        // still on screen, and the countdown must stay.
+        if target > now {
             Text(timerInterval: now...target, countsDown: true)
                 .monospacedDigit()
                 .fixedSize()
