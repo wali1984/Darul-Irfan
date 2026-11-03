@@ -592,11 +592,18 @@ final class RedesignScreenshotTests: XCTestCase {
         selectTab(2)
         pause(4)
         scrollToTop()
-        let shajraButton = onScreen(app.buttons.matching(NSPredicate(
+        // The button sits under the Tahajjud panel, below the first screen.
+        let shajraButtons = app.buttons.matching(NSPredicate(
             format: "label BEGINSWITH %@", label("Chain of Transmission")
-        )))
+        ))
+        var shajraSwipes = 0
+        while !onScreen(shajraButtons).isHittable && shajraSwipes < 4 {
+            app.swipeUp()
+            pause(1)
+            shajraSwipes += 1
+        }
         shot("zikr-shajra-button")
-        if tap(shajraButton) {
+        if tap(onScreen(shajraButtons)) {
             // The chain takes about three seconds to arrive.
             pause(4)
             shot("shajra")
