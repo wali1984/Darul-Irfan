@@ -72,3 +72,13 @@ After the change the edition has لیئے 1,273, لئے 32 and لیے 7 standalo
 
 `check_content.py` PASS, `hadith_gate.py` PASS. The iOS and Android seeds
 are byte-identical. Each changed row differs from HEAD only in this token.
+
+## Follow-up, 3 November: the five spots left open (owner: "review and publish")
+
+Re-read at 700-900 dpi from the 2020 volume, PDF pages 728, 1045, 1118 and 1149:
+
+- **27:40, 27:41, 80:20:** the print joins the word to کے, with two dots below and a hamza, as **کیلیئے**. The app's کے لئے is now کیلیئے, matching the print's word division.
+- **109:6, both occurrences:** the print uses the standard form with dots and hamza. لئے and لیے both became **لیئے**.
+- **59:9:** the print shows dots below and no hamza at any zoom, so it stays **لیے**, one of the print's few plain forms.
+- **ۓ (U+06D3):** not adopted. لیئے is how the app writes this printed shape everywhere. It renders the same in the app's Urdu fonts, and it keeps search consistent.
+- Duas and Ayah of the Day were re-checked and none of their texts include these ayat.
