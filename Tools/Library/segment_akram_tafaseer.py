@@ -39,6 +39,9 @@ its range, judged by the quoted Arabic matched against the bundled mushaf
 replaces Qur'anic quotations with the mushaf's own text: whole ayat closed by
 ﴿n﴾, and fragments whose letters are clearly a passage of one ayah of the row.
 
+A few stretches were re-cut by eye, after all of the above, in
+SECTION_CORRECTIONS: only their row boundaries move.
+
 Parahs follow the IndoPak divisions the book is printed in (para 4 opens at
 3:92, para 14 at 15:2, ...), not the Madani ones.
 
@@ -1337,6 +1340,145 @@ class Volume:
         return pages
 
 
+# ---------------------------------------------------------------------------
+# Cuts read by eye
+# ---------------------------------------------------------------------------
+
+# Where the book's section structure was read by a person (November 2026) and
+# the automatic cut filed commentary under a later ayah. Each entry names the
+# rows a stretch of a surah becomes: (first ayah, last ayah, where the row
+# starts). The rows the cutter made for that stretch are joined and cut again at
+# these places, so only row boundaries move; no word changes. A "|" marks the
+# cut inside text quoted to make the place unique; without one the row starts
+# at the quoted text. A stretch that no longer fits (a re-read changed its
+# words) stops the build, so a cut is never guessed.
+SECTION_CORRECTIONS = [
+    # The volume glosses 2:35-39 first (it closes: this is the plain translation), then comments on 2:35-36; the commentary on 2:37 opens at this quotation.
+    (2, [
+        (35, 36, None),
+        (37, 38, 'فَتَلَقّٰٓى اٰدَمُ مِنْ رَّبِّهٖ كَلِمٰتٍ آدم'),
+    ]),
+    # The commentary quotes 2:194 and 2:195 before this first quotation of 2:196.
+    (2, [
+        (193, 195, None),
+        (196, 196, 'وَاَتِمُّوا الْحَجَّ وَالْعُمْرَةَ لِلّٰهِؕ احسان '),
+    ]),
+    # Section opening 2:261-266; the commentary on 2:261-262 runs up to this first quotation of 2:263.
+    (2, [
+        (261, 262, None),
+        (263, 266, 'قَوْلٌ مَّعْرُوْفٌ وَّمَغْفِرَةٌ خَيْرٌ مِّنْ صَدَقَةٍ يَّتْبَعُهَاۤ اَذًى ؕ ایس'),
+    ]),
+    # Section opening 2:280-283; the commentary on 2:280-282 runs up to this heading over 2:283.
+    (2, [
+        (280, 282, None),
+        (283, 283, 'رہن کی صورت استفادہ جائز '),
+    ]),
+    # Printed sections 3:1-4, 3:5-9 and 3:10-11, each its Arabic, translation and commentary; the commentary quotes each ayah at these places.
+    (3, [
+        (1, 4, None),
+        (5, 6, 'اِنَّ اللّٰهَ لَا يَخْفٰى عَلَيْهِ شَىْءٌ فِى الْاَرْضِ وَلَا فِى السَّمَآءِ ؕ﴿'),
+        (7, 7, 'هُوَ الَّذِىْۤ اَنْزَلَ عَلَيْكَ الْكِتٰبَ اے'),
+        (8, 9, 'نفرت کرنے لگتا ہے۔\n\n|دلوں کے ٹیڑھے پن کا علاج'),
+        (10, 10, ' حشر فرمائے۔ آمین!\n\n|اِنَّ الَّذِيْنَ كَفَرُوْ'),
+        (11, 11, 'یندھن بننا پڑے گا۔\n\n|تاریخ سے عبرت حاصل کرو'),
+    ]),
+    # Section opening 3:65-71 was cut in three, its commentary filed under 3:71-72; 3:72-74 opens a section of its own.
+    (3, [
+        (65, 67, None),
+        (68, 70, 'اِنَّ اَوْلَى النَّاسِ بِاِبْرٰهِيْمَ لَـلَّذِيْنَ اتَّ'),
+        (71, 71, 'ہ وہ خود گواہ ہیں۔\n\n|يٰۤـاَهْلَ الْكِتٰبِ لِمَ'),
+        (72, 74, 'وَقَالَتْ طَّآئِفَةٌ مِّن'),
+    ]),
+    # The commentary on 3:78 runs up to this heading over 3:79.
+    (3, [
+        (78, 78, None),
+        (79, 79, 'کسی نبی نے اپنی بندگی کی '),
+    ]),
+    # Section opening 3:83-91; the commentary on 3:83-86 runs up to this first quotation of 3:87.
+    (3, [
+        (83, 86, None),
+        (87, 87, 'دعوے دار بن بیٹھے۔\n\n|اُولٰٓٮِٕكَ جَزَآؤُهُمْ '),
+    ]),
+    # The commentary on 3:135 runs up to this first quotation of 3:136.
+    (3, [
+        (135, 135, None),
+        (136, 139, 'اُولٰٓٮِٕكَ جَزَآؤُهُمْ مَّغْفِرَةٌ مِّنْ رَّبِّهِمْ ا'),
+    ]),
+    # Printed heading 5:20-26; the commentary on 5:20-22 runs up to this first quotation of 5:23.
+    (5, [
+        (20, 22, None),
+        (23, 26, 'لئے قوت دے دیتا ہے۔ |قَالَ رَجُلٰنِ مِنَ الَّذ'),
+    ]),
+    # The commentary on 5:61-62 runs up to this quotation of 5:63.
+    (5, [
+        (60, 62, None),
+        (63, 63, 'لَوْلَا يَنْهٰٮهُمُ الرَّ'),
+    ]),
+    # Printed heading 5:116-120; the commentary on 5:116-119 runs up to this first quotation of 5:120.
+    (5, [
+        (116, 119, None),
+        (120, 120, 'یں پہنچ جایا جائے۔\n\n|لِلّٰهِ مُلْكُ السَّمٰوٰت'),
+    ]),
+    # Printed heading 9:25-29; the account of Hunayn on 9:25 runs on to this quotation of 9:26, and 9:26's to this quotation of 9:27. Both old cuts fell mid-sentence.
+    (9, [
+        (25, 25, None),
+        (26, 26, 'ثُمَّ اَنْزَلَ اللّٰهُ سَكِيْنَـتَهٗ عَلٰى رَسُوْلِهٖ ج'),
+        (27, 27, 'ثُمَّ يَتُوْبُ اللّٰهُ مِنْۢ بَعْدِ ذٰلِكَ عَلَى مَنْ يَّشَآءُ ا'),
+    ]),
+    # The commentary on 11:1 runs up to this first quotation of 11:2.
+    (11, [
+        (1, 1, None),
+        (2, 2, 'تو فرمایا یاد رکھو اللّٰه'),
+    ]),
+    # The rest of the section's translation and the commentary on 21:76 run up to this first quotation of 21:77.
+    (21, [
+        (75, 76, None),
+        (77, 77, 'فرمایا: وَنَصَرْنٰهُ مِنَ'),
+    ]),
+]
+
+
+def apply_section_corrections(rows: list[dict], report: dict | None = None) -> list[dict]:
+    """Re-cut the stretches in SECTION_CORRECTIONS. Rows must be Akram rows; the
+    order of the words is untouched and every other row is returned as it is."""
+    result = list(rows)
+    for surah, wanted in SECTION_CORRECTIONS:
+        first, last = wanted[0][0], wanted[-1][1]
+        where = f"section correction {surah}:{first}-{last}"
+        old = sorted((r for r in result if r["surahNumber"] == surah and first <= r["ayahStart"] <= last),
+                     key=lambda r: r["ayahStart"])
+        if not old or old[0]["ayahStart"] != first or old[-1]["ayahEnd"] != last:
+            raise SystemExit(f"{where}: the rows no longer span it")
+        for a, b in zip(old, old[1:]):
+            if a["ayahEnd"] + 1 != b["ayahStart"]:
+                raise SystemExit(f"{where}: its rows are not contiguous")
+        for a, b in zip(wanted, wanted[1:]):
+            if a[1] + 1 != b[0]:
+                raise SystemExit(f"{where}: the new rows are not contiguous")
+        joined = "\n\n".join(r["text"] for r in old)
+        cuts = [0]
+        for _, _, anchor in wanted[1:]:
+            before, bar, after = anchor.rpartition("|")
+            place = before + after
+            if joined.count(place) != 1:
+                raise SystemExit(f"{where}: {anchor!r} is found {joined.count(place)} times")
+            cuts.append(joined.index(place) + (len(before) if bar else 0))
+        if cuts != sorted(cuts):
+            raise SystemExit(f"{where}: the cuts are out of order")
+        parts = [joined[a:b].strip() for a, b in zip(cuts, cuts[1:] + [len(joined)])]
+        template = old[0]
+        new = [{**template, "ayahStart": a, "ayahEnd": b, "text": part}
+               for (a, b, _), part in zip(wanted, parts)]
+        if "".join("".join(p.split()) for p in parts) != "".join("".join(r["text"].split()) for r in old):
+            raise SystemExit(f"{where}: the words changed")
+        gone = {id(r) for r in old}
+        result = [r for r in result if id(r) not in gone] + new
+        if report is not None:
+            report["sectionCorrections"] = report.get("sectionCorrections", 0) + 1
+    result.sort(key=lambda r: (r["surahNumber"], r["ayahStart"]))
+    return result
+
+
 def build(seed: Path, report: dict):
     surahs = load(seed, "quran_surahs")
     counts = {s["id"]: s["ayahCount"] for s in surahs}
@@ -1412,6 +1554,8 @@ def build(seed: Path, report: dict):
                                                 (row["surahNumber"], row["ayahEnd"]), mushaf)
         report["quotationsMatchedByLetters"] += fixed
 
+    # Last, so a row's words do not depend on where it was re-cut.
+    rows = apply_section_corrections(rows, report)
     rows.sort(key=lambda r: (r["surahNumber"], r["ayahStart"]))
     keys = [(r["surahNumber"], r["ayahStart"]) for r in rows]
     if len(keys) != len(set(keys)):
@@ -1431,7 +1575,12 @@ def misfiled(rows: list[dict], mushaf: Mushaf) -> list[str]:
     """Rows whose commentary quotes three or more of the ayat just before
     their own: the sign of a section cut in the wrong place, the commentary
     on its earlier ayat filed under a later one (2:29 once held 2:21-28's).
-    Listed for a person to check; nothing is moved."""
+    Listed for a person to check; nothing is moved.
+
+    The ayat after the row are searched too. A section's opening quotes them,
+    and a formula closing one ("اِنَّ اللّٰهَ غَفُوْرٌ رَّحِيْمٌ") would otherwise be
+    counted against the earlier ayah that closes the same way. A cut that
+    separates only one or two earlier ayat is not caught by this count."""
     found = []
     for row in rows:
         surah, start, end, text = row["surahNumber"], row["ayahStart"], row["ayahEnd"], row["text"]
@@ -1439,7 +1588,7 @@ def misfiled(rows: list[dict], mushaf: Mushaf) -> list[str]:
         quotes += [text[s:e] for s, e in quranic_runs(text)]
         earlier = set()
         for quote in quotes:
-            hit = mushaf.best(quote, (surah, max(1, start - 30)), (surah, end))
+            hit = mushaf.best(quote, (surah, max(1, start - 30)), (surah, end + 40))
             if hit and hit[0][1] < start:
                 earlier.add(hit[0][1])
         if len(earlier) >= 3:
