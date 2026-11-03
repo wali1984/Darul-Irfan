@@ -43,7 +43,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from urdu_spoken import drop_digits, spoken  # noqa: E402
 
 V = Path("/mnt/sata1tb/di-voices")
-ROOT = V / "quran-higgs"
+# NARRATION_ROOT / VERIFY_DIR check another set (the November remake) without
+# touching the published set's results.
+ROOT = Path(os.environ.get("NARRATION_ROOT", str(V / "quran-higgs")))
+VERIFY_DIR = Path(os.environ.get("VERIFY_DIR", str(V)))
 INPUT = Path("/mnt/sata1tb/di-tts/tts_input.json")
 CORRECTIONS = V / "text_corrections.json"
 
@@ -188,7 +191,7 @@ def main() -> int:
     parser.add_argument("--rescore", action="store_true")
     parser.add_argument("names", nargs="*")
     args = parser.parse_args()
-    out = V / f"verify_{args.kind}.json"
+    out = VERIFY_DIR / f"verify_{args.kind}.json"
     results = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {}
     if args.rescore:
         texts = sources(args.kind)
