@@ -17,6 +17,7 @@ import {
 import { serveMedia } from "./media";
 import { quranAudioFile, quranAudioManifest } from "./audio";
 import { appReleases } from "./releases";
+import { transcript } from "./transcripts";
 import { currentWeather } from "./weather";
 import { nearbyMasjids } from "./nearbyMasjids";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
@@ -106,6 +107,10 @@ async function route(request: Request, env: Env): Promise<Response> {
   }
   if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/audio/quran/")) {
     return quranAudioFile(request, env, path.slice("/v1/audio/quran/".length));
+  }
+  // A bayan's timed transcript: public, read-only, held long at the edge.
+  if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/v1/transcripts/")) {
+    return transcript(request, env, path.slice("/v1/transcripts/".length));
   }
   // The newest app build out to testers, for the update banner on Today.
   if ((request.method === "GET" || request.method === "HEAD") && path === "/v1/app/releases") return appReleases(env);
@@ -327,7 +332,7 @@ export default {
       const response = await route(request, env);
       // Public, read-only feeds are intentionally available to web companions.
       // Administrative and device routes never receive browser CORS permission.
-      if (request.method === "GET" && (["/v1/live", "/v1/bootstrap", "/v1/feed", "/v1/audio/quran/manifest"].includes(new URL(request.url).pathname) || new URL(request.url).pathname.startsWith("/v1/audio/quran/") || new URL(request.url).pathname.startsWith("/v1/live/audio/"))) response.headers.set("access-control-allow-origin", "*");
+      if (request.method === "GET" && (["/v1/live", "/v1/bootstrap", "/v1/feed", "/v1/audio/quran/manifest"].includes(new URL(request.url).pathname) || new URL(request.url).pathname.startsWith("/v1/audio/quran/") || new URL(request.url).pathname.startsWith("/v1/transcripts/") || new URL(request.url).pathname.startsWith("/v1/live/audio/"))) response.headers.set("access-control-allow-origin", "*");
       return response;
     }
     catch (error) {

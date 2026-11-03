@@ -17,6 +17,7 @@ the device.
 | Content catalog | GET requests to the GitHub-hosted content manifest and its JSON payloads | Public catalog data is cached in SQLite; no personal data is sent. |
 | YouTube playback | The selected video ID and normal web request metadata go to YouTube through a non-persistent `WKWebView` | The app does not receive YouTube cookies or account data and does not extract/download YouTube streams. Users can instead open YouTube externally. |
 | Audio/PDF use | Requested public media/document URL | Files explicitly downloaded by the user stay in the app container. Owned direct audio streams use `AVPlayer`. |
+| Bayan transcripts | `GET /v1/transcripts/<mediaId>` for the bayan open in the player, with normal request metadata; no app identifier | Public text; each fetched transcript is kept in the app's cache and removed by Content & Storage › Clear Downloaded Content. |
 | Apple geocoding | City query or coordinates handled by `CLGeocoder` | Apple operating-system service. The app stores one city-level place, rounded to two decimal coordinates, not location history. |
 | Source links and directions | User-selected URL handed to Safari, YouTube, Facebook, Paltalk, Maps, Mail, or Phone | The destination application controls its own data under its privacy policy. |
 

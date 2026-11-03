@@ -42,6 +42,8 @@ Automatic YouTube live detection runs every five minutes. Facebook and other
 feed refreshes run every fifteen minutes. Selecting “manual override” in the
 live editor prevents the YouTube poller from replacing an urgent staff update.
 
+Bayan transcripts reach the apps by `Tools/Release/upload_transcripts.py` (run `--dry-run` first): it sends each valid `<mediaId>.json.gz` to R2 `transcripts/`, served read-only at `GET /v1/transcripts/<mediaId>` and held 30 days at the edge; a phone refreshes its kept copy after a week.
+
 ## Health and incident response
 
 Alert on Worker exceptions, five consecutive cron failures, YouTube quota or
