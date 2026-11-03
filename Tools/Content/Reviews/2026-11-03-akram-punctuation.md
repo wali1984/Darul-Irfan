@@ -235,3 +235,117 @@ before the 8:21 tail.
 | 96:6-7 | 30-part2:106 | unchanged: no mark in print | agrees |
 | 102:5-6 | 30-part2:165 | unchanged: no mark in print | - |
 | 112:1-3 | 30-part2:232 | unchanged: no mark in print | - |
+
+## Follow-up the same day: word errors fixed against the print
+
+The owner asked for the errors listed above to be fixed before the next release. The print is the
+authority. Qur'an Arabic follows the app's mushaf (`quran_ayahs.json`, read-only, not edited): where the
+row quoted an ayah, the corrected span is the mushaf text of those words, and only where the print shows
+the same words.
+
+**How each spot was checked**
+- **First reading (lead):** I read each spot by eye on scan crops rendered at 400-800 dpi.
+- **Second reading:** a fresh reviewer was given only the crops and the old and new text. They checked
+  every change by eye and checked every Qur'an span against `quran_ayahs.json` by script.
+- **Result:** all 18 changes were confirmed; none was disputed or marked unsure.
+- **One soft reading:** the vowel marks on دَعْوَانَا (change 3) are the standard vocalisation of the
+  printed letters. The second reader read the same marks, with only moderate confidence on the fatha over
+  the waw because the scan is soft.
+
+**Script diff:** 17 rows changed and every field other than `text` is the same. Every changed token is
+listed below. The table gives each change in context; the raw token diff follows at the end.
+
+| # | Row | Printed page (vol:PDF p.) | Old | New | Second reader |
+|---|---|---|---|---|---|
+| 1 | 2:130-141 | 1:317-318 | …aisiah.com ¶ www.oursheikh.com ¶  ¶ EMAIL: ameer@lhr.comsats.net.PK ¶ darulirfan@gmail.com | (removed) | confirm |
+| 2 | 7:56-56 | 8:306 | واپس آجاؤ، وہ بڑا کریم | واپس آجاؤ، وہ بڑا کریم ہے۔ | confirm |
+| 3 | 6:110-110 | 7:402 | وَاٰخِرُ دَعْوٰٮهُمْ اَنِ | وَاٰخِرُ دَعْوَانَا اَنِ | confirm |
+| 4 | 7:159-159 | 9:131 and 9:135 |  ¶  ¶ مِنْ قَوْمِ مُوْسٰٓى |  ¶  ¶ وَ مِنْ قَوْمِ مُوْسٰٓى | confirm |
+| 5 | 11:13-13 | 12:36 | یہ وحی والہی ہے | یہ وحیء الٰہی ہے | confirm |
+| 6 | 19:46-46 | 16:83 | سنگ کرنے کی دھمکی | سنگسار کرنے کی دھمکی | confirm |
+| 7 | 20:17-19 | 16:147 | قَالَ اَلْقِهَا يُمُوّنُوا بَارِي تَعَالَى نَى فَرَمَايَا، | قَالَ اَلْقِهَا يٰمُوْسٰى ﴿۱۹﴾ باری تعالیٰ نے فرمایا، | confirm |
+| 8 | 26:192-192 | 19:185 | جاتے ہیں ﴿۲۲۷﴾ ¶  ¶ فرمایا: | جاتے ہیں ﴿۲۲۷﴾ ¶  ¶ تفسیر ومعارف ¶  ¶ عظمتِ قرآن: ¶  ¶ فرمایا: | confirm |
+| 9 | 26:192-192 | 19:185 | یہ (قرآن) پر دردگارِ عالم | یہ (قرآن) پروردگارِ عالم | confirm |
+| 10 | 27:8-8 | 19:208 | سب کی تکہیانی کرنے والا | سب کی نگہبانی کرنے والا | confirm |
+| 11 | 27:9-9 | 19:208 | سوار شاد ہوا: | سو ارشاد ہوا: | confirm |
+| 12 | 34:9-9 | 22:112 | …ُّـؤْمِنُ بِالْاٰخِرَةِ مَنْ هُوَ مِنْهَا فِىْ شَاكٍ وَرَبُّكَ عَلٰی كُلِّ شَیْءٍ حَفِیْظٌ | …الْاٰخِرَةِ مِمَّنْ هُوَ مِنْهَا فِىْ شَكٍّ ؕ وَ رَبُّكَ عَلٰى كُلِّ شَىْءٍ حَفِيْظٌ  ﴿۲۱﴾ | confirm |
+| 13 | 34:10-10 | 22:114 | فرمایا: وَاَلَــنَّا لَـهُ الْحَرِيْدَ | ایجادات: ¶  ¶ فرمایا: وَاَلَــنَّا لَـهُ الْحَدِيْدَ ۙ ﴿۱۰﴾ | confirm |
+| 14 | 34:11-11 | 22:114 | اِنِّ الْحَمْلِ سٰبِغٰتٍ | اَنِ اعْمَلْ سٰبِغٰتٍ | confirm |
+| 15 | 35:34-34 | 22:219 | نیکیوں پر اجرا پنی شان | نیکیوں پر اجر اپنی شان | confirm |
+| 16 | 89:27-27 | 30-part1:198 | يَا يٰۤاَيَّتُهَا النَّفْسُ الْمُطْمَٮِٕنَّةُ ¶  ¶ از جعج الی | يٰۤاَيَّتُهَا النَّفْسُ الْمُطْمَٮِٕنَّةُ  ۖ ﴿۲۷﴾ ¶  ¶ ارْجِعِىْۤ اِلٰى | confirm |
+| 17 | 3:106-106 | 4:63 | تَكْفُرُوْنَ اب اپنے کفر | تَكْفُرُوْنَ ﴿۱۰۶﴾ اب اپنے کفر | confirm |
+| 18 | 7:8-8 | 8:183 | الْمُفْلِحُوْنَ وہ کامیاب | الْمُفْلِحُوْنَ ﴿۸﴾ وہ کامیاب | confirm |
+
+What the changes cover:
+- **2:130-141:** the back-cover contact text was removed.
+- **7:56:** "ہے۔" restored.
+- **Markers:** the printed ayah markers were added in 3:106, 7:8, 34:9 (۱۹ ۲۰ ۲۱), 34:10 and 89:27, in
+  the file's own form: a space, then ﴿n﴾ with Urdu digits.
+- **Headings:** "تفسیر ومعارف" and "عظمتِ قرآن:" (26:192) and "ایجادات:" (34:10) were restored, each
+  printed at that place in the row's text block. They are written as paragraphs of their own, as elsewhere
+  in the file.
+- **20:17-19:** only the garbled span was replaced: "يٰمُوْسٰى ﴿۱۹﴾ باری تعالیٰ نے فرمایا".
+- **Two further OCR errors on the same printed lines** were fixed as well, and the second reader confirmed
+  both: 27:9 "سوار شاد" → "سو ارشاد" (19:208), and 34:11 "اِنِّ الْحَمْلِ" → mushaf "اَنِ اعْمَلْ" (22:114).
+- **7:159:** the row quotes the ayah twice (9:131 and 9:135), and both quotations lacked the وَ. Both were
+  fixed.
+
+**Not changed:**
+- **29:63 "امین" (21:42):** at the scan's resolution I could not tell whether the print has آمین or امین.
+  The row keeps "امین" until someone checks the paper copy.
+
+**Noticed but left alone**, as structure rather than a word error: row 34:9 ends with the Arabic of 34:19
+(end) to 34:21, the tail of the 34:10-21 section's Arabic block. The start of that block (34:10 to the
+middle of 34:19, printed on 22:110) is not in that row. Segmentation should be looked at separately.
+
+Gates after the change: `check_content.py` PASS and `hadith_gate.py` PASS. The Android copy is
+byte-identical (`cmp`). The manifest stays at 56.
+
+
+Token diff against the previous commit (whitespace-split tokens; ¶ = paragraph break not shown):
+
+```
+## 2:130-141
+  delete: 'OUR CONTACT WEBSITES: www.owaisiah.com www.oursheikh.com EMAIL: ameer@lhr.comsats.net.PK darulirfan@gmail.com' -> ''
+## 3:106-106
+  insert: '' -> '﴿۱۰۶﴾'
+## 6:110-110
+  replace: 'دَعْوٰٮهُمْ' -> 'دَعْوَانَا'
+## 7:8-8
+  insert: '' -> '﴿۸﴾'
+## 7:56-56
+  insert: '' -> 'ہے۔'
+## 7:159-159
+  insert: '' -> 'وَ'
+  insert: '' -> 'وَ'
+## 11:13-13
+  replace: 'وحی والہی' -> 'وحیء الٰہی'
+## 19:46-46
+  replace: 'سنگ' -> 'سنگسار'
+## 20:17-19
+  replace: 'يُمُوّنُوا بَارِي تَعَالَى نَى فَرَمَايَا،' -> 'يٰمُوْسٰى\u200f ﴿۱۹﴾ باری تعالیٰ نے فرمایا،'
+## 26:192-192
+  insert: '' -> 'تفسیر ومعارف عظمتِ قرآن:'
+  replace: 'پر دردگارِ' -> 'پروردگارِ'
+## 27:8-8
+  replace: 'تکہیانی' -> 'نگہبانی'
+## 27:9-9
+  replace: 'سوار شاد' -> 'سو ارشاد'
+## 34:9-9
+  replace: 'اَحَادِیْثَ وَمَرْقَنٰہُمْ كُلٌّ مُحَرَّقٍ' -> 'اَحَادِيْثَ وَمَزَّقْنٰهُمْ كُلَّ مُمَزَّقٍ ؕ'
+  replace: 'ذٰلِكَ لَا یٰسِ لِّحْكِ صَبَّارٍ شَکُورٍ' -> 'ذٰ لِكَ لَاٰيٰتٍ لّـِكُلِّ صَبَّارٍ شَكُوْرٍ\u200f ﴿۱۹﴾'
+  insert: '' -> '﴿۲۰﴾'
+  replace: 'مَنْ' -> 'مِمَّنْ'
+  replace: 'شَاكٍ وَرَبُّكَ عَلٰی كُلِّ شَیْءٍ حَفِیْظٌ' -> 'شَكٍّ ؕ وَ رَبُّكَ عَلٰى كُلِّ شَىْءٍ حَفِيْظٌ\ue022\u200f \ufeff\ufeff ﴿۲۱﴾'
+## 34:10-10
+  insert: '' -> 'ایجادات:'
+  replace: 'الْحَرِيْدَ' -> 'الْحَدِيْدَ ۙ\u200f ﴿۱۰﴾'
+## 34:11-11
+  replace: 'اِنِّ الْحَمْلِ' -> 'اَنِ اعْمَلْ'
+## 35:34-34
+  replace: 'اجرا پنی' -> 'اجر اپنی'
+## 89:27-27
+  delete: 'يَا' -> ''
+  replace: 'از جعج الی' -> '\ue01c ۖ\u200f ﴿۲۷﴾ ارْجِعِىْۤ اِلٰى'
+rows changed 17
+```
