@@ -89,14 +89,6 @@ struct HadithBookView: View {
                             messageKey: "It will arrive with the next content update."
                         )
                     } else {
-                        Toggle(isOn: $showsArabic) {
-                            Text("Show Arabic")
-                                .diInterfaceFont(.subheadline)
-                                .foregroundStyle(DIColor.textPrimary)
-                        }
-                        .tint(DIColor.actionForeground)
-                        .padding(.horizontal, DISpacing.xs)
-
                         if isLoadingEarlier {
                             ProgressView()
                                 .frame(maxWidth: .infinity)
@@ -145,6 +137,25 @@ struct HadithBookView: View {
                 .scrollTargetLayout()
                 .padding(DISpacing.md)
                 .diResponsiveWidth()
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                // Pinned above the list (Android: under the search field): as
+                // the list's first row it sat just above the screen whenever
+                // the collection opened on a narration, and earlier pages
+                // loading in above kept it out of reach.
+                if !isLoading && !entries.isEmpty {
+                    Toggle(isOn: $showsArabic) {
+                        Text("Show Arabic")
+                            .diInterfaceFont(.subheadline)
+                            .foregroundStyle(DIColor.textPrimary)
+                    }
+                    .tint(DIColor.actionForeground)
+                    .padding(.horizontal, DISpacing.md + DISpacing.xs)
+                    .padding(.vertical, DISpacing.xs)
+                    .diResponsiveWidth()
+                    .frame(maxWidth: .infinity)
+                    .background(DIColor.background)
+                }
             }
             .scrollPosition(id: $topRowID, anchor: .top)
             .onChange(of: topRowID) { _, id in
