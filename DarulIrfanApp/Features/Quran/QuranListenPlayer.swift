@@ -44,6 +44,22 @@ struct ListenAyah: Hashable, Comparable, Sendable {
     }
 }
 
+/// Where a recitation part really starts and stops. The ayah timings put an
+/// ayah's end at the next ayah's first sound: measured against the recordings,
+/// stopping exactly there let the next voice through at 1,313 of 5,869 ayah ends
+/// and starting there clipped 688 ayah starts. A little earlier lands in the
+/// reciter's pause. Android: ListenPlan.clipStartMs / clipEndMs.
+enum QuranListenCut {
+    static let stopEarlyMs = 40
+    static let startEarlyMs = 40
+
+    static func startMs(fromMs: Int) -> Int { max(0, fromMs - startEarlyMs) }
+
+    static func stopMs(fromMs: Int, toMs: Int) -> Int {
+        toMs - fromMs > 2 * stopEarlyMs ? toMs - stopEarlyMs : toMs
+    }
+}
+
 enum QuranListenRange {
     /// Every ayah from `start` to the end of its ayah, ruku, surah or juz.
     static func ayahs(from start: ListenAyah, scope: QuranListenScope) -> [ListenAyah] {
@@ -164,6 +180,8 @@ final class QuranListenPlayer {
     /// Bumped each time a recitation part starts, so its end is handled once.
     @ObservationIgnored private var partToken = 0
     @ObservationIgnored private var afterPart: (() -> Void)?
+    /// The ayat of the part playing: its early start must not light the ayah before.
+    @ObservationIgnored private var partRange: ClosedRange<Int>?
 
     @ObservationIgnored private var reciter: AVPlayer?
     @ObservationIgnored private var reciterSurah: Int?
@@ -378,23 +396,28 @@ final class QuranListenPlayer {
         partToken += 1
         let token = partToken
         afterPart = then
+        partRange = first.ayah...last.ayah
         // The last ayah of a recording runs to its end; any other stops at its timing.
+        let stopMs = QuranListenCut.stopMs(fromMs: end.fromMs, toMs: end.toMs)
         if end.toMs < surahRecitation.durationMs - 300 {
             boundary = reciter.addBoundaryTimeObserver(
-                forTimes: [NSValue(time: CMTime(value: CMTimeValue(end.toMs), timescale: 1000))], queue: .main
+                forTimes: [NSValue(time: CMTime(value: CMTimeValue(stopMs), timescale: 1000))], queue: .main
             ) { [weak self] in Task { @MainActor in self?.endPart(token) } }
         }
         reciterEnd = NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime, object: reciter.currentItem, queue: .main
         ) { [weak self] _ in Task { @MainActor in self?.endPart(token) } }
         // The next ayah begins where the last one stopped (recitation with
-        // translation): play on from there rather than seek to it again.
+        // translation): play on from there rather than seek to it again, but
+        // only from before its first sound. A stop that ran late has passed
+        // it, and playing on would clip the ayah's start: go back instead.
+        let startMs = QuranListenCut.startMs(fromMs: start.fromMs)
         let here = reciter.currentTime().seconds
-        if here.isFinite, abs(Int(here * 1000) - start.fromMs) < 400 {
+        if here.isFinite, startMs - Int(here * 1000) >= 0, startMs - Int(here * 1000) < 400 {
             if isPlaying { reciter.play() }
             return
         }
-        reciter.seek(to: CMTime(value: CMTimeValue(start.fromMs), timescale: 1000), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+        reciter.seek(to: CMTime(value: CMTimeValue(startMs), timescale: 1000), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
             Task { @MainActor in
                 guard let self, self.session == mySession, self.isPlaying else { return }
                 self.reciter?.play()
@@ -426,7 +449,8 @@ final class QuranListenPlayer {
 
     private func follow(ms: Int) {
         guard part == .arabic, let recitation, let surah = reciterSurah else { return }
-        guard let verse = recitation.verses.first(where: { ms >= $0.fromMs && ms < $0.toMs }) else { return }
+        guard let verse = recitation.verses.first(where: { ms >= $0.fromMs && ms < $0.toMs }),
+              partRange?.contains(verse.ayah) != false else { return }
         let ref = ListenAyah(surah: surah, ayah: verse.ayah)
         if current != ref { current = ref }
         // Assigned only on change: this runs twenty times a second, and every
