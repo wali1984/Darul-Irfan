@@ -32,7 +32,8 @@ N = Path("/mnt/sata1tb/di-voices/nov-fixes")
 results = json.loads((N / "verify/verify_translation.json").read_text(encoding="utf-8"))
 keys = [k for k in Path(sys.argv[1]).read_text().split() if k]
 bad = [k for k in keys if results.get(k, {}).get("flag", True)]
-print("\n".join(bad))
+if bad:
+    print("\n".join(bad))
 PY
 }
 todo=$SLICE
