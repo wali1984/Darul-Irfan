@@ -10,7 +10,12 @@ struct BayansSection: View {
     let dependencies: AppDependencies
     @State private var presentedVideo: BayanVideo? = nil
 
-    private let tileColumns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// Two across at accessibility text sizes, where three would cut the names mid-word.
+    private var tileColumns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 10), count: typeSize.isAccessibilitySize ? 2 : 3)
+    }
 
     /// Categories with something in them. Most of the catalogue's are empty,
     /// and a tile saying "No items yet" looked broken.
