@@ -244,7 +244,7 @@ struct SilsilaCategoryDestination: View {
             guard items == nil else { return }
             loadFailed = false
             do {
-                items = try await library.silsilaItems(in: entry.category)
+                items = try await library.silsilaItems(in: entry.category, readsUrdu: appState.settings.language.contentLanguageCode == "ur")
             } catch is CancellationError {
                 return
             } catch {

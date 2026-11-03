@@ -183,11 +183,22 @@ final class LibraryViewModel {
     // MARK: - Item queries
 
     /// Silsila navigation must distinguish an unreadable catalogue from an empty category.
-    func silsilaItems(in category: ContentCategory) async throws -> [ContentItem] {
+    func silsilaItems(in category: ContentCategory, readsUrdu: Bool = false) async throws -> [ContentItem] {
         let fetched = try await contentRepository.items(
             category: category, type: nil, language: nil, limit: 500
         )
-        return Self.newestFirst(fetched)
+        return Self.newestFirst(Self.oneLanguagePerArticle(fetched, readsUrdu: readsUrdu))
+    }
+
+    /// A teaching article's Urdu translation is its own row, "<id>-ur". When
+    /// both rows are listed the reader sees the one in their language; a row
+    /// whose counterpart is not in the list always stays.
+    static func oneLanguagePerArticle(_ items: [ContentItem], readsUrdu: Bool) -> [ContentItem] {
+        let ids = Set(items.map(\.id))
+        return items.filter { item in
+            if item.id.hasSuffix("-ur"), ids.contains(String(item.id.dropLast(3))) { return readsUrdu }
+            return !(readsUrdu && ids.contains(item.id + "-ur"))
+        }
     }
 
     /// Items for one category with the active filters applied, newest first.

@@ -11,6 +11,7 @@ struct CategoryListView: View {
     /// The shelf's own name when it lists more than one category.
     var shelfTitle: String? = nil
 
+    @Environment(\.locale) private var locale
     @State private var items: [ContentItem] = []
     @State private var isLoading = true
     @State private var loadFailed = false
@@ -85,7 +86,7 @@ struct CategoryListView: View {
             do {
                 let loaded = try await viewModel.items(in: categories)
                 try Task.checkCancellation()
-                items = loaded
+                items = LibraryViewModel.oneLanguagePerArticle(loaded, readsUrdu: locale.language.languageCode?.identifier == "ur")
             } catch is CancellationError {
                 return
             } catch {

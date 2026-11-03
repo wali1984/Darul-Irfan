@@ -27,6 +27,7 @@ final class BookPageFormatterTests: XCTestCase {
         XCTAssertEqual(BookPageFormatter.articleParagraph(source, itemID: "unreviewed").blocks.count, 1)
         XCTAssertTrue(BookPageFormatter.reviewedArticleReferences(itemID: "what-is-tasawwuf", text: "(103:2-9) (1:1)").isEmpty)
         XCTAssertEqual(BookPageFormatter.reviewedArticleReferences(itemID: "what-is-tasawwuf", text: "(103:1–2) (103:1-2)").count, 1)
+        XCTAssertEqual(BookPageFormatter.reviewedArticleReferences(itemID: "what-is-tasawwuf-ur", text: "(103:1-2)").count, 1)
     }
 
     func testInlineHadithKeepsArabicSeparateFromUrduAndQuran() {

@@ -63,7 +63,8 @@ enum BookPageFormatter {
     static func reviewedArticleReferences(itemID: String?, text: String) -> [ArticleReference] {
         guard let regex = try? NSRegularExpression(pattern: #"\b(\d{1,3})\s*:\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?(?![\d:]|\s*[-–])"#) else { return [] }
         let reviewed: [ArticleReference]
-        switch itemID {
+        // An article's Urdu translation, "<id>-ur", cites the same verses.
+        switch itemID.map({ $0.hasSuffix("-ur") ? String($0.dropLast(3)) : $0 }) {
         case "what-is-tasawwuf":
             reviewed = [ArticleReference(surah: 2,start: 137,end: 137),
             ArticleReference(surah: 49,start: 3,end: 3), ArticleReference(surah: 8,start: 4,end: 4),
