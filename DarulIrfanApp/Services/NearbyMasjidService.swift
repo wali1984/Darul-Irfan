@@ -18,6 +18,12 @@ struct NearbyMasjid: Decodable, Identifiable, Sendable {
     }
 }
 
+/// The search service is off, so the card stays hidden rather than ending every
+/// tap in "unavailable". Turn this on when the server route is live.
+enum NearbyMasjidFeature {
+    static let isEnabled = false
+}
+
 enum NearbyMasjidError: Error, Equatable { case invalidLocation, unavailable, limitReached, invalidResponse }
 
 /// Results exist only in the requesting screen's memory. Calling this service

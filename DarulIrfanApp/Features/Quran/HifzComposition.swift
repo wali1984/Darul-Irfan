@@ -57,23 +57,32 @@ enum HifzComposition {
         }
         // AVFoundation excludes trailing empty segments from asset duration,
         // even when explicitly assigned to track.segments. Use actual silent
-        // PCM samples at the end so repeat timing survives in AVPlayer.
+        // PCM samples at the end so repeat timing survives in AVPlayer. They
+        // get their own track: the source is an MP3, never mixed with PCM.
         if let final = timeline.segments.last {
             let expectedEnd = CMTime(value: final.startMs + final.durationMs, timescale: 1000)
             let actualEnd = try await composition.load(.duration)
             if CMTimeCompare(actualEnd, expectedEnd) < 0 {
-                let missing = CMTimeSubtract(expectedEnd, actualEnd)
-                guard missing.seconds <= 5 else { throw Failure.invalidSourceDuration }
-                let silence = AVURLAsset(url: try silenceURL())
-                guard let silentTrack = try await silence.loadTracks(withMediaType: .audio).first else {
-                    throw Failure.unavailableAudio
-                }
+                let missing = CMTimeMinimum(CMTimeSubtract(expectedEnd, actualEnd), CMTime(value: 5, timescale: 1))
+                await appendSilentTail(to: composition, at: actualEnd, duration: missing)
                 try Task.checkCancellation()
-                track.removeTimeRange(CMTimeRange(start: actualEnd, duration: missing))
-                try track.insertTimeRange(CMTimeRange(start: .zero, duration: missing), of: silentTrack, at: actualEnd)
             }
         }
         return composition
+    }
+
+    /// Every word of the recitation is already in place, so a failure here only
+    /// ends the item slightly early. It must never cost the learner the verse.
+    private static func appendSilentTail(to composition: AVMutableComposition, at start: CMTime, duration: CMTime) async {
+        var tail: AVMutableCompositionTrack?
+        do {
+            let silence = AVURLAsset(url: try silenceURL())
+            guard let silentTrack = try await silence.loadTracks(withMediaType: .audio).first else { return }
+            tail = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid)
+            try tail?.insertTimeRange(CMTimeRange(start: .zero, duration: duration), of: silentTrack, at: start)
+        } catch {
+            if let tail { composition.removeTrack(tail) }
+        }
     }
 
     /// A small shared PCM file must outlive the composition reading it. Store

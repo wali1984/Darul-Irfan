@@ -151,8 +151,9 @@ final class StorageSettingsViewModel {
         do {
             let count = try await downloadsRepository.allAssets().count
             try Task.checkCancellation()
-            bytesUsed = bytes
-            assetCount = count
+            let practice = HifzAudioSource.cacheSummary()
+            bytesUsed = bytes + practice.bytes
+            assetCount = count + practice.files
             loadFailed = false
             hasLoaded = true
         } catch is CancellationError {
@@ -170,6 +171,9 @@ final class StorageSettingsViewModel {
         isClearing = true
         defer { isClearing = false }
         failedDeletions = 0
+        // Practice may be reading the file it kept; it cannot outlive that file.
+        HifzPlayer.active?.stop()
+        failedDeletions += HifzAudioSource.clearCache()
         do {
             let assets = try await downloadsRepository.allAssets()
             for asset in assets {

@@ -72,15 +72,35 @@ final class RecitationPracticeRecorder: NSObject, AVAudioRecorderDelegate, AVAud
         let request = ticket
         permission { [weak self] granted in
             guard let self, self.isCurrent(request) else { return }
-            guard !self.audioReserved(), allowedNow() else { self.phase = .idle; self.failure = .audio; return }
+            guard !self.audioReserved() else { self.phase = .idle; self.failure = .audio; return }
             guard granted else { self.phase = .idle; self.failure = .permission; return }
-            prepareAudio { [weak self] ready in
-                guard let self, self.isCurrent(request) else { return }
-                guard ready, !self.audioReserved(), allowedNow(), UIApplication.shared.applicationState == .active else {
-                    self.phase = .idle; self.failure = .audio; return
+            // The app can still be inactive while the permission prompt closes.
+            self.proceed(request, when: allowedNow) {
+                prepareAudio { [weak self] ready in
+                    guard let self, self.isCurrent(request) else { return }
+                    guard ready, !self.audioReserved() else { self.phase = .idle; self.failure = .audio; return }
+                    self.proceed(request, when: { allowedNow() && UIApplication.shared.applicationState == .active }) {
+                        guard !self.audioReserved() else { self.phase = .idle; self.failure = .audio; return }
+                        self.beginCapture(reference: reference)
+                    }
                 }
-                self.beginCapture(reference: reference)
             }
+        }
+    }
+
+    /// Continues at once when `condition` holds, otherwise waits up to two
+    /// seconds for it. A suspend or close meanwhile retires the request.
+    private func proceed(_ request: UUID, when condition: @escaping () -> Bool, then next: @escaping @MainActor () -> Void) {
+        if condition() { next(); return }
+        Task { @MainActor [weak self] in
+            for _ in 0..<20 {
+                try? await Task.sleep(nanoseconds: 100_000_000)
+                guard let self, self.isCurrent(request) else { return }
+                if condition() { next(); return }
+            }
+            guard let self, self.isCurrent(request) else { return }
+            self.phase = .idle
+            self.failure = .audio
         }
     }
 

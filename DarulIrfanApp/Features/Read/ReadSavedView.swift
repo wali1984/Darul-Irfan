@@ -40,7 +40,7 @@ struct ReadSavedView: View {
                         savedRow(
                             systemImage: "bookmark.fill",
                             title: "Bookmarks",
-                            detail: quran.bookmarksLoading ? Text("Loading...") :
+                            detail: quran.bookmarksLoading ? Text("Loading") :
                                 quran.bookmarksFailed ? Text("Your personal records could not be read. Please try again.") :
                                 Text("\(quran.bookmarks.count) ayahs"),
                             gold: false
@@ -56,7 +56,7 @@ struct ReadSavedView: View {
                         savedRow(
                             systemImage: "star.fill",
                             title: "Favorites",
-                            detail: library.favoritesLoading ? Text("Loading...") :
+                            detail: library.favoritesLoading ? Text("Loading") :
                                 library.favoritesFailed ? Text("Your personal records could not be read. Please try again.") :
                                 Text("\(library.favoritesCount) items"),
                             gold: true
@@ -73,7 +73,7 @@ struct ReadSavedView: View {
                             systemImage: "note.text",
                             title: "Private notes",
                             detail: notes.canRead ? Text("\(notes.document.notes.count) items") :
-                                Text(notes.loadFailed ? "Your personal records could not be read. Please try again." : "Loading..."),
+                                Text(notes.loadFailed ? "Your personal records could not be read. Please try again." : "Loading"),
                             gold: false
                         )
                     }

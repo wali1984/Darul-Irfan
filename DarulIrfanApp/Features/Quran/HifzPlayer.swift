@@ -45,6 +45,9 @@ final class HifzPlayer {
     private(set) var repetition = 1
     private(set) var playbackFailed = false
     private(set) var isPreparing = false
+    /// How much of the surah's recording has arrived, while it is downloading
+    /// and its size is known; otherwise nil.
+    private(set) var downloadProgress: Double?
 
     var isPlaying: Bool { phase == .reciting || phase == .pausing }
 
@@ -94,8 +97,7 @@ final class HifzPlayer {
                 repeats: repeats, pauseSeconds: pauseSeconds)
         } catch { failPlayback(); return }
 
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
-        try? AVAudioSession.sharedInstance().setActive(true)
+        try? claimAudioSession()
 
         // One recording at a time: the reader's recitation stops and the
         // bayan player pauses; a bayan started later ends the practice.
@@ -117,15 +119,34 @@ final class HifzPlayer {
         isPreparing = true
         preparationTask = Task { @MainActor [weak self, weak newPlayer] in
             guard let self, let newPlayer, let timeline = self.timeline else { return }
-            defer { if self.audioSessionID == sessionID { self.isPreparing = false } }
+            defer {
+                if self.audioSessionID == sessionID {
+                    self.isPreparing = false
+                    self.downloadProgress = nil
+                }
+            }
             do {
-                let local = try await HifzAudioSource.localURL(for: url)
+                let local = try await HifzAudioSource.localURL(for: url, onProgress: { [weak self] fraction in
+                    guard let self, self.audioSessionID == sessionID else { return }
+                    self.downloadProgress = fraction
+                })
+                self.downloadProgress = nil
                 try Task.checkCancellation()
                 let source = AVURLAsset(url: local, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
-                let composition = try await HifzComposition.make(asset: source, timeline: timeline)
+                let composition: AVMutableComposition
+                do {
+                    composition = try await HifzComposition.make(asset: source, timeline: timeline)
+                } catch is CancellationError {
+                    throw CancellationError()
+                } catch {
+                    // A kept copy that cannot be read would fail every Retry;
+                    // removing it makes the next attempt download a fresh one.
+                    if !Task.isCancelled, self.audioSessionID == sessionID { HifzAudioSource.discardCachedCopy(for: url) }
+                    throw error
+                }
                 guard !Task.isCancelled, self.audioSessionID == sessionID, self.player === newPlayer else { return }
                 newPlayer.replaceCurrentItem(with: AVPlayerItem(asset: composition))
-                self.installItemObservers(newPlayer)
+                self.installItemObservers(newPlayer, source: url)
                 if self.isPlaying, let ayah = self.currentAyah { self.recite(ayah: ayah) }
             } catch is CancellationError { return }
             catch {
@@ -159,11 +180,22 @@ final class HifzPlayer {
 
     func resume() {
         guard let ayah = currentAyah else { return }
-        do { try AVAudioSession.sharedInstance().setActive(true) }
+        do { try claimAudioSession() }
         catch { return }
         // Restart the verse rather than resuming mid-word: a half-verse is not
         // useful for memorising.
         recite(ayah: ayah)
+    }
+
+    /// Recording leaves the shared session in `.playAndRecord`, which plays on
+    /// the speaker rather than AirPods, so every start of the reference audio
+    /// sets the category again. The recorder goes first: play from Control
+    /// Center or a headset must not be captured into the learner's clip.
+    private func claimAudioSession() throws {
+        RecitationPracticeRecorder.yieldToHalqah()
+        let session = AVAudioSession.sharedInstance()
+        try session.setCategory(.playback, mode: .spokenAudio)
+        try session.setActive(true)
     }
 
     func stop() {
@@ -178,6 +210,7 @@ final class HifzPlayer {
         preparationTask?.cancel()
         preparationTask = nil
         isPreparing = false
+        downloadProgress = nil
         timeline = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver) }
         endObserver = nil
@@ -239,6 +272,7 @@ final class HifzPlayer {
         guard range.contains(ayah) else { return }
         currentAyah = ayah
         repetition = 1
+        try? claimAudioSession()
         recite(ayah: ayah)
     }
 
@@ -275,12 +309,14 @@ final class HifzPlayer {
         phase = segment.sourceStartMs == nil ? .pausing : .reciting
     }
 
-    private func installItemObservers(_ newPlayer: AVPlayer) {
+    private func installItemObservers(_ newPlayer: AVPlayer, source: URL) {
         if let item = newPlayer.currentItem {
             itemStatusObserver = item.observe(\.status, options: [.initial, .new]) { [weak self, weak newPlayer] item, _ in
                 guard item.status == .failed else { return }
                 Task { @MainActor in
                     guard let self, let newPlayer, self.player === newPlayer else { return }
+                    // Assembled from a local file, so the kept copy is at fault.
+                    HifzAudioSource.discardCachedCopy(for: source)
                     self.failPlayback()
                 }
             }

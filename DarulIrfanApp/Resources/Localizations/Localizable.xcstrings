@@ -14058,6 +14058,40 @@
         }
       }
     },
+    "City": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "City"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شہر"
+          }
+        }
+      }
+    },
+    "Country": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Country"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ملک"
+          }
+        }
+      }
+    },
     "Collections": {
       "extractionState": "manual",
       "localizations": {

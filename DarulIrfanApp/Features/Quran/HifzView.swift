@@ -118,7 +118,15 @@ struct HifzView: View {
                 ayahText
 
                 if player.isPreparing {
-                    ProgressView("Loading")
+                    if let progress = player.downloadProgress {
+                        ProgressView(value: progress) {
+                            Text("Downloading…").diInterfaceFont(.footnote)
+                        } currentValueLabel: {
+                            Text(verbatim: "\(Int(progress * 100))%").diInterfaceFont(.caption)
+                        }
+                    } else {
+                        ProgressView("Loading")
+                    }
                 }
                 if player.playbackFailed {
                     Text("Audio could not be loaded. Check your connection and tap Retry.")

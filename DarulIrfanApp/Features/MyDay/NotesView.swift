@@ -183,7 +183,7 @@ private struct MyDayReadStateModifier: ViewModifier {
                     VStack(spacing: DISpacing.sm) {
                         Text(store.recoveredFile ?
                              "An unreadable personal-data file was kept safely aside. New records can be saved on this phone." :
-                             store.loadFailed ? "Your personal records could not be read. Please try again." : "Loading...")
+                             store.loadFailed ? "Your personal records could not be read. Please try again." : "Loading")
                             .diInterfaceFont(.subheadline)
                             .foregroundStyle(DIColor.textMuted)
                         if store.loadFailed {

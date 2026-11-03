@@ -51,6 +51,27 @@ final class RecitationPracticeRecorderTests: XCTestCase {
     }
 
     @MainActor
+    func testPermissionWaitsBrieflyWhileThePromptIsClosing() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let recorder = try RecitationPracticeRecorder(cacheDirectory: root, audioReserved: { false })
+        defer { recorder.close() }
+        var allowed = true
+        var answer: (@MainActor (Bool) -> Void)?
+        var audioRequested = false
+        recorder.start(permission: { answer = $0 }, prepareAudio: { _ in audioRequested = true }, allowedNow: { allowed })
+        allowed = false
+        answer?(true)
+        XCTAssertEqual(recorder.phase, .preparing)
+        XCTAssertNil(recorder.failure)
+        XCTAssertFalse(audioRequested)
+        allowed = true
+        let deadline = Date().addingTimeInterval(2)
+        while !audioRequested && Date() < deadline { try await Task.sleep(nanoseconds: 20_000_000) }
+        XCTAssertTrue(audioRequested)
+    }
+
+    @MainActor
     func testLateAudioHandoffCannotReopenClosedRecorder() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

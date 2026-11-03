@@ -77,6 +77,49 @@ final class HifzAudioSourceTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: cache.path))
     }
 
+    func testDiscardedCopyIsDownloadedAgain() async throws {
+        let root = try directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let remote = try XCTUnwrap(URL(string: "https://example.invalid/surah.mp3"))
+        let temporary = root.appendingPathComponent("transfer")
+        var calls = 0
+        let fetch: (URL) async throws -> (URL, URLResponse) = { url in
+            calls += 1
+            try Data([UInt8(calls)]).write(to: temporary)
+            return (temporary, try self.response(url))
+        }
+        let cache = root.appendingPathComponent("cache")
+        _ = try await HifzAudioSource.localURL(for: remote, directory: cache, download: fetch)
+        HifzAudioSource.discardCachedCopy(for: remote, directory: cache)
+        let repaired = try await HifzAudioSource.localURL(for: remote, directory: cache, download: fetch)
+        XCTAssertEqual(calls, 2)
+        XCTAssertEqual(try Data(contentsOf: repaired), Data([2]))
+    }
+
+    func testDiscardNeverRemovesAudioKeptAtItsOwnAddress() throws {
+        let root = try directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let local = root.appendingPathComponent("audio.mp3")
+        try Data([1]).write(to: local)
+        HifzAudioSource.discardCachedCopy(for: local, directory: root)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: local.path))
+    }
+
+    func testStorageSummaryCountsAndClearRemovesKeptRecordings() throws {
+        let root = try directory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try Data([1, 2, 3]).write(to: root.appendingPathComponent("one.mp3"))
+        try Data([4]).write(to: root.appendingPathComponent("two.mp3"))
+        let summary = HifzAudioSource.cacheSummary(directory: root)
+        XCTAssertEqual(summary.bytes, 4)
+        XCTAssertEqual(summary.files, 2)
+        XCTAssertEqual(HifzAudioSource.clearCache(directory: root), 0)
+        XCTAssertEqual(HifzAudioSource.cacheSummary(directory: root).files, 0)
+        let missing = root.appendingPathComponent("never-created")
+        XCTAssertEqual(HifzAudioSource.clearCache(directory: missing), 0)
+        XCTAssertEqual(HifzAudioSource.cacheSummary(directory: missing).bytes, 0)
+    }
+
     func testLocalFixtureDoesNotDownload() async throws {
         let root = try directory()
         defer { try? FileManager.default.removeItem(at: root) }

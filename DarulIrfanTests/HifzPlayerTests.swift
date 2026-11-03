@@ -178,13 +178,67 @@ final class HifzPlayerTests: XCTestCase {
         XCTAssertEqual(duration.seconds, 3.2, accuracy: 0.001)
         let tracks = try await composition.loadTracks(withMediaType: .audio)
         let segments = try await XCTUnwrap(tracks.first).load(.segments)
-        let audio = segments.filter { !$0.isEmpty && ($0 as? AVCompositionTrackSegment)?.sourceURL == url }
+        let audio = segments.filter { !$0.isEmpty && ($0 as? AVCompositionTrackSegment)?.sourceURL?.standardizedFileURL == url.standardizedFileURL }
         XCTAssertEqual(audio.count, 2)
         XCTAssertTrue(audio.allSatisfy { $0.timeMapping.source.end.seconds <= 7 })
-        let tail = try XCTUnwrap(segments.last as? AVCompositionTrackSegment)
+        XCTAssertEqual(tracks.count, 2, "Silent PCM must not share the recitation's track")
+        let tailSegments = try await XCTUnwrap(tracks.last).load(.segments)
+        let tail = try XCTUnwrap(tailSegments.last as? AVCompositionTrackSegment)
         XCTAssertFalse(tail.isEmpty, "Final padding must contain silent media, not a discarded empty range")
-        XCTAssertNotEqual(tail.sourceURL, url)
+        XCTAssertNotEqual(tail.sourceURL?.standardizedFileURL, url.standardizedFileURL)
         XCTAssertEqual(tail.timeMapping.target.duration.seconds, 0.1, accuracy: 0.001)
+    }
+
+    func testCompositionPadsOverrunOfRealMP3Source() async throws {
+        // 7 seconds of silent MPEG-1 Layer III frames (128 kbps, 44.1 kHz),
+        // the format of the real recordings, built here rather than checked in.
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("hifz-\(UUID().uuidString).mp3")
+        defer { try? FileManager.default.removeItem(at: url) }
+        var frame = Data([0xFF, 0xFB, 0x90, 0x00])
+        frame.append(Data(count: 413))
+        var file = Data()
+        for _ in 0..<268 { file.append(frame) }
+        try file.write(to: url)
+        var recording = recitation
+        recording.audioUrl = url.absoluteString
+        recording.verses = [RecitationVerse(ayah: 1, fromMs: 6000, toMs: 7100, words: [])]
+        let plan = try HifzPlaybackTimeline(recitation: recording, range: 1...1, repeats: 2, pauseSeconds: 1)
+        let source = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
+        let composition = try await HifzComposition.make(asset: source, timeline: plan)
+        let duration = try await composition.load(.duration)
+        XCTAssertEqual(duration.seconds, 3.2, accuracy: 0.01)
+    }
+
+    func testResumeAndJumpRestorePlaybackSessionAfterRecording() throws {
+        let player = HifzPlayer()
+        defer { player.stop() }
+        let session = AVAudioSession.sharedInstance()
+        player.start(recitation: recitation, range: 1...7, repeats: 3, pauseSeconds: 1.5)
+        player.pause()
+        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+        player.resume()
+        XCTAssertEqual(session.category, .playback)
+        XCTAssertEqual(session.mode, .spokenAudio)
+        try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+        player.practise(ayah: 2)
+        XCTAssertEqual(session.category, .playback)
+        XCTAssertEqual(session.mode, .spokenAudio)
+    }
+
+    func testResumeRetiresRecorderBeforeReferenceAudioPlays() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let recorder = try RecitationPracticeRecorder(cacheDirectory: root, audioReserved: { false })
+        defer { recorder.close() }
+        let player = HifzPlayer()
+        defer { player.stop() }
+        player.start(recitation: recitation, range: 1...7, repeats: 3, pauseSeconds: 1.5)
+        player.pause()
+        recorder.start(permission: { _ in }, prepareAudio: { _ in }, allowedNow: { true })
+        XCTAssertEqual(recorder.phase, .preparing)
+        player.resume()
+        XCTAssertEqual(recorder.phase, .idle)
+        XCTAssertTrue(player.isPlaying)
     }
 
     func testCompositionRejectsTimingsBeyondActualFile() async throws {
