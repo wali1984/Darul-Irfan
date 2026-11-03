@@ -3313,11 +3313,50 @@ SECTION_CORRECTIONS = [
 ]
 
 
-def apply_section_corrections(rows: list[dict], report: dict | None = None) -> list[dict]:
+# Surahs 63, 64, 67, 79 and 81 keep rows made before the November 2026 re-cut
+# (restored from the earlier seed after a --write), so SECTION_CORRECTIONS never
+# reaches them. These cuts are applied to those restored rows by --recut-kept,
+# which must run after the restore. Same format and rules as above.
+KEPT_SURAH_CORRECTIONS = [
+    # The account of Ibn Ubayy and Zayd ibn Arqam, which 63:7-8 answer, opens with this paragraph; the old cut fell mid-sentence.
+    (63, [
+        (6, 6, None),
+        (7, 7, 'ابن ابی نے اسی پر بس نہیں کیا'),
+    ]),
+    # 64:4's commentary (He knows what you hide and what you show) opens with this paragraph; the old row began mid-sentence.
+    (64, [
+        (3, 3, None),
+        (4, 4, 'وہ ذات ایسی بارگاہ ہے'),
+    ]),
+    # The commentary on 64:10 opens with this paragraph on the Day of Mutual Loss.
+    (64, [
+        (9, 9, None),
+        (10, 18, 'اس جمع ہونے کے دن، اس سود'),
+    ]),
+    # Section 67:15-30 opens here with its translation (the OCR lost the heading); the old cut fell inside 67:15's translation.
+    (67, [
+        (1, 14, None),
+        (15, 15, 'گزار رہے ہو۔\n\n|وہی ہستی ہے جس نے تمہارے لیے زمین'),
+    ]),
+    # The commentary on 67:30 opens with this quotation of it.
+    (67, [
+        (28, 29, None),
+        (30, 30, 'فرمایا: قُلْ اَدَءَ'),
+    ]),
+    # The commentary on 79:45 opens with this quotation of it.
+    (79, [
+        (27, 44, None),
+        (45, 46, 'بتا دیا۔ |فرمایا: اِنَّمَاۤ اَنْتَ مُنْذِرُ'),
+    ]),
+]
+
+
+def apply_section_corrections(rows: list[dict], report: dict | None = None,
+                              table: list | None = None) -> list[dict]:
     """Re-cut the stretches in SECTION_CORRECTIONS. Rows must be Akram rows; the
     order of the words is untouched and every other row is returned as it is."""
     result = list(rows)
-    for surah, wanted in SECTION_CORRECTIONS:
+    for surah, wanted in (SECTION_CORRECTIONS if table is None else table):
         first, last = wanted[0][0], wanted[-1][1]
         where = f"section correction {surah}:{first}-{last}"
         old = sorted((r for r in result if r["surahNumber"] == surah and first <= r["ayahStart"] <= last),
@@ -3477,6 +3516,9 @@ def main() -> int:
     parser.add_argument("--targets", default="ios,android,harmony,web",
                         help="comma-separated seed folders to write: ios, android, harmony, web")
     parser.add_argument("--report", help="also save the full build report as JSON here")
+    parser.add_argument("--recut-kept", action="store_true",
+                        help="only apply KEPT_SURAH_CORRECTIONS to the Akram rows already in the iOS seed (run after "
+                             "the older rows of surahs 63, 64, 67, 79 and 81 are restored); with --write, write --targets")
     parser.add_argument("--requote", action="store_true",
                         help="only give the Akram rows already in the iOS seed the mushaf's words where their letters "
                              "are exactly the mushaf's (correct_by_letters), without cutting them again")
@@ -3484,6 +3526,21 @@ def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
 
     primary = SEED_DIRS[0]
+    if args.recut_kept:
+        tafsir = load(primary, "quran_tafsir")
+        akram = [r for r in tafsir if r["editionID"] == EDITION]
+        if akram != tafsir[:len(akram)]:
+            raise SystemExit("the Akram rows are not first in quran_tafsir.json")
+        tafsir = apply_section_corrections(akram, table=KEPT_SURAH_CORRECTIONS) + tafsir[len(akram):]
+        print(f"kept-surah cuts applied: {len(KEPT_SURAH_CORRECTIONS)}")
+        if args.write:
+            for target in args.targets.split(","):
+                path = SEED_DIRS[TARGETS[target.strip()]] / "quran_tafsir.json"
+                with path.open("w", encoding="utf-8", newline="\n") as handle:
+                    json.dump(tafsir, handle, ensure_ascii=False, indent=1)
+                    handle.write("\n")
+                print(f"wrote {path}")
+        return 0
     if args.requote:
         mushaf = Mushaf(load(primary, "quran_ayahs"))
         tafsir = load(primary, "quran_tafsir")
