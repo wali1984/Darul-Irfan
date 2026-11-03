@@ -65,6 +65,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from akram_markers import renumber_markers  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1].parent
 SEED_DIRS = [
     ROOT / "DarulIrfanApp" / "Resources" / "SeedData",
@@ -3402,7 +3405,8 @@ def build(seed: Path, report: dict):
             if name:
                 names[norm_name(name)] = surah["id"]
     names.update({norm_name(k): v for k, v in NAME_ALIASES.items()})
-    mushaf = Mushaf(load(seed, "quran_ayahs"))
+    mushaf_ayahs = load(seed, "quran_ayahs")
+    mushaf = Mushaf(mushaf_ayahs)
     translations = {(r["surahNumber"], r["ayahNumber"]): r["text"]
                     for r in load(seed, "quran_translations") if r["editionID"] == TRANSLATION_EDITION}
 
@@ -3470,6 +3474,9 @@ def build(seed: Path, report: dict):
 
     # Last, so a row's words do not depend on where it was re-cut.
     rows = apply_section_corrections(rows, report)
+    # Marker digits the OCR misread, once each row has its final range.
+    rows, markers = renumber_markers(rows, mushaf_ayahs)
+    report["markersRenumberedToMushaf"] = markers["markersRenumberedToMushaf"]
     rows.sort(key=lambda r: (r["surahNumber"], r["ayahStart"]))
     keys = [(r["surahNumber"], r["ayahStart"]) for r in rows]
     if len(keys) != len(set(keys)):
@@ -3522,6 +3529,9 @@ def main() -> int:
     parser.add_argument("--requote", action="store_true",
                         help="only give the Akram rows already in the iOS seed the mushaf's words where their letters "
                              "are exactly the mushaf's (correct_by_letters), without cutting them again")
+    parser.add_argument("--renumber-markers", action="store_true",
+                        help="only renumber the ayah-end markers of the Akram rows already in the iOS seed to the "
+                             "mushaf (akram_markers.py), without cutting them again; with --write, write --targets")
     args = parser.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -3533,6 +3543,19 @@ def main() -> int:
             raise SystemExit("the Akram rows are not first in quran_tafsir.json")
         tafsir = apply_section_corrections(akram, table=KEPT_SURAH_CORRECTIONS) + tafsir[len(akram):]
         print(f"kept-surah cuts applied: {len(KEPT_SURAH_CORRECTIONS)}")
+        if args.write:
+            for target in args.targets.split(","):
+                path = SEED_DIRS[TARGETS[target.strip()]] / "quran_tafsir.json"
+                with path.open("w", encoding="utf-8", newline="\n") as handle:
+                    json.dump(tafsir, handle, ensure_ascii=False, indent=1)
+                    handle.write("\n")
+                print(f"wrote {path}")
+        return 0
+    if args.renumber_markers:
+        tafsir, markers = renumber_markers(load(primary, "quran_tafsir"), load(primary, "quran_ayahs"))
+        print(json.dumps({k: v for k, v in markers.items() if k != "rows"}, ensure_ascii=False))
+        for entry in markers["rows"]:
+            print(f"  {entry['row']}: {', '.join(entry['markers'])}")
         if args.write:
             for target in args.targets.split(","):
                 path = SEED_DIRS[TARGETS[target.strip()]] / "quran_tafsir.json"
