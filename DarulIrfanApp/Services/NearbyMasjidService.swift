@@ -18,10 +18,10 @@ struct NearbyMasjid: Decodable, Identifiable, Sendable {
     }
 }
 
-/// The search service is off, so the card stays hidden rather than ending every
-/// tap in "unavailable". Turn this on when the server route is live.
+/// On since 3 Nov 2026, when the server route went live. Google caps searches
+/// at 32 a day and the server at 1,000 a month, inside the free tier.
 enum NearbyMasjidFeature {
-    static let isEnabled = false
+    static let isEnabled = true
 }
 
 enum NearbyMasjidError: Error, Equatable { case invalidLocation, unavailable, limitReached, invalidResponse }

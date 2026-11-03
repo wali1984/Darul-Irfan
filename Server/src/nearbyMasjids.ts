@@ -66,7 +66,7 @@ export async function nearbyMasjids(request: Request, env: Env,
       headers: { "Content-Type": "application/json", "X-Goog-Api-Key": env.PLACES_API_KEY,
         "X-Goog-FieldMask": fields },
       body: JSON.stringify({ includedTypes: ["mosque"], maxResultCount: 20,
-        rankPreference: "DISTANCE", languageCode: url.searchParams.get("lang") === "ur" ? "ur" : "en",
+        rankPreference: "POPULARITY", languageCode: url.searchParams.get("lang") === "ur" ? "ur" : "en",
         locationRestriction: { circle: { center, radius: 10_000 } } }),
     });
     if (!upstream.ok) { await upstream.body?.cancel(); return unavailable(); }
@@ -92,6 +92,21 @@ export async function nearbyMasjids(request: Request, env: Env,
     });
     if ((places.length && !items.length) || new Set(items.map(item => item.id)).size !== items.length)
       return unavailable();
-    return response({ items, radiusMeters: 10_000, attribution: "Google Maps" });
+    return response({ items: placed(items, center), radiusMeters: 10_000, attribution: "Google Maps" });
   } catch { return unavailable(); }
+}
+
+/** Google pins places it has no exact spot for to the area's centre, many to
+ * one point (19 of Lahore's nearest 20 were there), so a point shared by three
+ * or more results is that placeholder, not a masjid's location. Those are
+ * dropped; the rest come nearest first. */
+function placed<T extends { latitude: number; longitude: number }>(items: T[],
+  center: { latitude: number; longitude: number }): T[] {
+  const spot = (item: T) => `${item.latitude.toFixed(4)},${item.longitude.toFixed(4)}`;
+  const counts = new Map<string, number>();
+  for (const item of items) counts.set(spot(item), (counts.get(spot(item)) ?? 0) + 1);
+  const scale = Math.cos(center.latitude * Math.PI / 180);
+  const distance = (item: T) =>
+    (item.latitude - center.latitude) ** 2 + ((item.longitude - center.longitude) * scale) ** 2;
+  return items.filter(item => counts.get(spot(item))! < 3).sort((a, b) => distance(a) - distance(b));
 }
