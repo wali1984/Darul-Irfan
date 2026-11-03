@@ -114,6 +114,8 @@ struct PlayerSheetView: View {
     @State private var viewModel: PlayerSheetViewModel
     @State private var isScrubbing = false
     @State private var scrubPosition: Double = 0
+    @State private var transcript = BayanTranscriptModel()
+    @State private var pane: PlayerPane = .audio
     @Environment(\.dismiss) private var dismiss
 
     init(
@@ -147,7 +149,20 @@ struct PlayerSheetView: View {
                         } else if audioPlayer.isBuffering {
                             ProgressView("Buffering…").padding()
                         }
-                        playerContent
+                        if showsTranscriptSwitch {
+                            DISegmentedControl(
+                                items: PlayerPane.allCases,
+                                title: { LocalizedStringKey($0.rawValue) },
+                                selection: $pane
+                            )
+                            .padding(.horizontal, DISpacing.md)
+                            .padding(.top, DISpacing.sm)
+                        }
+                        if pane == .transcript && showsTranscriptSwitch {
+                            transcriptPane
+                        } else {
+                            playerContent
+                        }
                     }
                 }
             }
@@ -164,6 +179,13 @@ struct PlayerSheetView: View {
         }
         .task(id: audioPlayer.nowPlaying?.mediaItemID) {
             await viewModel.refreshBookmarks()
+        }
+        .task(id: audioPlayer.nowPlaying?.mediaItemID) {
+            await transcript.load(mediaItemID: audioPlayer.nowPlaying?.mediaItemID)
+        }
+        .onChange(of: transcript.state) { _, state in
+            // A bayan without a transcript has no switch: back to the player.
+            if state == .unavailable || state == .idle { pane = .audio }
         }
         .alert(
             "Add Bookmark",
@@ -212,6 +234,39 @@ struct PlayerSheetView: View {
 
     private var heroGradient: LinearGradient {
         isLiveStream ? MediaStyle.crimson : DIGradient.emerald
+    }
+
+    // MARK: Transcript
+
+    /// The switch shows once the bayan has a transcript, and stays while the
+    /// next bayan's loads or fails on the Transcript pane.
+    private var showsTranscriptSwitch: Bool {
+        if transcript.transcript != nil { return true }
+        return pane == .transcript && (transcript.state == .loading || transcript.state == .failed)
+    }
+
+    /// The title, position and transport above the transcript's lines.
+    private var transcriptPane: some View {
+        VStack(spacing: DISpacing.sm) {
+            VStack(spacing: DISpacing.sm) {
+                Text(audioPlayer.nowPlaying?.title ?? "")
+                    .diInterfaceFont(.headline, weight: .semibold, design: .serif)
+                    .foregroundStyle(DIColor.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                if let subtitle = audioPlayer.nowPlaying?.subtitle {
+                    Text(subtitle)
+                        .diInterfaceFont(.caption)
+                        .foregroundStyle(DIColor.textMuted)
+                        .lineLimit(1)
+                }
+                seekSection
+                transportControls
+            }
+            .padding(.horizontal, DISpacing.md)
+            .padding(.top, DISpacing.sm)
+            BayanTranscriptView(model: transcript, audioPlayer: audioPlayer, onOpenQuran: { dismiss() })
+        }
     }
 
     // MARK: Content

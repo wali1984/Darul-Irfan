@@ -152,8 +152,9 @@ final class StorageSettingsViewModel {
             let count = try await downloadsRepository.allAssets().count
             try Task.checkCancellation()
             let practice = HifzAudioSource.cacheSummary()
-            bytesUsed = bytes + practice.bytes
-            assetCount = count + practice.files
+            let transcripts = BayanTranscriptStore.cacheSummary()
+            bytesUsed = bytes + practice.bytes + transcripts.bytes
+            assetCount = count + practice.files + transcripts.files
             loadFailed = false
             hasLoaded = true
         } catch is CancellationError {
@@ -174,6 +175,8 @@ final class StorageSettingsViewModel {
         // Practice may be reading the file it kept; it cannot outlive that file.
         HifzPlayer.active?.stop()
         failedDeletions += HifzAudioSource.clearCache()
+        // Bayan transcripts kept for offline reading are fetched again when opened.
+        failedDeletions += BayanTranscriptStore.clearCache()
         do {
             let assets = try await downloadsRepository.allAssets()
             for asset in assets {
