@@ -222,7 +222,13 @@ enum ZikrTimeLine {
             let day = start.formatted(Date.FormatStyle(locale: locale, timeZone: timeZone).weekday(.abbreviated))
             let clock = start.formatted(Date.FormatStyle(locale: locale, timeZone: timeZone).hour().minute())
             let zone = ZikrScheduleMath.zoneName(timeZone, at: start, locale: locale)
-            local = "\(day) \u{2066}\(clock) \(zone)\u{2069}"
+            // An abbreviation ("EST") reads with the clock; an Urdu zone name
+            // follows it as Urdu, outside the left-to-right run.
+            if zone.unicodeScalars.contains(where: { (0x0600...0x06FF).contains($0.value) }) {
+                local = "\(day) \u{2066}\(clock)\u{2069} \(zone)"
+            } else {
+                local = "\(day) \u{2066}\(clock) \(zone)\u{2069}"
+            }
         } else {
             local = formattedLocal
         }
