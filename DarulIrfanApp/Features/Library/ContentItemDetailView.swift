@@ -846,7 +846,7 @@ struct LibraryDownloadRow: View {
                 .foregroundStyle(DIColor.textMuted)
         case .downloaded(let asset, _):
             if asset.byteSize > 0 {
-                Text(verbatim: asset.byteSize.formatted(.byteCount(style: .file)))
+                Text(verbatim: StorageSize.format(Int64(asset.byteSize)))
                     .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
             } else {
@@ -993,7 +993,7 @@ struct BookKeepOfflineRow: View {
                 .foregroundStyle(DIColor.textMuted)
         case .downloaded(let asset, _):
             if asset.byteSize > 0 {
-                Text(verbatim: asset.byteSize.formatted(.byteCount(style: .file)))
+                Text(verbatim: StorageSize.format(Int64(asset.byteSize)))
                     .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
             } else {

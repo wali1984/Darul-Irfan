@@ -89,8 +89,29 @@ enum ZikrScheduleMath {
     /// Toronto or Houston knows the time is theirs: "Mon 10:05 AM EDT".
     static func localTimeText(_ date: Date, timeZone: TimeZone = .current, locale: Locale = .current) -> String {
         let time = date.formatted(Date.FormatStyle(locale: locale, timeZone: timeZone).weekday(.abbreviated).hour().minute())
-        let style: NSTimeZone.NameStyle = timeZone.isDaylightSavingTime(for: date) ? .shortDaylightSaving : .shortStandard
-        return "\(time) \(timeZone.localizedName(for: style, locale: locale) ?? timeZone.identifier)"
+        return "\(time) \(zoneName(timeZone, at: date, locale: locale))"
+    }
+
+    /// The zone's name at `date`, daylight or standard, the same way in both
+    /// languages (Android ZikrScheduleMath.shortZoneName): the locale's
+    /// abbreviation where it has one ("EDT"), else its own name for the zone
+    /// ("Pakistan Standard Time", or the Urdu name); the GMT form only when
+    /// there is neither. Urdu has almost no abbreviations, so it read
+    /// "GMT -4" where English read "EDT".
+    static func zoneName(_ timeZone: TimeZone, at date: Date, locale: Locale) -> String {
+        let daylight = timeZone.isDaylightSavingTime(for: date)
+        let short = timeZone.localizedName(for: daylight ? .shortDaylightSaving : .shortStandard, locale: locale) ?? timeZone.identifier
+        guard isGMTForm(short) else { return short }
+        guard let long = timeZone.localizedName(for: daylight ? .daylightSaving : .standard, locale: locale),
+              !isGMTForm(long) else { return short }
+        return long
+    }
+
+    /// "GMT", "UTC", "GMT+5", "GMT -4", "GMT+05:30": an offset, not a name.
+    static func isGMTForm(_ name: String) -> Bool {
+        let marks: Set<Character> = ["\u{200E}", "\u{200F}", "\u{2066}", "\u{2067}", "\u{2068}", "\u{2069}", "\u{061C}"]
+        let bare = String(name.filter { !marks.contains($0) }).trimmingCharacters(in: .whitespaces)
+        return bare.range(of: "^(GMT|UTC)(\\s*[+\\-\u{2212}]\\s*\\d{1,2}(:?\\d{2})?)?$", options: .regularExpression) != nil
     }
 
     /// The announced start time formatted in the session's own timezone,

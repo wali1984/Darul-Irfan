@@ -84,7 +84,7 @@ final class LocationService: NSObject, LocationServicing, CLLocationManagerDeleg
 
         let geocoder = CLGeocoder()
         do {
-            let placemarks = try await geocoder.geocodeAddressString(trimmed)
+            let placemarks = try await geocoder.geocodeAddressString(trimmed, in: nil, preferredLocale: Self.placeNameLocale)
             return placemarks.compactMap { placemark -> PlaceCoordinate? in
                 // A city's times are shown on its own clock; without its time
                 // zone they would be shown on this phone's, which is wrong for
@@ -170,7 +170,7 @@ final class LocationService: NSObject, LocationServicing, CLLocationManagerDeleg
         var countryCode: String?
 
         let geocoder = CLGeocoder()
-        if let placemarks = try? await geocoder.reverseGeocodeLocation(location),
+        if let placemarks = try? await geocoder.reverseGeocodeLocation(location, preferredLocale: Self.placeNameLocale),
            let placemark = placemarks.first {
             name = displayName(for: placemark, coordinate: coordinate)
             if let placemarkTimeZone = placemark.timeZone {
@@ -186,6 +186,14 @@ final class LocationService: NSObject, LocationServicing, CLLocationManagerDeleg
             timeZoneIdentifier: timeZoneIdentifier,
             countryCode: countryCode
         )
+    }
+
+    /// Places are named in the app's language, not the phone's, so a city
+    /// found while reading in Urdu is saved as لاہور (Android's geocoder is
+    /// built with the app's locale too). A place saved in the other language
+    /// keeps its name.
+    private static var placeNameLocale: Locale {
+        Locale(identifier: LanguageManager.current.contentLanguageCode)
     }
 
     private func displayName(for placemark: CLPlacemark, coordinate: CLLocationCoordinate2D) -> String {

@@ -125,14 +125,14 @@ struct SettingsList: View {
         Menu {
             Picker("Language", selection: languageBinding) {
                 ForEach(AppLanguage.allCases) { language in
-                    Text(LocalizedStringKey(language.displayName)).tag(language)
+                    language.menuLabel.tag(language)
                 }
             }
         } label: {
             HalqahListRowLabel(
                 titleKey: LocalizedStringKey(SettingsEntry.language.title),
                 systemImage: SettingsEntry.language.systemImage,
-                value: Text(LocalizedStringKey(appState.settings.language.displayName)),
+                value: appState.settings.language.menuLabel,
                 chevronSymbol: "chevron.up.chevron.down"
             )
         }
@@ -224,5 +224,15 @@ struct SettingsHomeView: View {
         .tint(DIColor.actionForeground)
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
         .navigationTitle("Settings")
+    }
+}
+
+extension AppLanguage {
+    /// The name in every language menu: each language in its own script
+    /// ("English", "اردو") whatever the interface language, so a reader can
+    /// always find their own. Only "System" is translated. Android:
+    /// languageTitle in AppearanceSettings.kt.
+    var menuLabel: Text {
+        self == .system ? Text(LocalizedStringKey(displayName)) : Text(verbatim: displayName)
     }
 }

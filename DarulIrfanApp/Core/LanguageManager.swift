@@ -22,6 +22,9 @@ final class LanguageBundle: Bundle, @unchecked Sendable {
 enum LanguageManager {
     /// The `.lproj` bundle for the forced language, or nil to follow the system.
     static private(set) var overrideBundle: Bundle?
+    /// The language last applied, for system services that take a locale of
+    /// their own (the geocoder names places in it).
+    static private(set) var current: AppLanguage = .system
     private static var installed = false
 
     /// Apply the chosen app language. Safe to call repeatedly (at launch and
@@ -31,6 +34,7 @@ enum LanguageManager {
             object_setClass(Bundle.main, LanguageBundle.self)
             installed = true
         }
+        current = language
         if let code = language.forcedLocaleIdentifier,
            let path = Bundle.main.path(forResource: code, ofType: "lproj"),
            let bundle = Bundle(path: path) {

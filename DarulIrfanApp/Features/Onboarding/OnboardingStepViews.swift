@@ -236,7 +236,7 @@ struct OnboardingLanguageStep: View {
                 ForEach(Array(AppLanguage.allCases.enumerated()), id: \.element.id) { index, language in
                     OnboardingChoiceCard(
                         isSelected: viewModel.selectedLanguage == language,
-                        title: Text(LocalizedStringKey(language.displayName)),
+                        title: language.menuLabel,
                         subtitle: subtitle(for: language),
                         leading: { languageBadge(language) },
                         action: { Task { await viewModel.selectLanguage(language) } }

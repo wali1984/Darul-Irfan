@@ -221,8 +221,7 @@ enum ZikrTimeLine {
         if locale.language.languageCode?.identifier == "ur" {
             let day = start.formatted(Date.FormatStyle(locale: locale, timeZone: timeZone).weekday(.abbreviated))
             let clock = start.formatted(Date.FormatStyle(locale: locale, timeZone: timeZone).hour().minute())
-            let style: NSTimeZone.NameStyle = timeZone.isDaylightSavingTime(for: start) ? .shortDaylightSaving : .shortStandard
-            let zone = timeZone.localizedName(for: style, locale: locale) ?? timeZone.identifier
+            let zone = ZikrScheduleMath.zoneName(timeZone, at: start, locale: locale)
             local = "\(day) \u{2066}\(clock) \(zone)\u{2069}"
         } else {
             local = formattedLocal

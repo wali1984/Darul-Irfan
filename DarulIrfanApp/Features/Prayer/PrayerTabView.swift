@@ -65,7 +65,7 @@ struct PrayerTabView: View {
                     Menu {
                         Picker("Language", selection: languageBinding) {
                             ForEach(AppLanguage.allCases) { language in
-                                Text(LocalizedStringKey(language.displayName)).tag(language)
+                                language.menuLabel.tag(language)
                             }
                         }
                     } label: {

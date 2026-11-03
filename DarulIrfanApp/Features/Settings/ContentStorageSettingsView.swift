@@ -54,7 +54,7 @@ struct ContentStorageSettingsView: View {
                 if viewModel.loadFailed {
                     Text(verbatim: "--").foregroundStyle(DIColor.textMuted)
                 } else if viewModel.hasLoaded {
-                    Text(viewModel.bytesUsed, format: .byteCount(style: .file))
+                    Text(verbatim: StorageSize.format(Int64(viewModel.bytesUsed)))
                         .font(.body.monospacedDigit())
                         .foregroundStyle(DIColor.textMuted)
                 } else {
@@ -191,5 +191,29 @@ final class StorageSettingsViewModel {
             failedDeletions += 1
         }
         await load()
+    }
+}
+
+/// A size on disk the same way in both languages and on both platforms
+/// (Android StorageSize): B, KB, MB or GB with Western digits, as Urdu writes
+/// these units too, rather than whatever the system's Urdu formatter gives.
+/// Whole kilobytes, megabytes to one place, gigabytes to two, in steps of
+/// 1,000 like ByteCountFormatter's file style.
+enum StorageSize {
+    static func format(_ bytes: Int64) -> String {
+        let count = max(bytes, 0)
+        let (value, unit, places): (Double, String, Int) = switch count {
+        case ..<1_000: (Double(count), "B", 0)
+        case ..<1_000_000: (Double(count) / 1_000, "KB", 0)
+        case ..<1_000_000_000: (Double(count) / 1_000_000, "MB", 1)
+        default: (Double(count) / 1_000_000_000, "GB", 2)
+        }
+        let number = NumberFormatter()
+        number.locale = Locale(identifier: "en_US_POSIX")
+        number.numberStyle = .decimal
+        number.usesGroupingSeparator = true
+        number.minimumFractionDigits = 0
+        number.maximumFractionDigits = places
+        return "\(number.string(from: NSNumber(value: value)) ?? String(Int(value))) \(unit)"
     }
 }
