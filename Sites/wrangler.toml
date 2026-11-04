@@ -1,0 +1,20 @@
+# The public websites: oursheikh., namerica. and uk.naqshbandiaowaisiah.us.
+# One Worker; the page is chosen by hostname. Live data comes from the platform
+# Worker through a service binding (no CORS, no public API host needed).
+name = "darul-irfan-sites"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+workers_dev = true
+preview_urls = false
+routes = [
+  { pattern = "oursheikh.naqshbandiaowaisiah.us", custom_domain = true },
+  { pattern = "namerica.naqshbandiaowaisiah.us", custom_domain = true },
+  { pattern = "uk.naqshbandiaowaisiah.us", custom_domain = true },
+]
+
+[[services]]
+binding = "API"
+service = "darul-irfan-platform"
+
+[observability]
+enabled = true
