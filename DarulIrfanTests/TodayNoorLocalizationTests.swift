@@ -36,10 +36,12 @@ final class TodayNoorLocalizationTests: XCTestCase {
 
     func testUrduSayingsCarryOfficialSourcesAndUrduText() {
         let quotes = SeedBundle.aqwalESheikh(urdu: true)
-        XCTAssertEqual(quotes.count, 6)
+        XCTAssertEqual(quotes.count, 200)
+        // The same saying in both languages on the same day: identical ids in identical order.
+        XCTAssertEqual(quotes.map(\.id), SeedBundle.aqwalESheikh(urdu: false).map(\.id))
         XCTAssertEqual(Set(quotes.map(\.id)).count, quotes.count)
         for quote in quotes {
-            XCTAssertTrue(quote.sourceUrl?.hasPrefix("https://www.naqshbandiaowaisiah.org/aqwal-e-sheikh/") == true)
+            XCTAssertTrue(quote.sourceUrl?.hasPrefix("https://www.youtube.com/watch?v=") == true)
             XCTAssertNotNil(quote.text.range(of: "\\p{Arabic}", options: .regularExpression))
             XCTAssertFalse(quote.attribution.isEmpty)
         }
