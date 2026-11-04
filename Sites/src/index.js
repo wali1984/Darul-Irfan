@@ -105,7 +105,31 @@ const SECURITY = {
   ].join("; "),
 };
 
+/** The zone's firewall lets in only the home_vpn IP list (besides these sites).
+ * Every 5 minutes: look up vpn.wajidali.us and, when its address changed, make it
+ * the list's only entry. Needs HOME_VPN_LIST_TOKEN (Account Filter Lists: Edit). */
+async function followHomeVPN(env) {
+  if (!env.HOME_VPN_LIST_TOKEN) return;
+  const dns = await fetch(`https://cloudflare-dns.com/dns-query?name=${env.HOME_VPN_HOST}&type=A`,
+    { headers: { accept: "application/dns-json" } }).then(r => r.json());
+  const ips = (dns.Answer ?? []).filter(a => a.type === 1).map(a => a.data);
+  // One ordinary public IPv4 address, or nothing changes.
+  const ip = ips.length === 1 && /^\d{1,3}(\.\d{1,3}){3}$/.test(ips[0]) &&
+    !/^(10|127|0)\.|^192\.168\.|^172\.(1[6-9]|2\d|3[01])\.|^169\.254\./.test(ips[0]) ? ips[0] : null;
+  if (!ip) return console.log("home VPN: unexpected DNS answer", JSON.stringify(ips));
+  const api = (path, init = {}) => fetch(`https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/rules/lists/${env.HOME_VPN_LIST_ID}${path}`,
+    { ...init, headers: { authorization: `Bearer ${env.HOME_VPN_LIST_TOKEN}`, "content-type": "application/json" } }).then(r => r.json());
+  const current = (await api("/items")).result?.map(item => item.ip) ?? [];
+  if (current.length === 1 && current[0] === ip) return;
+  const done = await api("/items", { method: "PUT", body: JSON.stringify([{ ip, comment: env.HOME_VPN_HOST }]) });
+  console.log("home VPN list", JSON.stringify(current), "->", ip, done.success ? "ok" : JSON.stringify(done.errors));
+}
+
 export default {
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(followHomeVPN(env));
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
     const key = siteFor(url);

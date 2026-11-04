@@ -12,6 +12,14 @@ routes = [
   { pattern = "uk.naqshbandiaowaisiah.us", custom_domain = true },
 ]
 
+# Keeps the firewall's home_vpn IP list on vpn.wajidali.us (src/index.js followHomeVPN).
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+HOME_VPN_HOST = "vpn.wajidali.us"
+HOME_VPN_LIST_ID = "58eec7c74902461a8eed5ed121c18b89"
+
 [[services]]
 binding = "API"
 service = "darul-irfan-platform"
