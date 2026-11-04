@@ -339,12 +339,12 @@ export async function zikrStage(env: Env, memberID: string, groupID: string, url
 
 /** Hazrat ji's picture: the thumbnail of the latest official Daily Zikr, and
  * YouTube's full-size frame where the video has one (apps fall back to pictureURL). */
-async function sheikhPicture(env: Env): Promise<{ pictureURL: string; pictureHDURL?: string } | null> {
+async function sheikhPicture(env: Env): Promise<{ pictureURL: string; pictureHDURL?: string; videoID?: string } | null> {
   const row = await env.DB.prepare(`SELECT image_url,video_id FROM feed_items WHERE source='youtube' AND image_url IS NOT NULL
       AND title LIKE 'Online Zikr with%' ORDER BY published_at DESC LIMIT 1`).first<{ image_url: string; video_id: string | null }>();
   if (!row) return null;
-  return { pictureURL: row.image_url,
-    pictureHDURL: row.video_id && /^[A-Za-z0-9_-]{11}$/.test(row.video_id) ? `https://i.ytimg.com/vi/${row.video_id}/maxresdefault.jpg` : undefined };
+  const videoID = row.video_id && /^[A-Za-z0-9_-]{11}$/.test(row.video_id) ? row.video_id : undefined;
+  return { pictureURL: row.image_url, videoID, pictureHDURL: videoID ? `https://i.ytimg.com/vi/${videoID}/maxresdefault.jpg` : undefined };
 }
 
 /** An admin takes a stage announcement off the stage (a mistaken tap, a test). */
@@ -370,6 +370,8 @@ export async function publicSheikhStage(env: Env): Promise<Record<string, unknow
     stage: cue ? { title: cue.title, titleUr: cue.title_ur ?? undefined, at: cue.created_at,
       arabic: RECITATIONS.find(recitation => recitation.id === cue.stage_id)?.arabic } : null,
     pictureURL: picture?.pictureURL, pictureHDURL: picture?.pictureHDURL,
+    // The latest Daily Zikr, for the websites to play when nothing is live.
+    latestVideoID: picture?.videoID,
   };
 }
 
