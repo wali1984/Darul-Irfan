@@ -16,6 +16,9 @@ final class ZikrStageModel {
     private(set) var live: HalqaStageUpdate.Live?
     private(set) var pictureURLs: [URL] = []
     private(set) var canLead = false
+    /// Admins and the Super admin may take announcements and messages off
+    /// the stage, live or not.
+    private(set) var canModerate = false
     private(set) var cues: [HalqaZikrCue] = []
     private(set) var messages: [HalqaStageMessage] = []
     private(set) var catalogue: HalqaZikrStages?
@@ -47,7 +50,8 @@ final class ZikrStageModel {
             live = update.live
             pictureURLs = [update.pictureHDURL, update.pictureURL].compactMap { $0 }
             canLead = update.canLead
-            merge(cues: update.cues)
+            canModerate = update.canModerate ?? update.canLead
+            cues = Self.stageCues(cues, adding: update.cues, hidden: update.hiddenCues ?? [], isLive: update.live != nil)
             let hidden = Set(update.hidden)
             let known = Set(messages.map(\.id))
             messages = (messages + update.messages.filter { !known.contains($0.id) })
@@ -65,8 +69,19 @@ final class ZikrStageModel {
     }
 
     private func merge(cues new: [HalqaZikrCue]) {
+        cues = Self.stageCues(cues, adding: new, hidden: [], isLive: true)
+    }
+
+    /// The stage's announcements after a poll: the new ones added in order,
+    /// those an admin removed taken away, and none at all once the Zikr is no
+    /// longer live (they belong to the session they were made in).
+    nonisolated static func stageCues(_ cues: [HalqaZikrCue], adding new: [HalqaZikrCue], hidden: [String], isLive: Bool) -> [HalqaZikrCue] {
+        guard isLive else { return [] }
         let known = Set(cues.map(\.id))
-        cues = (cues + new.filter { !known.contains($0.id) }).sorted { $0.sequence < $1.sequence }.suffix(60).map { $0 }
+        let removed = Set(hidden.map { $0.lowercased() })
+        return (cues + new.filter { !known.contains($0.id) })
+            .filter { !removed.contains($0.id.lowercased()) }
+            .sorted { $0.sequence < $1.sequence }.suffix(60).map { $0 }
     }
 
     /// Announces a stage or recitation; retried with the same event id.
@@ -123,6 +138,20 @@ final class ZikrStageModel {
         } catch { actionError = error.localizedDescription }
     }
 
+    /// Takes a stage announcement off the stage for everyone (admins).
+    func remove(_ cue: HalqaZikrCue) async {
+        guard canModerate else { return }
+        busy = true
+        defer { busy = false }
+        do {
+            try await service.removeZikrCue(cue.id, in: groupID)
+            cues.removeAll { $0.id == cue.id }
+            if heard?.id == cue.id { heard = nil }
+            actionError = nil
+        } catch is CancellationError {
+        } catch { actionError = error.localizedDescription }
+    }
+
     func toggleVoice() async {
         if let listener, voice == .listening || voice == .asking {
             listener.stop()
@@ -151,6 +180,8 @@ struct ZikrStageView: View {
     @State private var model: ZikrStageModel
     @State private var presenting = false
     @State private var draft = ""
+    /// The stage announcement an admin asked to remove, awaiting confirmation.
+    @State private var cueToRemove: HalqaZikrCue?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
@@ -219,7 +250,20 @@ struct ZikrStageView: View {
         )) {
             Button("OK", role: .cancel) { model.actionError = nil }
         } message: { Text(verbatim: model.actionError ?? "") }
+        .confirmationDialog("Remove this stage announcement?", isPresented: Binding(
+            get: { cueToRemove != nil }, set: { if !$0 { cueToRemove = nil } }
+        ), titleVisibility: .visible, presenting: cueToRemove) { cue in
+            Button("Remove", role: .destructive) {
+                cueToRemove = nil
+                Task { await model.remove(cue) }
+            }
+            Button("Cancel", role: .cancel) { cueToRemove = nil }
+        } message: { cue in
+            Text(verbatim: cueTitle(cue) + "\n\n" + String(localized: "It is taken off the stage for everyone."))
+        }
     }
+
+    private func cueTitle(_ cue: HalqaZikrCue) -> String { urdu ? cue.titleUr ?? cue.title : cue.title }
 
     // MARK: Backdrop
 
@@ -241,7 +285,38 @@ struct ZikrStageView: View {
             portrait
             nowShowing
             if model.canLead && !presenting { leadControls }
+            if model.canModerate && !presenting && !model.cues.isEmpty { announcementList }
         }
+    }
+
+    /// This session's stage announcements, newest first, for admins to take
+    /// any of them off the stage.
+    private var announcementList: some View {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            Text("Stage announcements").diInterfaceFont(.caption, weight: .semibold).foregroundStyle(DIColor.accent)
+            ForEach(model.cues.reversed()) { cue in
+                HStack(spacing: DISpacing.sm) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(verbatim: cueTitle(cue)).diInterfaceFont(.subheadline, weight: cue.id == model.current?.id ? .bold : .regular)
+                            .foregroundStyle(DIColor.onPrimary)
+                        Text(verbatim: GroupInvitationDate.text(cue.createdAt, locale: locale, includesTime: true))
+                            .diInterfaceFont(.caption).foregroundStyle(DIColor.onPrimary.opacity(0.6))
+                    }
+                    Spacer(minLength: 0)
+                    Button { cueToRemove = cue } label: { Image(systemName: "trash").padding(8) }
+                        .foregroundStyle(DIColor.danger)
+                        .disabled(model.busy)
+                        .accessibilityLabel(Text(verbatim: String(localized: "Remove") + ": " + cueTitle(cue)))
+                        .accessibilityIdentifier("stage-cue-remove-" + cue.id)
+                }
+                .contextMenu {
+                    Button("Remove", role: .destructive) { cueToRemove = cue }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(DISpacing.md)
+        .diGlassPanel(cornerRadius: 22)
     }
 
     private var header: some View {
@@ -256,6 +331,9 @@ struct ZikrStageView: View {
                     .foregroundStyle(DIColor.accent)
             }
             Spacer(minLength: 0)
+            if model.live?.isTest == true {
+                HalqahTestBadge()
+            }
             if model.live != nil {
                 Label("LIVE", systemImage: "dot.radiowaves.left.and.right")
                     .diInterfaceFont(.caption, weight: .bold).foregroundStyle(.white)
@@ -313,6 +391,11 @@ struct ZikrStageView: View {
         .frame(maxWidth: .infinity)
         .padding(DISpacing.lg)
         .diGlassPanel(cornerRadius: 26)
+        .contextMenu {
+            if model.canModerate, let cue = model.current {
+                Button("Remove from the stage", role: .destructive) { cueToRemove = cue }
+            }
+        }
         .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.85), value: model.current?.id)
         .id(model.current?.id)
         .transition(.opacity.combined(with: .scale(scale: 0.97)))
@@ -421,7 +504,7 @@ struct ZikrStageView: View {
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(DIColor.onPrimary.opacity(message.presetID == nil ? 0.16 : 0.08), in: RoundedRectangle(cornerRadius: 14))
         .contextMenu {
-            if model.canLead {
+            if model.canModerate {
                 Button("Remove", role: .destructive) { Task { await model.remove(message) } }
             }
         }

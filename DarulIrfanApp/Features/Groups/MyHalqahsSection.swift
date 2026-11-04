@@ -714,6 +714,7 @@ struct HalqahHeroCardLabel: View {
                         Text(group.liveKind == "meeting" ? "Meeting live" : "Zikr live")
                             .diInterfaceFont(.subheadline, weight: .bold)
                             .foregroundStyle(Color.white)
+                        if group.liveIsTest == true { HalqahTestBadge() }
                     }
                 }
                 Text((group.canManage ?? [.admin, .administrator, .superadmin].contains(group.myRole ?? .member)) ? "Start Daily Zikr" : "Join Daily Zikr")
@@ -778,6 +779,7 @@ struct HalqahHeroCardLabel: View {
             Text(group.liveKind == "meeting" ? "Meeting live" : "Zikr live")
                 .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(Color.white)
+            if group.liveIsTest == true { HalqahTestBadge() }
             Spacer(minLength: DISpacing.sm)
             Text("Join")
                 .diInterfaceFont(.subheadline, weight: .bold)

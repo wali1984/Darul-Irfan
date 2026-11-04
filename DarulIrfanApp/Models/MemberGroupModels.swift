@@ -41,6 +41,9 @@ struct MemberGroup: Codable, Sendable, Identifiable, Equatable, Hashable {
     /// Whether a zikr or meeting is live in this group right now.
     var isLive: Bool? = nil
     var liveKind: String? = nil
+    /// The live session is an admin's test: only the Halqah's admins see it
+    /// and nobody was notified. Absent from an older server.
+    var liveIsTest: Bool? = nil
     /// The signed-in member's role here; absent from an older server.
     var myRole: GroupRole? = nil
 }
@@ -86,6 +89,8 @@ struct GroupLive: Codable, Sendable, Equatable {
     var attendance: [GroupAttendee]?
     /// The room is being recorded; everyone in the session is told.
     var roomRecording: Bool?
+    /// A test session: only the Halqah's admins see it, nobody is notified.
+    var isTest: Bool? = nil
 
     var isMeeting: Bool { kind == "meeting" }
     var isRecorded: Bool { recorded == true && !(queue ?? []).isEmpty }
@@ -178,6 +183,8 @@ struct GroupSessionRecord: Codable, Sendable, Identifiable, Equatable {
     var startedAt: Date
     var endedAt: Date
     var attendees: Int
+    /// An admin's test session; absent from an older server.
+    var isTest: Bool? = nil
 }
 
 struct GroupSessionHistory: Codable, Sendable {
@@ -461,6 +468,8 @@ struct HalqaStageUpdate: Codable, Sendable {
         let title: String?
         let videoID: String?
         let startedAt: Date?
+        /// An admin's test Zikr, seen only by the Halqah's admins.
+        var isTest: Bool? = nil
     }
     let live: Live?
     let pictureURL: URL?
@@ -471,6 +480,11 @@ struct HalqaStageUpdate: Codable, Sendable {
     let messages: [HalqaStageMessage]
     let nextChat: Int64
     let hidden: [String]
+    /// Admins and the Super admin may take anything off the stage, live or
+    /// not. Absent from an older server, where only the leader could.
+    var canModerate: Bool? = nil
+    /// Stage announcements an admin removed since the phone's cursor.
+    var hiddenCues: [String]? = nil
 }
 struct HalqaStageMessage: Codable, Sendable, Identifiable, Equatable {
     let sequence: Int64

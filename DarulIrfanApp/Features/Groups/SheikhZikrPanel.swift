@@ -29,6 +29,8 @@ struct SheikhZikrPanel: View {
     @State private var controls = false
     @State private var history = false
     @State private var adding = false
+    /// The stage announcement an admin asked to remove, awaiting confirmation.
+    @State private var cueToRemove: HalqaZikrCue?
     @State private var title = ""
     @State private var titleUr = ""
     private enum EditorField: Hashable { case name, urduName }
@@ -78,10 +80,21 @@ struct SheikhZikrPanel: View {
                 if history {
                     if cues.isEmpty { Text("No stage announcements yet.").foregroundStyle(DIColor.textMuted) }
                     ForEach(cues.reversed()) { cue in
-                        VStack(alignment: .leading, spacing: DISpacing.xs) {
-                            Text(verbatim: cueTitle(cue)).diInterfaceFont(.headline)
-                            Text(verbatim: GroupInvitationDate.text(cue.createdAt, locale: locale, includesTime: true))
-                                .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
+                        HStack(spacing: DISpacing.sm) {
+                            VStack(alignment: .leading, spacing: DISpacing.xs) {
+                                Text(verbatim: cueTitle(cue)).diInterfaceFont(.headline)
+                                Text(verbatim: GroupInvitationDate.text(cue.createdAt, locale: locale, includesTime: true))
+                                    .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
+                            }
+                            Spacer(minLength: 0)
+                            // Admins take a stage announcement off the stage for everyone.
+                            if catalogue?.canBroadcast == true {
+                                Button { cueToRemove = cue } label: { Image(systemName: "trash") }
+                                    .buttonStyle(DICompactButtonStyle(destructive: true))
+                                    .disabled(busy)
+                                    .accessibilityLabel(Text(verbatim: String(localized: "Remove") + ": " + cueTitle(cue)))
+                                    .accessibilityIdentifier("sheikh-cue-remove-" + cue.id)
+                            }
                         }
                     }
                 }
@@ -92,6 +105,17 @@ struct SheikhZikrPanel: View {
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: history)
         }
         .sheet(isPresented: $adding) { stageEditor }
+        .alert("Remove this stage announcement?", isPresented: Binding(
+            get: { cueToRemove != nil }, set: { if !$0 { cueToRemove = nil } }
+        ), presenting: cueToRemove) { cue in
+            Button("Remove", role: .destructive) {
+                cueToRemove = nil
+                Task { await remove(cue) }
+            }
+            Button("Cancel", role: .cancel) { cueToRemove = nil }
+        } message: { cue in
+            Text(verbatim: cueTitle(cue) + "\n\n" + String(localized: "It is taken off the stage for everyone."))
+        }
         .diAppear()
         .diBreathingGlow(maxRadius: 8)
         .task(id: scenePhase) {
@@ -194,6 +218,20 @@ struct SheikhZikrPanel: View {
             }
         } catch is CancellationError { return }
         catch { if ticket == generation { self.error = error.localizedDescription } }
+    }
+
+    private func remove(_ cue: HalqaZikrCue) async {
+        guard !busy else { return }
+        busy = true
+        defer { busy = false }
+        do {
+            try await service.removeZikrCue(cue.id, in: groupID)
+            // A load that started before the removal must not bring it back.
+            generation += 1
+            cues.removeAll { $0.id == cue.id }
+            error = nil
+        } catch is CancellationError { return }
+        catch { self.error = error.localizedDescription }
     }
 
     private func send(_ action: PendingSheikhStageAction) async {

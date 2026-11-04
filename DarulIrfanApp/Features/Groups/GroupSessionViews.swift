@@ -5,6 +5,21 @@ import SwiftUI
 // the admin's message, who is listening, dua requests, and - for admins - the
 // controls that pause, move and add to it for everyone.
 
+/// Marks an admin's test session wherever it is shown: only the Halqah's
+/// admins see a test, and nobody was notified of it.
+struct HalqahTestBadge: View {
+    var body: some View {
+        Label("TEST", systemImage: "testtube.2")
+            .diInterfaceFont(.caption2, weight: .bold)
+            .padding(.horizontal, 8).padding(.vertical, 3)
+            .background(Capsule().fill(Color(hex: 0xE0B75F)))
+            .foregroundStyle(Color(hex: 0x064B34))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Test session: only admins see it"))
+            .accessibilityIdentifier("halqah-test-badge")
+    }
+}
+
 @MainActor
 struct GroupSessionCard: View {
     let live: GroupLive
@@ -119,6 +134,7 @@ struct GroupSessionCard: View {
                 }
             }
             Spacer(minLength: 0)
+            if live.isTest == true { HalqahTestBadge() }
             Text("LIVE")
                 .diInterfaceFont(.caption2, weight: .bold)
                 .padding(.horizontal, DISpacing.sm).padding(.vertical, 3)
@@ -759,6 +775,8 @@ struct GroupDuaRequestsView: View {
     @State private var failed = false
     @State private var actionError: String?
     @State private var working = false
+    /// The dua request an admin asked to remove, awaiting confirmation.
+    @State private var removing: GroupDuaRequest?
 
     var body: some View {
         List {
@@ -789,11 +807,21 @@ struct GroupDuaRequestsView: View {
                             }
                             .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.textMuted)
-                            if !request.isRead {
-                                Button("Mark as read") { Task { await markRead(request) } }
-                                    .buttonStyle(DICompactButtonStyle())
+                            HStack(spacing: DISpacing.sm) {
+                                if !request.isRead {
+                                    Button("Mark as read") { Task { await markRead(request) } }
+                                        .buttonStyle(DICompactButtonStyle())
+                                        .disabled(working)
+                                }
+                                Button("Remove") { removing = request }
+                                    .buttonStyle(DICompactButtonStyle(destructive: true))
                                     .disabled(working)
+                                    .accessibilityIdentifier("dua-remove-" + request.id)
                             }
+                        }
+                        .swipeActions {
+                            Button("Remove", role: .destructive) { removing = request }
+                                .disabled(working)
                         }
                     }
                 } else if !failed {
@@ -811,6 +839,37 @@ struct GroupDuaRequestsView: View {
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() }.buttonStyle(DIToolbarButtonStyle()) } }
         .task { await load() }
         .refreshable { await load() }
+        .alert(
+            "Remove this dua request?",
+            isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
+            presenting: removing
+        ) { request in
+            Button("Remove", role: .destructive) {
+                removing = nil
+                Task { await remove(request) }
+            }
+            Button("Cancel", role: .cancel) { removing = nil }
+        } message: { _ in
+            Text("It is taken off the list for every admin. This cannot be undone.")
+        }
+    }
+
+    private func remove(_ request: GroupDuaRequest) async {
+        guard !working else { return }
+        working = true
+        defer { working = false }
+        do {
+            try await service.removeDua(request.id, in: groupID)
+            // Ignore refresh responses started before this confirmed write.
+            loadGeneration += 1
+            requests?.removeAll { $0.id == request.id }
+            actionError = nil
+            await load()
+        } catch is CancellationError {
+            return
+        } catch {
+            actionError = MemberGroupError.actionDescription(for: error)
+        }
     }
 
     private func load() async {
@@ -896,7 +955,10 @@ struct GroupSessionHistoryView: View {
                                 GroupSessionAttendeesView(groupID: groupID, session: session, service: service)
                             } label: {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
+                                    HStack(spacing: DISpacing.xs) {
+                                        Text(verbatim: session.title ?? String(localized: "Halqah Zikr"))
+                                        if session.isTest == true { HalqahTestBadge() }
+                                    }
                                     Text(verbatim: GroupInvitationDate.text(session.startedAt, locale: locale, includesTime: true))
                                         .diInterfaceFont(.caption)
                                         .foregroundStyle(DIColor.textMuted)

@@ -263,6 +263,8 @@ struct GroupLiveStarter: View {
     @State private var joinTogether = true
     /// Records the room into the group's recordings.
     @State private var recordRoom = true
+    /// An admin's test: nobody is notified and only the Halqah's admins see it.
+    @State private var testOnly = false
     @State private var library: GroupRecordingLibrary?
     @State private var libraryFailed = false
     @State private var libraryLoadGeneration = 0
@@ -321,6 +323,14 @@ struct GroupLiveStarter: View {
                             .accessibilityIdentifier("recording-library-retry")
                     }
                 }
+                if !addingToSession {
+                    Section {
+                        Toggle("Test only", isOn: $testOnly)
+                            .accessibilityIdentifier("session-test-only")
+                    } footer: {
+                        Text("Try the session, the stage and the room first: nobody is notified and only this Halqah's admins see it. End it as usual when you are done.")
+                    }
+                }
                 Section {
                     Button {
                         Task { await start() }
@@ -329,6 +339,8 @@ struct GroupLiveStarter: View {
                             if working { ProgressView().tint(.white) }
                             if addingToSession {
                                 Label("Add to the session", systemImage: "text.badge.plus")
+                            } else if testOnly {
+                                Label("Start test without notifying anyone", systemImage: "testtube.2")
                             } else {
                                 Label("Start now and notify the group", systemImage: "dot.radiowaves.left.and.right")
                             }
@@ -597,15 +609,16 @@ struct GroupLiveStarter: View {
                 if source == .youtube, let video { entries.insert(.video(video), at: 0) }
                 try await service.addToSession(entries, in: groupID)
             } else if kind == .meeting {
-                try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true, record: recordRoom)
+                try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true, record: recordRoom,
+                                            test: testOnly)
             } else if source == .room {
                 try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: video,
-                                            room: joinTogether && meetingsReady, record: recordRoom)
+                                            room: joinTogether && meetingsReady, record: recordRoom, test: testOnly)
             } else {
                 // The server asks YouTube whether a pasted link is live or past:
                 // live is watched live, past joins the queue at the front.
                 try await service.startLive(in: groupID, kind: "zikr", title: title,
-                                            videoID: source == .youtube ? video : nil, room: false, queue: picked)
+                                            videoID: source == .youtube ? video : nil, room: false, queue: picked, test: testOnly)
             }
             dismiss()
         } catch is CancellationError {

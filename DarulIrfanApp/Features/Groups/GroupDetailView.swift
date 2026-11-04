@@ -105,12 +105,11 @@ struct GroupDetailView: View {
                         }
                     }
                 } else {
-                    if group.id == "our-sheikh" {
-                        if detail?.live?.kind == "zikr" {
-                            StageEntryCard { stageOpen = true }
-                        } else {
-                            SheikhZikrPanel(groupID: group.id, service: service, isLiveZikr: false)
-                        }
+                    // Stage announcements belong to the live Zikr: shown on its
+                    // stage and in its room only, never on the page once it ends
+                    // (owner, 2026-11-04).
+                    if group.id == "our-sheikh", detail?.live?.kind == "zikr" {
+                        StageEntryCard { stageOpen = true }
                     }
                     officialLiveSection
                     liveSection

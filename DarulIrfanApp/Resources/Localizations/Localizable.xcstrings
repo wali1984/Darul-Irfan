@@ -1,6 +1,193 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "TEST": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TEST"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آزمائشی"
+          }
+        }
+      }
+    },
+    "Test session: only admins see it": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test session: only admins see it"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آزمائشی نشست: صرف منتظمین دیکھ سکتے ہیں"
+          }
+        }
+      }
+    },
+    "Test only": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test only"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صرف آزمائش"
+          }
+        }
+      }
+    },
+    "Try the session, the stage and the room first: nobody is notified and only this Halqah's admins see it. End it as usual when you are done.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try the session, the stage and the room first: nobody is notified and only this Halqah's admins see it. End it as usual when you are done."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پہلے نشست، اسٹیج اور کمرہ آزما لیں: کسی کو اطلاع نہیں جاتی اور صرف اس حلقے کے منتظمین اسے دیکھتے ہیں۔ فارغ ہو کر حسبِ معمول ختم کریں۔"
+          }
+        }
+      }
+    },
+    "Start test without notifying anyone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start test without notifying anyone"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کسی کو اطلاع دیے بغیر آزمائش شروع کریں"
+          }
+        }
+      }
+    },
+    "Remove this stage announcement?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove this stage announcement?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کیا مرحلے کا یہ اعلان ہٹانا ہے؟"
+          }
+        }
+      }
+    },
+    "It is taken off the stage for everyone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It is taken off the stage for everyone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ سب کے لیے اسٹیج سے ہٹ جائے گا۔"
+          }
+        }
+      }
+    },
+    "Remove from the stage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from the stage"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیج سے ہٹائیں"
+          }
+        }
+      }
+    },
+    "Stage announcements": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stage announcements"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مرحلوں کے اعلانات"
+          }
+        }
+      }
+    },
+    "Remove this dua request?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove this dua request?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کیا دعا کی یہ درخواست ہٹانی ہے؟"
+          }
+        }
+      }
+    },
+    "It is taken off the list for every admin. This cannot be undone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It is taken off the list for every admin. This cannot be undone."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ سب منتظمین کی فہرست سے ہٹ جائے گی۔ یہ عمل واپس نہیں ہو سکتا۔"
+          }
+        }
+      }
+    },
     "Naqshbandia Owaisiah · Darul Irfan": {
       "localizations": {
         "en": {
