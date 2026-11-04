@@ -292,7 +292,7 @@ footer a{text-decoration:none}footer a:hover{color:var(--gold2)}
           <div class="card gold"><b>Daily Zikr</b>Live with Our Sheikh<div class="shimmer"></div></div>
           <div class="card"><b id="phone-stage">1st Latifa</b>Current stage</div>
           <div class="card"><b>Akram-ut-Tarajum</b>Today's ayah<div class="shimmer"></div><div class="shimmer" style="width:70%"></div></div>
-          <div class="card"><b>${esc(site.halqahs[1]?.name ?? "Our Sheikh")}</b>Next Zikr after Isha</div>
+          <div class="card"><b>${esc(site.halqahs[1]?.name ?? "Our Sheikh")}</b>Zikr times and notices</div>
         </div>
       </div>
     </div>
