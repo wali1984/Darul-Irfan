@@ -90,6 +90,10 @@ async function data(env, key) {
   };
 }
 
+// The eight-pointed star of the page's brand mark, gold on deep green.
+const FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#04150f"/>
+<path d="M20 4 25 15 36 20 25 25 20 36 15 25 4 20 15 15Z" fill="none" stroke="#d9b56a" stroke-width="2.2"/><circle cx="20" cy="20" r="5" fill="#d9b56a"/></svg>`;
+
 const SECURITY = {
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
@@ -140,6 +144,9 @@ export default {
       });
     }
     if (url.pathname === "/robots.txt") return new Response("User-agent: *\nAllow: /\n", { headers: { "content-type": "text/plain" } });
+    if (url.pathname === "/favicon.ico" || url.pathname === "/favicon.svg") {
+      return new Response(FAVICON, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
+    }
     if (url.pathname !== "/" && url.pathname !== "/index.html") return Response.redirect(new URL("/", url).toString(), 302);
     const others = Object.entries(SITES).filter(([k]) => k !== key).map(([, s]) => ({ host: s.host, region: s.region }));
     return new Response(page(SITES[key], others, await data(env, key)), {

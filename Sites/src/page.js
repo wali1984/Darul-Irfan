@@ -38,6 +38,7 @@ export function page(site, others, initial) {
 <title>${esc(site.title)}</title>
 <meta name="description" content="${esc(site.tagline)}. ${esc(site.intro)}">
 <meta name="theme-color" content="#04150f">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content="${esc(site.title)}">
 <meta property="og:description" content="${esc(site.tagline)}">
 ${initial.picture ? `<meta property="og:image" content="${esc(initial.picture)}">` : ""}
