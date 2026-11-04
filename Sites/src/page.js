@@ -109,7 +109,8 @@ h1,h2,h3{overflow-wrap:break-word}
   box-shadow:0 0 14px 4px rgba(243,220,157,.7);transform:rotate(calc(var(--k) * 51.43deg)) translateY(calc(-1 * min(250px,46.5vw)))}
 .portrait .photo{position:absolute;inset:6%;border-radius:50%;overflow:hidden;background:radial-gradient(circle,#0b3a2b,#04150f);
   box-shadow:0 0 0 1px var(--line),0 30px 80px -20px rgba(16,185,129,.55),inset 0 0 60px rgba(0,0,0,.6)}
-.portrait img{width:100%;height:100%;object-fit:cover;transform:scale(1.32);filter:saturate(1.05) contrast(1.04)}
+/* The Daily Zikr thumbnail has Hazrat ji on its right-hand side. */
+.portrait img{width:100%;height:100%;object-fit:cover;object-position:80% 30%;filter:saturate(1.05) contrast(1.04)}
 .portrait .halo{position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(217,181,106,.22),transparent 62%);animation:breathe 6s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.06);opacity:.6}}
 
