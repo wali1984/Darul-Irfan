@@ -1,7 +1,9 @@
 import * as apns from "../src/apns";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Env } from "../src/contracts";
-import { broadcastZikrCue, dispatchZikrCues, hideStageMessage, postStageMessage, zikrStage, zikrStages } from "../src/groupZikrStages";
+import {
+  broadcastZikrCue, dispatchZikrCues, hideStageMessage, hideZikrCue, postStageMessage, publicSheikhStage, zikrStage, zikrStages,
+} from "../src/groupZikrStages";
 import { sqliteD1 } from "./sqlite-d1";
 
 function setup() {
@@ -82,6 +84,53 @@ describe("live Zikr stage", () => {
     expect((await cue.json() as any).cue).toMatchObject({ title: "Istighfar", arabic: "أَسْتَغْفِرُ اللّٰهَ رَبِّي مِنْ كُلِّ ذَنْبٍ وَأَتُوبُ إِلَيْهِ", notificationState: "complete" });
     await dispatchZikrCues(env);
     expect(push).not.toHaveBeenCalled();
+  });
+
+  it("shows only this session's stage; a closed Zikr leaves the stage empty", async () => {
+    const { env, raw } = setup();
+    raw.prepare(`INSERT INTO group_zikr_cues(group_id,event_id,stage_id,title,author_id,created_at,notification_state)
+      VALUES('our-sheikh',?,'latifa-3','3rd Latifa','admin','2026-11-02T00:00:00.000Z','complete')`).run(uuid(20));
+    vi.spyOn(apns, "sendPushToInstallations").mockResolvedValue(undefined as any);
+    await broadcastZikrCue(env, "admin", "our-sheikh", { id: uuid(21), stageID: "latifa-1" });
+    expect((await (await stage(env, "member")).json() as any).cues.map((c: any) => c.id)).toEqual([uuid(21)]);
+    raw.prepare("UPDATE group_live SET state='offline'").run();
+    const closed = await (await stage(env, "member")).json() as any;
+    expect(closed).toMatchObject({ live: null, cues: [] });
+    expect(publicSheikhStage).toBeDefined();
+    expect((await publicSheikhStage(env)).stage).toBeNull();
+  });
+
+  it("admins remove a stage announcement and any message, live or not; members cannot", async () => {
+    const { env, raw } = setup();
+    vi.spyOn(apns, "sendPushToInstallations").mockResolvedValue(undefined as any);
+    await broadcastZikrCue(env, "admin", "our-sheikh", { id: uuid(30), stageID: "latifa-2" });
+    await postStageMessage(env, "member", "our-sheikh", { id: uuid(31), presetID: "ameen" });
+    const first = await (await stage(env, "member")).json() as any;
+    expect((await stage(env, "admin")).ok).toBe(true);
+    expect((await (await stage(env, "admin")).json() as any).canModerate).toBe(true);
+    expect((await hideZikrCue(env, "member", "our-sheikh", uuid(30))).status).toBe(403);
+    expect((await hideZikrCue(env, "admin", "our-sheikh", uuid(30))).status).toBe(204);
+    const next = await (await stage(env, "member", `?cues=${first.nextCue}&chat=${first.nextChat}`)).json() as any;
+    expect(next.hiddenCues).toEqual([uuid(30)]);
+    expect((await (await stage(env, "member")).json() as any).cues).toEqual([]);
+    raw.prepare("UPDATE group_live SET state='offline'").run();
+    expect((await hideStageMessage(env, "admin", "our-sheikh", uuid(31))).status).toBe(204);
+  });
+
+  it("a test Zikr is seen by admins only and notifies nobody", async () => {
+    const { env, raw } = setup();
+    const push = vi.spyOn(apns, "sendPushToInstallations").mockResolvedValue(undefined as any);
+    raw.prepare("UPDATE group_live SET is_test=1").run();
+    const member = await (await stage(env, "member")).json() as any;
+    expect(member).toMatchObject({ live: null, canLead: false, cues: [] });
+    expect((await postStageMessage(env, "member", "our-sheikh", { id: uuid(40), presetID: "ameen" })).status).toBe(409);
+    const admin = await (await stage(env, "admin")).json() as any;
+    expect(admin).toMatchObject({ live: { isTest: true }, canLead: true });
+    const cue = await broadcastZikrCue(env, "admin", "our-sheikh", { id: uuid(41), stageID: "latifa-1" });
+    expect((await cue.json() as any).cue.notificationState).toBe("complete");
+    await dispatchZikrCues(env);
+    expect(push).not.toHaveBeenCalled();
+    expect((await publicSheikhStage(env)).live).toBeNull();
   });
 
   it("a recitation after a Latifa does not cancel the Latifa's pending notification", async () => {

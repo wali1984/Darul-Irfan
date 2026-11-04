@@ -1,4 +1,7 @@
-import { zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues, zikrStage, postStageMessage, hideStageMessage } from "./groupZikrStages";
+import {
+  zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues, zikrStage, postStageMessage, hideStageMessage,
+  hideZikrCue, publicSheikhStage,
+} from "./groupZikrStages";
 import { joinOurSheikh } from "./sheikhPublicJoin";
 import type { AndroidDeviceRegistration, DeviceRegistration, Env } from "./contracts";
 import { refreshPaltalkRoom } from "./paltalkRoom";
@@ -23,9 +26,9 @@ import { nearbyMasjids } from "./nearbyMasjids";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
-import { autoplayDue, checkIn, controlSession, deleteSessionRecord, duaRequests, markDuaRead, requestDua, sessionHistory } from "./session";
+import { autoplayDue, checkIn, controlSession, deleteSessionRecord, duaRequests, markDuaRead, removeDua, requestDua, sessionHistory } from "./session";
 import { collectRoomRecordings } from "./roomRecordings";
-import { createHalqah, memberDirectory, retireHalqah, updateHalqah } from "./halqahs";
+import { createHalqah, memberDirectory, publicHalqahs, retireHalqah, updateHalqah } from "./halqahs";
 import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
 import { uploadPostMedia } from "./postMedia";
 import { libraryPDFRoute } from "./pdfProxy";
@@ -48,6 +51,13 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path.startsWith("/admin")) return adminRequest(request, env, path);
   if (request.method === "GET" && path === "/v1/bootstrap") return cachedJSON(await bootstrap(env), request, 300);
   if (request.method === "GET" && path === "/v1/live") return cachedJSON(await liveBroadcast(env), request, 60);
+  // For the websites (oursheikh., namerica., uk.): Our Sheikh's live stage and
+  // the named Halqahs' names; nothing about their people.
+  if (request.method === "GET" && path === "/v1/public/sheikh-stage") return cachedJSON(await publicSheikhStage(env), request, 15);
+  if (request.method === "GET" && path === "/v1/public/halqahs") {
+    const ids = (url.searchParams.get("ids") ?? "").split(",").filter(id => /^[a-z0-9-]{1,40}$/.test(id)).slice(0, 30);
+    return cachedJSON(await publicHalqahs(env, ids), request, 300);
+  }
   if (request.method === "GET" && path === "/v1/feed") {
     const limit = Number(url.searchParams.get("limit") ?? 20); const cursor = url.searchParams.get("cursor") ?? undefined;
     if (!Number.isInteger(limit) || limit < 1 || limit > 50) return json({ error: "Limit must be an integer from 1 to 50" }, { status: 400 });
@@ -163,6 +173,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     const [, groupID = "", section, entity, action] = route;
     if (section === "zikr-cues" && !entity && request.method === "GET") return zikrCues(env, member, groupID, url.searchParams.get("after"));
     if (section === "zikr-cues" && !entity && request.method === "POST") return broadcastZikrCue(env, member, groupID, await body());
+    if (section === "zikr-cues" && entity && !action && request.method === "DELETE") return hideZikrCue(env, member, groupID, entity);
     if (section === "zikr-stages" && !entity && request.method === "GET") return zikrStages(env, member, groupID);
     // The live Zikr stage: one poll for everything on it, and its chat.
     if (section === "stage" && !entity && request.method === "GET") return zikrStage(env, member, groupID, url);
@@ -209,6 +220,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (section === "duas" && !entity && request.method === "GET") return duaRequests(env, member, groupID);
     if (section === "duas" && !entity && request.method === "POST") return requestDua(env, member, groupID, await body());
     if (section === "duas" && entity && action === "read" && request.method === "POST") return markDuaRead(env, member, groupID, entity);
+    if (section === "duas" && entity && !action && request.method === "DELETE") return removeDua(env, member, groupID, entity);
     if (section === "history" && request.method === "GET") return sessionHistory(env, member, groupID, entity);
     if (section === "history" && entity && request.method === "DELETE") return deleteSessionRecord(env, member, groupID, entity);
     return json({ error: "Not found" }, { status: 404 });

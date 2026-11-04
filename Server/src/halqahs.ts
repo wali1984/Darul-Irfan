@@ -24,6 +24,18 @@ async function slug(env: Env, name: string): Promise<string> {
   return candidate;
 }
 
+/** The named active Halqahs' names and descriptions, for the public websites. Never their people. */
+export async function publicHalqahs(env: Env, ids: string[]): Promise<{ halqahs: { id: string; name: string; description?: string }[] }> {
+  if (!ids.length) return { halqahs: [] };
+  const rows = await env.DB.prepare(`SELECT id,name,description FROM member_groups WHERE is_active=1 AND id IN (${ids.map(() => "?").join(",")})`)
+    .bind(...ids).all<{ id: string; name: string; description: string | null }>();
+  const found = new Map((rows.results ?? []).map(row => [row.id, row]));
+  return { halqahs: ids.flatMap(id => {
+    const row = found.get(id);
+    return row ? [{ id: row.id, name: row.name, description: row.description ?? undefined }] : [];
+  }) };
+}
+
 export async function createHalqah(env: Env, memberID: string, input: Record<string, unknown>): Promise<Response> {
   if (!await superAdmin(env, memberID)) return forbidden();
   const name = cleanText(input.name, 80);

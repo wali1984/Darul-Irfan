@@ -97,8 +97,13 @@ export const STAGE_PRESETS = [
   { id: "cannot-hear", title: "The sound is not clear", titleUr: "آواز صاف نہیں آ رہی" },
 ];
 
-async function liveZikr(env: Env, groupID: string): Promise<boolean> {
-  return !!await env.DB.prepare("SELECT group_id FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'").bind(groupID).first();
+interface LiveZikr { title: string | null; video_id: string | null; started_at: string | null; is_test: number }
+
+/** The live Zikr as this person may see it: a test Zikr exists only for the Halqah's admins. */
+async function liveZikr(env: Env, groupID: string, managing = true): Promise<LiveZikr | null> {
+  const live = await env.DB.prepare("SELECT title,video_id,started_at,is_test FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
+    .bind(groupID).first<LiveZikr>();
+  return live && (!live.is_test || managing) ? live : null;
 }
 
 async function access(env: Env, memberID: string, groupID: string, write: boolean): Promise<Response | boolean> {
@@ -112,12 +117,18 @@ async function access(env: Env, memberID: string, groupID: string, write: boolea
   return managing;
 }
 
+/** Stage announcements belong to the session they were made in: once it ends
+ * the stage is empty, and nothing from it shows anywhere else. */
+const SESSION_CUES = "group_id=? AND hidden_at IS NULL AND created_at>=?";
+/** When the live Zikr began; a session without a start time keeps its last three hours. */
+const sessionStart = (live: LiveZikr) => live.started_at ?? new Date(Date.now() - 3 * 3_600_000).toISOString();
+
 export async function zikrStages(env: Env, memberID: string, groupID: string): Promise<Response> {
   const managing = await access(env, memberID, groupID, false);
   if (managing instanceof Response) return managing;
   const custom = await env.DB.prepare("SELECT id,title,title_ur FROM group_zikr_stages WHERE group_id=? ORDER BY created_at,id")
     .bind(groupID).all<{ id: string; title: string; title_ur: string | null }>();
-  return json({ canBroadcast: managing && await liveZikr(env, groupID), stages: [...DEFAULT_ZIKR_STAGES, ...(custom.results ?? []).map(row => ({
+  return json({ canBroadcast: managing && !!await liveZikr(env, groupID), stages: [...DEFAULT_ZIKR_STAGES, ...(custom.results ?? []).map(row => ({
     id: row.id, title: row.title, titleUr: row.title_ur ?? undefined, isCustom: true,
   }))], recitations: RECITATIONS, presets: STAGE_PRESETS });
 }
@@ -162,11 +173,14 @@ export async function zikrCues(env: Env, memberID: string, groupID: string, afte
   if (after !== null && (!/^\d{1,15}$/.test(after) || !Number.isSafeInteger(Number(after)))) {
     return json({ error: "Invalid chat cursor" }, { status: 400 });
   }
+  const live = await liveZikr(env, groupID, permitted);
+  if (!live) return json({ cues: [], nextSequence: Number(after ?? 0) });
+  const since = sessionStart(live);
   const rows = after === null
-    ? await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? ORDER BY sequence DESC LIMIT 100")
-        .bind(groupID).all<CueRow>()
-    : await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND sequence>? ORDER BY sequence LIMIT 100")
-        .bind(groupID, Number(after)).all<CueRow>();
+    ? await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE ${SESSION_CUES} ORDER BY sequence DESC LIMIT 100`)
+        .bind(groupID, since).all<CueRow>()
+    : await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE ${SESSION_CUES} AND sequence>? ORDER BY sequence LIMIT 100`)
+        .bind(groupID, since, Number(after)).all<CueRow>();
   const ordered = after === null ? (rows.results ?? []).reverse() : rows.results ?? [];
   return json({ cues: ordered.map(presentCue), nextSequence: ordered.at(-1)?.sequence ?? Number(after ?? 0) });
 }
@@ -190,10 +204,11 @@ export async function broadcastZikrCue(env: Env, memberID: string, groupID: stri
   }
   if (!stage) return json({ error: "Stage not found" }, { status: 404 });
   // A recitation changes every few minutes; it shows on the stage without a
-  // notification (only Latifas and Muraqabat notify).
+  // notification (only Latifas and Muraqabat notify). A test Zikr notifies nobody.
+  const test = !!(await liveZikr(env, groupID))?.is_test;
   const result = await env.DB.prepare(`INSERT OR IGNORE INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
     VALUES(?,?,?,?,?,?,?,?)`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
-    recitation ? "complete" : "pending").run();
+    recitation || test ? "complete" : "pending").run();
   const saved = await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND event_id=?")
     .bind(groupID, eventID).first<CueRow>();
   if (!saved) return json({ error: "Stage announcement could not be saved" }, { status: 503 });
@@ -287,18 +302,20 @@ export async function zikrStage(env: Env, memberID: string, groupID: string, url
   };
   const cueAfter = cursor("cues"), chatAfter = cursor("chat");
   if (Number.isNaN(cueAfter) || Number.isNaN(chatAfter)) return json({ error: "Invalid stage cursor" }, { status: 400 });
-  const live = await env.DB.prepare("SELECT kind,title,video_id,started_at FROM group_live WHERE group_id=? AND state='live'")
-    .bind(groupID).first<{ kind: string; title: string | null; video_id: string | null; started_at: string | null }>();
-  const zikr = live?.kind === "zikr";
-  // Hazrat ji's picture: the thumbnail of the latest official Daily Zikr.
-  const picture = await env.DB.prepare(`SELECT image_url,video_id FROM feed_items WHERE source='youtube' AND image_url IS NOT NULL
-      AND title LIKE 'Online Zikr with%' ORDER BY published_at DESC LIMIT 1`).first<{ image_url: string; video_id: string | null }>();
-  const cues = cueAfter === null
-    ? ((await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? ORDER BY sequence DESC LIMIT 30")
-        .bind(groupID).all<CueRow>()).results ?? []).reverse()
-    : (await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND sequence>? ORDER BY sequence LIMIT 100")
-        .bind(groupID, cueAfter).all<CueRow>()).results ?? [];
-  const since = zikr && live?.started_at ? live.started_at : new Date().toISOString();
+  const live = await liveZikr(env, groupID, managing);
+  const zikr = !!live;
+  const picture = await sheikhPicture(env);
+  const since = live ? sessionStart(live) : new Date().toISOString();
+  // Only this session's stage announcements; with no live Zikr the stage is empty.
+  const cues = !zikr ? [] : cueAfter === null
+    ? ((await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE ${SESSION_CUES} ORDER BY sequence DESC LIMIT 30`)
+        .bind(groupID, since).all<CueRow>()).results ?? []).reverse()
+    : (await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE ${SESSION_CUES} AND sequence>? ORDER BY sequence LIMIT 100`)
+        .bind(groupID, since, cueAfter).all<CueRow>()).results ?? [];
+  // Announcements an admin removed since the phone's cursor, so they leave every screen.
+  const hiddenCues = !zikr || cueAfter === null ? [] : ((await env.DB.prepare(`SELECT event_id FROM group_zikr_cues
+      WHERE group_id=? AND hidden_at IS NOT NULL AND hidden_at>=?`).bind(groupID, since).all<{ event_id: string }>()).results ?? [])
+    .map(row => row.event_id);
   const messages = chatAfter === null
     ? ((await env.DB.prepare(`${STAGE_MESSAGE_SELECT} WHERE m.group_id=? AND m.created_at>=? AND m.hidden_at IS NULL
         ORDER BY m.sequence DESC LIMIT 100`).bind(groupID, since).all<StageMessageRow>()).results ?? []).reverse()
@@ -309,13 +326,51 @@ export async function zikrStage(env: Env, memberID: string, groupID: string, url
       WHERE group_id=? AND hidden_at IS NOT NULL AND hidden_at>=?`).bind(groupID, since).all<{ id: string }>()).results ?? [])
     .map(row => row.id);
   return json({
-    live: zikr ? { title: live?.title ?? undefined, videoID: live?.video_id ?? undefined, startedAt: live?.started_at ?? undefined } : null,
-    pictureURL: picture?.image_url, canLead: managing && zikr,
-    // YouTube's full-size frame where the video has one; the app falls back to pictureURL.
-    pictureHDURL: picture?.video_id && /^[A-Za-z0-9_-]{11}$/.test(picture.video_id) ? `https://i.ytimg.com/vi/${picture.video_id}/maxresdefault.jpg` : undefined,
-    cues: cues.map(presentCue), nextCue: cues.at(-1)?.sequence ?? cueAfter ?? 0,
+    live: zikr ? { title: live?.title ?? undefined, videoID: live?.video_id ?? undefined, startedAt: live?.started_at ?? undefined,
+      isTest: live?.is_test ? true : undefined } : null,
+    pictureURL: picture?.pictureURL, canLead: managing && zikr,
+    // Admins and the Super admin may take anything off the stage, live or not.
+    canModerate: managing,
+    pictureHDURL: picture?.pictureHDURL,
+    cues: cues.map(presentCue), nextCue: cues.at(-1)?.sequence ?? cueAfter ?? 0, hiddenCues,
     messages: messages.map(presentMessage), nextChat: messages.at(-1)?.sequence ?? chatAfter ?? 0, hidden,
   });
+}
+
+/** Hazrat ji's picture: the thumbnail of the latest official Daily Zikr, and
+ * YouTube's full-size frame where the video has one (apps fall back to pictureURL). */
+async function sheikhPicture(env: Env): Promise<{ pictureURL: string; pictureHDURL?: string } | null> {
+  const row = await env.DB.prepare(`SELECT image_url,video_id FROM feed_items WHERE source='youtube' AND image_url IS NOT NULL
+      AND title LIKE 'Online Zikr with%' ORDER BY published_at DESC LIMIT 1`).first<{ image_url: string; video_id: string | null }>();
+  if (!row) return null;
+  return { pictureURL: row.image_url,
+    pictureHDURL: row.video_id && /^[A-Za-z0-9_-]{11}$/.test(row.video_id) ? `https://i.ytimg.com/vi/${row.video_id}/maxresdefault.jpg` : undefined };
+}
+
+/** An admin takes a stage announcement off the stage (a mistaken tap, a test). */
+export async function hideZikrCue(env: Env, memberID: string, groupID: string, eventID: string): Promise<Response> {
+  const managing = await access(env, memberID, groupID, false);
+  if (managing instanceof Response) return managing;
+  if (!managing) return json({ error: "Group admin role required" }, { status: 403 });
+  await env.DB.prepare(`UPDATE group_zikr_cues SET hidden_at=?,
+      notification_state=CASE WHEN notification_state='pending' THEN 'expired' ELSE notification_state END
+    WHERE group_id=? AND event_id=? AND hidden_at IS NULL`).bind(new Date().toISOString(), groupID, eventID.toLowerCase()).run();
+  return new Response(null, { status: 204 });
+}
+
+/** The public face of Our Sheikh's live Zikr for the websites: what is live and
+ * the stage being followed. Never a test Zikr, never the chat or who is there. */
+export async function publicSheikhStage(env: Env): Promise<Record<string, unknown>> {
+  const live = await liveZikr(env, SHEIKH_HALQA_ID, false);
+  const cue = live ? await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE ${SESSION_CUES} ORDER BY sequence DESC LIMIT 1`)
+    .bind(SHEIKH_HALQA_ID, sessionStart(live)).first<CueRow>() : null;
+  const picture = await sheikhPicture(env);
+  return {
+    live: live ? { title: live.title ?? undefined, startedAt: live.started_at ?? undefined } : null,
+    stage: cue ? { title: cue.title, titleUr: cue.title_ur ?? undefined, at: cue.created_at,
+      arabic: RECITATIONS.find(recitation => recitation.id === cue.stage_id)?.arabic } : null,
+    pictureURL: picture?.pictureURL, pictureHDURL: picture?.pictureHDURL,
+  };
 }
 
 /** A member sends a ready-made message; an admin may also type one (up to 200
@@ -323,7 +378,7 @@ export async function zikrStage(env: Env, memberID: string, groupID: string, url
 export async function postStageMessage(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
   const managing = await access(env, memberID, groupID, false);
   if (managing instanceof Response) return managing;
-  if (!await liveZikr(env, groupID)) return json({ error: "The chat opens during the live Zikr." }, { status: 409 });
+  if (!await liveZikr(env, groupID, managing)) return json({ error: "The chat opens during the live Zikr." }, { status: 409 });
   const id = typeof input.id === "string" ? input.id.toLowerCase() : "";
   const presetID = typeof input.presetID === "string" ? input.presetID : null;
   const text = typeof input.text === "string" ? input.text.trim().replace(/\s+/g, " ") : null;

@@ -175,6 +175,8 @@ describe("stage delivery retry and recipient isolation", () => {
     await dispatchZikrCues(env, now);
     expect(sender).not.toHaveBeenCalled();
     expect(raw.prepare("SELECT notification_state FROM group_zikr_cues").get()).toEqual({ notification_state: "expired" });
-    expect((await (await zikrCues(env, "member", "our-sheikh", null)).json() as any).cues).toHaveLength(1);
+    // The record is kept, but once the Zikr ends its stage leaves every screen.
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM group_zikr_cues").get()).toEqual({ n: 1 });
+    expect((await (await zikrCues(env, "member", "our-sheikh", null)).json() as any).cues).toHaveLength(0);
   });
 });

@@ -22,6 +22,8 @@ type LiveRow = {
   started_at: string | null; started_by: string | null; session_id: string | null; queue_json: string;
   queue_index: number; position_seconds: number; position_at: string | null; paused: number;
   notice: string | null; notice_at: string | null; room_recording: number;
+  /** A test session: only the Halqah's admins see it, nobody is notified. */
+  is_test: number;
 };
 
 const notFound = () => json({ error: "Not found" }, { status: 404 });
@@ -51,7 +53,13 @@ export function playbackAt(queue: QueueItem[], index: number, position: number, 
 
 export async function liveRow(env: Env, groupID: string): Promise<LiveRow | null> {
   return env.DB.prepare(`SELECT state,kind,title,video_id,room_id,started_at,started_by,session_id,queue_json,queue_index,
-    position_seconds,position_at,paused,notice,notice_at,room_recording FROM group_live WHERE group_id=?`).bind(groupID).first<LiveRow>();
+    position_seconds,position_at,paused,notice,notice_at,room_recording,is_test FROM group_live WHERE group_id=?`).bind(groupID).first<LiveRow>();
+}
+
+/** What is live, as this person may see it: a test session exists only for the Halqah's admins. */
+export async function visibleLiveRow(env: Env, groupID: string, managing: boolean): Promise<LiveRow | null> {
+  const live = await liveRow(env, groupID);
+  return live?.state === "live" && live.is_test && !managing ? null : live;
 }
 
 export function queueOf(row: Pick<LiveRow, "queue_json"> | null): QueueItem[] {
@@ -103,6 +111,7 @@ export async function beginSession(
   env: Env, groupID: string, startedBy: string,
   session: {
     kind: "zikr" | "meeting"; title: string; videoID: string | null; roomID: string | null; queue: QueueItem[]; roomRecording?: boolean;
+    test?: boolean;
   },
 ): Promise<string> {
   const current = await liveRow(env, groupID);
@@ -110,14 +119,15 @@ export async function beginSession(
   const now = new Date().toISOString();
   const sessionID = `session-${crypto.randomUUID().slice(0, 12)}`;
   await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,
-      session_id,queue_json,queue_index,position_seconds,position_at,paused,notice,notice_at,room_recording)
-    VALUES(?,'live',?,?,?,?,?,?,?,?,?,0,0,?,0,NULL,NULL,?)
+      session_id,queue_json,queue_index,position_seconds,position_at,paused,notice,notice_at,room_recording,is_test)
+    VALUES(?,'live',?,?,?,?,?,?,?,?,?,0,0,?,0,NULL,NULL,?,?)
     ON CONFLICT(group_id) DO UPDATE SET state='live',kind=excluded.kind,title=excluded.title,video_id=excluded.video_id,
       room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at,
       session_id=excluded.session_id,queue_json=excluded.queue_json,queue_index=0,position_seconds=0,
-      position_at=excluded.position_at,paused=0,notice=NULL,notice_at=NULL,room_recording=excluded.room_recording`)
+      position_at=excluded.position_at,paused=0,notice=NULL,notice_at=NULL,room_recording=excluded.room_recording,
+      is_test=excluded.is_test`)
     .bind(groupID, session.kind, session.title, session.videoID, session.roomID, now, startedBy, now, sessionID,
-      JSON.stringify(session.queue), now, session.roomRecording ? 1 : 0).run();
+      JSON.stringify(session.queue), now, session.roomRecording ? 1 : 0, session.test ? 1 : 0).run();
   return sessionID;
 }
 
@@ -130,13 +140,15 @@ export async function endSession(env: Env, groupID: string, endedBy: string): Pr
   if (live?.state === "live" && live.session_id) {
     const attended = await env.DB.prepare("SELECT COUNT(*) AS n FROM group_live_presence WHERE session_id=?")
       .bind(live.session_id).first<{ n: number }>();
-    await env.DB.prepare(`INSERT OR REPLACE INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees)
-      VALUES(?,?,?,?,?,?,?,?,?)`)
-      .bind(live.session_id, groupID, live.kind, live.title, live.started_at ?? now, live.started_by, now, endedBy, attended?.n ?? 0).run();
+    await env.DB.prepare(`INSERT OR REPLACE INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
+      VALUES(?,?,?,?,?,?,?,?,?,?)`)
+      .bind(live.session_id, groupID, live.kind, live.title, live.started_at ?? now, live.started_by, now, endedBy, attended?.n ?? 0,
+        live.is_test ? 1 : 0).run();
   }
   await env.DB.prepare(`INSERT INTO group_live(group_id,state,updated_at) VALUES(?,'offline',?)
     ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,session_id=NULL,queue_json='[]',
-      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,updated_at=excluded.updated_at`)
+      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,is_test=0,
+      updated_at=excluded.updated_at`)
     .bind(groupID, now).run();
 }
 
@@ -327,7 +339,7 @@ export async function duaRequests(env: Env, memberID: string, groupID: string): 
   if (!await canManage(env, memberID, role, groupID)) return forbidden();
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const rows = await env.DB.prepare(`SELECT d.id,d.text,d.show_name,d.created_at,d.read_at,m.display_name FROM group_dua_requests d
-    LEFT JOIN members m ON m.id=d.member_id WHERE d.group_id=? AND (d.read_at IS NULL OR d.created_at>=?)
+    LEFT JOIN members m ON m.id=d.member_id WHERE d.group_id=? AND d.removed_at IS NULL AND (d.read_at IS NULL OR d.created_at>=?)
     ORDER BY d.read_at IS NOT NULL, d.created_at DESC LIMIT 100`).bind(groupID, since)
     .all<{ id: string; text: string; show_name: number; created_at: string; read_at: string | null; display_name: string | null }>();
   return json({
@@ -348,8 +360,18 @@ export async function markDuaRead(env: Env, memberID: string, groupID: string, d
   return new Response(null, { status: 204 });
 }
 
+/** An admin takes a dua request off the list (kept in the database, never shown again). */
+export async function removeDua(env: Env, memberID: string, groupID: string, duaID: string): Promise<Response> {
+  const role = await memberRole(env, memberID);
+  if (!await canSee(env, memberID, role, groupID)) return notFound();
+  if (!await canManage(env, memberID, role, groupID)) return forbidden();
+  await env.DB.prepare("UPDATE group_dua_requests SET removed_at=? WHERE group_id=? AND id=? AND removed_at IS NULL")
+    .bind(new Date().toISOString(), groupID, duaID).run();
+  return new Response(null, { status: 204 });
+}
+
 export async function unreadDuaCount(env: Env, groupID: string): Promise<number> {
-  const row = await env.DB.prepare("SELECT COUNT(*) AS n FROM group_dua_requests WHERE group_id=? AND read_at IS NULL")
+  const row = await env.DB.prepare("SELECT COUNT(*) AS n FROM group_dua_requests WHERE group_id=? AND read_at IS NULL AND removed_at IS NULL")
     .bind(groupID).first<{ n: number }>();
   return row?.n ?? 0;
 }
@@ -367,14 +389,15 @@ export async function sessionHistory(env: Env, memberID: string, groupID: string
       attendees: (rows.results ?? []).map(row => ({ name: row.display_name ?? "Member", firstSeenAt: row.first_seen_at, lastSeenAt: row.last_seen_at })),
     });
   }
-  const rows = await env.DB.prepare(`SELECT session_id,kind,title,started_at,ended_at,attendees FROM group_live_history
+  const rows = await env.DB.prepare(`SELECT session_id,kind,title,started_at,ended_at,attendees,is_test FROM group_live_history
     WHERE group_id=? ORDER BY started_at DESC LIMIT 50`).bind(groupID)
-    .all<{ session_id: string; kind: string; title: string | null; started_at: string; ended_at: string; attendees: number }>();
+    .all<{ session_id: string; kind: string; title: string | null; started_at: string; ended_at: string; attendees: number; is_test: number }>();
   return json({
     // Only the Super admin removes a past session from the record.
     canDelete: role === "superadmin",
     sessions: (rows.results ?? []).map(row => ({
       id: row.session_id, kind: row.kind, title: row.title ?? undefined, startedAt: row.started_at, endedAt: row.ended_at, attendees: row.attendees,
+      isTest: row.is_test ? true : undefined,
     })),
   });
 }

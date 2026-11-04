@@ -123,9 +123,9 @@ export async function renameMember(env: Env, memberID: string, input: Record<str
 export async function communityGroups(env: Env, memberID: string): Promise<Response> {
   const role = await memberRole(env, memberID);
   const sql = role === "superadmin"
-    ? `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind
+    ? `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind,l.is_test AS live_test
        FROM member_groups g LEFT JOIN group_live l ON l.group_id=g.id WHERE g.is_active=1 ORDER BY g.name`
-    : `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind
+    : `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind,l.is_test AS live_test
        FROM member_groups g JOIN member_group_members m ON m.group_id=g.id
        LEFT JOIN group_live l ON l.group_id=g.id
        WHERE m.member_id=? AND g.is_active=1 ORDER BY g.name`;
@@ -134,12 +134,15 @@ export async function communityGroups(env: Env, memberID: string): Promise<Respo
   const groups = [];
   for (const row of result.results ?? []) {
     const mine = role === "superadmin" ? "superadmin" : await roleIn(env, memberID, String(row.id)) ?? "member";
+    const managing = await canManage(env, memberID, role, String(row.id));
+    // A test session is live only for the Halqah's admins.
+    const live = row.live_state === "live" && (!row.live_test || managing);
     groups.push({
       myRole: mine,
       id: row.id, name: row.name, description: row.description ?? undefined,
       meetingURL: row.meeting_url ?? undefined, meetingNote: row.meeting_note ?? undefined,
-      isLive: row.live_state === "live", liveKind: row.live_state === "live" ? row.live_kind : undefined,
-      canManage: await canManage(env, memberID, role, String(row.id)),
+      isLive: live, liveKind: live ? row.live_kind : undefined, liveIsTest: live && row.live_test ? true : undefined,
+      canManage: managing,
     });
   }
   if (role !== "superadmin") return json({ role, groups });
@@ -167,14 +170,15 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
     env.DB.prepare(`SELECT COUNT(*) AS n FROM member_group_members g JOIN members m ON m.id=g.member_id
       WHERE g.group_id=?`).bind(groupID).first<{ n: number }>(),
   ]);
-  const isLive = live?.state === "live";
   const managing = await canManage(env, memberID, role, groupID);
+  // A test session is live only for the Halqah's admins.
+  const isLive = live?.state === "live" && (!live.is_test || managing);
   return json({
     group: { id: group?.id, name: group?.name, description: group?.description ?? undefined },
     canManage: managing,
     memberCount: people?.n ?? 0,
     live: isLive && live ? {
-      kind: live?.kind, title: live?.title ?? undefined,
+      kind: live?.kind, title: live?.title ?? undefined, isTest: live.is_test ? true : undefined,
       // The video plays in the app; the room is joined through /join.
       videoID: live?.video_id ?? undefined, hasRoom: !!live?.room_id, startedAt: live?.started_at ?? undefined,
       // Recordings and past videos played to the group, the shared playback
@@ -400,15 +404,20 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
     if (room instanceof Response) return room;
     roomID = room;
   }
-  const sessionID = await beginSession(env, groupID, memberID, { kind, title, videoID: video, roomID, queue, roomRecording: record });
+  // A test Zikr lets an admin try the session, the stage and the room: only
+  // the Halqah's admins see it, and nobody is notified, then or by its stages.
+  const test = input.test === true;
+  const sessionID = await beginSession(env, groupID, memberID, { kind, title, videoID: video, roomID, queue, roomRecording: record, test });
   if (roomID) await trackRoom(env, { roomID, groupID, sessionID, kind, title, record });
   const recorded = queue.length > 0;
-  await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title,
-    kind === "meeting" ? "The group meeting has started. Join now in Darul Irfan."
-      : recorded && !roomID ? "The Halqah zikr has started. Listen together in Darul Irfan."
-      : "Halqah zikr has started. Join now in Darul Irfan.",
-    `darulirfan://groups/${groupID}`);
-  return json({ ok: true, state: "live", kind, hasRoom: !!roomID, recorded, sessionID });
+  if (!test) {
+    await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title,
+      kind === "meeting" ? "The group meeting has started. Join now in Darul Irfan."
+        : recorded && !roomID ? "The Halqah zikr has started. Listen together in Darul Irfan."
+        : "Halqah zikr has started. Join now in Darul Irfan.",
+      `darulirfan://groups/${groupID}`);
+  }
+  return json({ ok: true, state: "live", kind, hasRoom: !!roomID, recorded, sessionID, isTest: test || undefined });
 }
 
 export async function scheduleMeeting(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
