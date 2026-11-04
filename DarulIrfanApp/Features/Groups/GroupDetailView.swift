@@ -129,7 +129,9 @@ struct GroupDetailView: View {
             guard scenePhase == .active || listeningHere else { return }
             await followSession()
         }
-        .refreshable { await load() }
+        // Its own task: SwiftUI cancels the refresh gesture's task when the
+        // page redraws mid-load, and the load must still finish.
+        .refreshable { await Task { await load() }.value }
         .alert("Remove this announcement?", isPresented: Binding(
             get: { postToRemove != nil }, set: { if !$0 { postToRemove = nil } }
         )) {

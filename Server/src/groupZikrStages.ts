@@ -74,6 +74,29 @@ export const DEFAULT_ZIKR_STAGES: ZikrStage[] = [
   }
 ];
 
+/** The recitations that open every Zikr, in order, exactly as the Method of
+ * Zikr gives them (method_of_zikr.json): shown in Arabic on the live stage
+ * while Hazrat ji recites them. Announced like a stage. */
+export interface Recitation { id: string; title: string; titleUr: string; arabic: string }
+export const RECITATIONS: Recitation[] = [
+  { id: "tasbih", title: "Tasbihat", titleUr: "تسبیحات", arabic: "سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيمِ" },
+  { id: "istighfar", title: "Istighfar", titleUr: "استغفار", arabic: "أَسْتَغْفِرُ اللّٰهَ رَبِّي مِنْ كُلِّ ذَنْبٍ وَأَتُوبُ إِلَيْهِ" },
+  { id: "shahadah", title: "Shahadah", titleUr: "کلمہ شہادت", arabic: "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ" },
+  { id: "taawwudh", title: "Ta'awwudh", titleUr: "تعوذ", arabic: "أَعُوذُ بِاللّٰهِ مِنَ الشَّيْطَانِ الرَّجِيمِ" },
+  { id: "basmalah", title: "Bismillah", titleUr: "تسمیہ", arabic: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ" },
+];
+
+/** The stage chat's ready-made messages: all a member can send. */
+export const STAGE_PRESETS = [
+  { id: "salam", title: "Assalamu alaikum wa rahmatullah", titleUr: "السلام علیکم ورحمۃ اللہ" },
+  { id: "dua-request", title: "Request for prayers", titleUr: "دعا کی درخواست" },
+  { id: "ameen", title: "Ameen", titleUr: "آمین" },
+  { id: "jazakallah", title: "JazakAllahu khairan", titleUr: "جزاک اللہ خیراً" },
+  { id: "subhanallah", title: "SubhanAllah", titleUr: "سبحان اللہ" },
+  { id: "mashallah", title: "MashaAllah", titleUr: "ماشاء اللہ" },
+  { id: "cannot-hear", title: "The sound is not clear", titleUr: "آواز صاف نہیں آ رہی" },
+];
+
 async function liveZikr(env: Env, groupID: string): Promise<boolean> {
   return !!await env.DB.prepare("SELECT group_id FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'").bind(groupID).first();
 }
@@ -96,7 +119,7 @@ export async function zikrStages(env: Env, memberID: string, groupID: string): P
     .bind(groupID).all<{ id: string; title: string; title_ur: string | null }>();
   return json({ canBroadcast: managing && await liveZikr(env, groupID), stages: [...DEFAULT_ZIKR_STAGES, ...(custom.results ?? []).map(row => ({
     id: row.id, title: row.title, titleUr: row.title_ur ?? undefined, isCustom: true,
-  }))] });
+  }))], recitations: RECITATIONS, presets: STAGE_PRESETS });
 }
 
 /** Client retains the UUID across retries; repeated submission cannot create another stage. */
@@ -128,7 +151,8 @@ interface CueRow {
 function presentCue(row: CueRow) {
   return { sequence: row.sequence, id: row.event_id, stageID: row.stage_id, title: row.title,
     titleUr: row.title_ur ?? undefined, authorID: row.author_id, createdAt: row.created_at,
-    notificationState: row.notification_state };
+    notificationState: row.notification_state,
+    arabic: RECITATIONS.find(recitation => recitation.id === row.stage_id)?.arabic };
 }
 
 /** Persistent stage chat; poll after the last sequence without losing a burst of cues. */
@@ -156,15 +180,20 @@ export async function broadcastZikrCue(env: Env, memberID: string, groupID: stri
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(eventID) || !stageID || stageID.length > 80) {
     return json({ error: "A stage and event ID are required" }, { status: 400 });
   }
-  let stage = DEFAULT_ZIKR_STAGES.find(value => value.id === stageID);
+  let stage: ZikrStage | undefined = DEFAULT_ZIKR_STAGES.find(value => value.id === stageID);
+  const recitation = RECITATIONS.find(value => value.id === stageID);
+  if (!stage && recitation) stage = { id: recitation.id, title: recitation.title, titleUr: recitation.titleUr, isCustom: false };
   if (!stage) {
     const row = await env.DB.prepare("SELECT id,title,title_ur FROM group_zikr_stages WHERE group_id=? AND id=?")
       .bind(groupID, stageID).first<{ id: string; title: string; title_ur: string | null }>();
     if (row) stage = { id: row.id, title: row.title, titleUr: row.title_ur ?? undefined, isCustom: true };
   }
   if (!stage) return json({ error: "Stage not found" }, { status: 404 });
-  const result = await env.DB.prepare(`INSERT OR IGNORE INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at)
-    VALUES(?,?,?,?,?,?,?)`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString()).run();
+  // A recitation changes every few minutes; it shows on the stage without a
+  // notification (only Latifas and Muraqabat notify).
+  const result = await env.DB.prepare(`INSERT OR IGNORE INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
+    VALUES(?,?,?,?,?,?,?,?)`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
+    recitation ? "complete" : "pending").run();
   const saved = await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND event_id=?")
     .bind(groupID, eventID).first<CueRow>();
   if (!saved) return json({ error: "Stage announcement could not be saved" }, { status: 503 });
@@ -185,8 +214,9 @@ export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void
   const timestamp = now.toISOString();
   await env.DB.prepare(`UPDATE group_zikr_cues SET notification_state='expired'
     WHERE notification_state='pending' AND (NOT EXISTS (SELECT 1 FROM group_live l WHERE l.group_id=group_zikr_cues.group_id AND l.state='live' AND l.kind='zikr') OR created_at<? OR sequence < (
-      SELECT MAX(newer.sequence) FROM group_zikr_cues newer WHERE newer.group_id=group_zikr_cues.group_id))`)
-    .bind(new Date(now.getTime() - CUE_MAX_AGE_MS).toISOString()).run();
+      SELECT MAX(newer.sequence) FROM group_zikr_cues newer WHERE newer.group_id=group_zikr_cues.group_id
+        AND newer.stage_id NOT IN (${RECITATIONS.map(() => "?").join(",")})))`)
+    .bind(new Date(now.getTime() - CUE_MAX_AGE_MS).toISOString(), ...RECITATIONS.map(recitation => recitation.id)).run();
   const pending = await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE notification_state='pending'
     AND (notification_lease_until IS NULL OR notification_lease_until<?) ORDER BY sequence LIMIT 10`)
     .bind(timestamp).all<CueRow>();
@@ -227,4 +257,105 @@ export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void
         .bind(cue.sequence, lease).run();
     }
   }
+}
+
+
+interface StageMessageRow {
+  sequence: number; id: string; author_id: string; preset_id: string | null; body: string | null;
+  created_at: string; name: string | null; city: string | null;
+}
+function presentMessage(row: StageMessageRow) {
+  const preset = STAGE_PRESETS.find(value => value.id === row.preset_id);
+  return { sequence: row.sequence, id: row.id, authorID: row.author_id, authorName: row.name ?? "Member",
+    city: row.city ?? undefined, presetID: row.preset_id ?? undefined, text: preset?.title ?? row.body ?? "",
+    textUr: preset?.titleUr, createdAt: row.created_at };
+}
+const STAGE_MESSAGE_SELECT = `SELECT m.sequence,m.id,m.author_id,m.preset_id,m.body,m.created_at,
+    COALESCE(p.display_name,mb.display_name) AS name,p.city AS city
+  FROM group_stage_messages m JOIN members mb ON mb.id=m.author_id
+  LEFT JOIN sheikh_public_profiles p ON p.member_id=m.author_id`;
+
+/** Everything the live stage shows, in one small request it repeats every few
+ * seconds: the session, the picture, stage announcements and chat after the
+ * phone's cursors. The chat starts with the current session. */
+export async function zikrStage(env: Env, memberID: string, groupID: string, url: URL): Promise<Response> {
+  const managing = await access(env, memberID, groupID, false);
+  if (managing instanceof Response) return managing;
+  const cursor = (name: string) => {
+    const value = url.searchParams.get(name);
+    return value === null ? null : /^\d{1,15}$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : NaN;
+  };
+  const cueAfter = cursor("cues"), chatAfter = cursor("chat");
+  if (Number.isNaN(cueAfter) || Number.isNaN(chatAfter)) return json({ error: "Invalid stage cursor" }, { status: 400 });
+  const live = await env.DB.prepare("SELECT kind,title,video_id,started_at FROM group_live WHERE group_id=? AND state='live'")
+    .bind(groupID).first<{ kind: string; title: string | null; video_id: string | null; started_at: string | null }>();
+  const zikr = live?.kind === "zikr";
+  // Hazrat ji's picture: the thumbnail of the latest official Daily Zikr.
+  const picture = await env.DB.prepare(`SELECT image_url,video_id FROM feed_items WHERE source='youtube' AND image_url IS NOT NULL
+      AND title LIKE 'Online Zikr with%' ORDER BY published_at DESC LIMIT 1`).first<{ image_url: string; video_id: string | null }>();
+  const cues = cueAfter === null
+    ? ((await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? ORDER BY sequence DESC LIMIT 30")
+        .bind(groupID).all<CueRow>()).results ?? []).reverse()
+    : (await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND sequence>? ORDER BY sequence LIMIT 100")
+        .bind(groupID, cueAfter).all<CueRow>()).results ?? [];
+  const since = zikr && live?.started_at ? live.started_at : new Date().toISOString();
+  const messages = chatAfter === null
+    ? ((await env.DB.prepare(`${STAGE_MESSAGE_SELECT} WHERE m.group_id=? AND m.created_at>=? AND m.hidden_at IS NULL
+        ORDER BY m.sequence DESC LIMIT 100`).bind(groupID, since).all<StageMessageRow>()).results ?? []).reverse()
+    : (await env.DB.prepare(`${STAGE_MESSAGE_SELECT} WHERE m.group_id=? AND m.created_at>=? AND m.sequence>? AND m.hidden_at IS NULL
+        ORDER BY m.sequence LIMIT 100`).bind(groupID, since, chatAfter).all<StageMessageRow>()).results ?? [];
+  // Removals since the phone's cursor, so a removed message leaves every screen.
+  const hidden = chatAfter === null ? [] : ((await env.DB.prepare(`SELECT id FROM group_stage_messages
+      WHERE group_id=? AND hidden_at IS NOT NULL AND hidden_at>=?`).bind(groupID, since).all<{ id: string }>()).results ?? [])
+    .map(row => row.id);
+  return json({
+    live: zikr ? { title: live?.title ?? undefined, videoID: live?.video_id ?? undefined, startedAt: live?.started_at ?? undefined } : null,
+    pictureURL: picture?.image_url, canLead: managing && zikr,
+    // YouTube's full-size frame where the video has one; the app falls back to pictureURL.
+    pictureHDURL: picture?.video_id && /^[A-Za-z0-9_-]{11}$/.test(picture.video_id) ? `https://i.ytimg.com/vi/${picture.video_id}/maxresdefault.jpg` : undefined,
+    cues: cues.map(presentCue), nextCue: cues.at(-1)?.sequence ?? cueAfter ?? 0,
+    messages: messages.map(presentMessage), nextChat: messages.at(-1)?.sequence ?? chatAfter ?? 0, hidden,
+  });
+}
+
+/** A member sends a ready-made message; an admin may also type one (up to 200
+ * characters). Only during the live Zikr. The client's UUID makes a retry safe. */
+export async function postStageMessage(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
+  const managing = await access(env, memberID, groupID, false);
+  if (managing instanceof Response) return managing;
+  if (!await liveZikr(env, groupID)) return json({ error: "The chat opens during the live Zikr." }, { status: 409 });
+  const id = typeof input.id === "string" ? input.id.toLowerCase() : "";
+  const presetID = typeof input.presetID === "string" ? input.presetID : null;
+  const text = typeof input.text === "string" ? input.text.trim().replace(/\s+/g, " ") : null;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id)) return json({ error: "A message ID is required" }, { status: 400 });
+  if (presetID !== null && text === null) {
+    if (!STAGE_PRESETS.some(preset => preset.id === presetID)) return json({ error: "Unknown message" }, { status: 400 });
+  } else if (text !== null && presetID === null) {
+    if (!managing) return json({ error: "Members send the ready-made messages." }, { status: 403 });
+    if (!text || text.length > 200 || /[\u0000-\u001f\u007f]/.test(text)) return json({ error: "Write up to 200 characters." }, { status: 400 });
+  } else return json({ error: "Send a ready-made message or text" }, { status: 400 });
+  // One message every 3 seconds per member keeps the stage readable.
+  const last = await env.DB.prepare("SELECT created_at FROM group_stage_messages WHERE group_id=? AND author_id=? ORDER BY sequence DESC LIMIT 1")
+    .bind(groupID, memberID).first<{ created_at: string }>();
+  const existing = await env.DB.prepare(`${STAGE_MESSAGE_SELECT} WHERE m.group_id=? AND m.id=?`).bind(groupID, id).first<StageMessageRow>();
+  if (existing) {
+    return existing.author_id === memberID ? json({ message: presentMessage(existing) })
+      : json({ error: "This message ID already belongs to another message" }, { status: 409 });
+  }
+  if (!managing && last && Date.now() - Date.parse(last.created_at) < 3_000) return json({ error: "Please wait a moment." }, { status: 429 });
+  await env.DB.prepare(`INSERT OR IGNORE INTO group_stage_messages(group_id,id,author_id,preset_id,body,created_at) VALUES(?,?,?,?,?,?)`)
+    .bind(groupID, id, memberID, presetID, presetID === null ? text : null, new Date().toISOString()).run();
+  const saved = await env.DB.prepare(`${STAGE_MESSAGE_SELECT} WHERE m.group_id=? AND m.id=?`).bind(groupID, id).first<StageMessageRow>();
+  if (!saved || saved.author_id !== memberID) return json({ error: "The message could not be saved" }, { status: 503 });
+  return json({ message: presentMessage(saved) }, { status: 201 });
+}
+
+/** An admin takes a message off the stage. */
+export async function hideStageMessage(env: Env, memberID: string, groupID: string, messageID: string): Promise<Response> {
+  const managing = await access(env, memberID, groupID, false);
+  if (managing instanceof Response) return managing;
+  if (!managing) return json({ error: "Group admin role required" }, { status: 403 });
+  await env.DB.prepare("UPDATE group_stage_messages SET hidden_at=? WHERE group_id=? AND id=? AND hidden_at IS NULL")
+    .bind(new Date().toISOString(), groupID, messageID.toLowerCase()).run();
+  return new Response(null, { status: 204 });
 }

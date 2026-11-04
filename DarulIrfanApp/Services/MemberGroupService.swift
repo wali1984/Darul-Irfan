@@ -599,7 +599,7 @@ actor MemberGroupService {
             request.setValue("application/json", forHTTPHeaderField: "content-type")
             request.httpBody = try JSONSerialization.data(withJSONObject: payload)
         }
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await self.data(for: request)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
@@ -648,6 +648,15 @@ actor MemberGroupService {
         try SheikhVisitorStore.delete()
     }
 
+    /// A request cancelled with its task (pull-to-refresh ends, the page
+    /// redraws, the panel's poll restarts) is a cancellation, not a failure:
+    /// URLSession reports it as URLError.cancelled, which every screen showed
+    /// as an error with "Try again" although the server had answered 200.
+    private func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        do { return try await session.data(for: request) }
+        catch let error as URLError where error.code == .cancelled { throw CancellationError() }
+    }
+
     private func authorized<T: Decodable>(_ type: T.Type, path: String, query: String? = nil) async throws -> T {
         guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
         var url = baseURL.appendingPathComponent(path)
@@ -657,7 +666,7 @@ actor MemberGroupService {
         }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await self.data(for: request)
         let code = (response as? HTTPURLResponse)?.statusCode ?? 0
         if code == 401 {
             // The session expired or was revoked; drop it so the UI asks for a

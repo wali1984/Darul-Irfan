@@ -1,4 +1,4 @@
-import { zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues } from "./groupZikrStages";
+import { zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues, zikrStage, postStageMessage, hideStageMessage } from "./groupZikrStages";
 import { joinOurSheikh } from "./sheikhPublicJoin";
 import type { AndroidDeviceRegistration, DeviceRegistration, Env } from "./contracts";
 import { refreshPaltalkRoom } from "./paltalkRoom";
@@ -158,12 +158,19 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues|stage|stage-chat)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (section === "zikr-cues" && !entity && request.method === "GET") return zikrCues(env, member, groupID, url.searchParams.get("after"));
     if (section === "zikr-cues" && !entity && request.method === "POST") return broadcastZikrCue(env, member, groupID, await body());
     if (section === "zikr-stages" && !entity && request.method === "GET") return zikrStages(env, member, groupID);
+    // The live Zikr stage: one poll for everything on it, and its chat.
+    if (section === "stage" && !entity && request.method === "GET") return zikrStage(env, member, groupID, url);
+    if (section === "stage-chat" && !entity && request.method === "POST") {
+      if (!await withinWriteLimit(request, env, "stage-chat", 600)) return json({ error: "Too many requests" }, { status: 429 });
+      return postStageMessage(env, member, groupID, await body());
+    }
+    if (section === "stage-chat" && entity && !action && request.method === "DELETE") return hideStageMessage(env, member, groupID, entity);
     if (section === "zikr-stages" && !entity && request.method === "POST") return addZikrStage(env, member, groupID, await body());
     if (!section && request.method === "GET") return groupDetail(env, member, groupID);
     if (!section && request.method === "PUT") return updateHalqah(env, member, groupID, await body());
