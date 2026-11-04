@@ -76,8 +76,37 @@ interface SessionInput {
 export async function createSession(request: Request, env: Env, resolveKey?: JWTVerifyGetKey): Promise<Response> {
   const input = await request.json<SessionInput>();
   const provider = input?.provider == null || input.provider === "" ? "apple" : String(input.provider).trim().toLowerCase();
-  if (provider === "google") return createGoogleSession(env, input);
-  if (provider !== "apple") return json({ error: "Unknown sign-in provider" }, { status: 400 });
+  // Read before signing in: the phone's Our Sheikh visitor session, if any.
+  const visitor = await authenticatedMember(request, env);
+  const response = provider === "google" ? await createGoogleSession(env, input)
+    : provider === "apple" ? await createAppleSession(env, input, resolveKey)
+    : json({ error: "Unknown sign-in provider" }, { status: 400 });
+  if (response.status === 201 && visitor) {
+    const { memberID } = await response.clone().json<{ memberID: string }>();
+    await adoptVisitor(env, visitor, memberID);
+  }
+  return response;
+}
+
+/** A visitor who joined Our Sheikh publicly and now signs in (for an
+ * invitation-only Halqah) keeps Our Sheikh and their name and city on the
+ * signed-in account. Only a public visitor account is carried over. */
+async function adoptVisitor(env: Env, visitorID: string, memberID: string): Promise<void> {
+  if (visitorID === memberID) return;
+  const visitor = await env.DB.prepare("SELECT apple_subject FROM members WHERE id=?").bind(visitorID).first<{ apple_subject: string }>();
+  if (!visitor?.apple_subject.startsWith("sheikh-guest:")) return;
+  const now = new Date().toISOString();
+  await env.DB.batch([
+    env.DB.prepare(`INSERT OR IGNORE INTO member_group_members(group_id,member_id,added_at,added_by,role)
+      SELECT group_id,?,?,'visitor-sign-in','member' FROM member_group_members WHERE member_id=? AND group_id='our-sheikh'`)
+      .bind(memberID, now, visitorID),
+    env.DB.prepare(`INSERT OR IGNORE INTO sheikh_public_profiles(member_id,display_name,city,country_code,contact_email,updated_at)
+      SELECT ?,display_name,city,country_code,contact_email,? FROM sheikh_public_profiles WHERE member_id=?`)
+      .bind(memberID, now, visitorID),
+  ]);
+}
+
+async function createAppleSession(env: Env, input: SessionInput, resolveKey?: JWTVerifyGetKey): Promise<Response> {
   const verified = await appleSubject(String(input?.identityToken ?? ""), env, resolveKey);
   if (!verified) return json({ error: "Apple identity could not be verified" }, { status: 401 });
 

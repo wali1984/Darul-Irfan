@@ -99,10 +99,13 @@ const newID = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 12)}
 // MARK: - Reading
 
 export async function me(env: Env, memberID: string): Promise<Response> {
-  const row = await env.DB.prepare("SELECT id,role,display_name FROM members WHERE id=?").bind(memberID)
-    .first<{ id: string; role: string; display_name: string | null }>();
+  const row = await env.DB.prepare("SELECT id,role,display_name,apple_subject FROM members WHERE id=?").bind(memberID)
+    .first<{ id: string; role: string; display_name: string | null; apple_subject: string }>();
   if (!row) return notFound();
-  return json({ memberID: row.id, role: await memberRole(env, memberID), displayName: row.display_name ?? undefined });
+  // A public Our Sheikh visitor has no Apple or Google identity: the app
+  // offers them sign-in for the invitation-only Halqahs.
+  return json({ memberID: row.id, role: await memberRole(env, memberID), displayName: row.display_name ?? undefined,
+    isVisitor: row.apple_subject.startsWith("sheikh-guest:") });
 }
 
 /** PUT /v1/members/me - the member's own name, as their Halqah's admins, the

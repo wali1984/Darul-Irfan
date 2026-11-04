@@ -46,6 +46,9 @@ final class GroupsModel {
     /// The member's own name, as their Halqah's admins and the meeting room
     /// show it.
     var displayName: String?
+    /// Signed in only as a public Our Sheikh visitor: the tab offers Sign in
+    /// with Apple for the invitation-only Halqahs.
+    var isVisitor = false
     var isSavingName = false
     var nameError: String?
 
@@ -106,6 +109,7 @@ final class GroupsModel {
         signedIn = nil
         memberID = nil
         displayName = nil
+        isVisitor = false
         role = .member
         offerNotices = false
         phase = .signedOut
@@ -138,6 +142,7 @@ final class GroupsModel {
                 try Task.checkCancellation()
                 guard revision == refreshRevision else { return }
                 if profileRevision == nameRevision && !isSavingName { displayName = profile.displayName }
+                isVisitor = profile.isVisitor == true
             } catch is CancellationError {
                 return
             } catch MemberGroupError.notSignedIn {

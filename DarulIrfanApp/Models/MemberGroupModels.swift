@@ -277,6 +277,9 @@ struct MemberProfile: Codable, Sendable {
     var memberID: String
     var role: MemberRole
     var displayName: String?
+    /// Joined Our Sheikh publicly, with no Apple or Google identity: offered
+    /// sign-in for the invitation-only Halqahs (older server: absent).
+    var isVisitor: Bool?
 }
 
 enum MemberGroupPostKind: String, Codable, Sendable {
@@ -436,7 +439,51 @@ struct HalqaZikrStage: Codable, Sendable, Identifiable, Equatable {
 struct HalqaZikrStages: Codable, Sendable {
     let canBroadcast: Bool
     let stages: [HalqaZikrStage]
+    /// The Method of Zikr's opening recitations, in order (older server: none).
+    var recitations: [HalqaRecitation]? = nil
+    /// The stage chat's ready-made messages.
+    var presets: [HalqaStagePreset]? = nil
 }
+struct HalqaRecitation: Codable, Sendable, Identifiable, Equatable {
+    let id: String
+    let title: String
+    let titleUr: String
+    let arabic: String
+}
+struct HalqaStagePreset: Codable, Sendable, Identifiable, Equatable {
+    let id: String
+    let title: String
+    let titleUr: String
+}
+/// One poll of the live stage: what changed after the phone's cursors.
+struct HalqaStageUpdate: Codable, Sendable {
+    struct Live: Codable, Sendable, Equatable {
+        let title: String?
+        let videoID: String?
+        let startedAt: Date?
+    }
+    let live: Live?
+    let pictureURL: URL?
+    let pictureHDURL: URL?
+    let canLead: Bool
+    let cues: [HalqaZikrCue]
+    let nextCue: Int64
+    let messages: [HalqaStageMessage]
+    let nextChat: Int64
+    let hidden: [String]
+}
+struct HalqaStageMessage: Codable, Sendable, Identifiable, Equatable {
+    let sequence: Int64
+    let id: String
+    let authorID: String
+    let authorName: String
+    let city: String?
+    let presetID: String?
+    let text: String
+    let textUr: String?
+    let createdAt: Date
+}
+struct HalqaStageMessageResult: Codable, Sendable { let message: HalqaStageMessage }
 struct HalqaZikrCue: Codable, Sendable, Identifiable, Equatable {
     let sequence: Int64
     let id: String
@@ -446,6 +493,8 @@ struct HalqaZikrCue: Codable, Sendable, Identifiable, Equatable {
     let authorID: String
     let createdAt: Date
     let notificationState: String
+    /// A recitation's Arabic, shown while Hazrat ji recites it.
+    var arabic: String? = nil
 }
 struct HalqaZikrCuePage: Codable, Sendable {
     let cues: [HalqaZikrCue]

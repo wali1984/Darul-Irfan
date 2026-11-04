@@ -48,6 +48,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
                 completionHandler(PersonalZikrStore.shared.screenActive ? [] : [.banner, .list, .sound])
             }
         } else {
+            // A stage announcement for Our Sheikh: an open live stage shows it now.
+            if (notification.request.content.userInfo["path"] as? String)?.hasSuffix("groups/our-sheikh") == true {
+                Task { @MainActor in NotificationCenter.default.post(name: .halqahStageNudge, object: nil) }
+            }
             completionHandler([.banner, .list, .sound])
         }
     }

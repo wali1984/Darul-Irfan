@@ -42,6 +42,10 @@ struct GroupDetailView: View {
     /// than every card loading a player at once.
     @State private var playingVideoID: String?
     @State private var room: GroupRoomPass?
+    /// Our Sheikh's live Zikr stage, full screen.
+    @State private var stageOpen = false
+    /// Sessions whose stage opened by itself once in this run of the app.
+    @MainActor private static var stageOpenedFor: Set<String> = []
     @State private var joining = false
     @State private var joinError: String?
     @State private var sheet: AdminSheet?
@@ -101,7 +105,13 @@ struct GroupDetailView: View {
                         }
                     }
                 } else {
-                    if group.id == "our-sheikh" { SheikhZikrPanel(groupID: group.id, service: service, isLiveZikr: detail?.live?.kind == "zikr") }
+                    if group.id == "our-sheikh" {
+                        if detail?.live?.kind == "zikr" {
+                            StageEntryCard { stageOpen = true }
+                        } else {
+                            SheikhZikrPanel(groupID: group.id, service: service, isLiveZikr: false)
+                        }
+                    }
                     officialLiveSection
                     liveSection
                     nextZikrSection
@@ -183,6 +193,17 @@ struct GroupDetailView: View {
         )) {
             Button("OK", role: .cancel) { actionFailure = nil }
         } message: { Text(verbatim: actionFailure ?? "") }
+        .fullScreenCover(isPresented: $stageOpen) {
+            ZikrStageView(groupID: group.id, service: service)
+        }
+        // Going live, or opening Our Sheikh while it is live, opens the stage
+        // once per session; closing it leaves the page and its card.
+        .onChange(of: detail?.live?.sessionID) { _, sessionID in
+            guard group.id == "our-sheikh", detail?.live?.kind == "zikr", let sessionID, room == nil,
+                  !Self.stageOpenedFor.contains(sessionID) else { return }
+            Self.stageOpenedFor.insert(sessionID)
+            stageOpen = true
+        }
         .fullScreenCover(item: $room) { pass in
             if pass.roomID?.isEmpty == false {
                 NativeMeetingRoomView(pass: pass, groupID: group.id, service: service,

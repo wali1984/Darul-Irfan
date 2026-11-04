@@ -1,6 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "NSSpeechRecognitionUsageDescription" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you lead the live Zikr, Darul Irfan recognises Hazrat ji's words on this phone to show the stage he announces. Nothing he says is stored."
+          }
+        },
+        "ur" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جب آپ براہِ راست ذکر کی قیادت کریں تو دارالعرفان اسی فون پر حضرت جی کے الفاظ پہچان کر وہ مرحلہ دکھاتا ہے جس کا وہ اعلان کریں۔ ان کی کوئی بات محفوظ نہیں کی جاتی۔"
+          }
+        }
+      }
+    },
     "NSCalendarsWriteOnlyAccessUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -56,13 +72,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Darul Irfan uses the microphone when you choose to speak in a Halqah or record your recitation for private memorization practice."
+            "value" : "Darul Irfan uses the microphone when you choose to speak in a Halqah, record your recitation for private memorization practice, or, leading the live Zikr, let the stage follow Hazrat ji's voice."
           }
         },
         "ur" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "دارالعرفان مائیکروفون اس وقت استعمال کرتا ہے جب آپ حلقے میں بولنا چاہیں یا حفظ کی ذاتی مشق کے لیے اپنی تلاوت ریکارڈ کریں۔"
+            "value" : "دارالعرفان مائیکروفون اس وقت استعمال کرتا ہے جب آپ حلقے میں بولنا چاہیں، حفظ کی ذاتی مشق کے لیے اپنی تلاوت ریکارڈ کریں، یا براہِ راست ذکر کی قیادت میں اسٹیج کو حضرت جی کی آواز کے ساتھ چلائیں۔"
           }
         }
       }

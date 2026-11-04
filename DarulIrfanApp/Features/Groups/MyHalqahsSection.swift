@@ -107,6 +107,11 @@ struct MyHalqahsSection: View {
         } else {
             groupList
         }
+        // Our Sheikh is open to everyone; every other Halqah is invitation
+        // only and needs a signed-in account (owner, 2026-11-03).
+        if model.isVisitor && MemberGroupsFeature.appleSignInAvailable {
+            visitorSignInCard
+        }
         // Another code (a second group, or an admin role) adds to this same
         // account.
         addCodeRow
@@ -318,6 +323,32 @@ struct MyHalqahsSection: View {
                 .frame(height: 48)
                 .accessibilityLabel("Sign in with Apple to see your private group")
             }
+        }
+        .myHalqahsPanel()
+    }
+
+    /// For someone who joined Our Sheikh as a visitor: signing in keeps Our
+    /// Sheikh and opens the invitation-only Halqahs.
+    private var visitorSignInCard: some View {
+        VStack(alignment: .leading, spacing: DISpacing.sm) {
+            HStack(spacing: DISpacing.md) {
+                cardSymbol("person.crop.circle.badge.checkmark")
+                Text("Your Halqah").diInterfaceFont(.headline)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+            Text("Our Sheikh is open to everyone. Other Halqahs are by invitation: sign in, then enter your code or ask an administrator to add you. You stay in Our Sheikh.")
+                .diInterfaceFont(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            SignInWithAppleButton(.signIn) { request in
+                request.requestedScopes = [.fullName, .email]
+            } onCompletion: { result in
+                Task { await model.completeSignIn(result) }
+            }
+            .signInWithAppleButtonStyle(.black)
+            .frame(height: 48)
+            .accessibilityLabel("Sign in with Apple to see your private group")
         }
         .myHalqahsPanel()
     }

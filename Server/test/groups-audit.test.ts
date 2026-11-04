@@ -191,7 +191,7 @@ describe("LIVE-007: a member's own name", () => {
     const { call, member } = await setup();
     const renamed = await call(member, "PUT", "/v1/members/me", { displayName: "  Imran   Ali " });
     expect(renamed.status).toBe(200);
-    expect(await renamed.json()).toEqual({ memberID: A, role: "member", displayName: "Imran Ali" });
+    expect(await renamed.json()).toEqual({ memberID: A, role: "member", displayName: "Imran Ali", isVisitor: false });
     expect(((await (await call(member, "GET", "/v1/members/me")).json()) as { displayName: string }).displayName).toBe("Imran Ali");
     const empty = await call(member, "PUT", "/v1/members/me", { displayName: "   " });
     expect(empty.status).toBe(400);

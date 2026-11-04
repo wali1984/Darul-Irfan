@@ -1,6 +1,342 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Naqshbandia Owaisiah · Darul Irfan": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naqshbandia Owaisiah · Darul Irfan"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نقشبندیہ اویسیہ · دارالعرفان"
+          }
+        }
+      }
+    },
+    "The Zikr is not live now.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Zikr is not live now."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر اس وقت براہِ راست نہیں۔"
+          }
+        }
+      }
+    },
+    "The Zikr begins soon.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Zikr begins soon."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ذکر جلد شروع ہوگا۔"
+          }
+        }
+      }
+    },
+    "Connecting to the live Zikr…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting to the live Zikr…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست ذکر سے رابطہ ہو رہا ہے…"
+          }
+        }
+      }
+    },
+    "Listening to Hazrat ji": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listening to Hazrat ji"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حضرت جی کو سنا جا رہا ہے"
+          }
+        }
+      }
+    },
+    "Listen to Hazrat ji": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen to Hazrat ji"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حضرت جی کو سنیں"
+          }
+        }
+      }
+    },
+    "Presentation": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presentation"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیشکش"
+          }
+        }
+      }
+    },
+    "Heard: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heard: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سنا گیا: %@"
+          }
+        }
+      }
+    },
+    "Undo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Undo"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "واپس کریں"
+          }
+        }
+      }
+    },
+    "Opening recitations": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opening recitations"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابتدائی تسبیحات"
+          }
+        }
+      }
+    },
+    "Stages": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stages"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مراحل"
+          }
+        }
+      }
+    },
+    "Tap to show it on the stage. Pressing \"Presentation\" hides these controls; double-tap the stage to bring them back.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap to show it on the stage. Pressing \"Presentation\" hides these controls; double-tap the stage to bring them back."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیج پر دکھانے کے لیے ٹیپ کریں۔ ”پیشکش“ دبانے سے یہ بٹن چھپ جاتے ہیں؛ واپس لانے کے لیے اسٹیج پر دو بار ٹیپ کریں۔"
+          }
+        }
+      }
+    },
+    "Messages from those joining appear here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messages from those joining appear here."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شامل ہونے والوں کے پیغامات یہاں نظر آئیں گے۔"
+          }
+        }
+      }
+    },
+    "Write to everyone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Write to everyone"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سب کو لکھیں"
+          }
+        }
+      }
+    },
+    "Open the live Zikr stage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the live Zikr stage"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "براہِ راست ذکر کا اسٹیج کھولیں"
+          }
+        }
+      }
+    },
+    "The current stage, the recitation in Arabic, and the chat.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current stage, the recitation in Arabic, and the chat."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجودہ مرحلہ، عربی میں تسبیحات، اور گفتگو۔"
+          }
+        }
+      }
+    },
+    "Allow Speech Recognition and the Microphone for Darul Irfan in Settings.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Speech Recognition and the Microphone for Darul Irfan in Settings."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سیٹنگز میں دارالعرفان کے لیے اسپیچ ریکگنیشن اور مائیکروفون کی اجازت دیں۔"
+          }
+        }
+      }
+    },
+    "Speech recognition is not available on this phone right now.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech recognition is not available on this phone right now."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس فون پر ابھی اسپیچ ریکگنیشن دستیاب نہیں۔"
+          }
+        }
+      }
+    },
+    "The microphone could not be started.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone could not be started."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مائیکروفون شروع نہیں ہو سکا۔"
+          }
+        }
+      }
+    },
+    "Your Halqah": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Halqah"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کا حلقہ"
+          }
+        }
+      }
+    },
+    "Our Sheikh is open to everyone. Other Halqahs are by invitation: sign in, then enter your code or ask an administrator to add you. You stay in Our Sheikh.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Our Sheikh is open to everyone. Other Halqahs are by invitation: sign in, then enter your code or ask an administrator to add you. You stay in Our Sheikh."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہمارے شیخ سب کے لیے کھلا ہے۔ دوسرے حلقے دعوت پر ہیں: سائن اِن کریں، پھر اپنا کوڈ درج کریں یا کسی منتظم سے شامل کرنے کی درخواست کریں۔ آپ ہمارے شیخ میں شامل رہیں گے۔"
+          }
+        }
+      }
+    },
     "Decrease": {
       "localizations": {
         "en": {

@@ -119,7 +119,10 @@ struct NativeMethodOfZikrView: View {
 }
 
 /// Position and numbering follow both source diagrams; never mirror anatomy in RTL.
-private struct MethodLatifaDiagram: View {
+/// The live Zikr stage passes the Latifa being done (1-7), which glows gold.
+struct MethodLatifaDiagram: View {
+    var highlighted: Int? = nil
+    var size: CGFloat = 220
     private let positions: [(CGFloat, CGFloat)] = [
         (0.70, 0.77), (0.30, 0.77), (0.70, 0.53), (0.30, 0.53),
         (0.50, 0.65), (0.50, 0.24), (0.50, 0.07)
@@ -137,17 +140,20 @@ private struct MethodLatifaDiagram: View {
                     path.addLine(to: CGPoint(x: w * 0.88, y: h * 0.94))
                 }.stroke(DIColor.actionForeground.opacity(0.5), lineWidth: 2)
                 ForEach(0..<positions.count, id: \.self) { index in
+                    let lit = highlighted == index + 1
                     Text(verbatim: String(index + 1))
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundStyle(DIColor.actionForeground)
-                        .frame(width: 30, height: 30)
-                        .background(Circle().fill(DIColor.actionForeground.opacity(0.10)))
+                        .font(.system(size: 16 * size / 220, weight: .bold, design: .rounded))
+                        .foregroundStyle(lit ? DIColor.background : DIColor.actionForeground)
+                        .frame(width: 30 * size / 220, height: 30 * size / 220)
+                        .background(Circle().fill(lit ? DIColor.accent : DIColor.actionForeground.opacity(0.10)))
+                        .scaleEffect(lit ? 1.35 : 1)
+                        .diGoldGlow(radius: lit ? 14 : 0, opacity: lit ? 0.8 : 0)
                         .position(x: geometry.size.width * positions[index].0,
                                   y: geometry.size.height * positions[index].1)
                 }
             }
         }
-        .frame(width: 220, height: 220)
+        .frame(width: size, height: size)
         .environment(\.layoutDirection, .leftToRight)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 at the top."))

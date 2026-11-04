@@ -93,6 +93,28 @@ beforeEach(() => resetGoogleKeys());
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 describe("a Google sign-in", () => {
+  it("keeps an Our Sheikh visitor's membership, name and city on the account they sign in with", async () => {
+    const { env, raw, google, call } = await setup();
+    raw.prepare("INSERT INTO member_groups(id,name,updated_at) VALUES('our-sheikh','Our Sheikh','now')").run();
+    const joined = await worker.fetch(new Request("https://api.example.com/v1/our-sheikh/join", {
+      method: "POST", headers: { "content-type": "application/json", "cf-connecting-ip": "8.8.4.5" },
+      body: JSON.stringify({ name: "Visitor", city: "Lahore", countryCode: "pk", guestSecret: "b".repeat(64) }),
+    }), env);
+    expect(joined.status).toBe(201);
+    const visitor = await joined.json() as Session;
+    expect(await (await call(visitor.token, "GET", "/v1/members/me")).json()).toMatchObject({ isVisitor: true });
+    const signedIn = await (await worker.fetch(new Request("https://api.example.com/v1/members/session", {
+      method: "POST", headers: { "content-type": "application/json", "cf-connecting-ip": "8.8.4.4", authorization: `Bearer ${visitor.token}` },
+      body: JSON.stringify({ provider: "google", idToken: await idToken(google.privateKey, { sub: "2001", email: "visitor@example.com" }) }),
+    }), env)).json() as Session;
+    expect(signedIn.memberID).not.toBe(visitor.memberID);
+    const groups = await (await call(signedIn.token, "GET", "/v1/groups")).json() as { groups: Array<{ id: string }> };
+    expect(groups.groups.map(group => group.id)).toEqual(["our-sheikh"]);
+    expect(raw.prepare("SELECT display_name,city FROM sheikh_public_profiles WHERE member_id=?").get(signedIn.memberID))
+      .toEqual({ display_name: "Visitor", city: "Lahore" });
+    expect(await (await call(signedIn.token, "GET", "/v1/members/me")).json()).toMatchObject({ isVisitor: false });
+  });
+
   it("makes a new member, and answers exactly as a Sign in with Apple does", async () => {
     const { signInWithGoogle, member, call, unexpected } = await setup();
     const response = await signInWithGoogle({ sub: "1001", email: "New.Member@Example.com" }, { name: "  New   Member " });
@@ -110,7 +132,7 @@ describe("a Google sign-in", () => {
     });
     // The bearer token works like any other member's, and grants nothing yet.
     const me = await call(session.token, "GET", "/v1/members/me");
-    expect(await me.json()).toEqual({ memberID: session.memberID, role: "member", displayName: "New Member" });
+    expect(await me.json()).toEqual({ memberID: session.memberID, role: "member", displayName: "New Member", isVisitor: false });
     expect(await (await call(session.token, "GET", "/v1/groups")).json()).toMatchObject({ groups: [] });
     expect(unexpected).toEqual([]);
   });

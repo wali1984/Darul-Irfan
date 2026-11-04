@@ -48,7 +48,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Darul Irfan uses the microphone when you choose to speak in a group meeting or record your recitation for private memorization practice.</string>
+	<string>Darul Irfan uses the microphone when you choose to speak in a Halqah, record your recitation for private memorization practice, or, leading the live Zikr, let the stage follow Hazrat ji&apos;s voice.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>When you lead the live Zikr, Darul Irfan recognises Hazrat ji&apos;s words on this phone to show the stage he announces. Nothing he says is stored.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Darul Irfan uses the camera only when you join a group meeting and turn your video on.</string>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>

@@ -159,6 +159,11 @@ actor MemberGroupService {
         var request = URLRequest(url: baseURL.appendingPathComponent("v1/members/session"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "content-type")
+        // An Our Sheikh visitor signing in: the server keeps Our Sheikh, and
+        // their name and city, on the signed-in account.
+        if let saved = savedSession.load() {
+            request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
+        }
         var payload: [String: String] = ["identityToken": token]
         if let displayName, !displayName.isEmpty { payload["displayName"] = displayName }
         request.httpBody = try JSONSerialization.data(withJSONObject: payload)
@@ -330,6 +335,25 @@ actor MemberGroupService {
         let data = try await send("POST", path: "v1/groups/\(groupID)/zikr-cues",
                                   payload: ["id": eventID.uuidString.lowercased(), "stageID": stageID], expecting: [200, 201])
         return try decoder.decode(HalqaZikrCueResult.self, from: data).cue
+    }
+
+    /// The live stage after the phone's cursors (nil: from the start).
+    func stage(in groupID: String, cuesAfter: Int64?, chatAfter: Int64?) async throws -> HalqaStageUpdate {
+        let query = [cuesAfter.map { "cues=\($0)" }, chatAfter.map { "chat=\($0)" }].compactMap { $0 }.joined(separator: "&")
+        return try await authorized(HalqaStageUpdate.self, path: "v1/groups/\(groupID)/stage", query: query.isEmpty ? nil : query)
+    }
+
+    /// A ready-made message, or an admin's own text. Keep messageID on retries.
+    func sendStageMessage(in groupID: String, messageID: UUID, presetID: String?, text: String?) async throws -> HalqaStageMessage {
+        var payload: [String: Any] = ["id": messageID.uuidString.lowercased()]
+        if let presetID { payload["presetID"] = presetID }
+        if let text { payload["text"] = text }
+        let data = try await send("POST", path: "v1/groups/\(groupID)/stage-chat", payload: payload, expecting: [200, 201])
+        return try decoder.decode(HalqaStageMessageResult.self, from: data).message
+    }
+
+    func removeStageMessage(_ messageID: String, in groupID: String) async throws {
+        try await send("DELETE", path: "v1/groups/\(groupID)/stage-chat/\(messageID)", payload: nil, expecting: [204])
     }
 
     func duaRequests(in groupID: String) async throws -> [GroupDuaRequest] {
