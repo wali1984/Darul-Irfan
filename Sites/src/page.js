@@ -376,10 +376,10 @@ footer a{text-decoration:none}footer a:hover{color:var(--gold2)}
 
   function showStage(d) {
     const box = $("stage-now"), s = d.stage;
-    const key = s ? s.title + "|" + s.at : d.halqahLive ? "awaiting" : "off";
+    const key = (s ? s.title + "|" + s.at : d.halqahLive ? "awaiting" : "off") + (d.halqahTest ? "|test" : "");
     if (key === shownStage) return;
     shownStage = key;
-    const parts = [el("div", "label", d.halqahLive ? "Now" : "The stage")];
+    const parts = [el("div", "label", d.halqahTest ? "Now · test Zikr" : d.halqahLive ? "Now" : "The stage")];
     if (s) {
       parts.push(el("div", "title", s.title));
       if (s.titleUr) { const u = el("div", "urdu", s.titleUr); u.lang = "ur"; parts.push(u); }
@@ -400,7 +400,8 @@ footer a{text-decoration:none}footer a:hover{color:var(--gold2)}
   function render(d) {
     const on = d.live.onAir || d.halqahLive;
     $("status").classList.toggle("on", on);
-    $("status-text").textContent = on ? "Live now" : d.live.room ? "Tahajjud room open" : "Offline";
+    const test = d.halqahTest && !d.live.onAir;
+    $("status-text").textContent = test ? "Test Zikr" : on ? "Live now" : d.live.room ? "Tahajjud room open" : "Offline";
     showVideo(d.live.videoID || d.latestVideoID, !!d.live.videoID);
     $("video-label").replaceChildren(el("b", "", d.live.videoID ? (d.live.title || "Daily Zikr") + " · live" : "Latest Daily Zikr"));
     showStage(d);
@@ -419,7 +420,8 @@ footer a{text-decoration:none}footer a:hover{color:var(--gold2)}
       card.querySelector("[data-name]").textContent = h.name;
       let chip = card.querySelector(".chip.live");
       const isLive = h.id === "our-sheikh" && on;
-      if (isLive && !chip) { chip = el("span", "chip live", "Live"); card.querySelector(".chip").after(chip); }
+      if (isLive && !chip) { chip = el("span", "chip live", ""); card.querySelector(".chip").after(chip); }
+      if (chip) chip.textContent = d.halqahTest && !d.live.onAir ? "Test" : "Live";
       if (!isLive && chip) chip.remove();
     }
   }

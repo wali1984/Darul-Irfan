@@ -130,7 +130,8 @@ describe("live Zikr stage", () => {
     expect((await cue.json() as any).cue.notificationState).toBe("complete");
     await dispatchZikrCues(env);
     expect(push).not.toHaveBeenCalled();
-    expect((await publicSheikhStage(env)).live).toBeNull();
+    // The websites show a test Zikr, marked as one, so it can be tried there too.
+    expect(await publicSheikhStage(env)).toMatchObject({ live: { isTest: true }, stage: { title: "1st Latifa" } });
   });
 
   it("a recitation after a Latifa does not cancel the Latifa's pending notification", async () => {

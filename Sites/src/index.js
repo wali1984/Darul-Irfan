@@ -83,6 +83,8 @@ async function data(env, key) {
     },
     stage: stage?.live ? stage.stage ?? null : null,
     halqahLive: !!stage?.live,
+    // A test Zikr shows on the websites too, marked as a test.
+    halqahTest: !!stage?.live?.isTest,
     latestVideoID: stage?.latestVideoID ?? null,
     picture: stage?.pictureHDURL ?? stage?.pictureURL ?? null,
     pictureFallback: stage?.pictureURL ?? null,

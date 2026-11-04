@@ -359,14 +359,15 @@ export async function hideZikrCue(env: Env, memberID: string, groupID: string, e
 }
 
 /** The public face of Our Sheikh's live Zikr for the websites: what is live and
- * the stage being followed. Never a test Zikr, never the chat or who is there. */
+ * the stage being followed, a test Zikr included and marked as one (owner
+ * 2026-11-04, to try the websites). Never the chat or who is there. */
 export async function publicSheikhStage(env: Env): Promise<Record<string, unknown>> {
-  const live = await liveZikr(env, SHEIKH_HALQA_ID, false);
+  const live = await liveZikr(env, SHEIKH_HALQA_ID, true);
   const cue = live ? await env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE ${SESSION_CUES} ORDER BY sequence DESC LIMIT 1`)
     .bind(SHEIKH_HALQA_ID, sessionStart(live)).first<CueRow>() : null;
   const picture = await sheikhPicture(env);
   return {
-    live: live ? { title: live.title ?? undefined, startedAt: live.started_at ?? undefined } : null,
+    live: live ? { title: live.title ?? undefined, startedAt: live.started_at ?? undefined, isTest: live.is_test ? true : undefined } : null,
     stage: cue ? { title: cue.title, titleUr: cue.title_ur ?? undefined, at: cue.created_at,
       arabic: RECITATIONS.find(recitation => recitation.id === cue.stage_id)?.arabic } : null,
     pictureURL: picture?.pictureURL, pictureHDURL: picture?.pictureHDURL,
