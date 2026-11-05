@@ -59,6 +59,7 @@ describe("joining a live Zikr from the websites", () => {
     expect(joined.room).toEqual({ authToken: "listener-token" });
     expect(sent.find(s => s.url.includes("/participants"))?.body).toMatchObject({ preset_name: "web_listener", name: "Sara" });
     raw.prepare("UPDATE group_live SET state='offline'").run();
-    expect((await post("/v1/public/halqahs/usa/join", { name: "Sara", city: "Leeds", countryCode: "GB", guestSecret: SECRET })).status).toBe(409);
+    expect((await post("/v1/public/halqahs/usa/join", { name: "Nadia", city: "York", countryCode: "GB", guestSecret: "d".repeat(64) })).status).toBe(409);
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM sheikh_public_profiles WHERE display_name='Nadia'").get()).toEqual({ n: 0 });
   });
 });

@@ -99,6 +99,8 @@ export async function publicJoin(env: Env, groupID: string, input: Record<string
   if (memberID instanceof Response) return memberID;
   const group = await env.DB.prepare("SELECT id FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
   if (!group) return json({ error: "Not found" }, { status: 404 });
+  // Nothing about the visitor is kept unless there is a live Zikr to join.
+  if (!await liveOf(env, groupID)) return json({ error: "This Halqah's Zikr is not live right now.", live: null }, { status: 409 });
   const stamp = new Date().toISOString();
   await env.DB.batch([
     env.DB.prepare(`INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at) VALUES(?,?,?,NULL,?,?)
