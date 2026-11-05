@@ -46,6 +46,11 @@ struct MemberGroup: Codable, Sendable, Identifiable, Equatable, Hashable {
     var liveIsTest: Bool? = nil
     /// The signed-in member's role here; absent from an older server.
     var myRole: GroupRole? = nil
+    /// "halqah", or "markaz" for the Silsila Markaz (the officers' group);
+    /// absent from an older server.
+    var kind: String? = nil
+
+    var isMarkaz: Bool { kind == "markaz" || id == "silsila-markaz" }
 }
 
 /// A member's role in the groups. Admins run their own groups; the super

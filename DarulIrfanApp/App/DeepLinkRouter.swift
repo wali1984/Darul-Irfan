@@ -38,6 +38,9 @@ enum AppRoute: Equatable, Sendable {
     case groups
     /// One Halqah.
     case group(id: String)
+    /// The Silsila Markaz's daily or monthly report, from the officers'
+    /// digest ("markaz/reports/daily", "markaz/reports/monthly").
+    case markazReport(monthly: Bool)
     /// Discover's official updates; one of them when given.
     case updates(itemID: String?)
     /// Discover's events; one of them when given.
@@ -86,6 +89,10 @@ enum AppRoute: Equatable, Sendable {
             } else {
                 self = .groups
             }
+        case "markaz":
+            guard second?.lowercased() == "reports", let which = third?.lowercased(),
+                  which == "daily" || which == "monthly" else { return nil }
+            self = .markazReport(monthly: which == "monthly")
         case "feed", "updates":
             self = .updates(itemID: second)
         case "events", "event":

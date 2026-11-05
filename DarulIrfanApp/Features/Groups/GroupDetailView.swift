@@ -51,6 +51,8 @@ struct GroupDetailView: View {
     @State private var sheet: AdminSheet?
     /// The official Daily Zikr, shown in every halqah while it is live.
     @State private var officialLive: LiveBroadcast?
+    /// For the Silsila Markaz: whether this officer sees its reports.
+    @State private var markazAccess: MarkazAccess?
     @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -443,6 +445,10 @@ struct GroupDetailView: View {
     private var adminSection: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             DISectionHeader(titleKey: "Halqah admin", systemImage: "person.badge.key")
+            if group.isMarkaz, let markazAccess, markazAccess.canReport {
+                MarkazEntryCards(service: service, access: markazAccess)
+                    .diAppear(delay: 0.04)
+            }
             Button {
                 sheet = .live
             } label: {
@@ -485,6 +491,10 @@ struct GroupDetailView: View {
                     }
                 }
             }
+        }
+        .task(id: group.id) {
+            guard group.isMarkaz else { return }
+            markazAccess = await MarkazAccessCache.access(using: service)
         }
     }
 

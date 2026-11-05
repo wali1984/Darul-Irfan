@@ -625,10 +625,25 @@ actor MemberGroupService {
         try await send("DELETE", path: "v1/members/devices/\(installationID.uuidString)", payload: nil, expecting: [204])
     }
 
+    // MARK: Silsila Markaz (officers)
+
+    /// One Markaz route's answer as it came, for `MarkazService` to read: the
+    /// same session, refusals and server messages as every other call here.
+    /// `query` is already percent-encoded.
+    func markaz(_ method: String, path: String, query: String? = nil, payload: [String: Any]? = nil,
+                expecting codes: Set<Int> = [200]) async throws -> Data {
+        try await send(method, path: path, query: query, payload: payload, expecting: codes)
+    }
+
     @discardableResult
-    private func send(_ method: String, path: String, payload: [String: Any]?, expecting codes: Set<Int>) async throws -> Data {
+    private func send(_ method: String, path: String, query: String? = nil, payload: [String: Any]?, expecting codes: Set<Int>) async throws -> Data {
         guard let saved = savedSession.load() else { throw MemberGroupError.notSignedIn }
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        var url = baseURL.appendingPathComponent(path)
+        if let query, var components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            components.percentEncodedQuery = query
+            url = components.url ?? url
+        }
+        var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("Bearer \(saved.token)", forHTTPHeaderField: "authorization")
         if let payload {

@@ -29,6 +29,8 @@ struct MyHalqahsSection: View {
     @State private var editing: HalqahEdit?
     @State private var retiring: MemberGroup?
     @State private var retireError: String?
+    /// Whether the Super admin sees the Markaz's reports (asked once a run).
+    @State private var markazAccess: MarkazAccess?
     @FocusState private var isCodeFocused: Bool
     /// The symbol circles beside card headings, grown with the text.
     @ScaledMetric(relativeTo: .headline) private var symbolBox: CGFloat = 38
@@ -197,12 +199,19 @@ struct MyHalqahsSection: View {
                 )
             }
             .diAppear(delay: 0.1)
+            if let markazAccess, markazAccess.canReport {
+                MarkazEntryCards(service: model.service, access: markazAccess)
+                    .diAppear(delay: 0.12)
+            }
             Text("Tap ⋯ on a Halqah, or press and hold it, to rename or retire it.")
                 .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
             if let retireError {
                 Text(verbatim: retireError).diInterfaceFont(.footnote).foregroundStyle(DIColor.danger)
             }
+        }
+        .task(id: model.memberID) {
+            markazAccess = await MarkazAccessCache.access(using: model.service)
         }
     }
 
@@ -229,7 +238,8 @@ struct MyHalqahsSection: View {
     /// only; an older server sends no count, and then it is not shown).
     @ViewBuilder
     private var peopleStats: some View {
-        HalqahStat(value: model.groups.count, labelKey: "Halqahs", systemImage: "person.3.fill")
+        // The Silsila Markaz is a group of officers, not a Halqah.
+        HalqahStat(value: model.groups.filter { !$0.isMarkaz }.count, labelKey: "Halqahs", systemImage: "person.3.fill")
         if let signedIn = model.signedIn {
             HalqahStat(value: signedIn, labelKey: "Signed in", systemImage: "person.crop.circle.badge.checkmark")
         }
@@ -749,6 +759,14 @@ struct HalqahHeroCardLabel: View {
                 Text(LocalizedStringKey(group.name))
                     .diInterfaceFont(group.id == "our-sheikh" ? .title2 : .title3, weight: .heavy)
                     .foregroundStyle(group.id == "our-sheikh" ? Color(hex: 0xFFE9A8) : Color.white)
+                if group.isMarkaz {
+                    Text("Markaz")
+                        .diInterfaceFont(.caption2, weight: .bold)
+                        .foregroundStyle(Color(hex: 0x064B34))
+                        .padding(.horizontal, DISpacing.sm)
+                        .padding(.vertical, 2)
+                        .background(Capsule().fill(Self.joinGold))
+                }
                 if let description = group.description, !description.isEmpty {
                     Text(verbatim: description)
                         .diInterfaceFont(.footnote, weight: .medium)

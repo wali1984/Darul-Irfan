@@ -29,6 +29,8 @@ struct RootView: View {
     @State private var halqahStack = UUID()
     /// A Halqah a notification opened, shown over the Halqah tab.
     @State private var linkedGroup: LinkedGroup?
+    /// A Markaz report the officers' digest opened, over the Halqah tab.
+    @State private var linkedReport: LinkedMarkazReport?
 
     private var router: DeepLinkRouter { .shared }
 
@@ -118,6 +120,11 @@ struct RootView: View {
                 GroupLinkView(groupID: group.id, dependencies: dependencies)
             }
         }
+        .sheet(item: $linkedReport) { report in
+            NavigationStack {
+                MarkazReportLinkView(monthly: report.monthly)
+            }
+        }
     }
 
     /// A request one of the app's own screens posted. A Read tab that exists
@@ -159,6 +166,10 @@ struct RootView: View {
             selectedTab = .more
             router.clear(route)
             linkedGroup = LinkedGroup(id: id)
+        case .markazReport(let monthly):
+            selectedTab = .more
+            router.clear(route)
+            linkedReport = LinkedMarkazReport(monthly: monthly)
         case .updates, .events, .media, .topics:
             selectedTab = .explore
         }
@@ -168,4 +179,10 @@ struct RootView: View {
 /// A Halqah opened by a notification.
 private struct LinkedGroup: Identifiable {
     let id: String
+}
+
+/// A Markaz report opened by the officers' digest.
+private struct LinkedMarkazReport: Identifiable {
+    let monthly: Bool
+    var id: String { monthly ? "monthly" : "daily" }
 }

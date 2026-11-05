@@ -434,7 +434,8 @@ async function report(env: Env, window: Window, scope: Scope, kind: string, grou
   const cells = weekdayHour(window, current.sessions, bySession);
   const care = await needsCare(env, scope, window.to, window.zone);
   const everyone = people(current.presence, byID, window.zone);
-  const before = { from: previousWindow.from, to: previousWindow.to, sessions: previous.sessions.length, attendance: previous.presence.length,
+  const earlier = await summarise(env, previousWindow, scope, kind, previous.sessions, previous.presence);
+  const before = { ...earlier, from: previousWindow.from, to: previousWindow.to, sessions: previous.sessions.length, attendance: previous.presence.length,
     uniqueAttendees: new Set(previous.presence.map(row => row.member_id)).size,
     averageAttendance: previous.sessions.length ? round1(previous.presence.length / previous.sessions.length) : 0 };
   return {
