@@ -215,7 +215,10 @@ export async function relayLive(env: Env, groupID: string, input: Record<string,
     if (live?.state === "live") return json({ state: "live", sessionID: live.session_id, started: false });
     const title = typeof input.title === "string" && input.title.trim() ? input.title.trim().slice(0, 120) : "Zikr";
     await ensureRelayAuthor(env);
-    const sessionID = await beginSession(env, groupID, RELAY_AUTHOR, { kind: "zikr", title, videoID: null, roomID: null, queue: [] });
+    // {test: true}: as an admin's Test Zikr, seen by admins only and announced to no one.
+    const test = input.test === true;
+    const sessionID = await beginSession(env, groupID, RELAY_AUTHOR, { kind: "zikr", title, videoID: null, roomID: null, queue: [], test });
+    if (test) return json({ state: "live", sessionID, started: true, test: true }, { status: 201 });
     try {
       await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title, "Halqah zikr has started. Join now in Darul Irfan.",
         `darulirfan://groups/${groupID}`);

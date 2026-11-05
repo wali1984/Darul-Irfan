@@ -150,6 +150,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const { name, domain } = place(url);
+    // A closed domain (CLOSED_DOMAINS) keeps its routes and data but opens nothing
+    // (owner 2026-11-05: naqshbandiaowaisiah.us until production; the live relay
+    // captures oursheikh.wajidali.us/broadcast).
+    if (name !== null && (env.CLOSED_DOMAINS ?? "").split(",").map(d => d.trim()).includes(domain)) {
+      return new Response("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
+    }
     const hostOf = key => `${key}.${domain}`;
     // reporting.: the Silsila Markaz's reports, signed in from the app (and ?site=reporting on workers.dev).
     if (name === "reporting" || url.searchParams.get("site") === "reporting") return reportingRequest(request, env, LOGO);

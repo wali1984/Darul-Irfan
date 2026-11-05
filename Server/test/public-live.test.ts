@@ -102,4 +102,15 @@ describe("joining a live Zikr from the websites", () => {
     expect(raw.prepare("SELECT state,auto_end_at FROM group_live WHERE group_id='usa'").get()).toEqual({ state: "offline", auto_end_at: null });
     expect(raw.prepare("SELECT COUNT(*) AS n FROM group_live_history WHERE group_id='usa'").get()).toEqual({ n: 1 });
   });
+
+  it("the relay's test start is a Test Zikr: marked as a test, for admins only", async () => {
+    const { env, raw } = setup();
+    raw.prepare("UPDATE group_live SET state='offline'").run();
+    const started = await worker.fetch(new Request("https://api.example.com/v1/service/groups/usa/live", {
+      method: "POST", headers: { "content-type": "application/json", authorization: "Bearer relay-secret" },
+      body: JSON.stringify({ state: "live", title: "Simulation", test: true }) }), env);
+    expect(started.status).toBe(201);
+    expect(((await started.json()) as any).test).toBe(true);
+    expect(raw.prepare("SELECT state,is_test FROM group_live WHERE group_id='usa'").get()).toEqual({ state: "live", is_test: 1 });
+  });
 });
