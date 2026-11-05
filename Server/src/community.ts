@@ -123,9 +123,9 @@ export async function renameMember(env: Env, memberID: string, input: Record<str
 export async function communityGroups(env: Env, memberID: string): Promise<Response> {
   const role = await memberRole(env, memberID);
   const sql = role === "superadmin"
-    ? `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind,l.is_test AS live_test
+    ? `SELECT g.id,g.name,g.description,g.kind,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind,l.is_test AS live_test
        FROM member_groups g LEFT JOIN group_live l ON l.group_id=g.id WHERE g.is_active=1 ORDER BY g.name`
-    : `SELECT g.id,g.name,g.description,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind,l.is_test AS live_test
+    : `SELECT g.id,g.name,g.description,g.kind,g.meeting_url,g.meeting_note,l.state AS live_state,l.kind AS live_kind,l.is_test AS live_test
        FROM member_groups g JOIN member_group_members m ON m.group_id=g.id
        LEFT JOIN group_live l ON l.group_id=g.id
        WHERE m.member_id=? AND g.is_active=1 ORDER BY g.name`;
@@ -139,7 +139,7 @@ export async function communityGroups(env: Env, memberID: string): Promise<Respo
     const live = row.live_state === "live" && (!row.live_test || managing);
     groups.push({
       myRole: mine,
-      id: row.id, name: row.name, description: row.description ?? undefined,
+      id: row.id, name: row.name, description: row.description ?? undefined, kind: row.kind ?? "halqah",
       meetingURL: row.meeting_url ?? undefined, meetingNote: row.meeting_note ?? undefined,
       isLive: live, liveKind: live ? row.live_kind : undefined, liveIsTest: live && row.live_test ? true : undefined,
       canManage: managing,

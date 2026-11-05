@@ -11,7 +11,12 @@ import { bootstrap, feed, liveBroadcast } from "./repository";
 import { refreshWebsiteCatalog, refreshYouTube } from "./sources";
 import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
 import { whatsappSubscription, whatsappWebhook } from "./whatsapp";
-import { authenticatedMember, createSession, deleteMember, redeemInvite, signOutMember } from "./members";
+import { authenticatedMember, authenticatedSession, createSession, deleteMember, redeemInvite, signOutMember } from "./members";
+import {
+  access as markazAccessRoute, analytics as markazAnalytics, announce, announcements, approveReportingLink, dailyReport,
+  endReportingSession, exportCSV, markazDigest, monthlyReport, organization, personHistory, placeHalqah, pollReportingLink,
+  reportingSessions, sessionDetail, startReportingLink, syncAdmins,
+} from "./markaz";
 import {
   cancelMeeting, communityGroups, communityPosts, createPost, groupDetail, hidePost, joinRoom, me, meetingPage,
   publishDraft, registerMemberDevice, removeZikrSession, renameMember, saveZikrSession, scheduleMeeting, setLive,
@@ -177,6 +182,47 @@ async function route(request: Request, env: Env): Promise<Response> {
       ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
     if (item && request.method === "PUT") return updateDailyMedia(env, member, item, input);
     if (item && request.method === "DELETE") return deleteDailyMedia(env, member, item);
+    return json({ error: "Not found" }, { status: 404 });
+  }
+  // The reporting website's sign-in: it shows a code, an officer approves it in the app.
+  if (request.method === "POST" && path === "/v1/reporting/link") {
+    if (!await withinWriteLimit(request, env, "reporting-link", 30)) return json({ error: "Too many requests" }, { status: 429 });
+    return startReportingLink(env);
+  }
+  if (request.method === "POST" && path === "/v1/reporting/link/poll") {
+    if (!await withinWriteLimit(request, env, "reporting-poll", 900)) return json({ error: "Too many requests" }, { status: 429 });
+    return pollReportingLink(env, await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)));
+  }
+  // The Silsila Markaz: reports, analytics and the organisation, for super admins
+  // and the Markaz's officers, from the apps and the reporting website.
+  if (path.startsWith("/v1/markaz/")) {
+    const session = await authenticatedSession(request, env);
+    if (!session) return json({ error: "Member sign-in required" }, { status: 401 });
+    const member = session.memberID;
+    const input = async () => (request.headers.get("content-type") ?? "").includes("json")
+      ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
+    const [, , , section = "", entity = "", extra = ""] = path.split("/");
+    if (request.method === "GET") {
+      if (section === "access") return markazAccessRoute(env, member);
+      if (section === "analytics") return markazAnalytics(env, member, url);
+      if (section === "reports" && entity === "daily") return dailyReport(env, member, url);
+      if (section === "reports" && entity === "monthly") return monthlyReport(env, member, url);
+      if (section === "sessions" && entity) return sessionDetail(env, member, entity);
+      if (section === "people" && entity) return personHistory(env, member, entity, url);
+      if (section === "export") return exportCSV(env, member, url);
+      if (section === "organization") return organization(env, member);
+      if (section === "announcements") return announcements(env, member);
+      if (section === "reporting-sessions") return reportingSessions(env, member, session.hash);
+    }
+    if (request.method === "PUT" && section === "halqahs" && entity) return placeHalqah(env, member, entity, await input());
+    if (request.method === "POST" && section === "sync-admins") return syncAdmins(env, member);
+    if (request.method === "POST" && section === "announce") return announce(env, member, await input());
+    // Letting a computer in is done from a phone that is already trusted.
+    if (request.method === "POST" && section === "reporting-link" && entity === "approve" && !extra) {
+      if (session.client === "reporting") return json({ error: "Approve from the app" }, { status: 403 });
+      return approveReportingLink(env, member, await input());
+    }
+    if (request.method === "DELETE" && section === "reporting-sessions" && entity) return endReportingSession(env, member, entity);
     return json({ error: "Not found" }, { status: 404 });
   }
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
@@ -401,6 +447,8 @@ export default {
     const jobs: Array<{ name: string; run: Promise<void> }> = [
       { name: "sheikh-zikr-cues", run: dispatchZikrCues(env) },
       { name: "end-after-dua", run: endAfterDua(env) },
+      // At 12:00 UTC: yesterday's Zikr in one line to the Markaz's officers.
+      { name: "markaz-digest", run: markazDigest(env) },
       { name: "live", run: Promise.allSettled([refreshPaltalkRoom(env), refreshYouTube(env)])
           .then(async results => {
             await reconcileLive(env);

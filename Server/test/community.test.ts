@@ -59,7 +59,8 @@ describe("community groups", () => {
     const ids = async (token: string) => ((await (await call(token, "GET", "/v1/groups")).json()) as { groups: { id: string }[] }).groups.map(g => g.id);
     expect(await ids(member)).toEqual(["usa"]);
     expect(await ids(admin)).toEqual(["usa"]);
-    expect((await ids(superAdmin)).sort()).toEqual(["canada", "darul-irfan", "usa"]);
+    // The Silsila Markaz is a group too, which only super admins and its people see.
+    expect((await ids(superAdmin)).sort()).toEqual(["canada", "darul-irfan", "silsila-markaz", "usa"]);
     // Another region stays indistinguishable from nothing.
     expect((await call(admin, "GET", "/v1/groups/canada")).status).toBe(404);
     expect((await call(superAdmin, "GET", "/v1/groups/canada")).status).toBe(200);

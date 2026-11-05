@@ -213,12 +213,25 @@ async function googleMember(env: Env, identity: GoogleIdentity, name: string | n
 /** Resolves the bearer token to a member, or null. Only the hash is compared,
  * and an expired session is treated as absent. */
 export async function authenticatedMember(request: Request, env: Env): Promise<string | null> {
+  const session = await authenticatedSession(request, env);
+  // A reporting website's session reads the Markaz's reports and nothing else.
+  return session && session.client !== "reporting" ? session.memberID : null;
+}
+
+/** The session behind the bearer token: the member, the hash it is kept
+ *  under, and which client it was made for (null for the apps). */
+export async function authenticatedSession(request: Request, env: Env): Promise<{ memberID: string; hash: string; client: string | null } | null> {
   const token = bearerToken(request);
   if (!token) return null;
-  const row = await env.DB.prepare("SELECT member_id,expires_at FROM member_sessions WHERE token_hash=?")
-    .bind(await sha256(token)).first<{ member_id: string; expires_at: string }>();
+  const hash = await sha256(token);
+  const row = await env.DB.prepare("SELECT member_id,expires_at,last_seen_at,client FROM member_sessions WHERE token_hash=?")
+    .bind(hash).first<{ member_id: string; expires_at: string; last_seen_at: string; client: string | null }>();
   if (!row || Date.parse(row.expires_at) <= Date.now()) return null;
-  return row.member_id;
+  // The reporting website lists its computers by when they were last used.
+  if (row.client === "reporting" && Date.now() - Date.parse(row.last_seen_at) > 300_000) {
+    await env.DB.prepare("UPDATE member_sessions SET last_seen_at=? WHERE token_hash=?").bind(new Date().toISOString(), hash).run();
+  }
+  return { memberID: row.member_id, hash, client: row.client };
 }
 
 /** The member bearer token of a request, when it has the right shape. */
