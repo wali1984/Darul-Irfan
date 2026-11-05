@@ -52,6 +52,126 @@ const STYLE = `
 @media (max-width:600px){.step{grid-template-columns:1fr}.step dl{grid-template-columns:1fr}}
 `;
 
+const VISION = [
+  ["Every teaching, one living app", "The Qur'an with the Silsila's own translation and tafsir, hadith, the library, Al-Murshid, bayans and Zikr, joined up: from an ayah to its tafsir to the Sheikh's bayan in two taps."],
+  ["A better experience for everyone", "Calm, clear and bilingual, with Urdu in Nastaliq, large text and offline reading: easy for those with the Silsila for decades and for someone opening it today."],
+  ["Reaching a new generation", "Young people live on their phones, YouTube and social media. The Silsila now meets them there: a daily ayah, hadith and saying to share, gentle reminders, and a live stage that looks beautiful on any screen."],
+  ["On every major platform", "iPhone, Android, regional websites, YouTube, Facebook and Paltalk, one Silsila and one look: a modern portfolio for a timeless message."],
+];
+
+const REACH = [
+  "Open doors: anyone can follow a live Zikr from a website link with just a name and a city, no account or download needed.",
+  "Every Daily Zikr streamed to YouTube and Facebook with the live stage, where new audiences already are.",
+  "Daily cards (ayah, hadith, Aqwal-e-Sheikh) made to forward on WhatsApp and social media, each one an invitation.",
+  "Invitations in seconds: a WhatsApp link or a code from any Ijtema or gathering.",
+  "English and Urdu throughout, so second-generation members abroad feel at home.",
+  "The Markaz's reports show new members, website visitors and countries each month, so outreach can be measured and improved.",
+];
+
+const AUTOMATION = [
+  {
+    tag: "Automation", title: "From Paltalk to every screen, by itself",
+    text: "When Hazrat ji begins on Paltalk, everything follows with no one typing or tapping Start.",
+    points: ["The Zikr starts in the app and members are told", "The websites go live and Join lights up",
+      "The YouTube and Facebook picture is the live stage itself", "Paltalk's host cues move the stage; when the Dua begins it shows, and the session closes five minutes later"],
+    shots: ["live-card", "stage-tasbihat"],
+  },
+  {
+    tag: "Automation", title: "The stage follows the voice; taps are only the backup",
+    text: "Go Live listens on the leading phone and moves the stage as each recitation, Latifa and Muraqaba is called.",
+    points: ["Hands-free for the whole session, the screen stays awake", "If the sound is unclear, one tap on the stage does it", "Undo puts back a wrong stage at once"],
+    shots: ["stage-listening", "stage-controls"],
+  },
+  {
+    tag: "Streaming", title: "Better than a chat-window stream",
+    text: "Viewers no longer watch a Paltalk chat window. They see the stage: the emblem or Hazrat ji's photograph, the current Latifa in light, the Arabic recitations.",
+    points: ["One full-screen picture made for YouTube and Facebook", "Each Latifa numbered, each Muraqaba named, English with Urdu", "The same stage in the app and on the websites"],
+    shots: ["stage-latifa7", "stage-tasbihat"],
+  },
+  {
+    tag: "Monitoring", title: "Admins monitor; the system does the work",
+    text: "The manual steps are gone. Admins watch who is listening, see what needs attention, and step in only when needed.",
+    points: ["Who is listening, live, in every session", "Every Halqah on air at a glance in the Silsila Markaz", "A morning summary of yesterday's Zikr on officers' phones"],
+    shots: ["session-controls", "admin-attendance"],
+  },
+];
+
+const MARKAZ = [
+  {
+    tag: "Silsila Markaz", title: "One organisation, run centrally",
+    text: "A new group, the Silsila Markaz, sees every region and Halqah: its people, its admins, its Zikr times, and whether it is live now.",
+    points: ["Regions, countries and cities for every Halqah", "Notices to every Halqah, a region, or chosen Halqahs, with a notification",
+      "Every Halqah's admins brought into the Markaz for global notices and meetings", "Only super admins and the Markaz's officers see the reports"],
+    shots: ["markaz-org", "markaz-announce"],
+  },
+  {
+    tag: "Analytics", title: "Analytics for every Halqah",
+    text: "Attendance, different people, app and website visitors, against the period before, for any Halqah, region or time.",
+    points: ["Trends day by day, and the busiest weekdays and hours", "Regulars, and those not seen for three weeks so their Halqah can call",
+      "Insights worked out from the figures: growth, quiet Halqahs, sessions that ran by themselves", "Test sessions are never counted"],
+    shots: ["markaz-analytics", "markaz-analytics-2"],
+  },
+  {
+    tag: "Reports", title: "Daily and monthly reports",
+    text: "Every Zikr, who attended and for how long, the Halqahs that held none, and the month's growth with new members.",
+    points: ["Daily Zikr report, with a morning summary on officers' phones", "Monthly report on the 1st", "Spreadsheets of sessions, attendance, Halqahs and people; any report printed or saved as a PDF"],
+    shots: ["markaz-daily", "markaz-monthly"],
+  },
+  {
+    tag: "On the computer", title: "reporting.naqshbandiaowaisiah.us",
+    text: "The full dashboard for a computer: overview, daily and monthly reports, Halqahs, people, sessions, the organisation, notices and signed-in computers.",
+    points: ["The website shows a code; an officer approves it in the app. No passwords to share or lose",
+      "Each sign-in lasts 12 hours; every computer is listed and can be signed out", "Private, never indexed, with strict security headers"],
+    shots: ["markaz-signin", "markaz-daily"],
+  },
+];
+
+function guideItems(list, base) {
+  return list.map((g, i) => `
+    <article class="item reveal" style="--d:${i * 40}ms">
+      <div>
+        <span class="chip">${esc(g.tag)}</span>
+        <h3>${esc(g.title)}</h3>
+        <p>${esc(g.text)}</p>
+        <ul>${g.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+      </div>
+      <div class="phones">${g.shots.map(id => `<img src="/demo/${base(id)}/${esc(id)}.webp" alt="" loading="lazy" width="1080" height="2400">`).join("")}</div>
+    </article>`).join("");
+}
+const shotFolder = id => id.startsWith("markaz-") ? "markaz" : "admin";
+
+function visionSection() {
+  return `
+  <section id="vision"><div class="wrap">
+    <div class="eyebrow reveal">Why this matters</div>
+    <h2 class="reveal">One Silsila, made for today</h2>
+    <p class="lead reveal">How the app brings all the teachings together, gives existing and new members a better experience, reaches a new generation, and puts the Silsila on every major platform.</p>
+    <div class="roles">${VISION.map(([t, d]) => `<div class="role reveal"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join("")}</div>
+    <h2 class="reveal" style="margin-top:56px">Bringing in younger people and new audiences</h2>
+    <div class="steps">${REACH.map(r => `<div class="step reveal"><div><p style="color:var(--ink)">${esc(r)}</p></div></div>`).join("")}</div>
+  </div></section>`;
+}
+
+function automationSection() {
+  return `
+  <section id="automation"><div class="wrap">
+    <div class="eyebrow reveal">For Hazrat ji and the admins</div>
+    <h2 class="reveal">From starting the Zikr to streaming everywhere, automatic</h2>
+    <p class="lead reveal">No typing and no checklists: the Zikr starts itself from Paltalk, the stage follows the voice, and the same picture reaches the app, the websites, YouTube and Facebook. The Silsila's admins only monitor.</p>
+    <div class="new">${guideItems(AUTOMATION, shotFolder)}</div>
+  </div></section>`;
+}
+
+function markazSection() {
+  return `
+  <section id="markaz"><div class="wrap">
+    <div class="eyebrow reveal">For super admins and the Silsila Markaz</div>
+    <h2 class="reveal">The Silsila Markaz: organisation, analytics and reports</h2>
+    <p class="lead reveal">The whole organisation managed centrally, with full analytics and reporting for every Halqah, in the app and on reporting.naqshbandiaowaisiah.us. Member names are blurred in these screens.</p>
+    <div class="new">${guideItems(MARKAZ, shotFolder)}</div>
+  </div></section>`;
+}
+
 const ROLES = [
   ["Super admin", "Every Halqah and every person. Makes, renames and retires Halqahs, places anyone in any Halqah, publishes Today's pictures."],
   ["Administrator", "Runs a Halqah: its people, its Admins and everything the Admins do. Appoints other Administrators."],
@@ -240,7 +360,10 @@ export function demoPage(site, others) {
       <p class="lead reveal" style="--d:160ms">The Qur'an with the Silsila's translation and tafsir, hadith, the library, Zikr with the Sheikh and every Halqah, in English and Urdu, on iPhone and Android.</p>
       <div class="cta reveal" style="--d:240ms">
         <a class="btn btn-gold live" href="/demo/showcase">Start the interactive showcase</a>
+        <a class="btn btn-ghost" href="#vision">The vision</a>
+        <a class="btn btn-ghost" href="#automation">Automation</a>
         <a class="btn btn-ghost" href="#admin">Administration</a>
+        <a class="btn btn-ghost" href="#markaz">Silsila Markaz</a>
         <a class="btn btn-ghost" href="#new">What's new</a>
       </div>
       <div class="stats reveal" style="--d:300ms">
@@ -261,7 +384,10 @@ export function demoPage(site, others) {
       <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v4.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 85 MB</span></span></a>
     </div>
   </div></section>
+${visionSection()}
+${automationSection()}
 ${adminGuide()}
+${markazSection()}
 
   <section id="new"><div class="wrap">
     <div class="eyebrow reveal">Since the showcase</div>

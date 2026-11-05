@@ -1,0 +1,628 @@
+// The Silsila Markaz's reporting website (reporting.naqshbandiaowaisiah.us).
+// Plain script, no libraries: the page is built with DOM calls (never from
+// names as HTML), charts are drawn as SVG, and every figure comes from the
+// platform's /v1/markaz routes through this site's /api/.
+(() => {
+  "use strict";
+  const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const app = document.getElementById("app");
+  const state = { view: "overview", preset: "30", from: "", to: "", scope: "all", kind: "all", access: null, org: null, date: "", month: "", timers: [] };
+
+  // MARK: - Small helpers
+  function h(tag, attrs, ...children) {
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(attrs || {})) {
+      if (value === null || value === undefined || value === false) continue;
+      if (key === "class") node.className = value;
+      else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+      else node.setAttribute(key, value === true ? "" : String(value));
+    }
+    for (const child of children.flat(Infinity)) {
+      if (child === null || child === undefined || child === false) continue;
+      node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+    }
+    return node;
+  }
+  function s(tag, attrs, ...children) {
+    const node = document.createElementNS(SVGNS, tag);
+    for (const [key, value] of Object.entries(attrs || {})) if (value !== null && value !== undefined) node.setAttribute(key, String(value));
+    for (const child of children.flat(Infinity)) if (child) node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+    return node;
+  }
+  const num = value => new Intl.NumberFormat("en").format(Math.round((value || 0) * 10) / 10);
+  const pct = value => value === null || value === undefined ? "–" : `${Math.round(value * 100)}%`;
+  const fmt = (iso, opts) => iso ? new Intl.DateTimeFormat("en-GB", { timeZone: TZ, ...opts }).format(new Date(iso)) : "–";
+  const when = iso => fmt(iso, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const day = iso => fmt(iso, { day: "numeric", month: "short", year: "numeric" });
+  const time = iso => fmt(iso, { hour: "2-digit", minute: "2-digit" });
+  const localDate = (d = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+  const addDays = (date, n) => new Date(Date.parse(`${date}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
+  const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const STATUS = { active: "Active", quiet: "Quiet", inactive: "Inactive" };
+
+  function delta(now, before) {
+    if (!before) return h("span", { class: "delta flat" }, now ? "new" : "–");
+    const change = (now - before) / before;
+    const cls = change > 0.005 ? "up" : change < -0.005 ? "down" : "flat";
+    return h("span", { class: `delta ${cls}` }, `${change > 0 ? "▲" : change < 0 ? "▼" : "•"} ${Math.abs(Math.round(change * 100))}% vs before`);
+  }
+  function toast(text) {
+    const node = h("div", { class: "toast", role: "status" }, text);
+    document.body.append(node);
+    setTimeout(() => node.remove(), 3200);
+  }
+  /** Replaces a node's children with the given nodes, lists flattened and empty ones left out. */
+  const put = (root, ...items) => root.replaceChildren(...items.flat(Infinity).filter(item => item !== null && item !== undefined && item !== false));
+  function clearTimers() { state.timers.forEach(clearInterval); state.timers = []; }
+
+  async function api(path, options = {}) {
+    const response = await fetch(`/api/${path}`, { credentials: "same-origin", ...options,
+      headers: { accept: "application/json", ...(options.body ? { "content-type": "application/json" } : {}), ...(options.method && options.method !== "GET" ? { "x-markaz": "1" } : {}) } });
+    if (response.status === 401) { signIn(); throw new Error("signed-out"); }
+    const body = response.status === 204 ? {} : await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.error || `Request failed (${response.status})`);
+    return body;
+  }
+
+  function range() {
+    const today = localDate();
+    if (state.preset === "custom" && state.from && state.to) return { from: state.from, to: state.to };
+    if (state.preset === "month") return { from: `${today.slice(0, 7)}-01`, to: today };
+    if (state.preset === "lastmonth") {
+      const end = addDays(`${today.slice(0, 7)}-01`, -1);
+      return { from: `${end.slice(0, 7)}-01`, to: end };
+    }
+    const days = Number(state.preset) || 30;
+    return { from: addDays(today, -(days - 1)), to: today };
+  }
+  const query = extra => {
+    const r = range();
+    const params = new URLSearchParams({ from: r.from, to: r.to, tz: TZ, scope: state.scope, kind: state.kind, ...(extra || {}) });
+    return params.toString();
+  };
+
+  // MARK: - Sign in
+  let polling = null;
+  async function signIn() {
+    clearTimers();
+    if (polling) clearTimeout(polling);
+    const code = h("div", { class: "code", "aria-live": "polite" }, "· · · ·");
+    const wait = h("div", { class: "wait" }, h("span", { class: "dot" }), h("span", {}, "Waiting for approval in the app…"));
+    const left = h("span", {});
+    app.replaceChildren(h("div", { class: "signin" },
+      h("div", { class: "side" },
+        h("div", { class: "brand" }, h("img", { src: "/logo.webp", alt: "" }), h("div", {}, h("b", {}, "Silsila Naqshbandia Owaisiah"), h("div", {}, "Silsila Markaz"))),
+        h("div", {}, h("h1", {}, "Every Halqah, in one place."),
+          h("div", { class: "points" },
+            h("div", {}, h("b", {}, "◆"), h("span", {}, "Daily and monthly Zikr reports: who attended, where and for how long.")),
+            h("div", {}, h("b", {}, "◆"), h("span", {}, "Trends, the busiest hours, the regulars, and those not seen for a while.")),
+            h("div", {}, h("b", {}, "◆"), h("span", {}, "The whole organisation by region, live sessions now, and notices to many Halqahs at once.")))),
+        h("div", { class: "updated" }, "For super admins and the officers of the Silsila Markaz.")),
+      h("div", { class: "card" },
+        h("h2", {}, "Sign in"),
+        h("p", { class: "sub" }, "Approve this computer from the Darul Irfan app."),
+        code,
+        h("ol", { class: "steps" },
+          h("li", {}, "Open Darul Irfan on your phone and go to the Halqah tab."),
+          h("li", {}, "Open Reports & analytics, then Sign in on a computer."),
+          h("li", {}, "Type the code above and tap Approve.")),
+        wait, h("div", { class: "updated", style: "margin-top:8px" }, left))));
+    try {
+      const response = await fetch("/auth/start", { method: "POST" });
+      const link = await response.json();
+      if (!response.ok || !link.code) throw new Error(link.error || "Could not start");
+      code.textContent = link.code;
+      const expires = Date.parse(link.expiresAt);
+      const tick = async () => {
+        const seconds = Math.max(0, Math.round((expires - Date.now()) / 1000));
+        left.textContent = `This code works for ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")} more.`;
+        if (seconds <= 0) return signIn();
+        const poll = await fetch("/auth/poll", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pollToken: link.pollToken }) })
+          .then(r => r.json()).catch(() => ({ status: "pending" }));
+        if (poll.status === "approved") { toast("Signed in"); return boot(); }
+        if (poll.status === "expired") return signIn();
+        polling = setTimeout(tick, 2500);
+      };
+      polling = setTimeout(tick, 1500);
+    } catch (error) {
+      wait.replaceChildren(h("span", { class: "err" }, "The sign-in service is unavailable. Refresh in a moment."));
+    }
+  }
+
+  // MARK: - Shell
+  const VIEWS = [
+    ["overview", "Overview", "◈"], ["daily", "Daily report", "☀"], ["monthly", "Monthly report", "▦"],
+    ["halqahs", "Halqahs", "◎"], ["people", "People", "☺"], ["sessions", "Sessions", "◷"],
+    ["organisation", "Organisation", "⌂"], ["notices", "Notices", "✉"], ["computers", "Signed-in computers", "⎙"],
+  ];
+
+  async function boot() {
+    try {
+      state.access = await api("access");
+      if (!state.access.canReport) {
+        app.replaceChildren(h("div", { class: "signin" }, h("div", { class: "card" }, h("h2", {}, "No access"),
+          h("p", {}, "This account is not a super admin or an officer of the Silsila Markaz."),
+          h("button", { class: "btn em", onclick: signOut }, "Sign out"))));
+        return;
+      }
+      state.org = await api("organization");
+      const view = location.hash.slice(1);
+      if (VIEWS.some(([id]) => id === view)) state.view = view;
+      render();
+    } catch (error) {
+      if (error.message !== "signed-out") app.replaceChildren(h("div", { class: "boot" }, h("p", { class: "err" }, error.message)));
+    }
+  }
+
+  async function signOut() {
+    await fetch("/auth/signout", { method: "POST" }).catch(() => null);
+    signIn();
+  }
+
+  function scopeSelect() {
+    const select = h("select", { "aria-label": "Halqahs", onchange: event => { state.scope = event.target.value; render(); } },
+      h("option", { value: "all" }, "All Halqahs"));
+    for (const region of state.org?.regions || []) {
+      const group = h("optgroup", { label: region.name }, h("option", { value: `region:${region.name}` }, `All of ${region.name}`));
+      for (const halqah of region.halqahs) group.append(h("option", { value: `halqah:${halqah.id}` }, halqah.name));
+      select.append(group);
+    }
+    const loose = state.org?.unassigned || [];
+    if (loose.length) select.append(h("optgroup", { label: "Not placed in a region" }, loose.map(item => h("option", { value: `halqah:${item.id}` }, item.name))));
+    select.append(h("option", { value: "halqah:silsila-markaz" }, "Silsila Markaz"));
+    select.value = state.scope;
+    return select;
+  }
+
+  function filters() {
+    const presets = [["7", "7 days"], ["30", "30 days"], ["90", "90 days"], ["365", "12 months"], ["month", "This month"], ["lastmonth", "Last month"], ["custom", "Custom"]];
+    const preset = h("select", { "aria-label": "Period", onchange: event => { state.preset = event.target.value; if (state.preset !== "custom") render(); else render(); } },
+      presets.map(([value, label]) => h("option", { value }, label)));
+    preset.value = state.preset;
+    const r = range();
+    const custom = state.preset === "custom" ? [
+      h("input", { type: "date", value: state.from || r.from, "aria-label": "From", onchange: event => { state.from = event.target.value; render(); } }),
+      h("input", { type: "date", value: state.to || r.to, "aria-label": "To", onchange: event => { state.to = event.target.value; render(); } }),
+    ] : [];
+    const kind = h("select", { "aria-label": "Kind", onchange: event => { state.kind = event.target.value; render(); } },
+      h("option", { value: "all" }, "Zikr and meetings"), h("option", { value: "zikr" }, "Zikr only"), h("option", { value: "meeting" }, "Meetings only"));
+    kind.value = state.kind;
+    return h("div", { class: "filters" }, preset, custom, scopeSelect(), kind);
+  }
+
+  function render() {
+    clearTimers();
+    location.hash = state.view;
+    const nav = h("nav", { class: "nav", "aria-label": "Sections" },
+      h("div", { class: "brand" }, h("img", { src: "/logo.webp", alt: "" }), h("div", {}, h("b", {}, "Silsila Markaz"), h("span", {}, "Reports & analytics"))),
+      VIEWS.slice(0, 6).map(([id, label, icon]) => h("a", { href: `#${id}`, class: state.view === id ? "on" : "", onclick: event => { event.preventDefault(); go(id); } }, h("span", {}, icon), label)),
+      h("div", { class: "sep" }, "Organisation"),
+      VIEWS.slice(6).map(([id, label, icon]) => h("a", { href: `#${id}`, class: state.view === id ? "on" : "", onclick: event => { event.preventDefault(); go(id); } }, h("span", {}, icon), label)),
+      h("div", { class: "who" }, state.access?.isSuperAdmin ? "Signed in as a super admin" : "Signed in as a Markaz officer",
+        h("div", { style: "margin-top:8px;display:flex;gap:8px;flex-wrap:wrap" },
+          h("button", { class: "btn", onclick: toggleTheme }, "Theme"), h("button", { class: "btn", onclick: signOut }, "Sign out"))));
+    const title = VIEWS.find(([id]) => id === state.view)?.[1] || "Overview";
+    const content = h("div", { class: "content" }, h("div", { class: "card" }, h("p", { class: "empty" }, "Loading…")));
+    const usesFilters = ["overview", "halqahs", "people", "sessions"].includes(state.view);
+    const top = h("header", { class: "top" },
+      h("button", { class: "menu", onclick: () => nav.classList.toggle("open"), "aria-label": "Menu" }, "☰"),
+      h("h1", {}, title), usesFilters ? filters() : null);
+    app.replaceChildren(h("div", { class: "shell" }, nav, h("main", { class: "main" }, top, content)));
+    const views = { overview, daily: dailyView, monthly: monthlyView, halqahs: halqahsView, people: peopleView, sessions: sessionsView,
+      organisation: organisationView, notices: noticesView, computers: computersView };
+    (views[state.view] || overview)(content).catch(error => {
+      if (error.message !== "signed-out") content.replaceChildren(h("div", { class: "card" }, h("p", { class: "err" }, error.message)));
+    });
+  }
+  function go(view) { state.view = view; render(); }
+  function toggleTheme() {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("markaz-theme", root.dataset.theme); } catch (_) { /* private mode */ }
+  }
+
+  // MARK: - Charts
+  function trendChart(days) {
+    const width = 900, height = 260, pad = { l: 40, r: 40, t: 14, b: 28 };
+    const maxA = Math.max(1, ...days.map(d => d.attendance)), maxS = Math.max(1, ...days.map(d => d.sessions));
+    const x = i => pad.l + (days.length <= 1 ? 0 : (i / (days.length - 1)) * (width - pad.l - pad.r));
+    const y = v => height - pad.b - (v / maxA) * (height - pad.t - pad.b);
+    const svg = s("svg", { viewBox: `0 0 ${width} ${height}`, class: "chart", role: "img",
+      "aria-label": `Attendance per day, from ${days[0]?.date} to ${days[days.length - 1]?.date}; highest ${maxA}.` });
+    const defs = s("defs", {}, s("linearGradient", { id: "area", x1: 0, y1: 0, x2: 0, y2: 1 },
+      s("stop", { offset: "0%", "stop-color": "#0f7a59", "stop-opacity": ".45" }), s("stop", { offset: "100%", "stop-color": "#0f7a59", "stop-opacity": "0" })));
+    svg.append(defs);
+    for (let i = 0; i <= 4; i++) {
+      const v = Math.round((maxA * i) / 4), yy = y(v);
+      svg.append(s("line", { x1: pad.l, x2: width - pad.r, y1: yy, y2: yy, stroke: "currentColor", "stroke-opacity": ".08" }), s("text", { x: pad.l - 6, y: yy + 4, "text-anchor": "end" }, v));
+    }
+    const barW = Math.max(2, (width - pad.l - pad.r) / Math.max(1, days.length) * 0.5);
+    days.forEach((d, i) => {
+      if (!d.sessions) return;
+      const bh = (d.sessions / maxS) * (height - pad.t - pad.b) * 0.35;
+      svg.append(s("rect", { x: x(i) - barW / 2, y: height - pad.b - bh, width: barW, height: bh, rx: 2, fill: "#c79a3a", "fill-opacity": ".55" },
+        s("title", {}, `${d.date}: ${d.sessions} sessions`)));
+    });
+    if (days.length) {
+      const line = days.map((d, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(d.attendance).toFixed(1)}`).join(" ");
+      svg.append(s("path", { d: `${line} L${x(days.length - 1)},${height - pad.b} L${x(0)},${height - pad.b} Z`, fill: "url(#area)" }));
+      svg.append(s("path", { d: line, fill: "none", stroke: "#0f7a59", "stroke-width": 2.5, "stroke-linejoin": "round" }));
+      days.forEach((d, i) => svg.append(s("circle", { cx: x(i), cy: y(d.attendance), r: days.length > 60 ? 1.5 : 3, fill: "#0b5c43" },
+        s("title", {}, `${d.date}: ${d.attendance} present, ${d.unique} different people, ${d.sessions} sessions`))));
+      const step = Math.max(1, Math.ceil(days.length / 8));
+      days.forEach((d, i) => { if (i % step === 0 || (i === days.length - 1 && i % step >= step / 2)) svg.append(s("text", { x: x(i), y: height - 8, "text-anchor": "middle" }, d.date.slice(5))); });
+    }
+    return h("div", {}, svg, h("div", { class: "legend" }, h("span", {}, h("i", { style: "background:#0f7a59" }), "Attendance"), h("span", {}, h("i", { style: "background:#c79a3a" }), "Sessions")));
+  }
+
+  function heatmap(cells) {
+    if (!cells.length) return h("p", { class: "empty" }, "No sessions in this period.");
+    const hours = [...new Set(cells.map(c => c.hour))].sort((a, b) => a - b);
+    const max = Math.max(1, ...cells.map(c => c.attendance));
+    const grid = h("div", { class: "heat", style: `grid-template-columns:44px repeat(${hours.length},minmax(26px,1fr))`, role: "table", "aria-label": "Attendance by weekday and hour" });
+    grid.append(h("div", {}), ...hours.map(hour => h("div", { style: "text-align:center" }, `${String(hour).padStart(2, "0")}:00`)));
+    for (let w = 1; w <= 7; w++) {
+      grid.append(h("div", {}, WEEKDAYS[w - 1]));
+      for (const hour of hours) {
+        const cell = cells.find(c => c.weekday === w && c.hour === hour);
+        const value = cell ? cell.attendance : 0;
+        const alpha = value ? 0.18 + 0.82 * (value / max) : 0.05;
+        grid.append(h("div", { class: "cell", style: `background:rgba(11,92,67,${alpha.toFixed(2)})`, title: cell ? `${WEEKDAYS[w - 1]} ${hour}:00 · ${cell.sessions} sessions · ${value} present` : "" }, value || ""));
+      }
+    }
+    return h("div", { class: "scroll" }, grid);
+  }
+
+  function bars(rows, value, label, onpick) {
+    const max = Math.max(1, ...rows.map(value));
+    if (!rows.length) return h("p", { class: "empty" }, "Nothing to show.");
+    return h("div", { class: "bars" }, rows.map(row => h("div", { class: "row", onclick: onpick ? () => onpick(row) : null, title: onpick ? "Show only this" : "" },
+      h("span", {}, label(row)), h("div", { class: "track" }, h("div", { class: "fill", style: `width:${(value(row) / max) * 100}%` })), h("span", { class: "num" }, num(value(row))))));
+  }
+
+  function donut(app, web) {
+    const total = Math.max(1, app + web), r = 70, c = 2 * Math.PI * r, share = app / total;
+    return h("div", { style: "display:flex;gap:22px;align-items:center;flex-wrap:wrap" },
+      s("svg", { viewBox: "0 0 180 180", width: 170, height: 170, role: "img", "aria-label": `${app} through the app and ${web} from the websites` },
+        s("circle", { cx: 90, cy: 90, r, fill: "none", stroke: "#c79a3a", "stroke-width": 24 }),
+        s("circle", { cx: 90, cy: 90, r, fill: "none", stroke: "#0b5c43", "stroke-width": 24, "stroke-dasharray": `${c * share} ${c}`, transform: "rotate(-90 90 90)" }),
+        s("text", { x: 90, y: 88, "text-anchor": "middle", style: "font:700 26px Georgia;fill:currentColor" }, Math.round(share * 100) + "%"),
+        s("text", { x: 90, y: 108, "text-anchor": "middle", style: "font-size:11px;fill:currentColor;opacity:.7" }, "in the app")),
+      h("div", { class: "legend", style: "display:grid" }, h("span", {}, h("i", { style: "background:#0b5c43" }), `App · ${num(app)}`), h("span", {}, h("i", { style: "background:#c79a3a" }), `Websites · ${num(web)}`)));
+  }
+
+  // MARK: - Shared pieces
+  function kpis(summary, previous) {
+    const card = (label, value, before, note) => h("div", { class: "card kpi" }, h("div", { class: "label" }, label), h("div", { class: "value" }, value),
+      before !== undefined ? delta(typeof value === "string" ? Number(value.replace(/[^0-9.]/g, "")) : value, before) : h("span", { class: "delta flat" }, note || ""));
+    return h("div", { class: "grid k4" },
+      card("Sessions", summary.sessions, previous?.sessions),
+      card("Attendance", summary.attendance, previous?.attendance),
+      card("Different people", summary.uniqueAttendees, previous?.uniqueAttendees),
+      card("Average per session", num(summary.averageAttendance), previous?.averageAttendance),
+      card("From the websites", summary.webAttendance, undefined, "Visitors not in the app"),
+      card("Average length", `${summary.averageMinutes} min`, undefined, `${num(summary.totalMinutes / 60)} hours in all`),
+      card("Active Halqahs", `${summary.activeHalqahs} / ${summary.totalHalqahs}`, undefined, "held at least one session"),
+      card("Ran by themselves", summary.automatedStarts, undefined, "from Paltalk or a Zikr time"));
+  }
+  function insightsCard(list) {
+    return h("div", { class: "card" }, h("h3", {}, "Insights"), h("p", { class: "sub" }, "What stands out, worked out from the figures."),
+      list.length ? h("div", { class: "insights" }, list.map(item => h("div", { class: `insight ${item.level}` }, h("div", {}, h("b", {}, item.title), h("span", {}, item.detail)))))
+        : h("p", { class: "empty" }, "Nothing unusual."));
+  }
+  function sessionsTable(list) {
+    if (!list.length) return h("p", { class: "empty" }, "No sessions.");
+    return h("div", { class: "scroll" }, h("table", { class: "table" },
+      h("thead", {}, h("tr", {}, ["Started", "Halqah", "Session", "Minutes", "Present", "App", "Web", "Started by"].map(t => h("th", {}, t)))),
+      h("tbody", {}, list.map(row => h("tr", { class: "click", onclick: () => sessionModal(row.id) },
+        h("td", {}, when(row.startedAt)), h("td", {}, row.groupName), h("td", {}, row.title, " ", row.kind === "meeting" ? h("span", { class: "pill" }, "Meeting") : null),
+        h("td", { class: "n" }, row.minutes), h("td", { class: "n" }, row.attendance), h("td", { class: "n" }, row.app), h("td", { class: "n" }, row.web),
+        h("td", {}, row.automated ? h("span", { class: "pill good" }, "Automatic") : row.startedBy || "–"))))));
+  }
+  function peopleList(list, detail) {
+    if (!list.length) return h("p", { class: "empty" }, "No one yet.");
+    return h("div", { class: "people" }, list.map(person => h("div", { class: "person", onclick: () => personModal(person.memberID) },
+      h("div", {}, h("b", {}, person.name), h("br"), h("small", {}, detail(person))), h("small", {}, person.sessions !== undefined ? `${person.sessions} sessions` : `${person.sessionsBefore} before`))));
+  }
+  function exportButtons(extra) {
+    const link = (type, label) => h("a", { class: "btn", href: `/api/export?${query({ type, ...(extra || {}) })}`, download: "" }, "⬇ ", label);
+    return h("div", { class: "row noprint", style: "display:flex;gap:8px;flex-wrap:wrap" },
+      link("sessions", "Sessions CSV"), link("attendance", "Attendance CSV"), link("halqahs", "Halqahs CSV"), link("people", "People CSV"),
+      h("button", { class: "btn", onclick: () => window.print() }, "⎙ Print or save as PDF"));
+  }
+
+  // MARK: - Views
+  async function overview(root) {
+    const data = await api(`analytics?${query()}`);
+    const r = data.range;
+    put(root, 
+      h("div", { class: "card hero" }, h("h2", {}, data.scope.name),
+        h("p", {}, `${day(r.from + "T12:00:00Z")} to ${day(r.to + "T12:00:00Z")} · ${r.days} days · times in ${r.tz}. Test sessions are never counted.`),
+        h("div", { class: "updated", style: "color:#cfe0d6;margin-top:8px" }, `Updated ${time(data.generatedAt)}`)),
+      kpis(data.summary, data.previous),
+      h("div", { class: "grid c3" },
+        h("div", { class: "card" }, h("h3", {}, "Attendance over time"), h("p", { class: "sub" }, "People present each day, with the number of sessions."), trendChart(data.daily)),
+        h("div", { class: "card" }, h("h3", {}, "App or website"), h("p", { class: "sub" }, "How people joined."), donut(data.summary.appAttendance, data.summary.webAttendance),
+          data.countries.length ? h("div", { style: "margin-top:12px" }, h("h3", {}, "Countries"), bars(data.countries.slice(0, 8), c => c.attendees, c => c.code)) : null)),
+      h("div", { class: "grid c2" },
+        h("div", { class: "card" }, h("h3", {}, "Halqahs"), h("p", { class: "sub" }, "Attendance in the period. Choose one to see it alone."),
+          bars(data.halqahs.filter(row => row.sessions || row.members), row => row.attendance, row => row.name, row => { state.scope = `halqah:${row.id}`; render(); })),
+        h("div", { class: "card" }, h("h3", {}, "When people come"), h("p", { class: "sub" }, "Attendance by weekday and hour."), heatmap(data.weekdayHour))),
+      h("div", { class: "grid c3" }, insightsCard(data.insights),
+        h("div", { class: "card" }, h("h3", {}, "Regulars"), h("p", { class: "sub" }, "Who comes most."),
+          peopleList(data.regulars.slice(0, 10), p => `${p.halqahs.join(", ")} · last ${day(p.lastSeenAt)}`))),
+      h("div", { class: "grid c2" },
+        h("div", { class: "card" }, h("h3", {}, "Not seen for three weeks"), h("p", { class: "sub" }, "They came often before. A call from their Halqah may help."),
+          peopleList(data.needsCare.slice(0, 12), p => `${p.halqah} · last ${day(p.lastSeenAt)}`)),
+        h("div", { class: "card" }, h("h3", {}, "Regions"), h("p", { class: "sub" }, "Attendance by region."), bars(data.regions, row => row.attendance, row => row.name))),
+      h("div", { class: "card" }, h("h3", {}, "Latest sessions"), h("p", { class: "sub" }, "Choose one for who attended and the stages called."), sessionsTable(data.sessions.slice(0, 15))),
+      h("div", { class: "card noprint" }, h("h3", {}, "Export"), h("p", { class: "sub" }, "Spreadsheets for this period and these Halqahs (they open in Excel with Urdu names intact)."), exportButtons()));
+    state.timers.push(setInterval(() => { if (state.view === "overview") render(); }, 300000));
+  }
+
+  async function dailyView(root) {
+    const date = state.date || addDays(localDate(), -1);
+    const data = await api(`reports/daily?date=${date}&tz=${encodeURIComponent(TZ)}`);
+    const picker = h("input", { type: "date", value: date, max: localDate(), onchange: event => { state.date = event.target.value; render(); } });
+    put(root, 
+      h("div", { class: "card hero" }, h("h2", {}, `Daily Zikr report · ${day(date + "T12:00:00Z")}`),
+        h("p", {}, `${data.summary.sessions} sessions in ${data.halqahs.length} Halqahs, ${data.summary.attendance} present (${data.previousDay.attendance} the day before).`)),
+      h("div", { class: "card noprint", style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" }, h("b", {}, "Day"), picker,
+        h("button", { class: "btn", onclick: () => { state.date = addDays(date, -1); render(); } }, "‹ Day before"),
+        h("button", { class: "btn", onclick: () => { state.date = addDays(date, 1); render(); }, disabled: date >= localDate() }, "Day after ›"),
+        h("a", { class: "btn", href: `/api/export?${new URLSearchParams({ type: "attendance", from: date, to: date, tz: TZ })}`, download: "" }, "⬇ Attendance CSV"),
+        h("button", { class: "btn gold", onclick: () => window.print() }, "⎙ Print or save as PDF")),
+      kpis(data.summary, undefined),
+      data.noSession.length ? h("div", { class: "card" }, h("h3", {}, "No session held"), h("p", { class: "sub" }, "These Halqahs keep a Zikr time on this day."),
+        h("div", { style: "display:flex;gap:8px;flex-wrap:wrap" }, data.noSession.map(item => h("span", { class: "pill alert" }, item.name)))) : null,
+      data.halqahs.length ? data.halqahs.map(group => h("div", { class: "card" }, h("h3", {}, group.name), h("p", { class: "sub" }, group.region || ""),
+        group.sessions.map(session => h("div", { style: "margin:10px 0 16px" },
+          h("div", { style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center" }, h("b", {}, session.title),
+            h("span", { class: "pill" }, `${time(session.startedAt)}–${time(session.endedAt)} · ${session.minutes} min`),
+            h("span", { class: "pill good" }, `${session.attendance} present`), session.automated ? h("span", { class: "pill" }, "Started by itself") : session.startedBy ? h("span", { class: "pill" }, `Led by ${session.startedBy}`) : null),
+          session.attendees.length ? h("div", { class: "scroll" }, h("table", { class: "table", style: "margin-top:8px" },
+            h("thead", {}, h("tr", {}, ["Name", "Place", "Joined from", "Joined", "Minutes"].map(t => h("th", {}, t)))),
+            h("tbody", {}, session.attendees.map(a => h("tr", { class: a.memberID ? "click" : "", onclick: () => a.memberID && personModal(a.memberID) },
+              h("td", {}, a.name), h("td", {}, [a.city, a.country].filter(Boolean).join(", ") || "–"), h("td", {}, a.via === "web" ? h("span", { class: "pill web" }, "Website") : "App"),
+              h("td", {}, time(a.joinedAt)), h("td", { class: "n" }, a.minutes)))))) : h("p", { class: "empty" }, "No one was recorded."))))) :
+        h("div", { class: "card" }, h("p", { class: "empty" }, "No sessions on this day.")),
+      insightsCard(data.insights));
+  }
+
+  async function monthlyView(root) {
+    const now = localDate();
+    const month = state.month || addDays(`${now.slice(0, 7)}-01`, -1).slice(0, 7);
+    const data = await api(`reports/monthly?month=${month}&tz=${encodeURIComponent(TZ)}`);
+    const name = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-15T00:00:00Z`));
+    const search = h("input", { type: "search", placeholder: "Find a person", "aria-label": "Find a person" });
+    const table = h("tbody");
+    const fill = () => {
+      const term = search.value.trim().toLowerCase();
+      table.replaceChildren(...data.attendanceByPerson.filter(p => !term || p.name.toLowerCase().includes(term)).map(p => h("tr", { class: "click", onclick: () => personModal(p.memberID) },
+        h("td", {}, p.name), h("td", {}, p.via === "web" ? h("span", { class: "pill web" }, "Website") : "App"), h("td", {}, p.halqahs.join(", ")),
+        h("td", { class: "n" }, p.sessions), h("td", { class: "n" }, p.days), h("td", {}, day(p.lastSeenAt)))));
+    };
+    search.addEventListener("input", fill);
+    fill();
+    put(root, 
+      h("div", { class: "card hero" }, h("h2", {}, `Monthly report · ${name}`),
+        h("p", {}, `${data.summary.sessions} sessions, ${data.summary.attendance} present, ${data.summary.uniqueAttendees} different people across ${data.summary.activeHalqahs} Halqahs.`)),
+      h("div", { class: "card noprint", style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" }, h("b", {}, "Month"),
+        h("input", { type: "month", value: month, max: now.slice(0, 7), onchange: event => { state.month = event.target.value; render(); } }),
+        h("a", { class: "btn", href: `/api/export?${new URLSearchParams({ type: "attendance", from: `${month}-01`, to: data.daily[data.daily.length - 1]?.date || `${month}-28`, tz: TZ })}`, download: "" }, "⬇ Attendance CSV"),
+        h("a", { class: "btn", href: `/api/export?${new URLSearchParams({ type: "people", from: `${month}-01`, to: data.daily[data.daily.length - 1]?.date || `${month}-28`, tz: TZ })}`, download: "" }, "⬇ People CSV"),
+        h("button", { class: "btn gold", onclick: () => window.print() }, "⎙ Print or save as PDF")),
+      kpis(data.summary, data.previous),
+      h("div", { class: "card" }, h("h3", {}, "Day by day"), trendChart(data.daily)),
+      h("div", { class: "grid c2" },
+        h("div", { class: "card" }, h("h3", {}, "Halqahs"), halqahTable(data.halqahs)),
+        h("div", { class: "card" }, h("h3", {}, "When people came"), heatmap(data.weekdayHour))),
+      h("div", { class: "grid c3" }, insightsCard(data.insights),
+        h("div", { class: "card" }, h("h3", {}, "New members"), data.newMembers.length ? h("div", { class: "people" }, data.newMembers.map(m => h("div", { class: "person" },
+          h("div", {}, h("b", {}, m.name), h("br"), h("small", {}, m.halqah)), h("small", {}, day(m.joinedAt))))) : h("p", { class: "empty" }, "None this month."))),
+      h("div", { class: "card" }, h("h3", {}, "Who attended"), h("p", { class: "sub" }, "Everyone present at least once, most first."), h("div", { class: "noprint", style: "margin-bottom:10px" }, search),
+        h("div", { class: "scroll" }, h("table", { class: "table" }, h("thead", {}, h("tr", {}, ["Name", "Joined from", "Halqahs", "Sessions", "Days", "Last seen"].map(t => h("th", {}, t)))), table))),
+      h("div", { class: "card" }, h("h3", {}, "Not seen for three weeks"), peopleList(data.needsCare, p => `${p.halqah} · last ${day(p.lastSeenAt)}`)));
+  }
+
+  function halqahTable(rows) {
+    return h("div", { class: "scroll" }, h("table", { class: "table" },
+      h("thead", {}, h("tr", {}, ["Halqah", "Status", "Sessions", "Present", "Average", "People", "Members", "Rate", "Change"].map(t => h("th", {}, t)))),
+      h("tbody", {}, rows.map(row => h("tr", { class: "click", onclick: () => { state.scope = `halqah:${row.id}`; go("overview"); } },
+        h("td", {}, h("b", {}, row.name), h("br"), h("small", { class: "updated" }, row.region || "")), h("td", {}, h("span", { class: `pill ${row.status}` }, STATUS[row.status] || row.status)),
+        h("td", { class: "n" }, row.sessions), h("td", { class: "n" }, row.attendance), h("td", { class: "n" }, num(row.averageAttendance)),
+        h("td", { class: "n" }, row.uniqueAttendees), h("td", { class: "n" }, row.members), h("td", { class: "n" }, pct(row.attendanceRate)),
+        h("td", { class: "n" }, row.change === null ? "–" : h("span", { class: row.change >= 0 ? "up" : "down" }, `${row.change >= 0 ? "+" : ""}${Math.round(row.change * 100)}%`)))))));
+  }
+
+  async function halqahsView(root) {
+    const data = await api(`analytics?${query()}`);
+    put(root, 
+      h("div", { class: "card" }, h("h3", {}, "Every Halqah"), h("p", { class: "sub" }, "Status: active means a session in the last 7 days, quiet 8 to 21 days, inactive longer. Choose one to see it alone."),
+        halqahTable(data.halqahs)),
+      h("div", { class: "card" }, h("h3", {}, "Regions"), bars(data.regions, row => row.attendance, row => `${row.name} (${row.halqahs})`)),
+      h("div", { class: "card noprint" }, exportButtons()));
+  }
+
+  async function peopleView(root) {
+    const data = await api(`analytics?${query()}`);
+    const search = h("input", { type: "search", placeholder: "Find a person", "aria-label": "Find a person" });
+    const list = h("tbody");
+    const fill = () => {
+      const term = search.value.trim().toLowerCase();
+      list.replaceChildren(...(data.people || []).filter(p => !term || p.name.toLowerCase().includes(term)).map(p => h("tr", { class: "click", onclick: () => personModal(p.memberID) },
+        h("td", {}, p.name), h("td", {}, p.via === "web" ? h("span", { class: "pill web" }, "Website") : "App"), h("td", {}, p.halqahs.join(", ")),
+        h("td", { class: "n" }, p.sessions), h("td", { class: "n" }, p.days), h("td", {}, day(p.lastSeenAt)))));
+    };
+    search.addEventListener("input", fill);
+    fill();
+    put(root, 
+      h("div", { class: "grid c2" },
+        h("div", { class: "card" }, h("h3", {}, "Regulars"), peopleList(data.regulars, p => `${p.halqahs.join(", ")} · last ${day(p.lastSeenAt)}`)),
+        h("div", { class: "card" }, h("h3", {}, "Not seen for three weeks"), h("p", { class: "sub" }, "Three or more sessions before, none in the last 21 days."),
+          peopleList(data.needsCare, p => `${p.halqah} · last ${day(p.lastSeenAt)}`))),
+      h("div", { class: "card" }, h("h3", {}, "Everyone who attended"), h("div", { style: "margin-bottom:10px" }, search),
+        h("div", { class: "scroll" }, h("table", { class: "table" }, h("thead", {}, h("tr", {}, ["Name", "Joined from", "Halqahs", "Sessions", "Days", "Last seen"].map(t => h("th", {}, t)))), list))));
+  }
+
+  async function sessionsView(root) {
+    const data = await api(`analytics?${query()}`);
+    put(root, h("div", { class: "card" }, h("h3", {}, `${data.sessions.length} sessions`), h("p", { class: "sub" }, "Newest first. Choose one for who attended."), sessionsTable(data.sessions)),
+      h("div", { class: "card noprint" }, exportButtons()));
+  }
+
+  async function organisationView(root) {
+    const org = await api("organization");
+    state.org = org;
+    const superAdmin = state.access?.isSuperAdmin;
+    const card = item => h("div", { class: "hq" },
+      h("div", { style: "display:flex;justify-content:space-between;gap:8px" }, h("b", {}, h("span", { class: `status ${item.status}` }), item.name), item.isLive ? h("span", { class: "pill live" }, "LIVE") : null),
+      h("div", { class: "meta" },
+        h("span", {}, `${item.members} members · ${item.sessions30Days} sessions in 30 days · ${item.zikrTimes} Zikr times`),
+        h("span", {}, `Last session: ${item.lastSessionAt ? when(item.lastSessionAt) : "never"}`),
+        h("span", {}, `Administrators: ${item.administrators.join(", ") || "–"}`), h("span", {}, `Admins: ${item.admins.join(", ") || "–"}`),
+        h("span", {}, [item.city, item.countryCode].filter(Boolean).join(", "))),
+      superAdmin ? h("button", { class: "btn noprint", style: "margin-top:10px", onclick: () => placeModal(item) }, "Region and place") : null);
+    put(root, 
+      h("div", { class: "grid k4" },
+        [["Halqahs", org.totals.halqahs], ["Members", org.totals.members], ["Administrators", org.totals.administrators], ["Admins", org.totals.admins]]
+          .map(([label, value]) => h("div", { class: "card kpi" }, h("div", { class: "label" }, label), h("div", { class: "value" }, num(value))))),
+      h("div", { class: "card" }, h("h3", {}, "Live now"), org.liveNow.length ? h("div", { class: "people" }, org.liveNow.map(item => h("div", { class: "person" },
+        h("div", {}, h("span", { class: "pill live" }, "LIVE"), " ", h("b", {}, item.name), h("br"), h("small", {}, `${item.kind === "meeting" ? "Meeting" : "Zikr"} since ${time(item.startedAt)}`)),
+        h("b", {}, `${item.listening} here`)))) : h("p", { class: "empty" }, "Nothing is live right now.")),
+      h("div", { class: "card noprint", style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center" },
+        h("b", { style: "margin-right:auto" }, `Silsila Markaz: ${org.markaz.members} members, ${org.markaz.officers} officers`),
+        h("button", { class: "btn gold", onclick: announceModal }, "✉ Notice to Halqahs"),
+        superAdmin ? h("button", { class: "btn", onclick: syncAdmins }, "Bring in Halqah admins") : null),
+      org.regions.map(region => h("div", { class: "card region" }, h("h3", {}, region.name), h("div", { class: "halqahs" }, region.halqahs.map(card)))),
+      org.unassigned.length ? h("div", { class: "card region" }, h("h3", {}, "Not yet placed in a region"), h("div", { class: "halqahs" }, org.unassigned.map(card))) : null);
+    state.timers.push(setInterval(() => { if (state.view === "organisation") render(); }, 30000));
+  }
+
+  async function syncAdmins() {
+    if (!confirm("Add every Halqah's Administrators and Admins to the Silsila Markaz as members? They will see its notices and meetings, not the reports.")) return;
+    try { const result = await api("sync-admins", { method: "POST", body: "{}" }); toast(`${result.added} added · ${result.total} in the Markaz`); render(); }
+    catch (error) { toast(error.message); }
+  }
+
+  async function noticesView(root) {
+    const data = await api("announcements");
+    put(root, 
+      h("div", { class: "card noprint", style: "display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap" },
+        h("div", {}, h("h3", {}, "Notices from the Markaz"), h("p", { class: "sub", style: "margin:0" }, "One notice to many Halqahs, or to every Halqah's admins.")),
+        h("button", { class: "btn gold", onclick: announceModal }, "✉ New notice")),
+      data.announcements.length ? data.announcements.map(item => h("div", { class: "card" },
+        h("div", { style: "display:flex;gap:10px;flex-wrap:wrap;align-items:center" }, h("h3", { style: "margin:0" }, item.title),
+          h("span", { class: "pill" }, item.audience === "admins" ? "Halqah admins" : "Members"), h("span", { class: "updated" }, `${when(item.sentAt)} · ${item.sentBy}`)),
+        item.body ? h("p", {}, item.body) : null, h("small", { class: "updated" }, `To: ${item.targets.join(", ")}`))) :
+        h("div", { class: "card" }, h("p", { class: "empty" }, "No notices sent yet.")));
+  }
+
+  async function computersView(root) {
+    const data = await api("reporting-sessions");
+    put(root, h("div", { class: "card" }, h("h3", {}, "Computers signed in to reports"),
+      h("p", { class: "sub" }, "Each sign-in lasts 12 hours. Sign out any you do not recognise."),
+      data.sessions.length ? h("div", { class: "scroll" }, h("table", { class: "table" },
+        h("thead", {}, h("tr", {}, ["Approved by", "Signed in", "Last used", "Ends", ""].map(t => h("th", {}, t)))),
+        h("tbody", {}, data.sessions.map(item => h("tr", {}, h("td", {}, item.name, item.current ? h("span", { class: "pill good", style: "margin-left:6px" }, "This computer") : null),
+          h("td", {}, when(item.createdAt)), h("td", {}, when(item.lastSeenAt)), h("td", {}, when(item.expiresAt)),
+          h("td", {}, h("button", { class: "btn danger", onclick: async () => {
+            if (item.current) return signOut();
+            await api(`reporting-sessions/${item.id}`, { method: "DELETE" }).catch(error => toast(error.message));
+            render();
+          } }, "Sign out"))))))) : h("p", { class: "empty" }, "None.")));
+  }
+
+  // MARK: - Modals
+  function modal(title, ...body) {
+    const close = () => { node.remove(); document.removeEventListener("keydown", onkey); };
+    const onkey = event => { if (event.key === "Escape") close(); };
+    const node = h("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": title, onclick: event => { if (event.target === node) close(); } },
+      h("div", { class: "box" }, h("div", { class: "head" }, h("h2", {}, title), h("button", { class: "btn", onclick: close, "aria-label": "Close" }, "✕")), ...body));
+    document.addEventListener("keydown", onkey);
+    document.body.append(node);
+    return close;
+  }
+
+  async function sessionModal(id) {
+    try {
+      const data = await api(`sessions/${encodeURIComponent(id)}?tz=${encodeURIComponent(TZ)}`);
+      const se = data.session;
+      modal(`${se.groupName} · ${se.title}`,
+        h("p", {}, `${when(se.startedAt)} – ${time(se.endedAt)} · ${se.minutes} minutes · ${se.attendance} present (${se.app} app, ${se.web} website) · ${data.duaRequests} dua requests`),
+        h("p", { class: "updated" }, se.automated ? "Started by itself." : se.startedBy ? `Led by ${se.startedBy}.` : ""),
+        h("h3", {}, "Who attended"),
+        data.attendees.length ? h("table", { class: "table" }, h("thead", {}, h("tr", {}, ["Name", "Place", "From", "Joined", "Minutes"].map(t => h("th", {}, t)))),
+          h("tbody", {}, data.attendees.map(a => h("tr", {}, h("td", {}, a.name), h("td", {}, [a.city, a.country].filter(Boolean).join(", ") || "–"),
+            h("td", {}, a.via === "web" ? "Website" : "App"), h("td", {}, time(a.joinedAt)), h("td", { class: "n" }, a.minutes))))) : h("p", { class: "empty" }, "No one was recorded."),
+        h("h3", { style: "margin-top:16px" }, "Stages called"),
+        data.stages.length ? h("div", { style: "display:flex;gap:6px;flex-wrap:wrap" }, data.stages.map(st => h("span", { class: "pill" }, `${time(st.at)} · ${st.title}`))) : h("p", { class: "empty" }, "None recorded."));
+    } catch (error) { toast(error.message); }
+  }
+
+  async function personModal(id) {
+    try {
+      const p = await api(`people/${encodeURIComponent(id)}?tz=${encodeURIComponent(TZ)}`);
+      modal(p.name,
+        h("div", { class: "grid k4" }, [["Sessions", p.sessions], ["Last 90 days", p.last90Days], ["Days in a row", p.currentStreakDays], ["Last seen", day(p.lastSeenAt)]]
+          .map(([label, value]) => h("div", { class: "card kpi" }, h("div", { class: "label" }, label), h("div", { class: "value", style: "font-size:24px" }, value)))),
+        h("p", {}, p.halqahs.map(x => `${x.name} (${x.role})`).join(" · ") || "Not in a Halqah", p.email ? h("span", { class: "updated" }, ` · ${p.email}`) : null),
+        h("h3", {}, "History"),
+        p.history.length ? h("table", { class: "table" }, h("thead", {}, h("tr", {}, ["Date", "Halqah", "Session", "Minutes"].map(t => h("th", {}, t)))),
+          h("tbody", {}, p.history.map(row => h("tr", {}, h("td", {}, row.date), h("td", {}, row.groupName), h("td", {}, row.title), h("td", { class: "n" }, row.minutes))))) : h("p", { class: "empty" }, "No sessions yet."));
+    } catch (error) { toast(error.message); }
+  }
+
+  function placeModal(item) {
+    const region = h("input", { type: "text", value: item.region || "", list: "regions", placeholder: "e.g. North America" });
+    const datalist = h("datalist", { id: "regions" }, (state.org?.regions || []).map(r => h("option", { value: r.name })));
+    const country = h("input", { type: "text", value: item.countryCode || "", maxlength: 2, placeholder: "US" });
+    const city = h("input", { type: "text", value: item.city || "", placeholder: "City" });
+    const close = modal(`${item.name}: region and place`, h("div", { class: "form" },
+      h("label", {}, "Region", region, datalist), h("div", { class: "row" }, h("label", {}, "Country code", country), h("label", {}, "City", city)),
+      h("div", { class: "row" }, h("button", { class: "btn em", onclick: async () => {
+        try {
+          await api(`halqahs/${item.id}`, { method: "PUT", body: JSON.stringify({ region: region.value.trim() || null, countryCode: country.value.trim() || null, city: city.value.trim() || null }) });
+          close(); toast("Saved"); render();
+        } catch (error) { toast(error.message); }
+      } }, "Save"))));
+  }
+
+  function announceModal() {
+    const org = state.org || { regions: [], unassigned: [] };
+    const all = [...org.regions.flatMap(r => r.halqahs), ...org.unassigned];
+    const title = h("input", { type: "text", maxlength: 200, placeholder: "Title" });
+    const body = h("textarea", { maxlength: 4000, placeholder: "The notice" });
+    const audience = h("select", {}, h("option", { value: "members" }, "Members of the chosen Halqahs"), h("option", { value: "admins" }, "Every Halqah's admins (through the Markaz)"));
+    const scope = h("select", {}, h("option", { value: "all" }, "Every Halqah"), org.regions.map(r => h("option", { value: `region:${r.name}` }, `All of ${r.name}`)), h("option", { value: "halqahs" }, "Choose Halqahs"));
+    const picks = h("div", { style: "display:none;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px" },
+      all.map(item => h("label", { style: "display:flex;gap:6px;font-weight:500" }, h("input", { type: "checkbox", value: item.id }), item.name)));
+    scope.addEventListener("change", () => { picks.style.display = scope.value === "halqahs" ? "grid" : "none"; });
+    const notify = h("input", { type: "checkbox", checked: true });
+    const close = modal("Notice to Halqahs", h("div", { class: "form" },
+      h("label", {}, "Title", title), h("label", {}, "Message", body),
+      h("div", { class: "row" }, h("label", {}, "Who receives it", audience), h("label", {}, "Halqahs", scope)), picks,
+      h("label", { style: "display:flex;gap:8px;align-items:center;font-weight:500" }, notify, "Also send it as a notification to their phones"),
+      h("div", { class: "row" }, h("button", { class: "btn gold", onclick: async event => {
+        if (!title.value.trim()) return toast("Give the notice a title.");
+        event.target.disabled = true;
+        try {
+          const chosen = [...picks.querySelectorAll("input:checked")].map(input => input.value);
+          const result = await api("announce", { method: "POST", body: JSON.stringify({ title: title.value, body: body.value, audience: audience.value,
+            scope: scope.value, halqahIDs: chosen, notify: notify.checked }) });
+          close(); toast(`Sent to ${result.posted} ${result.posted === 1 ? "group" : "Halqahs"} · ${result.notified} phones notified`);
+          if (state.view === "notices") render();
+        } catch (error) { toast(error.message); event.target.disabled = false; }
+      } }, "Send"))));
+  }
+
+  // MARK: - Start
+  try { const theme = localStorage.getItem("markaz-theme"); if (theme) document.documentElement.dataset.theme = theme; } catch (_) { /* private mode */ }
+  addEventListener("hashchange", () => {
+    const view = location.hash.slice(1);
+    if (state.access && view !== state.view && VIEWS.some(([id]) => id === view)) go(view);
+  });
+  boot();
+})();

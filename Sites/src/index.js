@@ -6,6 +6,7 @@
 import { broadcastPage, homePage } from "./home.js";
 import { methodPage, shajraPage } from "./content.js";
 import { demoFile, demoPage, SHOWCASE } from "./demo.js";
+import { REPORTING_HOST, reportingRequest } from "./reporting/server.js";
 import LOGO from "../assets/logo.webp";
 
 export const SITES = {
@@ -139,6 +140,8 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
+    // reporting.: the Silsila Markaz's reports, signed in from the app (and ?site=reporting on workers.dev).
+    if (url.hostname === REPORTING_HOST || url.searchParams.get("site") === "reporting") return reportingRequest(request, env, LOGO);
     // app-demo.: the app's showcase for an audience (and ?site=demo on workers.dev).
     if (url.hostname === DEMO_HOST || url.searchParams.get("site") === "demo") {
       const all = Object.values(SITES).map(s => ({ host: s.host, region: s.region }));

@@ -3,8 +3,8 @@
 # Worker through a service binding (no CORS, no public API host needed).
 name = "darul-irfan-sites"
 main = "src/index.js"
-# The logo is bundled into the Worker.
-rules = [{ type = "Data", globs = ["**/*.webp"], fallthrough = false }]
+# The logo is bundled into the Worker; so are the reporting page's script and style (.txt).
+rules = [{ type = "Data", globs = ["**/*.webp"], fallthrough = false }, { type = "Text", globs = ["**/*.txt"], fallthrough = false }]
 compatibility_date = "2026-07-01"
 workers_dev = true
 preview_urls = false
@@ -13,6 +13,7 @@ routes = [
   { pattern = "namerica.naqshbandiaowaisiah.us", custom_domain = true },
   { pattern = "uk.naqshbandiaowaisiah.us", custom_domain = true },
   { pattern = "app-demo.naqshbandiaowaisiah.us", custom_domain = true },
+  { pattern = "reporting.naqshbandiaowaisiah.us", custom_domain = true },
 ]
 
 # app-demo.'s showcase files (PowerPoint, screenshots, admin screens) are served
