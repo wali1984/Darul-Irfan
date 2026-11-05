@@ -7,6 +7,7 @@ const STAGES = [
   ["1st Latifa", "پہلا لطیفہ"], ["2nd Latifa", "دوسرا لطیفہ"], ["3rd Latifa", "تیسرا لطیفہ"], ["4th Latifa", "چوتھا لطیفہ"],
   ["5th Latifa", "پانچواں لطیفہ"], ["6th Latifa", "چھٹا لطیفہ"], ["7th Latifa", "ساتواں لطیفہ"], ["Raabta", "رابطہ"],
   ["Muraqaba Ahadiyat", "مراقبہ احدیت"], ["Muraqaba Ma'iyyat", "مراقبہ معیت"], ["Muraqaba Aqrabiyyat", "مراقبہ اقربیت"],
+  ["Sair-e-Kaaba", "سیرِ کعبہ"], ["Rauza-e-Athar", "روضۂ اطہر"], ["Masjid-e-Nabawi", "مسجدِ نبوی"],
 ];
 
 const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);

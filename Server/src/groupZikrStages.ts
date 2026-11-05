@@ -71,7 +71,11 @@ export const DEFAULT_ZIKR_STAGES: ZikrStage[] = [
     "title": "Muraqaba Aqrabiyyat",
     "titleUr": "مراقبہ اقربیت",
     "isCustom": false
-  }
+  },
+  // Called after Aqrabiyyat in the Daily Zikr (heard in the sessions of 2 and 3 Nov 2026).
+  { "id": "sair-kaaba", "title": "Sair-e-Kaaba", "titleUr": "سیرِ کعبہ", "isCustom": false },
+  { "id": "rauza-athar", "title": "Rauza-e-Athar", "titleUr": "روضۂ اطہر", "isCustom": false },
+  { "id": "masjid-nabawi", "title": "Masjid-e-Nabawi", "titleUr": "مسجدِ نبوی", "isCustom": false }
 ];
 
 /** The recitations that open every Zikr, in order, exactly as the Method of

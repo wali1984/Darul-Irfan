@@ -358,37 +358,64 @@ private extension ZikrVoiceListener.State {
 /// The words that name each stage, as each recognizer writes them. Kept apart
 /// from the listener so it can be tested without a microphone.
 enum ZikrSpeechMatcher {
-    /// Arabic marks and tatweel go; alef forms and ya/kaf/ha fold together.
+    /// Arabic marks, tatweel, Devanagari nukta and nasal marks go; letters the
+    /// phones' recognisers mix up in Hazrat ji's call-outs fold together (heard in
+    /// the Daily Zikr of 2 and 3 Nov 2026): ٹ/ت, a final ں, ۂ/ہ; द/त, थ/त, ठ/ट.
     static func normalized(_ text: String) -> String {
         let dropped: (Unicode.Scalar) -> Bool = {
-            (0x064B...0x065F).contains($0.value) || [0x0670, 0x0640, 0x093C].contains($0.value)
+            (0x064B...0x065F).contains($0.value) || [0x0670, 0x0640, 0x093C, 0x0901, 0x0902, 0x06BA].contains($0.value)
         }
         let map: [Unicode.Scalar: Unicode.Scalar] = ["أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ی", "ي": "ی",
-                                                     "ك": "ک", "ة": "ہ", "ه": "ہ", "ھ": "ہ"]
+                                                     "ك": "ک", "ة": "ہ", "ه": "ہ", "ھ": "ہ", "ۂ": "ہ", "ٹ": "ت",
+                                                     "द": "त", "थ": "त", "ठ": "ट"]
         var scalars = String.UnicodeScalarView()
         for scalar in text.lowercased().unicodeScalars where !dropped(scalar) { scalars.append(map[scalar] ?? scalar) }
         return String(scalars)
     }
 
-    /// Listed most specific first: "latifa" with its number before the plain word.
-    static let phrases: [(stage: String, words: [String])] = [
-        ("tasbih", ["سبحان اللہ والحمد", "سبحان اللہ و الحمد"]),
-        ("istighfar", ["استغفر اللہ ربی", "استغفر اللہ"]),
-        ("shahadah", ["اشہد ان لا الہ", "اشہد ان"]),
-        ("taawwudh", ["اعوذ باللہ", "اعوذ"]),
-        ("basmalah", ["بسم اللہ الرحمن", "بسم اللہ"]),
-        ("latifa-1", ["پہلا لطیفہ", "پہلے لطیفے", "لطیفہ قلب", "पहला लतीफ़ा", "पहला लतीफा", "पहले लतीफ़े", "पहले लतीफे"]),
-        ("latifa-2", ["دوسرا لطیفہ", "دوسرے لطیفے", "लतीफ़ा रूह", "दूसरा लतीफ़ा", "दूसरा लतीफा", "दूसरे लतीफ़े", "दूसरे लतीफे"]),
-        ("latifa-3", ["تیسرا لطیفہ", "تیسرے لطیفے", "तीसरा लतीफ़ा", "तीसरा लतीफा", "तीसरे लतीफ़े", "तीसरे लतीफे"]),
-        ("latifa-4", ["چوتھا لطیفہ", "چوتھے لطیفے", "चौथा लतीफ़ा", "चौथा लतीफा", "चौथे लतीफ़े", "चौथे लतीफे"]),
-        ("latifa-5", ["پانچواں لطیفہ", "پانچویں لطیفے", "पांचवां लतीफ़ा", "पाँचवाँ लतीफ़ा", "पांचवां लतीफा", "पांचवें लतीफ़े", "पांचवें लतीफे"]),
-        ("latifa-6", ["چھٹا لطیفہ", "چھٹے لطیفے", "छठा लतीफ़ा", "छठा लतीफा", "छठे लतीफ़े", "छठे लतीफे"]),
-        ("latifa-7", ["ساتواں لطیفہ", "ساتویں لطیفے", "सातवां लतीफ़ा", "सातवाँ लतीफ़ा", "सातवां लतीफा", "सातवें लतीफ़े", "सातवें लतीफे"]),
-        ("ahadiyat", ["مراقبہ احدیت", "احدیت", "मुराक़बा अहदियत", "अहदियत"]),
-        ("maiyyat", ["مراقبہ معیت", "معیت", "मुराक़बा मइय्यत", "मइय्यत", "मैयत"]),
-        ("aqrabiyyat", ["مراقبہ اقربیت", "اقربیت", "मुराक़बा अक़रबियत", "अक़रबियत", "अकरबियत"]),
-        ("raabta", ["رابطہ", "राबिता", "राब्ता", "राबता"]),
+    /// Each Latifa as Hazrat ji calls it, "<number> latifa", in every form the
+    /// recognisers wrote it (Urdu, and Hindi in Devanagari).
+    private static let ordinals: [[String]] = [
+        ["پہلا", "پہلے", "اہلا", "पहला", "पहले"],
+        ["دوسرا", "دوسرے", "दूसरा", "दूसरे"],
+        ["تیسرا", "تیسرے", "तीसरा", "तीसरे"],
+        ["چوتھا", "چوتھے", "चौथा", "चौथे"],
+        ["پانچواں", "پانچویں", "پانچو", "पांचवां", "पांचवें", "पांच"],
+        ["چھٹا", "چھٹے", "छठा", "छठे", "छटने", "छट्टे"],
+        ["ساتواں", "ساتویں", "ساتھو", "ساتوے", "सातवां", "सातवें", "सात"],
     ]
+    private static let latifaWords = ["لطیفہ", "لطیفے", "लतीफा", "लतीफे"]
+
+    static let phrases: [(stage: String, words: [String])] = makePhrases()
+
+    private static func makePhrases() -> [(stage: String, words: [String])] {
+        var list: [(stage: String, words: [String])] = [
+            (stage: "tasbih", words: ["سبحان اللہ والحمد", "سبحان اللہ و الحمد"]),
+            (stage: "istighfar", words: ["استغفر اللہ ربی", "استغفر اللہ"]),
+            (stage: "shahadah", words: ["اشہد ان لا الہ", "اشہد ان"]),
+            (stage: "taawwudh", words: ["اعوذ باللہ", "اعوذ"]),
+            (stage: "basmalah", words: ["بسم اللہ الرحمن", "بسم اللہ"]),
+        ]
+        for (index, numbers) in ordinals.enumerated() {
+            var words: [String] = []
+            for number in numbers {
+                for latifa in latifaWords { words.append(number + " " + latifa) }
+            }
+            if index == 0 { words.append("لطیفہ قلب") }
+            if index == 1 { words.append("लतीफा रूह") }
+            list.append((stage: "latifa-" + String(index + 1), words: words))
+        }
+        list += [
+            (stage: "ahadiyat", words: ["احدیت", "عادیت", "अहदियत", "आधियत", "अहदीयत"]),
+            (stage: "maiyyat", words: ["معیت", "मइय्यत", "मैयत", "मायियत", "माईयत"]),
+            (stage: "aqrabiyyat", words: ["اقربیت", "अकरबियत", "अक्रबियत"]),
+            (stage: "sair-kaaba", words: ["سیر کعبہ", "سہر کعبہ", "سیرِ کعبہ", "सैर काबा", "सहर काबा", "सैरे काबा"]),
+            (stage: "rauza-athar", words: ["روضہ اطہر", "روضۂ اطہر", "روز اثر", "روزہ اثر", "रोज अथर", "रोजा अथर", "रौजा अतहर", "रोजा अतहर"]),
+            (stage: "masjid-nabawi", words: ["مسجد نبوی", "مسجد نبی", "मस्जिद नबवी", "मस्जिदे नबवी", "मस्च नवी", "मस्चे नवी"]),
+            (stage: "raabta", words: ["رابطہ", "राबिता", "राब्ता", "राबता"]),
+        ]
+        return list
+    }
 
     /// The stage whose words were said last in the transcript, if any.
     static func stage(in transcript: String) -> String? {
@@ -397,7 +424,6 @@ enum ZikrSpeechMatcher {
             for word in words {
                 guard let range = transcript.range(of: normalized(word), options: .backwards) else { continue }
                 if best == nil || range.lowerBound > best!.at { best = (stage, range.lowerBound) }
-                break
             }
         }
         return best?.stage
