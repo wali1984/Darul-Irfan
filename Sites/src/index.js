@@ -102,20 +102,19 @@ async function followHomeVPN(env) {
 const FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#04150f"/>
 <path d="M20 4 25 15 36 20 25 25 20 36 15 25 4 20 15 15Z" fill="none" stroke="#d9b56a" stroke-width="2.2"/><circle cx="20" cy="20" r="5" fill="#d9b56a"/></svg>`;
 
-// The room is played by Cloudflare RealtimeKit's web components (listen only).
 const SECURITY = {
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
   "permissions-policy": "camera=(), microphone=(), geolocation=(), autoplay=(self)",
   "content-security-policy": [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
-    "font-src https://fonts.gstatic.com https://cdn.jsdelivr.net data:",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src https://fonts.gstatic.com data:",
     "img-src 'self' data: blob: https:",
     "media-src 'self' blob: https:",
     "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
-    "connect-src 'self' https: wss:",
+    "connect-src 'self'",
   ].join("; "),
 };
 

@@ -1,5 +1,4 @@
 import type { Env } from "./contracts";
-import { addParticipant } from "./community";
 import { RECITATIONS } from "./groupZikrStages";
 import { liveRow, sessionPayload } from "./session";
 import { json, sha256 } from "./util";
@@ -67,9 +66,11 @@ async function visitor(env: Env, input: Record<string, unknown>): Promise<string
   return (await sha256(`web-guest:${input.guestSecret}`)).slice(0, 32);
 }
 
-/** What a joined visitor's browser plays: the live video, the recordings on the
- *  shared clock, or (on join only) a listen-only token for the room. */
-async function presence(env: Env, groupID: string, memberID: string, withRoom: boolean, name?: string): Promise<Response> {
+/** What a joined visitor's browser plays: the live video or the recordings on the
+ *  shared clock. A room's sound is never given to a website visitor through
+ *  RealtimeKit, which bills per listener: the owner's budget (under $70 a month)
+ *  sends listeners through the Realtime SFU feed instead (Tools/LiveRelay). */
+async function presence(env: Env, groupID: string, memberID: string): Promise<Response> {
   const now = await liveOf(env, groupID);
   if (!now?.row.session_id) return json({ error: "This Halqah's Zikr is not live right now.", live: null }, { status: 409 });
   const stamp = new Date().toISOString();
@@ -77,14 +78,8 @@ async function presence(env: Env, groupID: string, memberID: string, withRoom: b
     ON CONFLICT(session_id,member_id) DO UPDATE SET last_seen_at=excluded.last_seen_at`)
     .bind(now.row.session_id, groupID, memberID, stamp, stamp).run();
   const session = await sessionPayload(env, groupID, now.row, false);
-  let room: { authToken: string } | undefined;
-  if (withRoom && now.row.room_id) {
-    const token = await addParticipant(env, now.row.room_id, memberID, name ?? "Visitor", "listener");
-    if (token instanceof Response) return token;
-    room = { authToken: token };
-  }
   return json({ live: now.live, stage: await currentStage(env, groupID, now.live.startedAt),
-    queue: session.queue, playback: session.playback, notice: session.notice, room });
+    queue: session.queue, playback: session.playback, notice: session.notice });
 }
 
 /** POST /v1/public/halqahs/:id/join {name, city, countryCode, guestSecret}. */
@@ -110,7 +105,7 @@ export async function publicJoin(env: Env, groupID: string, input: Record<string
       VALUES(?,?,?,?,NULL,?) ON CONFLICT(member_id) DO UPDATE SET display_name=excluded.display_name,city=excluded.city,
       country_code=excluded.country_code,updated_at=excluded.updated_at`).bind(memberID, name, city, country, stamp),
   ]);
-  return presence(env, groupID, memberID, true, name);
+  return presence(env, groupID, memberID);
 }
 
 /** POST /v1/public/halqahs/:id/presence {guestSecret}: still here; the latest playback clock and stage. */
@@ -119,5 +114,5 @@ export async function publicPresence(env: Env, groupID: string, input: Record<st
   if (memberID instanceof Response) return memberID;
   const known = await env.DB.prepare("SELECT id FROM members WHERE id=? AND apple_subject=?").bind(memberID, `web-guest:${memberID}`).first();
   if (!known) return json({ error: "Join first" }, { status: 401 });
-  return presence(env, groupID, memberID, false);
+  return presence(env, groupID, memberID);
 }

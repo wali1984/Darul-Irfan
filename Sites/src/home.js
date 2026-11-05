@@ -74,7 +74,6 @@ dialog h3{font-size:28px;margin-bottom:6px}
 @media (max-width:960px){#player .body{grid-template-columns:1fr}}
 #player .media{border-radius:18px;overflow:hidden;background:#020b08;border:1px solid var(--line);min-height:240px;display:grid;place-items:center;position:relative}
 #player .media iframe,#player .media video{width:100%;aspect-ratio:16/9;border:0;display:block}
-#player rtk-meeting{display:block;width:100%;height:min(62vh,560px)}
 #player .pstage{display:grid;gap:18px;justify-items:center;text-align:center;align-content:start}
 .listen{display:grid;gap:14px;justify-items:center;padding:30px}
 .eq{display:flex;gap:5px;align-items:flex-end;height:34px}.eq i{width:6px;background:linear-gradient(var(--gold2),var(--emerald));border-radius:3px;animation:eq 1.1s ease-in-out infinite}
@@ -272,7 +271,7 @@ const CLIENT = `
   });
 
   // The player: what is live, heard and seen with no controls, and the stage beside it.
-  let media = { key: null, el: null, meeting: null };
+  let media = { key: null, el: null };
   function openPlayer(h, session) {
     joined = h; shown.player = null;
     $("p-name").textContent = h.name;
@@ -299,8 +298,6 @@ const CLIENT = `
   }
   function play(session, first) {
     const box = $("p-media");
-    if (session.room && session.room.authToken && first) return joinRoom(box, session.room.authToken);
-    if (media.meeting) return;
     if (session.live && session.live.videoID) {
       const key = "yt:" + session.live.videoID;
       if (media.key === key) return;
@@ -340,31 +337,16 @@ const CLIENT = `
       }
       return;
     }
-    if (media.key !== "wait") { media.key = "wait"; box.replaceChildren(listening("The Zikr is live. The sound will start when it is shared.")); }
-  }
-  function loadScript(src, module) {
-    return new Promise((ok, fail) => { const s = document.createElement("script"); if (module) s.type = "module"; s.src = src; s.onload = ok; s.onerror = fail; document.head.append(s); });
-  }
-  async function joinRoom(box, token) {
-    media.key = "room";
-    box.replaceChildren(listening("Joining the Zikr…"));
-    try {
-      await loadScript("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit@2.0.2/dist/browser.js");
-      const ui = await import("https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@2.0.2/loader/index.es2017.js");
-      ui.defineCustomElements();
-      const meeting = await RealtimeKitClient.init({ authToken: token, defaults: { audio: false, video: false } });
-      media.meeting = meeting;
-      const view = document.createElement("rtk-meeting");
-      view.setAttribute("show-setup-screen", "false");
-      view.meeting = meeting;
-      box.replaceChildren(view);
-      await meeting.join().catch(() => {});
-    } catch { box.replaceChildren(listening("Could not open the Zikr room. Leave and join again.")); }
+    // A Zikr led live in a room: its sound reaches the website through the
+    // Silsila's live feed, which is not open yet; the stage follows meanwhile.
+    const note = session.live && session.live.hasRoom
+      ? "This Zikr is being led live in the Darul Irfan app. Follow each stage here; its sound is in the app."
+      : "The Zikr is live. The sound will start when it is shared.";
+    if (media.key !== note) { media.key = note; box.replaceChildren(listening(note)); }
   }
   function stopMedia() {
-    try { media.meeting && media.meeting.leave(); } catch {}
     try { media.el && media.el.pause(); } catch {}
-    media = { key: null, el: null, meeting: null };
+    media = { key: null, el: null };
     $("p-media").replaceChildren();
   }
   function ended() {

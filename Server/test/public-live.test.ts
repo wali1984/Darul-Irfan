@@ -53,11 +53,12 @@ describe("joining a live Zikr from the websites", () => {
     expect((await post("/v1/public/halqahs/usa/presence", { guestSecret: "b".repeat(64) })).status).toBe(401);
   });
 
-  it("joins a room only as a listener and refuses when nothing is live", async () => {
+  it("never seats a visitor in the room (RealtimeKit bills per listener) and refuses when nothing is live", async () => {
     const { post, sent, raw } = setup(true);
     const joined = await (await post("/v1/public/halqahs/usa/join", { name: "Sara", city: "Leeds", countryCode: "GB", guestSecret: SECRET })).json() as any;
-    expect(joined.room).toEqual({ authToken: "listener-token" });
-    expect(sent.find(s => s.url.includes("/participants"))?.body).toMatchObject({ preset_name: "web_listener", name: "Sara" });
+    expect(joined.live).toMatchObject({ hasRoom: true });
+    expect(joined.room).toBeUndefined();
+    expect(sent.filter(s => s.url.includes("/participants"))).toEqual([]);
     raw.prepare("UPDATE group_live SET state='offline'").run();
     expect((await post("/v1/public/halqahs/usa/join", { name: "Nadia", city: "York", countryCode: "GB", guestSecret: "d".repeat(64) })).status).toBe(409);
     expect(raw.prepare("SELECT COUNT(*) AS n FROM sheikh_public_profiles WHERE display_name='Nadia'").get()).toEqual({ n: 0 });
