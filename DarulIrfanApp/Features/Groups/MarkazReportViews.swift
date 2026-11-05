@@ -120,9 +120,9 @@ struct MarkazDailyReportView: View {
         let before = report.previousDay
         return [
             MarkazFigure(id: "sessions", titleKey: "Sessions", value: "\(summary.sessions)", systemImage: "calendar",
-                         change: MarkazText.change(Double(summary.sessions), before?.sessions.map { Double($0) })),
+                         change: MarkazText.countChange(summary.sessions, before?.sessions)),
             MarkazFigure(id: "attendance", titleKey: "Attendance", value: "\(summary.attendance)", systemImage: "person.3.fill",
-                         change: MarkazText.change(Double(summary.attendance), before?.attendance.map { Double($0) })),
+                         change: MarkazText.countChange(summary.attendance, before?.attendance)),
             MarkazFigure(id: "unique", titleKey: "Different people", value: "\(summary.uniqueAttendees)", systemImage: "person.crop.circle"),
             MarkazFigure(id: "web", titleKey: "Website visitors", value: "\(summary.webAttendance)", systemImage: "globe"),
             MarkazFigure(id: "length", titleKey: "Average length (minutes)", value: MarkazText.decimal(summary.averageMinutes), systemImage: "clock.fill"),

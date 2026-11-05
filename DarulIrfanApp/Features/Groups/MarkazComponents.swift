@@ -151,6 +151,12 @@ enum MarkazText {
         return (now - before) / before
     }
 
+    /// `change` for counts; nil when there is nothing before.
+    static func countChange(_ now: Int, _ before: Int?) -> Double? {
+        guard let before else { return nil }
+        return change(Double(now), Double(before))
+    }
+
     static func dayTitle(_ text: String, locale: Locale) -> String {
         guard let date = MarkazDay.date(text) else { return text }
         return GroupInvitationDate.text(date, locale: locale)
@@ -283,24 +289,24 @@ extension MarkazSummary {
     func figures(previous: MarkazPrevious?) -> [MarkazFigure] {
         [
             MarkazFigure(id: "sessions", titleKey: "Sessions", value: "\(sessions)", systemImage: "calendar",
-                         change: MarkazText.change(Double(sessions), previous?.sessions.map { Double($0) })),
+                         change: MarkazText.countChange(sessions, previous?.sessions)),
             MarkazFigure(id: "attendance", titleKey: "Attendance", value: "\(attendance)", systemImage: "person.3.fill",
-                         change: MarkazText.change(Double(attendance), previous?.attendance.map { Double($0) })),
+                         change: MarkazText.countChange(attendance, previous?.attendance)),
             MarkazFigure(id: "unique", titleKey: "Different people", value: "\(uniqueAttendees)", systemImage: "person.crop.circle",
-                         change: MarkazText.change(Double(uniqueAttendees), previous?.uniqueAttendees.map { Double($0) })),
+                         change: MarkazText.countChange(uniqueAttendees, previous?.uniqueAttendees)),
             MarkazFigure(id: "average", titleKey: "Average per session", value: MarkazText.decimal(averageAttendance),
                          systemImage: "chart.bar.fill",
                          change: MarkazText.change(averageAttendance, previous?.averageAttendance)),
             MarkazFigure(id: "web", titleKey: "Website visitors", value: "\(webAttendance)", systemImage: "globe",
-                         change: MarkazText.change(Double(webAttendance), previous?.webAttendance.map { Double($0) })),
+                         change: MarkazText.countChange(webAttendance, previous?.webAttendance)),
             MarkazFigure(id: "length", titleKey: "Average length (minutes)", value: MarkazText.decimal(averageMinutes),
                          systemImage: "clock.fill",
                          change: MarkazText.change(averageMinutes, previous?.averageMinutes)),
             MarkazFigure(id: "active", titleKey: "Active Halqahs", value: "\(activeHalqahs) / \(totalHalqahs)",
                          systemImage: "dot.radiowaves.left.and.right",
-                         change: MarkazText.change(Double(activeHalqahs), previous?.activeHalqahs.map { Double($0) })),
+                         change: MarkazText.countChange(activeHalqahs, previous?.activeHalqahs)),
             MarkazFigure(id: "new", titleKey: "New members", value: "\(newMembers)", systemImage: "person.badge.plus",
-                         change: MarkazText.change(Double(newMembers), previous?.newMembers.map { Double($0) }))
+                         change: MarkazText.countChange(newMembers, previous?.newMembers))
         ]
     }
 }
@@ -464,9 +470,7 @@ struct MarkazHeatmap: View {
                             x: .value("Hour", cell.hour),
                             y: .value("Weekday", cell.weekday)
                         )
-                        .foregroundStyle(cell.sessions == 0
-                                         ? DIColor.sandstone.opacity(0.7)
-                                         : DIColor.primary.opacity(0.18 + 0.82 * Double(cell.attendance) / Double(peak)))
+                        .foregroundStyle(fill(cell, peak: peak))
                         .cornerRadius(3)
                     }
                 }
@@ -482,6 +486,13 @@ struct MarkazHeatmap: View {
                     .foregroundStyle(DIColor.textMuted)
             }
         }
+    }
+
+    /// Sand where there was no session; emerald, darker where more came.
+    private func fill(_ cell: Cell, peak: Int) -> Color {
+        guard cell.sessions > 0 else { return DIColor.sandstone.opacity(0.7) }
+        let share: Double = Double(cell.attendance) / Double(peak)
+        return DIColor.primary.opacity(0.18 + 0.82 * share)
     }
 
     private func summary(_ grid: [Cell]) -> String {

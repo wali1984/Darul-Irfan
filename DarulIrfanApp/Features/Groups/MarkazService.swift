@@ -107,7 +107,8 @@ struct MarkazService: Sendable {
     // MARK: Plumbing
 
     private func get<T: Decodable>(_ type: T.Type, _ path: String, _ items: [(String, String?)] = []) async throws -> T {
-        let query = Self.query(items + [("tz", TimeZone.current.identifier)])
+        let zone: (String, String?) = ("tz", TimeZone.current.identifier)
+        let query = Self.query(items + [zone])
         let data = try await groups.markaz("GET", path: path, query: query)
         return try decode(type, data)
     }
