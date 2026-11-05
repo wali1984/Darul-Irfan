@@ -1,6 +1,6 @@
 import {
   zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues, zikrStage, postStageMessage, hideStageMessage,
-  hideZikrCue, publicSheikhStage, relayZikrCue,
+  hideZikrCue, publicSheikhStage, relayZikrCue, relayLive, endAfterDua,
 } from "./groupZikrStages";
 import { joinOurSheikh } from "./sheikhPublicJoin";
 import type { AndroidDeviceRegistration, DeviceRegistration, Env } from "./contracts";
@@ -59,16 +59,17 @@ async function route(request: Request, env: Env): Promise<Response> {
     const ids = (url.searchParams.get("ids") ?? "").split(",").filter(id => /^[a-z0-9-]{1,40}$/.test(id)).slice(0, 30);
     return cachedJSON(await publicLive(env, ids), request, 10);
   }
-  // The live relay posts the stage called in Paltalk (bearer LISTENER_TOKEN; body {id: uuid, stageID}).
-  const relayCue = /^\/v1\/service\/groups\/([a-z0-9-]{1,40})\/zikr-cues$/.exec(path);
-  if (relayCue && request.method === "POST") {
+  // The live relay (bearer RELAY_TOKEN): posts the stage called in Paltalk ({id: uuid, stageID}),
+  // starts the Zikr ({state: "live"}) and says when the dua begins ({state: "dua"}).
+  const relay = /^\/v1\/service\/groups\/([a-z0-9-]{1,40})\/(zikr-cues|live)$/.exec(path);
+  if (relay && request.method === "POST") {
     const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
-    if (!env.LISTENER_TOKEN || bearer.length !== env.LISTENER_TOKEN.length || bearer !== env.LISTENER_TOKEN) {
+    if (!env.RELAY_TOKEN || bearer.length !== env.RELAY_TOKEN.length || bearer !== env.RELAY_TOKEN) {
       return json({ error: "Not authorized" }, { status: 401 });
     }
     let input: Record<string, unknown>;
     try { input = await request.json(); } catch { return json({ error: "Invalid request" }, { status: 400 }); }
-    return relayZikrCue(env, relayCue[1]!, input ?? {});
+    return relay[2] === "live" ? relayLive(env, relay[1]!, input ?? {}) : relayZikrCue(env, relay[1]!, input ?? {});
   }
   // A website visitor joins a live Zikr (name and place) and stays counted while listening.
   const visit = /^\/v1\/public\/halqahs\/([a-z0-9-]{1,40})\/(join|presence)$/.exec(path);
@@ -399,6 +400,7 @@ export default {
     // so the app and the notifications follow within a minute.
     const jobs: Array<{ name: string; run: Promise<void> }> = [
       { name: "sheikh-zikr-cues", run: dispatchZikrCues(env) },
+      { name: "end-after-dua", run: endAfterDua(env) },
       { name: "live", run: Promise.allSettled([refreshPaltalkRoom(env), refreshYouTube(env)])
           .then(async results => {
             await reconcileLive(env);

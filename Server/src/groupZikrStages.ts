@@ -1,6 +1,7 @@
 import { sendPushToInstallations } from "./apns";
 import type { Env } from "./contracts";
-import { canManage, canSee, memberRole } from "./community";
+import { canManage, canSee, memberRole, notifyGroup } from "./community";
+import { beginSession, endSession } from "./session";
 import { json } from "./util";
 
 export const SHEIKH_HALQA_ID = "our-sheikh";
@@ -89,6 +90,10 @@ export const RECITATIONS: Recitation[] = [
   { id: "taawwudh", title: "Ta'awwudh", titleUr: "تعوذ", arabic: "أَعُوذُ بِاللّٰهِ مِنَ الشَّيْطَانِ الرَّجِيمِ" },
   { id: "basmalah", title: "Bismillah", titleUr: "تسمیہ", arabic: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ" },
 ];
+
+/** The dua that closes the Zikr: shown on the stage, notifies nobody; the relay
+ *  calling it ends the session five minutes later (owner 2026-11-05). */
+export const DUA_STAGE: ZikrStage = { id: "dua", title: "Dua", titleUr: "دعا", isCustom: false };
 
 /** The stage chat's ready-made messages: all a member can send. */
 export const STAGE_PRESETS = [
@@ -197,15 +202,62 @@ export async function broadcastZikrCue(env: Env, memberID: string, groupID: stri
   return recordCue(env, memberID, groupID, input);
 }
 
+/** The live relay starts a Halqah's Zikr when Hazrat ji is live on Paltalk
+ *  (owner 2026-11-05) and tells when the dua begins; the session then ends by
+ *  itself five minutes later. The relay never ends a session directly.
+ *  {state: "live", title?} | {state: "dua"} */
+export async function relayLive(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
+  const group = await env.DB.prepare("SELECT id FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
+  if (!group) return json({ error: "Not found" }, { status: 404 });
+  const live = await env.DB.prepare("SELECT state,kind,session_id,auto_end_at FROM group_live WHERE group_id=?").bind(groupID)
+    .first<{ state: string; kind: string; session_id: string | null; auto_end_at: string | null }>();
+  if (input.state === "live") {
+    if (live?.state === "live") return json({ state: "live", sessionID: live.session_id, started: false });
+    const title = typeof input.title === "string" && input.title.trim() ? input.title.trim().slice(0, 120) : "Zikr";
+    await ensureRelayAuthor(env);
+    const sessionID = await beginSession(env, groupID, RELAY_AUTHOR, { kind: "zikr", title, videoID: null, roomID: null, queue: [] });
+    try {
+      await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title, "Halqah zikr has started. Join now in Darul Irfan.",
+        `darulirfan://groups/${groupID}`);
+    } catch { /* The session is live; a notice is best effort. */ }
+    return json({ state: "live", sessionID, started: true }, { status: 201 });
+  }
+  if (input.state === "dua") {
+    if (live?.state !== "live" || live.kind !== "zikr") return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
+    const endsAt = live.auto_end_at ?? new Date(Date.now() + DUA_MINUTES * 60_000).toISOString();
+    if (!live.auto_end_at) {
+      await env.DB.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id=? AND state='live' AND auto_end_at IS NULL")
+        .bind(endsAt, groupID).run();
+      await recordCue(env, RELAY_AUTHOR, groupID, { id: crypto.randomUUID(), stageID: DUA_STAGE.id });
+    }
+    return json({ state: "dua", endsAt });
+  }
+  return json({ error: "state must be live or dua" }, { status: 400 });
+}
+
+/** Minutes the session stays open after the dua begins. */
+export const DUA_MINUTES = 5;
+
+/** Each minute: a session whose dua began five minutes ago ends, and is kept in history. */
+export async function endAfterDua(env: Env, now = new Date()): Promise<void> {
+  const due = await env.DB.prepare("SELECT group_id FROM group_live WHERE state='live' AND auto_end_at IS NOT NULL AND auto_end_at<=?")
+    .bind(now.toISOString()).all<{ group_id: string }>();
+  for (const row of due.results ?? []) await endSession(env, row.group_id, RELAY_AUTHOR);
+}
+
+async function ensureRelayAuthor(env: Env): Promise<void> {
+  const stamp = new Date().toISOString();
+  await env.DB.prepare(`INSERT OR IGNORE INTO members(id,apple_subject,display_name,email,created_at,last_seen_at)
+    VALUES(?,?,'Paltalk',NULL,?,?)`).bind(RELAY_AUTHOR, `service:${RELAY_AUTHOR}`, stamp, stamp).run();
+}
+
 /** The live relay (Tools/LiveRelay) posts the stage Paltalk's hosts call, so the
  *  app, the websites and the YouTube picture show one stage. It authenticates
  *  with the platform's LISTENER_TOKEN and records as the "Paltalk" author. */
 export const RELAY_AUTHOR = "service-paltalk-relay";
 export async function relayZikrCue(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
   if (!await liveZikr(env, groupID)) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
-  const stamp = new Date().toISOString();
-  await env.DB.prepare(`INSERT OR IGNORE INTO members(id,apple_subject,display_name,email,created_at,last_seen_at)
-    VALUES(?,?,'Paltalk',NULL,?,?)`).bind(RELAY_AUTHOR, `service:${RELAY_AUTHOR}`, stamp, stamp).run();
+  await ensureRelayAuthor(env);
   return recordCue(env, RELAY_AUTHOR, groupID, input);
 }
 
@@ -217,6 +269,7 @@ async function recordCue(env: Env, memberID: string, groupID: string, input: Rec
   }
   let stage: ZikrStage | undefined = DEFAULT_ZIKR_STAGES.find(value => value.id === stageID);
   const recitation = RECITATIONS.find(value => value.id === stageID);
+  if (!stage && stageID === DUA_STAGE.id) stage = DUA_STAGE;
   if (!stage && recitation) stage = { id: recitation.id, title: recitation.title, titleUr: recitation.titleUr, isCustom: false };
   if (!stage) {
     const row = await env.DB.prepare("SELECT id,title,title_ur FROM group_zikr_stages WHERE group_id=? AND id=?")
@@ -229,7 +282,7 @@ async function recordCue(env: Env, memberID: string, groupID: string, input: Rec
   const test = !!(await liveZikr(env, groupID))?.is_test;
   const result = await env.DB.prepare(`INSERT OR IGNORE INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
     VALUES(?,?,?,?,?,?,?,?)`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
-    recitation || test ? "complete" : "pending").run();
+    recitation || test || stageID === DUA_STAGE.id ? "complete" : "pending").run();
   const saved = await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND event_id=?")
     .bind(groupID, eventID).first<CueRow>();
   if (!saved) return json({ error: "Stage announcement could not be saved" }, { status: 503 });

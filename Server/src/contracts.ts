@@ -162,6 +162,8 @@ export interface Env {
   REALTIME_PRESET_MEMBER?: string;
   /** Live zikr pipeline: the listeners' shared bearer token. */
   LISTENER_TOKEN?: string;
+  /** The live relay's own token for /v1/service/... (Tools/LiveRelay PLATFORM_CUE_TOKEN). */
+  RELAY_TOKEN?: string;
   /** The Paltalk room watched in Paltalk's directory, and its group number. */
   PALTALK_ROOM?: string;
   PALTALK_GROUP_ID?: string;

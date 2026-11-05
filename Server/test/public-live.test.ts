@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 import type { Env } from "../src/contracts";
 import { sqliteD1 } from "./sqlite-d1";
+import { endAfterDua } from "../src/groupZikrStages";
 
 const SECRET = "a".repeat(64);
 
@@ -21,7 +22,7 @@ function setup(room = false) {
   raw.prepare(`INSERT INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
     VALUES('usa','e1','latifa-3','3rd Latifa','تیسرا لطیفہ','x','2026-11-04T00:10:00.000Z','complete')`).run();
   const env = { DB: db, PUBLIC_BASE_URL: "https://api.example.com", REALTIME_ACCOUNT_ID: "a", REALTIME_APP_ID: "b",
-    REALTIME_API_TOKEN: "t", LISTENER_TOKEN: "relay-secret" } as unknown as Env;
+    REALTIME_API_TOKEN: "t", RELAY_TOKEN: "relay-secret" } as unknown as Env;
   const post = (path: string, body: unknown, ip = "8.8.8.8") => worker.fetch(new Request(`https://api.example.com${path}`, {
     method: "POST", headers: { "content-type": "application/json", "cf-connecting-ip": ip }, body: JSON.stringify(body) }), env);
   const get = (path: string) => worker.fetch(new Request(`https://api.example.com${path}`), env);
@@ -77,5 +78,28 @@ describe("joining a live Zikr from the websites", () => {
     expect(raw.prepare("SELECT author_id,stage_id FROM group_zikr_cues WHERE event_id=?").get(body.id)).toEqual({ author_id: "service-paltalk-relay", stage_id: "latifa-4" });
     raw.prepare("UPDATE group_live SET state='offline'").run();
     expect((await cue("relay-secret", { ...body, id: "11111111-2222-4333-8444-666666666666" })).status).toBe(409);
+  });
+
+  it("the relay starts the Zikr, calls the dua, and the session ends by itself five minutes later", async () => {
+    const { env, raw } = setup();
+    raw.prepare("UPDATE group_live SET state='offline'").run();
+    const live = (token: string, body: unknown) => worker.fetch(new Request("https://api.example.com/v1/service/groups/usa/live", {
+      method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${token}` }, body: JSON.stringify(body) }), env);
+    expect((await live("wrong", { state: "live" })).status).toBe(401);
+    expect((await live("relay-secret", { state: "dua" })).status).toBe(409);
+    const started = await live("relay-secret", { state: "live", title: "Daily Zikr" });
+    expect(started.status).toBe(201);
+    expect((await live("relay-secret", { state: "live" })).status).toBe(200);
+    const dua = await (await live("relay-secret", { state: "dua" })).json() as any;
+    const endsAt = Date.parse(dua.endsAt);
+    expect(endsAt - Date.now()).toBeGreaterThan(4 * 60_000);
+    expect(raw.prepare("SELECT stage_id FROM group_zikr_cues ORDER BY sequence DESC LIMIT 1").get()).toEqual({ stage_id: "dua" });
+    // A second dua call keeps the first end time.
+    expect((await (await live("relay-secret", { state: "dua" })).json() as any).endsAt).toBe(dua.endsAt);
+    await endAfterDua(env, new Date(endsAt - 1000));
+    expect(raw.prepare("SELECT state FROM group_live WHERE group_id='usa'").get()).toEqual({ state: "live" });
+    await endAfterDua(env, new Date(endsAt + 1000));
+    expect(raw.prepare("SELECT state,auto_end_at FROM group_live WHERE group_id='usa'").get()).toEqual({ state: "offline", auto_end_at: null });
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM group_live_history WHERE group_id='usa'").get()).toEqual({ n: 1 });
   });
 });

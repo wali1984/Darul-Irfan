@@ -125,7 +125,7 @@ export async function beginSession(
       room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at,
       session_id=excluded.session_id,queue_json=excluded.queue_json,queue_index=0,position_seconds=0,
       position_at=excluded.position_at,paused=0,notice=NULL,notice_at=NULL,room_recording=excluded.room_recording,
-      is_test=excluded.is_test`)
+      is_test=excluded.is_test,auto_end_at=NULL`)
     .bind(groupID, session.kind, session.title, session.videoID, session.roomID, now, startedBy, now, sessionID,
       JSON.stringify(session.queue), now, session.roomRecording ? 1 : 0, session.test ? 1 : 0).run();
   return sessionID;
@@ -147,7 +147,7 @@ export async function endSession(env: Env, groupID: string, endedBy: string): Pr
   }
   await env.DB.prepare(`INSERT INTO group_live(group_id,state,updated_at) VALUES(?,'offline',?)
     ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,session_id=NULL,queue_json='[]',
-      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,is_test=0,
+      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,is_test=0,auto_end_at=NULL,
       updated_at=excluded.updated_at`)
     .bind(groupID, now).run();
 }
