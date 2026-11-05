@@ -104,7 +104,7 @@ export function demoPage(site, others) {
       <h1 class="reveal shine" style="--d:80ms">The Silsila's app, in your hands</h1>
       <p class="lead reveal" style="--d:160ms">The Qur'an with the Silsila's translation and tafsir, hadith, the library, Zikr with the Sheikh and every Halqah, in English and Urdu, on iPhone and Android.</p>
       <div class="cta reveal" style="--d:240ms">
-        <a class="btn btn-gold live" href="/demo/showcase.html">Start the interactive showcase</a>
+        <a class="btn btn-gold live" href="/demo/showcase">Start the interactive showcase</a>
         <a class="btn btn-ghost" href="#new">What's new</a>
       </div>
       <div class="stats reveal" style="--d:300ms">
@@ -119,7 +119,7 @@ export function demoPage(site, others) {
     <h2 class="reveal">The showcase</h2>
     <p class="lead reveal">Open the interactive showcase full screen to present; arrow keys move through it. The PowerPoint and PDF carry the same 35 slides.</p>
     <div class="downloads">
-      <a class="dl reveal" href="/demo/showcase.html"><span class="ic">▶</span><span><b>Interactive showcase</b><span>Introduction, app tour, 62 screens, feature tree</span></span></a>
+      <a class="dl reveal" href="/demo/showcase"><span class="ic">▶</span><span><b>Interactive showcase</b><span>Introduction, app tour, 62 screens, feature tree</span></span></a>
       <a class="dl reveal" href="/demo/Darul-Irfan-Product-Showcase-v3.pptx" download><span class="ic">PPT</span><span><b>PowerPoint</b><span>35 slides · 12.5 MB</span></span></a>
       <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v3.pdf"><span class="ic">PDF</span><span><b>PDF</b><span>For reading and printing · 27.6 MB</span></span></a>
       <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v3.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 55 MB</span></span></a>
