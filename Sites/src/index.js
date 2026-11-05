@@ -5,6 +5,7 @@
 // carries the Method of Zikr and the Shajra, word for word from the app's data.
 import { broadcastPage, homePage } from "./home.js";
 import { methodPage, shajraPage } from "./content.js";
+import { demoFile, demoPage } from "./demo.js";
 import LOGO from "../assets/logo.webp";
 
 export const SITES = {
@@ -43,6 +44,8 @@ export const SITES = {
     ],
   },
 };
+
+const DEMO_HOST = "app-demo.naqshbandiaowaisiah.us";
 
 function siteFor(url) {
   const byHost = Object.entries(SITES).find(([, site]) => site.host === url.hostname);
@@ -136,6 +139,20 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
+    // app-demo.: the app's showcase for an audience (and ?site=demo on workers.dev).
+    if (url.hostname === DEMO_HOST || url.searchParams.get("site") === "demo") {
+      const all = Object.values(SITES).map(s => ({ host: s.host, region: s.region }));
+      const file = /^\/demo\/files\/([A-Za-z0-9.-]+)$/.exec(url.pathname);
+      if (file) return demoFile(env, file[1], request);
+      if (url.pathname === "/logo.webp") {
+        return new Response(LOGO, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
+      }
+      if (url.pathname === "/favicon.ico" || url.pathname === "/favicon.svg") {
+        return new Response(FAVICON, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
+      }
+      if (url.pathname !== "/" && url.pathname !== "/index.html") return new Response("Not found", { status: 404 });
+      return html(demoPage({ region: "App showcase" }, all), 300);
+    }
     const key = siteFor(url);
     const site = SITES[key];
     const others = Object.entries(SITES).filter(([k]) => k !== key).map(([, s]) => ({ host: s.host, region: s.region }));

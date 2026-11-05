@@ -12,7 +12,18 @@ routes = [
   { pattern = "oursheikh.naqshbandiaowaisiah.us", custom_domain = true },
   { pattern = "namerica.naqshbandiaowaisiah.us", custom_domain = true },
   { pattern = "uk.naqshbandiaowaisiah.us", custom_domain = true },
+  { pattern = "app-demo.naqshbandiaowaisiah.us", custom_domain = true },
 ]
+
+# app-demo.'s showcase files (the interactive page, PowerPoint, screenshots) are
+# served from demo-assets/ (not in git: copied from outputs/darul-app-showcase
+# at deploy time); the PDF and the package exceed 25 MB and come from R2 demo/.
+[assets]
+directory = "./demo-assets"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "darul-irfan-media"
 
 # Keeps the firewall's home_vpn IP list on vpn.wajidali.us (src/index.js followHomeVPN).
 [triggers]

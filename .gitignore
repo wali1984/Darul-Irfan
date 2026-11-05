@@ -72,3 +72,4 @@ hadith_build_progress.log
 # corpus will be larger; both are regenerable from the seed and must never be
 # committed.
 build/
+Sites/demo-assets/
