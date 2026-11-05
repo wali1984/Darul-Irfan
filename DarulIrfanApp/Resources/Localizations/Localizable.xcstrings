@@ -252,34 +252,34 @@
         }
       }
     },
-    "Listening to Hazrat ji": {
+    "Live: following Hazrat ji's voice": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Listening to Hazrat ji"
+            "value": "Live: following Hazrat ji's voice"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "حضرت جی کو سنا جا رہا ہے"
+            "value": "لائیو: حضرت جی کی آواز سے مراحل خود بدل رہے ہیں"
           }
         }
       }
     },
-    "Listen to Hazrat ji": {
+    "Go Live": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Listen to Hazrat ji"
+            "value": "Go Live"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "حضرت جی کو سنیں"
+            "value": "لائیو شروع کریں"
           }
         }
       }
@@ -296,6 +296,70 @@
           "stringUnit": {
             "state": "translated",
             "value": "پیشکش"
+          }
+        }
+      }
+    },
+    "Listening…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listening…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سنا جا رہا ہے…"
+          }
+        }
+      }
+    },
+    "Last heard: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last heard: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آخری بار سنا: %@"
+          }
+        }
+      }
+    },
+    "Could not show the stage heard. Tap it to show it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not show the stage heard. Tap it to show it."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سنا گیا مرحلہ نہیں دکھایا جا سکا۔ اسے دکھانے کے لیے اس پر ٹیپ کریں۔"
+          }
+        }
+      }
+    },
+    "After \"Go Live\", each stage Hazrat ji names is shown by itself, until you stop it. \"Undo\" puts back a wrong one.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After \"Go Live\", each stage Hazrat ji names is shown by itself, until you stop it. \"Undo\" puts back a wrong one."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"لائیو شروع کریں\" کے بعد حضرت جی جس مرحلے کا نام لیں وہ خود دکھایا جاتا ہے، جب تک آپ اسے بند نہ کریں۔ غلط مرحلہ ہو تو \"واپس کریں\" سے پچھلا لوٹ آتا ہے۔"
           }
         }
       }
@@ -34145,19 +34209,19 @@
         }
       }
     },
-    "Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 at the top.": {
+    "Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 a circle around the whole body.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 at the top."
+            "value": "Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 a circle around the whole body."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سامنے سے نظر آنے والا نمبر وار خاکہ: 1 نیچے دائیں، 2 نیچے بائیں، 3 درمیان میں دائیں، 4 درمیان میں بائیں، 5 مرکز میں، 6 اوپر مرکز میں، 7 سب سے اوپر۔"
+            "value": "سامنے سے نظر آنے والا نمبر وار خاکہ: 1 نیچے دائیں، 2 نیچے بائیں، 3 درمیان میں دائیں، 4 درمیان میں بائیں، 5 مرکز میں، 6 اوپر مرکز میں، 7 پورے جسم کے گرد ایک دائرہ۔"
           }
         }
       }

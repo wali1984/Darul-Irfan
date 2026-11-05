@@ -1,5 +1,6 @@
 import AVFoundation
 import Speech
+import UIKit
 
 /// Listens to Hazrat ji on the leading admin's phone and names the stage he
 /// is on: the Method of Zikr's opening recitations (heard in Arabic) and the
@@ -10,6 +11,11 @@ import Speech
 /// The owner chose (2026-11-03) that a heard stage shows at once and an admin
 /// can undo it; a tap always works too. Nothing leaves the phone except the
 /// stage announcement itself: recognition runs on the device where it can.
+///
+/// One "Go Live" tap must carry a whole session hands-free (owner,
+/// 2026-11-04): the screen stays awake, recognition starts again whenever it
+/// ends or fails, and the microphone comes back after a call, Siri, another
+/// app's audio, a headset change or a return to the app.
 @MainActor
 final class ZikrVoiceListener {
     enum State: Equatable { case off, asking, listening, unavailable(String) }
@@ -17,6 +23,8 @@ final class ZikrVoiceListener {
     var onState: ((State) -> Void)?
     /// A stage id the speech matched ("tasbih", "latifa-1", "raabta").
     var onHeard: ((String) -> Void)?
+    /// The latest few words heard, for the admin's small live indicator.
+    var onWords: ((String) -> Void)?
 
     private let engine = AVAudioEngine()
     private var tasks: [SFSpeechRecognitionTask] = []
@@ -24,7 +32,20 @@ final class ZikrVoiceListener {
     private let feed = RequestFeed()
     private var requests: [SFSpeechAudioBufferRecognitionRequest] = [] { didSet { feed.set(requests) } }
     private var recognizers: [SFSpeechRecognizer] = []
-    private var restart: Task<Void, Never>?
+    private var watchdog: Task<Void, Never>?
+    private var pendingRestart: Task<Void, Never>?
+    private var pendingRecovery: Task<Void, Never>?
+    private var observers: [NSObjectProtocol] = []
+    /// Bumped by every fresh start of recognition; a task that ends with an
+    /// older number was replaced on purpose and is not restarted.
+    private var generation = 0
+    private var begunAt = Date()
+    /// Recognition that ended without hearing anything, in a row: backs off.
+    private var quietEnds = 0
+    /// A phone call or Siri has the microphone; resumed when it ends.
+    private var interrupted = false
+    /// The screen-lock setting before listening began, put back on stop.
+    private var idleTimerBefore: Bool?
 
     func start() async {
         guard state == .off || state.isUnavailable else { return }
@@ -33,6 +54,7 @@ final class ZikrVoiceListener {
             SFSpeechRecognizer.requestAuthorization { continuation.resume(returning: $0) }
         }
         let microphone = await AVAudioApplication.requestRecordPermission()
+        guard state == .asking else { return }
         guard speech == .authorized, microphone else {
             state = .unavailable(String(localized: "Allow Speech Recognition and the Microphone for Darul Irfan in Settings."))
             return
@@ -44,70 +66,270 @@ final class ZikrVoiceListener {
             state = .unavailable(String(localized: "Speech recognition is not available on this phone right now."))
             return
         }
+        guard startAudio() else {
+            state = .unavailable(String(localized: "The microphone could not be started."))
+            return
+        }
+        state = .listening
+        keepScreenAwake(true)
+        observeAudioSession()
+        quietEnds = 0
+        begin()
+        watchdog = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(5))
+                guard let self, !Task.isCancelled, self.state == .listening else { return }
+                self.checkHealth()
+            }
+        }
+    }
+
+    func stop() {
+        watchdog?.cancel(); watchdog = nil
+        pendingRestart?.cancel(); pendingRestart = nil
+        pendingRecovery?.cancel(); pendingRecovery = nil
+        observers.forEach { NotificationCenter.default.removeObserver($0) }
+        observers = []
+        generation += 1
+        tasks.forEach { $0.cancel() }; tasks = []
+        requests.forEach { $0.endAudio() }; requests = []
+        engine.inputNode.removeTap(onBus: 0)
+        engine.stop()
+        interrupted = false
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        keepScreenAwake(false)
+        state = .off
+    }
+
+    /// Back in the app: the microphone may have been taken while away.
+    func resumeIfNeeded() {
+        guard state == .listening else { return }
+        interrupted = false
+        if !engine.isRunning { scheduleRecovery(after: .milliseconds(300)) }
+    }
+
+    // MARK: Audio
+
+    private func startAudio() -> Bool {
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playAndRecord, mode: .measurement, options: [.mixWithOthers, .defaultToSpeaker, .allowBluetooth])
             try session.setActive(true)
             let input = engine.inputNode
             input.removeTap(onBus: 0)
+            let format = input.outputFormat(forBus: 0)
+            // No input yet (a route is still changing): the watchdog tries again.
+            guard format.sampleRate > 0, format.channelCount > 0 else { return false }
             let feed = self.feed
-            input.installTap(onBus: 0, bufferSize: 2048, format: input.outputFormat(forBus: 0)) { buffer, _ in
+            input.installTap(onBus: 0, bufferSize: 2048, format: format) { buffer, _ in
                 feed.append(buffer)
             }
             engine.prepare()
             try engine.start()
+            feed.markStarted()
+            return true
         } catch {
-            state = .unavailable(String(localized: "The microphone could not be started."))
-            return
-        }
-        state = .listening
-        begin()
-        // Server recognition stops after about a minute; start afresh before then.
-        restart = Task { [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(50))
-                guard let self, !Task.isCancelled, self.state == .listening else { return }
-                self.begin()
-            }
+            return false
         }
     }
 
-    func stop() {
-        restart?.cancel(); restart = nil
-        tasks.forEach { $0.cancel() }; tasks = []
-        requests.forEach { $0.endAudio() }; requests = []
-        engine.inputNode.removeTap(onBus: 0)
+    /// Starts the microphone afresh (a new route, a reset, an interruption over).
+    private func recoverAudio() {
+        guard state == .listening, !interrupted else { return }
         engine.stop()
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-        state = .off
+        engine.inputNode.removeTap(onBus: 0)
+        guard startAudio() else { return }
+        quietEnds = 0
+        begin()
     }
+
+    /// Notifications come in bursts; one recovery a moment later serves them all.
+    private func scheduleRecovery(after delay: Duration = .milliseconds(600)) {
+        pendingRecovery?.cancel()
+        pendingRecovery = Task { [weak self] in
+            try? await Task.sleep(for: delay)
+            guard let self, !Task.isCancelled else { return }
+            self.recoverAudio()
+        }
+    }
+
+    private func checkHealth() {
+        switch Self.watchdogAction(engineRunning: engine.isRunning, secondsSinceAudio: feed.secondsSinceLastBuffer(),
+                                   secondsSinceBegin: Date().timeIntervalSince(begunAt), interrupted: interrupted) {
+        case .none: break
+        case .refreshRecognition: begin()
+        case .restartAudio: recoverAudio()
+        }
+    }
+
+    private func observeAudioSession() {
+        guard observers.isEmpty else { return }
+        let center = NotificationCenter.default
+        observers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] note in
+            let action = ZikrVoiceListener.interruptionAction(note.userInfo)
+            MainActor.assumeIsolated {
+                guard let self, self.state == .listening else { return }
+                switch action {
+                case .pause:
+                    self.interrupted = true
+                case .resume:
+                    self.interrupted = false
+                    self.scheduleRecovery()
+                case .ignore:
+                    break
+                }
+            }
+        })
+        observers.append(center.addObserver(forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main) { [weak self] note in
+            let recover = ZikrVoiceListener.recoversAfterRouteChange(note.userInfo)
+            MainActor.assumeIsolated {
+                guard recover, let self, self.state == .listening else { return }
+                self.scheduleRecovery()
+            }
+        })
+        observers.append(center.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.state == .listening else { return }
+                self.scheduleRecovery()
+            }
+        })
+        observers.append(center.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.state == .listening else { return }
+                self.interrupted = false
+                self.scheduleRecovery(after: .seconds(1))
+            }
+        })
+    }
+
+    private func keepScreenAwake(_ awake: Bool) {
+        if awake {
+            if idleTimerBefore == nil { idleTimerBefore = UIApplication.shared.isIdleTimerDisabled }
+            UIApplication.shared.isIdleTimerDisabled = true
+        } else if let before = idleTimerBefore {
+            UIApplication.shared.isIdleTimerDisabled = before
+            idleTimerBefore = nil
+        }
+    }
+
+    // MARK: Recognition
 
     private func begin() {
+        generation += 1
+        let current = generation
+        pendingRestart?.cancel(); pendingRestart = nil
         tasks.forEach { $0.finish() }
         requests.forEach { $0.endAudio() }
         tasks = []; requests = []
-        for recognizer in recognizers {
+        begunAt = Date()
+        for recognizer in recognizers where recognizer.isAvailable {
             let request = SFSpeechAudioBufferRecognitionRequest()
             request.shouldReportPartialResults = true
             if recognizer.supportsOnDeviceRecognition { request.requiresOnDeviceRecognition = true }
             request.addsPunctuation = false
             requests.append(request)
-            tasks.append(recognizer.recognitionTask(with: request) { [weak self] result, _ in
-                guard let text = result?.bestTranscription.formattedString else { return }
-                Task { @MainActor in self?.heard(text) }
+            tasks.append(recognizer.recognitionTask(with: request) { [weak self] result, error in
+                let text = result?.bestTranscription.formattedString
+                let ended = error != nil || result?.isFinal == true
+                Task { @MainActor in
+                    guard let self else { return }
+                    if let text, !text.isEmpty { self.heard(text) }
+                    if ended { self.recognitionEnded(generation: current) }
+                }
             })
+        }
+        // A recognizer can be briefly unavailable; try again shortly.
+        if requests.isEmpty { recognitionEnded(generation: current) }
+    }
+
+    /// A recognition task finished or failed by itself: start again, sooner
+    /// after speech, later after repeated silent failures.
+    private func recognitionEnded(generation ended: Int) {
+        guard Self.restartsRecognition(endedGeneration: ended, currentGeneration: generation, isListening: state == .listening) else { return }
+        let delay = Self.restartDelay(quietEnds: quietEnds)
+        quietEnds += 1
+        pendingRestart?.cancel()
+        pendingRestart = Task { [weak self] in
+            try? await Task.sleep(for: delay)
+            guard let self, !Task.isCancelled, self.state == .listening, self.generation == ended else { return }
+            if self.interrupted || !self.engine.isRunning { self.recoverAudio() } else { self.begin() }
         }
     }
 
     private var lastHeard: (stage: String, at: Date)?
+    private var lastWords = ""
 
     private func heard(_ transcript: String) {
+        quietEnds = 0
+        let words = Self.recentWords(transcript)
+        if words != lastWords { lastWords = words; onWords?(words) }
         // Only the latest words: a partial result repeats everything said so far.
         let recent = String(ZikrSpeechMatcher.normalized(transcript).suffix(80))
         guard let stage = ZikrSpeechMatcher.stage(in: recent) else { return }
-        if let lastHeard, lastHeard.stage == stage, Date().timeIntervalSince(lastHeard.at) < 120 { return }
+        if Self.isRepeat(stage, last: lastHeard, now: Date()) { return }
         lastHeard = (stage, Date())
         onHeard?(stage)
+    }
+
+    // MARK: Decisions (tested without a microphone)
+
+    enum WatchdogAction: Equatable { case none, refreshRecognition, restartAudio }
+    enum InterruptionAction: Equatable { case pause, resume, ignore }
+
+    /// Every few seconds: the microphone silent or stopped is started again;
+    /// recognition is renewed before the recognizer's one-minute limit.
+    nonisolated static func watchdogAction(engineRunning: Bool, secondsSinceAudio: TimeInterval?,
+                                           secondsSinceBegin: TimeInterval, interrupted: Bool) -> WatchdogAction {
+        if interrupted { return .none }
+        if !engineRunning { return .restartAudio }
+        if let secondsSinceAudio, secondsSinceAudio > 6 { return .restartAudio }
+        return secondsSinceBegin >= 50 ? .refreshRecognition : .none
+    }
+
+    /// Only the live recognition, ending by itself while listening, restarts.
+    nonisolated static func restartsRecognition(endedGeneration: Int, currentGeneration: Int, isListening: Bool) -> Bool {
+        isListening && endedGeneration == currentGeneration
+    }
+
+    /// Half a second after speech; doubling after each silent end, up to 30 seconds.
+    nonisolated static func restartDelay(quietEnds: Int) -> Duration {
+        let steps = min(max(quietEnds, 0), 6)
+        return .milliseconds(min(30_000, 500 * (1 << steps)))
+    }
+
+    nonisolated static func interruptionAction(_ userInfo: [AnyHashable: Any]?) -> InterruptionAction {
+        guard let raw = userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: raw) else { return .ignore }
+        switch type {
+        case .began:
+            return .pause
+        case .ended:
+            return .resume
+        @unknown default:
+            return .ignore
+        }
+    }
+
+    /// A headset or microphone coming or going changes the input; our own
+    /// category setting (and other apps') does not need a restart here.
+    nonisolated static func recoversAfterRouteChange(_ userInfo: [AnyHashable: Any]?) -> Bool {
+        guard let raw = userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: raw) else { return false }
+        switch reason {
+        case .newDeviceAvailable, .oldDeviceUnavailable, .routeConfigurationChange, .wakeFromSleep: return true
+        default: return false
+        }
+    }
+
+    /// The same stage heard again within two minutes is the same call-out.
+    nonisolated static func isRepeat(_ stage: String, last: (stage: String, at: Date)?, now: Date) -> Bool {
+        guard let last else { return false }
+        return last.stage == stage && now.timeIntervalSince(last.at) < 120
+    }
+
+    /// The last few words of a transcript, for the live indicator.
+    nonisolated static func recentWords(_ transcript: String, count: Int = 6) -> String {
+        transcript.split(whereSeparator: \.isWhitespace).suffix(count).joined(separator: " ")
     }
 }
 
@@ -115,8 +337,18 @@ final class ZikrVoiceListener {
 private final class RequestFeed: @unchecked Sendable {
     private let lock = NSLock()
     private var requests: [SFSpeechAudioBufferRecognitionRequest] = []
+    private var lastBuffer: Date?
     func set(_ value: [SFSpeechAudioBufferRecognitionRequest]) { lock.withLock { requests = value } }
-    func append(_ buffer: AVAudioPCMBuffer) { lock.withLock { requests }.forEach { $0.append(buffer) } }
+    func append(_ buffer: AVAudioPCMBuffer) {
+        let live = lock.withLock { () -> [SFSpeechAudioBufferRecognitionRequest] in
+            lastBuffer = Date()
+            return requests
+        }
+        live.forEach { $0.append(buffer) }
+    }
+    /// A fresh start counts as audio, so the watchdog waits for the first buffer.
+    func markStarted() { lock.withLock { lastBuffer = Date() } }
+    func secondsSinceLastBuffer() -> TimeInterval? { lock.withLock { lastBuffer.map { Date().timeIntervalSince($0) } } }
 }
 
 private extension ZikrVoiceListener.State {
