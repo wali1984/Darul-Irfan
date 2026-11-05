@@ -186,11 +186,16 @@ export async function sessionPayload(env: Env, groupID: string, live: LiveRow, m
     roomRecording: !!live.room_id && !!live.room_recording,
   };
   if (managing && live.session_id) {
-    const attendance = await env.DB.prepare(`SELECT p.member_id,m.display_name,p.first_seen_at,p.last_seen_at
-      FROM group_live_presence p LEFT JOIN members m ON m.id=p.member_id WHERE p.session_id=? ORDER BY p.first_seen_at`)
-      .bind(live.session_id).all<{ member_id: string; display_name: string | null; first_seen_at: string; last_seen_at: string }>();
+    // Website visitors give a name and a place; admins see both.
+    const attendance = await env.DB.prepare(`SELECT p.member_id,COALESCE(pp.display_name,m.display_name) AS display_name,pp.city,
+        p.first_seen_at,p.last_seen_at,m.apple_subject LIKE 'web-guest:%' AS web
+      FROM group_live_presence p LEFT JOIN members m ON m.id=p.member_id LEFT JOIN sheikh_public_profiles pp ON pp.member_id=p.member_id
+      WHERE p.session_id=? ORDER BY p.first_seen_at`)
+      .bind(live.session_id).all<{ member_id: string; display_name: string | null; city: string | null; first_seen_at: string;
+        last_seen_at: string; web: number }>();
     payload.attendance = (attendance.results ?? []).map(row => ({
-      name: row.display_name ?? "Member", firstSeenAt: row.first_seen_at, lastSeenAt: row.last_seen_at, isHere: row.last_seen_at >= since,
+      name: (row.display_name ?? "Member") + (row.city ? ` · ${row.city}` : "") + (row.web ? " (web)" : ""),
+      firstSeenAt: row.first_seen_at, lastSeenAt: row.last_seen_at, isHere: row.last_seen_at >= since,
     }));
   }
   return payload;

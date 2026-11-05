@@ -112,7 +112,8 @@ async function liveZikr(env: Env, groupID: string, managing = true): Promise<Liv
 
 async function access(env: Env, memberID: string, groupID: string, write: boolean): Promise<Response | boolean> {
   const role = await memberRole(env, memberID);
-  if (groupID !== SHEIKH_HALQA_ID || !await canSee(env, memberID, role, groupID)) {
+  // Every Halqah's live Zikr has a stage (owner 2026-11-04), led by its own admins.
+  if (!await canSee(env, memberID, role, groupID)) {
     return json({ error: "Not found" }, { status: 404 });
   }
   const managing = await canManage(env, memberID, role, groupID);
@@ -160,7 +161,7 @@ export async function addZikrStage(env: Env, memberID: string, groupID: string, 
 
 
 interface CueRow {
-  sequence: number; event_id: string; stage_id: string; title: string;
+  sequence: number; group_id: string; event_id: string; stage_id: string; title: string;
   title_ur: string | null; author_id: string; created_at: string; notification_state: string;
 }
 function presentCue(row: CueRow) {
@@ -246,23 +247,27 @@ export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void
       .bind(lease, cue.sequence, timestamp).run();
     if (!claim.meta.changes) continue;
     const eventID = `halqah-cue:${cue.event_id}`;
+    const group = cue.group_id ?? SHEIKH_HALQA_ID;
+    const sheikh = group === SHEIKH_HALQA_ID;
+    const name = sheikh ? null : (await env.DB.prepare("SELECT name FROM member_groups WHERE id=?").bind(group).first<{ name: string }>())?.name;
     try {
       const devices = await env.DB.prepare(`SELECT DISTINCT d.installation_id,d.locale FROM devices d
         JOIN member_devices md ON upper(md.installation_id)=upper(d.installation_id)
         JOIN member_group_members gm ON gm.member_id=md.member_id
         JOIN member_groups g ON g.id=gm.group_id
-        WHERE gm.group_id=? AND g.is_active=1`).bind(SHEIKH_HALQA_ID)
+        WHERE gm.group_id=? AND g.is_active=1`).bind(group)
         .all<{ installation_id: string; locale: string }>();
       const list = devices.results ?? [];
       for (const urdu of [false, true]) {
         const ids = list.filter(d => d.locale.toLowerCase().startsWith("ur") === urdu).map(d => d.installation_id);
         if (!ids.length) continue;
-        await sendPushToInstallations(env, eventID, `group:${SHEIKH_HALQA_ID}`, ids,
+        await sendPushToInstallations(env, eventID, `group:${group}`, ids,
           urdu && cue.title_ur ? cue.title_ur : cue.title,
-          urdu ? "ہمارے شیخ: ذکر کا موجودہ مرحلہ" : "Our Sheikh: current Zikr stage",
-          `darulirfan://groups/${SHEIKH_HALQA_ID}`,
+          sheikh ? (urdu ? "ہمارے شیخ: ذکر کا موجودہ مرحلہ" : "Our Sheikh: current Zikr stage")
+            : urdu ? `${name ?? "حلقہ"}: ذکر کا موجودہ مرحلہ` : `${name ?? "Halqah"}: current Zikr stage`,
+          `darulirfan://groups/${group}`,
           { sound: "zikr_soft_chime", ttlSeconds: Math.max(1, Math.floor((Date.parse(cue.created_at) + CUE_MAX_AGE_MS - now.getTime()) / 1000)),
-            collapseID: "sheikh-zikr-stage" });
+            collapseID: sheikh ? "sheikh-zikr-stage" : `zikr-stage-${group}` });
       }
       const delivered = await env.DB.prepare("SELECT installation_id FROM notification_deliveries WHERE event_id=? AND status='accepted'")
         .bind(eventID).all<{ installation_id: string }>();
@@ -308,7 +313,8 @@ export async function zikrStage(env: Env, memberID: string, groupID: string, url
   if (Number.isNaN(cueAfter) || Number.isNaN(chatAfter)) return json({ error: "Invalid stage cursor" }, { status: 400 });
   const live = await liveZikr(env, groupID, managing);
   const zikr = !!live;
-  const picture = await sheikhPicture(env);
+  // Hazrat ji's picture belongs to Our Sheikh's stage only.
+  const picture = groupID === SHEIKH_HALQA_ID ? await sheikhPicture(env) : null;
   const since = live ? sessionStart(live) : new Date().toISOString();
   // Only this session's stage announcements; with no live Zikr the stage is empty.
   const cues = !zikr ? [] : cueAfter === null

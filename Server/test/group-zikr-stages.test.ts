@@ -56,10 +56,12 @@ describe("Our Sheikh stage catalogue", () => {
     expect(body.stages).toHaveLength(15);
     expect(body.stages[14]).toEqual({ ...draft, isCustom: true });
   });
-  it("does not let custom input replace a built-in or escape the Sheikh group", async () => {
+  it("does not let custom input replace a built-in; every Halqah's stage is its own", async () => {
     const { env } = setup();
     expect((await addZikrStage(env, "owner", "our-sheikh", { ...draft, id: "latifa-1" })).status).toBe(400);
-    expect((await addZikrStage(env, "owner", "usa", draft)).status).toBe(404);
+    // Other Halqahs have a stage too (owner 2026-11-04); USA has no live Zikr here, so it is closed.
+    expect((await addZikrStage(env, "owner", "usa", draft)).status).toBe(409);
+    expect((await addZikrStage(env, "admin", "usa", draft)).status).toBe(404);
     expect((await addZikrStage(env, "owner", "our-sheikh", { ...draft, title: " " })).status).toBe(400);
     expect((await addZikrStage(env, "owner", "our-sheikh", { ...draft, title: "a".repeat(101) })).status).toBe(400);
     expect((await addZikrStage(env, "owner", "our-sheikh", draft)).status).toBe(201);

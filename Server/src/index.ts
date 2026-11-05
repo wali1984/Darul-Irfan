@@ -18,6 +18,7 @@ import {
   unlinkMemberDevice,
 } from "./community";
 import { serveMedia } from "./media";
+import { publicJoin, publicLive, publicPresence } from "./publicLive";
 import { quranAudioFile, quranAudioManifest } from "./audio";
 import { appReleases } from "./releases";
 import { transcript } from "./transcripts";
@@ -54,6 +55,23 @@ async function route(request: Request, env: Env): Promise<Response> {
   // For the websites (oursheikh., namerica., uk.): Our Sheikh's live stage and
   // the named Halqahs' names; nothing about their people.
   if (request.method === "GET" && path === "/v1/public/sheikh-stage") return cachedJSON(await publicSheikhStage(env), request, 15);
+  if (request.method === "GET" && path === "/v1/public/live") {
+    const ids = (url.searchParams.get("ids") ?? "").split(",").filter(id => /^[a-z0-9-]{1,40}$/.test(id)).slice(0, 30);
+    return cachedJSON(await publicLive(env, ids), request, 10);
+  }
+  // A website visitor joins a live Zikr (name and place) and stays counted while listening.
+  const visit = /^\/v1\/public\/halqahs\/([a-z0-9-]{1,40})\/(join|presence)$/.exec(path);
+  if (visit && request.method === "POST") {
+    if (!await withinWriteLimit(request, env, `public-${visit[2]}`, visit[2] === "join" ? 30 : 240)) {
+      return json({ error: "Too many requests" }, { status: 429 });
+    }
+    const text = await request.text();
+    if (text.length > 4_096) return json({ error: "Too large" }, { status: 413 });
+    let input: Record<string, unknown>;
+    try { input = JSON.parse(text); } catch { return json({ error: "Invalid request" }, { status: 400 }); }
+    if (!input || typeof input !== "object" || Array.isArray(input)) return json({ error: "Invalid request" }, { status: 400 });
+    return visit[2] === "join" ? publicJoin(env, visit[1]!, input) : publicPresence(env, visit[1]!, input);
+  }
   if (request.method === "GET" && path === "/v1/public/halqahs") {
     const ids = (url.searchParams.get("ids") ?? "").split(",").filter(id => /^[a-z0-9-]{1,40}$/.test(id)).slice(0, 30);
     return cachedJSON(await publicHalqahs(env, ids), request, 300);

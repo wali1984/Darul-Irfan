@@ -562,7 +562,9 @@ async function createRoom(env: Env, title: string, recordFor: string | null): Pr
   return id;
 }
 
-async function addParticipant(env: Env, roomID: string, memberID: string, name: string, host: boolean): Promise<string | Response> {
+/** host: admins (moderate); false: members; "listener": website visitors, who
+ *  hear and see the room but cannot speak, show video, share or chat (preset web_listener). */
+export async function addParticipant(env: Env, roomID: string, memberID: string, name: string, host: boolean | "listener"): Promise<string | Response> {
   const base = realtimeBase(env);
   if (!base) return notConfigured();
   const response = await fetch(`${base}/meetings/${encodeURIComponent(roomID)}/participants`, {
@@ -571,7 +573,8 @@ async function addParticipant(env: Env, roomID: string, memberID: string, name: 
     body: JSON.stringify({
       name: name.slice(0, 80),
       // Hosts can moderate (mute, remove); members join as participants.
-      preset_name: host ? (env.REALTIME_PRESET_HOST ?? "group_call_host") : (env.REALTIME_PRESET_MEMBER ?? "group_call_participant"),
+      preset_name: host === "listener" ? "web_listener"
+        : host ? (env.REALTIME_PRESET_HOST ?? "group_call_host") : (env.REALTIME_PRESET_MEMBER ?? "group_call_participant"),
       custom_participant_id: memberID,
     }),
   });
