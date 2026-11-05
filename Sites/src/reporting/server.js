@@ -19,7 +19,7 @@ const HEADERS = {
   "cross-origin-opener-policy": "same-origin",
   "x-robots-tag": "noindex, nofollow",
   "content-security-policy": [
-    "default-src 'none'", "script-src 'self'", "style-src 'self' https://fonts.googleapis.com", "font-src https://fonts.gstatic.com",
+    "default-src 'none'", "script-src 'self'", "style-src 'self' https://fonts.googleapis.com", "style-src-attr 'unsafe-inline'","font-src https://fonts.gstatic.com",
     "img-src 'self' data:", "connect-src 'self'", "base-uri 'none'", "form-action 'self'", "frame-ancestors 'none'",
   ].join("; "),
 };

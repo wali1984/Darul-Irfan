@@ -385,7 +385,7 @@ function insights(summary: Summary, before: { attendance: number; sessions: numb
   const best = halqahs.filter(item => item.attendanceRate !== null && item.members >= 3).sort((a, b) => (b.attendanceRate ?? 0) - (a.attendanceRate ?? 0))[0];
   if (best && (best.attendanceRate ?? 0) > 0) out.push({ level: "good", title: `${best.name} leads in attendance`,
     detail: `${Math.round((best.attendanceRate ?? 0) * 100)}% of its members came at least once.`, halqahID: best.id });
-  if (summary.automatedStarts) out.push({ level: "good", title: `${summary.automatedStarts} sessions ran by themselves`,
+  if (summary.automatedStarts) out.push({ level: "good", title: summary.automatedStarts === 1 ? "1 session ran by itself" : `${summary.automatedStarts} sessions ran by themselves`,
     detail: "Started from Paltalk or at a Zikr time, with no one tapping Start.", halqahID: null });
   if (summary.webAttendance) out.push({ level: "good", title: `${summary.webAttendance} joined from the websites`,
     detail: "Visitors who are not yet in the app, following the live stage.", halqahID: null });

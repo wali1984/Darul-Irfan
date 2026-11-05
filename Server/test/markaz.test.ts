@@ -87,7 +87,7 @@ describe("Markaz analytics", () => {
     expect(usa).toMatchObject({ sessions: 2, attendance: 4, members: 2, status: "active", region: "North America" });
     expect(body.countries).toEqual([{ code: "GB", attendees: 1 }]);
     expect(body.regulars[0]).toMatchObject({ name: "Ali", sessions: 3 });
-    expect(body.insights.some((item: { title: string }) => item.title.includes("ran by themselves"))).toBe(true);
+    expect(body.insights.some((item: { title: string }) => item.title.includes("ran by itself"))).toBe(true);
 
     const region = await (await call(TOKENS[SUPER]!, "GET", "/v1/markaz/analytics?tz=UTC&scope=halqah:canada")).json() as Record<string, any>;
     expect(region.summary.sessions).toBe(1);
