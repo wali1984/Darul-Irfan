@@ -65,9 +65,10 @@ async function api(env, path, init) {
 /** What the page refreshes every 15 seconds: each Halqah, what is live in it and its stage. */
 async function data(env, key) {
   const site = SITES[key];
-  const [halqahs, room] = await Promise.all([
+  const [halqahs, room, sheikh] = await Promise.all([
     api(env, `/v1/public/live?ids=${site.halqahs.map(h => h.id).join(",")}`),
     api(env, "/v1/live"),
+    api(env, "/v1/public/sheikh-stage"),
   ]);
   const found = new Map((halqahs.body?.halqahs ?? []).map(h => [h.id, h]));
   return {
@@ -75,6 +76,9 @@ async function data(env, key) {
       const live = found.get(h.id);
       return { id: h.id, name: live?.name ?? h.name, description: h.description, live: live?.live ?? null, stage: live?.stage ?? null };
     }),
+    // Hazrat ji's picture, as the app shows it on Our Sheikh's stage.
+    picture: sheikh.body?.pictureHDURL ?? sheikh.body?.pictureURL ?? null,
+    pictureFallback: sheikh.body?.pictureURL ?? null,
     // The Tahajjud Zikr is joined in the Silsila's Paltalk room while it is open.
     tahajjud: room.body?.room ? { listeners: room.body.room.listeners ?? 0, url: room.body.room.url ?? null } : null,
   };
@@ -114,7 +118,7 @@ const SECURITY = {
     "img-src 'self' data: blob: https:",
     "media-src 'self' blob: https:",
     "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
-    "connect-src 'self'",
+    "connect-src 'self' https://darul-irfan-live-staging.wajidmahmoodali1984-e23.workers.dev wss://darul-irfan-live-staging.wajidmahmoodali1984-e23.workers.dev https://*.cloudflare.com",
   ].join("; "),
 };
 
@@ -158,6 +162,7 @@ export default {
     if (url.pathname === "/method-of-zikr") return html(methodPage(site, others), 3600);
     if (url.pathname === "/shajra") return html(shajraPage(site, others), 3600);
     if (url.pathname !== "/" && url.pathname !== "/index.html") return Response.redirect(new URL("/", url).toString(), 302);
-    return html(homePage(site, others, await data(env, key)), 30);
+    const feed = env.LIVE_FEED_BASE ? { base: env.LIVE_FEED_BASE, key: env.LIVE_FEED_KEY ?? "" } : null;
+    return html(homePage(site, others, await data(env, key), feed), 30);
   },
 };

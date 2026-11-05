@@ -1,6 +1,6 @@
 import type { Env } from "./contracts";
 import { RECITATIONS } from "./groupZikrStages";
-import { liveRow, sessionPayload } from "./session";
+import { liveRow } from "./session";
 import { json, sha256 } from "./util";
 
 // The websites (oursheikh., namerica., uk.naqshbandiaowaisiah.us) show every
@@ -9,21 +9,13 @@ import { json, sha256 } from "./util";
 // controls. A visitor is not made a member of the Halqah; they are counted in
 // the session's attendance, which the Halqah's admins see.
 
-interface PublicLive {
-  kind: string; title?: string; isTest?: boolean; startedAt?: string;
-  hasRoom: boolean; videoID?: string; recorded: boolean;
-}
+interface PublicLive { kind: string; title?: string; isTest?: boolean; startedAt?: string }
 
 async function liveOf(env: Env, groupID: string): Promise<{ live: PublicLive; row: NonNullable<Awaited<ReturnType<typeof liveRow>>> } | null> {
   const row = await liveRow(env, groupID);
   // A test Zikr shows on the websites too, marked as a test (owner 2026-11-04).
   if (row?.state !== "live" || row.kind !== "zikr") return null;
-  let queue: unknown[] = [];
-  try { queue = JSON.parse(row.queue_json || "[]"); } catch { /* none */ }
-  return { row, live: {
-    kind: row.kind, title: row.title ?? undefined, isTest: row.is_test ? true : undefined, startedAt: row.started_at ?? undefined,
-    hasRoom: !!row.room_id, videoID: row.video_id ?? undefined, recorded: Array.isArray(queue) && queue.length > 0,
-  } };
+  return { row, live: { kind: row.kind, title: row.title ?? undefined, isTest: row.is_test ? true : undefined, startedAt: row.started_at ?? undefined } };
 }
 
 /** The stage being followed in this session: the latest announcement since it began. */
@@ -66,10 +58,10 @@ async function visitor(env: Env, input: Record<string, unknown>): Promise<string
   return (await sha256(`web-guest:${input.guestSecret}`)).slice(0, 32);
 }
 
-/** What a joined visitor's browser plays: the live video or the recordings on the
- *  shared clock. A room's sound is never given to a website visitor through
- *  RealtimeKit, which bills per listener: the owner's budget (under $70 a month)
- *  sends listeners through the Realtime SFU feed instead (Tools/LiveRelay). */
+/** A joined visitor is counted and sees the stage. Live only (owner 2026-11-04):
+ *  no recording or past video is ever handed to a website, and a room's sound
+ *  never goes through RealtimeKit, which bills per listener; the sound reaches
+ *  listeners through the Silsila's Realtime SFU feed (Tools/LiveRelay). */
 async function presence(env: Env, groupID: string, memberID: string): Promise<Response> {
   const now = await liveOf(env, groupID);
   if (!now?.row.session_id) return json({ error: "This Halqah's Zikr is not live right now.", live: null }, { status: 409 });
@@ -77,9 +69,8 @@ async function presence(env: Env, groupID: string, memberID: string): Promise<Re
   await env.DB.prepare(`INSERT INTO group_live_presence(session_id,group_id,member_id,first_seen_at,last_seen_at) VALUES(?,?,?,?,?)
     ON CONFLICT(session_id,member_id) DO UPDATE SET last_seen_at=excluded.last_seen_at`)
     .bind(now.row.session_id, groupID, memberID, stamp, stamp).run();
-  const session = await sessionPayload(env, groupID, now.row, false);
   return json({ live: now.live, stage: await currentStage(env, groupID, now.live.startedAt),
-    queue: session.queue, playback: session.playback, notice: session.notice });
+    notice: now.row.notice ? { text: now.row.notice } : undefined });
 }
 
 /** POST /v1/public/halqahs/:id/join {name, city, countryCode, guestSecret}. */

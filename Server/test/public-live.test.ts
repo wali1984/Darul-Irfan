@@ -35,7 +35,7 @@ describe("joining a live Zikr from the websites", () => {
     const { get } = setup();
     const body = await (await get("/v1/public/live?ids=usa,canada")).json() as any;
     expect(body.halqahs.find((h: any) => h.id === "usa")).toMatchObject({
-      live: { kind: "zikr", title: "Thursday Zikr", hasRoom: false }, stage: { stageID: "latifa-3", titleUr: "تیسرا لطیفہ" } });
+      live: { kind: "zikr", title: "Thursday Zikr" }, stage: { stageID: "latifa-3", titleUr: "تیسرا لطیفہ" } });
     expect(body.halqahs.find((h: any) => h.id === "canada").live).toBeNull();
     expect(JSON.stringify(body)).not.toContain("member");
   });
@@ -56,8 +56,9 @@ describe("joining a live Zikr from the websites", () => {
   it("never seats a visitor in the room (RealtimeKit bills per listener) and refuses when nothing is live", async () => {
     const { post, sent, raw } = setup(true);
     const joined = await (await post("/v1/public/halqahs/usa/join", { name: "Sara", city: "Leeds", countryCode: "GB", guestSecret: SECRET })).json() as any;
-    expect(joined.live).toMatchObject({ hasRoom: true });
+    // Live only: no room seat, no recording or video is ever handed to a website.
     expect(joined.room).toBeUndefined();
+    expect(JSON.stringify(joined)).not.toMatch(/queue|playback|url|videoID/);
     expect(sent.filter(s => s.url.includes("/participants"))).toEqual([]);
     raw.prepare("UPDATE group_live SET state='offline'").run();
     expect((await post("/v1/public/halqahs/usa/join", { name: "Nadia", city: "York", countryCode: "GB", guestSecret: "d".repeat(64) })).status).toBe(409);

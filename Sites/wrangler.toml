@@ -21,6 +21,10 @@ crons = ["*/5 * * * *"]
 [vars]
 HOME_VPN_HOST = "vpn.wajidali.us"
 HOME_VPN_LIST_ID = "58eec7c74902461a8eed5ed121c18b89"
+# Our Sheikh's live sound: the Silsila's Realtime SFU feed (Tools/LiveRelay), listen only.
+# Staging for now; production will expose the same paths with a public listener role.
+# LIVE_FEED_KEY (a listener-only key, never able to publish) is a secret.
+LIVE_FEED_BASE = "https://darul-irfan-live-staging.wajidmahmoodali1984-e23.workers.dev"
 
 [[services]]
 binding = "API"

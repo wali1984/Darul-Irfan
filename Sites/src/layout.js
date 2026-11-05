@@ -30,7 +30,9 @@ a{color:inherit}[lang=ur]{font-family:"Noto Nastaliq Urdu",serif;direction:rtl;l
 nav.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20px;justify-content:space-between;padding:12px clamp(16px,4vw,48px);
   backdrop-filter:blur(14px) saturate(1.3);background:linear-gradient(rgba(4,21,15,.85),rgba(4,21,15,.5));border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-.brand img{width:40px;height:40px;border-radius:50%;box-shadow:0 0 18px rgba(243,220,157,.45);animation:spin 40s linear infinite}
+.brand .emblem{flex:none;margin:0}
+.emblem.mini .orbit i{width:4px;height:4px;margin:-2px;box-shadow:0 0 6px 2px rgba(243,220,157,.7)}
+.emblem.mini .r1{border-width:1px}
 .brand b{font:600 20px/1 var(--serif);letter-spacing:.04em}
 .brand small{display:block;color:var(--gold);font:600 11px/1.4 var(--sans);letter-spacing:.18em;text-transform:uppercase}
 .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}.navlinks a{text-decoration:none;transition:color .2s}.navlinks a:hover,.navlinks a.on{color:var(--gold2)}
@@ -68,6 +70,20 @@ h2{font-size:clamp(32px,4.4vw,52px);line-height:1.08;margin:12px 0 14px}
 .emblem .orbit{position:absolute;inset:-5%;animation:spin 36s linear infinite}
 .emblem .orbit i{position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:var(--gold2);
   box-shadow:0 0 14px 4px rgba(243,220,157,.7);transform:rotate(calc(var(--k) * 51.43deg)) translateY(calc(var(--s) * -.55))}
+.portrait{position:relative;width:min(560px,100%);margin-inline:auto;animation:float 8s ease-in-out infinite}
+.portrait .frame{position:relative;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(16,185,129,.55),0 0 50px -10px rgba(243,220,157,.45)}
+.portrait img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#062419}
+.portrait .sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,246,220,.28) 50%,transparent 65%);
+  background-size:250% 100%;animation:sweep 6s ease-in-out infinite;mix-blend-mode:screen;pointer-events:none}
+@keyframes sweep{0%{background-position:150% 0}60%,100%{background-position:-60% 0}}
+.portrait .edge{position:absolute;inset:-3px;border-radius:27px;padding:3px;pointer-events:none;
+  background:conic-gradient(from var(--pa,0deg),var(--gold) 0%,transparent 20%,var(--emerald2) 45%,transparent 60%,var(--gold2) 80%,var(--gold) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:pedge 8s linear infinite}
+@property --pa{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes pedge{to{--pa:360deg}}
+.portrait .glow{position:absolute;inset:-12%;border-radius:40%;background:radial-gradient(closest-side,rgba(243,220,157,.25),transparent);z-index:-1;animation:breathe 6s ease-in-out infinite}
+.portrait .spark{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--gold2);box-shadow:0 0 12px 4px rgba(243,220,157,.8);animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
 .chip{display:inline-block;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);color:var(--gold)}
 .chip.live{border-color:rgba(248,113,113,.6);color:#fecaca;background:rgba(239,68,68,.12)}
 .chip.test{border-color:rgba(251,191,36,.6);color:#fde68a;background:rgba(251,191,36,.12)}
@@ -141,7 +157,7 @@ export function shell({ site, others, title, description, active, body, extraSty
 <rect x="11" y="11" width="18" height="18" fill="none" stroke="#d9b56a" stroke-width=".6" transform="rotate(45 20 20)"/></pattern></defs>
 <rect width="640" height="640" fill="url(#p)"/></svg>
 <nav class="top">
-  <a class="brand" href="/"><img src="/logo.webp" alt=""><span><small>Naqshbandia Owaisiah</small><b>${esc(site.region)}</b></span></a>
+  <a class="brand" href="/">${animatedLogo("48px", "mini")}<span><small>Naqshbandia Owaisiah</small><b>${esc(site.region)}</b></span></a>
   <div class="navlinks">${link("/#live", "Live Zikr", "live")}${link("/#halqahs", "Halqahs", "halqahs")}${link("/method-of-zikr", "Method of Zikr", "method")}${link("/shajra", "Shajra", "shajra")}</div>
   <span id="nav-status"></span>
 </nav>
