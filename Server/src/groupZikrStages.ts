@@ -194,6 +194,22 @@ export async function zikrCues(env: Env, memberID: string, groupID: string, afte
 export async function broadcastZikrCue(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
   const permitted = await access(env, memberID, groupID, true);
   if (permitted instanceof Response) return permitted;
+  return recordCue(env, memberID, groupID, input);
+}
+
+/** The live relay (Tools/LiveRelay) posts the stage Paltalk's hosts call, so the
+ *  app, the websites and the YouTube picture show one stage. It authenticates
+ *  with the platform's LISTENER_TOKEN and records as the "Paltalk" author. */
+export const RELAY_AUTHOR = "service-paltalk-relay";
+export async function relayZikrCue(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
+  if (!await liveZikr(env, groupID)) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
+  const stamp = new Date().toISOString();
+  await env.DB.prepare(`INSERT OR IGNORE INTO members(id,apple_subject,display_name,email,created_at,last_seen_at)
+    VALUES(?,?,'Paltalk',NULL,?,?)`).bind(RELAY_AUTHOR, `service:${RELAY_AUTHOR}`, stamp, stamp).run();
+  return recordCue(env, RELAY_AUTHOR, groupID, input);
+}
+
+async function recordCue(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
   const eventID = typeof input.id === "string" ? input.id.toLowerCase() : "";
   const stageID = typeof input.stageID === "string" ? input.stageID : "";
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(eventID) || !stageID || stageID.length > 80) {

@@ -3,7 +3,7 @@
 // site) with the stage being followed, and lets anyone join a live Zikr with a
 // name and a place, to listen with no controls (owner 2026-11-04). It also
 // carries the Method of Zikr and the Shajra, word for word from the app's data.
-import { homePage } from "./home.js";
+import { broadcastPage, homePage } from "./home.js";
 import { methodPage, shajraPage } from "./content.js";
 import LOGO from "../assets/logo.webp";
 
@@ -159,6 +159,12 @@ export default {
       return new Response(FAVICON, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
     }
     if (url.pathname === "/robots.txt") return new Response("User-agent: *\nAllow: /\n", { headers: { "content-type": "text/plain" } });
+    // The stage alone for the YouTube/Facebook stream's picture (?halqah=, default Our Sheikh).
+    if (url.pathname === "/broadcast") {
+      const halqah = url.searchParams.get("halqah") ?? "our-sheikh";
+      if (!site.halqahs.some(h => h.id === halqah)) return Response.redirect(new URL("/broadcast", url).toString(), 302);
+      return html(broadcastPage(site, await data(env, key), halqah), 0);
+    }
     if (url.pathname === "/method-of-zikr") return html(methodPage(site, others), 3600);
     if (url.pathname === "/shajra") return html(shajraPage(site, others), 3600);
     if (url.pathname !== "/" && url.pathname !== "/index.html") return Response.redirect(new URL("/", url).toString(), 302);

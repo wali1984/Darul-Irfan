@@ -16,7 +16,7 @@ export const STYLE = `
 :root{--bg:#04150f;--ink:#eef6f1;--muted:#9fbcb0;--line:rgba(212,175,95,.22);--gold:#d9b56a;--gold2:#f3dc9d;
   --emerald:#10b981;--emerald2:#34d399;--glass:rgba(10,40,30,.55);--radius:22px;
   --serif:"Cormorant Garamond",Georgia,serif;--sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
+*{box-sizing:border-box}html{scroll-behavior:smooth}[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit}[lang=ur]{font-family:"Noto Nastaliq Urdu",serif;direction:rtl;line-height:2.1}
 .arabic{font-family:Amiri,serif;direction:rtl}

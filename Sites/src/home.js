@@ -3,7 +3,7 @@
 // (owner 2026-11-04): no recording and no past video is ever played here; the
 // sound comes only from the Silsila's live feed. Everything from the API is set
 // with textContent or attributes, never as HTML.
-import { animatedLogo, esc, shell } from "./layout.js";
+import { animatedLogo, esc, shell, SKY_SCRIPT, STYLE as STAGE_BASE } from "./layout.js";
 
 // The stages a Zikr moves through, in order, as the app names them (Server
 // RECITATIONS and DEFAULT_ZIKR_STAGES). A custom Muraqaba shows only when called.
@@ -109,6 +109,49 @@ function portrait(picture) {
   return picture
     ? `<div class="portrait"><div class="glow"></div><div class="frame"><img id="photo" src="${esc(picture)}" alt="Hazrat Ameer Abdul Qadeer Awan (MZA)"><div class="sweep"></div></div><div class="edge"></div>${sparks}</div>`
     : animatedLogo();
+}
+
+/** /broadcast: the stage alone, 1920x1080, for the relay to capture as the
+ *  picture of the YouTube and Facebook streams (sound comes from the live feed). */
+export function broadcastPage(site, initial, halqahID) {
+  const state = JSON.stringify({ ...initial, halqahID }).replace(/</g, "\u003c");
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1920,height=1080">
+<title>Stage · ${esc(site.region)}</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@500;600&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<style>${STAGE_BASE}${STYLE}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#04150f}
+.stage{position:fixed;inset:0;min-height:0;padding:80px}
+.stage .mark .emblem{--s:520px}
+.stage.on .mark{transform:scale(.3);top:40px;left:40px}
+.now .title{font-size:150px}.now .urdu{font-size:84px}.now .arabic{font-size:72px}
+.now .card{width:1400px;padding:70px 40px}
+.brandline{position:fixed;bottom:36px;left:0;right:0;text-align:center;color:#d9b56a;font:600 22px Inter,sans-serif;letter-spacing:.32em;text-transform:uppercase}
+</style></head><body>
+<div class="aurora"></div><canvas id="sky"></canvas>
+${stageScreen("b-stage", "")}
+<div class="brandline">Naqshbandia Owaisiah · ${esc(site.region)}</div>
+<script type="application/json" id="initial">${state}</script>
+<script>${SKY_SCRIPT}
+(() => {
+  const $ = id => document.getElementById(id);
+  let data = JSON.parse($("initial").textContent), shown = null;
+  function show() {
+    const h = data.halqahs.find(x => x.id === data.halqahID) || data.halqahs[0];
+    const box = $("b-stage"), live = h && h.live, s = h && h.stage;
+    box.classList.toggle("on", !!live);
+    const key = live ? (s ? s.stageID + "|" + s.at : "awaiting") : "off";
+    if (key === shown) return; shown = key;
+    const card = box.querySelector(".card");
+    card.querySelector(".title").textContent = s ? s.title : "";
+    card.querySelector(".urdu").textContent = s && s.titleUr ? s.titleUr : "";
+    card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
+    card.querySelector(".test").hidden = !(live && live.isTest);
+    card.classList.remove("burst"); void card.offsetWidth; card.classList.add("burst");
+  }
+  show();
+  setInterval(async () => { try { const r = await fetch("/data.json", { cache: "no-store" }); if (r.ok) { data = { ...(await r.json()), halqahID: data.halqahID }; show(); } } catch {} }, 3000);
+})();
+</script></body></html>`;
 }
 
 export function homePage(site, others, initial, feed) {

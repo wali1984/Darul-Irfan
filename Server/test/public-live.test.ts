@@ -21,7 +21,7 @@ function setup(room = false) {
   raw.prepare(`INSERT INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
     VALUES('usa','e1','latifa-3','3rd Latifa','تیسرا لطیفہ','x','2026-11-04T00:10:00.000Z','complete')`).run();
   const env = { DB: db, PUBLIC_BASE_URL: "https://api.example.com", REALTIME_ACCOUNT_ID: "a", REALTIME_APP_ID: "b",
-    REALTIME_API_TOKEN: "t" } as unknown as Env;
+    REALTIME_API_TOKEN: "t", LISTENER_TOKEN: "relay-secret" } as unknown as Env;
   const post = (path: string, body: unknown, ip = "8.8.8.8") => worker.fetch(new Request(`https://api.example.com${path}`, {
     method: "POST", headers: { "content-type": "application/json", "cf-connecting-ip": ip }, body: JSON.stringify(body) }), env);
   const get = (path: string) => worker.fetch(new Request(`https://api.example.com${path}`), env);
@@ -63,5 +63,19 @@ describe("joining a live Zikr from the websites", () => {
     raw.prepare("UPDATE group_live SET state='offline'").run();
     expect((await post("/v1/public/halqahs/usa/join", { name: "Nadia", city: "York", countryCode: "GB", guestSecret: "d".repeat(64) })).status).toBe(409);
     expect(raw.prepare("SELECT COUNT(*) AS n FROM sheikh_public_profiles WHERE display_name='Nadia'").get()).toEqual({ n: 0 });
+  });
+
+  it("the live relay posts the stage called in Paltalk with its token; nobody else can", async () => {
+    const { env, raw } = setup();
+    const cue = (token: string | null, body: unknown) => worker.fetch(new Request("https://api.example.com/v1/service/groups/usa/zikr-cues", {
+      method: "POST", headers: { "content-type": "application/json", ...(token ? { authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) }), env);
+    const body = { id: "11111111-2222-4333-8444-555555555555", stageID: "latifa-4" };
+    expect((await cue(null, body)).status).toBe(401);
+    expect((await cue("wrong", body)).status).toBe(401);
+    expect((await cue("relay-secret", body)).status).toBe(201);
+    expect((await cue("relay-secret", body)).status).toBe(200);
+    expect(raw.prepare("SELECT author_id,stage_id FROM group_zikr_cues WHERE event_id=?").get(body.id)).toEqual({ author_id: "service-paltalk-relay", stage_id: "latifa-4" });
+    raw.prepare("UPDATE group_live SET state='offline'").run();
+    expect((await cue("relay-secret", { ...body, id: "11111111-2222-4333-8444-666666666666" })).status).toBe(409);
   });
 });
