@@ -1,9 +1,11 @@
 // The public websites. Each hostname is a site: Our Sheikh, North America, the
-// United Kingdom. All three carry Our Sheikh's live Zikr (the Daily Zikr on
-// YouTube, the stage being followed, the Tahajjud room on Paltalk) and the
-// region's Halqahs. Halqahs are invitation only: the page names them and
-// sends people to the app; it never shows who is in them.
-import { page } from "./page.js";
+// United Kingdom. Each shows the live Zikr of its Halqahs (Our Sheikh on every
+// site) with the stage being followed, and lets anyone join a live Zikr with a
+// name and a place, to listen with no controls (owner 2026-11-04). It also
+// carries the Method of Zikr and the Shajra, word for word from the app's data.
+import { homePage } from "./home.js";
+import { methodPage, shajraPage } from "./content.js";
+import LOGO from "../assets/logo.webp";
 
 export const SITES = {
   oursheikh: {
@@ -11,19 +13,17 @@ export const SITES = {
     region: "Our Sheikh",
     title: "Our Sheikh · Naqshbandia Owaisiah",
     tagline: "Live Zikr with Hazrat Ameer Abdul Qadeer Awan (MZA)",
-    intro: "Join the Daily Zikr live, follow each Latifa as it is called, and keep company with the Silsila wherever you are.",
-    halqahs: [
-      { id: "our-sheikh", name: "Our Sheikh", description: "Hazrat Ameer Abdul Qadeer Awan (MZA)", open: true },
-    ],
+    intro: "Sit in Zikr with Our Sheikh live from anywhere: follow each Latifa and Muraqaba as it is called.",
+    halqahs: [{ id: "our-sheikh", name: "Our Sheikh", description: "Hazrat Ameer Abdul Qadeer Awan (MZA)" }],
   },
   namerica: {
     host: "namerica.naqshbandiaowaisiah.us",
     region: "North America",
     title: "North America · Naqshbandia Owaisiah",
     tagline: "The Halqahs of the United States and Canada",
-    intro: "Sit in Zikr with Our Sheikh live, and find your Halqah across the United States and Canada.",
+    intro: "Sit in Zikr with Our Sheikh live, and join the Zikr of the Halqahs across the United States and Canada.",
     halqahs: [
-      { id: "our-sheikh", name: "Our Sheikh", description: "Hazrat Ameer Abdul Qadeer Awan (MZA)", open: true },
+      { id: "our-sheikh", name: "Our Sheikh", description: "Hazrat Ameer Abdul Qadeer Awan (MZA)" },
       { id: "north-america", name: "North America", description: "Naqshbandia Owaisiah | North America" },
       { id: "usa", name: "United States of America", description: "Naqshbandia Owaisiah | United States" },
       { id: "canada", name: "Canada", description: "Naqshbandia Owaisiah | Canada" },
@@ -36,9 +36,9 @@ export const SITES = {
     region: "United Kingdom",
     title: "United Kingdom · Naqshbandia Owaisiah",
     tagline: "The Halqahs of the United Kingdom",
-    intro: "Sit in Zikr with Our Sheikh live, and find your Halqah in the United Kingdom.",
+    intro: "Sit in Zikr with Our Sheikh live, and join the Zikr of the Halqahs in the United Kingdom.",
     halqahs: [
-      { id: "our-sheikh", name: "Our Sheikh", description: "Hazrat Ameer Abdul Qadeer Awan (MZA)", open: true },
+      { id: "our-sheikh", name: "Our Sheikh", description: "Hazrat Ameer Abdul Qadeer Awan (MZA)" },
       { id: "united-kingdom", name: "United Kingdom", description: "Naqshbandia Owaisiah | United Kingdom" },
     ],
   },
@@ -52,68 +52,35 @@ function siteFor(url) {
   return asked && SITES[asked] ? asked : "oursheikh";
 }
 
-async function api(env, path) {
+async function api(env, path, init) {
   try {
-    const response = await env.API.fetch(new Request(`https://platform${path}`, { headers: { accept: "application/json" } }));
-    return response.ok ? await response.json() : null;
+    const response = await env.API.fetch(new Request(`https://platform${path}`,
+      { ...init, headers: { accept: "application/json", "content-type": "application/json", ...(init?.headers ?? {}) } }));
+    return { status: response.status, body: await response.json().catch(() => null) };
   } catch {
-    return null;
+    return { status: 502, body: null };
   }
 }
 
-/** What the page refreshes every 20 seconds. */
+/** What the page refreshes every 15 seconds: each Halqah, what is live in it and its stage. */
 async function data(env, key) {
   const site = SITES[key];
-  const [live, stage, halqahs] = await Promise.all([
+  const [halqahs, room] = await Promise.all([
+    api(env, `/v1/public/live?ids=${site.halqahs.map(h => h.id).join(",")}`),
     api(env, "/v1/live"),
-    api(env, "/v1/public/sheikh-stage"),
-    api(env, `/v1/public/halqahs?ids=${site.halqahs.map(h => h.id).join(",")}`),
   ]);
-  const youtube = live?.state === "live" ? live.sources?.find(s => s.kind === "youtube" && s.videoID) : undefined;
-  const names = new Map((halqahs?.halqahs ?? []).map(h => [h.id, h]));
+  const found = new Map((halqahs.body?.halqahs ?? []).map(h => [h.id, h]));
   return {
-    live: {
-      onAir: !!youtube,
-      title: live?.title ?? "Daily Zikr",
-      videoID: youtube?.videoID ?? null,
-      startedAt: live?.startedAt ?? null,
-      scheduledStart: live?.scheduledStart ?? null,
-      cue: live?.cue?.text ?? null,
-      room: live?.room ? { listeners: live.room.listeners ?? 0, url: live.room.url ?? null } : null,
-    },
-    stage: stage?.live ? stage.stage ?? null : null,
-    halqahLive: !!stage?.live,
-    // A test Zikr shows on the websites too, marked as a test.
-    halqahTest: !!stage?.live?.isTest,
-    latestVideoID: stage?.latestVideoID ?? null,
-    picture: stage?.pictureHDURL ?? stage?.pictureURL ?? null,
-    pictureFallback: stage?.pictureURL ?? null,
-    halqahs: site.halqahs.map(h => ({ ...h, ...(names.get(h.id) ? { name: names.get(h.id).name } : {}) })),
+    halqahs: site.halqahs.map(h => {
+      const live = found.get(h.id);
+      return { id: h.id, name: live?.name ?? h.name, description: h.description, live: live?.live ?? null, stage: live?.stage ?? null };
+    }),
+    // The Tahajjud Zikr is joined in the Silsila's Paltalk room while it is open.
+    tahajjud: room.body?.room ? { listeners: room.body.room.listeners ?? 0, url: room.body.room.url ?? null } : null,
   };
 }
 
-// The eight-pointed star of the page's brand mark, gold on deep green.
-const FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#04150f"/>
-<path d="M20 4 25 15 36 20 25 25 20 36 15 25 4 20 15 15Z" fill="none" stroke="#d9b56a" stroke-width="2.2"/><circle cx="20" cy="20" r="5" fill="#d9b56a"/></svg>`;
-
-const SECURITY = {
-  "x-content-type-options": "nosniff",
-  "referrer-policy": "strict-origin-when-cross-origin",
-  "permissions-policy": "camera=(), microphone=(), geolocation=()",
-  "content-security-policy": [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline'",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src https://fonts.gstatic.com",
-    "img-src 'self' data: https://i.ytimg.com https://img.youtube.com",
-    "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
-    "connect-src 'self'",
-  ].join("; "),
-};
-
-/** The zone's firewall lets in only the home_vpn IP list (besides these sites).
- * Every 5 minutes: look up vpn.wajidali.us and, when its address changed, make it
- * the list's only entry. Needs HOME_VPN_LIST_TOKEN (Account Filter Lists: Edit). */
+/** The keeper of the firewall's home_vpn list (see followHomeVPN). */
 async function followHomeVPN(env) {
   if (!env.HOME_VPN_LIST_TOKEN) return;
   const dns = await fetch(`https://cloudflare-dns.com/dns-query?name=${env.HOME_VPN_HOST}&type=A`,
@@ -123,13 +90,41 @@ async function followHomeVPN(env) {
   const ip = ips.length === 1 && /^\d{1,3}(\.\d{1,3}){3}$/.test(ips[0]) &&
     !/^(10|127|0)\.|^192\.168\.|^172\.(1[6-9]|2\d|3[01])\.|^169\.254\./.test(ips[0]) ? ips[0] : null;
   if (!ip) return console.log("home VPN: unexpected DNS answer", JSON.stringify(ips));
-  const api = (path, init = {}) => fetch(`https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/rules/lists/${env.HOME_VPN_LIST_ID}${path}`,
+  const call = (path, init = {}) => fetch(`https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/rules/lists/${env.HOME_VPN_LIST_ID}${path}`,
     { ...init, headers: { authorization: `Bearer ${env.HOME_VPN_LIST_TOKEN}`, "content-type": "application/json" } }).then(r => r.json());
-  const current = (await api("/items")).result?.map(item => item.ip) ?? [];
+  const current = (await call("/items")).result?.map(item => item.ip) ?? [];
   if (current.length === 1 && current[0] === ip) return;
-  const done = await api("/items", { method: "PUT", body: JSON.stringify([{ ip, comment: env.HOME_VPN_HOST }]) });
+  const done = await call("/items", { method: "PUT", body: JSON.stringify([{ ip, comment: env.HOME_VPN_HOST }]) });
   console.log("home VPN list", JSON.stringify(current), "->", ip, done.success ? "ok" : JSON.stringify(done.errors));
 }
+
+// The eight-pointed star of the brand mark, gold on deep green.
+const FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#04150f"/>
+<path d="M20 4 25 15 36 20 25 25 20 36 15 25 4 20 15 15Z" fill="none" stroke="#d9b56a" stroke-width="2.2"/><circle cx="20" cy="20" r="5" fill="#d9b56a"/></svg>`;
+
+// The room is played by Cloudflare RealtimeKit's web components (listen only).
+const SECURITY = {
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "permissions-policy": "camera=(), microphone=(), geolocation=(), autoplay=(self)",
+  "content-security-policy": [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+    "font-src https://fonts.gstatic.com https://cdn.jsdelivr.net data:",
+    "img-src 'self' data: blob: https:",
+    "media-src 'self' blob: https:",
+    "frame-src https://www.youtube-nocookie.com https://www.youtube.com",
+    "connect-src 'self' https: wss:",
+  ].join("; "),
+};
+
+const html = (body, maxAge = 60) => new Response(body, {
+  headers: { "content-type": "text/html; charset=utf-8", "cache-control": `public, max-age=${maxAge}`, ...SECURITY },
+});
+const jsonResponse = (status, body) => new Response(JSON.stringify(body), {
+  status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...SECURITY },
+});
 
 export default {
   async scheduled(event, env, ctx) {
@@ -139,20 +134,31 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const key = siteFor(url);
-    if (request.method !== "GET" && request.method !== "HEAD") return new Response("Method not allowed", { status: 405 });
-    if (url.pathname === "/data.json") {
-      return new Response(JSON.stringify(await data(env, key)), {
-        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=15", ...SECURITY },
-      });
+    const site = SITES[key];
+    const others = Object.entries(SITES).filter(([k]) => k !== key).map(([, s]) => ({ host: s.host, region: s.region }));
+    // Joining and staying counted: passed to the platform as they are; the visitor's
+    // own IP travels with it for the platform's rate limit.
+    const visit = /^\/(join|presence)\/([a-z0-9-]{1,40})$/.exec(url.pathname);
+    if (visit && request.method === "POST") {
+      if (!site.halqahs.some(h => h.id === visit[2])) return jsonResponse(404, { error: "Not found" });
+      const body = await request.text();
+      if (body.length > 4096) return jsonResponse(413, { error: "Too large" });
+      const result = await api(env, `/v1/public/halqahs/${visit[2]}/${visit[1]}`, {
+        method: "POST", body, headers: { "cf-connecting-ip": request.headers.get("cf-connecting-ip") ?? "" } });
+      return jsonResponse(result.status, result.body ?? { error: "Please try again." });
     }
-    if (url.pathname === "/robots.txt") return new Response("User-agent: *\nAllow: /\n", { headers: { "content-type": "text/plain" } });
+    if (request.method !== "GET" && request.method !== "HEAD") return new Response("Method not allowed", { status: 405 });
+    if (url.pathname === "/data.json") return jsonResponse(200, await data(env, key));
+    if (url.pathname === "/logo.webp") {
+      return new Response(LOGO, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
+    }
     if (url.pathname === "/favicon.ico" || url.pathname === "/favicon.svg") {
       return new Response(FAVICON, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
     }
+    if (url.pathname === "/robots.txt") return new Response("User-agent: *\nAllow: /\n", { headers: { "content-type": "text/plain" } });
+    if (url.pathname === "/method-of-zikr") return html(methodPage(site, others), 3600);
+    if (url.pathname === "/shajra") return html(shajraPage(site, others), 3600);
     if (url.pathname !== "/" && url.pathname !== "/index.html") return Response.redirect(new URL("/", url).toString(), 302);
-    const others = Object.entries(SITES).filter(([k]) => k !== key).map(([, s]) => ({ host: s.host, region: s.region }));
-    return new Response(page(SITES[key], others, await data(env, key)), {
-      headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=60", ...SECURITY },
-    });
+    return html(homePage(site, others, await data(env, key)), 30);
   },
 };
