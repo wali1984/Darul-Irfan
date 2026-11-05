@@ -1,7 +1,7 @@
 // app-demo.naqshbandiaowaisiah.us: the app's showcase for an audience. The
 // interactive showcase, PowerPoint, PDF and package were made separately
-// (outputs/darul-app-showcase/deliverables, v4); the PowerPoint and the admin
-// screens are site files under /demo/, the three large ones come from R2
+// (outputs/darul-app-showcase/deliverables, v5); the admin
+// screens are site files under /demo/, the four large files come from R2
 // (demo/...). "Administration and live Zikr" walks through how Hazrat ji's admins
 // and each Halqah's leaders run things; member names are blurred in its screens.
 import { animatedLogo, esc, shell } from "./layout.js";
@@ -367,7 +367,7 @@ export function demoPage(site, others) {
         <a class="btn btn-ghost" href="#new">What's new</a>
       </div>
       <div class="stats reveal" style="--d:300ms">
-        <div><b>51</b><span>bilingual slides</span></div><div><b>263</b><span>features</span></div><div><b>103</b><span>app screens</span></div>
+        <div><b>65</b><span>bilingual slides</span></div><div><b>281</b><span>features</span></div><div><b>110</b><span>app screens</span></div>
       </div>
     </div>
     <div class="reveal" style="--d:200ms">${animatedLogo()}</div>
@@ -376,12 +376,12 @@ export function demoPage(site, others) {
   <section id="downloads"><div class="wrap">
     <div class="eyebrow reveal">For presenting</div>
     <h2 class="reveal">The showcase</h2>
-    <p class="lead reveal">Open the interactive showcase full screen to present; arrow keys move through it. The PowerPoint and PDF carry the same 51 slides, including the Administration and Live Zikr chapter.</p>
+    <p class="lead reveal">Open the interactive showcase full screen to present; arrow keys move through it. The PowerPoint and PDF carry the same 65 slides: the vision, the app tour, automation, administration, live Zikr and the Silsila Markaz.</p>
     <div class="downloads">
-      <a class="dl reveal" href="/demo/showcase"><span class="ic">▶</span><span><b>Interactive showcase</b><span>App tour, administration, 103 screens, feature tree · 34 MB</span></span></a>
-      <a class="dl reveal" href="/demo/Darul-Irfan-Product-Showcase-v4.pptx" download><span class="ic">PPT</span><span><b>PowerPoint</b><span>51 slides · 19.8 MB</span></span></a>
-      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v4.pdf"><span class="ic">PDF</span><span><b>PDF</b><span>For reading and printing · 42 MB</span></span></a>
-      <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v4.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 85 MB</span></span></a>
+      <a class="dl reveal" href="/demo/showcase"><span class="ic">▶</span><span><b>Interactive showcase</b><span>Vision, app tour, automation, administration, the Markaz · 110 screens · 40 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v5.pptx" download><span class="ic">PPT</span><span><b>PowerPoint</b><span>65 slides · 25 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v5.pdf"><span class="ic">PDF</span><span><b>PDF</b><span>For reading and printing · 54 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v5.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 106 MB</span></span></a>
     </div>
   </div></section>
 ${visionSection()}
@@ -404,15 +404,16 @@ ${markazSection()}
 }
 
 /** The large files, from R2 (demo/...): over the 25 MB site-file limit. */
-export const SHOWCASE = "Darul-Irfan-Interactive-Showcase-v4.html";
+export const SHOWCASE = "Darul-Irfan-Interactive-Showcase-v5.html";
 export async function demoFile(env, name, request) {
-  const allowed = { "Darul-Irfan-Product-Showcase-v4.pdf": "application/pdf", "Darul-Irfan-Presentation-Package-v4.zip": "application/zip",
+  const allowed = { "Darul-Irfan-Product-Showcase-v5.pdf": "application/pdf", "Darul-Irfan-Presentation-Package-v5.zip": "application/zip",
+    "Darul-Irfan-Product-Showcase-v5.pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     [SHOWCASE]: "text/html; charset=utf-8" };
   if (!allowed[name] || !env.MEDIA) return new Response("Not found", { status: 404 });
   const object = await env.MEDIA.get(`demo/${name}`, { range: request.headers });
   if (!object) return new Response("Not found", { status: 404 });
   const headers = new Headers({ "content-type": allowed[name], "cache-control": "public, max-age=86400", "accept-ranges": "bytes",
-    "content-disposition": `${name.endsWith(".zip") ? "attachment" : "inline"}; filename="${name}"` });
+    "content-disposition": `${name.endsWith(".zip") || name.endsWith(".pptx") ? "attachment" : "inline"}; filename="${name}"` });
   if (object.range) {
     const { offset = 0, length = object.size - offset } = object.range;
     headers.set("content-range", `bytes ${offset}-${offset + length - 1}/${object.size}`);
