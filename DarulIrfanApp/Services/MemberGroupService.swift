@@ -104,6 +104,11 @@ actor MemberGroupService {
     }
 
     var isSignedIn: Bool { savedSession.load() != nil }
+
+    /// The sign-in, for Our Sheikh's live audio page only: it travels in the
+    /// page address's fragment (never sent to a server), and the live service
+    /// trades it for its own key at once (LiveAudioView).
+    var liveAudioToken: String? { savedSession.load()?.token }
     /// Synchronous identity snapshot for account-scoped SwiftUI persistence.
     /// The immutable Sendable store serializes its own reads (Keychain lock
     /// in production); no actor-isolated networking/decoder state is touched.

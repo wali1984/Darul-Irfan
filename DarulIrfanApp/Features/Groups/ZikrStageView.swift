@@ -313,6 +313,8 @@ struct ZikrStageView: View {
     @State private var addingMuraqaba = false
     /// The stage announcement an admin asked to remove, awaiting confirmation.
     @State private var cueToRemove: HalqaZikrCue?
+    @State private var liveAudio: LiveAudioMode?
+    @State private var liveAudioToken = ""
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
@@ -383,6 +385,9 @@ struct ZikrStageView: View {
             UIApplication.shared.isIdleTimerDisabled = false
         }
         .sheet(isPresented: $addingMuraqaba) { StageMuraqabaEditor(model: model) }
+        .fullScreenCover(item: $liveAudio, onDismiss: { liveAudioToken = "" }) { mode in
+            LiveAudioView(mode: mode, token: liveAudioToken, urdu: urdu)
+        }
         .alert("Could not complete action", isPresented: Binding(
             get: { model.actionError != nil }, set: { if !$0 { model.actionError = nil } }
         )) {
@@ -410,6 +415,7 @@ struct ZikrStageView: View {
             header
             portrait
             nowShowing
+            if ourSheikh && !presenting && (model.live != nil || model.canModerate) { liveAudioControls }
             if model.canLead && !presenting { leadControls }
             if model.canModerate && !presenting && !model.cues.isEmpty { announcementList }
         }
@@ -627,6 +633,37 @@ struct ZikrStageView: View {
         .buttonStyle(DIPrimaryButtonStyle())
         .symbolEffect(.variableColor.iterative, isActive: live && !reduceMotion)
         .accessibilityIdentifier("stage-go-live")
+    }
+
+    /// Our Sheikh's live sound (Android LiveAudioButtons): everyone can hear
+    /// the Zikr while it is live; admins can also send this phone's voice to
+    /// the app, Paltalk and YouTube.
+    private var liveAudioControls: some View {
+        VStack(spacing: DISpacing.sm) {
+            if model.live != nil {
+                Button { openLiveAudio(.listen) } label: { Label("Listen live", systemImage: "headphones") }
+                    .buttonStyle(DIPrimaryButtonStyle())
+                    .accessibilityIdentifier("stage-listen-live")
+            }
+            if model.canModerate {
+                Button { openLiveAudio(.broadcast) } label: { Label("Broadcast", systemImage: "music.mic") }
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .accessibilityIdentifier("stage-broadcast")
+                Text("Your voice goes to the app, Paltalk and YouTube.")
+                    .font(.footnote).foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center).frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private func openLiveAudio(_ mode: LiveAudioMode) {
+        // One microphone: following Hazrat ji's voice pauses while this
+        // phone broadcasts.
+        if mode == .broadcast { model.stopVoice() }
+        Task {
+            liveAudioToken = await model.service.liveAudioToken ?? ""
+            liveAudio = mode
+        }
     }
 
     private var presentationButton: some View {
