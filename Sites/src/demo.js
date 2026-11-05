@@ -1,8 +1,9 @@
 // app-demo.naqshbandiaowaisiah.us: the app's showcase for an audience. The
 // interactive showcase, PowerPoint, PDF and package were made separately
-// (outputs/darul-app-showcase/deliverables, v3); the first two are served as
-// site files under /demo/, the two large ones from R2 (demo/...). "What's new"
-// covers what was added after the showcase was made.
+// (outputs/darul-app-showcase/deliverables, v4); the PowerPoint and the admin
+// screens are site files under /demo/, the three large ones come from R2
+// (demo/...). "Administration and live Zikr" walks through how Hazrat ji's admins
+// and each Halqah's leaders run things; member names are blurred in its screens.
 import { animatedLogo, esc, shell } from "./layout.js";
 
 const STYLE = `
@@ -35,7 +36,141 @@ const STYLE = `
 .shot::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,246,220,.14) 50%,transparent 60%);background-size:250% 100%;animation:sweep 7s ease-in-out infinite}
 @keyframes sweep{0%{background-position:150% 0}60%,100%{background-position:-60% 0}}
 .pillrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.phones{display:flex;gap:16px;justify-content:center;align-items:flex-start}
+.phones img{width:min(46%,250px);height:auto;border-radius:22px;border:1px solid rgba(243,220,157,.35);box-shadow:0 30px 70px -25px rgba(16,185,129,.55)}
+.phones img:nth-child(2){margin-top:40px}
+.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:30px}
+.role{padding:22px;border-radius:var(--radius);border:1px solid var(--line);background:rgba(10,40,30,.55)}
+.role b{display:block;font:600 22px/1.2 var(--serif);color:var(--gold2);margin-bottom:8px}
+.role span{color:var(--muted);font-size:14px}
+.steps{counter-reset:step;display:grid;gap:14px;margin-top:30px}
+.step{display:grid;grid-template-columns:56px 1fr;gap:18px;padding:20px 22px;border-radius:var(--radius);border:1px solid var(--line);background:rgba(10,40,30,.45)}
+.step::before{counter-increment:step;content:counter(step);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1d1406;font:700 20px var(--sans)}
+.step h4{margin:0 0 6px;font-size:19px}.step p{margin:0;color:var(--muted);font-size:15px}
+.step dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:10px 0 0;font-size:14px}
+.step dt{color:var(--gold2)}.step dd{margin:0;color:var(--ink)}
+@media (max-width:600px){.step{grid-template-columns:1fr}.step dl{grid-template-columns:1fr}}
 `;
+
+const ROLES = [
+  ["Super admin", "Every Halqah and every person. Makes, renames and retires Halqahs, places anyone in any Halqah, publishes Today's pictures."],
+  ["Administrator", "Runs a Halqah: its people, its Admins and everything the Admins do. Appoints other Administrators."],
+  ["Admin", "Posts, Zikr, meetings and people of the Halqah. Leads the live stage, removes anything from it, ends the session."],
+  ["Member", "Reads and watches, joins the Zikr, sends dua requests and the ready-made chat messages."],
+  ["Website visitor", "Gives a name, city and country, then follows the live Zikr with no controls. Counted in attendance."],
+];
+
+const GUIDE = [
+  {
+    tag: "Super admin", title: "Halqahs and people",
+    text: "The Halqah page opens on a dashboard: Halqahs, people signed in, live Zikr and live meetings.",
+    points: ["New Halqah: a name and a description; it starts empty and gets its first Administrator",
+      "⋯ on a Halqah: rename, describe or retire it (people and history are kept)",
+      "Everyone who has signed in: search, change a role in any Halqah, remove, or add to another Halqah",
+      "Nobody can change their own place or another super admin's"],
+    shots: ["admin-dashboard", "admin-role-menu"],
+  },
+  {
+    tag: "Super admin", title: "Today's pictures",
+    text: "The Ayah, Hadith, Aqwal-e-Sheikh, daily quote or announcement picture for a day, in every reader's own time.",
+    points: ["Choose where it shows and on which day; announcements can run several days",
+      "Also open it over the Today page, with an optional caption",
+      "Forward a picture to the WhatsApp Business number with #ayah, #hadith, #aqwal, #quote or #announcement: it waits as a draft",
+      "Publish, save as a draft, hide or delete"],
+    shots: ["admin-pictures", "admin-picture-editor"],
+  },
+  {
+    tag: "Halqah admin", title: "Running a Halqah",
+    text: "Every Halqah's Administrators and Admins have a Halqah admin section: Go live and six tiles.",
+    points: ["People: add by email, or make a single-use code sent from your own phone (lasts 1 to 90 days)",
+      "Make someone an Administrator, an Admin or a member; withdraw an invitation not used yet",
+      "New post: paste from WhatsApp, up to 10 photos or videos; publish (members are told) or keep as a draft",
+      "Meetings and Zikr times in each member's own time; a Zikr time can play a recording by itself",
+      "Dua requests and past sessions with attendance"],
+    shots: ["admin-tiles", "admin-people"],
+  },
+  {
+    tag: "Live Zikr", title: "Go live, or test first",
+    text: "Choose Halqah Zikr or a meeting, then how the group joins.",
+    points: ["Lead live: members join together and listen; optionally record it or add a live video link",
+      "YouTube: a live link, or past Zikr from the channel played to everyone at the same moment",
+      "Recording: the Halqah's own recordings",
+      "Test only: nobody is notified and only the Halqah's admins see it, marked TEST"],
+    shots: ["admin-golive", "admin-golive-test"],
+  },
+  {
+    tag: "Leading", title: "How Hazrat ji's admins and each leader run the stage",
+    text: "The stage opens full screen. Each stage tapped appears for everyone at once, with a soft chime for members.",
+    points: ["Opening recitations: Tasbihat, Istighfar, Shahadah, Ta'awwudh, Bismillah, shown in Arabic",
+      "Stages: the seven Lataif, Raabta, Muraqaba Ahadiyat, Ma'iyyat, Aqrabiyyat, Sair-e-Kaaba, Rauza-e-Athar, Masjid-e-Nabawi",
+      "Go Live: the leading phone listens and the stage follows the voice, hands-free; Undo puts back a wrong stage",
+      "Presentation hides the controls for the stream; double-tap to bring them back",
+      "Add Muraqaba on the spot; remove any stage announcement or chat message"],
+    shots: ["stage-listening", "stage-controls"],
+  },
+  {
+    tag: "Members", title: "What everyone sees",
+    text: "The emblem waits until the Zikr begins; then only the current stage fills the screen, in English with Urdu.",
+    points: ["Recitations in Arabic; each Latifa with its numbered medallion; each Muraqaba by name",
+      "On Our Sheikh, Hazrat ji's photograph; on other Halqahs, the Silsila emblem",
+      "Ready-made messages: Assalamu alaikum, Request for prayers, Ameen, JazakAllahu khairan, SubhanAllah, MashaAllah"],
+    shots: ["stage-tasbihat", "stage-latifa7"],
+  },
+  {
+    tag: "Session", title: "Session controls, attendance and duas",
+    text: "From the live card, admins guide the session and close it for everyone.",
+    points: ["Add to the session, record it, message the group (optionally as a notification)",
+      "Who is listening, right now",
+      "End the session for everyone; it stays open until then",
+      "Past sessions keep who joined and when, app members and website visitors alike"],
+    shots: ["session-controls", "admin-attendance"],
+  },
+];
+
+const STEPS = [
+  ["Before", "Members see the next Zikr in their own time, a greyed Join, Remind me and Send a dua request.",
+    { Websites: "Not live; Join Live Zikr is greyed out." }],
+  ["Rehearse (optional)", "Go live › Test only › Start test without notifying anyone. End the session when done.",
+    { Websites: "Shown as Test Zikr." }],
+  ["Start", "Go live › Halqah Zikr › Lead live, YouTube or Recording › Start now and notify the group. For Our Sheikh, Hazrat ji starting on Paltalk starts it by itself.",
+    { Members: "\"Halqah zikr has started\"; the card shows Zikr live and the stage opens once.", Websites: "Live now; Join Live Zikr lights up." }],
+  ["Joining", "Members join the room with the microphone off, or listen and watch together at the same moment.",
+    { Websites: "Name, city, country, then the full-screen stage. Our Sheikh with live sound.", "YouTube & Facebook": "The stage picture with the live sound." }],
+  ["During", "The leader taps each stage or lets Go Live follow the voice. Chat, Add Muraqaba, Message the group, removals.",
+    { Everywhere: "The emblem moves to the corner; only the current stage shows, with a burst of light at each change." }],
+  ["Dua", "When the Dua begins the stage shows Dua. Members' dua requests have reached the admins.",
+    { Paltalk: "Started from Paltalk, the session closes by itself five minutes later." }],
+  ["End", "End session › End the session for everyone?",
+    { Members: "The live card and stage clear.", Websites: "The Zikr has ended. JazakAllahu khairan.", Admins: "The session is in Past sessions, with attendance." }],
+];
+
+function adminGuide() {
+  const shot = id => `<img src="/demo/admin/${esc(id)}.webp" alt="" loading="lazy" width="1080" height="2400">`;
+  const roles = ROLES.map(([r, t]) => `<div class="role reveal"><b>${esc(r)}</b><span>${esc(t)}</span></div>`).join("");
+  const items = GUIDE.map((g, i) => `
+    <article class="item reveal" style="--d:${i * 40}ms">
+      <div>
+        <span class="chip">${esc(g.tag)}</span>
+        <h3>${esc(g.title)}</h3>
+        <p>${esc(g.text)}</p>
+        <ul>${g.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+      </div>
+      <div class="phones">${g.shots.map(shot).join("")}</div>
+    </article>`).join("");
+  const steps = STEPS.map(([h, p, seen]) => `
+    <div class="step reveal"><div><h4>${esc(h)}</h4><p>${esc(p)}</p>
+      <dl>${Object.entries(seen).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div></div>`).join("");
+  return `
+  <section id="admin"><div class="wrap">
+    <div class="eyebrow reveal">For admins and live leaders</div>
+    <h2 class="reveal">Administration and live Zikr</h2>
+    <p class="lead reveal">Who looks after what, how Hazrat ji's admins and each Halqah's leaders run a live Zikr, and what members, website visitors and the live streams see at every stage. Screens are from the Android app; iOS matches except Apple sign-in. Member names, emails and places are blurred.</p>
+    <div class="roles">${roles}</div>
+    <div class="new">${items}</div>
+    <h2 class="reveal" style="margin-top:70px">A live Zikr, step by step</h2>
+    <div class="steps">${steps}</div>
+  </div></section>`;
+}
 
 const NEW = [
   {
@@ -105,10 +240,11 @@ export function demoPage(site, others) {
       <p class="lead reveal" style="--d:160ms">The Qur'an with the Silsila's translation and tafsir, hadith, the library, Zikr with the Sheikh and every Halqah, in English and Urdu, on iPhone and Android.</p>
       <div class="cta reveal" style="--d:240ms">
         <a class="btn btn-gold live" href="/demo/showcase">Start the interactive showcase</a>
+        <a class="btn btn-ghost" href="#admin">Administration</a>
         <a class="btn btn-ghost" href="#new">What's new</a>
       </div>
       <div class="stats reveal" style="--d:300ms">
-        <div><b>35</b><span>bilingual slides</span></div><div><b>243</b><span>features</span></div><div><b>62</b><span>app screens</span></div>
+        <div><b>51</b><span>bilingual slides</span></div><div><b>263</b><span>features</span></div><div><b>103</b><span>app screens</span></div>
       </div>
     </div>
     <div class="reveal" style="--d:200ms">${animatedLogo()}</div>
@@ -117,14 +253,15 @@ export function demoPage(site, others) {
   <section id="downloads"><div class="wrap">
     <div class="eyebrow reveal">For presenting</div>
     <h2 class="reveal">The showcase</h2>
-    <p class="lead reveal">Open the interactive showcase full screen to present; arrow keys move through it. The PowerPoint and PDF carry the same 35 slides.</p>
+    <p class="lead reveal">Open the interactive showcase full screen to present; arrow keys move through it. The PowerPoint and PDF carry the same 51 slides, including the Administration and Live Zikr chapter.</p>
     <div class="downloads">
-      <a class="dl reveal" href="/demo/showcase"><span class="ic">▶</span><span><b>Interactive showcase</b><span>Introduction, app tour, 62 screens, feature tree</span></span></a>
-      <a class="dl reveal" href="/demo/Darul-Irfan-Product-Showcase-v3.pptx" download><span class="ic">PPT</span><span><b>PowerPoint</b><span>35 slides · 12.5 MB</span></span></a>
-      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v3.pdf"><span class="ic">PDF</span><span><b>PDF</b><span>For reading and printing · 27.6 MB</span></span></a>
-      <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v3.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 55 MB</span></span></a>
+      <a class="dl reveal" href="/demo/showcase"><span class="ic">▶</span><span><b>Interactive showcase</b><span>App tour, administration, 103 screens, feature tree · 34 MB</span></span></a>
+      <a class="dl reveal" href="/demo/Darul-Irfan-Product-Showcase-v4.pptx" download><span class="ic">PPT</span><span><b>PowerPoint</b><span>51 slides · 19.8 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v4.pdf"><span class="ic">PDF</span><span><b>PDF</b><span>For reading and printing · 42 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v4.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 85 MB</span></span></a>
     </div>
   </div></section>
+${adminGuide()}
 
   <section id="new"><div class="wrap">
     <div class="eyebrow reveal">Since the showcase</div>
@@ -140,9 +277,11 @@ export function demoPage(site, others) {
     .replace('<a class="brand" href="/">', '<a class="brand" href="/">');
 }
 
-/** The two large files, from R2 (demo/...). */
+/** The large files, from R2 (demo/...): over the 25 MB site-file limit. */
+export const SHOWCASE = "Darul-Irfan-Interactive-Showcase-v4.html";
 export async function demoFile(env, name, request) {
-  const allowed = { "Darul-Irfan-Product-Showcase-v3.pdf": "application/pdf", "Darul-Irfan-Presentation-Package-v3.zip": "application/zip" };
+  const allowed = { "Darul-Irfan-Product-Showcase-v4.pdf": "application/pdf", "Darul-Irfan-Presentation-Package-v4.zip": "application/zip",
+    [SHOWCASE]: "text/html; charset=utf-8" };
   if (!allowed[name] || !env.MEDIA) return new Response("Not found", { status: 404 });
   const object = await env.MEDIA.get(`demo/${name}`, { range: request.headers });
   if (!object) return new Response("Not found", { status: 404 });

@@ -5,7 +5,7 @@
 // carries the Method of Zikr and the Shajra, word for word from the app's data.
 import { broadcastPage, homePage } from "./home.js";
 import { methodPage, shajraPage } from "./content.js";
-import { demoFile, demoPage } from "./demo.js";
+import { demoFile, demoPage, SHOWCASE } from "./demo.js";
 import LOGO from "../assets/logo.webp";
 
 export const SITES = {
@@ -144,6 +144,7 @@ export default {
       const all = Object.values(SITES).map(s => ({ host: s.host, region: s.region }));
       const file = /^\/demo\/files\/([A-Za-z0-9.-]+)$/.exec(url.pathname);
       if (file) return demoFile(env, file[1], request);
+      if (url.pathname === "/demo/showcase") return demoFile(env, SHOWCASE, request);
       if (url.pathname === "/logo.webp") {
         return new Response(LOGO, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
       }
