@@ -1,4 +1,4 @@
-// reporting.naqshbandiaowaisiah.us: the Silsila Markaz's reports and analytics
+// reporting.wajidali.us (and reporting.naqshbandiaowaisiah.us): the Silsila Markaz's reports and analytics
 // for super admins and the Markaz's officers (owner 2026-11-05). Nothing here
 // is public: the page signs in with a code that an officer approves in the
 // app (Halqah > Reports & analytics > Sign in on a computer). The session then
@@ -7,7 +7,6 @@
 import APP from "./app.client.txt";
 import STYLE from "./app.css.txt";
 
-export const REPORTING_HOST = "reporting.naqshbandiaowaisiah.us";
 const COOKIE = "__Host-di_report";
 
 const HEADERS = {

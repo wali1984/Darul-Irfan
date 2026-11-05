@@ -1,5 +1,6 @@
-# The public websites: oursheikh., namerica. and uk.naqshbandiaowaisiah.us.
-# One Worker; the page is chosen by hostname. Live data comes from the platform
+# The public websites: oursheikh., namerica. and uk., with app-demo. and reporting.,
+# each on wajidali.us (shared for now) and naqshbandiaowaisiah.us (kept for
+# production). One Worker; the page is chosen by subdomain. Live data comes from the platform
 # Worker through a service binding (no CORS, no public API host needed).
 name = "darul-irfan-sites"
 main = "src/index.js"
@@ -14,6 +15,11 @@ routes = [
   { pattern = "uk.naqshbandiaowaisiah.us", custom_domain = true },
   { pattern = "app-demo.naqshbandiaowaisiah.us", custom_domain = true },
   { pattern = "reporting.naqshbandiaowaisiah.us", custom_domain = true },
+  { pattern = "oursheikh.wajidali.us", custom_domain = true },
+  { pattern = "namerica.wajidali.us", custom_domain = true },
+  { pattern = "uk.wajidali.us", custom_domain = true },
+  { pattern = "app-demo.wajidali.us", custom_domain = true },
+  { pattern = "reporting.wajidali.us", custom_domain = true },
 ]
 
 # app-demo.'s showcase files (PowerPoint, screenshots, admin screens) are served

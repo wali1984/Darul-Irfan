@@ -112,8 +112,11 @@ function portrait(picture) {
 }
 
 /** /broadcast: the stage alone, 1920x1080, for the relay to capture as the
- *  picture of the YouTube and Facebook streams (sound comes from the live feed). */
+ *  picture of the YouTube and Facebook streams (sound comes from the live feed).
+ *  Our Sheikh's stage carries Hazrat ji's picture beside the stage, as in the app
+ *  (owner 2026-11-05). */
 export function broadcastPage(site, initial, halqahID) {
+  const sheikh = halqahID === "our-sheikh";
   const state = JSON.stringify({ ...initial, halqahID }).replace(/</g, "\u003c");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1920,height=1080">
 <title>Stage · ${esc(site.region)}</title><meta name="robots" content="noindex">
@@ -126,8 +129,16 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#04150f
 .now .title{font-size:150px}.now .urdu{font-size:84px}.now .arabic{font-size:72px}
 .now .card{width:1400px;padding:70px 40px}
 .brandline{position:fixed;bottom:36px;left:0;right:0;text-align:center;color:#d9b56a;font:600 22px Inter,sans-serif;letter-spacing:.32em;text-transform:uppercase}
+.photo{display:none;position:fixed;left:96px;top:50%;translate:0 -50%;width:840px;aspect-ratio:16/9;border-radius:30px;overflow:hidden;
+  border:2px solid rgba(243,220,157,.65);box-shadow:0 0 90px -10px rgba(243,220,157,.45);animation:bob 5s ease-in-out infinite}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+body.duo .photo{display:block}
+body.duo .stage{padding:80px 80px 80px 1000px}
+body.duo .now .card{width:820px;padding:60px 36px}
+body.duo .now .title{font-size:112px}body.duo .now .urdu{font-size:68px}body.duo .now .arabic{font-size:54px}
 </style></head><body>
 <div class="aurora"></div><canvas id="sky"></canvas>
+${sheikh ? `<div class="photo"><img id="b-photo" alt="Hazrat Ameer Abdul Qadeer Awan (MZA)"></div>` : ""}
 ${stageScreen("b-stage", "")}
 <div class="brandline">Naqshbandia Owaisiah · ${esc(site.region)}</div>
 <script type="application/json" id="initial">${state}</script>
@@ -139,10 +150,16 @@ ${stageScreen("b-stage", "")}
     const h = data.halqahs.find(x => x.id === data.halqahID) || data.halqahs[0];
     const box = $("b-stage"), live = h && h.live, s = h && h.stage;
     box.classList.toggle("on", !!live);
+    const photo = $("b-photo"), picture = data.picture || data.pictureFallback;
+    if (photo && picture && photo.getAttribute("src") !== picture) photo.src = picture;
+    document.body.classList.toggle("duo", !!(photo && picture && live));
     const key = live ? (s ? s.stageID + "|" + s.at : "awaiting") : "off";
     if (key === shown) return; shown = key;
-    const card = box.querySelector(".card");
-    card.querySelector(".title").textContent = s ? s.title : "";
+    const card = box.querySelector(".card"), title = card.querySelector(".title");
+    title.textContent = s ? s.title : "";
+    // A long name never runs past the card: the title shrinks until it fits.
+    title.style.fontSize = "";
+    for (let size = parseFloat(getComputedStyle(title).fontSize); title.scrollWidth > title.clientWidth && size > 48; size -= 4) title.style.fontSize = size + "px";
     card.querySelector(".urdu").textContent = s && s.titleUr ? s.titleUr : "";
     card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
     card.querySelector(".test").hidden = !(live && live.isTest);

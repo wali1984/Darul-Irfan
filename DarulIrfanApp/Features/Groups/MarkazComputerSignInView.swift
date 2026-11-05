@@ -22,7 +22,7 @@ struct MarkazComputerSignInView: View {
     var body: some View {
         Form {
             Section {
-                Text("Open reporting.naqshbandiaowaisiah.us on the computer and type the code shown there.")
+                Text("Open reporting.wajidali.us (this will be moved to the naqshbandiaowaisiah.us public domain) on the computer and type the code shown there.")
                     .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)

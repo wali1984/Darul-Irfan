@@ -1,4 +1,4 @@
-// The Silsila Markaz's reporting website (reporting.naqshbandiaowaisiah.us).
+// The Silsila Markaz's reporting website (reporting.wajidali.us and reporting.naqshbandiaowaisiah.us).
 // Plain script, no libraries: the page is built with DOM calls (never from
 // names as HTML), charts are drawn as SVG, and every figure comes from the
 // platform's /v1/markaz routes through this site's /api/.

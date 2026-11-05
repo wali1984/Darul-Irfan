@@ -1,4 +1,4 @@
-// The public websites. Each hostname is a site: Our Sheikh, North America, the
+// The public websites. Each subdomain is a site: Our Sheikh, North America, the
 // United Kingdom. Each shows the live Zikr of its Halqahs (Our Sheikh on every
 // site) with the stage being followed, and lets anyone join a live Zikr with a
 // name and a place, to listen with no controls (owner 2026-11-04). It also
@@ -6,12 +6,25 @@
 import { broadcastPage, homePage } from "./home.js";
 import { methodPage, shajraPage } from "./content.js";
 import { demoFile, demoPage, SHOWCASE } from "./demo.js";
-import { REPORTING_HOST, reportingRequest } from "./reporting/server.js";
+import { reportingRequest } from "./reporting/server.js";
 import LOGO from "../assets/logo.webp";
+
+// Every site answers on both domains under the same name (oursheikh., namerica.,
+// uk., app-demo., reporting.). wajidali.us is the one shared for now; the
+// naqshbandiaowaisiah.us names stay unannounced until production (owner
+// 2026-11-05). Links between the sites stay on the domain the visitor came in on.
+export const DOMAINS = ["wajidali.us", "naqshbandiaowaisiah.us"];
+export const SHARED_DOMAIN = DOMAINS[0];
+
+/** The subdomain name and the domain a request came in on (workers.dev: no name, the shared domain). */
+function place(url) {
+  const [name, ...rest] = url.hostname.split(".");
+  const domain = rest.join(".");
+  return DOMAINS.includes(domain) ? { name, domain } : { name: null, domain: SHARED_DOMAIN };
+}
 
 export const SITES = {
   oursheikh: {
-    host: "oursheikh.naqshbandiaowaisiah.us",
     region: "Our Sheikh",
     title: "Our Sheikh · Naqshbandia Owaisiah",
     tagline: "Live Zikr with Hazrat Ameer Abdul Qadeer Awan (MZA)",
@@ -19,7 +32,6 @@ export const SITES = {
     halqahs: [{ id: "our-sheikh", name: "Our Sheikh", description: "Hazrat Ameer Abdul Qadeer Awan (MZA)" }],
   },
   namerica: {
-    host: "namerica.naqshbandiaowaisiah.us",
     region: "North America",
     title: "North America · Naqshbandia Owaisiah",
     tagline: "The Halqahs of the United States and Canada",
@@ -34,7 +46,6 @@ export const SITES = {
     ],
   },
   uk: {
-    host: "uk.naqshbandiaowaisiah.us",
     region: "United Kingdom",
     title: "United Kingdom · Naqshbandia Owaisiah",
     tagline: "The Halqahs of the United Kingdom",
@@ -46,11 +57,9 @@ export const SITES = {
   },
 };
 
-const DEMO_HOST = "app-demo.naqshbandiaowaisiah.us";
-
 function siteFor(url) {
-  const byHost = Object.entries(SITES).find(([, site]) => site.host === url.hostname);
-  if (byHost) return byHost[0];
+  const { name } = place(url);
+  if (name && SITES[name]) return name;
   // The workers.dev address previews any site with ?site=.
   const asked = url.searchParams.get("site");
   return asked && SITES[asked] ? asked : "oursheikh";
@@ -140,11 +149,13 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
+    const { name, domain } = place(url);
+    const hostOf = key => `${key}.${domain}`;
     // reporting.: the Silsila Markaz's reports, signed in from the app (and ?site=reporting on workers.dev).
-    if (url.hostname === REPORTING_HOST || url.searchParams.get("site") === "reporting") return reportingRequest(request, env, LOGO);
+    if (name === "reporting" || url.searchParams.get("site") === "reporting") return reportingRequest(request, env, LOGO);
     // app-demo.: the app's showcase for an audience (and ?site=demo on workers.dev).
-    if (url.hostname === DEMO_HOST || url.searchParams.get("site") === "demo") {
-      const all = Object.values(SITES).map(s => ({ host: s.host, region: s.region }));
+    if (name === "app-demo" || url.searchParams.get("site") === "demo") {
+      const all = Object.entries(SITES).map(([k, s]) => ({ host: hostOf(k), region: s.region }));
       const file = /^\/demo\/files\/([A-Za-z0-9.-]+)$/.exec(url.pathname);
       if (file) return demoFile(env, file[1], request);
       if (url.pathname === "/demo/showcase") return demoFile(env, SHOWCASE, request);
@@ -155,11 +166,11 @@ export default {
         return new Response(FAVICON, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
       }
       if (url.pathname !== "/" && url.pathname !== "/index.html") return new Response("Not found", { status: 404 });
-      return html(demoPage({ region: "App showcase" }, all), 300);
+      return html(demoPage({ region: "App showcase" }, all, domain), 300);
     }
     const key = siteFor(url);
     const site = SITES[key];
-    const others = Object.entries(SITES).filter(([k]) => k !== key).map(([, s]) => ({ host: s.host, region: s.region }));
+    const others = Object.entries(SITES).filter(([k]) => k !== key).map(([k, s]) => ({ host: hostOf(k), region: s.region }));
     // Joining and staying counted: passed to the platform as they are; the visitor's
     // own IP travels with it for the platform's rate limit.
     const visit = /^\/(join|presence)\/([a-z0-9-]{1,40})$/.exec(url.pathname);

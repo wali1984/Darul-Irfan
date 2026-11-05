@@ -1,4 +1,4 @@
-// app-demo.naqshbandiaowaisiah.us: the app's showcase for an audience. The
+// app-demo.: the app's showcase for an audience. The
 // interactive showcase, PowerPoint, PDF and package were made separately
 // (outputs/darul-app-showcase/deliverables, v5); the admin
 // screens are site files under /demo/, the four large files come from R2
@@ -118,7 +118,7 @@ const MARKAZ = [
     shots: ["markaz-daily", "markaz-monthly"],
   },
   {
-    tag: "On the computer", title: "reporting.naqshbandiaowaisiah.us",
+    tag: "On the computer", title: "reporting.%DOMAIN%%NOTE%",
     text: "The full dashboard for a computer: overview, daily and monthly reports, Halqahs, people, sessions, the organisation, notices and signed-in computers.",
     points: ["The website shows a code; an officer approves it in the app. No passwords to share or lose",
       "Each sign-in lasts 12 hours; every computer is listed and can be signed out", "Private, never indexed, with strict security headers"],
@@ -167,7 +167,7 @@ function markazSection() {
   <section id="markaz"><div class="wrap">
     <div class="eyebrow reveal">For super admins and the Silsila Markaz</div>
     <h2 class="reveal">The Silsila Markaz: organisation, analytics and reports</h2>
-    <p class="lead reveal">The whole organisation managed centrally, with full analytics and reporting for every Halqah, in the app and on reporting.naqshbandiaowaisiah.us. Member names are blurred in these screens.</p>
+    <p class="lead reveal">The whole organisation managed centrally, with full analytics and reporting for every Halqah, in the app and on reporting.%DOMAIN%%NOTE%. Member names are blurred in these screens.</p>
     <div class="new">${guideItems(MARKAZ, shotFolder)}</div>
   </div></section>`;
 }
@@ -297,23 +297,24 @@ const NEW = [
     tag: "New · Websites", title: "Live Zikr on the web, for every region",
     text: "Three public websites, open to everyone, in the app's emerald and gold with the living emblem.",
     points: [
-      "oursheikh., namerica. (USA and Canada) and uk.naqshbandiaowaisiah.us",
+      "oursheikh., namerica. (USA and Canada) and uk.%DOMAIN%%NOTE%",
       "Each Halqah's Zikr appears the moment it is live; anyone joins with a name and a place",
       "Listen only, live: the sound comes straight from the Zikr as it happens, never a recording",
       "Hazrat ji's admins see every web visitor in the session's attendance",
     ],
     shot: "/demo/new/home.webp", alt: "North America website",
-    links: [["https://oursheikh.naqshbandiaowaisiah.us", "Our Sheikh"], ["https://namerica.naqshbandiaowaisiah.us", "North America"], ["https://uk.naqshbandiaowaisiah.us", "United Kingdom"]],
+    links: [["https://oursheikh.%DOMAIN%", "Our Sheikh"], ["https://namerica.%DOMAIN%", "North America"], ["https://uk.%DOMAIN%", "United Kingdom"]],
   },
   {
     tag: "New · Live stage", title: "The stage, on every screen",
-    text: "Once a Zikr starts, the emblem steps aside and only the stage being done fills the screen: the opening Tasbihat in Arabic, each Latifa, Raabta and every Muraqaba up to Masjid-e-Nabawi.",
+    text: "Once a Zikr starts, the emblem steps aside and only the stage being done fills the screen: the opening Tasbihat in Arabic, each Latifa, Raabta and every Muraqaba up to Masjid-e-Nabawi. On Our Sheikh's stage, Hazrat ji's picture stands beside each stage announcement.",
     points: [
       "The same stage in the app, on the websites and in the YouTube and Facebook picture",
-      "A 1920×1080 broadcast stage for the live streams",
+      "A 1920×1080 broadcast stage for the live streams, with Hazrat ji's picture",
+      "Every stage announced is listed with its time for the Halqah's admins",
       "Every Halqah now has its stage, led by its own Ameer or admins",
     ],
-    shot: "/demo/new/broadcast.webp", alt: "Broadcast stage showing 3rd Latifa",
+    shot: "/demo/new/broadcast.webp", alt: "Broadcast stage: Hazrat ji's picture beside Muraqaba Ma'iyyat",
   },
   {
     tag: "New · Hands-free", title: "Go Live: the stage follows Hazrat ji's voice",
@@ -336,11 +337,14 @@ const NEW = [
     text: "Word for word from the app, in Urdu and English. The Lataif picture now shows the seventh as a circle around the whole body, in the app and on the web.",
     points: ["Opening recitations in Arabic, each Latifa's instruction, Raabta", "The full chain of transmission, from the Holy Prophet ﷺ to the present Sheikh"],
     shot: "/demo/new/method.webp", alt: "Method of Zikr page",
-    links: [["https://oursheikh.naqshbandiaowaisiah.us/method-of-zikr", "Method of Zikr"], ["https://oursheikh.naqshbandiaowaisiah.us/shajra", "Shajra"]],
+    links: [["https://oursheikh.%DOMAIN%/method-of-zikr", "Method of Zikr"], ["https://oursheikh.%DOMAIN%/shajra", "Shajra"]],
   },
 ];
 
-export function demoPage(site, others) {
+// The site names above say %DOMAIN%: the domain the visitor came in on. Where they are shown on
+// wajidali.us, %NOTE% says they move to naqshbandiaowaisiah.us (owner 2026-11-05).
+const MOVING = " (this will be moved to the naqshbandiaowaisiah.us public domain)";
+export function demoPage(site, others, domain) {
   const items = NEW.map((n, i) => `
     <article class="item reveal" style="--d:${i * 40}ms">
       <div>
@@ -378,10 +382,10 @@ export function demoPage(site, others) {
     <h2 class="reveal">The showcase</h2>
     <p class="lead reveal">Open the interactive showcase full screen to present; arrow keys move through it. The PowerPoint and PDF carry the same 65 slides: the vision, the app tour, automation, administration, live Zikr and the Silsila Markaz.</p>
     <div class="downloads">
-      <a class="dl reveal" href="/demo/showcase"><span class="ic">▶</span><span><b>Interactive showcase</b><span>Vision, app tour, automation, administration, the Markaz · 110 screens · 40 MB</span></span></a>
-      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v5.pptx" download><span class="ic">PPT</span><span><b>PowerPoint</b><span>65 slides · 25 MB</span></span></a>
-      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v5.pdf"><span class="ic">PDF</span><span><b>PDF</b><span>For reading and printing · 54 MB</span></span></a>
-      <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v5.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 106 MB</span></span></a>
+      <a class="dl reveal" href="/demo/showcase"><span class="ic">▶</span><span><b>Interactive showcase</b><span>Vision, app tour, automation, administration, the Markaz · 110 screens · 41 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v5.pptx" download><span class="ic">PPT</span><span><b>PowerPoint</b><span>65 slides · 26 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Product-Showcase-v5.pdf"><span class="ic">PDF</span><span><b>PDF</b><span>For reading and printing · 55 MB</span></span></a>
+      <a class="dl reveal" href="/demo/files/Darul-Irfan-Presentation-Package-v5.zip" download><span class="ic">ZIP</span><span><b>Complete package</b><span>Everything together · 108 MB</span></span></a>
     </div>
   </div></section>
 ${visionSection()}
@@ -396,11 +400,12 @@ ${markazSection()}
     <div class="new">${items}</div>
   </div></section>`;
   // The shared navigation points into the Our Sheikh site; this host only has the showcase.
-  const home = "https://oursheikh.naqshbandiaowaisiah.us";
+  const home = "https://oursheikh.%DOMAIN%";
   return shell({ site, others, title: "Darul Irfan · App showcase", description: "The Darul Irfan app: interactive showcase, slides and what's new.",
     active: "", extraStyle: STYLE, body })
     .replace(/href="\/(#live|#halqahs|method-of-zikr|shajra)"/g, (_, path) => `href="${home}/${path}"`)
-    .replace('<a class="brand" href="/">', '<a class="brand" href="/">');
+    .replace('<a class="brand" href="/">', '<a class="brand" href="/">')
+    .replaceAll("%NOTE%", domain === "wajidali.us" ? MOVING : "").replaceAll("%DOMAIN%", domain);
 }
 
 /** The large files, from R2 (demo/...): over the 25 MB site-file limit. */

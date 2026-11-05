@@ -3,7 +3,7 @@ import { RECITATIONS } from "./groupZikrStages";
 import { liveRow } from "./session";
 import { json, sha256 } from "./util";
 
-// The websites (oursheikh., namerica., uk.naqshbandiaowaisiah.us) show every
+// The websites (oursheikh., namerica., uk. on wajidali.us and naqshbandiaowaisiah.us) show every
 // named Halqah's live Zikr and let anyone join it from the browser (owner
 // 2026-11-04): they give a name and a place, then hear and watch it with no
 // controls. A visitor is not made a member of the Halqah; they are counted in
