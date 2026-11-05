@@ -59,7 +59,10 @@ struct SheikhZikrPanel: View {
                 } else {
                     Text("Awaiting the next Zikr stage").diInterfaceFont(.title3).bold().foregroundStyle(DIColor.scripture)
                 }
-                Text("Follow the stage announced by your Sheikh.").diInterfaceFont(.subheadline).foregroundStyle(DIColor.textMuted)
+                Text(HalqahStage.isOurSheikh(groupID)
+                     ? LocalizedStringKey("Follow the stage announced by your Sheikh.")
+                     : LocalizedStringKey("Follow the stage announced by the one leading the Zikr."))
+                    .diInterfaceFont(.subheadline).foregroundStyle(DIColor.textMuted)
                 if let error {
                     Text(verbatim: error).diInterfaceFont(.subheadline).foregroundStyle(DIColor.danger)
                     Button("Try again") { Task { await load() } }.buttonStyle(DICompactButtonStyle()).disabled(busy)

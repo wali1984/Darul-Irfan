@@ -51,7 +51,9 @@ struct NativeMeetingRoomView: View {
                         ScrollView {
                             VStack(alignment: .leading, spacing: DISpacing.md) {
                                 MethodOfZikrLink(compact: true)
-                                if groupID == "our-sheikh" {
+                                // Every Halqah's live Zikr is guided from its stage
+                                // (Our Sheikh's room keeps the panel in meetings too).
+                                if HalqahStage.isOurSheikh(groupID) || isLiveZikr {
                                     SheikhZikrPanel(groupID: groupID, service: service, isLiveZikr: isLiveZikr)
                                 }
                             }.padding().diResponsiveWidth()

@@ -134,4 +134,25 @@ final class ZikrStageAutomationTests: XCTestCase {
                                    CGPoint(x: 0.30, y: 0.53), CGPoint(x: 0.50, y: 0.65), CGPoint(x: 0.50, y: 0.24)]
         XCTAssertEqual(MethodLatifaDiagram.bodyPositions, expected)
     }
+
+    // MARK: - Every Halqah has its stage (owner, 2026-11-04)
+
+    func testOnlyOurSheikhsStageShowsHazratJisPhotograph() {
+        let standard = URL(string: "https://i.ytimg.com/vi/abc/hqdefault.jpg")!
+        let full = URL(string: "https://i.ytimg.com/vi/abc/maxresdefault.jpg")!
+        XCTAssertEqual(HalqahStage.portraitURLs(groupID: "our-sheikh", pictureURL: standard, pictureHDURL: full), [full, standard])
+        XCTAssertEqual(HalqahStage.portraitURLs(groupID: "our-sheikh", pictureURL: standard, pictureHDURL: nil), [standard])
+        // Another Halqah shows the logo, even should the server send a picture.
+        XCTAssertEqual(HalqahStage.portraitURLs(groupID: "usa", pictureURL: standard, pictureHDURL: full), [])
+    }
+
+    func testAPushNudgesOnlyTheStageOfItsOwnHalqah() {
+        XCTAssertEqual(HalqahStage.groupID(fromPath: "groups/our-sheikh"), "our-sheikh")
+        XCTAssertEqual(HalqahStage.groupID(fromPath: "/groups/usa"), "usa")
+        XCTAssertEqual(HalqahStage.groupID(fromPath: "darulirfan://groups/uk-london?stage=1"), "uk-london")
+        XCTAssertEqual(HalqahStage.groupID(fromPath: "groups/usa/"), "usa")
+        XCTAssertNil(HalqahStage.groupID(fromPath: "live/official-live"))
+        XCTAssertNil(HalqahStage.groupID(fromPath: "groups/"))
+        XCTAssertNil(HalqahStage.groupID(fromPath: nil))
+    }
 }

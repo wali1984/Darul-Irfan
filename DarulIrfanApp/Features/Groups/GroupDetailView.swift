@@ -42,7 +42,7 @@ struct GroupDetailView: View {
     /// than every card loading a player at once.
     @State private var playingVideoID: String?
     @State private var room: GroupRoomPass?
-    /// Our Sheikh's live Zikr stage, full screen.
+    /// The Halqah's live Zikr stage, full screen (every Halqah, owner 2026-11-04).
     @State private var stageOpen = false
     /// Sessions whose stage opened by itself once in this run of the app.
     @MainActor private static var stageOpenedFor: Set<String> = []
@@ -107,8 +107,9 @@ struct GroupDetailView: View {
                 } else {
                     // Stage announcements belong to the live Zikr: shown on its
                     // stage and in its room only, never on the page once it ends
-                    // (owner, 2026-11-04).
-                    if group.id == "our-sheikh", detail?.live?.kind == "zikr" {
+                    // (owner, 2026-11-04). Every Halqah's live Zikr has its stage,
+                    // led in a room, on a live video or played from a recording.
+                    if detail?.live?.kind == "zikr" {
                         StageEntryCard { stageOpen = true }
                     }
                     officialLiveSection
@@ -193,12 +194,12 @@ struct GroupDetailView: View {
             Button("OK", role: .cancel) { actionFailure = nil }
         } message: { Text(verbatim: actionFailure ?? "") }
         .fullScreenCover(isPresented: $stageOpen) {
-            ZikrStageView(groupID: group.id, service: service)
+            ZikrStageView(groupID: group.id, groupName: group.name, service: service)
         }
-        // Going live, or opening Our Sheikh while it is live, opens the stage
-        // once per session; closing it leaves the page and its card.
+        // Going live, or opening a Halqah while its Zikr is live, opens the
+        // stage once per session; closing it leaves the page and its card.
         .onChange(of: detail?.live?.sessionID) { _, sessionID in
-            guard group.id == "our-sheikh", detail?.live?.kind == "zikr", let sessionID, room == nil,
+            guard detail?.live?.kind == "zikr", let sessionID, room == nil,
                   !Self.stageOpenedFor.contains(sessionID) else { return }
             Self.stageOpenedFor.insert(sessionID)
             stageOpen = true

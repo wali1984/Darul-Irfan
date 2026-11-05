@@ -2,8 +2,33 @@ import Observation
 import SwiftUI
 
 extension Notification.Name {
-    /// A push for Our Sheikh arrived while the app was open: the stage polls now.
+    /// A push for a Halqah arrived while the app was open: that Halqah's
+    /// stage polls now. The object is the Halqah's id, when the push named one.
     static let halqahStageNudge = Notification.Name("halqahStageNudge")
+}
+
+/// Every Halqah's live Zikr has its stage, led by its own admins (owner,
+/// 2026-11-04). Only a few things stay Our Sheikh's own: Hazrat ji's
+/// photograph on the stage and the words that name him.
+enum HalqahStage {
+    static let ourSheikhID = "our-sheikh"
+
+    static func isOurSheikh(_ groupID: String) -> Bool { groupID == ourSheikhID }
+
+    /// The stage's picture: Hazrat ji's photograph from the live video on Our
+    /// Sheikh's stage only; every other Halqah shows the Silsila's logo there.
+    static func portraitURLs(groupID: String, pictureURL: URL?, pictureHDURL: URL?) -> [URL] {
+        guard isOurSheikh(groupID) else { return [] }
+        return [pictureHDURL, pictureURL].compactMap { $0 }
+    }
+
+    /// The Halqah a push opens ("…/groups/<id>"), so only its stage polls.
+    static func groupID(fromPath path: String?) -> String? {
+        guard let path, let range = path.range(of: "groups/", options: .backwards) else { return nil }
+        let rest = path[range.upperBound...].prefix { $0 != "?" && $0 != "#" }
+        guard let id = rest.split(separator: "/").first.map(String.init), !id.isEmpty else { return nil }
+        return id
+    }
 }
 
 /// Everything the live Zikr stage shows, kept current by one small request
@@ -67,7 +92,7 @@ final class ZikrStageModel {
             let update = try await service.stage(in: groupID, cuesAfter: cueCursor, chatAfter: chatCursor)
             if catalogue == nil || canLead != update.canLead { catalogue = try await service.zikrStages(in: groupID) }
             live = update.live
-            pictureURLs = [update.pictureHDURL, update.pictureURL].compactMap { $0 }
+            pictureURLs = HalqahStage.portraitURLs(groupID: groupID, pictureURL: update.pictureURL, pictureHDURL: update.pictureHDURL)
             canLead = update.canLead
             canModerate = update.canModerate ?? update.canLead
             cues = Self.stageCues(cues, adding: update.cues, hidden: update.hiddenCues ?? [], isLive: update.live != nil)
@@ -271,14 +296,18 @@ final class ZikrStageModel {
     }
 }
 
-/// The live Zikr stage for Our Sheikh: the Silsila's seal, Hazrat ji's
-/// picture (the live video's own frame, a photograph), the stage or
+/// The live Zikr stage of a Halqah (every Halqah, led by its own admins):
+/// the Silsila's seal, the Halqah's name, on Our Sheikh's stage Hazrat ji's
+/// picture (the live video's own frame, a photograph) and on every other
+/// Halqah's the Silsila's logo in its place, the stage or
 /// recitation now in a floating card (in Arabic while he recites), and the
 /// chat. Built to be streamed: always the dark emerald and gold look, alive
 /// with light, and "Presentation" hides the controls from the picture. No
 /// illustrations on the stage (owner, 2026-11-04).
 struct ZikrStageView: View {
     @State private var model: ZikrStageModel
+    /// The Halqah's own name, shown on its stage.
+    let groupName: String
     @State private var presenting = false
     @State private var draft = ""
     @State private var addingMuraqaba = false
@@ -290,9 +319,12 @@ struct ZikrStageView: View {
     @Environment(\.horizontalSizeClass) private var widthClass
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(groupID: String, service: MemberGroupService) {
+    init(groupID: String, groupName: String, service: MemberGroupService) {
+        self.groupName = groupName
         _model = State(initialValue: ZikrStageModel(groupID: groupID, service: service))
     }
+
+    private var ourSheikh: Bool { HalqahStage.isOurSheikh(model.groupID) }
 
     private var urdu: Bool { locale.language.languageCode?.identifier == "ur" }
 
@@ -340,7 +372,9 @@ struct ZikrStageView: View {
                 try? await Task.sleep(for: .seconds(4))
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .halqahStageNudge)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .halqahStageNudge)) { note in
+            // Another Halqah's push leaves this stage alone.
+            if let id = note.object as? String, id != model.groupID { return }
             Task { await model.poll() }
         }
         .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
@@ -415,6 +449,11 @@ struct ZikrStageView: View {
         HStack(spacing: DISpacing.md) {
             StageEmblem(size: presenting ? 92 : 72)
             VStack(alignment: .leading, spacing: 2) {
+                halqahName
+                    .diInterfaceFont(.caption, weight: .semibold)
+                    .foregroundStyle(DIColor.accent)
+                    .lineLimit(1)
+                    .accessibilityIdentifier("stage-halqah-name")
                 Text(verbatim: model.live?.title ?? String(localized: "Online Zikr"))
                     .diInterfaceFont(.title3, weight: .semibold).foregroundStyle(DIColor.onPrimary)
                     .lineLimit(2)
@@ -441,8 +480,13 @@ struct ZikrStageView: View {
         .padding(.trailing, presenting ? 0 : 48)
     }
 
-    /// Hazrat ji's photograph from the live video (kept: it is a photo, not
-    /// an illustration).
+    /// The Halqah's name as its page shows it (Our Sheikh's in Urdu too).
+    private var halqahName: Text {
+        ourSheikh ? Text(LocalizedStringKey(groupName)) : Text(verbatim: groupName)
+    }
+
+    /// Hazrat ji's photograph from the live video on Our Sheikh's stage (kept:
+    /// it is a photo, not an illustration); the logo on every other Halqah's.
     private var portrait: some View {
         StagePortrait(urls: model.pictureURLs)
             .frame(maxWidth: 640)
@@ -563,7 +607,9 @@ struct ZikrStageView: View {
                 .accessibilityIdentifier("stage-add-muraqaba")
             Text("Tap to show it on the stage. Pressing \"Presentation\" hides these controls; double-tap the stage to bring them back.")
                 .diInterfaceFont(.caption).foregroundStyle(DIColor.onPrimary.opacity(0.7))
-            Text("After \"Go Live\", each stage Hazrat ji names is shown by itself, until you stop it. \"Undo\" puts back a wrong one.")
+            Text(ourSheikh
+                 ? LocalizedStringKey("After \"Go Live\", each stage Hazrat ji names is shown by itself, until you stop it. \"Undo\" puts back a wrong one.")
+                 : LocalizedStringKey("After \"Go Live\", each stage named in the Zikr is shown by itself, until you stop it. \"Undo\" puts back a wrong one."))
                 .diInterfaceFont(.caption).foregroundStyle(DIColor.onPrimary.opacity(0.7))
         }
         .padding(DISpacing.md)
@@ -573,7 +619,9 @@ struct ZikrStageView: View {
     private var goLiveButton: some View {
         let live = model.voice == .listening
         return Button { Task { await model.toggleVoice() } } label: {
-            Label(live ? LocalizedStringKey("Live: following Hazrat ji's voice") : LocalizedStringKey("Go Live"),
+            Label(live ? (ourSheikh ? LocalizedStringKey("Live: following Hazrat ji's voice")
+                                    : LocalizedStringKey("Live: following the leader's voice"))
+                       : LocalizedStringKey("Go Live"),
                   systemImage: live ? "waveform" : "dot.radiowaves.left.and.right")
         }
         .buttonStyle(DIPrimaryButtonStyle())
@@ -1051,7 +1099,8 @@ private extension AnyTransition {
     }
 }
 
-/// Hazrat ji's picture: YouTube's full-size frame, else its standard one.
+/// Hazrat ji's picture: YouTube's full-size frame, else its standard one;
+/// the Silsila's logo when there is none (every Halqah but Our Sheikh).
 /// Loaded by hand: YouTube answers a missing full-size frame with a grey
 /// placeholder image and status 404, which AsyncImage would show.
 private struct StagePortrait: View {
@@ -1081,8 +1130,9 @@ private struct StagePortrait: View {
     }
 }
 
-/// On Our Sheikh's page while the Zikr is live: the way into the stage, in
-/// place of the stage controls that used to sit on the page.
+/// On a Halqah's page while its Zikr is live (in a room, a live video or a
+/// recording played from the app): the way into the stage, in place of the
+/// stage controls that used to sit on the page.
 struct StageEntryCard: View {
     let open: () -> Void
 
