@@ -26,7 +26,7 @@ from audio_io import FRAME, RATE, PcmBuffer
 
 LOG_FILE = Path(__file__).with_name("programme.log")
 PICTURE_FPS = 1
-OUTPUT_FPS = 5
+OUTPUT_FPS = 10  # a still picture needs few frames; YouTube's preview needs a steady bitrate, not many
 WIDTH, HEIGHT = 1280, 720
 
 
@@ -111,7 +111,11 @@ class Programme:
             "-map", "0:v", "-map", "1:a",
             "-vf", f"scale={WIDTH}:{HEIGHT}:force_original_aspect_ratio=decrease,pad={WIDTH}:{HEIGHT}:(ow-iw)/2:(oh-ih)/2,fps={OUTPUT_FPS}",
             "-c:v", "libx264", "-preset", "veryfast", "-tune", "stillimage", "-pix_fmt", "yuv420p",
-            "-g", str(OUTPUT_FPS * 2), "-b:v", "500k", "-maxrate", "500k", "-bufsize", "1000k",
+            # Constant 1.5 Mbps with filler: a still picture would otherwise
+            # send ~130 kbps and YouTube never finishes "preparing the stream"
+            # (6 November). Filler bits cost no CPU.
+            "-g", str(OUTPUT_FPS * 2), "-b:v", "1500k", "-minrate", "1500k", "-maxrate", "1500k", "-bufsize", "3000k",
+            "-x264-params", "nal-hrd=cbr:force-cfr=1",
             "-c:a", "aac", "-b:a", "128k", "-ar", "48000",
             *sink,
         ]
