@@ -194,7 +194,8 @@ class YouTube:
         event for tonight). None when there is none."""
         found: list[tuple[int, str, str]] = []
         for status in ("active", "upcoming"):
-            data = self._call("GET", "liveBroadcasts", {"part": "id,snippet,status,contentDetails", "mine": "true",
+            # broadcastStatus already means "mine": the API refuses both together.
+            data = self._call("GET", "liveBroadcasts", {"part": "id,snippet,status,contentDetails",
                                                          "broadcastStatus": status, "maxResults": 20})
             for item in data.get("items", []):
                 details = item.get("contentDetails", {})
