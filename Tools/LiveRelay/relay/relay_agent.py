@@ -57,7 +57,7 @@ PENDING_FOR = 600.0  # seconds an unacknowledged cue is kept for a restart to se
 CLOSE_DUA_EVERY = 10.0  # seconds between tries of the dua after the room closed...
 CLOSE_DUA_FOR = 600.0   # ...and how long before giving up on it
 TOKEN_REFUSED = "the platform refused the relay token"
-START_VOICE = 5.0    # seconds of sound in the room that start the platform's Zikr
+START_VOICE = 5.0    # (kept for tests) seconds of sound; the Zikr now starts on joining the open room
 DUA_AFTER = {"masjid-nabawi", "shajra"}  # stages after which members' "aameen" means the dua
 AMEEN = re.compile(r"\b(aa?mee?n|ameen|amin|aameen)\b|آمین|آمِین|امین", re.IGNORECASE)
 # Opening recitations come from the room's sound only: a host's "Astaghfirullah"
@@ -739,13 +739,12 @@ class Relay:
         self.close_dua_given_up = False
 
     async def _track_on_air(self) -> None:
-        """The platform's Zikr starts when the relay is in the room and the
-        room has been heard for START_VOICE seconds (owner: the mic opening
-        is the start; the tasbih may follow seconds or minutes later) - not
-        merely when the room opens, because Our Sheikh can sit open and
-        silent for hours before the Tahajjud. A host's cue also starts it
-        (see _send_cue). After a dua in a room left open, a new Zikr needs
-        20 minutes and longer sound."""
+        """The platform's Zikr starts the moment the relay is in the open
+        room (owner, 2026-11-06 evening: listeners, YouTube and the websites
+        must open when Our Sheikh opens on Paltalk, not at the first sound).
+        A host's cue also starts it (see _send_cue). After a dua in a room
+        left open, a new Zikr still needs 20 minutes and some sound, so the
+        dua's tail cannot start another."""
         if not (self.joined and self.has_lease and self.platform_cues) or self.mode == "app":
             return
         if self.platform_is_live or self.platform_live:
@@ -756,9 +755,9 @@ class Relay:
                 return
             log("someone took the mic in the open room: a new Zikr")
             self._clear_dua()
-        elif heard < START_VOICE:
+            await self._start_now(f"{heard:.0f} s of sound in the open room after the dua")
             return
-        await self._start_now(f"{heard:.0f} s of sound in the room")
+        await self._start_now("the room is open")
 
     async def _start_now(self, why: str) -> None:
         """Starts the Halqah's Zikr on the platform (or finds it live)."""

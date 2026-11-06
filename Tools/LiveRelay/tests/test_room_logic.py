@@ -295,7 +295,7 @@ check("aameen mid-Zikr is not the dua", "dua" not in calls["cues"], f"cues={call
 # 12. Start: an open, silent room does not start the Zikr; sound for START_VOICE does.
 relay, calls, clock = build([IN] * 6)
 run(relay)
-check("open silent room: no start", calls["start"] == 0, f"starts={calls['start']}")
+check("an open room starts the Zikr at once, once", calls["start"] == 1, f"starts={calls['start']}")
 relay, calls, clock = build([IN] * 8)
 
 
@@ -311,7 +311,7 @@ class Loud(_Buffer):
 
 relay.room_audio = Loud()
 run(relay)
-check("sound in the room starts the Zikr once", calls["start"] == 1, f"starts={calls['start']}")
+check("sound in the room changes nothing: still one start", calls["start"] == 1, f"starts={calls['start']}")
 
 ra.DUA_FILE.unlink(missing_ok=True)
 ra.PENDING_FILE.unlink(missing_ok=True)
