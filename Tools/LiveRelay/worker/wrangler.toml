@@ -29,12 +29,15 @@ enabled = true
 
 # Secrets (`wrangler secret put`):
 # SFU_APP_ID, SFU_APP_TOKEN - the Realtime SFU app "darul-irfan-zikr"
-# HOST_KEY   - host test page (stands in for the app's broadcaster)
+# HOST_KEY   - host test page (stands in for the app's broadcaster); also
+#              signs the app keys and the SFU session tokens (x-live-session)
 # RELAY_KEY  - the Windows relay
 # LISTEN_KEY - listener test page
 
 # The platform, reached directly (a Worker cannot fetch another workers.dev
-# Worker of the same account over the public URL).
+# Worker of the same account over the public URL). The Control object also
+# asks it GET /v1/public/live?ids=HALQAH_ID: the Zikr session is the
+# platform's, this Worker only mirrors it.
 [[services]]
 binding = "PLATFORM"
 service = "darul-irfan-platform"

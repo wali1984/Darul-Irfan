@@ -2,3 +2,5 @@ relay.env
 relay.log
 paltalk_controls.txt
 __pycache__/
+pending_cues.json
+pending_cues.json.tmp

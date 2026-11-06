@@ -59,10 +59,9 @@
     <div class="row" style="margin-top:12px">
       <label class="sub" style="margin:0">Source</label>
       <select id="override"><option value="auto">Automatic</option><option value="app">App only</option><option value="paltalk">Paltalk only</option></select>
-      <button id="start">Start session</button>
-      <button class="danger" id="end">End session</button>
       <button id="reset">Reset (staging)</button>
     </div>
+    <p class="sub" style="margin:10px 0 0">The Zikr session starts and ends on the platform (the app's stage controls); this page only shows it.</p>
   </section>
 
   <section class="operator">
@@ -74,8 +73,10 @@
 <script>
   const CUES = ["1st Latifa", "2nd", "3rd", "4th", "5th", "6th", "7th", "Ahdiat", "Maeiat", "Akrabiat", "M-Nabvee"];
   const $ = (id) => document.getElementById(id);
-  let live = null; // { pc, sessionId, trackName, stream, beat, startedAt, meter }
+  let live = null; // { pc, sessionId, sessionToken, trackName, stream, beat, meter }
   let state = null;
+  // Everything the server relays (stage names, relay ids, problems) is text.
+  function esc(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
   $("keySave").onclick = () => { Live.setKey($("keyInput").value); location.reload(); };
 
@@ -88,8 +89,11 @@
   $("sendCustom").onclick = () => { const v = $("custom").value.trim(); if (v) { sendStage(v); $("custom").value = ""; } };
 
   async function sendStage(stage) {
+    // The cue names the session this page last saw, so one meant for an
+    // earlier session is refused rather than logged under the next.
+    const sessionId = state && state.session && state.session.id || undefined;
     try {
-      const r = await Live.api("POST", "/api/stage", { stage, origin: "app" });
+      const r = await Live.api("POST", "/api/stage", { stage, origin: "app", sessionId });
       if (r.duplicate) note(`"${stage}" was already sent`);
     } catch (e) { note(e.message, true); }
   }
@@ -99,7 +103,7 @@
   async function heartbeat() {
     if (!live) return;
     try {
-      await Live.api("POST", "/api/source", { source: "app", sessionId: live.sessionId, trackName: live.trackName, startedAt: live.startedAt, by: navigator.userAgent.includes("Mobile") ? "phone" : "computer" });
+      await Live.api("POST", "/api/source", { source: "app", sessionId: live.sessionId, trackName: live.trackName, by: navigator.userAgent.includes("Mobile") ? "phone" : "computer" });
     } catch (e) {
       if (e.data && e.data.superseded) { note(Live.t("Another device has gone live; this one stopped."), true); stop(false); }
       else note("Heartbeat failed: " + e.message, true);
@@ -113,7 +117,7 @@
       const track = stream.getAudioTracks()[0];
       const trackName = "app-" + Math.random().toString(36).slice(2, 10);
       const published = await Live.publish(track, trackName);
-      live = { ...published, stream, startedAt: Date.now() };
+      live = { ...published, stream };
       live.meter = levelMeter(stream);
       await heartbeat();
       live.beat = setInterval(heartbeat, 3000);
@@ -158,9 +162,7 @@
   }
 
   $("override").onchange = async (e) => { try { await Live.api("POST", "/api/override", { source: e.target.value }); } catch (err) { note(err.message, true); } };
-  $("start").onclick = () => Live.api("POST", "/api/session", { action: "start" }).catch((e) => note(e.message, true));
-  $("end").onclick = () => { if (confirm("End the session for everyone?")) Live.api("POST", "/api/session", { action: "end" }).catch((e) => note(e.message, true)); };
-  $("reset").onclick = () => { if (confirm("Clear all staging state?")) Live.api("POST", "/api/reset").catch((e) => note(e.message, true)); };
+  $("reset").onclick = () => { if (confirm("Clear the sources, override, stages and relay lease? (The session itself stays as the platform has it.)")) Live.api("POST", "/api/reset").catch((e) => note(e.message, true)); };
 
   const SOURCE_NAMES = { app: "Darul Irfan app", paltalk: "Paltalk room" };
   function render() {
@@ -174,24 +176,26 @@
     const now = Date.now();
     const skew = state.now - now;
     const s = state;
+    const p = s.platform || {};
     const rows = [
-      ["Session", `${s.session.state}${s.session.startedAt ? " · " + Live.ago(now + skew - s.session.startedAt) : ""}`],
-      ["On air", s.active.source ? `<span class="ok">${SOURCE_NAMES[s.active.source]}</span>` : `<span class="bad">nothing</span>`],
-      ["App source", s.sources.app ? `${s.sources.app.by} · ${s.sources.app.fresh ? '<span class="ok">alive</span>' : '<span class="bad">stale</span>'}` : "—"],
+      ["Session", `${esc(s.session.state)}${s.session.startedAt ? " · " + Live.ago(now + skew - s.session.startedAt) : ""}${s.session.id ? " · " + esc(s.session.id) : ""}`],
+      ["Platform", `${p.live ? '<span class="ok">live</span>' : "not live"}${p.isTest ? " · test" : ""}${p.title ? " · " + esc(p.title) : ""}${p.ok ? "" : ' · <span class="bad">unreachable, showing the last answer</span>'}`],
+      ["On air", s.active.source ? `<span class="ok">${esc(SOURCE_NAMES[s.active.source])}</span>` : `<span class="bad">nothing</span>`],
+      ["App source", s.sources.app ? `${esc(s.sources.app.by)} · ${s.sources.app.fresh ? '<span class="ok">alive</span>' : '<span class="bad">stale</span>'}` : "—"],
       ["Paltalk source", s.sources.paltalk ? (s.sources.paltalk.fresh ? '<span class="ok">alive</span>' : '<span class="bad">stale</span>') : "—"],
-      ["Relay", s.lease && s.lease.valid ? `<span class="ok">${s.lease.relayId}</span>` : '<span class="bad">no relay</span>'],
+      ["Relay", s.lease && s.lease.valid ? `<span class="ok">${esc(s.lease.relayId)}</span>` : '<span class="bad">no relay</span>'],
     ];
     const r = s.relay && s.relay.status || {};
     if (s.relay) {
-      rows.push(["Relay mode", r.mode || "—"]);
+      rows.push(["Relay mode", esc(r.mode || "—")]);
       rows.push(["Paltalk", [r.paltalk ? "running" : "not running", r.joined ? "in room" : "not in room", r.micHeld ? "mic held" : "mic free"].join(" · ")]);
-      rows.push(["YouTube", r.youtube || "off"]);
+      rows.push(["YouTube", esc(r.youtube || "off")]);
       rows.push(["Last relay report", s.relay.fresh ? '<span class="ok">just now</span>' : '<span class="bad">' + Live.ago(now + skew - s.relay.lastSeen) + " ago</span>"]);
-      if (r.problem) rows.push(["Problem", `<span class="bad">${r.problem}</span>`]);
+      if (r.problem) rows.push(["Problem", `<span class="bad">${esc(r.problem)}</span>`]);
     }
     $("status").innerHTML = rows.map(([k, v]) => `<div>${k}</div><div>${v}</div>`).join("");
     $("override").value = s.override;
-    $("log").innerHTML = s.stages.slice().reverse().map((e) => `<div><b class="gold">${e.stage}</b> · from ${e.origin} · ${new Date(e.at).toLocaleTimeString()}</div>`).join("") || "<div>No cues yet</div>";
+    $("log").innerHTML = s.stages.slice().reverse().map((e) => `<div><b class="gold">${esc(e.stage)}</b> · from ${esc(e.origin)} · ${new Date(e.at).toLocaleTimeString()}</div>`).join("") || "<div>No cues yet</div>";
   }
   setInterval(render, 1000);
 

@@ -15,6 +15,7 @@ Settings: relay.env beside this file (see relay.env.example).
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import queue
 import re
@@ -29,6 +30,7 @@ import psutil
 
 HERE = Path(__file__).resolve().parent
 DUA_FILE = HERE / "dua_given.txt"  # when the last dua was given, kept across restarts
+PENDING_FILE = HERE / "pending_cues.json"  # cues the platform has not acknowledged yet, kept across restarts
 sys.path.insert(0, str(HERE))
 
 import paltalk_ui as pt  # noqa: E402
@@ -44,6 +46,13 @@ LEAVE_AFTER = 20.0   # seconds of a clear "no room open" before the relay has le
 SPEAKER_TRIES = 2    # unconfirmed speaker presses before the relay stops pressing (then: one rejoin)
 REJOIN_AFTER = 600.0  # seconds in a room whose speaker cannot be switched on before leaving and rejoining it
 REJOIN_EVERY = 1200.0  # at most one such rejoin this often
+LEASE_MARGIN = 3.0   # seconds taken off the Worker's lease deadline: the network, and the two clocks
+LEASE_FALLBACK = 20.0  # the Worker's lease length, for a reply that does not say when it ends
+CUE_BACKOFF = (2, 4, 8, 16, 30)  # seconds between the six tries of a cue the platform did not take
+PENDING_FOR = 600.0  # seconds an unacknowledged cue is kept for a restart to send again
+CLOSE_DUA_EVERY = 10.0  # seconds between tries of the dua after the room closed...
+CLOSE_DUA_FOR = 600.0   # ...and how long before giving up on it
+TOKEN_REFUSED = "the platform refused the relay token"
 START_VOICE = 5.0    # seconds of sound in the room that start the platform's Zikr
 DUA_AFTER = {"masjid-nabawi", "shajra"}  # stages after which members' "aameen" means the dua
 AMEEN = re.compile(r"\b(aa?mee?n|ameen|amin|aameen)\b|آمین|آمِین|امین", re.IGNORECASE)
@@ -97,7 +106,14 @@ class Relay:
         self.mic_name = cfg.get("MIC_DEVICE", "Hi-Fi Cable Input")
         self.track_name = f"paltalk-{self.id}"
 
-        self.lease = False
+        self.lease = False          # granted by the Worker (for reporting); has_lease says whether it still holds
+        self.lease_until = 0.0      # when it ends, ms epoch on the Worker's clock
+        self.lease_deadline = 0.0   # the same on this machine's monotonic clock, less LEASE_MARGIN
+        self.lease_error = ""
+        # Steps when the lease, the room or the platform's session is lost:
+        # work queued before (a typed cue waiting, a retry asleep, a picker
+        # reading) belongs to that generation and must not reach the platform.
+        self.generation = 0
         self.state: dict = {}
         self.joined: str | None = None
         self.problem: str | None = None
@@ -129,7 +145,13 @@ class Relay:
         self.out_since: float | None = None
         self.unknown_since: float | None = None
         self.first_closed_at: float | None = None
-        self.close_dua_sent = False
+        self.close_dua_sent = False      # the platform has the dua for the closed room (never before it says so)
+        self.close_generation = 0        # the generation the closing was seen in
+        self.close_dua_tries = 0
+        self.close_dua_next = 0.0        # no try before this
+        self.close_dua_first = 0.0       # when the first try was made
+        self.close_dua_given_up = False
+        self.dua_status = 0              # the platform's last answer to the dua
         # The room's speaker: True on, False muted, None not readable.
         self.speaker_state: bool | None = None
         self.speaker_due = 0.0
@@ -142,7 +164,16 @@ class Relay:
         self.dua_shown = False
         self.health_at = 0.0
         self.prompt_checked_at = 0.0
-        self.lease_failing_since: float | None = None
+        # A refused token, a dua the platform never took: shown as the
+        # problem until a write to the platform succeeds again.
+        self.platform_problem: str | None = None
+        # Cues the platform has not acknowledged (cue id -> the cue), on disk
+        # too, so a restart can send them again; `sending` are those being
+        # tried right now.
+        self.pending: dict[str, dict] = self._load_pending()
+        self.sending: set[str] = set()
+        self.pending_replayed = False
+        self.dua_task: asyncio.Task | None = None  # the "dua" cue on its way to the platform
         # PUBLISH_AUDIO=0: tests in other rooms never reach listeners.
         self.publish_audio = cfg.get("PUBLISH_AUDIO", "1") != "0"
         try:
@@ -178,7 +209,12 @@ class Relay:
         self.heard_at: dict[str, float] = {}  # stage -> when the picker gave it
         self.loop: asyncio.AbstractEventLoop | None = None
         self.picker = None
-        self.picker_audio: queue.SimpleQueue = queue.SimpleQueue()
+        # A second of 20 ms blocks: when the picker falls behind, the oldest
+        # block goes rather than the delay growing without end.
+        self.picker_audio: queue.Queue = queue.Queue(maxsize=50)
+        self.picker_drops = 0
+        self.picker_drops_logged = 0
+        self.picker_drops_logged_at = 0.0
         if self.platform_cues and cfg.get("AUDIO_PICKER", "1") != "0":
             from audio_picker import Picker  # loads Whisper on the first call
             self.picker = Picker(self._picked, lambda: self.platform_stage, model_name=cfg.get("PICKER_MODEL", "base"))
@@ -186,26 +222,134 @@ class Relay:
 
     # MARK: - Worker
 
+    @property
+    def has_lease(self) -> bool:
+        """Whether this relay may act now: the Worker granted the lease and,
+        by the Worker's own deadline, it has not run out."""
+        return self.lease and time.monotonic() < self.lease_deadline
+
     async def keep_lease(self) -> None:
-        """The Worker's lease (20 s) says which relay acts. A failed call is
-        a network blip, not a lost lease: the relay keeps acting for 15 s of
-        failures (the lease itself lasts 20 s) instead of dropping the
-        listeners' sound at the first one."""
+        """The Worker's lease (20 s) says which relay acts, and the Worker's
+        clock says how long it lasts: a failed call extends nothing. Past
+        the deadline (less a margin) has_lease is False and every side
+        effect stops, since another relay may hold the lease by then."""
         while True:
-            try:
-                result = await self.worker.call("POST", "/api/lease", {"relayId": self.id})
-                if result["granted"] != self.lease:
-                    log("holding the lease" if result["granted"] else f"standby: lease held by {result.get('holder')}")
-                self.lease = result["granted"]
-                self.lease_failing_since = None
-            except Exception as error:  # noqa: BLE001 - the network; next round
-                self.lease_failing_since = self.lease_failing_since or time.time()
-                if self.lease and time.time() - self.lease_failing_since > 15:
-                    log(f"lease lost: the Worker has not answered for 15 s ({error})")
-                    self.lease = False
-                elif self.lease:
-                    log(f"lease call failed (keeping it for now): {error}")
+            await self._lease_round()
             await asyncio.sleep(5)
+
+    async def _lease_round(self) -> None:
+        try:
+            result = await self.worker.call("POST", "/api/lease", {"relayId": self.id})
+            if result["granted"]:
+                until = float(result.get("until") or 0)
+                now_ms = float((result.get("state") or {}).get("now") or time.time() * 1000)
+                left = (until - now_ms) / 1000 if until else LEASE_FALLBACK
+                self.lease_until = until
+                self.lease_deadline = time.monotonic() + left - LEASE_MARGIN
+                if not self.lease:
+                    log("holding the lease")
+                self.lease = True
+            elif self.lease:
+                self._lease_lost(f"lease held by {result.get('holder')}")
+            self.lease_error = ""
+        except Exception as error:  # noqa: BLE001 - the network; next round
+            self.lease_error = str(error)
+            if self.lease:
+                log(f"lease call failed (it holds until its deadline): {error}")
+        if self.lease and time.monotonic() >= self.lease_deadline:
+            self._lease_lost(f"lease expired: the Worker has not renewed it ({self.lease_error or 'no answer'})")
+
+    def _lease_lost(self, why: str) -> None:
+        log(f"standby: {why}")
+        self.lease = False
+        self.generation += 1
+
+    # MARK: - Cues the platform has not acknowledged yet
+
+    def _load_pending(self) -> dict[str, dict]:
+        try:
+            cues = json.loads(PENDING_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+        now = time.time()
+        return {i: c for i, c in cues.items() if isinstance(c, dict) and now - c.get("created_at", 0) <= PENDING_FOR}
+
+    def _save_pending(self) -> None:
+        """pending_cues.json, whole or not at all: written beside it and then
+        put in its place, so a crash mid-write cannot leave half a file."""
+        now = time.time()
+        self.pending = {i: c for i, c in self.pending.items() if now - c["created_at"] <= PENDING_FOR}
+        tmp = PENDING_FILE.with_suffix(".json.tmp")
+        try:
+            if not self.pending:
+                PENDING_FILE.unlink(missing_ok=True)
+                return
+            tmp.write_text(json.dumps(self.pending), encoding="utf-8")
+            os.replace(tmp, PENDING_FILE)
+        except OSError as error:
+            log(f"pending cues not saved: {error}")
+
+    def _remember_cue(self, cue_id: str, stage: str, text: str, created_at: float, generation: int) -> None:
+        self.pending[cue_id] = {"cue_id": cue_id, "stage": stage, "text": text, "created_at": created_at, "generation": generation}
+        self._save_pending()
+
+    def _forget_cue(self, cue_id: str) -> None:
+        if self.pending.pop(cue_id, None) is not None:
+            self._save_pending()
+
+    def _forget_stage(self, stage: str) -> None:
+        """The platform has a cue for `stage` now: older ones for it that it
+        never took are moot (sent after a restart, they would double it)."""
+        for cue_id, cue in list(self.pending.items()):
+            if cue["stage"] == stage and cue_id not in self.sending:
+                self._forget_cue(cue_id)
+
+    def _being_sent(self, stage: str) -> bool:
+        """Whether a cue for `stage` is being tried right now."""
+        return any(cue["stage"] == stage for cue_id, cue in self.pending.items() if cue_id in self.sending)
+
+    def _replay_pending(self) -> None:
+        """Cues the last run never got acknowledged: sent again, with their
+        ids (the platform dedups), under this run's generation, once the
+        platform is live and this relay holds the lease and is in the room.
+        Older than PENDING_FOR they are dropped: the Zikr has moved on."""
+        self.pending_replayed = True
+        now = time.time()
+        for cue_id, cue in list(self.pending.items()):
+            if now - cue["created_at"] > PENDING_FOR:
+                self._forget_cue(cue_id)
+                continue
+            log(f"cue {cue['stage']} from before the restart: sending it again")
+            asyncio.ensure_future(self._replay_one(cue_id, cue))
+
+    async def _replay_one(self, cue_id: str, cue: dict) -> None:
+        ok = await self._send_cue(cue["stage"], cue["text"], self.generation, cue_id, cue["created_at"])
+        if ok and cue["stage"] == "dua":
+            self.dua_shown = True
+
+    def _stale(self, generation: int) -> str | None:
+        """Why work made at `generation` must not reach the platform now, or
+        None: it is still this generation, and the relay holds the lease and
+        is in the room."""
+        if generation != self.generation:
+            return f"generation {generation} is over ({self.generation} now)"
+        if not self.has_lease:
+            return "no lease"
+        if not self.joined:
+            return "not in the room"
+        return None
+
+    def _token_refused(self, what: str) -> None:
+        """401/403: the platform refuses the relay's token. Said once; shown
+        as the problem until a write to the platform succeeds again."""
+        if self.platform_problem != TOKEN_REFUSED:
+            log(f"{what}: {TOKEN_REFUSED} (401/403); check PLATFORM_CUE_TOKEN")
+        self.platform_problem = self.problem = TOKEN_REFUSED
+
+    def _platform_answered(self) -> None:
+        if self.platform_problem:
+            log("the platform takes the relay's writes again")
+            self.platform_problem = None
 
     async def follow_state(self) -> None:
         while True:
@@ -281,6 +425,7 @@ class Relay:
                 # a moment before Paltalk's "not open" (6 November 12:52).
                 if not self.joined and self.in_streak >= 2:
                     self.first_closed_at = None
+                    self._forget_close()
                     self._entered(detail, view)
             elif status == "closed":
                 self.unknown_since = None
@@ -298,7 +443,7 @@ class Relay:
                 if now - self.unknown_since > 120:
                     problem = problem or f"cannot read Paltalk's window for 2 minutes ({detail})"
                 if detail.startswith("the room's tab is open") and now - self.unknown_since > 30 \
-                        and now - self.last_join_try > 120 and self.lease:
+                        and now - self.last_join_try > 120 and self.has_lease:
                     # Joined, but another page is in front: bring the room back.
                     self.last_join_try = now
                     await asyncio.to_thread(pt.try_join, self.room, self.cfg.get("PALTALK_ROOM_LINK") or None)
@@ -313,7 +458,7 @@ class Relay:
                     # look every two minutes (a Zikr's first minutes matter more
                     # than the moment it takes to close Paltalk's notice).
                     wait = 60 if self.join_tries < 3 else 120
-                    if self.lease and self.room and now - self.last_join_try > wait:
+                    if self.has_lease and self.room and now - self.last_join_try > wait:
                         self.last_join_try = now
                         self.join_tries += 1
                         await asyncio.to_thread(pt.try_join, self.room, self.cfg.get("PALTALK_ROOM_LINK") or None)
@@ -341,16 +486,21 @@ class Relay:
             else:
                 self.voice_since = None
 
+            if status in ("out", "unknown") and self.close_dua_tries and self.first_closed_at is not None:
+                # A dua the platform did not take is tried again, whatever
+                # Paltalk shows meanwhile.
+                await self._room_closed(now)
+
             if self.joined and view is not None and view.ok:
                 if now >= self.speaker_due:
                     await self._check_speaker(view)
-                if self.lease:
+                if self.has_lease:
                     await self._read_chat(view)
             if self.joined and self.speaker_tries >= SPEAKER_TRIES and self.speaker_state is not True:
                 problem = problem or "the room's speaker could not be switched on (Paltalk may not have drawn the room)"
                 await self._recover_room(now)
             await self._track_on_air()
-            self.problem = problem
+            self.problem = problem or self.platform_problem
             self._health(now)
             await asyncio.sleep(2)
 
@@ -379,6 +529,7 @@ class Relay:
         self.left_room_at = time.time()
         self.out_since = None
         self.speaker_state = None
+        self.generation += 1  # cues heard or typed in the room are over with it
 
     async def _check_speaker(self, view) -> None:  # noqa: ANN001
         """The room's speaker, from its icon. Off: press it once, look again,
@@ -465,7 +616,7 @@ class Relay:
                 continue  # the same cue again (a redraw, or a repeat)
             self.cues_done.add(stage)
             log(f"cue from {sender}: {text[:60]!r} -> {stage}")
-            asyncio.ensure_future(self._typed_cue(stage, text))
+            asyncio.ensure_future(self._typed_cue(stage, text, self.generation))
         for sender, text in fresh:
             if sender.lower() in self.cue_hosts and not (is_dua(text) or typed_stage(text)):
                 log(f"host {sender}: {text[:60]!r} (not a cue)")
@@ -475,27 +626,62 @@ class Relay:
             await self._show_dua(f"{len(self.ameens)} aameen from {len(senders)} members after {self.platform_stage}")
 
     async def _show_dua(self, why: str) -> None:
-        """The dua has begun: the stage shows it (a "dua" cue). The session is
-        not ended here - it ends five minutes after the room closes - so app
-        listeners hear the whole dua."""
+        """The dua has begun: the stage shows it (a "dua" cue), and dua_shown
+        says so only once the platform has the cue - not on the try (on
+        6 November a flag set on the try hid the dua from the apps for good
+        when the platform refused the cue). The session is not ended here -
+        it ends five minutes after the room closes - so app listeners hear
+        the whole dua."""
         if self.dua_shown or not self.platform_is_live:
             return
-        self.dua_shown = True
+        if self.dua_task and not self.dua_task.done():
+            return  # on its way already (more aameen while the platform is slow)
         log(f"dua begins ({why})")
-        await self._send_cue("dua", "dua")
+        self.dua_task = asyncio.ensure_future(self._dua_cue(self.generation))
+
+    async def _dua_cue(self, generation: int) -> None:
+        if await self._send_cue("dua", "dua", generation):
+            self.dua_shown = True
 
     async def _room_closed(self, now: float) -> None:
         """Paltalk says the room is not open. Seen twice, a join attempt
         apart, while a Zikr is live: the Zikr is over - send the dua (the
-        platform ends the session five minutes later)."""
+        platform ends the session five minutes later). close_dua_sent is set
+        only when the platform has taken it: a try the network or the
+        platform failed is made again CLOSE_DUA_EVERY seconds later, for
+        CLOSE_DUA_FOR seconds at most (6 November: a failed try counted as
+        sent, and the session was never ended)."""
         if self.first_closed_at is None:
             self.first_closed_at = now
+            self.close_generation = self.generation
             return
-        if now - self.first_closed_at < 45 or self.close_dua_sent:
+        if now - self.first_closed_at < 45 or self.close_dua_sent or self.close_dua_given_up or now < self.close_dua_next:
             return
-        if self.lease and self.platform_cues and self.mode != "app" and (self.platform_is_live or self.platform_live):
+        if not (self.has_lease and self.platform_cues and self.mode != "app" and (self.platform_is_live or self.platform_live)):
+            return
+        if self.generation != self.close_generation:
+            # The lease or the session went since the closing was seen: a
+            # dua now would end a session this relay does not know.
+            log(f"close dua dropped (stale: generation {self.close_generation} is over ({self.generation} now))")
+            self.first_closed_at = None
+            self._forget_close()
+            return
+        self.close_dua_first = self.close_dua_first or now
+        if await self._dua("the room closed"):
             self.close_dua_sent = True
-            await self._dua("the room closed")
+            return
+        self.close_dua_tries += 1
+        self.close_dua_next = now + CLOSE_DUA_EVERY
+        if self.dua_status in (401, 403, 404) or now - self.close_dua_first >= CLOSE_DUA_FOR:
+            self.close_dua_given_up = True
+            if self.dua_status not in (401, 403):  # those have said what is wrong: the token
+                self.platform_problem = f"the room closed but the platform did not take the dua ({self.dua_status} after {self.close_dua_tries} tries)"
+            log(f"close dua given up: {self.platform_problem}")
+
+    def _forget_close(self) -> None:
+        self.close_dua_tries = 0
+        self.close_dua_next = self.close_dua_first = 0.0
+        self.close_dua_given_up = False
 
     async def _track_on_air(self) -> None:
         """The platform's Zikr starts when the relay is in the room and the
@@ -505,7 +691,7 @@ class Relay:
         silent for hours before the Tahajjud. A host's cue also starts it
         (see _send_cue). After a dua in a room left open, a new Zikr needs
         20 minutes and longer sound."""
-        if not (self.joined and self.lease and self.platform_cues) or self.mode == "app":
+        if not (self.joined and self.has_lease and self.platform_cues) or self.mode == "app":
             return
         if self.platform_is_live or self.platform_live:
             return
@@ -533,11 +719,16 @@ class Relay:
         else:
             log(f"platform Zikr not started ({status}): {body}")
 
-    async def _dua(self, why: str) -> None:
+    async def _dua(self, why: str) -> bool:
+        """Tells the platform the dua has begun (it ends the session five
+        minutes later). True when the platform has it - or has no live Zikr
+        to end (409), which for a closing is the same thing; False when the
+        network or the platform failed, for the caller to try again."""
         if not self.platform_cues:
-            return
+            return False
         status, body = await asyncio.to_thread(self.platform_cues.dua)
         log(f"dua on the platform ({why}): {status} {body}")
+        self.dua_status = status
         if status in (200, 201, 409):
             self.platform_live = False
             self.dua_given = True
@@ -546,6 +737,12 @@ class Relay:
                 DUA_FILE.write_text(str(self.dua_at))
             except OSError:
                 pass
+            if status != 409:
+                self._platform_answered()
+            return True
+        if status in (401, 403):
+            self._token_refused("the dua")
+        return False
 
     def _clear_dua(self) -> None:
         self.dua_given = False
@@ -553,12 +750,15 @@ class Relay:
         DUA_FILE.unlink(missing_ok=True)
 
     def _new_session(self, live: bool) -> None:
-        """The platform's Zikr began or ended: forget the last one's cues."""
+        """The platform's Zikr began or ended: forget the last one's cues,
+        and let none of its queued work through (a new generation)."""
+        self.generation += 1
         self.cues_done.clear()
         self.ameens.clear()
         self.dua_shown = False
         self.close_dua_sent = False
         self.first_closed_at = None
+        self._forget_close()
         if not live:
             self.platform_live = False
         if self.picker:
@@ -574,19 +774,26 @@ class Relay:
         speaker = {True: "on", False: "OFF", None: "unknown"}[self.speaker_state]
         log(f"[health] room={self.room_status} speaker={speaker} last-sound={'never' if sound > 1e8 else f'{sound:.0f}s'} "
             f"publishing={'yes' if self.pub_pc is not None else 'no'} platform={'live' if self.platform_is_live else 'off'} "
+            f"lease={'held' if self.has_lease else 'no'} gen={self.generation} pending={len(self.pending)} "
             f"stage={self.platform_stage} dua={'shown' if self.dua_shown else 'no'} "
             f"youtube={self.programme.state if self.programme else '-'} cpu={psutil.cpu_percent():.0f}% "
             f"read={self.walk_seconds:.1f}s problem={self.problem or '-'}")
 
-    async def _send_cue(self, stage: str, text: str) -> None:
-        """To the platform's cue list (the one source of truth), keeping one
-        id across retries; also to the staging test page's log."""
+    async def _send_cue(self, stage: str, text: str, generation: int | None = None,
+                        cue_id: str | None = None, created_at: float | None = None) -> bool:
+        """To the platform's cue list (the one source of truth); also to the
+        staging test page's log. True only once the platform answered 200
+        or 201 - the cue is on the platform - so a caller moves its own
+        state (the stage, the dua) on that alone. One id across the tries
+        (the platform dedups), CUE_BACKOFF between tries the network, a 429
+        or a 5xx failed; 401/403 (the token) and 404 stop it; and it is
+        dropped unposted once its generation, the lease or the room is gone."""
         try:
             await self.worker.call("POST", "/api/stage", {"stage": text[:80], "origin": "paltalk"})
         except Exception:  # noqa: BLE001 - the staging log is only for the test page
             pass
         if not self.platform_cues:
-            return
+            return False
         if stage != "dua" and self.dua_shown:
             if not text.startswith("heard:"):
                 # A host's typed cue after the dua was shown: the dua was not
@@ -595,17 +802,36 @@ class Relay:
                 self.dua_shown = False
             else:
                 log(f"[picker] {stage} ignored: the dua is on")
-                return
-        cue_id = str(uuid.uuid4())
+                return False
+        generation = self.generation if generation is None else generation
+        cue_id = cue_id or str(uuid.uuid4())
+        self._remember_cue(cue_id, stage, text, created_at or time.time(), generation)
+        self.sending.add(cue_id)
+        try:
+            return await self._post_cue(stage, cue_id, generation)
+        finally:
+            self.sending.discard(cue_id)
+
+    async def _post_cue(self, stage: str, cue_id: str, generation: int) -> bool:
         self.last_cue_from_room = time.time()
-        for attempt in range(6):
+        why = ""
+        for attempt in range(len(CUE_BACKOFF) + 1):
+            stale = self._stale(generation)
+            if stale:
+                log(f"cue {stage} dropped (stale: {stale})")
+                self._forget_cue(cue_id)
+                return False
             status, why = await asyncio.to_thread(self.platform_cues.post, stage, cue_id)
             if status in (200, 201):
-                log(f"cue {stage} on the platform")
-                return
+                log(f"cue {stage} on the platform{f' (try {attempt + 1})' if attempt else ''}")
+                self._forget_cue(cue_id)
+                self._forget_stage(stage)
+                self._platform_answered()
+                return True
             if status == 409 and stage == "dua":
                 log("dua cue: no Zikr live on the platform")
-                return
+                self._forget_cue(cue_id)
+                return False
             if status == 409 and attempt == 0 and time.time() - self.dua_at > 600:
                 # A host's cue means Zikr is on, though the platform has none
                 # live (the room opened early, or stayed open after a dua).
@@ -614,12 +840,24 @@ class Relay:
                 self.platform_live = False
                 self.last_start_try = 0.0
                 await self._start_now(f"a cue ({stage})")
+                if self.platform_live:
+                    generation = self.generation  # this cue began the session: it is not stale to it
                 continue
-            if status in (401, 404, 409):
-                log(f"cue {stage} refused by the platform: {why}")
-                return
-            await asyncio.sleep(5)
-        log(f"cue {stage} not delivered: {why}")
+            if status in (401, 403):
+                self._token_refused(f"cue {stage}")
+                self._forget_cue(cue_id)
+                return False
+            if status in (404, 409):
+                log(f"cue {stage} refused by the platform ({status}): {why}")
+                self._forget_cue(cue_id)
+                return False
+            if attempt == len(CUE_BACKOFF):
+                break
+            # 0 (the network), 429, a 5xx: the platform may take it in a moment.
+            log(f"cue {stage} not taken ({status} {why}): again in {CUE_BACKOFF[attempt]} s")
+            await asyncio.sleep(CUE_BACKOFF[attempt])
+        log(f"cue {stage} not delivered in {len(CUE_BACKOFF) + 1} tries ({why}); kept for a restart to send")
+        return False
 
     # MARK: - Room audio -> SFU
 
@@ -630,7 +868,7 @@ class Relay:
         while True:
             # Without the platform (sound-only tests) the room is sent whenever the relay is in it.
             live = (self.platform_is_live or self.platform_live) if self.platform_cues else True
-            want = self.publish_audio and self.lease and bool(self.joined) and self.mode != "app" and live
+            want = self.publish_audio and self.has_lease and bool(self.joined) and self.mode != "app" and live
             if want and self.pub_pc is None:
                 try:
                     self.pub_pc, self.pub_session = await publish(self.worker, BufferTrack(self.room_audio), self.track_name)
@@ -662,7 +900,7 @@ class Relay:
     async def carry_app(self) -> None:
         while True:
             active = self.state.get("active") or {}
-            on_air_app = self.lease and active.get("source") == "app"
+            on_air_app = self.has_lease and active.get("source") == "app"
             self.mode = "app" if on_air_app else ("paltalk" if self.joined else "idle")
             key = f"{active.get('sessionId')}/{active.get('trackName')}" if on_air_app else None
             if key != self.pull_key or (self.pull_pc is not None and self.pull_pc.connectionState == "failed"):
@@ -706,7 +944,7 @@ class Relay:
                 if event["seq"] <= self.posted_seq:
                     continue
                 self.posted_seq = event["seq"]
-                if self.listen_only or not self.joined or not self.lease or event["origin"] == "paltalk":
+                if self.listen_only or not self.joined or not self.has_lease or event["origin"] == "paltalk":
                     continue
                 ok = await asyncio.to_thread(pt.RoomWriter().send_chat, event["stage"])
                 log(f"posted cue {event['stage']!r}" if ok else f"cue {event['stage']!r} not confirmed in chat")
@@ -720,7 +958,7 @@ class Relay:
         seen_at: str | None = None
         while True:
             await asyncio.sleep(5)
-            if self.listen_only or not self.joined or not self.lease or self.halqah != "our-sheikh":
+            if self.listen_only or not self.joined or not self.has_lease or self.halqah != "our-sheikh":
                 continue
             try:
                 data = await asyncio.to_thread(_get_json, url)
@@ -757,7 +995,7 @@ class Relay:
             except Exception:  # noqa: BLE001 - a network blip keeps the stream as it is
                 pass
             on_air_app = (self.state.get("active") or {}).get("source") == "app"
-            live = self.lease and (platform_live or on_air_app)
+            live = self.has_lease and (platform_live or on_air_app)
             if live:
                 picture = await asyncio.to_thread(self.picture.refresh)
                 if picture:
@@ -820,6 +1058,9 @@ class Relay:
         """48 kHz stereo blocks from the room's cable -> 16 kHz mono."""
         while True:
             block = self.picker_audio.get()
+            if self.picker_drops > self.picker_drops_logged and time.time() - self.picker_drops_logged_at > 60:
+                log(f"[picker] {self.picker_drops - self.picker_drops_logged} blocks of sound dropped: the picker is behind")
+                self.picker_drops_logged, self.picker_drops_logged_at = self.picker_drops, time.time()
             mono = block.astype(np.float32).mean(axis=1)
             mono = mono[: len(mono) // 3 * 3].reshape(-1, 3).mean(axis=1)
             try:
@@ -828,22 +1069,32 @@ class Relay:
                 log(f"[picker] {error}")
 
     def _picked(self, stage: str | None, why: str) -> None:
-        """From the picker's threads: a stage it heard, or why it gave none."""
+        """From the picker's thread: a stage it heard, or why it gave none.
+        The cue goes to the platform on the event loop, fenced by this
+        moment's generation; the stage is this relay's own once the
+        platform has the cue (_heard), not before."""
         if stage is None:
             log(f"[picker] {why}")
             return
-        if not (self.lease and self.joined and self.platform_is_live) or self.mode == "app":
+        if not (self.has_lease and self.joined and self.platform_is_live) or self.mode == "app":
             log(f"[picker] heard {stage} ({why}) but no Zikr is being relayed")
             return
         if self.dua_shown:
             log(f"[picker] heard {stage} ({why}) during the dua: ignored")
             return
+        cue_stage = self.cfg.get("SHAJRA_STAGE_ID", "shajra") if stage == "shajra" else stage
+        if self._being_sent(cue_stage):
+            log(f"[picker] heard {stage} ({why}): its cue is on its way already")
+            return
         log(f"[picker] {stage}: {why}")
-        self.platform_stage, self.stage_set_at = stage, time.time()
-        self.heard_at[stage] = time.time()
-        stage_id = self.cfg.get("SHAJRA_STAGE_ID", "shajra") if stage == "shajra" else stage
+        generation = self.generation
         if self.loop:
-            self.loop.call_soon_threadsafe(lambda: asyncio.ensure_future(self._send_cue(stage_id, f"heard: {stage}")))
+            self.loop.call_soon_threadsafe(lambda: asyncio.ensure_future(self._heard(stage, cue_stage, generation)))
+
+    async def _heard(self, stage: str, cue_stage: str, generation: int) -> None:
+        if await self._send_cue(cue_stage, f"heard: {stage}", generation):
+            self.platform_stage, self.stage_set_at = stage, time.time()
+            self.heard_at[stage] = time.time()
 
     async def follow_platform(self) -> None:
         """The platform's live state and current stage: where the picker
@@ -862,26 +1113,31 @@ class Relay:
                 # predate it.
                 if time.time() - self.stage_set_at > 8:
                     self.platform_stage = (entry.get("stage") or {}).get("stageID") if live else None
+                if live and self.pending and not self.pending_replayed and self.has_lease and self.joined:
+                    self._replay_pending()
             except Exception:  # noqa: BLE001 - the network; next round
                 pass
             await asyncio.sleep(3)
 
-    async def _typed_cue(self, stage: str, text: str) -> None:
+    async def _typed_cue(self, stage: str, text: str, generation: int | None = None) -> None:
         """A host's typed cue is the backup: the picker leads. It is dropped
-        when the stage is already on, was heard lately, or lies behind the
-        current one; otherwise it waits for the picker's reading first."""
+        when the stage is already on, was heard lately, is on its way, or
+        lies behind the current one; otherwise it waits for the picker's
+        reading first. The stage is this relay's own once the platform has
+        the cue, not before."""
+        generation = self.generation if generation is None else generation
         for wait in (0, 15):  # the picker reads a call within a few seconds; 15 s covers its last reading
             await asyncio.sleep(wait)
             if not self.picker:
                 break
-            if self.platform_stage == stage or time.time() - self.heard_at.get(stage, 0) < 300:
+            if self.platform_stage == stage or time.time() - self.heard_at.get(stage, 0) < 300 or self._being_sent(stage):
                 log(f"typed cue {stage}: already heard")
                 return
             if self.platform_stage and stage in ORDER and not ahead(stage, self.platform_stage):
                 log(f"typed cue {stage}: behind the stage ({self.platform_stage})")
                 return
-        await self._send_cue(stage, text)
-        self.platform_stage, self.stage_set_at = stage, time.time()
+        if await self._send_cue(stage, text, generation):
+            self.platform_stage, self.stage_set_at = stage, time.time()
 
     async def run(self) -> None:
         log(f"relay {self.id} starting ({'listen-only' if self.listen_only else 'two-way'}; room {self.room!r})")
@@ -896,9 +1152,23 @@ class Relay:
 
     def _tap(self, samples: np.ndarray) -> None:
         """While Paltalk is on air, the room is the programme's sound and
-        what the audio picker listens to."""
+        what the audio picker listens to. The picker's queue is a second
+        deep: when it falls behind, the oldest block goes (a stage read a
+        minute late is no use; the sound itself goes on, untouched)."""
         if self.picker and self.mode != "app":
-            self.picker_audio.put(samples.copy())
+            block = samples.copy()
+            try:
+                self.picker_audio.put_nowait(block)
+            except queue.Full:
+                try:
+                    self.picker_audio.get_nowait()
+                except queue.Empty:
+                    pass
+                self.picker_drops += 1
+                try:
+                    self.picker_audio.put_nowait(block)
+                except queue.Full:
+                    pass
         if self.programme and self.mode != "app":
             self.programme.buffer.write(samples)
 

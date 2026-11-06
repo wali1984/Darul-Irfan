@@ -86,6 +86,8 @@ def build(statuses, speaker=None, chat=None, platform_live=False, stage=None, ro
     ra.asyncio.sleep = fake_sleep
     ra.DUA_FILE = Path(__file__).with_name("_dua_test.txt")
     ra.DUA_FILE.unlink(missing_ok=True)
+    ra.PENDING_FILE = Path(__file__).with_name("_pending_test.json")
+    ra.PENDING_FILE.unlink(missing_ok=True)
 
     async def to_thread(fn, *args, **kwargs):
         return fn(*args, **kwargs)
@@ -141,6 +143,7 @@ def build(statuses, speaker=None, chat=None, platform_live=False, stage=None, ro
            "CUE_HOSTS": "ameer_imam,ghazi_faiz", "PALTALK_ROOM": "Our Sheikh", "PALTALK_USER": "Our Shiekh TEST"}
     relay = ra.Relay(cfg)
     relay.lease = True
+    relay.lease_deadline = float("inf")  # the lease holds for the whole scenario (the monotonic clock is real here)
     relay.platform_is_live = platform_live
     relay.platform_stage = stage
 
@@ -299,5 +302,6 @@ run(relay)
 check("sound in the room starts the Zikr once", calls["start"] == 1, f"starts={calls['start']}")
 
 ra.DUA_FILE.unlink(missing_ok=True)
+ra.PENDING_FILE.unlink(missing_ok=True)
 print(f"{failures} failure(s)")
 sys.exit(failures)

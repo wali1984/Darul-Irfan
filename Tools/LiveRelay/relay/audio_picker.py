@@ -47,6 +47,8 @@ FIRST_QUIET = 12.0    # quiet after a 1st Latifa read before any stage (not a ba
 TASBIH_SECONDS = 5.0   # voice this long before any stage: maybe the opening Tasbih
 CLIP_SECONDS = 11.5  # the last reading: the call and the ayah after it
 OPENING = ("tasbih", "istighfar", "shahadah", "taawwudh", "basmalah")
+JOBS = 4              # readings waiting for the worker thread at most; the oldest goes when a fifth comes
+STALE_SECONDS = 30.0  # a reading whose clip is this old is skipped: the stage has moved on by then
 
 # Words a call names, as Whisper writes them (seen in a recorded session) or
 # as the app's own matcher has them. Only names, never Latifa numbers alone:
@@ -138,7 +140,7 @@ def next_stage(current: str | None) -> str | None:
 
 class Picker:
     """Feed 16 kHz mono int16 audio; `on_stage(stage, why)` is called from
-    the feeding thread (steps) or a worker thread (corrections)."""
+    the feeding thread (steps) or the one worker thread (readings)."""
 
     def __init__(self, on_stage, current_stage, model_name: str = "base", read_calls: bool = True,
                  inline: bool = False) -> None:
@@ -168,9 +170,23 @@ class Picker:
         self.last_tasbih_try = -1e9
         self.first_call: tuple[float, str] | None = None  # a Latifa call read before any stage, waiting for the quiet after it
         self.lock = threading.Lock()
+        # Readings run on one worker thread (the server has two cores; a
+        # thread per reading piled up behind one lock on 6 November), from a
+        # short queue: (generation, the clip's clock, what to run, its
+        # arguments). The generation steps on reset(), so a reading queued
+        # for the last session is skipped when its turn comes.
+        self.generation = 0
+        self.jobs: deque = deque(maxlen=JOBS)
+        self.jobs_ready = threading.Condition()
+        self.worker: threading.Thread | None = None
+        self.dropped = 0  # readings pushed out of the queue by newer ones
+        self.skipped = 0  # readings skipped as stale when their turn came
 
     def reset(self) -> None:
-        """A new session: forget the last one's calls."""
+        """A new session: forget the last one's calls, and skip its readings."""
+        self.generation += 1
+        with self.jobs_ready:
+            self.jobs.clear()
         self.reads.clear()
         self.settled.clear()
         self.call_at = None
@@ -178,6 +194,39 @@ class Picker:
         self.shajra_given = self.tasbih_given = False
         self.last_tasbih_try = -1e9
         self.first_call = None
+
+    def _queue(self, fn, *args) -> None:  # noqa: ANN001
+        """A reading for the worker thread (inline: run here, on the feeding
+        thread - the tests and replay_picker). JOBS wait at most: the oldest
+        goes when another comes, since a backlog that long means the machine
+        cannot keep up and the latest call is the one that matters."""
+        job = (self.generation, self.clock, fn, args)
+        if self.inline:
+            self._run(job)
+            return
+        with self.jobs_ready:
+            if len(self.jobs) == self.jobs.maxlen:
+                self.dropped += 1
+            self.jobs.append(job)
+            self.jobs_ready.notify()
+        if self.worker is None:
+            self.worker = threading.Thread(target=self._work, daemon=True)
+            self.worker.start()
+
+    def _work(self) -> None:
+        while True:
+            with self.jobs_ready:
+                while not self.jobs:
+                    self.jobs_ready.wait()
+                job = self.jobs.popleft()
+            self._run(job)
+
+    def _run(self, job: tuple) -> None:
+        generation, at, fn, args = job
+        if generation != self.generation or self.clock - at > STALE_SECONDS:
+            self.skipped += 1  # a new session, or a call long over: a reading now would name a stage that has passed
+            return
+        fn(*args)
 
     def feed(self, samples: np.ndarray) -> None:
         self.pending = np.concatenate([self.pending, samples])
@@ -224,10 +273,7 @@ class Picker:
                 # What was said after the call: the Zikr's quiet reads as
                 # nothing (or one word over and over), a bayan as sentences.
                 clip = np.concatenate(list(self.audio)[-int(FIRST_QUIET * 10):])
-                if self.inline:
-                    self._after_first(clip, at, first)
-                else:
-                    threading.Thread(target=self._after_first, args=(clip, at, first), daemon=True).start()
+                self._queue(self._after_first, clip, at, first)
         if stage == LAST_MURAQABA and not self.shajra_given and run >= SHAJRA_SECONDS:
             self.shajra_given = True
             self._give("shajra", f"{run:.0f} s of voice after the last Muraqaba")
@@ -240,10 +286,7 @@ class Picker:
                 clip = np.concatenate(list(self.audio)[-int(RECITE_EVERY * 10):])
             else:
                 clip = np.concatenate(list(self.audio)[-int((CLIP_SECONDS + 0.5) * 10):])
-            if self.inline:
-                self._read(clip, *read[1:])
-            else:
-                threading.Thread(target=self._read, args=(clip, *read[1:]), daemon=True).start()
+            self._queue(self._read, clip, *read[1:])
 
         if self.call_at is not None:
             since = self.clock - self.call_at
@@ -282,8 +325,9 @@ class Picker:
         # reads a garbled word the quick way misses), from two places.
         windows = ((clip, False), (clip, True), (clip[RATE // 2:], True)) if how == "full" else ((clip, False),)
         texts = []
+        generation = self.generation
         for window, padded in windows:
-            with self.lock:  # one reading at a time: the server has two cores
+            with self.lock:  # one reading at a time, whichever thread runs it
                 if at in self.settled:
                     return
                 try:
@@ -291,6 +335,8 @@ class Picker:
                 except Exception as error:  # noqa: BLE001 - the typed cues still carry the stage
                     self.on_stage(None, f"could not read the call: {error}")
                     return
+                if generation != self.generation:
+                    return  # a new session while this was read: the last one's call
                 texts.append(text)
                 if self._settle(text, step, heard, at, how):
                     self.settled.add(at)
@@ -299,13 +345,14 @@ class Picker:
             self.on_stage(None, f"not a call ({' / '.join(t[:25] for t in texts if t) or 'no words'}; {heard:.1f} s)")
 
     def _after_first(self, clip: np.ndarray, at: float, first: str) -> None:
+        generation = self.generation
         with self.lock:
             try:
                 words = self.transcribe(clip).split()
             except Exception as error:  # noqa: BLE001 - the typed cues still carry the stage
                 self.on_stage(None, f"could not read after the call: {error}")
                 return
-            if self.current_stage() is not None:
+            if self.current_stage() is not None or generation != self.generation:
                 return
             if len(set(words)) <= 2:
                 self.last_call = at

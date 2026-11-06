@@ -43,7 +43,10 @@
 <script>
   const $ = (id) => document.getElementById(id);
   const NAMES = { app: Live.t("from the Darul Irfan app"), paltalk: Live.t("from the Paltalk room") };
-  let state = null, wanted = false, current = null, pulling = false, linked = false;
+  let state = null, wanted = false, current = null, linked = false, problem = "";
+  // Each pull belongs to a generation; Stop or a source change moves on and
+  // the old pull is cancelled, or discarded if it had already finished.
+  let generation = 0, inflight = null;
 
   $("keySave").onclick = () => { Live.setKey($("keyInput").value); location.reload(); };
 
@@ -54,31 +57,49 @@
   };
 
   function drop() {
-    if (current) { current.pc.close(); current = null; }
+    generation += 1;
+    if (inflight) { inflight.abort.abort(); inflight = null; }
+    if (current) { try { current.pc.close(); } catch (_) {} current = null; }
     $("player").srcObject = null;
   }
 
   // Keeps the player on whatever the server says is on air.
   async function follow() {
-    if (!wanted || pulling || !state) return;
+    if (!wanted || !state) return;
     const a = state.active;
     const key = a.source ? `${a.sessionId}/${a.trackName}` : null;
+    if (inflight) {
+      if (inflight.key === key) return;
+      inflight.abort.abort(); inflight = null;
+    }
     if (current && current.key === key && current.pc.connectionState !== "failed") return;
     drop();
     if (!key) return;
-    pulling = true;
+    const mine = ++generation;
+    const abort = new AbortController();
+    inflight = { key, abort };
     try {
-      const { pc, stream } = await Live.pull(a.sessionId, a.trackName);
+      const { pc, stream } = await Live.pull(a.sessionId, a.trackName, { signal: abort.signal });
+      if (mine !== generation || !wanted) { try { pc.close(); } catch (_) {} return; }
       current = { pc, key };
+      problem = "";
       $("player").srcObject = stream;
       await $("player").play().catch(() => {});
-      pc.onconnectionstatechange = () => { if (pc.connectionState === "failed") { drop(); setTimeout(follow, 1000); } };
+      pc.onconnectionstatechange = () => { if (current && current.pc === pc && pc.connectionState === "failed") { drop(); setTimeout(follow, 1000); } };
     } catch (e) {
-      $("detail").textContent = Live.t("Could not connect: ") + e.message;
+      if (mine !== generation || abort.signal.aborted) return;
+      problem = Live.t("Could not connect: ") + e.message;
+      render();
       setTimeout(follow, 3000);
     } finally {
-      pulling = false;
+      if (inflight && inflight.abort === abort) inflight = null;
     }
+  }
+
+  function line(className, text, tail) {
+    const span = document.createElement("span");
+    span.className = className; span.textContent = text;
+    $("state").replaceChildren(span, tail ? ` ${tail}` : "");
   }
 
   function render() {
@@ -87,14 +108,21 @@
     if (s.session.state !== "live") {
       $("state").textContent = Live.t(s.session.state === "ended" ? "The session has ended" : "Zikr has not started yet");
     } else if (!s.active.source) {
-      $("state").innerHTML = `<span class="bad">${Live.t("Waiting for Hazrat Ji…")}</span>`;
+      line("bad", Live.t("Waiting for Hazrat Ji…"));
     } else {
-      $("state").innerHTML = `<span class="ok">${Live.t("● Live")}</span> ${NAMES[s.active.source]}`;
+      line("ok", Live.t("● Live"), NAMES[s.active.source]);
     }
     const last = s.stages[s.stages.length - 1];
     $("stage").textContent = s.session.state === "live" && last ? last.stage : "";
-    $("detail").textContent = linked ? "" : Live.t("Reconnecting to the server…");
-    $("log").innerHTML = s.stages.slice().reverse().map((e) => `<div><b>${e.stage}</b> · ${new Date(e.at).toLocaleTimeString()}</div>`).join("");
+    $("detail").textContent = !linked ? Live.t("Reconnecting to the server…") : problem;
+    // Stage names come from the relay and admins: text only, never markup.
+    $("log").replaceChildren(...s.stages.slice().reverse().map((e) => {
+      const row = document.createElement("div");
+      const name = document.createElement("b");
+      name.textContent = e.stage;
+      row.append(name, ` · ${new Date(e.at).toLocaleTimeString()}`);
+      return row;
+    }));
   }
 
   Live.ready.then(() => {

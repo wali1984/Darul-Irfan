@@ -30,23 +30,50 @@ window.Live = (() => {
     if (data.key) { setKey(data.key); role = data.role; }
   }).catch(() => {});
 
-  async function api(method, path, body) {
-    const response = await fetch(path, {
-      method,
-      headers: { "content-type": "application/json", "x-live-key": key },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    const text = await response.text();
-    let data;
-    try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
-    if (!response.ok) {
-      const error = new Error(data.error || data.errorDescription || (data.superseded ? "superseded" : `HTTP ${response.status}`));
-      error.status = response.status;
-      error.data = data;
-      throw error;
+  // No call may hang: each gets this long, and a caller's signal cuts it short.
+  const CALL_MS = 15000;
+  // After the SFU has the answer, the audio track must arrive within this.
+  const TRACK_MS = 20000;
+
+  function stopped() { const e = new Error("stopped"); e.name = "AbortError"; return e; }
+
+  // options: { headers, signal } — extra headers (the session token) and an
+  // AbortSignal from the caller.
+  async function api(method, path, body, options) {
+    const extra = options || {};
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), CALL_MS);
+    const onAbort = () => controller.abort();
+    if (extra.signal) {
+      if (extra.signal.aborted) { clearTimeout(timer); throw stopped(); }
+      extra.signal.addEventListener("abort", onAbort, { once: true });
     }
-    if (data.errorCode) throw new Error(`${data.errorCode}: ${data.errorDescription || ""}`);
-    return data;
+    let response;
+    try {
+      response = await fetch(path, {
+        method,
+        headers: Object.assign({ "content-type": "application/json", "x-live-key": key }, extra.headers || {}),
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal: controller.signal,
+      });
+      const text = await response.text();
+      let data;
+      try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
+      if (!response.ok) {
+        const error = new Error(data.error || data.errorDescription || (data.superseded ? "superseded" : `HTTP ${response.status}`));
+        error.status = response.status;
+        error.data = data;
+        throw error;
+      }
+      if (data.errorCode) throw new Error(`${data.errorCode}: ${data.errorDescription || ""}`);
+      return data;
+    } catch (e) {
+      if (e && e.name === "AbortError") throw extra.signal && extra.signal.aborted ? stopped() : new Error(`${path} took longer than ${CALL_MS / 1000} s`);
+      throw e;
+    } finally {
+      clearTimeout(timer);
+      if (extra.signal) extra.signal.removeEventListener("abort", onAbort);
+    }
   }
 
   // Calls onState with every state the server sends; reconnects on its own.
@@ -78,39 +105,78 @@ window.Live = (() => {
     });
   }
 
-  // Sends one audio track; returns { pc, sessionId, trackName }.
-  async function publish(track, trackName) {
-    const pc = peer();
-    const transceiver = pc.addTransceiver(track, { direction: "sendonly" });
-    await pc.setLocalDescription(await pc.createOffer());
-    const { sessionId } = await api("POST", "/api/sfu/sessions/new");
-    const result = await api("POST", `/api/sfu/sessions/${sessionId}/tracks/new`, {
-      sessionDescription: { type: "offer", sdp: pc.localDescription.sdp },
-      tracks: [{ location: "local", mid: transceiver.mid, trackName }],
-    });
-    await pc.setRemoteDescription(result.sessionDescription);
-    return { pc, sessionId, trackName };
+  // Opens an SFU session. The Worker hands back a token that names this
+  // session and our role; every later call on the session carries it, so a
+  // key can only ever touch its own sessions.
+  async function openSession(signal) {
+    const session = await api("POST", "/api/sfu/sessions/new", undefined, { signal });
+    const headers = session.sessionToken ? { "x-live-session": session.sessionToken } : {};
+    return { sessionId: session.sessionId, sessionToken: session.sessionToken, headers };
   }
 
-  // Receives one remote audio track; returns { pc, stream }.
-  async function pull(remoteSessionId, trackName) {
+  // Sends one audio track; returns { pc, sessionId, sessionToken, trackName }.
+  async function publish(track, trackName) {
     const pc = peer();
-    const stream = new Promise((resolve) => {
-      pc.ontrack = (event) => resolve(event.streams[0] || new MediaStream([event.track]));
-    });
-    const { sessionId } = await api("POST", "/api/sfu/sessions/new");
-    const result = await api("POST", `/api/sfu/sessions/${sessionId}/tracks/new`, {
-      tracks: [{ location: "remote", sessionId: remoteSessionId, trackName }],
-    });
-    if (result.tracks && result.tracks[0] && result.tracks[0].errorCode) {
-      throw new Error(result.tracks[0].errorDescription || result.tracks[0].errorCode);
+    try {
+      const transceiver = pc.addTransceiver(track, { direction: "sendonly" });
+      await pc.setLocalDescription(await pc.createOffer());
+      const { sessionId, sessionToken, headers } = await openSession();
+      const result = await api("POST", `/api/sfu/sessions/${sessionId}/tracks/new`, {
+        sessionDescription: { type: "offer", sdp: pc.localDescription.sdp },
+        tracks: [{ location: "local", mid: transceiver.mid, trackName }],
+      }, { headers });
+      await pc.setRemoteDescription(result.sessionDescription);
+      return { pc, sessionId, sessionToken, trackName };
+    } catch (e) {
+      try { pc.close(); } catch (_) {}
+      throw e;
     }
-    await pc.setRemoteDescription(result.sessionDescription);
-    await pc.setLocalDescription(await pc.createAnswer());
-    await api("PUT", `/api/sfu/sessions/${sessionId}/renegotiate`, {
-      sessionDescription: { type: "answer", sdp: pc.localDescription.sdp },
+  }
+
+  // Receives one remote audio track; returns { pc, stream, sessionId, sessionToken }.
+  // options.signal (an AbortSignal) cancels a pull that is no longer wanted:
+  // every step is cut short and the connection closed. Each step has its own
+  // deadline (the calls in api(), the track below), so a pull never hangs.
+  async function pull(remoteSessionId, trackName, options) {
+    const signal = options && options.signal;
+    const pc = peer();
+    let trackTimer = null, rejectTrack = null;
+    const stream = new Promise((resolve, reject) => {
+      rejectTrack = reject;
+      pc.ontrack = (event) => { clearTimeout(trackTimer); resolve(event.streams[0] || new MediaStream([event.track])); };
     });
-    return { pc, stream: await stream };
+    stream.catch(() => {});
+    const cancel = () => { clearTimeout(trackTimer); try { pc.close(); } catch (_) {} rejectTrack(stopped()); };
+    if (signal) {
+      if (signal.aborted) { cancel(); throw stopped(); }
+      signal.addEventListener("abort", cancel, { once: true });
+    }
+    try {
+      const { sessionId, sessionToken, headers } = await openSession(signal);
+      const result = await api("POST", `/api/sfu/sessions/${sessionId}/tracks/new`, {
+        tracks: [{ location: "remote", sessionId: remoteSessionId, trackName }],
+      }, { headers, signal });
+      if (result.tracks && result.tracks[0] && result.tracks[0].errorCode) {
+        throw new Error(result.tracks[0].errorDescription || result.tracks[0].errorCode);
+      }
+      await pc.setRemoteDescription(result.sessionDescription);
+      await pc.setLocalDescription(await pc.createAnswer());
+      await api("PUT", `/api/sfu/sessions/${sessionId}/renegotiate`, {
+        sessionDescription: { type: "answer", sdp: pc.localDescription.sdp },
+      }, { headers, signal });
+      // The SFU has our answer: only now must the audio arrive in time. The
+      // calls before this had their own deadlines and do not count here.
+      trackTimer = setTimeout(() => rejectTrack(new Error(`no audio arrived within ${TRACK_MS / 1000} s`)), TRACK_MS);
+      const media = await stream;
+      if (signal && signal.aborted) throw stopped();
+      return { pc, stream: media, sessionId, sessionToken };
+    } catch (e) {
+      try { pc.close(); } catch (_) {}
+      throw e;
+    } finally {
+      clearTimeout(trackTimer);
+      if (signal) signal.removeEventListener("abort", cancel);
+    }
   }
 
   // The app opens the pages in its own language (?lang=ur): Urdu, right to left.

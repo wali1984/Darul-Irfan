@@ -2,14 +2,14 @@
 // token never reaches a client), routes state to the Control object, and
 // serves the host and listener test pages.
 
-import { Control, json, type Role } from "./control";
+import { Control, json, type ControlEnv, type Role } from "./control";
 import hostPage from "./pages/host.html";
 import listenPage from "./pages/listen.html";
 import clientLib from "./pages/client.txt";
 
 export { Control };
 
-interface Env {
+interface Env extends ControlEnv {
   CONTROL: DurableObjectNamespace;
   SFU_BASE: string;
   SFU_APP_ID: string;
@@ -18,9 +18,6 @@ interface Env {
   RELAY_KEY: string;
   LISTEN_KEY: string;
   ALLOWED_ORIGINS?: string;
-  PLATFORM_URL: string;
-  HALQAH_ID: string;
-  PLATFORM: Fetcher;
 }
 
 async function roleFor(request: Request, env: Env): Promise<Role | null> {
@@ -48,6 +45,17 @@ async function hmac(secret: string, text: string): Promise<string> {
   return btoa(String.fromCharCode(...signature)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+// Compares a presented signature with the right one in time that does not
+// depend on where they differ, so a guess learns nothing from the clock.
+function sameSignature(presented: string, expected: string): boolean {
+  const a = new TextEncoder().encode(presented);
+  const b = new TextEncoder().encode(expected);
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+
 async function signAppKey(role: "host" | "listen", env: Env): Promise<string> {
   const body = `${role}.${Date.now() + APP_KEY_HOURS * 3_600_000}`;
   return `app.${body}.${await hmac(env.HOST_KEY, body)}`;
@@ -57,7 +65,7 @@ async function verifyAppKey(key: string, env: Env): Promise<Role | null> {
   const [, role, expires, signature] = key.split(".");
   if ((role !== "host" && role !== "listen") || !expires || !signature) return null;
   if (Number(expires) < Date.now()) return null;
-  return (await hmac(env.HOST_KEY, `${role}.${expires}`)) === signature ? role : null;
+  return sameSignature(signature, await hmac(env.HOST_KEY, `${role}.${expires}`)) ? role : null;
 }
 
 async function appSession(request: Request, env: Env): Promise<Response> {
@@ -74,6 +82,33 @@ async function appSession(request: Request, env: Env): Promise<Response> {
   return json({ role, key: await signAppKey(role, env), expiresInHours: APP_KEY_HOURS });
 }
 
+// MARK: - SFU session ownership
+// Whoever opens an SFU session gets a signed token for it; the follow-up
+// calls (tracks/new, renegotiate, tracks/close) must carry it, so a listener
+// key can only ever touch the listener's own receiving session, never the
+// publisher's. The token is bound to the session and to the caller's role.
+// Format: sess.<sessionId>.<role>.<expiresMs>.<hmac>
+
+const SESSION_TOKEN_HOURS = 14;
+const SESSION_HEADER = "x-live-session";
+
+async function signSessionToken(sessionId: string, role: Role, env: Env): Promise<string> {
+  const body = `${sessionId}.${role}.${Date.now() + SESSION_TOKEN_HOURS * 3_600_000}`;
+  return `sess.${body}.${await hmac(env.HOST_KEY, body)}`;
+}
+
+async function verifySessionToken(token: string, sessionId: string, role: Role, env: Env): Promise<boolean> {
+  const parts = token.split(".");
+  if (parts.length !== 5 || parts[0] !== "sess") return false;
+  const [, id, tokenRole, expires, signature] = parts;
+  if (id !== sessionId || tokenRole !== role || !signature) return false;
+  if (!/^\d+$/.test(expires) || Number(expires) < Date.now()) return false;
+  return sameSignature(signature, await hmac(env.HOST_KEY, `${id}.${tokenRole}.${expires}`));
+}
+
+// The SFU operations a client may ask for, each with its one method.
+const SFU_OPERATIONS: Record<string, string> = { new: "POST", "tracks/new": "POST", "tracks/close": "PUT", renegotiate: "PUT" };
+
 // What each role may publish: the host page only "app…" tracks, the relay
 // only "paltalk…" tracks, listeners nothing.
 function tracksAllowed(role: Role, tracks: unknown): boolean {
@@ -86,30 +121,67 @@ function tracksAllowed(role: Role, tracks: unknown): boolean {
   });
 }
 
-async function sfu(request: Request, env: Env, role: Role, path: string): Promise<Response> {
-  const method = request.method;
-  let body: string | undefined;
-  if (method === "POST" || method === "PUT") {
-    body = await request.text();
-    if (path.endsWith("/tracks/new")) {
-      let parsed: any;
-      try {
-        parsed = JSON.parse(body || "{}");
-      } catch {
-        return json({ error: "bad json" }, 400);
-      }
-      if (!tracksAllowed(role, parsed.tracks)) return json({ error: "track not allowed for this key" }, 403);
-    }
-  }
-  const upstream = await fetch(`${env.SFU_BASE}/${env.SFU_APP_ID}${path}`, {
+async function sfuFetch(env: Env, path: string, method: string, body?: string): Promise<Response> {
+  return fetch(`${env.SFU_BASE}/${env.SFU_APP_ID}${path}`, {
     method,
     body,
     headers: { authorization: `Bearer ${env.SFU_APP_TOKEN}`, "content-type": "application/json" },
   });
+}
+
+// Opens a session and hands the caller its token.
+async function sfuNewSession(env: Env, role: Role): Promise<Response> {
+  const upstream = await sfuFetch(env, "/sessions/new", "POST");
+  const text = await upstream.text();
+  let data: any = null;
+  try {
+    data = JSON.parse(text || "{}");
+  } catch {
+    data = null;
+  }
+  if (!upstream.ok || typeof data?.sessionId !== "string") {
+    return new Response(text, { status: upstream.status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
+  }
+  return json({ ...data, sessionToken: await signSessionToken(data.sessionId, role, env) });
+}
+
+async function sfu(request: Request, env: Env, role: Role, path: string): Promise<Response> {
+  const method = request.method;
+  const body = await request.text();
+  if (path.endsWith("/tracks/new")) {
+    let parsed: any;
+    try {
+      parsed = JSON.parse(body || "{}");
+    } catch {
+      return json({ error: "bad json" }, 400);
+    }
+    if (!tracksAllowed(role, parsed.tracks)) return json({ error: "track not allowed for this key" }, 403);
+  }
+  const upstream = await sfuFetch(env, path, method, body);
   return new Response(upstream.body, {
     status: upstream.status,
     headers: { "content-type": "application/json", "cache-control": "no-store" },
   });
+}
+
+// /api/sfu/sessions/new, /api/sfu/sessions/:id/tracks/new,
+// /api/sfu/sessions/:id/renegotiate, /api/sfu/sessions/:id/tracks/close
+async function sfuRoute(request: Request, env: Env, role: Role, rest: string): Promise<Response> {
+  const match = /^\/sessions\/(?:(new)|([A-Za-z0-9]+)\/(tracks\/new|tracks\/close|renegotiate))$/.exec(rest);
+  if (!match) return json({ error: "not found" }, 404);
+  const operation = match[1] ?? match[3];
+  const sessionId = match[2] ?? "";
+  const allowed = SFU_OPERATIONS[operation];
+  if (request.method !== allowed) {
+    const response = json({ error: "method not allowed" }, 405);
+    response.headers.set("allow", allowed);
+    return response;
+  }
+  if (operation === "new") return sfuNewSession(env, role);
+  // Ownership is settled here, before anything reaches the SFU.
+  const token = request.headers.get(SESSION_HEADER) ?? "";
+  if (!(await verifySessionToken(token, sessionId, role, env))) return json({ error: "not your session" }, 403);
+  return sfu(request, env, role, rest);
 }
 
 function page(html: string): Response {
@@ -147,7 +219,7 @@ export default {
         headers: {
           "access-control-allow-origin": origin,
           "access-control-allow-methods": "GET, POST, PUT",
-          "access-control-allow-headers": "content-type, x-live-key",
+          "access-control-allow-headers": `content-type, x-live-key, ${SESSION_HEADER}`,
           "access-control-max-age": "86400",
           vary: "origin",
         },
@@ -175,15 +247,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     if (!role) return json({ error: "key required" }, 401);
     if (path === "/api/whoami") return json({ role });
 
-    // /api/sfu/sessions/new, /api/sfu/sessions/:id/tracks/new,
-    // /api/sfu/sessions/:id/renegotiate, /api/sfu/sessions/:id/tracks/close
-    if (path.startsWith("/api/sfu/")) {
-      const rest = path.slice("/api/sfu".length);
-      if (!/^\/sessions\/(new|[A-Za-z0-9]+(\/tracks\/new|\/tracks\/close|\/renegotiate)?)$/.test(rest)) {
-        return json({ error: "not found" }, 404);
-      }
-      return sfu(request, env, role, rest);
-    }
+    if (path.startsWith("/api/sfu/")) return sfuRoute(request, env, role, path.slice("/api/sfu".length));
 
     if (path === "/api/ws" && request.headers.get("upgrade") !== "websocket") return json({ error: "websocket expected" }, 426);
     const stub = env.CONTROL.get(env.CONTROL.idFromName("programme"));
