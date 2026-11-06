@@ -58,12 +58,12 @@ function fillStage(card, s, emptyTitle) {
       line.textContent = text;
       lines.append(line);
     });
-    // From the first line to the last, about as fast as the Shajra is read,
+    // From the first line to the last in under a minute (owner 2026-11-06),
     // then it rests on the last line until the Dua.
     requestAnimationFrame(() => {
       const dist = Math.max(0, lines.scrollHeight - roll.clientHeight);
       lines.style.setProperty("--dist", -dist + "px");
-      lines.style.setProperty("--dur", Math.round(SHAJRA_LINES.length * 9) + "s");
+      lines.style.setProperty("--dur", Math.round(SHAJRA_LINES.length * 3.5) + "s");
       if (dist && !matchMedia("(prefers-reduced-motion: reduce)").matches) lines.classList.add("run");
     });
   }
@@ -111,7 +111,7 @@ const STYLE = `
   -webkit-mask:linear-gradient(transparent,#000 14%,#000 86%,transparent);mask:linear-gradient(transparent,#000 14%,#000 86%,transparent)}
 .now .roll[hidden]{display:none}
 .now .lines{padding:40px 0;display:grid;gap:6px}
-.now .lines.run{animation:roll var(--dur,120s) linear 1.2s forwards}
+.now .lines.run{animation:roll var(--dur,50s) linear 1s forwards}
 @keyframes roll{to{transform:translateY(var(--dist,0))}}
 .now .line{font-size:clamp(20px,2.4vw,30px);color:#fff8e6;text-shadow:0 0 18px rgba(243,220,157,.35)}
 .now .line.closing{font-family:Amiri,serif;color:var(--gold2);margin-top:10px}
