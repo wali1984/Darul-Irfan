@@ -43,6 +43,10 @@ class Fake:
         if path == "liveBroadcasts/bind":
             self.broadcasts[params["id"]]["bound"] = params["streamId"]
             return {}
+        if path == "liveBroadcasts" and method == "GET" and "broadcastStatus" in params:
+            wanted = {"active": ("live", "testing"), "upcoming": ("ready", "created")}[params["broadcastStatus"]]
+            return {"items": [{"id": bid, "status": {"lifeCycleStatus": b["life"]}, "contentDetails": {"boundStreamId": b["bound"]},
+                               "snippet": {"scheduledStartTime": b.get("sched")}} for bid, b in self.broadcasts.items() if b["life"] in wanted]}
         if path == "liveBroadcasts" and method == "GET":
             b = self.broadcasts.get(params["id"])
             return {"items": [{"status": {"lifeCycleStatus": b["life"]}}]} if b else {"items": []}
@@ -79,9 +83,12 @@ fake.broadcasts[bid]["life"] = "complete"
 bid2 = yt2.ensure("session-1")
 check("a completed broadcast gives way to a new one", bid2 != bid and len(fake.broadcasts) == 2)
 
-# 4. Another session: another broadcast.
-bid3 = yt2.ensure("session-2")
-check("a new session gets its own broadcast", bid3 not in (bid, bid2))
+# 4. Another session while the last one's broadcast is still 'ready' on our stream: that broadcast carries it
+# (a Studio-made event works the same way); once completed, a new session gets a new broadcast.
+check("a ready broadcast on our stream carries the next session", yt2.ensure("session-2") == bid2)
+yt2.complete()
+bid3 = yt2.ensure("session-3")
+check("after completion a new session gets its own broadcast", bid3 not in (bid, bid2) and fake.broadcasts[bid2]["life"] == "complete")
 
 # 5. ready + stream active -> asks for live; ready + stream not active -> stays ready.
 yt, fake = fresh()
@@ -97,6 +104,15 @@ check("complete ends the broadcast and forgets it", fake.broadcasts["bc-1"]["lif
       and not yl.SESSION_FILE.exists())
 yt.complete()
 check("completing nothing is harmless", True)
+
+# 6b. A broadcast scheduled in Studio on our stream is adopted instead of making a rival; one on another stream is not.
+yt, fake = fresh()
+fake.broadcasts["studio-1"] = {"life": "ready", "body": None, "bound": "stream-1", "sched": "2026-11-06T23:45:00Z"}
+fake.broadcasts["other-1"] = {"life": "ready", "body": None, "bound": "stream-2", "sched": "2026-11-06T20:00:00Z"}
+check("a Studio broadcast on our stream is adopted", yt.ensure("s-adopt") == "studio-1" and len(fake.broadcasts) == 2)
+yt, fake = fresh()
+fake.broadcasts["other-1"] = {"life": "ready", "body": None, "bound": "stream-2", "sched": "2026-11-06T20:00:00Z"}
+check("a broadcast on another stream is left alone", yt.ensure("s-new") not in ("other-1",) and len(fake.broadcasts) == 2)
 
 # 7. No stream with our key: ensure raises a clear error (the encoder still runs).
 yt, fake = fresh()

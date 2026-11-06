@@ -164,6 +164,14 @@ class YouTube:
             log(f"broadcast {self.broadcast_id} is {life}: making a new one")
             self._forget_session()
         stream_id = self._find_stream()
+        adopted = self._adoptable(stream_id)
+        if adopted:
+            # Someone scheduled tonight's broadcast in Studio on our stream:
+            # it is the session's broadcast, not a rival to one of ours.
+            self.broadcast_id, self.session_key = adopted, session_key
+            self._save_session()
+            log(f"broadcast {adopted} (scheduled in Studio on the stream) adopted for this session")
+            return adopted
         now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         created = self._call("POST", "liveBroadcasts", {"part": "snippet,status,contentDetails"}, {
             "snippet": {"title": (title or self.title)[:100], "description": self.description[:5000], "scheduledStartTime": now},
@@ -179,6 +187,26 @@ class YouTube:
         self._save_session()
         log(f"broadcast {self.broadcast_id} made and bound to the stream ({self.privacy}, auto-start)")
         return self.broadcast_id
+
+    def _adoptable(self, stream_id: str) -> str | None:
+        """A broadcast already on our stream that can carry this session: one
+        that is live, else the 'ready' one scheduled soonest (a Studio-made
+        event for tonight). None when there is none."""
+        found: list[tuple[int, str, str]] = []
+        for status in ("active", "upcoming"):
+            data = self._call("GET", "liveBroadcasts", {"part": "id,snippet,status,contentDetails", "mine": "true",
+                                                         "broadcastStatus": status, "maxResults": 20})
+            for item in data.get("items", []):
+                details = item.get("contentDetails", {})
+                life = item.get("status", {}).get("lifeCycleStatus", "")
+                if details.get("boundStreamId") != stream_id or life not in ("live", "testing", "ready"):
+                    continue
+                rank = 0 if life == "live" else 1 if life == "testing" else 2
+                found.append((rank, item.get("snippet", {}).get("scheduledStartTime") or "9999", item["id"]))
+        if not found:
+            return None
+        found.sort()
+        return found[0][2]
 
     def lifecycle(self) -> str:
         """created, ready, testing, live, complete, revoked... or 'gone'."""
