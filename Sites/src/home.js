@@ -208,13 +208,25 @@ const CLIENT = `
   }
   // Our Sheikh's live sound: the Silsila's SFU feed, listen only (Tools/LiveRelay client).
   const feed = data.feed;
-  let feedState = null, onAir = false, pc = null, pulling = false, wantSound = false, pulled = null;
-  async function call(method, path, body) {
-    const r = await fetch(feed.base + path, { method, headers: { "content-type": "application/json", "x-live-key": feed.key },
-      body: body === undefined ? undefined : JSON.stringify(body) });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok || d.errorCode) throw new Error(d.error || d.errorDescription || ("HTTP " + r.status));
-    return d;
+  let feedState = null, onAir = false, pc = null, wantSound = false, pulled = null;
+  // Each pull belongs to a generation: leaving, the end of the Zikr or a change of
+  // source moves on, and a pull still in flight is cancelled (or discarded if it
+  // had already finished), so stale sound is never attached.
+  let generation = 0, inflight = null;
+  // No call to the feed may hang: 15 s each, 20 s for the first audio to arrive.
+  const CALL_MS = 15000, TRACK_MS = 20000;
+  async function call(method, path, body, headers, signal) {
+    const control = new AbortController();
+    const timer = setTimeout(() => control.abort(), CALL_MS);
+    const onAbort = () => control.abort();
+    if (signal) signal.addEventListener("abort", onAbort, { once: true });
+    try {
+      const r = await fetch(feed.base + path, { method, headers: { "content-type": "application/json", "x-live-key": feed.key, ...(headers || {}) },
+        body: body === undefined ? undefined : JSON.stringify(body), signal: control.signal });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || d.errorCode) throw new Error(d.error || d.errorDescription || ("HTTP " + r.status));
+      return d;
+    } finally { clearTimeout(timer); if (signal) signal.removeEventListener("abort", onAbort); }
   }
   function watchFeed() {
     if (!feed || !feed.base) return;
@@ -235,41 +247,63 @@ const CLIENT = `
     render();
     if (wantSound) follow();
   }
-  function drop() { try { pc && pc.close(); } catch {} pc = null; }
+  function drop() {
+    generation += 1;
+    if (inflight) { inflight.abort(); inflight = null; }
+    try { pc && pc.close(); } catch {} pc = null;
+  }
   function sound(text) { $("p-sound").textContent = text; }
   // Pull the track on air; pull again when it changes (app <-> Paltalk, a new device) or fails.
   async function follow() {
-    if (!wantSound || pulling) return;
+    if (!wantSound) return;
     const a = onAir ? feedState.active : null;
     const id = a ? a.sessionId + "/" + a.trackName : null;
+    if (inflight && inflight.id === id) return;
     if (id === pulled && pc) return;
     drop(); pulled = null;
     if (!a) { sound("Waiting for the live sound…"); return; }
-    pulling = true;
+    const mine = ++generation;
+    const control = new AbortController(), signal = control.signal;
+    const me = { id, abort: () => control.abort() };
+    inflight = me;
+    const peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.cloudflare.com:3478" }], bundlePolicy: "max-bundle" });
+    let trackTimer = null;
+    const stream = new Promise((ok, fail) => {
+      trackTimer = setTimeout(() => fail(new Error("no audio arrived in " + TRACK_MS / 1000 + " s")), TRACK_MS);
+      signal.addEventListener("abort", () => fail(new Error("stopped")), { once: true });
+      peer.ontrack = e => { clearTimeout(trackTimer); ok(e.streams[0] || new MediaStream([e.track])); };
+    });
+    stream.catch(() => {});
     try {
-      const peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.cloudflare.com:3478" }], bundlePolicy: "max-bundle" });
-      const stream = new Promise(ok => { peer.ontrack = e => ok(e.streams[0] || new MediaStream([e.track])); });
-      const { sessionId } = await call("POST", "/api/sfu/sessions/new");
-      const result = await call("POST", "/api/sfu/sessions/" + sessionId + "/tracks/new",
-        { tracks: [{ location: "remote", sessionId: a.sessionId, trackName: a.trackName }] });
+      const session = await call("POST", "/api/sfu/sessions/new", undefined, undefined, signal);
+      // The Worker's token names this session and our role; every later call on the session carries it.
+      const headers = session.sessionToken ? { "x-live-session": session.sessionToken } : {};
+      const result = await call("POST", "/api/sfu/sessions/" + session.sessionId + "/tracks/new",
+        { tracks: [{ location: "remote", sessionId: a.sessionId, trackName: a.trackName }] }, headers, signal);
       if (result.tracks && result.tracks[0] && result.tracks[0].errorCode) throw new Error(result.tracks[0].errorDescription);
       await peer.setRemoteDescription(result.sessionDescription);
       await peer.setLocalDescription(await peer.createAnswer());
-      await call("PUT", "/api/sfu/sessions/" + sessionId + "/renegotiate", { sessionDescription: { type: "answer", sdp: peer.localDescription.sdp } });
+      await call("PUT", "/api/sfu/sessions/" + session.sessionId + "/renegotiate", { sessionDescription: { type: "answer", sdp: peer.localDescription.sdp } }, headers, signal);
+      const media = await stream;
+      if (mine !== generation || !wantSound) throw new Error("stopped");
       pc = peer; pulled = id;
-      peer.onconnectionstatechange = () => { if (peer.connectionState === "failed") { drop(); pulled = null; setTimeout(follow, 1000); } };
-      const audio = $("p-audio"); audio.srcObject = await stream;
+      peer.onconnectionstatechange = () => { if (pc === peer && peer.connectionState === "failed") { drop(); pulled = null; setTimeout(follow, 1000); } };
+      const audio = $("p-audio"); audio.srcObject = media;
       audio.play().then(() => sound("Live sound of the Zikr")).catch(() => sound("Tap anywhere to hear the Zikr."));
-    } catch { setTimeout(follow, 3000); }
-    finally { pulling = false; }
+    } catch (e) {
+      clearTimeout(trackTimer);
+      try { peer.close(); } catch {}
+      if (mine !== generation || signal.aborted) return;
+      sound("The live sound could not be reached (" + ((e && e.message) || "error") + "). Trying again…");
+      setTimeout(follow, 3000);
+    } finally { if (inflight === me) inflight = null; }
   }
   document.addEventListener("click", () => { const a = $("p-audio"); if (wantSound && a.paused && a.srcObject) a.play().then(() => sound("Live sound of the Zikr")).catch(() => {}); });
   watchFeed();
 
   function render() {
     const sheikh = data.halqahs.find(h => h.id === "our-sheikh");
-    // Our Sheikh is live when the app says so or when the live feed is on air.
-    if (sheikh && onAir && !sheikh.live) sheikh.live = { kind: "zikr" };
+    // Live is the platform's word alone; the feed only says whether sound is on air.
     if (sheikh) {
       chip($("sheikh-chip"), sheikh.live);
       stage($("sheikh-stage"), sheikh.stage, sheikh.live);
@@ -359,7 +393,8 @@ const CLIENT = `
         if (!r.ok) return;
         data = await r.json();
         const now = data.halqahs.find(x => x.id === h.id);
-        if (!now || (!now.live && !(now.id === "our-sheikh" && onAir))) return ended();
+        // The platform's end ends the player, whatever the feed still carries.
+        if (!now || !now.live) return ended();
         apply(now);
       } catch {}
     }, 5000);
