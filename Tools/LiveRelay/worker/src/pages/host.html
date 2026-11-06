@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Host (staging)</title>
+<style>
+  :root { --bg:#0b1f18; --card:#12302a; --line:#1f4a40; --text:#eef5f1; --muted:#9db8ad; --gold:#e9c46a; --ok:#5fd39a; --bad:#ff8a7a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:4px 0 2px; } .sub { color:var(--muted); margin:0 0 14px; font-size:13px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--gold); margin:0 0 10px; }
+  button, select, input { font:inherit; border-radius:10px; border:1px solid var(--line); background:#0e2621; color:var(--text); padding:10px 12px; }
+  button { cursor:pointer; } button.primary { background:var(--gold); color:#1b1606; border-color:var(--gold); font-weight:600; }
+  button.danger { border-color:var(--bad); color:var(--bad); } button:disabled { opacity:.45; cursor:default; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:8px; }
+  .kv { display:grid; grid-template-columns:150px 1fr; gap:4px 10px; font-size:14px; } .kv div:nth-child(odd) { color:var(--muted); }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .gold { color:var(--gold); }
+  meter { width:100%; height:14px; } #log { max-height:200px; overflow:auto; font-size:13px; color:var(--muted); }
+  #log div { padding:3px 0; border-bottom:1px solid var(--line); } input { width:100%; }
+</style>
+</head>
+<body>
+<main>
+  <div id="operator">
+  <h1>Live Host <span class="gold">· staging</span></h1>
+  <p class="sub">Stands in for the Darul Irfan app's broadcaster. Test accounts and the test Paltalk room only.</p>
+  </div>
+
+  <section id="keyBox" hidden>
+    <h2>Key</h2>
+    <div class="row"><input id="keyInput" placeholder="Host key"><button class="primary" id="keySave">Save</button></div>
+  </section>
+
+  <section>
+    <h2 data-t>Broadcast from this device</h2>
+    <div class="row">
+      <button class="primary" id="goLive" data-t>Go live</button>
+      <button class="danger" id="stopLive" disabled data-t>Stop</button>
+      <span id="liveNote" class="sub" style="margin:0"></span>
+    </div>
+    <p class="sub" style="margin:10px 0 4px" data-t>Microphone level</p>
+    <meter id="level" min="0" max="1" value="0"></meter>
+    <p class="sub" id="onAir" hidden style="margin:10px 0 0"></p>
+  </section>
+
+  <section class="operator">
+    <h2>Stage</h2>
+    <div class="grid" id="stages"></div>
+    <div class="row" style="margin-top:8px"><input id="custom" placeholder="Other cue, as it should appear"><button id="sendCustom">Send</button></div>
+  </section>
+
+  <section class="operator">
+    <h2>Programme</h2>
+    <div class="kv" id="status"></div>
+    <div class="row" style="margin-top:12px">
+      <label class="sub" style="margin:0">Source</label>
+      <select id="override"><option value="auto">Automatic</option><option value="app">App only</option><option value="paltalk">Paltalk only</option></select>
+      <button id="start">Start session</button>
+      <button class="danger" id="end">End session</button>
+      <button id="reset">Reset (staging)</button>
+    </div>
+  </section>
+
+  <section class="operator">
+    <h2>Stage log</h2>
+    <div id="log"></div>
+  </section>
+</main>
+<script src="/client.js"></script>
+<script>
+  const CUES = ["1st Latifa", "2nd", "3rd", "4th", "5th", "6th", "7th", "Ahdiat", "Maeiat", "Akrabiat", "M-Nabvee"];
+  const $ = (id) => document.getElementById(id);
+  let live = null; // { pc, sessionId, trackName, stream, beat, startedAt, meter }
+  let state = null;
+
+  $("keySave").onclick = () => { Live.setKey($("keyInput").value); location.reload(); };
+
+  for (const cue of CUES) {
+    const b = document.createElement("button");
+    b.textContent = cue;
+    b.onclick = () => sendStage(cue);
+    $("stages").appendChild(b);
+  }
+  $("sendCustom").onclick = () => { const v = $("custom").value.trim(); if (v) { sendStage(v); $("custom").value = ""; } };
+
+  async function sendStage(stage) {
+    try {
+      const r = await Live.api("POST", "/api/stage", { stage, origin: "app" });
+      if (r.duplicate) note(`"${stage}" was already sent`);
+    } catch (e) { note(e.message, true); }
+  }
+
+  function note(text, bad) { $("liveNote").textContent = text; $("liveNote").className = "sub " + (bad ? "bad" : ""); }
+
+  async function heartbeat() {
+    if (!live) return;
+    try {
+      await Live.api("POST", "/api/source", { source: "app", sessionId: live.sessionId, trackName: live.trackName, startedAt: live.startedAt, by: navigator.userAgent.includes("Mobile") ? "phone" : "computer" });
+    } catch (e) {
+      if (e.data && e.data.superseded) { note(Live.t("Another device has gone live; this one stopped."), true); stop(false); }
+      else note("Heartbeat failed: " + e.message, true);
+    }
+  }
+
+  $("goLive").onclick = async () => {
+    $("goLive").disabled = true;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
+      const track = stream.getAudioTracks()[0];
+      const trackName = "app-" + Math.random().toString(36).slice(2, 10);
+      const published = await Live.publish(track, trackName);
+      live = { ...published, stream, startedAt: Date.now() };
+      live.meter = levelMeter(stream);
+      await heartbeat();
+      live.beat = setInterval(heartbeat, 3000);
+      published.pc.oniceconnectionstatechange = () => note("Connection: " + published.pc.iceConnectionState, published.pc.iceConnectionState === "failed");
+      $("stopLive").disabled = false;
+      note(Live.t("Live from this device"));
+    } catch (e) {
+      note(e.message, true);
+      $("goLive").disabled = false;
+    }
+  };
+  $("stopLive").onclick = () => stop(true);
+
+  async function stop(tellServer) {
+    if (!live) return;
+    const was = live; live = null;
+    clearInterval(was.beat);
+    was.meter && was.meter();
+    if (tellServer) { try { await Live.api("POST", "/api/source", { source: "app", sessionId: was.sessionId, live: false }); } catch (_) {} }
+    was.stream.getTracks().forEach((t) => t.stop());
+    was.pc.close();
+    $("goLive").disabled = false; $("stopLive").disabled = true;
+    $("level").value = 0;
+    if (tellServer) note(Live.t("Stopped"));
+  }
+
+  function levelMeter(stream) {
+    const ctx = new AudioContext();
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    ctx.createMediaStreamSource(stream).connect(analyser);
+    const data = new Float32Array(analyser.fftSize);
+    let run = true;
+    (function tick() {
+      if (!run) return;
+      analyser.getFloatTimeDomainData(data);
+      let sum = 0; for (const v of data) sum += v * v;
+      $("level").value = Math.min(1, Math.sqrt(sum / data.length) * 4);
+      requestAnimationFrame(tick);
+    })();
+    return () => { run = false; ctx.close(); };
+  }
+
+  $("override").onchange = async (e) => { try { await Live.api("POST", "/api/override", { source: e.target.value }); } catch (err) { note(err.message, true); } };
+  $("start").onclick = () => Live.api("POST", "/api/session", { action: "start" }).catch((e) => note(e.message, true));
+  $("end").onclick = () => { if (confirm("End the session for everyone?")) Live.api("POST", "/api/session", { action: "end" }).catch((e) => note(e.message, true)); };
+  $("reset").onclick = () => { if (confirm("Clear all staging state?")) Live.api("POST", "/api/reset").catch((e) => note(e.message, true)); };
+
+  const SOURCE_NAMES = { app: "Darul Irfan app", paltalk: "Paltalk room" };
+  function render() {
+    if (!state) return;
+    if (Live.inApp) {
+      const src = state.active.source;
+      const mine = live && state.active.sessionId === live.sessionId;
+      $("onAir").textContent = src ? `${Live.t("On air:")} ${Live.t(mine ? "from this phone" : src === "app" ? "from the Darul Irfan app" : "from the Paltalk room")}` : Live.t("Nothing is on air");
+      return;
+    }
+    const now = Date.now();
+    const skew = state.now - now;
+    const s = state;
+    const rows = [
+      ["Session", `${s.session.state}${s.session.startedAt ? " · " + Live.ago(now + skew - s.session.startedAt) : ""}`],
+      ["On air", s.active.source ? `<span class="ok">${SOURCE_NAMES[s.active.source]}</span>` : `<span class="bad">nothing</span>`],
+      ["App source", s.sources.app ? `${s.sources.app.by} · ${s.sources.app.fresh ? '<span class="ok">alive</span>' : '<span class="bad">stale</span>'}` : "—"],
+      ["Paltalk source", s.sources.paltalk ? (s.sources.paltalk.fresh ? '<span class="ok">alive</span>' : '<span class="bad">stale</span>') : "—"],
+      ["Relay", s.lease && s.lease.valid ? `<span class="ok">${s.lease.relayId}</span>` : '<span class="bad">no relay</span>'],
+    ];
+    const r = s.relay && s.relay.status || {};
+    if (s.relay) {
+      rows.push(["Relay mode", r.mode || "—"]);
+      rows.push(["Paltalk", [r.paltalk ? "running" : "not running", r.joined ? "in room" : "not in room", r.micHeld ? "mic held" : "mic free"].join(" · ")]);
+      rows.push(["YouTube", r.youtube || "off"]);
+      rows.push(["Last relay report", s.relay.fresh ? '<span class="ok">just now</span>' : '<span class="bad">' + Live.ago(now + skew - s.relay.lastSeen) + " ago</span>"]);
+      if (r.problem) rows.push(["Problem", `<span class="bad">${r.problem}</span>`]);
+    }
+    $("status").innerHTML = rows.map(([k, v]) => `<div>${k}</div><div>${v}</div>`).join("");
+    $("override").value = s.override;
+    $("log").innerHTML = s.stages.slice().reverse().map((e) => `<div><b class="gold">${e.stage}</b> · from ${e.origin} · ${new Date(e.at).toLocaleTimeString()}</div>`).join("") || "<div>No cues yet</div>";
+  }
+  setInterval(render, 1000);
+
+  Live.ready.then(() => {
+    $("keyBox").hidden = !!Live.key || Live.inApp;
+    // In the app: only this phone's broadcast. Stages are called with the
+    // app's own stage buttons (they reach Paltalk through the platform).
+    if (Live.inApp) {
+      $("operator").hidden = true;
+      document.querySelectorAll(".operator").forEach((el) => { el.hidden = true; });
+      $("onAir").hidden = false;
+    }
+    if (Live.inApp && Live.role !== "host") {
+      // Signed in, but not a moderator of the Halqah: nothing here to press.
+      document.querySelectorAll("button").forEach((b) => { b.disabled = true; });
+      note(Live.t(Live.key ? "Only Halqah admins can broadcast." : "Please sign in to the Halqah."), true);
+      return;
+    }
+    if (Live.key) Live.watch((s) => { state = s; render(); });
+  });
+  window.addEventListener("pagehide", () => { if (live) navigator.sendBeacon && stop(true); });
+</script>
+</body>
+</html>

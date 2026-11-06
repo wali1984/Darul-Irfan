@@ -1,0 +1,156 @@
+// Shared by the host and listener test pages: the key, API calls, the live
+// state socket, and publishing / pulling one audio track through the SFU.
+window.Live = (() => {
+  const STORE = "di-live-key";
+  const params = new URLSearchParams(location.search);
+  let key = params.get("key") || "";
+  try {
+    if (key) localStorage.setItem(STORE, key);
+    else key = localStorage.getItem(STORE) || "";
+  } catch (_) {
+    // Private mode: the key lives only in this page.
+  }
+  if (params.get("key")) history.replaceState(null, "", location.pathname);
+
+  function setKey(value) {
+    key = value.trim();
+    try { localStorage.setItem(STORE, key); } catch (_) {}
+  }
+
+  // Inside the Darul Irfan app: the page opens as …#bearer=<sign-in>. The
+  // fragment never reaches a server; trade it for a live key, then drop it.
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const bearer = hash.get("bearer");
+  let role = null;
+  if (bearer) history.replaceState(null, "", location.pathname + location.search);
+  const ready = !bearer ? Promise.resolve() : fetch("/api/app-session", {
+    method: "POST",
+    headers: { authorization: `Bearer ${bearer}` },
+  }).then((response) => response.json()).then((data) => {
+    if (data.key) { setKey(data.key); role = data.role; }
+  }).catch(() => {});
+
+  async function api(method, path, body) {
+    const response = await fetch(path, {
+      method,
+      headers: { "content-type": "application/json", "x-live-key": key },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const text = await response.text();
+    let data;
+    try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
+    if (!response.ok) {
+      const error = new Error(data.error || data.errorDescription || (data.superseded ? "superseded" : `HTTP ${response.status}`));
+      error.status = response.status;
+      error.data = data;
+      throw error;
+    }
+    if (data.errorCode) throw new Error(`${data.errorCode}: ${data.errorDescription || ""}`);
+    return data;
+  }
+
+  // Calls onState with every state the server sends; reconnects on its own.
+  function watch(onState, onLink) {
+    let socket;
+    let stopped = false;
+    const open = () => {
+      const proto = location.protocol === "https:" ? "wss:" : "ws:";
+      socket = new WebSocket(`${proto}//${location.host}/api/ws?key=${encodeURIComponent(key)}`);
+      socket.onopen = () => onLink && onLink(true);
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.type === "state") onState(message.state);
+      };
+      socket.onclose = () => {
+        onLink && onLink(false);
+        if (!stopped) setTimeout(open, 2000);
+      };
+    };
+    open();
+    const ping = setInterval(() => { try { socket.readyState === 1 && socket.send("ping"); } catch (_) {} }, 25000);
+    return () => { stopped = true; clearInterval(ping); socket && socket.close(); };
+  }
+
+  function peer() {
+    return new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.cloudflare.com:3478" }],
+      bundlePolicy: "max-bundle",
+    });
+  }
+
+  // Sends one audio track; returns { pc, sessionId, trackName }.
+  async function publish(track, trackName) {
+    const pc = peer();
+    const transceiver = pc.addTransceiver(track, { direction: "sendonly" });
+    await pc.setLocalDescription(await pc.createOffer());
+    const { sessionId } = await api("POST", "/api/sfu/sessions/new");
+    const result = await api("POST", `/api/sfu/sessions/${sessionId}/tracks/new`, {
+      sessionDescription: { type: "offer", sdp: pc.localDescription.sdp },
+      tracks: [{ location: "local", mid: transceiver.mid, trackName }],
+    });
+    await pc.setRemoteDescription(result.sessionDescription);
+    return { pc, sessionId, trackName };
+  }
+
+  // Receives one remote audio track; returns { pc, stream }.
+  async function pull(remoteSessionId, trackName) {
+    const pc = peer();
+    const stream = new Promise((resolve) => {
+      pc.ontrack = (event) => resolve(event.streams[0] || new MediaStream([event.track]));
+    });
+    const { sessionId } = await api("POST", "/api/sfu/sessions/new");
+    const result = await api("POST", `/api/sfu/sessions/${sessionId}/tracks/new`, {
+      tracks: [{ location: "remote", sessionId: remoteSessionId, trackName }],
+    });
+    if (result.tracks && result.tracks[0] && result.tracks[0].errorCode) {
+      throw new Error(result.tracks[0].errorDescription || result.tracks[0].errorCode);
+    }
+    await pc.setRemoteDescription(result.sessionDescription);
+    await pc.setLocalDescription(await pc.createAnswer());
+    await api("PUT", `/api/sfu/sessions/${sessionId}/renegotiate`, {
+      sessionDescription: { type: "answer", sdp: pc.localDescription.sdp },
+    });
+    return { pc, stream: await stream };
+  }
+
+  // The app opens the pages in its own language (?lang=ur): Urdu, right to left.
+  const lang = params.get("lang") === "ur" ? "ur" : "en";
+  const UR = {
+    "Live Zikr": "براہِ راست ذکر",
+    "Connecting…": "رابطہ ہو رہا ہے…",
+    "Listen": "سنیں",
+    "Stop listening": "سننا بند کریں",
+    "The session has ended": "نشست ختم ہو گئی ہے",
+    "Zikr has not started yet": "ذکر ابھی شروع نہیں ہوا",
+    "Waiting for Hazrat Ji…": "حضرت جی کا انتظار ہے…",
+    "● Live": "● براہِ راست",
+    "from the Darul Irfan app": "دارالعرفان ایپ سے",
+    "from the Paltalk room": "پالٹاک روم سے",
+    "from this phone": "اس فون سے",
+    "Nothing is on air": "ابھی کچھ نشر نہیں ہو رہا",
+    "Reconnecting to the server…": "سرور سے دوبارہ رابطہ ہو رہا ہے…",
+    "Could not connect: ": "رابطہ نہیں ہو سکا: ",
+    "Please sign in to the Halqah to listen.": "سننے کے لیے حلقے میں سائن ان کریں۔",
+    "Broadcast from this device": "اس فون سے نشر کریں",
+    "Go live": "نشر شروع کریں",
+    "Stop": "روکیں",
+    "Microphone level": "مائیکروفون کی سطح",
+    "Live from this device": "اس فون سے براہِ راست",
+    "Stopped": "روک دیا گیا",
+    "Another device has gone live; this one stopped.": "کسی اور فون سے نشر شروع ہو گیا؛ یہ رک گیا۔",
+    "Only Halqah admins can broadcast.": "صرف حلقے کے منتظمین نشر کر سکتے ہیں۔",
+    "Please sign in to the Halqah.": "حلقے میں سائن ان کریں۔",
+    "On air:": "نشر:",
+  };
+  function t(text) { return lang === "ur" && UR[text] ? UR[text] : text; }
+  if (lang === "ur") { document.documentElement.lang = "ur"; document.documentElement.dir = "rtl"; }
+  // Static labels marked data-t take the page's language.
+  document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t(el.textContent.trim()); });
+
+  function ago(ms) {
+    const s = Math.max(0, Math.round(ms / 1000));
+    return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`;
+  }
+
+  return { get key() { return key; }, get role() { return role; }, ready, inApp: !!bearer, lang, t, setKey, api, watch, publish, pull, ago };
+})();

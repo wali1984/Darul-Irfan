@@ -1,0 +1,40 @@
+name = "darul-irfan-live-staging"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+workers_dev = true
+preview_urls = false
+
+# Test pages and the relay's client library are bundled as text.
+rules = [{ type = "Text", globs = ["**/*.html", "**/*.txt"], fallthrough = false }]
+
+[vars]
+ENVIRONMENT = "staging"
+SFU_BASE = "https://rtc.live.cloudflare.com/v1/apps"
+# The platform that vouches for app users (its stage poll's canModerate = may broadcast).
+PLATFORM_URL = "https://darul-irfan-platform.wajidmahmoodali1984-e23.workers.dev"
+HALQAH_ID = "our-sheikh"
+# Sites allowed to call the listener routes (state, SFU pull) from the browser.
+ALLOWED_ORIGINS = "https://oursheikh.wajidali.us,https://namerica.wajidali.us,https://uk.wajidali.us,https://oursheikh.naqshbandiaowaisiah.us,https://namerica.naqshbandiaowaisiah.us,https://uk.naqshbandiaowaisiah.us,https://darul-irfan-sites.wajidmahmoodali1984-e23.workers.dev"
+
+[[durable_objects.bindings]]
+name = "CONTROL"
+class_name = "Control"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Control"]
+
+[observability]
+enabled = true
+
+# Secrets (`wrangler secret put`):
+# SFU_APP_ID, SFU_APP_TOKEN - the Realtime SFU app "darul-irfan-zikr"
+# HOST_KEY   - host test page (stands in for the app's broadcaster)
+# RELAY_KEY  - the Windows relay
+# LISTEN_KEY - listener test page
+
+# The platform, reached directly (a Worker cannot fetch another workers.dev
+# Worker of the same account over the public URL).
+[[services]]
+binding = "PLATFORM"
+service = "darul-irfan-platform"
