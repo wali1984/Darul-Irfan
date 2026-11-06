@@ -47,6 +47,8 @@ LEAVE_AFTER = 20.0   # seconds of a clear "no room open" before the relay has le
 SPEAKER_TRIES = 2    # unconfirmed speaker presses before the relay stops pressing (then: one rejoin)
 REJOIN_AFTER = 600.0  # seconds in a room whose speaker cannot be switched on before leaving and rejoining it
 REJOIN_EVERY = 1200.0  # at most one such rejoin this often
+RECONNECT_RESTART = 240.0  # seconds of Paltalk's "Reconnecting" dialog before the relay starts Paltalk over
+PALTALK_RESTART_EVERY = 900.0  # and not again this soon
 LEASE_MARGIN = 3.0   # seconds taken off the Worker's lease deadline: the network, and the two clocks
 LEASE_FALLBACK = 20.0  # the Worker's lease length, for a reply that does not say when it ends
 CUE_BACKOFF = (2, 4, 8, 16, 30)  # seconds between the six tries of a cue the platform did not take
@@ -159,6 +161,8 @@ class Relay:
         self.speaker_fixed_at = 0.0
         self.speaker_tries = 0      # unconfirmed presses in a row
         self.rejoined_at = 0.0
+        self.reconnecting_since: float | None = None  # Paltalk's own "Reconnecting" dialog
+        self.paltalk_restarted_at = 0.0
         self.voice_since: float | None = None
         self.cues_done: set[str] = set()
         self.ameens: list[tuple[float, str]] = []
@@ -437,6 +441,24 @@ class Relay:
             if status != self.room_status:
                 log(f"[room] {status}: {detail}")
             self.room_status = status
+            if detail.startswith("Paltalk is reconnecting"):
+                # Paltalk lost its servers: nothing can be read or heard until
+                # it is back. Its own retry usually takes seconds; stuck for
+                # RECONNECT_RESTART it is started over (auto-login is on), at
+                # most once in PALTALK_RESTART_EVERY and never under Remote
+                # Desktop, where someone may be signing in.
+                self.reconnecting_since = self.reconnecting_since or now
+                problem = problem or "Paltalk is reconnecting to its servers"
+                if (now - self.reconnecting_since > RECONNECT_RESTART and now - self.paltalk_restarted_at > PALTALK_RESTART_EVERY
+                        and not pt.remote_desktop_connected()):
+                    self.paltalk_restarted_at = now
+                    self.reconnecting_since = None
+                    log(f"Paltalk stuck reconnecting for {RECONNECT_RESTART / 60:.0f} min: starting it over")
+                    await asyncio.to_thread(pt.restart)
+                    if self.joined:
+                        self._left("Paltalk restarted")
+            else:
+                self.reconnecting_since = None
 
             self.in_streak = self.in_streak + 1 if status == "in" else 0
             if status == "in":

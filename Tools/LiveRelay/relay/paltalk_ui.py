@@ -536,6 +536,12 @@ def room_status(view: View, markers: list[str], room: str = "") -> tuple[str, st
     the window could not be read - which says nothing about the room."""
     if not view.ok:
         return "unknown", view.error or "window not read"
+    # "Reconnecting - hold tight while we attempt to get you back online":
+    # Paltalk has lost its own servers. Its room tab stays listed with a stale
+    # member count and a blank room (6 November, an hour of it), which is not
+    # the room and not leaving it either.
+    if view.first(name="Exit Paltalk", kind="Button") is not None or view.first(name="Reconnecting", kind="Text") is not None:
+        return "unknown", "Paltalk is reconnecting to its servers"
     overlay = view.first(suffix="JoinRoomFailedMessageOverlayWidget")
     if overlay is not None:
         try:

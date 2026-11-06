@@ -255,6 +255,18 @@ check("a room whose speaker cannot be switched on is rejoined once (then two fre
       calls.get("leave", 0) == 1 and calls["press"] == 8 and relay.joined == "room open",
       f"leaves={calls.get('leave', 0)} presses={calls['press']} joined={relay.joined}")
 
+# 7d. Paltalk's own "Reconnecting" dialog: not the room, not leaving it; after 4 minutes Paltalk is started over, once.
+RECONNECTING = ("unknown", "Paltalk is reconnecting to its servers")
+relay, calls, clock = build([IN] * 3 + [RECONNECTING] * 200)
+
+def restart():
+    calls["restart"] = calls.get("restart", 0) + 1
+
+pt.restart = restart
+run(relay)
+check("Paltalk stuck reconnecting is started over once", calls.get("restart", 0) == 1 and calls["dua"] == 0 and relay.joined is None,
+      f"restarts={calls.get('restart', 0)} dua={calls['dua']} joined={relay.joined}")
+
 # 8. Speaker unreadable (screen not drawn): never pressed.
 relay, calls, _ = build([IN] * 10, speaker=[None] * 20)
 run(relay)
