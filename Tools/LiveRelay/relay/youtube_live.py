@@ -201,7 +201,9 @@ class YouTube:
                 life = item.get("status", {}).get("lifeCycleStatus", "")
                 if details.get("boundStreamId") != stream_id or life not in ("live", "testing", "ready"):
                     continue
-                rank = 0 if life == "live" else 1 if life == "testing" else 2
+                # YouTube itself starts an auto-start broadcast when the stream
+                # comes up, so among the ready ones that is the one to follow.
+                rank = 0 if life == "live" else 1 if life == "testing" else 2 if details.get("enableAutoStart") else 3
                 found.append((rank, item.get("snippet", {}).get("scheduledStartTime") or "9999", item["id"]))
         if not found:
             return None
