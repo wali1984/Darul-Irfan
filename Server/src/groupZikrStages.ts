@@ -2,7 +2,7 @@ import { sendPushToInstallations } from "./apns";
 import type { Env } from "./contracts";
 import { canManage, canSee, memberRole, notifyGroup, zikrNoticeLink } from "./community";
 import { announceDailyZikr } from "./live";
-import { beginSession, endSession } from "./session";
+import { beginSessionIfIdle, endSession } from "./session";
 import { json } from "./util";
 
 export const SHEIKH_HALQA_ID = "our-sheikh";
@@ -134,7 +134,7 @@ async function access(env: Env, memberID: string, groupID: string, write: boolea
  * the stage is empty, and nothing from it shows anywhere else. */
 const SESSION_CUES = "group_id=? AND hidden_at IS NULL AND created_at>=?";
 /** When the live Zikr began; a session without a start time keeps its last three hours. */
-const sessionStart = (live: LiveZikr) => live.started_at ?? new Date(Date.now() - 3 * 3_600_000).toISOString();
+const sessionStart = (live: Pick<LiveZikr, "started_at">) => live.started_at ?? new Date(Date.now() - 3 * 3_600_000).toISOString();
 
 export async function zikrStages(env: Env, memberID: string, groupID: string): Promise<Response> {
   const managing = await access(env, memberID, groupID, false);
@@ -208,48 +208,132 @@ export async function broadcastZikrCue(env: Env, memberID: string, groupID: stri
 /** The live relay starts a Halqah's Zikr when Hazrat ji is live on Paltalk
  *  (owner 2026-11-05) and tells when the dua begins; the session then ends by
  *  itself five minutes later. The relay never ends a session directly.
- *  {state: "live", title?} | {state: "dua"} */
+ *  {state: "live", title?, test?, sessionID?} | {state: "dua", sessionID?}
+ *  Live again while the dua's end is pending resumes the session; a real
+ *  start while a Test Zikr runs replaces the test; a meeting is never taken
+ *  over; two starts at once make one session (audit 2026-11-06, F02/F05).
+ *  With `sessionID` the relay names the session it believes is live: a call
+ *  meant for another session is refused as stale and changes nothing. */
 export async function relayLive(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
   const group = await env.DB.prepare("SELECT id FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
   if (!group) return json({ error: "Not found" }, { status: 404 });
-  const live = await env.DB.prepare("SELECT state,kind,session_id,auto_end_at FROM group_live WHERE group_id=?").bind(groupID)
-    .first<{ state: string; kind: string; session_id: string | null; auto_end_at: string | null }>();
+  const live = await env.DB.prepare("SELECT state,kind,session_id,auto_end_at,is_test,started_at FROM group_live WHERE group_id=?").bind(groupID)
+    .first<{ state: string; kind: string; session_id: string | null; auto_end_at: string | null; is_test: number; started_at: string | null }>();
+  const stale = live?.state === "live" && input.sessionID != null && input.sessionID !== live.session_id;
   if (input.state === "live") {
-    if (live?.state === "live") return json({ state: "live", sessionID: live.session_id, started: false });
-    const title = typeof input.title === "string" && input.title.trim() ? input.title.trim().slice(0, 120) : "Zikr";
-    await ensureRelayAuthor(env);
     // {test: true}: as an admin's Test Zikr, seen by admins only and announced to no one.
     const test = input.test === true;
-    const sessionID = await beginSession(env, groupID, RELAY_AUTHOR, { kind: "zikr", title, videoID: null, roomID: null, queue: [], test });
+    let replacedTest = false;
+    if (live?.state === "live") {
+      // A meeting is the admins' own session; the relay never takes it over.
+      if (live.kind !== "zikr") return meetingLive();
+      if (stale) return staleSession();
+      if (!!live.is_test === test && live.auto_end_at) {
+        // Live again within the dua window (a false closure, a dropped
+        // connection): the end is cancelled and the session carries on, with
+        // no second notice. Only {state: "live"} cancels it; a stage cue does
+        // not, and a test never resumes a real Zikr nor a real start a test.
+        const resumed = await env.DB.prepare("UPDATE group_live SET auto_end_at=NULL WHERE group_id=? AND session_id=? AND state='live' AND auto_end_at IS NOT NULL")
+          .bind(groupID, live.session_id).run();
+        if (resumed.meta?.changes) {
+          await hideDuaCue(env, groupID, live);
+          return json({ state: "live", sessionID: live.session_id, started: false, resumed: true });
+        }
+        // The end landed first: the guarded start below reads the row again.
+      } else if (live.is_test && !test) {
+        // Hazrat ji is live while a Test Zikr runs: the test ends (kept in
+        // history as a test) and the real Zikr starts in its place.
+        replacedTest = !!live.session_id && await endSession(env, groupID, RELAY_AUTHOR, { sessionID: live.session_id });
+      } else {
+        return json({ state: "live", sessionID: live.session_id, started: false });
+      }
+    }
+    const title = typeof input.title === "string" && input.title.trim() ? input.title.trim().slice(0, 120) : "Zikr";
+    await ensureRelayAuthor(env);
+    const sessionID = await beginSessionIfIdle(env, groupID, RELAY_AUTHOR, { kind: "zikr", title, videoID: null, roomID: null, queue: [], test });
+    if (!sessionID) {
+      // Another start won (the relay retrying, a second process): one session,
+      // one notice. An admin's meeting that got in first is refused as above.
+      const winner = await env.DB.prepare("SELECT session_id,kind FROM group_live WHERE group_id=? AND state='live'").bind(groupID)
+        .first<{ session_id: string | null; kind: string }>();
+      if (winner && winner.kind !== "zikr") return meetingLive();
+      return json({ state: "live", sessionID: winner?.session_id ?? null, started: false });
+    }
     if (test) return json({ state: "live", sessionID, started: true, test: true }, { status: 201 });
     try {
       await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title, "Halqah zikr has started. Join now in Darul Irfan.",
         zikrNoticeLink(groupID));
       if (groupID === SHEIKH_HALQA_ID) await announceDailyZikr(env);
     } catch { /* The session is live; a notice is best effort. */ }
-    return json({ state: "live", sessionID, started: true }, { status: 201 });
+    return json({ state: "live", sessionID, started: true, ...(replacedTest ? { replacedTest: true } : {}) }, { status: 201 });
   }
   if (input.state === "dua") {
-    if (live?.state !== "live" || live.kind !== "zikr") return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
-    const endsAt = live.auto_end_at ?? new Date(Date.now() + DUA_MINUTES * 60_000).toISOString();
-    if (!live.auto_end_at) {
-      await env.DB.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id=? AND state='live' AND auto_end_at IS NULL")
-        .bind(endsAt, groupID).run();
-      await recordCue(env, RELAY_AUTHOR, groupID, { id: crypto.randomUUID(), stageID: DUA_STAGE.id });
+    // The dua belongs to the session it is called in; a row with no session id has none to bind to.
+    if (live?.state !== "live" || live.kind !== "zikr" || !live.session_id) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
+    if (stale) return staleSession();
+    if (live.auto_end_at) return json({ state: "dua", endsAt: live.auto_end_at });
+    const endsAt = new Date(Date.now() + DUA_MINUTES * 60_000).toISOString();
+    // The write names the session read above: a newer session in its place is
+    // left alone, and the dua shows on the stage only once its end is set.
+    const set = await env.DB.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id=? AND session_id=? AND state='live' AND auto_end_at IS NULL")
+      .bind(endsAt, groupID, live.session_id).run();
+    if (!set.meta?.changes) {
+      // The row moved on between the read and the write: a dua already
+      // pending for this session is answered again; anything else is stale.
+      const current = await env.DB.prepare("SELECT session_id,auto_end_at FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
+        .bind(groupID).first<{ session_id: string | null; auto_end_at: string | null }>();
+      if (current && current.session_id === live.session_id && current.auto_end_at) return json({ state: "dua", endsAt: current.auto_end_at });
+      return staleSession();
     }
+    await recordCue(env, RELAY_AUTHOR, groupID, { id: crypto.randomUUID(), stageID: DUA_STAGE.id });
     return json({ state: "dua", endsAt });
   }
   return json({ error: "state must be live or dua" }, { status: 400 });
 }
 
+const meetingLive = () => json({ error: "A meeting is live in this Halqah" }, { status: 409 });
+/** The relay named a session that is not the live one: nothing changes on its word. */
+const staleSession = () => json({ error: "stale session" }, { status: 409 });
+
+/** On a resume the dua that announced the end leaves the stage, so the stage
+ *  before it shows again everywhere. */
+async function hideDuaCue(env: Env, groupID: string, live: Pick<LiveZikr, "started_at">): Promise<void> {
+  await env.DB.prepare(`UPDATE group_zikr_cues SET hidden_at=? WHERE sequence=(SELECT MAX(sequence) FROM group_zikr_cues
+      WHERE group_id=? AND stage_id=? AND hidden_at IS NULL AND created_at>=?)`)
+    .bind(new Date().toISOString(), groupID, DUA_STAGE.id, sessionStart(live)).run();
+}
+
 /** Minutes the session stays open after the dua begins. */
 export const DUA_MINUTES = 5;
 
-/** Each minute: a session whose dua began five minutes ago ends, and is kept in history. */
+/** Each minute: a session whose dua began five minutes ago ends, and is kept
+ *  in history. The end belongs to the session the dua was called in: a newer
+ *  session in its place, or this one resumed since, is left alone. */
 export async function endAfterDua(env: Env, now = new Date()): Promise<void> {
-  const due = await env.DB.prepare("SELECT group_id FROM group_live WHERE state='live' AND auto_end_at IS NOT NULL AND auto_end_at<=?")
-    .bind(now.toISOString()).all<{ group_id: string }>();
-  for (const row of due.results ?? []) await endSession(env, row.group_id, RELAY_AUTHOR);
+  const stamp = now.toISOString();
+  const due = await env.DB.prepare("SELECT group_id,session_id FROM group_live WHERE state='live' AND session_id IS NOT NULL AND auto_end_at IS NOT NULL AND auto_end_at<=?")
+    .bind(stamp).all<{ group_id: string; session_id: string }>();
+  for (const row of due.results ?? []) await endSession(env, row.group_id, RELAY_AUTHOR, { sessionID: row.session_id, dueBy: stamp });
+}
+
+/** The longest a Zikr the relay started may stay live without a sign of life. */
+export const RELAY_MAX_HOURS = 5;
+/** A sign of life: a stage cue this recent keeps an old session, however long it has run. */
+export const RELAY_QUIET_MINUTES = 60;
+
+/** Each minute: a Zikr the relay started and never saw to its dua (the relay
+ *  died, the room closed unseen) ends once it is five hours old and its stage
+ *  has been still for an hour, instead of staying live for ever; nobody is
+ *  notified. A long Zikr whose stage still moves goes on. A session an admin
+ *  started is theirs to end. */
+export async function endStaleRelaySessions(env: Env, now = new Date()): Promise<void> {
+  const before = new Date(now.getTime() - RELAY_MAX_HOURS * 3_600_000).toISOString();
+  const quietSince = new Date(now.getTime() - RELAY_QUIET_MINUTES * 60_000).toISOString();
+  const stale = await env.DB.prepare(`SELECT group_id,session_id FROM group_live WHERE state='live' AND kind='zikr' AND started_by=?
+      AND session_id IS NOT NULL AND started_at<=?
+      AND NOT EXISTS (SELECT 1 FROM group_zikr_cues c WHERE c.group_id=group_live.group_id AND c.created_at>=?)`)
+    .bind(RELAY_AUTHOR, before, quietSince).all<{ group_id: string; session_id: string }>();
+  for (const row of stale.results ?? []) await endSession(env, row.group_id, RELAY_AUTHOR, { sessionID: row.session_id });
 }
 
 async function ensureRelayAuthor(env: Env): Promise<void> {

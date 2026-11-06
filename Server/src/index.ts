@@ -1,6 +1,6 @@
 import {
   zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues, zikrStage, postStageMessage, hideStageMessage,
-  hideZikrCue, publicSheikhStage, relayZikrCue, relayLive, endAfterDua,
+  hideZikrCue, publicSheikhStage, relayZikrCue, relayLive, endAfterDua, endStaleRelaySessions,
 } from "./groupZikrStages";
 import { joinOurSheikh } from "./sheikhPublicJoin";
 import type { AndroidDeviceRegistration, DeviceRegistration, Env } from "./contracts";
@@ -485,6 +485,8 @@ export default {
     const jobs: Array<{ name: string; run: Promise<void> }> = [
       { name: "sheikh-zikr-cues", run: dispatchZikrCues(env) },
       { name: "end-after-dua", run: endAfterDua(env) },
+      // A Zikr the relay started and never saw to its dua ends after five hours.
+      { name: "end-stale-relay-sessions", run: endStaleRelaySessions(env) },
       // At 12:00 UTC: yesterday's Zikr in one line to the Markaz's officers.
       { name: "markaz-digest", run: markazDigest(env) },
       { name: "live", run: Promise.allSettled([refreshPaltalkRoom(env), refreshYouTube(env)])

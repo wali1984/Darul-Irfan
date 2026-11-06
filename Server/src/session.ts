@@ -106,36 +106,55 @@ export async function resolveQueue(env: Env, groupID: string, raw: unknown): Pro
   return items;
 }
 
-/** Starts a session, ending any session already live. */
-export async function beginSession(
-  env: Env, groupID: string, startedBy: string,
-  session: {
-    kind: "zikr" | "meeting"; title: string; videoID: string | null; roomID: string | null; queue: QueueItem[]; roomRecording?: boolean;
-    test?: boolean;
-  },
-): Promise<string> {
-  const current = await liveRow(env, groupID);
-  if (current?.state === "live") await endSession(env, groupID, startedBy);
+type NewSession = {
+  kind: "zikr" | "meeting"; title: string; videoID: string | null; roomID: string | null; queue: QueueItem[]; roomRecording?: boolean;
+  test?: boolean;
+};
+
+/** Writes the live row for a new session. With `onlyIfIdle` the write is
+ *  refused while another session is live, so the row itself decides between
+ *  two starts that arrive together: `changes` is 0 for the one that lost. */
+async function writeLiveSession(env: Env, groupID: string, startedBy: string, session: NewSession, onlyIfIdle: boolean): Promise<{ sessionID: string; changes: number }> {
   const now = new Date().toISOString();
   const sessionID = `session-${crypto.randomUUID().slice(0, 12)}`;
-  await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,
+  const result = await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,
       session_id,queue_json,queue_index,position_seconds,position_at,paused,notice,notice_at,room_recording,is_test)
     VALUES(?,'live',?,?,?,?,?,?,?,?,?,0,0,?,0,NULL,NULL,?,?)
     ON CONFLICT(group_id) DO UPDATE SET state='live',kind=excluded.kind,title=excluded.title,video_id=excluded.video_id,
       room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at,
       session_id=excluded.session_id,queue_json=excluded.queue_json,queue_index=0,position_seconds=0,
       position_at=excluded.position_at,paused=0,notice=NULL,notice_at=NULL,room_recording=excluded.room_recording,
-      is_test=excluded.is_test,auto_end_at=NULL`)
+      is_test=excluded.is_test,auto_end_at=NULL${onlyIfIdle ? " WHERE group_live.state!='live'" : ""}`)
     .bind(groupID, session.kind, session.title, session.videoID, session.roomID, now, startedBy, now, sessionID,
       JSON.stringify(session.queue), now, session.roomRecording ? 1 : 0, session.test ? 1 : 0).run();
-  return sessionID;
+  return { sessionID, changes: result.meta?.changes ?? 0 };
 }
 
-/** Ends the live session and keeps a record of it. */
-export async function endSession(env: Env, groupID: string, endedBy: string): Promise<void> {
-  const live = await liveRow(env, groupID);
-  const now = new Date().toISOString();
-  // The recording closes with the session, and is then kept.
+/** Starts a session, ending any session already live. */
+export async function beginSession(env: Env, groupID: string, startedBy: string, session: NewSession): Promise<string> {
+  const current = await liveRow(env, groupID);
+  if (current?.state === "live") await endSession(env, groupID, startedBy);
+  return (await writeLiveSession(env, groupID, startedBy, session, false)).sessionID;
+}
+
+/** Starts a session only while nothing is live. Two starts that arrive
+ *  together (the relay retrying, two of its processes) make one session: the
+ *  loser gets null and reads the row for the session that won. */
+export async function beginSessionIfIdle(env: Env, groupID: string, startedBy: string, session: NewSession): Promise<string | null> {
+  const written = await writeLiveSession(env, groupID, startedBy, session, true);
+  return written.changes ? written.sessionID : null;
+}
+
+/** Which session a timer may end: its id, and for the dua timer the moment
+ *  its scheduled end must have passed (a resume clears auto_end_at, and the
+ *  end then no longer applies). */
+export type SessionFence = { sessionID: string; dueBy?: string };
+
+const OFFLINE_FIELDS = `state='offline',video_id=NULL,room_id=NULL,session_id=NULL,queue_json='[]',
+      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,is_test=0,auto_end_at=NULL`;
+
+/** The recording closes with the session, and the session is kept in history. */
+async function keepRecord(env: Env, groupID: string, live: LiveRow | null, endedBy: string, now: string): Promise<void> {
   if (live?.state === "live" && live.room_id && live.room_recording) await stopRoomRecording(env, groupID, live.room_id);
   if (live?.state === "live" && live.session_id) {
     const attended = await env.DB.prepare("SELECT COUNT(*) AS n FROM group_live_presence WHERE session_id=?")
@@ -145,11 +164,39 @@ export async function endSession(env: Env, groupID: string, endedBy: string): Pr
       .bind(live.session_id, groupID, live.kind, live.title, live.started_at ?? now, live.started_by, now, endedBy, attended?.n ?? 0,
         live.is_test ? 1 : 0).run();
   }
+}
+
+/** Ends the live session and keeps a record of it. An admin's end (no fence)
+ *  ends whatever is live. A timer's end names its session: a newer session in
+ *  its place, or one resumed since the timer was set, is left alone, and the
+ *  answer says whether anything was ended. */
+export async function endSession(env: Env, groupID: string, endedBy: string, expected?: SessionFence): Promise<boolean> {
+  const live = await liveRow(env, groupID);
+  const now = new Date().toISOString();
+  if (expected) {
+    if (live?.state !== "live" || live.session_id !== expected.sessionID) return false;
+    // The write is the fence: whatever changed between the read and now wins.
+    // The history row and the end are one transaction, both taken from the
+    // row as it stands at that moment, so neither ever exists without the other.
+    const fence = "group_id=? AND state='live' AND session_id=? AND (? IS NULL OR (auto_end_at IS NOT NULL AND auto_end_at<=?))";
+    const dueBy = expected.dueBy ?? null;
+    const [, ended] = await env.DB.batch([
+      env.DB.prepare(`INSERT OR REPLACE INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
+        SELECT session_id,group_id,kind,title,COALESCE(started_at,?),started_by,?,?,
+          (SELECT COUNT(*) FROM group_live_presence p WHERE p.session_id=group_live.session_id),is_test
+        FROM group_live WHERE ${fence}`).bind(now, now, endedBy, groupID, expected.sessionID, dueBy, dueBy),
+      env.DB.prepare(`UPDATE group_live SET ${OFFLINE_FIELDS},updated_at=? WHERE ${fence}`).bind(now, groupID, expected.sessionID, dueBy, dueBy),
+    ]);
+    if (!(ended?.meta?.changes ?? 0)) return false;
+    // The recording closes with the session; a relay session has no room.
+    if (live.room_id && live.room_recording) await stopRoomRecording(env, groupID, live.room_id);
+    return true;
+  }
+  await keepRecord(env, groupID, live, endedBy, now);
   await env.DB.prepare(`INSERT INTO group_live(group_id,state,updated_at) VALUES(?,'offline',?)
-    ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,session_id=NULL,queue_json='[]',
-      queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,is_test=0,auto_end_at=NULL,
-      updated_at=excluded.updated_at`)
+    ON CONFLICT(group_id) DO UPDATE SET ${OFFLINE_FIELDS},updated_at=excluded.updated_at`)
     .bind(groupID, now).run();
+  return true;
 }
 
 /** The live session as the group page shows it. Admins also get who is

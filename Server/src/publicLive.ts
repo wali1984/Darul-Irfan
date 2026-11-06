@@ -9,13 +9,15 @@ import { json, sha256 } from "./util";
 // controls. A visitor is not made a member of the Halqah; they are counted in
 // the session's attendance, which the Halqah's admins see.
 
-interface PublicLive { kind: string; title?: string; isTest?: boolean; startedAt?: string }
+interface PublicLive { kind: string; title?: string; isTest?: boolean; startedAt?: string; sessionID?: string }
 
 async function liveOf(env: Env, groupID: string): Promise<{ live: PublicLive; row: NonNullable<Awaited<ReturnType<typeof liveRow>>> } | null> {
   const row = await liveRow(env, groupID);
   // A test Zikr shows on the websites too, marked as a test (owner 2026-11-04).
   if (row?.state !== "live" || row.kind !== "zikr") return null;
-  return { row, live: { kind: row.kind, title: row.title ?? undefined, isTest: row.is_test ? true : undefined, startedAt: row.started_at ?? undefined } };
+  // The session id lets the live Worker follow one session; a random id with no secret value.
+  return { row, live: { kind: row.kind, title: row.title ?? undefined, isTest: row.is_test ? true : undefined, startedAt: row.started_at ?? undefined,
+    sessionID: row.session_id ?? undefined } };
 }
 
 /** The stage being followed in this session: the latest announcement since it began. */
