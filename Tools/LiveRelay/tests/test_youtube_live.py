@@ -83,12 +83,13 @@ fake.broadcasts[bid]["life"] = "complete"
 bid2 = yt2.ensure("session-1")
 check("a completed broadcast gives way to a new one", bid2 != bid and len(fake.broadcasts) == 2)
 
-# 4. Another session while the last one's broadcast is still 'ready' on our stream: that broadcast carries it
-# (a Studio-made event works the same way); once completed, a new session gets a new broadcast.
-check("a ready broadcast on our stream carries the next session", yt2.ensure("session-2") == bid2)
-yt2.complete()
-bid3 = yt2.ensure("session-3")
-check("after completion a new session gets its own broadcast", bid3 not in (bid, bid2) and fake.broadcasts[bid2]["life"] == "complete")
+# 4. Another session: a 'ready' broadcast of an earlier session is not reused; a LIVE one on our stream is.
+bid3 = yt2.ensure("session-2")
+check("a new session gets its own broadcast", bid3 not in (bid, bid2))
+fake.broadcasts[bid3]["life"] = "live"
+yt3 = yl.YouTube("key-abc", "Daily Zikr", "unlisted"); yt3._call = fake.call; yt3.access_token, yt3.token_expires = "t", 9e12  # noqa: SLF001
+yl.SESSION_FILE.unlink(missing_ok=True)
+check("a broadcast already live on our stream is adopted", yt3.ensure("session-9") == bid3)
 
 # 5. ready + stream active -> asks for live; ready + stream not active -> stays ready.
 yt, fake = fresh()
@@ -109,7 +110,8 @@ check("completing nothing is harmless", True)
 yt, fake = fresh()
 fake.broadcasts["studio-1"] = {"life": "ready", "body": None, "bound": "stream-1", "sched": "2026-11-06T23:45:00Z"}
 fake.broadcasts["other-1"] = {"life": "ready", "body": None, "bound": "stream-2", "sched": "2026-11-06T20:00:00Z"}
-check("a Studio broadcast on our stream is adopted", yt.ensure("s-adopt") == "studio-1" and len(fake.broadcasts) == 2)
+check("a ready Studio event on our stream is NOT adopted (YouTube refuses API transitions on it)",
+      yt.ensure("s-adopt") not in ("studio-1", "other-1") and len(fake.broadcasts) == 3)
 yt, fake = fresh()
 fake.broadcasts["other-1"] = {"life": "ready", "body": None, "bound": "stream-2", "sched": "2026-11-06T20:00:00Z"}
 check("a broadcast on another stream is left alone", yt.ensure("s-new") not in ("other-1",) and len(fake.broadcasts) == 2)
