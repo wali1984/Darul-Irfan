@@ -224,18 +224,27 @@ class YouTube:
         is the belt to its braces: with the stream active and the broadcast
         still 'ready', ask for the transition. Returns the lifecycle."""
         life = self.lifecycle()
-        if life == "ready":
+        if life in ("ready", "testing"):
             stream, _ = self.stream_status()
             if stream == "active":
-                try:
-                    self._call("POST", "liveBroadcasts/transition",
-                               {"id": self.broadcast_id, "broadcastStatus": "live", "part": "status"})
-                    log("asked YouTube to take the broadcast live")
-                except YouTubeError as error:
-                    if error.status not in (403, 409):  # already on its way: fine
-                        raise
-                life = self.lifecycle()
+                life = self._transition("live") or life
+                if life == "ready":
+                    # A Studio-made broadcast keeps its monitor stream, which
+                    # YouTube only lets go live from "testing": one step first.
+                    life = self._transition("testing") or life
         return life
+
+    def _transition(self, status: str) -> str | None:
+        """Asks for a lifecycle transition; the new lifecycle, or None when
+        YouTube refused it (logged, with its reason - a 403 here means the
+        transition is not allowed yet, not a permission problem)."""
+        try:
+            self._call("POST", "liveBroadcasts/transition", {"id": self.broadcast_id, "broadcastStatus": status, "part": "status"})
+            log(f"asked YouTube to take the broadcast to {status}")
+            return self.lifecycle()
+        except YouTubeError as error:
+            log(f"transition to {status} refused: {error}")
+            return None
 
     def complete(self) -> None:
         """The session is over: end the broadcast (if auto-stop has not) and forget it."""
