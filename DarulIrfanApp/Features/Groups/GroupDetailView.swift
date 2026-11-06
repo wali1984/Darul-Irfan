@@ -18,6 +18,9 @@ struct GroupDetailView: View {
     let group: MemberGroup
     let service: MemberGroupService
     let dependencies: AppDependencies?
+    /// Opened by a Join (Our Sheikh's Daily Zikr or Tahajjud zikr): while its
+    /// Zikr is live the stage opens at once, with the app's live sound on.
+    var joinLive = false
 
     @State private var detail: GroupDetail?
     @State private var posts: [MemberGroupPost] = []
@@ -44,13 +47,18 @@ struct GroupDetailView: View {
     @State private var room: GroupRoomPass?
     /// The Halqah's live Zikr stage, full screen (every Halqah, owner 2026-11-04).
     @State private var stageOpen = false
+    /// The stage opens with the live sound playing (Our Sheikh, from a Join).
+    @State private var stageListens = false
+    /// The Join has been answered once on this page.
+    @State private var joinedLive = false
     /// Sessions whose stage opened by itself once in this run of the app.
     @MainActor private static var stageOpenedFor: Set<String> = []
     @State private var joining = false
     @State private var joinError: String?
     @State private var sheet: AdminSheet?
-    /// The official Daily Zikr, shown in every halqah while it is live.
-    @State private var officialLive: LiveBroadcast?
+    /// Our Sheikh's own live Zikr, shown in every other Halqah while it is
+    /// live and joined on its stage (owner, 2026-11-06).
+    @State private var sheikhLive: SheikhLiveZikr?
     /// For the Silsila Markaz: whether this officer sees its reports.
     @State private var markazAccess: MarkazAccess?
     @Environment(\.locale) private var locale
@@ -195,14 +203,23 @@ struct GroupDetailView: View {
         )) {
             Button("OK", role: .cancel) { actionFailure = nil }
         } message: { Text(verbatim: actionFailure ?? "") }
-        .fullScreenCover(isPresented: $stageOpen) {
-            ZikrStageView(groupID: group.id, groupName: group.name, service: service)
+        .fullScreenCover(isPresented: $stageOpen, onDismiss: { stageListens = false }) {
+            ZikrStageView(groupID: group.id, groupName: group.name, service: service,
+                          listenOnOpen: stageListens && HalqahStage.isOurSheikh(group.id))
         }
         // Going live, or opening a Halqah while its Zikr is live, opens the
         // stage once per session; closing it leaves the page and its card.
+        // A Join opens it whenever the Zikr is live, with the live sound.
         .onChange(of: detail?.live?.sessionID) { _, sessionID in
-            guard detail?.live?.kind == "zikr", let sessionID, room == nil,
-                  !Self.stageOpenedFor.contains(sessionID) else { return }
+            guard detail?.live?.kind == "zikr", let sessionID, room == nil else { return }
+            if joinLive && !joinedLive {
+                joinedLive = true
+                Self.stageOpenedFor.insert(sessionID)
+                stageListens = true
+                stageOpen = true
+                return
+            }
+            guard !Self.stageOpenedFor.contains(sessionID) else { return }
             Self.stageOpenedFor.insert(sessionID)
             stageOpen = true
         }
@@ -297,9 +314,8 @@ struct GroupDetailView: View {
 
     @ViewBuilder
     private var officialLiveSection: some View {
-        if let officialLive, officialLive.state == .live, let dependencies {
-            LiveBroadcastCard(broadcast: officialLive, audioPlayer: dependencies.audioPlayer,
-                              platform: dependencies.officialPlatform)
+        if sheikhLive != nil, !HalqahStage.isOurSheikh(group.id) {
+            SheikhLiveJoinCard()
         }
     }
 
@@ -687,9 +703,9 @@ struct GroupDetailView: View {
             } else {
                 drafts = []
             }
-            let loadedOfficial = await dependencies?.officialPlatform.currentLiveBroadcast(forceRefresh: true)
+            let loadedSheikh = await dependencies?.officialPlatform.sheikhLiveZikr()
             guard generation == loadGeneration, !Task.isCancelled else { return }
-            officialLive = loadedOfficial
+            sheikhLive = loadedSheikh
         } catch is CancellationError {
             return
         } catch {

@@ -6,13 +6,19 @@ import SwiftUI
 /// the other with two Join buttons and two bells.
 ///
 /// Before the session, the time left on a ring, in this phone's time and
-/// Pakistan's; while it is live, "On air now" and the host's cue. One Join,
-/// greyed until the channel is live and then gold, playing in the app (Daily
-/// Zikr is YouTube only). One Reminders menu holding both existing choices,
-/// and the recorded zikr folded under Join. The screen keeps the live state
-/// current (`ZikrHomeViewModel.followLive`), so the card does not ask itself.
+/// Pakistan's; while it is live, "On air now" and the stage being followed.
+/// One Join, greyed until Our Sheikh's Daily Zikr is live and then gold,
+/// opening Our Sheikh's live stage with the app's own live sound (owner,
+/// 2026-11-06: "we use our stream for daily zikr"; never the YouTube stream);
+/// one who leads Our Sheikh can start it from there. One Reminders menu
+/// holding both existing choices, and the recorded zikr folded under Join.
+/// The screen keeps the live state current (`ZikrHomeViewModel.followLive`),
+/// so the card does not ask itself.
 struct DailyZikrCard: View {
     let broadcast: LiveBroadcast
+    /// Our Sheikh's Daily Zikr while it is live; nil otherwise. This alone
+    /// makes the card live.
+    let sheikhLive: SheikhLiveZikr?
     /// Daily Zikr's session in the schedule, for the countdown and the
     /// reminder before it; nil when the schedule has none.
     let session: ZikrSession?
@@ -22,10 +28,11 @@ struct DailyZikrCard: View {
     let alertsWhenLive: Binding<Bool>
     /// The local reminder before each session; nil without a session.
     let reminderBeforeSession: Binding<Bool>?
-    /// Plays what Join offers: the live video, or the room's relayed sound.
-    let join: (LiveSource) -> Void
+    /// Opens Our Sheikh's live stage with the live sound.
+    let join: () -> Void
     /// Plays one recording.
     let playRecording: (OfficialFeedItem) -> Void
+    /// Opens Our Sheikh's Halqah, where one who leads it starts the Zikr.
     var openSheikh: (() -> Void)? = nil
 
     @State private var showsRecordings = false
@@ -33,9 +40,11 @@ struct DailyZikrCard: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.locale) private var locale
 
-    private var isLive: Bool { broadcast.state == .live }
+    private var isLive: Bool { sheikhLive != nil }
     private var inUrdu: Bool { DIBrand.readsUrdu(locale) }
-    private var source: LiveSource? { DailyZikrPresentation.joinSource(for: broadcast) }
+    private var joinState: DailyZikrPresentation.Join {
+        DailyZikrPresentation.join(sheikhLive: isLive, canLead: canLeadSheikh && openSheikh != nil)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -45,8 +54,8 @@ struct DailyZikrCard: View {
             } else { headline }
             if isLive {
                 onAirPanel
-                if let cue = broadcast.cue {
-                    ZikrCueBanner(cue: cue)
+                if let stage = sheikhLive?.stage(urdu: inUrdu) {
+                    ZikrCueBanner(cue: LiveCue(text: stage, sender: nil, at: sheikhLive?.stageAt ?? Date()))
                 }
             } else if let session {
                 DailyZikrCountdown(session: session)
@@ -63,24 +72,23 @@ struct DailyZikrCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             joinButton
-            if let openSheikh {
+            if joinState == .unavailable, let openSheikh {
+                // Our Sheikh's Halqah stays one tap away while nothing is live.
                 Button {
                     DIHaptics.light()
                     openSheikh()
                 } label: {
-                    VStack(spacing: 2) {
-                        Text("Our Sheikh").diInterfaceFont(.caption, weight: .semibold)
-                        Text(canLeadSheikh ? "Start Daily Zikr" : "Join Daily Zikr").diInterfaceFont(.subheadline, weight: .bold)
-                    }
-                    .foregroundStyle(Color(hex: 0x064B34))
-                    .frame(maxWidth: .infinity, minHeight: 56)
-                    .background { joinFill(true) }
+                    Label("Our Sheikh", systemImage: "person.3.fill")
+                        .diInterfaceFont(.subheadline, weight: .semibold)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(DIPressableStyle())
             }
-            if source == nil {
-                // Says only what the channel reports: nothing here claims the
-                // zikr is on before its live video is.
+            if !isLive {
+                // Says only what the server reports: nothing here claims the
+                // zikr is on before Our Sheikh's Zikr is live.
                 Text("Daily Zikr appears here, live, when the session begins. Turn on a reminder below to be told when.")
                     .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(.white.opacity(0.78))
@@ -110,9 +118,9 @@ struct DailyZikrCard: View {
                 canLeadSheikh = group.canManage ?? (group.myRole == .admin || group.myRole == .administrator || groups.role == .superadmin)
             }
         }
-        .onChange(of: broadcast.cue) { old, new in
-            // A new latifa or muraqaba while the card is on screen: a chime
-            // over the stream, since the mic may have dropped as it changed.
+        .onChange(of: sheikhLive?.stageTitle) { old, new in
+            // A new latifa or muraqaba while the card is on screen: a chime,
+            // since the mic may have dropped as it changed.
             if old != nil, let new, new != old {
                 AudioServicesPlaySystemSound(1013)
                 DIHaptics.success()
@@ -133,7 +141,7 @@ struct DailyZikrCard: View {
                 .textCase(.uppercase)
                 .foregroundStyle(Color(hex: 0xFFE3A0))
             Spacer(minLength: DISpacing.sm)
-            Text(LocalizedStringKey(DailyZikrPresentation.statusKey(for: broadcast.state)))
+            Text(LocalizedStringKey(DailyZikrPresentation.statusKey(sheikhLive: isLive, broadcast: broadcast.state)))
                 .diInterfaceFont(.caption2, weight: .heavy)
                 .tracking(inUrdu ? 0 : 0.6)
                 .foregroundStyle(isLive ? Color(hex: 0x064B34) : Color.white.opacity(0.85))
@@ -174,7 +182,7 @@ struct DailyZikrCard: View {
                 Text("On air now")
                     .diInterfaceFont(.subheadline, weight: .bold)
                     .foregroundStyle(.white)
-                Text(verbatim: DailyZikrPresentation.onAirDetail(startedAt: broadcast.startedAt, locale: locale))
+                Text(verbatim: DailyZikrPresentation.onAirDetail(startedAt: sheikhLive?.startedAt, locale: locale))
                     .diInterfaceFont(.caption, weight: .medium)
                     .foregroundStyle(.white.opacity(0.85))
                     .fixedSize(horizontal: false, vertical: true)
@@ -193,17 +201,21 @@ struct DailyZikrCard: View {
 
     // MARK: Join
 
-    /// Always shown; greyed until the channel is live with something the app
-    /// can play, then gold.
+    /// Always shown; greyed until Our Sheikh's Daily Zikr is live, then gold,
+    /// opening its live stage with the live sound. One who leads Our Sheikh
+    /// sees "Start Daily Zikr" before it begins.
     private var joinButton: some View {
-        let source = self.source
-        let available = source != nil
+        let state = joinState
+        let available = state != .unavailable
         return Button {
-            guard let source else { return }
             DIHaptics.light()
-            join(source)
+            switch state {
+            case .joinLive: join()
+            case .start: openSheikh?()
+            case .unavailable: break
+            }
         } label: {
-            Label("Join Daily Zikr", systemImage: source?.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
+            Label(state == .start ? "Start Daily Zikr" : "Join Daily Zikr", systemImage: "headphones")
                 .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(available ? Color(hex: 0x064B34) : Color.white.opacity(0.62))
                 .frame(maxWidth: .infinity, minHeight: 50)

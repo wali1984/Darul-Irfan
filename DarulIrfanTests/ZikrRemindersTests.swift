@@ -76,7 +76,8 @@ final class ZikrRemindersTests: XCTestCase {
         XCTAssertEqual(fires, [soon, later.addingTimeInterval(-600)])
     }
 
-    /// Tahajjud is joined on Paltalk; the reminder must not call it Daily Zikr.
+    /// Tahajjud is joined live in the app (Our Sheikh's stage, never
+    /// Paltalk); the reminder must not call it Daily Zikr.
     func testEachSessionsReminderNamesItsOwnZikr() {
         let tahajjud = session(id: "zikr-tahajjud", title: "Tahajjud Zikr", hour: 4, minute: 0, anchor: "beforeFajr")
         let daily = session(id: "zikr-after-isha", title: "Daily Zikr", hour: 21, minute: 15)
@@ -87,7 +88,7 @@ final class ZikrRemindersTests: XCTestCase {
         XCTAssertNotEqual(tahajjudBody, ZikrReminders.body(for: daily))
         XCTAssertEqual(
             tahajjudBody,
-            String(localized: "Tahajjud Zikr begins soon. Join it on Paltalk from Darul Irfan.")
+            String(localized: "Tahajjud Zikr begins soon. Join it live in Darul Irfan.")
         )
     }
 

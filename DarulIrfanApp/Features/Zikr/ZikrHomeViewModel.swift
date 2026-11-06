@@ -20,6 +20,9 @@ final class ZikrHomeViewModel {
     private(set) var reminderEnabled: [String: Bool] = [:]
     private(set) var isLoaded = false
     private(set) var live: LiveBroadcast = .offline
+    /// Our Sheikh's own live Zikr (nil while it is not live): what Daily
+    /// Zikr's and the Tahajjud zikr's Join follow (owner, 2026-11-06).
+    private(set) var sheikhLive: SheikhLiveZikr?
     /// Latest official videos, shown as in-app playable "Recent Bayans" so the
     /// section is useful even when no live session is on air.
     private(set) var recentBayans: [OfficialFeedItem] = []
@@ -63,6 +66,7 @@ final class ZikrHomeViewModel {
     func load(forceRefresh: Bool = false) async {
         let bootstrap = await platform.bootstrap(forceRefresh: forceRefresh)
         live = await platform.currentLiveBroadcast(forceRefresh: forceRefresh)
+        sheikhLive = await platform.sheikhLiveZikr()
         // The channel's uploads are mostly the daily zikr streams: they are
         // listed as recordings under the Join button, not as bayans, and the
         // feed is read on (three pages at most) until six bayans are found.
@@ -128,14 +132,15 @@ final class ZikrHomeViewModel {
     }
 
     /// Keeps the live state current while the screen is open, so a session's
-    /// Join turns on when its video goes live or its room opens: every 10
+    /// Join turns on when Our Sheikh's Zikr (or a video) goes live: every 10
     /// seconds during the broadcast, so the host's cue shows promptly, and
     /// every 30 otherwise.
     func followLive() async {
         while !Task.isCancelled {
-            try? await Task.sleep(for: .seconds(live.state == .live ? 10 : 30))
+            try? await Task.sleep(for: .seconds(sheikhLive != nil || live.state == .live ? 10 : 30))
             if Task.isCancelled { break }
             live = await platform.currentLiveBroadcast(forceRefresh: true)
+            sheikhLive = await platform.sheikhLiveZikr()
         }
     }
 
@@ -202,7 +207,7 @@ final class ZikrHomeViewModel {
     /// The coming week of reminders for one session. A single reminder fired
     /// once and then stayed silent until this screen was opened again; the
     /// app now also refreshes them with the prayer alerts (ZikrReminders).
-    /// The Tahajjud zikr's says it is joined on Paltalk.
+    /// The Tahajjud zikr's says it is joined live in Darul Irfan.
     private func scheduleReminder(for session: ZikrSession) async {
         // Always recompute: the occurrence cached at load() may have passed
         // while the screen stayed open.

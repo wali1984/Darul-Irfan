@@ -1,30 +1,22 @@
 import Observation
 import SwiftUI
 
-/// What Today's live strip shows, when anything is live: the Daily Zikr
-/// broadcast, which plays here in the app, or the Tahajjud zikr's Paltalk
-/// room, where that zikr is held and joined.
+/// What Today's live strip shows, when anything is live: Our Sheikh's own
+/// live Zikr, Daily Zikr or, before dawn in Pakistan, the Tahajjud zikr. Both
+/// are joined on Our Sheikh's live stage, with the app's own live sound
+/// (owner, 2026-11-06), never the Paltalk app or the YouTube stream.
 enum TodayLiveStrip: Equatable {
-    case dailyZikr(title: String, source: LiveSource)
-    case tahajjud(room: URL)
+    case dailyZikr
+    case tahajjud
 
-    /// The strip for a live state at `now`, or nil while nothing is live.
-    /// Daily Zikr counts only with something the app can play (its live
-    /// video, or a stream staff set). The Tahajjud room counts only while it
-    /// is open before dawn in Pakistan, as the Zikr tab reads it: the same
-    /// room carries Daily Zikr in the evening.
-    static func strip(for live: LiveBroadcast, at now: Date) -> TodayLiveStrip? {
-        if live.state == .live, let source = live.preferredSource {
-            return .dailyZikr(title: live.title, source: source)
+    /// The strip at `now`, or nil while Our Sheikh's Zikr is not live: the
+    /// status says live only when that Zikr actually is.
+    static func strip(for sheikh: SheikhLiveZikr?, at now: Date) -> TodayLiveStrip? {
+        switch SheikhLiveZikr.liveSession(sheikh, at: now) {
+        case .daily: return .dailyZikr
+        case .tahajjud: return .tahajjud
+        case nil: return nil
         }
-        if let url = live.room?.url {
-            var calendar = Calendar(identifier: .gregorian)
-            calendar.timeZone = TimeZone(identifier: "Asia/Karachi") ?? .current
-            if calendar.component(.hour, from: now) < 7 {
-                return .tahajjud(room: url)
-            }
-        }
-        return nil
     }
 }
 
@@ -62,8 +54,7 @@ final class TodayLiveModel {
             strip = nil
             return
         }
-        let live = await platform.currentLiveBroadcast(forceRefresh: forceRefresh)
-        let next = TodayLiveStrip.strip(for: live, at: Date())
+        let next = TodayLiveStrip.strip(for: await platform.sheikhLiveZikr(), at: Date())
         if next != strip {
             strip = next
         }
@@ -71,16 +62,13 @@ final class TodayLiveModel {
 }
 
 /// Today's live strip (boards Main and TodayDark): one line, shown only
-/// while a session is live. "LIVE NOW", the session's title and Join. Daily
-/// Zikr plays here, in the app; the Tahajjud zikr opens its Paltalk room.
-/// The official updates that used to show here are in Discover.
+/// while a session is live. "LIVE NOW", the session's title and Join, which
+/// opens Our Sheikh's live stage with the app's own live sound. The official
+/// updates that used to show here are in Discover.
 @MainActor
 struct TodayOfficialSection: View {
     let strip: TodayLiveStrip
-    let dependencies: AppDependencies
 
-    @State private var presentedVideo: TodayLiveVideo?
-    @Environment(\.openURL) private var openURL
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -120,9 +108,6 @@ struct TodayOfficialSection: View {
             .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
         .buttonStyle(DIPressableStyle())
-        .sheet(item: $presentedVideo) { video in
-            YouTubePlayerSheet(videoID: video.id, title: video.title)
-        }
     }
 
     /// The session's title: the broadcast's own, looked up as a key so the
@@ -147,33 +132,9 @@ struct TodayOfficialSection: View {
         .diShimmer()
     }
 
+    /// Daily Zikr and the Tahajjud zikr alike: Our Sheikh's live stage.
     private func join() {
         DIHaptics.light()
-        switch strip {
-        case .dailyZikr(let title, let source):
-            switch source.kind {
-            case .youtube:
-                if let videoID = source.videoID {
-                    presentedVideo = TodayLiveVideo(
-                        id: videoID,
-                        title: String(localized: String.LocalizationValue(title))
-                    )
-                }
-            case .ownedStream:
-                let item = AudioPlayableItem(id: "official-live", title: title, subtitle: "Darul Irfan", url: source.url)
-                dependencies.audioPlayer.play(item, queue: [item])
-            case .paltalk:
-                break
-            }
-        case .tahajjud(let room):
-            // The Tahajjud zikr is held in the Paltalk room and joined there.
-            openURL(room)
-        }
+        DeepLinkRouter.shared.open(.sheikhStage)
     }
-}
-
-/// The live video the strip plays, for the sheet.
-private struct TodayLiveVideo: Identifiable {
-    let id: String
-    let title: String
 }

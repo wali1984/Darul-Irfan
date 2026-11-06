@@ -34,6 +34,68 @@ enum LiveAudioConfiguration {
         components?.percentEncodedFragment = "bearer=" + (bearer.addingPercentEncoding(withAllowedCharacters: fragment) ?? "none")
         return components?.url ?? baseURL
     }
+
+    /// Presses the listener page's own "Listen" once, so the live sound
+    /// starts by itself on the stage (the page waits for a tap otherwise).
+    static let autoListenScript = """
+    (function () {
+      if (window.__darulIrfanListening) { return "started"; }
+      var button = document.getElementById("listen");
+      if (!button) { return "missing"; }
+      window.__darulIrfanListening = true;
+      button.click();
+      return "started";
+    })();
+    """
+
+    /// The listener page's own line about the sound ("● Live from the
+    /// Paltalk room", "Waiting for Hazrat Ji…"), in the page's language.
+    static let statusScript = """
+    (function () {
+      var state = document.getElementById("state");
+      return state ? (state.innerText || "").trim() : "";
+    })();
+    """
+}
+
+/// Our Sheikh's live sound heard on the stage itself (iOS and Android alike):
+/// the live service's listener page, out of sight, started by itself, and its
+/// own status line handed back for the stage to show. The Zikr plays even
+/// with the ring switch on silent; the app's audio setting comes back when it
+/// stops. Android LiveListenPlayer.
+@MainActor
+struct LiveListenPlayer: View {
+    let token: String
+    let urdu: Bool
+    let onStatus: (String) -> Void
+    @State private var previousCategory: AVAudioSession.Category?
+
+    var body: some View {
+        LiveAudioWebView(url: LiveAudioConfiguration.pageURL(.listen, token: token, urdu: urdu),
+                         allowsMicrophone: false,
+                         onFailure: { onStatus(String(localized: "Could not complete action")) },
+                         autoListen: true,
+                         onStatus: onStatus)
+            .frame(width: 2, height: 2)
+            .opacity(0.01)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .onAppear(perform: claimAudio)
+            .onDisappear(perform: releaseAudio)
+    }
+
+    private func claimAudio() {
+        let audio = AVAudioSession.sharedInstance()
+        previousCategory = audio.category
+        try? audio.setCategory(.playback, mode: .spokenAudio)
+        try? audio.setActive(true)
+    }
+
+    private func releaseAudio() {
+        let audio = AVAudioSession.sharedInstance()
+        try? audio.setActive(false, options: .notifyOthersOnDeactivation)
+        if let previousCategory { try? audio.setCategory(previousCategory) }
+    }
 }
 
 @MainActor
@@ -101,8 +163,14 @@ struct LiveAudioWebView: UIViewRepresentable {
     let url: URL
     let allowsMicrophone: Bool
     let onFailure: () -> Void
+    /// Starts the listener page's sound by itself once it has loaded.
+    var autoListen = false
+    /// Hears the page's status line every few seconds.
+    var onStatus: ((String) -> Void)? = nil
 
-    func makeCoordinator() -> Coordinator { Coordinator(allowsMicrophone: allowsMicrophone, onFailure: onFailure) }
+    func makeCoordinator() -> Coordinator {
+        Coordinator(allowsMicrophone: allowsMicrophone, onFailure: onFailure, autoListen: autoListen, onStatus: onStatus)
+    }
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
@@ -124,6 +192,8 @@ struct LiveAudioWebView: UIViewRepresentable {
 
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
         coordinator.active = false
+        coordinator.statusTimer?.invalidate()
+        coordinator.statusTimer = nil
         webView.uiDelegate = nil
         webView.navigationDelegate = nil
         webView.loadHTMLString("", baseURL: nil)
@@ -133,8 +203,45 @@ struct LiveAudioWebView: UIViewRepresentable {
         var active = true
         let allowsMicrophone: Bool
         let onFailure: () -> Void
-        init(allowsMicrophone: Bool, onFailure: @escaping () -> Void) {
+        let autoListen: Bool
+        let onStatus: ((String) -> Void)?
+        var statusTimer: Timer?
+        init(allowsMicrophone: Bool, onFailure: @escaping () -> Void, autoListen: Bool = false, onStatus: ((String) -> Void)? = nil) {
             self.allowsMicrophone = allowsMicrophone; self.onFailure = onFailure
+            self.autoListen = autoListen; self.onStatus = onStatus
+        }
+
+        /// Once the page is in: its "Listen" pressed (when asked), and its
+        /// status line read every two seconds while it stays.
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            Task { @MainActor [weak self, weak webView] in
+                guard let self, let webView else { return }
+                self.pageLoaded(webView)
+            }
+        }
+
+        @MainActor
+        private func pageLoaded(_ webView: WKWebView) {
+            guard active, MeetingOrigin.allows(webView.url, trusted: LiveAudioConfiguration.baseURL) else { return }
+            if autoListen { webView.evaluateJavaScript(LiveAudioConfiguration.autoListenScript, completionHandler: nil) }
+            guard onStatus != nil, statusTimer == nil else { return }
+            statusTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self, weak webView] timer in
+                Task { @MainActor in
+                    guard let self, self.active, let webView else {
+                        timer.invalidate()
+                        return
+                    }
+                    self.readStatus(webView)
+                }
+            }
+        }
+
+        @MainActor
+        private func readStatus(_ webView: WKWebView) {
+            webView.evaluateJavaScript(LiveAudioConfiguration.statusScript) { [weak self] result, _ in
+                guard let self, self.active, let text = result as? String else { return }
+                self.onStatus?(text)
+            }
         }
 
         func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {

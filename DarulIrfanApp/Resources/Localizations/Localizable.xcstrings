@@ -1,6 +1,12 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Tahajjud Zikr begins soon. Join it live in Darul Irfan.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Tahajjud Zikr begins soon. Join it live in Darul Irfan."}}, "ur": {"stringUnit": {"state": "translated", "value": "تہجد ذکر جلد شروع ہو رہا ہے۔ دارالعرفان میں براہِ راست اس میں شامل ہوں۔"}}}},
+    "live in Darul Irfan": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "live in Darul Irfan"}}, "ur": {"stringUnit": {"state": "translated", "value": "دارالعرفان میں براہِ راست"}}}},
+    "Join Tahajjud Zikr": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Join Tahajjud Zikr"}}, "ur": {"stringUnit": {"state": "translated", "value": "تہجد ذکر میں شامل ہوں"}}}},
+    "Available when Tahajjud Zikr is live": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Available when Tahajjud Zikr is live"}}, "ur": {"stringUnit": {"state": "translated", "value": "تہجد ذکر براہِ راست ہونے پر دستیاب"}}}},
+    "Stop listening": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Stop listening"}}, "ur": {"stringUnit": {"state": "translated", "value": "سننا بند کریں"}}}},
+    "Join in the dua": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Join in the dua"}}, "ur": {"stringUnit": {"state": "translated", "value": "دعا میں شامل ہوں"}}}},
     "TEST": {
       "extractionState": "manual",
       "localizations": {

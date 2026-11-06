@@ -5,6 +5,9 @@ import AuthenticationServices
 struct OurSheikhEntryView: View {
     let service: MemberGroupService
     let dependencies: AppDependencies
+    /// Opened from a Join or a live-zikr notification: the Halqah goes
+    /// straight onto its live stage with the live sound while it is live.
+    var joinLive = false
     @State private var identity: SheikhVisitorIdentity?
     @State private var profile = SheikhVisitorProfile()
     @State private var group: MemberGroup?
@@ -20,7 +23,7 @@ struct OurSheikhEntryView: View {
     var body: some View {
         Group {
             if let group {
-                GroupDetailView(group: group, service: service, dependencies: dependencies)
+                GroupDetailView(group: group, service: service, dependencies: dependencies, joinLive: joinLive)
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {

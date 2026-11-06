@@ -109,8 +109,8 @@ enum ZikrReminders {
         "zikrReminder.\(sessionID)"
     }
 
-    /// The Tahajjud zikr is joined in the Paltalk room; Daily Zikr is
-    /// followed inside the app.
+    /// The Tahajjud zikr, which like Daily Zikr is joined live in the app,
+    /// on Our Sheikh's stage.
     static func isTahajjud(_ session: ZikrSession) -> Bool {
         switch session.zikrAnchor {
         case .beforeFajr, .tahajjud:
@@ -123,7 +123,7 @@ enum ZikrReminders {
     /// What an official session's reminder says.
     static func body(for session: ZikrSession) -> String {
         if isTahajjud(session) {
-            return String(localized: "Tahajjud Zikr begins soon. Join it on Paltalk from Darul Irfan.")
+            return String(localized: "Tahajjud Zikr begins soon. Join it live in Darul Irfan.")
         }
         if session.id == "zikr-after-isha" {
             return String(localized: "Daily Zikr begins soon. Open Darul Irfan to join it live.")

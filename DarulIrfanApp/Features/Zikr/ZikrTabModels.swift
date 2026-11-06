@@ -13,12 +13,12 @@ enum ZikrSessionRoles {
     static let dailySessionID = "zikr-after-isha"
 
     /// Daily Zikr's session: the bundled "zikr-after-isha", or in a schedule
-    /// the administrators publish, the first session that is not joined on
-    /// Paltalk. The Daily Zikr card shows its countdown and reminder; the
+    /// the administrators publish, the first session that is not the Tahajjud
+    /// zikr. The Daily Zikr card shows its countdown and reminder; the
     /// session itself stays in the schedule for reminders, widgets and Today.
     static func dailySession(in sessions: [ZikrSession]) -> ZikrSession? {
         sessions.first { $0.id == dailySessionID }
-            ?? sessions.first { !ZikrSessionJoin.joinsOnPaltalk($0) }
+            ?? sessions.first { !ZikrSessionJoin.isTahajjud($0) }
     }
 
     /// Every other session, in schedule order: the Tahajjud zikr, and any
@@ -43,31 +43,30 @@ enum ZikrSessionRoles {
 // MARK: - How a session is joined
 
 enum ZikrSessionJoin {
-    /// The Tahajjud zikr is held in the Paltalk room; Daily Zikr (and any
-    /// other session) is joined through the channel's live video, in the app.
-    static func joinsOnPaltalk(_ session: ZikrSession) -> Bool {
+    /// The Tahajjud zikr, held before Fajr. Like Daily Zikr it is joined on
+    /// Our Sheikh's live stage with the app's own live sound (owner,
+    /// 2026-11-06: "our relay for tahajjud zikr"), never in the Paltalk app.
+    static func isTahajjud(_ session: ZikrSession) -> Bool {
         session.zikrAnchor == .beforeFajr || session.zikrAnchor == .tahajjud || session.id.contains("tahajjud")
     }
 
-    /// The room while it is open and it is before dawn in Pakistan, as the
-    /// server names the session; the same room carries Daily Zikr in the
-    /// evening, which is joined in the app instead.
-    static func openRoom(for session: ZikrSession, live: LiveBroadcast, at now: Date) -> LiveRoom? {
-        guard joinsOnPaltalk(session), let room = live.room, room.url != nil else { return nil }
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "Asia/Karachi") ?? .current
-        return calendar.component(.hour, from: now) < 7 ? room : nil
+    /// Whether the Tahajjud zikr's Join is on at `now`: only while Our
+    /// Sheikh's Zikr is actually live before dawn in Pakistan (the same room
+    /// carries Daily Zikr in the evening, joined from the Daily Zikr card).
+    static func joinsSheikhStage(for session: ZikrSession, sheikh: SheikhLiveZikr?, at now: Date) -> Bool {
+        isTahajjud(session) && SheikhLiveZikr.liveSession(sheikh, at: now) == .tahajjud
     }
 
-    /// The channel's live video while it is on air, for a session joined in
-    /// the app (never the Paltalk one).
+    /// The channel's live video while it is on air, for a further session
+    /// the administrators publish (never Daily Zikr's or the Tahajjud zikr's,
+    /// which are joined on Our Sheikh's stage).
     static func liveVideoID(for session: ZikrSession, live: LiveBroadcast) -> String? {
-        guard !joinsOnPaltalk(session), live.state == .live else { return nil }
+        guard !isTahajjud(session), live.state == .live else { return nil }
         return live.sources.first { $0.kind == .youtube && $0.videoID != nil }?.videoID
     }
 
     /// The line under a session's name: how it is announced ("Before Fajr at
-    /// Dar-ul-Irfan"), or its days, then where it is joined ("on Paltalk"),
+    /// Dar-ul-Irfan"), or its days, then where it is joined ("live in Darul Irfan"),
     /// or else how long it lasts.
     static func subtitle(for session: ZikrSession) -> String {
         var parts: [String] = []
@@ -78,8 +77,8 @@ enum ZikrSessionJoin {
         } else {
             parts.append(ZikrScheduleMath.shortWeekdaySymbols(for: session.weekdays).joined(separator: " · "))
         }
-        if joinsOnPaltalk(session) {
-            parts.append(String(localized: "on Paltalk"))
+        if isTahajjud(session) {
+            parts.append(String(localized: "live in Darul Irfan"))
         } else if session.durationMinutes > 0 {
             parts.append(String(localized: "About \(session.durationMinutes) minutes"))
         }
@@ -139,11 +138,27 @@ enum DailyZikrPresentation {
         return details
     }
 
-    /// What Join plays, only while the broadcast is live: the channel's live
-    /// video, or the room's sound when staff relay it. Never the Paltalk room.
-    static func joinSource(for broadcast: LiveBroadcast) -> LiveSource? {
-        guard broadcast.state == .live else { return nil }
-        return broadcast.preferredSource
+    /// What the Daily Zikr card's Join does: open Our Sheikh's live stage
+    /// with the app's own live sound while that Zikr is live; let one who
+    /// leads Our Sheikh start it; otherwise wait, greyed. Never the YouTube
+    /// stream or the Paltalk app (owner, 2026-11-06).
+    enum Join: Equatable {
+        case joinLive
+        case start
+        case unavailable
+    }
+
+    static func join(sheikhLive: Bool, canLead: Bool) -> Join {
+        if sheikhLive { return .joinLive }
+        return canLead ? .start : .unavailable
+    }
+
+    /// The status badge's catalogue key: live only while Our Sheikh's Daily
+    /// Zikr is; a broadcast the channel has scheduled says so; otherwise off
+    /// air (the channel's own live video no longer makes it live).
+    static func statusKey(sheikhLive: Bool, broadcast state: LiveBroadcastState) -> String {
+        if sheikhLive { return statusKey(for: .live) }
+        return state == .scheduled ? statusKey(for: .scheduled) : statusKey(for: .offline)
     }
 
     /// The status badge's catalogue key.

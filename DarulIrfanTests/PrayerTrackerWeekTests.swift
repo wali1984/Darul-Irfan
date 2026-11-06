@@ -269,32 +269,18 @@ final class PrayerTrackerWeekTests: XCTestCase {
 
     // MARK: - Today's live strip
 
-    func testLiveStripShowsDailyZikrOnlyWithSomethingToPlay() {
+    /// Owner, 2026-11-06: Daily Zikr is our stream and the Tahajjud zikr our
+    /// relay, both on Our Sheikh's live stage. The strip shows only while Our
+    /// Sheikh's Zikr is actually live (never for a YouTube video or an open
+    /// Paltalk room), named by the hour in Pakistan.
+    func testLiveStripFollowsOurSheikhsOwnLiveZikr() {
         let evening = TestDates.make(year: 2026, month: 10, day: 30, hour: 21, timeZone: TestDates.karachi)
-        var live = LiveBroadcast.offline
-        XCTAssertNil(TodayLiveStrip.strip(for: live, at: evening))
-
-        live.state = .live
-        XCTAssertNil(TodayLiveStrip.strip(for: live, at: evening), "Live with nothing the app can play shows no strip")
-
-        let url = URL(string: "https://www.youtube.com/watch?v=abc123") ?? URL(fileURLWithPath: "/")
-        let video = LiveSource(kind: .youtube, url: url, videoID: "abc123", supportsBackgroundAudio: false)
-        live.sources = [video]
-        XCTAssertEqual(TodayLiveStrip.strip(for: live, at: evening), .dailyZikr(title: live.title, source: video))
-
-        live.state = .ended
-        XCTAssertNil(TodayLiveStrip.strip(for: live, at: evening))
-    }
-
-    func testLiveStripShowsTheTahajjudRoomOnlyBeforeDawnInPakistan() {
-        let room = URL(string: "https://paltalk.im/egnMPD3Y") ?? URL(fileURLWithPath: "/")
-        var live = LiveBroadcast.offline
-        live.room = LiveRoom(platform: "paltalk", listeners: 12, since: nil, url: room)
         let beforeDawn = TestDates.make(year: 2026, month: 10, day: 30, hour: 4, timeZone: TestDates.karachi)
-        let evening = TestDates.make(year: 2026, month: 10, day: 30, hour: 20, timeZone: TestDates.karachi)
-        XCTAssertEqual(TodayLiveStrip.strip(for: live, at: beforeDawn), .tahajjud(room: room))
-        // The same room carries Daily Zikr in the evening; that is not the
-        // Tahajjud zikr.
-        XCTAssertNil(TodayLiveStrip.strip(for: live, at: evening))
+        XCTAssertNil(TodayLiveStrip.strip(for: nil, at: evening))
+        XCTAssertNil(TodayLiveStrip.strip(for: nil, at: beforeDawn))
+
+        let live = SheikhLiveZikr(startedAt: evening)
+        XCTAssertEqual(TodayLiveStrip.strip(for: live, at: evening), .dailyZikr)
+        XCTAssertEqual(TodayLiveStrip.strip(for: live, at: beforeDawn), .tahajjud)
     }
 }

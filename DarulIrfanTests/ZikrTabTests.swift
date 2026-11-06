@@ -3,8 +3,8 @@ import XCTest
 @testable import DarulIrfan
 
 /// The Zikr tab of the October 2026 redesign: one Daily Zikr card for the
-/// broadcast and its session (YouTube only, played in the app), the Tahajjud
-/// zikr joined on Paltalk, one Reminders menu over the two existing switches,
+/// broadcast and its session and the Tahajjud zikr, both joined on Our
+/// Sheikh's live stage, one Reminders menu over the two existing switches,
 /// this phone's time and Pakistan's, and the Tasbih tile.
 final class ZikrTabTests: XCTestCase {
 
@@ -70,7 +70,7 @@ final class ZikrTabTests: XCTestCase {
     }
 
     /// A schedule the administrators publish names its sessions itself: the
-    /// first one not joined on Paltalk is Daily Zikr's.
+    /// first one that is not the Tahajjud zikr is Daily Zikr's.
     func testPublishedScheduleFindsDailyZikrByHowItIsJoined() {
         let evening = session(id: "evening", title: "Online Zikr", hour: 21, minute: 15)
         XCTAssertEqual(ZikrSessionRoles.dailySession(in: [tahajjud, evening])?.id, "evening")
@@ -90,45 +90,54 @@ final class ZikrTabTests: XCTestCase {
 
     // MARK: - Joining
 
-    /// Daily Zikr is YouTube only, played in the app: Join waits for the
-    /// broadcast to be live, and never offers the Paltalk room.
-    func testDailyZikrJoinOffersOnlyWhatPlaysInTheAppWhileLive() {
-        var live = LiveBroadcast.offline
-        live.sources = [LiveSource(kind: .youtube, url: https, videoID: "video", supportsBackgroundAudio: false)]
-        XCTAssertNil(DailyZikrPresentation.joinSource(for: live), "Greyed until live")
+    /// Daily Zikr is our own stream (owner, 2026-11-06): Join opens Our
+    /// Sheikh's live stage while that Zikr is live, one who leads Our Sheikh
+    /// may start it, and otherwise it waits greyed. The YouTube stream and the
+    /// Paltalk room never make it live.
+    func testDailyZikrJoinOpensOurSheikhsStageOnlyWhileItIsLive() {
+        XCTAssertEqual(DailyZikrPresentation.join(sheikhLive: true, canLead: false), .joinLive)
+        XCTAssertEqual(DailyZikrPresentation.join(sheikhLive: true, canLead: true), .joinLive)
+        XCTAssertEqual(DailyZikrPresentation.join(sheikhLive: false, canLead: true), .start)
+        XCTAssertEqual(DailyZikrPresentation.join(sheikhLive: false, canLead: false), .unavailable)
 
-        live.state = .live
-        XCTAssertEqual(DailyZikrPresentation.joinSource(for: live)?.videoID, "video")
-
-        live.sources = [LiveSource(kind: .paltalk, url: https, supportsBackgroundAudio: false)]
-        XCTAssertNil(DailyZikrPresentation.joinSource(for: live), "The room is never Daily Zikr's Join")
+        XCTAssertEqual(DailyZikrPresentation.statusKey(sheikhLive: true, broadcast: .offline), "LIVE")
+        XCTAssertEqual(DailyZikrPresentation.statusKey(sheikhLive: false, broadcast: .live), "OFF AIR",
+                       "The channel's own live video no longer makes Daily Zikr live")
+        XCTAssertEqual(DailyZikrPresentation.statusKey(sheikhLive: false, broadcast: .scheduled), "SCHEDULED")
+        XCTAssertEqual(DailyZikrPresentation.statusKey(sheikhLive: false, broadcast: .ended), "OFF AIR")
     }
 
-    /// The Tahajjud zikr is joined in the Paltalk room, only while it is open
-    /// before dawn in Pakistan; other sessions follow the live video.
-    func testTahajjudJoinsTheOpenRoomBeforeDawnInPakistan() {
-        var live = LiveBroadcast.offline
-        live.room = LiveRoom(platform: "paltalk", listeners: 12, since: nil, url: URL(string: "https://paltalk.im/room"))
+    /// The Tahajjud zikr is our relay: joined on Our Sheikh's stage, only
+    /// while that Zikr is live before dawn in Pakistan (the same room carries
+    /// Daily Zikr in the evening); an open Paltalk room alone never turns it on.
+    /// A further published session still follows the channel's live video.
+    func testTahajjudJoinsOurSheikhsStageBeforeDawnInPakistan() {
         let beforeDawn = TestDates.make(year: 2026, month: 10, day: 30, hour: 4, minute: 10, timeZone: TestDates.karachi)
         let evening = TestDates.make(year: 2026, month: 10, day: 30, hour: 21, minute: 20, timeZone: TestDates.karachi)
+        let sheikh = SheikhLiveZikr(startedAt: beforeDawn)
 
-        XCTAssertTrue(ZikrSessionJoin.joinsOnPaltalk(tahajjud))
-        XCTAssertFalse(ZikrSessionJoin.joinsOnPaltalk(daily))
-        XCTAssertEqual(ZikrSessionJoin.openRoom(for: tahajjud, live: live, at: beforeDawn)?.listeners, 12)
-        XCTAssertNil(ZikrSessionJoin.openRoom(for: tahajjud, live: live, at: evening), "The evening room carries Daily Zikr")
-        XCTAssertNil(ZikrSessionJoin.openRoom(for: daily, live: live, at: beforeDawn))
+        XCTAssertTrue(ZikrSessionJoin.isTahajjud(tahajjud))
+        XCTAssertFalse(ZikrSessionJoin.isTahajjud(daily))
+        XCTAssertTrue(ZikrSessionJoin.joinsSheikhStage(for: tahajjud, sheikh: sheikh, at: beforeDawn))
+        XCTAssertFalse(ZikrSessionJoin.joinsSheikhStage(for: tahajjud, sheikh: nil, at: beforeDawn), "Greyed until live")
+        XCTAssertFalse(ZikrSessionJoin.joinsSheikhStage(for: tahajjud, sheikh: sheikh, at: evening), "The evening Zikr is Daily Zikr")
+        XCTAssertFalse(ZikrSessionJoin.joinsSheikhStage(for: daily, sheikh: sheikh, at: beforeDawn))
 
+        var live = LiveBroadcast.offline
+        live.room = LiveRoom(platform: "paltalk", listeners: 12, since: nil, url: URL(string: "https://paltalk.im/room"))
         live.state = .live
         live.sources = [LiveSource(kind: .youtube, url: https, videoID: "video", supportsBackgroundAudio: false)]
-        XCTAssertEqual(ZikrSessionJoin.liveVideoID(for: daily, live: live), "video")
+        let published = session(id: "friday", title: "Friday Zikr", hour: 15, minute: 0)
+        XCTAssertEqual(ZikrSessionJoin.liveVideoID(for: published, live: live), "video")
         XCTAssertNil(ZikrSessionJoin.liveVideoID(for: tahajjud, live: live))
     }
 
     func testTahajjudSubtitleSaysWhereItIsJoined() {
         XCTAssertEqual(
             ZikrSessionJoin.subtitle(for: tahajjud),
-            [String(localized: "Before Fajr at Dar-ul-Irfan"), String(localized: "on Paltalk")].joined(separator: " · ")
+            [String(localized: "Before Fajr at Dar-ul-Irfan"), String(localized: "live in Darul Irfan")].joined(separator: " · ")
         )
+        XCTAssertFalse(ZikrSessionJoin.subtitle(for: tahajjud).localizedCaseInsensitiveContains("Paltalk"))
     }
 
     // MARK: - Headline and notes

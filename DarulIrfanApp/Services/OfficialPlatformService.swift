@@ -94,6 +94,18 @@ actor OfficialPlatformService:
         }
     }
 
+    /// Whether Our Sheikh's own live Zikr is on now (the websites' public
+    /// route, no sign-in), which every Join in the app follows; nil while it
+    /// is not, or when the server cannot be reached (nothing is called live
+    /// that the app cannot confirm).
+    func sheikhLiveZikr() async -> SheikhLiveZikr? {
+        var components = URLComponents(url: baseURL.appendingPathComponent("v1/public/live"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [URLQueryItem(name: "ids", value: HalqahStage.ourSheikhID)]
+        guard let url = components?.url,
+              let data = try? await fetch(url: url, cacheKey: "sheikh-live", forceRefresh: true) else { return nil }
+        return SheikhLiveZikr.parse(data, decoder: decoder)
+    }
+
     func registerForPush(token: Data, preferences: PushPreferences) async throws {
         guard preferences.isEnabled else {
             await unregisterFromPush()

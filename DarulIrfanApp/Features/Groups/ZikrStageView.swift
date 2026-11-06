@@ -29,6 +29,58 @@ enum HalqahStage {
         guard let id = rest.split(separator: "/").first.map(String.init), !id.isEmpty else { return nil }
         return id
     }
+
+    /// The stage after Masjid-e-Nabawi and before the Dua: the Shajra Sharif.
+    static let shajraID = "shajra"
+    /// The dua that closes the Zikr.
+    static let duaID = "dua"
+
+    /// How the stage card shows a stage: the Shajra's own lines, the Dua's
+    /// card, or the stage's name (with the Arabic while it is recited).
+    enum Card: Equatable {
+        case standard
+        case shajra
+        case dua
+    }
+
+    static func card(for stageID: String) -> Card {
+        switch stageID.lowercased() {
+        case shajraID: return .shajra
+        case duaID: return .dua
+        default: return .standard
+        }
+    }
+
+    /// The names the app knows for the stages that close the Zikr, for a cue
+    /// that arrives without its own (an older server, or one that sends only
+    /// the id).
+    private static let knownTitles: [String: (english: String, urdu: String)] = [
+        shajraID: ("Shajra Sharif", "شجرہ شریف"),
+        duaID: ("Dua", "دعا"),
+    ]
+
+    private static func named(_ text: String?, notID stageID: String) -> String? {
+        guard let trimmed = text?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty,
+              trimmed.caseInsensitiveCompare(stageID) != .orderedSame else { return nil }
+        return trimmed
+    }
+
+    /// A stage's name as the stage shows it, in the app's language: the
+    /// server's own; for a stage that comes without a name, or with its id
+    /// for a name, the app's; never a raw id such as "shajra".
+    static func title(stageID: String, title: String, titleUr: String?, urdu: Bool) -> String {
+        let known = knownTitles[stageID.lowercased()]
+        if urdu, let shown = named(titleUr, notID: stageID) ?? known?.urdu { return shown }
+        if let shown = named(title, notID: stageID) { return shown }
+        if let known { return urdu ? known.urdu : known.english }
+        return stageID.split(separator: "-").map { $0.capitalized }.joined(separator: " ")
+    }
+
+    /// The Urdu name under the English one (English only); nil when there is none.
+    static func secondaryTitle(stageID: String, titleUr: String?, urdu: Bool) -> String? {
+        guard !urdu else { return nil }
+        return named(titleUr, notID: stageID) ?? knownTitles[stageID.lowercased()]?.urdu
+    }
 }
 
 /// Everything the live Zikr stage shows, kept current by one small request
@@ -315,15 +367,25 @@ struct ZikrStageView: View {
     @State private var cueToRemove: HalqaZikrCue?
     @State private var liveAudio: LiveAudioMode?
     @State private var liveAudioToken = ""
+    /// Our Sheikh's live sound, heard on the stage itself (the live
+    /// service's listener page, out of sight).
+    @State private var listening = false
+    @State private var listenToken = ""
+    /// What the live sound says of itself ("Live", "Waiting for Hazrat ji…").
+    @State private var listenStatus = ""
+    /// Opened by a Join: the live sound starts once the stage knows the Zikr
+    /// is live.
+    @State private var listenWanted: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.horizontalSizeClass) private var widthClass
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(groupID: String, groupName: String, service: MemberGroupService) {
+    init(groupID: String, groupName: String, service: MemberGroupService, listenOnOpen: Bool = false) {
         self.groupName = groupName
         _model = State(initialValue: ZikrStageModel(groupID: groupID, service: service))
+        _listenWanted = State(initialValue: listenOnOpen && HalqahStage.isOurSheikh(groupID))
     }
 
     private var ourSheikh: Bool { HalqahStage.isOurSheikh(model.groupID) }
@@ -379,9 +441,27 @@ struct ZikrStageView: View {
             if let id = note.object as? String, id != model.groupID { return }
             Task { await model.poll() }
         }
+        .background {
+            if listening {
+                LiveListenPlayer(token: listenToken, urdu: urdu) { listenStatus = $0 }
+            }
+        }
+        // The live sound follows the Zikr: it starts for a Join once the Zikr
+        // is live, and stops when the Zikr ends.
+        .onChange(of: model.live != nil) { _, isLive in
+            if isLive {
+                if listenWanted {
+                    listenWanted = false
+                    startListening()
+                }
+            } else {
+                stopListening()
+            }
+        }
         .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
         .onDisappear {
             model.stopVoice()
+            stopListening()
             UIApplication.shared.isIdleTimerDisabled = false
         }
         .sheet(isPresented: $addingMuraqaba) { StageMuraqabaEditor(model: model) }
@@ -406,7 +486,9 @@ struct ZikrStageView: View {
         }
     }
 
-    private func cueTitle(_ cue: HalqaZikrCue) -> String { urdu ? cue.titleUr ?? cue.title : cue.title }
+    private func cueTitle(_ cue: HalqaZikrCue) -> String {
+        HalqahStage.title(stageID: cue.stageID, title: cue.title, titleUr: cue.titleUr, urdu: urdu)
+    }
 
     // MARK: Stage
 
@@ -537,6 +619,60 @@ struct ZikrStageView: View {
 
     @ViewBuilder
     private func cueContent(_ cue: HalqaZikrCue) -> some View {
+        switch HalqahStage.card(for: cue.stageID) {
+        case .shajra: shajraContent(cue)
+        case .dua: duaContent(cue)
+        case .standard: standardContent(cue)
+        }
+    }
+
+    /// The Shajra Sharif: its name, then its lines rising slowly through the
+    /// card from the first to the last, where they stop (still, with Reduce
+    /// Motion). The words are ShajraText's, exactly as the Shajra page shows them.
+    @ViewBuilder
+    private func shajraContent(_ cue: HalqaZikrCue) -> some View {
+        Text(verbatim: cueTitle(cue))
+            .font(.system(size: 32, weight: .semibold, design: .serif))
+            .foregroundStyle(DIColor.accent).multilineTextAlignment(.center)
+            .diGoldTextShimmer()
+            .diGoldGlow(radius: 12, opacity: 0.45)
+            .accessibilityIdentifier("stage-title")
+        if let secondary = HalqahStage.secondaryTitle(stageID: cue.stageID, titleUr: cue.titleUr, urdu: urdu) {
+            Text(verbatim: secondary).font(DIFont.urduBody(scale: 1.3)).foregroundStyle(DIColor.onPrimary.opacity(0.92))
+                .multilineTextAlignment(.center)
+        }
+        ShajraStageLines(announcedAt: cue.createdAt, urdu: urdu)
+            .frame(height: presenting ? 440 : 330)
+            .accessibilityIdentifier("stage-shajra")
+    }
+
+    /// The dua that closes the Zikr, on a card of its own.
+    @ViewBuilder
+    private func duaContent(_ cue: HalqaZikrCue) -> some View {
+        Image(systemName: "hands.and.sparkles.fill")
+            .font(.system(size: 52, weight: .regular))
+            .foregroundStyle(DIColor.accent)
+            .diGoldGlow(radius: 14, opacity: 0.55)
+            .accessibilityHidden(true)
+        Text(verbatim: cueTitle(cue))
+            .font(.system(size: 40, weight: .semibold, design: .serif))
+            .foregroundStyle(DIColor.accent).multilineTextAlignment(.center)
+            .diGoldTextShimmer()
+            .diGoldGlow(radius: 12, opacity: 0.45)
+            .accessibilityIdentifier("stage-title")
+        if let secondary = HalqahStage.secondaryTitle(stageID: cue.stageID, titleUr: cue.titleUr, urdu: urdu) {
+            Text(verbatim: secondary).font(DIFont.urduBody(scale: 1.5)).foregroundStyle(DIColor.onPrimary.opacity(0.92))
+                .multilineTextAlignment(.center)
+        }
+        Text("Join in the dua")
+            .diInterfaceFont(.title3, weight: .medium)
+            .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+            .multilineTextAlignment(.center)
+            .accessibilityIdentifier("stage-dua")
+    }
+
+    @ViewBuilder
+    private func standardContent(_ cue: HalqaZikrCue) -> some View {
         if let latifa = Self.latifa(cue.stageID) {
             LatifaMedallion(number: latifa)
         }
@@ -546,7 +682,7 @@ struct ZikrStageView: View {
             .diGoldTextShimmer()
             .diGoldGlow(radius: 12, opacity: 0.45)
             .accessibilityIdentifier("stage-title")
-        if !urdu, let titleUr = cue.titleUr {
+        if let titleUr = HalqahStage.secondaryTitle(stageID: cue.stageID, titleUr: cue.titleUr, urdu: urdu) {
             Text(verbatim: titleUr).font(DIFont.urduBody(scale: 1.4)).foregroundStyle(DIColor.onPrimary.opacity(0.92))
                 .multilineTextAlignment(.center)
                 .diGoldTextShimmer(delay: 2)
@@ -636,14 +772,28 @@ struct ZikrStageView: View {
     }
 
     /// Our Sheikh's live sound (Android LiveAudioButtons): everyone can hear
-    /// the Zikr while it is live; admins can also send this phone's voice to
-    /// the app, Paltalk and YouTube.
+    /// the Zikr while it is live, here on the stage; admins can also send
+    /// this phone's voice to the app, Paltalk and YouTube.
     private var liveAudioControls: some View {
         VStack(spacing: DISpacing.sm) {
             if model.live != nil {
-                Button { openLiveAudio(.listen) } label: { Label("Listen live", systemImage: "headphones") }
-                    .buttonStyle(DIPrimaryButtonStyle())
-                    .accessibilityIdentifier("stage-listen-live")
+                Button { listening ? stopListening() : startListening() } label: {
+                    Label(listening ? LocalizedStringKey("Stop listening") : LocalizedStringKey("Listen live"),
+                          systemImage: listening ? "stop.fill" : "headphones")
+                }
+                .buttonStyle(DIPrimaryButtonStyle())
+                .accessibilityIdentifier("stage-listen-live")
+                if listening {
+                    HStack(spacing: DISpacing.sm) {
+                        DILivePulse(size: 8)
+                        Text(verbatim: listenStatus.isEmpty ? String(localized: "Live audio") : listenStatus)
+                            .diInterfaceFont(.footnote)
+                            .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                            .lineLimit(2)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("stage-listen-status")
+                }
             }
             if model.canModerate {
                 Button { openLiveAudio(.broadcast) } label: { Label("Broadcast", systemImage: "music.mic") }
@@ -656,10 +806,31 @@ struct ZikrStageView: View {
         }
     }
 
+    /// Hears the live sound on the stage, out of sight, while the stage shows.
+    private func startListening() {
+        guard ourSheikh, !listening else { return }
+        Task {
+            let token = await model.service.liveAudioToken ?? ""
+            guard model.live != nil, !listening else { return }
+            listenToken = token
+            listenStatus = ""
+            listening = true
+        }
+    }
+
+    private func stopListening() {
+        listening = false
+        listenToken = ""
+        listenStatus = ""
+    }
+
     private func openLiveAudio(_ mode: LiveAudioMode) {
         // One microphone: following Hazrat ji's voice pauses while this
-        // phone broadcasts.
-        if mode == .broadcast { model.stopVoice() }
+        // phone broadcasts, and the live sound stops (it would echo).
+        if mode == .broadcast {
+            model.stopVoice()
+            stopListening()
+        }
         Task {
             liveAudioToken = await model.service.liveAudioToken ?? ""
             liveAudio = mode
@@ -1164,6 +1335,140 @@ private struct StagePortrait: View {
             }
         }
         .accessibilityHidden(true)
+    }
+}
+
+/// The Shajra on the live stage: each link of the chain in Urdu (with the
+/// website's English line under it in English), then the closing dua in
+/// Arabic, rising slowly from the first line to the last and stopping there
+/// (ShajraStageScroll). A stage opened late joins it where it is. Reduce
+/// Motion shows the lines still, to scroll by hand. Android ShajraStageLines.
+struct ShajraStageLines: View {
+    /// When the Shajra was announced on the stage.
+    let announcedAt: Date
+    let urdu: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var contentHeight: CGFloat = 0
+    @State private var progress: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { box in
+            if reduceMotion {
+                ScrollView(showsIndicators: false) { lines.frame(width: box.size.width) }
+            } else {
+                lines
+                    .frame(width: box.size.width)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .background(GeometryReader { inner in
+                        Color.clear.preference(key: ShajraHeightKey.self, value: inner.size.height)
+                    })
+                    .modifier(ShajraRise(progress: progress, distance: max(0, contentHeight - box.size.height)))
+                    .frame(width: box.size.width, height: box.size.height, alignment: .top)
+                    .clipped()
+            }
+        }
+        .onPreferenceChange(ShajraHeightKey.self) { height in
+            Task { @MainActor in contentHeight = height }
+        }
+        .mask(LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: .black, location: 0.08),
+                                     .init(color: .black, location: 0.92), .init(color: .clear, location: 1)],
+                             startPoint: .top, endPoint: .bottom))
+        .task(id: announcedAt) { await rise() }
+    }
+
+    private var lines: some View {
+        VStack(spacing: DISpacing.md) {
+            ForEach(ShajraText.entries) { entry in
+                VStack(spacing: 4) {
+                    Text(verbatim: entry.urdu)
+                        .font(DIFont.urduBody(scale: 1.25))
+                        .foregroundStyle(entry.kind == .sheikh ? DIColor.onPrimary : DIColor.accent)
+                        .multilineTextAlignment(.center)
+                        .environment(\.layoutDirection, .rightToLeft)
+                        .lineSpacing(6)
+                    if !urdu {
+                        Text(verbatim: entry.english)
+                            .diInterfaceFont(.footnote)
+                            .foregroundStyle(DIColor.onPrimary.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(verbatim: ShajraText.closingArabic)
+                .font(DIFont.quranArabic(scale: 1.15))
+                .foregroundStyle(DIColor.accent)
+                .multilineTextAlignment(.center)
+                .environment(\.layoutDirection, .rightToLeft)
+                .lineSpacing(8)
+                .frame(maxWidth: .infinity)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, DISpacing.lg)
+    }
+
+    /// Where the Shajra is now, then on to its last line at its pace.
+    private func rise() async {
+        guard !reduceMotion else { return }
+        let elapsed = Date().timeIntervalSince(announcedAt)
+        progress = CGFloat(ShajraStageScroll.progress(elapsed: elapsed))
+        let remaining = ShajraStageScroll.remaining(elapsed: elapsed)
+        guard remaining > 0 else { return }
+        // Once the lines are laid out and measured.
+        try? await Task.sleep(for: .milliseconds(400))
+        guard !Task.isCancelled else { return }
+        withAnimation(.linear(duration: max(remaining - 0.4, 0.1))) { progress = 1 }
+    }
+}
+
+/// Moves the Shajra's lines up by `progress` of `distance`; the distance can
+/// change (the lines measured late) while the rise goes on.
+private struct ShajraRise: GeometryEffect {
+    var progress: CGFloat
+    var distance: CGFloat
+
+    var animatableData: CGFloat {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func effectValue(size: CGSize) -> ProjectionTransform {
+        ProjectionTransform(CGAffineTransform(translationX: 0, y: -distance * progress))
+    }
+}
+
+private struct ShajraHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
+}
+
+/// In every other Halqah while Our Sheikh's own Zikr is live (Daily Zikr, or
+/// the Tahajjud zikr before dawn): joined on Our Sheikh's live stage with the
+/// app's live sound, where the YouTube stream used to play (owner, 2026-11-06).
+struct SheikhLiveJoinCard: View {
+    var body: some View {
+        Button {
+            DIHaptics.light()
+            DeepLinkRouter.shared.open(.sheikhStage)
+        } label: {
+            HStack(spacing: DISpacing.md) {
+                DILivePulse(color: .white, size: 9)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Live now: \(String(localized: "Our Sheikh"))")
+                        .diInterfaceFont(.headline).foregroundStyle(DIColor.onPrimary)
+                    Text("Join Zikr").diInterfaceFont(.subheadline).foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "headphones").font(.title3).foregroundStyle(DIColor.accent)
+            }
+            .padding(DISpacing.md)
+            .background(LinearGradient(colors: [DIColor.primaryDeep, DIColor.primary], startPoint: .leading, endPoint: .trailing),
+                        in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(DIColor.accent.opacity(0.6)))
+        }
+        .buttonStyle(DIPressableStyle())
+        .accessibilityIdentifier("sheikh-live-join")
     }
 }
 

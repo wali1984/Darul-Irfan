@@ -3,8 +3,8 @@ import UIKit
 
 /// The Zikr tab: practice, live sessions and the member's own zikr. At its
 /// head Qur'an 13:28, centred; then Daily Zikr, one card for the broadcast
-/// and its session (YouTube only, played in the app); the Tahajjud zikr,
-/// joined on Paltalk; any halqah where zikr is live now; the member's own
+/// and its session, and the Tahajjud zikr, both joined on Our Sheikh's live
+/// stage with the app's own live sound; any halqah where zikr is live now; the member's own
 /// practice (Tasbih and the illustrated Method of Zikr); and the recent
 /// bayans.
 @MainActor
@@ -20,6 +20,9 @@ struct ZikrHomeView: View {
     @State private var focusScrollTask: Task<Void, Never>?
     @State private var personalZikr = false
     @State private var showOurSheikh = false
+    /// Our Sheikh's Halqah opens on its live stage with the live sound (a
+    /// Join, or a live-zikr notification), not only on its page.
+    @State private var joinSheikhLive = false
     @State private var linkedTasbihID: UUID?
     @State private var showLinkedTasbih = false
     @Environment(\.scenePhase) private var scenePhase
@@ -130,8 +133,10 @@ struct ZikrHomeView: View {
                     ZikrSessionPanel(
                         session: session,
                         live: viewModel.live,
+                        sheikhLive: viewModel.sheikhLive,
                         reminder: reminderBinding(for: session),
-                        playVideo: { videoID in playLiveVideo(videoID) }
+                        playVideo: { videoID in playLiveVideo(videoID) },
+                        joinSheikh: { openSheikh(joinLive: true) }
                     )
                     .id(session.id)
                     .diAppear(delay: 0.1 + 0.04 * Double(index))
@@ -175,7 +180,7 @@ struct ZikrHomeView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $personalZikr) { PersonalZikrView() }
         .navigationDestination(isPresented: $showOurSheikh) {
-            OurSheikhEntryView(service: groupService, dependencies: dependencies)
+            OurSheikhEntryView(service: groupService, dependencies: dependencies, joinLive: joinSheikhLive)
         }
         .navigationDestination(isPresented: $showLinkedTasbih) {
             if let id = linkedTasbihID {
@@ -191,6 +196,10 @@ struct ZikrHomeView: View {
             if DeepLinkRouter.shared.pending == .personalZikr {
                 DeepLinkRouter.shared.clear(.personalZikr)
                 personalZikr = true
+            }
+            if DeepLinkRouter.shared.pending == .sheikhStage {
+                DeepLinkRouter.shared.clear(.sheikhStage)
+                openSheikh(joinLive: true)
             }
         }
         .diScreenBackground()
@@ -246,36 +255,32 @@ struct ZikrHomeView: View {
     /// need it too), so the card does not ask a second time.
     private var dailyZikrCard: some View {
         let session = viewModel.dailySession
+        // Live only while Our Sheikh's Zikr is, in Daily Zikr's hours (before
+        // dawn in Pakistan the same Zikr is the Tahajjud zikr's).
+        let dailyLive = SheikhLiveZikr.liveSession(viewModel.sheikhLive, at: Date()) == .daily
         return DailyZikrCard(
             broadcast: viewModel.live,
+            sheikhLive: dailyLive ? viewModel.sheikhLive : nil,
             session: session,
             recordings: viewModel.recordedZikr,
             alertsWhenLive: liveAlertsBinding,
             reminderBeforeSession: session.map { reminderBinding(for: $0) },
-            join: { source in joinDailyZikr(source) },
+            join: { openSheikh(joinLive: true) },
             playRecording: { item in
                 if let videoID = item.videoID {
                     presentedVideo = ZikrPresentedVideo(id: videoID, title: item.title)
                 }
             },
-            openSheikh: { showOurSheikh = true }
+            openSheikh: { openSheikh(joinLive: false) }
         )
     }
 
-    /// Plays Daily Zikr in the app: the room's own sound when staff relay
-    /// it, the channel's live video otherwise.
-    private func joinDailyZikr(_ source: LiveSource) {
-        switch source.kind {
-        case .ownedStream:
-            let title = DailyZikrPresentation.headline(for: viewModel.live).title
-            let item = AudioPlayableItem(id: "official-live", title: title, subtitle: "Darul Irfan", url: source.url)
-            dependencies.audioPlayer.play(item, queue: [item])
-        case .youtube:
-            if let videoID = source.videoID { playLiveVideo(videoID) }
-        case .paltalk:
-            // The Paltalk room is the Tahajjud zikr's; Daily Zikr is YouTube only.
-            break
-        }
+    /// Our Sheikh's Halqah: with `joinLive`, straight onto its live stage
+    /// with the app's own live sound, where Daily Zikr and the Tahajjud zikr
+    /// are joined (never Paltalk or YouTube, owner 2026-11-06).
+    private func openSheikh(joinLive: Bool) {
+        joinSheikhLive = joinLive
+        showOurSheikh = true
     }
 
     private func playLiveVideo(_ videoID: String) {

@@ -64,7 +64,11 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         if let path = response.notification.request.content.userInfo["path"] as? String {
             // Kept until the screen it opens exists: with the app closed, this
             // arrives during the splash, before any screen is listening.
-            Task { @MainActor in DeepLinkRouter.shared.open(path: path) }
+            // The live-zikr notices open Our Sheikh's live stage, where the
+            // Zikr is heard in the app (never Paltalk or YouTube).
+            Task { @MainActor in
+                if let route = AppRoute.notification(path: path) { DeepLinkRouter.shared.open(route) }
+            }
         }
         completionHandler()
     }

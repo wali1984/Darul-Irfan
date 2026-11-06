@@ -50,6 +50,8 @@ final class LiveAuditFixesTests: XCTestCase {
     /// by exact name: a Halqah called Liverpool is a group, not the live zikr.
     func testPushPathsRouteByExactName() {
         XCTAssertEqual(AppRoute(path: "darulirfan://live/official-live"), .live)
+        XCTAssertEqual(AppRoute(path: "darulirfan://live/our-sheikh"), .sheikhStage)
+        XCTAssertEqual(AppRoute(path: "live/Our-Sheikh"), .sheikhStage)
         XCTAssertEqual(AppRoute(path: "darulirfan://zikr"), .zikr(session: nil))
         XCTAssertEqual(AppRoute(path: "darulirfan://zikr/tahajjud"), .zikr(session: "tahajjud"))
         XCTAssertEqual(AppRoute(path: "darulirfan://groups/usa"), .group(id: "usa"))

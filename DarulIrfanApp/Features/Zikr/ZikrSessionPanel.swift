@@ -1,32 +1,35 @@
 import SwiftUI
 
 /// An official zikr session other than Daily Zikr, on glass: the Tahajjud
-/// zikr, held before Fajr at Dar-ul-Irfan and joined in the Paltalk room, and
-/// any further session the administrators publish, joined through the
-/// channel's live video in the app. Its countdown, this phone's time and
-/// Pakistan's, the room's listeners while it is open, Join, and its bell
-/// (the reminder before each session).
+/// zikr, held before Fajr at Dar-ul-Irfan and joined on Our Sheikh's live
+/// stage with the app's own live sound (owner, 2026-11-06), and any further
+/// session the administrators publish, joined through the channel's live
+/// video in the app. Its countdown, this phone's time and Pakistan's, "Live
+/// now" while it is, Join, and its bell (the reminder before each session).
 struct ZikrSessionPanel: View {
     let session: ZikrSession
-    /// The official live state: the open Paltalk room, or the live video.
+    /// The channel's live state, for a further session's live video.
     let live: LiveBroadcast
+    /// Our Sheikh's own live Zikr; nil while it is not live.
+    let sheikhLive: SheikhLiveZikr?
     /// The reminder before each session.
     let reminder: Binding<Bool>
     /// Plays the channel's live video in the app.
     let playVideo: (String) -> Void
+    /// Opens Our Sheikh's live stage with the live sound.
+    let joinSheikh: () -> Void
 
-    @Environment(\.openURL) private var openURL
     @Environment(\.locale) private var locale
     @Environment(\.colorScheme) private var colorScheme
 
     private var inUrdu: Bool { DIBrand.readsUrdu(locale) }
-    private var joinsOnPaltalk: Bool { ZikrSessionJoin.joinsOnPaltalk(session) }
+    private var isTahajjud: Bool { ZikrSessionJoin.isTahajjud(session) }
     /// Small gold text: darker on cream, brighter at night.
     private var accentText: Color { colorScheme == .dark ? DIColor.accent : Color(hex: 0x7A5A14) }
 
     var body: some View {
         // Re-read every thirty seconds: the countdown's state, and whether
-        // the room is open; the digits count each second by themselves.
+        // the Zikr is live; the digits count each second by themselves.
         TimelineView(.periodic(from: .now, by: 30)) { context in
             panel(at: context.date)
         }
@@ -34,7 +37,7 @@ struct ZikrSessionPanel: View {
 
     private func panel(at now: Date) -> some View {
         let window = ZikrCountdown.window(for: session, at: now)
-        let room = ZikrSessionJoin.openRoom(for: session, live: live, at: now)
+        let sheikhJoinable = ZikrSessionJoin.joinsSheikhStage(for: session, sheikh: sheikhLive, at: now)
         return VStack(alignment: .leading, spacing: 12) {
             header(window: window, now: now)
             if let window {
@@ -50,13 +53,13 @@ struct ZikrSessionPanel: View {
                     .foregroundStyle(DIColor.textMuted)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            if let room {
-                Label("Live on Paltalk now · \(room.listeners) listening", systemImage: "person.3.fill")
+            if sheikhJoinable {
+                Label("Live now", systemImage: "dot.radiowaves.left.and.right")
                     .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.primary)
             }
             HStack(spacing: 10) {
-                joinButton(room: room)
+                joinButton(sheikhJoinable: sheikhJoinable)
                 bellButton
             }
         }
@@ -102,14 +105,14 @@ struct ZikrSessionPanel: View {
     /// The Tahajjud zikr's night-blue orb with a gold crescent; an emerald
     /// one for any other session.
     private var orb: some View {
-        Image(systemName: joinsOnPaltalk ? "moon.fill" : "sparkles")
+        Image(systemName: isTahajjud ? "moon.fill" : "sparkles")
             .diInterfaceFont(.body, weight: .semibold)
             .foregroundStyle(DIColor.goldGlow)
             .frame(width: 42, height: 42)
             .background(
                 Circle().fill(
                     RadialGradient(
-                        colors: joinsOnPaltalk
+                        colors: isTahajjud
                             ? [Color(hex: 0x2A4D7A), Color(hex: 0x16294A), Color(hex: 0x0B1630)]
                             : [Color(hex: 0x34B98A), Color(hex: 0x0B7250), Color(hex: 0x064B34)],
                         center: UnitPoint(x: 0.32, y: 0.26),
@@ -125,21 +128,21 @@ struct ZikrSessionPanel: View {
 
     // MARK: Join and bell
 
-    /// Always shown; greyed until the zikr is on: the open room for the
-    /// Tahajjud zikr, the live video for any other session.
-    private func joinButton(room: LiveRoom?) -> some View {
+    /// Always shown; greyed until the zikr is on: Our Sheikh's live Zikr
+    /// before dawn for the Tahajjud zikr, the live video for any other session.
+    private func joinButton(sheikhJoinable: Bool) -> some View {
         let videoID = ZikrSessionJoin.liveVideoID(for: session, live: live)
-        let available = joinsOnPaltalk ? room != nil : videoID != nil
+        let available = isTahajjud ? sheikhJoinable : videoID != nil
         return Button {
             DIHaptics.light()
-            if let url = room?.url {
-                openURL(url)
+            if isTahajjud {
+                if sheikhJoinable { joinSheikh() }
             } else if let videoID {
                 playVideo(videoID)
             }
         } label: {
-            Label(joinsOnPaltalk ? "Join Zikr on Paltalk" : "Join Zikr on YouTube",
-                  systemImage: joinsOnPaltalk ? "headphones" : "play.rectangle.fill")
+            Label(isTahajjud ? "Join Tahajjud Zikr" : "Join Zikr on YouTube",
+                  systemImage: isTahajjud ? "headphones" : "play.rectangle.fill")
                 .diInterfaceFont(.subheadline, weight: .bold)
                 .foregroundStyle(available ? Color.white : DIColor.textMuted)
                 .frame(maxWidth: .infinity, minHeight: 44)
@@ -149,7 +152,7 @@ struct ZikrSessionPanel: View {
         .buttonStyle(DIPressableStyle())
         .disabled(!available)
         .accessibilityHint(available ? Text("")
-            : joinsOnPaltalk ? Text("Available when the Paltalk room is open") : Text("Available when the zikr is live on YouTube"))
+            : isTahajjud ? Text("Available when Tahajjud Zikr is live") : Text("Available when the zikr is live on YouTube"))
     }
 
     @ViewBuilder

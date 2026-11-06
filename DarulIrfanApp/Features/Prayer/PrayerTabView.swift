@@ -33,9 +33,9 @@ struct PrayerTabView: View {
                 VStack(alignment: .leading, spacing: DISpacing.md) {
                     // A newer TestFlight or App Store build, while one is out.
                     TodayUpdateBanner()
-                    // Only while Daily Zikr or the Tahajjud zikr is live.
+                    // Only while Our Sheikh's Daily Zikr or Tahajjud zikr is live.
                     if let strip = liveModel.strip {
-                        TodayOfficialSection(strip: strip, dependencies: dependencies)
+                        TodayOfficialSection(strip: strip)
                             .transition(.opacity)
                     }
                     TodayHeroView(viewModel: viewModel, dependencies: dependencies, appState: appState)
