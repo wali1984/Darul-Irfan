@@ -4,3 +4,6 @@ paltalk_controls.txt
 __pycache__/
 pending_cues.json
 pending_cues.json.tmp
+youtube-oauth-client.json
+youtube-token.json
+youtube_session.json

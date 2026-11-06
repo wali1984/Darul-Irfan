@@ -41,6 +41,7 @@ from cues import PlatformCues, is_dua, stage_id  # noqa: E402
 from live_client import ApiError, Worker, publish, pull  # noqa: E402
 from programme import Programme  # noqa: E402
 from stage_picture import StagePicture  # noqa: E402
+from youtube_live import YouTube  # noqa: E402
 
 
 LEAVE_AFTER = 20.0   # seconds of a clear "no room open" before the relay has left the room
@@ -191,6 +192,18 @@ class Relay:
         self.platform_live = False  # a Zikr this relay started on the platform
         outputs = [cfg.get("YOUTUBE_URL", ""), cfg.get("FACEBOOK_URL", "")]
         self.programme = Programme(outputs, HERE / "daily_zikr_frame.png") if any(outputs) else None
+        # YouTube's broadcast for each session, made and ended through its API
+        # (youtube_live.py) when the OAuth files are beside the relay.
+        self.youtube: YouTube | None = None
+        if cfg.get("YOUTUBE_URL"):
+            candidate = YouTube(cfg["YOUTUBE_URL"].rstrip("/").rsplit("/", 1)[-1],
+                                cfg.get("YOUTUBE_TITLE", "Online Zikr with Sheikh-ul-Mukarram Hazrat Ameer Abdul Qadeer Awan MZA"),
+                                cfg.get("YOUTUBE_PRIVACY", "public"), cfg.get("YOUTUBE_DESCRIPTION", ""))
+            self.youtube = candidate if candidate.configured else None
+        self.youtube_for: str | None = None  # the platform session the broadcast was made for
+        self.youtube_life = "-"
+        self.youtube_checked_at = 0.0
+        self.youtube_warned_at = 0.0
         platform = cfg.get("PLATFORM_URL", "https://darul-irfan-platform.wajidmahmoodali1984-e23.workers.dev")
         self.platform = platform
         self.halqah = cfg.get("HALQAH_ID", "our-sheikh")
@@ -403,7 +416,7 @@ class Relay:
                     "micHeld": self.mic_held,
                     "roomPeak": self.room_audio.take_peak(),
                     "appPeak": self.app_audio.take_peak(),
-                    "youtube": self.programme.state if self.programme else "not configured",
+                    "youtube": f"{self.programme.state}/{self.youtube_life}" if self.programme else "not configured",
                     "freeMB": int(psutil.virtual_memory().available / 1_048_576),
                     "problem": self.problem,
                 }
@@ -818,7 +831,7 @@ class Relay:
             f"publishing={'yes' if self.pub_pc is not None else 'no'} platform={'live' if self.platform_is_live else 'off'} "
             f"lease={'held' if self.has_lease else 'no'} gen={self.generation} pending={len(self.pending)} "
             f"stage={self.platform_stage} dua={'shown' if self.dua_shown else 'no'} "
-            f"youtube={self.programme.state if self.programme else '-'} cpu={psutil.cpu_percent():.0f}% "
+            f"youtube={self.programme.state if self.programme else '-'}/{self.youtube_life} cpu={psutil.cpu_percent():.0f}% "
             f"read={self.walk_seconds:.1f}s problem={self.problem or '-'}")
 
     async def _send_cue(self, stage: str, text: str, generation: int | None = None,
@@ -1029,16 +1042,26 @@ class Relay:
             return
         url = f"{self.platform.rstrip('/')}/v1/public/live?ids={self.halqah}"
         platform_live = False
+        session_key, title = "", ""
         while True:
             try:
                 data = await asyncio.to_thread(_get_json, url)
                 entry = next((h for h in data.get("halqahs", []) if h.get("id") == self.halqah), {})
                 platform_live = bool(entry.get("live"))
+                if platform_live:
+                    live_entry = entry.get("live") or {}
+                    session_key = str(live_entry.get("sessionID") or live_entry.get("startedAt") or "session")
+                    title = str(live_entry.get("title") or "")
             except Exception:  # noqa: BLE001 - a network blip keeps the stream as it is
                 pass
             on_air_app = (self.state.get("active") or {}).get("source") == "app"
             live = self.has_lease and (platform_live or on_air_app)
             if live:
+                if self.youtube:
+                    # The broadcast first, so YouTube has somewhere to put the
+                    # picture when the encoder connects; the encoder never waits
+                    # on the API (a Studio-made broadcast would still take it).
+                    await self._youtube_live(session_key or "app", title)
                 picture = await asyncio.to_thread(self.picture.refresh)
                 if picture:
                     self.programme.set_picture(picture)
@@ -1047,9 +1070,42 @@ class Relay:
                 self.programme.start()
             else:
                 self.programme.stop()
+                if self.youtube and self.youtube_for:
+                    await self._youtube_done()
                 if self.camera:  # between sessions: the Silsila's resting frame, never an old stage
                     await asyncio.to_thread(self.camera.set_picture, (HERE / "daily_zikr_frame.png").read_bytes())
             await asyncio.sleep(5)
+
+    async def _youtube_live(self, session_key: str, title: str) -> None:
+        """The session's broadcast made (or found again) and, every 30 s,
+        looked at: ready -> live once the stream is active; the lifecycle
+        goes to the health line. API trouble is logged once a minute and
+        never stops the encoder."""
+        now = time.time()
+        try:
+            if self.youtube_for != session_key:
+                await asyncio.to_thread(self.youtube.ensure, session_key, title or None)
+                self.youtube_for = session_key
+                self.youtube_life = "created"
+                log(f"[youtube] this session's broadcast: {self.youtube.watch_url()}")
+            if now - self.youtube_checked_at >= 30:
+                self.youtube_checked_at = now
+                life = await asyncio.to_thread(self.youtube.go_live_if_ready)
+                if life != self.youtube_life:
+                    log(f"[youtube] broadcast {life}")
+                self.youtube_life = life
+        except Exception as error:  # noqa: BLE001 - the API; the encoder runs regardless
+            if now - self.youtube_warned_at > 60:
+                self.youtube_warned_at = now
+                log(f"[youtube] {error}")
+            self.youtube_life = "error"
+
+    async def _youtube_done(self) -> None:
+        try:
+            await asyncio.to_thread(self.youtube.complete)
+        except Exception as error:  # noqa: BLE001
+            log(f"[youtube] could not complete the broadcast: {error}")
+        self.youtube_for, self.youtube_life = None, "-"
 
     # MARK: - Start
 
