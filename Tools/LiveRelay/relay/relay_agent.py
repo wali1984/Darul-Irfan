@@ -141,7 +141,7 @@ class Relay:
         self.last_cue_from_room = 0.0
         self.left_room_at: float | None = None
         # The room as last read: in / out / closed / unknown (paltalk_ui.room_status).
-        self.room_status = "unknown"
+        self.room_status = ""  # so the first read is logged, whatever it says
         self.in_streak = 0
         self.walk_seconds = 0.0
         self.joined_at = 0.0
