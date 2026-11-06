@@ -95,6 +95,9 @@ final class SheikhLiveJoinTests: XCTestCase {
         XCTAssertEqual(ShajraStageScroll.progress(elapsed: -30), 0, "A phone clock behind the server's")
         XCTAssertEqual(ShajraStageScroll.remaining(elapsed: 3_600), 0)
         XCTAssertEqual(ShajraStageScroll.remaining(elapsed: 0), ShajraStageScroll.duration, accuracy: 0.0001)
-        XCTAssertGreaterThan(ShajraStageScroll.duration, 60, "Slowly: about a minute or more")
+        // Owner, 2026-11-06: the whole roll, pause included, in under 60 seconds (about 51).
+        XCTAssertLessThan(ShajraStageScroll.lead + ShajraStageScroll.duration, 60)
+        XCTAssertEqual(ShajraStageScroll.lead + ShajraStageScroll.duration, 51, accuracy: 0.0001)
+        XCTAssertGreaterThan(ShajraStageScroll.duration, 30, "Still slow enough to read")
     }
 }

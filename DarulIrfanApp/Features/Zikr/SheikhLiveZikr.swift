@@ -95,12 +95,14 @@ extension AppRoute {
 
 /// The Shajra on the live stage (cue "shajra", after Masjid-e-Nabawi and
 /// before the Dua): its lines rise slowly through the stage card, from the
-/// first to the last, and stop there (Android ShajraStageScroll).
+/// first to the last, and stop there, the whole roll in under a minute
+/// (owner, 2026-11-06: "shajra should be shown in less than 60 sec rolling";
+/// about 51 s, as the websites). Android ShajraStageScroll.
 enum ShajraStageScroll {
     /// The first lines stay still this long before they begin to move.
-    static let lead: TimeInterval = 4
-    /// About how long one line of the Shajra is recited.
-    static let perLine: TimeInterval = 8
+    static let lead: TimeInterval = 2
+    /// How long each line takes to pass.
+    static let perLine: TimeInterval = 3.5
 
     /// The lines that pass: each link of the chain, then the closing dua.
     static var lineCount: Int { ShajraText.entries.count + 1 }
