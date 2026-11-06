@@ -1,5 +1,5 @@
 import type { Env } from "./contracts";
-import { canManage, canSee, memberRole, notifyGroup } from "./community";
+import { canManage, canSee, memberRole, notifyGroup, zikrNoticeLink } from "./community";
 import { signedMediaURL } from "./media";
 import { groupRecording, youtubeVideos } from "./recordings";
 import { startRoomRecording, stopRoomRecording } from "./roomRecordings";
@@ -281,7 +281,7 @@ export async function controlSession(env: Env, memberID: string, groupID: string
       await env.DB.prepare("UPDATE group_live SET notice=?,notice_at=?,updated_at=? WHERE group_id=?")
         .bind(text ?? null, text ? now.toISOString() : null, now.toISOString(), groupID).run();
       if (text && input.notify === true) {
-        await notifyGroup(env, groupID, `notice:${groupID}:${now.toISOString()}`, live.title ?? "Halqah Zikr", text, `darulirfan://groups/${groupID}`);
+        await notifyGroup(env, groupID, `notice:${groupID}:${now.toISOString()}`, live.title ?? "Halqah Zikr", text, zikrNoticeLink(groupID));
       }
       break;
     }
@@ -463,6 +463,6 @@ export async function autoplayDue(env: Env, now = new Date()): Promise<void> {
       .bind(now.toISOString(), row.group_id, row.id).run();
     await beginSession(env, row.group_id, "schedule", { kind: "zikr", title: row.title, videoID: null, roomID: null, queue });
     await notifyGroup(env, row.group_id, `autoplay:${row.group_id}:${row.id}:${now.toISOString().slice(0, 13)}`, row.title,
-      "The Halqah zikr has started. Listen together in Darul Irfan.", `darulirfan://groups/${row.group_id}`);
+      "The Halqah zikr has started. Listen together in Darul Irfan.", zikrNoticeLink(row.group_id));
   }
 }

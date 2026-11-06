@@ -412,7 +412,9 @@ struct TodayUpcomingCard: View {
                 DeepLinkRouter.shared.open(route(for: zikr))
             } label: {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(DailyZikrBanner.phase(start: zikr.startsAt, end: zikr.endsAt, now: now) == .live ? "LIVE NOW" : "Upcoming")
+                    // Never "LIVE NOW" by the clock: only Our Sheikh's Zikr live
+                    // on the server is live, and then Today's live strip shows instead.
+                    Text("Upcoming")
                         .diInterfaceFont(.caption, weight: .bold).foregroundStyle(Color(hex: 0xFFE3A0))
                     Text(LocalizedStringKey(DailyZikrBanner.title))
                         .diInterfaceFont(.subheadline, weight: .semibold).foregroundStyle(.white)
@@ -443,8 +445,8 @@ struct TodayUpcomingCard: View {
         }
     }
 
-    /// The Zikr tab at the card of the session shown: the Daily Zikr
-    /// broadcast, or the Tahajjud zikr joined on Paltalk.
+    /// The Zikr tab at the card of the session shown, Daily Zikr or the
+    /// Tahajjud zikr, whose Join opens Our Sheikh's live stage once it is live.
     private func route(for zikr: WidgetZikrSession) -> AppRoute {
         let sessionID = zikr.id.split(separator: "|").first.map(String.init) ?? ""
         if sessionID == "zikr-after-isha" { return .live }

@@ -19,7 +19,10 @@ away; if the earlier build is still waiting, this one joins the queue.
 `announce` writes the newest build Apple has passed for the external testers
 to app/releases.json in R2, which the server serves at /v1/app/releases: a
 TestFlight copy on an older build then shows the update banner on Today
-(TestFlight has no lookup an app can ask). The R2 credentials are the "S3
+(TestFlight has no lookup an app can ask). It also writes the newest build the
+internal testers have ("internal"), which only a copy already on a build later
+than the external one offers, so internal-only releases show the banner to the
+internal testers and never to the external ones. The R2 credentials are the "S3
 clients" ones in `cloudflare.md` one folder above this repository (outside
 git), never printed.
 """
@@ -177,29 +180,54 @@ def r2():
                         aws_secret_access_key=after("Secret Access Key"), region_name="auto")
 
 
+def internal_build() -> tuple[int, str] | None:
+    """(build number, version) of the newest processed build the internal
+    testers have: every upload reaches them, up to the policy's internalBuild."""
+    data = get(f"/v1/builds?filter[app]={APP}&sort=-uploadedDate&limit=20&include=preReleaseVersion"
+               "&fields[builds]=version,processingState,preReleaseVersion&fields[preReleaseVersions]=version")
+    included = {(item["type"], item["id"]): item["attributes"] for item in data.get("included", [])}
+    ceiling = int(distribution_policy().get("internalBuild", 10**9))
+    valid = []
+    for build in data.get("data", []):
+        number = int(build["attributes"]["version"])
+        if build["attributes"]["processingState"] == "VALID" and number <= ceiling:
+            link = build["relationships"]["preReleaseVersion"]["data"]["id"]
+            valid.append((number, included.get(("preReleaseVersions", link), {}).get("version")))
+    return max(valid) if valid else None
+
+
 def announce(known: int | None = None) -> int | None:
-    """Name the newest tester build in app/releases.json. Returns its number
-    when the file changed; nothing is read from R2 while it is `known`."""
+    """Name the newest tester builds in app/releases.json: the external
+    testers' (its number is returned when it changed) and the internal
+    testers' newest. `known` is the external build last announced."""
     found = tester_build()
-    if not found or found[0] == known:
-        return None
-    number, version = found
-    if number > int(distribution_policy().get("externalBuildCeiling", 70)):
+    if found and found[0] > int(distribution_policy().get("externalBuildCeiling", 70)):
         print("External update announcement held by owner policy.")
+        found = None
+    inside = internal_build()
+    if not inside and (not found or found[0] == known):
         return None
     bucket = r2()
     try:
         releases = json.loads(bucket.get_object(Bucket=BUCKET, Key=RELEASES)["Body"].read())
     except bucket.exceptions.NoSuchKey:
         releases = {}
-    if releases.get("ios", {}).get("testflight", {}).get("build") == number:
+    ios = releases.setdefault("ios", {})
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    changed = None
+    if found and ios.get("testflight", {}).get("build") != found[0]:
+        ios["testflight"] = {"version": found[1], "build": found[0], "releasedAt": now}
+        changed = found[0]
+    # Never older than the external build: an internal tester has that too.
+    if found and (not inside or inside[0] < found[0]):
+        inside = found
+    if inside and ios.get("internal", {}).get("build", 0) < inside[0]:
+        ios["internal"] = {"version": inside[1], "build": inside[0], "releasedAt": now}
+    elif changed is None:
         return None
-    releases.setdefault("ios", {})["testflight"] = {
-        "version": version, "build": number,
-        "releasedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
     bucket.put_object(Bucket=BUCKET, Key=RELEASES, Body=json.dumps(releases, separators=(",", ":")).encode(),
                       ContentType="application/json", CacheControl="public, max-age=300")
-    return number
+    return changed
 
 
 def main() -> int:
@@ -213,7 +241,7 @@ def main() -> int:
         return release(args[1], args[2])
     if args[0] == "announce":
         number = announce()
-        print(f"announced build {number}" if number else "already announced")
+        print(f"announced build {number}" if number else "external build already announced")
         return 0
     sys.exit(__doc__)
 

@@ -4,11 +4,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 import type { Env } from "../src/contracts";
-import { reconcileLive } from "../src/live";
+import { announceDailyZikr, reconcileLive } from "../src/live";
 import { refreshPaltalkRoom } from "../src/paltalkRoom";
 import { refreshWebsiteCatalog, refreshYouTube } from "../src/sources";
 import { autoplayDue } from "../src/session";
-import { notifyGroup } from "../src/community";
+import { notifyGroup, zikrNoticeLink } from "../src/community";
 import { resetAPNSToken, sendPushToInstallations, sendTopicPush } from "../src/apns";
 import { sqliteD1 } from "./sqlite-d1";
 
@@ -187,8 +187,13 @@ describe("LIVE-009: the official broadcast follows the live video, or the next o
 describe("LIVE-010 / LIVE-027: one alert per broadcast, which expires and replaces the last", () => {
   it("announces a live stream that drops out for a minute and comes back once", async () => {
     let content: Video["content"] = "live";
-    const { env, device, apns } = await setup(youtube(() => [{ id: "todaylive01", content, started: "2026-10-28T16:02:00Z" }]));
+    const { env, raw, device, apns } = await setup(youtube(() => [{ id: "todaylive01", content, started: "2026-10-28T16:02:00Z" }]));
     device(installation(1));
+    // Owner 2026-11-06: Daily Zikr is joined on Our Sheikh's stage, so the
+    // channel going live is announced only while his Zikr is live there.
+    raw.prepare("INSERT OR IGNORE INTO member_groups(id,name,updated_at) VALUES('our-sheikh','Our Sheikh','now')").run();
+    raw.prepare(`INSERT INTO group_live(group_id,state,kind,title,started_at,updated_at,session_id,queue_json,is_test)
+      VALUES('our-sheikh','live','zikr','Daily Zikr','2026-10-28T16:00:00Z','now','s1','[]',0)`).run();
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-28T16:03:00Z")); await refreshYouTube(env);
     content = "none"; vi.setSystemTime(new Date("2026-10-28T16:04:00Z")); await refreshYouTube(env);
@@ -197,6 +202,32 @@ describe("LIVE-010 / LIVE-027: one alert per broadcast, which expires and replac
     const headers = apns()[0]!.headers;
     expect(headers["apns-collapse-id"]).toBe("live-zikr");
     expect(Number(headers["apns-expiration"])).toBe(Math.floor(Date.parse("2026-10-28T16:03:00Z") / 1000) + 1_800);
+    expect(JSON.parse(apns()[0]!.body).path).toBe("darulirfan://live/our-sheikh");
+  });
+
+  it("announces Daily Zikr once a day, on Our Sheikh's stage; never before dawn (the Tahajjud has its own)", async () => {
+    const { env, device, apns } = await setup(youtube(() => []));
+    device(installation(1));
+    await announceDailyZikr(env, new Date("2026-10-28T16:00:00Z"));
+    await announceDailyZikr(env, new Date("2026-10-28T16:30:00Z"));
+    expect(apns()).toHaveLength(1);
+    expect(JSON.parse(apns()[0]!.body).path).toBe("darulirfan://live/our-sheikh");
+    await announceDailyZikr(env, new Date("2026-10-28T23:30:00Z"));
+    expect(apns()).toHaveLength(1);
+    // Our Sheikh's own Halqah notices open his stage; every other Halqah's, its page.
+    expect(zikrNoticeLink("our-sheikh")).toBe("darulirfan://live/our-sheikh");
+    expect(zikrNoticeLink("usa")).toBe("darulirfan://groups/usa");
+  });
+
+  it("holds the channel's alert while Our Sheikh's Zikr is not live (or only a test)", async () => {
+    const { env, raw, device, apns } = await setup(youtube(() => [{ id: "todaylive02", content: "live", started: "2026-10-28T16:02:00Z" }]));
+    device(installation(1));
+    raw.prepare("INSERT OR IGNORE INTO member_groups(id,name,updated_at) VALUES('our-sheikh','Our Sheikh','now')").run();
+    raw.prepare(`INSERT INTO group_live(group_id,state,kind,title,started_at,updated_at,session_id,queue_json,is_test)
+      VALUES('our-sheikh','live','zikr','Simulation','2026-10-28T16:00:00Z','now','s1','[]',1)`).run();
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-28T16:03:00Z")); await refreshYouTube(env);
+    expect(apns()).toHaveLength(0);
   });
 
   it("announces the Tahajjud room once a night, even when it flickers in Paltalk's directory", async () => {

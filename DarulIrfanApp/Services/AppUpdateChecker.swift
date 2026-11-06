@@ -12,8 +12,9 @@ struct AppRelease: Equatable, Sendable {
     let url: URL
 }
 
-/// GET /v1/app/releases: the newest build out to the external testers, per
-/// platform. `{}` until a release has been announced.
+/// GET /v1/app/releases: the newest build out to the external testers, and
+/// the newest out to the internal testers only, per platform. `{}` until a
+/// release has been announced.
 struct PublishedReleases: Decodable, Sendable {
     struct Build: Decodable, Sendable {
         let version: String
@@ -22,6 +23,13 @@ struct PublishedReleases: Decodable, Sendable {
 
     struct Platform: Decodable, Sendable {
         let testflight: Build?
+        /// The newest build the internal testers have; nil until announced.
+        let internalTesters: Build?
+
+        private enum CodingKeys: String, CodingKey {
+            case testflight
+            case internalTesters = "internal"
+        }
     }
 
     let ios: Platform?
@@ -31,9 +39,10 @@ struct PublishedReleases: Decodable, Sendable {
 ///
 /// TestFlight has no lookup an app can ask, so the release script on the
 /// team's PC (`Tools/Release/testflight.py announce`) writes the newest build
-/// Apple has passed for the external testers to the server, and a TestFlight
-/// copy compares its build number with that. An App Store copy asks Apple's
-/// own lookup for the version in the store.
+/// Apple has passed for the external testers to the server, with the newest
+/// uploaded for the internal testers, and a TestFlight copy compares its build
+/// number with those. An App Store copy asks Apple's own lookup for the
+/// version in the store.
 enum AppReleaseCheck {
     /// The app's Apple ID in App Store Connect.
     static let appleID = "6789375037"
@@ -54,8 +63,8 @@ enum AppReleaseCheck {
         let version = info?["CFBundleShortVersionString"] as? String ?? "0"
         let build = Int(info?["CFBundleVersion"] as? String ?? "") ?? 0
         if isTestFlight {
-            guard let latest = await latestTestFlight() else { return nil }
-            return newerTestFlight(latest, thanBuild: build)
+            guard let published = await publishedTestFlight() else { return nil }
+            return newerTestFlight(published, thanBuild: build)
         }
         guard let latest = await latestAppStore() else { return nil }
         return isNewer(latest.version, than: version) ? latest : nil
@@ -65,6 +74,16 @@ enum AppReleaseCheck {
     static func newerTestFlight(_ latest: PublishedReleases.Build, thanBuild current: Int) -> AppRelease? {
         guard latest.build > current else { return nil }
         return AppRelease(channel: .testFlight, version: latest.version, build: latest.build, url: testFlightURL)
+    }
+
+    /// The external testers' build when it is later than this one. Otherwise,
+    /// on a build later than theirs, which only an internal tester can have,
+    /// the internal testers' newest: an external tester is never offered a
+    /// build they cannot install.
+    static func newerTestFlight(_ published: PublishedReleases.Platform, thanBuild current: Int) -> AppRelease? {
+        if let external = published.testflight, let offer = newerTestFlight(external, thanBuild: current) { return offer }
+        guard let internalTesters = published.internalTesters, current > (published.testflight?.build ?? 0) else { return nil }
+        return newerTestFlight(internalTesters, thanBuild: current)
     }
 
     /// Whether `candidate` is a later version than `current`, part by part:
@@ -80,10 +99,10 @@ enum AppReleaseCheck {
         return false
     }
 
-    private static func latestTestFlight() async -> PublishedReleases.Build? {
+    private static func publishedTestFlight() async -> PublishedReleases.Platform? {
         let url = OfficialPlatformConfiguration.baseURL.appendingPathComponent("v1/app/releases")
         guard let data = await fetch(url) else { return nil }
-        return (try? JSONDecoder().decode(PublishedReleases.self, from: data))?.ios?.testflight
+        return (try? JSONDecoder().decode(PublishedReleases.self, from: data))?.ios
     }
 
     private struct AppStoreLookup: Decodable {

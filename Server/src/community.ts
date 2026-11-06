@@ -5,6 +5,7 @@ import { signedMediaURL } from "./media";
 import { youtubeVideos } from "./recordings";
 import { beginSession, endSession, liveRow, queueOf, resolveQueue, sessionPayload, unreadDuaCount } from "./session";
 import { recordingConfig, trackRoom } from "./roomRecordings";
+import { announceDailyZikr } from "./live";
 import { presentAttachments, validAttachments } from "./postMedia";
 
 // Community groups: what members see and do inside their group, and what the
@@ -415,7 +416,8 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
       kind === "meeting" ? "The group meeting has started. Join now in Darul Irfan."
         : recorded && !roomID ? "The Halqah zikr has started. Listen together in Darul Irfan."
         : "Halqah zikr has started. Join now in Darul Irfan.",
-      `darulirfan://groups/${groupID}`);
+      kind === "meeting" ? `darulirfan://groups/${groupID}` : zikrNoticeLink(groupID));
+    if (groupID === "our-sheikh" && kind === "zikr") await announceDailyZikr(env);
   }
   return json({ ok: true, state: "live", kind, hasRoom: !!roomID, recorded, sessionID, isTest: test || undefined });
 }
@@ -648,6 +650,13 @@ export async function unlinkMemberDevice(env: Env, memberID: string, installatio
 
 /** Pushes to this group's members only - never a topic everyone shares. A
  *  missing push credential never blocks the post or session itself. */
+/** Where a Halqah's live-Zikr notice opens: for Our Sheikh his live stage
+ * with the app's own sound (the apps route "live/our-sheikh" there), for every
+ * other Halqah its page. */
+export function zikrNoticeLink(groupID: string): string {
+  return groupID === "our-sheikh" ? "darulirfan://live/our-sheikh" : `darulirfan://groups/${groupID}`;
+}
+
 export async function notifyGroup(env: Env, groupID: string, eventID: string, title: string, body: string, path: string): Promise<number> {
   const devices = await env.DB.prepare(`SELECT DISTINCT d.installation_id FROM devices d
     JOIN member_devices md ON upper(md.installation_id)=upper(d.installation_id)

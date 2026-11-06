@@ -1415,10 +1415,12 @@ struct ShajraStageLines: View {
         progress = CGFloat(ShajraStageScroll.progress(elapsed: elapsed))
         let remaining = ShajraStageScroll.remaining(elapsed: elapsed)
         guard remaining > 0 else { return }
-        // Once the lines are laid out and measured.
-        try? await Task.sleep(for: .milliseconds(400))
+        // Once the lines are laid out and measured, and the lead has passed.
+        let still = max(ShajraStageScroll.stillLeft(elapsed: elapsed), 0.4)
+        try? await Task.sleep(for: .milliseconds(Int(still * 1000)))
         guard !Task.isCancelled else { return }
-        withAnimation(.linear(duration: max(remaining - 0.4, 0.1))) { progress = 1 }
+        let late = still - ShajraStageScroll.stillLeft(elapsed: elapsed)
+        withAnimation(.linear(duration: max(remaining - late, 0.1))) { progress = 1 }
     }
 }
 

@@ -49,6 +49,8 @@ final class SheikhLiveJoinTests: XCTestCase {
         // "Tahajjud Zikr has started".
         XCTAssertEqual(AppRoute.notification(path: "darulirfan://zikr/tahajjud"), .sheikhStage)
         XCTAssertEqual(AppRoute.notification(path: "darulirfan://live/our-sheikh"), .sheikhStage)
+        // Our Sheikh's own Halqah notices: the Zikr has started, a stage, a notice.
+        XCTAssertEqual(AppRoute.notification(path: "darulirfan://groups/our-sheikh"), .sheikhStage)
         // Everything else goes where it says.
         XCTAssertEqual(AppRoute.notification(path: "darulirfan://groups/usa"), .group(id: "usa"))
         XCTAssertEqual(AppRoute.notification(path: "darulirfan://zikr"), .zikr(session: nil))
@@ -95,6 +97,10 @@ final class SheikhLiveJoinTests: XCTestCase {
         XCTAssertEqual(ShajraStageScroll.progress(elapsed: -30), 0, "A phone clock behind the server's")
         XCTAssertEqual(ShajraStageScroll.remaining(elapsed: 3_600), 0)
         XCTAssertEqual(ShajraStageScroll.remaining(elapsed: 0), ShajraStageScroll.duration, accuracy: 0.0001)
+        // The first lines stay still for the lead before they move.
+        XCTAssertEqual(ShajraStageScroll.stillLeft(elapsed: 0), ShajraStageScroll.lead)
+        XCTAssertEqual(ShajraStageScroll.stillLeft(elapsed: 0.5), 1.5, accuracy: 0.0001)
+        XCTAssertEqual(ShajraStageScroll.stillLeft(elapsed: 10), 0)
         // Owner, 2026-11-06: the whole roll, pause included, in under 60 seconds (about 51).
         XCTAssertLessThan(ShajraStageScroll.lead + ShajraStageScroll.duration, 60)
         XCTAssertEqual(ShajraStageScroll.lead + ShajraStageScroll.duration, 51, accuracy: 0.0001)

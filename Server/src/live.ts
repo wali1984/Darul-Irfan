@@ -88,6 +88,18 @@ export function zikrTitle(now: Date): string {
   return hour < 7 ? "Tahajjud Zikr" : "Daily Zikr";
 }
 
+/** "Daily Zikr has started", to everyone who follows the live zikr, once a
+ * day: when Our Sheikh's Zikr goes live on the platform (relay or admin), or
+ * when the channel goes live while it is. Daily Zikr is joined on his live
+ * stage (owner 2026-11-06: "we use our stream for daily zikr"), so a tap
+ * never lands on a stage that is not live. The Tahajjud zikr is announced
+ * when its room opens. */
+export async function announceDailyZikr(env: Env, now = new Date()): Promise<void> {
+  if (zikrTitle(now) !== "Daily Zikr") return;
+  await sendTopicPush(env, `daily-zikr:${pakistanDay(now)}`, "liveZikr", "Daily Zikr has started",
+    "Join the official daily zikr in Darul Irfan.", "darulirfan://live/our-sheikh", LIVE_ALERT).catch(() => 0);
+}
+
 /** The day in Pakistan, "2026-10-29": one Tahajjud zikr each. */
 export function pakistanDay(now: Date): string {
   return new Date(now.getTime() + 5 * 3_600_000).toISOString().slice(0, 10);

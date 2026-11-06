@@ -1,6 +1,6 @@
 import type { Env } from "./contracts";
 import { cleanText, validHTTPURL, wholeSeconds } from "./util";
-import { LIVE_ALERT, sendTopicPush } from "./apns";
+import { announceDailyZikr } from "./live";
 
 interface YouTubeVideoItem { id?: string; snippet?: { title?: string; description?: string; publishedAt?: string; liveBroadcastContent?: string; thumbnails?: { high?: { url?: string } } }; liveStreamingDetails?: { scheduledStartTime?: string; actualStartTime?: string; actualEndTime?: string } }
 interface YouTubeVideosResponse { items?: YouTubeVideoItem[] }
@@ -96,14 +96,11 @@ export async function refreshYouTube(env: Env): Promise<void> {
         details?.actualStartTime ?? null, details?.actualEndTime ?? null, now, now).run();
     // Alert once when the channel actually goes live (not for upcoming). The
     // event is the video, so a stream that drops out for a minute and comes
-    // back is not announced twice.
-    if (candidate.state === "live" && prior?.state !== "live") {
-      await sendTopicPush(
-        env, `youtube-live:${candidate.id}`, "liveZikr",
-        "Daily Zikr has started", "Join the official daily zikr in Darul Irfan.",
-        "darulirfan://live/official-live", LIVE_ALERT
-      );
-    }
+    // back is not announced twice. It waits for Our Sheikh's Zikr to be live
+    // on the platform (announceDailyZikr); a Test Zikr is announced to no one.
+    const sheikhLive = await env.DB.prepare("SELECT 1 AS live FROM group_live WHERE group_id='our-sheikh' AND state='live' AND kind='zikr' AND is_test=0")
+      .first<{ live: number }>();
+    if (candidate.state === "live" && prior?.state !== "live" && sheikhLive) await announceDailyZikr(env);
   } else if (automatic && prior?.state === "live") {
     await env.DB.prepare("UPDATE live_broadcasts SET state='ended',youtube_live=0,ended_at=?,updated_at=?,source_updated_at=? WHERE id='official-live'")
       .bind(now, now, now).run();

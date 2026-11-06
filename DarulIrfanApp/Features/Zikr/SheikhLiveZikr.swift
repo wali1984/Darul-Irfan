@@ -84,11 +84,15 @@ struct SheikhLiveZikr: Equatable, Sendable {
 extension AppRoute {
     /// Where a tapped notification goes. The official live-zikr notices
     /// ("Daily Zikr has started", a host's cue, "Tahajjud Zikr has started")
-    /// open Our Sheikh's live stage, where the Zikr is heard in the app; every
-    /// other notice goes where its path says.
+    /// open Our Sheikh's live stage, where the Zikr is heard in the app, and
+    /// so do Our Sheikh's own Halqah notices (the Zikr has started, a stage, a
+    /// notice: each sent only while its Zikr is live); every other notice goes
+    /// where its path says.
     static func notification(path: String) -> AppRoute? {
         guard let route = AppRoute(path: path) else { return nil }
-        if route == .live || route == .zikr(session: "tahajjud") { return .sheikhStage }
+        if route == .live || route == .zikr(session: "tahajjud") || route == .group(id: HalqahStage.ourSheikhID) {
+            return .sheikhStage
+        }
         return route
     }
 }
@@ -121,5 +125,10 @@ enum ShajraStageScroll {
     /// Seconds of rise left at `elapsed`.
     static func remaining(elapsed: TimeInterval) -> TimeInterval {
         duration * (1 - progress(elapsed: elapsed))
+    }
+
+    /// Seconds the first lines still stay still at `elapsed`.
+    static func stillLeft(elapsed: TimeInterval) -> TimeInterval {
+        elapsed.isFinite ? max(lead - elapsed, 0) : lead
     }
 }

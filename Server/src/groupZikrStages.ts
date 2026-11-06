@@ -1,6 +1,7 @@
 import { sendPushToInstallations } from "./apns";
 import type { Env } from "./contracts";
-import { canManage, canSee, memberRole, notifyGroup } from "./community";
+import { canManage, canSee, memberRole, notifyGroup, zikrNoticeLink } from "./community";
+import { announceDailyZikr } from "./live";
 import { beginSession, endSession } from "./session";
 import { json } from "./util";
 
@@ -223,7 +224,8 @@ export async function relayLive(env: Env, groupID: string, input: Record<string,
     if (test) return json({ state: "live", sessionID, started: true, test: true }, { status: 201 });
     try {
       await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title, "Halqah zikr has started. Join now in Darul Irfan.",
-        `darulirfan://groups/${groupID}`);
+        zikrNoticeLink(groupID));
+      if (groupID === SHEIKH_HALQA_ID) await announceDailyZikr(env);
     } catch { /* The session is live; a notice is best effort. */ }
     return json({ state: "live", sessionID, started: true }, { status: 201 });
   }
@@ -339,7 +341,7 @@ export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void
           urdu && cue.title_ur ? cue.title_ur : cue.title,
           sheikh ? (urdu ? "ہمارے شیخ: ذکر کا موجودہ مرحلہ" : "Our Sheikh: current Zikr stage")
             : urdu ? `${name ?? "حلقہ"}: ذکر کا موجودہ مرحلہ` : `${name ?? "Halqah"}: current Zikr stage`,
-          `darulirfan://groups/${group}`,
+          zikrNoticeLink(group),
           { sound: "zikr_soft_chime", ttlSeconds: Math.max(1, Math.floor((Date.parse(cue.created_at) + CUE_MAX_AGE_MS - now.getTime()) / 1000)),
             collapseID: sheikh ? "sheikh-zikr-stage" : `zikr-stage-${group}` });
       }
