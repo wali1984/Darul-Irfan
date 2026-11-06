@@ -540,8 +540,16 @@ def room_status(view: View, markers: list[str], room: str = "") -> tuple[str, st
     # Paltalk has lost its own servers. Its room tab stays listed with a stale
     # member count and a blank room (6 November, an hour of it), which is not
     # the room and not leaving it either.
-    if view.first(name="Exit Paltalk", kind="Button") is not None or view.first(name="Reconnecting", kind="Text") is not None:
-        return "unknown", "Paltalk is reconnecting to its servers"
+    # The dialog is Paltalk's ReconnectWidget (its buttons are named
+    # ReconnectWidget_HideButton / _CloseAppButton, not by their words).
+    reconnect = view.first(contains="ReconnectWidget")
+    if reconnect is not None:
+        try:
+            showing = reconnect.is_visible()
+        except Exception:  # noqa: BLE001
+            showing = True
+        if showing:
+            return "unknown", "Paltalk is reconnecting to its servers"
     overlay = view.first(suffix="JoinRoomFailedMessageOverlayWidget")
     if overlay is not None:
         try:
