@@ -189,10 +189,15 @@ class YouTube:
         return self.broadcast_id
 
     def _adoptable(self, stream_id: str) -> str | None:
-        """A broadcast already on our stream that can carry this session: one
-        that is live, else the 'ready' one scheduled soonest (a Studio-made
-        event for tonight). None when there is none."""
-        found: list[tuple[int, str, str]] = []
+        """A broadcast on our stream that is already live (or testing): that
+        one carries the session rather than a rival. A merely 'ready' event
+        made in Studio is NOT adopted: on 6 November YouTube refused every
+        API transition on two such events ("Invalid transition") and did not
+        auto-start them either, so the relay makes its own broadcast, which
+        the API can take live. Ready events still bound to the stream are
+        named in the log so they can be removed in Studio."""
+        found: list[tuple[int, str]] = []
+        waiting: list[str] = []
         for status in ("active", "upcoming"):
             # broadcastStatus already means "mine": the API refuses both together.
             data = self._call("GET", "liveBroadcasts", {"part": "id,snippet,status,contentDetails",
@@ -200,16 +205,18 @@ class YouTube:
             for item in data.get("items", []):
                 details = item.get("contentDetails", {})
                 life = item.get("status", {}).get("lifeCycleStatus", "")
-                if details.get("boundStreamId") != stream_id or life not in ("live", "testing", "ready"):
+                if details.get("boundStreamId") != stream_id:
                     continue
-                # YouTube itself starts an auto-start broadcast when the stream
-                # comes up, so among the ready ones that is the one to follow.
-                rank = 0 if life == "live" else 1 if life == "testing" else 2 if details.get("enableAutoStart") else 3
-                found.append((rank, item.get("snippet", {}).get("scheduledStartTime") or "9999", item["id"]))
+                if life in ("live", "testing"):
+                    found.append((0 if life == "live" else 1, item["id"]))
+                elif life == "ready":
+                    waiting.append(f"{item['id']} ({item.get('snippet', {}).get('title', '')!r})")
+        if waiting:
+            log(f"Studio events still bound to the stream (remove them there): {', '.join(waiting)}")
         if not found:
             return None
         found.sort()
-        return found[0][2]
+        return found[0][1]
 
     def lifecycle(self) -> str:
         """created, ready, testing, live, complete, revoked... or 'gone'."""
