@@ -15,6 +15,7 @@ Settings: relay.env beside this file (see relay.env.example).
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import json
 import os
 import queue
@@ -239,11 +240,18 @@ class Relay:
 
     async def _lease_round(self) -> None:
         try:
-            result = await self.worker.call("POST", "/api/lease", {"relayId": self.id})
+            # 6 s at most: a call slower than that is a failed round (the
+            # deadline from the last good round still decides has_lease),
+            # never a hang past the deadline that drops the lease unseen.
+            result = await asyncio.wait_for(self.worker.call("POST", "/api/lease", {"relayId": self.id}), 6)
             if result["granted"]:
                 until = float(result.get("until") or 0)
-                now_ms = float((result.get("state") or {}).get("now") or time.time() * 1000)
-                left = (until - now_ms) / 1000 if until else LEASE_FALLBACK
+                worker_now = (result.get("state") or {}).get("now")
+                # Only the Worker's own clock measures its lease; without it
+                # (or with a strange answer) the lease is its usual length.
+                left = min((until - float(worker_now)) / 1000, LEASE_FALLBACK) if until and worker_now else LEASE_FALLBACK
+                if left <= 0:
+                    left = LEASE_FALLBACK
                 self.lease_until = until
                 self.lease_deadline = time.monotonic() + left - LEASE_MARGIN
                 if not self.lease:
@@ -270,6 +278,8 @@ class Relay:
         try:
             cues = json.loads(PENDING_FILE.read_text(encoding="utf-8"))
         except (OSError, ValueError):
+            return {}
+        if not isinstance(cues, dict):
             return {}
         now = time.time()
         return {i: c for i, c in cues.items() if isinstance(c, dict) and now - c.get("created_at", 0) <= PENDING_FOR}
@@ -306,7 +316,7 @@ class Relay:
 
     def _being_sent(self, stage: str) -> bool:
         """Whether a cue for `stage` is being tried right now."""
-        return any(cue["stage"] == stage for cue_id, cue in self.pending.items() if cue_id in self.sending)
+        return any(cue["stage"] == stage for cue_id, cue in list(self.pending.items()) if cue_id in self.sending)
 
     def _replay_pending(self) -> None:
         """Cues the last run never got acknowledged: sent again, with their
@@ -316,6 +326,8 @@ class Relay:
         self.pending_replayed = True
         now = time.time()
         for cue_id, cue in list(self.pending.items()):
+            if cue_id in self.sending:
+                continue  # this run is already trying it
             if now - cue["created_at"] > PENDING_FOR:
                 self._forget_cue(cue_id)
                 continue
@@ -323,6 +335,14 @@ class Relay:
             asyncio.ensure_future(self._replay_one(cue_id, cue))
 
     async def _replay_one(self, cue_id: str, cue: dict) -> None:
+        # A stage the Zikr has passed, or a dua before the last Muraqaba,
+        # would move the apps backwards and notify everyone again: dropped.
+        stage, current = cue["stage"], self.platform_stage
+        behind = (stage in ORDER and current in ORDER and not ahead(stage, current))             or (stage == "dua" and current not in DUA_AFTER)
+        if behind:
+            log(f"cue {stage} from before the restart: the Zikr has moved on ({current}); dropped")
+            self._forget_cue(cue_id)
+            return
         ok = await self._send_cue(cue["stage"], cue["text"], self.generation, cue_id, cue["created_at"])
         if ok and cue["stage"] == "dua":
             self.dua_shown = True
@@ -1113,8 +1133,8 @@ class Relay:
                 # predate it.
                 if time.time() - self.stage_set_at > 8:
                     self.platform_stage = (entry.get("stage") or {}).get("stageID") if live else None
-                if live and self.pending and not self.pending_replayed and self.has_lease and self.joined:
-                    self._replay_pending()
+                if live and not self.pending_replayed and self.has_lease and self.joined:
+                    self._replay_pending()  # once per run: cues this run is sending are skipped
             except Exception:  # noqa: BLE001 - the network; next round
                 pass
             await asyncio.sleep(3)
@@ -1142,6 +1162,9 @@ class Relay:
     async def run(self) -> None:
         log(f"relay {self.id} starting ({'listen-only' if self.listen_only else 'two-way'}; room {self.room!r})")
         self.loop = asyncio.get_running_loop()
+        # Platform calls wait up to 10 s each; with the default six threads on
+        # this two-core server an outage could queue the lease call behind them.
+        self.loop.set_default_executor(concurrent.futures.ThreadPoolExecutor(max_workers=16))
         if self.camera:
             # Up for good: stopping it while Paltalk holds it hangs Paltalk.
             await asyncio.to_thread(self.camera.set_picture, (HERE / "daily_zikr_frame.png").read_bytes())

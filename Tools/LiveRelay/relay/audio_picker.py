@@ -209,7 +209,8 @@ class Picker:
                 self.dropped += 1
             self.jobs.append(job)
             self.jobs_ready.notify()
-        if self.worker is None:
+        if self.worker is None or not self.worker.is_alive():
+            # A worker that died takes every later reading with it: start another.
             self.worker = threading.Thread(target=self._work, daemon=True)
             self.worker.start()
 
@@ -226,7 +227,13 @@ class Picker:
         if generation != self.generation or self.clock - at > STALE_SECONDS:
             self.skipped += 1  # a new session, or a call long over: a reading now would name a stage that has passed
             return
-        fn(*args)
+        try:
+            fn(*args)
+        except Exception as error:  # noqa: BLE001 - one bad reading must not end all readings
+            try:
+                self.on_stage(None, f"reading failed: {error!r}")
+            except Exception:  # noqa: BLE001
+                pass
 
     def feed(self, samples: np.ndarray) -> None:
         self.pending = np.concatenate([self.pending, samples])
