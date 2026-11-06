@@ -109,12 +109,13 @@ async function settleBroadcast(env: Env, roomOpen: boolean, now: Date): Promise<
   await env.DB.prepare("UPDATE live_broadcasts SET hub_stream_url=NULL,room_open=?,updated_at=? WHERE id='official-live'")
     .bind(roomOpen ? 1 : 0, at).run();
   // Daily Zikr is announced when the channel goes live; the room opening
-  // before dawn announces the Tahajjud zikr, which is joined on Paltalk. Once
+  // before dawn announces the Tahajjud zikr, joined live in the app on Our
+  // Sheikh's stage (the apps open it from this notice). Once
   // a day: a room that drops out of the directory for a minute and reappears
   // is not announced again.
   if (opened && zikrTitle(now) === "Tahajjud Zikr") {
     await sendTopicPush(env, `room-open:${pakistanDay(now)}`, "liveZikr", "Tahajjud Zikr has started",
-      "Join it on Paltalk from Darul Irfan.", "darulirfan://zikr/tahajjud", LIVE_ALERT).catch(() => 0);
+      "Join it live in Darul Irfan.", "darulirfan://zikr/tahajjud", LIVE_ALERT).catch(() => 0);
   }
 }
 
