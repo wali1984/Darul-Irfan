@@ -4,6 +4,7 @@
 // sound comes only from the Silsila's live feed. Everything from the API is set
 // with textContent or attributes, never as HTML.
 import { animatedLogo, esc, shell, SKY_SCRIPT, STYLE as STAGE_BASE } from "./layout.js";
+import SHAJRA from "./content/shajra.json";
 
 // The stages a Zikr moves through, in order, as the app names them (Server
 // RECITATIONS and DEFAULT_ZIKR_STAGES). A custom Muraqaba shows only when called.
@@ -16,7 +17,57 @@ const STAGES = [
   ["ahadiyat", "Muraqaba Ahadiyat", "مراقبہ احدیت"], ["maiyyat", "Muraqaba Ma'iyyat", "مراقبہ معیت"],
   ["aqrabiyyat", "Muraqaba Aqrabiyyat", "مراقبہ اقربیت"], ["sair-kaaba", "Sair-e-Kaaba", "سیرِ کعبہ"],
   ["rauza-athar", "Rauza-e-Athar", "روضۂ اطہر"], ["masjid-nabawi", "Masjid-e-Nabawi", "مسجدِ نبوی"],
+  ["shajra", "Shajra Sharif", "شجرہ شریف"], ["dua", "Dua", "دعا"],
 ];
+
+// The Shajra's lines, word for word from the app's data, for its stage card.
+const SHAJRA_LINES = JSON.stringify([...SHAJRA.entries.map(e => e.urdu), SHAJRA.closingArabic]).replace(/</g, "\\u003c");
+
+/** Fills a stage card the way the app shows each kind of stage: the opening
+ *  recitations with their Arabic, a Latifa with its number on a turning gold
+ *  star, a Muraqaba, the Shajra with its lines rolling slowly from the first
+ *  to the last, and the Dua. Shared by the home page and /broadcast. */
+const FILL_SCRIPT = `
+const SHAJRA_LINES = ${SHAJRA_LINES};
+function stageKind(id) {
+  if (!id) return "awaiting";
+  if (/^latifa-[1-7]$/.test(id)) return "latifa";
+  if (["tasbih", "istighfar", "shahadah", "taawwudh", "basmalah"].includes(id)) return "recite";
+  if (id === "shajra" || id === "dua") return id;
+  return "muraqaba";
+}
+function fillStage(card, s, emptyTitle) {
+  const id = s ? s.stageID : null, kind = stageKind(id);
+  card.className = card.className.replace(/\\bkind-\\w+/g, "").trim() + " kind-" + kind;
+  card.querySelector(".label").textContent = { recite: "Recitation", latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua" }[kind] || "Now";
+  const medal = card.querySelector(".medal");
+  medal.hidden = kind !== "latifa";
+  medal.querySelector("b").textContent = kind === "latifa" ? id.slice(7) : "";
+  card.querySelector(".title").textContent = s ? s.title : (emptyTitle || "");
+  card.querySelector(".urdu").textContent = s && s.titleUr ? s.titleUr : "";
+  card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
+  const roll = card.querySelector(".roll"), lines = roll.querySelector(".lines");
+  lines.classList.remove("run"); lines.style.removeProperty("--dist");
+  lines.textContent = "";
+  roll.hidden = kind !== "shajra";
+  if (kind === "shajra") {
+    SHAJRA_LINES.forEach((text, i) => {
+      const line = document.createElement("div");
+      line.className = i === SHAJRA_LINES.length - 1 ? "line closing" : "line";
+      line.lang = i === SHAJRA_LINES.length - 1 ? "ar" : "ur";
+      line.textContent = text;
+      lines.append(line);
+    });
+    // From the first line to the last, about as fast as the Shajra is read,
+    // then it rests on the last line until the Dua.
+    requestAnimationFrame(() => {
+      const dist = Math.max(0, lines.scrollHeight - roll.clientHeight);
+      lines.style.setProperty("--dist", -dist + "px");
+      lines.style.setProperty("--dur", Math.round(SHAJRA_LINES.length * 9) + "s");
+      if (dist && !matchMedia("(prefers-reduced-motion: reduce)").matches) lines.classList.add("run");
+    });
+  }
+}`;
 
 const STYLE = `
 .hero{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(24px,5vw,64px);align-items:center;min-height:min(calc(100svh - 74px),860px);padding-top:30px}
@@ -46,6 +97,27 @@ const STYLE = `
 .now .urdu{font-size:clamp(30px,4vw,54px);color:var(--gold2);margin-top:6px;text-shadow:0 0 22px rgba(243,220,157,.35)}
 .now .arabic{font-size:clamp(28px,3.6vw,46px);line-height:1.9;color:#fff8e6;margin-top:14px;text-shadow:0 0 28px rgba(243,220,157,.5)}
 .now .test{display:inline-block;margin-top:18px}
+/* Each kind of stage, as the app shows it: a Latifa's number on a turning
+   gold star, the Arabic of a recitation, the Shajra's lines rolling. */
+.now .medal{position:relative;width:96px;height:96px;margin:0 auto 6px;display:grid;place-items:center}
+.now .medal[hidden]{display:none}
+.now .medal i{position:absolute;inset:0;background:linear-gradient(180deg,#ffe9a8,#e0b75f 55%,#b48a2c);
+  clip-path:polygon(50% 0,61% 22%,85% 15%,78% 39%,100% 50%,78% 61%,85% 85%,61% 78%,50% 100%,39% 78%,15% 85%,22% 61%,0 50%,22% 39%,15% 15%,39% 22%);
+  animation:turn 30s linear infinite;filter:drop-shadow(0 0 18px rgba(243,220,157,.55))}
+.now .medal b{position:relative;width:58%;height:58%;border-radius:50%;background:#062a1f;display:grid;place-items:center;
+  color:var(--gold2);font:700 38px/1 var(--sans);box-shadow:inset 0 0 12px rgba(0,0,0,.6)}
+@keyframes turn{to{transform:rotate(360deg)}}
+.now .roll{position:relative;max-height:min(46vh,420px);overflow:hidden;margin-top:18px;
+  -webkit-mask:linear-gradient(transparent,#000 14%,#000 86%,transparent);mask:linear-gradient(transparent,#000 14%,#000 86%,transparent)}
+.now .roll[hidden]{display:none}
+.now .lines{padding:40px 0;display:grid;gap:6px}
+.now .lines.run{animation:roll var(--dur,120s) linear 1.2s forwards}
+@keyframes roll{to{transform:translateY(var(--dist,0))}}
+.now .line{font-size:clamp(20px,2.4vw,30px);color:#fff8e6;text-shadow:0 0 18px rgba(243,220,157,.35)}
+.now .line.closing{font-family:Amiri,serif;color:var(--gold2);margin-top:10px}
+.now .card.kind-recite .arabic{font-size:clamp(30px,4vw,52px)}
+.now .card.kind-dua{box-shadow:0 0 90px -6px rgba(243,220,157,.55),inset 0 0 50px rgba(243,220,157,.12)}
+.now .card.kind-shajra .title,.now .card.kind-dua .title{letter-spacing:.02em}
 .now .card{position:relative;margin-inline:auto;width:min(760px,100%);padding:clamp(26px,4vw,48px) 22px;border-radius:26px;
   border:1px solid rgba(243,220,157,.45);background:radial-gradient(120% 100% at 50% 0%,rgba(16,185,129,.28),transparent 70%),rgba(2,12,9,.55);
   box-shadow:0 0 60px -10px rgba(243,220,157,.35),inset 0 0 40px rgba(16,185,129,.15);animation:bob 5s ease-in-out infinite}
@@ -98,8 +170,9 @@ function stageScreen(id, waiting) {
   return `<div class="stage" id="${id}">
       <div class="mark">${animatedLogo("min(260px,62vw)")}</div>
       <div class="waiting"><div class="quiet">${esc(waiting)}</div></div>
-      <div class="now"><div class="card"><div class="ring"></div><div class="label">Now</div><div class="title"></div>
-        <div class="urdu" lang="ur"></div><div class="arabic" lang="ar"></div><span class="chip test" hidden>Test Zikr</span></div></div>
+      <div class="now"><div class="card"><div class="ring"></div><div class="medal" hidden><i></i><b></b></div><div class="label">Now</div><div class="title"></div>
+        <div class="urdu" lang="ur"></div><div class="arabic" lang="ar"></div><div class="roll" hidden><div class="lines"></div></div>
+        <span class="chip test" hidden>Test Zikr</span></div></div>
     </div>`;
 }
 
@@ -136,13 +209,16 @@ body.duo .photo{display:block}
 body.duo .stage{padding:80px 80px 80px 1000px}
 body.duo .now .card{width:820px;padding:60px 36px}
 body.duo .now .title{font-size:112px}body.duo .now .urdu{font-size:68px}body.duo .now .arabic{font-size:54px}
+.now .medal{width:150px;height:150px}.now .medal b{font-size:60px}
+.now .roll{max-height:470px}.now .line{font-size:34px}
+.now .card.kind-shajra .title{font-size:84px}.now .card.kind-shajra .urdu{font-size:52px}
 </style></head><body>
 <div class="aurora"></div><canvas id="sky"></canvas>
 ${sheikh ? `<div class="photo"><img id="b-photo" alt="Hazrat Ameer Abdul Qadeer Awan (MZA)"></div>` : ""}
 ${stageScreen("b-stage", "")}
 <div class="brandline">Naqshbandia Owaisiah · ${esc(site.region)}</div>
 <script type="application/json" id="initial">${state}</script>
-<script>${SKY_SCRIPT}
+<script>${SKY_SCRIPT}${FILL_SCRIPT}
 (() => {
   const $ = id => document.getElementById(id);
   let data = JSON.parse($("initial").textContent), shown = null;
@@ -156,12 +232,10 @@ ${stageScreen("b-stage", "")}
     const key = live ? (s ? s.stageID + "|" + s.at : "awaiting") : "off";
     if (key === shown) return; shown = key;
     const card = box.querySelector(".card"), title = card.querySelector(".title");
-    title.textContent = s ? s.title : "";
+    fillStage(card, s, "");
     // A long name never runs past the card: the title shrinks until it fits.
     title.style.fontSize = "";
     for (let size = parseFloat(getComputedStyle(title).fontSize); title.scrollWidth > title.clientWidth && size > 48; size -= 4) title.style.fontSize = size + "px";
-    card.querySelector(".urdu").textContent = s && s.titleUr ? s.titleUr : "";
-    card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
     card.querySelector(".test").hidden = !(live && live.isTest);
     card.classList.remove("burst"); void card.offsetWidth; card.classList.add("burst");
   }
@@ -200,7 +274,7 @@ export function homePage(site, others, initial, feed) {
   <section id="live"><div class="wrap">
     <div class="eyebrow reveal">Our Sheikh · Live Zikr</div>
     <h2 class="reveal">Sit in Zikr with Hazrat ji</h2>
-    <p class="lead reveal">When Our Sheikh's Zikr is live, its stage shows here as it happens: the opening Tasbihat, each Latifa and each Muraqaba.</p>
+    <p class="lead reveal">When Our Sheikh's Zikr is live, its stage shows here as it happens: the opening Tasbihat, each Latifa, each Muraqaba, the Shajra and the Dua.</p>
     <div class="stage-grid">
       <div class="panel reveal">${stageScreen("sheikh-stage", "The stage appears here when Our Sheikh's Zikr is live.")}</div>
       <div class="panel side reveal" id="sheikh-side" style="--d:120ms">
@@ -208,11 +282,6 @@ export function homePage(site, others, initial, feed) {
         <button class="btn btn-gold" id="sheikh-join" data-join="our-sheikh" disabled>Join Live Zikr</button>
         <div class="join-note" id="sheikh-note">The button opens when Our Sheikh's Zikr is live.</div>
         <ol class="track">${track}</ol>
-        <div class="room" id="tahajjud">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.6"><path d="M12 3a4 4 0 0 1 4 4v5a4 4 0 0 1-8 0V7a4 4 0 0 1 4-4zM5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-          <div><b>Tahajjud Zikr is open on Paltalk</b><div class="quiet" id="tahajjud-count"></div></div>
-          <a class="btn btn-ghost" id="tahajjud-link" href="#" target="_blank" rel="noopener" style="margin-left:auto">Join</a>
-        </div>
       </div>
     </div>
   </div></section>
@@ -244,7 +313,7 @@ export function homePage(site, others, initial, feed) {
   </div>`;
   return shell({
     site, others, title: site.title, description: `${site.tagline}. ${site.intro}`, active: "live", extraStyle: STYLE, body,
-    script: `<script type="application/json" id="initial">${state}</script><script>${CLIENT.replace("__COUNTRIES__", COUNTRIES)}</script>`,
+    script: `<script type="application/json" id="initial">${state}</script><script>${FILL_SCRIPT}${CLIENT.replace("__COUNTRIES__", COUNTRIES)}</script>`,
   });
 }
 
@@ -262,9 +331,7 @@ const CLIENT = `
     const key = live ? (s ? s.stageID + "|" + s.at : "awaiting") + (live.isTest ? "|t" : "") : "off";
     if (shown[box.id] === key) return; shown[box.id] = key;
     const card = box.querySelector(".card");
-    card.querySelector(".title").textContent = s ? s.title : "Awaiting the first stage…";
-    card.querySelector(".urdu").textContent = s && s.titleUr ? s.titleUr : "";
-    card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
+    fillStage(card, s, "Awaiting the first stage…");
     card.querySelector(".test").hidden = !(live && live.isTest);
     if (live && !reduce) { card.classList.remove("burst"); void card.offsetWidth; card.classList.add("burst"); }
   }
@@ -353,9 +420,6 @@ const CLIENT = `
       card.querySelector("[data-now]").textContent = h.live ? (h.stage ? "Now: " + h.stage.title : "Zikr is live") : "";
       const b = card.querySelector("[data-join]"); b.disabled = !h.live; b.classList.toggle("live", !!h.live);
     }
-    const t = data.tahajjud;
-    $("tahajjud").classList.toggle("show", !!t);
-    if (t) { $("tahajjud-count").textContent = t.listeners ? t.listeners + " listening" : ""; const a = $("tahajjud-link"); if (t.url) a.href = t.url; a.hidden = !t.url; }
     const photo = $("photo");
     if (photo) {
       if (data.picture && photo.getAttribute("src") !== data.picture) photo.src = data.picture;

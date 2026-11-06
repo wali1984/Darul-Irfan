@@ -76,7 +76,9 @@ export const DEFAULT_ZIKR_STAGES: ZikrStage[] = [
   // Called after Aqrabiyyat in the Daily Zikr (heard in the sessions of 2 and 3 Nov 2026).
   { "id": "sair-kaaba", "title": "Sair-e-Kaaba", "titleUr": "سیرِ کعبہ", "isCustom": false },
   { "id": "rauza-athar", "title": "Rauza-e-Athar", "titleUr": "روضۂ اطہر", "isCustom": false },
-  { "id": "masjid-nabawi", "title": "Masjid-e-Nabawi", "titleUr": "مسجدِ نبوی", "isCustom": false }
+  { "id": "masjid-nabawi", "title": "Masjid-e-Nabawi", "titleUr": "مسجدِ نبوی", "isCustom": false },
+  // The leader reads the Shajra (mostly hummed) after the last Muraqaba, before the dua (owner 2026-11-06).
+  { "id": "shajra", "title": "Shajra Sharif", "titleUr": "شجرہ شریف", "isCustom": false }
 ];
 
 /** The recitations that open every Zikr, in order, exactly as the Method of

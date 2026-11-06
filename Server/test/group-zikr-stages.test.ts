@@ -28,7 +28,7 @@ describe("Our Sheikh stage catalogue", () => {
       expect((await zikrCues(env, "member", "our-sheikh", null)).status).toBe(200);
     }
   });
-  it("uses stable group identity and exposes 14 ordered defaults with member read-only access", async () => {
+  it("uses stable group identity and exposes 15 ordered defaults with member read-only access", async () => {
     const { env } = setup();
     const response = await zikrStages(env, "member", "our-sheikh");
     const body = await response.json() as any;
@@ -36,7 +36,7 @@ describe("Our Sheikh stage catalogue", () => {
     expect(body.canBroadcast).toBe(false);
     expect(body.stages.map((s: any) => s.id)).toEqual([
       "latifa-1", "latifa-2", "latifa-3", "latifa-4", "latifa-5", "latifa-6", "latifa-7", "raabta", "ahadiyat", "maiyyat", "aqrabiyyat",
-      "sair-kaaba", "rauza-athar", "masjid-nabawi",
+      "sair-kaaba", "rauza-athar", "masjid-nabawi", "shajra",
     ]);
     expect(body.stages.every((s: any) => s.titleUr && !s.isCustom)).toBe(true);
   });
@@ -53,8 +53,8 @@ describe("Our Sheikh stage catalogue", () => {
     expect((await addZikrStage(env, "admin", "our-sheikh", draft)).status).toBe(200);
     expect((await addZikrStage(env, "admin", "our-sheikh", { ...draft, title: "Different" })).status).toBe(409);
     const body = await (await zikrStages(env, "member", "our-sheikh")).json() as any;
-    expect(body.stages).toHaveLength(15);
-    expect(body.stages[14]).toEqual({ ...draft, isCustom: true });
+    expect(body.stages).toHaveLength(16);
+    expect(body.stages[15]).toEqual({ ...draft, isCustom: true });
   });
   it("does not let custom input replace a built-in; every Halqah's stage is its own", async () => {
     const { env } = setup();
