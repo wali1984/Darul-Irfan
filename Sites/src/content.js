@@ -5,6 +5,12 @@ import { esc, shell } from "./layout.js";
 import METHOD from "./content/method_of_zikr.json";
 import SHAJRA from "./content/shajra.json";
 
+// The app's node badge: an eight-pointed star (DIOctagram, inner ratio 0.76).
+const STAR = Array.from({ length: 16 }, (_, i) => {
+  const r = i % 2 ? 38 : 50, a = (i * Math.PI) / 8 - Math.PI / 2;
+  return `${(50 + r * Math.cos(a)).toFixed(1)}% ${(50 + r * Math.sin(a)).toFixed(1)}%`;
+}).join(",");
+
 const STYLE = `
 .page{padding:clamp(40px,7vw,80px) 0}
 .page h1{font-size:clamp(40px,5.6vw,70px);line-height:1.05;margin:14px 0 10px}
@@ -24,14 +30,19 @@ const STYLE = `
 .diagram{position:sticky;top:90px;padding:20px;text-align:center}
 .diagram svg{width:100%;max-width:300px}
 .diagram .cap{font-size:14px;color:var(--muted);margin-top:8px}
-.chain{list-style:none;margin:30px 0;padding:0;position:relative}
-.chain::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;translate:-1px 0;background:linear-gradient(var(--gold),var(--emerald),var(--gold))}
-.link{position:relative;width:min(760px,100%);margin:0 auto 22px;padding:22px 26px;border-radius:20px;border:1px solid var(--line);background:rgba(6,34,26,.85);text-align:center}
+.chain{list-style:none;margin:30px auto;padding:0;width:min(820px,100%)}
+.link{position:relative;display:grid;grid-template-columns:40px 1fr;gap:16px;align-items:start;margin-bottom:22px}
+.link:not(:last-child)::before{content:"";position:absolute;left:19px;top:32px;width:2px;height:calc(100% + 22px);background:linear-gradient(var(--gold),var(--emerald));opacity:.7}
+.link .node{position:relative;z-index:1;width:40px;height:40px;margin-top:12px;display:grid;place-items:center;clip-path:polygon(${STAR});background:#0b7250;color:#fff;font:800 13px/1 var(--sans);font-variant-numeric:tabular-nums}
+.link.prophet .node{background:linear-gradient(#ffe9a8,#e0b75f,#b48a2c);color:#06402c;font-size:19px}
+.link.present .node{background:linear-gradient(#e0b75f,#b48a2c);padding:1.5px;color:#f3dc9d}
+.link.present .node span{display:grid;place-items:center;width:100%;height:100%;clip-path:polygon(${STAR});background:linear-gradient(#0e8a60,#064b34)}
+.link .card{padding:20px 24px;border-radius:20px;border:1px solid var(--line);background:rgba(6,34,26,.85);text-align:center;min-width:0}
 .link .ur{font-size:clamp(20px,2.4vw,26px);color:var(--gold2)}
-.link .en{color:var(--muted);margin-top:4px}
-.link.prophet{border-color:rgba(243,220,157,.7);box-shadow:0 0 40px -12px rgba(243,220,157,.6)}
-.link.present{border-color:rgba(52,211,153,.6);box-shadow:0 0 40px -12px rgba(52,211,153,.5)}
-.link .n{position:absolute;left:50%;top:-13px;translate:-50% 0;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#1d1406;font:700 12px/26px var(--sans)}
+.link .en{color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid rgba(224,183,95,.25)}
+.link.prophet .card{border-color:rgba(243,220,157,.7);box-shadow:0 0 40px -12px rgba(243,220,157,.6)}
+.link.present .card{border-color:rgba(52,211,153,.6);box-shadow:0 0 40px -12px rgba(52,211,153,.5)}
+@media (max-width:600px){.link{grid-template-columns:32px 1fr;gap:10px}.link .node{width:32px;height:32px;font-size:12px}.link:not(:last-child)::before{left:15px;top:28px}.link .card{padding:16px}}
 .closing{text-align:center;font-size:clamp(24px,2.8vw,32px);line-height:2;color:#fff8e6;margin-top:20px}
 `;
 
@@ -82,9 +93,14 @@ export function methodPage(site, others) {
 }
 
 export function shajraPage(site, others) {
-  const links = SHAJRA.entries.map(e => `<li class="link ${e.kind === "prophet" ? "prophet" : e.kind === "presentSheikh" ? "present" : ""}">
-      ${e.kind === "sheikh" ? `<span class="n">${e.index}</span>` : ""}
-      <div class="ur" lang="ur">${esc(e.urdu)}</div><div class="en">${esc(e.english)}</div></li>`).join("");
+  // Each link: its star on the gold trunk down the side (as in the app), then its card. The trunk
+  // runs between the stars only, never through the text.
+  const links = SHAJRA.entries.map(e => {
+    const kind = e.kind === "prophet" ? "prophet" : e.kind === "presentSheikh" ? "present" : "";
+    const mark = e.kind === "prophet" ? "ﷺ" : String(e.index);
+    return `<li class="link ${kind}"><span class="node" aria-hidden="true">${kind === "present" ? `<span>${esc(mark)}</span>` : esc(mark)}</span>
+      <div class="card"><div class="ur" lang="ur">${esc(e.urdu)}</div><div class="en">${esc(e.english)}</div></div></li>`;
+  }).join("");
   const body = `<div class="wrap page">
     <div class="eyebrow">The chain of transmission</div>
     <h1 class="shine" lang="ur" style="font-family:'Noto Nastaliq Urdu',serif;line-height:1.8">${esc(SHAJRA.title.ur)}</h1>

@@ -1,7 +1,7 @@
 # Silsila Markaz: reports, analytics and organisation (API + screens)
 
 Owner request 2026-11-05. One contract for the server (`Server/src/markaz.ts`), the iOS and
-Android apps (built together, identical behaviour), and reporting.wajidali.us (this will be moved to the naqshbandiaowaisiah.us public domain; reporting.naqshbandiaowaisiah.us already serves the same site).
+Android apps (built together, identical behaviour), and reporting.wajidali.us (this will be transferred to the Silsila's official domain).
 
 ## Who may see it
 
@@ -155,7 +155,7 @@ Entry points:
 2. **Daily report**: date picker (default yesterday), summary, each Halqah with its sessions and attendee list, "No session" list, share as text/CSV.
 3. **Monthly report**: month picker (default last month), summary with changes, trend chart, Halqah table, attendance by person, new members, needs care, share/CSV.
 4. **Organisation**: totals strip; "Live now" list; regions (collapsible) → Halqah cards (status dot, members, admins' names, last session, sessions in 30 days); super admin: tap a Halqah → set region / country / city; buttons **Announce to Halqahs** (title, message, audience Members / Halqah admins, scope All / region / chosen Halqahs, notify toggle) and **Bring in Halqah admins** (super admin); list of past announcements.
-5. **Sign in on a computer**: explains "Open reporting.wajidali.us (this will be moved to the naqshbandiaowaisiah.us public domain) on the computer and type the code shown there", code field (8 characters, auto-uppercase, dash optional) → Approve; list of signed-in computers with Sign out.
+5. **Sign in on a computer**: explains "Open reporting.wajidali.us (this will be transferred to the Silsila's official domain) on the computer and type the code shown there", code field (8 characters, auto-uppercase, dash optional) → Approve; list of signed-in computers with Sign out.
 
 Wording: plain, no technical words. English and Urdu strings for every label (Western digits in both).
 Charts: Swift Charts on iOS; Compose Canvas on Android (no new chart library).
