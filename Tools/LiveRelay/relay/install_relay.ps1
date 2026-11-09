@@ -86,7 +86,18 @@ if (-not $haveHiFi) {
 # 5. Python packages.
 Step 'Python packages'
 & $python -m pip install --quiet --upgrade pip
-& $python -m pip install --quiet aiortc sounddevice numpy pywinauto psutil
+& $python -m pip install --quiet --no-warn-script-location aiortc==1.15.0 sounddevice numpy pywinauto psutil pywin32 faster-whisper pillow py-spy
+# pywin32's DLLs, and the Visual C++ runtime its win32ui needs: a new Windows
+# Server 2025 has neither (Contabo, 9 November: every room read failed).
+& $python "C:\Program Files\Python312\Scripts\pywin32_postinstall.py" -install | Out-Null
+if (-not (Test-Path C:\Windows\System32\mfc140u.dll)) {
+    Step 'Visual C++ runtime'
+    $vc = Join-Path $downloads 'vc_redist.x64.exe'
+    Invoke-WebRequest 'https://aka.ms/vs/17/release/vc_redist.x64.exe' -OutFile $vc -UseBasicParsing
+    Start-Process $vc -ArgumentList '/install', '/quiet', '/norestart' -Wait
+}
+# PowerShell 5 talks to the PowerShell Gallery only over TLS 1.2.
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # 6. Paltalk's speaker -> the cable: make the cable the default playback
 #    device (Paltalk follows the default unless set otherwise).
