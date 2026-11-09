@@ -31,6 +31,8 @@ struct RootView: View {
     @State private var linkedGroup: LinkedGroup?
     /// A Markaz report the officers' digest opened, over the Halqah tab.
     @State private var linkedReport: LinkedMarkazReport?
+    /// A desktop computer's QR, scanned with the phone's camera: Approve a computer, over the Halqah tab.
+    @State private var linkedComputer: LinkedComputer?
 
     private var router: DeepLinkRouter { .shared }
 
@@ -125,6 +127,11 @@ struct RootView: View {
                 MarkazReportLinkView(monthly: report.monthly)
             }
         }
+        .sheet(item: $linkedComputer) { link in
+            NavigationStack {
+                ApproveComputerLinkView(code: link.code)
+            }
+        }
     }
 
     /// A request one of the app's own screens posted. A Read tab that exists
@@ -170,6 +177,10 @@ struct RootView: View {
             selectedTab = .more
             router.clear(route)
             linkedReport = LinkedMarkazReport(monthly: monthly)
+        case .approveComputer(let code):
+            selectedTab = .more
+            router.clear(route)
+            linkedComputer = LinkedComputer(code: code)
         case .updates, .events, .media, .topics:
             selectedTab = .explore
         }
@@ -179,6 +190,13 @@ struct RootView: View {
 /// A Halqah opened by a notification.
 private struct LinkedGroup: Identifiable {
     let id: String
+}
+
+/// A computer's code, from the QR the desktop app shows. Each scan is a new
+/// sheet, even of the same code.
+private struct LinkedComputer: Identifiable {
+    let id = UUID()
+    let code: String?
 }
 
 /// A Markaz report opened by the officers' digest.

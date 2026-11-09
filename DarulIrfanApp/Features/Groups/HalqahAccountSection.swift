@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// The account at the end of the Halqah tab, moved from the end of the
-/// groups list: the member's name, signing out, and deleting the account.
+/// groups list: the member's name, approving a computer, signing out, and
+/// deleting the account.
 /// Shown while signed in.
 @MainActor
 struct HalqahAccountSection: View {
@@ -25,6 +26,18 @@ struct HalqahAccountSection: View {
                     .buttonStyle(.plain)
                     HalqahRowDivider()
                 }
+                // Every member may sign the desktop app in, as themselves.
+                NavigationLink {
+                    ApproveComputerView(service: model.service)
+                } label: {
+                    HalqahListRowLabel(
+                        titleKey: "Approve a computer",
+                        systemImage: "desktopcomputer",
+                        tint: .gold
+                    )
+                }
+                .buttonStyle(.plain)
+                HalqahRowDivider()
                 Button {
                     Task { await model.signOut() }
                 } label: {

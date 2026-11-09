@@ -44,6 +44,9 @@ enum AppRoute: Equatable, Sendable {
     /// The Silsila Markaz's daily or monthly report, from the officers'
     /// digest ("markaz/reports/daily", "markaz/reports/monthly").
     case markazReport(monthly: Bool)
+    /// "Approve a computer", from the QR the desktop app shows
+    /// ("approve-computer?code=K7Q2-9MXD"); the code is filled in, never approved by itself.
+    case approveComputer(code: String?)
     /// Discover's official updates; one of them when given.
     case updates(itemID: String?)
     /// Discover's events; one of them when given.
@@ -63,7 +66,9 @@ enum AppRoute: Equatable, Sendable {
             guard text[..<separator.lowerBound].lowercased() == "darulirfan" else { return nil }
             text = String(text[separator.upperBound...])
         }
-        let path = text.split(separator: "?", maxSplits: 1).first.map(String.init) ?? ""
+        let pieces = text.split(separator: "?", maxSplits: 1)
+        let path = pieces.first.map(String.init) ?? ""
+        let query = pieces.count > 1 ? String(pieces[1]) : ""
         let parts = path.split(separator: "/").map { String($0).removingPercentEncoding ?? String($0) }
         guard let head = parts.first?.lowercased() else { return nil }
         let second = parts.count > 1 ? parts[1] : nil
@@ -96,6 +101,8 @@ enum AppRoute: Equatable, Sendable {
             guard second?.lowercased() == "reports", let which = third?.lowercased(),
                   which == "daily" || which == "monthly" else { return nil }
             self = .markazReport(monthly: which == "monthly")
+        case "approve-computer":
+            self = .approveComputer(code: ComputerLinkCode.code(inQuery: query))
         case "feed", "updates":
             self = .updates(itemID: second)
         case "events", "event":
