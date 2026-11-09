@@ -60,6 +60,7 @@ def fresh():
     fake = Fake()
     tmp = Path(tempfile.mkdtemp())
     yl.SESSION_FILE = tmp / "youtube_session.json"
+    yl.USAGE_FILE = tmp / "youtube_usage.json"
     yt = yl.YouTube("key-abc", "Daily Zikr", "unlisted")
     yt._call = fake.call  # noqa: SLF001
     yt.access_token, yt.token_expires = "t", 9e12
@@ -124,6 +125,26 @@ try:
     check("unknown key raises", False, "no error")
 except yl.YouTubeError as error:
     check("unknown key raises", error.status == 404 and "no stream" in str(error), str(error))
+
+# 8. The budget: past the soft cap polling stops, writes still go; past the hard cap nothing goes.
+import json as _json
+yt = yl.YouTube("key-abc", "Daily Zikr")
+yl.USAGE_FILE = Path(tempfile.mkdtemp()) / "u.json"
+day = __import__("time").strftime("%Y-%m-%d", __import__("time").gmtime(__import__("time").time() - 8 * 3600))
+yl.USAGE_FILE.write_text(_json.dumps({"day": day, "units": yl.SOFT_BUDGET}))
+try:
+    yt._spend(1, essential=False); check("reads stop at the soft budget", False)
+except yl.YouTubeError:
+    check("reads stop at the soft budget", True)
+yt._spend(50, essential=True)
+check("writes still go past the soft budget", yt.units_today() == yl.SOFT_BUDGET + 50)
+yl.USAGE_FILE.write_text(_json.dumps({"day": day, "units": yl.HARD_BUDGET}))
+try:
+    yt._spend(50, essential=True); check("nothing goes past the hard budget", False)
+except yl.YouTubeError:
+    check("nothing goes past the hard budget", True)
+yl.USAGE_FILE.write_text(_json.dumps({"day": "2000-01-01", "units": 99999}))
+check("a new day starts from zero", yt.units_today() == 0)
 
 print(f"{failures} failure(s)")
 sys.exit(failures)

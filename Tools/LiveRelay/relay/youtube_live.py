@@ -30,6 +30,17 @@ HERE = Path(__file__).resolve().parent
 CLIENT_FILE = HERE / "youtube-oauth-client.json"
 TOKEN_FILE = HERE / "youtube-token.json"
 SESSION_FILE = HERE / "youtube_session.json"  # the broadcast made for the running session
+USAGE_FILE = HERE / "youtube_usage.json"  # quota units spent today (YouTube's day: midnight Pacific)
+# The YouTube Data API is free: 10,000 quota units a day, no billing - past
+# it calls just fail until midnight Pacific. The relay keeps itself to a
+# fraction of that: past SOFT_BUDGET only the calls that start or end a
+# broadcast go out (no more polling); past HARD_BUDGET nothing does.
+# A session costs about 300 units (insert 50, bind 50, transition 50,
+# complete 50, list calls 1 each).
+SOFT_BUDGET = 3_000
+HARD_BUDGET = 6_000
+WRITE_COST = 50
+READ_COST = 1
 API = "https://www.googleapis.com/youtube/v3"
 SCOPE = "https://www.googleapis.com/auth/youtube"
 USER_AGENT = "DarulIrfanRelay/1.0"
@@ -85,7 +96,35 @@ class YouTube:
         self.access_token = data["access_token"]
         self.token_expires = time.time() + float(data.get("expires_in", 3600)) - 60
 
+    def _spend(self, units: int, essential: bool) -> None:
+        """Counts quota units for YouTube's day and refuses a call past the budget."""
+        day = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 8 * 3600))  # Pacific, near enough
+        try:
+            usage = json.loads(USAGE_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            usage = {}
+        if not isinstance(usage, dict) or usage.get("day") != day:
+            usage = {"day": day, "units": 0}
+        limit = HARD_BUDGET if essential else SOFT_BUDGET
+        if usage["units"] + units > limit:
+            raise YouTubeError(429, f"the relay's own YouTube budget for today is spent ({usage['units']} of {limit} units)")
+        usage["units"] += units
+        try:
+            USAGE_FILE.write_text(json.dumps(usage), encoding="utf-8")
+        except OSError:
+            pass
+
+    def units_today(self) -> int:
+        try:
+            usage = json.loads(USAGE_FILE.read_text(encoding="utf-8"))
+            day = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 8 * 3600))
+            return int(usage.get("units", 0)) if usage.get("day") == day else 0
+        except (OSError, ValueError, AttributeError):
+            return 0
+
     def _call(self, method: str, path: str, params: dict | None = None, body: dict | None = None) -> dict:
+        write = method != "GET"
+        self._spend(WRITE_COST if write else READ_COST, essential=write)
         if not self.access_token or time.time() > self.token_expires:
             self._refresh()
         url = f"{API}/{path}"

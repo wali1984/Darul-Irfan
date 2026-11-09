@@ -1087,7 +1087,9 @@ class Relay:
                 self.youtube_for = session_key
                 self.youtube_life = "created"
                 log(f"[youtube] this session's broadcast: {self.youtube.watch_url()}")
-            if now - self.youtube_checked_at >= 30:
+            # Every 30 s until it is live, then every 5 minutes: one quota
+            # unit a look, and a live broadcast needs no watching.
+            if now - self.youtube_checked_at >= (300 if self.youtube_life == "live" else 30):
                 self.youtube_checked_at = now
                 life = await asyncio.to_thread(self.youtube.go_live_if_ready)
                 if life != self.youtube_life:
