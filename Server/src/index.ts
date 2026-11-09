@@ -13,6 +13,9 @@ import { cleanText, isUUID, json, redactDiagnostics, sha256 } from "./util";
 import { whatsappSubscription, whatsappWebhook } from "./whatsapp";
 import { authenticatedMember, authenticatedSession, createSession, deleteMember, redeemInvite, signOutMember } from "./members";
 import {
+  approveComputerLink, listComputers, pollComputerLink, previewComputerLink, signOutComputers, startComputerLink,
+} from "./computerLinks";
+import {
   access as markazAccessRoute, analytics as markazAnalytics, announce, announcements, approveReportingLink, dailyReport,
   endReportingSession, exportCSV, markazDigest, monthlyReport, organization, personHistory, placeHalqah, pollReportingLink,
   reportingSessions, sessionDetail, startReportingLink, syncAdmins,
@@ -219,10 +222,45 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (request.method === "POST" && section === "announce") return announce(env, member, await input());
     // Letting a computer in is done from a phone that is already trusted.
     if (request.method === "POST" && section === "reporting-link" && entity === "approve" && !extra) {
-      if (session.client === "reporting") return json({ error: "Approve from the app" }, { status: 403 });
+      if (session.client) return json({ error: "Approve from the app" }, { status: 403 });
       return approveReportingLink(env, member, await input());
     }
     if (request.method === "DELETE" && section === "reporting-sessions" && entity) return endReportingSession(env, member, entity);
+    return json({ error: "Not found" }, { status: 404 });
+  }
+  // The desktop app's sign-in (Windows, macOS): the computer asks for a code and
+  // shows it, the member approves it in the app on their phone, and the computer
+  // polls until it is given a session of its own for that account.
+  if (request.method === "POST" && path === "/v1/members/computer-link") {
+    if (!await withinWriteLimit(request, env, "computer-link", 30)) return json({ error: "Too many requests" }, { status: 429 });
+    return startComputerLink(request, env);
+  }
+  if (request.method === "POST" && path === "/v1/members/computer-link/poll") {
+    if (!await withinWriteLimit(request, env, "computer-link-poll", 900)) return json({ error: "Too many requests" }, { status: 429 });
+    return pollComputerLink(request, env);
+  }
+  if (path.startsWith("/v1/members/computer-link/") || path === "/v1/members/computers" || path.startsWith("/v1/members/computers/")) {
+    const session = await authenticatedSession(request, env);
+    // The reporting website's session is for the Markaz's reports only.
+    if (!session || session.client === "reporting") return json({ error: "Member sign-in required" }, { status: 401 });
+    const input = async () => (request.headers.get("content-type") ?? "").includes("json")
+      ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
+    const step = /^\/v1\/members\/computer-link\/(preview|approve)$/.exec(path)?.[1];
+    if (request.method === "POST" && step) {
+      // A computer is let in from a phone that is already trusted, never from another computer.
+      if (session.client) return json({ error: "Approve from the app on your phone" }, { status: 403 });
+      // Codes are short, so wrong ones are limited hard; a member may still try a few.
+      if (!await withinWriteLimit(request, env, "computer-approve", 60)) return json({ error: "Too many requests" }, { status: 429 });
+      if (await requestCount(request, env, "computer-approve-refused") >= 20) return json({ error: "Too many requests" }, { status: 429 });
+      const body = await input();
+      const response = step === "preview" ? await previewComputerLink(env, body) : await approveComputerLink(env, session.memberID, body);
+      if (response.status === 400 || response.status === 404) await countRequest(request, env, "computer-approve-refused");
+      return response;
+    }
+    if (request.method === "GET" && path === "/v1/members/computers") return listComputers(env, session.memberID, session.hash);
+    if (request.method === "DELETE" && path === "/v1/members/computers") return signOutComputers(env, session.memberID, null);
+    const computer = /^\/v1\/members\/computers\/([^/]+)$/.exec(path)?.[1];
+    if (request.method === "DELETE" && computer) return signOutComputers(env, session.memberID, computer);
     return json({ error: "Not found" }, { status: 404 });
   }
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {

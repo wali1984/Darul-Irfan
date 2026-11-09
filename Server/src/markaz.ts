@@ -2,6 +2,7 @@ import type { Env } from "./contracts";
 import { halqahRole, isSuperAdmin, memberRole, notifyGroup, roleIn } from "./community";
 import { upsertMembership } from "./members";
 import { sendPushToInstallations } from "./apns";
+import { normaliseLinkCode, openLink } from "./computerLinks";
 import { cleanText, json, sha256 } from "./util";
 
 // The Silsila Markaz (owner 2026-11-05): every Halqah's Zikr and meetings in
@@ -780,30 +781,22 @@ export async function announcements(env: Env, memberID: string): Promise<Respons
 
 // MARK: - The reporting website's sign-in
 
-const LINK_ALPHABET = "ACDEFGHJKMNPQRSTUVWXYZ2345679";
-const normaliseLink = (raw: string) => raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+// The links, codes and their table are shared with the desktop app's sign-in (computerLinks.ts).
 const hex = (bytes: Uint8Array) => [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
 const REPORTING_HOURS = 12;
 
 /** POST /v1/reporting/link - a code for the website to show. */
 export async function startReportingLink(env: Env): Promise<Response> {
-  const random = crypto.getRandomValues(new Uint8Array(8));
-  const code = [...random].map(byte => LINK_ALPHABET[byte % LINK_ALPHABET.length]).join("");
-  const pollToken = hex(crypto.getRandomValues(new Uint8Array(32)));
-  const now = new Date(), expires = new Date(now.getTime() + 5 * 60_000).toISOString();
-  await env.DB.prepare("DELETE FROM reporting_links WHERE expires_at<?").bind(new Date(now.getTime() - DAY).toISOString()).run();
-  await env.DB.prepare("INSERT INTO reporting_links(code_hash,poll_hash,created_at,expires_at) VALUES(?,?,?,?)")
-    .bind(await sha256(code), await sha256(pollToken), now.toISOString(), expires).run();
-  return json({ code: `${code.slice(0, 4)}-${code.slice(4)}`, pollToken, expiresAt: expires }, { status: 201 });
+  return json(await openLink(env, "reporting"), { status: 201 });
 }
 
 /** POST /v1/markaz/reporting-link/approve - an officer lets the computer in. */
 export async function approveReportingLink(env: Env, memberID: string, input: Record<string, unknown>): Promise<Response> {
   if (!(await markazAccess(env, memberID)).canReport) return forbidden();
-  const code = normaliseLink(typeof input.code === "string" ? input.code : "");
+  const code = normaliseLinkCode(input.code);
   if (code.length !== 8) return badRequest("Type the 8 characters shown on the computer.");
   const result = await env.DB.prepare(`UPDATE reporting_links SET approved_by=?,approved_at=? WHERE code_hash=? AND expires_at>?
-      AND approved_by IS NULL AND consumed_at IS NULL`).bind(memberID, new Date().toISOString(), await sha256(code), new Date().toISOString()).run();
+      AND approved_by IS NULL AND consumed_at IS NULL AND client='reporting'`).bind(memberID, new Date().toISOString(), await sha256(code), new Date().toISOString()).run();
   if ((result.meta?.changes ?? 0) === 0) return json({ error: "That code is not valid or has expired. Refresh the page on the computer for a new one." }, { status: 404 });
   await env.DB.prepare("INSERT INTO audit_log(actor_email,action,entity_type,entity_id,before_json,after_json,created_at) VALUES(?,?,?,?,?,?,?)")
     .bind(`member:${memberID}`, "approve", "reporting-link", code.slice(0, 2) + "******", null, null, new Date().toISOString()).run();
@@ -815,7 +808,7 @@ export async function pollReportingLink(env: Env, input: Record<string, unknown>
   const token = typeof input.pollToken === "string" && /^[0-9a-f]{64}$/.test(input.pollToken) ? input.pollToken : "";
   if (!token) return badRequest("Invalid request");
   const hash = await sha256(token);
-  const row = await env.DB.prepare("SELECT expires_at,approved_by,consumed_at FROM reporting_links WHERE poll_hash=?").bind(hash)
+  const row = await env.DB.prepare("SELECT expires_at,approved_by,consumed_at FROM reporting_links WHERE poll_hash=? AND client='reporting'").bind(hash)
     .first<{ expires_at: string; approved_by: string | null; consumed_at: string | null }>();
   const now = new Date();
   if (!row || row.consumed_at) return json({ status: "expired" });

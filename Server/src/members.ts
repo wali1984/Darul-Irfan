@@ -1,6 +1,7 @@
 import { halqahRole, type HalqahRole } from "./community";
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from "jose";
 import type { Env } from "./contracts";
+import { noteComputerUse } from "./computerLinks";
 import { googleClientIDs, verifyGoogleIDToken, type GoogleIdentity } from "./google";
 import { cleanText, json, sha256, validHTTPURL } from "./util";
 
@@ -219,7 +220,8 @@ export async function authenticatedMember(request: Request, env: Env): Promise<s
 }
 
 /** The session behind the bearer token: the member, the hash it is kept
- *  under, and which client it was made for (null for the apps). */
+ *  under, and which client it was made for (null for the phone apps,
+ *  'reporting' for the reporting website, 'desktop' for the desktop app). */
 export async function authenticatedSession(request: Request, env: Env): Promise<{ memberID: string; hash: string; client: string | null } | null> {
   const token = bearerToken(request);
   if (!token) return null;
@@ -227,10 +229,9 @@ export async function authenticatedSession(request: Request, env: Env): Promise<
   const row = await env.DB.prepare("SELECT member_id,expires_at,last_seen_at,client FROM member_sessions WHERE token_hash=?")
     .bind(hash).first<{ member_id: string; expires_at: string; last_seen_at: string; client: string | null }>();
   if (!row || Date.parse(row.expires_at) <= Date.now()) return null;
-  // The reporting website lists its computers by when they were last used.
-  if (row.client === "reporting" && Date.now() - Date.parse(row.last_seen_at) > 300_000) {
-    await env.DB.prepare("UPDATE member_sessions SET last_seen_at=? WHERE token_hash=?").bind(new Date().toISOString(), hash).run();
-  }
+  // Computers are listed by when they were last used; a desktop app in use
+  // stays signed in.
+  await noteComputerUse(env, hash, row.client, row.last_seen_at);
   return { memberID: row.member_id, hash, client: row.client };
 }
 
