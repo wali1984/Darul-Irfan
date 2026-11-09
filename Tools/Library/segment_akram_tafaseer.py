@@ -1356,6 +1356,10 @@ class Volume:
 # at the quoted text. A stretch that no longer fits (a re-read changed its
 # words) stops the build, so a cut is never guessed.
 SECTION_CORRECTIONS = [
+    # November 2026: Parahs 11-30 were read again by Claude; the entries whose
+    # words changed were re-anchored to the new text at the same reviewed places:
+    # the cut stays where the reviewed row began, and a section's heading opens
+    # its own row.
     # The volume glosses 2:35-39 first (it closes: this is the plain translation), then comments on 2:35-36; the commentary on 2:37 opens at this quotation.
     (2, [
         (35, 36, None),
@@ -1431,12 +1435,14 @@ SECTION_CORRECTIONS = [
     # The commentary on 11:1 runs up to this first quotation of 11:2.
     (11, [
         (1, 1, None),
-        (2, 2, 'تو فرمایا یاد رکھو اللّٰه'),
+        (2, 2, 'تو فرمایا یاد '),
     ]),
     # The rest of the section's translation and the commentary on 21:76 run up to this first quotation of 21:77.
     (21, [
-        (75, 76, None),
-        (77, 77, 'فرمایا: وَنَصَرْنٰهُ مِنَ'),
+        (74, 74, None),
+        (75, 76, 'ان بدکاروں کی '),
+        (77, 77, 'فرمایا: وَنَصَ'),
+        (78, 79, 'اللہ کریم کے ا'),
     ]),
     # ------------------------------------------------------------------------
     # Row boundaries reviewed one by one, November 2026. Each cut that follows
@@ -2210,7 +2216,7 @@ SECTION_CORRECTIONS = [
     (10, [
         (52, 52, None),
         (53, 53, 'وَيَسْتَنْۢبِـ'),
-        (54, 54, 'سورة یونس رکوع'),
+        (54, 54, 'سورۃ یونس رکوع'),
     ]),
     (10, [
         (57, 57, None),
@@ -2226,15 +2232,15 @@ SECTION_CORRECTIONS = [
     ]),
     (10, [
         (72, 72, None),
-        (73, 73, 'فَكَذَّبُوهُ ا'),
+        (73, 73, 'فَكَذَّبُوْهُ '),
     ]),
     (10, [
         (74, 75, None),
-        (76, 77, 'فَلَهَا جَآءَ'),
+        (76, 77, 'فَلَمَّا جَآء'),
     ]),
     (10, [
         (79, 80, None),
-        (81, 81, 'موسیٰ نے فرمایا فَلَ'),
+        (81, 81, 'موسیٰؑ نے فرمایا ف'),
         (82, 82, 'اور وَيُحِقُّ '),
     ]),
     (10, [
@@ -2248,7 +2254,7 @@ SECTION_CORRECTIONS = [
     ]),
     (11, [
         (3, 3, None),
-        (4, 5, 'اِلَی اللہِ مَرْجِعُكُمْ ۚ ہمیں '),
+        (4, 5, 'اِلَى اللّٰهِ مَرْجِعُكُمْ ہ'),
     ]),
     (11, [
         (18, 18, None),
@@ -2258,7 +2264,7 @@ SECTION_CORRECTIONS = [
     ]),
     (11, [
         (28, 28, None),
-        (29, 30, 'فرمایا، قَوْمِ'),
+        (29, 30, 'فرمایا، وَيٰقَ'),
         (31, 31, 'اَقُوْلُ لَـكُ'),
     ]),
     (11, [
@@ -2269,7 +2275,7 @@ SECTION_CORRECTIONS = [
         (36, 36, None),
         (37, 37, 'فرمایا، آپ ایس'),
         (38, 38, 'نوحؑ اپنا کام '),
-        (39, 39, 'فَسَوْفَ تَعْل'),
+        (39, 39, 'فَسَوْفَ تَعْلَمُوْنَۙ مَنْ يَّاْتِيْهِ عَذَابٌ يُّخْزِيْهِ وَيَحِلُّ عَلَيْهِ عَذَابٌ مُّقِيْمٌ\u200f\n'),
     ]),
     (11, [
         (41, 41, None),
@@ -2277,7 +2283,7 @@ SECTION_CORRECTIONS = [
     ]),
     (11, [
         (43, 43, None),
-        (44, 44, 'وَقِيْلَ يَا ر'),
+        (44, 44, 'وَقِيْلَ يٰۤاَ'),
     ]),
     (11, [
         (50, 50, None),
@@ -2286,7 +2292,7 @@ SECTION_CORRECTIONS = [
     (11, [
         (59, 59, None),
         (60, 60, 'وَاُتْبِعُوْا '),
-        (61, 68, 'سورة محمود رکو'),
+        (61, 68, 'سورۃ ھود رکوع '),
     ]),
     (11, [
         (94, 94, None),
@@ -2294,11 +2300,11 @@ SECTION_CORRECTIONS = [
     ]),
     (11, [
         (96, 96, None),
-        (97, 97, 'فَاتَّبَعُوْۤا'),
+        (97, 97, 'فَاتَّبَعُوْۤا اَمْرَ فِرْعَوْنَ\u200bۚ وَمَاۤ اَمْرُ فِرْعَوْنَ بِرَشِيْدٍ\u200f ﴿۹۷﴾ ا'),
     ]),
     (11, [
         (102, 104, None),
-        (105, 107, 'یَوْمَ يَأْتِ\n'),
+        (105, 107, 'يَوْمَ يَاْتِ\n'),
     ]),
     (11, [
         (108, 108, None),
@@ -2306,7 +2312,7 @@ SECTION_CORRECTIONS = [
     ]),
     (11, [
         (110, 111, None),
-        (112, 112, 'فَاسْتَقِمْ كَمَاۤ اُمِرْتَ وَمَ'),
+        (112, 112, 'فَاسْتَقِمْ كَمَاۤ اُمِرْتَ وَمَنْ تَابَ مَعَكَ وَلَا تَطْغَوْا ؕ اِنَّهٗ بِمَا تَعْمَلُوْنَ بَصِيْرٌ\u200f ﴿'),
     ]),
     (11, [
         (116, 116, None),
@@ -2314,7 +2320,7 @@ SECTION_CORRECTIONS = [
     ]),
     (11, [
         (118, 118, None),
-        (119, 119, 'اللہ مَنْ رَّح'),
+        (119, 119, 'اِلَّا مَنْ رّ'),
     ]),
     (12, [
         (8, 8, None),
@@ -2334,11 +2340,11 @@ SECTION_CORRECTIONS = [
     ]),
     (12, [
         (28, 29, None),
-        (30, 35, 'سورة یوسف رکوع'),
+        (30, 35, 'سورۃ یوسف رکوع'),
     ]),
     (12, [
         (68, 68, None),
-        (69, 79, 'سورة یوسف راکو'),
+        (69, 79, 'سورۃ یوسف رکوع'),
     ]),
     (12, [
         (80, 80, None),
@@ -2354,7 +2360,7 @@ SECTION_CORRECTIONS = [
     ]),
     (13, [
         (2, 2, None),
-        (3, 3, 'قدرت الہی کی ن'),
+        (3, 3, 'قدرتِ الٰہی کی'),
     ]),
     (13, [
         (5, 5, None),
@@ -2375,11 +2381,11 @@ SECTION_CORRECTIONS = [
     ]),
     (14, [
         (1, 1, None),
-        (2, 2, 'اللّٰهِ الَّذِ'),
-        (3, 4, 'فرمایا، اَلَّذ'),
-        (5, 5, 'وَلَـقَدْ اَرْ'),
-        (6, 6, 'وَاِذْ قَالَ م'),
-        (7, 12, 'سورة ابراہیم رکوع 12'),
+        (2, 2, 'اللّٰهِ الَّذِىْ لَهٗ مَا فِی السَ'),
+        (3, 4, 'فرمایا، اۨلَّذ'),
+        (5, 5, 'وَلَـقَدْ اَرْسَلْنَا مُوْسٰى بِاٰيٰتِنَاۤ اَنْ اَخْرِجْ قَوْمَكَ مِنَ الظُّلُمٰتِ اِلَى النُّوْرِ\ue021 '),
+        (6, 6, 'وَاِذْ قَالَ مُوْسٰى لِـقَوْمِهِ اذْكُرُوْا نِعْمَةَ اللّٰهِ عَلَيْكُمْ او'),
+        (7, 12, 'سورۃ ابراہیم رکوع 2 '),
     ]),
     (15, [
         (27, 27, None),
@@ -2395,7 +2401,7 @@ SECTION_CORRECTIONS = [
     ]),
     (16, [
         (26, 26, None),
-        (27, 27, 'یہ تو اخروی ذل'),
+        (27, 27, 'یہ تو اُخروی ذ'),
     ]),
     (16, [
         (29, 29, None),
@@ -2416,7 +2422,7 @@ SECTION_CORRECTIONS = [
     ]),
     (17, [
         (11, 22, None),
-        (23, 30, 'سورۃ بنی اسراء'),
+        (23, 30, 'سورۃ بنی اسرآءیل رکوع 3 '),
     ]),
     (17, [
         (39, 39, None),
@@ -2424,27 +2430,27 @@ SECTION_CORRECTIONS = [
     ]),
     (17, [
         (61, 70, None),
-        (71, 77, 'سورة بنی اسراء'),
+        (71, 77, 'سورۃ بنی اسرآء'),
     ]),
     (17, [
         (85, 93, None),
-        (94, 100, 'سورہ بنی اسراء'),
+        (94, 100, 'سورۃ بنی اسرآء'),
     ]),
     (18, [
         (1, 1, None),
-        (2, 3, 'قَيِّمًا لِّيُ'),
+        (2, 3, 'قَيِّمًا لِّيُنْذِرَ بَاْسًا شَدِيْدًا مِّنْ لَّدُنْهُ ۔'),
     ]),
     (18, [
         (23, 23, None),
-        (24, 24, 'اِلَّاۤ اَنْ ي'),
+        (24, 24, 'اِلَّاۤ اَنْ يَّشَآءَ اللّٰهُ ۔'),
     ]),
     (18, [
         (45, 49, None),
-        (50, 53, 'سورة اللاصف رک'),
+        (50, 53, 'سورۃ الکھف رکوع 7 '),
     ]),
     (18, [
         (60, 70, None),
-        (71, 74, 'سورۃ الکعب رگو'),
+        (71, 74, 'سورۃ الکھف رکوع 10'),
     ]),
     (18, [
         (84, 86, None),
@@ -2452,7 +2458,7 @@ SECTION_CORRECTIONS = [
     ]),
     (18, [
         (88, 89, None),
-        (90, 92, 'حَتّٰٓى اِذَا '),
+        (90, 92, 'حَتّٰٓى اِذَاب'),
     ]),
     (18, [
         (95, 95, None),
@@ -2474,20 +2480,21 @@ SECTION_CORRECTIONS = [
     ]),
     (20, [
         (12, 12, None),
-        (13, 13, 'نبی ازل سے نبی'),
+        (13, 13, 'نبیؑ ازل سے نب'),
         (14, 14, 'سب سے بنیادی ب'),
     ]),
     (20, [
         (17, 19, None),
-        (20, 21, 'فَالْقِهَا۔۔۔ '),
+        (20, 21, 'فَاَلْقٰىهَا۔۔'),
     ]),
     (20, [
         (25, 26, None),
         (27, 28, 'مزید عرض کی: و'),
-        (29, 34, 'وَاجْعَلْ لِّى'),
+        (29, 34, 'وَاجْعَلْ لِّىْ وَزِيْرًا مِّنْ اَهْلِىْ ۙ\u200f ﴿۲۹﴾ هٰرُوْنَ اَخِی﴿'),
     ]),
     (20, [
-        (39, 39, None),
+        (37, 38, None),
+        (39, 39, 'فرمایا: فَلْيُ'),
         (40, 41, 'اِذْ تَمْشِىْۤ'),
         (42, 43, 'اِذْهَبْ اَنْت'),
     ]),
@@ -2505,7 +2512,7 @@ SECTION_CORRECTIONS = [
     ]),
     (20, [
         (71, 71, None),
-        (72, 72, 'جادو گروں نے ج'),
+        (72, 72, 'جادوگروں نے جو'),
     ]),
     (20, [
         (75, 75, None),
@@ -2521,7 +2528,7 @@ SECTION_CORRECTIONS = [
     ]),
     (20, [
         (90, 104, None),
-        (105, 105, 'سورة ظلم رکوع '),
+        (105, 105, 'سورۃ طٰہٰ رکوع 6'),
     ]),
     (20, [
         (122, 122, None),
@@ -2541,7 +2548,7 @@ SECTION_CORRECTIONS = [
     ]),
     (21, [
         (49, 49, None),
-        (50, 50, 'قرآن کریم کی ع'),
+        (50, 50, 'قرآنِ کریم کی '),
     ]),
     (21, [
         (58, 59, None),
@@ -2551,18 +2558,15 @@ SECTION_CORRECTIONS = [
         (64, 64, None),
         (65, 67, 'ثُمَّ نُكِسُوْ'),
     ]),
-    (21, [
-        (74, 74, None),
-        (75, 76, 'ان بد کاروں کی'),
-    ]),
+    # merged into the re-anchored entry above
     (21, [
         (83, 83, None),
         (84, 84, 'فَاسْتَجَبْنَا'),
     ]),
     (21, [
         (87, 87, None),
-        (88, 88, 'فَاسْتَجَبْنَا لَهُ '),
-        (89, 90, 'اللہ کریم فرماتے ہیں'),
+        (88, 88, 'فَاسْتَجَبْنَا لَهٗۙ'),
+        (89, 90, 'اللہ کریم فرماتے'),
     ]),
     (21, [
         (91, 91, None),
@@ -2575,27 +2579,27 @@ SECTION_CORRECTIONS = [
     ]),
     (21, [
         (107, 107, None),
-        (108, 108, 'سوفر مایا: لوگ'),
+        (108, 108, 'سو فرمایا: لوگ'),
         (109, 109, 'اگر یہ بات بھی'),
         (110, 112, 'یہ تم جانو اور'),
     ]),
     (22, [
         (19, 19, None),
         (20, 21, 'فرمایا: يُصْهَ'),
-        (22, 22, 'جب وہ ارادہ کریں گے کہ کہیں ادھر'),
+        (22, 22, 'جب وہ ارادہ کریں گے کہ کہیں اِ'),
     ]),
     (22, [
         (34, 34, None),
-        (35, 35, 'الَّذِيْنَ اِذ'),
+        (35, 35, 'الَّذِيْنَ اِذَا ذُكِرَ اللّٰهُ وَجِلَتْ قُلُوْبُهُمْ ۔۔'),
     ]),
     (22, [
         (40, 40, None),
         (41, 41, 'فرمایا: لَّذِي'),
-        (42, 42, 'فرمایا: وَإِنْ'),
+        (42, 42, 'فرمایا: وَاِنۡ'),
     ]),
     (22, [
         (43, 43, None),
-        (44, 44, 'اسی طرح وَّ اَ'),
+        (44, 44, 'اسی طرح وَّاَص'),
         (45, 45, 'فرمایا: فَكَاَ'),
     ]),
     (22, [
@@ -2604,7 +2608,7 @@ SECTION_CORRECTIONS = [
     ]),
     (22, [
         (48, 48, None),
-        (49, 49, 'سورة الح رکوع '),
+        (49, 49, 'سورۃ الحج رکوع'),
         (50, 50, 'فرمایا: فَالَّ'),
     ]),
     (22, [
@@ -2642,7 +2646,7 @@ SECTION_CORRECTIONS = [
     ]),
     (23, [
         (99, 99, None),
-        (100, 100, 'لَعَلِّيَّ\n\nاَ'),
+        (100, 100, 'لَعَلِّيْٓ\n\nاَ'),
     ]),
     (24, [
         (39, 39, None),
@@ -2650,7 +2654,7 @@ SECTION_CORRECTIONS = [
     ]),
     (24, [
         (54, 54, None),
-        (55, 55, 'فرمایا: اللّٰه'),
+        (55, 55, 'فرمایا: وَعَدَ'),
     ]),
     (25, [
         (7, 7, None),
@@ -2666,7 +2670,7 @@ SECTION_CORRECTIONS = [
     ]),
     (25, [
         (34, 34, None),
-        (35, 35, 'اور يقينا بهم '),
+        (35, 35, 'سورۃ الفرقان ر'),
     ]),
     (25, [
         (62, 62, None),
@@ -2674,13 +2678,14 @@ SECTION_CORRECTIONS = [
     ]),
     (26, [
         (10, 33, None),
-        (34, 51, 'قَالَ قَآٮِٕل'),
-        (52, 67, 'اور ہم نے موسیٰ (علیہ السلام) پر وحی ف'),
-        (68, 68, 'رحمت رب العالمین بطف'),
+        (34, 51, 'قَالَ لِلْمَلَاِ حَوْلَهٗۤ اِنَّ هٰذَا لَسٰحِرٌ عَلِيْمٌ ﴿۳۴﴾ اپ'),
+        (52, 67, 'سورۃ الشعرآء رکوع 4 '),
+        (68, 68, 'رحمتِ رب العالمین بط'),
     ]),
     (26, [
         (92, 93, None),
         (94, 97, 'فَكُبْكِبُوْا '),
+        (98, 99, 'اللہ کی قسم ہم'),
     ]),
     (26, [
         (100, 101, None),
@@ -2696,7 +2701,7 @@ SECTION_CORRECTIONS = [
     ]),
     (26, [
         (192, 192, None),
-        (193, 194, 'نَزَلَ بِهِ الرُّوْحُ الْاَمِيْنُ ﴿۱۹۳'),
+        (193, 194, 'نَزَلَ بِهِ الرُّوْحُ الْاَمِيْنُ ﴿۱۹۳﴾ اس کو امانت دار فرشتہ لے کر آیا ہے۔\n'),
     ]),
     (26, [
         (199, 201, None),
@@ -2722,15 +2727,15 @@ SECTION_CORRECTIONS = [
     ]),
     (27, [
         (1, 1, None),
-        (2, 2, 'هُدًى وَّبُشْر'),
+        (2, 2, 'هُدًى وَّبُشْرٰى لِلْمُؤْمِنِيْنَ ②\n'),
     ]),
     (27, [
         (8, 8, None),
-        (9, 9, 'سوار شاد ہوا: '),
+        (9, 9, 'سو ارشاد ہوا: '),
     ]),
     (27, [
         (20, 20, None),
-        (21, 21, 'لَا عَلَيْهِ ب'),
+        (21, 21, 'لَاُعَذِّبَنَّ'),
     ]),
     (27, [
         (23, 23, None),
@@ -2742,11 +2747,11 @@ SECTION_CORRECTIONS = [
     ]),
     (27, [
         (82, 83, None),
-        (84, 93, 'پُرِسْش:\n\nفرما'),
+        (84, 93, 'پُرسش:\n\nفرمایا'),
     ]),
     (28, [
         (6, 6, None),
-        (7, 7, 'فرمایا: وَأَوْ'),
+        (7, 7, 'فرمایا: وَاَوْ'),
     ]),
     (28, [
         (29, 29, None),
@@ -2762,7 +2767,7 @@ SECTION_CORRECTIONS = [
     ]),
     (28, [
         (43, 43, None),
-        (44, 45, 'آپ صلی اللہ علیہ وسلم کی رسالت کی دلیل:\n\nاور'),
+        (44, 45, 'آپ صلی اللہ علیہ وسلم کی رسالت کی دلیل:\n'),
     ]),
     (28, [
         (54, 54, None),
@@ -2790,12 +2795,12 @@ SECTION_CORRECTIONS = [
     ]),
     (29, [
         (63, 63, None),
-        (64, 68, 'سورۃ العنبرات '),
+        (64, 68, 'سورۃ العنکبوت رک'),
         (69, 69, 'فرمایا: وَالَّ'),
     ]),
     (30, [
         (20, 27, None),
-        (28, 28, '(اللہ) تمہارے ہی حالات میں سے تمہارے لیے ایک مثال بیان فرماتے ہیں۔\nک'),
+        (28, 28, 'سورۃ الروم رکوع 4 '),
     ]),
     (30, [
         (52, 52, None),
@@ -2807,7 +2812,7 @@ SECTION_CORRECTIONS = [
     ]),
     (31, [
         (8, 8, None),
-        (9, 9, 'خٰلِدِيْنَ فِي'),
+        (9, 9, 'خٰلِدِیْنَ فِی'),
     ]),
     (31, [
         (23, 23, None),
@@ -2815,12 +2820,12 @@ SECTION_CORRECTIONS = [
     ]),
     (31, [
         (27, 27, None),
-        (28, 28, 'اِنَّ اللّٰهَ '),
+        (28, 28, 'اِنَّ اللّٰهَ سَ'),
     ]),
     (31, [
         (29, 29, None),
         (30, 30, 'اور یہ اس لیے '),
-        (31, 31, 'سورۃ ثمن رکوع '),
+        (31, 31, 'سورۃ لقمٰن رکو'),
     ]),
     (33, [
         (2, 2, None),
@@ -2828,7 +2833,7 @@ SECTION_CORRECTIONS = [
     ]),
     (33, [
         (38, 38, None),
-        (39, 40, 'انبیاء علیہ ہم'),
+        (39, 40, 'انبیا علیھم ال'),
     ]),
     (33, [
         (41, 42, None),
@@ -2837,7 +2842,7 @@ SECTION_CORRECTIONS = [
     ]),
     (34, [
         (10, 10, None),
-        (11, 11, 'اِنِّ الْحَمْل'),
+        (11, 11, 'اَنِ اعْمَلْ سٰبِغٰتٍ وَّقَدِّرْ فِى'),
     ]),
     (34, [
         (20, 20, None),
@@ -2845,11 +2850,11 @@ SECTION_CORRECTIONS = [
     ]),
     (34, [
         (22, 30, None),
-        (31, 36, 'سورة سبارکوع 4'),
+        (31, 36, 'سورۃ سبا رکوع 4 '),
     ]),
     (34, [
         (37, 45, None),
-        (46, 54, 'سورة سبار گوع '),
+        (46, 54, 'سورۃ سبا رکوع 6 '),
     ]),
     (35, [
         (6, 6, None),
@@ -2861,7 +2866,7 @@ SECTION_CORRECTIONS = [
     ]),
     (35, [
         (14, 14, None),
-        (15, 15, 'سورۃ فاطمہ رکو'),
+        (15, 15, 'سورۃ فاطر رکوع'),
     ]),
     (35, [
         (16, 16, None),
@@ -2869,7 +2874,7 @@ SECTION_CORRECTIONS = [
     ]),
     (35, [
         (29, 29, None),
-        (30, 30, 'لِیُو فِیْہُمْ'),
+        (30, 30, 'لِيُوَفِّيَهُم'),
     ]),
     (35, [
         (34, 34, None),
@@ -2881,7 +2886,7 @@ SECTION_CORRECTIONS = [
     ]),
     (36, [
         (1, 12, None),
-        (13, 21, 'سورۃ بیس رکوع '),
+        (13, 21, 'سورۃ یٰسٓ رکوع 2'),
     ]),
     (36, [
         (51, 68, None),
@@ -2889,8 +2894,8 @@ SECTION_CORRECTIONS = [
     ]),
     (37, [
         (1, 21, None),
-        (22, 22, 'جولوگ ظلم کرتے'),
-        (23, 25, 'مِنْ دُونِ الل'),
+        (22, 22, 'سورۃ الصّٰفّٰت رکوع 2 '),
+        (23, 25, 'مِنْ دُوْنِ اللّٰهِ۔'),
     ]),
     (37, [
         (28, 29, None),
@@ -2921,7 +2926,8 @@ SECTION_CORRECTIONS = [
         (97, 98, 'قَالُوا ابْنُو'),
     ]),
     (37, [
-        (105, 108, None),
+        (103, 104, None),
+        (105, 108, 'تسلیم کرلیا او'),
         (109, 111, 'سَلٰمٌ عَلٰٓى '),
     ]),
     (37, [
@@ -2933,25 +2939,25 @@ SECTION_CORRECTIONS = [
         (161, 161, 'فرمایا: فَاِنّ'),
     ]),
     (37, [
-        (172, 172, None),
+        (171, 171, None),
+        (172, 172, 'اِنَّھُمْ لَھُ'),
         (173, 174, 'وَاِنَّ جُنْدَ'),
+        (175, 176, 'فرمایا: فَتَوَ'),
+        (177, 179, 'فَاِذَا نَزَلَ'),
     ]),
-    (37, [
-        (175, 176, None),
-        (177, 179, '﴿فَإِذَا نَزَل'),
-    ]),
+    # merged into the re-anchored entry above
     (38, [
         (1, 13, None),
         (14, 26, 'اس کا پھر نتیج'),
-        (27, 40, 'سورة ص ارکوع 3'),
+        (27, 40, 'سورۃ ص رکوع 3 '),
     ]),
     (38, [
         (62, 63, None),
-        (64, 64, 'فرمایا: اِنَّ '),
+        (64, 64, 'فرمایا:\n\nاِنَّ'),
     ]),
     (38, [
         (65, 65, None),
-        (66, 66, 'رَبُّ السَّمٰو'),
+        (66, 66, 'رَبُّ السَّمٰوٰتِ وَالْاَرْضِ وَمَا بَيْنَهُمَا الْعَزِيْزُ الْغَفَّارُ\u200f ﴿۶۶﴾ وہ'),
     ]),
     (39, [
         (34, 34, None),
@@ -2959,32 +2965,31 @@ SECTION_CORRECTIONS = [
     ]),
     (40, [
         (38, 50, None),
-        (51, 60, 'يقينا بهم اپنے'),
-        (61, 68, 'الله هي تو به '),
+        (51, 60, 'سورۃ المومن رکوع 6'),
+        (61, 68, 'سورۃ المومن رکوع 7'),
     ]),
     (40, [
         (69, 78, None),
-        (79, 82, 'اللہ نے تمہارے'),
+        (79, 82, 'سورۃ المومن رکوع 9'),
+        (83, 84, ' ہو گئے۔\n\n|فَلَمَّا جَآءَتْهُم'),
     ]),
     (41, [
         (1, 2, None),
-        (3, 3, 'قرآن حکیم کی خ'),
-    ]),
-    (41, [
-        (4, 4, None),
+        (3, 3, 'قرآنِ حکیم کی '),
+        (4, 4, 'فرمایا، لوگوں '),
         (5, 5, 'حق کا انکار ان'),
-    ]),
-    (41, [
-        (6, 6, None),
+        (6, 6, 'حضور صلی اللہ علیہ وسلم سے'),
         (7, 8, 'فرمایا: الَّذِ'),
     ]),
+    # merged into the re-anchored entry above
+    # merged into the re-anchored entry above
     (41, [
         (18, 18, None),
-        (19, 25, 'سورۃ خم السجدہ'),
+        (19, 25, 'سورۃ حٰمٓ السج'),
     ]),
     (41, [
         (44, 44, None),
-        (45, 46, 'سورة ختم السجد'),
+        (45, 46, 'سورۃ حٰمٓ السج'),
     ]),
     (42, [
         (18, 18, None),
@@ -2996,21 +3001,21 @@ SECTION_CORRECTIONS = [
     ]),
     (42, [
         (44, 44, None),
-        (45, 45, 'وَتَرٰٮهُمْ يُ'),
+        (45, 45, 'وَتَرٰٮهُمْ يُعْرَضُوْنَ عَلَيْهَا خٰشِعِيْنَ مِنَ الذُّلِّ يَنْظُرُوْنَ مِنْ طَرْفٍ خَفِىٍّ ا'),
     ]),
     (42, [
         (46, 46, None),
         (47, 47, 'کوئی اُس کی مد'),
-        (48, 48, 'فَإِنْ أَعْرَض'),
+        (48, 48, 'فَاِنۡ اَعۡرَض'),
     ]),
     (42, [
         (51, 51, None),
-        (52, 52, 'وَ كَذٰلِكَ أَ'),
-        (53, 53, 'صِرَاط الله ال'),
+        (52, 52, 'وَكَذٰلِكَ اَو'),
+        (53, 53, 'صِرَاطِ اللّٰه'),
     ]),
     (43, [
         (1, 10, None),
-        (11, 25, 'وَالَّذِىْ نَز'),
+        (11, 25, ' رہ سکے۔\n\n|وَالَّذِىْ نَزَّلَ م'),
     ]),
     (44, [
         (13, 13, None),
@@ -3018,7 +3023,7 @@ SECTION_CORRECTIONS = [
     ]),
     (44, [
         (17, 17, None),
-        (18, 18, 'آپؐ نے آواز لگ'),
+        (18, 18, 'آپؑ نے آواز لگ'),
     ]),
     (44, [
         (20, 21, None),
@@ -3038,7 +3043,7 @@ SECTION_CORRECTIONS = [
     ]),
     (48, [
         (12, 12, None),
-        (13, 13, 'فرمایا: وَمَنْ لَّمْ'),
+        (13, 13, 'فرمایا: وَمَنْ لَّمْ يُؤْمِنْۢ ب'),
     ]),
     (48, [
         (19, 19, None),
@@ -3046,15 +3051,15 @@ SECTION_CORRECTIONS = [
     ]),
     (48, [
         (26, 26, None),
-        (27, 27, 'سورۃ الشیخ رکو'),
+        (27, 27, 'سورۃ الفتح رکو'),
     ]),
     (48, [
         (28, 28, None),
-        (29, 29, 'فرمایا: هُمَّه'),
+        (29, 29, 'فرمایا: مُحَمّ'),
     ]),
     (49, [
         (11, 11, None),
-        (12, 12, 'فرمایا: يَا يٰۤـاَيّ'),
+        (12, 12, 'فرمایا: يٰۤـاَ'),
     ]),
     (49, [
         (15, 15, None),
@@ -3066,8 +3071,8 @@ SECTION_CORRECTIONS = [
     ]),
     (50, [
         (1, 15, None),
-        (16, 29, 'سورۃ قرآن کو ع'),
-        (30, 30, 'جس دن اسم دوزخ'),
+        (16, 29, 'سورۃ قٓ رکوع 2'),
+        (30, 30, 'سورۃ قٓ رکوع 3'),
     ]),
     (50, [
         (39, 39, None),
@@ -3080,25 +3085,24 @@ SECTION_CORRECTIONS = [
     ]),
     (51, [
         (1, 6, None),
-        (7, 9, 'حساب کتاب کا دن قائم'),
+        (7, 9, 'حساب کتاب کا دن قا'),
         (10, 13, 'اپنی بربادی کے'),
         (14, 16, 'میرے حبیب صلی '),
         (17, 18, 'یہ لوگ وہ تھے '),
         (19, 20, 'تو عبادت پر نا'),
+        (21, 21, 'وَفِىْۤ اَنْفُ'),
+        (22, 22, 'وَفِى السَّمَآءِ رِزْقُكُمْ وَمَا تُوْعَدُوْنَ\u200f ﴿'),
+        (23, 23, 'فَوَرَبِّ السَّمَآءِ وَالْاَرْضِ اِنَّهٗ لَحَـقٌّ مِّثْلَ مَاۤ اَنَّكُمْ تَنْطِقُوْنَ\ue022\u200f ﴿'),
+        (24, 30, 'سورۃ الذّٰریٰت رکوع 2 '),
     ]),
-    (51, [
-        (21, 21, None),
-        (22, 22, 'وَفِى السَّمَا'),
-        (23, 23, 'فَوَرَبِّ السّ'),
-        (24, 30, 'كَيَا ابْرَائِ'),
-    ]),
+    # merged into the re-anchored entry above
     (52, [
         (1, 27, None),
-        (28, 28, 'اِنَّا كُـنَّا مِنْ '),
+        (28, 28, 'اِنَّا كُـنَّا مِنْ قَبْلُ نَدْعُوْهُ ؕ اِنَّهٗ هُوَ الْبَـرُّ الرَّحِيْمُ\ue022\u200f ﴿'),
     ]),
     (53, [
         (1, 1, None),
-        (2, 2, 'مَا ضَلَّ صَاحِبُكُمْ وَمَا غَوٰى اللَ'),
+        (2, 2, 'مَا ضَلَّ صَاحِبُكُمْ وَمَا غَوٰى تم'),
     ]),
     (53, [
         (21, 22, None),
@@ -3114,7 +3118,7 @@ SECTION_CORRECTIONS = [
     ]),
     (57, [
         (20, 25, None),
-        (26, 29, 'اور يقينا بهم '),
+        (26, 29, 'سورۃ الحدید رکوع 4'),
     ]),
     (59, [
         (8, 8, None),
@@ -3130,15 +3134,15 @@ SECTION_CORRECTIONS = [
     ]),
     (65, [
         (7, 7, None),
-        (8, 12, 'سورة الطلاق رک'),
+        (8, 12, 'سورۃ الطلاق رک'),
     ]),
     (66, [
         (11, 11, None),
-        (12, 12, 'فرمایا: وَمَرْ'),
+        (12, 12, 'فرمایا:\n\nوَمَر'),
     ]),
     (68, [
         (1, 1, None),
-        (2, 3, 'مَاۤ اَنْتَ بِـنِعْمَةِ رَبِّكَ بِمَجْنُوْنٍ ﴿۲﴾ و'),
+        (2, 3, 'مَاۤ اَنْتَ بِـنِعْمَةِ رَبِّكَ بِمَجْنُوْنٍ \u06dd و'),
     ]),
     (68, [
         (19, 21, None),
@@ -3154,7 +3158,7 @@ SECTION_CORRECTIONS = [
     ]),
     (68, [
         (44, 44, None),
-        (45, 45, 'فرمایا: وَاُمْ'),
+        (45, 45, 'فرمایا: وَاُمۡ'),
     ]),
     (68, [
         (46, 46, None),
@@ -3182,7 +3186,7 @@ SECTION_CORRECTIONS = [
     ]),
     (70, [
         (35, 35, None),
-        (36, 44, 'سورة المعارف ر'),
+        (36, 44, 'سورۃ المعارج ر'),
     ]),
     (72, [
         (4, 4, None),
@@ -3194,7 +3198,7 @@ SECTION_CORRECTIONS = [
     ]),
     (73, [
         (19, 19, None),
-        (20, 20, 'سورة الحرم مل '),
+        (20, 20, 'سورۃ المزمل رک'),
     ]),
     (76, [
         (1, 1, None),
@@ -3210,11 +3214,11 @@ SECTION_CORRECTIONS = [
     ]),
     (77, [
         (20, 20, None),
-        (21, 24, 'فرمایا:\nفَجَعَ'),
+        (21, 24, 'فرمایا: فَجَعَ'),
     ]),
     (77, [
         (29, 29, None),
-        (30, 30, 'فرمایا: اِنْطَ'),
+        (30, 30, 'فرمایا: اِنْطَلِقُوْۤا اِلٰى ظ'),
     ]),
     (77, [
         (38, 38, None),
@@ -3222,11 +3226,11 @@ SECTION_CORRECTIONS = [
     ]),
     (78, [
         (1, 30, None),
-        (31, 40, 'سورۃ النبا کو '),
+        (31, 40, 'سورۃ النبا رکوع 2 '),
     ]),
     (83, [
         (1, 1, None),
-        (2, 2, 'الَّذِيْنَ اِذ'),
+        (2, 2, 'الَّذِيْنَ اِذَا اكْتَالُوْا عَلَى النَّاسِ يَسْتَوْفُوْنَ\ue01a \u06dd '),
     ]),
     (83, [
         (18, 21, None),
@@ -3234,7 +3238,7 @@ SECTION_CORRECTIONS = [
     ]),
     (83, [
         (29, 29, None),
-        (30, 32, 'فرمایا: وَاِذَ'),
+        (30, 32, 'فرمایا:\n\nوَاِذ'),
     ]),
     (86, [
         (7, 7, None),
@@ -3259,13 +3263,13 @@ SECTION_CORRECTIONS = [
     ]),
     (89, [
         (9, 9, None),
-        (10, 10, 'وَفِرْ عَوْنَ '),
+        (10, 10, 'وَفِرْعَوْنَ ذ'),
         (11, 12, 'الَّذِيْنَ طَغ'),
     ]),
     (89, [
         (25, 26, None),
-        (27, 27, 'ارشاد ہوگا،\n\nي'),
-        (28, 28, 'رَبِّكِ رَاضِي'),
+        (27, 27, 'ارشاد ہوگا، يٰ'),
+        (28, 28, 'ارْجِعِىْۤ اِل'),
     ]),
     (90, [
         (11, 13, None),
@@ -3316,15 +3320,18 @@ SECTION_CORRECTIONS = [
 ]
 
 
-# Surahs 63, 64, 67, 79 and 81 keep rows made before the November 2026 re-cut
-# (restored from the earlier seed after a --write), so SECTION_CORRECTIONS never
-# reaches them. These cuts are applied to those restored rows by --recut-kept,
-# which must run after the restore. Same format and rules as above.
+# Cuts in surahs 63, 64, 67 and 79. Until November 2026 these surahs kept rows
+# made before the first re-cut (their pages had not been re-read), and these cuts
+# were applied to those restored rows by --recut-kept. Claude has now read their
+# pages too, so build() applies these after SECTION_CORRECTIONS like any other.
+# Same format and rules as above.
 KEPT_SURAH_CORRECTIONS = [
+    # November 2026: these surahs were read again by Claude too; 63:7, 67:15 and
+    # 67:30 re-anchored to the new text at the same places.
     # The account of Ibn Ubayy and Zayd ibn Arqam, which 63:7-8 answer, opens with this paragraph; the old cut fell mid-sentence.
     (63, [
         (6, 6, None),
-        (7, 7, 'ابن ابی نے اسی پر بس نہیں کیا'),
+        (7, 7, 'ابنِ اُبی ء نے ا'),
     ]),
     # 64:4's commentary (He knows what you hide and what you show) opens with this paragraph; the old row began mid-sentence.
     (64, [
@@ -3339,12 +3346,12 @@ KEPT_SURAH_CORRECTIONS = [
     # Section 67:15-30 opens here with its translation (the OCR lost the heading); the old cut fell inside 67:15's translation.
     (67, [
         (1, 14, None),
-        (15, 15, 'گزار رہے ہو۔\n\n|وہی ہستی ہے جس نے تمہارے لیے زمین'),
+        (15, 15, 'سورۃ الملک رکو'),
     ]),
     # The commentary on 67:30 opens with this quotation of it.
     (67, [
         (28, 29, None),
-        (30, 30, 'فرمایا: قُلْ اَدَءَ'),
+        (30, 30, 'فرمایا: قُلْ اَرَءَيْتُمْ اِنْ اَص'),
     ]),
     # The commentary on 79:45 opens with this quotation of it.
     (79, [
@@ -3352,6 +3359,251 @@ KEPT_SURAH_CORRECTIONS = [
         (45, 46, 'بتا دیا۔ |فرمایا: اِنَّمَاۤ اَنْتَ مُنْذِرُ'),
     ]),
 ]
+
+
+# Boundaries kept from the reviewed seed, November 2026. Claude's re-read of
+# Parahs 11-30 let the cutting find more of the book's own openings, and most
+# of the boundaries it moved now open a row with its section heading or a
+# sub-heading, which is kept. Where it moved a boundary that had been checked
+# and shipped, and the new place is not a heading, the reviewed place is kept
+# here: (surah, ayah, the words that open the ayah's row). The boundary between
+# the row holding ayah-1 and the row holding ayah moves there (or, inside one
+# row, the row is split there); the words and their order never change.
+REVIEWED_BOUNDARIES = [
+    (11, 14, 'فَاِلَّمْ يَسْتَجِيْبُوْا لَـكُمْ فَاعْلَمُوْۤا اَنَّمَاۤ اُنْزِلَ بِعِلْمِ اللّٰهِ او'),
+    (11, 122, 'وَانْتَظِرُوْا'),
+    (11, 123, 'وَلِلّٰهِ غَيْبُ السَّمٰوٰتِ وَالْاَرْضِ ز'),
+    (12, 24, 'وَھَمَّ بِھَا '),
+    (12, 43, 'سورۂ یوسف رکوع 6'),
+    (13, 11, 'حفاظتِ الٰہیہ:'),
+    (16, 47, 'فَاِنَّ رَبَّكُمْ لَرَءُوْفٌ رَّحِيْمٌ\u200f ﴿۴۷﴾ ی'),
+    (17, 31, 'سورۃ بنی اسرآءیل رکوع 4 '),
+    (17, 53, 'سورہ بنی اسرآء'),
+    (17, 85, 'سورۂ بنی اسرآءیل رکوع 10'),
+    (17, 101, 'سورۂ بنی اسرآءیل رکوع 12'),
+    (18, 17, 'اس شرط پر کہ ا'),
+    (19, 17, '\ue01b\ue01eفَاَرْسَلْنَاۤ اِلَيْهَا رُوْحَنَا فَتَمَثَّلَ لَهَا بَشَرًا سَوِيًّا\u200f ﴿۱۷﴾ ہم'),
+    (19, 18, 'قَالَتْ اِنِّىْۤ اَعُوْذُ بِالرَّحْمٰنِ مِنْكَ اِنْ كُنْتَ تَقِيًّا\u200f ﴿۱۸﴾ می'),
+    (19, 24, 'فَنَادٰٮهَا مِنْ تَحْتِهَاۤ اَلَّا تَحْزَنِىْ قَدْ جَعَلَ رَبُّكِ تَحْتَكِ سَرِيًّا\u200f آ'),
+    (19, 25, 'وَهُزِّىْۤ اِلَيْكِ بِجِذْعِ النَّخْلَةِ تُسٰقِطْ عَلَيْكِ رُطَبًا جَنِيًّا\ue01a\u200f آپ'),
+    (19, 33, 'چنانچہ حضرت عی'),
+    (19, 46, 'ہر گناہ مفضی الی'),
+    (20, 2, 'فرمایا: مَاۤ ا'),
+    (20, 54, 'فرمایا، زمین ا'),
+    (20, 58, 'حضرت موسیٰ علیہ السلام اور ج'),
+    (20, 73, 'اِنَّاۤ اٰمَنَّا بِرَبِّنَا لِيَـغْفِرَ لَـنَا خَطٰيٰنَا وَمَاۤ اَكْرَهْتَـنَا عَلَيْهِ مِنَ السِّحْرِؕ '),
+    (20, 74, 'جادوگروں نے فرعون سے ک'),
+    (21, 20, 'اللہ کریم فرماتے ہیں م'),
+    (21, 35, 'یہ لوگ کیوں نہ'),
+    (21, 42, 'سورۃ الانبیآء رکوع 4'),
+    (21, 56, 'آپ (علیہ السلام) کے نز'),
+    (23, 39, 'قَالَ رَبِّ انْصُرْنِىْ بِمَا كَذَّبُوْنِ\u200f ﴿۳۹﴾ اُ'),
+    (23, 40, 'قَالَ عَمَّا قَلِيْلٍ لَّيُصْبِحُنَّ نٰدِمِيْنَ ﴿۴۰﴾ فرم'),
+    (23, 41, 'نبیؑ کی پکار ک'),
+    (23, 48, 'تکبر کس طرح ان'),
+    (23, 50, 'اللہ کریم نے بنی ا'),
+    (23, 62, 'یہی نیک اور کا'),
+    (23, 95, 'فرمایا: وَاِنَّا'),
+    (23, 111, 'تم تو ان کے اس'),
+    (24, 28, 'فرمایا، یہ جو '),
+    (24, 54, 'دنیا اور آخرت دو'),
+    (25, 7, 'کافر جب قرآن پ'),
+    (26, 92, 'الحمد للہ اللہ'),
+    (26, 123, 'سورۃ الشعرآء رکوع 7 '),
+    (27, 31, 'خط کسی کو بھی '),
+    (27, 39, 'نبیؑ کا معجزہ اس'),
+    (27, 82, 'قیامت کی ایک ن'),
+    (28, 2, 'تِلْكَ اٰيٰتُ الْـ'),
+    (28, 9, 'اللہ کی قدرت کہ '),
+    (28, 12, 'اپنی بیٹی سے ک'),
+    (28, 38, 'فَاَوْقِدْ لِىْ يٰهَامٰنُ عَلَى الطِّيْنِ فَاجْعَلْ لِّىْ صَرْحًا ۔۔'),
+    (28, 56, 'اب یہ بڑی نازک'),
+    (29, 2, 'ایمان کو پرکھا'),
+    (29, 30, 'فرمایا: قَالَ رَ'),
+    (31, 17, 'امر بالمعروف و'),
+    (31, 25, 'صرف تمہارے ایک'),
+    (31, 27, 'وَلَوْ اَنَّ مَا فِى'),
+    (32, 2, 'قرآن حکیم کی ش'),
+    (33, 16, 'یہ بہانے بنا ک'),
+    (33, 73, 'فرمایا:\n\nلِّيُ'),
+    (34, 13, 'جنّات، سلیمان '),
+    (35, 25, 'وَاِنْ يُّكَذِّبُوْكَ فَقَدْ كَذَّبَ الَّذِيْنَ مِنْ قَبْلِهِمْ '),
+    (35, 26, 'ثُمَّ اَخَذْتُ الَّذِيْنَ كَفَرُوْا فَكَيْفَ كَانَ نَـكِيْرِ\ue022\u200f ﴿۲۶﴾ '),
+    (37, 151, 'فرمایا، تم کہت'),
+    (37, 153, 'اللہ، واحد ہے '),
+    (37, 156, 'دنیوی اعتبار س'),
+    (38, 42, 'یہ بات قابلِ غ'),
+    (38, 48, 'یہ ایسے لوگ تھ'),
+    (38, 77, 'اللہ کو کون نہ'),
+    (41, 38, 'سجدۂ تلاوت کا '),
+    (42, 33, 'اِنْ يَّشَاْ يُسْكِنِ الرِّيْحَ فَيَظْلَلْنَ رَوَاكِدَ عَلٰى ظَهْرِهٖؕ اگر'),
+    (42, 35, 'انسان بھی عجیب'),
+    (42, 37, 'فرمایا، ان کی '),
+    (46, 9, 'فرمایا: قُلْ م'),
+    (46, 10, 'تم صرف منفی پہ'),
+    (47, 14, 'دنیا میں ازل س'),
+    (50, 36, 'اللہ کریم کی ی'),
+    (52, 49, 'وَمِنَ الَّيْلِ فَسَبِّحْهُ وَاِدْبَارَ النُّجُوْمِ\ue022\u200f ﴿۴'),
+    (53, 18, 'لَقَدْ رَاٰى مِنْ اٰيٰتِ رَبِّهِ الْكُبْرٰى\u200f ﴿'),
+    (57, 9, 'اللہ ہی وہ کری'),
+    (58, 20, 'فرمایا، یہ یقی'),
+    (59, 8, 'مہاجرینؓ وانصارؓ کی عظ'),
+    (63, 4, 'نفاق کی وجہ بت'),
+    (64, 5, 'اَلَمْ يَاْتِكُمْ نَبَـؤُا الَّذِيْنَ كَفَرُوْا مِنْ قَبْلُ\ue01a فَذَاقُوْا وَبَالَ اَمْرِهِمْ وَلَهُمْ عَذَابٌ اَلِيْمٌ\u200f \u06dd '),
+    (66, 10, 'انجام کا مدار '),
+    (70, 34, 'وَالَّذِيْنَ هُمْ عَلٰى صَلَاتِهِمْ يُحَافِظُوْنَؕ\u200f او'),
+    (72, 16, 'پون صدی ہوگئی '),
+    (76, 6, 'عَيْنًا يَّشْرَبُ بِهَا عِبَادُ اللّٰهِ يُفَجِّرُوْنَهَا تَفْجِيْرًا\u200f \u06dd '),
+    (83, 26, 'نبی کریم صلی اللہ علیہ وسلم کے'),
+    (86, 2, 'اس کائناتِ بسی'),
+    (88, 4, 'ہر دور میں مذہ'),
+    (88, 17, 'اللہ کی عظمت ک'),
+    (89, 14, 'اِنَّ رَبَّكَ لَبِالْمِرْصَادِؕ\u200f ﴿۱۴'),
+    (89, 18, 'وَلَا تَحٰٓضُّوْنَ عَلٰى طَعَامِ الْمِسْكِيْنِ ﴿۱۸'),
+    (90, 4, 'لَقَدْ خَلَقْنَا الْاِنْسَانَ فِىْ كَبَدٍؕ\u200f کہ'),
+    (91, 5, 'وَالسَّمَآءِ وَمَا بَنٰٮهَا\ue01b ۞ '),
+    (91, 6, 'وَالْاَرْضِ وَمَا طَحٰٮهَا\ue01b ۞ '),
+    # Cut inside a quotation by the page split; moved to where the ayah itself is quoted.
+    (36, 35, 'لِيَاْكُلُوْا مِنْ ثَمَرِهٖ ۙ '),
+    (43, 35, 'وَزُخْرُفًا ؕ وَاِنْ كُلُّ ذٰ '),
+    # Rows the page split opened with the previous ayah's quotation; moved to where
+    # the commentary turns to their own ayah (the sentence that leads in to it).
+    (10, 92, 'فرمایا فَالْيَوْمَ نُـنَجِّيْك'),
+    (11, 79, 'تو وہ کہنے لگے قَالُوْا لَقَدْ'),
+    (11, 82, 'فَلَمَّا جَآءَ اَمْرُنَا جَعَ'),
+    (12, 92, 'آپ علیہ السلام نے فرمایا، قَال'),
+    (18, 108, 'جنّت اتنی بڑی نعمت ہے اور ایسی'),
+    (23, 94, ' مَا يُوْعَدُوْنَ \u06dd |رَبِّ فَلَا تَجْعَلْنِىْ '),
+    (31, 3, 'هُدًى وَّرَحْمَةً لِّلْمُحْسِن'),
+    (43, 69, 'اس لیے کہ: اَلَّذِيْنَ اٰمَنُو'),
+    (71, 8, 'فرمایا: ثُمَّ اِنِّىْ دَعَوْتُ'),
+]
+
+
+def apply_reviewed_boundaries(rows: list[dict], report: dict | None = None) -> list[dict]:
+    result = list(rows)
+    for surah, ayah, anchor in REVIEWED_BOUNDARIES:
+        where = f"reviewed boundary {surah}:{ayah}"
+        mine = sorted((r for r in result if r["surahNumber"] == surah), key=lambda r: r["ayahStart"])
+        before = next((r for r in mine if r["ayahStart"] <= ayah - 1 <= r["ayahEnd"]), None)
+        after = next((r for r in mine if r["ayahStart"] <= ayah <= r["ayahEnd"]), None)
+        if before is None or after is None:
+            raise SystemExit(f"{where}: no rows around it")
+        joined = before["text"] if before is after else before["text"] + "\n\n" + after["text"]
+        bar_before, bar, bar_after = anchor.rpartition("|")
+        place = bar_before + bar_after
+        if joined.count(place) != 1:
+            raise SystemExit(f"{where}: {anchor!r} is found {joined.count(place)} times")
+        cut = joined.index(place) + (len(bar_before) if bar else 0)
+        first, second = joined[:cut].strip(), joined[cut:].strip()
+        if not first or not second:
+            raise SystemExit(f"{where}: a row would be empty")
+        new = [{**before, "ayahEnd": ayah - 1, "text": first}, {**after, "ayahStart": ayah, "text": second}]
+        if before is after:
+            new[0]["ayahStart"], new[1]["ayahEnd"] = before["ayahStart"], before["ayahEnd"]
+        gone = {id(before), id(after)}
+        result = [r for r in result if id(r) not in gone] + new
+        if report is not None:
+            report["reviewedBoundaries"] = report.get("reviewedBoundaries", 0) + 1
+    result.sort(key=lambda r: (r["surahNumber"], r["ayahStart"]))
+    return result
+
+
+SENTENCE_END = "۔!؟?"
+# Surahs whose rows were cut again from Claude's November 2026 reading of
+# Parahs 11-30 (the rest were reviewed by eye against the same text before).
+REREAD_SURAHS = (10, 91)
+CLOSING_WORDS = ("آمین", "الحمد للہ", "الحمدللہ")
+
+
+def close_mid_sentence_cuts(rows: list[dict], report: dict | None = None) -> list[dict]:
+    """A cut made where a page ended (an over-budget row split by the quotations
+    it holds) can fall inside a sentence; Claude's text joins the pages, so the
+    sentence then runs across two rows. Such a cut moves back to the end of the
+    previous sentence, so the whole sentence opens the next row with the words
+    that lead in to its ayah. A cut before a heading, a sub-heading or a
+    Qur'anic quotation is left alone, and so is one after a closing du'a."""
+    result = sorted(rows, key=lambda r: (r["surahNumber"], r["ayahStart"]))
+    moved = 0
+    for i in range(1, len(result)):
+        before, after = result[i - 1], result[i]
+        if before["surahNumber"] != after["surahNumber"] or not REREAD_SURAHS[0] <= before["surahNumber"] <= REREAD_SURAHS[1]:
+            continue
+        tail, head = before["text"].rstrip(), after["text"].lstrip()
+        if not tail or not head or tail[-1] in SENTENCE_END + ":؛)»\"'”" or tail.endswith(CLOSING_WORDS):
+            continue
+        if not ("؀" <= tail[-1] <= "ۿ") or not ("؀" <= head[0] <= "ۿ"):
+            continue
+        if len(HARAKA.findall(head.split(maxsplit=1)[0])) >= 2 or iter_heading_start(head) or re.match(r"[^\n۔:؟!]{3,70}:\n", head):
+            continue
+        end = max(tail.rfind(mark, max(0, len(tail) - 600)) for mark in SENTENCE_END)
+        # A closing quotation mark stays with its sentence.
+        while end + 1 < len(tail) and tail[end + 1] in "'\"”’»)":
+            end += 1
+        if end <= 0 or end + 1 >= len(tail):
+            continue
+        before["text"], after["text"] = tail[:end + 1].rstrip(), (tail[end + 1:].strip() + " " + head).strip()
+        moved += 1
+    if report is not None:
+        report["midSentenceCutsClosed"] = moved
+    return result
+
+
+SECTION_HEADING = re.compile(r"سور[ۃةہۂ][^\n]{0,40}?رکوع\s*[0-9۰-۹٠-٩]+\s*آی(?:ات|ت)\s*([0-9۰-۹٠-٩]+)")
+DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
+
+
+def open_rows_at_headings(rows: list[dict], report: dict | None = None) -> list[dict]:
+    """A section's printed heading (سورۃ ... رکوع n آیات a تا b) opens the row of
+    ayah a. Where the cutting left it inside an earlier row (at the end of the
+    row before, or inside a row whose range already covers a), the boundary
+    moves to the heading: the row before ends just ahead of it, or the row is
+    split there. Only within one surah, and only in REREAD_SURAHS."""
+    result = sorted(rows, key=lambda r: (r["surahNumber"], r["ayahStart"]))
+    opened = 0
+    changed = True
+    while changed:
+        changed = False
+        for i, row in enumerate(result):
+            surah = row["surahNumber"]
+            if not REREAD_SURAHS[0] <= surah <= REREAD_SURAHS[1]:
+                continue
+            for match in SECTION_HEADING.finditer(row["text"]):
+                ayah = int(match.group(1).translate(DIGITS))
+                following = result[i + 1] if i + 1 < len(result) else None
+                # The next surah's first heading at the end of this surah's last row.
+                next_surah = (ayah == 1 and following is not None and following["surahNumber"] == surah + 1
+                              and following["ayahStart"] == 1 and surah + 1 <= REREAD_SURAHS[1])
+                if match.start() == 0 or not (row["ayahStart"] < ayah <= row["ayahEnd"] + 1 or next_surah):
+                    continue
+                head, rest = row["text"][:match.start()].strip(), row["text"][match.start():].strip()
+                if not head:
+                    continue
+                if next_surah:
+                    result[i] = {**row, "text": head}
+                    result[i + 1] = {**following, "text": rest + "\n\n" + following["text"]}
+                elif ayah <= row["ayahEnd"]:
+                    first = {**row, "ayahEnd": ayah - 1, "text": head}
+                    second = {**row, "ayahStart": ayah, "text": rest}
+                    result[i:i + 1] = [first, second]
+                else:
+                    following = result[i + 1] if i + 1 < len(result) else None
+                    if following is None or following["surahNumber"] != surah or following["ayahStart"] != ayah:
+                        continue
+                    result[i] = {**row, "text": head}
+                    result[i + 1] = {**following, "text": rest + "\n\n" + following["text"]}
+                opened += 1
+                changed = True
+                break
+            if changed:
+                break
+    if report is not None:
+        report["rowsOpenedAtHeadings"] = opened
+    return result
+
+
+def iter_heading_start(text: str) -> bool:
+    return bool(re.match(r"\s*سور[ۃةہۂ]\s*\S+.{0,40}?رکوع", text))
 
 
 def apply_section_corrections(rows: list[dict], report: dict | None = None,
@@ -3474,6 +3726,10 @@ def build(seed: Path, report: dict):
 
     # Last, so a row's words do not depend on where it was re-cut.
     rows = apply_section_corrections(rows, report)
+    rows = apply_section_corrections(rows, report, table=KEPT_SURAH_CORRECTIONS)
+    rows = apply_reviewed_boundaries(rows, report)
+    rows = open_rows_at_headings(rows, report)
+    rows = close_mid_sentence_cuts(rows, report)
     # Marker digits the OCR misread, once each row has its final range.
     rows, markers = renumber_markers(rows, mushaf_ayahs)
     report["markersRenumberedToMushaf"] = markers["markersRenumberedToMushaf"]
