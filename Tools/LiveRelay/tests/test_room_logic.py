@@ -267,6 +267,20 @@ run(relay)
 check("Paltalk stuck reconnecting is started over once", calls.get("restart", 0) == 1 and calls["dua"] == 0 and relay.joined is None,
       f"restarts={calls.get('restart', 0)} dua={calls['dua']} joined={relay.joined}")
 
+# 7e. 7-8 November: after a session's dua the room closed, and the NEXT opening waited for
+# "20 minutes and sound after the dua". A closed room ends that state: the next opening starts at once.
+relay, calls, clock = build([CLOSED] * 3 + [OUT] * 2 + [IN] * 4)
+relay.dua_given, relay.dua_at = True, clock.now - 3600
+run(relay)
+check("after a dua and the room closing, the next opening starts the Zikr at once",
+      calls["start"] == 1 and not relay.dua_given, f"starts={calls['start']} dua_given={relay.dua_given}")
+
+# 7f. A room left open after its dua does not start a new Zikr straight away.
+relay, calls, clock = build([IN] * 6)
+relay.dua_given, relay.dua_at = True, clock.now - 60
+run(relay)
+check("a room left open after its dua starts nothing at once", calls["start"] == 0, f"starts={calls['start']}")
+
 # 8. Speaker unreadable (screen not drawn): never pressed.
 relay, calls, _ = build([IN] * 10, speaker=[None] * 20)
 run(relay)

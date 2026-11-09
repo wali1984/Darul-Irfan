@@ -350,6 +350,10 @@ class Picker:
                     return
         if how == "full":
             self.on_stage(None, f"not a call ({' / '.join(t[:25] for t in texts if t) or 'no words'}; {heard:.1f} s)")
+        elif how == "recite":
+            # What the opening's Arabic reading heard: the evidence for tuning
+            # the Tasbihat (never once recognised by 8 November).
+            self.on_stage(None, f"recite read: {(texts[0] if texts else '')[:60] or 'no words'}")
 
     def _after_first(self, clip: np.ndarray, at: float, first: str) -> None:
         generation = self.generation

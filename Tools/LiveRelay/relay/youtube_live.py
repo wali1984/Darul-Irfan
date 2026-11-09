@@ -216,7 +216,11 @@ class YouTube:
             "snippet": {"title": (title or self.title)[:100], "description": self.description[:5000], "scheduledStartTime": now},
             "status": {"privacyStatus": self.privacy, "selfDeclaredMadeForKids": False},
             "contentDetails": {
-                "enableAutoStart": True, "enableAutoStop": True, "enableDvr": True, "recordFromStart": True,
+                # No auto-stop: on 7-8 November YouTube ended every broadcast
+                # minutes in, at the first stall of the busy server's encoder,
+                # and the Zikr went unbroadcast. The relay completes it itself
+                # when the session ends.
+                "enableAutoStart": True, "enableAutoStop": False, "enableDvr": True, "recordFromStart": True,
                 "latencyPreference": "ultraLow", "monitorStream": {"enableMonitorStream": False},
             },
         })

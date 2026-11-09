@@ -72,7 +72,7 @@ yt, fake = fresh()
 bid = yt.ensure("session-1", "Tahajjud Zikr")
 b = fake.broadcasts[bid]
 check("broadcast made and bound to the relay's stream", b["bound"] == "stream-1" and b["body"]["snippet"]["title"] == "Tahajjud Zikr"
-      and b["body"]["contentDetails"]["enableAutoStart"] and b["body"]["contentDetails"]["enableAutoStop"]
+      and b["body"]["contentDetails"]["enableAutoStart"] and not b["body"]["contentDetails"]["enableAutoStop"]
       and b["body"]["status"]["privacyStatus"] == "unlisted", str(b))
 
 # 2. The same session again (a relay restart): the saved broadcast is reused while usable.

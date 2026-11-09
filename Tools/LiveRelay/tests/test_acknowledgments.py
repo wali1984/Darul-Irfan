@@ -118,6 +118,7 @@ async def close_dua():
     r, c, clock = build([], platform_live=True)
     dua, attempts = answers(503, 503, 200)
     r.platform_cues.dua = dua
+    r.was_in_session = True
     await r._room_closed(clock.now)  # the first "not open"
     clock.now += 46
     await r._room_closed(clock.now)  # seen again: the first try, which fails
@@ -139,6 +140,7 @@ async def close_dua():
     r, c, clock = build([], platform_live=True)
     dua, attempts = answers(409)
     r.platform_cues.dua = dua
+    r.was_in_session = True
     await r._room_closed(clock.now)
     clock.now += 46
     await r._room_closed(clock.now)
@@ -148,6 +150,7 @@ async def close_dua():
     r, c, clock = build([], platform_live=True)
     dua, attempts = answers(503)
     r.platform_cues.dua = dua
+    r.was_in_session = True
     await r._room_closed(clock.now)
     clock.now += 46
     for _ in range(80):
@@ -161,6 +164,7 @@ async def close_dua():
     r, c, clock = build([], platform_live=True)
     dua, attempts = answers(401)
     r.platform_cues.dua = dua
+    r.was_in_session = True
     await r._room_closed(clock.now)
     clock.now += 46
     for _ in range(5):
@@ -173,6 +177,7 @@ async def close_dua():
     r, c, clock = build([], platform_live=True)
     dua, attempts = answers(200)
     r.platform_cues.dua = dua
+    r.was_in_session = True
     await r._room_closed(clock.now)
     r._lease_lost("test")
     clock.now += 46

@@ -65,6 +65,55 @@ AMEEN = re.compile(r"\b(aa?mee?n|ameen|amin|aameen)\b|آمین|آمِین|امی
 OPENING_STAGES = {"tasbih", "istighfar", "shahadah", "taawwudh", "basmalah"}
 
 
+class SessionRecorder:
+    """The room's sound during a live session as a 16 kHz mono WAV in
+    recordings/ (about 115 MB an hour); the newest KEEP are kept."""
+
+    KEEP = 8
+
+    def __init__(self, folder: Path) -> None:
+        self.folder = folder
+        self.file = None
+        self.lock = threading.Lock()
+
+    def start(self) -> None:
+        import wave
+        with self.lock:
+            if self.file:
+                return
+            try:
+                self.folder.mkdir(exist_ok=True)
+                old = sorted(self.folder.glob("session-*.wav"))
+                for path in old[: max(0, len(old) - self.KEEP + 1)]:
+                    path.unlink(missing_ok=True)
+                path = self.folder / time.strftime("session-%Y%m%d-%H%M%S.wav")
+                self.file = wave.open(str(path), "wb")
+                self.file.setnchannels(1)
+                self.file.setsampwidth(2)
+                self.file.setframerate(16000)
+                log(f"recording the session's sound to {path.name}")
+            except OSError as error:
+                log(f"session not recorded: {error}")
+                self.file = None
+
+    def write(self, samples: np.ndarray) -> None:
+        with self.lock:
+            if self.file:
+                try:
+                    self.file.writeframes(samples.tobytes())
+                except OSError:
+                    self.file = None
+
+    def stop(self) -> None:
+        with self.lock:
+            if self.file:
+                try:
+                    self.file.close()
+                except OSError:
+                    pass
+                self.file = None
+
+
 def typed_stage(text: str) -> str | None:
     """A host's typed cue: a Latifa or a Muraqaba, never a recitation."""
     stage = stage_id(text)
@@ -204,6 +253,11 @@ class Relay:
         self.youtube_life = "-"
         self.youtube_checked_at = 0.0
         self.youtube_warned_at = 0.0
+        self.youtube_remade = 0
+        self.was_in_session = False  # this relay was in the room while the platform's Zikr was live
+        # Each live session's room sound, 16 kHz mono, for tuning the picker
+        # on real sessions (the Tasbihat were never recognised).
+        self.recorder = SessionRecorder(HERE / "recordings") if cfg.get("RECORD_SESSIONS", "1") != "0" else None
         platform = cfg.get("PLATFORM_URL", "https://darul-irfan-platform.wajidmahmoodali1984-e23.workers.dev")
         self.platform = platform
         self.halqah = cfg.get("HALQAH_ID", "our-sheikh")
@@ -487,6 +541,13 @@ class Relay:
                 if self.joined:
                     self._left("Paltalk says the room is not open")
                 await self._room_closed(now)
+                if self.dua_given and (self.close_dua_sent or not (self.platform_is_live or self.platform_live)):
+                    # The room has closed after its dua: its next opening is a
+                    # new Zikr, started at once (7-8 November: this state was
+                    # never cleared, and every session started 17-31 minutes
+                    # late, on sound "after the dua", or on the first cue).
+                    log("the room closed after its dua: its next opening is a new Zikr")
+                    self._clear_dua()
             elif status == "out":
                 self.unknown_since = None
                 if self.joined:
@@ -512,7 +573,10 @@ class Relay:
                     # A closed room's link opens nothing: after three tries,
                     # look every two minutes (a Zikr's first minutes matter more
                     # than the moment it takes to close Paltalk's notice).
-                    wait = 60 if self.join_tries < 3 else 120
+                    # Every 20 s: the Tahajjud room opens a minute or two
+                    # before the Zikr (8 November: joined 2 minutes in, the
+                    # opening missed). A closed room's link costs nothing.
+                    wait = 20
                     if self.has_lease and self.room and now - self.last_join_try > wait:
                         self.last_join_try = now
                         self.join_tries += 1
@@ -563,6 +627,12 @@ class Relay:
         log(f"in the room: {detail}")
         self.joined = detail
         self.joined_at = time.time()
+        if self.platform_is_live or self.platform_live:
+            # Back in the room of a Zikr already live (a relay or Paltalk
+            # restart): it is this room's session, its end is ours to send.
+            self.was_in_session = True
+            if self.recorder:
+                self.recorder.start()
         self.join_tries = 0
         self.out_since = None
         self.chat = pt.MessageFollower()
@@ -714,6 +784,10 @@ class Relay:
             return
         if not (self.has_lease and self.platform_cues and self.mode != "app" and (self.platform_is_live or self.platform_live)):
             return
+        if not self.was_in_session:
+            # A Zikr this relay was never in the room for (an admin's Halqah
+            # Zikr from the app, 6 November 23:41) is not the room's to end.
+            return
         if self.generation != self.close_generation:
             # The lease or the session went since the closing was seen: a
             # dua now would end a session this relay does not know.
@@ -812,7 +886,13 @@ class Relay:
         self.dua_shown = False
         self.close_dua_sent = False
         self.first_closed_at = None
+        self.was_in_session = bool(self.joined) and live
         self._forget_close()
+        if self.recorder:
+            if live:
+                self.recorder.start()
+            else:
+                self.recorder.stop()
         if not live:
             self.platform_live = False
         if self.picker:
@@ -1089,12 +1169,17 @@ class Relay:
                 log(f"[youtube] this session's broadcast: {self.youtube.watch_url()}")
             # Every 30 s until it is live, then every 5 minutes: one quota
             # unit a look, and a live broadcast needs no watching.
-            if now - self.youtube_checked_at >= (300 if self.youtube_life == "live" else 30):
+            if now - self.youtube_checked_at >= (60 if self.youtube_life == "live" else 30):
                 self.youtube_checked_at = now
                 life = await asyncio.to_thread(self.youtube.go_live_if_ready)
                 if life != self.youtube_life:
                     log(f"[youtube] broadcast {life}")
                 self.youtube_life = life
+                if life in ("complete", "revoked", "gone") and self.youtube_remade < 3:
+                    # Ended by YouTube during the session: carry on in a new one.
+                    self.youtube_remade += 1
+                    log(f"[youtube] the broadcast ended during the session: a new one ({self.youtube_remade})")
+                    self.youtube_for = None
         except Exception as error:  # noqa: BLE001 - the API; the encoder runs regardless
             if now - self.youtube_warned_at > 60:
                 self.youtube_warned_at = now
@@ -1107,6 +1192,7 @@ class Relay:
         except Exception as error:  # noqa: BLE001
             log(f"[youtube] could not complete the broadcast: {error}")
         self.youtube_for, self.youtube_life = None, "-"
+        self.youtube_remade = 0
 
     # MARK: - Start
 
@@ -1162,8 +1248,11 @@ class Relay:
                 self.picker_drops_logged, self.picker_drops_logged_at = self.picker_drops, time.time()
             mono = block.astype(np.float32).mean(axis=1)
             mono = mono[: len(mono) // 3 * 3].reshape(-1, 3).mean(axis=1)
+            samples16 = mono.astype(np.int16)
+            if self.recorder:
+                self.recorder.write(samples16)
             try:
-                self.picker.feed(mono.astype(np.int16))
+                self.picker.feed(samples16)
             except Exception as error:  # noqa: BLE001 - the typed cues still carry the stage
                 log(f"[picker] {error}")
 
