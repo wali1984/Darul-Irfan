@@ -77,13 +77,22 @@ def dismiss_prompt() -> bool:
         return False
 
 
+_started_at = 0.0
+
+
 def ensure_running() -> str | None:
     """Starts Paltalk if needed. Returns a problem, or None."""
+    global _started_at
     if running():
         return None if main_window() else "Paltalk is running but its window is hidden"
     exe = paltalk_exe()
     if not exe:
         return "Paltalk is not installed"
+    if time.time() - _started_at < 90:
+        # 9 November: started four times in six seconds while Paltalk's
+        # launcher handed over to its updater; one start, then wait.
+        return "Paltalk is starting"
+    _started_at = time.time()
     subprocess.Popen([str(exe)], close_fds=True)
     log("started Paltalk")
     return "Paltalk was not running (started)"
