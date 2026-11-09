@@ -1141,7 +1141,11 @@ class Relay:
                     # picture when the encoder connects; the encoder never waits
                     # on the API (a Studio-made broadcast would still take it).
                     await self._youtube_live(session_key or "app", title)
-                picture = await asyncio.to_thread(self.picture.refresh)
+                try:
+                    picture = await asyncio.to_thread(self.picture.refresh)
+                except Exception as error:  # noqa: BLE001 - the previous picture stays on
+                    log(f"[stage] picture not refreshed: {error!r}")
+                    picture = None
                 if picture:
                     self.programme.set_picture(picture)
                     if self.camera:
@@ -1337,9 +1341,21 @@ class Relay:
             # Up for good: stopping it while Paltalk holds it hangs Paltalk.
             await asyncio.to_thread(self.camera.set_picture, (HERE / "daily_zikr_frame.png").read_bytes())
             await asyncio.to_thread(self.camera.start)
-        await asyncio.gather(self.follow_platform(), self.open_devices(), self.keep_lease(), self.follow_state(), self.report(),
-                             self.watch_room(), self.publish_room(), self.carry_app(),
-                             self.post_cues(), self.mirror_platform_stage(), self.run_programme())
+        await asyncio.gather(*(self._forever(job) for job in (
+            self.follow_platform, self.open_devices, self.keep_lease, self.follow_state, self.report,
+            self.watch_room, self.publish_room, self.carry_app,
+            self.post_cues, self.mirror_platform_stage, self.run_programme)))
+
+    async def _forever(self, job) -> None:
+        """One of the relay's loops, started again if it fails: on 9 November
+        one error in the stage picture ended the whole relay mid-Zikr."""
+        while True:
+            try:
+                await job()
+                return
+            except Exception as error:  # noqa: BLE001 - the relay must outlive any one loop
+                log(f"[relay] {job.__name__} failed ({error!r}); starting it again")
+                await asyncio.sleep(5)
 
     def _tap(self, samples: np.ndarray) -> None:
         """While Paltalk is on air, the room is the programme's sound and

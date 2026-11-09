@@ -160,8 +160,17 @@ class Programme:
             errors.flush()
             # No console window: one would cover Paltalk, and the relay reads
             # the room from Paltalk's window.
-            self.process = subprocess.Popen(self._command(port), stdin=subprocess.PIPE, stderr=errors,
-                                            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            try:
+                self.process = subprocess.Popen(self._command(port), stdin=subprocess.PIPE, stderr=errors,
+                                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            except OSError as error:
+                # 9 November: out of memory, Popen raised, this thread died
+                # with running still set and the encoder never came back.
+                errors.close()
+                self.state = "restarting"
+                log(f"encoder could not start ({error}); trying again in 10 s")
+                time.sleep(10)
+                continue
             self.connected_logged = False
             started = time.time()
             threading.Thread(target=self._feed_picture, args=(port, started), daemon=True).start()
