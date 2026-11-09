@@ -147,10 +147,14 @@ def find_device(name: str, output: bool) -> int:
     for index, device in enumerate(sd.query_devices()):
         channels = device["max_output_channels"] if output else device["max_input_channels"]
         if channels and wanted in device["name"].lower():
-            matches.append((apis[device["hostapi"]]["name"] != "MME", index))
+            # A name that starts with what was asked for first: "CABLE Output"
+            # is also inside "Hi-Fi Cable Output", the silent mic cable, and
+            # on the Contabo server (9 November) that one was listed first -
+            # the room was captured as silence through a whole Tahajjud start.
+            matches.append((not device["name"].lower().startswith(wanted), apis[device["hostapi"]]["name"] != "MME", index))
     if not matches:
         raise RuntimeError(f"no {'output' if output else 'input'} device named like {name!r}")
-    return sorted(matches)[0][1]
+    return sorted(matches)[0][-1]
 
 
 class DeviceOutput:
