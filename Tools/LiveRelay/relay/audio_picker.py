@@ -121,8 +121,12 @@ def is_call(text: str, step: str | None) -> bool:
 
 
 def ahead(stage: str, current: str | None) -> bool:
-    """Whether `stage` comes after `current` in the order."""
+    """Whether `stage` comes after `current` in the order. One step goes
+    back: after the 7th Latifa the Zikr returns to the 1st for a moment,
+    then a few seconds of Raabta, then the Muraqabat (owner, 9 November)."""
     if current not in ORDER:
+        return True
+    if current == "latifa-7" and stage == "latifa-1":
         return True
     return stage in ORDER and ORDER.index(stage) > ORDER.index(current)
 
