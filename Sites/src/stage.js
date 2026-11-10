@@ -151,7 +151,7 @@ function rail() {
 export function stageScreen(id, waiting, { rail: withRail = true } = {}) {
   return `<div class="stage" id="${id}">
       <div class="mark">${animatedLogo("min(260px,62vw)")}</div>
-      <div class="photo"><img alt="Hazrat Ameer Abdul Qadeer Awan (MZA)" decoding="async"></div>
+      <div class="photo"><img alt="Hazrat Ameer Abdul Qadeer Awan (MZA)" decoding="sync" loading="eager" fetchpriority="high"></div>
       <div class="waiting"><div class="quiet">${esc(waiting)}</div></div>
       <div class="now"><div class="card"><div class="ring"></div><div class="medal" hidden><i></i><b></b></div><div class="label">Now</div><div class="title"></div>
         <div class="urdu" lang="ur"></div><div class="next"></div><div class="arabic" lang="ar"></div><div class="roll" hidden><div class="lines"></div></div>

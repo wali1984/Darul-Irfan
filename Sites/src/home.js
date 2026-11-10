@@ -76,6 +76,7 @@ export function broadcastPage(site, initial, halqahID) {
   const state = JSON.stringify({ ...initial, halqahID }).replace(/</g, "\\u003c");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1920,height=1080">
 <title>Stage · ${esc(site.region)}</title><meta name="robots" content="noindex">
+${sheikh && (initial.picture || initial.pictureFallback) ? `<link rel="preload" as="image" href="${esc(initial.picture || initial.pictureFallback)}" fetchpriority="high">` : ""}
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@500;600&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
 <style>${STAGE_BASE}${STAGE_STYLE}
 html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#04150f}
