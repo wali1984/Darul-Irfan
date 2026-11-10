@@ -54,6 +54,14 @@ async function open(base, path, { width = 1440, height = 900, reducedMotion = "n
 const refresh = page => page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
 const said = (page, box, text) => page.waitForFunction(([b, t]) => document.querySelector(`#${b} .say`)?.textContent === t, [box, text], { timeout: 12000 });
 const box = (page, selector) => page.locator(selector).boundingBox();
+// Joining: listening without a profile where the page offers it (the audit
+// branch's entry choice), otherwise with a name and a place.
+async function join(page, button, city) {
+  await page.locator(button).click();
+  if (await page.locator("#anonymous-join").count()) return page.locator("#anonymous-join").click();
+  await page.locator("#join-fields [name=name]").fill("Test Visitor"); await page.locator("#join-fields [name=city]").fill(city);
+  await page.locator("#join-go").click();
+}
 async function stageFacts(page, id) {
   return page.evaluate(id => {
     const b = document.getElementById(id), shown = el => !!el && getComputedStyle(el).display !== "none";
@@ -160,9 +168,7 @@ try {
     state.live = true; go("ahadiyat");
     for (const [width, height, name] of [[1366, 900, "10-desktop-joined"], [390, 844, "11-phone-joined"]]) {
       const page = await open(oursheikh.base, "/", { width, height });
-      await page.locator("#sheikh-join").click();
-      await page.locator("#join-fields [name=name]").fill("Test Visitor"); await page.locator("#join-fields [name=city]").fill("New York");
-      await page.locator("#join-go").click();
+      await join(page, "#sheikh-join", "New York");
       await page.locator("#player.open").waitFor();
       await said(page, "p-stage", "Now: Muraqaba Ahadiyat");
       const f = await stageFacts(page, "p-stage");
@@ -189,9 +195,7 @@ try {
     const page = await open(namerica.base, "/");
     await said(page, "sheikh-stage", "Now: 3rd Latifa");
     assert.ok((await stageFacts(page, "sheikh-stage")).duo, "Our Sheikh's stage still carries the picture on every site");
-    await page.locator('[data-join="north-america"]').click();
-    await page.locator("#join-fields [name=name]").fill("Test Visitor"); await page.locator("#join-fields [name=city]").fill("Worcester");
-    await page.locator("#join-go").click();
+    await join(page, '[data-join="north-america"]', "Worcester");
     await said(page, "p-stage", "Now: 3rd Latifa");
     const f = await stageFacts(page, "p-stage");
     assert.ok(f.on && !f.duo && !f.photo && f.rail && f.current === "latifa-3", JSON.stringify(f));
