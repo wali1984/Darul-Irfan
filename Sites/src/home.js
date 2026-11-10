@@ -4,70 +4,8 @@
 // sound comes only from the Silsila's live feed. Everything from the API is set
 // with textContent or attributes, never as HTML.
 import { animatedLogo, esc, shell, SKY_SCRIPT, STYLE as STAGE_BASE } from "./layout.js";
-import SHAJRA from "./content/shajra.json";
 
-// The stages a Zikr moves through, in order, as the app names them (Server
-// RECITATIONS and DEFAULT_ZIKR_STAGES). A custom Muraqaba shows only when called.
-const STAGES = [
-  ["tasbih", "Tasbihat", "تسبیحات"], ["istighfar", "Istighfar", "استغفار"], ["shahadah", "Shahadah", "کلمہ شہادت"],
-  ["taawwudh", "Ta'awwudh", "تعوذ"], ["basmalah", "Bismillah", "تسمیہ"],
-  ["latifa-1", "1st Latifa", "پہلا لطیفہ"], ["latifa-2", "2nd Latifa", "دوسرا لطیفہ"], ["latifa-3", "3rd Latifa", "تیسرا لطیفہ"],
-  ["latifa-4", "4th Latifa", "چوتھا لطیفہ"], ["latifa-5", "5th Latifa", "پانچواں لطیفہ"], ["latifa-6", "6th Latifa", "چھٹا لطیفہ"],
-  ["latifa-7", "7th Latifa", "ساتواں لطیفہ"], ["raabta", "Raabta", "رابطہ"],
-  ["ahadiyat", "Muraqaba Ahadiyat", "مراقبہ احدیت"], ["maiyyat", "Muraqaba Ma'iyyat", "مراقبہ معیت"],
-  ["aqrabiyyat", "Muraqaba Aqrabiyyat", "مراقبہ اقربیت"], ["sair-kaaba", "Sair-e-Kaaba", "سیرِ کعبہ"],
-  ["rauza-athar", "Rauza-e-Athar", "روضۂ اطہر"], ["masjid-nabawi", "Masjid-e-Nabawi", "مسجدِ نبوی"],
-  ["shajra", "Shajra Sharif", "شجرہ شریف"], ["dua", "Dua", "دعا"],
-];
-
-// The Shajra's lines, word for word from the app's data, for its stage card.
-const SHAJRA_LINES = JSON.stringify([...SHAJRA.entries.map(e => e.urdu), SHAJRA.closingArabic]).replace(/</g, "\\u003c");
-
-/** Fills a stage card the way the app shows each kind of stage: the opening
- *  recitations with their Arabic, a Latifa with its number on a turning gold
- *  star, a Muraqaba, the Shajra with its lines rolling slowly from the first
- *  to the last, and the Dua. Shared by the home page and /broadcast. */
-const FILL_SCRIPT = `
-const SHAJRA_LINES = ${SHAJRA_LINES};
-function stageKind(id) {
-  if (!id) return "awaiting";
-  if (/^latifa-[1-7]$/.test(id)) return "latifa";
-  if (["tasbih", "istighfar", "shahadah", "taawwudh", "basmalah"].includes(id)) return "recite";
-  if (id === "shajra" || id === "dua") return id;
-  return "muraqaba";
-}
-function fillStage(card, s, emptyTitle) {
-  const id = s ? s.stageID : null, kind = stageKind(id);
-  card.className = card.className.replace(/\\bkind-\\w+/g, "").trim() + " kind-" + kind;
-  card.querySelector(".label").textContent = { recite: "Recitation", latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua" }[kind] || "Now";
-  const medal = card.querySelector(".medal");
-  medal.hidden = kind !== "latifa";
-  medal.querySelector("b").textContent = kind === "latifa" ? id.slice(7) : "";
-  card.querySelector(".title").textContent = s ? s.title : (emptyTitle || "");
-  card.querySelector(".urdu").textContent = s && s.titleUr ? s.titleUr : "";
-  card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
-  const roll = card.querySelector(".roll"), lines = roll.querySelector(".lines");
-  lines.classList.remove("run"); lines.style.removeProperty("--dist");
-  lines.textContent = "";
-  roll.hidden = kind !== "shajra";
-  if (kind === "shajra") {
-    SHAJRA_LINES.forEach((text, i) => {
-      const line = document.createElement("div");
-      line.className = i === SHAJRA_LINES.length - 1 ? "line closing" : "line";
-      line.lang = i === SHAJRA_LINES.length - 1 ? "ar" : "ur";
-      line.textContent = text;
-      lines.append(line);
-    });
-    // From the first line to the last in under a minute (owner 2026-11-06),
-    // then it rests on the last line until the Dua.
-    requestAnimationFrame(() => {
-      const dist = Math.max(0, lines.scrollHeight - roll.clientHeight);
-      lines.style.setProperty("--dist", -dist + "px");
-      lines.style.setProperty("--dur", Math.round(SHAJRA_LINES.length * 3.5) + "s");
-      if (dist && !matchMedia("(prefers-reduced-motion: reduce)").matches) lines.classList.add("run");
-    });
-  }
-}`;
+import { STAGES, STAGE_SCRIPT, STAGE_STYLE, stageScreen } from "./stage.js";
 
 const STYLE = `
 .hero{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(24px,5vw,64px);align-items:center;min-height:min(calc(100svh - 74px),860px);padding-top:30px}
@@ -79,58 +17,12 @@ const STYLE = `
 .stage-grid>*{min-width:0}
 @media (max-width:960px){.stage-grid{grid-template-columns:1fr}}
 
-/* The stage. Waiting: the living emblem, large. Live: the emblem goes small to
-   the corner and only the stage being done now fills the screen. */
-.stage{position:relative;min-height:440px;display:grid;place-items:center;padding:clamp(24px,4vw,44px);text-align:center;overflow:hidden}
-.stage .mark{transition:transform 1s cubic-bezier(.2,.8,.2,1),opacity .6s;transform-origin:top left}
-.stage .mark .emblem{--s:min(260px,62vw)}
-.stage.on .mark{position:absolute;top:18px;left:18px;transform:scale(.3)}
-.stage .waiting{display:grid;gap:16px;justify-items:center}
-.stage.on .waiting{display:none}
-.stage .now{display:none;width:100%}
-.stage.on .now{display:block}
-.now .label{color:var(--gold);font:600 12px/1 var(--sans);letter-spacing:.3em;text-transform:uppercase}
-.now .title{font:600 clamp(48px,7vw,104px)/1.02 var(--serif);margin-top:16px;
-  background:linear-gradient(100deg,var(--gold2),#fff6dc 30%,var(--gold) 55%,var(--gold2) 80%);background-size:220% 100%;
-  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite;
-  filter:drop-shadow(0 0 26px rgba(243,220,157,.35))}
-.now .urdu{font-size:clamp(30px,4vw,54px);color:var(--gold2);margin-top:6px;text-shadow:0 0 22px rgba(243,220,157,.35)}
-.now .arabic{font-size:clamp(28px,3.6vw,46px);line-height:1.9;color:#fff8e6;margin-top:14px;text-shadow:0 0 28px rgba(243,220,157,.5)}
-.now .test{display:inline-block;margin-top:18px}
-/* Each kind of stage, as the app shows it: a Latifa's number on a turning
-   gold star, the Arabic of a recitation, the Shajra's lines rolling. */
-.now .medal{position:relative;width:96px;height:96px;margin:0 auto 6px;display:grid;place-items:center}
-.now .medal[hidden]{display:none}
-.now .medal i{position:absolute;inset:0;background:linear-gradient(180deg,#ffe9a8,#e0b75f 55%,#b48a2c);
-  clip-path:polygon(50% 0,61% 22%,85% 15%,78% 39%,100% 50%,78% 61%,85% 85%,61% 78%,50% 100%,39% 78%,15% 85%,22% 61%,0 50%,22% 39%,15% 15%,39% 22%);
-  animation:turn 30s linear infinite;filter:drop-shadow(0 0 18px rgba(243,220,157,.55))}
-.now .medal b{position:relative;width:58%;height:58%;border-radius:50%;background:#062a1f;display:grid;place-items:center;
-  color:var(--gold2);font:700 38px/1 var(--sans);box-shadow:inset 0 0 12px rgba(0,0,0,.6)}
-@keyframes turn{to{transform:rotate(360deg)}}
-.now .roll{position:relative;max-height:min(46vh,420px);overflow:hidden;margin-top:18px;
-  -webkit-mask:linear-gradient(transparent,#000 14%,#000 86%,transparent);mask:linear-gradient(transparent,#000 14%,#000 86%,transparent)}
-.now .roll[hidden]{display:none}
-.now .lines{padding:40px 0;display:grid;gap:6px}
-.now .lines.run{animation:roll var(--dur,50s) linear 1s forwards}
-@keyframes roll{to{transform:translateY(var(--dist,0))}}
-.now .line{font-size:clamp(20px,2.4vw,30px);color:#fff8e6;text-shadow:0 0 18px rgba(243,220,157,.35)}
-.now .line.closing{font-family:Amiri,serif;color:var(--gold2);margin-top:10px}
-.now .card.kind-recite .arabic{font-size:clamp(30px,4vw,52px)}
-.now .card.kind-dua{box-shadow:0 0 90px -6px rgba(243,220,157,.55),inset 0 0 50px rgba(243,220,157,.12)}
-.now .card.kind-shajra .title,.now .card.kind-dua .title{letter-spacing:.02em}
-.now .card{position:relative;margin-inline:auto;width:min(760px,100%);padding:clamp(26px,4vw,48px) 22px;border-radius:26px;
-  border:1px solid rgba(243,220,157,.45);background:radial-gradient(120% 100% at 50% 0%,rgba(16,185,129,.28),transparent 70%),rgba(2,12,9,.55);
-  box-shadow:0 0 60px -10px rgba(243,220,157,.35),inset 0 0 40px rgba(16,185,129,.15);animation:bob 5s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-10px)}}
-.now .card::after{content:"";position:absolute;inset:-2px;border-radius:27px;padding:2px;pointer-events:none;
-  background:conic-gradient(from var(--a,0deg),transparent 0 70%,var(--gold2) 80%,transparent 90%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:edge 4s linear infinite}
-@property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
-@keyframes edge{to{--a:360deg}}
-.now .card.burst{animation:burst 1.1s cubic-bezier(.2,.8,.2,1),bob 5s ease-in-out 1.1s infinite}
-@keyframes burst{0%{opacity:0;transform:scale(.86);filter:blur(10px) brightness(2.2)}60%{filter:blur(0) brightness(1.4)}100%{opacity:1;transform:none;filter:none}}
-.now .ring{position:absolute;left:50%;top:50%;width:120%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle,rgba(243,220,157,.16),transparent 60%);animation:breathe 5s ease-in-out infinite;z-index:-1}
+/* The live page: once Our Sheikh is live, the stage (Hazrat ji's picture beside it) takes the
+   whole width and the Join button lies beneath it; the joined screen scrolls on a small phone. */
+.stage-grid:has(.stage.on){grid-template-columns:1fr}
+.stage-grid:has(.stage.on) .side{grid-template-columns:auto auto minmax(0,1fr);align-items:center}
+@media (max-width:640px){.stage-grid:has(.stage.on) .side{grid-template-columns:1fr;justify-items:center;text-align:center}}
+#player{overflow-x:hidden;overflow-y:auto}#player .stage.on{flex:1 0 auto;overflow:visible}
 
 .side{padding:24px;display:grid;gap:16px}
 .join-note{font-size:14px;color:var(--muted)}
@@ -165,17 +57,6 @@ dialog h3{font-size:28px;margin-bottom:6px}
 
 const COUNTRIES = "US,CA,GB,PK,IN,AE,SA,QA,KW,BH,OM,AU,NZ,DE,FR,NL,BE,NO,SE,DK,IE,IT,ES,TR,MY,SG,ZA,KE,NG,EG,BD,AF,IR,IQ,JO,MA,DZ,TN,LY,SD,ID,JP,CN,HK,BR,MX,AR,CH,AT,PL,PT,GR,FI,RU,UA";
 
-/** One stage screen: the living emblem while waiting; live, the stage being done alone. */
-function stageScreen(id, waiting) {
-  return `<div class="stage" id="${id}">
-      <div class="mark">${animatedLogo("min(260px,62vw)")}</div>
-      <div class="waiting"><div class="quiet">${esc(waiting)}</div></div>
-      <div class="now"><div class="card"><div class="ring"></div><div class="medal" hidden><i></i><b></b></div><div class="label">Now</div><div class="title"></div>
-        <div class="urdu" lang="ur"></div><div class="arabic" lang="ar"></div><div class="roll" hidden><div class="lines"></div></div>
-        <span class="chip test" hidden>Test Zikr</span></div></div>
-    </div>`;
-}
-
 function portrait(picture) {
   const sparks = [[6, 12], [92, 18], [4, 78], [95, 72], [50, -3], [30, 101], [74, 99]]
     .map(([x, y], i) => `<i class="spark" style="left:${x}%;top:${y}%;animation-delay:${i * 0.45}s"></i>`).join("");
@@ -190,11 +71,12 @@ function portrait(picture) {
  *  (owner 2026-11-05). */
 export function broadcastPage(site, initial, halqahID) {
   const sheikh = halqahID === "our-sheikh";
-  const state = JSON.stringify({ ...initial, halqahID }).replace(/</g, "\u003c");
+  // "\\u003c" as on the home page: a title can never close the script tag it travels in.
+  const state = JSON.stringify({ ...initial, halqahID }).replace(/</g, "\\u003c");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1920,height=1080">
 <title>Stage · ${esc(site.region)}</title><meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@500;600&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
-<style>${STAGE_BASE}${STYLE}
+<style>${STAGE_BASE}${STAGE_STYLE}
 html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#04150f}
 .stage{position:fixed;inset:0;min-height:0;padding:80px}
 .stage .mark .emblem{--s:520px}
@@ -202,42 +84,28 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#04150f
 .now .title{font-size:150px}.now .urdu{font-size:84px}.now .arabic{font-size:72px}
 .now .card{width:1400px;padding:70px 40px}
 .brandline{position:fixed;bottom:36px;left:0;right:0;text-align:center;color:#d9b56a;font:600 22px Inter,sans-serif;letter-spacing:.32em;text-transform:uppercase}
-.photo{display:none;position:fixed;left:96px;top:50%;translate:0 -50%;width:840px;aspect-ratio:16/9;border-radius:30px;overflow:hidden;
-  border:2px solid rgba(243,220,157,.65);box-shadow:0 0 90px -10px rgba(243,220,157,.45);animation:bob 5s ease-in-out infinite}
-.photo img{width:100%;height:100%;object-fit:cover;display:block}
-body.duo .photo{display:block}
-body.duo .stage{padding:80px 80px 80px 1000px}
-body.duo .now .card{width:820px;padding:60px 36px}
-body.duo .now .title{font-size:112px}body.duo .now .urdu{font-size:68px}body.duo .now .arabic{font-size:54px}
+.stage .photo{position:fixed;left:96px;top:50%;translate:0 -50%;width:840px;border-radius:30px;box-shadow:0 0 90px -10px rgba(243,220,157,.45)}
+.stage.duo{grid-template-columns:minmax(0,1fr);padding:80px 80px 80px 1000px}
+.stage.duo .mark{opacity:1;visibility:visible}
+.stage.duo .now .card{width:820px;padding:60px 36px}
+.stage.duo .now .title{font-size:112px}.stage.duo .now .urdu{font-size:68px}.stage.duo .now .arabic{font-size:54px}
 .now .medal{width:150px;height:150px}.now .medal b{font-size:60px}
 .now .roll{max-height:470px}.now .line{font-size:34px}
 .now .card.kind-shajra .title{font-size:84px}.now .card.kind-shajra .urdu{font-size:52px}
 </style></head><body>
 <div class="aurora"></div><canvas id="sky"></canvas>
-${sheikh ? `<div class="photo"><img id="b-photo" alt="Hazrat Ameer Abdul Qadeer Awan (MZA)"></div>` : ""}
-${stageScreen("b-stage", "")}
+${stageScreen("b-stage", "", { rail: false })}
 <div class="brandline">Naqshbandia Owaisiah · ${esc(site.region)}</div>
 <script type="application/json" id="initial">${state}</script>
-<script>${SKY_SCRIPT}${FILL_SCRIPT}
+<script>${SKY_SCRIPT}${STAGE_SCRIPT}
 (() => {
   const $ = id => document.getElementById(id);
   let data = JSON.parse($("initial").textContent), shown = null;
   function show() {
     const h = data.halqahs.find(x => x.id === data.halqahID) || data.halqahs[0];
-    const box = $("b-stage"), live = h && h.live, s = h && h.stage;
-    box.classList.toggle("on", !!live);
-    const photo = $("b-photo"), picture = data.picture || data.pictureFallback;
-    if (photo && picture && photo.getAttribute("src") !== picture) photo.src = picture;
-    document.body.classList.toggle("duo", !!(photo && picture && live));
-    const key = live ? (s ? s.stageID + "|" + s.at : "awaiting") : "off";
-    if (key === shown) return; shown = key;
-    const card = box.querySelector(".card"), title = card.querySelector(".title");
-    fillStage(card, s, "");
-    // A long name never runs past the card: the title shrinks until it fits.
-    title.style.fontSize = "";
-    for (let size = parseFloat(getComputedStyle(title).fontSize); title.scrollWidth > title.clientWidth && size > 48; size -= 4) title.style.fontSize = size + "px";
-    card.querySelector(".test").hidden = !(live && live.isTest);
-    card.classList.remove("burst"); void card.offsetWidth; card.classList.add("burst");
+    // Hazrat ji's picture beside Our Sheikh's stage only.
+    shown = showStage($("b-stage"), h && h.stage, h && h.live, { last: shown, waiting: "", minTitle: 48,
+      picture: ${sheikh} ? data.picture || data.pictureFallback : null, fallback: data.pictureFallback });
   }
   show();
   setInterval(async () => { try { const r = await fetch("/data.json", { cache: "no-store" }); if (r.ok) { data = { ...(await r.json()), halqahID: data.halqahID }; show(); } } catch {} }, 3000);
@@ -312,8 +180,8 @@ export function homePage(site, others, initial, feed) {
     <div id="p-sound"></div><audio id="p-audio" autoplay playsinline></audio>
   </div>`;
   return shell({
-    site, others, title: site.title, description: `${site.tagline}. ${site.intro}`, active: "live", extraStyle: STYLE, body,
-    script: `<script type="application/json" id="initial">${state}</script><script>${FILL_SCRIPT}${CLIENT.replace("__COUNTRIES__", COUNTRIES)}</script>`,
+    site, others, title: site.title, description: `${site.tagline}. ${site.intro}`, active: "live", extraStyle: STAGE_STYLE + STYLE, body,
+    script: `<script type="application/json" id="initial">${state}</script><script>${STAGE_SCRIPT}${CLIENT.replace("__COUNTRIES__", COUNTRIES)}</script>`,
   });
 }
 
@@ -325,15 +193,13 @@ const CLIENT = `
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   let data = JSON.parse($("initial").textContent), joined = null, poll = null, presence = null, shown = {};
 
-  // A stage screen: live, the emblem goes to the corner and the stage being done shows alone.
+  // A stage screen, as the YouTube picture shows it (stage.js showStage): live,
+  // the stage being done, the order of the Zikr beneath it and, for Our Sheikh,
+  // Hazrat ji's picture beside it.
   function stage(box, s, live) {
-    box.classList.toggle("on", !!live);
-    const key = live ? (s ? s.stageID + "|" + s.at : "awaiting") + (live.isTest ? "|t" : "") : "off";
-    if (shown[box.id] === key) return; shown[box.id] = key;
-    const card = box.querySelector(".card");
-    fillStage(card, s, "Awaiting the first stage…");
-    card.querySelector(".test").hidden = !(live && live.isTest);
-    if (live && !reduce) { card.classList.remove("burst"); void card.offsetWidth; card.classList.add("burst"); }
+    const sheikh = box.id === "sheikh-stage" || (box.id === "p-stage" && !!joined && joined.id === "our-sheikh");
+    shown[box.id] = showStage(box, s, live, { last: shown[box.id], waiting: "Awaiting the first stage…",
+      picture: sheikh ? data.picture || data.pictureFallback : null, fallback: data.pictureFallback });
   }
   function chip(node, live) {
     node.className = "chip " + (live ? (live.isTest ? "test" : "live") : "off");
