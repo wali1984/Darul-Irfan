@@ -72,7 +72,11 @@ def capture(url: str, out: Path) -> bool:
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as profile:
         shot = Path(profile) / "shot.png"
         edge = subprocess.Popen([
-            str(EDGE), "--headless=new", "--disable-gpu", "--hide-scrollbars", "--mute-audio",
+            # --do-not-de-elevate: the relay runs elevated, and Edge started
+            # elevated in a desktop session relaunches itself un-elevated
+            # without these arguments and exits at once (Contabo, 9 November:
+            # every capture "produced no picture" in 0.2 s).
+            str(EDGE), "--headless=new", "--do-not-de-elevate", "--disable-gpu", "--hide-scrollbars", "--mute-audio",
             "--no-first-run", "--disable-extensions", f"--user-data-dir={profile}",
             "--renderer-process-limit=1", "--disable-background-networking", "--disable-component-update",
             "--disable-sync", "--no-default-browser-check", "--js-flags=--max-old-space-size=128",
