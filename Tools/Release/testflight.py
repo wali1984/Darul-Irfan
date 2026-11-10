@@ -29,6 +29,7 @@ git), never printed.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 import time
@@ -40,13 +41,25 @@ from pathlib import Path
 import jwt  # PyJWT
 
 REPO = Path(__file__).resolve().parents[2]
-CONFIG = REPO.parent / "appstoreconnect.md"
+
+
+def shared_root(repo: Path) -> Path:
+    """Support both the original checkout and a checkout under pw/."""
+    for candidate in (repo.parent, repo.parent.parent):
+        if (candidate / "appstoreconnect.md").is_file():
+            return candidate
+    return repo.parent
+
+
+SHARED_ROOT = shared_root(REPO)
+CONFIG = SHARED_ROOT / "appstoreconnect.md"
 API = "https://api.appstoreconnect.apple.com"
 APP = "6789375037"
 EXTERNAL_GROUP = "040ba83d-04ce-4f69-8ed0-7a838d64bdc1"
-R2_CONFIG = REPO.parent / "cloudflare.md"
+INTERNAL_GROUP = "bbdefdf1-8727-465a-b7e2-1817ea45cbb8"
+R2_CONFIG = SHARED_ROOT / "cloudflare.md"
 BUCKET, RELEASES = "darul-irfan-media", "app/releases.json"
-POLICY = REPO.parent / "automation" / "testflight-policy.json"
+POLICY = SHARED_ROOT / "automation" / "testflight-policy.json"
 
 
 def distribution_policy() -> dict:
@@ -66,9 +79,19 @@ def credentials() -> tuple[str, str]:
     return issuer.group(1), key.group(1)
 
 
+def private_key_file(kid: str) -> Path:
+    """Read existing ignored keys; never copy them into a worktree."""
+    explicit = os.environ.get("DARUL_IRFAN_ASC_KEY_FILE")
+    candidates = [Path(explicit)] if explicit else [REPO / f"AuthKey_{kid}.p8", SHARED_ROOT / "DarulIrfan-iOS" / f"AuthKey_{kid}.p8"]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    raise FileNotFoundError("App Store Connect key missing; set DARUL_IRFAN_ASC_KEY_FILE to its existing location")
+
+
 def token() -> str:
     issuer, kid = credentials()
-    key = (REPO / f"AuthKey_{kid}.p8").read_text(encoding="utf-8")
+    key = private_key_file(kid).read_text(encoding="utf-8")
     now = int(time.time())
     return jwt.encode({"iss": issuer, "iat": now, "exp": now + 900, "aud": "appstoreconnect-v1"},
                       key, algorithm="ES256", headers={"kid": kid, "typ": "JWT"})
@@ -92,10 +115,48 @@ def call(method: str, path: str, body: dict | None = None) -> tuple[int, dict | 
 
 
 def get(path: str) -> dict:
+    if path.startswith(API + "/"):
+        path = path[len(API):]
+    if not path.startswith("/") or path.startswith("//"):
+        raise ValueError("App Store Connect path required")
     status, body = call("GET", path)
     if status >= 300 or not isinstance(body, dict):
         raise RuntimeError(f"GET {path}: HTTP {status} {body}")
     return body
+
+
+def checked_call(method: str, path: str, body: dict) -> dict | str:
+    status, result = call(method, path, body)
+    if not 200 <= status < 300:
+        raise RuntimeError(f"{method} {path}: HTTP {status} {result}")
+    return result
+
+
+def group_build_ids(group_id: str) -> set[str]:
+    ids: set[str] = set()
+    path = f"/v1/betaGroups/{group_id}/relationships/builds?limit=200"
+    visited: set[str] = set()
+    while path:
+        if path in visited:
+            raise RuntimeError("Repeated TestFlight group pagination link")
+        visited.add(path)
+        page = get(path)
+        ids.update(item["id"] for item in page.get("data", []))
+        path = page.get("links", {}).get("next")
+    return ids
+
+
+def distribution_status(build_id: str) -> dict:
+    build = get(f"/v1/builds/{build_id}?fields[builds]=version,processingState,expired")["data"]["attributes"]
+    detail = get(f"/v1/builds/{build_id}/buildBetaDetail")["data"]["attributes"]
+    valid = build.get("processingState") == "VALID" and not build.get("expired", False)
+    internal_group = build_id in group_build_ids(INTERNAL_GROUP)
+    external_group = build_id in group_build_ids(EXTERNAL_GROUP)
+    return {"build": build.get("version"), "processingState": build.get("processingState"),
+            "internalGroupAssigned": internal_group, "externalGroupAssigned": external_group,
+            "internalBuildState": detail.get("internalBuildState"), "externalBuildState": detail.get("externalBuildState"),
+            "internalAvailable": valid and internal_group and detail.get("internalBuildState") == "IN_BETA_TESTING",
+            "externalAvailable": valid and external_group and detail.get("externalBuildState") == "IN_BETA_TESTING"}
 
 
 def newest(count: int = 5) -> list[dict]:
@@ -107,8 +168,12 @@ def newest(count: int = 5) -> list[dict]:
 
 
 def release(number: str, notes: str) -> int:
+    if not number.isdigit() or int(number) < 1 or not notes.strip() or len(notes) > 4000:
+        raise ValueError("A positive build number and 1–4000 characters of release notes are required")
     policy = distribution_policy()
-    if not policy.get("externalDistributionEnabled", False) or int(number) > int(policy.get("externalBuildCeiling", 70)):
+    if (not policy.get("externalDistributionEnabled", False)
+            or int(number) > int(policy.get("externalBuildCeiling", 70))
+            or int(number) > int(policy.get("internalBuild", 70))):
         print("External distribution held by owner policy; internal uploads are unaffected.")
         return 1
     build = None
@@ -117,6 +182,8 @@ def release(number: str, notes: str) -> int:
         if found and found[0]["attributes"]["processingState"] == "VALID":
             build = found[0]
             break
+        if found and found[0]["attributes"]["processingState"] in {"FAILED", "INVALID"}:
+            raise RuntimeError(f"Build {number} failed Apple processing")
         print(f"build {number}: {found[0]['attributes']['processingState'] if found else 'not uploaded yet'}", flush=True)
         time.sleep(60)
     if build is None:
@@ -124,44 +191,66 @@ def release(number: str, notes: str) -> int:
         return 1
     build_id = build["id"]
 
-    # Export compliance: standard HTTPS only.
-    call("PATCH", f"/v1/builds/{build_id}", {"data": {"type": "builds", "id": build_id,
-                                                      "attributes": {"usesNonExemptEncryption": False}}})
+    # Export compliance: standard HTTPS only. Apple refuses to change it once
+    # it is set (the Info.plist's ITSAppUsesNonExemptEncryption sets it at
+    # upload), so a value already false is fine.
+    compliance = get(f"/v1/builds/{build_id}?fields[builds]=usesNonExemptEncryption")["data"]["attributes"]
+    if compliance.get("usesNonExemptEncryption") is None:
+        checked_call("PATCH", f"/v1/builds/{build_id}", {"data": {"type": "builds", "id": build_id,
+                                                          "attributes": {"usesNonExemptEncryption": False}}})
+    elif compliance["usesNonExemptEncryption"]:
+        raise RuntimeError(f"Build {number} declares non-exempt encryption; not released")
     localizations = get(f"/v1/builds/{build_id}/betaBuildLocalizations").get("data", [])
-    if localizations:
-        status, _ = call("PATCH", f"/v1/betaBuildLocalizations/{localizations[0]['id']}",
-                         {"data": {"type": "betaBuildLocalizations", "id": localizations[0]["id"],
+    english = next((item for item in localizations if item.get("attributes", {}).get("locale") == "en-US"), None)
+    if english:
+        checked_call("PATCH", f"/v1/betaBuildLocalizations/{english['id']}",
+                         {"data": {"type": "betaBuildLocalizations", "id": english["id"],
                                    "attributes": {"whatsNew": notes}}})
     else:
-        status, _ = call("POST", "/v1/betaBuildLocalizations",
+        checked_call("POST", "/v1/betaBuildLocalizations",
                          {"data": {"type": "betaBuildLocalizations", "attributes": {"locale": "en-US", "whatsNew": notes},
                                    "relationships": {"build": {"data": {"type": "builds", "id": build_id}}}}})
-    print("what to test:", status)
-    status, body = call("POST", f"/v1/betaGroups/{EXTERNAL_GROUP}/relationships/builds",
-                        {"data": [{"type": "builds", "id": build_id}]})
-    print("added to external group:", status, "" if status < 300 else body)
-    status, body = call("POST", "/v1/betaAppReviewSubmissions",
+    for group in (INTERNAL_GROUP, EXTERNAL_GROUP):
+        if build_id not in group_build_ids(group):
+            checked_call("POST", f"/v1/betaGroups/{group}/relationships/builds",
+                         {"data": [{"type": "builds", "id": build_id}]})
+    detail = get(f"/v1/builds/{build_id}/buildBetaDetail")["data"]
+    if not detail["attributes"].get("autoNotifyEnabled"):
+        checked_call("PATCH", f"/v1/buildBetaDetails/{detail['id']}",
+                     {"data": {"type": "buildBetaDetails", "id": detail["id"], "attributes": {"autoNotifyEnabled": True}}})
+    if detail["attributes"].get("externalBuildState") != "IN_BETA_TESTING":
+        status, body = call("POST", "/v1/betaAppReviewSubmissions",
                         {"data": {"type": "betaAppReviewSubmissions",
                                   "relationships": {"build": {"data": {"type": "builds", "id": build_id}}}}})
-    # 409 when this build was already submitted: not an error for a re-run.
-    print("submitted for beta review:", status, "" if status < 300 or status == 409 else body)
-    detail = get(f"/v1/builds/{build_id}/buildBetaDetail").get("data", {}).get("attributes", {})
-    print("external state:", detail.get("externalBuildState"))
-    return 0
+        if status == 409:
+            # A conflict can be invalid metadata, not merely a duplicate.
+            submission = get(f"/v1/builds/{build_id}/betaAppReviewSubmission").get("data")
+            if not submission or submission.get("attributes", {}).get("betaReviewState") not in {"WAITING_FOR_REVIEW", "IN_REVIEW", "APPROVED"}:
+                raise RuntimeError(f"Beta submission conflict was not an accepted existing submission: {body}")
+        elif not 200 <= status < 300:
+            raise RuntimeError(f"Beta submission failed: HTTP {status} {body}")
+    verified = distribution_status(build_id)
+    print(json.dumps(verified, indent=2))
+    if verified["internalAvailable"] and verified["externalAvailable"]:
+        return 0
+    print("Tester availability is still pending; no successful release is claimed.")
+    return 1
 
 
 def tester_build() -> tuple[int, str] | None:
     """(build number, version) of the newest build Apple has passed for the
     external testers."""
+    assigned = group_build_ids(EXTERNAL_GROUP)
     data = get(f"/v1/builds?filter[app]={APP}&sort=-uploadedDate&limit=20&include=preReleaseVersion,buildBetaDetail"
-               "&fields[builds]=version,preReleaseVersion,buildBetaDetail&fields[preReleaseVersions]=version"
+               "&fields[builds]=version,processingState,expired,preReleaseVersion,buildBetaDetail&fields[preReleaseVersions]=version"
                "&fields[buildBetaDetails]=externalBuildState")
     included = {(item["type"], item["id"]): item["attributes"] for item in data.get("included", [])}
     passed = []
     for build in data.get("data", []):
         links = build["relationships"]
         detail = included.get(("buildBetaDetails", links["buildBetaDetail"]["data"]["id"]), {})
-        if detail.get("externalBuildState") == "IN_BETA_TESTING":
+        if (build["id"] in assigned and build["attributes"].get("processingState") == "VALID"
+                and not build["attributes"].get("expired", False) and detail.get("externalBuildState") == "IN_BETA_TESTING"):
             version = included.get(("preReleaseVersions", links["preReleaseVersion"]["data"]["id"]), {}).get("version")
             passed.append((int(build["attributes"]["version"]), version))
     return max(passed) if passed else None
@@ -181,16 +270,20 @@ def r2():
 
 
 def internal_build() -> tuple[int, str] | None:
-    """(build number, version) of the newest processed build the internal
-    testers have: every upload reaches them, up to the policy's internalBuild."""
-    data = get(f"/v1/builds?filter[app]={APP}&sort=-uploadedDate&limit=20&include=preReleaseVersion"
-               "&fields[builds]=version,processingState,preReleaseVersion&fields[preReleaseVersions]=version")
+    """Newest available build actually assigned to the internal tester group."""
+    assigned = group_build_ids(INTERNAL_GROUP)
+    data = get(f"/v1/builds?filter[app]={APP}&sort=-uploadedDate&limit=20&include=preReleaseVersion,buildBetaDetail"
+               "&fields[builds]=version,processingState,expired,preReleaseVersion,buildBetaDetail&fields[preReleaseVersions]=version"
+               "&fields[buildBetaDetails]=internalBuildState")
     included = {(item["type"], item["id"]): item["attributes"] for item in data.get("included", [])}
     ceiling = int(distribution_policy().get("internalBuild", 10**9))
     valid = []
     for build in data.get("data", []):
         number = int(build["attributes"]["version"])
-        if build["attributes"]["processingState"] == "VALID" and number <= ceiling:
+        detail_link = build["relationships"].get("buildBetaDetail", {}).get("data") or {}
+        detail = included.get(("buildBetaDetails", detail_link.get("id")), {})
+        if (build["id"] in assigned and build["attributes"]["processingState"] == "VALID" and number <= ceiling
+                and not build["attributes"].get("expired", False) and detail.get("internalBuildState") == "IN_BETA_TESTING"):
             link = build["relationships"]["preReleaseVersion"]["data"]["id"]
             valid.append((number, included.get(("preReleaseVersions", link), {}).get("version")))
     return max(valid) if valid else None
@@ -215,12 +308,9 @@ def announce(known: int | None = None) -> int | None:
     ios = releases.setdefault("ios", {})
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     changed = None
-    if found and ios.get("testflight", {}).get("build") != found[0]:
+    if found and ios.get("testflight", {}).get("build", 0) < found[0]:
         ios["testflight"] = {"version": found[1], "build": found[0], "releasedAt": now}
         changed = found[0]
-    # Never older than the external build: an internal tester has that too.
-    if found and (not inside or inside[0] < found[0]):
-        inside = found
     if inside and ios.get("internal", {}).get("build", 0) < inside[0]:
         ios["internal"] = {"version": inside[1], "build": inside[0], "releasedAt": now}
     elif changed is None:
