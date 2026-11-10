@@ -53,12 +53,15 @@ function stageStill() { return matchMedia("(prefers-reduced-motion: reduce)").ma
 function fillStage(card, s, emptyTitle) {
   const id = s ? s.stageID : null, kind = stageKind(id);
   card.className = card.className.replace(/\\bkind-\\w+/g, "").trim() + " kind-" + kind;
-  card.querySelector(".label").textContent = { recite: "Recitation", latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua" }[kind] || "Now";
+  card.querySelector(".label").textContent = { recite: "Recitation", latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua", awaiting: "Bayan" }[kind] || "Now";
   const medal = card.querySelector(".medal");
   medal.hidden = kind !== "latifa";
   medal.querySelector("b").textContent = kind === "latifa" ? id.slice(7) : "";
-  card.querySelector(".title").textContent = s ? s.title : (emptyTitle || "");
-  card.querySelector(".urdu").textContent = s && s.titleUr ? s.titleUr : "";
+  // Live before the first stage: the Bayan is playing and the Zikr follows it (owner 2026-11-10).
+  card.querySelector(".title").textContent = s ? s.title : (emptyTitle || "Playing Bayan");
+  card.querySelector(".urdu").textContent = s ? (s.titleUr || "") : "بیان جاری ہے";
+  const next = card.querySelector(".next");
+  if (next) next.textContent = s ? "" : "Zikr will start soon · ذکر جلد شروع ہوگا";
   card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
   const roll = card.querySelector(".roll"), lines = roll.querySelector(".lines");
   lines.classList.remove("run"); lines.style.removeProperty("--dist");
@@ -128,7 +131,7 @@ function showStage(box, s, live, o) {
   for (let size = parseFloat(getComputedStyle(title).fontSize); title.scrollWidth > title.clientWidth && size > (o.minTitle || 24); size -= 2) title.style.fontSize = size + "px";
   // Said once, politely, to a screen reader: the stage now, or that the Zikr ended.
   const say = box.querySelector(".say");
-  if (say) say.textContent = live ? (s ? "Now: " + s.title : "The Zikr is live. Awaiting the first stage.") : (o.last && o.last !== "off" ? "The Zikr has ended." : "");
+  if (say) say.textContent = live ? (s ? "Now: " + s.title : "The Zikr is live. Playing Bayan; the Zikr will start soon.") : (o.last && o.last !== "off" ? "The Zikr has ended." : "");
   if (live && !stageStill()) { card.classList.remove("burst"); void card.offsetWidth; card.classList.add("burst"); }
   return key;
 }
@@ -151,7 +154,7 @@ export function stageScreen(id, waiting, { rail: withRail = true } = {}) {
       <div class="photo"><img alt="Hazrat Ameer Abdul Qadeer Awan (MZA)" decoding="async"></div>
       <div class="waiting"><div class="quiet">${esc(waiting)}</div></div>
       <div class="now"><div class="card"><div class="ring"></div><div class="medal" hidden><i></i><b></b></div><div class="label">Now</div><div class="title"></div>
-        <div class="urdu" lang="ur"></div><div class="arabic" lang="ar"></div><div class="roll" hidden><div class="lines"></div></div>
+        <div class="urdu" lang="ur"></div><div class="next"></div><div class="arabic" lang="ar"></div><div class="roll" hidden><div class="lines"></div></div>
         <span class="chip test" hidden>Test Zikr</span></div></div>
       ${withRail ? rail() : ""}
       <p class="say sr" role="status" aria-live="polite" aria-atomic="true"></p>
@@ -177,6 +180,10 @@ export const STAGE_STYLE = `
   -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite;
   filter:drop-shadow(0 0 26px rgba(243,220,157,.35))}
 .now .urdu{font-size:clamp(30px,4vw,54px);color:var(--gold2);margin-top:6px;text-shadow:0 0 22px rgba(243,220,157,.35)}
+.now .next{font:500 clamp(18px,2vw,26px)/1.5 var(--sans);color:var(--gold);letter-spacing:.04em;margin-top:18px;animation:nextGlow 2.8s ease-in-out infinite}
+.now .next:empty{display:none}
+@keyframes nextGlow{50%{opacity:.55}}
+@media (prefers-reduced-motion: reduce){.now .next{animation:none}}
 .now .arabic{font-size:clamp(28px,3.6vw,46px);line-height:1.9;color:#fff8e6;margin-top:14px;text-shadow:0 0 28px rgba(243,220,157,.5)}
 .now .test{display:inline-block;margin-top:18px}
 /* Each kind of stage, as the app shows it: a Latifa's number on a turning

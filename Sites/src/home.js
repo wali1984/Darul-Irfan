@@ -177,7 +177,7 @@ export function homePage(site, others, initial, feed) {
   <div id="player" role="dialog" aria-modal="true" aria-label="Live Zikr">
     <header><b id="p-name"></b><span class="chip live" id="p-chip">Live</span>
       <button class="btn btn-ghost" id="p-leave" style="margin-left:auto;padding:10px 18px">Leave</button></header>
-    ${stageScreen("p-stage", "Awaiting the first stage…")}
+    ${stageScreen("p-stage", "Zikr will start soon")}
     <div id="p-sound"></div><audio id="p-audio" autoplay playsinline></audio>
   </div>`;
   return shell({
@@ -199,7 +199,7 @@ const CLIENT = `
   // Hazrat ji's picture beside it.
   function stage(box, s, live) {
     const sheikh = box.id === "sheikh-stage" || (box.id === "p-stage" && !!joined && joined.id === "our-sheikh");
-    shown[box.id] = showStage(box, s, live, { last: shown[box.id], waiting: "Awaiting the first stage…",
+    shown[box.id] = showStage(box, s, live, { last: shown[box.id], waiting: "Playing Bayan",
       picture: sheikh ? data.picture || data.pictureFallback : null, fallback: data.pictureFallback });
   }
   function chip(node, live) {
