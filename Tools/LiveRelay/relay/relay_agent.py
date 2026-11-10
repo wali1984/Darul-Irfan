@@ -1318,16 +1318,14 @@ class Relay:
         reading first. The stage is this relay's own once the platform has
         the cue, not before."""
         generation = self.generation if generation is None else generation
-        for wait in (0, 15):  # the picker reads a call within a few seconds; 15 s covers its last reading
-            await asyncio.sleep(wait)
-            if not self.picker:
-                break
-            if self.platform_stage == stage or time.time() - self.heard_at.get(stage, 0) < 300 or self._being_sent(stage):
-                log(f"typed cue {stage}: already heard")
-                return
-            if self.platform_stage and stage in ORDER and not ahead(stage, self.platform_stage):
-                log(f"typed cue {stage}: behind the stage ({self.platform_stage})")
-                return
+        # At once (10 November: the 15 s wait for the picker, on top of a
+        # 10-19 s read of Paltalk's window, put every typed cue 30 s late).
+        if self.platform_stage == stage or time.time() - self.heard_at.get(stage, 0) < 300 or self._being_sent(stage):
+            log(f"typed cue {stage}: already heard")
+            return
+        if self.platform_stage and stage in ORDER and not ahead(stage, self.platform_stage):
+            log(f"typed cue {stage}: behind the stage ({self.platform_stage})")
+            return
         if await self._send_cue(stage, text, generation):
             self.platform_stage, self.stage_set_at = stage, time.time()
 

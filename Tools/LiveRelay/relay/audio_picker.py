@@ -56,7 +56,7 @@ STALE_SECONDS = 30.0  # a reading whose clip is this old is skipped: the stage h
 NAMES = [
     ("ahadiyat", r"احد[یي]ت|عدید|احضیت|ا?حدیت"),
     ("maiyyat", r"مع[یي]ت|مائ[یي]ت|ما[یي]ت"),
-    ("aqrabiyyat", r"اقرب|قرب[یيا]|نحن|نحب|حب.?ل.?ن?و.?ر[یي]د|وا?ر[یي]د"),
+    ("aqrabiyyat", r"اقرب|قرب[یيا]|[کق]ر[بم]ی?ت|نحن|نحب|حب.?ل.?ن?و.?ر[یي]د|وا?ر[یي]د"),  # "او کربیت" 10 Nov
     ("sair-kaaba", r"سیر.?کعب|سرکب|سرکا|ارکا|کعبہ|کا بات|لب[یي]ک|لبار"),
     ("rauza-athar", r"روض|روز[یاے]|اطہر|اثر"),
     ("masjid-nabawi", r"مسجد|مشک|ماشی|نبوی"),
@@ -87,20 +87,47 @@ LATIFA_WORD = r"(?<!غ)ف[اب]\S?(?=\s|$)|ل[یاِ]?[تط][یي]?ف|تیف|ت�
 RECITATION_WORDS = [
     # 2026-11-10 Daily Zikr: the Arabic reading of the opening Tasbih came as
     # "سوحان الله و الحمد لله و لا ..." (و for ب) and the stage never moved.
-    ("tasbih", r"س[بو]ح[اـ]?ن|سبحن"),
-    ("istighfar", r"ستغفر|استغفار"),
-    ("shahadah", r"[أا]شهد|شهد [أا]ن"),
-    ("taawwudh", r"[أا]عوذ|عوذ ب"),
-    ("basmalah", r"بسم"),
+    ("tasbih", r"س[بو]?ح[اـ]?ن|سبحن|سوان ال"),
+    # As read on 10 November: "اسقاف الله ربي", "اصفلار", "اشادر لا اللہ اوشاد",
+    # "اوز بالام", "مسم اللہ رخمان".
+    ("istighfar", r"ستغفر|استغفار|استغف|اسقاف ال|صفلار|سفلار"),
+    ("shahadah", r"[أا]شهد|شهد [أا]ن|[أا]?شاد[رن]? |اوشاد|شادن"),
+    ("taawwudh", r"[أا]عوذ|عوذ ب|[أا]وز بال|عوز بال"),
+    ("basmalah", r"بسم|مسم ال|ر[حخ]مان"),
 ]
+# The Tasbih before any stage needs more than "سبحان اللہ" (a bayan says it):
+# its next words too ("والحمد لله", "الله اكبر").
+TASBIH_MORE = r"حمد|[اأ]كبر|اکبر"
 RECITE_EVERY = 8.0  # seconds between readings of the opening's voice
+# Listening (10 November 2026): the Daily Zikr's leader kept the mic open, the
+# room's Zikr was heard the whole time, no quiet ever came before a call, and
+# no call was read - every stage came from a host's typed cue, a minute or
+# more late. Now the last few seconds are read every LISTEN_EVERY whenever
+# there is voice, whoever leads and however loud the room is: a call shows
+# as its words, the Zikr itself reads as nothing or one word over and over.
+LISTEN_EVERY = 1.0  # a 5 s window every second: a call is read whole in several windows
+LISTEN_SECONDS = 5.0
+STAGE_GAP = 40.0  # a Latifa or Muraqaba lasts minutes: no new one this soon after the last stage
+OPENING_WINDOW = 45.0  # the opening recitations follow each other within seconds
+# A bayan is talk without a break; the Zikr between its calls reads as nothing
+# or one word over and over. A stage heard is believed only when the
+# readings of the TALK_BEFORE seconds before it (up to TALK_SKIP before it:
+# the call itself is talk) were mostly not talk: a bayan about the Lataif
+# says "پہلا لطیفہ" and "بسم اللہ" (the 2nd bayan recording, 10 November).
+TALK_BEFORE = 30.0
+TALK_SKIP = 6.0
+TALK_MOST = 0.4
+# "لطیفہ قلب" (the 1st) as read on 10 November: "لدی فائقان", "نتفعقال", "فيقال".
+LATIFA_ONE = r"ف[ائیي]{1,2}ق[اہ]?[لن]|فعقال"
 
 
 # A Latifa's number, when it comes through ("شوطحنا" = چوتھا, "اوانچوان" =
 # پانچواں): it puts the order right if a call was missed or one too many
 # was taken. Only ever forwards, and never more than two past the step.
-NUMBERS = [(1, r"پہلا"), (2, r"دوسر"), (3, r"تیسر"), (4, r"چوتھ|[شجچ]و ?[تط]ح"), (5, r"پانچ|انچوا"),
-           (6, r"چھٹ"), (7, r"ساتو")]
+NUMBERS = [(1, r"پہلا"), (2, r"دوسر|نسول"), (3, r"تیسر"), (4, r"چوتھ|[شجچ]و ?[تط]ح|جو ?تل"),
+           (5, r"پانچ|انچوا|بان ?جو|باہن ?جو|بانجر"), (6, r"چھٹ"), (7, r"ساتو|سا ?تنل")]
+# (10 November: "نسولہ تیفا" = دوسرا, "جو تل دیفا" = چوتھا, "بان جو نا دیفا" =
+# پانچواں, "سا تنل دیفا" = ساتواں.)
 
 
 def latifa_number(text: str) -> int | None:
@@ -120,6 +147,13 @@ def is_call(text: str, step: str | None) -> bool:
         return bool(re.search(LATIFA_WORD, text))
     words = text.split()
     return len(words) >= 3 and len(set(words)) * 2 > len(words)
+
+
+def is_talk(text: str) -> bool:
+    """Whether a reading is speech (a bayan, a call) rather than the Zikr's
+    sound, which reads as nothing or one or two words over and over."""
+    words = text.split()
+    return len(words) >= 3 and len(set(words)) >= 3
 
 
 def ahead(stage: str, current: str | None) -> bool:
@@ -175,6 +209,11 @@ class Picker:
         self.tasbih_given = False
         self.last_tasbih_try = -1e9
         self.first_call: tuple[float, str] | None = None  # a Latifa call read before any stage, waiting for the quiet after it
+        self.last_listen = -1e9
+        self.seen_stage: str | None = None  # the stage as last seen, and since when (any source: heard, typed, tapped)
+        self.stage_at = -1e9
+        self.recited: list[tuple[float, int]] = []  # opening recitations heard before any stage: (clock, index)
+        self.heard: deque = deque(maxlen=120)  # (clock, whether the reading was talk), the listener's last readings
         self.lock = threading.Lock()
         # Readings run on one worker thread (the server has two cores; a
         # thread per reading piled up behind one lock on 6 November), from a
@@ -200,6 +239,10 @@ class Picker:
         self.shajra_given = self.tasbih_given = False
         self.last_tasbih_try = -1e9
         self.first_call = None
+        self.last_listen = -1e9
+        self.seen_stage, self.stage_at = None, -1e9
+        self.recited = []
+        self.heard.clear()
 
     def _queue(self, fn, *args) -> None:  # noqa: ANN001
         """A reading for the worker thread (inline: run here, on the feeding
@@ -257,6 +300,13 @@ class Picker:
         self.audio.append(frame)
         self.levels.append(loud)
         stage = self.current_stage()
+        if stage != self.seen_stage:
+            self.seen_stage, self.stage_at = stage, self.clock
+        if (self.read_calls and self.clock - self.last_listen >= LISTEN_EVERY - 1e-6
+                and len(self.audio) >= LISTEN_SECONDS * 10
+                and max(list(self.history)[-int(LISTEN_SECONDS * 10):]) > LOUD_DB):
+            self.last_listen = self.clock
+            self._queue(self._listen, np.concatenate(list(self.audio)[-int(LISTEN_SECONDS * 10):]), self.clock)
         if loud:
             if self.clock - self.last_voice > 1.5:
                 self.voice_start = self.clock
@@ -274,9 +324,7 @@ class Picker:
             # the Zikr (the 9:15 PST room opens with one); during the opening,
             # the next recitation. Read it as Arabic; only the recitation's
             # own words move the stage, and only forwards in their order.
-            self.last_tasbih_try = self.clock
-            if self.read_calls:
-                self.reads.append((self.clock, "recite", run, self.clock, "recite"))
+            self.last_tasbih_try = self.clock  # the listener reads the opening (10 November)
         if self.first_call is not None and self.clock - self.first_call[0] >= FIRST_QUIET + 4:
             # A Latifa call read before any stage counts once the room has
             # gone quiet after it, as it does in the Zikr; a bayan before
@@ -361,6 +409,92 @@ class Picker:
             # the Tasbihat (never once recognised by 8 November).
             self.on_stage(None, f"recite read: {(texts[0] if texts else '')[:60] or 'no words'}")
 
+    def _listen(self, clip: np.ndarray, at: float) -> None:
+        """The last few seconds, read whatever the room sounds like: an opening
+        recitation, a Latifa's call, a Muraqaba's name. Only ever forwards in
+        the order, and never a new Latifa or Muraqaba within STAGE_GAP of the
+        last stage (whoever set it)."""
+        generation = self.generation
+        with self.lock:
+            current = self.current_stage()
+            opening = current is None or current in OPENING
+            try:
+                urdu = self.transcribe(clip)
+                arabic = self.transcribe(clip, language="ar") if opening else ""
+            except Exception as error:  # noqa: BLE001 - the typed cues still carry the stage
+                self.on_stage(None, f"could not listen: {error}")
+                return
+            if generation != self.generation or self.current_stage() != current:
+                return  # a new session, or the stage moved while this was read
+            stage = self.decide(current, urdu, arabic, at)
+            if stage:
+                self.last_call = at
+                if stage in OPENING:
+                    self.tasbih_given = True
+                self._give(stage, f"heard ({(arabic or urdu)[:40]}{' / ' + urdu[:30] if arabic else ''})")
+
+    def decide(self, current: str | None, urdu: str, arabic: str, at: float) -> str | None:
+        """The stage a reading moves to, if any: its words (_listened), and
+        never in the middle of talk - except the opening's next recitation
+        or the 1st Latifa once the opening is on the stage (it is talk)."""
+        self.heard.append((at, is_talk(urdu)))
+        stage = self._listened(current, urdu, arabic, at)
+        if stage and not (current in OPENING and stage in OPENING + ("latifa-1",)) and self.talk_before(at) >= TALK_MOST:
+            self.on_stage(None, f"not taken: {stage} heard in the middle of talk ({urdu[:40]})")
+            return None
+        return stage
+
+    def talk_before(self, at: float) -> float:
+        """The share of the listener's readings that were talk, from
+        TALK_BEFORE to TALK_SKIP seconds before `at` (0 when nothing was
+        heard: the quiet before the Zikr is not a bayan)."""
+        window = [talk for t, talk in self.heard if at - TALK_BEFORE <= t <= at - TALK_SKIP]
+        return sum(window) / len(window) if window else 0.0
+
+    def _listened(self, current: str | None, urdu: str, arabic: str, at: float) -> str | None:
+        both = f"{urdu} {arabic}"
+        since = at - self.stage_at
+        if current is None or current in OPENING:
+            after = -1 if current is None else OPENING.index(current)
+            for index, (recitation, pattern) in enumerate(RECITATION_WORDS):
+                if index <= after or not re.search(pattern, both):
+                    continue
+                if current is None:
+                    # Before any stage only the Zikr's own opening starts it: the
+                    # Tasbih with its next words, or the Istighfar or Shahadah
+                    # right after a Tasbih. A bayan opens with "اعوذ باللہ ...
+                    # بسم اللہ" and says "سبحان اللہ" (the 2nd bayan recording
+                    # read as the 1st Latifa that way), so those never start it.
+                    tasbih_before = any(i == 0 for t, i in self.recited if at - t <= OPENING_WINDOW)
+                    self.recited = [(t, i) for t, i in self.recited if at - t <= 60.0] + [(at, index)]
+                    if index == 0 and not re.search(TASBIH_MORE, both):
+                        continue
+                    if index > 0 and not (index <= 2 and tasbih_before):
+                        continue
+                return recitation
+            # The 1st Latifa's call ends the opening. Before any stage (the
+            # opening missed) only after a recitation in the minute before it,
+            # and - like every stage heard - not in the middle of talk.
+            if re.search(LATIFA_WORD, urdu) or re.search(LATIFA_ONE, both) or latifa_number(urdu) == 1:
+                if current is not None or any(at - t <= 60.0 for t, _ in self.recited):
+                    return "latifa-1"
+            return None
+        if since < STAGE_GAP:
+            return None
+        if current.startswith("latifa-") and current != "latifa-7":
+            if re.search(LATIFA_WORD, urdu) or latifa_number(urdu):
+                step = next_stage(current)
+                number = latifa_number(urdu)
+                if number and ahead(f"latifa-{number}", current) and number <= int(step[7:]) + 2:
+                    step = f"latifa-{number}"
+                return step
+            return None
+        if current in ORDER and ORDER.index(current) >= ORDER.index("latifa-6"):
+            named = named_stage(urdu)
+            if named and ahead(named, current) and ORDER.index(named) <= ORDER.index(current) + 2:
+                return named
+        return None
+
     def _after_first(self, clip: np.ndarray, at: float, first: str) -> None:
         generation = self.generation
         with self.lock:
@@ -425,7 +559,7 @@ class Picker:
         same way."""
         if self.model is None:
             from faster_whisper import WhisperModel
-            self.model = WhisperModel(self.model_name, device="cpu", compute_type="int8", cpu_threads=1)
+            self.model = WhisperModel(self.model_name, device="cpu", compute_type="int8", cpu_threads=2)
             tokenizer = self.model.hf_tokenizer
             self.prompts = {code: tokenizer.encode(f"<|startoftranscript|><|{code}|><|transcribe|><|notimestamps|>",
                                                    add_special_tokens=False).ids for code in ("ur", "ar")}
