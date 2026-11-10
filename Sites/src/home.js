@@ -4,6 +4,7 @@
 // sound comes only from the Silsila's live feed. Everything from the API is set
 // with textContent or attributes, never as HTML.
 import { animatedLogo, esc, shell, SKY_SCRIPT, STYLE as STAGE_BASE } from "./layout.js";
+import SHAJRA from "./content/shajra.json";
 
 import { STAGES, STAGE_SCRIPT, STAGE_STYLE, stageScreen } from "./stage.js";
 
