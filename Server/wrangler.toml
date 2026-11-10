@@ -30,7 +30,7 @@ SUPER_ADMIN_EMAILS = "wajidali1984@hotmail.com,wajidmahmood@hotmail.com,wajidmah
 # sign-in answers 503 and Sign in with Apple is unaffected. SUPER_ADMIN_EMAILS
 # applies to the Google account's verified email as it does to Apple's.
 # Firebase project darul-irfan-e8f62, its "Web client (auto created by Google Service)".
-GOOGLE_CLIENT_IDS = "361266757599-qe8lut74c1nh5fgul0gsup9o9muve5hh.apps.googleusercontent.com"
+GOOGLE_CLIENT_IDS = "361266757599-qe8lut74c1nh5fgul0gsup9o9muve5hh.apps.googleusercontent.com,361266757599-4n86ui0rga1batrhj8sm45d0gl30o541.apps.googleusercontent.com"
 
 [[d1_databases]]
 binding = "DB"
