@@ -701,10 +701,22 @@ struct ZikrStageView: View {
     @ViewBuilder
     private var idleContent: some View {
         StageEmblem(size: 112)
-        Text(model.live == nil ? LocalizedStringKey("The Zikr is not live now.") : LocalizedStringKey("The Zikr begins soon."))
-            .font(.system(size: 26, weight: .semibold, design: .serif)).foregroundStyle(DIColor.accent)
-            .multilineTextAlignment(.center)
-            .diGoldTextShimmer()
+        if model.live == nil {
+            Text("The Zikr is not live now.")
+                .font(.system(size: 26, weight: .semibold, design: .serif)).foregroundStyle(DIColor.accent)
+                .multilineTextAlignment(.center)
+                .diGoldTextShimmer()
+        } else {
+            // Live before the first stage: the Bayan is playing, the Zikr follows it (owner 2026-11-10).
+            Text("Bayan").diInterfaceFont(.caption, weight: .semibold).foregroundStyle(DIColor.accent)
+            Text("Playing Bayan")
+                .font(.system(size: 30, weight: .semibold, design: .serif)).foregroundStyle(DIColor.accent)
+                .multilineTextAlignment(.center)
+                .diGoldTextShimmer()
+                .diGoldGlow(radius: 14, opacity: 0.5)
+                .accessibilityIdentifier("stage-bayan")
+            ZikrStartsSoon()
+        }
         Text(verbatim: DIBrand.anchorVerseArabic).font(DIFont.quranArabic(scale: 1.2))
             .foregroundStyle(DIColor.onPrimary).multilineTextAlignment(.center)
             .diGoldTextShimmer(delay: 1.6)
@@ -1136,6 +1148,25 @@ private struct StageParticles: View {
     private static func unit(_ value: Double) -> Double {
         let scaled = sin(value) * 43758.5453
         return scaled - scaled.rounded(.down)
+    }
+}
+
+/// "Zikr will start soon" under "Playing Bayan": a slow breathing glow, still with Reduce Motion.
+private struct ZikrStartsSoon: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var dim = false
+
+    var body: some View {
+        Text("Zikr will start soon")
+            .diInterfaceFont(.headline, weight: .semibold)
+            .foregroundStyle(DIColor.onPrimary.opacity(0.85))
+            .multilineTextAlignment(.center)
+            .opacity(dim ? 0.55 : 1)
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) { dim = true }
+            }
+            .accessibilityIdentifier("stage-zikr-soon")
     }
 }
 
