@@ -85,7 +85,9 @@ LATIFA_WORD = r"(?<!غ)ف[اب]\S?(?=\s|$)|ل[یاِ]?[تط][یي]?ف|تیف|ت�
 # 1st Latifa"). They are Arabic, so they are read as Arabic: "سبحان الله"
 # comes through there where the Urdu reading garbles it ("سوحانا اللہ").
 RECITATION_WORDS = [
-    ("tasbih", r"سبح[اـ]?ن|سبحن"),
+    # 2026-11-10 Daily Zikr: the Arabic reading of the opening Tasbih came as
+    # "سوحان الله و الحمد لله و لا ..." (و for ب) and the stage never moved.
+    ("tasbih", r"س[بو]ح[اـ]?ن|سبحن"),
     ("istighfar", r"ستغفر|استغفار"),
     ("shahadah", r"[أا]شهد|شهد [أا]ن"),
     ("taawwudh", r"[أا]عوذ|عوذ ب"),
