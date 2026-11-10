@@ -9,6 +9,7 @@ when the relay runs listen-only."""
 from __future__ import annotations
 
 import ctypes
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -596,6 +597,12 @@ def room_status(view: View, markers: list[str], room: str = "") -> tuple[str, st
             # Joined, but another page (home, settings) is in front.
             return "unknown", "the room's tab is open but not shown"
         return "out", "no room open in Paltalk"
+    if room_chatters(view) == 0:
+        # 9 November, Contabo: Paltalk listed the room, its panel and topic,
+        # but drew nothing and counted 0 chatters - the room was not open,
+        # and a Zikr started on it with silence for 22 minutes. An open
+        # room always has its host in it.
+        return "unknown", "the room's tab shows 0 chatters (not open yet)"
     wanted = [m.lower() for m in markers if m]
     if not wanted:
         return "in", "room open"
@@ -605,6 +612,19 @@ def room_status(view: View, markers: list[str], room: str = "") -> tuple[str, st
             if any(m in text.lower() for m in wanted):
                 return "in", text
     return "unknown", "a room is open but its topic does not match"
+
+
+CHATTERS = re.compile(r"^\s*(\d+)\s+chatters?\s*$", re.IGNORECASE)
+
+
+def room_chatters(view: View) -> int | None:
+    """The chatter count under Active Rooms ("46 chatters"), or None when
+    Paltalk does not show one to UI automation."""
+    for element in view.all(contains=".RoomItem_"):
+        match = CHATTERS.match(_name(element))
+        if match:
+            return int(match.group(1))
+    return None
 
 
 def room_tab_open(view: View) -> bool:
