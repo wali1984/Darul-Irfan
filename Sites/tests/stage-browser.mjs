@@ -112,6 +112,24 @@ try {
     await page.context().close(); await broadcast.context().close();
   });
 
+  await check("the Tasbihat are shown as their whole Arabic text, their name only the label", async () => {
+    state.live = true; go("tasbih");
+    const page = await open(oursheikh.base, "/");
+    await page.locator("#live").scrollIntoViewIfNeeded();
+    await said(page, "sheikh-stage", "Now: Tasbihat");
+    const card = page.locator("#sheikh-stage .card");
+    assert.equal(await card.locator(".label").textContent(), "Tasbihat");
+    assert.equal(await card.locator(".title").isVisible(), false);
+    assert.match(await card.locator(".arabic").textContent(), /^سُبْحَانَ اللّٰهِ .* الْعَظِيمِ$/);
+    await page.waitForTimeout(1200);
+    await shot(page, "01d-desktop-tasbihat", "#live");
+    const broadcast = await open(oursheikh.base, "/broadcast", { width: 1920, height: 1080 });
+    await broadcast.waitForFunction(() => document.querySelector(".card .arabic")?.textContent.startsWith("سُبْحَانَ"), null, { timeout: 12000 });
+    await broadcast.waitForTimeout(1500);
+    await shot(broadcast, "01e-broadcast-tasbihat");
+    await page.context().close(); await broadcast.context().close();
+  });
+
   await check("desktop: each stage in turn, picture beside the card, the order of the Zikr lit", async () => {
     state.live = true; go("tasbih");
     const page = await open(oursheikh.base, "/");

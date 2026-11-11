@@ -23,6 +23,8 @@ export async function loadSites() {
 export const PICTURE = "https://i.ytimg.com/vi/OIMsVhzqQ-g/maxresdefault.jpg";
 
 // The stage titles as the platform sends them (Server DEFAULT_ZIKR_STAGES).
+// The platform's own Arabic for the opening recitations (Server/src/groupZikrStages.ts RECITATIONS).
+export const ARABIC = { tasbih: "سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيمِ" };
 export const TITLES = {
   tasbih: ["Tasbihat", "تسبیحات"], "latifa-1": ["1st Latifa", "پہلا لطیفہ"], "latifa-3": ["3rd Latifa", "تیسرا لطیفہ"],
   "latifa-7": ["7th Latifa", "ساتواں لطیفہ"], raabta: ["Raabta", "رابطہ"], ahadiyat: ["Muraqaba Ahadiyat", "مراقبہ احدیت"],
@@ -35,7 +37,7 @@ export function mockPlatform() {
   const state = { live: true, stageID: "maiyyat", isTest: false, picture: PICTURE, startedAt: "2026-11-09T23:23:19.305Z", calls: 0 };
   let at = 0;
   const stage = () => state.stageID
-    ? { stageID: state.stageID, title: TITLES[state.stageID]?.[0] ?? state.stageID, titleUr: TITLES[state.stageID]?.[1] ?? "", at: new Date(Date.UTC(2026, 10, 10, 0, 0, at)).toISOString() }
+    ? { stageID: state.stageID, title: TITLES[state.stageID]?.[0] ?? state.stageID, titleUr: TITLES[state.stageID]?.[1] ?? "", ...(ARABIC[state.stageID] ? { arabic: ARABIC[state.stageID] } : {}), at: new Date(Date.UTC(2026, 10, 10, 0, 0, at)).toISOString() }
     : null;
   const env = {
     CLOSED_DOMAINS: "naqshbandiaowaisiah.us",

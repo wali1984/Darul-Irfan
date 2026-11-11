@@ -91,6 +91,8 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#04150f
 .stage.duo .mark{opacity:1;visibility:visible}
 .stage.duo .now .card{width:820px;padding:60px 36px}
 .stage.duo .now .title{font-size:112px}.stage.duo .now .urdu{font-size:68px}.stage.duo .now .arabic{font-size:54px}
+.stage .now .card.kind-recite .urdu{font-size:44px}.stage .now .card.kind-recite .arabic{font-size:84px}
+.stage.duo .now .card.kind-recite .urdu{font-size:38px}.stage.duo .now .card.kind-recite .arabic{font-size:64px}
 .now .medal{width:150px;height:150px}.now .medal b{font-size:60px}
 .now .roll{max-height:470px}.now .line{font-size:34px}
 .now .card.kind-shajra .title{font-size:84px}.now .card.kind-shajra .urdu{font-size:52px}

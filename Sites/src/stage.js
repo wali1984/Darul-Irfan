@@ -53,7 +53,9 @@ function stageStill() { return matchMedia("(prefers-reduced-motion: reduce)").ma
 function fillStage(card, s, emptyTitle) {
   const id = s ? s.stageID : null, kind = stageKind(id);
   card.className = card.className.replace(/\\bkind-\\w+/g, "").trim() + " kind-" + kind;
-  card.querySelector(".label").textContent = { recite: "Recitation", latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua", awaiting: "Bayan" }[kind] || "Now";
+  // A recitation (the Tasbihat and the rest of the opening) is shown as its
+  // own Arabic words, whole; its name is the small label (owner 2026-11-10).
+  card.querySelector(".label").textContent = kind === "recite" && s ? s.title : { latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua", awaiting: "Bayan" }[kind] || "Now";
   const medal = card.querySelector(".medal");
   medal.hidden = kind !== "latifa";
   medal.querySelector("b").textContent = kind === "latifa" ? id.slice(7) : "";
@@ -204,7 +206,10 @@ export const STAGE_STYLE = `
 @keyframes roll{to{transform:translateY(var(--dist,0))}}
 .now .line{font-size:clamp(20px,2.4vw,30px);color:#fff8e6;text-shadow:0 0 18px rgba(243,220,157,.35)}
 .now .line.closing{font-family:Amiri,serif;color:var(--gold2);margin-top:10px}
-.now .card.kind-recite .arabic{font-size:clamp(30px,4vw,52px)}
+.stage .now .card.kind-recite .title{display:none}
+.stage .now .card.kind-recite .urdu{font-size:clamp(20px,2.2vw,30px);margin-top:4px}
+.stage.duo .now .card.kind-recite .arabic{font-size:clamp(26px,3.1vw,46px)}
+.stage .now .card.kind-recite .arabic{font-size:clamp(34px,4.6vw,64px);line-height:1.95;margin-top:12px;color:var(--gold2)}
 .now .card.kind-dua{box-shadow:0 0 90px -6px rgba(243,220,157,.55),inset 0 0 50px rgba(243,220,157,.12)}
 .now .card.kind-shajra .title,.now .card.kind-dua .title{letter-spacing:.02em}
 .now .card{position:relative;margin-inline:auto;width:min(760px,100%);padding:clamp(26px,4vw,48px) 22px;border-radius:26px;
