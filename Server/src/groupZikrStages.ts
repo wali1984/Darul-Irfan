@@ -98,6 +98,17 @@ export const RECITATIONS: Recitation[] = [
  *  calling it ends the session five minutes later (owner 2026-11-05). */
 export const DUA_STAGE: ZikrStage = { id: "dua", title: "Dua", titleUr: "دعا", isCustom: false };
 
+/** What the room is doing outside the Zikr's stages, as the relay hears it
+ *  (owner 2026-11-11: the room sat silent for an hour while every screen said
+ *  "Playing Bayan", and the Bayan after the Zikr stayed on the Shajra):
+ *  nothing heard yet, a Bayan before the Zikr, a Bayan after it. On the stage
+ *  like any stage; never notified, never in the admins' list to tap. */
+export const PHASE_STAGES: ZikrStage[] = [
+  { id: "waiting", title: "Zikr will start soon", titleUr: "ذکر جلد شروع ہوگا", isCustom: false },
+  { id: "bayan", title: "Playing Bayan", titleUr: "بیان جاری ہے", isCustom: false },
+  { id: "bayan-after", title: "Playing Bayan", titleUr: "بیان جاری ہے", isCustom: false },
+];
+
 /** The stage chat's ready-made messages: all a member can send. */
 export const STAGE_PRESETS = [
   { id: "salam", title: "Assalamu alaikum wa rahmatullah", titleUr: "السلام علیکم ورحمۃ اللہ" },
@@ -361,6 +372,8 @@ async function recordCue(env: Env, memberID: string, groupID: string, input: Rec
   let stage: ZikrStage | undefined = DEFAULT_ZIKR_STAGES.find(value => value.id === stageID);
   const recitation = RECITATIONS.find(value => value.id === stageID);
   if (!stage && stageID === DUA_STAGE.id) stage = DUA_STAGE;
+  const phase = PHASE_STAGES.find(value => value.id === stageID);
+  if (!stage && phase) stage = phase;
   if (!stage && recitation) stage = { id: recitation.id, title: recitation.title, titleUr: recitation.titleUr, isCustom: false };
   if (!stage) {
     const row = await env.DB.prepare("SELECT id,title,title_ur FROM group_zikr_stages WHERE group_id=? AND id=?")
@@ -373,7 +386,7 @@ async function recordCue(env: Env, memberID: string, groupID: string, input: Rec
   const test = !!(await liveZikr(env, groupID))?.is_test;
   const result = await env.DB.prepare(`INSERT OR IGNORE INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
     VALUES(?,?,?,?,?,?,?,?)`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
-    recitation || test || stageID === DUA_STAGE.id ? "complete" : "pending").run();
+    recitation || phase || test || stageID === DUA_STAGE.id ? "complete" : "pending").run();
   const saved = await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND event_id=?")
     .bind(groupID, eventID).first<CueRow>();
   if (!saved) return json({ error: "Stage announcement could not be saved" }, { status: 503 });
