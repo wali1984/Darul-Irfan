@@ -97,3 +97,16 @@ def test_no_new_stage_right_after_the_last():
 
 def test_after_the_7th_the_return_to_the_1st_is_not_a_new_latifa():
     assert picker("latifa-7")._listened("latifa-7", "اعلار کی فا", "", 1000.0) is None
+
+
+def test_a_latifa_look_alike_inside_a_recitation_is_not_the_call():
+    # Tahajjud 10 November: "ولا حول ولا قوۃ" read with "افال" in it, 22 s before the call.
+    p = picker("tasbih")
+    assert p._listened("tasbih", "افال ان لا ایک لحظ ان لا بلا ایک لحظ ان لا بكت", "لا خلال لا يبلاحظه الله ولا يحاول", 31.0) is None
+    assert p._listened("basmalah", "بلو لطيفا", "بللطفة", 55.0) == "latifa-1"
+
+
+def test_the_tahajjud_starts_on_its_first_recitation():
+    p = picker(None)
+    p.tahajjud = True
+    assert p.decide(None, "سبحان الله اگر حوض ان لا اگر", "سبحان الله و لحوض الله", 28.0) == "tasbih"

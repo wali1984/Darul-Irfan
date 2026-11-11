@@ -57,9 +57,9 @@ NAMES = [
     ("ahadiyat", r"احد[یي]ت|عدید|احضیت|ا?حدیت"),
     ("maiyyat", r"مع[یي]ت|مائ[یي]ت|ما[یي]ت"),
     ("aqrabiyyat", r"اقرب|قرب[یيا]|[کق]ر[بم]ی?ت|نحن|نحب|حب.?ل.?ن?و.?ر[یي]د|وا?ر[یي]د"),  # "او کربیت" 10 Nov
-    ("sair-kaaba", r"سیر.?کعب|سرکب|سرکا|ارکا|کعبہ|کا بات|لب[یي]ک|لبار"),
-    ("rauza-athar", r"روض|روز[یاے]|اطہر|اثر"),
-    ("masjid-nabawi", r"مسجد|مشک|ماشی|نبوی"),
+    ("sair-kaaba", r"سیر.?کعب|سرکب|سرکا|ارکا|کعبہ|کا بات|لب[یي]ک|لبار|سر[یي]? ?کا?ب"),  # "سری کابا" 10 Nov
+    ("rauza-athar", r"روض|روز[یاے]|اطہر|اثر|[رن]وزی?ں ا|اتر[اے]ر"),  # "نوزیں اترار" 10 Nov
+    ("masjid-nabawi", r"مسجد|مشک|ماشی|نبوی|مس\S{0,4} ?نب[یيو]"),  # "مستین نبی" 10 Nov
     ("raabta", r"رابط|رابطہ"),
 ]
 
@@ -90,14 +90,21 @@ RECITATION_WORDS = [
     ("tasbih", r"س[بو]?ح[اـ]?ن|سبحن|سوان ال"),
     # As read on 10 November: "اسقاف الله ربي", "اصفلار", "اشادر لا اللہ اوشاد",
     # "اوز بالام", "مسم اللہ رخمان".
-    ("istighfar", r"ستغفر|استغفار|استغف|اسقاف ال|صفلار|سفلار"),
+    ("istighfar", r"ستغفر|استغفار|استغف|اسقاف ال|صفلار|سفلار|استفن|[اأ]سف ل?ن?رب|رب[يی] من ك|رب[یي]م ا?ن ?کول"),
     ("shahadah", r"[أا]شهد|شهد [أا]ن|[أا]?شاد[رن]? |اوشاد|شادن"),
     ("taawwudh", r"[أا]عوذ|عوذ ب|[أا]وز بال|عوز بال"),
     ("basmalah", r"بسم|مسم ال|ر[حخ]مان"),
 ]
 # The Tasbih before any stage needs more than "سبحان اللہ" (a bayan says it):
 # its next words too ("والحمد لله", "الله اكبر").
-TASBIH_MORE = r"حمد|[اأ]كبر|اکبر"
+TASBIH_MORE = r"حمد|[اأ]كبر|اکبر|لا ?[إا]له|ایلہ|لا ?حول|حول ب|قوات|قوة|عظيم|عظیم|مكب|مکب"
+# (Tahajjud 10 November: "سبحان الله … لا إله … لا حول بنقوات" - the third
+# Kalima - with no "الحمد" read.)
+# The opening heard as a run: three different recitations within OPENING_WINDOW,
+# one of them the Tasbih, Istighfar or Shahadah, is the Zikr's opening even when
+# no single reading was clear and even though recitation reads as talk (the
+# Tahajjud's opening was refused as talk). A bayan quotes one at a time.
+OPENING_RUN = 3
 RECITE_EVERY = 8.0  # seconds between readings of the opening's voice
 # Listening (10 November 2026): the Daily Zikr's leader kept the mic open, the
 # room's Zikr was heard the whole time, no quiet ever came before a call, and
@@ -125,7 +132,7 @@ LATIFA_ONE = r"ف[ائیي]{1,2}ق[اہ]?[لن]|فعقال"
 # پانچواں): it puts the order right if a call was missed or one too many
 # was taken. Only ever forwards, and never more than two past the step.
 NUMBERS = [(1, r"پہلا"), (2, r"دوسر|نسول"), (3, r"تیسر"), (4, r"چوتھ|[شجچ]و ?[تط]ح|جو ?تل"),
-           (5, r"پانچ|انچوا|بان ?جو|باہن ?جو|بانجر"), (6, r"چھٹ"), (7, r"ساتو|سا ?تنل")]
+           (5, r"پانچ|انچوا|بان ?جو|باہن ?جو|بانجر"), (6, r"چھ[ٹڑ]"), (7, r"ساتو|سا ?تنل")]
 # (10 November: "نسولہ تیفا" = دوسرا, "جو تل دیفا" = چوتھا, "بان جو نا دیفا" =
 # پانچواں, "سا تنل دیفا" = ساتواں.)
 
@@ -214,6 +221,11 @@ class Picker:
         self.stage_at = -1e9
         self.recited: list[tuple[float, int]] = []  # opening recitations heard before any stage: (clock, index)
         self.heard: deque = deque(maxlen=120)  # (clock, whether the reading was talk), the listener's last readings
+        # The Tahajjud Zikr has no bayan and no speech: it starts with the
+        # Tasbihat and runs Lataif to the end (owner, 2026-11-10). Set by the
+        # relay for each session; then nothing heard is refused as talk and
+        # the first recitation or Latifa call starts the stages.
+        self.tahajjud = False
         self.lock = threading.Lock()
         # Readings run on one worker thread (the server has two cores; a
         # thread per reading piled up behind one lock on 6 November), from a
@@ -439,10 +451,15 @@ class Picker:
         or the 1st Latifa once the opening is on the stage (it is talk)."""
         self.heard.append((at, is_talk(urdu)))
         stage = self._listened(current, urdu, arabic, at)
-        if stage and not (current in OPENING and stage in OPENING + ("latifa-1",)) and self.talk_before(at) >= TALK_MOST:
+        opening = stage in OPENING + ("latifa-1",) and (current in OPENING or (current is None and self.opening_run(at, window=60.0)))
+        if stage and not opening and not self.tahajjud and self.talk_before(at) >= TALK_MOST:
             self.on_stage(None, f"not taken: {stage} heard in the middle of talk ({urdu[:40]})")
             return None
         return stage
+
+    def opening_run(self, at: float, window: float = OPENING_WINDOW) -> bool:
+        heard = {i for t, i in self.recited if at - t <= window}
+        return len(heard) >= OPENING_RUN and min(heard) <= 2
 
     def talk_before(self, at: float) -> float:
         """The share of the listener's readings that were talk, from
@@ -459,6 +476,8 @@ class Picker:
             for index, (recitation, pattern) in enumerate(RECITATION_WORDS):
                 if index <= after or not re.search(pattern, both):
                     continue
+                if current is None and self.tahajjud:
+                    return recitation  # no bayan before the Tahajjud: its first recitation is the Zikr
                 if current is None:
                     # Before any stage only the Zikr's own opening starts it: the
                     # Tasbih with its next words, or the Istighfar or Shahadah
@@ -467,6 +486,8 @@ class Picker:
                     # read as the 1st Latifa that way), so those never start it.
                     tasbih_before = any(i == 0 for t, i in self.recited if at - t <= OPENING_WINDOW)
                     self.recited = [(t, i) for t, i in self.recited if at - t <= 60.0] + [(at, index)]
+                    if self.opening_run(at):
+                        return recitation
                     if index == 0 and not re.search(TASBIH_MORE, both):
                         continue
                     if index > 0 and not (index <= 2 and tasbih_before):
@@ -475,8 +496,11 @@ class Picker:
             # The 1st Latifa's call ends the opening. Before any stage (the
             # opening missed) only after a recitation in the minute before it,
             # and - like every stage heard - not in the middle of talk.
-            if re.search(LATIFA_WORD, urdu) or re.search(LATIFA_ONE, both) or latifa_number(urdu) == 1:
-                if current is not None or any(at - t <= 60.0 for t, _ in self.recited):
+            # The call is a word or two ("پہلا لطیفہ"); a recitation reads as many
+            # words, one of which can look like Latifa ("افال" in "ولا حول ولا قوۃ",
+            # Tahajjud 10 November) - so never from a long reading.
+            if (re.search(LATIFA_WORD, urdu) or re.search(LATIFA_ONE, both) or latifa_number(urdu) == 1) and not is_talk(urdu):
+                if current is not None or self.tahajjud or self.opening_run(at, window=60.0):
                     return "latifa-1"
             return None
         if since < STAGE_GAP:

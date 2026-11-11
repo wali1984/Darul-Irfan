@@ -120,6 +120,10 @@ def typed_stage(text: str) -> str | None:
     return None if stage in OPENING_STAGES else stage
 
 
+def tahajjud_hours() -> bool:
+    """The Tahajjud Zikr's time: before 07:00 in Pakistan (UTC+5)."""
+    return (time.gmtime().tm_hour + 5) % 24 < 7
+
 def log(message: str) -> None:
     print(f"{time.strftime('%H:%M:%S')} {message}", flush=True)
 
@@ -838,7 +842,7 @@ class Relay:
         if not self.platform_cues or time.time() - self.last_start_try < 30:
             return
         self.last_start_try = time.time()
-        title = "Tahajjud Zikr" if (time.gmtime().tm_hour + 5) % 24 < 7 else "Daily Zikr"
+        title = "Tahajjud Zikr" if tahajjud_hours() else "Daily Zikr"
         status, body = await asyncio.to_thread(self.platform_cues.start, title)
         if status in (200, 201):
             self.platform_live = True
@@ -897,6 +901,7 @@ class Relay:
             self.platform_live = False
         if self.picker:
             self.picker.reset()
+            self.picker.tahajjud = tahajjud_hours()
 
     def _health(self, now: float) -> None:
         """One line a minute while in the room or while a Zikr is live: what

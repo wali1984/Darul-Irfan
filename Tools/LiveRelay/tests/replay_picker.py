@@ -18,6 +18,7 @@ def on_stage(stage, why):
     print(f"{int(t//60):02d}:{t%60:04.1f}  -> {stage}   ({why})", flush=True)
     if stage: state["stage"] = stage
 picker = ap.Picker(on_stage, lambda: state["stage"], inline=True)
+picker.tahajjud = len(sys.argv) > 4 and sys.argv[4] == "tahajjud"  # the Tahajjud has no bayan
 t0 = time.time()
 for i in range(0, len(x), 4800):
     picker.feed(x[i:i + 4800])
