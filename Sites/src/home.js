@@ -70,7 +70,7 @@ function portrait(picture) {
  *  picture of the YouTube and Facebook streams (sound comes from the live feed).
  *  Our Sheikh's stage carries Hazrat ji's picture beside the stage, as in the app
  *  (owner 2026-11-05). */
-export function broadcastPage(site, initial, halqahID) {
+export function broadcastPage(site, initial, halqahID, preview = null) {
   const sheikh = halqahID === "our-sheikh";
   // "\\u003c" as on the home page: a title can never close the script tag it travels in.
   const state = JSON.stringify({ ...initial, halqahID }).replace(/</g, "\\u003c");
@@ -112,7 +112,19 @@ ${stageScreen("b-stage", "", { rail: false })}
       picture: ${sheikh} ? data.picture || data.pictureFallback : null, fallback: data.pictureFallback });
   }
   show();
-  setInterval(async () => { try { const r = await fetch("/data.json", { cache: "no-store" }); if (r.ok) { data = { ...(await r.json()), halqahID: data.halqahID }; show(); } } catch {} }, 3000);
+  const preview = ${JSON.stringify(preview)};
+  if (preview) {
+    // A stage drawn ahead of time for the relay (?stage=): still, never
+    // followed; the Shajra's lines held where ?roll= (0 to 1) puts them.
+    setTimeout(() => {
+      const roll = document.querySelector(".roll"), lines = roll && roll.querySelector(".lines");
+      if (!lines || roll.hidden) return;
+      lines.classList.remove("run");
+      lines.style.transform = "translateY(" + (-Math.max(0, lines.scrollHeight - roll.clientHeight) * preview.roll) + "px)";
+    }, 100);
+  } else {
+    setInterval(async () => { try { const r = await fetch("/data.json", { cache: "no-store" }); if (r.ok) { data = { ...(await r.json()), halqahID: data.halqahID }; show(); } } catch {} }, 3000);
+  }
 })();
 </script></body></html>`;
 }
@@ -202,7 +214,7 @@ const CLIENT = `
   // Hazrat ji's picture beside it.
   function stage(box, s, live) {
     const sheikh = box.id === "sheikh-stage" || (box.id === "p-stage" && !!joined && joined.id === "our-sheikh");
-    shown[box.id] = showStage(box, s, live, { last: shown[box.id], waiting: "Playing Bayan",
+    shown[box.id] = showStage(box, s, live, { last: shown[box.id],
       picture: sheikh ? data.picture || data.pictureFallback : null, fallback: data.pictureFallback });
   }
   function chip(node, live) {
@@ -389,7 +401,8 @@ const CLIENT = `
     $("p-name").textContent = h.name;
     $("player").classList.add("open"); document.body.style.overflow = "hidden";
     apply(session);
-    // The stage every 5 seconds from the page's data; still here every 30 for the admins' attendance.
+    // The stage every 3 seconds from the page's data (5 put it seconds behind the
+    // sound, owner 2026-11-11); still here every 30 for the admins' attendance.
     poll = setInterval(async () => {
       try {
         const r = await fetch("/data.json", { cache: "no-store" });
@@ -400,7 +413,7 @@ const CLIENT = `
         if (!now || !now.live) return ended();
         apply(now);
       } catch {}
-    }, 5000);
+    }, 3000);
     presence = setInterval(() => {
       fetch("/presence/" + h.id, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ guestSecret: secret() }) }).catch(() => {});
     }, 30000);

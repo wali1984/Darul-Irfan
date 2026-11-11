@@ -94,11 +94,23 @@ try {
     await page.context().close();
   });
 
-  await check("live before the first stage: Playing Bayan, then the Zikr will start soon", async () => {
+  await check("live before the first stage, nothing heard: the Zikr will start soon (never Playing Bayan)", async () => {
     state.live = true; go(null);
     const page = await open(oursheikh.base, "/");
     await page.locator("#live").scrollIntoViewIfNeeded();
-    await said(page, "sheikh-stage", "The Zikr is live. Playing Bayan; the Zikr will start soon.");
+    await said(page, "sheikh-stage", "The Zikr is live and will start soon.");
+    const f = await stageFacts(page, "sheikh-stage");
+    assert.equal(f.on, true); assert.equal(f.title, "Zikr will start soon"); assert.equal(f.urdu, "ذکر جلد شروع ہوگا");
+    assert.equal(await page.locator("#sheikh-stage .card .next").textContent(), "");
+    assert.equal(await page.locator("#sheikh-stage .card .label").textContent(), "Live");
+    await page.context().close();
+  });
+
+  await check("a Bayan heard before the Zikr: Playing Bayan, then the Zikr will start soon", async () => {
+    state.live = true; go("bayan");
+    const page = await open(oursheikh.base, "/");
+    await page.locator("#live").scrollIntoViewIfNeeded();
+    await said(page, "sheikh-stage", "Now: Playing Bayan");
     const f = await stageFacts(page, "sheikh-stage");
     assert.equal(f.on, true); assert.equal(f.title, "Playing Bayan"); assert.equal(f.urdu, "بیان جاری ہے");
     assert.equal(await page.locator("#sheikh-stage .card .next").textContent(), "Zikr will start soon · ذکر جلد شروع ہوگا");
@@ -110,6 +122,31 @@ try {
     await broadcast.waitForTimeout(1200);
     await shot(broadcast, "01c-broadcast-bayan");
     await page.context().close(); await broadcast.context().close();
+  });
+
+  await check("the Bayan after the Zikr: Playing Bayan, nothing promised, every stage done", async () => {
+    state.live = true; go("bayan-after");
+    const page = await open(oursheikh.base, "/");
+    await page.locator("#live").scrollIntoViewIfNeeded();
+    await said(page, "sheikh-stage", "Now: Playing Bayan");
+    assert.equal(await page.locator("#sheikh-stage .card .next").textContent(), "");
+    assert.equal(await page.locator("#sheikh-stage .rail li[data-stage]:not(.past)").count(), 0);
+    await page.context().close();
+  });
+
+  await check("/broadcast?stage= draws a stage ahead of time, still, the Shajra held at ?roll=", async () => {
+    const tasbih = await open(oursheikh.base, "/broadcast?stage=tasbih", { width: 1920, height: 1080 });
+    await tasbih.waitForFunction(() => /^سُبْحَانَ/.test(document.querySelector(".card .arabic")?.textContent || ""), null, { timeout: 8000 });
+    await tasbih.context().close();
+    const end = await open(oursheikh.base, "/broadcast?stage=shajra&roll=1", { width: 1920, height: 1080 });
+    await end.waitForTimeout(1500);
+    const moved = await end.evaluate(() => getComputedStyle(document.querySelector(".lines")).transform);
+    assert.notEqual(moved, "none");
+    await shot(end, "01e-broadcast-shajra-end");
+    await end.context().close();
+    const none = await open(oursheikh.base, "/broadcast?stage=none", { width: 1920, height: 1080 });
+    await none.waitForFunction(() => document.querySelector(".card .title")?.textContent === "Zikr will start soon", null, { timeout: 8000 });
+    await none.context().close();
   });
 
   await check("the Tasbihat are shown as their whole Arabic text, their name only the label", async () => {

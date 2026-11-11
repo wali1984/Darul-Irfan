@@ -4,6 +4,7 @@
 // name and a place, to listen with no controls (owner 2026-11-04). It also
 // carries the Method of Zikr and the Shajra, word for word from the app's data.
 import { broadcastPage, homePage } from "./home.js";
+import { previewStage } from "./stage.js";
 import { methodPage, shajraPage } from "./content.js";
 import { demoFile, demoPage, SHOWCASE } from "./demo.js";
 import { reportingRequest } from "./reporting/server.js";
@@ -201,6 +202,18 @@ export default {
     if (url.pathname === "/broadcast") {
       const halqah = url.searchParams.get("halqah") ?? "our-sheikh";
       if (!site.halqahs.some(h => h.id === halqah)) return Response.redirect(new URL("/broadcast", url).toString(), 302);
+      // ?stage=<id> (&roll=0..1 for the Shajra): that stage drawn ahead of
+      // time, so the relay has every picture ready and swaps it the moment
+      // the stage changes (owner 2026-11-11: the stream's picture lagged).
+      const want = url.searchParams.get("stage");
+      if (want !== null) {
+        const stage = previewStage(want);
+        if (stage === undefined) return new Response("Unknown stage", { status: 404, headers: { "cache-control": "no-store" } });
+        const now = await data(env, key);
+        now.halqahs = now.halqahs.map(h => h.id === halqah ? { ...h, live: { kind: "zikr", title: "Preview", startedAt: "preview" }, stage } : h);
+        const roll = Math.min(1, Math.max(0, Number(url.searchParams.get("roll")) || 0));
+        return html(broadcastPage(site, now, halqah, { roll }), 0);
+      }
       return html(broadcastPage(site, await data(env, key), halqah), 0);
     }
     if (url.pathname === "/method-of-zikr") return html(methodPage(site, others), 3600);

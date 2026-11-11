@@ -32,6 +32,30 @@ export const STAGE_GROUPS = [
   ["dua", "Dua", "دعا", ["dua"]],
 ];
 
+// What the room is doing outside the stages, as the relay hears it (owner
+// 2026-11-11): nothing playing yet, a Bayan before the Zikr, a Bayan after it.
+export const PHASES = [
+  ["waiting", "Zikr will start soon", "ذکر جلد شروع ہوگا"], ["bayan", "Playing Bayan", "بیان جاری ہے"],
+  ["bayan-after", "Playing Bayan", "بیان جاری ہے"],
+];
+// The opening recitations' words (Server RECITATIONS), for a stage drawn ahead
+// of time (/broadcast?stage=, the relay's ready pictures).
+export const RECITATION_ARABIC = {
+  tasbih: "سُبْحَانَ اللّٰهِ وَالْحَمْدُ لِلّٰهِ وَلَا إِلٰهَ إِلَّا اللّٰهُ وَاللّٰهُ أَكْبَرُ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰهِ الْعَلِيِّ الْعَظِيمِ",
+  istighfar: "أَسْتَغْفِرُ اللّٰهَ رَبِّي مِنْ كُلِّ ذَنْبٍ وَأَتُوبُ إِلَيْهِ",
+  shahadah: "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللّٰهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+  taawwudh: "أَعُوذُ بِاللّٰهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+  basmalah: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ",
+};
+/** A stage as the platform would send it, drawn ahead of time; null for an
+ *  unknown id ("none" is the screen before anything is heard). */
+export function previewStage(id) {
+  if (id === "none") return null;
+  const found = [...STAGES, ...PHASES].find(([key]) => key === id);
+  if (!found) return undefined;
+  return { stageID: id, title: found[1], titleUr: found[2], at: "preview", arabic: RECITATION_ARABIC[id] };
+}
+
 const NAMES = new Map(STAGES.map(([id, en, ur]) => [id, { en, ur }]));
 const json = value => JSON.stringify(value).replace(/</g, "\\u003c");
 
@@ -43,7 +67,8 @@ export const STAGE_SCRIPT = `
 const SHAJRA_LINES = ${json([...SHAJRA.entries.map(e => e.urdu), SHAJRA.closingArabic])};
 const STAGE_ORDER = ${json(STAGES.map(([id]) => id))};
 function stageKind(id) {
-  if (!id) return "awaiting";
+  if (!id || id === "waiting") return "awaiting";
+  if (id === "bayan" || id === "bayan-after") return "bayan";
   if (/^latifa-[1-7]$/.test(id)) return "latifa";
   if (["tasbih", "istighfar", "shahadah", "taawwudh", "basmalah"].includes(id)) return "recite";
   if (id === "shajra" || id === "dua") return id;
@@ -55,15 +80,18 @@ function fillStage(card, s, emptyTitle) {
   card.className = card.className.replace(/\\bkind-\\w+/g, "").trim() + " kind-" + kind;
   // A recitation (the Tasbihat and the rest of the opening) is shown as its
   // own Arabic words, whole; its name is the small label (owner 2026-11-10).
-  card.querySelector(".label").textContent = kind === "recite" && s ? s.title : { latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua", awaiting: "Bayan" }[kind] || "Now";
+  card.querySelector(".label").textContent = kind === "recite" && s ? s.title : { latifa: "Latifa", muraqaba: "Muraqaba", shajra: "Shajra", dua: "Dua", awaiting: "Live", bayan: "Bayan" }[kind] || "Now";
   const medal = card.querySelector(".medal");
   medal.hidden = kind !== "latifa";
   medal.querySelector("b").textContent = kind === "latifa" ? id.slice(7) : "";
-  // Live before the first stage: the Bayan is playing and the Zikr follows it (owner 2026-11-10).
-  card.querySelector(".title").textContent = s ? s.title : (emptyTitle || "Playing Bayan");
-  card.querySelector(".urdu").textContent = s ? (s.titleUr || "") : "بیان جاری ہے";
+  // Live before the first stage: "Playing Bayan" only while the relay hears
+  // a Bayan; nothing heard yet, the Zikr will start soon (owner 2026-11-11).
+  // The Bayan after the Zikr says no more than that.
+  const waiting = kind === "awaiting";
+  card.querySelector(".title").textContent = waiting ? (emptyTitle || "Zikr will start soon") : s.title;
+  card.querySelector(".urdu").textContent = waiting ? "ذکر جلد شروع ہوگا" : (s.titleUr || "");
   const next = card.querySelector(".next");
-  if (next) next.textContent = s ? "" : "Zikr will start soon · ذکر جلد شروع ہوگا";
+  if (next) next.textContent = id === "bayan" ? "Zikr will start soon · ذکر جلد شروع ہوگا" : "";
   card.querySelector(".arabic").textContent = s && s.arabic ? s.arabic : "";
   const roll = card.querySelector(".roll"), lines = roll.querySelector(".lines");
   lines.classList.remove("run"); lines.style.removeProperty("--dist");
@@ -105,6 +133,8 @@ function stageRail(box, s, live) {
     if (i === at) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
   });
   const custom = at < 0 && s && stageKind(s.stageID) === "muraqaba";
+  // The Bayan after the Zikr: every stage is done.
+  if (s && s.stageID === "bayan-after") rail.querySelectorAll("li[data-stage]").forEach(li => li.classList.add("past"));
   rail.querySelectorAll(".grp").forEach(g => {
     const dots = [...g.querySelectorAll("li[data-stage]")];
     g.classList.toggle("here", dots.some(li => li.classList.contains("here")) || (custom && g.dataset.group === "muraqabat"));
@@ -133,7 +163,7 @@ function showStage(box, s, live, o) {
   for (let size = parseFloat(getComputedStyle(title).fontSize); title.scrollWidth > title.clientWidth && size > (o.minTitle || 24); size -= 2) title.style.fontSize = size + "px";
   // Said once, politely, to a screen reader: the stage now, or that the Zikr ended.
   const say = box.querySelector(".say");
-  if (say) say.textContent = live ? (s ? "Now: " + s.title : "The Zikr is live. Playing Bayan; the Zikr will start soon.") : (o.last && o.last !== "off" ? "The Zikr has ended." : "");
+  if (say) say.textContent = live ? (s ? "Now: " + s.title : "The Zikr is live and will start soon.") : (o.last && o.last !== "off" ? "The Zikr has ended." : "");
   if (live && !stageStill()) { card.classList.remove("burst"); void card.offsetWidth; card.classList.add("burst"); }
   return key;
 }

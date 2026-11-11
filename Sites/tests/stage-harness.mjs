@@ -30,6 +30,7 @@ export const TITLES = {
   "latifa-7": ["7th Latifa", "ساتواں لطیفہ"], raabta: ["Raabta", "رابطہ"], ahadiyat: ["Muraqaba Ahadiyat", "مراقبہ احدیت"],
   maiyyat: ["Muraqaba Ma'iyyat", "مراقبہ معیت"], "sair-kaaba": ["Sair-e-Kaaba", "سیرِ کعبہ"], "masjid-nabawi": ["Masjid-e-Nabawi", "مسجدِ نبوی"],
   shajra: ["Shajra Sharif", "شجرہ شریف"], dua: ["Dua", "دعا"],
+  waiting: ["Zikr will start soon", "ذکر جلد شروع ہوگا"], bayan: ["Playing Bayan", "بیان جاری ہے"], "bayan-after": ["Playing Bayan", "بیان جاری ہے"],
 };
 
 /** A platform whose state the test sets: live or not, and the stage now. */
