@@ -245,7 +245,7 @@ def tester_build() -> tuple[int, str] | None:
     """(build number, version) of the newest build Apple has passed for the
     external testers."""
     assigned = group_build_ids(EXTERNAL_GROUP)
-    data = get(f"/v1/builds?filter[app]={APP}&sort=-uploadedDate&limit=20&include=preReleaseVersion,buildBetaDetail"
+    data = get(f"/v1/builds?filter[app]={APP}&filter[preReleaseVersion.platform]=IOS&sort=-uploadedDate&limit=20&include=preReleaseVersion,buildBetaDetail"
                "&fields[builds]=version,processingState,expired,preReleaseVersion,buildBetaDetail&fields[preReleaseVersions]=version"
                "&fields[buildBetaDetails]=externalBuildState")
     included = {(item["type"], item["id"]): item["attributes"] for item in data.get("included", [])}
@@ -276,7 +276,7 @@ def r2():
 def internal_build() -> tuple[int, str] | None:
     """Newest available build actually assigned to the internal tester group."""
     assigned = group_build_ids(INTERNAL_GROUP)
-    data = get(f"/v1/builds?filter[app]={APP}&sort=-uploadedDate&limit=20&include=preReleaseVersion,buildBetaDetail"
+    data = get(f"/v1/builds?filter[app]={APP}&filter[preReleaseVersion.platform]=IOS&sort=-uploadedDate&limit=20&include=preReleaseVersion,buildBetaDetail"
                "&fields[builds]=version,processingState,expired,preReleaseVersion,buildBetaDetail&fields[preReleaseVersions]=version"
                "&fields[buildBetaDetails]=internalBuildState")
     included = {(item["type"], item["id"]): item["attributes"] for item in data.get("included", [])}
