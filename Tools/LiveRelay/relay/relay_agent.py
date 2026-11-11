@@ -1132,6 +1132,9 @@ class Relay:
         url = f"{self.platform.rstrip('/')}/v1/public/live?ids={self.halqah}"
         platform_live = False
         session_key, title = "", ""
+        # Every stage's picture drawn ahead, between sessions, so the first
+        # session after a start has them all.
+        threading.Thread(target=self._prepare_pictures, daemon=True).start()
         while True:
             try:
                 data = await asyncio.to_thread(_get_json, url)
