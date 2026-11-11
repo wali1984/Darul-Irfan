@@ -671,8 +671,35 @@ struct ZikrStageView: View {
             .accessibilityIdentifier("stage-dua")
     }
 
+    /// The opening recitations: shown as their whole Arabic text, the name only
+    /// a small label above it (owner 2026-11-10: the Tasbihat, not the word).
+    static let recitations: Set<String> = ["tasbih", "istighfar", "shahadah", "taawwudh", "basmalah"]
+
     @ViewBuilder
     private func standardContent(_ cue: HalqaZikrCue) -> some View {
+        if Self.recitations.contains(cue.stageID), let arabic = cue.arabic {
+            Text(verbatim: cueTitle(cue))
+                .diInterfaceFont(.footnote, weight: .semibold).foregroundStyle(DIColor.accent)
+                .accessibilityIdentifier("stage-title")
+            if let titleUr = HalqahStage.secondaryTitle(stageID: cue.stageID, titleUr: cue.titleUr, urdu: urdu) {
+                Text(verbatim: titleUr).font(DIFont.urduBody(scale: 1.0)).foregroundStyle(DIColor.onPrimary.opacity(0.85))
+                    .multilineTextAlignment(.center)
+            }
+            Text(verbatim: arabic)
+                .font(DIFont.quranArabic(scale: 2.0)).foregroundStyle(DIColor.accent)
+                .multilineTextAlignment(.center).environment(\.layoutDirection, .rightToLeft)
+                .lineSpacing(14)
+                .minimumScaleFactor(0.5)
+                .diGoldTextShimmer(delay: 0.6)
+                .diGoldGlow(radius: 16, opacity: 0.55)
+                .accessibilityIdentifier("stage-arabic")
+        } else {
+            standardStage(cue)
+        }
+    }
+
+    @ViewBuilder
+    private func standardStage(_ cue: HalqaZikrCue) -> some View {
         if let latifa = Self.latifa(cue.stageID) {
             LatifaMedallion(number: latifa)
         }
