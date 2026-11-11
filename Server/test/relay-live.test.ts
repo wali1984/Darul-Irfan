@@ -76,6 +76,26 @@ describe("the relay's hold on a Zikr session", () => {
     expect(body.halqahs[0].live).toMatchObject({ kind: "zikr", title: "Daily Zikr", sessionID: started.sessionID });
   });
 
+  it("the room's phases (waiting, a Bayan before or after the Zikr) go on the stage and notify nobody", async () => {
+    const { env, raw, live, cue, pushes } = await setup();
+    await live({ state: "live", title: "Daily Zikr" });
+    const sent = pushes.length;
+    const stage = async () => ((await (await worker.fetch(new Request("https://api.example.com/v1/public/live?ids=usa"), env)).json()) as any).halqahs[0].stage;
+    expect((await cue("waiting", 11)).status).toBe(201);
+    expect(await stage()).toMatchObject({ stageID: "waiting", title: "Zikr will start soon", titleUr: "ذکر جلد شروع ہوگا" });
+    expect((await cue("bayan", 12)).status).toBe(201);
+    expect(await stage()).toMatchObject({ stageID: "bayan", title: "Playing Bayan", titleUr: "بیان جاری ہے" });
+    expect((await cue("shajra", 13)).status).toBe(201);
+    expect((await cue("bayan-after", 14)).status).toBe(201);
+    expect(await stage()).toMatchObject({ stageID: "bayan-after", title: "Playing Bayan" });
+    expect(raw.prepare("SELECT stage_id,notification_state FROM group_zikr_cues WHERE stage_id IN ('waiting','bayan','bayan-after') ORDER BY sequence").all())
+      .toEqual([{ stage_id: "waiting", notification_state: "complete" }, { stage_id: "bayan", notification_state: "complete" },
+        { stage_id: "bayan-after", notification_state: "complete" }]);
+    // Only the Shajra notifies; the phases never do.
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM group_zikr_cues WHERE notification_state='complete' AND stage_id='shajra'").get()).toEqual({ n: 1 });
+    expect(pushes.length).toBe(sent + 1);
+  });
+
   it("live again within the dua window resumes the session: the end is cancelled, the dua leaves the stage, nobody is notified again", async () => {
     const { env, raw, live, cue, row, history, pushes } = await setup();
     const started = await (await live({ state: "live", title: "Daily Zikr" })).json() as any;
