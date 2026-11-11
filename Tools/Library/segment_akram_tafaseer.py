@@ -3606,6 +3606,45 @@ def iter_heading_start(text: str) -> bool:
     return bool(re.match(r"\s*سور[ۃةہۂ]\s*\S+.{0,40}?رکوع", text))
 
 
+# Words corrected by eye against the printed volumes on 3 November 2026
+# (Tools/Content/Reviews/2026-11-03-akram-punctuation.md): OCR word errors, a
+# missing ayah marker or stop, and the back-cover text that had run into 2:130.
+# They were made in the seed; here they are applied last, after the markers are
+# renumbered, so a fresh run of this tool gives the rows that shipped.
+# (surah, ayahStart of the row, the words as built, the words as printed)
+HAND_FIXES = [
+    (2, 103, 'رّٰحِمِيْنَ\u200f',
+     'رّٰحِمِيْنَ\u200f ۔'),
+    (2, 130, 'ْ يَعْلَمْؕ\u200f\n\nOUR CONTACT\n\nWEBSITES: www.owaisiah.com\nwww.oursheikh.com\n\nEMAIL: ameer@lhr.comsats.net.PK\ndarulirfan@gmail.com',
+     'ْ يَعْلَمْؕ\u200f'),
+    (3, 106, 'كْفُرُوْنَ\u200f اب اپنے کفر ',
+     'كْفُرُوْنَ\u200f ﴿۱۰۶﴾ اب اپنے کفر '),
+    (6, 110, 'اٰخِرُ دَعْوٰٮهُمْ اَنِ الْحَم',
+     'اٰخِرُ دَعْوَانَا اَنِ الْحَم'),
+    (7, 8, 'فْلِحُوْنَ\u200f وہ کامیاب ہو',
+     'فْلِحُوْنَ\u200f ﴿۸﴾ وہ کامیاب ہو'),
+    (7, 56, ' وہ بڑا کریم',
+     ' وہ بڑا کریم ہے۔'),
+    (7, 105, 'ْرَآءِيْلَ بنی اسرائیل ',
+     'ْرَآءِيْلَ ۔ بنی اسرائیل '),
+    (7, 159, 'اتھ انصاف:\n\nمِنْ قَوْمِ ',
+     'اتھ انصاف:\n\nوَ مِنْ قَوْمِ '),
+    (7, 159, 'یہ ظلم ہے۔\n\nمِنْ قَوْمِ ',
+     'یہ ظلم ہے۔\n\nوَ مِنْ قَوْمِ '),
+]
+
+
+def apply_hand_fixes(rows: list[dict], report: dict | None = None) -> list[dict]:
+    for surah, start, built, printed in HAND_FIXES:
+        row = next((r for r in rows if r["surahNumber"] == surah and r["ayahStart"] == start), None)
+        if row is None or row["text"].count(built) != 1:
+            raise SystemExit(f"hand fix {surah}:{start}: {built[:40]!r} is not found once")
+        row["text"] = row["text"].replace(built, printed)
+        if report is not None:
+            report["handFixes"] = report.get("handFixes", 0) + 1
+    return rows
+
+
 def apply_section_corrections(rows: list[dict], report: dict | None = None,
                               table: list | None = None) -> list[dict]:
     """Re-cut the stretches in SECTION_CORRECTIONS. Rows must be Akram rows; the
@@ -3732,6 +3771,7 @@ def build(seed: Path, report: dict):
     rows = close_mid_sentence_cuts(rows, report)
     # Marker digits the OCR misread, once each row has its final range.
     rows, markers = renumber_markers(rows, mushaf_ayahs)
+    rows = apply_hand_fixes(rows, report)
     report["markersRenumberedToMushaf"] = markers["markersRenumberedToMushaf"]
     rows.sort(key=lambda r: (r["surahNumber"], r["ayahStart"]))
     keys = [(r["surahNumber"], r["ayahStart"]) for r in rows]

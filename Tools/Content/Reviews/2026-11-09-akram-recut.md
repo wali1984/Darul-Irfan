@@ -36,3 +36,13 @@ rows that open with their section heading: 99 before, 268 now.
 `verify_akram_rows.py` flags 305 rows (8.7%; 133 before). 294 of them open with
 their section heading, whose opening recites every ayah of the section; that is
 the same pattern as the 115 rows it flags in the reviewed surahs 1-9.
+
+## Follow-up, 2026-11-10
+
+- The 3 November corrections (nine word fixes in 2:103, 2:130, 3:106, 6:110, 7:8,
+  7:56, 7:105 and 7:159) are now HAND_FIXES in the tool, applied last, so
+  `segment_akram_tafaseer.py --write` reproduces the shipped rows byte for byte:
+  no surahs need restoring by hand after a run.
+- `verify_akram_rows.py` leaves out a section's opening recitation (its heading,
+  then the Arabic of ayat a..b up to the marker of b). It now flags 23 rows
+  (0.66%), under its 5% gate; 3,800 opening recitations are left out.
