@@ -53,6 +53,7 @@ audio_picker = types.ModuleType("audio_picker")
 audio_picker.ORDER = ["tasbih", "latifa-1", "latifa-2", "latifa-3", "latifa-4", "latifa-5", "latifa-6", "latifa-7",
                       "raabta", "ahadiyat", "maiyyat", "aqrabiyyat", "sair-kaaba", "rauza-athar", "masjid-nabawi", "shajra"]
 audio_picker.ahead = lambda a, b: b is None or audio_picker.ORDER.index(a) > audio_picker.ORDER.index(b)
+audio_picker.WAITING, audio_picker.BAYAN, audio_picker.BAYAN_AFTER = "waiting", "bayan", "bayan-after"
 sys.modules["audio_picker"] = audio_picker
 
 import relay_agent as ra  # noqa: E402

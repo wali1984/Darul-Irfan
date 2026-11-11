@@ -55,7 +55,7 @@ STALE_SECONDS = 30.0  # a reading whose clip is this old is skipped: the stage h
 # Whisper garbles those, so the order carries the Latifas.
 NAMES = [
     ("ahadiyat", r"احد[یي]ت|عدید|احضیت|ا?حدیت"),
-    ("maiyyat", r"مع[یي]ت|مائ[یي]ت|ما[یي]ت"),
+    ("maiyyat", r"مع[یي]ت|مائ[یي]ت|ما[یي]ت|مائی ?ا[یي]ت"),  # "مائی ایت" 11 Nov
     ("aqrabiyyat", r"اقرب|قرب[یيا]|[کق]ر[بم]ی?ت|نحن|نحب|حب.?ل.?ن?و.?ر[یي]د|وا?ر[یي]د"),  # "او کربیت" 10 Nov
     ("sair-kaaba", r"سیر.?کعب|سرکب|سرکا|ارکا|کعبہ|کا بات|لب[یي]ک|لبار|سر[یي]? ?کا?ب"),  # "سری کابا" 10 Nov
     ("rauza-athar", r"روض|روز[یاے]|اطہر|اثر|[رن]وزی?ں ا|اتر[اے]ر"),  # "نوزیں اترار" 10 Nov
@@ -124,6 +124,19 @@ OPENING_WINDOW = 45.0  # the opening recitations follow each other within second
 TALK_BEFORE = 30.0
 TALK_SKIP = 6.0
 TALK_MOST = 0.4
+# What the room is doing outside the stages (owner, 11 November: the room sat
+# silent for an hour while every screen said "Playing Bayan", and the Bayan
+# after the Zikr stayed on the Shajra): nothing playing, a Bayan before the
+# Zikr, a Bayan after it. Stages on the platform like any other; to the
+# picker the first two are "no stage yet" and the last is "the Shajra".
+WAITING, BAYAN, BAYAN_AFTER = "waiting", "bayan", "bayan-after"
+PHASE_WINDOW = 30.0      # the readings a phase is judged on: the last 30 s
+PHASE_TALK = 0.6         # a Bayan: most of them talk...
+PHASE_READINGS = 10      # ...and at least this many (a reading a second while there is sound)
+WAITING_QUIET = 20.0     # before the Zikr, this long without a sound: nothing is playing
+BAYAN_QUIET = 60.0       # a Bayan's pause is not its end
+AFTER_SHAJRA = 90.0      # the Bayan after the Zikr: talk 90 s after the Shajra began (its dua comes first)
+PHASE_GAP = 20.0         # a phase changes at most this often
 # "لطیفہ قلب" (the 1st) as read on 10 November: "لدی فائقان", "نتفعقال", "فيقال".
 LATIFA_ONE = r"ف[ائیي]{1,2}ق[اہ]?[لن]|فعقال"
 
@@ -226,6 +239,8 @@ class Picker:
         # relay for each session; then nothing heard is refused as talk and
         # the first recitation or Latifa call starts the stages.
         self.tahajjud = False
+        self.phase_at = -1e9  # when a phase (waiting, a Bayan) was last given
+        self.last_sound = 0.0  # the last frame above LOUD_DB, whatever the room's floor
         self.lock = threading.Lock()
         # Readings run on one worker thread (the server has two cores; a
         # thread per reading piled up behind one lock on 6 November), from a
@@ -239,9 +254,45 @@ class Picker:
         self.dropped = 0  # readings pushed out of the queue by newer ones
         self.skipped = 0  # readings skipped as stale when their turn came
 
+    def _current(self) -> str | None:
+        """The platform's stage as the order sees it: before the Zikr (nothing
+        yet, or a phase) no stage; the Bayan after it, the Shajra."""
+        stage = self.current_stage()
+        if stage in (WAITING, BAYAN):
+            return None
+        return "shajra" if stage == BAYAN_AFTER else stage
+
+    def _phase(self) -> None:
+        """Once a second: the room's phase outside the stages, from its sound
+        (silence) and the listener's readings (talk). Never a Bayan in the
+        Tahajjud, which has none."""
+        raw = self.current_stage()
+        if self.clock - self.phase_at < PHASE_GAP:
+            return
+        recent = [talk for t, talk in list(self.heard) if self.clock - t <= PHASE_WINDOW]  # a copy: the worker adds to it
+        talking = len(recent) >= PHASE_READINGS and sum(recent) / len(recent) >= PHASE_TALK
+        # Silence by the level alone: a long Bayan lifts the room's "quiet"
+        # floor until its own words stop counting as voice (bayan-2: it
+        # flipped between Bayan and waiting every 20 s while talk went on).
+        quiet = self.clock - self.last_sound
+        if raw in (None, WAITING, BAYAN):
+            if raw != BAYAN and talking and not self.tahajjud:
+                phase, why = BAYAN, f"talk in {sum(recent)} of {len(recent)} readings before the Zikr"
+            elif raw != WAITING and not recent and quiet >= (BAYAN_QUIET if raw == BAYAN else WAITING_QUIET):
+                phase, why = WAITING, f"no sound for {quiet:.0f} s before the Zikr"
+            else:
+                return
+        elif raw == "shajra" and talking and not self.tahajjud and self.clock - self.stage_at >= AFTER_SHAJRA:
+            phase, why = BAYAN_AFTER, f"talk in {sum(recent)} of {len(recent)} readings after the Shajra"
+        else:
+            return
+        self.phase_at = self.clock
+        self._give(phase, why)
+
     def reset(self) -> None:
         """A new session: forget the last one's calls, and skip its readings."""
         self.generation += 1
+        self.phase_at = -1e9
         with self.jobs_ready:
             self.jobs.clear()
         self.reads.clear()
@@ -309,11 +360,15 @@ class Picker:
         if len(self.history) % 10 == 0:
             self.floor = float(np.percentile(self.history, 20))
         loud = db > max(LOUD_DB, self.floor + ABOVE_FLOOR_DB)
+        if db > LOUD_DB:
+            self.last_sound = self.clock
         self.audio.append(frame)
         self.levels.append(loud)
-        stage = self.current_stage()
+        stage = self._current()
         if stage != self.seen_stage:
             self.seen_stage, self.stage_at = stage, self.clock
+        if round(self.clock * 10) % 10 == 0:
+            self._phase()
         if (self.read_calls and self.clock - self.last_listen >= LISTEN_EVERY - 1e-6
                 and len(self.audio) >= LISTEN_SECONDS * 10
                 and max(list(self.history)[-int(LISTEN_SECONDS * 10):]) > LOUD_DB):
@@ -342,7 +397,7 @@ class Picker:
             # gone quiet after it, as it does in the Zikr; a bayan before
             # the Zikr talks on.
             (at, first), self.first_call = self.first_call, None
-            if self.current_stage() is None and self.read_calls:
+            if self._current() is None and self.read_calls:
                 # What was said after the call: the Zikr's quiet reads as
                 # nothing (or one word over and over), a bayan as sentences.
                 clip = np.concatenate(list(self.audio)[-int(FIRST_QUIET * 10):])
@@ -378,7 +433,7 @@ class Picker:
     def _call(self, at: float, heard: float, quick: bool) -> None:
         if at - self.last_call <= 45:
             return  # a stage was given moments ago: this is the ayah after its call
-        step = next_stage(self.current_stage())
+        step = next_stage(self._current())
         if not self.read_calls:
             if step:
                 self.last_call = at
@@ -428,7 +483,7 @@ class Picker:
         last stage (whoever set it)."""
         generation = self.generation
         with self.lock:
-            current = self.current_stage()
+            current = self._current()
             opening = current is None or current in OPENING
             try:
                 urdu = self.transcribe(clip)
@@ -436,7 +491,7 @@ class Picker:
             except Exception as error:  # noqa: BLE001 - the typed cues still carry the stage
                 self.on_stage(None, f"could not listen: {error}")
                 return
-            if generation != self.generation or self.current_stage() != current:
+            if generation != self.generation or self._current() != current:
                 return  # a new session, or the stage moved while this was read
             stage = self.decide(current, urdu, arabic, at)
             if stage:
@@ -527,7 +582,7 @@ class Picker:
             except Exception as error:  # noqa: BLE001 - the typed cues still carry the stage
                 self.on_stage(None, f"could not read after the call: {error}")
                 return
-            if self.current_stage() is not None or generation != self.generation:
+            if self._current() is not None or generation != self.generation:
                 return
             if len(set(words)) <= 2:
                 self.last_call = at
@@ -537,7 +592,7 @@ class Picker:
 
     def _settle(self, text: str, step: str | None, heard: float, at: float, how: str) -> bool:
         if step == "recite":
-            current = self.current_stage()
+            current = self._current()
             # Before any stage only the Tasbih can begin it; then each
             # recitation in turn (one may be missed, never gone back to).
             after = -1 if current is None else (OPENING.index(current) if current in OPENING else 99)
@@ -547,7 +602,7 @@ class Picker:
                     self._give(recitation, f"the opening recitation ({text[:40]})")
                     return True
             return False
-        current = self.current_stage()
+        current = self._current()
         if step in ORDER and current in ORDER and ORDER.index(step) <= ORDER.index(current):
             return True  # the stage moved on meanwhile (a tap, a typed cue): nothing to do
         when = f"{self.clock - at:.1f} s after it began, {heard:.1f} s of voice"
@@ -562,6 +617,11 @@ class Picker:
             self.last_call = at
             self._give(named, f"the call named it ({text[:40]}; {when})")
             return True
+        if step == "raabta" and not is_call(text, step) and is_call(text, "ahadiyat"):
+            # Raabta passes in seconds and is often not called: a Muraqaba's
+            # call (an ayah, no "Latifa") after the 7th Latifa is the first
+            # Muraqaba's (11 November: missed, then every Muraqaba after it).
+            step = "ahadiyat"
         if step and is_call(text, step):
             number = latifa_number(text) if step.startswith("latifa-") else None
             if number and ahead(f"latifa-{number}", current) and number <= int(step[7:]) + 2:

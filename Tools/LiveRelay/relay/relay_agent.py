@@ -35,7 +35,8 @@ PENDING_FILE = HERE / "pending_cues.json"  # cues the platform has not acknowled
 sys.path.insert(0, str(HERE))
 
 import paltalk_ui as pt  # noqa: E402
-from audio_picker import ORDER, ahead  # noqa: E402
+from audio_picker import BAYAN, BAYAN_AFTER, ORDER, WAITING, ahead  # noqa: E402
+PHASES = (WAITING, BAYAN, BAYAN_AFTER)  # the room outside the stages (11 November)
 from audio_io import BufferTrack, DeviceInput, DeviceOutput, PcmBuffer, drain  # noqa: E402
 from cues import PlatformCues, is_dua, stage_id  # noqa: E402
 from live_client import ApiError, Worker, publish, pull  # noqa: E402
@@ -58,7 +59,7 @@ CLOSE_DUA_EVERY = 10.0  # seconds between tries of the dua after the room closed
 CLOSE_DUA_FOR = 600.0   # ...and how long before giving up on it
 TOKEN_REFUSED = "the platform refused the relay token"
 START_VOICE = 5.0    # (kept for tests) seconds of sound; the Zikr now starts on joining the open room
-DUA_AFTER = {"masjid-nabawi", "shajra"}  # stages after which members' "aameen" means the dua
+DUA_AFTER = {"masjid-nabawi", "shajra", "bayan-after"}  # stages after which members' "aameen" means the dua
 AMEEN = re.compile(r"\b(aa?mee?n|ameen|amin|aameen)\b|آمین|آمِین|امین", re.IGNORECASE)
 # Opening recitations come from the room's sound only: a host's "Astaghfirullah"
 # during the dua is devotion, not a cue (6 November).
@@ -273,6 +274,10 @@ class Relay:
             self.camera = PaltalkCamera()
         self.picture = StagePicture(cfg.get("BROADCAST_PAGE", f"https://oursheikh.wajidali.us/broadcast?halqah={self.halqah}"),
                                     platform, self.halqah, HERE / "stage.png")
+        self.programme_live = False  # the stream was on at the last look
+        self.picture_stage: str | None = None  # the stage the stream's picture follows, and since when
+        self.picture_since = 0.0
+        self.picture_shown: bytes | None = None  # the ready picture on the stream now
         token = cfg.get("PLATFORM_CUE_TOKEN", "")
         # PLATFORM_TEST=1 (simulations): the platform's Test Zikr - admins
         # only, no notifications.
@@ -1140,21 +1145,29 @@ class Relay:
                 pass
             on_air_app = (self.state.get("active") or {}).get("source") == "app"
             live = self.has_lease and (platform_live or on_air_app)
+            if live and not self.programme_live:
+                # A session begins: any stage picture missing or old is drawn now.
+                threading.Thread(target=self._prepare_pictures, daemon=True).start()
+            self.programme_live = live
             if live:
                 if self.youtube:
                     # The broadcast first, so YouTube has somewhere to put the
                     # picture when the encoder connects; the encoder never waits
                     # on the API (a Studio-made broadcast would still take it).
                     await self._youtube_live(session_key or "app", title)
-                try:
-                    picture = await asyncio.to_thread(self.picture.refresh)
-                except Exception as error:  # noqa: BLE001 - the previous picture stays on
-                    log(f"[stage] picture not refreshed: {error!r}")
-                    picture = None
-                if picture:
-                    self.programme.set_picture(picture)
-                    if self.camera:
-                        await asyncio.to_thread(self.camera.set_picture, picture)
+                await self._show_ready_picture()
+                if self.picture_shown is None:
+                    # No picture drawn ahead for this stage (a custom Muraqaba,
+                    # or none drawn yet): capture the live page, as before.
+                    try:
+                        picture = await asyncio.to_thread(self.picture.refresh)
+                    except Exception as error:  # noqa: BLE001 - the previous picture stays on
+                        log(f"[stage] picture not refreshed: {error!r}")
+                        picture = None
+                    if picture:
+                        self.programme.set_picture(picture)
+                        if self.camera:
+                            await asyncio.to_thread(self.camera.set_picture, picture)
                 self.programme.start()
             else:
                 self.programme.stop()
@@ -1162,7 +1175,39 @@ class Relay:
                     await self._youtube_done()
                 if self.camera:  # between sessions: the Silsila's resting frame, never an old stage
                     await asyncio.to_thread(self.camera.set_picture, (HERE / "daily_zikr_frame.png").read_bytes())
-            await asyncio.sleep(5)
+            # The stage's own picture within half a second of the stage
+            # changing (the relay's own cue moves platform_stage at once).
+            for _ in range(10):
+                await asyncio.sleep(0.5)
+                if live:
+                    await self._show_ready_picture()
+
+    def _prepare_pictures(self) -> None:
+        try:
+            self.picture.prepare()
+        except Exception as error:  # noqa: BLE001 - the live capture still works
+            log(f"[stage] ready pictures failed: {error!r}")
+
+    async def _show_ready_picture(self) -> None:
+        """The current stage's picture drawn ahead of time, on the stream as
+        soon as the stage changes; picture_shown is None when there is none
+        for it (the live page is captured instead)."""
+        stage = self.platform_stage if self.platform_is_live else None
+        if stage != self.picture_stage:
+            self.picture_stage, self.picture_since = stage, time.time()
+        try:
+            png = self.picture.ready(stage, time.time() - self.picture_since)
+        except Exception:  # noqa: BLE001 - a file being written; the next look finds it
+            png = None
+        if png is None:
+            self.picture_shown = None
+            return
+        if png is not self.picture_shown:
+            self.picture_shown = png
+            self.programme.set_picture(png)
+            log(f"[stage] picture: {stage or 'before the first stage'} (drawn ahead)")
+            if self.camera:
+                await asyncio.to_thread(self.camera.set_picture, png)
 
     async def _youtube_live(self, session_key: str, title: str) -> None:
         """The session's broadcast made (or found again) and, every 30 s,
@@ -1274,7 +1319,8 @@ class Relay:
             log(f"[picker] {why}")
             return
         if not (self.has_lease and self.joined and self.platform_is_live) or self.mode == "app":
-            log(f"[picker] heard {stage} ({why}) but no Zikr is being relayed")
+            if stage not in PHASES:  # the room's silence between sessions says nothing
+                log(f"[picker] heard {stage} ({why}) but no Zikr is being relayed")
             return
         if self.dua_shown:
             log(f"[picker] heard {stage} ({why}) during the dua: ignored")

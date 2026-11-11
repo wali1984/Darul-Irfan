@@ -11,6 +11,7 @@ import subprocess
 import tempfile
 import threading
 import time
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -19,6 +20,22 @@ USER_AGENT = "DarulIrfanRelay/1.0"
 REFRESH_EVERY = 600  # re-capture anyway, in case the page's look changed
 RETRY_AFTER = 300  # after a failed capture: Edge is the heaviest thing on the server
 MIN_COMMIT_MB = 2500  # Edge is never started with less memory than this left
+
+# Every stage's picture drawn ahead of time (/broadcast?stage=<id>), so the
+# stream's picture changes the moment the stage does: a capture after the
+# change took 5-10 s (owner, 11 November: "more than 5 seconds delay"). "none"
+# is the screen before anything is heard.
+READY_STAGES = ["none", "waiting", "bayan", "tasbih", "istighfar", "shahadah", "taawwudh", "basmalah",
+                "latifa-1", "latifa-2", "latifa-3", "latifa-4", "latifa-5", "latifa-6", "latifa-7", "raabta",
+                "ahadiyat", "maiyyat", "aqrabiyyat", "sair-kaaba", "rauza-athar", "masjid-nabawi", "shajra", "dua",
+                "bayan-after"]
+# The Shajra's lines rise through its card on the websites (3.5 s a line, 14
+# lines, after a second); a still picture showed only its first lines for
+# good (11 November: "Shajra didn't complete"). The stream steps through
+# these frames instead, the last held until the next stage.
+SHAJRA_FRAMES = 8
+SHAJRA_SECONDS = 1 + 14 * 3.5
+READY_MAX_AGE = 12 * 3600  # a ready picture older than this is drawn again (Hazrat ji's picture changes daily)
 
 
 def commit_free_mb() -> int:
@@ -99,6 +116,17 @@ def capture(url: str, out: Path) -> bool:
     return True
 
 
+def with_query(url: str, **params: str) -> str:
+    parts = urllib.parse.urlsplit(url)
+    query = urllib.parse.parse_qsl(parts.query) + list(params.items())
+    return urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(query)))
+
+
+def shajra_frame(elapsed: float) -> int:
+    """The Shajra frame for `elapsed` seconds after the Shajra began."""
+    return max(0, min(SHAJRA_FRAMES - 1, int(elapsed / SHAJRA_SECONDS * (SHAJRA_FRAMES - 1) + 0.5)))
+
+
 class StagePicture:
     def __init__(self, page_url: str, platform: str, halqah: str, out: Path) -> None:
         self.page_url, self.platform, self.halqah, self.out = page_url, platform, halqah, out
@@ -106,6 +134,62 @@ class StagePicture:
         self.captured_at = 0.0
         self.failed_at = 0.0
         self.busy = threading.Lock()
+        self.ready_dir = out.parent / "stage_ready"
+        self.ready_cache: dict[str, tuple[float, bytes]] = {}
+        self.preparing = False
+
+    def _ready_items(self) -> list[tuple[str, dict]]:
+        items = []
+        for stage in READY_STAGES:
+            if stage == "shajra":
+                items += [(f"shajra-{k}", {"stage": stage, "roll": f"{k / (SHAJRA_FRAMES - 1):.3f}"}) for k in range(SHAJRA_FRAMES)]
+            else:
+                items.append((stage, {"stage": stage}))
+        return items
+
+    def ready(self, stage: str | None, elapsed: float = 0.0) -> bytes | None:
+        """The picture drawn ahead of time for `stage` (None: before anything
+        is heard; the Shajra by `elapsed` seconds since it began), or None."""
+        name = "none" if stage is None else (f"shajra-{shajra_frame(elapsed)}" if stage == "shajra" else stage)
+        path = self.ready_dir / f"{name}.png"
+        try:
+            mtime = path.stat().st_mtime
+        except OSError:
+            return None
+        cached = self.ready_cache.get(name)
+        if cached and cached[0] == mtime:
+            return cached[1]
+        png = path.read_bytes()
+        self.ready_cache[name] = (mtime, png)
+        return png
+
+    def prepare(self) -> None:
+        """Draws every stage's picture that is missing or old, one Edge at a
+        time, in the Zikr's order (the opening first). Run on its own thread
+        at the relay's start and as each session begins; a capture that
+        fails or finds too little memory leaves the rest to the next round."""
+        if self.preparing:
+            return
+        self.preparing = True
+        try:
+            self.ready_dir.mkdir(exist_ok=True)
+            drawn = 0
+            for name, params in self._ready_items():
+                path = self.ready_dir / f"{name}.png"
+                if path.exists() and time.time() - path.stat().st_mtime < READY_MAX_AGE:
+                    continue
+                if commit_free_mb() < MIN_COMMIT_MB:
+                    log("ready pictures: too little memory; the rest next time")
+                    return
+                with self.busy:  # one Edge at a time, the live capture included
+                    if not capture(with_query(self.page_url, **params), path):
+                        log(f"ready picture {name} not drawn; the rest next time")
+                        return
+                drawn += 1
+            if drawn:
+                log(f"{drawn} ready stage pictures drawn")
+        finally:
+            self.preparing = False
 
     def refresh(self) -> bytes | None:
         """Captures a new picture when the stage changed; returns its PNG bytes, else None."""
