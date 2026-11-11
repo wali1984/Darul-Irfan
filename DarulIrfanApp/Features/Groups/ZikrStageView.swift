@@ -330,6 +330,8 @@ final class ZikrStageModel {
         listener.onState = { [weak self] in self?.voice = $0 }
         listener.onHeard = { [weak self] stage in Task { await self?.announce(stage, fromVoice: true) } }
         listener.onWords = { [weak self] in self?.voiceWords = $0 }
+        // The stage on the screen, however it got there: the heard stages follow on from it.
+        listener.currentStage = { [weak self] in self?.current?.stageID }
         self.listener = listener
         voiceNotice = nil
         await listener.start()
