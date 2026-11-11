@@ -211,6 +211,10 @@ def release(number: str, notes: str) -> int:
                          {"data": {"type": "betaBuildLocalizations", "attributes": {"locale": "en-US", "whatsNew": notes},
                                    "relationships": {"build": {"data": {"type": "builds", "id": build_id}}}}})
     for group in (INTERNAL_GROUP, EXTERNAL_GROUP):
+        # A group with every build (the owner set TESTERS so, 2026-11-10)
+        # gets each one by itself: Apple refuses an assignment to it.
+        if get(f"/v1/betaGroups/{group}")["data"]["attributes"].get("hasAccessToAllBuilds"):
+            continue
         if build_id not in group_build_ids(group):
             checked_call("POST", f"/v1/betaGroups/{group}/relationships/builds",
                          {"data": [{"type": "builds", "id": build_id}]})
