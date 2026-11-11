@@ -34,6 +34,11 @@ enum HalqahStage {
     static let shajraID = "shajra"
     /// The dua that closes the Zikr.
     static let duaID = "dua"
+    /// The room outside the stages, as the relay hears it (owner 2026-11-11):
+    /// nothing playing yet, a Bayan before the Zikr, a Bayan after it.
+    static let waitingID = "waiting"
+    static let bayanID = "bayan"
+    static let bayanAfterID = "bayan-after"
 
     /// How the stage card shows a stage: the Shajra's own lines, the Dua's
     /// card, or the stage's name (with the Arabic while it is recited).
@@ -41,12 +46,16 @@ enum HalqahStage {
         case standard
         case shajra
         case dua
+        case waiting
+        case bayan
     }
 
     static func card(for stageID: String) -> Card {
         switch stageID.lowercased() {
         case shajraID: return .shajra
         case duaID: return .dua
+        case waitingID: return .waiting
+        case bayanID, bayanAfterID: return .bayan
         default: return .standard
         }
     }
@@ -57,6 +66,9 @@ enum HalqahStage {
     private static let knownTitles: [String: (english: String, urdu: String)] = [
         shajraID: ("Shajra Sharif", "شجرہ شریف"),
         duaID: ("Dua", "دعا"),
+        waitingID: ("Zikr will start soon", "ذکر جلد شروع ہوگا"),
+        bayanID: ("Playing Bayan", "بیان جاری ہے"),
+        bayanAfterID: ("Playing Bayan", "بیان جاری ہے"),
     ]
 
     private static func named(_ text: String?, notID stageID: String) -> String? {
@@ -331,7 +343,13 @@ final class ZikrStageModel {
         listener.onHeard = { [weak self] stage in Task { await self?.announce(stage, fromVoice: true) } }
         listener.onWords = { [weak self] in self?.voiceWords = $0 }
         // The stage on the screen, however it got there: the heard stages follow on from it.
-        listener.currentStage = { [weak self] in self?.current?.stageID }
+        // The room's phases are no stage to the order: before the Zikr none
+        // yet; the Bayan after it, the Shajra (the relay's picker does the same).
+        listener.currentStage = { [weak self] in
+            let stage = self?.current?.stageID
+            if stage == HalqahStage.waitingID || stage == HalqahStage.bayanID { return nil }
+            return stage == HalqahStage.bayanAfterID ? HalqahStage.shajraID : stage
+        }
         self.listener = listener
         voiceNotice = nil
         await listener.start()
@@ -435,7 +453,8 @@ struct ZikrStageView: View {
             model.resumeVoice()
             while !Task.isCancelled {
                 await model.poll()
-                try? await Task.sleep(for: .seconds(4))
+                // Every 2 s (4 put the stage seconds behind the sound, owner 2026-11-11).
+                try? await Task.sleep(for: .seconds(2))
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .halqahStageNudge)) { note in
@@ -625,6 +644,8 @@ struct ZikrStageView: View {
         case .shajra: shajraContent(cue)
         case .dua: duaContent(cue)
         case .standard: standardContent(cue)
+        case .waiting: idleContent
+        case .bayan: bayanContent(before: cue.stageID == HalqahStage.bayanID)
         }
     }
 
@@ -736,20 +757,37 @@ struct ZikrStageView: View {
                 .multilineTextAlignment(.center)
                 .diGoldTextShimmer()
         } else {
-            // Live before the first stage: the Bayan is playing, the Zikr follows it (owner 2026-11-10).
-            Text("Bayan").diInterfaceFont(.caption, weight: .semibold).foregroundStyle(DIColor.accent)
-            Text("Playing Bayan")
+            // Live, nothing heard yet: "Playing Bayan" only once the relay
+            // hears a Bayan (owner 2026-11-11: the room sat silent for an hour
+            // under "Playing Bayan").
+            Text("Zikr will start soon")
                 .font(.system(size: 30, weight: .semibold, design: .serif)).foregroundStyle(DIColor.accent)
                 .multilineTextAlignment(.center)
                 .diGoldTextShimmer()
                 .diGoldGlow(radius: 14, opacity: 0.5)
-                .accessibilityIdentifier("stage-bayan")
-            ZikrStartsSoon()
+                .accessibilityIdentifier("stage-waiting")
         }
         Text(verbatim: DIBrand.anchorVerseArabic).font(DIFont.quranArabic(scale: 1.2))
             .foregroundStyle(DIColor.onPrimary).multilineTextAlignment(.center)
             .diGoldTextShimmer(delay: 1.6)
             .diGoldGlow()
+    }
+
+    /// A Bayan in the room: before the Zikr, with the Zikr to follow; after
+    /// it, no more than that (owner 2026-11-11).
+    @ViewBuilder
+    private func bayanContent(before: Bool) -> some View {
+        StageEmblem(size: 112)
+        Text("Bayan").diInterfaceFont(.caption, weight: .semibold).foregroundStyle(DIColor.accent)
+        Text("Playing Bayan")
+            .font(.system(size: 30, weight: .semibold, design: .serif)).foregroundStyle(DIColor.accent)
+            .multilineTextAlignment(.center)
+            .diGoldTextShimmer()
+            .diGoldGlow(radius: 14, opacity: 0.5)
+            .accessibilityIdentifier("stage-bayan")
+        if before {
+            ZikrStartsSoon()
+        }
     }
 
     static func latifa(_ stageID: String) -> Int? {

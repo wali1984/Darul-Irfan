@@ -67,6 +67,10 @@ final class SheikhLiveJoinTests: XCTestCase {
         XCTAssertEqual(HalqahStage.card(for: "dua"), .dua)
         XCTAssertEqual(HalqahStage.card(for: "masjid-nabawi"), .standard)
         XCTAssertEqual(HalqahStage.card(for: "latifa-1"), .standard)
+        // The room's phases (owner 2026-11-11): nothing playing yet, a Bayan before or after the Zikr.
+        XCTAssertEqual(HalqahStage.card(for: "waiting"), .waiting)
+        XCTAssertEqual(HalqahStage.card(for: "bayan"), .bayan)
+        XCTAssertEqual(HalqahStage.card(for: "bayan-after"), .bayan)
     }
 
     func testAStageIsNeverShownByItsRawID() {
