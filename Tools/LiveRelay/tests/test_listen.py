@@ -84,6 +84,26 @@ def test_muraqaba_names():
     assert picker("maiyyat")._listened("maiyyat", "و کرمیت۔", "", 1000.0) == "aqrabiyyat"
 
 
+# Every Muraqaba name as Whisper wrote it in the recorded Zikrs (Daily 10/11
+# November, Tahajjud 9/10/11 November), keyed by the stage before it. Rauza-e-
+# Athar's "روز اطار" / "روزہ" was missed on 10 November.
+HEARD_NAMES = {
+    ("latifa-7", "ahadiyat"): ["اللہ رکھ میں احدیت", "احدیت"],
+    ("ahadiyat", "maiyyat"): ["مائیت", "تک میں مائیت", "مائی ایت"],
+    ("maiyyat", "aqrabiyyat"): ["و کرمیت۔", "او کربیت"],
+    ("aqrabiyyat", "sair-kaaba"): ["سری کبار سری کبار سری کبار", "سری کبہ سری کبہ سری کبہ", "سری کابا"],
+    ("sair-kaaba", "rauza-athar"): ["روز اطار", "روزہ", "روزہ اطہر", "نوزیں اترار", "روزیت مدبان",
+                                    "روزےیا", "روزیں اتھا"],
+    ("rauza-athar", "masjid-nabawi"): ["مسترن نبی مسترن نبی", "مستین نبی۔", "مسین نبی", "مشکا دے نا"],
+}
+
+
+def test_every_muraqaba_name_heard_so_far():
+    for (current, stage), texts in HEARD_NAMES.items():
+        for text in texts:
+            assert picker(current)._listened(current, text, "", 1000.0) == stage, (current, text)
+
+
 def test_the_zikr_itself_never_moves_the_stage():
     for current in (None, "basmalah", "latifa-1", "latifa-4", "latifa-7", "ahadiyat", "maiyyat"):
         for text in ZIKR_SOUND:
