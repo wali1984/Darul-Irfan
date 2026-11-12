@@ -87,7 +87,9 @@ LATIFA_WORD = r"(?<!غ)ف[اب]\S?(?=\s|$)|ل[یاِ]?[تط][یي]?ف|تیف|ت�
 RECITATION_WORDS = [
     # 2026-11-10 Daily Zikr: the Arabic reading of the opening Tasbih came as
     # "سوحان الله و الحمد لله و لا ..." (و for ب) and the stage never moved.
-    ("tasbih", r"س[بو]?ح[اـ]?ن|سبحن|سوان ال"),
+    # 12 November Daily Zikr: "اوان اللہ والحندر اللہ" / "اجوان اللہ والحنل اللہ" -
+    # the ب and the ح lost; the shape "…وان اللہ والح…" is the Tasbih's.
+    ("tasbih", r"س[بو]?ح[اـ]?ن|سبحن|سوان ال|[اجس]?وان ال\S* ?و ?ال?ح"),
     # As read on 10 November: "اسقاف الله ربي", "اصفلار", "اشادر لا اللہ اوشاد",
     # "اوز بالام", "مسم اللہ رخمان".
     ("istighfar", r"ستغفر|استغفار|استغف|اسقاف ال|صفلار|سفلار|استفن|[اأ]سف ل?ن?رب|رب[يی] من ك|رب[یي]م ا?ن ?کول"),
@@ -97,7 +99,7 @@ RECITATION_WORDS = [
 ]
 # The Tasbih before any stage needs more than "سبحان اللہ" (a bayan says it):
 # its next words too ("والحمد لله", "الله اكبر").
-TASBIH_MORE = r"حمد|[اأ]كبر|اکبر|لا ?[إا]له|ایلہ|لا ?حول|حول ب|قوات|قوة|عظيم|عظیم|مكب|مکب"
+TASBIH_MORE = r"حمد|حند|حنل|[اأ]كبر|اکبر|لا ?[إا]له|ایلہ|لا ?حول|حول ب|قوات|قوة|عظيم|عظیم|مكب|مکب"
 # (Tahajjud 10 November: "سبحان الله … لا إله … لا حول بنقوات" - the third
 # Kalima - with no "الحمد" read.)
 # The opening heard as a run: three different recitations within OPENING_WINDOW,
@@ -131,9 +133,10 @@ TALK_MOST = 0.4
 # Zikr, a Bayan after it. Stages on the platform like any other; to the
 # picker the first two are "no stage yet" and the last is "the Shajra".
 WAITING, BAYAN, BAYAN_AFTER = "waiting", "bayan", "bayan-after"
-PHASE_WINDOW = 30.0      # the readings a phase is judged on: the last 30 s
+PHASE_WINDOW = 45.0      # the readings a phase is judged on: the last 45 s (12 November: the opening's 10 s of recitation was taken for a Bayan at 30 s / 10 readings)
 PHASE_TALK = 0.6         # a Bayan: most of them talk...
-PHASE_READINGS = 10      # ...and at least this many (a reading a second while there is sound)
+WAITING_WINDOW = 30.0    # nothing read for this long (with no sound): nothing is playing
+PHASE_READINGS = 30      # ...and at least this many (a reading a second while there is sound)
 WAITING_QUIET = 20.0     # before the Zikr, this long without a sound: nothing is playing
 BAYAN_QUIET = 60.0       # a Bayan's pause is not its end
 AFTER_SHAJRA = 90.0      # the Bayan after the Zikr: talk 90 s after the Shajra began (its dua comes first)
@@ -146,7 +149,8 @@ LATIFA_ONE = r"ف[ائیي]{1,2}ق[اہ]?[لن]|فعقال"
 # پانچواں): it puts the order right if a call was missed or one too many
 # was taken. Only ever forwards, and never more than two past the step.
 NUMBERS = [(1, r"پہلا"), (2, r"دوسر|نسول"), (3, r"تیسر"), (4, r"چوتھ|[شجچ]و ?[تط]ح|جو ?تل"),
-           (5, r"پانچ|انچوا|بان ?جو|باہن ?جو|بانجر"), (6, r"چھ[ٹڑ]"), (7, r"ساتو|سا ?تنل")]
+           (5, r"پانچ|ن[چج]وا|بان ?جو|باہن ?جو|بانجر"), (6, r"چھ[ٹڑ]|(?<!\S)ر[تٹ]ا ل"), (7, r"ساتو|سا ?تنل|تان?توا")]
+# (12 November: "ارنجواندی فو" = پانچواں, "رتا لاتی" = چھٹا, "تانتوانلتی" = ساتواں.)
 # (10 November: "نسولہ تیفا" = دوسرا, "جو تل دیفا" = چوتھا, "بان جو نا دیفا" =
 # پانچواں, "سا تنل دیفا" = ساتواں.)
 
@@ -296,7 +300,8 @@ class Picker:
         raw = self.current_stage()
         if self.clock - self.phase_at < PHASE_GAP:
             return
-        recent = [talk for t, talk in list(self.heard) if self.clock - t <= PHASE_WINDOW]  # a copy: the worker adds to it
+        recent_at = [(t, talk) for t, talk in list(self.heard) if self.clock - t <= PHASE_WINDOW]  # a copy: the worker adds to it
+        recent = [talk for _, talk in recent_at]
         talking = len(recent) >= PHASE_READINGS and sum(recent) / len(recent) >= PHASE_TALK
         # Silence by the level alone: a long Bayan lifts the room's "quiet"
         # floor until its own words stop counting as voice (bayan-2: it
@@ -305,7 +310,7 @@ class Picker:
         if raw in (None, WAITING, BAYAN):
             if raw != BAYAN and talking and not self.tahajjud:
                 phase, why = BAYAN, f"talk in {sum(recent)} of {len(recent)} readings before the Zikr"
-            elif raw != WAITING and not recent and quiet >= (BAYAN_QUIET if raw == BAYAN else WAITING_QUIET):
+            elif raw != WAITING and not [t for t, _ in recent_at if self.clock - t <= WAITING_WINDOW] and quiet >= (BAYAN_QUIET if raw == BAYAN else WAITING_QUIET):
                 phase, why = WAITING, f"no sound for {quiet:.0f} s before the Zikr"
             else:
                 return

@@ -131,3 +131,13 @@ def test_the_tahajjud_starts_on_its_first_recitation():
     p = picker(None)
     p.tahajjud = True
     assert p.decide(None, "سبحان الله اگر حوض ان لا اگر", "سبحان الله و لحوض الله", 28.0) == "tasbih"
+
+
+def test_latifa_numbers_as_read_on_12_november():
+    from audio_picker import latifa_number
+    assert latifa_number("ارنجواندی فو") == 5
+    assert latifa_number("ارنجواند دیسا") == 5
+    assert latifa_number("رتا لاتی") == 6
+    assert latifa_number("تانتوانلتی فار") == 7
+    assert latifa_number("کرتا لاتی") is None  # "کرتا" is not چھٹا
+

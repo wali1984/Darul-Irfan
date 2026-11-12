@@ -59,6 +59,7 @@ CLOSE_DUA_EVERY = 10.0  # seconds between tries of the dua after the room closed
 CLOSE_DUA_FOR = 600.0   # ...and how long before giving up on it
 TOKEN_REFUSED = "the platform refused the relay token"
 START_VOICE = 5.0    # (kept for tests) seconds of sound; the Zikr now starts on joining the open room
+DUA_SILENCE = 300  # seconds of silence after the last Muraqaba that mean the Zikr is over
 DUA_AFTER = {"masjid-nabawi", "shajra", "bayan-after"}  # stages after which members' "aameen" means the dua
 AMEEN = re.compile(r"\b(aa?mee?n|ameen|amin|aameen)\b|آمین|آمِین|امین", re.IGNORECASE)
 # Opening recitations come from the room's sound only: a host's "Astaghfirullah"
@@ -627,6 +628,13 @@ class Relay:
             if self.joined and self.speaker_tries >= SPEAKER_TRIES and self.speaker_state is not True:
                 problem = problem or "the room's speaker could not be switched on (Paltalk may not have drawn the room)"
                 await self._recover_room(now)
+            if (self.joined and not self.dua_shown and self.platform_is_live and self.platform_stage in DUA_AFTER
+                    and now - self.room_audio.last_sound > DUA_SILENCE):
+                # 12 November: after Masjid-e-Nabawi the room fell silent, the
+                # admins left, and the room stayed open for over an hour while
+                # every screen said "Shajra". The Dua card only (the session
+                # still ends when the room closes).
+                await self._show_dua(f"{DUA_SILENCE // 60:.0f} min without a sound after {self.platform_stage}")
             await self._track_on_air()
             self.problem = problem or self.platform_problem
             self._health(now)

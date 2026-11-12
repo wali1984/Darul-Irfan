@@ -758,6 +758,10 @@ class MessageFollower:
     def new(self, view: View) -> list[tuple[str, str]]:
         now = time.time()
         current = messages_in(view)
+        if self.primed and len(current) >= 5 and not any(key in self.keys for key, _, _ in current):
+            # 12 November: ameer_imam's "1st Latifa" was never read while 190
+            # people joined - the chat scrolled past it between two reads.
+            log(f"[chat] {len(current)} new messages and none from the last read: some scrolled past unread")
         fresh = []
         for key, sender, text in current:
             words = (sender.lower(), " ".join(text.lower().split()))

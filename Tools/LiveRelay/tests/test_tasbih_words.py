@@ -18,3 +18,15 @@ def test_tasbih_as_read_on_10_november():
 def test_not_other_words():
     assert not re.search(TASBIH, "استغفر الله ربي من كل ذنب")
     assert not re.search(TASBIH, "بسم الله الرحمن الرحيم")
+
+
+def test_tasbih_as_read_on_12_november():
+    # The ب and the ح lost: "اوان اللہ والحندر اللہ" (Daily Zikr, 12 November).
+    from audio_picker import TASBIH_MORE
+    for heard in ("اوان اللہ والحندر اللہ وا", "اجوان اللہ والحندر اللہ و", "وان الله و الحندر الله و رب"):
+        assert re.search(TASBIH, heard), heard
+        assert re.search(TASBIH_MORE, heard), heard
+
+
+def test_a_bayan_naming_hazrat_awan_is_not_the_tasbih():
+    assert not re.search(TASBIH, "حضرت امیر محمد اکرم اعوان رحمۃ اللہ علیہ نے فرمایا")
