@@ -115,6 +115,7 @@ RECITE_EVERY = 8.0  # seconds between readings of the opening's voice
 LISTEN_EVERY = 1.0  # a 5 s window every second: a call is read whole in several windows
 LISTEN_SECONDS = 5.0
 STAGE_GAP = 40.0  # a Latifa or Muraqaba lasts minutes: no new one this soon after the last stage
+RETURN_GAP = 10.0  # the return to the 1st Latifa lasts moments: the Ahadiyat call came 31 s after it (10 November)
 OPENING_WINDOW = 45.0  # the opening recitations follow each other within seconds
 # A bayan is talk without a break; the Zikr between its calls reads as nothing
 # or one word over and over. A stage heard is believed only when the
@@ -192,8 +193,8 @@ def is_talk(text: str) -> bool:
 
 def ahead(stage: str, current: str | None) -> bool:
     """Whether `stage` comes after `current` in the order. One step goes
-    back: after the 7th Latifa the Zikr returns to the 1st for a moment,
-    then a few seconds of Raabta, then the Muraqabat (owner, 9 November)."""
+    back: after the 7th Latifa the Zikr returns to the 1st, then the
+    Muraqabat (owner, 9 and 11 November: "7th Latifa, 1st Latifa, Muraqabat")."""
     if current not in ORDER:
         return True
     if current == "latifa-7" and stage == "latifa-1":
@@ -208,6 +209,8 @@ def next_stage(current: str | None) -> str | None:
         return "latifa-1"  # the opening recitations, before the first Latifa
     if current not in ORDER:
         return None  # a custom stage or the dua: no step from there
+    if current == "latifa-7":
+        return "latifa-1"  # the return to the 1st Latifa, before the Muraqabat
     index = ORDER.index(current)
     return ORDER[index + 1] if index + 1 < len(ORDER) else None
 
@@ -279,11 +282,11 @@ class Picker:
         if stage == "latifa-7":
             self.lataif_done = True
         if stage == "latifa-1" and self.lataif_done:
-            # The return to the 1st Latifa after the 7th (a host types "1st
-            # latifa"): the order is past the Lataif, and the next call is
-            # Raabta's or the first Muraqaba's (Tahajjud 11 November: the
+            # The return to the 1st Latifa after the 7th (heard, or typed
+            # "1st latifa"): it holds Raabta's place in the order, and the
+            # next call is the first Muraqaba's (Tahajjud 11 November: the
             # Ahadiyat call was refused as the 2nd Latifa's).
-            return "latifa-7"
+            return "raabta"
         return "shajra" if stage == BAYAN_AFTER else stage
 
     def _phase(self) -> None:
@@ -457,7 +460,7 @@ class Picker:
                     self._call(at, heard, quick=False)
 
     def _call(self, at: float, heard: float, quick: bool) -> None:
-        if at - self.last_call <= 45:
+        if at - self.last_call <= (RETURN_GAP if self._current() == "raabta" else 45):
             return  # a stage was given moments ago: this is the ayah after its call
         step = next_stage(self._current())
         if not self.read_calls:
@@ -595,7 +598,7 @@ class Picker:
                 if at - self.zikr_heard[0] >= ZIKR_SPAN:
                     return "latifa-1"
             return None
-        if since < STAGE_GAP:
+        if since < (RETURN_GAP if current == "raabta" else STAGE_GAP):
             return None
         if current.startswith("latifa-") and current != "latifa-7":
             if re.search(LATIFA_WORD, urdu) or latifa_number(urdu):
@@ -605,6 +608,8 @@ class Picker:
                     step = f"latifa-{number}"
                 return step
             return None
+        if current == "latifa-7" and re.search(LATIFA_WORD, urdu) and latifa_number(urdu) in (None, 1):
+            return "latifa-1"  # the return to the 1st Latifa ("پہلا لطیفہ"), before the Muraqabat
         if current in ORDER and ORDER.index(current) >= ORDER.index("latifa-6"):
             named = named_stage(urdu)
             if named and ahead(named, current) and ORDER.index(named) <= ORDER.index(current) + 2:
@@ -640,7 +645,8 @@ class Picker:
                     return True
             return False
         current = self._current()
-        if step in ORDER and current in ORDER and ORDER.index(step) <= ORDER.index(current):
+        returning = step == "latifa-1" and current == "latifa-7"
+        if step in ORDER and current in ORDER and ORDER.index(step) <= ORDER.index(current) and not returning:
             return True  # the stage moved on meanwhile (a tap, a typed cue): nothing to do
         when = f"{self.clock - at:.1f} s after it began, {heard:.1f} s of voice"
         named = named_stage(text)
@@ -654,7 +660,7 @@ class Picker:
             self.last_call = at
             self._give(named, f"the call named it ({text[:40]}; {when})")
             return True
-        if step == "raabta" and not is_call(text, step) and is_call(text, "ahadiyat"):
+        if (step == "raabta" or returning) and not is_call(text, step) and is_call(text, "ahadiyat"):
             # Raabta passes in seconds and is often not called: a Muraqaba's
             # call (an ayah, no "Latifa") after the 7th Latifa is the first
             # Muraqaba's (11 November: missed, then every Muraqaba after it).

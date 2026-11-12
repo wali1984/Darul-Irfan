@@ -112,12 +112,15 @@ def test_a_muraqaba_call_after_the_7th_latifa_is_the_first_muraqaba():
     # 11 November: Raabta went uncalled, the Ahadiyat call was refused as
     # Raabta's, and every Muraqaba after it with it.
     room = Room("latifa-7")
-    assert room.p._settle("اللہ اللہ وقت وقت یہ دیلت", "raabta", 1.2, 10.0, "full")
+    assert room.p._settle("اللہ اللہ وقت وقت یہ دیلت", "latifa-1", 1.2, 10.0, "full")
     assert room.given == ["ahadiyat"]
-    # A Latifa's call there is still Raabta's (the return to the 1st Latifa).
+    # A Latifa's call there is the return to the 1st Latifa (owner: "7th
+    # Latifa, 1st Latifa, Muraqabat"), heard by the listener too.
     room = Room("latifa-7")
-    assert room.p._settle("پہلا لطیفہ", "raabta", 1.0, 10.0, "full")
-    assert room.given == ["raabta"]
+    assert room.p._settle("پہلا لطیفہ", "latifa-1", 1.0, 10.0, "full")
+    assert room.given == ["latifa-1"]
+    assert Room("latifa-7").p._listened("latifa-7", "بلو لطیفہ", "", 1e6) == "latifa-1"
+    assert Room("latifa-7").p._listened("latifa-7", "ساتوال لطیفہ", "", 1e6) is None
 
 
 def test_the_tahajjud_joined_late_starts_from_the_zikr_sound():
@@ -138,8 +141,8 @@ def test_the_return_to_the_1st_latifa_keeps_the_order_past_the_lataif():
     room = Room("latifa-7")
     assert room.p._current() == "latifa-7"
     room.stage = "latifa-1"
-    assert room.p._current() == "latifa-7"
-    assert room.p._settle("انا انا مراک ویادیات", "raabta", 1.7, 10.0, "full")
+    assert room.p._current() == "raabta"  # the return holds Raabta's place: next, the Muraqabat
+    assert room.p._settle("انا انا مراک ویادیات", "ahadiyat", 1.7, 10.0, "full")
     assert room.given == ["ahadiyat"]
     room = Room("latifa-1")  # the Zikr's first 1st Latifa is just that
     assert room.p._current() == "latifa-1"

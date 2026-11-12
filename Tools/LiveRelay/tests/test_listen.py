@@ -95,8 +95,9 @@ def test_no_new_stage_right_after_the_last():
     assert p._listened("latifa-2", "جو تل دیفا", "", 0.0) is None
 
 
-def test_after_the_7th_the_return_to_the_1st_is_not_a_new_latifa():
-    assert picker("latifa-7")._listened("latifa-7", "اعلار کی فا", "", 1000.0) is None
+def test_after_the_7th_the_return_to_the_1st_is_shown():
+    # Owner, 11 November: "7th Latifa, 1st Latifa, Muraqabat" is the order.
+    assert picker("latifa-7")._listened("latifa-7", "اعلار کی فا", "", 1000.0) == "latifa-1"
 
 
 def test_a_latifa_look_alike_inside_a_recitation_is_not_the_call():
