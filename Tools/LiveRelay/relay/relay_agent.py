@@ -674,7 +674,10 @@ class Relay:
         had not drawn): the next rung is a rejoin, in _recover_room."""
         on = await asyncio.to_thread(pt.speaker_on, view)
         now = time.time()
-        self.speaker_due = now + 15
+        # Just joined and the icon not drawn yet: look again in 2 s, not 15
+        # (11 November: joined muted, switched on 45 s later; the 1st
+        # Latifa's call was lost in between).
+        self.speaker_due = now + (2 if on is None and now - self.joined_at < 60 else 15)
         if on is not self.speaker_state:
             log(f"[speaker] {'on' if on else 'off' if on is False else 'cannot be read (is the screen drawn?)'}")
         self.speaker_state = on

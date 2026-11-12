@@ -169,6 +169,20 @@ def is_call(text: str, step: str | None) -> bool:
     return len(words) >= 3 and len(set(words)) * 2 > len(words)
 
 
+def zikr_sound(text: str) -> bool:
+    """Whether a reading is the Zikr's own sound, not a call or a recitation:
+    one word over and over ("ایک ایک ایک ایک") or one drawn-out sound
+    ("اوووووو"), as the 1st Latifa read on 11 November."""
+    words = text.split()
+    if len(words) >= 4 and len(set(words)) == 1:
+        return True
+    return 0 < len(words) <= 2 and any(re.search(r"(.)\1{5,}", word) for word in words)
+
+
+ZIKR_SPAN = 8.0  # the Zikr's sound heard this far apart (within ZIKR_WINDOW) starts the 1st Latifa
+ZIKR_WINDOW = 40.0
+
+
 def is_talk(text: str) -> bool:
     """Whether a reading is speech (a bayan, a call) rather than the Zikr's
     sound, which reads as nothing or one or two words over and over."""
@@ -233,6 +247,8 @@ class Picker:
         self.seen_stage: str | None = None  # the stage as last seen, and since when (any source: heard, typed, tapped)
         self.stage_at = -1e9
         self.recited: list[tuple[float, int]] = []  # opening recitations heard before any stage: (clock, index)
+        self.zikr_heard: list[float] = []  # the Zikr's own sound heard before any Latifa (Tahajjud): clocks
+        self.lataif_done = False  # the 7th Latifa reached: a 1st Latifa after it is the return, not a new start
         self.heard: deque = deque(maxlen=120)  # (clock, whether the reading was talk), the listener's last readings
         # The Tahajjud Zikr has no bayan and no speech: it starts with the
         # Tasbihat and runs Lataif to the end (owner, 2026-11-10). Set by the
@@ -260,6 +276,14 @@ class Picker:
         stage = self.current_stage()
         if stage in (WAITING, BAYAN):
             return None
+        if stage == "latifa-7":
+            self.lataif_done = True
+        if stage == "latifa-1" and self.lataif_done:
+            # The return to the 1st Latifa after the 7th (a host types "1st
+            # latifa"): the order is past the Lataif, and the next call is
+            # Raabta's or the first Muraqaba's (Tahajjud 11 November: the
+            # Ahadiyat call was refused as the 2nd Latifa's).
+            return "latifa-7"
         return "shajra" if stage == BAYAN_AFTER else stage
 
     def _phase(self) -> None:
@@ -305,6 +329,8 @@ class Picker:
         self.last_listen = -1e9
         self.seen_stage, self.stage_at = None, -1e9
         self.recited = []
+        self.zikr_heard = []
+        self.lataif_done = False
         self.heard.clear()
 
     def _queue(self, fn, *args) -> None:  # noqa: ANN001
@@ -554,8 +580,19 @@ class Picker:
             # The call is a word or two ("پہلا لطیفہ"); a recitation reads as many
             # words, one of which can look like Latifa ("افال" in "ولا حول ولا قوۃ",
             # Tahajjud 10 November) - so never from a long reading.
-            if (re.search(LATIFA_WORD, urdu) or re.search(LATIFA_ONE, both) or latifa_number(urdu) == 1) and not is_talk(urdu):
+            if (re.search(LATIFA_WORD, urdu) or re.search(LATIFA_ONE, both) or latifa_number(urdu)) and not is_talk(urdu):
                 if current is not None or self.tahajjud or self.opening_run(at, window=60.0):
+                    # Its number, when it comes through, outranks the order:
+                    # the first call heard can be the 2nd's ("دوسرا لطیفہ",
+                    # Tahajjud 11 November, when the room was joined late).
+                    number = latifa_number(urdu)
+                    return f"latifa-{number}" if number and number <= 3 else "latifa-1"
+            if self.tahajjud and zikr_sound(urdu) and not re.search(LATIFA_WORD, both):
+                # The Tahajjud has no bayan: the Zikr's own sound, heard twice
+                # some seconds apart, means the 1st Latifa is on (its call
+                # missed: on 11 November the room was joined muted after it).
+                self.zikr_heard = [t for t in self.zikr_heard if at - t <= ZIKR_WINDOW] + [at]
+                if at - self.zikr_heard[0] >= ZIKR_SPAN:
                     return "latifa-1"
             return None
         if since < STAGE_GAP:

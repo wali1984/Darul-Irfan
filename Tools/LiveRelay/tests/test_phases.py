@@ -120,6 +120,31 @@ def test_a_muraqaba_call_after_the_7th_latifa_is_the_first_muraqaba():
     assert room.given == ["raabta"]
 
 
+def test_the_tahajjud_joined_late_starts_from_the_zikr_sound():
+    # 11 November: joined muted after the 1st Latifa's call; the first thing
+    # heard was the Zikr's own sound, then the 2nd Latifa's call, posted as
+    # the 1st until a host typed "2nd".
+    p = Room(WAITING, tahajjud=True).p
+    assert [p.decide(None, ZIKR[i % 2], "", 100.0 + i) for i in range(10)] == [None] * 8 + ["latifa-1"] * 2
+    assert p._listened(None, "دوسرا لطیفہ", "", 10.0) == "latifa-2"
+    # The Zikr's sound never starts the Daily Zikr (a bayan may come first).
+    p = Room(WAITING).p
+    assert {p.decide(None, ZIKR[i % 2], "", 100.0 + i) for i in range(10)} == {None}
+
+
+def test_the_return_to_the_1st_latifa_keeps_the_order_past_the_lataif():
+    # 11 November Tahajjud: a host typed "1st latifa" after the 7th; the
+    # Ahadiyat call was then refused as the 2nd Latifa's.
+    room = Room("latifa-7")
+    assert room.p._current() == "latifa-7"
+    room.stage = "latifa-1"
+    assert room.p._current() == "latifa-7"
+    assert room.p._settle("انا انا مراک ویادیات", "raabta", 1.7, 10.0, "full")
+    assert room.given == ["ahadiyat"]
+    room = Room("latifa-1")  # the Zikr's first 1st Latifa is just that
+    assert room.p._current() == "latifa-1"
+
+
 def test_the_stream_picture_drawn_ahead(tmp_path):
     from stage_picture import SHAJRA_FRAMES, StagePicture
     picture = StagePicture("https://example.invalid/broadcast", "https://platform.invalid", "our-sheikh", tmp_path / "stage.png")
