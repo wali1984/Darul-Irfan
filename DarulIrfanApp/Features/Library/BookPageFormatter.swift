@@ -123,6 +123,93 @@ enum BookPageFormatter {
         var blocks: [Block]
         /// The page's footnotes, set after its text.
         var footnotes: [String] = []
+        /// Words the reading of the scan could not make out ("[؟]"), and all
+        /// the page's words: a page with many shows a note pointing to the
+        /// printed page (a handwritten letter, faint print).
+        var unreadableWords = 0
+        var wordCount = 0
+
+        var isPartlyUnreadable: Bool {
+            unreadableWords >= 8 || (wordCount > 0 && Double(unreadableWords) / Double(wordCount) >= 0.1)
+        }
+    }
+
+    // MARK: - Words the reading could not make out
+
+    /// "[؟]" stands for a word the reading of the scan could not make out. A
+    /// run of them is shown as one ellipsis, not a row of bracketed question
+    /// marks (which right-to-left text also turned inside out, "[!]").
+    static let unreadableMark = "[؟]"
+
+    static func unreadableCount(_ text: String) -> Int {
+        text.components(separatedBy: unreadableMark).count - 1
+    }
+
+    static func hidingUnreadable(_ text: String) -> String {
+        guard text.contains(unreadableMark) else { return text }
+        var result = ""
+        var rest = Substring(text)
+        while let range = rest.range(of: unreadableMark) {
+            result += rest[..<range.lowerBound]
+            var after = rest[range.upperBound...]
+            // The marks that follow, with only spaces between them, join this one.
+            while true {
+                let trimmed = after.drop(while: { $0 == " " || $0 == "\t" })
+                guard trimmed.hasPrefix(unreadableMark) else { break }
+                after = trimmed.dropFirst(unreadableMark.count)
+            }
+            result += "…"
+            rest = after
+        }
+        result += rest
+        return result
+    }
+
+    // MARK: - Tables as printed
+
+    /// How a table's columns share the width: a column of numbers (a serial
+    /// number, a page number) as narrow as its widest number, a column of
+    /// titles by the length of its text. Equal columns left a contents
+    /// page's titles wrapping word by word beside two half-empty columns.
+    struct TableLayout: Equatable, Sendable {
+        var weights: [Double]
+        /// The first row names the columns ("نمبر شمار | عنوانات | صفحہ نمبر").
+        var hasHeaderRow: Bool
+    }
+
+    static func tableLayout(_ rows: [[String]]) -> TableLayout {
+        let columns = max(1, rows.map(\.count).max() ?? 1)
+        let hasHeader = rows.count > 2
+            && !rows[0].joined().contains(where: { digits.contains($0) })
+            && rows.dropFirst().contains(where: { row in row.contains(where: isNumberCell) })
+            && rows[0].filter({ !$0.isEmpty }).count >= 2
+        var body: [[String]] = []
+        for (index, row) in rows.enumerated() where !(hasHeader && index == 0) && !isSectionRow(row, columns: columns) {
+            body.append(row)
+        }
+        let weights = (0..<columns).map { column -> Double in
+            let cells = body.compactMap { column < $0.count ? $0[column] : nil }.filter { !$0.isEmpty }
+            guard !cells.isEmpty else { return 2 }
+            if cells.allSatisfy(isNumberCell) {
+                return Double(min(8, max(3, cells.map(\.count).max() ?? 3)))
+            }
+            let mean = Double(cells.map(\.count).reduce(0, +)) / Double(cells.count)
+            return min(40, max(8, mean))
+        }
+        return TableLayout(weights: weights, hasHeaderRow: hasHeader)
+    }
+
+    /// A row naming a section of the table ("عقائد"): its one cell spans
+    /// the width instead of sitting in the first column.
+    static func isSectionRow(_ row: [String], columns: Int) -> Bool {
+        let filled = row.filter { !$0.isEmpty }
+        return columns >= 2 && filled.count == 1 && !isNumberCell(filled[0])
+    }
+
+    /// "12", "۴۵", "1.", "3-5": a serial or page number.
+    static func isNumberCell(_ cell: String) -> Bool {
+        !cell.isEmpty && cell.count <= 9 && cell.contains(where: { digits.contains($0) })
+            && cell.allSatisfy { digits.contains($0) || " .,-–:()۔،".contains($0) }
     }
 
     /// The kinds of block a page's layout names, one letter each.
@@ -146,7 +233,7 @@ enum BookPageFormatter {
     ///   set as Qur'an: `.letters` for pages re-read by Claude, `.exact` for
     ///   the original OCR.
     static func format(_ text: String, quranCheck: QuranQuotation.Check = .letters) -> Page {
-        let normalized = text.replacingOccurrences(of: "\r\n", with: "\n")
+        let normalized = hidingUnreadable(text.replacingOccurrences(of: "\r\n", with: "\n"))
         if isContentsPage(normalized) {
             return Page(isContents: true, blocks: [.paragraph([Run(text: normalized, isQuranic: false)])])
         }
@@ -166,8 +253,17 @@ enum BookPageFormatter {
     /// otherwise from the text alone.
     static func format(page: BookPage) -> Page {
         let check = quranCheck(for: page)
-        guard let parts = laidOutParts(of: page) else { return format(page.text, quranCheck: check) }
-        return format(parts: parts, text: page.text, check: check)
+        var shown = page
+        shown.text = hidingUnreadable(page.text)
+        var result: Page
+        if let parts = laidOutParts(of: shown) {
+            result = format(parts: parts, text: shown.text, check: check)
+        } else {
+            result = format(shown.text, quranCheck: check)
+        }
+        result.unreadableWords = unreadableCount(page.text)
+        result.wordCount = page.text.split(whereSeparator: \.isWhitespace).count
+        return result
     }
 
     /// The Qur'an check a page's provenance calls for.
@@ -279,7 +375,11 @@ enum BookPageFormatter {
                 let words = part.text.split(whereSeparator: \.isWhitespace).map(String.init)
                 blocks.append(QuranQuotation.isVerified(words, check: check) ? .quran(part.text) : .heading(part.text))
             case .paragraph:
-                blocks.append(.paragraph(proseRuns(part.text, check: check)))
+                if isContentsList(part.text) {
+                    blocks.append(.table(tableRows(part.text)))
+                } else {
+                    blocks.append(.paragraph(proseRuns(part.text, check: check)))
+                }
             case .verse:
                 blocks.append(.verse(part.text))
             case .arabic:
@@ -292,7 +392,32 @@ enum BookPageFormatter {
                 blocks.append(.caption(part.text))
             }
         }
-        return Page(isContents: isContentsPage(text), blocks: blocks, footnotes: footnotes)
+        return Page(isContents: isContentsPage(text), blocks: joiningTables(blocks), footnotes: footnotes)
+    }
+
+    /// One table where the reading cut a printed table into pieces: a table
+    /// straight after another, or after a short heading that itself follows
+    /// a table (a section's name, "عقائد"), joins it, the heading becoming a
+    /// row that spans the width. The column names alone then share the
+    /// widths of the rows under them.
+    static func joiningTables(_ blocks: [Block]) -> [Block] {
+        var result: [Block] = []
+        var index = 0
+        while index < blocks.count {
+            let block = blocks[index]
+            if case .table(let rows) = block, case .table(let earlier)? = result.last {
+                result[result.count - 1] = .table(earlier + rows)
+            } else if case .heading(let name) = block, name.count <= 40,
+                      case .table(let earlier)? = result.last,
+                      index + 1 < blocks.count, case .table(let next) = blocks[index + 1] {
+                result[result.count - 1] = .table(earlier + [[name]] + next)
+                index += 1
+            } else {
+                result.append(block)
+            }
+            index += 1
+        }
+        return result
     }
 
     /// An Arabic quotation is the Qur'an when all of it, up to a short
@@ -424,12 +549,30 @@ enum BookPageFormatter {
     private static func tableRows(_ text: String) -> [[String]] {
         text.split(separator: "\n").map { line -> [String] in
             let row = line.trimmingCharacters(in: .whitespaces)
+            if let entry = contentsEntry(row) { return entry }
             var cells = row.split(separator: "|", omittingEmptySubsequences: false)
                 .map { $0.trimmingCharacters(in: .whitespaces) }
             if cells.count > 1, row.hasPrefix("|") { cells.removeFirst() }
             if cells.count > 1, row.hasSuffix("|") { cells.removeLast() }
             return cells
         }
+    }
+
+    /// A contents entry read as one line, "17. اسے تو ہم شرک سمجھتے ہی نہیں 15":
+    /// its serial number, its title and its page number, as three cells.
+    static func contentsEntry(_ line: String) -> [String]? {
+        guard !line.contains("|"),
+              let regex = try? NSRegularExpression(pattern: #"^([0-9٠-٩۰-۹]+[.)۔-]?)\s+(.+?)\s+([0-9٠-٩۰-۹]+)$"#) else { return nil }
+        let trimmed = line.trimmingCharacters(in: .whitespaces)
+        let range = NSRange(trimmed.startIndex..., in: trimmed)
+        guard let match = regex.firstMatch(in: trimmed, range: range) else { return nil }
+        return (1...3).compactMap { Range(match.range(at: $0), in: trimmed).map { String(trimmed[$0]) } }
+    }
+
+    /// A block most of whose lines are contents entries is a contents table, not prose.
+    static func isContentsList(_ text: String) -> Bool {
+        let lines = text.split(separator: "\n").filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        return lines.count >= 3 && Double(lines.filter { contentsEntry(String($0)) != nil }.count) >= Double(lines.count) * 0.6
     }
 
     // MARK: - Page kinds

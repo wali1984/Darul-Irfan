@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Words on this page that could not be read from the scan are marked … — switch to Pages to see the printed page.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Words on this page that could not be read from the scan are marked … — switch to Pages to see the printed page."}}, "ur": {"stringUnit": {"state": "translated", "value": "اس صفحے کے کچھ الفاظ اسکین سے پڑھے نہیں جا سکے، اُن کی جگہ … ہے۔ چھپا ہوا صفحہ دیکھنے کے لیے «صفحات» کھولیں۔"}}}},
     "Tahajjud Zikr begins soon. Join it live in Darul Irfan.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Tahajjud Zikr begins soon. Join it live in Darul Irfan."}}, "ur": {"stringUnit": {"state": "translated", "value": "تہجد ذکر جلد شروع ہو رہا ہے۔ دارالعرفان میں براہِ راست اس میں شامل ہوں۔"}}}},
     "live in Darul Irfan": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "live in Darul Irfan"}}, "ur": {"stringUnit": {"state": "translated", "value": "دارالعرفان میں براہِ راست"}}}},
     "Join Tahajjud Zikr": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Join Tahajjud Zikr"}}, "ur": {"stringUnit": {"state": "translated", "value": "تہجد ذکر میں شامل ہوں"}}}},

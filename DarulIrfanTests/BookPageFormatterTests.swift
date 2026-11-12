@@ -373,4 +373,56 @@ final class BookPageFormatterTests: XCTestCase {
         let words = respelled.split(whereSeparator: \.isWhitespace).map(String.init)
         XCTAssertTrue(QuranQuotation.isVerified(words, check: .letters))
     }
+
+    // MARK: - Unreadable words and tables (12 November 2026)
+
+    func testARunOfUnreadableWordsShowsAsOneEllipsis() {
+        XCTAssertEqual(BookPageFormatter.hidingUnreadable("نیکی [؟] [؟] [؟] اللہ کریم"), "نیکی … اللہ کریم")
+        XCTAssertEqual(BookPageFormatter.hidingUnreadable("[؟] کام [؟]"), "… کام …")
+        XCTAssertEqual(BookPageFormatter.hidingUnreadable("کوئی نشان نہیں؟"), "کوئی نشان نہیں؟")
+        XCTAssertEqual(BookPageFormatter.unreadableCount("[؟] [؟] ہے [؟]"), 3)
+    }
+
+    func testAPageMostlyUnreadableSaysSo() {
+        let letter = BookPageFormatter.format("عزیزم [؟] [؟] [؟] [؟] [؟] [؟] [؟] [؟] [؟] السلام علیکم")
+        let shown = String(describing: letter.blocks)
+        XCTAssertFalse(shown.contains("[؟]"))
+        let page = BookPage(bookID: "b", page: 1, text: "عزیزم [؟] [؟] [؟] [؟] [؟] [؟] [؟] [؟] [؟] السلام علیکم", blocks: 1,
+                            unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "claude-opus-5-5")
+        let formatted = BookPageFormatter.format(page: page)
+        XCTAssertEqual(formatted.unreadableWords, 9)
+        XCTAssertTrue(formatted.isPartlyUnreadable)
+    }
+
+    func testContentsColumnsShareTheWidthByWhatTheyHold() {
+        let rows = [["نمبر شمار", "عنوانات", "صفحہ نمبر"],
+                    ["عقائد"],
+                    ["1.", "سب کچھ وہی ہے، بندہ کچھ بھی نہیں", "1"],
+                    ["2.", "اللہ کی ذات کے بارے انسان کا تصور قدیم", "1"],
+                    ["12.", "اللہ کو الٰہ ماننا مشکل نہیں، رب ماننا مشکل ہے", "105"]]
+        let layout = BookPageFormatter.tableLayout(rows)
+        XCTAssertTrue(layout.hasHeaderRow)
+        XCTAssertEqual(layout.weights.count, 3)
+        XCTAssertGreaterThan(layout.weights[1], layout.weights[0] * 3)
+        XCTAssertGreaterThan(layout.weights[1], layout.weights[2] * 3)
+        XCTAssertTrue(BookPageFormatter.isSectionRow(["عقائد"], columns: 3))
+        XCTAssertFalse(BookPageFormatter.isSectionRow(["1.", "", ""], columns: 3))
+        XCTAssertTrue(BookPageFormatter.isNumberCell("۱۲۳"))
+        XCTAssertFalse(BookPageFormatter.isNumberCell("باب 1"))
+    }
+
+    func testATableCutByASectionNameIsJoinedAgain() {
+        let header = BookPageFormatter.Block.table([["نمبر شمار", "عنوانات", "صفحہ نمبر"]])
+        let body = BookPageFormatter.Block.table([["1.", "یقین کامل", "4"]])
+        let joined = BookPageFormatter.joiningTables([header, .heading("عقائد"), body])
+        XCTAssertEqual(joined, [.table([["نمبر شمار", "عنوانات", "صفحہ نمبر"], ["عقائد"], ["1.", "یقین کامل", "4"]])])
+        XCTAssertEqual(BookPageFormatter.joiningTables([.heading("فہرست"), body]), [.heading("فہرست"), body])
+    }
+
+    func testAContentsEntryOnOneLineIsCutIntoItsCells() {
+        XCTAssertEqual(BookPageFormatter.contentsEntry("17. اسے تو ہم شرک سمجھتے ہی نہیں 15"), ["17.", "اسے تو ہم شرک سمجھتے ہی نہیں", "15"])
+        XCTAssertNil(BookPageFormatter.contentsEntry("یہ ایک عام جملہ ہے"))
+        XCTAssertTrue(BookPageFormatter.isContentsList(["1. شرک 14", "2. تقدیر 19", "3. ختم نبوت 22"].joined(separator: "\n")))
+        XCTAssertFalse(BookPageFormatter.isContentsList(["یہ ایک عام جملہ ہے", "اور دوسرا بھی"].joined(separator: "\n")))
+    }
 }
