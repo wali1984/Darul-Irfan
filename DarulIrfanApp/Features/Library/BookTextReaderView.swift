@@ -463,6 +463,9 @@ struct FormattedBookPage: View {
 
     private var blockList: some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
+            if page.isPartlyUnreadable {
+                unreadableNote
+            }
             ForEach(Array(page.blocks.enumerated()), id: \.offset) { _, block in
                 blockView(block)
             }
@@ -554,24 +557,59 @@ struct FormattedBookPage: View {
             .textSelection(.enabled)
     }
 
-    /// A table as printed: its cells in columns, a rule between the rows. A
-    /// row with fewer cells than the widest leaves the rest of its columns
-    /// empty.
+    /// Words the reading could not make out are shown as "…"; a page with
+    /// many (a handwritten letter, faint print) says so and points to the
+    /// printed page.
+    private var unreadableNote: some View {
+        Label {
+            Text("Words on this page that could not be read from the scan are marked … — switch to Pages to see the printed page.")
+                .diInterfaceFont(.footnote)
+                .foregroundStyle(DIColor.textMuted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } icon: {
+            Image(systemName: "eye.trianglebadge.exclamationmark")
+                .foregroundStyle(DIColor.textMuted)
+        }
+        .padding(DISpacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: DIRadius.sm, style: .continuous)
+                .fill(DIColor.sandstone.opacity(0.6))
+        )
+        .accessibilityElement(children: .combine)
+    }
+
+    /// A table as printed: its cells in columns that share the width by what
+    /// they hold (numbers narrow, titles wide), a rule between the rows. The
+    /// row naming the columns is set in bold; a row naming a section spans
+    /// the width. A row with fewer cells leaves the rest of its columns empty.
     private func table(_ rows: [[String]]) -> some View {
         let columns = max(1, rows.map(\.count).max() ?? 1)
+        let layout = BookPageFormatter.tableLayout(rows)
         let rightToLeft = isRightToLeft(rows.joined().joined(separator: " "))
         return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
                 if index > 0 {
                     Divider().overlay(DIColor.border)
                 }
-                HStack(alignment: .top, spacing: DISpacing.sm) {
-                    ForEach(0..<columns, id: \.self) { column in
-                        Text(verbatim: column < row.count ? row[column] : "")
-                            .font(face(rightToLeft, size: 0.85))
-                            .foregroundStyle(DIColor.textPrimary)
-                            .multilineTextAlignment(.leading)
+                Group {
+                    if BookPageFormatter.isSectionRow(row, columns: columns) {
+                        Text(verbatim: row.first { !$0.isEmpty } ?? "")
+                            .font(face(rightToLeft, size: 0.9))
+                            .fontWeight(.semibold)
+                            .foregroundStyle(DIColor.primary)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                    } else {
+                        WeightedColumns(weights: layout.weights, spacing: DISpacing.sm) {
+                            ForEach(0..<columns, id: \.self) { column in
+                                let cell = column < row.count ? row[column] : ""
+                                Text(verbatim: cell)
+                                    .font(face(rightToLeft, size: 0.85))
+                                    .fontWeight(index == 0 && layout.hasHeaderRow ? .semibold : .regular)
+                                    .foregroundStyle(index == 0 && layout.hasHeaderRow ? DIColor.textMuted : DIColor.textPrimary)
+                                    .multilineTextAlignment(.leading)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
                     }
                 }
                 .padding(.vertical, DISpacing.xs)
@@ -719,5 +757,41 @@ enum ScriptDirection {
             return fallbackLanguage == "ur" || fallbackLanguage == "ar"
         }
         return arabic > latin
+    }
+}
+
+
+/// A row of cells sharing the proposed width by weight (a table's columns:
+/// numbers narrow, titles wide). Each cell is offered its share and the row
+/// is as tall as its tallest cell. Placed from the leading edge, so a
+/// right-to-left table runs from the right.
+struct WeightedColumns: Layout {
+    var weights: [Double]
+    var spacing: CGFloat
+
+    private func widths(for total: CGFloat, count: Int) -> [CGFloat] {
+        let shares = (0..<count).map { $0 < weights.count ? max(weights[$0], 0.5) : 1 }
+        let sum = shares.reduce(0, +)
+        let available = max(0, total - spacing * CGFloat(max(0, count - 1)))
+        return shares.map { CGFloat($0 / sum) * available }
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? 320
+        let columns = widths(for: width, count: subviews.count)
+        let height = zip(subviews, columns)
+            .map { $0.sizeThatFits(ProposedViewSize(width: $1, height: nil)).height }
+            .max() ?? 0
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let columns = widths(for: bounds.width, count: subviews.count)
+        var x = bounds.minX
+        for (subview, width) in zip(subviews, columns) {
+            subview.place(at: CGPoint(x: x, y: bounds.minY), anchor: .topLeading,
+                          proposal: ProposedViewSize(width: width, height: nil))
+            x += width + spacing
+        }
     }
 }

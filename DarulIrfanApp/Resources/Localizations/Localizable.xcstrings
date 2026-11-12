@@ -1,6 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Words on this page that could not be read from the scan are marked … — switch to Pages to see the printed page.": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Words on this page that could not be read from the scan are marked … — switch to Pages to see the printed page."}}, "ur": {"stringUnit": {"state": "translated", "value": "اس صفحے کے کچھ الفاظ اسکین سے پڑھے نہیں جا سکے، اُن کی جگہ … ہے۔ چھپا ہوا صفحہ دیکھنے کے لیے «صفحات» کھولیں۔"}}}},
     "Playing Bayan": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Playing Bayan"}}, "ur": {"stringUnit": {"state": "translated", "value": "بیان جاری ہے"}}}},
     "Zikr will start soon": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Zikr will start soon"}}, "ur": {"stringUnit": {"state": "translated", "value": "ذکر جلد شروع ہوگا"}}}},
     "Approve a computer": {"extractionState": "manual", "localizations": {"en": {"stringUnit": {"state": "translated", "value": "Approve a computer"}}, "ur": {"stringUnit": {"state": "translated", "value": "کمپیوٹر کی منظوری دیں"}}}},
