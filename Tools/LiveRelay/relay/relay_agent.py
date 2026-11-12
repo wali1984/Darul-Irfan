@@ -286,6 +286,7 @@ class Relay:
         # The audio picker names the stage from the room's sound; typed cues
         # are its backup (owner, 2026-11-06).
         self.platform_is_live = False
+        self.ended_in_room_at = 0.0  # the platform ended its session while the room stayed open
         self.platform_stage: str | None = None
         self.stage_set_at = 0.0     # when this relay last set the stage itself
         self.heard_at: dict[str, float] = {}  # stage -> when the picker gave it
@@ -839,11 +840,25 @@ class Relay:
         A host's cue also starts it (see _send_cue). After a dua in a room
         left open, a new Zikr still needs 20 minutes and some sound, so the
         dua's tail cannot start another."""
+        if not self.joined:
+            self.ended_in_room_at = 0.0  # out of the room: the next opening is a new Zikr
         if not (self.joined and self.has_lease and self.platform_cues) or self.mode == "app":
             return
         if self.platform_is_live or self.platform_live:
             return
         heard = time.time() - self.voice_since if self.voice_since else 0.0
+        if self.ended_in_room_at:
+            # 12 November: the platform ended the Daily Zikr's session (its
+            # 5-hour cap) while the room sat open and silent, and the relay at
+            # once started a "Tahajjud Zikr" at 01:50 in Pakistan, two hours
+            # early, notifying every member. A session that ended under an
+            # open room is like a dua: a new one needs 20 minutes and sound.
+            if time.time() - self.ended_in_room_at < 1200 or heard < 10:
+                return
+            log("someone took the mic in the room left open: a new Zikr")
+            self.ended_in_room_at = 0.0
+            await self._start_now(f"{heard:.0f} s of sound in the room left open after the last Zikr ended")
+            return
         if self.dua_given:
             if time.time() - self.dua_at < 1200 or heard < 10:
                 return
@@ -1364,6 +1379,8 @@ class Relay:
                 live = bool(entry.get("live"))
                 if live != self.platform_is_live:
                     log(f"[platform] Zikr {'live' if live else 'not live'}")
+                    if not live and self.platform_is_live and self.joined and not self.dua_given:
+                        self.ended_in_room_at = time.time()
                     self._new_session(live)  # a session began or ended
                 self.platform_is_live = live
                 # Our own stage, just set, is newer than a read that may
