@@ -258,7 +258,7 @@ describe("the relay's stage as viewers see it", () => {
     expect(states.slice(1)).toEqual(["complete", "complete", "complete"]);
   });
 
-  it("one dua card: the room closing after the aameen adds none, and ends the session within a minute", async () => {
+  it("one dua card: the room closing after the aameen adds no second one, says the Zikr has ended, and ends the session within a minute", async () => {
     const { env, relay, shown, row } = await relaySetup();
     await relay("shajra");
     const aameen = await (await relayLive(env, "usa", { state: "dua" })).json() as any;
@@ -266,10 +266,18 @@ describe("the relay's stage as viewers see it", () => {
     const closed = await (await relayLive(env, "usa", { state: "dua", closed: true })).json() as any;
     expect(Date.parse(closed.endsAt) - Date.now()).toBeLessThanOrEqual(60_000);
     expect(row().auto_end_at).toBe(closed.endsAt);
-    expect(shown()).toEqual(["shajra", "dua"]);
-    // Another closed report keeps the sooner end.
+    // No "Join in the dua" once the room has closed (audit 1d).
+    expect(shown()).toEqual(["shajra", "dua", "ended"]);
+    // Another closed report keeps the sooner end and adds nothing.
     expect(await (await relayLive(env, "usa", { state: "dua", closed: true })).json()).toEqual({ state: "dua", endsAt: closed.endsAt });
-    await endAfterDua(env, new Date(Date.parse(closed.endsAt) + 1000));
+    expect(shown()).toEqual(["shajra", "dua", "ended"]);
+    // A false closure: the resume takes both cards off.
+    const resumed = await relayLive(env, "usa", { state: "live", sessionID: row().session_id });
+    expect(resumed.status).toBe(200);
+    expect(shown()).toEqual(["shajra"]);
+    await relayLive(env, "usa", { state: "dua", closed: true });
+    expect(shown()).toEqual(["shajra", "ended"]);
+    await endAfterDua(env, new Date(Date.parse(row().auto_end_at) + 1000));
     expect(row()).toMatchObject({ state: "offline", session_id: null });
   });
 
@@ -301,21 +309,61 @@ describe("the relay's stage as viewers see it", () => {
     expect(shown()).toEqual(["bayan-after", "dua"]);
   });
 
-  it("a Zikr that reached its end and went quiet for half an hour ends, however young; a still Latifa or a recent Bayan does not", async () => {
+  it("a Zikr that reached its end and went quiet ends, however young; a still Latifa or a long Bayan after the Zikr does not", async () => {
     const { env, raw, relay, row } = await relaySetup();
     const now = new Date();
     const age = (minutes: number) => raw.prepare("UPDATE group_zikr_cues SET created_at=? WHERE group_id='usa'")
       .run(new Date(now.getTime() - minutes * 60_000).toISOString());
-    raw.prepare("UPDATE group_live SET started_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 90 * 60_000).toISOString());
+    raw.prepare("UPDATE group_live SET started_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 200 * 60_000).toISOString());
     await relay("latifa-5"); age(45);
     await endStaleRelaySessions(env, now);
     expect(row().state).toBe("live");
-    await relay("bayan-after"); age(20);
+    // Today's relay posts bayan-after once and never repeats it: a Bayan after
+    // the Zikr 31 or 60 minutes long goes on.
+    await relay("shajra"); await relay("bayan-after"); age(31);
     await endStaleRelaySessions(env, now);
     expect(row().state).toBe("live");
-    age(31);
+    age(60);
+    await endStaleRelaySessions(env, now);
+    expect(row().state).toBe("live");
+    // The room left open after the Zikr (12 Nov: 3.9 hours) ends within ninety minutes.
+    age(91);
     await endStaleRelaySessions(env, now);
     expect(row()).toMatchObject({ state: "offline", session_id: null });
+  });
+
+  it("after the dua or 'The Zikr has ended', half an hour of quiet ends the session", async () => {
+    const { env, raw, relay, row } = await relaySetup();
+    const now = new Date();
+    raw.prepare("UPDATE group_live SET started_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 90 * 60_000).toISOString());
+    await relay("shajra");
+    // A cue row as the room-closed report leaves it, without its quick end.
+    raw.prepare(`INSERT INTO group_zikr_cues(group_id,event_id,stage_id,title,author_id,created_at,notification_state)
+      VALUES('usa','ended-1','ended','The Zikr has ended',?,?,'complete')`).run(RELAY_AUTHOR, new Date().toISOString());
+    raw.prepare("UPDATE group_zikr_cues SET created_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 20 * 60_000).toISOString());
+    await endStaleRelaySessions(env, now);
+    expect(row().state).toBe("live");
+    raw.prepare("UPDATE group_zikr_cues SET created_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 31 * 60_000).toISOString());
+    await endStaleRelaySessions(env, now);
+    expect(row()).toMatchObject({ state: "offline", session_id: null });
+  });
+
+  it("two readings in flight at once cannot send the stage backwards (12 Nov: Ahadiyat and the 1st Latifa a second apart)", async () => {
+    const { relay, shown } = await relaySetup();
+    await relay("latifa-7");
+    const [ahadiyat, back] = await Promise.all([relay("ahadiyat"), relay("latifa-1")]);
+    // Whichever lands first, the stage never ends behind Ahadiyat.
+    expect(shown().at(-1)).toBe("ahadiyat");
+    expect([ahadiyat.status, back.status].sort()).toEqual(back.status === 409 ? [201, 409] : [201, 201]);
+    if (back.status === 409) expect(await back.json()).toEqual({ error: "behind", stageID: "ahadiyat" });
+    // Many at once, in any order: only forward steps are kept.
+    await Promise.all(["maiyyat", "latifa-3", "aqrabiyyat", "latifa-1", "ahadiyat"].map(stage => relay(stage)));
+    // The Zikr's own order from the 7th Latifa on (the return to the 1st is its one step back).
+    const order = ["latifa-7", "latifa-1", "ahadiyat", "maiyyat", "aqrabiyyat"];
+    const steps = shown().map(stage => order.indexOf(stage));
+    expect(steps).not.toContain(-1);
+    expect(steps).toEqual([...steps].sort((a, b) => a - b));
+    expect(shown().at(-1)).toBe("aqrabiyyat");
   });
 
   it("the stage carries its session id, and the public live view is cached two seconds at most", async () => {
