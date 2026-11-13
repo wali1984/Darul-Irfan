@@ -239,7 +239,8 @@ final class BookPageFormatterTests: XCTestCase {
     func testALayoutThatDoesNotFitIsIgnored() {
         var page = laidOut(["فساد کی حقیقت:", "انسان جو چیز بناتا ہے اس کے استعمال کا ایک قاعدہ ہے۔"], layout: "h")
         XCTAssertNil(BookPageFormatter.laidOutParts(of: page))
-        XCTAssertEqual(BookPageFormatter.format(page: page), BookPageFormatter.format(page.text))
+        // The page's own count of unreadable words aside, the same layout as its text alone.
+        XCTAssertEqual(BookPageFormatter.format(page: page).blocks, BookPageFormatter.format(page.text).blocks)
         page.layout = "hx"
         XCTAssertNil(BookPageFormatter.laidOutParts(of: page))
         page.layout = nil
