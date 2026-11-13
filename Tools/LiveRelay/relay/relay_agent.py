@@ -61,6 +61,7 @@ TOKEN_REFUSED = "the platform refused the relay token"
 START_VOICE = 5.0    # (kept for tests) seconds of sound; the Zikr now starts on joining the open room
 DUA_SILENCE = 300  # seconds of silence after the last Muraqaba that mean the Zikr is over
 DUA_AFTER = {"masjid-nabawi", "shajra", "bayan-after"}  # stages after which members' "aameen" means the dua
+DUA_AMEENS = {"bayan-after": (8, 5)}  # aameen in 2 minutes, and from how many members (else 3 from 2)
 AMEEN = re.compile(r"\b(aa?mee?n|ameen|amin|aameen)\b|آمین|آمِین|امین", re.IGNORECASE)
 # Opening recitations come from the room's sound only: a host's "Astaghfirullah"
 # during the dua is devotion, not a cue (6 November).
@@ -767,8 +768,14 @@ class Relay:
             if sender.lower() in self.cue_hosts and not (is_dua(text) or typed_stage(text)):
                 log(f"host {sender}: {text[:60]!r} (not a cue)")
         senders = {s for _, s in self.ameens}
+        # In the Bayan after the Zikr members answer its short prayers with an
+        # "aameen" or two (13 November: 3 from 3 members showed the Dua five
+        # minutes early); the dua itself brings many more.
+        need, members = DUA_AMEENS.get(self.platform_stage, (3, 2))
+        if any(AMEEN.search(t) for _, t in fresh) and self.platform_stage in DUA_AFTER and not self.dua_shown:
+            log(f"aameen: {len(self.ameens)} from {len(senders)} members in 2 min (the dua at {need} from {members})")
         if (not self.dua_shown and self.platform_is_live and self.platform_stage in DUA_AFTER
-                and len(self.ameens) >= 3 and len(senders) >= 2):
+                and len(self.ameens) >= need and len(senders) >= members):
             await self._show_dua(f"{len(self.ameens)} aameen from {len(senders)} members after {self.platform_stage}")
 
     async def _show_dua(self, why: str) -> None:
@@ -940,14 +947,15 @@ class Relay:
         if now - self.health_at < 60 or not (self.joined or self.platform_is_live):
             return
         self.health_at = now
-        sound = now - self.room_audio.last_sound
+        sound = time.time() - self.room_audio.last_sound  # `now` is from before this round's slow UI walk
         speaker = {True: "on", False: "OFF", None: "unknown"}[self.speaker_state]
         log(f"[health] room={self.room_status} speaker={speaker} last-sound={'never' if sound > 1e8 else f'{sound:.0f}s'} "
             f"publishing={'yes' if self.pub_pc is not None else 'no'} platform={'live' if self.platform_is_live else 'off'} "
             f"lease={'held' if self.has_lease else 'no'} gen={self.generation} pending={len(self.pending)} "
             f"stage={self.platform_stage} dua={'shown' if self.dua_shown else 'no'} "
             f"youtube={self.programme.state if self.programme else '-'}/{self.youtube_life} cpu={psutil.cpu_percent():.0f}% "
-            f"read={self.walk_seconds:.1f}s problem={self.problem or '-'}")
+            f"read={self.walk_seconds:.1f}s overflows={getattr(self.capture, 'overflows', 0)} picker-drops={self.picker_drops} "
+            f"problem={self.problem or '-'}")
 
     async def _send_cue(self, stage: str, text: str, generation: int | None = None,
                         cue_id: str | None = None, created_at: float | None = None) -> bool:

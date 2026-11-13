@@ -54,12 +54,12 @@ STALE_SECONDS = 30.0  # a reading whose clip is this old is skipped: the stage h
 # as the app's own matcher has them. Only names, never Latifa numbers alone:
 # Whisper garbles those, so the order carries the Latifas.
 NAMES = [
-    ("ahadiyat", r"احد[یي]ت|عدید|احضیت|ا?حدیت"),
-    ("maiyyat", r"مع[یي]ت|مائ[یي]ت|ما[یي]ت|مائی ?ا[یي]ت"),  # "مائی ایت" 11 Nov
+    ("ahadiyat", r"احد[یي]ت|عدید|احضیت|ا?حدیت|[اآ] ?دیت|مر[اق]?[قک]ب?ہ? ?[اآ]?دیت"),  # "مراک میادیت", "مرقبہ دیت" 13 Nov
+    ("maiyyat", r"مع[یي]ت|مائ[یي]ت|ما[یي]ت|مائی ?ا[یي]ت|مائ[یي]?د"),  # "مائی ایت" 11 Nov, "مائد" 13 Nov
     ("aqrabiyyat", r"اقرب|قرب[یيا]|[کق]ر[بم]ی?ت|نحن|نحب|حب.?ل.?ن?و.?ر[یي]د|وا?ر[یي]د"),  # "او کربیت" 10 Nov
     ("sair-kaaba", r"سیر.?کعب|سرکب|سرکا|ارکا|کعبہ|کا بات|لب[یي]ک|لبار|سر[یي]? ?کا?ب"),  # "سری کابا" 10 Nov
-    ("rauza-athar", r"روض|روز[یاےہ]|اطہر|اثر|[رن]وزی?ں ا|اتر[اے]ر|روزہ? ?ا?[طت]ا?ہ?ر"),  # "نوزیں اترار", "روز اطار" 10 Nov
-    ("masjid-nabawi", r"مسجد|مشک|ماشی|نبوی|مس\S{0,4} ?نب[یيو]"),  # "مستین نبی" 10 Nov
+    ("rauza-athar", r"روض|روز[یاےہ]|اطہر|اثر|[رن]وزی?ں ا|اتر[اے]ر|روزہ? ?ا?[طت]ا?ہ?ر|وا?ز\S? ?[اآ][طت]"),  # "نوزیں اترار", "روز اطار" 10 Nov, "الوزہ اطر", "انوازی آتر" 13 Nov
+    ("masjid-nabawi", r"مسجد|مشک|ماشی|نبوی|مس\S{0,4} ?نب[یيو]|اُ?س [تجد]\S{0,2} (?:نا )?ن?بھ?[یيو]"),  # "مستین نبی" 10 Nov, "اس جن نا بھی" 13 Nov
     ("raabta", r"رابط|رابطہ"),
 ]
 
@@ -142,14 +142,14 @@ BAYAN_QUIET = 60.0       # a Bayan's pause is not its end
 AFTER_SHAJRA = 90.0      # the Bayan after the Zikr: talk 90 s after the Shajra began (its dua comes first)
 PHASE_GAP = 20.0         # a phase changes at most this often
 # "لطیفہ قلب" (the 1st) as read on 10 November: "لدی فائقان", "نتفعقال", "فيقال".
-LATIFA_ONE = r"ف[ائیي]{1,2}ق[اہ]?[لن]|فعقال"
+LATIFA_ONE = r"ف[ائیي]{1,2}ق[اہ]?[لن]|فعقال|فقل|ف ?کان|تی ?فک"  # "ایتفقل", "اگتی فکان", "ایتی فک" 13 Nov
 
 
 # A Latifa's number, when it comes through ("شوطحنا" = چوتھا, "اوانچوان" =
 # پانچواں): it puts the order right if a call was missed or one too many
 # was taken. Only ever forwards, and never more than two past the step.
 NUMBERS = [(1, r"پہلا"), (2, r"دوسر|نسول"), (3, r"تیسر"), (4, r"چوتھ|[شجچ]و ?[تط]ح|جو ?تل"),
-           (5, r"پانچ|ن[چج]وا|بان ?جو|باہن ?جو|بانجر"), (6, r"چھ[ٹڑ]|(?<!\S)ر[تٹ]ا ل"), (7, r"ساتو|سا ?تنل|تان?توا")]
+           (5, r"پانچ|ن[چج]وا|بان ?جو|باہن ?جو|بانجر|[بپو]ان ?ت[وا]? ?ل"), (6, r"چھ[ٹڑ]|(?<!\S)ر[تٹ]ا ل"), (7, r"ساتو|سا ?تنل|تان?توا")]
 # (12 November: "ارنجواندی فو" = پانچواں, "رتا لاتی" = چھٹا, "تانتوانلتی" = ساتواں.)
 # (10 November: "نسولہ تیفا" = دوسرا, "جو تل دیفا" = چوتھا, "بان جو نا دیفا" =
 # پانچواں, "سا تنل دیفا" = ساتواں.)
@@ -588,17 +588,23 @@ class Picker:
             # The call is a word or two ("پہلا لطیفہ"); a recitation reads as many
             # words, one of which can look like Latifa ("افال" in "ولا حول ولا قوۃ",
             # Tahajjud 10 November) - so never from a long reading.
-            if (re.search(LATIFA_WORD, urdu) or re.search(LATIFA_ONE, both) or latifa_number(urdu)) and not is_talk(urdu):
+            # After the Basmalah the 1st's own name ("لطیفہ قلب") counts even in a
+            # long reading: the call comes in the Basmalah's breath (13 November,
+            # "اللہ اللہ بل ایتفقل").
+            if ((re.search(LATIFA_WORD, urdu) or re.search(LATIFA_ONE, both) or latifa_number(urdu)) and not is_talk(urdu)
+                    or current == "basmalah" and re.search(LATIFA_ONE, urdu)):
                 if current is not None or self.tahajjud or self.opening_run(at, window=60.0):
                     # Its number, when it comes through, outranks the order:
                     # the first call heard can be the 2nd's ("دوسرا لطیفہ",
                     # Tahajjud 11 November, when the room was joined late).
                     number = latifa_number(urdu)
                     return f"latifa-{number}" if number and number <= 3 else "latifa-1"
-            if self.tahajjud and zikr_sound(urdu) and not re.search(LATIFA_WORD, both):
-                # The Tahajjud has no bayan: the Zikr's own sound, heard twice
-                # some seconds apart, means the 1st Latifa is on (its call
-                # missed: on 11 November the room was joined muted after it).
+            if (self.tahajjud or current in OPENING) and zikr_sound(urdu) and not re.search(LATIFA_WORD, both):
+                # The Zikr's own sound, heard twice some seconds apart, means the
+                # 1st Latifa is on (its call missed): in the Tahajjud, which has
+                # no bayan (11 November: the room joined muted after the call),
+                # and once the opening is on the stage (13 November: the call
+                # came in the Basmalah's breath, "اللہ اللہ بل ایتی فک").
                 self.zikr_heard = [t for t in self.zikr_heard if at - t <= ZIKR_WINDOW] + [at]
                 if at - self.zikr_heard[0] >= ZIKR_SPAN:
                     return "latifa-1"

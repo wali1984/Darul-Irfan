@@ -88,13 +88,14 @@ def test_muraqaba_names():
 # November, Tahajjud 9/10/11 November), keyed by the stage before it. Rauza-e-
 # Athar's "روز اطار" / "روزہ" was missed on 10 November.
 HEARD_NAMES = {
-    ("latifa-7", "ahadiyat"): ["اللہ رکھ میں احدیت", "احدیت"],
-    ("ahadiyat", "maiyyat"): ["مائیت", "تک میں مائیت", "مائی ایت"],
+    ("latifa-7", "ahadiyat"): ["اللہ رکھ میں احدیت", "احدیت", "اللہ اللہ مراک میادیت", "مرقم ایادیت"],
+    ("raabta", "ahadiyat"): ["اللہ اللہ مرقبہ دیت", "مراک میں آ دیتے ہیں"],
+    ("ahadiyat", "maiyyat"): ["مائیت", "تک میں مائیت", "مائی ایت", "مائد", "مائید"],
     ("maiyyat", "aqrabiyyat"): ["و کرمیت۔", "او کربیت"],
     ("aqrabiyyat", "sair-kaaba"): ["سری کبار سری کبار سری کبار", "سری کبہ سری کبہ سری کبہ", "سری کابا"],
     ("sair-kaaba", "rauza-athar"): ["روز اطار", "روزہ", "روزہ اطہر", "نوزیں اترار", "روزیت مدبان",
-                                    "روزےیا", "روزیں اتھا"],
-    ("rauza-athar", "masjid-nabawi"): ["مسترن نبی مسترن نبی", "مستین نبی۔", "مسین نبی", "مشکا دے نا"],
+                                    "روزےیا", "روزیں اتھا", "الوزہ اطر", "الوزع اتر", "انوازی آتر"],
+    ("rauza-athar", "masjid-nabawi"): ["مسترن نبی مسترن نبی", "مستین نبی۔", "مسین نبی", "مشکا دے نا", "اُس تنو بھی", "اس دن نبی", "اس جن نا بھی"],
 }
 
 
@@ -141,3 +142,17 @@ def test_latifa_numbers_as_read_on_12_november():
     assert latifa_number("تانتوانلتی فار") == 7
     assert latifa_number("کرتا لاتی") is None  # "کرتا" is not چھٹا
 
+
+
+def test_13_november_daily_latifas():
+    # The 1st Latifa's call in the Basmalah's breath, and the Zikr's sound after it.
+    assert picker("basmalah")._listened("basmalah", "اِم اللہ اللہ بل ایتفقل", "", 1000.0) == "latifa-1"
+    assert picker("basmalah")._listened("basmalah", "بل اگتی فکان", "", 1000.0) == "latifa-1"
+    p = picker("basmalah")
+    assert p._listened("basmalah", "ایک ایک ایک ایک ایک ایک", "", 1000.0) is None
+    assert p._listened("basmalah", "ایک ایک ایک ایک ایک ایک", "", 1009.0) == "latifa-1"
+    # Never before any stage in the Daily (a bayan may come first).
+    assert picker(None)._listened(None, "ایک ایک ایک ایک ایک ایک", "", 1009.0) is None
+    # The 5th as "بان تو لیسی پر" / "وانتالی".
+    for text in ("وانتالی", "بان تو لیسی پر", "بانتو لی بھارا", "بانتاللی بھی پر"):
+        assert picker("latifa-4")._listened("latifa-4", text, "", 1000.0) == "latifa-5", text

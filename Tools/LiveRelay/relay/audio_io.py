@@ -181,11 +181,17 @@ class DeviceInput:
     def __init__(self, name: str, *buffers: PcmBuffer, tap=None) -> None:  # noqa: ANN001
         import sounddevice as sd
         self.buffers, self.tap = buffers, tap
+        self.overflows = 0  # sound the device had and PortAudio lost before this callback ran
+        # "high" latency: a larger device buffer, so a busy machine (13 November:
+        # 52 s of the 100-minute recording missing, CPU at 86% in the Zikr)
+        # loses no sound before the callback runs. It adds a fraction of a second.
         self.stream = sd.InputStream(device=find_device(name, False), samplerate=RATE, channels=CHANNELS,
-                                     dtype="int16", blocksize=FRAME, callback=self._callback)
+                                     dtype="int16", blocksize=FRAME, latency="high", callback=self._callback)
         self.stream.start()
 
     def _callback(self, indata, frames, info, status) -> None:  # noqa: ANN001 - PortAudio signature
+        if status and status.input_overflow:
+            self.overflows += 1
         samples = indata.copy()
         for buffer in self.buffers:
             buffer.write(samples)

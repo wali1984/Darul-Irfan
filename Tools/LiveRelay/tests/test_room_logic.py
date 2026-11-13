@@ -307,6 +307,20 @@ relay, calls, _ = build([IN] * 8, platform_live=True, stage="latifa-3",
 run(relay)
 check("aameen mid-Zikr is not the dua", "dua" not in calls["cues"], f"cues={calls['cues']}")
 
+# 11b. In the Bayan after the Zikr a few aameen answer its short prayers (13 November): not the dua;
+# the dua's many aameen are.
+silence, ra.DUA_SILENCE = ra.DUA_SILENCE, 10 ** 9  # the room is talking: only the aameen count here
+relay, calls, _ = build([IN] * 8, platform_live=True, stage="bayan-after",
+                        chat=[[], [("a", "aameen"), ("b", "Ameen")], [("c", "آمین")]])
+run(relay)
+check("3 aameen in the Bayan after is not the dua", "dua" not in calls["cues"], f"cues={calls['cues']}")
+relay, calls, _ = build([IN] * 8, platform_live=True, stage="bayan-after",
+                        chat=[[], [("a", "aameen"), ("b", "Ameen"), ("c", "آمین")],
+                              [("d", "ameen"), ("e", "aameen"), ("a", "Aameen")], [("f", "آمین"), ("b", "ameen")]])
+run(relay)
+check("the dua's many aameen after the Bayan show the dua", "dua" in calls["cues"], f"cues={calls['cues']}")
+ra.DUA_SILENCE = silence
+
 # 12. Start: an open, silent room does not start the Zikr; sound for START_VOICE does.
 relay, calls, clock = build([IN] * 6)
 run(relay)
