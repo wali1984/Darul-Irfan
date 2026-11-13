@@ -475,6 +475,9 @@ struct HalqaStageUpdate: Codable, Sendable {
         let startedAt: Date?
         /// An admin's test Zikr, seen only by the Halqah's admins.
         var isTest: Bool? = nil
+        /// The session shown, so a new one in its place clears the stage.
+        /// Absent from an older server.
+        var sessionID: String? = nil
     }
     let live: Live?
     let pictureURL: URL?

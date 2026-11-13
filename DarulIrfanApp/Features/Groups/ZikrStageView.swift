@@ -39,6 +39,26 @@ enum HalqahStage {
     static let waitingID = "waiting"
     static let bayanID = "bayan"
     static let bayanAfterID = "bayan-after"
+    /// The room closed before a dua was shown (the platform's "ended").
+    static let endedID = "ended"
+
+    /// The relay's own name for the return to the 1st Latifa after the 7th.
+    /// An older platform published it as "Raabta"; it is the 1st Latifa.
+    static let returnID = "raabta"
+    static let firstLatifa = (english: "1st Latifa", urdu: "پہلا لطیفہ")
+
+    static func isReturn(_ stageID: String?) -> Bool { stageID?.lowercased() == returnID }
+
+    /// The stage id as the stage shows it: "raabta" is the 1st Latifa.
+    static func canonicalID(_ stageID: String) -> String { isReturn(stageID) ? "latifa-1" : stageID }
+
+    /// A new session in place of the one shown (a real Zikr replacing a Test
+    /// Zikr in one step): its stage starts afresh. An older server sends no
+    /// session id, and nothing changes.
+    static func isNewSession(previous: String?, now: String?) -> Bool {
+        guard let previous, let now else { return false }
+        return previous != now
+    }
 
     /// How the stage card shows a stage: the Shajra's own lines, the Dua's
     /// card, or the stage's name (with the Arabic while it is recited).
@@ -69,6 +89,7 @@ enum HalqahStage {
         waitingID: ("Zikr will start soon", "ذکر جلد شروع ہوگا"),
         bayanID: ("Playing Bayan", "بیان جاری ہے"),
         bayanAfterID: ("Playing Bayan", "بیان جاری ہے"),
+        endedID: ("The Zikr has ended", "ذکر ختم ہو گیا"),
     ]
 
     private static func named(_ text: String?, notID stageID: String) -> String? {
@@ -81,6 +102,7 @@ enum HalqahStage {
     /// server's own; for a stage that comes without a name, or with its id
     /// for a name, the app's; never a raw id such as "shajra".
     static func title(stageID: String, title: String, titleUr: String?, urdu: Bool) -> String {
+        if isReturn(stageID) { return urdu ? firstLatifa.urdu : firstLatifa.english }
         let known = knownTitles[stageID.lowercased()]
         if urdu, let shown = named(titleUr, notID: stageID) ?? known?.urdu { return shown }
         if let shown = named(title, notID: stageID) { return shown }
@@ -91,6 +113,7 @@ enum HalqahStage {
     /// The Urdu name under the English one (English only); nil when there is none.
     static func secondaryTitle(stageID: String, titleUr: String?, urdu: Bool) -> String? {
         guard !urdu else { return nil }
+        if isReturn(stageID) { return firstLatifa.urdu }
         return named(titleUr, notID: stageID) ?? knownTitles[stageID.lowercased()]?.urdu
     }
 }
@@ -155,6 +178,12 @@ final class ZikrStageModel {
         do {
             let update = try await service.stage(in: groupID, cuesAfter: cueCursor, chatAfter: chatCursor)
             if catalogue == nil || canLead != update.canLead { catalogue = try await service.zikrStages(in: groupID) }
+            if HalqahStage.isNewSession(previous: live?.sessionID, now: update.live?.sessionID) {
+                // The old session's stage and chat leave; this answer's cues
+                // and messages all belong to the new one.
+                cues = []
+                messages = []
+            }
             live = update.live
             pictureURLs = HalqahStage.portraitURLs(groupID: groupID, pictureURL: update.pictureURL, pictureHDURL: update.pictureHDURL)
             canLead = update.canLead
@@ -791,6 +820,7 @@ struct ZikrStageView: View {
     }
 
     static func latifa(_ stageID: String) -> Int? {
+        let stageID = HalqahStage.canonicalID(stageID)
         guard stageID.hasPrefix("latifa-"), let number = Int(stageID.dropFirst(7)), (1...7).contains(number) else { return nil }
         return number
     }

@@ -105,9 +105,42 @@ final class SheikhLiveJoinTests: XCTestCase {
         XCTAssertEqual(ShajraStageScroll.stillLeft(elapsed: 0), ShajraStageScroll.lead)
         XCTAssertEqual(ShajraStageScroll.stillLeft(elapsed: 0.5), 1.5, accuracy: 0.0001)
         XCTAssertEqual(ShajraStageScroll.stillLeft(elapsed: 10), 0)
-        // Owner, 2026-11-06: the whole roll, pause included, in under 60 seconds (about 51).
+        // Owner, 2026-11-06: the whole roll, pause included, in under 60 seconds;
+        // 3.8 s a line matches the Shajra measured on the recordings (about 55 s).
         XCTAssertLessThan(ShajraStageScroll.lead + ShajraStageScroll.duration, 60)
-        XCTAssertEqual(ShajraStageScroll.lead + ShajraStageScroll.duration, 51, accuracy: 0.0001)
+        XCTAssertEqual(ShajraStageScroll.lead + ShajraStageScroll.duration, 55.2, accuracy: 0.0001)
         XCTAssertGreaterThan(ShajraStageScroll.duration, 30, "Still slow enough to read")
+    }
+
+    // MARK: - What the stage shows (audit 2026-11-13)
+
+    func testTheTodayCardChimesForALatifaAMuraqabaOrTheShajraOnly() {
+        for id in ["latifa-1", "latifa-7", "ahadiyat", "masjid-nabawi", "shajra", "custom-12345678-1234-1234-1234-123456789abc"] {
+            XCTAssertTrue(SheikhLiveZikr.chimes(stageID: id), id)
+        }
+        for id in ["tasbih", "basmalah", "waiting", "bayan", "bayan-after", "dua", "ended", ""] {
+            XCTAssertFalse(SheikhLiveZikr.chimes(stageID: id), id)
+        }
+        XCTAssertFalse(SheikhLiveZikr.chimes(stageID: nil))
+        let json = #"{"halqahs":[{"id":"our-sheikh","live":{"kind":"zikr"},"stage":{"stageID":"shajra","title":"Shajra Sharif"}}]}"#
+        XCTAssertEqual(SheikhLiveZikr.parse(Data(json.utf8))?.stageID, "shajra")
+    }
+
+    func testTheReturnToTheFirstLatifaIsTheFirstLatifa() {
+        XCTAssertEqual(HalqahStage.title(stageID: "raabta", title: "Raabta", titleUr: "رابطہ", urdu: false), "1st Latifa")
+        XCTAssertEqual(HalqahStage.title(stageID: "raabta", title: "Raabta", titleUr: "رابطہ", urdu: true), "پہلا لطیفہ")
+        XCTAssertEqual(HalqahStage.secondaryTitle(stageID: "raabta", titleUr: "رابطہ", urdu: false), "پہلا لطیفہ")
+        XCTAssertEqual(HalqahStage.title(stageID: "ended", title: "", titleUr: nil, urdu: false), "The Zikr has ended")
+        let json = #"{"halqahs":[{"id":"our-sheikh","live":{"kind":"zikr"},"stage":{"stageID":"raabta","title":"Raabta","titleUr":"رابطہ"}}]}"#
+        let live = SheikhLiveZikr.parse(Data(json.utf8))
+        XCTAssertEqual(live?.stage(urdu: false), "1st Latifa")
+        XCTAssertEqual(live?.stageID, "latifa-1")
+    }
+
+    func testANewSessionStartsTheStageAfresh() {
+        XCTAssertTrue(HalqahStage.isNewSession(previous: "session-test", now: "session-real"))
+        XCTAssertFalse(HalqahStage.isNewSession(previous: "session-real", now: "session-real"))
+        XCTAssertFalse(HalqahStage.isNewSession(previous: nil, now: "session-real"), "An older server sends no session id")
+        XCTAssertFalse(HalqahStage.isNewSession(previous: "session-real", now: nil))
     }
 }
