@@ -41,8 +41,7 @@ import { createHalqah, memberDirectory, publicHalqahs, retireHalqah, updateHalqa
 import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
 import { uploadPostMedia } from "./postMedia";
 import { libraryPDFRoute } from "./pdfProxy";
-import { acceptCommunityConsent, adultEnrollment, consentRequired, hasCommunityConsent,
-  moderationReports, reportCommunityContent, resolveCommunityReport } from "./communitySafety";
+import { acceptCommunityConsent, moderationReports, reportCommunityContent, resolveCommunityReport } from "./communitySafety";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -124,11 +123,11 @@ async function route(request: Request, env: Env): Promise<Response> {
   // member bearer token, and none of it is reachable from the public feed.
   if (request.method === "POST" && path === "/v1/members/session") {
     if (!await withinWriteLimit(request, env, "member-session", 20)) return json({ error: "Too many requests" }, { status: 429 });
-    return adultEnrollment(request, env, () => createSession(request, env));
+    return createSession(request, env);
   }
   if (request.method === "POST" && path === "/v1/our-sheikh/join") {
     if (!await withinWriteLimit(request, env, "sheikh-public-join", 60)) return json({ error: "Too many requests" }, { status: 429 });
-    return adultEnrollment(request, env, () => joinOurSheikh(request, env));
+    return joinOurSheikh(request, env);
   }
   if (request.method === "POST" && path === "/v1/members/invite") {
     // This one takes a secret that could otherwise be guessed at, so wrong
@@ -137,7 +136,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // must not be turned away.
     if (!await withinWriteLimit(request, env, "member-invite", 60)) return json({ error: "Too many requests" }, { status: 429 });
     if (await requestCount(request, env, "member-invite-refused") >= 10) return json({ error: "Too many requests" }, { status: 429 });
-    const response = await adultEnrollment(request, env, () => redeemInvite(request, env));
+    const response = await redeemInvite(request, env);
     if (response.status === 400 || response.status === 403) await countRequest(request, env, "member-invite-refused");
     return response;
   }
@@ -181,7 +180,6 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path.startsWith("/v1/daily-media/manage")) {
     const member = await authenticatedMember(request, env);
     if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
-    if (!["GET", "HEAD"].includes(request.method) && !await hasCommunityConsent(env, member)) return consentRequired();
     const item = /^\/v1\/daily-media\/manage\/(daily-[a-f0-9-]{12})$/.exec(path)?.[1];
     if (path === "/v1/daily-media/manage" && request.method === "GET") return manageDailyMedia(env, member);
     if (path === "/v1/daily-media/manage" && request.method === "POST") {
@@ -209,7 +207,6 @@ async function route(request: Request, env: Env): Promise<Response> {
     const session = await authenticatedSession(request, env);
     if (!session) return json({ error: "Member sign-in required" }, { status: 401 });
     const member = session.memberID;
-    if (!["GET", "HEAD", "DELETE"].includes(request.method) && !await hasCommunityConsent(env, member)) return consentRequired();
     const input = async () => (request.headers.get("content-type") ?? "").includes("json")
       ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
     const [, , , section = "", entity = "", extra = ""] = path.split("/");
@@ -276,18 +273,20 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
     const member = await authenticatedMember(request, env);
     if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
+    // A JSON body is an object. No body at all reads as an empty one, as it
+    // always has; text that is not JSON, or JSON that is not an object (null,
+    // a list, a bare word), is refused with 400 instead of being read as empty.
     const body = async (): Promise<Record<string, unknown>> => {
-      const input = (request.headers.get("content-type") ?? "").includes("json") ? await request.json() : {};
+      if (!(request.headers.get("content-type") ?? "").includes("json")) return {};
+      const text = await request.text();
+      if (!text.trim()) return {};
+      const input: unknown = JSON.parse(text);
       if (!input || typeof input !== "object" || Array.isArray(input)) throw new SyntaxError("Request must be an object");
       return input as Record<string, unknown>;
     };
+    // The community terms a member accepted, kept for when they are asked for.
+    // Nothing requires them: no route refuses a member who has not accepted.
     if (request.method === "POST" && path === "/v1/members/community-consent") return acceptCommunityConsent(env, member, await body());
-    // Account deletion, sign-out and notification withdrawal remain available
-    // without consent. Community writes, presence and room tokens do not.
-    const withdrawing = (request.method === "DELETE" && (path === "/v1/members/me" || path.startsWith("/v1/members/devices/")))
-      || (request.method === "POST" && path === "/v1/members/signout");
-    if (!["GET", "HEAD"].includes(request.method) && !withdrawing
-        && !await hasCommunityConsent(env, member)) return consentRequired();
     if (request.method === "GET" && path === "/v1/groups") return communityGroups(env, member);
     // The Super admin's: make a Halqah, and everyone who has signed in.
     if (request.method === "POST" && path === "/v1/groups") return createHalqah(env, member, await body());
