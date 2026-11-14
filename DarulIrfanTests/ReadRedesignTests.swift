@@ -400,5 +400,4 @@ private final class ControlledArticleDownloadManager: DownloadManaging {
     func deleteAsset(_ asset: DownloadedAsset) async throws {}
     func localURL(for asset: DownloadedAsset) -> URL? { nil }
     func totalBytesUsed() async -> Int64 { 0 }
-    func clearOrphanedFiles() async throws -> Int { 0 }
 }
