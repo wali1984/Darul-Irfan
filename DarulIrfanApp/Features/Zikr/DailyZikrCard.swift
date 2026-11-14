@@ -118,10 +118,11 @@ struct DailyZikrCard: View {
                 canLeadSheikh = group.canManage ?? (group.myRole == .admin || group.myRole == .administrator || groups.role == .superadmin)
             }
         }
-        .onChange(of: sheikhLive?.stageTitle) { old, new in
-            // A new latifa or muraqaba while the card is on screen: a chime,
-            // since the mic may have dropped as it changed.
-            if old != nil, let new, new != old {
+        .onChange(of: sheikhLive?.stageID) { old, new in
+            // A new latifa, muraqaba or the Shajra while the card is on
+            // screen: a chime, since the mic may have dropped as it changed.
+            // Never for the opening recitations or the room's phases.
+            if old != nil, let new, new != old, SheikhLiveZikr.chimes(stageID: new) {
                 AudioServicesPlaySystemSound(1013)
                 DIHaptics.success()
             }

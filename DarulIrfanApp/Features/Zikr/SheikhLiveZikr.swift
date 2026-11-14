@@ -20,6 +20,21 @@ struct SheikhLiveZikr: Equatable, Sendable {
     var stageTitle: String?
     var stageTitleUr: String?
     var stageAt: Date?
+    /// The stage's id ("latifa-3", "shajra", "waiting"), so the Today card
+    /// chimes for a Latifa, a Muraqaba or the Shajra only.
+    var stageID: String? = nil
+
+    /// Whether a change to this stage is worth a chime on the Today card:
+    /// each Latifa, each Muraqaba (a custom one too) and the Shajra. The
+    /// opening recitations change seconds apart and the phases (waiting, a
+    /// Bayan) flip back and forth; a chime for each was noise (audit 2026-11-13).
+    static func chimes(stageID: String?) -> Bool {
+        guard let id = stageID?.lowercased(), !id.isEmpty else { return false }
+        let quiet: Set<String> = ["tasbih", "istighfar", "shahadah", "taawwudh", "basmalah",
+                                  HalqahStage.waitingID, HalqahStage.bayanID, HalqahStage.bayanAfterID,
+                                  HalqahStage.duaID, HalqahStage.endedID]
+        return !quiet.contains(id)
+    }
 
     /// The session a live Zikr is at `now`: before 07:00 in Pakistan the
     /// Tahajjud zikr, otherwise Daily Zikr (the server's `zikrTitle`; the
@@ -54,8 +69,10 @@ struct SheikhLiveZikr: Equatable, Sendable {
               let live = sheikh.live,
               live.kind == nil || live.kind == "zikr",
               live.isTest != true else { return nil }
-        return SheikhLiveZikr(startedAt: live.startedAt, stageTitle: sheikh.stage?.title,
-                              stageTitleUr: sheikh.stage?.titleUr, stageAt: sheikh.stage?.at)
+        let stageID = sheikh.stage?.stageID
+        return SheikhLiveZikr(startedAt: live.startedAt, stageTitle: HalqahStage.isReturn(stageID) ? HalqahStage.firstLatifa.english : sheikh.stage?.title,
+                              stageTitleUr: HalqahStage.isReturn(stageID) ? HalqahStage.firstLatifa.urdu : sheikh.stage?.titleUr,
+                              stageAt: sheikh.stage?.at, stageID: stageID.map(HalqahStage.canonicalID))
     }
 
     private struct PublicLive: Decodable {
@@ -75,6 +92,7 @@ struct SheikhLiveZikr: Equatable, Sendable {
     }
 
     private struct Stage: Decodable {
+        let stageID: String?
         let title: String?
         let titleUr: String?
         let at: Date?
@@ -101,12 +119,15 @@ extension AppRoute {
 /// before the Dua): its lines rise slowly through the stage card, from the
 /// first to the last, and stop there, the whole roll in under a minute
 /// (owner, 2026-11-06: "shajra should be shown in less than 60 sec rolling";
-/// about 51 s, as the websites). Android ShajraStageScroll.
+/// about 55 s, as the websites). Android ShajraStageScroll.
 enum ShajraStageScroll {
     /// The first lines stay still this long before they begin to move.
     static let lead: TimeInterval = 2
-    /// How long each line takes to pass.
-    static let perLine: TimeInterval = 3.5
+    /// How long each line takes to pass. Measured on the recordings of 10-13
+    /// Nov 2026: the Shajra runs 53-59 s from its first words to its closing
+    /// "برحمتک یا ارحم الراحمین", and its cue lands 2-4 s after it starts;
+    /// at 3.5 s the lines reached the end before the leader did.
+    static let perLine: TimeInterval = 3.8
 
     /// The lines that pass: each link of the chain, then the closing dua.
     static var lineCount: Int { ShajraText.entries.count + 1 }

@@ -51,12 +51,6 @@ export const DEFAULT_ZIKR_STAGES: ZikrStage[] = [
     "isCustom": false
   },
   {
-    "id": "raabta",
-    "title": "Raabta",
-    "titleUr": "رابطہ",
-    "isCustom": false
-  },
-  {
     "id": "ahadiyat",
     "title": "Muraqaba Ahadiyat",
     "titleUr": "مراقبہ احدیت",
@@ -81,6 +75,16 @@ export const DEFAULT_ZIKR_STAGES: ZikrStage[] = [
   // The leader reads the Shajra (mostly hummed) after the last Muraqaba, before the dua (owner 2026-11-06).
   { "id": "shajra", "title": "Shajra Sharif", "titleUr": "شجرہ شریف", "isCustom": false }
 ];
+
+/** "raabta" is the relay picker's own name for the return to the 1st Latifa
+ *  after the 7th. Viewers saw "Raabta" on 9 and 10 Nov 2026; it is the 1st
+ *  Latifa again, so it is stored and shown as one (audit 2026-11-13). */
+const STAGE_ALIASES: Record<string, string> = { raabta: "latifa-1" };
+
+/** The Zikr ended without a dua being shown (the room closed first): every
+ *  screen says so instead of asking viewers to join a dua already over
+ *  (audit 2026-11-13). An older app shows its name like any other stage. */
+export const ENDED_STAGE: ZikrStage = { id: "ended", title: "The Zikr has ended", titleUr: "ذکر ختم ہو گیا", isCustom: false };
 
 /** The recitations that open every Zikr, in order, exactly as the Method of
  * Zikr gives them (method_of_zikr.json): shown in Arabic on the live stage
@@ -120,11 +124,11 @@ export const STAGE_PRESETS = [
   { id: "cannot-hear", title: "The sound is not clear", titleUr: "آواز صاف نہیں آ رہی" },
 ];
 
-interface LiveZikr { title: string | null; video_id: string | null; started_at: string | null; is_test: number }
+interface LiveZikr { title: string | null; video_id: string | null; started_at: string | null; is_test: number; session_id: string | null }
 
 /** The live Zikr as this person may see it: a test Zikr exists only for the Halqah's admins. */
 async function liveZikr(env: Env, groupID: string, managing = true): Promise<LiveZikr | null> {
-  const live = await env.DB.prepare("SELECT title,video_id,started_at,is_test FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
+  const live = await env.DB.prepare("SELECT title,video_id,started_at,is_test,session_id FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
     .bind(groupID).first<LiveZikr>();
   return live && (!live.is_test || managing) ? live : null;
 }
@@ -219,7 +223,11 @@ export async function broadcastZikrCue(env: Env, memberID: string, groupID: stri
 /** The live relay starts a Halqah's Zikr when Hazrat ji is live on Paltalk
  *  (owner 2026-11-05) and tells when the dua begins; the session then ends by
  *  itself five minutes later. The relay never ends a session directly.
- *  {state: "live", title?, test?, sessionID?} | {state: "dua", sessionID?}
+ *  {state: "live", title?, test?, sessionID?} | {state: "dua", closed?, sessionID?}
+ *  {closed: true} says the relay saw the room close and has stopped publishing
+ *  its sound: the session then ends within a minute instead of five, and with
+ *  no dua on the stage yet the stage says the Zikr has ended, not "Join in the
+ *  dua" over silence (audit 2026-11-13).
  *  Live again while the dua's end is pending resumes the session; a real
  *  start while a Test Zikr runs replaces the test; a meeting is never taken
  *  over; two starts at once make one session (audit 2026-11-06, F02/F05).
@@ -282,40 +290,79 @@ export async function relayLive(env: Env, groupID: string, input: Record<string,
     // The dua belongs to the session it is called in; a row with no session id has none to bind to.
     if (live?.state !== "live" || live.kind !== "zikr" || !live.session_id) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
     if (stale) return staleSession();
-    if (live.auto_end_at) return json({ state: "dua", endsAt: live.auto_end_at });
-    const endsAt = new Date(Date.now() + DUA_MINUTES * 60_000).toISOString();
+    const closed = input.closed === true;
+    const endsAt = new Date(Date.now() + (closed ? CLOSED_END_SECONDS * 1000 : DUA_MINUTES * 60_000)).toISOString();
+    if (live.auto_end_at) {
+      // A dua already pending is answered again. Once the room has closed the
+      // end comes sooner; the write names the end it read, so a resume or a
+      // newer session in between is left alone.
+      if (!closed || live.auto_end_at <= endsAt) return json({ state: "dua", endsAt: live.auto_end_at });
+      const sooner = await env.DB.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id=? AND session_id=? AND state='live' AND auto_end_at=?")
+        .bind(endsAt, groupID, live.session_id, live.auto_end_at).run();
+      if (!sooner.meta?.changes) return pendingDua(env, groupID, live.session_id);
+      // The room has closed, so the dua is over: "Join in the dua" would ask
+      // people to join a room that no longer exists for its last minute. The
+      // stage says the Zikr has ended instead; a resume hides both cards.
+      if ((await latestCue(env, groupID, live))?.stage_id === DUA_STAGE.id) {
+        await recordCue(env, RELAY_AUTHOR, groupID, { id: crypto.randomUUID(), stageID: ENDED_STAGE.id });
+      }
+      return json({ state: "dua", endsAt });
+    }
     // The write names the session read above: a newer session in its place is
     // left alone, and the dua shows on the stage only once its end is set.
     const set = await env.DB.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id=? AND session_id=? AND state='live' AND auto_end_at IS NULL")
       .bind(endsAt, groupID, live.session_id).run();
-    if (!set.meta?.changes) {
-      // The row moved on between the read and the write: a dua already
-      // pending for this session is answered again; anything else is stale.
-      const current = await env.DB.prepare("SELECT session_id,auto_end_at FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
-        .bind(groupID).first<{ session_id: string | null; auto_end_at: string | null }>();
-      if (current && current.session_id === live.session_id && current.auto_end_at) return json({ state: "dua", endsAt: current.auto_end_at });
-      return staleSession();
+    if (!set.meta?.changes) return pendingDua(env, groupID, live.session_id);
+    // One dua card per dua: the aameen in the chat and the room closing a few
+    // minutes later used to put up two, and a resume then hid only one of
+    // them (13 Nov 2026). With the room closed and no dua shown, the stage
+    // says the Zikr has ended.
+    const latest = await latestCue(env, groupID, live);
+    if (latest?.stage_id !== DUA_STAGE.id && latest?.stage_id !== ENDED_STAGE.id) {
+      await recordCue(env, RELAY_AUTHOR, groupID, { id: crypto.randomUUID(), stageID: closed ? ENDED_STAGE.id : DUA_STAGE.id });
     }
-    await recordCue(env, RELAY_AUTHOR, groupID, { id: crypto.randomUUID(), stageID: DUA_STAGE.id });
     return json({ state: "dua", endsAt });
   }
   return json({ error: "state must be live or dua" }, { status: 400 });
+}
+
+/** The row moved on between the read and the write: a dua already pending for
+ *  this session is answered again; anything else is stale. */
+async function pendingDua(env: Env, groupID: string, sessionID: string): Promise<Response> {
+  const current = await env.DB.prepare("SELECT session_id,auto_end_at FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
+    .bind(groupID).first<{ session_id: string | null; auto_end_at: string | null }>();
+  if (current && current.session_id === sessionID && current.auto_end_at) return json({ state: "dua", endsAt: current.auto_end_at });
+  return staleSession();
+}
+
+/** The newest announcement still on this session's stage. */
+async function latestCue(env: Env, groupID: string, live: Pick<LiveZikr, "started_at">): Promise<CueRow | null> {
+  return env.DB.prepare(`SELECT * FROM group_zikr_cues WHERE ${SESSION_CUES} ORDER BY sequence DESC LIMIT 1`)
+    .bind(groupID, sessionStart(live)).first<CueRow>();
 }
 
 const meetingLive = () => json({ error: "A meeting is live in this Halqah" }, { status: 409 });
 /** The relay named a session that is not the live one: nothing changes on its word. */
 const staleSession = () => json({ error: "stale session" }, { status: 409 });
 
-/** On a resume the dua that announced the end leaves the stage, so the stage
- *  before it shows again everywhere. */
+/** On a resume every dua (or "ended") card that announced the end leaves the
+ *  stage, so the stage before them shows again everywhere. Hiding only the
+ *  newest one left an earlier dua on every screen while the Zikr carried on. */
 async function hideDuaCue(env: Env, groupID: string, live: Pick<LiveZikr, "started_at">): Promise<void> {
-  await env.DB.prepare(`UPDATE group_zikr_cues SET hidden_at=? WHERE sequence=(SELECT MAX(sequence) FROM group_zikr_cues
-      WHERE group_id=? AND stage_id=? AND hidden_at IS NULL AND created_at>=?)`)
-    .bind(new Date().toISOString(), groupID, DUA_STAGE.id, sessionStart(live)).run();
+  const since = sessionStart(live);
+  await env.DB.prepare(`UPDATE group_zikr_cues SET hidden_at=? WHERE group_id=? AND hidden_at IS NULL AND created_at>=?
+      AND stage_id IN (?,?) AND sequence > COALESCE((SELECT MAX(sequence) FROM group_zikr_cues
+        WHERE group_id=? AND hidden_at IS NULL AND created_at>=? AND stage_id NOT IN (?,?)), 0)`)
+    .bind(new Date().toISOString(), groupID, since, DUA_STAGE.id, ENDED_STAGE.id, groupID, since, DUA_STAGE.id, ENDED_STAGE.id).run();
 }
 
 /** Minutes the session stays open after the dua begins. */
 export const DUA_MINUTES = 5;
+/** Seconds the session stays open once the relay saw the room close: long
+ *  enough for a false closure to resume it, short enough that nobody watches
+ *  a dua card over silence for five minutes (audit 2026-11-13). The minute
+ *  cron adds up to a minute more. */
+export const CLOSED_END_SECONDS = 60;
 
 /** Each minute: a session whose dua began five minutes ago ends, and is kept
  *  in history. The end belongs to the session the dua was called in: a newer
@@ -331,6 +378,23 @@ export async function endAfterDua(env: Env, now = new Date()): Promise<void> {
 export const RELAY_MAX_HOURS = 5;
 /** A sign of life: a stage cue this recent keeps an old session, however long it has run. */
 export const RELAY_QUIET_MINUTES = 60;
+/** The Zikr has reached its end (the Shajra, the Bayan after it, the dua):
+ *  with no new cue for this long the room has gone quiet, whatever the
+ *  session's age. On 12 Nov 2026 the room stayed open after the Zikr and
+ *  every screen showed the Shajra for 3.9 hours. After the dua (or "The Zikr
+ *  has ended") half an hour is plenty. */
+export const RELAY_ENDED_QUIET_MINUTES = 30;
+/** After the Shajra, or once the Bayan after the Zikr has begun, Hazrat ji may
+ *  still be speaking: the relay posts bayan-after once and does not repeat it
+ *  while the talk goes on, so a half-hour limit would end a long Bayan, stop
+ *  its sound for every listener and let the relay start a "new" Zikr with a
+ *  push. Ninety minutes still ends the room left open within the hour and a
+ *  half instead of 3.9 hours. The relay repeating the stage resets the clock. */
+export const RELAY_BAYAN_QUIET_MINUTES = 90;
+const CLOSING_STAGES: Record<string, number> = {
+  "shajra": RELAY_BAYAN_QUIET_MINUTES, "bayan-after": RELAY_BAYAN_QUIET_MINUTES,
+  "dua": RELAY_ENDED_QUIET_MINUTES, "ended": RELAY_ENDED_QUIET_MINUTES,
+};
 
 /** Each minute: a Zikr the relay started and never saw to its dua (the relay
  *  died, the room closed unseen) ends once it is five hours old and its stage
@@ -345,6 +409,16 @@ export async function endStaleRelaySessions(env: Env, now = new Date()): Promise
       AND NOT EXISTS (SELECT 1 FROM group_zikr_cues c WHERE c.group_id=group_live.group_id AND c.created_at>=?)`)
     .bind(RELAY_AUTHOR, before, quietSince).all<{ group_id: string; session_id: string }>();
   for (const row of stale.results ?? []) await endSession(env, row.group_id, RELAY_AUTHOR, { sessionID: row.session_id });
+  // A Zikr that has reached its end and gone quiet ends, however young.
+  const open = await env.DB.prepare(`SELECT group_id,session_id,started_at FROM group_live WHERE state='live' AND kind='zikr' AND started_by=?
+      AND session_id IS NOT NULL`).bind(RELAY_AUTHOR).all<{ group_id: string; session_id: string; started_at: string | null }>();
+  for (const row of open.results ?? []) {
+    const latest = await latestCue(env, row.group_id, row);
+    const quiet = latest ? CLOSING_STAGES[latest.stage_id] : undefined;
+    if (latest && quiet && latest.created_at <= new Date(now.getTime() - quiet * 60_000).toISOString()) {
+      await endSession(env, row.group_id, RELAY_AUTHOR, { sessionID: row.session_id });
+    }
+  }
 }
 
 async function ensureRelayAuthor(env: Env): Promise<void> {
@@ -358,20 +432,73 @@ async function ensureRelayAuthor(env: Env): Promise<void> {
  *  with the platform's LISTENER_TOKEN and records as the "Paltalk" author. */
 export const RELAY_AUTHOR = "service-paltalk-relay";
 export async function relayZikrCue(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
-  if (!await liveZikr(env, groupID)) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
+  const live = await liveZikr(env, groupID);
+  if (!live) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
+  // A cue meant for another session (sent before a restart) changes nothing.
+  if (input.sessionID != null && input.sessionID !== live.session_id) return staleSession();
+  const behind = await behindStage(env, groupID, live, input);
+  if (behind) return json({ error: "behind", stageID: behind }, { status: 409 });
   await ensureRelayAuthor(env);
   return recordCue(env, RELAY_AUTHOR, groupID, input);
 }
 
+/** The Zikr only moves forward. Two readings posted in the same second sent the
+ *  stage from Ahadiyat back to the 1st Latifa and on again, with three pushes
+ *  (12 Nov 2026): a built-in stage behind the one on the stage is refused, and
+ *  the stage already shown is returned. The return to the 1st Latifa after the
+ *  7th is the one step back the Zikr takes. Phases, recitations and the dua are
+ *  never held back, and only the relay is: an admin's tap may correct the stage. */
+async function behindStage(env: Env, groupID: string, live: Pick<LiveZikr, "started_at">, input: Record<string, unknown>): Promise<string | null> {
+  const asked = typeof input.stageID === "string" ? input.stageID : "";
+  const stageID = STAGE_ALIASES[asked] ?? asked;
+  const order = DEFAULT_ZIKR_STAGES.findIndex(stage => stage.id === stageID);
+  if (order < 0) return null;
+  // A retry of a cue already saved is answered as before, whatever came since.
+  if (typeof input.id === "string" && await env.DB.prepare("SELECT 1 FROM group_zikr_cues WHERE group_id=? AND event_id=?")
+    .bind(groupID, input.id.toLowerCase()).first()) return null;
+  const shown = await shownStage(env, groupID, live);
+  if (!shown) return null;
+  if (stageID === "latifa-1" && shown === "latifa-7") return null;
+  return order < BUILT_IN_IDS.indexOf(shown) ? shown : null;
+}
+
+const BUILT_IN_IDS = DEFAULT_ZIKR_STAGES.map(stage => stage.id);
+/** The newest built-in stage on the session's stage (Latifas and Muraqabat). */
+async function shownStage(env: Env, groupID: string, live: Pick<LiveZikr, "started_at">): Promise<string | null> {
+  const shown = await env.DB.prepare(`SELECT stage_id FROM group_zikr_cues WHERE ${SESSION_CUES} AND stage_id IN (${BUILT_IN_IDS.map(() => "?").join(",")})
+      ORDER BY sequence DESC LIMIT 1`).bind(groupID, sessionStart(live), ...BUILT_IN_IDS).first<{ stage_id: string }>();
+  return shown?.stage_id ?? null;
+}
+
+/** The check above reads, then the cue is written: two readings in flight at
+ *  once (12 Nov: Ahadiyat and the 1st Latifa a second apart) both read the 7th
+ *  Latifa and both passed. The same rule is therefore part of the INSERT, which
+ *  D1 runs as one statement: the row is written only if no stage ahead of it
+ *  is the newest on the stage. Returns the WHERE clause and its bindings, or
+ *  null when nothing can be ahead (the Shajra, or not a built-in stage). */
+function forwardOnly(groupID: string, live: Pick<LiveZikr, "started_at">, stageID: string): { sql: string; binds: unknown[] } | null {
+  const order = BUILT_IN_IDS.indexOf(stageID);
+  const later = order < 0 ? [] : BUILT_IN_IDS.slice(order + 1);
+  if (!later.length) return null;
+  const marks = (list: string[]) => list.map(() => "?").join(",");
+  return {
+    sql: `WHERE NOT EXISTS (SELECT 1 FROM (SELECT stage_id FROM group_zikr_cues WHERE ${SESSION_CUES} AND stage_id IN (${marks(BUILT_IN_IDS)})
+        ORDER BY sequence DESC LIMIT 1) last WHERE last.stage_id IN (${marks(later)}) AND NOT (?='latifa-1' AND last.stage_id='latifa-7'))`,
+    binds: [groupID, sessionStart(live), ...BUILT_IN_IDS, ...later, stageID],
+  };
+}
+
 async function recordCue(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
   const eventID = typeof input.id === "string" ? input.id.toLowerCase() : "";
-  const stageID = typeof input.stageID === "string" ? input.stageID : "";
+  const asked = typeof input.stageID === "string" ? input.stageID : "";
+  const stageID = STAGE_ALIASES[asked] ?? asked;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(eventID) || !stageID || stageID.length > 80) {
     return json({ error: "A stage and event ID are required" }, { status: 400 });
   }
   let stage: ZikrStage | undefined = DEFAULT_ZIKR_STAGES.find(value => value.id === stageID);
   const recitation = RECITATIONS.find(value => value.id === stageID);
   if (!stage && stageID === DUA_STAGE.id) stage = DUA_STAGE;
+  if (!stage && stageID === ENDED_STAGE.id) stage = ENDED_STAGE;
   const phase = PHASE_STAGES.find(value => value.id === stageID);
   if (!stage && phase) stage = phase;
   if (!stage && recitation) stage = { id: recitation.id, title: recitation.title, titleUr: recitation.titleUr, isCustom: false };
@@ -383,12 +510,23 @@ async function recordCue(env: Env, memberID: string, groupID: string, input: Rec
   if (!stage) return json({ error: "Stage not found" }, { status: 404 });
   // A recitation changes every few minutes; it shows on the stage without a
   // notification (only Latifas and Muraqabat notify). A test Zikr notifies nobody.
-  const test = !!(await liveZikr(env, groupID))?.is_test;
+  const live = await liveZikr(env, groupID);
+  const test = !!live?.is_test;
+  // The relay repeating the stage already shown is a sign of life (a long
+  // Bayan after the Zikr), kept so the quiet end does not fire, never a
+  // second notification.
+  const repeat = memberID === RELAY_AUTHOR && !!live && (await latestCue(env, groupID, live))?.stage_id === stage.id;
+  // Only the relay is held to the order; an admin's tap may correct the stage.
+  const guard = memberID === RELAY_AUTHOR && live ? forwardOnly(groupID, live, stage.id) : null;
   const result = await env.DB.prepare(`INSERT OR IGNORE INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
-    VALUES(?,?,?,?,?,?,?,?)`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
-    recitation || phase || test || stageID === DUA_STAGE.id ? "complete" : "pending").run();
+    SELECT ?,?,?,?,?,?,?,? ${guard?.sql ?? ""}`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
+    recitation || phase || test || repeat || stage.id === DUA_STAGE.id || stage.id === ENDED_STAGE.id ? "complete" : "pending", ...(guard?.binds ?? [])).run();
   const saved = await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND event_id=?")
     .bind(groupID, eventID).first<CueRow>();
+  if (!saved && guard && live) {
+    // A stage ahead of this one got in first: nothing was written or sent.
+    return json({ error: "behind", stageID: await shownStage(env, groupID, live) }, { status: 409 });
+  }
   if (!saved) return json({ error: "Stage announcement could not be saved" }, { status: 503 });
   if (saved.stage_id !== stageID || saved.author_id !== memberID) {
     return json({ error: "This event ID already belongs to another announcement" }, { status: 409 });
@@ -509,8 +647,10 @@ export async function zikrStage(env: Env, memberID: string, groupID: string, url
       WHERE group_id=? AND hidden_at IS NOT NULL AND hidden_at>=?`).bind(groupID, since).all<{ id: string }>()).results ?? [])
     .map(row => row.id);
   return json({
+    // The session id lets a screen tell a new session from the one it shows
+    // (a real Zikr replacing a Test Zikr in one step) and start its stage afresh.
     live: zikr ? { title: live?.title ?? undefined, videoID: live?.video_id ?? undefined, startedAt: live?.started_at ?? undefined,
-      isTest: live?.is_test ? true : undefined } : null,
+      isTest: live?.is_test ? true : undefined, sessionID: live?.session_id ?? undefined } : null,
     pictureURL: picture?.pictureURL, canLead: managing && zikr,
     // Admins and the Super admin may take anything off the stage, live or not.
     canModerate: managing,

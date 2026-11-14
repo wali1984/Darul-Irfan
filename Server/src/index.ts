@@ -65,7 +65,10 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (request.method === "GET" && path === "/v1/public/sheikh-stage") return cachedJSON(await publicSheikhStage(env), request, 15);
   if (request.method === "GET" && path === "/v1/public/live") {
     const ids = (url.searchParams.get("ids") ?? "").split(",").filter(id => /^[a-z0-9-]{1,40}$/.test(id)).slice(0, 30);
-    return cachedJSON(await publicLive(env, ids), request, 10);
+    // Two seconds: the apps' Today card polls this for the stage and its chime, and a
+    // ten-second cache added up to ten seconds to every change (audit 2026-11-13).
+    // The websites reach it through a service binding, which no cache sits in front of.
+    return cachedJSON(await publicLive(env, ids), request, 2);
   }
   // The live relay (bearer RELAY_TOKEN): posts the stage called in Paltalk ({id: uuid, stageID}),
   // starts the Zikr ({state: "live"}) and says when the dua begins ({state: "dua"}).

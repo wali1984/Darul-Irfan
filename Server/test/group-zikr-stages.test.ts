@@ -1,7 +1,9 @@
 import * as apns from "../src/apns";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Env } from "../src/contracts";
-import { addZikrStage, zikrStages, broadcastZikrCue, zikrCues, dispatchZikrCues } from "../src/groupZikrStages";
+import { addZikrStage, zikrStages, broadcastZikrCue, zikrCues, dispatchZikrCues, relayLive, relayZikrCue, endAfterDua,
+  endStaleRelaySessions, zikrStage, RELAY_AUTHOR } from "../src/groupZikrStages";
+import worker from "../src/index";
 import { sqliteD1 } from "./sqlite-d1";
 
 function setup() {
@@ -28,14 +30,14 @@ describe("Our Sheikh stage catalogue", () => {
       expect((await zikrCues(env, "member", "our-sheikh", null)).status).toBe(200);
     }
   });
-  it("uses stable group identity and exposes 15 ordered defaults with member read-only access", async () => {
+  it("uses stable group identity and exposes 14 ordered defaults with member read-only access", async () => {
     const { env } = setup();
     const response = await zikrStages(env, "member", "our-sheikh");
     const body = await response.json() as any;
     expect(response.status).toBe(200);
     expect(body.canBroadcast).toBe(false);
     expect(body.stages.map((s: any) => s.id)).toEqual([
-      "latifa-1", "latifa-2", "latifa-3", "latifa-4", "latifa-5", "latifa-6", "latifa-7", "raabta", "ahadiyat", "maiyyat", "aqrabiyyat",
+      "latifa-1", "latifa-2", "latifa-3", "latifa-4", "latifa-5", "latifa-6", "latifa-7", "ahadiyat", "maiyyat", "aqrabiyyat",
       "sair-kaaba", "rauza-athar", "masjid-nabawi", "shajra",
     ]);
     expect(body.stages.every((s: any) => s.titleUr && !s.isCustom)).toBe(true);
@@ -53,8 +55,8 @@ describe("Our Sheikh stage catalogue", () => {
     expect((await addZikrStage(env, "admin", "our-sheikh", draft)).status).toBe(200);
     expect((await addZikrStage(env, "admin", "our-sheikh", { ...draft, title: "Different" })).status).toBe(409);
     const body = await (await zikrStages(env, "member", "our-sheikh")).json() as any;
-    expect(body.stages).toHaveLength(16);
-    expect(body.stages[15]).toEqual({ ...draft, isCustom: true });
+    expect(body.stages).toHaveLength(15);
+    expect(body.stages[14]).toEqual({ ...draft, isCustom: true });
   });
   it("does not let custom input replace a built-in; every Halqah's stage is its own", async () => {
     const { env } = setup();
@@ -181,5 +183,194 @@ describe("stage delivery retry and recipient isolation", () => {
     // The record is kept, but once the Zikr ends its stage leaves every screen.
     expect(raw.prepare("SELECT COUNT(*) AS n FROM group_zikr_cues").get()).toEqual({ n: 1 });
     expect((await (await zikrCues(env, "member", "our-sheikh", null)).json() as any).cues).toHaveLength(0);
+  });
+});
+
+
+// What viewers see while the relay follows the Zikr (audit 2026-11-13): one dua
+// card, an end soon after the room closes, the quiet end after the Shajra, the
+// return to the 1st Latifa named as such, and the stage never sent backwards.
+describe("the relay's stage as viewers see it", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  async function relaySetup() {
+    const { env, raw } = setup();
+    vi.stubGlobal("fetch", async () => new Response("", { status: 200 }));
+    let n = 0;
+    const id = () => `22222222-2222-4222-8222-${String(++n).padStart(12, "0")}`;
+    const relay = (stageID: string, extra: Record<string, unknown> = {}) => relayZikrCue(env, "usa", { id: id(), stageID, ...extra });
+    const shown = () => raw.prepare("SELECT stage_id AS id FROM group_zikr_cues WHERE group_id='usa' AND hidden_at IS NULL ORDER BY sequence").all()
+      .map((row: any) => row.id);
+    const row = () => raw.prepare("SELECT state,session_id,auto_end_at FROM group_live WHERE group_id='usa'").get() as any;
+    const started = await (await relayLive(env, "usa", { state: "live", title: "Daily Zikr" })).json() as any;
+    return { env, raw, relay, shown, row, id, sessionID: started.sessionID as string };
+  }
+
+  it("the return to the 1st Latifa is shown as the 1st Latifa, never 'Raabta'", async () => {
+    const { raw, relay } = await relaySetup();
+    await relay("latifa-7");
+    const back = await relay("raabta");
+    expect(back.status).toBe(201);
+    expect((await back.json() as any).cue).toMatchObject({ stageID: "latifa-1", title: "1st Latifa", titleUr: "پہلا لطیفہ" });
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM group_zikr_cues WHERE stage_id='raabta'").get()).toEqual({ n: 0 });
+  });
+
+  it("refuses a relay stage behind the one shown; the return to the 1st Latifa, phases and admins' taps pass", async () => {
+    const { env, relay, shown, id } = await relaySetup();
+    for (const stage of ["latifa-1", "latifa-4", "latifa-7"]) expect((await relay(stage)).status).toBe(201);
+    expect((await relay("latifa-1")).status).toBe(201);
+    expect((await relay("ahadiyat")).status).toBe(201);
+    // The 12 Nov double reading: the 1st Latifa a second after Ahadiyat.
+    const behind = await relay("latifa-1");
+    expect(behind.status).toBe(409);
+    expect(await behind.json()).toEqual({ error: "behind", stageID: "ahadiyat" });
+    expect((await relay("raabta")).status).toBe(409);
+    expect((await relay("bayan-after")).status).toBe(201);
+    expect((await relay("tasbih")).status).toBe(201);
+    // A retry of a cue saved before the stage moved on is answered as saved.
+    const early = id();
+    expect((await relayZikrCue(env, "usa", { id: early, stageID: "maiyyat" })).status).toBe(201);
+    expect((await relay("aqrabiyyat")).status).toBe(201);
+    expect((await relayZikrCue(env, "usa", { id: early, stageID: "maiyyat" })).status).toBe(200);
+    // The Super admin may set the stage back by hand.
+    const tap = await broadcastZikrCue(env, "owner", "usa", { id: id(), stageID: "latifa-3" });
+    expect(tap.status).toBe(201);
+    expect(shown().at(-1)).toBe("latifa-3");
+  });
+
+  it("a relay cue names its session: another session's is refused, the live one's and an unnamed one are taken", async () => {
+    const { relay, sessionID, shown } = await relaySetup();
+    const stale = await relay("latifa-1", { sessionID: "session-other" });
+    expect(stale.status).toBe(409);
+    expect(await stale.json()).toEqual({ error: "stale session" });
+    expect(shown()).toEqual([]);
+    expect((await relay("latifa-1", { sessionID })).status).toBe(201);
+    expect((await relay("latifa-2")).status).toBe(201);
+  });
+
+  it("the relay repeating the stage shown keeps it alive without a second notification", async () => {
+    const { raw, relay } = await relaySetup();
+    await relay("latifa-3");
+    await relay("latifa-3");
+    await relay("bayan-after");
+    await relay("bayan-after");
+    const states = raw.prepare("SELECT notification_state AS s FROM group_zikr_cues WHERE group_id='usa' ORDER BY sequence").all().map((row: any) => row.s);
+    // The first Latifa notifies (sent, or expired once superseded); the repeat and the phases never do.
+    expect(states.slice(1)).toEqual(["complete", "complete", "complete"]);
+  });
+
+  it("one dua card: the room closing after the aameen adds no second one, says the Zikr has ended, and ends the session within a minute", async () => {
+    const { env, relay, shown, row } = await relaySetup();
+    await relay("shajra");
+    const aameen = await (await relayLive(env, "usa", { state: "dua" })).json() as any;
+    expect(Date.parse(aameen.endsAt) - Date.now()).toBeGreaterThan(4 * 60_000);
+    const closed = await (await relayLive(env, "usa", { state: "dua", closed: true })).json() as any;
+    expect(Date.parse(closed.endsAt) - Date.now()).toBeLessThanOrEqual(60_000);
+    expect(row().auto_end_at).toBe(closed.endsAt);
+    // No "Join in the dua" once the room has closed (audit 1d).
+    expect(shown()).toEqual(["shajra", "dua", "ended"]);
+    // Another closed report keeps the sooner end and adds nothing.
+    expect(await (await relayLive(env, "usa", { state: "dua", closed: true })).json()).toEqual({ state: "dua", endsAt: closed.endsAt });
+    expect(shown()).toEqual(["shajra", "dua", "ended"]);
+    // A false closure: the resume takes both cards off.
+    const resumed = await relayLive(env, "usa", { state: "live", sessionID: row().session_id });
+    expect(resumed.status).toBe(200);
+    expect(shown()).toEqual(["shajra"]);
+    await relayLive(env, "usa", { state: "dua", closed: true });
+    expect(shown()).toEqual(["shajra", "ended"]);
+    await endAfterDua(env, new Date(Date.parse(row().auto_end_at) + 1000));
+    expect(row()).toMatchObject({ state: "offline", session_id: null });
+  });
+
+  it("the room closing with no dua shown says the Zikr has ended; a resume takes it off again", async () => {
+    const { env, raw, relay, shown, row, sessionID } = await relaySetup();
+    await relay("shajra");
+    const closed = await (await relayLive(env, "usa", { state: "dua", closed: true })).json() as any;
+    expect(Date.parse(closed.endsAt) - Date.now()).toBeLessThanOrEqual(60_000);
+    expect(shown()).toEqual(["shajra", "ended"]);
+    expect(raw.prepare("SELECT title,title_ur,notification_state FROM group_zikr_cues WHERE stage_id='ended'").get())
+      .toEqual({ title: "The Zikr has ended", title_ur: "ذکر ختم ہو گیا", notification_state: "complete" });
+    expect((await relayLive(env, "usa", { state: "live", sessionID })).status).toBe(200);
+    expect(row()).toMatchObject({ state: "live", session_id: sessionID, auto_end_at: null });
+    expect(shown()).toEqual(["shajra"]);
+  });
+
+  it("a resume hides every dua card after the last stage, not only the newest", async () => {
+    const { env, raw, relay, shown, sessionID } = await relaySetup();
+    await relay("bayan-after");
+    // Two dua cards, as on 13 Nov (the server put up one per report).
+    for (const n of [1, 2]) raw.prepare(`INSERT INTO group_zikr_cues(group_id,event_id,stage_id,title,author_id,created_at,notification_state)
+      VALUES('usa',?,'dua','Dua',?,?,'complete')`).run(`dua-${n}`, RELAY_AUTHOR, new Date().toISOString());
+    raw.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id='usa'").run(new Date(Date.now() + 300_000).toISOString());
+    expect((await relayLive(env, "usa", { state: "live", sessionID })).status).toBe(200);
+    expect(shown()).toEqual(["bayan-after"]);
+    // A dua called again puts up one card, however often it is reported.
+    await relayLive(env, "usa", { state: "dua" });
+    await relayLive(env, "usa", { state: "dua" });
+    expect(shown()).toEqual(["bayan-after", "dua"]);
+  });
+
+  it("a Zikr that reached its end and went quiet ends, however young; a still Latifa or a long Bayan after the Zikr does not", async () => {
+    const { env, raw, relay, row } = await relaySetup();
+    const now = new Date();
+    const age = (minutes: number) => raw.prepare("UPDATE group_zikr_cues SET created_at=? WHERE group_id='usa'")
+      .run(new Date(now.getTime() - minutes * 60_000).toISOString());
+    raw.prepare("UPDATE group_live SET started_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 200 * 60_000).toISOString());
+    await relay("latifa-5"); age(45);
+    await endStaleRelaySessions(env, now);
+    expect(row().state).toBe("live");
+    // Today's relay posts bayan-after once and never repeats it: a Bayan after
+    // the Zikr 31 or 60 minutes long goes on.
+    await relay("shajra"); await relay("bayan-after"); age(31);
+    await endStaleRelaySessions(env, now);
+    expect(row().state).toBe("live");
+    age(60);
+    await endStaleRelaySessions(env, now);
+    expect(row().state).toBe("live");
+    // The room left open after the Zikr (12 Nov: 3.9 hours) ends within ninety minutes.
+    age(91);
+    await endStaleRelaySessions(env, now);
+    expect(row()).toMatchObject({ state: "offline", session_id: null });
+  });
+
+  it("after the dua or 'The Zikr has ended', half an hour of quiet ends the session", async () => {
+    const { env, raw, relay, row } = await relaySetup();
+    const now = new Date();
+    raw.prepare("UPDATE group_live SET started_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 90 * 60_000).toISOString());
+    await relay("shajra");
+    // A cue row as the room-closed report leaves it, without its quick end.
+    raw.prepare(`INSERT INTO group_zikr_cues(group_id,event_id,stage_id,title,author_id,created_at,notification_state)
+      VALUES('usa','ended-1','ended','The Zikr has ended',?,?,'complete')`).run(RELAY_AUTHOR, new Date().toISOString());
+    raw.prepare("UPDATE group_zikr_cues SET created_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 20 * 60_000).toISOString());
+    await endStaleRelaySessions(env, now);
+    expect(row().state).toBe("live");
+    raw.prepare("UPDATE group_zikr_cues SET created_at=? WHERE group_id='usa'").run(new Date(now.getTime() - 31 * 60_000).toISOString());
+    await endStaleRelaySessions(env, now);
+    expect(row()).toMatchObject({ state: "offline", session_id: null });
+  });
+
+  it("two readings in flight at once cannot send the stage backwards (12 Nov: Ahadiyat and the 1st Latifa a second apart)", async () => {
+    const { relay, shown } = await relaySetup();
+    await relay("latifa-7");
+    const [ahadiyat, back] = await Promise.all([relay("ahadiyat"), relay("latifa-1")]);
+    // Whichever lands first, the stage never ends behind Ahadiyat.
+    expect(shown().at(-1)).toBe("ahadiyat");
+    expect([ahadiyat.status, back.status].sort()).toEqual(back.status === 409 ? [201, 409] : [201, 201]);
+    if (back.status === 409) expect(await back.json()).toEqual({ error: "behind", stageID: "ahadiyat" });
+    // Many at once, in any order: only forward steps are kept.
+    await Promise.all(["maiyyat", "latifa-3", "aqrabiyyat", "latifa-1", "ahadiyat"].map(stage => relay(stage)));
+    // The Zikr's own order from the 7th Latifa on (the return to the 1st is its one step back).
+    const order = ["latifa-7", "latifa-1", "ahadiyat", "maiyyat", "aqrabiyyat"];
+    const steps = shown().map(stage => order.indexOf(stage));
+    expect(steps).not.toContain(-1);
+    expect(steps).toEqual([...steps].sort((a, b) => a - b));
+    expect(shown().at(-1)).toBe("aqrabiyyat");
+  });
+
+  it("the stage carries its session id, and the public live view is cached two seconds at most", async () => {
+    const { env, sessionID } = await relaySetup();
+    const stage = await (await zikrStage(env, "owner", "usa", new URL("https://api.example.com/x"))).json() as any;
+    expect(stage.live.sessionID).toBe(sessionID);
+    const reply = await worker.fetch(new Request("https://api.example.com/v1/public/live?ids=usa"), env);
+    expect(reply.headers.get("cache-control")).toBe("public,max-age=2");
   });
 });
