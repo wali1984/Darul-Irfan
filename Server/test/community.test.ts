@@ -51,7 +51,7 @@ async function setup(overrides: Partial<Env> = {}) {
   return { env, raw, call, member: people[0]!.token, admin: people[1]!.token, superAdmin: people[2]!.token };
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe("community groups", () => {
   it("shows members and admins only their groups, and the super admin every group", async () => {
@@ -758,6 +758,10 @@ describe("daily pictures", () => {
   });
 
   it("shows only what the Super admin publishes, and only on its days", async () => {
+    // The manage list reaches back one week from today: hold the clock on the
+    // day the pictures are for, so the test reads the same on any date.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(Date.parse("2026-10-30T12:00:00Z"));
     const media = bucket();
     const { env, call, admin, superAdmin } = await setup({ MEDIA: media, MEDIA_URL_SECRET: "s" } as unknown as Partial<Env>);
     expect((await upload(env, admin, "slot=aqwal&day=2026-10-30&publish=1")).status).toBe(403);
@@ -793,6 +797,7 @@ describe("daily pictures", () => {
     expect(media.stored.size).toBe(2);
     const manage = (await (await call(superAdmin, "GET", "/v1/daily-media/manage")).json()) as { items: { id: string; status: string }[] };
     expect(manage.items.map(item => item.status).sort()).toEqual(["hidden", "published"]);
+    vi.useRealTimers();
   });
 
   it("records a #tagged picture forwarded on WhatsApp as a draft for its place", async () => {
