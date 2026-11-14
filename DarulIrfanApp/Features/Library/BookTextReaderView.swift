@@ -70,7 +70,7 @@ struct BookTextPagesView: View {
             } else if loadFailed {
                 VStack(spacing: DISpacing.md) {
                     DIEmptyState(systemImage: "text.book.closed", titleKey: "Something went wrong",
-                        messageKey: "The pages could not be loaded. Check your connection and try again ? once opened, it stays available offline.")
+                        messageKey: "The pages could not be loaded. Check your connection and try again — once opened, it stays available offline.")
                     Button("Try Again") { loadAttempt += 1 }
                         .buttonStyle(DICompactButtonStyle())
                 }
