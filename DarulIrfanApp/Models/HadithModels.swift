@@ -377,6 +377,16 @@ struct HadithNarrator: Codable, Sendable, Identifiable, Equatable {
     var bioUrdu: String?
     var needsEnglish: Bool?
     var needsUrdu: Bool?
+    /// The short facts in Urdu. Each falls back to its Arabic column where a
+    /// record has none.
+    var kunyaUrdu: String?
+    var generationUrdu: String?
+    var bynameUrdu: String?
+    var professionUrdu: String?
+    var madhhabUrdu: String?
+    var descriptionUrdu: String?
+    var citiesUrdu: String?
+    var affiliationsUrdu: String?
 
     func name(languageCode: String) -> String {
         switch languageCode {
@@ -387,12 +397,24 @@ struct HadithNarrator: Codable, Sendable, Identifiable, Equatable {
     }
 }
 
-/// One scholar's appraisal (jarḥ wa-taʿdīl) of a narrator, Arabic with an
-/// optional translation. Never machine-invented; a missing translation stays nil.
+/// One scholar's appraisal (jarḥ wa-taʿdīl) of a narrator: the Arabic, with
+/// its English and Urdu. The scholar's name is carried in all three as well.
 struct NarratorAppraisal: Codable, Sendable, Equatable, Hashable {
     var scholar: String?
     var scholarArabic: String?
     var textArabic: String?
     var textEnglish: String?
     var textUrdu: String?
+    var scholarUrdu: String?
+
+    /// The scholar's name for a reader of `languageCode`.
+    func scholarName(languageCode: String) -> String? {
+        let names = languageCode == "ur"
+            ? [scholarUrdu, scholarArabic, scholar]
+            : [scholar, scholarArabic]
+        for name in names {
+            if let name, !name.isEmpty { return name }
+        }
+        return nil
+    }
 }

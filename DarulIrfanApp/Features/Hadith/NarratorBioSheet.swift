@@ -5,8 +5,7 @@ import SwiftUI
 /// calls out to any site. Dismiss returns the reader exactly where it was.
 ///
 /// Bilingual by design: the Arabic is always shown, paired with English or Urdu
-/// to match the reader's language. Where a translation has not been prepared, it
-/// says so plainly rather than showing fabricated text.
+/// to match the reader's language.
 @MainActor
 struct NarratorBioSheet: View {
     let narratorId: Int
@@ -121,31 +120,26 @@ struct NarratorBioSheet: View {
                 }
             }
 
-            // Long-form biography in the reader's language, if prepared; the
-            // source's short description fills in where no prose bio exists.
-            // The Urdu fallback is the Arabic description — Arabic script,
-            // which Urdu readers read natively — never the English.
+            // Long-form biography in the reader's language where there is
+            // one; otherwise the source's short description.
             if let bio = isUrdu ? n.bioUrdu : n.bioEnglish, !bio.isEmpty {
                 sectionTitle("Biography")
                 localizedProse(bio)
-            } else if let desc = isUrdu ? n.descriptionArabic : n.descriptionEnglish,
+            } else if let desc = isUrdu ? (n.descriptionUrdu ?? n.descriptionArabic) : n.descriptionEnglish,
                       !desc.isEmpty {
                 sectionTitle("Description")
                 localizedProse(desc)
-            } else if isUrdu, (n.needsUrdu ?? false) {
-                Text("An Urdu biography is being prepared.")
-                    .diInterfaceFont(.footnote).italic()
-                    .foregroundStyle(DIColor.textMuted)
             }
 
-            // Scholarly appraisals (jarḥ wa-taʿdīl): Arabic + translation if any.
+            // Scholarly appraisals (jarḥ wa-taʿdīl): the Arabic, then its
+            // English or Urdu.
             let appraisals = publishedAppraisals(n)
             if !appraisals.isEmpty {
                 sectionTitle("Scholarly appraisals")
                 ForEach(Array(appraisals.enumerated()), id: \.offset) { _, a in
                     DICard {
                         VStack(alignment: .leading, spacing: DISpacing.xs) {
-                            if let who = a.scholar ?? a.scholarArabic {
+                            if let who = a.scholarName(languageCode: languageCode) {
                                 Text(verbatim: who)
                                     .diInterfaceFont(.caption, weight: .semibold)
                                     .foregroundStyle(DIColor.accent)
@@ -167,18 +161,11 @@ struct NarratorBioSheet: View {
         }
     }
 
-    /// Appraisals worth rendering: those that actually carry the scholar's
-    /// words. The store holds 16,422 rows with a scholar name and no body at
-    /// all — they would draw an empty card — and those are what must go.
+    /// Appraisals worth rendering: those that carry the scholar's words. A
+    /// row with a name and no body would draw an empty card.
     ///
-    /// The Arabic body itself is shown to every reader, because it is the
-    /// source rather than a claim of translation: it renders in the Quran face,
-    /// right-to-left, under the scholar's name, and a translation is added
-    /// beneath it only where one has been reviewed. Requiring a translation
-    /// instead would hide 65% of appraisals from English readers and *all* of
-    /// them from Urdu readers, who read Arabic script natively — the same
-    /// reason `HadithSection.title` and the narrator's name and lineage fall
-    /// back to Arabic for Urdu rather than showing nothing.
+    /// The Arabic is shown to every reader, in the Quran face under the
+    /// scholar's name, with its English or Urdu beneath it.
     private func publishedAppraisals(_ narrator: HadithNarrator) -> [NarratorAppraisal] {
         (narrator.appraisals ?? []).filter { appraisal in
             let arabic = appraisal.textArabic?
@@ -214,11 +201,9 @@ struct NarratorBioSheet: View {
         }
     }
 
-    /// Strictly per-language rows. In English UI every value is the page's own
-    /// English column; in Urdu UI the Urdu layer or the Arabic column — which
-    /// Urdu readers read natively — never the reverse. A fact the source lacks
-    /// in the reader's language is simply not shown, rather than padding the
-    /// sheet with the wrong script (the "bio is Arabic-only" defect).
+    /// Strictly per-language rows. In English UI every value is the English
+    /// column; in Urdu UI the Urdu column, and the Arabic one only for a
+    /// record that has no Urdu. A fact the record lacks is not shown.
     private func factRows(_ n: HadithNarrator) -> [(String, String)] {
         var rows: [(String, String)] = []
         func add(_ label: String, _ value: String?) {
@@ -226,14 +211,14 @@ struct NarratorBioSheet: View {
         }
         if isUrdu {
             add(String(localized: "Grade"), n.gradeUrdu ?? n.gradeArabic)
-            add(String(localized: "Byname"), n.bynameArabic)
-            add(String(localized: "Kunya"), n.kunyaArabic)
-            add(String(localized: "Generation"), n.generationArabic)
-            add(String(localized: "Profession"), n.professionArabic)
-            add(String(localized: "School"), n.madhhabArabic)
+            add(String(localized: "Byname"), n.bynameUrdu ?? n.bynameArabic)
+            add(String(localized: "Kunya"), n.kunyaUrdu ?? n.kunyaArabic)
+            add(String(localized: "Generation"), n.generationUrdu ?? n.generationArabic)
+            add(String(localized: "Profession"), n.professionUrdu ?? n.professionArabic)
+            add(String(localized: "School"), n.madhhabUrdu ?? n.madhhabArabic)
             add(String(localized: "Died"), n.deathYearArabic ?? n.deathYear)
-            add(String(localized: "Cities"), n.citiesArabic)
-            add(String(localized: "Affiliations"), n.affiliationsArabic)
+            add(String(localized: "Cities"), n.citiesUrdu ?? n.citiesArabic)
+            add(String(localized: "Affiliations"), n.affiliationsUrdu ?? n.affiliationsArabic)
             add(String(localized: "Lineage"), n.lineageUrdu ?? n.lineageArabic)
         } else {
             add(String(localized: "Grade"), n.gradeEnglish)
