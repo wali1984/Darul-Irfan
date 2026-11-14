@@ -61,18 +61,8 @@ final class OnboardingViewModel {
 
     // Location
     private(set) var locationPhase: LocationSetupPhase = .idle
-    @ObservationIgnored private var citySearchRevision = 0
     @ObservationIgnored private var locationRevision = 0
-    var citySearchQuery: String = "" {
-        didSet {
-            guard citySearchQuery != oldValue else { return }
-            citySearchRevision += 1
-            citySearchResults = []
-            isSearchingCities = false
-            citySearchFailed = false
-            hasSearchedCities = false
-        }
-    }
+    var citySearchQuery: String = ""
     private(set) var citySearchResults: [PlaceCoordinate] = []
     private(set) var isSearchingCities = false
     private(set) var citySearchFailed = false
@@ -176,18 +166,11 @@ final class OnboardingViewModel {
     func searchCities() async {
         let query = citySearchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty, !isSearchingCities else { return }
-        citySearchRevision += 1
-        let request = citySearchRevision
         isSearchingCities = true
         citySearchFailed = false
         do {
-            let results = try await location.searchPlaces(matching: query)
-            guard !Task.isCancelled, request == citySearchRevision else { return }
-            citySearchResults = results
+            citySearchResults = try await location.searchPlaces(matching: query)
         } catch {
-            guard request == citySearchRevision else { return }
-            isSearchingCities = false
-            guard !Task.isCancelled else { return }
             citySearchResults = []
             citySearchFailed = true
         }
