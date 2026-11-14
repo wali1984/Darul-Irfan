@@ -373,6 +373,8 @@ struct ZikrStageView: View {
     @State private var listenToken = ""
     /// What the live sound says of itself ("Live", "Waiting for Hazrat ji…").
     @State private var listenStatus = ""
+    @State private var listenFailed = false
+    @State private var audioRequestRevision = 0
     /// Opened by a Join: the live sound starts once the stage knows the Zikr
     /// is live.
     @State private var listenWanted: Bool
@@ -443,7 +445,10 @@ struct ZikrStageView: View {
         }
         .background {
             if listening {
-                LiveListenPlayer(token: listenToken, urdu: urdu) { listenStatus = $0 }
+                LiveListenPlayer(token: listenToken, urdu: urdu, onStatus: { listenStatus = $0 }, onFailure: {
+                    stopListening()
+                    listenFailed = true
+                })
             }
         }
         // The live sound follows the Zikr: it starts for a Join once the Zikr
@@ -778,11 +783,14 @@ struct ZikrStageView: View {
         VStack(spacing: DISpacing.sm) {
             if model.live != nil {
                 Button { listening ? stopListening() : startListening() } label: {
-                    Label(listening ? LocalizedStringKey("Stop listening") : LocalizedStringKey("Listen live"),
+                    Label(listening ? LocalizedStringKey("Stop listening") : LocalizedStringKey(listenFailed ? "Retry" : "Listen live"),
                           systemImage: listening ? "stop.fill" : "headphones")
                 }
                 .buttonStyle(DIPrimaryButtonStyle())
                 .accessibilityIdentifier("stage-listen-live")
+                if listenFailed {
+                    Text("Could not complete action").diInterfaceFont(.footnote).foregroundStyle(DIColor.danger)
+                }
                 if listening {
                     HStack(spacing: DISpacing.sm) {
                         DILivePulse(size: 8)
@@ -809,9 +817,12 @@ struct ZikrStageView: View {
     /// Hears the live sound on the stage, out of sight, while the stage shows.
     private func startListening() {
         guard ourSheikh, !listening else { return }
+        audioRequestRevision += 1
+        let revision = audioRequestRevision
+        listenFailed = false
         Task {
             let token = await model.service.liveAudioToken ?? ""
-            guard model.live != nil, !listening else { return }
+            guard !Task.isCancelled, revision == audioRequestRevision, model.live != nil, !listening else { return }
             listenToken = token
             listenStatus = ""
             listening = true
@@ -819,6 +830,8 @@ struct ZikrStageView: View {
     }
 
     private func stopListening() {
+        audioRequestRevision += 1
+        listenFailed = false
         listening = false
         listenToken = ""
         listenStatus = ""
@@ -831,8 +844,12 @@ struct ZikrStageView: View {
             model.stopVoice()
             stopListening()
         }
+        audioRequestRevision += 1
+        let revision = audioRequestRevision
         Task {
-            liveAudioToken = await model.service.liveAudioToken ?? ""
+            let token = await model.service.liveAudioToken ?? ""
+            guard !Task.isCancelled, revision == audioRequestRevision else { return }
+            liveAudioToken = token
             liveAudio = mode
         }
     }

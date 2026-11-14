@@ -41,6 +41,8 @@ struct GroupSessionCard: View {
 
     @State private var sheet: Sheet?
     @State private var confirmEnd = false
+    @State private var endingSessionID: String?
+    @State private var sheetSessionID: String?
     @State private var working = false
     @State private var controlError: String?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -101,16 +103,17 @@ struct GroupSessionCard: View {
         .sheet(item: $sheet, onDismiss: { Task { await onChange() } }) { sheet in
             NavigationStack {
                 switch sheet {
-                case .notice: GroupNoticeComposer(groupID: group.id, service: service, current: live.notice?.text)
+                case .notice: GroupNoticeComposer(groupID: group.id, service: service, current: live.notice?.text, sessionID: sheetSessionID)
                 case .dua: GroupDuaComposer(groupID: group.id, service: service)
                 case .listeners: GroupListenersView(attendance: live.attendance ?? [])
-                case .add: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, addingToSession: true)
+                case .add: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, addingToSession: true, sessionID: sheetSessionID)
                 }
             }
         }
         .confirmationDialog("End the session for everyone?", isPresented: $confirmEnd, titleVisibility: .visible) {
             Button("End session", role: .destructive) {
-                Task { await performSessionChange { try await service.endLive(in: group.id) } }
+                let sessionID = endingSessionID
+                Task { await performSessionChange { try await service.endLive(in: group.id, sessionID: sessionID) } }
             }
         }
     }
@@ -253,6 +256,7 @@ struct GroupSessionCard: View {
         }
         HalqahTileGrid(items: sessionTiles)
         Button(role: .destructive) {
+            endingSessionID = live.sessionID
             confirmEnd = true
         } label: {
             Label("End session", systemImage: "stop.circle")
@@ -270,7 +274,7 @@ struct GroupSessionCard: View {
             tiles.append(HalqahTileItem(
                 id: "add", titleKey: "Add to the session", subtitle: Text("Recordings or past zikr"),
                 systemImage: "text.badge.plus", hintKey: "Adds recordings or past zikr to this session."
-            ) { sheet = .add })
+            ) { sheetSessionID = live.sessionID; sheet = .add })
         }
         if live.hasRoom {
             if live.roomRecording == true {
@@ -293,7 +297,7 @@ struct GroupSessionCard: View {
             id: "notice", titleKey: noticeTitle, subtitle: noticeLine,
             systemImage: "megaphone", tint: DIColor.accent,
             hintKey: "Shows a short message to everyone in the session."
-        ) { sheet = .notice })
+        ) { sheetSessionID = live.sessionID; sheet = .notice })
         let hereCount = live.attendance?.filter { $0.isHere == true }.count ?? 0
         tiles.append(HalqahTileItem(
             id: "listeners", titleKey: "Who is listening", subtitle: Text("\(hereCount) here now"),
@@ -331,7 +335,7 @@ struct GroupSessionCard: View {
     }
 
     private func control(_ action: String, _ extra: [String: Any] = [:]) async {
-        await performSessionChange { try await service.control(action, extra, in: group.id) }
+        await performSessionChange { try await service.control(action, extra, in: group.id, sessionID: live.sessionID) }
     }
 
     private func performSessionChange(_ change: () async throws -> Void) async {
@@ -577,6 +581,7 @@ struct GroupNoticeComposer: View {
     let groupID: String
     let service: MemberGroupService
     let current: String?
+    var sessionID: String? = nil
 
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
@@ -630,7 +635,7 @@ struct GroupNoticeComposer: View {
         error = nil
         defer { working = false }
         do {
-            try await service.control("notice", ["text": message, "notify": notify && !message.isEmpty], in: groupID)
+            try await service.control("notice", ["text": message, "notify": notify && !message.isEmpty], in: groupID, sessionID: sessionID)
             dismiss()
         } catch is CancellationError {
             return

@@ -371,10 +371,28 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
   if (!await canManage(env, memberID, role, groupID)) return forbidden();
-  if (input.state !== "live") {
+  if (input.state !== "live" && input.state !== "offline") return json({ error: "state must be live or offline" }, { status: 400 });
+  if (input.sessionID !== undefined && (typeof input.sessionID !== "string" || !input.sessionID || input.sessionID.length > 100)) {
+    return json({ error: "Invalid session ID" }, { status: 400 });
+  }
+  if (["room", "record", "recorded", "test"].some(key => input[key] !== undefined && typeof input[key] !== "boolean")) {
+    return json({ error: "Session options must be true or false" }, { status: 400 });
+  }
+  if (input.state === "offline") {
     // Only an admin ends a session; a finished recording leaves it open.
-    await endSession(env, groupID, memberID);
+    const ended = await endSession(env, groupID, memberID,
+      typeof input.sessionID === "string" ? { sessionID: input.sessionID } : undefined);
+    if (!ended && input.sessionID !== undefined) {
+      return json({ error: "The live session changed. Refresh and try again.", code: "session_changed" }, { status: 409 });
+    }
     return json({ ok: true, state: "offline" });
+  }
+  const observed = await liveRow(env, groupID);
+  if (input.sessionID !== undefined && input.sessionID !== observed?.session_id) {
+    return json({ error: "The live session changed. Refresh and try again.", code: "session_changed" }, { status: 409 });
+  }
+  if (input.kind !== undefined && input.kind !== "zikr" && input.kind !== "meeting") {
+    return json({ error: "kind must be zikr or meeting" }, { status: 400 });
   }
   const kind = input.kind === "meeting" ? "meeting" : "zikr";
   const title = cleanText(input.title, 200) ?? (kind === "zikr" ? "Halqah Zikr" : "Group meeting");
@@ -408,16 +426,18 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
   // A test Zikr lets an admin try the session, the stage and the room: only
   // the Halqah's admins see it, and nobody is notified, then or by its stages.
   const test = input.test === true;
-  const sessionID = await beginSession(env, groupID, memberID, { kind, title, videoID: video, roomID, queue, roomRecording: record, test });
+  const sessionID = await beginSession(env, groupID, memberID, { kind, title, videoID: video, roomID, queue, roomRecording: record, test, expected: observed });
   if (roomID) await trackRoom(env, { roomID, groupID, sessionID, kind, title, record });
   const recorded = queue.length > 0;
   if (!test) {
+    try {
     await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title,
       kind === "meeting" ? "The group meeting has started. Join now in Darul Irfan."
         : recorded && !roomID ? "The Halqah zikr has started. Listen together in Darul Irfan."
         : "Halqah zikr has started. Join now in Darul Irfan.",
       kind === "meeting" ? `darulirfan://groups/${groupID}` : zikrNoticeLink(groupID));
     if (groupID === "our-sheikh" && kind === "zikr") await announceDailyZikr(env);
+    } catch { /* A committed session must not look like a failed start when a notice fails. */ }
   }
   return json({ ok: true, state: "live", kind, hasRoom: !!roomID, recorded, sessionID, isTest: test || undefined });
 }

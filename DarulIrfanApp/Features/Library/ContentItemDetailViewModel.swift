@@ -30,6 +30,7 @@ final class ContentItemDetailViewModel {
     private(set) var initialReadingFraction: Double = 0
     /// Download state per remote URL string.
     private(set) var downloadStates: [String: DownloadRowState] = [:]
+    @ObservationIgnored private var downloadRequests: [String: UUID] = [:]
     /// OCR'd pages available for this work; 0 when only the PDF exists.
     private(set) var bookPageCount: Int = 0
     /// False once every page of the book has been re-read from the scan.
@@ -136,13 +137,17 @@ final class ContentItemDetailViewModel {
 
     func download(urlString: String) async {
         guard let item, let url = URL(string: urlString) else { return }
+        let request = UUID()
+        downloadRequests[urlString] = request
         downloadStates[urlString] = .downloading
+        defer { if downloadRequests[urlString] == request { downloadRequests[urlString] = nil } }
         do {
             let asset = try await downloadManager.download(
                 url: url,
                 forContentItem: item.id,
                 mediaItemID: nil
             )
+            guard downloadRequests[urlString] == request else { return }
             if let localURL = downloadManager.localURL(for: asset) {
                 downloadStates[urlString] = .downloaded(asset: asset, localURL: localURL)
             } else {
@@ -150,7 +155,7 @@ final class ContentItemDetailViewModel {
             }
         } catch {
             // A user-cancelled download was already reset to .notDownloaded.
-            if downloadStates[urlString] == .downloading {
+            if downloadRequests[urlString] == request, downloadStates[urlString] == .downloading {
                 downloadStates[urlString] = .failed
             }
         }
@@ -158,6 +163,7 @@ final class ContentItemDetailViewModel {
 
     func cancelDownload(urlString: String) {
         guard let url = URL(string: urlString) else { return }
+        downloadRequests[urlString] = nil
         downloadManager.cancelDownload(url: url)
         downloadStates[urlString] = .notDownloaded
     }

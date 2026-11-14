@@ -23,13 +23,20 @@ SEED_COPY_FIELDS = {
     "zikr_sessions.json": {"title", "instructions", "availabilityNote"},
 }
 
+# Reporting filters identify where attendees joined; they are not links that
+# hand native reading off to a browser. Keep the exception exact and confined
+# to localization labels, so content and new handoff copy remain checked.
+ADMIN_CHANNEL_LABELS = {"App or website", "On the website", "Website", "Website visitors"}
+
 
 def load_json(path: Path):
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
 
 
-def check(label: str, value: object, failures: list[str]) -> None:
+def check(label: str, value: object, failures: list[str], *, admin_channel_label: bool = False) -> None:
+    if admin_channel_label and isinstance(value, str) and value in ADMIN_CHANNEL_LABELS:
+        return
     if isinstance(value, str) and FORBIDDEN.search(value):
         failures.append(f"{label}: {value}")
 
@@ -47,10 +54,11 @@ def main() -> int:
         ROOT / "DarulIrfanApp" / "Resources" / "Localizations" / "Localizable.xcstrings"
     )
     for key, entry in catalog.get("strings", {}).items():
-        check(f"Localizable key {key!r}", key, failures)
+        admin_label = key in ADMIN_CHANNEL_LABELS
+        check(f"Localizable key {key!r}", key, failures, admin_channel_label=admin_label)
         for language, localization in entry.get("localizations", {}).items():
             value = localization.get("stringUnit", {}).get("value")
-            check(f"Localizable {language} value for {key!r}", value, failures)
+            check(f"Localizable {language} value for {key!r}", value, failures, admin_channel_label=admin_label)
 
     if failures:
         print("Public copy must remain app-native:")

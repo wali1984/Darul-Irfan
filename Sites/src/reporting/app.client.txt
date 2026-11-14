@@ -7,7 +7,8 @@
   const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
   const SVGNS = "http://www.w3.org/2000/svg";
   const app = document.getElementById("app");
-  const state = { view: "overview", preset: "30", from: "", to: "", scope: "all", kind: "all", access: null, org: null, date: "", month: "", timers: [] };
+  const state = { view: "overview", preset: "30", from: "", to: "", scope: "all", kind: "all", access: null, org: null, date: "", month: "", timers: [], moderationStatus: "open" };
+  let authVersion = 0;
 
   // MARK: - Small helpers
   function h(tag, attrs, ...children) {
@@ -21,6 +22,11 @@
     for (const child of children.flat(Infinity)) {
       if (child === null || child === undefined || child === false) continue;
       node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+    }
+    if (typeof attrs?.onclick === "function" && !["button", "a", "input", "select", "dialog"].includes(tag)) {
+      node.tabIndex = 0;
+      if (tag === "div") node.setAttribute("role", "button");
+      node.addEventListener("keydown", event => { if (event.target === node && ["Enter", " "].includes(event.key)) { event.preventDefault(); node.click(); } });
     }
     return node;
   }
@@ -55,12 +61,23 @@
   /** Replaces a node's children with the given nodes, lists flattened and empty ones left out. */
   const put = (root, ...items) => root.replaceChildren(...items.flat(Infinity).filter(item => item !== null && item !== undefined && item !== false));
   function clearTimers() { state.timers.forEach(clearInterval); state.timers = []; }
+  async function request(path, options = {}) {
+    const abort = new AbortController(), timeout = setTimeout(() => abort.abort(), 15000);
+    try {
+      const response = await fetch(path, { ...options, signal: abort.signal });
+      const body = response.status === 204 ? {} : await response.json().catch(() => ({}));
+      return { ok: response.ok, status: response.status, body };
+    } catch { throw new Error("Check your connection and try again."); }
+    finally { clearTimeout(timeout); }
+  }
 
   async function api(path, options = {}) {
-    const response = await fetch(`/api/${path}`, { credentials: "same-origin", ...options,
+    const version = authVersion;
+    const response = await request(`/api/${path}`, { credentials: "same-origin", ...options,
       headers: { accept: "application/json", ...(options.body ? { "content-type": "application/json" } : {}), ...(options.method && options.method !== "GET" ? { "x-markaz": "1" } : {}) } });
+    if (version !== authVersion) throw new Error("signed-out");
     if (response.status === 401) { signIn(); throw new Error("signed-out"); }
-    const body = response.status === 204 ? {} : await response.json().catch(() => ({}));
+    const body = response.body;
     if (!response.ok) throw new Error(body.error || `Request failed (${response.status})`);
     return body;
   }
@@ -85,6 +102,8 @@
   // MARK: - Sign in
   let polling = null;
   async function signIn() {
+    const version = ++authVersion;
+    state.access = null; state.org = null;
     clearTimers();
     if (polling) clearTimeout(polling);
     const code = h("div", { class: "code", "aria-live": "polite" }, "· · · ·");
@@ -109,24 +128,27 @@
           h("li", {}, "Type the code above and tap Approve.")),
         wait, h("div", { class: "updated", style: "margin-top:8px" }, left))));
     try {
-      const response = await fetch("/auth/start", { method: "POST" });
-      const link = await response.json();
+      const response = await request("/auth/start", { method: "POST" });
+      if (version !== authVersion) return;
+      const link = response.body;
       if (!response.ok || !link.code) throw new Error(link.error || "Could not start");
       code.textContent = link.code;
       const expires = Date.parse(link.expiresAt);
       const tick = async () => {
+        if (version !== authVersion) return;
         const seconds = Math.max(0, Math.round((expires - Date.now()) / 1000));
         left.textContent = `This code works for ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")} more.`;
         if (seconds <= 0) return signIn();
-        const poll = await fetch("/auth/poll", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pollToken: link.pollToken }) })
-          .then(r => r.json()).catch(() => ({ status: "pending" }));
+        const result = await request("/auth/poll", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pollToken: link.pollToken }) }).catch(() => null);
+        if (version !== authVersion) return;
+        const poll = result?.ok ? result.body : { status: "pending" };
         if (poll.status === "approved") { toast("Signed in"); return boot(); }
         if (poll.status === "expired") return signIn();
         polling = setTimeout(tick, 2500);
       };
       polling = setTimeout(tick, 1500);
     } catch (error) {
-      wait.replaceChildren(h("span", { class: "err" }, "The sign-in service is unavailable. Refresh in a moment."));
+      if (version === authVersion) wait.replaceChildren(h("span", { class: "err", role: "alert" }, "The sign-in service is unavailable."), h("button", { class: "btn em", onclick: signIn }, "Try again"));
     }
   }
 
@@ -134,7 +156,7 @@
   const VIEWS = [
     ["overview", "Overview", "◈"], ["daily", "Daily report", "☀"], ["monthly", "Monthly report", "▦"],
     ["halqahs", "Halqahs", "◎"], ["people", "People", "☺"], ["sessions", "Sessions", "◷"],
-    ["organisation", "Organisation", "⌂"], ["notices", "Notices", "✉"], ["computers", "Signed-in computers", "⎙"],
+    ["organisation", "Organisation", "⌂"], ["notices", "Notices", "✉"], ["moderation", "Safety reports", "⚑"], ["computers", "Signed-in computers", "⎙"],
   ];
 
   async function boot() {
@@ -151,13 +173,18 @@
       if (VIEWS.some(([id]) => id === view)) state.view = view;
       render();
     } catch (error) {
-      if (error.message !== "signed-out") app.replaceChildren(h("div", { class: "boot" }, h("p", { class: "err" }, error.message)));
+      if (error.message !== "signed-out") app.replaceChildren(h("div", { class: "boot" }, h("p", { class: "err", role: "alert" }, error.message), h("button", { class: "btn em", onclick: boot }, "Try again")));
     }
   }
 
   async function signOut() {
-    await fetch("/auth/signout", { method: "POST" }).catch(() => null);
-    signIn();
+    authVersion += 1; clearTimers(); clearTimeout(polling);
+    try {
+      const result = await request("/auth/signout", { method: "POST" });
+      if (!result.ok) throw new Error("Could not sign out. Try again.");
+      signIn();
+      if (!result.body.revoked) toast("Signed out here. To end the server session, use Signed-in computers in the app.");
+    } catch (error) { toast(error.message); }
   }
 
   function scopeSelect() {
@@ -177,7 +204,7 @@
 
   function filters() {
     const presets = [["7", "7 days"], ["30", "30 days"], ["90", "90 days"], ["365", "12 months"], ["month", "This month"], ["lastmonth", "Last month"], ["custom", "Custom"]];
-    const preset = h("select", { "aria-label": "Period", onchange: event => { state.preset = event.target.value; if (state.preset !== "custom") render(); else render(); } },
+    const preset = h("select", { "aria-label": "Period", onchange: event => { const previous = range(); state.preset = event.target.value; if (state.preset === "custom") { state.from ||= previous.from; state.to ||= previous.to; } render(); } },
       presets.map(([value, label]) => h("option", { value }, label)));
     preset.value = state.preset;
     const r = range();
@@ -194,25 +221,27 @@
   function render() {
     clearTimers();
     location.hash = state.view;
-    const nav = h("nav", { class: "nav", "aria-label": "Sections" },
+    const nav = h("nav", { class: "nav", id: "markaz-nav", "aria-label": "Sections" },
       h("div", { class: "brand" }, h("img", { src: "/logo.webp", alt: "" }), h("div", {}, h("b", {}, "Silsila Markaz"), h("span", {}, "Reports & analytics"))),
-      VIEWS.slice(0, 6).map(([id, label, icon]) => h("a", { href: `#${id}`, class: state.view === id ? "on" : "", onclick: event => { event.preventDefault(); go(id); } }, h("span", {}, icon), label)),
+      VIEWS.slice(0, 6).map(([id, label, icon]) => h("a", { href: `#${id}`, class: state.view === id ? "on" : "", "aria-current": state.view === id ? "page" : null, onclick: event => { event.preventDefault(); go(id); } }, h("span", {}, icon), label)),
       h("div", { class: "sep" }, "Organisation"),
-      VIEWS.slice(6).map(([id, label, icon]) => h("a", { href: `#${id}`, class: state.view === id ? "on" : "", onclick: event => { event.preventDefault(); go(id); } }, h("span", {}, icon), label)),
+      VIEWS.slice(6).map(([id, label, icon]) => h("a", { href: `#${id}`, class: state.view === id ? "on" : "", "aria-current": state.view === id ? "page" : null, onclick: event => { event.preventDefault(); go(id); } }, h("span", {}, icon), label)),
       h("div", { class: "who" }, state.access?.isSuperAdmin ? "Signed in as a super admin" : "Signed in as a Markaz officer",
         h("div", { style: "margin-top:8px;display:flex;gap:8px;flex-wrap:wrap" },
           h("button", { class: "btn", onclick: toggleTheme }, "Theme"), h("button", { class: "btn", onclick: signOut }, "Sign out"))));
     const title = VIEWS.find(([id]) => id === state.view)?.[1] || "Overview";
     const content = h("div", { class: "content" }, h("div", { class: "card" }, h("p", { class: "empty" }, "Loading…")));
     const usesFilters = ["overview", "halqahs", "people", "sessions"].includes(state.view);
+    nav.inert = matchMedia("(max-width:980px)").matches;
     const top = h("header", { class: "top" },
-      h("button", { class: "menu", onclick: () => nav.classList.toggle("open"), "aria-label": "Menu" }, "☰"),
+      h("button", { class: "menu", onclick: event => { const open = nav.classList.toggle("open"); nav.inert = !open; event.currentTarget.setAttribute("aria-expanded", open); if (open) nav.querySelector("a")?.focus(); }, "aria-label": "Menu", "aria-expanded": "false", "aria-controls": "markaz-nav" }, "☰"),
       h("h1", {}, title), usesFilters ? filters() : null);
+    nav.addEventListener("keydown", event => { if (event.key === "Escape" && nav.classList.contains("open")) { nav.classList.remove("open"); nav.inert = matchMedia("(max-width:980px)").matches; const menu = top.querySelector(".menu"); menu.setAttribute("aria-expanded", "false"); menu.focus(); } });
     app.replaceChildren(h("div", { class: "shell" }, nav, h("main", { class: "main" }, top, content)));
     const views = { overview, daily: dailyView, monthly: monthlyView, halqahs: halqahsView, people: peopleView, sessions: sessionsView,
-      organisation: organisationView, notices: noticesView, computers: computersView };
+      organisation: organisationView, notices: noticesView, moderation: moderationView, computers: computersView };
     (views[state.view] || overview)(content).catch(error => {
-      if (error.message !== "signed-out") content.replaceChildren(h("div", { class: "card" }, h("p", { class: "err" }, error.message)));
+      if (error.message !== "signed-out") content.replaceChildren(h("div", { class: "card" }, h("p", { class: "err", role: "alert" }, error.message), h("button", { class: "btn em", onclick: render }, "Try again")));
     });
   }
   function go(view) { state.view = view; render(); }
@@ -359,7 +388,7 @@
         h("div", { class: "card" }, h("h3", {}, "Regions"), h("p", { class: "sub" }, "Attendance by region."), bars(data.regions, row => row.attendance, row => row.name))),
       h("div", { class: "card" }, h("h3", {}, "Latest sessions"), h("p", { class: "sub" }, "Choose one for who attended and the stages called."), sessionsTable(data.sessions.slice(0, 15))),
       h("div", { class: "card noprint" }, h("h3", {}, "Export"), h("p", { class: "sub" }, "Spreadsheets for this period and these Halqahs (they open in Excel with Urdu names intact)."), exportButtons()));
-    state.timers.push(setInterval(() => { if (state.view === "overview") render(); }, 300000));
+    if (root.isConnected) state.timers.push(setInterval(() => { if (state.view === "overview") render(); }, 300000));
   }
 
   async function dailyView(root) {
@@ -498,7 +527,7 @@
         superAdmin ? h("button", { class: "btn", onclick: syncAdmins }, "Bring in Halqah admins") : null),
       org.regions.map(region => h("div", { class: "card region" }, h("h3", {}, region.name), h("div", { class: "halqahs" }, region.halqahs.map(card)))),
       org.unassigned.length ? h("div", { class: "card region" }, h("h3", {}, "Not yet placed in a region"), h("div", { class: "halqahs" }, org.unassigned.map(card))) : null);
-    state.timers.push(setInterval(() => { if (state.view === "organisation") render(); }, 30000));
+    if (root.isConnected) state.timers.push(setInterval(() => { if (state.view === "organisation") render(); }, 30000));
   }
 
   async function syncAdmins() {
@@ -535,14 +564,63 @@
           } }, "Sign out"))))))) : h("p", { class: "empty" }, "None.")));
   }
 
+  async function moderationView(root) {
+    const data = await api(`moderation?status=${encodeURIComponent(state.moderationStatus)}`);
+    const select = h("select", { "aria-label": "Report status", onchange: event => { state.moderationStatus = event.target.value; render(); } },
+      ["open", "resolved", "dismissed"].map(value => h("option", { value }, value[0].toUpperCase() + value.slice(1))));
+    select.value = state.moderationStatus;
+    const reports = Array.isArray(data.reports) ? data.reports : [];
+    put(root,
+      h("div", { class: "card" }, h("h3", {}, "Community safety reports"),
+        h("p", { class: "sub" }, "Review the report and coordinate action with the responsible Halqah admin. Resolving a report records the outcome; it does not automatically hide content or block anyone."), select),
+      reports.length ? reports.map(report => h("article", { class: "card" },
+        h("h3", {}, report.groupName || report.groupID),
+        h("p", { class: "updated" }, `${when(report.createdAt)} · ${report.reporterName || "Member"} · ${report.status}`),
+        h("p", {}, report.reason || "Report"),
+        report.details ? h("p", { style: "white-space:pre-wrap" }, report.details) : null,
+        h("p", { class: "updated" }, `Reported item: ${report.targetKind} · ${report.targetID}`),
+        h("button", { class: "btn em", onclick: () => moderationModal(report) }, report.status === "open" ? "Review report" : "View report")))
+        : h("div", { class: "card" }, h("p", { class: "empty" }, "No reports with this status.")));
+  }
+
+  function moderationModal(report) {
+    const note = h("textarea", { maxlength: 2000, "aria-label": "Review note" });
+    const buttons = [];
+    const finish = async status => {
+      if (!note.value.trim()) return toast("Add a review note describing the action or reason.");
+      buttons.forEach(button => { button.disabled = true; });
+      try {
+        await api(`moderation/${encodeURIComponent(report.id)}`, { method: "POST", body: JSON.stringify({ status, note: note.value.trim() }) });
+        close(); toast(status === "resolved" ? "Report resolved" : "Report dismissed"); render();
+      } catch (error) { toast(error.message); buttons.forEach(button => { button.disabled = false; }); }
+    };
+    if (report.status === "open") {
+      buttons.push(h("button", { class: "btn em", onclick: () => finish("resolved") }, "Resolve report"),
+        h("button", { class: "btn", onclick: () => finish("dismissed") }, "Dismiss report"));
+    }
+    const preview = report.targetPreview;
+    const close = modal("Review safety report",
+      h("p", {}, `${report.groupName || report.groupID} · ${report.reason || "Report"}`),
+      h("p", { class: "updated" }, `Halqah ID: ${report.groupID} · ${report.targetKind}: ${report.targetID}`),
+      h("h3", {}, "Member's report"), h("p", { style: "white-space:pre-wrap" }, report.details || "No additional details."),
+      h("h3", {}, "Reported content"),
+      preview ? h("blockquote", { style: "white-space:pre-wrap;overflow-wrap:anywhere" }, preview)
+        : h("p", { class: "updated" }, report.targetUnavailable ? "The original content is no longer available here." : "Original content is not available in this dashboard. Contact the responsible Halqah admin."),
+      report.targetKind === "meeting-chat" || report.targetKind === "rtk-chat" ? h("p", { class: "updated" }, "Meeting chat evidence supplied in a report is unverified; the provider's private chat is not read by this dashboard.") : null,
+      h("p", {}, "Coordinate any content removal or member action with the responsible Halqah admin before recording the outcome."),
+      report.status === "open" ? h("label", { class: "form" }, "Review note", note) : h("p", { class: "updated" }, `Status: ${report.status}${report.resolvedAt ? " · " + when(report.resolvedAt) : ""}`),
+      buttons.length ? h("div", { class: "form", style: "margin-top:16px" }, h("div", { class: "row" }, buttons)) : null);
+  }
+
   // MARK: - Modals
   function modal(title, ...body) {
-    const close = () => { node.remove(); document.removeEventListener("keydown", onkey); };
-    const onkey = event => { if (event.key === "Escape") close(); };
-    const node = h("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": title, onclick: event => { if (event.target === node) close(); } },
+    const previous = document.activeElement;
+    const close = () => { node.close(); node.remove(); if (previous?.isConnected) previous.focus(); };
+    const node = h("dialog", { class: "modal", "aria-label": title, onclick: event => { if (event.target === node) close(); } },
       h("div", { class: "box" }, h("div", { class: "head" }, h("h2", {}, title), h("button", { class: "btn", onclick: close, "aria-label": "Close" }, "✕")), ...body));
-    document.addEventListener("keydown", onkey);
+    node.addEventListener("cancel", event => { event.preventDefault(); close(); });
     document.body.append(node);
+    node.showModal();
     return close;
   }
 
@@ -595,11 +673,16 @@
     const all = [...org.regions.flatMap(r => r.halqahs), ...org.unassigned];
     const title = h("input", { type: "text", maxlength: 200, placeholder: "Title" });
     const body = h("textarea", { maxlength: 4000, placeholder: "The notice" });
-    const audience = h("select", {}, h("option", { value: "members" }, "Members of the chosen Halqahs"), h("option", { value: "admins" }, "Every Halqah's admins (through the Markaz)"));
-    const scope = h("select", {}, h("option", { value: "all" }, "Every Halqah"), org.regions.map(r => h("option", { value: `region:${r.name}` }, `All of ${r.name}`)), h("option", { value: "halqahs" }, "Choose Halqahs"));
+    const audience = h("select", { "aria-label": "Who receives it" }, h("option", { value: "members" }, "Members of the chosen Halqahs"), h("option", { value: "admins" }, "Every Halqah's admins (through the Markaz)"));
+    const scope = h("select", { "aria-label": "Halqahs" }, h("option", { value: "all" }, "Every Halqah"), org.regions.map(r => h("option", { value: `region:${r.name}` }, `All of ${r.name}`)), h("option", { value: "halqahs" }, "Choose Halqahs"));
     const picks = h("div", { style: "display:none;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px" },
       all.map(item => h("label", { style: "display:flex;gap:6px;font-weight:500" }, h("input", { type: "checkbox", value: item.id }), item.name)));
     scope.addEventListener("change", () => { picks.style.display = scope.value === "halqahs" ? "grid" : "none"; });
+    audience.addEventListener("change", () => {
+      const everyAdmin = audience.value === "admins";
+      scope.disabled = everyAdmin;
+      if (everyAdmin) { scope.value = "all"; picks.style.display = "none"; }
+    });
     const notify = h("input", { type: "checkbox", checked: true });
     const close = modal("Notice to Halqahs", h("div", { class: "form" },
       h("label", {}, "Title", title), h("label", {}, "Message", body),
@@ -623,6 +706,10 @@
   addEventListener("hashchange", () => {
     const view = location.hash.slice(1);
     if (state.access && view !== state.view && VIEWS.some(([id]) => id === view)) go(view);
+  });
+  matchMedia("(max-width:980px)").addEventListener("change", event => {
+    const nav = document.getElementById("markaz-nav");
+    if (nav) nav.inert = event.matches && !nav.classList.contains("open");
   });
   boot();
 })();

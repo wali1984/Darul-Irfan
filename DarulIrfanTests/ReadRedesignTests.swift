@@ -135,6 +135,30 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     @MainActor
+    func testCancelledDownloadCannotReplaceImmediateRetryState() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        let downloads = DownloadsRepository(database: database)
+        let manager = ControlledArticleDownloadManager()
+        try await repository.upsertItems([libraryItem("download-race", category: .books)])
+        let model = ContentItemDetailViewModel(itemID: "download-race", contentRepository: repository,
+            downloadsRepository: downloads, downloadManager: manager)
+        await model.load()
+        let address = "https://example.com/book.pdf"
+        let first = Task { await model.download(urlString: address) }
+        while manager.pending.count < 1 { await Task.yield() }
+        model.cancelDownload(urlString: address)
+        let second = Task { await model.download(urlString: address) }
+        while manager.pending.count < 2 { await Task.yield() }
+        manager.pending[0].resume(throwing: CancellationError())
+        await first.value
+        XCTAssertEqual(model.downloadStates[address], .downloading)
+        manager.pending[1].resume(throwing: URLError(.notConnectedToInternet))
+        await second.value
+        XCTAssertEqual(model.downloadStates[address], .failed)
+    }
+
+    @MainActor
     func testReturningToArticleKeepsLoadedContentButExplicitReloadStillWorks() async throws {
         let database = try await AppDatabase.inMemory()
         let repository = ContentRepository(database: database)
@@ -363,4 +387,17 @@ final class ReadRedesignTests: XCTestCase {
             XCTAssertTrue(word.hasPrefix("word") && Int(word.dropFirst(4)) != nil, "\(word) is a whole word")
         }
     }
+}
+
+@MainActor
+private final class ControlledArticleDownloadManager: DownloadManaging {
+    var activeDownloads: [String: Double] { [:] }
+    var pending: [CheckedContinuation<DownloadedAsset, Error>] = []
+    func download(url: URL, forContentItem contentItemID: String?, mediaItemID: String?) async throws -> DownloadedAsset {
+        try await withCheckedThrowingContinuation { pending.append($0) }
+    }
+    func cancelDownload(url: URL) {}
+    func deleteAsset(_ asset: DownloadedAsset) async throws {}
+    func localURL(for asset: DownloadedAsset) -> URL? { nil }
+    func totalBytesUsed() async -> Int64 { 0 }
 }

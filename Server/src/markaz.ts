@@ -65,8 +65,11 @@ function local(iso: string, zone: string): { date: string; weekday: number; hour
   return { date: `${value("year")}-${value("month")}-${value("day")}`, weekday, hour: Number(value("hour")) % 24 };
 }
 
-const validDate = (value: string | null): string | null =>
-  value && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) ? value : null;
+const validDate = (value: string | null): string | null => {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? value : null;
+};
 const addDays = (date: string, days: number): string => new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY).toISOString().slice(0, 10);
 const daysBetween = (from: string, to: string): number => Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / DAY) + 1;
 const today = (zone: string): string => local(new Date().toISOString(), zone).date;
@@ -402,6 +405,9 @@ function insights(summary: Summary, before: { attendance: number; sessions: numb
 // MARK: - Analytics
 
 function windowFrom(url: URL, zone: string): Window | string {
+  for (const key of ["from", "to"]) {
+    if (url.searchParams.has(key) && !validDate(url.searchParams.get(key))) return "Choose a valid start and end date.";
+  }
   const to = validDate(url.searchParams.get("to")) ?? today(zone);
   const from = validDate(url.searchParams.get("from")) ?? addDays(to, -29);
   if (from > to) return "The start date is after the end date.";
@@ -464,6 +470,7 @@ async function report(env: Env, window: Window, scope: Scope, kind: string, grou
 export async function dailyReport(env: Env, memberID: string, url: URL): Promise<Response> {
   if (!(await markazAccess(env, memberID)).canReport) return forbidden();
   const zone = zoneOf(url.searchParams.get("tz"));
+  if (url.searchParams.has("date") && !validDate(url.searchParams.get("date"))) return badRequest("Choose a valid date.");
   const date = validDate(url.searchParams.get("date")) ?? addDays(today(zone), -1);
   return json(await dayReport(env, date, zone));
 }
@@ -508,6 +515,7 @@ export async function monthlyReport(env: Env, memberID: string, url: URL): Promi
   if (!(await markazAccess(env, memberID)).canReport) return forbidden();
   const zone = zoneOf(url.searchParams.get("tz"));
   const asked = url.searchParams.get("month");
+  if (asked !== null && !/^\d{4}-(0[1-9]|1[0-2])$/.test(asked)) return badRequest("Choose a valid month.");
   let month: string;
   if (asked && /^\d{4}-(0[1-9]|1[0-2])$/.test(asked)) month = asked;
   else {
@@ -598,7 +606,10 @@ export async function personHistory(env: Env, memberID: string, personID: string
 // MARK: - Export
 
 const csvCell = (value: unknown): string => {
-  const text = value === null || value === undefined ? "" : String(value);
+  let text = value === null || value === undefined ? "" : String(value);
+  // Names, places and titles are untrusted spreadsheet cells. Quoting alone
+  // does not stop Excel/Sheets evaluating a formula, including after whitespace.
+  if (typeof value === "string" && (/^[\s\uFEFF]*[=+@-]/.test(text) || /^[\t\r\n]/.test(text))) text = "'" + text;
   return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 const csv = (rows: unknown[][]): string => "﻿" + rows.map(row => row.map(csvCell).join(",")).join("\r\n") + "\r\n";
@@ -613,6 +624,9 @@ export async function exportCSV(env: Env, memberID: string, url: URL): Promise<R
   const scope = scopeOf(groups, url.searchParams.get("scope"));
   if (!scope) return notFound();
   const type = url.searchParams.get("type") ?? "sessions";
+  if (!["sessions", "attendance", "halqahs", "people"].includes(type)) return badRequest("Choose a valid export type.");
+  const kind = url.searchParams.get("kind") ?? "all";
+  if (!["all", "zikr", "meeting"].includes(kind)) return badRequest("Choose a valid session kind.");
   const byID = new Map(groups.map(group => [group.id, group]));
   const time = (iso: string) => {
     const when = local(iso, zone);
@@ -620,7 +634,7 @@ export async function exportCSV(env: Env, memberID: string, url: URL): Promise<R
   };
   let rows: unknown[][];
   if (type === "halqahs" || type === "people") {
-    const full = await report(env, window, scope, "all", groups);
+    const full = await report(env, window, scope, kind, groups);
     rows = type === "halqahs"
       ? [["Halqah", "Region", "Sessions", "Attendance", "Average", "Different people", "Members", "Attendance rate", "Last session", "Status"],
         ...full.halqahs.map(row => [row.name, row.region ?? "", row.sessions, row.attendance, row.averageAttendance, row.uniqueAttendees, row.members,
@@ -628,7 +642,7 @@ export async function exportCSV(env: Env, memberID: string, url: URL): Promise<R
       : [["Name", "Joined from", "Sessions", "Days", "Halqahs", "Last seen"],
         ...full.people.map(row => [row.name, row.via === "web" ? "Website" : "App", row.sessions, row.days, row.halqahs.join("; "), time(row.lastSeenAt)])];
   } else if (type === "attendance") {
-    const data = await load(env, window, new Set(scope.groups.map(group => group.id)), "all");
+    const data = await load(env, window, new Set(scope.groups.map(group => group.id)), kind);
     const sessions = new Map(data.sessions.map(row => [row.session_id, row]));
     rows = [["Date", "Halqah", "Session", "Name", "City", "Country", "Joined from", "Joined", "Minutes"],
       ...data.presence.sort((a, b) => a.first_seen_at.localeCompare(b.first_seen_at)).map(row => {
@@ -637,7 +651,7 @@ export async function exportCSV(env: Env, memberID: string, url: URL): Promise<R
           row.city ?? "", row.country ?? "", row.web ? "Website" : "App", time(row.first_seen_at), minutesOf(row.first_seen_at, row.last_seen_at)];
       })];
   } else {
-    const data = await load(env, window, new Set(scope.groups.map(group => group.id)), "all");
+    const data = await load(env, window, new Set(scope.groups.map(group => group.id)), kind);
     const bySession = sessionPresence(data.presence);
     rows = [["Started", "Ended", "Halqah", "Kind", "Title", "Minutes", "Attendance", "App", "Website", "Started by"],
       ...data.sessions.map(row => {
@@ -736,13 +750,14 @@ export async function announce(env: Env, memberID: string, input: Record<string,
   const audience = input.audience === "admins" ? "admins" : "members";
   const notify = input.notify !== false;
   const groups = (await activeGroups(env)).filter(group => group.kind === "halqah");
-  const scope = typeof input.scope === "string" ? input.scope : "all";
+  const scope = input.scope === undefined ? "all" : typeof input.scope === "string" ? input.scope : "";
   let targets: Group[];
   if (scope === "halqahs") {
     const chosen = new Set(Array.isArray(input.halqahIDs) ? input.halqahIDs.filter((id): id is string => typeof id === "string") : []);
     targets = groups.filter(group => chosen.has(group.id));
   } else if (scope.startsWith("region:")) targets = groups.filter(group => group.region === scope.slice(7));
-  else targets = groups;
+  else if (scope === "all") targets = groups;
+  else return badRequest("Choose a valid Halqah scope.");
   if (!targets.length) return badRequest("Choose at least one Halqah.");
   const author = await env.DB.prepare("SELECT COALESCE(email,display_name,id) AS who FROM members WHERE id=?").bind(memberID).first<{ who: string }>();
   const now = new Date().toISOString();
@@ -818,10 +833,11 @@ export async function pollReportingLink(env: Env, input: Record<string, unknown>
   const row = await env.DB.prepare("SELECT expires_at,approved_by,consumed_at FROM reporting_links WHERE poll_hash=?").bind(hash)
     .first<{ expires_at: string; approved_by: string | null; consumed_at: string | null }>();
   const now = new Date();
-  if (!row || row.consumed_at) return json({ status: "expired" });
-  if (!row.approved_by) return json({ status: Date.parse(row.expires_at) > now.getTime() ? "pending" : "expired" });
+  if (!row || row.consumed_at || !(Date.parse(row.expires_at) > now.getTime())) return json({ status: "expired" });
+  if (!row.approved_by) return json({ status: "pending" });
   // Approved: the website gets a session of its own, once.
-  const claimed = await env.DB.prepare("UPDATE reporting_links SET consumed_at=? WHERE poll_hash=? AND consumed_at IS NULL").bind(now.toISOString(), hash).run();
+  const claimed = await env.DB.prepare("UPDATE reporting_links SET consumed_at=? WHERE poll_hash=? AND consumed_at IS NULL AND expires_at>? AND approved_by=?")
+    .bind(now.toISOString(), hash, now.toISOString(), row.approved_by).run();
   if ((claimed.meta?.changes ?? 0) === 0) return json({ status: "expired" });
   if (!(await markazAccess(env, row.approved_by)).canReport) return json({ status: "expired" });
   const session = hex(crypto.getRandomValues(new Uint8Array(32)));

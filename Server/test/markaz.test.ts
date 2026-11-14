@@ -194,3 +194,57 @@ describe("Daily digest", () => {
     expect(raw.prepare("SELECT COUNT(*) AS n FROM app_config WHERE key LIKE 'markazDigest:%'").get()).toEqual({ n: 1 });
   });
 });
+
+describe("Markaz reporting hardening", () => {
+  it("never widens an invalid announcement scope to every Halqah", async () => {
+    const { raw, call } = await setup();
+    for (const scope of ["typo", "region:", null, 3]) {
+      expect((await call(TOKENS[OFFICER]!, "POST", "/v1/markaz/announce", { title: "Scope guard", scope, notify: false })).status).toBe(400);
+    }
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM member_group_posts WHERE title='Scope guard'").get()).toEqual({ n: 0 });
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM markaz_announcements WHERE title='Scope guard'").get()).toEqual({ n: 0 });
+  });
+  it("exports visitor-controlled formula text as spreadsheet text", async () => {
+    const { raw, call } = await setup();
+    held(raw, "formula-visit", "usa", 1, [GUEST]);
+    for (const value of ["=1+1", "+1+1", "-1+1", "@SUM(1)", "  =1+1", "\t=1+1"]) {
+      raw.prepare("UPDATE sheikh_public_profiles SET display_name=? WHERE member_id=?").run(value, GUEST);
+      const result = await call(TOKENS[OFFICER]!, "GET", "/v1/markaz/export?type=attendance&tz=UTC");
+      expect(result.status).toBe(200);
+      expect(await result.text()).toContain(`,'${value},`);
+    }
+  });
+
+  it("honors the selected session kind in sessions and attendance exports", async () => {
+    const { raw, call } = await setup();
+    held(raw, "include-meeting", "usa", 1, [GUEST]);
+    held(raw, "exclude-zikr", "usa", 1, [MEMBER]);
+    raw.prepare("UPDATE group_live_history SET kind='meeting',title='Included meeting' WHERE session_id='include-meeting'").run();
+    raw.prepare("UPDATE group_live_history SET title='Excluded Zikr' WHERE session_id='exclude-zikr'").run();
+    for (const type of ["sessions", "attendance"]) {
+      const result = await call(TOKENS[OFFICER]!, "GET", `/v1/markaz/export?type=${type}&kind=meeting&tz=UTC`);
+      const text = await result.text();
+      expect(text).toContain("Included meeting"); expect(text).not.toContain("Excluded Zikr");
+    }
+  });
+
+  it("rejects invalid export types and invalid calendar dates", async () => {
+    const { call } = await setup();
+    for (const path of ["export?type=unexpected", "export?kind=unexpected", "export?type=attendance&from=2026-02-30&to=2026-03-02", "analytics?from=not-a-date", "reports/daily?date=2026-02-30", "reports/monthly?month=2026-13"]) {
+      expect((await call(TOKENS[OFFICER]!, "GET", `/v1/markaz/${path}`)).status).toBe(400);
+    }
+  });
+
+  it("does not exchange an approved but expired computer code for a session", async () => {
+    const { raw, env, call } = await setup();
+    const site = (path: string, body?: unknown) => worker.fetch(new Request(`https://api.example.com${path}`, {
+      method: "POST", headers: { "content-type": "application/json", "cf-connecting-ip": "8.8.8.8" }, body: JSON.stringify(body ?? {}),
+    }), env);
+    const link = await (await site("/v1/reporting/link")).json() as { code: string; pollToken: string };
+    expect((await call(TOKENS[OFFICER]!, "POST", "/v1/markaz/reporting-link/approve", { code: link.code })).status).toBe(200);
+    raw.prepare("UPDATE reporting_links SET expires_at=?").run(new Date(Date.now() - 1000).toISOString());
+    const count = raw.prepare("SELECT COUNT(*) AS n FROM member_sessions").get();
+    expect(await (await site("/v1/reporting/link/poll", { pollToken: link.pollToken })).json()).toEqual({ status: "expired" });
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM member_sessions").get()).toEqual(count);
+  });
+});

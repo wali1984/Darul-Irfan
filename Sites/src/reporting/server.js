@@ -38,7 +38,11 @@ async function platform(env, request, path, init = {}) {
   // The platform's rate limits count each person, not this Worker.
   const ip = request.headers.get("cf-connecting-ip");
   if (ip) headers.set("cf-connecting-ip", ip);
-  return env.API.fetch(new Request(`https://platform${path}`, { ...init, headers }));
+  try {
+    return await env.API.fetch(new Request(`https://platform${path}`, { ...init, headers, signal: AbortSignal.timeout(10000) }));
+  } catch {
+    return jsonOut(503, { error: "The reporting service is unavailable. Please try again." });
+  }
 }
 
 const page = (logo) => `<!doctype html>
@@ -54,6 +58,10 @@ const page = (logo) => `<!doctype html>
 export async function reportingRequest(request, env, logo) {
   const url = new URL(request.url);
   const path = url.pathname;
+  if (!["GET", "HEAD"].includes(request.method)) {
+    const origin = request.headers.get("origin");
+    if ((origin && origin !== url.origin) || request.headers.get("sec-fetch-site") === "cross-site") return jsonOut(403, { error: "Not allowed" });
+  }
   if (path === "/logo.webp") return new Response(logo, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
   if (path === "/app.js") return respond(APP, "text/javascript; charset=utf-8", 200, { "cache-control": "no-cache" });
   if (path === "/app.css") return respond(STYLE, "text/css; charset=utf-8", 200, { "cache-control": "no-cache" });
@@ -69,22 +77,24 @@ export async function reportingRequest(request, env, logo) {
     const answer = await platform(env, request, "/v1/reporting/link/poll",
       { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pollToken: String(input.pollToken ?? "") }) });
     const body = await answer.json().catch(() => ({ status: "expired" }));
-    if (body.status === "approved" && /^[0-9a-f]{64}$/.test(body.token ?? "")) {
-      const maxAge = Math.max(60, Math.floor((Date.parse(body.expiresAt) - Date.now()) / 1000));
+    const remaining = Math.floor((Date.parse(body.expiresAt) - Date.now()) / 1000);
+    if (answer.ok && body.status === "approved" && /^[0-9a-f]{64}$/.test(body.token ?? "") && Number.isFinite(remaining) && remaining > 0) {
+      const maxAge = Math.min(12 * 3600, remaining);
       // The token never reaches the page's script.
       return jsonOut(200, { status: "approved" }, { "set-cookie": `${COOKIE}=${body.token}; Path=/; Max-Age=${maxAge}; HttpOnly; Secure; SameSite=Strict` });
     }
-    return jsonOut(answer.status === 429 ? 429 : 200, { status: body.status ?? "expired" });
+    return jsonOut(answer.status >= 400 ? answer.status : 200, { status: body.status === "pending" ? "pending" : "expired", ...(body.error ? { error: body.error } : {}) });
   }
   if (path === "/auth/signout" && request.method === "POST") {
     const token = tokenOf(request);
+    let revoked = !token;
     if (token) {
       const auth = { authorization: `Bearer ${token}` };
       const list = await platform(env, request, "/v1/markaz/reporting-sessions", { headers: auth }).then(r => r.json()).catch(() => null);
       const mine = list?.sessions?.find(item => item.current);
-      if (mine) await platform(env, request, `/v1/markaz/reporting-sessions/${mine.id}`, { method: "DELETE", headers: auth });
+      if (mine) revoked = (await platform(env, request, `/v1/markaz/reporting-sessions/${mine.id}`, { method: "DELETE", headers: auth })).ok;
     }
-    return jsonOut(200, { ok: true }, { "set-cookie": `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict` });
+    return jsonOut(200, { ok: true, revoked }, { "set-cookie": `${COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict` });
   }
 
   // The reports: /api/<route> is the platform's /v1/markaz/<route>, with the cookie's session.
@@ -114,6 +124,6 @@ export async function reportingRequest(request, env, logo) {
     return respond(answer.body, type, answer.status, extra);
   }
 
-  if (path === "/" || path === "/index.html") return respond(page("/logo.webp"), "text/html; charset=utf-8");
+  if ((path === "/" || path === "/index.html") && ["GET", "HEAD"].includes(request.method)) return respond(page("/logo.webp"), "text/html; charset=utf-8");
   return respond("Not found", "text/plain; charset=utf-8", 404);
 }

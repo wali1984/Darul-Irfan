@@ -275,35 +275,42 @@ workflows:
           xcodegen generate
       - name: Run release preflight tests
         script: |
+          set -euo pipefail
           if grep -RInE --include='*.swift' --include='*.xcstrings' 'open on website|view on website|read on (naqshbandiaowaisiah\.org|quran\.com)|visit the source website|view source on' DarulIrfanApp; then
             echo "User-facing external content handoff text must not ship."
             exit 1
           fi
           (cd Server && npm ci && npm run check && npm test)
+          node --test Sites/tests/*.test.mjs
+          python3 Tools/validate_native_presentation.py
+          python3 -m unittest discover -s Tools/CI -p 'test_native_presentation.py'
+          pip3 install 'PyJWT[crypto]==2.13.0'
+          python3 -m unittest discover -s Tools/Release -p 'test_testflight.py'
           (cd Tools/ContentIngest && pip3 install -r requirements.txt pytest && python3 -m pytest tests -q)
           pip3 install -r Tools/Quran/requirements.txt pytest
           python3 -m pytest Tools/Quran/tests -q
           python3 -m unittest discover -s Tools/Hadith -p test_source_references.py
-      - name: Run unit tests (includes the schema migration)
+      - name: Run unit and launch UI tests (includes the schema migration)
         script: |
           # A signed release must not ship past a failing migration or a
           # content check, so the tag workflow re-runs them rather than
           # trusting that ios-verify was green on the same commit.
-          set -o pipefail
+          set -euo pipefail
           command -v xcbeautify >/dev/null || brew install xcbeautify
           mkdir -p build/logs
-          DEVICE=$(xcrun simctl list devices available | grep -oE 'iPhone [^(]+' | head -n 1 | xargs)
-          echo "Using simulator: ${DEVICE}"
+          DEVICE=$(python3 Tools/CI/select_simulator.py --family iPhone)
           xcodebuild test \
             -project DarulIrfan.xcodeproj \
             -scheme DarulIrfan \
-            -destination "platform=iOS Simulator,name=${DEVICE}" \
+            -destination "platform=iOS Simulator,id=${DEVICE}" \
             -only-testing:DarulIrfanTests \
+            -only-testing:DarulIrfanUITests/SmokeUITests \
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath build/ReleaseTests.xcresult \
             2>&1 | tee build/logs/xcodebuild-release-tests.log | xcbeautify
       - name: Content integrity gate
         script: |
+          set -euo pipefail
           python3 -m unittest discover -s Tools/ContentIntegrity -p 'test_*.py'
           python3 Tools/ContentIntegrity/check_content.py \
             --migration-status passed \
@@ -360,6 +367,7 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - build/CONTENT_INTEGRITY.md
+      - build/ReleaseTests.xcresult
       - build/logs/*.log
       - /tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM

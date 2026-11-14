@@ -2,6 +2,7 @@ import type { Env } from "./contracts";
 import { RECITATIONS } from "./groupZikrStages";
 import { liveRow } from "./session";
 import { json, sha256 } from "./util";
+import { consentRequired, consentStatement, hasAdultDeclaration, hasCommunityConsent } from "./communitySafety";
 
 // The websites (oursheikh., namerica., uk. on wajidali.us and naqshbandiaowaisiah.us) show every
 // named Halqah's live Zikr and let anyone join it from the browser (owner
@@ -9,13 +10,14 @@ import { json, sha256 } from "./util";
 // controls. A visitor is not made a member of the Halqah; they are counted in
 // the session's attendance, which the Halqah's admins see.
 
-interface PublicLive { kind: string; title?: string; isTest?: boolean; startedAt?: string }
+interface PublicLive { kind: string; title?: string; isTest?: boolean; startedAt?: string; sessionID?: string }
 
 async function liveOf(env: Env, groupID: string): Promise<{ live: PublicLive; row: NonNullable<Awaited<ReturnType<typeof liveRow>>> } | null> {
   const row = await liveRow(env, groupID);
   // A test Zikr shows on the websites too, marked as a test (owner 2026-11-04).
   if (row?.state !== "live" || row.kind !== "zikr") return null;
-  return { row, live: { kind: row.kind, title: row.title ?? undefined, isTest: row.is_test ? true : undefined, startedAt: row.started_at ?? undefined } };
+  return { row, live: { kind: row.kind, title: row.title ?? undefined, isTest: row.is_test ? true : undefined,
+    startedAt: row.started_at ?? undefined, sessionID: row.session_id ?? undefined } };
 }
 
 /** The stage being followed in this session: the latest announcement since it began. */
@@ -75,6 +77,7 @@ async function presence(env: Env, groupID: string, memberID: string): Promise<Re
 
 /** POST /v1/public/halqahs/:id/join {name, city, countryCode, guestSecret}. */
 export async function publicJoin(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
+  if (!hasAdultDeclaration(input)) return consentRequired();
   const name = field(input.name, 80);
   const city = field(input.city, 100);
   const country = field(input.countryCode, 2)?.toUpperCase();
@@ -95,6 +98,7 @@ export async function publicJoin(env: Env, groupID: string, input: Record<string
     env.DB.prepare(`INSERT INTO sheikh_public_profiles(member_id,display_name,city,country_code,contact_email,updated_at)
       VALUES(?,?,?,?,NULL,?) ON CONFLICT(member_id) DO UPDATE SET display_name=excluded.display_name,city=excluded.city,
       country_code=excluded.country_code,updated_at=excluded.updated_at`).bind(memberID, name, city, country, stamp),
+    consentStatement(env, memberID),
   ]);
   return presence(env, groupID, memberID);
 }
@@ -105,5 +109,6 @@ export async function publicPresence(env: Env, groupID: string, input: Record<st
   if (memberID instanceof Response) return memberID;
   const known = await env.DB.prepare("SELECT id FROM members WHERE id=? AND apple_subject=?").bind(memberID, `web-guest:${memberID}`).first();
   if (!known) return json({ error: "Join first" }, { status: 401 });
+  if (!await hasCommunityConsent(env, memberID)) return consentRequired();
   return presence(env, groupID, memberID);
 }

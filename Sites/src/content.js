@@ -47,10 +47,20 @@ const STYLE = `
 `;
 
 const TAB_SCRIPT = `<script>
-document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
-  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
-  document.querySelectorAll("[data-lang]").forEach(p => p.hidden = p.dataset.lang !== b.dataset.show);
-}));
+(() => {
+  const tabs = [...document.querySelectorAll(".tabs button")];
+  function select(b) {
+    tabs.forEach(x => { x.setAttribute("aria-selected", x === b); x.tabIndex = x === b ? 0 : -1; });
+    document.querySelectorAll("[data-lang]").forEach(p => p.hidden = p.dataset.lang !== b.dataset.show);
+  }
+  tabs.forEach((b, i) => {
+    b.addEventListener("click", () => select(b));
+    b.addEventListener("keydown", e => {
+      const index = e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : e.key === "ArrowRight" ? (i + 1) % tabs.length : e.key === "ArrowLeft" ? (i + tabs.length - 1) % tabs.length : null;
+      if (index !== null) { e.preventDefault(); tabs[index].focus(); select(tabs[index]); }
+    });
+  });
+})();
 </script>`;
 
 function entries(list, urdu) {
@@ -69,7 +79,7 @@ function diagram() {
   const p = (x, y) => at(x, y).map(v => v.toFixed(1)).join(" ");
   const body = `M${p(.12, .94)} L${p(.12, .48)} Q${p(.12, .36)} ${p(.30, .36)} C${p(.30, .10)} ${p(.70, .10)} ${p(.70, .36)} Q${p(.88, .36)} ${p(.88, .48)} L${p(.88, .94)}`;
   return `<svg viewBox="0 0 100 100" role="img" aria-label="Numbered diagram, viewed from the front: 1 lower right, 2 lower left, 3 middle right, 4 middle left, 5 centre, 6 upper centre, 7 a circle around the whole body.">
-    <circle cx="50" cy="53" r="45" fill="none" stroke="#d9b56a" stroke-width="1.4" stroke-dasharray="3 2"><animate attributeName="stroke-opacity" values=".5;1;.5" dur="4s" repeatCount="indefinite"/></circle>
+    <circle cx="50" cy="53" r="45" fill="none" stroke="#d9b56a" stroke-width="1.4" stroke-dasharray="3 2"/>
     <circle cx="50" cy="8" r="5" fill="#d9b56a"/><text x="50" y="10.2" text-anchor="middle" font-size="6" font-weight="700" fill="#1d1406">7</text>
     <path d="${body}" fill="none" stroke="rgba(238,246,241,.5)" stroke-width="1.2"/>
     ${points.map(([x, y], i) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="rgba(243,220,157,.18)" stroke="#d9b56a" stroke-width=".6"/><text x="${x.toFixed(1)}" y="${(y + 1.7).toFixed(1)}" text-anchor="middle" font-size="4.6" font-weight="700" fill="#f3dc9d">${i + 1}</text>`).join("")}
@@ -80,9 +90,9 @@ export function methodPage(site, others) {
   const body = `<div class="wrap page">
     <div class="eyebrow">Silsila Naqshbandia Owaisiah</div>
     <h1 class="shine">Method of Zikr</h1>
-    <div class="tabs" role="tablist"><button data-show="ur" aria-selected="true">اردو</button><button data-show="en" aria-selected="false">English</button></div>
+    <div class="tabs" role="tablist" aria-label="Language"><button id="tab-ur" role="tab" data-show="ur" aria-controls="method-ur" aria-selected="true" lang="ur">اردو</button><button id="tab-en" role="tab" data-show="en" aria-controls="method-en" aria-selected="false" tabindex="-1">English</button></div>
     <div class="cols">
-      <div><div data-lang="ur">${entries(METHOD.ur, true)}</div><div data-lang="en" hidden>${entries(METHOD.en, false)}</div></div>
+      <div><div id="method-ur" role="tabpanel" aria-labelledby="tab-ur" data-lang="ur" dir="rtl">${entries(METHOD.ur, true)}</div><div id="method-en" role="tabpanel" aria-labelledby="tab-en" data-lang="en" hidden>${entries(METHOD.en, false)}</div></div>
       <aside class="panel diagram">${diagram()}
         <div class="cap" data-lang="ur" lang="ur">${esc(METHOD.diagramCaptionUr)}</div>
         <div class="cap" data-lang="en" hidden>${esc(METHOD.diagramCaptionEn)}</div></aside>

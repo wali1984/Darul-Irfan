@@ -2,8 +2,8 @@ import { sendPushToInstallations } from "./apns";
 import type { Env } from "./contracts";
 import { canManage, canSee, memberRole, notifyGroup, zikrNoticeLink } from "./community";
 import { announceDailyZikr } from "./live";
-import { beginSession, endSession } from "./session";
-import { json } from "./util";
+import { beginSession, endSession, SessionConflictError } from "./session";
+import { json, sha256 } from "./util";
 
 export const SHEIKH_HALQA_ID = "our-sheikh";
 export interface ZikrStage { id: string; title: string; titleUr?: string; isCustom: boolean }
@@ -109,11 +109,11 @@ export const STAGE_PRESETS = [
   { id: "cannot-hear", title: "The sound is not clear", titleUr: "آواز صاف نہیں آ رہی" },
 ];
 
-interface LiveZikr { title: string | null; video_id: string | null; started_at: string | null; is_test: number }
+interface LiveZikr { title: string | null; video_id: string | null; started_at: string | null; is_test: number; session_id: string | null }
 
 /** The live Zikr as this person may see it: a test Zikr exists only for the Halqah's admins. */
 async function liveZikr(env: Env, groupID: string, managing = true): Promise<LiveZikr | null> {
-  const live = await env.DB.prepare("SELECT title,video_id,started_at,is_test FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
+  const live = await env.DB.prepare("SELECT title,video_id,started_at,is_test,session_id FROM group_live WHERE group_id=? AND state='live' AND kind='zikr'")
     .bind(groupID).first<LiveZikr>();
   return live && (!live.is_test || managing) ? live : null;
 }
@@ -210,17 +210,29 @@ export async function broadcastZikrCue(env: Env, memberID: string, groupID: stri
  *  itself five minutes later. The relay never ends a session directly.
  *  {state: "live", title?} | {state: "dua"} */
 export async function relayLive(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
+  if (input.test !== undefined && typeof input.test !== "boolean") return json({ error: "test must be true or false" }, { status: 400 });
   const group = await env.DB.prepare("SELECT id FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
   if (!group) return json({ error: "Not found" }, { status: 404 });
-  const live = await env.DB.prepare("SELECT state,kind,session_id,auto_end_at FROM group_live WHERE group_id=?").bind(groupID)
-    .first<{ state: string; kind: string; session_id: string | null; auto_end_at: string | null }>();
+  const live = await env.DB.prepare("SELECT state,kind,session_id,auto_end_at,is_test FROM group_live WHERE group_id=?").bind(groupID)
+    .first<{ state: string; kind: string; session_id: string | null; auto_end_at: string | null; is_test: number }>();
+  if (input.sessionID !== undefined && input.sessionID !== live?.session_id) {
+    return json({ error: "The live session changed.", code: "session_changed" }, { status: 409 });
+  }
   if (input.state === "live") {
-    if (live?.state === "live") return json({ state: "live", sessionID: live.session_id, started: false });
+    if (live?.state === "live") {
+      if (live.kind !== "zikr" || !!live.is_test !== (input.test === true)) {
+        return json({ error: "Another live session is active.", code: "session_conflict" }, { status: 409 });
+      }
+      const resumed = await env.DB.prepare("UPDATE group_live SET auto_end_at=NULL WHERE group_id=? AND state='live' AND session_id IS ?")
+        .bind(groupID, live.session_id).run();
+      if (!resumed.meta.changes) throw new SessionConflictError();
+      return json({ state: "live", sessionID: live.session_id, started: false, test: !!live.is_test });
+    }
     const title = typeof input.title === "string" && input.title.trim() ? input.title.trim().slice(0, 120) : "Zikr";
     await ensureRelayAuthor(env);
     // {test: true}: as an admin's Test Zikr, seen by admins only and announced to no one.
     const test = input.test === true;
-    const sessionID = await beginSession(env, groupID, RELAY_AUTHOR, { kind: "zikr", title, videoID: null, roomID: null, queue: [], test });
+    const sessionID = await beginSession(env, groupID, RELAY_AUTHOR, { kind: "zikr", title, videoID: null, roomID: null, queue: [], test, onlyIfIdle: true });
     if (test) return json({ state: "live", sessionID, started: true, test: true }, { status: 201 });
     try {
       await notifyGroup(env, groupID, `live:${groupID}:${sessionID}`, title, "Halqah zikr has started. Join now in Darul Irfan.",
@@ -233,11 +245,20 @@ export async function relayLive(env: Env, groupID: string, input: Record<string,
     if (live?.state !== "live" || live.kind !== "zikr") return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
     const endsAt = live.auto_end_at ?? new Date(Date.now() + DUA_MINUTES * 60_000).toISOString();
     if (!live.auto_end_at) {
-      await env.DB.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id=? AND state='live' AND auto_end_at IS NULL")
-        .bind(endsAt, groupID).run();
-      await recordCue(env, RELAY_AUTHOR, groupID, { id: crypto.randomUUID(), stageID: DUA_STAGE.id });
+      await env.DB.prepare("UPDATE group_live SET auto_end_at=? WHERE group_id=? AND state='live' AND session_id IS ? AND auto_end_at IS NULL")
+        .bind(endsAt, groupID, live.session_id).run();
     }
-    return json({ state: "dua", endsAt });
+    const saved = await env.DB.prepare("SELECT auto_end_at FROM group_live WHERE group_id=? AND state='live' AND session_id IS ?")
+      .bind(groupID, live.session_id).first<{ auto_end_at: string | null }>();
+    if (!saved?.auto_end_at) throw new SessionConflictError();
+    // Retry the same durable cue after a lost response or database failure.
+    // Scheduling the deadline alone is not an acknowledgment of the stage.
+    await ensureRelayAuthor(env);
+    const hash = await sha256(`dua:${groupID}:${live.session_id}:${saved.auto_end_at}`);
+    const eventID = `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(12, 16)}-${hash.slice(16, 20)}-${hash.slice(20, 32)}`;
+    const cue = await recordCue(env, RELAY_AUTHOR, groupID, { id: eventID, stageID: DUA_STAGE.id }, live.session_id, saved.auto_end_at);
+    if (!cue.ok) return cue;
+    return json({ state: "dua", endsAt: saved.auto_end_at, sessionID: live.session_id });
   }
   return json({ error: "state must be live or dua" }, { status: 400 });
 }
@@ -247,9 +268,9 @@ export const DUA_MINUTES = 5;
 
 /** Each minute: a session whose dua began five minutes ago ends, and is kept in history. */
 export async function endAfterDua(env: Env, now = new Date()): Promise<void> {
-  const due = await env.DB.prepare("SELECT group_id FROM group_live WHERE state='live' AND auto_end_at IS NOT NULL AND auto_end_at<=?")
-    .bind(now.toISOString()).all<{ group_id: string }>();
-  for (const row of due.results ?? []) await endSession(env, row.group_id, RELAY_AUTHOR);
+  const due = await env.DB.prepare("SELECT group_id,session_id,auto_end_at FROM group_live WHERE state='live' AND auto_end_at IS NOT NULL AND auto_end_at<=?")
+    .bind(now.toISOString()).all<{ group_id: string; session_id: string | null; auto_end_at: string }>();
+  for (const row of due.results ?? []) await endSession(env, row.group_id, RELAY_AUTHOR, { sessionID: row.session_id, autoEndAt: row.auto_end_at });
 }
 
 async function ensureRelayAuthor(env: Env): Promise<void> {
@@ -263,12 +284,23 @@ async function ensureRelayAuthor(env: Env): Promise<void> {
  *  with the platform's LISTENER_TOKEN and records as the "Paltalk" author. */
 export const RELAY_AUTHOR = "service-paltalk-relay";
 export async function relayZikrCue(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
-  if (!await liveZikr(env, groupID)) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
+  const live = await liveZikr(env, groupID);
+  if (!live) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
+  if (input.sessionID !== undefined && input.sessionID !== live.session_id) {
+    return json({ error: "The live session changed.", code: "session_changed" }, { status: 409 });
+  }
   await ensureRelayAuthor(env);
-  return recordCue(env, RELAY_AUTHOR, groupID, input);
+  return recordCue(env, RELAY_AUTHOR, groupID, input, live.session_id);
 }
 
-async function recordCue(env: Env, memberID: string, groupID: string, input: Record<string, unknown>): Promise<Response> {
+async function recordCue(env: Env, memberID: string, groupID: string, input: Record<string, unknown>,
+  expectedSessionID?: string | null, expectedAutoEndAt?: string,
+): Promise<Response> {
+  const live = await liveZikr(env, groupID);
+  if (!live || (expectedSessionID !== undefined && expectedSessionID !== live.session_id)
+      || (input.sessionID !== undefined && input.sessionID !== live.session_id)) {
+    return json({ error: "The live session changed.", code: "session_changed" }, { status: 409 });
+  }
   const eventID = typeof input.id === "string" ? input.id.toLowerCase() : "";
   const stageID = typeof input.stageID === "string" ? input.stageID : "";
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(eventID) || !stageID || stageID.length > 80) {
@@ -286,13 +318,21 @@ async function recordCue(env: Env, memberID: string, groupID: string, input: Rec
   if (!stage) return json({ error: "Stage not found" }, { status: 404 });
   // A recitation changes every few minutes; it shows on the stage without a
   // notification (only Latifas and Muraqabat notify). A test Zikr notifies nobody.
-  const test = !!(await liveZikr(env, groupID))?.is_test;
+  const test = !!live.is_test;
   const result = await env.DB.prepare(`INSERT OR IGNORE INTO group_zikr_cues(group_id,event_id,stage_id,title,title_ur,author_id,created_at,notification_state)
-    VALUES(?,?,?,?,?,?,?,?)`).bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
-    recitation || test || stageID === DUA_STAGE.id ? "complete" : "pending").run();
-  const saved = await env.DB.prepare("SELECT * FROM group_zikr_cues WHERE group_id=? AND event_id=?")
-    .bind(groupID, eventID).first<CueRow>();
-  if (!saved) return json({ error: "Stage announcement could not be saved" }, { status: 503 });
+    SELECT ?,?,?,?,?,?,?,? FROM group_live WHERE group_id=? AND state='live' AND kind='zikr' AND session_id IS ? AND started_at IS ?
+      ${expectedAutoEndAt !== undefined ? "AND auto_end_at=?" : ""}`)
+    .bind(groupID, eventID, stage.id, stage.title, stage.titleUr ?? null, memberID, new Date().toISOString(),
+      recitation || test || stageID === DUA_STAGE.id ? "complete" : "pending", groupID, live.session_id, live.started_at,
+      ...(expectedAutoEndAt !== undefined ? [expectedAutoEndAt] : [])).run();
+  const saved = await env.DB.prepare(`SELECT c.* FROM group_zikr_cues c WHERE c.group_id=? AND c.event_id=?
+    AND EXISTS (SELECT 1 FROM group_live l WHERE l.group_id=c.group_id AND l.state='live' AND l.kind='zikr'
+      AND l.session_id IS ? AND l.started_at IS ? ${expectedAutoEndAt !== undefined ? "AND l.auto_end_at=?" : ""})`)
+    .bind(groupID, eventID, live.session_id, live.started_at, ...(expectedAutoEndAt !== undefined ? [expectedAutoEndAt] : [])).first<CueRow>();
+  if (!saved) return json({ error: "The live session changed.", code: "session_changed" }, { status: 409 });
+  if (live.started_at && saved.created_at < live.started_at) {
+    return json({ error: "This event belongs to an earlier session.", code: "session_changed" }, { status: 409 });
+  }
   if (saved.stage_id !== stageID || saved.author_id !== memberID) {
     return json({ error: "This event ID already belongs to another announcement" }, { status: 409 });
   }
@@ -309,7 +349,7 @@ const CUE_MAX_AGE_MS = 5 * 60_000;
 export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void> {
   const timestamp = now.toISOString();
   await env.DB.prepare(`UPDATE group_zikr_cues SET notification_state='expired'
-    WHERE notification_state='pending' AND (NOT EXISTS (SELECT 1 FROM group_live l WHERE l.group_id=group_zikr_cues.group_id AND l.state='live' AND l.kind='zikr') OR created_at<? OR sequence < (
+    WHERE notification_state='pending' AND (NOT EXISTS (SELECT 1 FROM group_live l WHERE l.group_id=group_zikr_cues.group_id AND l.state='live' AND l.kind='zikr' AND l.is_test=0 AND (l.started_at IS NULL OR group_zikr_cues.created_at>=l.started_at)) OR created_at<? OR sequence < (
       SELECT MAX(newer.sequence) FROM group_zikr_cues newer WHERE newer.group_id=group_zikr_cues.group_id
         AND newer.stage_id NOT IN (${RECITATIONS.map(() => "?").join(",")})))`)
     .bind(new Date(now.getTime() - CUE_MAX_AGE_MS).toISOString(), ...RECITATIONS.map(recitation => recitation.id)).run();
@@ -412,7 +452,7 @@ export async function zikrStage(env: Env, memberID: string, groupID: string, url
       WHERE group_id=? AND hidden_at IS NOT NULL AND hidden_at>=?`).bind(groupID, since).all<{ id: string }>()).results ?? [])
     .map(row => row.id);
   return json({
-    live: zikr ? { title: live?.title ?? undefined, videoID: live?.video_id ?? undefined, startedAt: live?.started_at ?? undefined,
+    live: zikr ? { title: live?.title ?? undefined, videoID: live?.video_id ?? undefined, startedAt: live?.started_at ?? undefined, sessionID: live?.session_id ?? undefined,
       isTest: live?.is_test ? true : undefined } : null,
     pictureURL: picture?.pictureURL, canLead: managing && zikr,
     // Admins and the Super admin may take anything off the stage, live or not.
@@ -453,7 +493,8 @@ export async function publicSheikhStage(env: Env): Promise<Record<string, unknow
     .bind(SHEIKH_HALQA_ID, sessionStart(live)).first<CueRow>() : null;
   const picture = await sheikhPicture(env);
   return {
-    live: live ? { title: live.title ?? undefined, startedAt: live.started_at ?? undefined, isTest: live.is_test ? true : undefined } : null,
+    live: live ? { title: live.title ?? undefined, startedAt: live.started_at ?? undefined, isTest: live.is_test ? true : undefined,
+      sessionID: live.session_id ?? undefined } : null,
     stage: cue ? { title: cue.title, titleUr: cue.title_ur ?? undefined, at: cue.created_at,
       arabic: RECITATIONS.find(recitation => recitation.id === cue.stage_id)?.arabic } : null,
     pictureURL: picture?.pictureURL, pictureHDURL: picture?.pictureHDURL,

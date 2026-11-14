@@ -240,6 +240,7 @@ struct GroupLiveStarter: View {
     var meetingsReady = true
     /// Adds recordings and past zikr to the session already live.
     var addingToSession = false
+    var sessionID: String? = nil
 
     private enum Kind: String, CaseIterable, Identifiable {
         case zikr = "Halqah Zikr"
@@ -607,7 +608,7 @@ struct GroupLiveStarter: View {
                 // A pasted link here is a past video; a live one is refused.
                 var entries = picked
                 if source == .youtube, let video { entries.insert(.video(video), at: 0) }
-                try await service.addToSession(entries, in: groupID)
+                try await service.addToSession(entries, in: groupID, sessionID: sessionID)
             } else if kind == .meeting {
                 try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true, record: recordRoom,
                                             test: testOnly)

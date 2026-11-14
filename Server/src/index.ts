@@ -32,12 +32,14 @@ import { nearbyMasjids } from "./nearbyMasjids";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
-import { autoplayDue, checkIn, controlSession, deleteSessionRecord, duaRequests, markDuaRead, removeDua, requestDua, sessionHistory } from "./session";
+import { autoplayDue, checkIn, controlSession, deleteSessionRecord, duaRequests, markDuaRead, removeDua, requestDua, sessionHistory, SessionConflictError } from "./session";
 import { collectRoomRecordings } from "./roomRecordings";
 import { createHalqah, memberDirectory, publicHalqahs, retireHalqah, updateHalqah } from "./halqahs";
 import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
 import { uploadPostMedia } from "./postMedia";
 import { libraryPDFRoute } from "./pdfProxy";
+import { acceptCommunityConsent, adultEnrollment, consentRequired, hasCommunityConsent,
+  moderationReports, reportCommunityContent, resolveCommunityReport } from "./communitySafety";
 
 const allowedTopics = new Set(["liveZikr", "broadcasts", "announcements", "events"]);
 
@@ -74,7 +76,8 @@ async function route(request: Request, env: Env): Promise<Response> {
     }
     let input: Record<string, unknown>;
     try { input = await request.json(); } catch { return json({ error: "Invalid request" }, { status: 400 }); }
-    return relay[2] === "live" ? relayLive(env, relay[1]!, input ?? {}) : relayZikrCue(env, relay[1]!, input ?? {});
+    if (!input || typeof input !== "object" || Array.isArray(input)) return json({ error: "Invalid request" }, { status: 400 });
+    return relay[2] === "live" ? relayLive(env, relay[1]!, input) : relayZikrCue(env, relay[1]!, input);
   }
   // A website visitor joins a live Zikr (name and place) and stays counted while listening.
   const visit = /^\/v1\/public\/halqahs\/([a-z0-9-]{1,40})\/(join|presence)$/.exec(path);
@@ -115,11 +118,11 @@ async function route(request: Request, env: Env): Promise<Response> {
   // member bearer token, and none of it is reachable from the public feed.
   if (request.method === "POST" && path === "/v1/members/session") {
     if (!await withinWriteLimit(request, env, "member-session", 20)) return json({ error: "Too many requests" }, { status: 429 });
-    return createSession(request, env);
+    return adultEnrollment(request, env, () => createSession(request, env));
   }
   if (request.method === "POST" && path === "/v1/our-sheikh/join") {
     if (!await withinWriteLimit(request, env, "sheikh-public-join", 60)) return json({ error: "Too many requests" }, { status: 429 });
-    return joinOurSheikh(request, env);
+    return adultEnrollment(request, env, () => joinOurSheikh(request, env));
   }
   if (request.method === "POST" && path === "/v1/members/invite") {
     // This one takes a secret that could otherwise be guessed at, so wrong
@@ -128,7 +131,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // must not be turned away.
     if (!await withinWriteLimit(request, env, "member-invite", 60)) return json({ error: "Too many requests" }, { status: 429 });
     if (await requestCount(request, env, "member-invite-refused") >= 10) return json({ error: "Too many requests" }, { status: 429 });
-    const response = await redeemInvite(request, env);
+    const response = await adultEnrollment(request, env, () => redeemInvite(request, env));
     if (response.status === 400 || response.status === 403) await countRequest(request, env, "member-invite-refused");
     return response;
   }
@@ -172,6 +175,7 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path.startsWith("/v1/daily-media/manage")) {
     const member = await authenticatedMember(request, env);
     if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
+    if (!["GET", "HEAD"].includes(request.method) && !await hasCommunityConsent(env, member)) return consentRequired();
     const item = /^\/v1\/daily-media\/manage\/(daily-[a-f0-9-]{12})$/.exec(path)?.[1];
     if (path === "/v1/daily-media/manage" && request.method === "GET") return manageDailyMedia(env, member);
     if (path === "/v1/daily-media/manage" && request.method === "POST") {
@@ -199,6 +203,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     const session = await authenticatedSession(request, env);
     if (!session) return json({ error: "Member sign-in required" }, { status: 401 });
     const member = session.memberID;
+    if (!["GET", "HEAD", "DELETE"].includes(request.method) && !await hasCommunityConsent(env, member)) return consentRequired();
     const input = async () => (request.headers.get("content-type") ?? "").includes("json")
       ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
     const [, , , section = "", entity = "", extra = ""] = path.split("/");
@@ -213,7 +218,9 @@ async function route(request: Request, env: Env): Promise<Response> {
       if (section === "organization") return organization(env, member);
       if (section === "announcements") return announcements(env, member);
       if (section === "reporting-sessions") return reportingSessions(env, member, session.hash);
+      if (section === "moderation" && !entity) return moderationReports(env, member, url);
     }
+    if (request.method === "POST" && section === "moderation" && entity && !extra) return resolveCommunityReport(env, member, entity, await input());
     if (request.method === "PUT" && section === "halqahs" && entity) return placeHalqah(env, member, entity, await input());
     if (request.method === "POST" && section === "sync-admins") return syncAdmins(env, member);
     if (request.method === "POST" && section === "announce") return announce(env, member, await input());
@@ -228,8 +235,18 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (path.startsWith("/v1/members") || path.startsWith("/v1/groups")) {
     const member = await authenticatedMember(request, env);
     if (!member) return json({ error: "Member sign-in required" }, { status: 401 });
-    const body = async () => (request.headers.get("content-type") ?? "").includes("json")
-      ? await request.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>)) : {};
+    const body = async (): Promise<Record<string, unknown>> => {
+      const input = (request.headers.get("content-type") ?? "").includes("json") ? await request.json() : {};
+      if (!input || typeof input !== "object" || Array.isArray(input)) throw new SyntaxError("Request must be an object");
+      return input as Record<string, unknown>;
+    };
+    if (request.method === "POST" && path === "/v1/members/community-consent") return acceptCommunityConsent(env, member, await body());
+    // Account deletion, sign-out and notification withdrawal remain available
+    // without consent. Community writes, presence and room tokens do not.
+    const withdrawing = (request.method === "DELETE" && (path === "/v1/members/me" || path.startsWith("/v1/members/devices/")))
+      || (request.method === "POST" && path === "/v1/members/signout");
+    if (!["GET", "HEAD"].includes(request.method) && !withdrawing
+        && !await hasCommunityConsent(env, member)) return consentRequired();
     if (request.method === "GET" && path === "/v1/groups") return communityGroups(env, member);
     // The Super admin's: make a Halqah, and everyone who has signed in.
     if (request.method === "POST" && path === "/v1/groups") return createHalqah(env, member, await body());
@@ -244,9 +261,13 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues|stage|stage-chat)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues|stage|stage-chat|reports)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
+    if (section === "reports" && !entity && request.method === "POST") {
+      if (!await withinWriteLimit(request, env, "community-report", 30)) return json({ error: "Too many requests" }, { status: 429 });
+      return reportCommunityContent(env, member, groupID, await body());
+    }
     if (section === "zikr-cues" && !entity && request.method === "GET") return zikrCues(env, member, groupID, url.searchParams.get("after"));
     if (section === "zikr-cues" && !entity && request.method === "POST") return broadcastZikrCue(env, member, groupID, await body());
     if (section === "zikr-cues" && entity && !action && request.method === "DELETE") return hideZikrCue(env, member, groupID, entity);
@@ -432,6 +453,7 @@ export default {
     }
     catch (error) {
       if (error instanceof SyntaxError) return json({ error: "Invalid JSON" }, { status: 400 });
+      if (error instanceof SessionConflictError) return json({ error: error.message, code: "session_changed" }, { status: 409 });
       console.error("request failed", error instanceof Error ? error.message : "unknown error");
       return json({ error: "Request could not be completed" }, { status: 500 });
     }

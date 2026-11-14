@@ -24,6 +24,7 @@ type LiveRow = {
   notice: string | null; notice_at: string | null; room_recording: number;
   /** A test session: only the Halqah's admins see it, nobody is notified. */
   is_test: number;
+  auto_end_at: string | null;
 };
 
 const notFound = () => json({ error: "Not found" }, { status: 404 });
@@ -53,7 +54,7 @@ export function playbackAt(queue: QueueItem[], index: number, position: number, 
 
 export async function liveRow(env: Env, groupID: string): Promise<LiveRow | null> {
   return env.DB.prepare(`SELECT state,kind,title,video_id,room_id,started_at,started_by,session_id,queue_json,queue_index,
-    position_seconds,position_at,paused,notice,notice_at,room_recording,is_test FROM group_live WHERE group_id=?`).bind(groupID).first<LiveRow>();
+    position_seconds,position_at,paused,notice,notice_at,room_recording,is_test,auto_end_at FROM group_live WHERE group_id=?`).bind(groupID).first<LiveRow>();
 }
 
 /** What is live, as this person may see it: a test session exists only for the Halqah's admins. */
@@ -71,9 +72,13 @@ export function queueOf(row: Pick<LiveRow, "queue_json"> | null): QueueItem[] {
   }
 }
 
-async function saveClock(env: Env, groupID: string, queue: QueueItem[], index: number, position: number, paused: boolean, now: Date) {
-  await env.DB.prepare(`UPDATE group_live SET queue_json=?,queue_index=?,position_seconds=?,position_at=?,paused=?,updated_at=?
-    WHERE group_id=?`).bind(JSON.stringify(queue), index, position, now.toISOString(), paused ? 1 : 0, now.toISOString(), groupID).run();
+async function saveClock(env: Env, groupID: string, live: LiveRow, queue: QueueItem[], index: number, position: number, paused: boolean, now: Date) {
+  const saved = await env.DB.prepare(`UPDATE group_live SET queue_json=?,queue_index=?,position_seconds=?,position_at=?,paused=?,updated_at=?
+    WHERE group_id=? AND state='live' AND session_id IS ? AND started_at IS ?
+      AND queue_json=? AND queue_index=? AND position_seconds=? AND position_at IS ? AND paused=?`)
+    .bind(JSON.stringify(queue), index, position, now.toISOString(), paused ? 1 : 0, now.toISOString(), groupID, live.session_id, live.started_at,
+      live.queue_json, live.queue_index, live.position_seconds, live.position_at, live.paused).run();
+  if (!saved.meta.changes) throw new SessionConflictError();
 }
 
 /** Turns what the admin chose - recordings of the group and YouTube videos -
@@ -106,50 +111,73 @@ export async function resolveQueue(env: Env, groupID: string, raw: unknown): Pro
   return items;
 }
 
-/** Starts a session, ending any session already live. */
+export class SessionConflictError extends Error {
+  constructor() { super("The live session changed. Refresh and try again."); }
+}
+
+/** Starts a session, ending only the session observed by this request. */
 export async function beginSession(
   env: Env, groupID: string, startedBy: string,
   session: {
     kind: "zikr" | "meeting"; title: string; videoID: string | null; roomID: string | null; queue: QueueItem[]; roomRecording?: boolean;
-    test?: boolean;
+    test?: boolean; onlyIfIdle?: boolean;
+    expected?: Pick<LiveRow, "state" | "session_id" | "started_at"> | null;
   },
 ): Promise<string> {
   const current = await liveRow(env, groupID);
-  if (current?.state === "live") await endSession(env, groupID, startedBy);
+  if (session.expected !== undefined && (current?.state !== session.expected?.state
+      || current?.session_id !== session.expected?.session_id || current?.started_at !== session.expected?.started_at)) {
+    throw new SessionConflictError();
+  }
+  if (current?.state === "live") {
+    if (session.onlyIfIdle || !await endSession(env, groupID, startedBy, { sessionID: current.session_id })) {
+      throw new SessionConflictError();
+    }
+  }
   const now = new Date().toISOString();
   const sessionID = `session-${crypto.randomUUID().slice(0, 12)}`;
-  await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,
+  const started = await env.DB.prepare(`INSERT INTO group_live(group_id,state,kind,title,video_id,room_id,started_at,started_by,updated_at,
       session_id,queue_json,queue_index,position_seconds,position_at,paused,notice,notice_at,room_recording,is_test)
     VALUES(?,'live',?,?,?,?,?,?,?,?,?,0,0,?,0,NULL,NULL,?,?)
     ON CONFLICT(group_id) DO UPDATE SET state='live',kind=excluded.kind,title=excluded.title,video_id=excluded.video_id,
       room_id=excluded.room_id,started_at=excluded.started_at,started_by=excluded.started_by,updated_at=excluded.updated_at,
       session_id=excluded.session_id,queue_json=excluded.queue_json,queue_index=0,position_seconds=0,
       position_at=excluded.position_at,paused=0,notice=NULL,notice_at=NULL,room_recording=excluded.room_recording,
-      is_test=excluded.is_test,auto_end_at=NULL`)
+      is_test=excluded.is_test,auto_end_at=NULL WHERE group_live.state IS ? AND group_live.session_id IS ? AND group_live.started_at IS ?`)
     .bind(groupID, session.kind, session.title, session.videoID, session.roomID, now, startedBy, now, sessionID,
-      JSON.stringify(session.queue), now, session.roomRecording ? 1 : 0, session.test ? 1 : 0).run();
+      JSON.stringify(session.queue), now, session.roomRecording ? 1 : 0, session.test ? 1 : 0,
+      current?.state === "live" ? "offline" : current?.state ?? null,
+      current?.state === "live" ? null : current?.session_id ?? null, current?.started_at ?? null).run();
+  if (!started.meta.changes) throw new SessionConflictError();
   return sessionID;
 }
 
-/** Ends the live session and keeps a record of it. */
-export async function endSession(env: Env, groupID: string, endedBy: string): Promise<void> {
+/** Archive and close atomically. A delayed request/alarm cannot close a newer session. */
+export async function endSession(env: Env, groupID: string, endedBy: string,
+  expected?: { sessionID: string | null; autoEndAt?: string },
+): Promise<boolean> {
   const live = await liveRow(env, groupID);
+  if (live?.state !== "live" || (expected && live.session_id !== expected.sessionID)
+      || (expected?.autoEndAt !== undefined && live.auto_end_at !== expected.autoEndAt)) return false;
   const now = new Date().toISOString();
-  // The recording closes with the session, and is then kept.
-  if (live?.state === "live" && live.room_id && live.room_recording) await stopRoomRecording(env, groupID, live.room_id);
-  if (live?.state === "live" && live.session_id) {
-    const attended = await env.DB.prepare("SELECT COUNT(*) AS n FROM group_live_presence WHERE session_id=?")
-      .bind(live.session_id).first<{ n: number }>();
-    await env.DB.prepare(`INSERT OR REPLACE INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
-      VALUES(?,?,?,?,?,?,?,?,?,?)`)
-      .bind(live.session_id, groupID, live.kind, live.title, live.started_at ?? now, live.started_by, now, endedBy, attended?.n ?? 0,
-        live.is_test ? 1 : 0).run();
-  }
-  await env.DB.prepare(`INSERT INTO group_live(group_id,state,updated_at) VALUES(?,'offline',?)
-    ON CONFLICT(group_id) DO UPDATE SET state='offline',video_id=NULL,room_id=NULL,session_id=NULL,queue_json='[]',
+  const guard = "group_id=? AND state='live' AND session_id IS ? AND started_at IS ?" +
+    (expected?.autoEndAt !== undefined ? " AND auto_end_at=?" : "");
+  const values = [groupID, live.session_id, live.started_at, ...(expected?.autoEndAt !== undefined ? [expected.autoEndAt] : [])];
+  const results = await env.DB.batch([
+    env.DB.prepare(`INSERT OR IGNORE INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
+      SELECT session_id,group_id,kind,title,COALESCE(started_at,?),started_by,?,?,
+        (SELECT COUNT(*) FROM group_live_presence p WHERE p.session_id=group_live.session_id),is_test
+      FROM group_live WHERE ${guard} AND session_id IS NOT NULL`).bind(now, now, endedBy, ...values),
+    env.DB.prepare(`UPDATE group_live SET state='offline',video_id=NULL,room_id=NULL,session_id=NULL,queue_json='[]',
       queue_index=0,position_seconds=0,position_at=NULL,paused=0,notice=NULL,notice_at=NULL,room_recording=0,is_test=0,auto_end_at=NULL,
-      updated_at=excluded.updated_at`)
-    .bind(groupID, now).run();
+      updated_at=? WHERE ${guard}`).bind(now, ...values),
+  ]);
+  const ended = (results[1]?.meta.changes ?? 0) > 0;
+  if (ended && live.room_id && live.room_recording) {
+    try { await stopRoomRecording(env, groupID, live.room_id); }
+    catch { console.error("Ended session recording cleanup failed", groupID, live.session_id); }
+  }
+  return ended;
 }
 
 /** The live session as the group page shows it. Admins also get who is
@@ -210,6 +238,9 @@ export async function controlSession(env: Env, memberID: string, groupID: string
   if (!await canManage(env, memberID, role, groupID)) return forbidden();
   const live = await liveRow(env, groupID);
   if (live?.state !== "live") return nothingLive();
+  if (input.sessionID !== undefined && input.sessionID !== live.session_id) {
+    return json({ error: "The live session changed. Refresh and try again.", code: "session_changed" }, { status: 409 });
+  }
   const now = new Date();
   let queue = queueOf(live);
   const current = playbackAt(queue, live.queue_index, live.position_seconds, live.position_at, !!live.paused, now);
@@ -217,43 +248,43 @@ export async function controlSession(env: Env, memberID: string, groupID: string
   const number = (value: unknown) => typeof value === "number" && Number.isFinite(value) ? value : NaN;
   switch (input.action) {
     case "pause":
-      await saveClock(env, groupID, queue, current.index, current.positionSeconds, true, now);
+      await saveClock(env, groupID, live, queue, current.index, current.positionSeconds, true, now);
       break;
     case "resume":
-      await saveClock(env, groupID, queue, current.index, current.positionSeconds, false, now);
+      await saveClock(env, groupID, live, queue, current.index, current.positionSeconds, false, now);
       break;
     case "skip": {
       const by = number(input.seconds);
       if (Number.isNaN(by)) return json({ error: "seconds is required" }, { status: 400 });
       const target = Math.max(0, current.positionSeconds + by);
-      await saveClock(env, groupID, queue, current.index, length ? Math.min(target, length) : target, current.paused, now);
+      await saveClock(env, groupID, live, queue, current.index, length ? Math.min(target, length) : target, current.paused, now);
       break;
     }
     case "seek": {
       const to = number(input.seconds);
       if (Number.isNaN(to) || to < 0) return json({ error: "seconds is required" }, { status: 400 });
-      await saveClock(env, groupID, queue, current.index, length ? Math.min(to, length) : to, current.paused, now);
+      await saveClock(env, groupID, live, queue, current.index, length ? Math.min(to, length) : to, current.paused, now);
       break;
     }
     case "next":
       if (current.index + 1 >= queue.length) {
         // Past the last item: the session stays open, with nothing playing.
-        await saveClock(env, groupID, queue, queue.length, 0, current.paused, now);
+        await saveClock(env, groupID, live, queue, queue.length, 0, current.paused, now);
       } else {
-        await saveClock(env, groupID, queue, current.index + 1, 0, current.paused, now);
+        await saveClock(env, groupID, live, queue, current.index + 1, 0, current.paused, now);
       }
       break;
     case "previous": {
       // Like any player: back to the start of this item, or to the one before
       // when already at its start.
       const index = current.positionSeconds > 5 && !current.finished ? current.index : Math.max(0, current.index - (current.finished ? 0 : 1));
-      await saveClock(env, groupID, queue, index, 0, current.paused, now);
+      await saveClock(env, groupID, live, queue, index, 0, current.paused, now);
       break;
     }
     case "jump": {
       const index = number(input.index);
       if (!Number.isInteger(index) || index < 0 || index >= queue.length) return json({ error: "No such item" }, { status: 400 });
-      await saveClock(env, groupID, queue, index, 0, false, now);
+      await saveClock(env, groupID, live, queue, index, 0, false, now);
       break;
     }
     case "add": {
@@ -263,8 +294,8 @@ export async function controlSession(env: Env, memberID: string, groupID: string
       const start = queue.length;
       queue = [...queue, ...added].slice(0, 30);
       // Added to a finished session, it plays straight away.
-      if (wasFinished && added.length) await saveClock(env, groupID, queue, start, 0, false, now);
-      else await saveClock(env, groupID, queue, current.index, current.positionSeconds, current.paused, now);
+      if (wasFinished && added.length) await saveClock(env, groupID, live, queue, start, 0, false, now);
+      else await saveClock(env, groupID, live, queue, current.index, current.positionSeconds, current.paused, now);
       break;
     }
     case "remove": {
@@ -273,15 +304,18 @@ export async function controlSession(env: Env, memberID: string, groupID: string
         return json({ error: "Only an item not playing now can be removed" }, { status: 400 });
       }
       queue = queue.filter((_, i) => i !== index);
-      await saveClock(env, groupID, queue, index < current.index ? current.index - 1 : current.index, current.positionSeconds, current.paused, now);
+      await saveClock(env, groupID, live, queue, index < current.index ? current.index - 1 : current.index, current.positionSeconds, current.paused, now);
       break;
     }
     case "notice": {
       const text = cleanText(input.text, 280);
-      await env.DB.prepare("UPDATE group_live SET notice=?,notice_at=?,updated_at=? WHERE group_id=?")
-        .bind(text ?? null, text ? now.toISOString() : null, now.toISOString(), groupID).run();
+      const saved = await env.DB.prepare("UPDATE group_live SET notice=?,notice_at=?,updated_at=? WHERE group_id=? AND state='live' AND session_id IS ? AND started_at IS ?")
+        .bind(text ?? null, text ? now.toISOString() : null, now.toISOString(), groupID, live.session_id, live.started_at).run();
+      if (!saved.meta.changes) throw new SessionConflictError();
       if (text && input.notify === true) {
-        await notifyGroup(env, groupID, `notice:${groupID}:${now.toISOString()}`, live.title ?? "Halqah Zikr", text, zikrNoticeLink(groupID));
+        try {
+          await notifyGroup(env, groupID, `notice:${groupID}:${now.toISOString()}`, live.title ?? "Halqah Zikr", text, zikrNoticeLink(groupID));
+        } catch { /* The notice was saved; a delivery failure must not suggest repeating the write. */ }
       }
       break;
     }
@@ -298,6 +332,7 @@ export async function controlSession(env: Env, memberID: string, groupID: string
       return json({ error: "Unknown action" }, { status: 400 });
   }
   const updated = await liveRow(env, groupID);
+  if (updated?.state !== "live" || updated.session_id !== live.session_id) throw new SessionConflictError();
   return json({ ok: true, live: updated ? await sessionPayload(env, groupID, updated, true, now) : undefined });
 }
 
@@ -308,7 +343,7 @@ export async function controlSession(env: Env, memberID: string, groupID: string
 export async function checkIn(env: Env, memberID: string, groupID: string): Promise<Response> {
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
-  const live = await liveRow(env, groupID);
+  const live = await visibleLiveRow(env, groupID, await canManage(env, memberID, role, groupID));
   if (live?.state !== "live" || !live.session_id) return nothingLive();
   const now = new Date().toISOString();
   await env.DB.prepare(`INSERT INTO group_live_presence(session_id,group_id,member_id,first_seen_at,last_seen_at) VALUES(?,?,?,?,?)
@@ -459,9 +494,14 @@ export async function autoplayDue(env: Env, now = new Date()): Promise<void> {
     if (row.last_autoplay_at && now.getTime() - Date.parse(row.last_autoplay_at) < 3_600_000) continue;
     const queue = queueOf({ queue_json: row.autoplay_json });
     if (!queue.length) continue;
+    try {
+      await beginSession(env, row.group_id, "schedule", { kind: "zikr", title: row.title, videoID: null, roomID: null, queue, onlyIfIdle: true });
+    } catch (error) {
+      if (error instanceof SessionConflictError) continue;
+      throw error;
+    }
     await env.DB.prepare("UPDATE group_zikr_sessions SET last_autoplay_at=? WHERE group_id=? AND id=?")
       .bind(now.toISOString(), row.group_id, row.id).run();
-    await beginSession(env, row.group_id, "schedule", { kind: "zikr", title: row.title, videoID: null, roomID: null, queue });
     await notifyGroup(env, row.group_id, `autoplay:${row.group_id}:${row.id}:${now.toISOString().slice(0, 13)}`, row.title,
       "The Halqah zikr has started. Listen together in Darul Irfan.", zikrNoticeLink(row.group_id));
   }

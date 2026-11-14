@@ -295,16 +295,49 @@ export async function groupPosts(env: Env, memberID: string, groupID: string, li
   });
 }
 
-/** Deletes the member, their sessions and their memberships.
- *
- * Apple requires an account created in the app to be deletable from inside it.
- * Posts belong to the organisation, not the member, so nothing published is
- * lost; the cascades remove everything that is about this person. */
+/** Remove the account and private participation data atomically. Shared
+ * organisational posts, meetings and recordings remain, with the account's
+ * attribution removed. Personal information embedded in shared media or held
+ * by the meeting provider needs the separately disclosed support removal path;
+ * deleting database identities cannot erase a voice from a shared recording. */
 export async function deleteMember(env: Env, memberID: string): Promise<Response> {
-  await env.DB.prepare("DELETE FROM member_sessions WHERE member_id=?").bind(memberID).run();
-  await env.DB.prepare("DELETE FROM member_devices WHERE member_id=?").bind(memberID).run();
-  await env.DB.prepare("DELETE FROM member_group_members WHERE member_id=?").bind(memberID).run();
-  await env.DB.prepare("DELETE FROM members WHERE id=?").bind(memberID).run();
+  const memberActor = `member:${memberID}`;
+  const statement = (sql: string, ...values: (string | null)[]) => env.DB.prepare(sql).bind(...values);
+  // Only verified identity emails, never a public profile's unverified contact
+  // address, may remove an unclaimed invitation addressed to this account.
+  const emails = "SELECT lower(email) FROM members WHERE id=? AND email IS NOT NULL UNION SELECT lower(google_email) FROM members WHERE id=? AND google_email IS NOT NULL";
+  await env.DB.batch([
+    // These mandatory FKs have no ON DELETE action. Remove the account's own
+    // stages/cues before members; other authors' cues have their own title copy.
+    statement("DELETE FROM group_zikr_cues WHERE author_id=?", memberID),
+    statement("DELETE FROM group_zikr_stages WHERE created_by=?", memberID),
+    // SET NULL would leave private freeform descriptions after account deletion.
+    statement("DELETE FROM group_dua_requests WHERE member_id=?", memberID),
+    statement("DELETE FROM community_reports WHERE reporter_id=?", memberID),
+    statement("DELETE FROM member_invites WHERE redeemed_by=?", memberID),
+    statement(`DELETE FROM member_group_grants WHERE claimed_by=? OR (claimed_by IS NULL AND lower(email) IN (${emails}))`, memberID, memberID, memberID),
+    // Remove attributable administrative metadata while preserving everyone
+    // else's group access and the organisation's shared published material.
+    statement("UPDATE member_group_members SET added_by='deleted-account' WHERE added_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE member_invites SET created_by='deleted-account' WHERE created_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE member_group_grants SET created_by='deleted-account' WHERE created_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE member_groups SET created_by=NULL WHERE created_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE group_meetings SET created_by='deleted-account' WHERE created_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE group_recordings SET created_by='deleted-account' WHERE created_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE group_live SET started_by=NULL WHERE started_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE group_live_history SET started_by=NULL WHERE started_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE group_live_history SET ended_by=NULL WHERE ended_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE group_dua_requests SET read_by=NULL WHERE read_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE daily_media SET created_by=NULL WHERE created_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE daily_media SET published_by=NULL WHERE published_by IN (?,?)", memberID, memberActor),
+    statement("UPDATE markaz_announcements SET sent_by='deleted-account' WHERE sent_by IN (?,?)", memberID, memberActor),
+    statement(`UPDATE member_group_posts SET author_email='deleted-account' WHERE author_email IN (?,?) OR lower(author_email) IN (${emails})`, memberID, memberActor, memberID, memberID),
+    statement(`DELETE FROM audit_log WHERE actor_email IN (?,?) OR lower(actor_email) IN (${emails}) OR (entity_type='member' AND entity_id=?)`, memberID, memberActor, memberID, memberID, memberID),
+    // The member deletion cascades to sessions, membership, device associations,
+    // profile, presence, stage-chat, consent, blocks and approved reporting links.
+    // Independent device-level official-alert subscriptions remain user-controlled.
+    statement("DELETE FROM members WHERE id=?", memberID),
+  ]);
   return new Response(null, { status: 204 });
 }
 

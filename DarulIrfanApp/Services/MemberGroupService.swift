@@ -301,14 +301,15 @@ actor MemberGroupService {
     /// A playback control applied for everyone: pause, resume, skip (by
     /// seconds), seek (to seconds), next, previous, jump (to index), add
     /// (items), remove (index) or notice (text).
-    func control(_ action: String, _ extra: [String: Any] = [:], in groupID: String) async throws {
+    func control(_ action: String, _ extra: [String: Any] = [:], in groupID: String, sessionID: String? = nil) async throws {
         var payload = extra
         payload["action"] = action
+        if let sessionID { payload["sessionID"] = sessionID }
         try await send("POST", path: "v1/groups/\(groupID)/control", payload: payload, expecting: [200])
     }
 
-    func addToSession(_ entries: [GroupQueueEntry], in groupID: String) async throws {
-        try await control("add", ["items": entries.map(\.payload)], in: groupID)
+    func addToSession(_ entries: [GroupQueueEntry], in groupID: String, sessionID: String? = nil) async throws {
+        try await control("add", ["items": entries.map(\.payload)], in: groupID, sessionID: sessionID)
     }
 
     /// Tells the group's admins this member has the session open.
@@ -435,8 +436,10 @@ actor MemberGroupService {
         try await send("DELETE", path: "v1/groups/\(groupID)/recordings/\(recordingID)", payload: nil, expecting: [204])
     }
 
-    func endLive(in groupID: String) async throws {
-        try await send("POST", path: "v1/groups/\(groupID)/live", payload: ["state": "offline"], expecting: [200])
+    func endLive(in groupID: String, sessionID: String? = nil) async throws {
+        var payload: [String: Any] = ["state": "offline"]
+        if let sessionID { payload["sessionID"] = sessionID }
+        try await send("POST", path: "v1/groups/\(groupID)/live", payload: payload, expecting: [200])
     }
 
     func scheduleMeeting(in groupID: String, title: String, startsAt: Date, durationMinutes: Int, requestID: UUID) async throws {
