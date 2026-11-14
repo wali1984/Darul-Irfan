@@ -131,7 +131,7 @@ final class OnboardingViewModel {
         let request = locationRevision
         locationPhase = .requestingPermission
         let status = await location.requestPermission()
-        guard !Task.isCancelled, request == locationRevision else { return }
+        guard !Task.isCancelled, request == locationRevision else { return abandonLocation(request) }
         guard status == .authorized else {
             locationPhase = .denied
             return
@@ -141,16 +141,16 @@ final class OnboardingViewModel {
             // Round to city precision before persisting — the app never
             // stores precise coordinates (see PrivacySettingsView).
             let place = try await location.currentPlace().roundedToCityPrecision()
-            guard !Task.isCancelled, request == locationRevision else { return }
+            guard !Task.isCancelled, request == locationRevision else { return abandonLocation(request) }
             await appState.updateSettings {
                 $0.lastKnownPlace = place
                 $0.locationMode = .device
             }
-            guard !Task.isCancelled, request == locationRevision else { return }
+            guard !Task.isCancelled, request == locationRevision else { return abandonLocation(request) }
             locationPhase = .resolved(place)
             suggestMethod(for: place)
         } catch {
-            guard !Task.isCancelled, request == locationRevision else { return }
+            guard !Task.isCancelled, request == locationRevision else { return abandonLocation(request) }
             locationPhase = .failed
         }
     }
@@ -160,6 +160,14 @@ final class OnboardingViewModel {
     private func suggestMethod(for place: PlaceCoordinate) {
         if let recommended = CalculationMethodChoice.recommended(forCountryCode: place.countryCode) {
             selectedMethod = recommended
+        }
+    }
+
+    /// A lookup that was cancelled, or overtaken by a newer choice, leaves the
+    /// step ready to be tried again instead of looking busy for ever.
+    private func abandonLocation(_ request: Int) {
+        if request == locationRevision, locationPhase == .requestingPermission || locationPhase == .locating {
+            locationPhase = .idle
         }
     }
 
