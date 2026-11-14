@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Env } from "../src/contracts";
 import { setLive } from "../src/community";
-import { beginSession, checkIn, controlSession, endSession, SessionConflictError } from "../src/session";
+import { beginSessionIfIdle, checkIn, controlSession, endSession, SessionConflictError } from "../src/session";
 import { endAfterDua, relayLive, relayZikrCue, dispatchZikrCues } from "../src/groupZikrStages";
 import { sqliteD1 } from "./sqlite-d1";
 import worker from "../src/index";
@@ -138,10 +138,12 @@ describe("session mutation safety", () => {
   it("allows only one concurrent automated start from an idle group", async () => {
     const { env, raw } = setup();
     raw.prepare("UPDATE group_live SET state='offline' WHERE group_id='usa'").run();
-    const session = { kind: "zikr" as const, title: "Start", videoID: null, roomID: null, queue: [], onlyIfIdle: true };
-    const results = await Promise.allSettled([beginSession(env, "usa", "admin", session), beginSession(env, "usa", "admin", session)]);
-    expect(results.filter(r => r.status === "fulfilled")).toHaveLength(1);
-    expect(results.find(r => r.status === "rejected")).toMatchObject({ reason: expect.any(SessionConflictError) });
+    // The automated start is beginSessionIfIdle: the start that lost is told so with null.
+    const session = { kind: "zikr" as const, title: "Start", videoID: null, roomID: null, queue: [] };
+    const results = await Promise.all([beginSessionIfIdle(env, "usa", "admin", session), beginSessionIfIdle(env, "usa", "admin", session)]);
+    expect(results.filter(id => id !== null)).toHaveLength(1);
+    expect(results).toContain(null);
+    expect(raw.prepare("SELECT session_id FROM group_live WHERE group_id='usa'").get()).toEqual({ session_id: results.find(id => id !== null) });
     expect(raw.prepare("SELECT COUNT(*) AS n FROM group_live_history").get()).toEqual({ n: 0 });
   });
 
@@ -155,13 +157,22 @@ describe("session mutation safety", () => {
 });
 
 describe("relay session and deadline fencing", () => {
-  it("rejects reusing a meeting or a test as a public relay session", async () => {
+  it("never reuses a meeting or a test as a public relay session", async () => {
     const { env, raw } = setup();
     raw.prepare("UPDATE group_live SET kind='meeting' WHERE group_id='usa'").run();
     expect((await relayLive(env, "usa", { state: "live" })).status).toBe(409);
+    expect(raw.prepare("SELECT session_id,auto_end_at FROM group_live WHERE group_id='usa'").get())
+      .toEqual({ session_id: "session-current", auto_end_at: "2026-11-06T13:00:00.000Z" });
+    // A Test Zikr is not reused either: it ends, kept in history as a test, and
+    // the real Zikr starts as a session of its own.
     raw.prepare("UPDATE group_live SET kind='zikr',is_test=1 WHERE group_id='usa'").run();
-    expect((await relayLive(env, "usa", { state: "live" })).status).toBe(409);
-    expect(raw.prepare("SELECT auto_end_at FROM group_live WHERE group_id='usa'").get()).toEqual({ auto_end_at: "2026-11-06T13:00:00.000Z" });
+    const started = await relayLive(env, "usa", { state: "live" });
+    expect(started.status).toBe(201);
+    const { sessionID } = await started.json() as { sessionID: string };
+    expect(sessionID).not.toBe("session-current");
+    expect(raw.prepare("SELECT session_id,is_test,auto_end_at FROM group_live WHERE group_id='usa'").get())
+      .toEqual({ session_id: sessionID, is_test: 0, auto_end_at: null });
+    expect(raw.prepare("SELECT session_id,is_test FROM group_live_history").all()).toEqual([{ session_id: "session-current", is_test: 1 }]);
   });
 
   it("cancels the matching deadline on resumed live and ignores the cancelled alarm", async () => {
@@ -179,35 +190,46 @@ describe("relay session and deadline fencing", () => {
     expect(raw.prepare("SELECT COUNT(*) AS n FROM group_zikr_cues").get()).toEqual({ n: 0 });
   });
 
-  it("repairs an acknowledged deadline with a missing cue and keeps one event across retries", async () => {
+  it("answers a dua already pending with its deadline and keeps one card across retries", async () => {
     const { env, raw } = setup();
     const input = { state: "dua", sessionID: "session-current" };
+    // The deadline the session already carries is answered again, unchanged.
+    const pending = await relayLive(env, "usa", input);
+    expect(pending.status).toBe(200);
+    expect(await pending.json()).toMatchObject({ endsAt: "2026-11-06T13:00:00.000Z" });
+    // The card goes up with the deadline, once: a fresh dua writes both, its retries neither.
+    raw.prepare("UPDATE group_live SET auto_end_at=NULL WHERE group_id='usa'").run();
     const first = await relayLive(env, "usa", input);
     expect(first.status).toBe(200);
-    expect(await first.json()).toMatchObject({ endsAt: "2026-11-06T13:00:00.000Z" });
-    expect((await relayLive(env, "usa", input)).status).toBe(200);
+    const { endsAt } = await first.json() as { endsAt: string };
+    const retry = await relayLive(env, "usa", input);
+    expect(retry.status).toBe(200);
+    expect(await retry.json()).toMatchObject({ endsAt });
+    expect(raw.prepare("SELECT auto_end_at FROM group_live WHERE group_id='usa'").get()).toEqual({ auto_end_at: endsAt });
     expect(raw.prepare("SELECT stage_id,author_id FROM group_zikr_cues").all())
       .toEqual([{ stage_id: "dua", author_id: "service-paltalk-relay" }]);
   });
 
-  it("does not acknowledge a replayed Dua after its deadline was cancelled during the request", async () => {
+  it("does not acknowledge a Dua whose session was replaced during the request", async () => {
     const { env, raw } = setup();
-    const input = { state: "dua", sessionID: "session-current" };
-    expect((await relayLive(env, "usa", input)).status).toBe(200);
+    raw.prepare("UPDATE group_live SET auto_end_at=NULL WHERE group_id='usa'").run();
     const prepare = env.DB.prepare.bind(env.DB);
     vi.spyOn(env.DB, "prepare").mockImplementation((sql: string) => {
       const statement = prepare(sql);
-      if (sql.startsWith("INSERT OR IGNORE INTO group_zikr_cues")) {
+      // The write that sets the deadline names the session it read.
+      if (sql.startsWith("UPDATE group_live SET auto_end_at=?")) {
         const run = statement.run.bind(statement);
         vi.spyOn(statement, "run").mockImplementationOnce(async () => {
-          raw.prepare("UPDATE group_live SET auto_end_at=NULL WHERE group_id='usa'").run();
+          raw.prepare("UPDATE group_live SET session_id='session-newer' WHERE group_id='usa'").run();
           return run();
         });
       }
       return statement;
     });
-    expect((await relayLive(env, "usa", input)).status).toBe(409);
-    expect(raw.prepare("SELECT auto_end_at FROM group_live WHERE group_id='usa'").get()).toEqual({ auto_end_at: null });
+    expect((await relayLive(env, "usa", { state: "dua", sessionID: "session-current" })).status).toBe(409);
+    expect(raw.prepare("SELECT session_id,auto_end_at FROM group_live WHERE group_id='usa'").get())
+      .toEqual({ session_id: "session-newer", auto_end_at: null });
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM group_zikr_cues").get()).toEqual({ n: 0 });
   });
 
   it("ignores a due alarm cancelled after the cron read", async () => {
@@ -215,7 +237,7 @@ describe("relay session and deadline fencing", () => {
     const prepare = env.DB.prepare.bind(env.DB);
     vi.spyOn(env.DB, "prepare").mockImplementation((sql: string) => {
       const statement = prepare(sql);
-      if (sql.startsWith("SELECT group_id,session_id,auto_end_at")) {
+      if (sql.startsWith("SELECT group_id,session_id FROM group_live WHERE state='live' AND session_id IS NOT NULL AND auto_end_at")) {
         const all = statement.all.bind(statement);
         vi.spyOn(statement, "all").mockImplementationOnce(async () => {
           const result = await all();
