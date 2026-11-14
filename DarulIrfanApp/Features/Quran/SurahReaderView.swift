@@ -43,7 +43,6 @@ struct SurahReaderView: View {
     @State private var pendingScrollAyah: Int?
     /// Volumes whose book still has original OCR pages, which carry the
     /// "not yet proofread" line; the re-read volumes do not.
-    @State private var machineReadVolumeIDs: Set<String> = []
 
     init(
         surah: QuranSurah,
@@ -794,17 +793,7 @@ struct SurahReaderView: View {
                 ForEach(viewModel.fullVolumes) { volume in
                     volumeLink(volume, title: volumeTitle(volume))
                 }
-                // Only while the volume still holds original OCR pages; the
-                // volumes re-read from the scan carry no such notice.
-                if viewModel.fullVolumes.contains(where: { machineReadVolumeIDs.contains($0.bookID) }) {
-                    Text("Machine-read from the printed book and not yet proofread.")
-                        .diInterfaceFont(.caption)
-                        .foregroundStyle(DIColor.textMuted)
-                }
             }
-        }
-        .task(id: viewModel.fullVolumes.map(\.bookID)) {
-            await loadVolumeProvenance(viewModel.fullVolumes)
         }
     }
 
@@ -813,7 +802,8 @@ struct SurahReaderView: View {
             TafsirVolumeDestination(
                 volume: volume,
                 dependencies: dependencies,
-                fontScale: appState.settings.readerFontScale.rawValue
+                fontScale: appState.settings.readerFontScale.rawValue,
+                appState: appState
             )
         } label: {
             Label {
@@ -826,17 +816,6 @@ struct SurahReaderView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .buttonStyle(.bordered)
-    }
-
-    @MainActor
-    private func loadVolumeProvenance(_ volumes: [TafsirVolume]) async {
-        var machineRead: Set<String> = []
-        for volume in volumes {
-            if (try? await dependencies.contentRepository.bookHasMachineProvisionalPages(bookID: volume.bookID)) ?? true {
-                machineRead.insert(volume.bookID)
-            }
-        }
-        machineReadVolumeIDs = machineRead
     }
 
     private func volumeTitle(_ volume: TafsirVolume) -> String {
@@ -1039,6 +1018,8 @@ struct TafsirVolumeDestination: View {
     let dependencies: AppDependencies
     /// The reader's text size, carried into the book text.
     var fontScale: Double = 1
+    /// Lets a reference in the book's text open over the page.
+    var appState: AppState? = nil
     @State private var item: ContentItem?
     @State private var hasNoPages = false
     @State private var failed = false
@@ -1047,7 +1028,7 @@ struct TafsirVolumeDestination: View {
     var body: some View {
         Group {
             if let item {
-                BookTextReaderView(item: item, dependencies: dependencies, startPage: volume.page, fontScale: fontScale)
+                BookTextReaderView(item: item, dependencies: dependencies, startPage: volume.page, fontScale: fontScale, appState: appState)
                     .id(volume.id)
             } else if failed {
                 VStack(spacing: DISpacing.sm) {
@@ -1150,7 +1131,7 @@ private struct AyahCardView: View {
                     translationView(translation)
                 } else if displayMode.showsTranslation, viewModel.isAsrarTranslationWithheld(ayah.ayahNumber) {
                     if displayMode.showsArabic { Divider() }
-                    Text("Asrar-at-Tanzil's translation of this ayah is still being checked and is not shown yet.")
+                    Text("Asrar-at-Tanzil's translation of this ayah is not available yet.")
                         .diInterfaceFont(.footnote)
                         .italic()
                         .foregroundStyle(DIColor.textMuted)

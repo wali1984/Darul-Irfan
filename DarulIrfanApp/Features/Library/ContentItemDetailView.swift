@@ -278,18 +278,9 @@ struct ContentItemDetailView: View {
                     Text("Read the text")
                         .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
-                    Group {
-                        if viewModel.machineReadPageCount >= viewModel.bookPageCount {
-                            Text("\(viewModel.bookPageCount) pages — searchable, machine-read, not yet proofread")
-                        } else if viewModel.machineReadPageCount > 0 {
-                            // Mostly re-read from the scan: say how much is not.
-                            Text("\(viewModel.bookPageCount) pages — searchable text; \(viewModel.machineReadPageCount) still machine-read")
-                        } else {
-                            Text("\(viewModel.bookPageCount) pages — searchable text")
-                        }
-                    }
-                    .diInterfaceFont(.caption)
-                    .foregroundStyle(DIColor.textMuted)
+                    Text("\(viewModel.bookPageCount) pages — searchable text")
+                        .diInterfaceFont(.caption)
+                        .foregroundStyle(DIColor.textMuted)
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.forward")
@@ -308,9 +299,7 @@ struct ContentItemDetailView: View {
         .buttonStyle(DIPressableStyle())
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(viewModel.bookTextIsMachineRead
-            ? Text("Read the text, \(viewModel.bookPageCount) pages, machine-read and not yet proofread")
-            : Text("Read the text, \(viewModel.bookPageCount) pages"))
+        .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages"))
     }
 
     /// The app's one reader, on the printed pages or the text.
@@ -489,25 +478,15 @@ struct ContentItemDetailView: View {
                 }
                 .buttonStyle(DIPressableStyle())
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel(viewModel.bookTextIsMachineRead
-                    ? Text("Read the text, \(viewModel.bookPageCount) pages, machine-read and not yet proofread")
-                    : Text("Read the text, \(viewModel.bookPageCount) pages"))
+                .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages"))
             }
         }
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// The text's pages and how much of it is still machine-read, as the
-    /// text has always said.
+    /// How many pages the text has.
     private var textTileDetail: Text {
-        if viewModel.machineReadPageCount >= viewModel.bookPageCount {
-            return Text("\(viewModel.bookPageCount) pages — searchable, machine-read, not yet proofread")
-        }
-        if viewModel.machineReadPageCount > 0 {
-            // Mostly re-read from the scan: say how much is not.
-            return Text("\(viewModel.bookPageCount) pages — searchable text; \(viewModel.machineReadPageCount) still machine-read")
-        }
-        return Text("\(viewModel.bookPageCount) pages — searchable text")
+        Text("\(viewModel.bookPageCount) pages — searchable text")
     }
 
     private func readingTile(systemImage: String, titleKey: LocalizedStringKey, detail: Text) -> some View {

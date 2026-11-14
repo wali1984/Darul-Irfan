@@ -377,12 +377,6 @@ struct HadithBookView: View {
                     missingTranslationNote
                 }
 
-                if entry.isMachineTranslated(languageCode: languageCode) {
-                    machineDraftNote
-                } else if entry.isProvisional(languageCode: languageCode) {
-                    provisionalNote
-                }
-
                 referenceBlock(entry)
             }
         }
@@ -613,26 +607,6 @@ struct HadithBookView: View {
         case "ar": return "This narration has no Arabic text"
         default: return "This narration has no English translation"
         }
-    }
-
-    /// Shown beneath a translation that is still an unreviewed machine draft.
-    /// Sacred text carries its provenance visibly: a reader must be able to
-    /// tell a reviewed translation from one awaiting scholarly review without
-    /// leaving the page.
-    private var machineDraftNote: some View {
-        Label("Machine translation — pending scholarly review", systemImage: "exclamationmark.triangle")
-            .diInterfaceFont(.caption2)
-            .foregroundStyle(DIColor.textMuted)
-            .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
-    }
-
-    /// Beneath a translation taken from a source that has not been reviewed
-    /// (the provisional Urdu of Mishkat and part of Sunan an-Nasa'i).
-    private var provisionalNote: some View {
-        Label("Provisional translation — pending scholarly review", systemImage: "exclamationmark.triangle")
-            .diInterfaceFont(.caption2)
-            .foregroundStyle(DIColor.textMuted)
-            .frame(maxWidth: .infinity, alignment: languageCode == "ur" ? .trailing : .leading)
     }
 
     private var missingTranslationNote: some View {
