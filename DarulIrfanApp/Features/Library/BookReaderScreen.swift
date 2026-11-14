@@ -231,7 +231,8 @@ struct BookReaderScreen: View {
                     dependencies: dependencies,
                     startPage: startPage,
                     fontScale: scale,
-                    session: text
+                    session: text,
+                    appState: appState
                 )
                 .modifier(BookReaderLayer(isActive: mode == .text))
             }

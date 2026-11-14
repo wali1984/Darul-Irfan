@@ -30,7 +30,8 @@ struct SearchResultLink<RowContent: View>: View {
                             bookID: page.bookID,
                             page: page.page,
                             dependencies: dependencies,
-                            fontScale: appState.settings.readerFontScale.rawValue
+                            fontScale: appState.settings.readerFontScale.rawValue,
+                            appState: appState
                         )
                     } label: { label() }
                 } else {
@@ -119,6 +120,8 @@ private struct BookPageDestination: View {
     let page: Int
     let dependencies: AppDependencies
     let fontScale: Double
+    /// Lets a reference in the book's text open over the page.
+    var appState: AppState? = nil
     @State private var item: ContentItem?
     @State private var loadFailed = false
     @State private var attempt = 0
@@ -126,7 +129,7 @@ private struct BookPageDestination: View {
     var body: some View {
         Group {
             if let item {
-                BookTextReaderView(item: item, dependencies: dependencies, startPage: page, fontScale: fontScale)
+                BookTextReaderView(item: item, dependencies: dependencies, startPage: page, fontScale: fontScale, appState: appState)
             } else if loadFailed {
                 VStack(spacing: DISpacing.md) {
                     DIEmptyState(systemImage: "books.vertical", titleKey: "Could not complete action")

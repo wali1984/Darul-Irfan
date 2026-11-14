@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Reads a book's OCR'd text, one printed page at a time.
+/// Reads a book's text, one printed page at a time.
 ///
 /// Distinct from `BookReaderView`, which renders the work's PDF through
 /// PDFKit. This view shows the *text* layer: selectable, searchable, and
@@ -11,19 +11,15 @@ import SwiftUI
 /// which is what made a large body unrenderable; nothing here holds more than
 /// the visible pages.
 ///
-/// A page re-read from the scan is set out as it was read: headings,
-/// paragraphs, poetry line by line, Arabic quotations, tables and captions,
-/// with its footnotes at the foot of the page, in Urdu or English as each
-/// block is written. A page still in its original OCR is laid out from its
-/// text when it is Urdu and shown as it is otherwise.
+/// A page is set out as it is printed: headings, paragraphs, poetry line by
+/// line, Arabic quotations, tables and captions, with its footnotes at the
+/// foot of the page, in Urdu or English as each block is written. Arabic is
+/// set as Qur'an only where the mushaf confirms it; other quotations are the
+/// book's own text.
 ///
-/// Pages still in their original OCR (`machineProvisional`: OCR arbitration
-/// plus a visual cross-check, no human proofreading) are announced once at the
-/// top - how many of the book's pages they are - and, in a book that mixes
-/// them with pages re-read from the scan (`claudeTranscribed`), each such page
-/// is marked; the re-read pages carry no notice. Any page the validator could
-/// not fully settle is marked too. Arabic is set as Qur'an only where the
-/// mushaf confirms it; other quotations are the book's own text.
+/// Where a page cites or quotes an ayah, quotes a narration or names a
+/// narrator, those words open the ayah, the narration or the biography over
+/// the page (`BookLinks.swift`).
 ///
 /// The page at the top of the screen is kept, so the book reopens there.
 ///
@@ -43,6 +39,9 @@ struct BookTextPagesView: View {
     var fontScale: Double = 1
     /// Set by `BookReaderScreen`; nil when the view stands alone.
     var session: BookReaderSession? = nil
+    /// Lets a reference in the text open over the page; nil leaves the text
+    /// plain.
+    var appState: AppState? = nil
 
     @State private var pages: [BookPage] = []
     /// Pages set out into headings, paragraphs, poetry and quotations.
@@ -56,21 +55,11 @@ struct BookTextPagesView: View {
     @State private var showsGoToPage = false
     @State private var goToPageText = ""
     @State private var pendingPage: Int?
-
-    private var unresolvedPageCount: Int {
-        pages.filter { $0.isMachineProvisional && !$0.isFullyResolved }.count
-    }
-
-    /// Pages still in their original OCR; the notice is about these only.
-    private var machineReadPageCount: Int {
-        pages.filter(\.isMachineProvisional).count
-    }
-
-    /// Some pages re-read from the scan and some not: each original OCR page
-    /// is then marked, so the reader can tell which is which.
-    private var mixesReviewStates: Bool {
-        machineReadPageCount > 0 && machineReadPageCount < pages.count
-    }
+    /// The places on each printed page that open an ayah, a narration or a
+    /// narrator's biography.
+    @State private var links: [Int: [BookLink]] = [:]
+    /// The reference a reader tapped, shown over the page.
+    @State private var openedLink: BookLinkTarget?
 
     var body: some View {
         Group {
@@ -95,9 +84,6 @@ struct BookTextPagesView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: DISpacing.lg) {
-                            if machineReadPageCount > 0 {
-                                provenanceNote
-                            }
                             ForEach(pages, id: \.page) { page in
                                 pageView(page)
                                     .id(page.page)
@@ -167,48 +153,38 @@ struct BookTextPagesView: View {
         .task(id: loadAttempt) {
             await load()
         }
-    }
-
-    /// Stated once at the top of the work, not repeated per page.
-    private var provenanceNote: some View {
-        DICard(background: DIColor.sandstone) {
-            VStack(alignment: .leading, spacing: DISpacing.xs) {
-                Label {
-                    Text("Machine-read text — pending proofreading")
-                        .diInterfaceFont(.caption, weight: .semibold)
-                } icon: {
-                    Image(systemName: "info.circle")
-                }
-                .foregroundStyle(DIColor.textPrimary)
-                if mixesReviewStates {
-                    Text("\(machineReadPageCount) of \(pages.count) pages are still machine-read and have not been checked by a person; they are marked. Read the PDF for the authoritative text.")
-                        .diInterfaceFont(.caption)
-                        .foregroundStyle(DIColor.textMuted)
-                } else {
-                    Text("Scanned and machine-corrected from the printed book. It has not been checked by a person. Read the PDF for the authoritative text.")
-                        .diInterfaceFont(.caption)
-                        .foregroundStyle(DIColor.textMuted)
-                }
-                if unresolvedPageCount > 0 {
-                    Text("\(unresolvedPageCount) of \(pages.count) pages have passages the checker could not settle; those are marked.")
-                        .diInterfaceFont(.caption)
-                        .foregroundStyle(DIColor.textMuted)
+        // What a tapped reference opens: the ayah with its tafsir, the
+        // narration in its collection, or the narrator's biography.
+        .sheet(item: $openedLink) { target in
+            if let appState {
+                switch target {
+                case .ayah(let surah, let ayah):
+                    TodayAyahTafsirSheet(
+                        surahNumber: surah,
+                        ayahNumber: ayah,
+                        dependencies: dependencies,
+                        appState: appState
+                    )
+                case .hadith(let canonicalID):
+                    BookHadithSheet(canonicalID: canonicalID, dependencies: dependencies, appState: appState)
+                case .narrator(let id):
+                    NarratorBioSheet(narratorId: id, repository: dependencies.hadithRepository, appState: appState)
                 }
             }
         }
     }
 
-    /// One printed page on its sheet: the marks a page carries (still
-    /// machine-read in a book that mixes the two; passages the checker could
-    /// not settle), its text, and its number at the foot.
+    /// One printed page on its sheet: its text, and its number at the foot.
     @ViewBuilder
     private func pageView(_ page: BookPage) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            if carriesMarks(page) {
-                pageMarks(page)
-            }
             if let formattedPage = formatted[page.id] {
-                FormattedBookPage(page: formattedPage, scale: fontScale)
+                FormattedBookPage(
+                    page: formattedPage,
+                    scale: fontScale,
+                    links: appState == nil ? [] : (links[page.page] ?? []),
+                    onLink: { link in openedLink = BookLinkTarget(link.t) }
+                )
             } else {
                 pageText(page.text)
             }
@@ -218,36 +194,6 @@ struct BookTextPagesView: View {
         .padding(.top, 26)
         .padding(.bottom, 20)
         .background(BookPaper())
-    }
-
-    private func carriesMarks(_ page: BookPage) -> Bool {
-        (mixesReviewStates && page.isMachineProvisional)
-            || (page.isMachineProvisional && !page.isFullyResolved)
-    }
-
-    private func pageMarks(_ page: BookPage) -> some View {
-        HStack(spacing: DISpacing.sm) {
-            if mixesReviewStates && page.isMachineProvisional {
-                Label {
-                    Text("machine-read, not yet proofread")
-                        .diInterfaceFont(.caption2)
-                } icon: {
-                    Image(systemName: "doc.text.magnifyingglass")
-                }
-                .foregroundStyle(DIColor.textMuted)
-            }
-            if page.isMachineProvisional && !page.isFullyResolved {
-                Label {
-                    Text("unchecked passages")
-                        .diInterfaceFont(.caption2)
-                } icon: {
-                    Image(systemName: "exclamationmark.triangle")
-                }
-                .foregroundStyle(DIColor.accent)
-                .accessibilityLabel(Text("This page has \(page.unresolvedBlocks) passages the checker could not settle"))
-            }
-            Spacer(minLength: 0)
-        }
     }
 
     /// Direction and face follow the page's own script, not a fixed Urdu
@@ -311,6 +257,12 @@ struct BookTextPagesView: View {
                 })
             }.value
             try Task.checkCancellation()
+            let bookID = item.id
+            let found = await Task.detached(priority: .userInitiated) {
+                BookLinkProvider.shared.links(bookID: bookID)
+            }.value
+            try Task.checkCancellation()
+            links = found
             formatted = prepared
             pages = loaded.filter { !$0.text.isEmpty }
             session?.pageNumbers = pages.map(\.page)
@@ -335,6 +287,8 @@ struct BookTextReaderView: View {
     var startPage: Int?
     /// The reader's text size, as the article reader and the Quran use it.
     var fontScale: Double = 1
+    /// Lets a reference in the text open over the page.
+    var appState: AppState? = nil
 
     var body: some View {
         BookReaderScreen(
@@ -342,6 +296,7 @@ struct BookTextReaderView: View {
             dependencies: dependencies,
             mode: .text,
             startPage: startPage,
+            appState: appState,
             fontScale: fontScale
         )
     }
@@ -422,6 +377,11 @@ struct FormattedBookPage: View {
     let page: BookPageFormatter.Page
     /// The reader's text size.
     var scale: Double = 1
+    /// The places in this page's text that open an ayah, a narration or a
+    /// narrator's biography. Empty leaves the text plain.
+    var links: [BookLink] = []
+    /// Called with the link a reader tapped.
+    var onLink: ((BookLink) -> Void)? = nil
     @State private var showsContents = false
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
 
@@ -450,6 +410,7 @@ struct FormattedBookPage: View {
             }
         }
         .environment(\.layoutDirection, .rightToLeft)
+        .modifier(BookLinkTaps(links: links, onLink: onLink))
     }
 
     /// The text of a contents page from the original OCR, which is one
@@ -483,7 +444,7 @@ struct FormattedBookPage: View {
         case .paragraph(let runs):
             paragraph(runs)
         case .quran(let text):
-            Text(verbatim: text)
+            linkedText(text)
                 .font(DIFont.quranArabic(scale: 0.8 * scale))
                 .foregroundStyle(DIColor.scripture)
                 .lineSpacing(8)
@@ -532,7 +493,7 @@ struct FormattedBookPage: View {
     /// Arabic the mushaf does not confirm - a hadith, a du'a, a saying - set
     /// apart in the Arabic face, without the Qur'an's colour and panel.
     private func arabicQuotation(_ text: String) -> some View {
-        Text(verbatim: text)
+        linkedText(text)
             .font(DIFont.quranArabic(scale: 0.75 * scale))
             .foregroundStyle(DIColor.scripture)
             .lineSpacing(CGFloat(8 * scale))
@@ -562,7 +523,7 @@ struct FormattedBookPage: View {
     /// printed page.
     private var unreadableNote: some View {
         Label {
-            Text("Words on this page that could not be read from the scan are marked … — switch to Pages to see the printed page.")
+            Text("Some words on this page are shown as … — switch to Pages to see the printed page.")
                 .diInterfaceFont(.footnote)
                 .foregroundStyle(DIColor.textMuted)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -652,7 +613,7 @@ struct FormattedBookPage: View {
 
     private func footnote(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return Text(verbatim: text)
+        return linkedText(text)
             .font(face(rightToLeft, size: 0.8))
             .foregroundStyle(DIColor.textMuted)
             .lineSpacing(CGFloat((rightToLeft ? 6 : 3) * scale))
@@ -679,6 +640,75 @@ struct FormattedBookPage: View {
         return text + Text(verbatim: String(plain))
     }
 
+    /// The words of a link: tappable, in the tint the page gives its links.
+    private func linkText(_ string: String, index: Int) -> Text {
+        var attributed = AttributedString(string)
+        if let url = URL(string: "\(BookLinkTaps.scheme):\(index)") {
+            attributed.link = url
+        }
+        return Text(attributed)
+    }
+
+    /// A quotation or a footnote, tappable where one of the page's links
+    /// names its words.
+    private func linkedText(_ string: String) -> Text {
+        guard !links.isEmpty else { return Text(verbatim: string) }
+        let pieces = BookLinkMatcher.pieces(of: string, links: links)
+        guard pieces.contains(where: { $0.link != nil }) else { return Text(verbatim: string) }
+        var text = Text(verbatim: "")
+        for piece in pieces {
+            if let index = piece.link {
+                text = text + linkText(piece.text, index: index)
+            } else {
+                text = text + Text(verbatim: piece.text)
+            }
+        }
+        return text
+    }
+
+    /// Words of prose in the page's own face, the mushaf's waqf signs and the
+    /// salutation sign kept in the face that draws them.
+    private func plainProse(_ string: String, leftToRight: Bool) -> Text {
+        guard leftToRight && string.contains("\u{FDFA}") else { return keepingWaqfMarks(string) }
+        var text = Text(verbatim: "")
+        let parts = string.components(separatedBy: "\u{FDFA}")
+        for (partIndex, part) in parts.enumerated() {
+            if partIndex > 0 {
+                text = text + Text(verbatim: "\u{FDFA}")
+                    .font(DIFont.quranArabic(scale: (17.0 / 27.0) * scale))
+            }
+            text = text + Text(verbatim: part)
+        }
+        return text
+    }
+
+    /// A run that holds one of the page's links, cut at the link so that its
+    /// words can be tapped; nil when the run holds none.
+    private func linkedRun(_ run: BookPageFormatter.Run, leftToRight: Bool) -> Text? {
+        guard !links.isEmpty else { return nil }
+        let pieces = BookLinkMatcher.pieces(of: run.text, links: links)
+        guard pieces.contains(where: { $0.link != nil }) else { return nil }
+        let quoted = run.isQuranic || run.isArabic
+        var text = Text(verbatim: "")
+        for piece in pieces {
+            var part: Text
+            if let index = piece.link {
+                part = linkText(piece.text, index: index)
+            } else if quoted {
+                part = Text(verbatim: piece.text)
+            } else {
+                part = plainProse(piece.text, leftToRight: leftToRight)
+            }
+            if quoted {
+                part = part
+                    .font(DIFont.quranArabic(scale: 0.72 * scale))
+                    .foregroundStyle(DIColor.scripture)
+            }
+            text = text + part
+        }
+        return text
+    }
+
     /// Prose, with a short Qur'anic quotation kept inline in the Qur'an face
     /// and a printed line break kept where the paragraph had one.
     private func prose(_ runs: [BookPageFormatter.Run]) -> Text {
@@ -686,6 +716,10 @@ struct FormattedBookPage: View {
         var text = Text(verbatim: "")
         for (index, run) in runs.enumerated() {
             if index > 0 { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
+            if let linked = linkedRun(run, leftToRight: leftToRight) {
+                text = text + linked
+                continue
+            }
             if run.isQuranic || run.isArabic {
                 text = text + Text(verbatim: run.text)
                     .font(DIFont.quranArabic(scale: 0.72 * scale))
