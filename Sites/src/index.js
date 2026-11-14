@@ -9,6 +9,8 @@ import { methodPage, shajraPage } from "./content.js";
 import { demoFile, demoPage, SHOWCASE } from "./demo.js";
 import { reportingRequest } from "./reporting/server.js";
 import LOGO from "../assets/logo.webp";
+// The seal uncut, as the main website serves it: the pages draw the logo's badge around it.
+import SEAL from "../assets/seal.webp";
 
 // Every site answers on both domains under the same name (oursheikh., namerica.,
 // uk., app-demo., reporting.). wajidali.us is the one shared for now; the
@@ -166,6 +168,9 @@ export default {
       const file = /^\/demo\/files\/([A-Za-z0-9.-]+)$/.exec(url.pathname);
       if (file) return demoFile(env, file[1], request);
       if (url.pathname === "/demo/showcase") return demoFile(env, SHOWCASE, request);
+      if (url.pathname === "/seal.webp") {
+        return new Response(SEAL, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
+      }
       if (url.pathname === "/logo.webp") {
         return new Response(LOGO, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
       }
@@ -191,6 +196,9 @@ export default {
     }
     if (request.method !== "GET" && request.method !== "HEAD") return new Response("Method not allowed", { status: 405 });
     if (url.pathname === "/data.json") return jsonResponse(200, await data(env, key));
+    if (url.pathname === "/seal.webp") {
+      return new Response(SEAL, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
+    }
     if (url.pathname === "/logo.webp") {
       return new Response(LOGO, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
     }

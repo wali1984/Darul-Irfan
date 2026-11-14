@@ -3,15 +3,13 @@
 
 export const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-/** The Silsila's logo, alive: turning gold rings, seven orbiting lights, a breathing halo.
- *  The picture (/logo.webp) is the seal as the main website shows it: with its ring of words, on a
- *  round white ground with a fine gold edge. One logo for every site (owner, 2026-11-13). */
+/** The Silsila's logo, drawn exactly as the main website (naqshbandiaowaisiah.us) draws it: the seal, with its
+ *  ring of words, in a white round badge with a gold edge; large, inside a fine gold ring and two slowly turning
+ *  gold arcs; small (the header), the badge alone. The picture (/seal.webp) is that site's own file, uncut.
+ *  Nothing else is added around it: no lights, no rays (owner, 2026-11-13). */
 export function animatedLogo(size = "min(420px,78vw)", extraClass = "") {
-  return `<div class="emblem ${extraClass}" style="--s:${size}" aria-label="Naqshbandia Owaisiah">
-    <div class="halo"></div><div class="rays"></div><div class="ring r3"></div><div class="ring r2"></div><div class="ring r1"></div>
-    <div class="orbit">${Array.from({ length: 7 }, (_, k) => `<i style="--k:${k}"></i>`).join("")}</div>
-    <img src="/logo.webp" alt="" width="560" height="560">
-  </div>`;
+  const mini = extraClass.includes("mini");
+  return `<div class="emblem ${extraClass}" style="--s:${size}" aria-label="Naqshbandia Owaisiah">${mini ? "" : "<span></span>"}<img src="/seal.webp" alt="" width="560" height="560"></div>`;
 }
 
 export const STYLE = `
@@ -33,9 +31,6 @@ nav.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20p
   backdrop-filter:blur(14px) saturate(1.3);background:linear-gradient(rgba(4,21,15,.85),rgba(4,21,15,.5));border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
 .brand .emblem{flex:none;margin:0}
-.emblem.mini .orbit i{width:4px;height:4px;margin:-2px;box-shadow:0 0 6px 2px rgba(243,220,157,.7)}
-.emblem.mini .r1{border-width:1px}
-.emblem.mini img{inset:5%;width:90%;height:90%}
 .brand b{font:600 20px/1 var(--serif);letter-spacing:.04em}
 .brand small{display:block;color:var(--gold);font:600 11px/1.4 var(--sans);letter-spacing:.18em;text-transform:uppercase}
 .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}.navlinks a{text-decoration:none;transition:color .2s}.navlinks a:hover,.navlinks a.on{color:var(--gold2)}
@@ -57,22 +52,24 @@ h2{font-size:clamp(32px,4.4vw,52px);line-height:1.08;margin:12px 0 14px}
 @keyframes beckon{50%{box-shadow:0 0 0 10px rgba(243,220,157,.12),0 16px 40px -10px rgba(217,181,106,.9)}}
 .btn-ghost{border:1px solid var(--line);background:rgba(255,255,255,.03)}.btn-ghost:hover{border-color:var(--gold)}
 .btn:disabled{background:rgba(255,255,255,.06);color:#6f8a80;box-shadow:none;cursor:not-allowed;border:1px solid rgba(255,255,255,.08)}
-.emblem{position:relative;width:var(--s);aspect-ratio:1;margin-inline:auto}
-.emblem img{position:absolute;inset:12%;width:76%;height:76%;border-radius:50%;animation:float 7s ease-in-out infinite;
-  filter:drop-shadow(0 20px 50px rgba(16,185,129,.45)) drop-shadow(0 0 30px rgba(243,220,157,.35))}
+/* The logo: the main website's own rules, value for value. A logo of 8rem or more has that site's measures
+   (.25rem, .6rem, 1rem ...); a smaller one keeps the same proportions. */
+.emblem{position:relative;flex:none;box-sizing:border-box;width:var(--s);height:var(--s);margin-inline:auto;isolation:isolate;border-radius:50%;
+  background:rgba(255,255,255,.98);border:1px solid rgba(224,189,114,.75);padding:min(.25rem,calc(var(--s) * .03125));
+  box-shadow:0 0 0 min(.6rem,calc(var(--s) * .075)) rgba(224,189,114,.08),0 0 min(4rem,calc(var(--s) * .5)) rgba(224,189,114,.26),0 min(2rem,calc(var(--s) * .25)) min(5rem,calc(var(--s) * .625)) rgba(0,0,0,.28)}
+.emblem::before,.emblem::after,.emblem>span{content:"";pointer-events:none;border:1px solid rgba(224,189,114,.38);border-radius:50%;position:absolute;inset:calc(-1 * min(1rem,calc(var(--s) * .125)))}
+.emblem::after{border-color:#d8bc82 transparent #d8bc82 transparent;animation:orbit-spin 28s linear infinite;inset:calc(-1 * min(1.55rem,calc(var(--s) * .194)))}
+.emblem>span{border-color:transparent rgba(255,255,255,.22);inset:calc(-1 * min(2.25rem,calc(var(--s) * .281)));transform:rotate(45deg)}
+.emblem img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+@keyframes orbit-spin{to{transform:rotate(360deg)}}
+.emblem.mini{background:#fff;border-color:rgba(224,189,114,.7);padding:max(1px,calc(var(--s) * .03));overflow:hidden;
+  box-shadow:0 0 0 calc(var(--s) * .07) rgba(6,75,52,.08),0 calc(var(--s) * .1625) calc(var(--s) * .4) rgba(1,29,22,.15);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.emblem.mini::before,.emblem.mini::after{content:none}
+.brand:hover .emblem.mini{transform:rotate(4deg) scale(1.04)}
+@media (max-width:760px){.brand .emblem{--s:3.4rem!important}}
+@media (prefers-reduced-motion:reduce){.emblem::after{animation:none}.emblem.mini{transition:none}}
 @keyframes float{50%{transform:translateY(-10px) scale(1.015)}}
-.emblem .halo{position:absolute;inset:-8%;border-radius:50%;background:radial-gradient(circle,rgba(243,220,157,.30),transparent 62%);animation:breathe 6s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.08);opacity:.55}}
-.emblem .rays{position:absolute;inset:-4%;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(243,220,157,.14) 0 2deg,transparent 2deg 12deg);
-  -webkit-mask:radial-gradient(circle,transparent 46%,#000 52%,transparent 72%);mask:radial-gradient(circle,transparent 46%,#000 52%,transparent 72%);animation:spin 60s linear infinite}
-.emblem .ring{position:absolute;border-radius:50%}
-.emblem .r1{inset:6%;border:2px solid transparent;background:conic-gradient(from 0deg,var(--gold),transparent 30%,var(--emerald2) 55%,transparent 75%,var(--gold)) border-box;
-  -webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 14s linear infinite}
-.emblem .r2{inset:1%;border:1px dashed rgba(217,181,106,.4);animation:spin 70s linear infinite reverse}
-.emblem .r3{inset:-5%;border:1px solid rgba(52,211,153,.18)}
-.emblem .orbit{position:absolute;inset:-5%;animation:spin 36s linear infinite}
-.emblem .orbit i{position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:var(--gold2);
-  box-shadow:0 0 14px 4px rgba(243,220,157,.7);transform:rotate(calc(var(--k) * 51.43deg)) translateY(calc(var(--s) * -.55))}
 .portrait{position:relative;width:min(560px,100%);margin-inline:auto;animation:float 8s ease-in-out infinite}
 .portrait .frame{position:relative;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(16,185,129,.55),0 0 50px -10px rgba(243,220,157,.45)}
 .portrait img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:#062419}
@@ -160,7 +157,7 @@ export function shell({ site, others, title, description, active, body, extraSty
 <rect x="11" y="11" width="18" height="18" fill="none" stroke="#d9b56a" stroke-width=".6" transform="rotate(45 20 20)"/></pattern></defs>
 <rect width="640" height="640" fill="url(#p)"/></svg>
 <nav class="top">
-  <a class="brand" href="/">${animatedLogo("48px", "mini")}<span><small>Naqshbandia Owaisiah</small><b>${esc(site.region)}</b></span></a>
+  <a class="brand" href="/">${animatedLogo("4rem", "mini")}<span><small>Naqshbandia Owaisiah</small><b>${esc(site.region)}</b></span></a>
   <div class="navlinks">${link("/#live", "Live Zikr", "live")}${link("/#halqahs", "Halqahs", "halqahs")}${link("/method-of-zikr", "Method of Zikr", "method")}${link("/shajra", "Shajra", "shajra")}</div>
   <span id="nav-status"></span>
 </nav>
