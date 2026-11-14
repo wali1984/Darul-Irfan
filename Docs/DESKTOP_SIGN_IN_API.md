@@ -131,21 +131,24 @@ the computer making the request.
 Sign one computer out (`204`, or `404` when it is not this member's), or all of
 this member's computers (`204`). The phone stays signed in.
 
-## Merge note: community consent gate
+## Community terms and session conflicts
 
-The uncommitted consent gate (`communitySafety.ts`, `{adult: true, termsVersion}`)
-answers `403 {"code":"community_consent_required"}` to non-GET member writes.
-The desktop routes sit before the general `/v1/members` block in `index.ts`, so
-when that work is merged, add inside the `computer-link/(preview|approve)` branch:
+**The community terms are not required.** No route answers
+`403 {"code":"community_consent_required"}`: starting a link, approving one and
+every member write work without an age declaration, exactly as before. Extra
+`"adult"` and `"termsVersion"` fields in the `computer-link` body are ignored.
+A client that has collected the declaration may record it with its member
+session:
 
-```ts
-if (!await hasCommunityConsent(env, session.memberID)) return consentRequired();
-```
+`POST /v1/members/community-consent` `{ "adult": true, "termsVersion": "2026-11-06" }`
+-> `200 { "ok": true, "termsVersion": "2026-11-06" }` (one row per member,
+replaced when sent again; removed with the account). Anything else in the body
+is `400`. Nothing reads the record yet.
 
-and add `DELETE /v1/members/computers…` to its `withdrawing` list (signing out
-must stay available without consent). The desktop app should send
-`"adult": true, "termsVersion": "<current>"` in its `computer-link` body from
-the start; the server ignores them today, and `adultEnrollment(request, env, ()
-=> startComputerLink(request, env))` can then wrap the start route in one line.
-Desktop sessions are the same member, so the gate on community writes applies to
-them automatically.
+**Session conflicts.** A desktop session uses the same admin controls as the
+phone, so it gets the same answer when the live session changed under it:
+`409 { "error": "The live session changed. Refresh and try again.", "code": "session_changed" }`
+from `POST /v1/groups/{id}/live` and `POST /v1/groups/{id}/control`. Read the
+Halqah again and show the session that is live now; do not repeat the request
+unchanged. See `Docs/PRIVATE_GROUPS.md`, "Live sessions: controls name their
+session".

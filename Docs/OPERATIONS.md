@@ -68,7 +68,8 @@ organization’s access and retention policy.
 - Back up D1, then apply all D1 migrations in staging and production
   **before** deploying the Worker (from 0015 on, the code writes
   `devices.platform`, so deploying first breaks device registration for
-  iPhones too).
+  iPhones too). `0023_community_safety.sql` was written before `0024` and
+  applied after it; it only adds tables, and account deletion needs them.
 - Run `npm ci && npm run check && npm test` in `Server/`.
 - Verify `/health`, `/v1/bootstrap`, `/v1/feed`, and `/v1/live` with no auth.
 - Verify `/admin` is inaccessible without Cloudflare Access.

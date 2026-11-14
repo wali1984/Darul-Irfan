@@ -3,45 +3,21 @@ import { canSee, memberRole } from "./community";
 import { markazAccess } from "./markaz";
 import { cleanText, isUUID, json, sha256, wholeSeconds } from "./util";
 
+// The community terms (adults only, a terms version) are not asked for yet.
+// A client that already collects the declaration may record it here; nothing
+// reads it back, and no route refuses a member who has none.
 export const COMMUNITY_TERMS_VERSION = "2026-11-06";
-export const consentRequired = () => json({
-  error: "Community access is for adults. Update the app, complete the age check and accept the community terms to continue.",
-  code: "community_consent_required", termsVersion: COMMUNITY_TERMS_VERSION,
-}, { status: 403 });
 
-export function hasAdultDeclaration(input: unknown): boolean {
-  return !!input && typeof input === "object" && !Array.isArray(input)
-    && (input as Record<string, unknown>).adult === true
-    && (input as Record<string, unknown>).termsVersion === COMMUNITY_TERMS_VERSION;
-}
-
-export function consentStatement(env: Env, memberID: string): D1PreparedStatement {
-  return env.DB.prepare(`INSERT INTO member_community_consent(member_id,terms_version,accepted_at) VALUES(?,?,?)
-    ON CONFLICT(member_id) DO UPDATE SET terms_version=excluded.terms_version,accepted_at=excluded.accepted_at`)
-    .bind(memberID, COMMUNITY_TERMS_VERSION, wholeSeconds(new Date()));
-}
-
-export async function hasCommunityConsent(env: Env, memberID: string): Promise<boolean> {
-  return !!await env.DB.prepare("SELECT 1 AS ok FROM member_community_consent WHERE member_id=? AND terms_version=?")
-    .bind(memberID, COMMUNITY_TERMS_VERSION).first();
-}
-
-export async function acceptCommunityConsent(env: Env, memberID: string, input: unknown): Promise<Response> {
-  if (!hasAdultDeclaration(input)) return consentRequired();
-  await consentStatement(env, memberID).run();
-  return json({ ok: true, termsVersion: COMMUNITY_TERMS_VERSION });
-}
-
-/** Validate before profile creation/identity SDK exchange, without storing DOB. */
-export async function adultEnrollment(request: Request, env: Env, enroll: () => Promise<Response>): Promise<Response> {
-  const input: unknown = await request.clone().json();
-  if (!hasAdultDeclaration(input)) return consentRequired();
-  const response = await enroll();
-  if (response.ok) {
-    const result = await response.clone().json<{ memberID?: string }>();
-    if (result.memberID) await consentStatement(env, result.memberID).run();
+/** POST /v1/members/community-consent {adult: true, termsVersion}: records that
+ *  this member accepted the current terms. No birth date is stored. */
+export async function acceptCommunityConsent(env: Env, memberID: string, input: Record<string, unknown>): Promise<Response> {
+  if (input.adult !== true || input.termsVersion !== COMMUNITY_TERMS_VERSION) {
+    return json({ error: "Send adult: true and the current termsVersion.", termsVersion: COMMUNITY_TERMS_VERSION }, { status: 400 });
   }
-  return response;
+  await env.DB.prepare(`INSERT INTO member_community_consent(member_id,terms_version,accepted_at) VALUES(?,?,?)
+    ON CONFLICT(member_id) DO UPDATE SET terms_version=excluded.terms_version,accepted_at=excluded.accepted_at`)
+    .bind(memberID, COMMUNITY_TERMS_VERSION, wholeSeconds(new Date())).run();
+  return json({ ok: true, termsVersion: COMMUNITY_TERMS_VERSION });
 }
 
 const targetKinds = new Set(["group", "post", "participant", "chat", "stage-chat", "dua"]);

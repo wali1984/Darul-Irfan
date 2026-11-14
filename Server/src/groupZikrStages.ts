@@ -234,6 +234,8 @@ export async function broadcastZikrCue(env: Env, memberID: string, groupID: stri
  *  With `sessionID` the relay names the session it believes is live: a call
  *  meant for another session is refused as stale and changes nothing. */
 export async function relayLive(env: Env, groupID: string, input: Record<string, unknown>): Promise<Response> {
+  // "true" in quotes must never turn a Test Zikr into a public one, with its notice.
+  if (input.test != null && typeof input.test !== "boolean") return json({ error: "test must be true or false" }, { status: 400 });
   const group = await env.DB.prepare("SELECT id FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
   if (!group) return json({ error: "Not found" }, { status: 404 });
   const live = await env.DB.prepare("SELECT state,kind,session_id,auto_end_at,is_test,started_at FROM group_live WHERE group_id=?").bind(groupID)
@@ -290,6 +292,9 @@ export async function relayLive(env: Env, groupID: string, input: Record<string,
     // The dua belongs to the session it is called in; a row with no session id has none to bind to.
     if (live?.state !== "live" || live.kind !== "zikr" || !live.session_id) return json({ error: "No live Zikr in this Halqah." }, { status: 409 });
     if (stale) return staleSession();
+    // The dua card is the relay's own: its author exists even when an admin
+    // started this Zikr and the relay has never started one here.
+    await ensureRelayAuthor(env);
     const closed = input.closed === true;
     const endsAt = new Date(Date.now() + (closed ? CLOSED_END_SECONDS * 1000 : DUA_MINUTES * 60_000)).toISOString();
     if (live.auto_end_at) {
@@ -540,11 +545,14 @@ async function recordCue(env: Env, memberID: string, groupID: string, input: Rec
 
 
 const CUE_MAX_AGE_MS = 5 * 60_000;
-/** Short lease serializes retries; providers' accepted-device records avoid resending successful deliveries. */
+/** Short lease serializes retries; providers' accepted-device records avoid resending successful deliveries.
+ *  An announcement still waiting from a session that has ended is never sent
+ *  into the session that followed it (a newer Zikr, or a Test Zikr). */
 export async function dispatchZikrCues(env: Env, now = new Date()): Promise<void> {
   const timestamp = now.toISOString();
   await env.DB.prepare(`UPDATE group_zikr_cues SET notification_state='expired'
-    WHERE notification_state='pending' AND (NOT EXISTS (SELECT 1 FROM group_live l WHERE l.group_id=group_zikr_cues.group_id AND l.state='live' AND l.kind='zikr') OR created_at<? OR sequence < (
+    WHERE notification_state='pending' AND (NOT EXISTS (SELECT 1 FROM group_live l WHERE l.group_id=group_zikr_cues.group_id AND l.state='live' AND l.kind='zikr'
+        AND l.is_test=0 AND (l.started_at IS NULL OR group_zikr_cues.created_at>=l.started_at)) OR created_at<? OR sequence < (
       SELECT MAX(newer.sequence) FROM group_zikr_cues newer WHERE newer.group_id=group_zikr_cues.group_id
         AND newer.stage_id NOT IN (${RECITATIONS.map(() => "?").join(",")})))`)
     .bind(new Date(now.getTime() - CUE_MAX_AGE_MS).toISOString(), ...RECITATIONS.map(recitation => recitation.id)).run();
