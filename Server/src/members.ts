@@ -333,7 +333,11 @@ export async function deleteMember(env: Env, memberID: string): Promise<Response
     statement("UPDATE daily_media SET published_by=NULL WHERE published_by IN (?,?)", memberID, memberActor),
     statement("UPDATE markaz_announcements SET sent_by='deleted-account' WHERE sent_by IN (?,?)", memberID, memberActor),
     statement(`UPDATE member_group_posts SET author_email='deleted-account' WHERE author_email IN (?,?) OR lower(author_email) IN (${emails})`, memberID, memberActor, memberID, memberID),
-    statement(`DELETE FROM audit_log WHERE actor_email IN (?,?) OR lower(actor_email) IN (${emails}) OR (entity_type='member' AND entity_id=?)`, memberID, memberActor, memberID, memberID, memberID),
+    // The audit log is not touched: it is immutable (its triggers abort any
+    // DELETE or UPDATE since the first migration), and a delete here would
+    // undo the whole batch and leave the account undeletable. Its rows name
+    // a member by id, which no longer leads to anyone; a staff member's own
+    // actions on the admin page stay under the address they were made with.
     // The member deletion cascades to sessions, membership, device associations,
     // profile, presence, stage-chat, consent, blocks and approved reporting links.
     // Independent device-level official-alert subscriptions remain user-controlled.

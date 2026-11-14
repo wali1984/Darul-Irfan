@@ -57,7 +57,7 @@ describe("account deletion against the migrated database", () => {
     const { env, raw } = setup();
     for (const [id, email, claimed] of [["claimed", "old@example.com", "departing"], ["verified", "DEPARTING@example.com", null], ["contact", "unverified@example.com", null], ["other", "departing@example.com", "remaining"]]) {
       raw.prepare("INSERT INTO member_group_grants(id,group_id,email,created_by,created_at,claimed_by) VALUES(?, ?,?,'departing','now',?)")
-        .run(id!, id === "other" ? "canada" : "usa", email!, claimed);
+        .run(id!, id === "other" ? "canada" : "usa", email!, claimed ?? null);
     }
     raw.prepare("INSERT INTO member_invites(code_hash,group_id,created_by,created_at,expires_at,redeemed_by) VALUES('redeemed','usa','departing','now','future','departing')").run();
     raw.prepare("INSERT INTO member_invites(code_hash,group_id,created_by,created_at,expires_at) VALUES('unclaimed','usa','departing','now','future')").run();
@@ -80,7 +80,9 @@ describe("account deletion against the migrated database", () => {
     expect(raw.prepare("SELECT media_key,created_by FROM group_recordings").get()).toEqual({ media_key: "shared-key", created_by: "deleted-account" });
     expect(raw.prepare("SELECT started_by,ended_by,attendees FROM group_live_history").get()).toEqual({ started_by: null, ended_by: null, attendees: 2 });
     expect(raw.prepare("SELECT created_by,published_by FROM daily_media").get()).toEqual({ created_by: null, published_by: null });
-    expect(raw.prepare("SELECT id FROM audit_log").all()).toEqual([]);
+    // The audit log is immutable: its row stays, and does not stop the deletion.
+    expect(raw.prepare("SELECT actor_email FROM audit_log").all()).toEqual([{ actor_email: "member:departing" }]);
+    expect(raw.prepare("SELECT id FROM members").all()).toEqual([{ id: "remaining" }]);
   });
 
   it("is idempotent and cannot delete another account on retry", async () => {
