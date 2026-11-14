@@ -3,7 +3,9 @@
 
 export const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-/** The Silsila's emblem, alive: turning gold rings, seven orbiting lights, a breathing halo. */
+/** The Silsila's logo, alive: turning gold rings, seven orbiting lights, a breathing halo.
+ *  The picture (/logo.webp) is the seal as the main website shows it: with its ring of words, on a
+ *  round white ground with a fine gold edge. One logo for every site (owner, 2026-11-13). */
 export function animatedLogo(size = "min(420px,78vw)", extraClass = "") {
   return `<div class="emblem ${extraClass}" style="--s:${size}" aria-label="Naqshbandia Owaisiah">
     <div class="halo"></div><div class="rays"></div><div class="ring r3"></div><div class="ring r2"></div><div class="ring r1"></div>
@@ -33,6 +35,7 @@ nav.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20p
 .brand .emblem{flex:none;margin:0}
 .emblem.mini .orbit i{width:4px;height:4px;margin:-2px;box-shadow:0 0 6px 2px rgba(243,220,157,.7)}
 .emblem.mini .r1{border-width:1px}
+.emblem.mini img{inset:5%;width:90%;height:90%}
 .brand b{font:600 20px/1 var(--serif);letter-spacing:.04em}
 .brand small{display:block;color:var(--gold);font:600 11px/1.4 var(--sans);letter-spacing:.18em;text-transform:uppercase}
 .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}.navlinks a{text-decoration:none;transition:color .2s}.navlinks a:hover,.navlinks a.on{color:var(--gold2)}
@@ -145,7 +148,7 @@ export function shell({ site, others, title, description, active, body, extraSty
 <meta name="theme-color" content="#04150f">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="/logo.webp">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/logo.webp" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
 <style>${STYLE}${extraStyle}</style>
