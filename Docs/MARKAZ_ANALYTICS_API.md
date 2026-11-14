@@ -125,10 +125,20 @@ Adds every Halqah Administrator and Admin to the Silsila Markaz as a member (nev
 - `admins`: brings Halqah admins into the Markaz first, then posts it in the Silsila Markaz.
 → `{ "ok": true, "posted": 6, "notified": 140 }`. Listed by GET /v1/markaz/announcements → `{ "announcements": [ { "id","title","body","audience","targets": ["North America"],"sentBy","sentAt","posted" } ] }`.
 
+### Content reports (Markaz officer)
+Members report content with `POST /v1/groups/{id}/reports` (`Docs/PRIVATE_GROUPS.md`).
+- `GET /v1/markaz/moderation?status=open|resolved|dismissed` (default `open`) → `{ "reports": [ { "id", "groupID", "groupName", "reporterName", "targetKind", "targetID", "reason", "details", "status", "createdAt", "resolvedAt", "reviewNote", "targetPreview", "targetUnavailable" } ] }`, newest first, up to 200. `targetPreview` is the reported text as it stands now (a Halqah, a post, a stage-chat message, a dua request); `targetUnavailable` is true when it is gone or has no text.
+- `POST /v1/markaz/moderation/{id}` `{ "status": "resolved"|"dismissed", "note": "<what was done, required, up to 2000>" }` → `{ "ok": true }`. A report is closed once: the same outcome and note again answer the same, anything else `409`; `404` for an unknown id.
+
+### Input checks
+- Dates must exist on the calendar (`2026-02-30` is refused), `month` is `YYYY-MM`: otherwise `400`.
+- `export`: an unknown `type` or `kind` is `400`; `kind=zikr|meeting` filters the sessions and attendance exports. A cell that would start a formula (`=`, `+`, `-`, `@`, also after spaces) is written with a leading `'`.
+- `announce`: a `scope` that is not `all`, `region:<name>` or `halqahs` is `400`; it is never widened to every Halqah.
+
 ### Reporting website sign-in (device code)
 1. Website: `POST /v1/reporting/link` (no auth, rate limited) → `{ "code": "K7Q2-9MXD", "pollToken": "<64 hex>", "expiresAt": "…" }` (5 minutes, single use).
 2. App (Markaz officer): `POST /v1/markaz/reporting-link/approve { "code": "K7Q2-9MXD" }` → `{ "ok": true }`; 404 when unknown or expired.
-3. Website: `POST /v1/reporting/link/poll { "pollToken" }` → `{ "status": "pending" }` | `{ "status": "approved", "token": "<64 hex>", "expiresAt": "…" }` (a 12-hour session marked for reporting) | `{ "status": "expired" }`.
+3. Website: `POST /v1/reporting/link/poll { "pollToken" }` → `{ "status": "pending" }` | `{ "status": "approved", "token": "<64 hex>", "expiresAt": "…" }` (a 12-hour session marked for reporting) | `{ "status": "expired" }`. A code approved but not collected within its 5 minutes is `expired` too: no session is made.
 - `GET /v1/markaz/reporting-sessions` → `{ "sessions": [ { "id": "<first 12 of hash>", "name": "…", "createdAt", "lastSeenAt", "expiresAt", "current": bool } ] }`; `DELETE /v1/markaz/reporting-sessions/{id}` signs that computer out.
 
 ### Daily digest

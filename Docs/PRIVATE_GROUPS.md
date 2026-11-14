@@ -158,11 +158,78 @@ expire.
 Revoking membership takes effect on the member's next request; it does not need
 their device to cooperate.
 
+## Reporting content
+
+`POST /v1/groups/{id}/reports` (any member of that Halqah; 30 an hour per
+address):
+
+```json
+{ "requestID": "<UUID, kept across retries>", "targetKind": "post",
+  "targetID": "<the item's id>", "reason": "inappropriate", "details": "<optional, up to 2000>" }
+```
+
+`targetKind`: `group` | `post` | `participant` | `chat` | `stage-chat` | `dua`.
+`reason`: `harassment` | `inappropriate` | `privacy` | `spam` | `other`.
+`201 { "ok": true, "id": "<report id>" }`; the same `requestID` sent again
+answers the same, and with different contents `409`. `400` for anything else
+in the body, `404` for a Halqah the member is not in. Reports go to the
+Markaz's officers (`Docs/MARKAZ_ANALYTICS_API.md`, "Content reports") and are
+removed with the reporter's account.
+
+## Live sessions: controls name their session
+
+An admin's screen can be showing a session that has since ended or been
+replaced (another admin, the relay starting the Zikr). So that a late tap never
+lands on the wrong session:
+
+- `POST /v1/groups/{id}/live` and `POST /v1/groups/{id}/control` take an
+  optional `"sessionID"`: the `sessionID` the screen last read. When it is not
+  the live session, nothing changes and the answer is
+  `409 { "error": "The live session changed. Refresh and try again.", "code": "session_changed" }`.
+- Without `sessionID` they work as before: End ends whatever is live, Start
+  replaces it. The same `409` is still given when the session changes while
+  the request is being carried out (a start that had to open a room first, two
+  admins moving the playback clock at once): read the Halqah again.
+- `state` must be `"live"` or `"offline"`, and `room`, `record`, `recorded`,
+  `test` true or false; anything else is `400`, never read as End.
+- A JSON body on `/v1/members/*` and `/v1/groups/*` is an object. `null`, a
+  list, a bare value or text that is not JSON is `400 {"error":"Invalid JSON"}`;
+  no body at all still reads as `{}`.
+- In a Test Zikr only the Halqah's admins are counted by
+  `POST /v1/groups/{id}/presence`; a member gets the `409` of "nothing live".
+
+The relay's routes (`/v1/service/groups/{id}/live`, `/zikr-cues`) are unchanged:
+they answer `409 {"error":"stale session"}` for a session that is no longer the
+live one, and `400` for a `test` that is not true or false.
+
+## Community terms
+
+Not required. Sign-in, invitations, joining Our Sheikh, the websites' visitor
+join and every member write are answered without an age declaration, and no
+route answers `community_consent_required`. `POST /v1/members/community-consent`
+only records a declaration a client chooses to send
+(`Docs/DESKTOP_SIGN_IN_API.md`).
+
+## Deleting an account
+
+`DELETE /v1/members/me` -> `204`, in one transaction: the member, their
+sessions (phones and computers), memberships, device links, profile,
+attendance, stage chat, dua requests, reports they sent, stages and stage
+announcements they made, invitations they redeemed and unclaimed invitations to
+their verified email. Posts, meetings, recordings and past sessions stay with
+the Halqah, with the member's name taken off them (`deleted-account` or empty).
+The audit log is immutable and keeps its rows: they name a member by id, and
+a staff member's own actions on the admin page by the address they were made
+with. If any step fails nothing is removed. Deleting twice is `204` then `401`.
+
 ## Deploying it
 
 1. Apply the migrations: `npm run db:migrate:remote` in `Server/`. `0003`
    creates the group tables and seeds the three groups; `0004` creates the
-   invite store.
+   invite store. `0023_community_safety.sql` (reports, the terms record) only
+   adds two tables and an index, and applies cleanly to a database that already
+   has `0024`. It must be applied **before** the Worker that uses it is
+   deployed: account deletion and the report routes fail without its tables.
 2. No secrets are needed for invitations. `APPLE_CLIENT_ID` matters only if
    Sign in with Apple is turned on later, and defaults to `APNS_TOPIC`, which
    is already the bundle id.
