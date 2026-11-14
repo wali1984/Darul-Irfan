@@ -125,8 +125,7 @@ actor MemberGroupService {
         var payload = ["name": name, "city": city, "countryCode": countryCode]
         if original == nil { payload["guestSecret"] = guestSecret }
         if let email, !email.isEmpty { payload["email"] = email }
-        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await enrol(request, payload: payload)
         guard savedSession.load()?.token == original?.token else { throw MemberGroupError.requestFailed }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         if status == 429 { throw MemberGroupError.tooManyAttempts }
@@ -171,8 +170,7 @@ actor MemberGroupService {
         }
         var payload: [String: String] = ["identityToken": token]
         if let displayName, !displayName.isEmpty { payload["displayName"] = displayName }
-        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await enrol(request, payload: payload)
         guard (response as? HTTPURLResponse)?.statusCode == 201,
               let value = try? decoder.decode(MemberSession.self, from: data) else {
             throw MemberGroupError.signInRejected
@@ -199,8 +197,7 @@ actor MemberGroupService {
         }
         var payload: [String: String] = ["code": code]
         if let displayName, !displayName.isEmpty { payload["displayName"] = displayName }
-        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await enrol(request, payload: payload)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard status == 201, let value = try? decoder.decode(MemberSession.self, from: data) else {
             throw status == 429 ? MemberGroupError.tooManyAttempts : MemberGroupError.inviteRejected
@@ -658,8 +655,17 @@ actor MemberGroupService {
             request.setValue("application/json", forHTTPHeaderField: "content-type")
             request.httpBody = try JSONSerialization.data(withJSONObject: payload)
         }
-        let (data, response) = try await self.data(for: request)
-        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        var (data, response) = try await self.data(for: request)
+        var code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if CommunityTerms.isRequested(status: code, body: data) {
+            // Everything but reading needs the community terms accepted once:
+            // ask, record the agreement, and send the same request again.
+            guard await acceptCommunityTerms(token: saved.token) else {
+                throw MemberGroupError.server(CommunityTerms.declinedMessage)
+            }
+            (data, response) = try await self.data(for: request)
+            code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        }
         if code == 401 {
             guard savedSession.deleteIfCurrent(token: saved.token) else { throw CancellationError() }
             await onSessionInvalidated()
@@ -683,6 +689,39 @@ actor MemberGroupService {
             throw message.map(MemberGroupError.server) ?? MemberGroupError.requestFailed
         }
         return data
+    }
+
+    /// Sends an enrolment (signing in, an invitation code, joining Our
+    /// Sheikh). When the server asks for the community terms the person is
+    /// asked, and the request goes again with their agreement.
+    private func enrol(_ request: URLRequest, payload: [String: Any]) async throws -> (Data, URLResponse) {
+        var request = request
+        request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let first = try await session.data(for: request)
+        let status = (first.1 as? HTTPURLResponse)?.statusCode ?? 0
+        guard CommunityTerms.isRequested(status: status, body: first.0) else { return first }
+        guard await CommunityTerms.ask(always: true) else {
+            throw MemberGroupError.server(CommunityTerms.declinedMessage)
+        }
+        var agreed = payload
+        agreed["adult"] = true
+        agreed["termsVersion"] = CommunityTerms.version
+        request.httpBody = try JSONSerialization.data(withJSONObject: agreed)
+        return try await session.data(for: request)
+    }
+
+    /// Asks for the community terms and records the person's agreement with
+    /// the server. False when they chose not to, or it could not be recorded.
+    private func acceptCommunityTerms(token: String) async -> Bool {
+        guard await CommunityTerms.ask() else { return false }
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/members/community-consent"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        request.setValue("application/json", forHTTPHeaderField: "content-type")
+        let agreement: [String: Any] = ["adult": true, "termsVersion": CommunityTerms.version]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: agreement)
+        guard let answer = try? await session.data(for: request) else { return false }
+        return (answer.1 as? HTTPURLResponse)?.statusCode == 200
     }
 
     /// Deletes the account, its sessions and its group memberships.
