@@ -265,7 +265,7 @@ struct BookTextPagesView: View {
             // A sentence cut by the page break is shown whole on the earlier
             // page: its words keep their links there.
             var byPage = found
-            let numbers = loaded.map(\.page)
+            let numbers = loaded.filter { !$0.text.isEmpty }.map(\.page)
             for (index, number) in numbers.enumerated() where index + 1 < numbers.count {
                 if let carried = found[numbers[index + 1]] {
                     byPage[number, default: []] += carried
