@@ -68,11 +68,6 @@ struct AcknowledgementsView: View {
                 Text("The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission.")
                     .diInterfaceFont(.subheadline)
                     .foregroundStyle(DIColor.textPrimary)
-
-                // Higgs TTS 3's Creator Use Grant asks for this credit with the audio.
-                Text("The Urdu narration of the translation and tafsir was created with Boson AI's Higgs Audio, in a voice modelled on recordings of Shamshad Ali Khan, used with permission.")
-                    .diInterfaceFont(.footnote)
-                    .foregroundStyle(DIColor.textMuted)
             }
         }
     }

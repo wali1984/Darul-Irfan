@@ -27128,23 +27128,6 @@
         }
       }
     },
-    "The Urdu narration of the translation and tafsir was created with Boson AI's Higgs Audio, in a voice modelled on recordings of Shamshad Ali Khan, used with permission.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The Urdu narration of the translation and tafsir was created with Boson AI's Higgs Audio, in a voice modelled on recordings of Shamshad Ali Khan, used with permission."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ترجمہ اور تفسیر کی اردو آواز Boson AI کے Higgs Audio سے تیار کی گئی ہے، شمشاد علی خان کی ریکارڈنگز پر مبنی آواز میں، اجازت کے ساتھ۔"
-          }
-        }
-      }
-    },
     "Live on Paltalk now · %lld listening": {
       "extractionState": "manual",
       "localizations": {
