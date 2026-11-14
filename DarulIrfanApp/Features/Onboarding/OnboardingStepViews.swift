@@ -35,6 +35,7 @@ struct OnboardingStepHeader: View {
 /// and a soft glow. Used by the language and Asr choices so selection feels
 /// consistent and delightful throughout onboarding.
 private struct OnboardingChoiceCard<Leading: View>: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let isSelected: Bool
     let title: Text
     let subtitle: Text
@@ -80,7 +81,7 @@ private struct OnboardingChoiceCard<Leading: View>: View {
                     radius: isSelected ? 12 : 6, x: 0, y: isSelected ? 6 : 3)
         }
         .buttonStyle(DIPressableStyle())
-        .animation(.spring(response: 0.35, dampingFraction: 0.7), value: isSelected)
+        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.7), value: isSelected)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
@@ -279,6 +280,7 @@ struct OnboardingLanguageStep: View {
 // MARK: - 4. Calculation
 
 struct OnboardingCalculationStep: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var viewModel: OnboardingViewModel
 
     /// Custom angles need their own editor; that lives in Settings, so the
@@ -324,7 +326,7 @@ struct OnboardingCalculationStep: View {
                 Text(methodExplanationKey)
                     .diInterfaceFont(.footnote)
                     .foregroundStyle(DIColor.textMuted)
-                    .animation(.easeInOut(duration: 0.2), value: viewModel.selectedMethod)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: viewModel.selectedMethod)
             }
         }
     }

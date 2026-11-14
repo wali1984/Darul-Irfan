@@ -4,6 +4,30 @@ import WebKit
 
 @MainActor
 final class WebRendererRecoveryTests: XCTestCase {
+    func testLiveNavigationFailureStopsStatusPollingAndReportsOnce() {
+        var failures = 0
+        let coordinator = LiveAudioWebView.Coordinator(allowsMicrophone: false, onFailure: { failures += 1 })
+        let timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in }
+        coordinator.statusTimer = timer
+        coordinator.navigationFailed(URLError(.notConnectedToInternet))
+        coordinator.navigationFailed(URLError(.timedOut))
+        XCTAssertEqual(failures, 1)
+        XCTAssertFalse(coordinator.active)
+        XCTAssertFalse(timer.isValid)
+        XCTAssertNil(coordinator.statusTimer)
+    }
+
+    func testLivePageCancellationAndDisposedCallbacksAreIgnored() {
+        var failures = 0
+        let coordinator = LiveAudioWebView.Coordinator(allowsMicrophone: false, onFailure: { failures += 1 })
+        coordinator.navigationFailed(URLError(.cancelled))
+        XCTAssertTrue(coordinator.active)
+        coordinator.active = false
+        coordinator.navigationFailed(URLError(.notConnectedToInternet))
+        coordinator.webViewWebContentProcessDidTerminate(WKWebView())
+        XCTAssertEqual(failures, 0)
+    }
+
     func testVideoTerminationReportsOnceAndDisablesFurtherUpdates() {
         var failures = 0
         let coordinator = YouTubeWebView.Coordinator { failures += 1 }

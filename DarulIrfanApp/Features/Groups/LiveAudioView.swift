@@ -68,12 +68,15 @@ struct LiveListenPlayer: View {
     let token: String
     let urdu: Bool
     let onStatus: (String) -> Void
+    var onFailure: () -> Void = {}
     @State private var previousCategory: AVAudioSession.Category?
+    @State private var previousMode: AVAudioSession.Mode?
+    @State private var previousOptions: AVAudioSession.CategoryOptions = []
 
     var body: some View {
         LiveAudioWebView(url: LiveAudioConfiguration.pageURL(.listen, token: token, urdu: urdu),
                          allowsMicrophone: false,
-                         onFailure: { onStatus(String(localized: "Could not complete action")) },
+                         onFailure: onFailure,
                          autoListen: true,
                          onStatus: onStatus)
             .frame(width: 2, height: 2)
@@ -87,6 +90,8 @@ struct LiveListenPlayer: View {
     private func claimAudio() {
         let audio = AVAudioSession.sharedInstance()
         previousCategory = audio.category
+        previousMode = audio.mode
+        previousOptions = audio.categoryOptions
         try? audio.setCategory(.playback, mode: .spokenAudio)
         try? audio.setActive(true)
     }
@@ -94,7 +99,9 @@ struct LiveListenPlayer: View {
     private func releaseAudio() {
         let audio = AVAudioSession.sharedInstance()
         try? audio.setActive(false, options: .notifyOthersOnDeactivation)
-        if let previousCategory { try? audio.setCategory(previousCategory) }
+        if let previousCategory {
+            try? audio.setCategory(previousCategory, mode: previousMode ?? .default, options: previousOptions)
+        }
     }
 }
 
@@ -105,15 +112,22 @@ struct LiveAudioView: View {
     let urdu: Bool
     @State private var rendererFailed = false
     @State private var previousCategory: AVAudioSession.Category?
+    @State private var previousMode: AVAudioSession.Mode?
+    @State private var previousOptions: AVAudioSession.CategoryOptions = []
+    @State private var previousIdleTimerDisabled = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             Group {
                 if rendererFailed {
-                    Text("Could not complete action")
-                        .padding().frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .diScreenBackground()
+                    VStack(spacing: DISpacing.md) {
+                        Text("Could not complete action")
+                        Button("Retry") { rendererFailed = false }
+                            .buttonStyle(DIPrimaryButtonStyle())
+                    }
+                    .padding().frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .diScreenBackground()
                 } else {
                     LiveAudioWebView(url: LiveAudioConfiguration.pageURL(mode, token: token, urdu: urdu),
                                      allowsMicrophone: mode == .broadcast,
@@ -140,9 +154,12 @@ struct LiveAudioView: View {
     /// The Zikr plays even with the ring switch on silent; broadcasting also
     /// records. The app's own setting comes back when this closes.
     private func claimAudio() {
+        previousIdleTimerDisabled = UIApplication.shared.isIdleTimerDisabled
         UIApplication.shared.isIdleTimerDisabled = true
         let audio = AVAudioSession.sharedInstance()
         previousCategory = audio.category
+        previousMode = audio.mode
+        previousOptions = audio.categoryOptions
         if mode == .broadcast {
             try? audio.setCategory(.playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth])
         } else {
@@ -152,10 +169,12 @@ struct LiveAudioView: View {
     }
 
     private func releaseAudio() {
-        UIApplication.shared.isIdleTimerDisabled = false
+        UIApplication.shared.isIdleTimerDisabled = previousIdleTimerDisabled
         let audio = AVAudioSession.sharedInstance()
         try? audio.setActive(false, options: .notifyOthersOnDeactivation)
-        if let previousCategory { try? audio.setCategory(previousCategory) }
+        if let previousCategory {
+            try? audio.setCategory(previousCategory, mode: previousMode ?? .default, options: previousOptions)
+        }
     }
 }
 
@@ -194,6 +213,7 @@ struct LiveAudioWebView: UIViewRepresentable {
         coordinator.active = false
         coordinator.statusTimer?.invalidate()
         coordinator.statusTimer = nil
+        webView.stopLoading()
         webView.uiDelegate = nil
         webView.navigationDelegate = nil
         webView.loadHTMLString("", baseURL: nil)
@@ -245,8 +265,39 @@ struct LiveAudioWebView: UIViewRepresentable {
         }
 
         func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            fail()
+        }
+
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            navigationFailed(error)
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            navigationFailed(error)
+        }
+
+        func webView(_ webView: WKWebView, decidePolicyFor response: WKNavigationResponse,
+                     decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+            if response.isForMainFrame, let http = response.response as? HTTPURLResponse, http.statusCode >= 400 {
+                decisionHandler(.cancel)
+                fail()
+                return
+            }
+            decisionHandler(active ? .allow : .cancel)
+        }
+
+        func navigationFailed(_ error: Error) {
+            // Closing/replacing a page cancels its request; it is not a playback failure.
+            let failure = error as NSError
+            guard failure.domain != NSURLErrorDomain || failure.code != NSURLErrorCancelled else { return }
+            fail()
+        }
+
+        private func fail() {
             guard active else { return }
             active = false
+            statusTimer?.invalidate()
+            statusTimer = nil
             onFailure()
         }
 

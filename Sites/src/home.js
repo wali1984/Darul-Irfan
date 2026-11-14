@@ -5,6 +5,7 @@
 // with textContent or attributes, never as HTML.
 import { animatedLogo, esc, shell, SKY_SCRIPT, STYLE as STAGE_BASE } from "./layout.js";
 import SHAJRA from "./content/shajra.json";
+import { createLiveReceiver } from "./live-audio.js";
 
 // The stages a Zikr moves through, in order, as the app names them (Server
 // RECITATIONS and DEFAULT_ZIKR_STAGES). A custom Muraqaba shows only when called.
@@ -154,13 +155,16 @@ dialog h3{font-size:28px;margin-bottom:6px}
 .field{display:grid;gap:6px;margin-top:14px;font-size:14px;color:var(--muted)}
 .field input,.field select{font:16px var(--sans);padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#031510;color:var(--ink)}
 .row2{display:flex;gap:12px;justify-content:flex-end;margin-top:22px}
+.consent{display:flex;align-items:flex-start;gap:10px;margin-top:18px;font-size:14px}.consent input{width:20px;height:20px;flex:none;margin-top:2px}
 .err{color:#fca5a5;font-size:14px;min-height:20px;margin-top:10px}
 #player{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#0a3b2c,#03120d 70%)}
 #player.open{display:flex}
+#player{width:100%;max-width:none;height:100%;max-height:none;margin:0;border:0;border-radius:0;padding:0;overflow:auto}
 #player header{display:flex;align-items:center;gap:14px;padding:14px clamp(14px,3vw,30px);border-bottom:1px solid var(--line)}
 #player header b{font:600 22px var(--serif)}
 #player .stage{flex:1;border-radius:0;border:0;background:transparent;min-height:0}
 #p-sound{font-size:14px;color:var(--muted);text-align:center;padding:10px 16px 18px}
+@media(prefers-reduced-motion:reduce){.now .roll{overflow:auto;-webkit-mask:none;mask:none}}
 `;
 
 const COUNTRIES = "US,CA,GB,PK,IN,AE,SA,QA,KW,BH,OM,AU,NZ,DE,FR,NL,BE,NO,SE,DK,IE,IT,ES,TR,MY,SG,ZA,KE,NG,EG,BD,AF,IR,IQ,JO,MA,DZ,TN,LY,SD,ID,JP,CN,HK,BR,MX,AR,CH,AT,PL,PT,GR,FI,RU,UA";
@@ -293,24 +297,40 @@ export function homePage(site, others, initial, feed) {
     <div class="grid">${cards}</div>
   </div></section>` : ""}
 
-  <dialog id="join-form">
+  <dialog id="entry-choice" aria-labelledby="entry-title">
+    <h3 id="entry-title">Join live Zikr</h3>
+    <p class="quiet" id="entry-note">You can listen without a profile. Community profiles and attendance are for adults aged 18 or older.</p>
+    <div class="cta"><button class="btn btn-gold" id="anonymous-join">Listen without a profile</button><button class="btn btn-ghost" id="profile-join">Join with a profile</button><button class="btn btn-ghost" id="entry-cancel">Cancel</button></div>
+  </dialog>
+  <dialog id="age-form" aria-labelledby="age-title">
+    <form id="age-fields" method="dialog">
+      <h3 id="age-title">Your date of birth</h3>
+      <p class="quiet">This is checked in your browser and is not sent to the server or saved.</p>
+      <label class="field">Date of birth<input id="birth-date" type="date" required></label>
+      <div id="age-error" class="err" role="alert"></div>
+      <div class="row2"><button class="btn btn-ghost" type="button" id="age-cancel">Cancel</button><button class="btn btn-gold" type="submit">Continue</button></div>
+    </form>
+  </dialog>
+  <dialog id="join-form" aria-labelledby="join-title">
     <form method="dialog" id="join-fields">
       <h3 id="join-title">Join the Zikr</h3>
-      <div class="quiet">Your name and place are shared with the Halqah's admins only.</div>
+      <div class="quiet">Your name, city and country are visible to the Halqah's admins and authorized Markaz officers.</div>
       <label class="field">Your name<input name="name" maxlength="80" required autocomplete="name"></label>
       <label class="field">City<input name="city" maxlength="100" required autocomplete="address-level2"></label>
       <label class="field">Country<select name="country" required></select></label>
-      <div class="err" id="join-error"></div>
-      <div class="row2"><button class="btn btn-ghost" value="cancel" formnovalidate>Cancel</button><button class="btn btn-gold" id="join-go" value="join">Join</button></div>
+      <label class="consent"><input type="checkbox" id="join-terms" required><span>I agree to the <a href="/community-terms" target="_blank" rel="noopener">community terms</a> and have read the <a href="/privacy" target="_blank" rel="noopener">privacy policy</a>.</span></label>
+      <div class="err" id="join-error" role="alert"></div>
+      <div class="row2"><button class="btn btn-ghost" id="join-cancel" type="button">Cancel</button><button class="btn btn-gold" id="join-go" value="join">Join</button></div>
     </form>
   </dialog>
 
-  <div id="player" role="dialog" aria-modal="true" aria-label="Live Zikr">
+  <dialog id="player" aria-label="Live Zikr">
     <header><b id="p-name"></b><span class="chip live" id="p-chip">Live</span>
       <button class="btn btn-ghost" id="p-leave" style="margin-left:auto;padding:10px 18px">Leave</button></header>
     ${stageScreen("p-stage", "Awaiting the first stage…")}
-    <div id="p-sound"></div><audio id="p-audio" autoplay playsinline></audio>
-  </div>`;
+    <div id="p-privacy" class="quiet" style="text-align:center;padding:0 16px"></div><div id="p-sound" role="status" aria-live="polite"></div>
+    <button class="btn btn-ghost" id="p-play" hidden>Play sound</button><audio id="p-audio" autoplay playsinline></audio>
+  </dialog>`;
   return shell({
     site, others, title: site.title, description: `${site.tagline}. ${site.intro}`, active: "live", extraStyle: STYLE, body,
     script: `<script type="application/json" id="initial">${state}</script><script>${FILL_SCRIPT}${CLIENT.replace("__COUNTRIES__", COUNTRIES)}</script>`,
@@ -324,6 +344,16 @@ const CLIENT = `
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
   let data = JSON.parse($("initial").textContent), joined = null, poll = null, presence = null, shown = {};
+  let refreshing = false, joiningRequest = null, joinVersion = 0, playerVersion = 0;
+  async function request(url, init = {}) {
+    const abort = new AbortController();
+    const cancel = () => abort.abort();
+    init.signal?.addEventListener("abort", cancel, { once: true });
+    if (init.signal?.aborted) abort.abort();
+    const timeout = setTimeout(cancel, 12000);
+    try { const r = await fetch(url, { ...init, signal: abort.signal }); return { ok: r.ok, status: r.status, body: await r.json().catch(() => ({})) }; }
+    finally { clearTimeout(timeout); init.signal?.removeEventListener("abort", cancel); }
+  }
 
   // A stage screen: live, the emblem goes to the corner and the stage being done shows alone.
   function stage(box, s, live) {
@@ -341,75 +371,56 @@ const CLIENT = `
   }
   // Our Sheikh's live sound: the Silsila's SFU feed, listen only (Tools/LiveRelay client).
   const feed = data.feed;
-  let feedState = null, onAir = false, pc = null, pulling = false, wantSound = false, pulled = null;
-  async function call(method, path, body) {
-    const r = await fetch(feed.base + path, { method, headers: { "content-type": "application/json", "x-live-key": feed.key },
-      body: body === undefined ? undefined : JSON.stringify(body) });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok || d.errorCode) throw new Error(d.error || d.errorDescription || ("HTTP " + r.status));
-    return d;
+  let feedState = null, wantSound = false, socket = null, reconnect = null, ping = null, socketVersion = 0;
+  function sound(text) { $("p-sound").textContent = text; }
+  const receiver = (${createLiveReceiver.toString()})({ feed, audio: $("p-audio"), status: sound });
+  function onFeed() {
+    const sheikh = data.halqahs.find(h => h.id === "our-sheikh");
+    const active = feedState && feedState.session?.state === "live" && feedState.active?.source ? feedState.active : null;
+    // Only the platform's session can authorize playback. Transport health
+    // must never turn an ended session live or resurrect its Join button.
+    receiver.update(sheikh?.live ? active : null);
+  }
+  function stopFeed() {
+    socketVersion += 1; clearTimeout(reconnect); clearInterval(ping);
+    if (socket) { socket.onclose = null; socket.close(); socket = null; }
+    feedState = null; receiver.stop(); receiver.update(null);
   }
   function watchFeed() {
-    if (!feed || !feed.base) return;
-    let socket;
+    stopFeed();
+    if (!wantSound || !feed?.base) return;
+    receiver.start();
+    const version = socketVersion;
+    let failures = 0;
     const open = () => {
-      socket = new WebSocket(feed.base.replace(/^http/, "ws") + "/api/ws?key=" + encodeURIComponent(feed.key));
-      socket.onmessage = e => {
+      if (!wantSound || version !== socketVersion) return;
+      const next = new WebSocket(feed.base.replace(/^http/, "ws") + "/api/ws?key=" + encodeURIComponent(feed.key));
+      socket = next;
+      next.onopen = () => { if (version === socketVersion) failures = 0; };
+      next.onmessage = e => {
+        if (version !== socketVersion) return;
         try { const m = JSON.parse(e.data); if (m.type === "state") { feedState = m.state; onFeed(); } } catch {}
       };
-      socket.onclose = () => setTimeout(open, 2000);
+      next.onclose = () => {
+        if (!wantSound || version !== socketVersion) return;
+        feedState = null; onFeed(); sound("The connection was interrupted. Reconnecting…");
+        reconnect = setTimeout(open, Math.min(30000, 1000 * 2 ** Math.min(failures++, 5)) + Math.random() * 500);
+      };
     };
     open();
-    setInterval(() => { try { socket.readyState === 1 && socket.send("ping"); } catch {} }, 25000);
+    ping = setInterval(() => { try { socket?.readyState === 1 && socket.send("ping"); } catch {} }, 25000);
   }
-  function onFeed() {
-    const a = feedState && feedState.active;
-    onAir = !!(feedState && feedState.session && feedState.session.state === "live" && a && a.source);
-    render();
-    if (wantSound) follow();
-  }
-  function drop() { try { pc && pc.close(); } catch {} pc = null; }
-  function sound(text) { $("p-sound").textContent = text; }
-  // Pull the track on air; pull again when it changes (app <-> Paltalk, a new device) or fails.
-  async function follow() {
-    if (!wantSound || pulling) return;
-    const a = onAir ? feedState.active : null;
-    const id = a ? a.sessionId + "/" + a.trackName : null;
-    if (id === pulled && pc) return;
-    drop(); pulled = null;
-    if (!a) { sound("Waiting for the live sound…"); return; }
-    pulling = true;
-    try {
-      const peer = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.cloudflare.com:3478" }], bundlePolicy: "max-bundle" });
-      const stream = new Promise(ok => { peer.ontrack = e => ok(e.streams[0] || new MediaStream([e.track])); });
-      const { sessionId } = await call("POST", "/api/sfu/sessions/new");
-      const result = await call("POST", "/api/sfu/sessions/" + sessionId + "/tracks/new",
-        { tracks: [{ location: "remote", sessionId: a.sessionId, trackName: a.trackName }] });
-      if (result.tracks && result.tracks[0] && result.tracks[0].errorCode) throw new Error(result.tracks[0].errorDescription);
-      await peer.setRemoteDescription(result.sessionDescription);
-      await peer.setLocalDescription(await peer.createAnswer());
-      await call("PUT", "/api/sfu/sessions/" + sessionId + "/renegotiate", { sessionDescription: { type: "answer", sdp: peer.localDescription.sdp } });
-      pc = peer; pulled = id;
-      peer.onconnectionstatechange = () => { if (peer.connectionState === "failed") { drop(); pulled = null; setTimeout(follow, 1000); } };
-      const audio = $("p-audio"); audio.srcObject = await stream;
-      audio.play().then(() => sound("Live sound of the Zikr")).catch(() => sound("Tap anywhere to hear the Zikr."));
-    } catch { setTimeout(follow, 3000); }
-    finally { pulling = false; }
-  }
-  document.addEventListener("click", () => { const a = $("p-audio"); if (wantSound && a.paused && a.srcObject) a.play().then(() => sound("Live sound of the Zikr")).catch(() => {}); });
-  watchFeed();
+  $("p-play").addEventListener("click", () => receiver.play());
 
   function render() {
     const sheikh = data.halqahs.find(h => h.id === "our-sheikh");
-    // Our Sheikh is live when the app says so or when the live feed is on air.
-    if (sheikh && onAir && !sheikh.live) sheikh.live = { kind: "zikr" };
     if (sheikh) {
       chip($("sheikh-chip"), sheikh.live);
       stage($("sheikh-stage"), sheikh.stage, sheikh.live);
       $("sheikh-side").classList.toggle("on", !!sheikh.live);
       const button = $("sheikh-join");
-      button.disabled = !sheikh.live; button.classList.toggle("live", !!sheikh.live);
-      $("sheikh-note").textContent = sheikh.live ? "Our Sheikh's Zikr is live now." : "The button opens when Our Sheikh's Zikr is live.";
+      button.disabled = data.available === false || !sheikh.live; button.classList.toggle("live", !!sheikh.live);
+      $("sheikh-note").textContent = data.available === false ? "Live status is unavailable. Checking again shortly…" : sheikh.live ? "Our Sheikh's Zikr is live now." : "The button opens when Our Sheikh's Zikr is live.";
     }
     for (const h of data.halqahs) {
       const card = document.querySelector('.halqah[data-id="' + CSS.escape(h.id) + '"]');
@@ -418,7 +429,7 @@ const CLIENT = `
       chip(card.querySelector("[data-chip]"), h.live);
       card.classList.toggle("is-live", !!h.live);
       card.querySelector("[data-now]").textContent = h.live ? (h.stage ? "Now: " + h.stage.title : "Zikr is live") : "";
-      const b = card.querySelector("[data-join]"); b.disabled = !h.live; b.classList.toggle("live", !!h.live);
+      const b = card.querySelector("[data-join]"); b.disabled = data.available === false || !h.live; b.classList.toggle("live", !!h.live);
     }
     const photo = $("photo");
     if (photo) {
@@ -426,10 +437,15 @@ const CLIENT = `
       photo.onerror = () => { if (data.pictureFallback && photo.src !== data.pictureFallback) photo.src = data.pictureFallback; };
     }
     const any = data.halqahs.some(h => h.live);
-    const s = $("nav-status"); s.className = "chip " + (any ? "live" : "off"); s.textContent = any ? "Live now" : "Offline";
+    const s = $("nav-status"); s.className = "chip " + (any ? "live" : "off"); s.textContent = data.available === false ? "Status unavailable" : any ? "Live now" : "Not live";
+    onFeed();
   }
   async function refresh() {
-    try { const r = await fetch("/data.json", { cache: "no-store" }); if (r.ok) { data = await r.json(); render(); } } catch {}
+    if (refreshing) return;
+    refreshing = true;
+    try { const r = await request("/data.json", { cache: "no-store" }); if (!r.ok || r.body.available === false) throw new Error("Unavailable"); data = r.body; }
+    catch { data.available = false; }
+    finally { refreshing = false; render(); }
   }
   render();
   // Every 5 seconds, so a stage called shows here within moments.
@@ -438,66 +454,120 @@ const CLIENT = `
 
   // Joining: a name and a place, remembered on this browser with a random secret that is the visitor's identity.
   const form = $("join-form"), fields = $("join-fields");
-  const names = new Intl.DisplayNames([navigator.language || "en"], { type: "region" });
-  const select = fields.country;
-  for (const code of "__COUNTRIES__".split(",").sort((a, b) => names.of(a).localeCompare(names.of(b)))) {
-    const o = el("option", "", names.of(code)); o.value = code; select.append(o);
+  let names;
+  try { names = new Intl.DisplayNames([navigator.language || "en"], { type: "region" }); } catch {}
+  const countryName = code => names ? names.of(code) : code;
+  const select = fields.elements.namedItem("country");
+  for (const code of "__COUNTRIES__".split(",").sort((a, b) => countryName(a).localeCompare(countryName(b)))) {
+    const o = el("option", "", countryName(code)); o.value = code; select.append(o);
   }
-  const saved = JSON.parse(store.get("zikr.visitor") || "{}");
-  fields.name.value = saved.name || ""; fields.city.value = saved.city || ""; select.value = saved.country || "US";
+  let saved = {};
+  try { const value = JSON.parse(store.get("zikr.visitor") || "{}"); if (value && typeof value === "object") saved = value; } catch {}
+  fields.elements.namedItem("name").value = typeof saved.name === "string" ? saved.name : "";
+  fields.elements.namedItem("city").value = typeof saved.city === "string" ? saved.city : ""; select.value = saved.country || "US";
+  let guestSecret = null;
   function secret() {
-    let s = store.get("zikr.secret");
+    let s = guestSecret || store.get("zikr.secret");
     if (!s || !/^[0-9a-f]{64}$/.test(s)) { s = [...crypto.getRandomValues(new Uint8Array(32))].map(b => b.toString(16).padStart(2, "0")).join(""); store.set("zikr.secret", s); }
-    return s;
+    guestSecret = s; return s;
   }
-  let joining = null;
+  let joining = null, adultVerified = false, under18 = false;
+  function profileForm() {
+    $("join-title").textContent = "Join " + (joining ? joining.name : "the Zikr");
+    $("join-error").textContent = ""; $("join-terms").checked = false;
+    form.showModal();
+  }
   document.addEventListener("click", e => {
     const b = e.target.closest("[data-join]");
     if (!b || b.disabled) return;
     joining = data.halqahs.find(h => h.id === b.dataset.join);
-    $("join-title").textContent = "Join " + (joining ? joining.name : "the Zikr");
-    $("join-error").textContent = "";
-    form.showModal();
+    $("entry-choice").showModal();
   });
-  $("join-go").addEventListener("click", async e => {
+  $("entry-cancel").addEventListener("click", () => $("entry-choice").close());
+  $("anonymous-join").addEventListener("click", () => {
+    $("entry-choice").close();
+    if (joining?.live) openPlayer(joining, joining, true);
+  });
+  $("profile-join").addEventListener("click", () => {
+    if (under18) return;
+    $("entry-choice").close();
+    if (adultVerified) return profileForm();
+    const today = new Date();
+    $("birth-date").max = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+    $("birth-date").value = ""; $("age-error").textContent = ""; $("age-form").showModal();
+  });
+  $("age-cancel").addEventListener("click", () => $("age-form").close());
+  $("age-fields").addEventListener("submit", e => {
     e.preventDefault();
-    if (!fields.reportValidity() || !joining) return;
-    const visitor = { name: fields.name.value.trim(), city: fields.city.value.trim(), country: select.value };
+    if (!$("age-fields").reportValidity()) return;
+    const parts = $("birth-date").value.split("-").map(Number), [year, month, day] = parts;
+    const born = new Date(year, month - 1, day), now = new Date();
+    if (parts.length !== 3 || born.getFullYear() !== year || born.getMonth() !== month - 1 || born.getDate() !== day || born > now) { $("age-error").textContent = "Enter a valid date of birth."; return; }
+    const age = now.getFullYear() - year - ((now.getMonth() + 1 < month || (now.getMonth() + 1 === month && now.getDate() < day)) ? 1 : 0);
+    $("birth-date").value = ""; $("age-form").close();
+    adultVerified = age >= 18; under18 = !adultVerified;
+    if (adultVerified) profileForm();
+    else { $("profile-join").disabled = true; $("entry-note").textContent = "You can listen without a profile. Community profiles are available to adults aged 18 or older."; $("entry-choice").showModal(); }
+  });
+  form.addEventListener("close", () => { joinVersion += 1; joiningRequest?.abort(); });
+  $("join-cancel").addEventListener("click", () => form.close());
+  fields.addEventListener("submit", async e => {
+    if (e.submitter?.value === "cancel") return;
+    e.preventDefault();
+    if (!adultVerified || !fields.reportValidity() || !joining || $("join-go").disabled) return;
+    const selected = joining, version = ++joinVersion;
+    joiningRequest = new AbortController();
+    const visitor = { name: fields.elements.namedItem("name").value.trim(), city: fields.elements.namedItem("city").value.trim(), country: select.value };
     store.set("zikr.visitor", JSON.stringify(visitor));
     $("join-go").disabled = true; $("join-error").textContent = "";
     try {
-      const r = await fetch("/join/" + joining.id, { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name: visitor.name, city: visitor.city, countryCode: visitor.country, guestSecret: secret() }) });
-      const body = await r.json().catch(() => ({}));
-      if (!r.ok) { $("join-error").textContent = body.error || "Could not join. Please try again."; return; }
-      form.close(); openPlayer(joining, body);
-    } catch { $("join-error").textContent = "Could not join. Check your connection and try again."; }
+      const r = await request("/join/" + selected.id, { method: "POST", signal: joiningRequest.signal, headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: visitor.name, city: visitor.city, countryCode: visitor.country, guestSecret: secret(), adult: true, termsVersion: "2026-11-06" }) });
+      if (version !== joinVersion || !form.open) return;
+      if (!r.ok) { $("join-error").textContent = r.body.error || "Could not join. Please try again."; return; }
+      form.close(); openPlayer(selected, r.body);
+    } catch { if (version === joinVersion && form.open) $("join-error").textContent = "Could not join. Check your connection and try again."; }
     finally { $("join-go").disabled = false; }
   });
 
   // The joined screen: the stage live, full screen, with no controls. Its sound
   // comes only from the Silsila's live feed (never a recording).
-  function openPlayer(h, session) {
+  function openPlayer(h, session, anonymous = false) {
     joined = h; shown["p-stage"] = null;
+    const version = ++playerVersion;
+    let checking = false, checkingPresence = false;
+    const startedAt = session.live?.startedAt;
+    data.halqahs = data.halqahs.map(item => item.id === h.id ? { ...item, ...session } : item);
     // Sound is unlocked inside the tap that joined; Our Sheikh's feed is pulled.
     wantSound = h.id === "our-sheikh" && !!(feed && feed.base);
-    if (wantSound) { $("p-audio").play().catch(() => {}); follow(); }
+    $("p-play").hidden = !wantSound;
+    if (wantSound) watchFeed();
     $("p-name").textContent = h.name;
-    $("player").classList.add("open"); document.body.style.overflow = "hidden";
+    $("p-privacy").textContent = anonymous ? "Listening without a profile. Your attendance is not recorded." : "";
+    $("player").classList.add("open"); $("player").showModal(); document.body.style.overflow = "hidden";
     apply(session);
     // The stage every 5 seconds from the page's data; still here every 30 for the admins' attendance.
     poll = setInterval(async () => {
+      if (checking) return;
+      checking = true;
       try {
-        const r = await fetch("/data.json", { cache: "no-store" });
-        if (!r.ok) return;
-        data = await r.json();
+        const r = await request("/data.json", { cache: "no-store" });
+        if (version !== playerVersion) return;
+        if (!r.ok || r.body.available === false) throw new Error("Unavailable");
+        data = r.body;
         const now = data.halqahs.find(x => x.id === h.id);
-        if (!now || (!now.live && !(now.id === "our-sheikh" && onAir))) return ended();
-        apply(now);
-      } catch {}
+        if (!now?.live || (startedAt && now.live.startedAt !== startedAt)) return ended();
+        apply(now); onFeed();
+      } catch { if (version === playerVersion) $("p-chip").textContent = "Reconnecting…"; }
+      finally { checking = false; }
     }, 5000);
-    presence = setInterval(() => {
-      fetch("/presence/" + h.id, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ guestSecret: secret() }) }).catch(() => {});
+    if (!anonymous) presence = setInterval(async () => {
+      if (checkingPresence) return;
+      checkingPresence = true;
+      try {
+        const r = await request("/presence/" + h.id, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ guestSecret: secret() }) });
+        if (version === playerVersion && r.status === 409) ended();
+      } catch {} finally { checkingPresence = false; }
     }, 30000);
   }
   function apply(session) {
@@ -506,14 +576,19 @@ const CLIENT = `
     if (!wantSound) sound("This Halqah's live sound is in the Darul Irfan app. Its stage follows the Zikr live here.");
   }
   function ended() {
-    clearInterval(poll); clearInterval(presence); wantSound = false; drop(); pulled = null;
+    playerVersion += 1; clearInterval(poll); clearInterval(presence); wantSound = false; stopFeed();
     stage($("p-stage"), null, null);
     $("p-stage").querySelector(".waiting .quiet").textContent = "The Zikr has ended. JazakAllahu khairan.";
-    $("p-sound").textContent = "";
+    chip($("p-chip"), null); $("p-chip").textContent = "Ended";
+    $("p-sound").textContent = ""; $("p-play").hidden = true;
   }
-  $("p-leave").addEventListener("click", () => {
-    clearInterval(poll); clearInterval(presence); joined = null; wantSound = false; drop(); pulled = null; $("p-audio").srcObject = null;
-    $("player").classList.remove("open"); document.body.style.overflow = ""; refresh();
-  });
+  function leave() {
+    playerVersion += 1; clearInterval(poll); clearInterval(presence); joined = null; wantSound = false; stopFeed();
+    $("player").classList.remove("open"); if ($("player").open) $("player").close(); document.body.style.overflow = ""; refresh();
+  }
+  $("p-leave").addEventListener("click", leave);
+  $("player").addEventListener("cancel", e => { e.preventDefault(); leave(); });
+  addEventListener("pagehide", () => { playerVersion += 1; clearInterval(poll); clearInterval(presence); wantSound = false; stopFeed(); joiningRequest?.abort(); });
+  addEventListener("pageshow", e => { if (e.persisted) leave(); });
 })();
 `;

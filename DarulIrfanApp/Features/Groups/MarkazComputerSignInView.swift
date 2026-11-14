@@ -13,6 +13,8 @@ struct MarkazComputerSignInView: View {
     @State private var error: String?
     @State private var computers: [MarkazReportingSession]?
     @State private var listFailed = false
+    @State private var loadingComputers = false
+    @State private var listLoadID = UUID()
     @State private var signingOut: MarkazReportingSession?
     @FocusState private var codeFocused: Bool
 
@@ -63,6 +65,9 @@ struct MarkazComputerSignInView: View {
                 if listFailed {
                     Text("The list could not be loaded. Please try again.")
                         .foregroundStyle(DIColor.textMuted)
+                    Button("Retry") { Task { await loadComputers() } }
+                        .buttonStyle(DISecondaryButtonStyle())
+                        .disabled(loadingComputers)
                 }
                 if let computers {
                     if computers.isEmpty {
@@ -159,13 +164,19 @@ struct MarkazComputerSignInView: View {
     }
 
     private func loadComputers() async {
+        let requestID = UUID()
+        listLoadID = requestID
+        loadingComputers = true
+        defer { if listLoadID == requestID { loadingComputers = false } }
         do {
-            computers = try await MarkazService(groups: service).reportingSessions()
+            let loaded = try await MarkazService(groups: service).reportingSessions()
+            guard !Task.isCancelled, listLoadID == requestID else { return }
+            computers = loaded
             listFailed = false
         } catch is CancellationError {
             return
         } catch {
-            if !Task.isCancelled { listFailed = true }
+            if !Task.isCancelled, listLoadID == requestID { listFailed = true }
         }
     }
 

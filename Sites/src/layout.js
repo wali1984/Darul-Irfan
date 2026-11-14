@@ -5,7 +5,7 @@ export const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&":
 
 /** The Silsila's emblem, alive: turning gold rings, seven orbiting lights, a breathing halo. */
 export function animatedLogo(size = "min(420px,78vw)", extraClass = "") {
-  return `<div class="emblem ${extraClass}" style="--s:${size}" aria-label="Naqshbandia Owaisiah">
+  return `<div class="emblem ${extraClass}" style="--s:${size}" role="img" aria-label="Naqshbandia Owaisiah">
     <div class="halo"></div><div class="rays"></div><div class="ring r3"></div><div class="ring r2"></div><div class="ring r1"></div>
     <div class="orbit">${Array.from({ length: 7 }, (_, k) => `<i style="--k:${k}"></i>`).join("")}</div>
     <img src="/logo.webp" alt="" width="560" height="560">
@@ -19,6 +19,9 @@ export const STYLE = `
 *{box-sizing:border-box}html{scroll-behavior:smooth}[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit}[lang=ur]{font-family:"Noto Nastaliq Urdu",serif;direction:rtl;line-height:2.1}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold2);outline-offset:4px}
+.skip{position:fixed;top:8px;left:8px;z-index:100;background:var(--gold2);color:#04150f;padding:10px 18px;transform:translateY(-160%)}.skip:focus{transform:none}
+section[id]{scroll-margin-top:120px}
 .arabic{font-family:Amiri,serif;direction:rtl}
 #sky{position:fixed;inset:0;z-index:-2;width:100%;height:100%;pointer-events:none}
 .aurora{position:fixed;inset:-30%;z-index:-3;background:radial-gradient(40% 35% at 20% 20%,rgba(16,185,129,.28),transparent 70%),
@@ -36,7 +39,7 @@ nav.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20p
 .brand b{font:600 20px/1 var(--serif);letter-spacing:.04em}
 .brand small{display:block;color:var(--gold);font:600 11px/1.4 var(--sans);letter-spacing:.18em;text-transform:uppercase}
 .navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}.navlinks a{text-decoration:none;transition:color .2s}.navlinks a:hover,.navlinks a.on{color:var(--gold2)}
-@media (max-width:760px){.navlinks{display:none}}
+@media (max-width:760px){nav.top{flex-wrap:wrap;gap:12px}.navlinks{display:flex;order:3;width:100%;gap:8px 16px;flex-wrap:wrap;font-size:13px}.navlinks a{padding:5px 0}.brand b{font-size:18px}.brand small{font-size:10px}}
 .wrap{width:min(1180px,100% - 32px);margin-inline:auto}
 section{padding:clamp(56px,9vw,110px) 0}
 .eyebrow{color:var(--gold);font:600 12px/1 var(--sans);letter-spacing:.28em;text-transform:uppercase}
@@ -93,28 +96,33 @@ h2{font-size:clamp(32px,4.4vw,52px);line-height:1.08;margin:12px 0 14px}
 .panel::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
   background:linear-gradient(130deg,rgba(243,220,157,.55),transparent 35%,transparent 65%,rgba(52,211,153,.45));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.8,.2,1) var(--d,0ms),transform .9s cubic-bezier(.2,.8,.2,1) var(--d,0ms)}
+.reveal{opacity:1;transition:opacity .9s cubic-bezier(.2,.8,.2,1) var(--d,0ms),transform .9s cubic-bezier(.2,.8,.2,1) var(--d,0ms)}
+.reveal.pending{opacity:0;transform:translateY(26px)}
 .reveal.in{opacity:1;transform:none}
 footer{border-top:1px solid var(--line);padding:40px 0 60px;color:var(--muted);font-size:14px}
 footer .row{display:flex;flex-wrap:wrap;gap:16px 28px;justify-content:space-between;align-items:center}
 footer .links{display:flex;gap:18px;flex-wrap:wrap}footer a{text-decoration:none}footer a:hover{color:var(--gold2)}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}#sky{display:none}}
+.share{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px}.share .btn{padding:9px 16px;font-size:14px}.share input{max-width:100%;width:360px;padding:8px;border-radius:8px;background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.reveal,.reveal.pending{opacity:1;transform:none}#sky{display:none}}
 `;
 
 /** Rising motes of light, section reveals: shared by every page. */
 export const SKY_SCRIPT = `
 (() => {
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const sky = document.getElementById("sky"), ctx = sky.getContext("2d");
-  let motes = [];
+  const preference = matchMedia("(prefers-reduced-motion: reduce)");
+  const sky = document.getElementById("sky"), ctx = sky?.getContext("2d");
+  let motes = [], animation = null;
   function size() {
-    const r = devicePixelRatio || 1;
+    if (!ctx) return;
+    const r = Math.min(2, devicePixelRatio || 1);
     sky.width = innerWidth * r; sky.height = innerHeight * r; ctx.setTransform(r, 0, 0, r, 0, 0);
     motes = Array.from({ length: Math.min(120, Math.floor(innerWidth / 11)) }, () => ({
       x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: Math.random() * 1.9 + .3,
       v: Math.random() * .35 + .08, a: Math.random() * Math.PI * 2, g: Math.random() < .4 }));
   }
   function frame(t) {
+    animation = null;
+    if (!ctx || preference.matches || document.hidden) return;
     ctx.clearRect(0, 0, innerWidth, innerHeight);
     for (const m of motes) {
       m.y -= m.v; m.x += Math.sin(t / 2400 + m.a) * .25;
@@ -124,17 +132,35 @@ export const SKY_SCRIPT = `
       ctx.fillStyle = m.g ? "rgba(243,220,157," + glow + ")" : "rgba(110,231,183," + glow * .7 + ")";
       ctx.shadowBlur = 8; ctx.shadowColor = ctx.fillStyle; ctx.fill();
     }
-    requestAnimationFrame(frame);
+    animation = requestAnimationFrame(frame);
   }
-  if (!reduce) { size(); addEventListener("resize", size); requestAnimationFrame(frame); }
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .1 });
-  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  function resume() { if (animation !== null) cancelAnimationFrame(animation); animation = null; if (ctx && !preference.matches && !document.hidden) { size(); animation = requestAnimationFrame(frame); } }
+  resume(); addEventListener("resize", size); document.addEventListener("visibilitychange", resume); preference.addEventListener("change", resume);
+  if (typeof IntersectionObserver !== "undefined" && !preference.matches) {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove("pending"); e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .1 });
+    document.querySelectorAll(".reveal").forEach(el => { el.classList.add("pending"); io.observe(el); });
+  }
+  const share = document.getElementById("share-page");
+  if (share) {
+    share.hidden = false;
+    share.addEventListener("click", async () => {
+      const url = location.origin + location.pathname, status = document.getElementById("share-status");
+      try {
+        if (navigator.share) await navigator.share({ title: document.title, url });
+        else { await navigator.clipboard.writeText(url); status.textContent = "Link copied."; }
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        const field = document.getElementById("share-url"); field.value = url; field.hidden = false; field.focus(); field.select(); status.textContent = "Copy this link to share the page.";
+      }
+    });
+  }
 })();
 `;
 
 export function shell({ site, others, title, description, active, body, extraStyle = "", script = "" }) {
   const regions = others.map(o => `<a href="https://${esc(o.host)}">${esc(o.region)}</a>`).join("");
-  const link = (href, label, key) => `<a href="${href}"${active === key ? ' class="on"' : ""}>${label}</a>`;
+  const link = (href, label, key) => `<a href="${href}"${active === key ? ' class="on" aria-current="page"' : ""}>${label}</a>`;
+  const domain = others[0]?.host.split(".").slice(1).join(".");
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -151,21 +177,22 @@ export function shell({ site, others, title, description, active, body, extraSty
 <style>${STYLE}${extraStyle}</style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <div class="aurora"></div><canvas id="sky" aria-hidden="true"></canvas>
 <svg class="pattern" viewBox="0 0 640 640" aria-hidden="true"><defs><pattern id="p" width="40" height="40" patternUnits="userSpaceOnUse">
 <path d="M20 2 26 14 38 20 26 26 20 38 14 26 2 20 14 14Z" fill="none" stroke="#d9b56a" stroke-width=".8"/>
 <rect x="11" y="11" width="18" height="18" fill="none" stroke="#d9b56a" stroke-width=".6" transform="rotate(45 20 20)"/></pattern></defs>
 <rect width="640" height="640" fill="url(#p)"/></svg>
-<nav class="top">
+<nav class="top" aria-label="Main navigation">
   <a class="brand" href="/">${animatedLogo("48px", "mini")}<span><small>Naqshbandia Owaisiah</small><b>${esc(site.region)}</b></span></a>
-  <div class="navlinks">${link("/#live", "Live Zikr", "live")}${link("/#halqahs", "Halqahs", "halqahs")}${link("/method-of-zikr", "Method of Zikr", "method")}${link("/shajra", "Shajra", "shajra")}</div>
+  <div class="navlinks">${link("/#live", "Live Zikr", "live")}${site.halqahs?.length > 1 ? link("/#halqahs", "Halqahs", "halqahs") : ""}${link("/method-of-zikr", "Method of Zikr", "method")}${link("/shajra", "Shajra", "shajra")}</div>
   <span id="nav-status"></span>
 </nav>
-<main>${body}</main>
+<main id="main" tabindex="-1">${body}</main>
 <footer><div class="wrap row">
   <span>© Naqshbandia Owaisiah · <a href="https://www.naqshbandiaowaisiah.org" target="_blank" rel="noopener">naqshbandiaowaisiah.org</a></span>
-  <span class="links"><a href="/method-of-zikr">Method of Zikr</a><a href="/shajra">Shajra</a>${regions}</span>
-</div></footer>
+  <span class="links"><a href="/method-of-zikr">Method of Zikr</a><a href="/shajra">Shajra</a>${regions}${domain && site.halqahs ? `<a href="https://app-demo.${esc(domain)}/#get-started">Explore the app</a>` : ""}</span>
+</div><div class="wrap share"><button type="button" class="btn btn-ghost" id="share-page" hidden>Share this page</button><span id="share-status" role="status"></span><input id="share-url" aria-label="Website link" readonly hidden></div></footer>
 <script>${SKY_SCRIPT}</script>
 ${script}
 </body>

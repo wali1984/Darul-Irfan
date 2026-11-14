@@ -47,12 +47,12 @@ const VISION = [
   ["Every teaching, one living app", "The Qur'an with the Silsila's own translation and tafsir, hadith, the library, Al-Murshid, bayans and Zikr, joined up: from an ayah to its tafsir to the Sheikh's bayan in two taps."],
   ["A better experience for everyone", "Calm, clear and bilingual, with Urdu in Nastaliq, large text and offline reading: easy for those with the Silsila for decades and for someone opening it today."],
   ["Reaching a new generation", "Young people live on their phones, YouTube and social media. The Silsila now meets them there: a daily ayah, hadith and saying to share, gentle reminders, and a live stage that looks beautiful on any screen."],
-  ["On every major platform", "iPhone, Android, regional websites, YouTube, Facebook and Paltalk, one Silsila and one look: a modern portfolio for a timeless message."],
+  ["Across phones and the web", "Native iPhone and Android apps and regional websites share one visual identity. Paltalk relay and social streaming are being validated as part of the live-service preview."],
 ];
 
 const REACH = [
   "Open doors: anyone can follow a live Zikr from a website link with just a name and a city, no account or download needed.",
-  "Every Daily Zikr streamed to YouTube and Facebook with the live stage, where new audiences already are.",
+  "A planned route to YouTube and Facebook with the live stage; availability depends on broadcast verification.",
   "Daily cards (ayah, hadith, Aqwal-e-Sheikh) made to forward on WhatsApp and social media, each one an invitation.",
   "Invitations in seconds: a WhatsApp link or a code from any Ijtema or gathering.",
   "English and Urdu throughout, so second-generation members abroad feel at home.",
@@ -61,17 +61,17 @@ const REACH = [
 
 const AUTOMATION = [
   {
-    tag: "Automation", title: "From Paltalk to every screen, by itself",
-    text: "When Hazrat ji begins on Paltalk, everything follows with no one typing or tapping Start.",
-    points: ["The Zikr starts in the app the moment the microphone opens, and members are told", "The websites go live and Join lights up; in the app, Join opens the stage with the live sound",
-      "The relay listens to Hazrat ji and moves the stage within seconds of each call; typed host cues are only the backup",
-      "The YouTube and Facebook picture is the live stage itself", "After the Shajra Sharif the Dua shows, and the session closes five minutes later"],
+    tag: "Automation preview", title: "Connecting Paltalk with the app and websites",
+    text: "The relay is being tested with an admin supervising the source, stage and session state.",
+    points: ["Automatic start and member notifications require a confirmed session", "The websites open Join when the platform reports a live Zikr",
+      "Voice cues can assist stage changes; admins confirm and correct them during testing",
+      "YouTube and Facebook broadcasts require a separate availability check", "Admins verify the end of each session; unattended start, recovery and closure remain under validation"],
     shots: ["live-card", "stage-tasbihat"],
   },
   {
-    tag: "Automation", title: "The stage follows the voice; taps are only the backup",
-    text: "Go Live listens on the leading phone and moves the stage as each recitation, Latifa and Muraqaba is called.",
-    points: ["Hands-free for the whole session, the screen stays awake", "If the sound is unclear, one tap on the stage does it", "Undo puts back a wrong stage at once"],
+    tag: "Voice assistance preview", title: "Voice cues with an admin in control",
+    text: "Go Live can listen on the leading phone to assist stage selection. Recognition and recovery are being tested across devices.",
+    points: ["An admin supervises the stage while voice assistance is enabled", "If the sound is unclear, the admin can select a stage", "Undo lets an admin correct a stage"],
     shots: ["stage-listening", "stage-controls"],
   },
   {
@@ -81,8 +81,8 @@ const AUTOMATION = [
     shots: ["stage-latifa7", "stage-tasbihat"],
   },
   {
-    tag: "Monitoring", title: "Admins monitor; the system does the work",
-    text: "The manual steps are gone. Admins watch who is listening, see what needs attention, and step in only when needed.",
+    tag: "Monitoring", title: "Admins supervise the live service",
+    text: "Admins check the source and audience experience, follow attendance and use the session controls when attention is needed.",
     points: ["Who is listening, live, in every session", "Every Halqah on air at a glance in the Silsila Markaz", "A morning summary of yesterday's Zikr on officers' phones"],
     shots: ["session-controls", "admin-attendance"],
   },
@@ -148,8 +148,8 @@ function automationSection() {
   return `
   <section id="automation"><div class="wrap">
     <div class="eyebrow reveal">For Hazrat ji and the admins</div>
-    <h2 class="reveal">From starting the Zikr to streaming everywhere, automatic</h2>
-    <p class="lead reveal">No typing and no checklists: the Zikr starts itself from Paltalk, the stage follows the voice, and the same picture reaches the app, the websites, YouTube and Facebook. The Silsila's admins only monitor.</p>
+    <h2 class="reveal">Live-service automation preview</h2>
+    <p class="lead reveal">The app, websites and broadcast stage are designed to follow one session. Automatic start, voice cues, recovery and social streaming still require end-to-end validation. An admin supervises live trials; response time and audience capacity have not yet been certified.</p>
     <div class="new">${guideItems(AUTOMATION, shotFolder)}</div>
   </div></section>`;
 }
@@ -207,7 +207,7 @@ const GUIDE = [
     points: ["Lead live: members join together and listen; optionally record it or add a live video link",
       "YouTube: a live link, or past Zikr from the channel played to everyone at the same moment",
       "Recording: the Halqah's own recordings",
-      "Test only: nobody is notified and only the Halqah's admins see it, marked TEST"],
+      "Test only: no member notification; the websites also show it, clearly marked Test Zikr"],
     shots: ["admin-golive", "admin-golive-test"],
   },
   {
@@ -245,14 +245,14 @@ const STEPS = [
     { Websites: "Not live; Join Live Zikr is greyed out." }],
   ["Rehearse (optional)", "Go live › Test only › Start test without notifying anyone. End the session when done.",
     { Websites: "Shown as Test Zikr." }],
-  ["Start", "Go live › Halqah Zikr › Lead live, YouTube or Recording › Start now and notify the group. For Our Sheikh, Hazrat ji starting on Paltalk starts it by itself.",
+  ["Start", "Go live › Halqah Zikr › Lead live, YouTube or Recording › Start now and notify the group. Automatic Paltalk start is under validation and must be supervised.",
     { Members: "\"Halqah zikr has started\"; the card shows Zikr live and the stage opens once.", Websites: "Live now; Join Live Zikr lights up." }],
   ["Joining", "Members tap Join: for Our Sheikh, Daily or Tahajjud, the stage opens in the app with the live sound. Other Halqahs join the room with the microphone off, or listen and watch together at the same moment.",
-    { Websites: "Name, city, country, then the full-screen stage. Our Sheikh with live sound.", "YouTube & Facebook": "The stage picture with the live sound." }],
-  ["During", "The leader taps each stage or lets Go Live follow the voice. From Paltalk, the relay hears each call and moves the stage within seconds. Chat, Add Muraqaba, Message the group, removals.",
+    { Websites: "Name, city, country, then the full-screen stage. Our Sheikh has live sound when the source is connected.", "YouTube & Facebook": "Available only after that broadcast is verified live." }],
+  ["During", "The leader selects each stage or supervises voice assistance. Paltalk recognition and stage timing are under validation. Chat, Add Muraqaba, Message the group, removals.",
     { Everywhere: "The emblem moves to the corner; only the current stage shows, with a burst of light at each change." }],
   ["Shajra and Dua", "After Masjid-e-Nabawi the Shajra Sharif rolls in line by line, then the stage shows Dua. Members' dua requests have reached the admins.",
-    { Paltalk: "Started from Paltalk, the session closes by itself five minutes after the Dua." }],
+    { Paltalk: "Automatic closure is under validation; the admin checks when the session ends." }],
   ["End", "End session › End the session for everyone?",
     { Members: "The live card and stage clear.", Websites: "The Zikr has ended. JazakAllahu khairan.", Admins: "The session is in Past sessions, with attendance." }],
 ];
@@ -303,7 +303,7 @@ const NEW = [
     points: [
       "oursheikh., namerica. (USA and Canada) and uk.%DOMAIN%%NOTE%",
       "Each Halqah's Zikr appears the moment it is live; anyone joins with a name and a place",
-      "Listen only, live: the sound comes straight from the Zikr as it happens, never a recording",
+      "Our Sheikh's live sound is available when the source is connected; other Halqahs show their stage and use the app for sound",
       "Hazrat ji's admins see every web visitor in the session's attendance",
     ],
     shot: "/demo/new/home.webp", alt: "North America website",
@@ -322,19 +322,19 @@ const NEW = [
     shot: "/demo/new/broadcast.webp", alt: "Broadcast stage: Hazrat ji's picture beside Muraqaba Ma'iyyat",
   },
   {
-    tag: "New · Hands-free", title: "Go Live: the stage follows Hazrat ji's voice",
-    text: "One tap, and the leading phone listens: each recitation, Latifa and Muraqaba Hazrat ji names shows by itself. It was tuned on real Daily Zikr sessions, so it understands the stages the way they are actually called, in Urdu and Hindi script.",
+    tag: "Preview · Voice assistance", title: "Go Live: assisted stage selection",
+    text: "The leading phone can listen for stage cues. Recognition has been developed with session material and still needs supervised validation on the devices and networks people use.",
     points: [
-      "Keeps listening the whole session; the screen stays awake and it recovers by itself",
+      "The screen stays awake while listening; interruption and recovery behavior require device testing",
       "Undo puts back a wrong stage; admins can add a Muraqaba from the stage",
-      "On Paltalk, the live relay hears the same calls and moves the stage for everyone",
+      "The Paltalk relay's voice-assisted stage changes remain under validation",
     ],
     shot: null,
   },
   {
-    tag: "New · Automation", title: "The Zikr starts, follows and ends by itself",
-    text: "When Hazrat ji opens the microphone on Paltalk, the live relay starts Our Sheikh's Zikr in the app and on the websites, and members are told. It listens to the Zikr itself, so the stage moves two to four seconds after each call, from the opening Tasbih to the Shajra. When the Dua begins, the stage shows it, and the session closes five minutes later.",
-    points: ["The voice leads; typed host cues in the Paltalk chat are only the backup",
+    tag: "Preview · Automation", title: "Automatic session handling is being tested",
+    text: "The intended flow connects Paltalk audio, the app session and the websites, with assisted stage changes and a confirmed end. Unattended operation and stage-response time are not yet verified.",
+    points: ["Voice and typed host cues are checked against the active session",
       "Opening recitations followed in order: Tasbih, Istighfar, Shahadah, Ta'awwudh, Bismillah",
       "Test Zikr: admins try everything without notifying anyone", "Admins remove any stage announcement, message or dua request"],
     shot: null,
@@ -370,8 +370,10 @@ export function demoPage(site, others, domain) {
       <div class="eyebrow reveal">Darul Irfan · Product showcase</div>
       <h1 class="reveal shine" style="--d:80ms">The Silsila's app, in your hands</h1>
       <p class="lead reveal" style="--d:160ms">The Qur'an with the Silsila's translation and tafsir, hadith, the library, Zikr with the Sheikh and every Halqah, in English and Urdu, on iPhone and Android.</p>
+      <p class="quiet reveal">Product preview. Screens may show features awaiting tester release. Live relay automation and social broadcasts are under validation.</p>
       <div class="cta reveal" style="--d:240ms">
         <a class="btn btn-gold live" href="/demo/showcase">Start the interactive showcase</a>
+        <a class="btn btn-ghost" href="#get-started">Get started</a>
         <a class="btn btn-ghost" href="#vision">The vision</a>
         <a class="btn btn-ghost" href="#automation">Automation</a>
         <a class="btn btn-ghost" href="#admin">Administration</a>
@@ -381,6 +383,16 @@ export function demoPage(site, others, domain) {
     </div>
     <div class="reveal" style="--d:200ms">${animatedLogo()}</div>
   </div>
+  <section id="get-started"><div class="wrap">
+    <div class="eyebrow">Start here</div><h2>Choose how to take part</h2>
+    <div class="roles">
+      <article class="role"><b>Listen on the web</b><p>Open Our Sheikh's page. When the Zikr is live, join with your name, city and country.</p><a class="btn btn-gold" href="https://oursheikh.%DOMAIN%">Open live Zikr</a></article>
+      <article class="role"><b>Explore before joining</b><p>Read the Method of Zikr or the Shajra in the website's original source text.</p><a class="btn btn-ghost" href="https://oursheikh.%DOMAIN%/method-of-zikr">Method of Zikr</a></article>
+      <article class="role"><b>iPhone and iPad testers</b><p>Join the available iOS beta through TestFlight. This is a testing version, and features may change.</p><a class="btn btn-gold" href="https://testflight.apple.com/join/keXtV7jF" target="_blank" rel="noopener">Join TestFlight</a></article>
+      <article class="role"><b>Android testers</b><p>Use your existing Google Play internal testing invitation. If you need access, contact your Halqah's admin.</p><a class="btn btn-ghost" href="/demo/showcase">Explore the app preview</a></article>
+      <article class="role"><b>Markaz officers</b><p>Open the private reports website and approve its sign-in code from the app.</p><a class="btn btn-ghost" href="https://reporting.%DOMAIN%">Open admin reports</a></article>
+    </div>
+  </div></section>
 ${visionSection()}
 ${automationSection()}
 ${adminGuide()}
@@ -389,7 +401,7 @@ ${markazSection()}
   <section id="new"><div class="wrap">
     <div class="eyebrow reveal">Since the showcase</div>
     <h2 class="reveal">What's new</h2>
-    <p class="lead reveal">Added after the showcase was made: the live sound in the app, live Zikr on the web, one stage everywhere with the Shajra Sharif and the Dua, and a Zikr that runs itself.</p>
+    <p class="lead reveal">Recent work includes live sound, public Zikr pages and a shared stage. Automated relay behavior remains a supervised preview until its end-to-end checks pass.</p>
     <div class="new">${items}</div>
   </div></section>`;
   // The shared navigation points into the Our Sheikh site; this host only has the showcase.
@@ -408,16 +420,20 @@ export async function demoFile(env, name, request) {
     "Darul-Irfan-Product-Showcase-v5.pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     [SHOWCASE]: "text/html; charset=utf-8" };
   if (!allowed[name] || !env.MEDIA) return new Response("Not found", { status: 404 });
-  const object = await env.MEDIA.get(`demo/${name}`, { range: request.headers });
+  const hasRange = request.headers.has("range");
+  const object = request.method === "HEAD" && !hasRange
+    ? await env.MEDIA.head(`demo/${name}`)
+    : await env.MEDIA.get(`demo/${name}`, hasRange ? { range: request.headers } : undefined);
   if (!object) return new Response("Not found", { status: 404 });
   const headers = new Headers({ "content-type": allowed[name], "cache-control": "public, max-age=86400", "accept-ranges": "bytes",
+    "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin",
     "content-disposition": `${name.endsWith(".zip") || name.endsWith(".pptx") ? "attachment" : "inline"}; filename="${name}"` });
-  if (object.range) {
+  if (hasRange && object.range) {
     const { offset = 0, length = object.size - offset } = object.range;
     headers.set("content-range", `bytes ${offset}-${offset + length - 1}/${object.size}`);
     headers.set("content-length", String(length));
-    return new Response(object.body, { status: 206, headers });
+    return new Response(request.method === "HEAD" ? null : object.body, { status: 206, headers });
   }
   headers.set("content-length", String(object.size));
-  return new Response(object.body, { headers });
+  return new Response(request.method === "HEAD" ? null : object.body, { headers });
 }

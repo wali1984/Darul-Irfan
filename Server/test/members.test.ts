@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import worker from "../src/index";
 import type { Env } from "../src/contracts";
+import { sqliteD1 } from "./sqlite-d1";
 
 /** A tiny stand-in for D1 that answers from fixture tables, so the isolation
  *  rules can be exercised without a database. Each prepare() is matched by the
@@ -170,13 +171,18 @@ describe("private regional groups", () => {
   });
 
   it("deletes the account, its sessions and its memberships", async () => {
-    const deletes: string[] = [];
-    const env = envFor(await baseFixture(), deletes);
+    const { db, raw } = sqliteD1();
+    raw.prepare("INSERT INTO members(id,apple_subject,created_at,last_seen_at) VALUES('member-usa','subject','now','now')").run();
+    raw.prepare("INSERT INTO member_sessions(token_hash,member_id,created_at,expires_at,last_seen_at) VALUES(?,'member-usa','now',?,'now')").run(await hash(TOKEN_A), future);
+    raw.prepare("INSERT INTO member_group_members(group_id,member_id,added_at,added_by) VALUES('usa','member-usa','now','test')").run();
+    const env = { DB: db } as Env;
     const response = await worker.fetch(new Request("https://api.example.com/v1/members/me", {
       method: "DELETE", headers: { authorization: `Bearer ${TOKEN_A}` },
     }), env);
     expect(response.status).toBe(204);
-    expect(deletes).toEqual(["member_sessions", "member_devices", "member_group_members", "members"]);
+    expect(raw.prepare("SELECT id FROM members").all()).toEqual([]);
+    expect(raw.prepare("SELECT token_hash FROM member_sessions").all()).toEqual([]);
+    expect(raw.prepare("SELECT member_id FROM member_group_members").all()).toEqual([]);
   });
 
   it("rejects an unusable post limit", async () => {

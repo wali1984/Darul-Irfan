@@ -6,6 +6,7 @@ import UIKit
 /// fallback that also carries users through permission denial.
 struct OnboardingLocationStep: View {
     @Bindable var viewModel: OnboardingViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.openURL) private var openURL
     @FocusState private var citySearchFocused: Bool
 
@@ -45,7 +46,7 @@ struct OnboardingLocationStep: View {
                     .padding(.top, DISpacing.xs)
             }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.hasSelectedPlace)
+        .animation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: viewModel.hasSelectedPlace)
     }
 
     // MARK: - Privacy

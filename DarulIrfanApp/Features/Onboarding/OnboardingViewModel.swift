@@ -61,7 +61,18 @@ final class OnboardingViewModel {
 
     // Location
     private(set) var locationPhase: LocationSetupPhase = .idle
-    var citySearchQuery: String = ""
+    @ObservationIgnored private var citySearchRevision = 0
+    @ObservationIgnored private var locationRevision = 0
+    var citySearchQuery: String = "" {
+        didSet {
+            guard citySearchQuery != oldValue else { return }
+            citySearchRevision += 1
+            citySearchResults = []
+            isSearchingCities = false
+            citySearchFailed = false
+            hasSearchedCities = false
+        }
+    }
     private(set) var citySearchResults: [PlaceCoordinate] = []
     private(set) var isSearchingCities = false
     private(set) var citySearchFailed = false
@@ -126,8 +137,11 @@ final class OnboardingViewModel {
     /// location. On denial or failure the view offers manual city search.
     func useDeviceLocation() async {
         guard locationPhase != .requestingPermission, locationPhase != .locating else { return }
+        locationRevision += 1
+        let request = locationRevision
         locationPhase = .requestingPermission
         let status = await location.requestPermission()
+        guard !Task.isCancelled, request == locationRevision else { return }
         guard status == .authorized else {
             locationPhase = .denied
             return
@@ -137,13 +151,16 @@ final class OnboardingViewModel {
             // Round to city precision before persisting — the app never
             // stores precise coordinates (see PrivacySettingsView).
             let place = try await location.currentPlace().roundedToCityPrecision()
+            guard !Task.isCancelled, request == locationRevision else { return }
             await appState.updateSettings {
                 $0.lastKnownPlace = place
                 $0.locationMode = .device
             }
+            guard !Task.isCancelled, request == locationRevision else { return }
             locationPhase = .resolved(place)
             suggestMethod(for: place)
         } catch {
+            guard !Task.isCancelled, request == locationRevision else { return }
             locationPhase = .failed
         }
     }
@@ -159,11 +176,18 @@ final class OnboardingViewModel {
     func searchCities() async {
         let query = citySearchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty, !isSearchingCities else { return }
+        citySearchRevision += 1
+        let request = citySearchRevision
         isSearchingCities = true
         citySearchFailed = false
         do {
-            citySearchResults = try await location.searchPlaces(matching: query)
+            let results = try await location.searchPlaces(matching: query)
+            guard !Task.isCancelled, request == citySearchRevision else { return }
+            citySearchResults = results
         } catch {
+            guard request == citySearchRevision else { return }
+            isSearchingCities = false
+            guard !Task.isCancelled else { return }
             citySearchResults = []
             citySearchFailed = true
         }
@@ -172,6 +196,7 @@ final class OnboardingViewModel {
     }
 
     func chooseManualPlace(_ place: PlaceCoordinate) async {
+        locationRevision += 1
         await appState.updateSettings {
             $0.manualPlace = place
             $0.locationMode = .manual

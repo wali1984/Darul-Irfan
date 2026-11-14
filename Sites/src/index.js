@@ -68,7 +68,7 @@ function siteFor(url) {
 async function api(env, path, init) {
   try {
     const response = await env.API.fetch(new Request(`https://platform${path}`,
-      { ...init, headers: { accept: "application/json", "content-type": "application/json", ...(init?.headers ?? {}) } }));
+      { ...init, signal: AbortSignal.timeout(10000), headers: { accept: "application/json", "content-type": "application/json", ...(init?.headers ?? {}) } }));
     return { status: response.status, body: await response.json().catch(() => null) };
   } catch {
     return { status: 502, body: null };
@@ -83,8 +83,9 @@ async function data(env, key) {
     api(env, "/v1/live"),
     api(env, "/v1/public/sheikh-stage"),
   ]);
-  const found = new Map((halqahs.body?.halqahs ?? []).map(h => [h.id, h]));
+  const found = new Map((Array.isArray(halqahs.body?.halqahs) ? halqahs.body.halqahs : []).map(h => [h.id, h]));
   return {
+    available: halqahs.status === 200 && Array.isArray(halqahs.body?.halqahs),
     halqahs: site.halqahs.map(h => {
       const live = found.get(h.id);
       return { id: h.id, name: live?.name ?? h.name, description: h.description, live: live?.live ?? null, stage: live?.stage ?? null };
@@ -123,8 +124,14 @@ const SECURITY = {
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
   "permissions-policy": "camera=(), microphone=(), geolocation=(), autoplay=(self)",
+  "strict-transport-security": "max-age=31536000; includeSubDomains",
+  "x-frame-options": "DENY",
   "content-security-policy": [
     "default-src 'self'",
+    "base-uri 'none'",
+    "object-src 'none'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
     "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src https://fonts.gstatic.com data:",
@@ -135,9 +142,22 @@ const SECURITY = {
   ].join("; "),
 };
 
-const html = (body, maxAge = 60) => new Response(body, {
-  headers: { "content-type": "text/html; charset=utf-8", "cache-control": `public, max-age=${maxAge}`, ...SECURITY },
-});
+const html = async (body, maxAge = 60, url) => {
+  if (url) {
+    const canonical = new URL(url.pathname === "/index.html" ? "/" : url.pathname, url.origin).href;
+    body = body.replace("</head>", `<link rel="canonical" href="${canonical}"><meta property="og:url" content="${canonical}"><meta property="og:type" content="website"></head>`)
+      .replace('content="/logo.webp"', `content="${url.origin}/logo.webp"`);
+  }
+  // Generated inline scripts get exact hashes; API/user content cannot inject
+  // executable script even if a future renderer forgets to escape a field.
+  const hashes = await Promise.all([...body.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(async match => {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(match[1]));
+    return `'sha256-${btoa(String.fromCharCode(...new Uint8Array(digest)))}'`;
+  }));
+  const policy = SECURITY["content-security-policy"].replace("script-src 'self' 'unsafe-inline'", `script-src 'self' ${hashes.join(" ")}`);
+  return new Response(body, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": maxAge ? `public, max-age=${maxAge}` : "no-store",
+    ...SECURITY, "content-security-policy": policy } });
+};
 const jsonResponse = (status, body) => new Response(JSON.stringify(body), {
   status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", ...SECURITY },
 });
@@ -158,9 +178,10 @@ export default {
     }
     const hostOf = key => `${key}.${domain}`;
     // reporting.: the Silsila Markaz's reports, signed in from the app (and ?site=reporting on workers.dev).
-    if (name === "reporting" || url.searchParams.get("site") === "reporting") return reportingRequest(request, env, LOGO);
+    if (name === "reporting" || (name === null && url.searchParams.get("site") === "reporting")) return reportingRequest(request, env, LOGO);
     // app-demo.: the app's showcase for an audience (and ?site=demo on workers.dev).
-    if (name === "app-demo" || url.searchParams.get("site") === "demo") {
+    if (name === "app-demo" || (name === null && url.searchParams.get("site") === "demo")) {
+      if (request.method !== "GET" && request.method !== "HEAD") return jsonResponse(405, { error: "Method not allowed" });
       const all = Object.entries(SITES).map(([k, s]) => ({ host: hostOf(k), region: s.region }));
       const file = /^\/demo\/files\/([A-Za-z0-9.-]+)$/.exec(url.pathname);
       if (file) return demoFile(env, file[1], request);
@@ -172,7 +193,7 @@ export default {
         return new Response(FAVICON, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
       }
       if (url.pathname !== "/" && url.pathname !== "/index.html") return new Response("Not found", { status: 404 });
-      return html(demoPage({ region: "App showcase" }, all, domain), 300);
+      return html(demoPage({ region: "App showcase" }, all, domain), 300, url);
     }
     const key = siteFor(url);
     const site = SITES[key];
@@ -189,24 +210,30 @@ export default {
       return jsonResponse(result.status, result.body ?? { error: "Please try again." });
     }
     if (request.method !== "GET" && request.method !== "HEAD") return new Response("Method not allowed", { status: 405 });
-    if (url.pathname === "/data.json") return jsonResponse(200, await data(env, key));
+    if (url.pathname === "/data.json") {
+      const result = await data(env, key);
+      return jsonResponse(result.available ? 200 : 503, result);
+    }
     if (url.pathname === "/logo.webp") {
       return new Response(LOGO, { headers: { "content-type": "image/webp", "cache-control": "public, max-age=604800" } });
     }
     if (url.pathname === "/favicon.ico" || url.pathname === "/favicon.svg") {
       return new Response(FAVICON, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
     }
-    if (url.pathname === "/robots.txt") return new Response("User-agent: *\nAllow: /\n", { headers: { "content-type": "text/plain" } });
+    if (url.pathname === "/robots.txt") return new Response(`User-agent: *\nAllow: /\nDisallow: /broadcast\nSitemap: ${url.origin}/sitemap.xml\n`, { headers: { "content-type": "text/plain", ...SECURITY } });
+    if (url.pathname === "/sitemap.xml") return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${["/", "/method-of-zikr", "/shajra"].map(path => `<url><loc>${url.origin}${path}</loc></url>`).join("")}</urlset>`, { headers: { "content-type": "application/xml; charset=utf-8", ...SECURITY } });
     // The stage alone for the YouTube/Facebook stream's picture (?halqah=, default Our Sheikh).
     if (url.pathname === "/broadcast") {
       const halqah = url.searchParams.get("halqah") ?? "our-sheikh";
       if (!site.halqahs.some(h => h.id === halqah)) return Response.redirect(new URL("/broadcast", url).toString(), 302);
-      return html(broadcastPage(site, await data(env, key), halqah), 0);
+      const response = await html(broadcastPage(site, await data(env, key), halqah), 0);
+      response.headers.set("x-robots-tag", "noindex");
+      return response;
     }
-    if (url.pathname === "/method-of-zikr") return html(methodPage(site, others), 3600);
-    if (url.pathname === "/shajra") return html(shajraPage(site, others), 3600);
-    if (url.pathname !== "/" && url.pathname !== "/index.html") return Response.redirect(new URL("/", url).toString(), 302);
+    if (url.pathname === "/method-of-zikr") return html(methodPage(site, others), 3600, url);
+    if (url.pathname === "/shajra") return html(shajraPage(site, others), 3600, url);
+    if (url.pathname !== "/" && url.pathname !== "/index.html") return new Response("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8", ...SECURITY } });
     const feed = env.LIVE_FEED_BASE ? { base: env.LIVE_FEED_BASE, key: env.LIVE_FEED_KEY ?? "" } : null;
-    return html(homePage(site, others, await data(env, key), feed), 30);
+    return html(homePage(site, others, await data(env, key), feed), 30, url);
   },
 };
