@@ -262,7 +262,16 @@ struct BookTextPagesView: View {
                 BookLinkProvider.shared.links(bookID: bookID)
             }.value
             try Task.checkCancellation()
-            links = found
+            // A sentence cut by the page break is shown whole on the earlier
+            // page: its words keep their links there.
+            var byPage = found
+            let numbers = loaded.map(\.page)
+            for (index, number) in numbers.enumerated() where index + 1 < numbers.count {
+                if let carried = found[numbers[index + 1]] {
+                    byPage[number, default: []] += carried
+                }
+            }
+            links = byPage
             formatted = prepared
             pages = loaded.filter { !$0.text.isEmpty }
             session?.pageNumbers = pages.map(\.page)
