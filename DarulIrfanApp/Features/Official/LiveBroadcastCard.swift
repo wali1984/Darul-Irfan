@@ -55,7 +55,7 @@ struct LiveBroadcastCard: View {
             // something the app can play.
             let source = displaySources.first
             Button { if let source { activate(source) } } label: {
-                Label("Join Daily Zikr with Sheikh-ul-Mukarram",
+                Label("Join Daily Zikr",
                       systemImage: source?.kind == .ownedStream ? "headphones" : "play.rectangle.fill")
                     .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(source == nil ? DIColor.textMuted : (isLive ? DIColor.primaryDeep : DIColor.onPrimary))

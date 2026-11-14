@@ -188,11 +188,15 @@ struct ContentItemRow: View {
             HStack(alignment: .top, spacing: DISpacing.md) {
                 NavigationLink(value: LibraryRoute.item(id: item.id)) {
                     HStack(alignment: .top, spacing: DISpacing.md) {
-                        LibraryMedallion(
-                            systemImage: item.type.libraryIcon,
-                            isSpecial: item.type.isFeaturedPublication,
-                            diameter: 44
-                        )
+                        if let asset = OriginalBookCovers.assets[item.id] {
+                            OriginalBookCover(asset: asset, width: 58)
+                        } else {
+                            LibraryMedallion(
+                                systemImage: item.type.libraryIcon,
+                                isSpecial: item.type.isFeaturedPublication,
+                                diameter: 44
+                            )
+                        }
                         VStack(alignment: .leading, spacing: DISpacing.xs) {
                             VStack(alignment: .leading, spacing: DISpacing.xs) {
                                 if locale.language.languageCode?.identifier == "ur",

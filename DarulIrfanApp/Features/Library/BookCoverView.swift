@@ -32,7 +32,13 @@ struct BookCoverView: View {
                 .scaleEffect(breathing ? 1.08 : 1)
                 .opacity(breathing ? 1 : 0.55)
                 .accessibilityHidden(true)
-            cover
+            Group {
+                if let asset = OriginalBookCovers.assets[item.id] {
+                    OriginalBookCover(asset: asset, width: width)
+                } else {
+                    cover
+                }
+            }
                 .rotationEffect(.degrees(-2))
                 .offset(y: floating ? -6 : 0)
         }
