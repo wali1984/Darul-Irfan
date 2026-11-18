@@ -7,7 +7,7 @@ import type { Env } from "../src/contracts";
 import { announceDailyZikr, reconcileLive } from "../src/live";
 import { refreshPaltalkRoom } from "../src/paltalkRoom";
 import { refreshWebsiteCatalog, refreshYouTube } from "../src/sources";
-import { autoplayDue } from "../src/session";
+import { autoplayDue, endFinishedPlayback } from "../src/session";
 import { notifyGroup, zikrNoticeLink } from "../src/community";
 import { resetAPNSToken, sendPushToInstallations, sendTopicPush } from "../src/apns";
 import { sqliteD1 } from "./sqlite-d1";
@@ -405,5 +405,67 @@ describe("LIVE-025: the public health check", () => {
     const text = await degraded.text();
     expect(JSON.parse(text)).toEqual({ ok: false });
     expect(text).not.toContain("quota");
+  });
+});
+
+describe("North America 2026-11-17: a zikr that plays by itself, and ends when its videos have played", () => {
+  // Every day 22:00 in New York, 30 minutes, one 20-minute video.
+  const zikr = (raw: Awaited<ReturnType<typeof setup>>["raw"]) => raw.prepare(`INSERT INTO group_zikr_sessions(id,group_id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,is_active,updated_at,autoplay_json)
+      VALUES('nightly','usa','Halqah Zikr','[1,2,3,4,5,6,7]',22,0,'America/New_York',NULL,30,1,datetime('now'),?)`)
+    .run(JSON.stringify([{ kind: "video", id: "7ZH3CyJI0SY", title: "Online Zikr", durationSeconds: 1200 }]));
+  const live = (raw: Awaited<ReturnType<typeof setup>>["raw"]) =>
+    raw.prepare("SELECT state,session_id,started_by,is_test FROM group_live WHERE group_id='usa'").get() as { state: string; session_id: string | null; started_by: string; is_test: number } | undefined;
+  const testSession = (raw: Awaited<ReturnType<typeof setup>>["raw"]) => raw.prepare(`INSERT INTO group_live(group_id,state,kind,title,started_at,started_by,updated_at,session_id,queue_json,is_test)
+      VALUES('usa','live','zikr','Test','2026-11-18T02:30:00.000Z','admin',datetime('now'),'session-test','[]',1)`).run();
+
+  it("starts once the test still live at 22:00 has ended, while the Zikr's time lasts", async () => {
+    const { env, raw } = await setup();
+    zikr(raw); testSession(raw);
+    await autoplayDue(env, new Date("2026-11-18T03:00:00Z")); // 22:00: a test is live
+    expect(live(raw)?.session_id).toBe("session-test");
+    raw.prepare("UPDATE group_live SET state='offline',session_id=NULL,is_test=0 WHERE group_id='usa'").run();
+    raw.prepare(`INSERT INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
+      VALUES('session-test','usa','zikr','Test','2026-11-18T02:30:00.000Z','admin','2026-11-18T03:04:00.000Z','admin',0,1)`).run();
+    await autoplayDue(env, new Date("2026-11-18T03:05:00Z")); // 22:05: the test ended at 22:04
+    expect(live(raw)).toMatchObject({ state: "live", started_by: "schedule" });
+  });
+
+  it("never after the Zikr's time, never twice a day, never once an admin has held that day's Zikr", async () => {
+    const { env, raw } = await setup();
+    zikr(raw);
+    await autoplayDue(env, new Date("2026-11-18T03:31:00Z")); // 22:31: past its 30 minutes
+    expect(live(raw)?.state ?? "offline").toBe("offline");
+    raw.prepare(`INSERT INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
+      VALUES('held','usa','zikr','Halqah Zikr','2026-11-19T03:00:30.000Z','admin','2026-11-19T03:10:00.000Z','admin',3,0)`).run();
+    await autoplayDue(env, new Date("2026-11-19T03:12:00Z")); // the next day, after the admin's own Zikr
+    expect(live(raw)?.state ?? "offline").toBe("offline");
+    await autoplayDue(env, new Date("2026-11-20T03:01:00Z")); // the day after: starts
+    expect(live(raw)?.state).toBe("live");
+    raw.prepare("UPDATE group_live SET state='offline',session_id=NULL WHERE group_id='usa'").run();
+    await autoplayDue(env, new Date("2026-11-20T03:20:00Z")); // ended early by an admin: not again that day
+    expect(live(raw)?.state).toBe("offline");
+  });
+
+  it("ends a session once its last video has played, never a paused one, one with a room or one of unknown length", async () => {
+    const { env, raw } = await setup();
+    zikr(raw);
+    await autoplayDue(env, new Date("2026-11-18T03:00:00Z"));
+    const row = raw.prepare("SELECT position_at FROM group_live WHERE group_id='usa'").get() as { position_at: string };
+    const startedAt = Date.parse(row.position_at);
+    await endFinishedPlayback(env, new Date(startedAt + 1_200_000 + 10_000)); // ten seconds after the end: grace
+    expect(live(raw)?.state).toBe("live");
+    raw.prepare("UPDATE group_live SET paused=1 WHERE group_id='usa'").run();
+    await endFinishedPlayback(env, new Date(startedAt + 1_300_000));
+    expect(live(raw)?.state).toBe("live");
+    raw.prepare("UPDATE group_live SET paused=0,room_id='room-1' WHERE group_id='usa'").run();
+    await endFinishedPlayback(env, new Date(startedAt + 1_300_000));
+    expect(live(raw)?.state).toBe("live");
+    raw.prepare("UPDATE group_live SET room_id=NULL,queue_json=? WHERE group_id='usa'").run(JSON.stringify([{ kind: "video", id: "7ZH3CyJI0SY", title: "Online Zikr" }]));
+    await endFinishedPlayback(env, new Date(startedAt + 1_300_000));
+    expect(live(raw)?.state).toBe("live");
+    raw.prepare("UPDATE group_live SET queue_json=? WHERE group_id='usa'").run(JSON.stringify([{ kind: "video", id: "7ZH3CyJI0SY", title: "Online Zikr", durationSeconds: 1200 }]));
+    await endFinishedPlayback(env, new Date(startedAt + 1_300_000));
+    expect(live(raw)?.state).toBe("offline");
+    expect(raw.prepare("SELECT ended_by FROM group_live_history WHERE group_id='usa'").get()).toEqual({ ended_by: "playback-finished" });
   });
 });

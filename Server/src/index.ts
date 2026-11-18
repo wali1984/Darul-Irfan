@@ -35,7 +35,7 @@ import { nearbyMasjids } from "./nearbyMasjids";
 import { addPerson, groupPeople, removePerson, revokeInvitation, setPersonRole } from "./groupAdmin";
 import { listenerHeartbeat, reconcileLive, streamEvent } from "./live";
 import { deleteRecording, listRecordings, uploadRecording } from "./recordings";
-import { autoplayDue, checkIn, controlSession, deleteSessionRecord, duaRequests, markDuaRead, removeDua, requestDua, sessionHistory, SessionConflictError } from "./session";
+import { autoplayDue, checkIn, endFinishedPlayback, controlSession, deleteSessionRecord, duaRequests, markDuaRead, removeDua, requestDua, sessionHistory, SessionConflictError } from "./session";
 import { collectRoomRecordings } from "./roomRecordings";
 import { createHalqah, memberDirectory, publicHalqahs, retireHalqah, updateHalqah } from "./halqahs";
 import { dailyMediaFor, deleteDailyMedia, manageDailyMedia, updateDailyMedia, uploadDailyMedia } from "./dailyMedia";
@@ -520,9 +520,10 @@ export default {
             if (failed && failed.status === "rejected") throw failed.reason;
           }) },
     ];
+    // Every minute: a group's zikr that plays by itself at its time starts, and a
+    // session whose recordings or videos have all played ends (owner 2026-11-17).
+    jobs.push({ name: "group-autoplay", run: autoplayDue(env) }, { name: "playback-end", run: endFinishedPlayback(env) });
     if (minute % 5 === 0) jobs.push(
-      // Starts a group's zikr that plays a recording by itself at its time.
-      { name: "group-autoplay", run: autoplayDue(env) },
       // Copies finished room recordings into our storage and the group's recordings.
       { name: "room-recordings", run: collectRoomRecordings(env) },
     );

@@ -532,6 +532,22 @@ export async function deleteSessionRecord(env: Env, memberID: string, groupID: s
 
 // MARK: - Playing by itself at the zikr time
 
+/** Ends each session that plays recordings or YouTube videos once the last of
+ *  them has played (owner 2026-11-17), whoever started it. Never a session with
+ *  a room or a live stream, never one paused, never one with an item of unknown
+ *  length; half a minute's grace after the end. Runs every minute. */
+export async function endFinishedPlayback(env: Env, now = new Date()): Promise<void> {
+  const rows = await env.DB.prepare(`SELECT group_id,session_id,queue_json,queue_index,position_seconds,position_at,paused FROM group_live
+    WHERE state='live' AND session_id IS NOT NULL AND room_id IS NULL AND video_id IS NULL AND queue_json IS NOT NULL AND queue_json!='[]'`)
+    .all<{ group_id: string; session_id: string; queue_json: string; queue_index: number; position_seconds: number; position_at: string | null; paused: number }>();
+  for (const row of rows.results ?? []) {
+    const queue = queueOf(row);
+    if (!queue.length || row.paused || !row.position_at || queue.some(item => !item.durationSeconds)) continue;
+    const at = playbackAt(queue, row.queue_index, row.position_seconds, row.position_at, false, new Date(now.getTime() - 30_000));
+    if (at.finished) await endSession(env, row.group_id, "playback-finished", { sessionID: row.session_id });
+  }
+}
+
 /** Weekday (1 = Sunday) and minutes past midnight at `now` in `zone`. */
 export function localClock(now: Date, zone: string): { weekday: number; minutes: number } {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: zone, weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
@@ -542,13 +558,18 @@ export function localClock(now: Date, zone: string): { weekday: number; minutes:
 }
 
 /** Starts each clock-time zikr that has something to play, when its time
- *  comes and no admin has started a session. Runs every five minutes. */
+ *  comes and no admin has started a session. Runs every minute. It may start
+ *  at any moment of the Zikr's own time (start to start + duration), so a
+ *  session still live at the start (a test, a meeting) only delays it; it
+ *  starts once per day, and never after an admin has already held that day's
+ *  Zikr (owner 2026-11-17: it had one five-minute chance, missed whenever
+ *  anything was live then). */
 export async function autoplayDue(env: Env, now = new Date()): Promise<void> {
   const rows = await env.DB.prepare(`SELECT s.id,s.group_id,s.title,s.weekdays_json,s.start_hour,s.start_minute,s.time_zone,s.autoplay_json,
-      s.last_autoplay_at,l.state FROM group_zikr_sessions s LEFT JOIN group_live l ON l.group_id=s.group_id
+      s.duration_minutes,s.last_autoplay_at,l.state FROM group_zikr_sessions s LEFT JOIN group_live l ON l.group_id=s.group_id
     WHERE s.is_active=1 AND s.anchor IS NULL AND s.autoplay_json IS NOT NULL`).all<{
       id: string; group_id: string; title: string; weekdays_json: string; start_hour: number; start_minute: number;
-      time_zone: string; autoplay_json: string; last_autoplay_at: string | null; state: string | null;
+      time_zone: string; autoplay_json: string; duration_minutes: number | null; last_autoplay_at: string | null; state: string | null;
     }>();
   for (const row of rows.results ?? []) {
     if (row.state === "live") continue;
@@ -560,8 +581,13 @@ export async function autoplayDue(env: Env, now = new Date()): Promise<void> {
     const late = (clock.minutes - start + 1_440) % 1_440;
     const day = clock.minutes < start ? (clock.weekday + 5) % 7 + 1 : clock.weekday;
     const weekdays = JSON.parse(row.weekdays_json) as number[];
-    if (!weekdays.includes(day) || late >= 5) continue;
-    if (row.last_autoplay_at && now.getTime() - Date.parse(row.last_autoplay_at) < 3_600_000) continue;
+    if (!weekdays.includes(day) || late >= Math.max(5, row.duration_minutes ?? 30)) continue;
+    // This day's Zikr began `late` minutes ago (to the minute): started by itself already, or held by an admin.
+    const began = new Date(now.getTime() - late * 60_000 - now.getUTCSeconds() * 1000 - now.getUTCMilliseconds() - 60_000).toISOString();
+    if (row.last_autoplay_at && row.last_autoplay_at >= began) continue;
+    const held = await env.DB.prepare("SELECT 1 AS n FROM group_live_history WHERE group_id=? AND is_test=0 AND started_at>=? LIMIT 1")
+      .bind(row.group_id, began).first();
+    if (held) continue;
     const queue = queueOf({ queue_json: row.autoplay_json });
     if (!queue.length) continue;
     // Only while nothing is live: a session that started since the read above
