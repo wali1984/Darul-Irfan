@@ -143,6 +143,15 @@ struct GroupDetailView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(colorScheme, for: .navigationBar)
         .task { await load() }
+        // The phone stays on while this Halqah's session is live, for admins
+        // and members alike (owner 2026-11-18): a sleeping phone stopped the
+        // video and dropped the member from the session.
+        .keepsScreenAwake("halqah-page:" + group.id, while: detail?.live != nil)
+        // Back in the app: the session at once, so the players rejoin the
+        // group's place instead of waiting for the next quarter minute.
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active, detail?.live != nil { Task { await refreshQuietly() } }
+        }
         // Not while the app is in the background with other audio playing:
         // that was a request every 15 seconds for nothing.
         .task(id: Following(sessionID: detail?.live?.sessionID, running: scenePhase == .active || listeningHere)) {
@@ -205,7 +214,8 @@ struct GroupDetailView: View {
         } message: { Text(verbatim: actionFailure ?? "") }
         .fullScreenCover(isPresented: $stageOpen, onDismiss: { stageListens = false }) {
             ZikrStageView(groupID: group.id, groupName: group.name, service: service,
-                          listenOnOpen: stageListens && HalqahStage.isOurSheikh(group.id))
+                          listenOnOpen: stageListens && HalqahStage.isOurSheikh(group.id),
+                          session: detail?.live, audioPlayer: dependencies?.audioPlayer)
         }
         // Going live, or opening a Halqah while its Zikr is live, opens the
         // stage once per session; closing it leaves the page and its card.
@@ -327,7 +337,8 @@ struct GroupDetailView: View {
                 meetingsReady: meetingsReady, audioPlayer: dependencies?.audioPlayer,
                 joining: joining, joinError: joinError,
                 onJoinRoom: { Task { await join(meetingID: nil) } },
-                onChange: { await refreshQuietly() }
+                onChange: { await refreshQuietly() },
+                showsMedia: !stageOpen
             )
         }
     }
@@ -340,7 +351,10 @@ struct GroupDetailView: View {
         var tick = 0
         while !Task.isCancelled {
             if tick % 4 == 0 { await service.checkIn(in: group.id) }
-            try? await Task.sleep(for: .seconds(15))
+            // Every 5 s while the stage shows the session's video or recording, so
+            // an admin's pause or move reaches it as quickly as the stage itself.
+            let media = stageOpen && GroupSessionMedia.shows(detail?.live, groupID: group.id)
+            try? await Task.sleep(for: .seconds(media ? 5 : 15))
             if Task.isCancelled { break }
             await refreshQuietly()
             tick += 1

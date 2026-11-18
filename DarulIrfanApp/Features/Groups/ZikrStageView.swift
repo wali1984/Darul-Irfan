@@ -433,8 +433,16 @@ struct ZikrStageView: View {
     @Environment(\.horizontalSizeClass) private var widthClass
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(groupID: String, groupName: String, service: MemberGroupService, listenOnOpen: Bool = false) {
+    /// The Halqah's live session as its page follows it: the video or
+    /// recording it plays shows on the stage (owner 2026-11-18).
+    let session: GroupLive?
+    let audioPlayer: (any AudioPlayerServicing)?
+
+    init(groupID: String, groupName: String, service: MemberGroupService, listenOnOpen: Bool = false,
+         session: GroupLive? = nil, audioPlayer: (any AudioPlayerServicing)? = nil) {
         self.groupName = groupName
+        self.session = session
+        self.audioPlayer = audioPlayer
         _model = State(initialValue: ZikrStageModel(groupID: groupID, service: service))
         _listenWanted = State(initialValue: listenOnOpen && HalqahStage.isOurSheikh(groupID))
     }
@@ -513,11 +521,12 @@ struct ZikrStageView: View {
                 stopListening()
             }
         }
-        .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
+        // The phone stays on while the stage is open (with the page's own hold
+        // while the session is live, so closing the stage never lets it sleep).
+        .keepsScreenAwake("halqah-stage:" + model.groupID)
         .onDisappear {
             model.stopVoice()
             stopListening()
-            UIApplication.shared.isIdleTimerDisabled = false
         }
         .sheet(isPresented: $addingMuraqaba) { StageMuraqabaEditor(model: model) }
         .fullScreenCover(item: $liveAudio, onDismiss: { liveAudioToken = "" }) { mode in
@@ -550,7 +559,16 @@ struct ZikrStageView: View {
     private var stagePanel: some View {
         VStack(spacing: DISpacing.lg) {
             header
-            portrait
+            if let session, GroupSessionMedia.shows(session, groupID: model.groupID) {
+                // The session's video or recording in the picture's place.
+                GroupSessionMedia(live: session, groupName: groupName, audioPlayer: audioPlayer)
+                    .padding(DISpacing.sm)
+                    .frame(maxWidth: 640)
+                    .diGlassPanel(cornerRadius: 22)
+                    .accessibilityIdentifier("stage-session-media")
+            } else {
+                portrait
+            }
             nowShowing
             if ourSheikh && !presenting && (model.live != nil || model.canModerate) { liveAudioControls }
             if model.canLead && !presenting { leadControls }

@@ -92,7 +92,10 @@ struct YouTubeWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.allowsInlineMediaPlayback = true
-        configuration.mediaTypesRequiringUserActionForPlayback = .all
+        // A group's video starts by itself at the group's place (owner
+        // 2026-11-18: members saw a player that did not play); any other video
+        // waits for a tap.
+        configuration.mediaTypesRequiringUserActionForPlayback = sync == nil ? .all : []
         configuration.websiteDataStore = .nonPersistent()
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
@@ -126,7 +129,7 @@ struct YouTubeWebView: UIViewRepresentable {
             html = """
             <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
             <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#000;overflow:hidden}</style></head>
-            <body><iframe id="player" title="YouTube player" src="https://www.youtube-nocookie.com/embed/\(safeID)?playsinline=1&rel=0&enablejsapi=1&start=\(start)&origin=https://www.youtube-nocookie.com" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <body><iframe id="player" title="YouTube player" src="https://www.youtube-nocookie.com/embed/\(safeID)?playsinline=1&rel=0&enablejsapi=1&autoplay=\(sync.paused ? 0 : 1)&start=\(start)&origin=https://www.youtube-nocookie.com" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
             <script>
             var player = null, ready = false, joined = false;
             var group = { pos: \(sync.position), paused: \(sync.paused), at: \(sync.at.timeIntervalSince1970) };
@@ -143,9 +146,15 @@ struct YouTubeWebView: UIViewRepresentable {
               follow();
               if (wasPaused && !paused && joined && ready) { player.seekTo(place(), true); player.playVideo(); }
             };
+            // Back from the lock screen or another app: on again, at the group's place.
+            document.addEventListener("visibilitychange", function () {
+              if (document.hidden || !ready || group.paused) return;
+              var state = player.getPlayerState();
+              if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING && state !== YT.PlayerState.ENDED) { player.seekTo(place(), true); player.playVideo(); }
+            });
             function onYouTubeIframeAPIReady() {
               player = new YT.Player("player", { events: {
-                onReady: function () { ready = true; },
+                onReady: function () { ready = true; if (!group.paused) { player.seekTo(place(), true); player.playVideo(); } },
                 onStateChange: function (e) {
                   if (e.data !== YT.PlayerState.PLAYING) return;
                   joined = true;

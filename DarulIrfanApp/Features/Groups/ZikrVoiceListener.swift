@@ -48,7 +48,6 @@ final class ZikrVoiceListener {
     /// A phone call or Siri has the microphone; resumed when it ends.
     private var interrupted = false
     /// The screen-lock setting before listening began, put back on stop.
-    private var idleTimerBefore: Bool?
     /// Whether a heard stage becomes the stage, and the recent words it reads.
     private var rules = ZikrStageRules()
     private var heardWords = ZikrRecentWords()
@@ -217,13 +216,7 @@ final class ZikrVoiceListener {
     }
 
     private func keepScreenAwake(_ awake: Bool) {
-        if awake {
-            if idleTimerBefore == nil { idleTimerBefore = UIApplication.shared.isIdleTimerDisabled }
-            UIApplication.shared.isIdleTimerDisabled = true
-        } else if let before = idleTimerBefore {
-            UIApplication.shared.isIdleTimerDisabled = before
-            idleTimerBefore = nil
-        }
+        ScreenAwake.set("zikr-voice", awake: awake)
     }
 
     // MARK: Recognition

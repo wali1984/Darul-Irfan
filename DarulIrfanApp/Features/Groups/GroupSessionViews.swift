@@ -33,6 +33,9 @@ struct GroupSessionCard: View {
     let onJoinRoom: () -> Void
     /// Reloads the page after a change.
     let onChange: () async -> Void
+    /// False while the stage is open over the page: the stage shows the video
+    /// or recording then, and one player at a time plays it.
+    var showsMedia = true
 
     private enum Sheet: String, Identifiable {
         case notice, dua, listeners, add
@@ -60,7 +63,7 @@ struct GroupSessionCard: View {
                 .background(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous).fill(DIColor.primary.opacity(0.1)))
                 .accessibilityElement(children: .combine)
             }
-            if let video = live.videoID {
+            if showsMedia, let video = live.videoID {
                 YouTubePlayerView(videoID: video)
                     .frame(height: 210)
                     .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
@@ -182,7 +185,7 @@ struct GroupSessionCard: View {
                  : "The recording has finished. The session stays open until the admin closes it.")
                 .diInterfaceFont(.subheadline)
                 .foregroundStyle(DIColor.textMuted)
-        } else if let item = live.currentItem {
+        } else if showsMedia, let item = live.currentItem {
             Text("A recording is playing to the group. It plays from where the group is now, so everyone hears the same part.")
                 .diInterfaceFont(.caption)
                 .foregroundStyle(DIColor.textMuted)
@@ -370,6 +373,37 @@ struct GroupSessionCard: View {
 /// admin's pauses and moves. Audio plays in the app's player, so it carries on
 /// from the lock screen and other pages.
 @MainActor
+/// The video or recording a Halqah's session is playing, for its stage
+/// (owner 2026-11-18: the stage opened over the page and nothing played): the
+/// session's YouTube video, or the recording the group is at with the same
+/// player as on the page. Nothing for Our Sheikh, whose stage has its live sound.
+struct GroupSessionMedia: View {
+    let live: GroupLive
+    let groupName: String
+    let audioPlayer: (any AudioPlayerServicing)?
+
+    /// Whether the session has something to show on the stage.
+    static func shows(_ live: GroupLive?, groupID: String) -> Bool {
+        guard let live, !HalqahStage.isOurSheikh(groupID) else { return false }
+        if live.videoID != nil { return true }
+        guard live.isRecorded, let playback = live.playback, !playback.finished else { return false }
+        return live.currentItem != nil
+    }
+
+    var body: some View {
+        if let video = live.videoID {
+            YouTubePlayerView(videoID: video)
+                .aspectRatio(16 / 9, contentMode: .fit)
+                .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
+        } else if let playback = live.playback, let item = live.currentItem {
+            GroupSessionPlayer(
+                item: item, upNext: Array((live.queue ?? []).dropFirst(playback.index + 1)),
+                playback: playback, groupName: groupName, audioPlayer: audioPlayer
+            )
+        }
+    }
+}
+
 struct GroupSessionPlayer: View {
     let item: GroupQueueItem
     /// What the group plays after this item, in order.
@@ -416,7 +450,8 @@ struct GroupSessionPlayer: View {
                     videoID: item.videoID ?? item.id,
                     sync: YouTubeSync(position: playback.positionSeconds, paused: playback.paused, at: playback.at)
                 )
-                .frame(height: 210)
+                .aspectRatio(16 / 9, contentMode: .fit)
+                .frame(maxHeight: 360)
                 .clipShape(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous))
             } else {
                 if scenePhase == .active, let videoPlayer {

@@ -114,7 +114,6 @@ struct LiveAudioView: View {
     @State private var previousCategory: AVAudioSession.Category?
     @State private var previousMode: AVAudioSession.Mode?
     @State private var previousOptions: AVAudioSession.CategoryOptions = []
-    @State private var previousIdleTimerDisabled = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -154,8 +153,7 @@ struct LiveAudioView: View {
     /// The Zikr plays even with the ring switch on silent; broadcasting also
     /// records. The app's own setting comes back when this closes.
     private func claimAudio() {
-        previousIdleTimerDisabled = UIApplication.shared.isIdleTimerDisabled
-        UIApplication.shared.isIdleTimerDisabled = true
+        ScreenAwake.hold("live-audio")
         let audio = AVAudioSession.sharedInstance()
         previousCategory = audio.category
         previousMode = audio.mode
@@ -169,7 +167,7 @@ struct LiveAudioView: View {
     }
 
     private func releaseAudio() {
-        UIApplication.shared.isIdleTimerDisabled = previousIdleTimerDisabled
+        ScreenAwake.release("live-audio")
         let audio = AVAudioSession.sharedInstance()
         try? audio.setActive(false, options: .notifyOthersOnDeactivation)
         if let previousCategory {
