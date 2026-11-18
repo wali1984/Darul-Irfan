@@ -114,3 +114,34 @@ describe("joining a live Zikr from the websites", () => {
     expect(raw.prepare("SELECT state,is_test FROM group_live WHERE group_id='usa'").get()).toEqual({ state: "live", is_test: 1 });
   });
 });
+
+describe("north-america.: Zikr times and who is in the Zikr (owner 2026-11-17)", () => {
+  it("gives a Halqah's Zikr times only when asked", async () => {
+    const { get, raw } = setup();
+    raw.prepare(`INSERT INTO group_zikr_sessions(id,group_id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,is_active,updated_at)
+      VALUES('z1','usa','Halqah Zikr','[1,2,3,4,5,6,7]',19,0,'America/Los_Angeles',NULL,30,1,'now'),
+            ('z2','usa','Old Zikr','[1]',5,0,'America/New_York',NULL,30,0,'now')`).run();
+    const plain = await (await get("/v1/public/live?ids=usa")).json() as any;
+    expect(plain.halqahs[0].times).toBeUndefined();
+    const timed = await (await get("/v1/public/live?ids=usa&times=1")).json() as any;
+    expect(timed.halqahs[0].times).toEqual([{ title: "Halqah Zikr", weekdays: [1, 2, 3, 4, 5, 6, 7], hour: 19, minute: 0,
+      timeZone: "America/Los_Angeles", durationMinutes: 30 }]);
+  });
+
+  it("names website visitors and the admin who started it, counts app members, never a city", async () => {
+    const { post, raw } = setup();
+    const admin = "0123456789abcdef0123456789abcdef";
+    raw.prepare("INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at) VALUES(?,?,?,NULL,'now','now')").run(admin, "apple-admin", "Halqah Admin");
+    raw.prepare("INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at) VALUES('app1','apple-1','App Member',NULL,'now','now')").run();
+    raw.prepare("UPDATE group_live SET started_by=? WHERE group_id='usa'").run(admin);
+    const now = new Date().toISOString();
+    raw.prepare("INSERT INTO group_live_presence(session_id,group_id,member_id,first_seen_at,last_seen_at) VALUES('session-1','usa','app1',?,?)").run(now, now);
+    await post("/v1/public/halqahs/usa/join", { name: "Fatima", city: "Boston", countryCode: "US", guestSecret: "b".repeat(64) });
+    const plain = await (await post("/v1/public/halqahs/usa/join", { name: "Omar", city: "Toronto", countryCode: "CA", guestSecret: SECRET })).json() as any;
+    expect(plain.participants).toBeUndefined();
+    const body = await (await post("/v1/public/halqahs/usa/presence", { guestSecret: SECRET, participants: true })).json() as any;
+    expect(body.participants).toEqual({ people: [{ name: "Halqah Admin", admin: true }, { name: "Fatima" }, { name: "Omar", you: true }], inApp: 1, total: 4 });
+    const text = JSON.stringify(body);
+    for (const hidden of ["App Member", "Boston", "Toronto", admin]) expect(text).not.toContain(hidden);
+  });
+});
