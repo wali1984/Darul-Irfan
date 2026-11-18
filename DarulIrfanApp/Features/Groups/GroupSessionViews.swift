@@ -63,6 +63,12 @@ struct GroupSessionCard: View {
                 .background(RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous).fill(DIColor.primary.opacity(0.1)))
                 .accessibilityElement(children: .combine)
             }
+            if !showsMedia, live.videoID != nil || (live.isRecorded && live.playback?.finished == false && live.currentItem != nil) {
+                // The stage over the page plays it (Android's caption too).
+                Label("Playing on the stage.", systemImage: "play.rectangle")
+                    .diInterfaceFont(.caption)
+                    .foregroundStyle(DIColor.textMuted)
+            }
             if showsMedia, let video = live.videoID {
                 YouTubePlayerView(videoID: video)
                     .frame(height: 210)

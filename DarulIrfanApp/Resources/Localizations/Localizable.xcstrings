@@ -18,6 +18,23 @@
         }
       }
     },
+    "Playing on the stage.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playing on the stage."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیج پر چل رہا ہے۔"
+          }
+        }
+      }
+    },
     "Zikr will start soon": {
       "extractionState": "manual",
       "localizations": {

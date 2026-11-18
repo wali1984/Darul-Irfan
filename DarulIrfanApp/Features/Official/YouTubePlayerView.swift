@@ -144,7 +144,7 @@ struct YouTubeWebView: UIViewRepresentable {
               var wasPaused = group.paused;
               group = { pos: pos, paused: paused, at: at };
               follow();
-              if (wasPaused && !paused && joined && ready) { player.seekTo(place(), true); player.playVideo(); }
+              if (wasPaused && !paused && ready) { player.seekTo(place(), true); player.playVideo(); }
             };
             // Back from the lock screen or another app: on again, at the group's place.
             document.addEventListener("visibilitychange", function () {
