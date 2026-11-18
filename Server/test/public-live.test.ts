@@ -145,3 +145,22 @@ describe("north-america.: Zikr times and who is in the Zikr (owner 2026-11-17)",
     for (const hidden of ["App Member", "Boston", "Toronto", admin]) expect(text).not.toContain(hidden);
   });
 });
+
+describe("north-america.: the YouTube video a Halqah plays (owner 2026-11-17)", () => {
+  it("gives the video and where it is only when asked, never an audio recording", async () => {
+    const { get, raw } = setup();
+    const startedAt = new Date(Date.now() - 125_000).toISOString();
+    raw.prepare("UPDATE group_live SET queue_json=?,queue_index=0,position_seconds=0,position_at=?,paused=0 WHERE group_id='usa'")
+      .run(JSON.stringify([{ kind: "video", id: "yuQSH_D2iMo", title: "Online Zikr", durationSeconds: 2695 }]), startedAt);
+    const plain = await (await get("/v1/public/live?ids=usa")).json() as any;
+    expect(plain.halqahs[0].playing).toBeUndefined();
+    const body = await (await get("/v1/public/live?ids=usa&playback=1")).json() as any;
+    expect(body.halqahs[0].playing).toMatchObject({ videoID: "yuQSH_D2iMo", title: "Online Zikr", paused: false });
+    expect(body.halqahs[0].playing.positionSeconds).toBeGreaterThanOrEqual(124);
+    expect(body.halqahs[0].playing.positionSeconds).toBeLessThan(140);
+    raw.prepare("UPDATE group_live SET queue_json=? WHERE group_id='usa'")
+      .run(JSON.stringify([{ kind: "recording", id: "rec-1", title: "Audio", durationSeconds: 900 }]));
+    expect(((await (await get("/v1/public/live?ids=usa&playback=1")).json()) as any).halqahs[0].playing).toBeNull();
+    expect(((await (await get("/v1/public/live?ids=canada&playback=1")).json()) as any).halqahs.find((h: any) => h.id === "canada")?.playing ?? null).toBeNull();
+  });
+});

@@ -69,7 +69,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Two seconds: the apps' Today card polls this for the stage and its chime, and a
     // ten-second cache added up to ten seconds to every change (audit 2026-11-13).
     // The websites reach it through a service binding, which no cache sits in front of.
-    return cachedJSON(await publicLive(env, ids, url.searchParams.get("times") === "1"), request, 2);
+    return cachedJSON(await publicLive(env, ids, url.searchParams.get("times") === "1", url.searchParams.get("playback") === "1"), request, 2);
   }
   // The live relay (bearer RELAY_TOKEN): posts the stage called in Paltalk ({id: uuid, stageID}),
   // starts the Zikr ({state: "live"}) and says when the dua begins ({state: "dua"}).

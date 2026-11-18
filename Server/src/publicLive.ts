@@ -1,6 +1,6 @@
 import type { Env } from "./contracts";
 import { RECITATIONS } from "./groupZikrStages";
-import { liveRow } from "./session";
+import { liveRow, playbackAt, queueOf } from "./session";
 import { json, sha256 } from "./util";
 
 // The websites (oursheikh., namerica., uk. on wajidali.us and naqshbandiaowaisiah.us) show every
@@ -44,9 +44,30 @@ async function zikrTimes(env: Env, groupID: string) {
   });
 }
 
+type Row = NonNullable<Awaited<ReturnType<typeof liveRow>>>;
+const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
+
+/** The YouTube video a Halqah's session is playing and where it is now, for
+ *  north-america. only (owner 2026-11-17: the one exception to the websites'
+ *  live-only rule; asked for with playback=1). An audio recording is never
+ *  handed out. `mark` changes whenever an admin pauses, seeks or moves on, so
+ *  the page knows to catch up. */
+function playing(row: Row, now = new Date()): Record<string, unknown> | null {
+  const queue = queueOf(row);
+  if (queue.length) {
+    const at = playbackAt(queue, row.queue_index, row.position_seconds, row.position_at, !!row.paused, now);
+    const item = queue[at.index];
+    if (!item || at.finished || item.kind !== "video" || !YOUTUBE_ID.test(item.id)) return null;
+    return { videoID: item.id, title: item.title, positionSeconds: Math.floor(at.positionSeconds), paused: at.paused,
+      at: now.toISOString(), mark: `${at.index}|${row.queue_index}|${row.position_at ?? ""}|${row.paused ? 1 : 0}` };
+  }
+  // A live YouTube stream of the Zikr, when the session has one.
+  return row.video_id && YOUTUBE_ID.test(row.video_id) ? { videoID: row.video_id, live: true, mark: `live|${row.video_id}` } : null;
+}
+
 /** GET /v1/public/live?ids=: each named active Halqah, what is live in it and its stage
- *  (and, with times=1, its Zikr times). */
-export async function publicLive(env: Env, ids: string[], withTimes = false): Promise<Record<string, unknown>> {
+ *  (and, with times=1, its Zikr times; with playback=1, the video it is playing). */
+export async function publicLive(env: Env, ids: string[], withTimes = false, withPlayback = false): Promise<Record<string, unknown>> {
   if (!ids.length) return { halqahs: [] };
   const rows = await env.DB.prepare(`SELECT id,name,description FROM member_groups WHERE is_active=1 AND id IN (${ids.map(() => "?").join(",")})`)
     .bind(...ids).all<{ id: string; name: string; description: string | null }>();
@@ -57,7 +78,8 @@ export async function publicLive(env: Env, ids: string[], withTimes = false): Pr
     if (!group) continue;
     const now = await liveOf(env, id);
     halqahs.push({ id, name: group.name, description: group.description ?? undefined, live: now?.live ?? null,
-      stage: now ? await currentStage(env, id, now.live.startedAt) : null, ...(withTimes ? { times: await zikrTimes(env, id) } : {}) });
+      stage: now ? await currentStage(env, id, now.live.startedAt) : null, ...(withTimes ? { times: await zikrTimes(env, id) } : {}),
+      ...(withPlayback ? { playing: now ? playing(now.row) : null } : {}) });
   }
   return { halqahs };
 }
