@@ -135,9 +135,11 @@ async function participants(env: Env, row: { session_id: string | null; started_
  *  no recording or past video is ever handed to a website, and a room's sound
  *  never goes through RealtimeKit, which bills per listener; the sound reaches
  *  listeners through the Silsila's Realtime SFU feed (Tools/LiveRelay). */
-async function presence(env: Env, groupID: string, memberID: string, withPeople = false): Promise<Response> {
+async function presence(env: Env, groupID: string, memberID: string, withPeople = false, wait = false): Promise<Response> {
   const now = await liveOf(env, groupID);
-  if (!now?.row.session_id) return json({ error: "This Halqah's Zikr is not live right now.", live: null }, { status: 409 });
+  if (!now?.row.session_id) {
+    return wait ? waiting(env, groupID, memberID, withPeople) : json({ error: "This Halqah's Zikr is not live right now.", live: null }, { status: 409 });
+  }
   const stamp = new Date().toISOString();
   await env.DB.prepare(`INSERT INTO group_live_presence(session_id,group_id,member_id,first_seen_at,last_seen_at) VALUES(?,?,?,?,?)
     ON CONFLICT(session_id,member_id) DO UPDATE SET last_seen_at=excluded.last_seen_at`)
@@ -145,6 +147,21 @@ async function presence(env: Env, groupID: string, memberID: string, withPeople 
   return json({ live: now.live, stage: await currentStage(env, groupID, now.live.startedAt),
     notice: now.row.notice ? { text: now.row.notice } : undefined,
     ...(withPeople ? { participants: await participants(env, now.row, memberID) } : {}) });
+}
+
+/** Waiting for the Zikr (north-america., owner 2026-11-17: "when someone joins but the Zikr is not
+ *  live, participants should show in list"): a visitor who asks to wait ({waiting: true}) is
+ *  counted in the Halqah's waiting list, a presence row under the session id waiting:<id>. It is
+ *  never a session: no history, report or attendance reads it; once the Zikr is live the page
+ *  joins the real session. */
+const waitingID = (groupID: string) => `waiting:${groupID}`;
+async function waiting(env: Env, groupID: string, memberID: string, withPeople: boolean): Promise<Response> {
+  const stamp = new Date().toISOString();
+  await env.DB.prepare(`INSERT INTO group_live_presence(session_id,group_id,member_id,first_seen_at,last_seen_at) VALUES(?,?,?,?,?)
+    ON CONFLICT(session_id,member_id) DO UPDATE SET last_seen_at=excluded.last_seen_at`)
+    .bind(waitingID(groupID), groupID, memberID, stamp, stamp).run();
+  return json({ live: null, waiting: true,
+    ...(withPeople ? { participants: await participants(env, { session_id: waitingID(groupID), started_by: null }, memberID) } : {}) });
 }
 
 /** POST /v1/public/halqahs/:id/join {name, city, countryCode, guestSecret}. */
@@ -159,8 +176,9 @@ export async function publicJoin(env: Env, groupID: string, input: Record<string
   if (memberID instanceof Response) return memberID;
   const group = await env.DB.prepare("SELECT id FROM member_groups WHERE id=? AND is_active=1").bind(groupID).first();
   if (!group) return json({ error: "Not found" }, { status: 404 });
-  // Nothing about the visitor is kept unless there is a live Zikr to join.
-  if (!await liveOf(env, groupID)) return json({ error: "This Halqah's Zikr is not live right now.", live: null }, { status: 409 });
+  // Nothing about the visitor is kept unless there is a live Zikr to join, or they asked to wait for it.
+  const wait = input.waiting === true;
+  if (!wait && !await liveOf(env, groupID)) return json({ error: "This Halqah's Zikr is not live right now.", live: null }, { status: 409 });
   const stamp = new Date().toISOString();
   await env.DB.batch([
     env.DB.prepare(`INSERT INTO members(id,apple_subject,display_name,email,created_at,last_seen_at) VALUES(?,?,?,NULL,?,?)
@@ -170,7 +188,7 @@ export async function publicJoin(env: Env, groupID: string, input: Record<string
       VALUES(?,?,?,?,NULL,?) ON CONFLICT(member_id) DO UPDATE SET display_name=excluded.display_name,city=excluded.city,
       country_code=excluded.country_code,updated_at=excluded.updated_at`).bind(memberID, name, city, country, stamp),
   ]);
-  return presence(env, groupID, memberID, input.participants === true);
+  return presence(env, groupID, memberID, input.participants === true, wait);
 }
 
 /** POST /v1/public/halqahs/:id/presence {guestSecret}: still here; the latest playback clock and stage. */
@@ -179,5 +197,5 @@ export async function publicPresence(env: Env, groupID: string, input: Record<st
   if (memberID instanceof Response) return memberID;
   const known = await env.DB.prepare("SELECT id FROM members WHERE id=? AND apple_subject=?").bind(memberID, `web-guest:${memberID}`).first();
   if (!known) return json({ error: "Join first" }, { status: 401 });
-  return presence(env, groupID, memberID, input.participants === true);
+  return presence(env, groupID, memberID, input.participants === true, input.waiting === true);
 }

@@ -164,3 +164,24 @@ describe("north-america.: the YouTube video a Halqah plays (owner 2026-11-17)", 
     expect(((await (await get("/v1/public/live?ids=canada&playback=1")).json()) as any).halqahs.find((h: any) => h.id === "canada")?.playing ?? null).toBeNull();
   });
 });
+
+describe("north-america.: waiting for the Zikr (owner 2026-11-17)", () => {
+  it("lists visitors who wait before the Zikr is live, and only when they ask to wait", async () => {
+    const { post, raw } = setup();
+    raw.prepare("UPDATE group_live SET state='offline',session_id=NULL WHERE group_id='usa'").run();
+    expect((await post("/v1/public/halqahs/usa/join", { name: "Ahmed", city: "Boston", countryCode: "US", guestSecret: SECRET })).status).toBe(409);
+    await post("/v1/public/halqahs/usa/join", { name: "Fatima", city: "Boston", countryCode: "US", guestSecret: "b".repeat(64), waiting: true });
+    const body = await (await post("/v1/public/halqahs/usa/join", { name: "Omar", city: "Toronto", countryCode: "CA", guestSecret: SECRET, waiting: true, participants: true })).json() as any;
+    expect(body).toMatchObject({ live: null, waiting: true });
+    expect(body.participants).toEqual({ people: [{ name: "Fatima" }, { name: "Omar", you: true }], inApp: 0, total: 2 });
+    const still = await (await post("/v1/public/halqahs/usa/presence", { guestSecret: SECRET, waiting: true, participants: true })).json() as any;
+    expect(still.participants.total).toBe(2);
+    expect(JSON.stringify(body)).not.toMatch(/Boston|Toronto/);
+    // Never a session: no history row, and the waiting list is not the live session's attendance.
+    expect(raw.prepare("SELECT COUNT(*) AS n FROM group_live_history").get()).toEqual({ n: 0 });
+    raw.prepare("UPDATE group_live SET state='live',session_id='session-2' WHERE group_id='usa'").run();
+    const live = await (await post("/v1/public/halqahs/usa/presence", { guestSecret: SECRET, waiting: true, participants: true })).json() as any;
+    expect(live.live).toMatchObject({ title: "Thursday Zikr" });
+    expect(live.participants.people).toEqual([{ name: "Omar", you: true }]);
+  });
+});
