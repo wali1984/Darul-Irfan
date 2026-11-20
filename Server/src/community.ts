@@ -159,7 +159,7 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
   const [group, live, zikr, meetings, people] = await Promise.all([
-    env.DB.prepare("SELECT id,name,description,video_clips FROM member_groups WHERE id=?").bind(groupID).first(),
+    env.DB.prepare("SELECT id,name,description,video_clips,simple_page FROM member_groups WHERE id=?").bind(groupID).first(),
     liveRow(env, groupID),
     env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,autoplay_json
       FROM group_zikr_sessions WHERE group_id=? AND is_active=1 ORDER BY start_hour,start_minute`).bind(groupID).all(),
@@ -177,7 +177,10 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
   return json({
     group: { id: group?.id, name: group?.name, description: group?.description ?? undefined,
       // Admins of this Halqah may play part of a YouTube video (a start and an end time).
-      videoClips: group?.video_clips ? true : undefined },
+      videoClips: group?.video_clips ? true : undefined,
+      // The page shows only its zikr times and the session's video on the
+      // page (no stage); admins get only People and Add a zikr time.
+      simplePage: group?.simple_page ? true : undefined },
     canManage: managing,
     memberCount: people?.n ?? 0,
     live: isLive && live ? {
