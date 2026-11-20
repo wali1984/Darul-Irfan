@@ -97,7 +97,7 @@ struct VideoClipSection: View {
             if let problem = VideoClipTimes.problem(start: start, end: end) {
                 let message: LocalizedStringKey = problem == .endNotAfterStart
                     ? "End must be after the start."
-                    : "Enter a time such as 3:41 or 1:02:03."
+                    : "Enter a time such as 3:41."
                 Text(message).foregroundStyle(DIColor.danger)
                     .accessibilityIdentifier("clip-error")
             } else {
@@ -553,7 +553,8 @@ struct GroupLiveStarter: View {
         } message: { recording in
             Text(verbatim: recording.title + "\n\n" + String(localized: "This removes the recording from the group's library. This cannot be undone."))
         }
-        .alert(addingToSession ? "Add to the session" : "Go live", isPresented: Binding(
+        // A simple page's errors carry its own heading (its start title).
+        .alert(heading, isPresented: Binding(
             get: { error != nil },
             set: { if !$0 { error = nil } }
         )) {
@@ -611,7 +612,11 @@ struct GroupLiveStarter: View {
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
         } footer: {
-            Text("A live link is watched live. A past zikr plays to everyone together, from one place you control: pause, move back or forward, or go to the next for the whole group.")
+            if form.isSimple {
+                Text("The video plays to everyone together, from Start at to End at.")
+            } else {
+                Text("A live link is watched live. A past zikr plays to everyone together, from one place you control: pause, move back or forward, or go to the next for the whole group.")
+            }
         }
         if videoClips {
             VideoClipSection(start: $clipStart, end: $clipEnd)
@@ -1124,7 +1129,7 @@ struct GroupZikrEditor: View {
                         if !videoLink.isEmpty && VideoLink.id(from: videoLink) == nil {
                             Text("That video link was not recognised.").foregroundStyle(DIColor.danger)
                         } else {
-                            Text("A link pasted here plays instead of a choice from the library.").foregroundStyle(DIColor.textMuted)
+                            Text("A YouTube link plays instead of a choice from the library.").foregroundStyle(DIColor.textMuted)
                         }
                     }
                     VideoClipSection(start: $clipStart, end: $clipEnd)

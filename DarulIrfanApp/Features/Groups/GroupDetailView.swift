@@ -645,7 +645,7 @@ struct GroupDetailView: View {
         .buttonStyle(HalqahTileButtonStyle())
         .accessibilityLabel(start.heading.map { Text(verbatim: $0) } ?? Text("Go live"))
         .accessibilityValue(goLiveLine)
-        .accessibilityHint(Text("Starts a zikr or meeting for the whole Halqah."))
+        .accessibilityHint(Text("Starts the Zikr for the whole Halqah."))
         .accessibilityIdentifier("halqah-simple-start")
     }
 

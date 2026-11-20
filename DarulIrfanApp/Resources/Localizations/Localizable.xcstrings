@@ -39965,23 +39965,6 @@
         }
       }
     },
-    "Enter a time such as 3:41 or 1:02:03.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter a time such as 3:41 or 1:02:03."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "وقت اس طرح لکھیں: 3:41 یا 1:02:03۔"
-          }
-        }
-      }
-    },
     "Optional: play only part of the video, for example from 3:41 to 44:02.": {
       "extractionState": "manual",
       "localizations": {
@@ -40012,23 +39995,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "یوٹیوب لنک"
-          }
-        }
-      }
-    },
-    "A link pasted here plays instead of a choice from the library.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A link pasted here plays instead of a choice from the library."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "یہاں دیا گیا لنک لائبریری سے چنی گئی چیز کی جگہ چلے گا۔"
           }
         }
       }
@@ -40182,6 +40148,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "اگلا دن"
+          }
+        }
+      }
+    },
+    "The video plays to everyone together, from Start at to End at.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The video plays to everyone together, from Start at to End at."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو سب کے لیے ایک ساتھ، آغاز کے وقت سے اختتام کے وقت تک چلتی ہے۔"
+          }
+        }
+      }
+    },
+    "Enter a time such as 3:41.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a time such as 3:41."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وقت اس طرح لکھیں: 3:41۔"
+          }
+        }
+      }
+    },
+    "A YouTube link plays instead of a choice from the library.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A YouTube link plays instead of a choice from the library."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یوٹیوب لنک لائبریری سے چنی گئی چیز کی جگہ چلتا ہے۔"
+          }
+        }
+      }
+    },
+    "Starts the Zikr for the whole Halqah.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starts the Zikr for the whole Halqah."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پورے حلقہ کے لیے ذکر شروع کرتا ہے۔"
           }
         }
       }
