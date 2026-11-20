@@ -146,6 +146,8 @@ export interface Env {
   /** Audience of an Apple identity token: the app's bundle id. Falls back to
    *  APNS_TOPIC, which is the same value. */
   APPLE_CLIENT_ID?: string;
+  /** Services IDs of the websites' Sign in with Apple, comma-separated. */
+  APPLE_WEB_CLIENT_IDS?: string;
   /** Pictures forwarded to the WhatsApp Business number. */
   MEDIA?: R2Bucket;
   /** Graph API token of the WhatsApp Business account, to fetch pictures. */
