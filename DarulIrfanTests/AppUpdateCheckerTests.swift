@@ -1,7 +1,7 @@
 import XCTest
 @testable import DarulIrfan
 
-/// Today's update banner offers a newer build than the one running: by build
+/// The update banner offers a newer build than the one running: by build
 /// number in TestFlight, by version in the App Store. Closed, it stays away
 /// only until the app is opened again.
 final class AppUpdateCheckerTests: XCTestCase {
@@ -73,5 +73,50 @@ final class AppUpdateCheckerTests: XCTestCase {
         let checker = AppUpdateChecker(check: { nil })
         await checker.refresh()
         XCTAssertNil(checker.banner)
+    }
+
+    // MARK: - In real time (owner 2026-11-19)
+
+    /// Coming to the front checks when the last check is two minutes old;
+    /// while in front, every five minutes.
+    func testTheCheckIsDueByTheTimingRules() {
+        let last = Date(timeIntervalSince1970: 1_000_000)
+        XCTAssertTrue(AppUpdateTiming.isDue(lastChecked: nil, now: last, event: .foreground), "never checked: at once")
+        XCTAssertTrue(AppUpdateTiming.isDue(lastChecked: nil, now: last, event: .tick))
+        XCTAssertFalse(AppUpdateTiming.isDue(lastChecked: last, now: last.addingTimeInterval(119), event: .foreground))
+        XCTAssertTrue(AppUpdateTiming.isDue(lastChecked: last, now: last.addingTimeInterval(120), event: .foreground))
+        XCTAssertFalse(AppUpdateTiming.isDue(lastChecked: last, now: last.addingTimeInterval(240), event: .tick))
+        XCTAssertTrue(AppUpdateTiming.isDue(lastChecked: last, now: last.addingTimeInterval(295), event: .tick),
+                      "a timer firing a few seconds early still checks")
+        XCTAssertTrue(AppUpdateTiming.isDue(lastChecked: last, now: last.addingTimeInterval(300), event: .tick))
+        XCTAssertEqual(AppUpdateTiming.tickInterval, 300)
+        XCTAssertEqual(AppUpdateTiming.foregroundInterval, 120)
+    }
+
+    @MainActor
+    func testTheCheckerStartsACheckOnlyWhenDue() async throws {
+        let release = AppRelease(channel: .testFlight, version: "1.11.1", build: 69, url: AppReleaseCheck.testFlightURL)
+        let checker = AppUpdateChecker(check: { release })
+        await checker.refresh()
+        let last = try XCTUnwrap(checker.lastChecked)
+        XCTAssertFalse(checker.checkIfDue(.foreground, now: last.addingTimeInterval(60)))
+        XCTAssertFalse(checker.checkIfDue(.tick, now: last.addingTimeInterval(200)))
+        XCTAssertTrue(checker.checkIfDue(.tick, now: last.addingTimeInterval(300)))
+        XCTAssertFalse(checker.checkIfDue(.foreground, now: last.addingTimeInterval(600)), "one check at a time")
+
+        let other = AppUpdateChecker(check: { nil })
+        await other.refresh()
+        let otherLast = try XCTUnwrap(other.lastChecked)
+        XCTAssertTrue(other.checkIfDue(.foreground, now: otherLast.addingTimeInterval(121)))
+    }
+
+    @MainActor
+    func testTheFiveMinuteTickStopsWhenTheAppLeavesTheFront() async {
+        let checker = AppUpdateChecker(check: { nil })
+        let running = Task { await checker.runWhileActive() }
+        running.cancel()
+        // Returns at once, without waiting the five minutes.
+        await running.value
+        XCTAssertNil(checker.lastChecked, "cancelled before its first tick")
     }
 }

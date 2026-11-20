@@ -31,8 +31,6 @@ struct PrayerTabView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: DISpacing.md) {
-                    // A newer TestFlight or App Store build, while one is out.
-                    TodayUpdateBanner()
                     // Only while Our Sheikh's Daily Zikr or Tahajjud zikr is live.
                     if let strip = liveModel.strip {
                         TodayOfficialSection(strip: strip)

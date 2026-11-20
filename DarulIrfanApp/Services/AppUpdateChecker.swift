@@ -135,12 +135,41 @@ enum AppReleaseCheck {
     }
 }
 
-/// Whether Today shows the update banner.
+/// When the update check is due (owner 2026-11-19: the banner must appear
+/// in real time, without closing the app). While the app is in front it is
+/// checked every five minutes; coming to the front, when the last check is
+/// more than two minutes old. The server caches the feed for a minute.
+enum AppUpdateTiming {
+    enum Event: Equatable, Sendable {
+        /// The app came to the front (or finished launching).
+        case foreground
+        /// The five-minute tick while the app is in front.
+        case tick
+    }
+
+    static let foregroundInterval: TimeInterval = 120
+    static let tickInterval: TimeInterval = 300
+    /// A tick a few seconds early still counts, so a timer that fires a
+    /// little before the five minutes are up never skips a whole round.
+    static let tickTolerance: TimeInterval = 10
+
+    static func isDue(lastChecked: Date?, now: Date, event: Event) -> Bool {
+        guard let lastChecked else { return true }
+        let elapsed = now.timeIntervalSince(lastChecked)
+        switch event {
+        case .foreground: return elapsed >= foregroundInterval
+        case .tick: return elapsed >= tickInterval - tickTolerance
+        }
+    }
+}
+
+/// Whether the update banner shows, over every main tab.
 ///
-/// The release is checked when the app is opened and each time it comes back
-/// from the background (at most every ten minutes; the server caches five).
-/// Close and Cancel hide the banner only until the app is next opened: back
-/// from the background, it shows again while the newer release is out.
+/// The release is checked when the app is opened, each time it comes back to
+/// the front (when the last check is two minutes old), and every five
+/// minutes while it stays in front (`runWhileActive`). Close and Cancel hide
+/// the banner only until the app is next opened: back from the background,
+/// it shows again while the newer release is out.
 @Observable
 @MainActor
 final class AppUpdateChecker {
@@ -149,7 +178,7 @@ final class AppUpdateChecker {
     private(set) var available: AppRelease?
     private(set) var isDismissed = false
     @ObservationIgnored private var leftForBackground = false
-    @ObservationIgnored private var lastChecked: Date?
+    @ObservationIgnored private(set) var lastChecked: Date?
     @ObservationIgnored private var isChecking = false
     private let check: @Sendable () async -> AppRelease?
 
@@ -170,18 +199,40 @@ final class AppUpdateChecker {
 
     /// The app is in front: opened from the background it shows the banner
     /// again, and the release is checked when it is due.
-    func appBecameActive() {
+    func appBecameActive(now: Date = Date()) {
         if leftForBackground {
             leftForBackground = false
             isDismissed = false
         }
-        if let lastChecked, Date().timeIntervalSince(lastChecked) < 600 { return }
-        guard !isChecking else { return }
+        checkIfDue(.foreground, now: now)
+    }
+
+    /// The five-minute tick while the app is in front.
+    func tick(now: Date = Date()) {
+        checkIfDue(.tick, now: now)
+    }
+
+    /// Ticks every five minutes until the task is cancelled, which the
+    /// banner's view does when the app leaves the front.
+    func runWhileActive() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(AppUpdateTiming.tickInterval))
+            guard !Task.isCancelled else { return }
+            tick()
+        }
+    }
+
+    /// Starts a check when `event` makes one due and none is under way;
+    /// whether it started.
+    @discardableResult
+    func checkIfDue(_ event: AppUpdateTiming.Event, now: Date = Date()) -> Bool {
+        guard !isChecking, AppUpdateTiming.isDue(lastChecked: lastChecked, now: now, event: event) else { return false }
         isChecking = true
         Task {
             await refresh()
             isChecking = false
         }
+        return true
     }
 
     func refresh() async {
