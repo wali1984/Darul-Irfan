@@ -316,29 +316,6 @@ struct GroupPostComposer: View {
 
 // MARK: - Live now
 
-/// A YouTube link with its Start at and End at, as the fields show them.
-struct VideoLinkDraft: Equatable {
-    var link: String
-    var start: String
-    var end: String
-
-    init(link: String, start: String, end: String) {
-        self.link = link
-        self.start = start
-        self.end = end
-    }
-
-    init(videoID: String, startSeconds: Double?, endSeconds: Double?) {
-        link = "https://youtu.be/" + videoID
-        start = startSeconds.map { ClipTime.text($0) } ?? ""
-        end = endSeconds.map { ClipTime.text($0) } ?? ""
-    }
-
-    init(newest: GroupDetail.NewestZikr) {
-        self.init(videoID: newest.videoID, startSeconds: newest.startSeconds, endSeconds: newest.endSeconds)
-    }
-}
-
 /// The start sheet's form. A simple Halqah page (owner 2026-11-19, addendum
 /// 2: "no meeting option, no lead live, no record zikr option") starts a
 /// Halqah Zikr from YouTube or a recording only, under the server's own
@@ -348,19 +325,11 @@ struct HalqahStartForm: Equatable {
     /// The server's start title, e.g. "Start Daily North America Nightly Zikr".
     let startTitle: String?
 
-    /// The newest Daily Zikr the simple sheet opens with (addendum 4).
-    let newestZikr: GroupDetail.NewestZikr?
-
-    init(simple: Bool = false, startTitle: String? = nil, newestZikr: GroupDetail.NewestZikr? = nil) {
+    init(simple: Bool = false, startTitle: String? = nil) {
         isSimple = simple
         let trimmed = startTitle?.trimmingCharacters(in: .whitespacesAndNewlines)
         self.startTitle = simple && trimmed?.isEmpty == false ? trimmed : nil
-        self.newestZikr = simple ? newestZikr : nil
     }
-
-    /// The link and the Start at / End at the sheet opens with: the newest
-    /// Daily Zikr from where the Zikr begins. The admin may change any of it.
-    var prefill: VideoLinkDraft? { newestZikr.map(VideoLinkDraft.init(newest:)) }
 
     /// The sheet's heading and the start tile's label; nil: "Go live".
     var heading: String? { startTitle }
@@ -417,8 +386,6 @@ struct GroupLiveStarter: View {
     /// "Start at" and "End at" for the pasted YouTube link (video clips only).
     @State private var clipStart = ""
     @State private var clipEnd = ""
-    /// The newest Daily Zikr has been filled in once (simple page).
-    @State private var prefilled = false
     @State private var joinTogether = true
     /// Records the room into the group's recordings.
     @State private var recordRoom = true
@@ -561,14 +528,6 @@ struct GroupLiveStarter: View {
             // Until the room service is connected, start where a zikr can play.
             // A simple page's sheet starts on YouTube too.
             if addingToSession || !meetingsReady || !form.offersLeadLive { source = .youtube }
-            // A simple page's sheet opens with the newest Daily Zikr, from
-            // where the Zikr begins; the admin may change any of it.
-            if !addingToSession, !prefilled, videoLink.isEmpty, let prefill = form.prefill {
-                prefilled = true
-                videoLink = prefill.link
-                clipStart = prefill.start
-                clipEnd = prefill.end
-            }
             await loadLibrary()
         }
     }
@@ -1004,26 +963,16 @@ struct GroupZikrEditor: View {
     /// A Halqah with video clips: the time may play a pasted YouTube link,
     /// from a start time to an end time.
     var videoClips = false
-    /// A simple Halqah page: a clock time may play the newest Daily Zikr by
-    /// itself (owner 2026-11-19, addendum 4).
-    var offersNewest = false
-    /// The time already played the newest Daily Zikr when the editor opened,
-    /// so turning it off is sent.
-    private var startedNewest = false
 
     /// A new zikr time; or, in a Halqah with video clips, an existing one
     /// filled in and saved under its own id, so the admin changes what it
     /// plays in one step (owner 2026-11-19).
-    init(groupID: String, service: MemberGroupService, videoClips: Bool = false, offersNewest: Bool = false,
-         editing existing: ZikrSession? = nil) {
+    init(groupID: String, service: MemberGroupService, videoClips: Bool = false, editing existing: ZikrSession? = nil) {
         self.groupID = groupID
         self.service = service
         self.videoClips = videoClips
-        self.offersNewest = offersNewest
         guard let existing else { return }
         let draft = ZikrTimeDraft(existing, videoClips: videoClips)
-        startedNewest = offersNewest && draft.playsNewest
-        _playNewest = State(initialValue: offersNewest && draft.playsNewest)
         _title = State(initialValue: draft.title)
         switch draft.anchor {
         case .afterIsha?: _timing = State(initialValue: .afterIsha)
@@ -1061,8 +1010,6 @@ struct GroupZikrEditor: View {
     @State private var videoLink = ""
     @State private var clipStart = ""
     @State private var clipEnd = ""
-    /// Play the newest Daily Zikr (simple page only).
-    @State private var playNewest = false
     @State private var library: GroupRecordingLibrary?
     @State private var libraryFailed = false
     @State private var loadingLibrary = false
@@ -1090,13 +1037,7 @@ struct GroupZikrEditor: View {
                          : "Follows the prayer time at Dar-ul-Irfan each day.")
                         .foregroundStyle(DIColor.textMuted)
                 }
-                if timing == .clock && offersNewest {
-                    Section {
-                        Toggle("Play the newest Daily Zikr", isOn: $playNewest)
-                            .accessibilityIdentifier("autoplay-newest")
-                    }
-                }
-                if choosesVideo && (loadingLibrary || libraryFailed) {
+                if timing == .clock && (loadingLibrary || libraryFailed) {
                     Section {
                         if loadingLibrary { ProgressView("Loading the library…") }
                         if libraryFailed {
@@ -1106,7 +1047,7 @@ struct GroupZikrEditor: View {
                         }
                     }
                 }
-                if choosesVideo, let library, !(library.recordings.isEmpty && library.pastVideos.isEmpty) {
+                if timing == .clock, let library, !(library.recordings.isEmpty && library.pastVideos.isEmpty) {
                     Section {
                         NavigationLink {
                             GroupAutoplayChoices(library: library, selection: $autoplay)
@@ -1123,7 +1064,7 @@ struct GroupZikrEditor: View {
                         Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.").foregroundStyle(DIColor.textMuted)
                     }
                 }
-                if choosesVideo && videoClips {
+                if timing == .clock && videoClips {
                     Section {
                         TextField("YouTube link", text: $videoLink)
                             .textInputAutocapitalization(.never)
@@ -1207,25 +1148,10 @@ struct GroupZikrEditor: View {
         }
     }
 
-    /// The time plays the newest Daily Zikr by itself (a simple page's clock
-    /// time, toggle on).
-    private var newestOn: Bool { offersNewest && playNewest && timing == .clock }
-
-    /// A clock time whose video the admin chooses: the library and the link
-    /// are hidden while it plays the newest Daily Zikr.
-    private var choosesVideo: Bool { timing == .clock && !newestOn }
-
-    /// `autoplayNewest` as sent: true while on, false once turned off, and
-    /// not sent for a time that never played it (as before).
-    private var autoplayNewest: Bool? {
-        if newestOn { return true }
-        return startedNewest ? false : nil
-    }
-
     /// A pasted link (video clips only) is a video the server can find, and
     /// its End at is after its Start at; with no link there is nothing to check.
     private var videoReady: Bool {
-        guard videoClips, choosesVideo else { return true }
+        guard videoClips, timing == .clock else { return true }
         let link = videoLink.trimmingCharacters(in: .whitespacesAndNewlines)
         if !link.isEmpty && VideoLink.id(from: link) == nil { return false }
         return VideoClipTimes.problem(start: clipStart, end: clipEnd) == nil
@@ -1234,7 +1160,7 @@ struct GroupZikrEditor: View {
     /// What the time plays by itself: a pasted link, from its Start at to its
     /// End at, before a choice from the library.
     private var autoplayEntries: [GroupQueueEntry] {
-        guard choosesVideo else { return [] }
+        guard timing == .clock else { return [] }
         if videoClips, let video = VideoLink.id(from: videoLink),
            case .success(let times) = VideoClipTimes.read(start: clipStart, end: clipEnd) {
             return [.youTube(video, times: times)]
@@ -1269,7 +1195,7 @@ struct GroupZikrEditor: View {
             anchor: timing == .clock ? nil : (timing == .afterIsha ? "afterIsha" : "beforeFajr")
         )
         do {
-            try await service.saveZikrSession(session, autoplay: autoplayEntries, autoplayNewest: autoplayNewest, in: groupID)
+            try await service.saveZikrSession(session, autoplay: autoplayEntries, in: groupID)
             dismiss()
         } catch is CancellationError {
             return
@@ -1294,9 +1220,6 @@ struct ZikrTimeDraft {
     var videoLink: String
     var clipStart: String
     var clipEnd: String
-    /// It plays the newest Daily Zikr by itself; the link below is then the
-    /// video that resolved to, ready if the admin turns it off.
-    var playsNewest: Bool
 
     init(_ session: ZikrSession, videoClips: Bool, today: Date = Date()) {
         title = session.title
@@ -1313,7 +1236,6 @@ struct ZikrTimeDraft {
         videoLink = ""
         clipStart = ""
         clipEnd = ""
-        playsNewest = session.autoplayNewest == true
         guard let item = session.autoplay?.first else { return }
         if item.isVideo {
             if videoClips {

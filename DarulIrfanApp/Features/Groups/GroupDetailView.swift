@@ -308,10 +308,9 @@ struct GroupDetailView: View {
                 case .people: GroupPeopleView(groupID: group.id, groupName: group.name, service: service)
                 case .post: GroupPostComposer(groupID: group.id, service: service)
                 case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, videoClips: videoClips,
-                                             form: HalqahStartForm(simple: layout.isSimple, startTitle: detail?.group.startTitle,
-                                                                   newestZikr: detail?.group.newestZikr))
+                                             form: HalqahStartForm(simple: layout.isSimple, startTitle: detail?.group.startTitle))
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
-                case .zikr: GroupZikrEditor(groupID: group.id, service: service, videoClips: videoClips, offersNewest: layout.isSimple)
+                case .zikr: GroupZikrEditor(groupID: group.id, service: service, videoClips: videoClips)
                 case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
                 case .history: GroupSessionHistoryView(groupID: group.id, service: service)
                 }
@@ -321,7 +320,7 @@ struct GroupDetailView: View {
         // with that time, saved under the same id.
         .sheet(item: $editingZikr, onDismiss: { Task { await load() } }) { session in
             NavigationStack {
-                GroupZikrEditor(groupID: group.id, service: service, videoClips: true, offersNewest: layout.isSimple, editing: session)
+                GroupZikrEditor(groupID: group.id, service: service, videoClips: true, editing: session)
             }
         }
     }
@@ -1005,20 +1004,6 @@ private struct HalqahNextZikrCard: View {
 
 // MARK: - Zikr row
 
-/// What a zikr time's "Plays by itself" line names: the newest Daily Zikr
-/// when the time picks it by itself (owner 2026-11-19, addendum 4), else
-/// the server's title; a clip's part follows, e.g. "3:36 - 44:02".
-enum ZikrAutoplayLine {
-    static func text(for session: ZikrSession) -> String? {
-        let named = session.autoplayNewest == true ? String(localized: "the newest Daily Zikr") : session.autoplayTitle
-        guard let title = named else { return nil }
-        guard let item = session.autoplay?.first, item.isVideo, item.startSeconds != nil || item.endSeconds != nil else { return title }
-        let start = ClipTime.text(item.startSeconds ?? 0)
-        let end = item.endSeconds.map { ClipTime.text($0) } ?? ""
-        return "\(title) · \(start) - \(end)"
-    }
-}
-
 /// One of the group's zikr times, in the phone's own time, with a reminder.
 private struct GroupZikrRow: View {
     let session: ZikrSession
@@ -1047,7 +1032,13 @@ private struct GroupZikrRow: View {
     private var reminderKey: String { "groupZikrReminder.\(groupID).\(session.id)" }
 
     /// What the time plays by itself; a clip's part follows its title.
-    private var autoplayLine: String? { ZikrAutoplayLine.text(for: session) }
+    private var autoplayLine: String? {
+        guard let title = session.autoplayTitle else { return nil }
+        guard let item = session.autoplay?.first, item.isVideo, item.startSeconds != nil || item.endSeconds != nil else { return title }
+        let start = ClipTime.text(item.startSeconds ?? 0)
+        let end = item.endSeconds.map { ClipTime.text($0) } ?? ""
+        return "\(title) · \(start) - \(end)"
+    }
 
     var body: some View {
         let current = resolved

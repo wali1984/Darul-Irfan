@@ -410,18 +410,6 @@ struct GroupDetail: Codable, Sendable {
         /// A simple page's start tile and sheet heading, shown as the server
         /// wrote it, e.g. "Start Daily North America Nightly Zikr".
         var startTitle: String? = nil
-        /// The newest Daily Zikr from where the Zikr begins, for a simple
-        /// page's admins: the start sheet opens with it (owner 2026-11-19).
-        var newestZikr: NewestZikr? = nil
-    }
-
-    /// The channel's newest Daily Zikr, and where in it the Zikr begins and
-    /// ends.
-    struct NewestZikr: Codable, Sendable, Equatable {
-        var videoID: String
-        var title: String? = nil
-        var startSeconds: Double? = nil
-        var endSeconds: Double? = nil
     }
 
     var group: Summary

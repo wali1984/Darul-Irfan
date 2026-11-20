@@ -457,10 +457,8 @@ actor MemberGroupService {
         try await send("DELETE", path: "v1/groups/\(groupID)/meetings/\(meetingID)", payload: nil, expecting: [204])
     }
 
-    /// `autoplay` is what a clock-time zikr plays by itself. `autoplayNewest`
-    /// turns the newest Daily Zikr on or off (nil: not sent, as before).
-    func saveZikrSession(_ session: ZikrSession, autoplay: [GroupQueueEntry] = [], autoplayNewest: Bool? = nil,
-                         in groupID: String) async throws {
+    /// `autoplay` is what a clock-time zikr plays by itself.
+    func saveZikrSession(_ session: ZikrSession, autoplay: [GroupQueueEntry] = [], in groupID: String) async throws {
         var payload: [String: Any] = [
             "title": session.title, "weekdays": session.weekdays, "startHour": session.startHour,
             "startMinute": session.startMinute, "timeZoneIdentifier": session.timeZoneIdentifier,
@@ -468,7 +466,6 @@ actor MemberGroupService {
         ]
         if let anchor = session.anchor { payload["anchor"] = anchor }
         if !autoplay.isEmpty { payload["autoplay"] = autoplay.map(\.payload) }
-        if let autoplayNewest { payload["autoplayNewest"] = autoplayNewest }
         try await send("PUT", path: "v1/groups/\(groupID)/zikr/\(session.id)", payload: payload, expecting: [200])
     }
 

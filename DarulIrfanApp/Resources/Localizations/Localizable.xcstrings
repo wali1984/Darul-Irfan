@@ -40049,40 +40049,6 @@
           }
         }
       }
-    },
-    "Play the newest Daily Zikr": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Play the newest Daily Zikr"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تازہ ترین روزانہ ذکر چلائیں"
-          }
-        }
-      }
-    },
-    "the newest Daily Zikr": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "the newest Daily Zikr"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تازہ ترین روزانہ ذکر"
-          }
-        }
-      }
     }
   },
   "version": "1.0"

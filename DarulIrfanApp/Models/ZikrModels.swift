@@ -37,9 +37,6 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     /// The same, item by item, for the Halqah's admins, so the zikr time
     /// editor can show it again (absent for members and from an older server).
     var autoplay: [ZikrAutoplayItem]? = nil
-    /// The time plays the newest Daily Zikr by itself; `autoplay` and
-    /// `autoplayTitle` then show the video it resolved to (owner 2026-11-19).
-    var autoplayNewest: Bool? = nil
     /// The Urdu wording of `title` and `availabilityNote`, shown when the app
     /// is in Urdu; the catalogue fills them once the owner approves the
     /// wording, and the English is shown until then.
