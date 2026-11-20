@@ -31,8 +31,9 @@ struct HalqahPageLayout: Equatable {
     var showsRoomResume: Bool { !isSimple }
     var showsGoLive: Bool { !isSimple }
     /// A simple page's one start tile, which opens the simple start sheet
-    /// (owner 2026-11-19, addendum 2).
-    var showsStartTile: Bool { isSimple }
+    /// (owner 2026-11-19, addendum 2). Hidden while a session is live: End
+    /// session under the player is the admins' control then (as desktop).
+    func showsStartTile(isLive: Bool) -> Bool { isSimple && !isLive }
     /// The Markaz cards, integration notes and drafts in the admin section.
     var showsAdminExtras: Bool { !isSimple }
 
@@ -603,7 +604,7 @@ struct GroupDetailView: View {
                 .halqahTileAccessibility(titleKey: "Go live", value: goLiveLine, hintKey: "Starts a zikr or meeting for the whole Halqah.")
                 .diAppear(delay: 0.08)
             }
-            if layout.showsStartTile {
+            if layout.showsStartTile(isLive: detail?.live != nil) {
                 startTile
                     .diAppear(delay: 0.08)
             }

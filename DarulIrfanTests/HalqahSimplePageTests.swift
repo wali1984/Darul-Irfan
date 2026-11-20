@@ -51,7 +51,8 @@ final class HalqahSimplePageTests: XCTestCase {
             XCTAssertFalse(simple.showsAdminTile(tile), tile)
         }
         // Addendum 2: the one start tile; addendum 3: admins end by hand.
-        XCTAssertTrue(simple.showsStartTile)
+        XCTAssertTrue(simple.showsStartTile(isLive: false))
+        XCTAssertFalse(simple.showsStartTile(isLive: true), "while a session is live, End session is the admins' control")
         XCTAssertTrue(simple.showsPageEndSession(canManage: true))
         XCTAssertFalse(simple.showsPageEndSession(canManage: false), "members never see End session")
     }
@@ -102,7 +103,8 @@ final class HalqahSimplePageTests: XCTestCase {
         for tile in ["people", "post", "meeting", "zikr", "duas", "history"] {
             XCTAssertTrue(full.showsAdminTile(tile), tile)
         }
-        XCTAssertFalse(full.showsStartTile, "Go live stays")
+        XCTAssertFalse(full.showsStartTile(isLive: false), "Go live stays")
+        XCTAssertFalse(full.showsStartTile(isLive: true))
         XCTAssertFalse(full.showsPageEndSession(canManage: true), "End session stays on the session card")
     }
 }
