@@ -22,6 +22,11 @@ let appleKeys: ReturnType<typeof createRemoteJWKSet> | undefined;
 /** The audience of an Apple identity token is the app's bundle identifier,
  * which is also what APNs calls its topic. */
 const clientID = (env: Env): string => env.APPLE_CLIENT_ID ?? env.APNS_TOPIC;
+/** Who may receive an Apple identity token: the app, and the websites' Sign in
+ *  with Apple (a Services ID grouped with the app's App ID, so a person keeps
+ *  the same Apple subject, and the same account, on the web; owner 2026-11-19). */
+const appleAudiences = (env: Env): string[] =>
+  [clientID(env), ...(env.APPLE_WEB_CLIENT_IDS ?? "").split(",").map(value => value.trim())].filter(Boolean);
 
 function hexOf(bytes: Uint8Array): string {
   return [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
@@ -35,8 +40,8 @@ export async function appleSubject(
   env: Env,
   resolveKey?: JWTVerifyGetKey,
 ): Promise<{ subject: string; email?: string } | null> {
-  const audience = clientID(env);
-  if (!audience || !token) return null;
+  const audience = appleAudiences(env);
+  if (!audience.length || !token) return null;
   try {
     let keys = resolveKey ?? appleKeys;
     if (!keys) {

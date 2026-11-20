@@ -105,7 +105,7 @@ export async function groupRecording(env: Env, groupID: string, recordingID: str
     .first<{ id: string; title: string; media_key: string; content_type: string; duration_seconds: number | null }>();
 }
 
-type VideoInfo = { live: boolean; durationSeconds: number | null };
+type VideoInfo = { live: boolean; durationSeconds: number | null; title?: string };
 
 /** Whether each video is still live or scheduled, and how long it runs.
  *  One quota unit for up to 50 videos. Null when YouTube cannot be asked. */
@@ -116,13 +116,14 @@ export async function youtubeVideos(env: Env, ids: string[]): Promise<Map<string
     const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`);
     if (!response.ok) return null;
     const payload = await response.json<{ items?: Array<{
-      id?: string; snippet?: { liveBroadcastContent?: string }; contentDetails?: { duration?: string };
+      id?: string; snippet?: { liveBroadcastContent?: string; title?: string }; contentDetails?: { duration?: string };
     }> }>();
     const info = new Map<string, VideoInfo>();
     for (const item of payload.items ?? []) {
       if (!item.id) continue;
       const state = item.snippet?.liveBroadcastContent;
-      info.set(item.id, { live: state === "live" || state === "upcoming", durationSeconds: isoDuration(item.contentDetails?.duration) });
+      info.set(item.id, { live: state === "live" || state === "upcoming", durationSeconds: isoDuration(item.contentDetails?.duration),
+        title: item.snippet?.title || undefined });
     }
     return info;
   } catch {

@@ -1,5 +1,5 @@
 import type { Env } from "./contracts";
-import { halqahRole, isSuperAdmin, memberRole, notifyGroup, roleIn } from "./community";
+import { canManage, canSee, halqahRole, isSuperAdmin, memberRole, notifyGroup, roleIn } from "./community";
 import { upsertMembership } from "./members";
 import { sendPushToInstallations } from "./apns";
 import { normaliseLinkCode, openLink } from "./computerLinks";
@@ -900,4 +900,55 @@ async function officerInstallations(env: Env): Promise<string[]> {
     .bind(MARKAZ_ID).all<{ installation_id: string; email: string | null; markaz_role: string | null }>();
   return (rows.results ?? []).filter(row => isSuperAdmin(env, row) || row.markaz_role === "admin" || row.markaz_role === "administrator")
     .map(row => row.installation_id);
+}
+
+// MARK: - One Halqah's own reports (its admins: app and website)
+
+/** GET /v1/groups/{id}/activity/daily?date=YYYY-MM-DD&tz= - one Halqah's day,
+ *  for its own Admins and Administrators (owner 2026-11-19: daily and monthly
+ *  reporting for the app's and the website's admins). Tests are left out. */
+export async function halqahDailyReport(env: Env, memberID: string, groupID: string, url: URL): Promise<Response> {
+  const scope = await halqahScope(env, memberID, groupID);
+  if (scope instanceof Response) return scope;
+  const zone = zoneOf(url.searchParams.get("tz"));
+  if (url.searchParams.has("date") && !validDate(url.searchParams.get("date"))) return badRequest("Choose a valid date.");
+  const date = validDate(url.searchParams.get("date")) ?? today(zone);
+  const window = { from: date, to: date, zone };
+  const current = await load(env, window, new Set([groupID]), "all");
+  const bySession = sessionPresence(current.presence);
+  const byID = new Map(scope.groups.map(group => [group.id, group]));
+  const summary = await summarise(env, window, scope, "all", current.sessions, current.presence);
+  return json({
+    date, tz: zone, halqah: { id: groupID, name: scope.name }, summary,
+    sessions: current.sessions.slice().reverse().map(row => ({
+      ...sessionItem(row, byID, bySession.get(row.session_id) ?? []),
+      attendees: (bySession.get(row.session_id) ?? []).sort((a, b) => a.first_seen_at.localeCompare(b.first_seen_at)).map(attendee),
+    })),
+  });
+}
+
+/** GET /v1/groups/{id}/activity/monthly?month=YYYY-MM&tz= - one Halqah's month. */
+export async function halqahMonthlyReport(env: Env, memberID: string, groupID: string, url: URL): Promise<Response> {
+  const scope = await halqahScope(env, memberID, groupID);
+  if (scope instanceof Response) return scope;
+  const zone = zoneOf(url.searchParams.get("tz"));
+  const asked = url.searchParams.get("month");
+  if (asked !== null && !/^\d{4}-(0[1-9]|1[0-2])$/.test(asked)) return badRequest("Choose a valid month.");
+  const month = asked ?? today(zone).slice(0, 7);
+  const from = `${month}-01`;
+  const next = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 1)).toISOString().slice(0, 10);
+  const full = await report(env, { from, to: addDays(next, -1), zone }, scope, "all", scope.groups);
+  return json({
+    month, tz: zone, halqah: { id: groupID, name: scope.name },
+    summary: full.summary, previous: full.previous, daily: full.daily, sessions: full.sessions,
+    attendanceByPerson: full.people,
+  });
+}
+
+async function halqahScope(env: Env, memberID: string, groupID: string): Promise<Scope | Response> {
+  const role = await memberRole(env, memberID);
+  if (!await canSee(env, memberID, role, groupID)) return notFound();
+  if (!await canManage(env, memberID, role, groupID)) return json({ error: "Group admin role required" }, { status: 403 });
+  const group = (await activeGroups(env)).find(item => item.id === groupID);
+  return group ? { kind: "halqah", id: group.id, name: group.name, groups: [group] } : notFound();
 }

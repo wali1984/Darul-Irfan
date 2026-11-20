@@ -158,6 +158,14 @@ describe("north-america.: the YouTube video a Halqah plays (owner 2026-11-17)", 
     expect(body.halqahs[0].playing).toMatchObject({ videoID: "yuQSH_D2iMo", title: "Online Zikr", paused: false });
     expect(body.halqahs[0].playing.positionSeconds).toBeGreaterThanOrEqual(124);
     expect(body.halqahs[0].playing.positionSeconds).toBeLessThan(140);
+    expect(body.halqahs[0].playing).not.toHaveProperty("startSeconds");
+    // A clip from 3:41 to 44:02: the place is the video's own time, and it says where it stops.
+    raw.prepare("UPDATE group_live SET queue_json=? WHERE group_id='usa'")
+      .run(JSON.stringify([{ kind: "video", id: "yuQSH_D2iMo", title: "Online Zikr", durationSeconds: 2421, startSeconds: 221, endSeconds: 2642 }]));
+    const clip = ((await (await get("/v1/public/live?ids=usa&playback=1")).json()) as any).halqahs[0].playing;
+    expect(clip).toMatchObject({ startSeconds: 221, endSeconds: 2642 });
+    expect(clip.positionSeconds).toBeGreaterThanOrEqual(221 + 124);
+    expect(clip.positionSeconds).toBeLessThan(221 + 140);
     raw.prepare("UPDATE group_live SET queue_json=? WHERE group_id='usa'")
       .run(JSON.stringify([{ kind: "recording", id: "rec-1", title: "Audio", durationSeconds: 900 }]));
     expect(((await (await get("/v1/public/live?ids=usa&playback=1")).json()) as any).halqahs[0].playing).toBeNull();

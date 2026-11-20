@@ -605,6 +605,133 @@ describe("recorded zikr", () => {
     // A live video cannot be queued as a recording.
     expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ videoID: "liveliveliv" }] })).status).toBe(400);
   });
+
+  it("gives a Halqah's own admins its daily and monthly report, and nobody else", async () => {
+    const { raw, call, member, admin } = await setup();
+    const now = new Date().toISOString();
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", room: false, recordingID: undefined, videoID: undefined, queue: [] });
+    raw.prepare(`INSERT INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
+      VALUES('s-1','usa','zikr','Evening Zikr',?,?,?, 'x', 1, 0)`).run(now, "b".repeat(32), now);
+    raw.prepare(`INSERT INTO group_live_presence(session_id,group_id,member_id,first_seen_at,last_seen_at) VALUES('s-1','usa',?,?,?)`)
+      .run("a".repeat(32), now, now);
+    expect((await call(member, "GET", "/v1/groups/usa/activity/daily")).status).toBe(403);
+    expect((await call(admin, "GET", "/v1/groups/canada/activity/daily")).status).toBe(404);
+    const day = (await (await call(admin, "GET", "/v1/groups/usa/activity/daily?tz=UTC")).json()) as {
+      halqah: { id: string }; sessions: { title: string; attendance: number; attendees: { name: string; via: string }[] }[] };
+    expect(day.halqah.id).toBe("usa");
+    expect(day.sessions).toEqual([expect.objectContaining({ title: "Evening Zikr", attendance: 1, attendees: [expect.objectContaining({ name: "member", via: "app" })] })]);
+    const month = (await (await call(admin, "GET", "/v1/groups/usa/activity/monthly?tz=UTC")).json()) as {
+      sessions: unknown[]; daily: { sessions: number }[]; attendanceByPerson: { name: string }[] };
+    expect(month.sessions).toHaveLength(1);
+    expect(month.daily.reduce((n, d) => n + d.sessions, 0)).toBe(1);
+    expect(month.attendanceByPerson.map(p => p.name)).toEqual(["member"]);
+    expect((await call(admin, "GET", "/v1/groups/usa/activity/monthly?month=2026-13")).status).toBe(400);
+  });
+
+  it("plays the newest marked Daily Zikr by itself, unless an admin chose the video today", async () => {
+    const { env, raw, call, member, admin } = await setup({ VIDEO_MARKS_TOKEN: "marks-token" } as Partial<Env>);
+    const now = new Date("2026-10-30T01:02:00Z"); // Thursday 21:02 in New York
+    const video = (id: string, published: string) => raw.prepare(`INSERT INTO feed_items(id,source,kind,title,source_url,video_id,published_at,updated_at)
+      VALUES(?,'youtube','video',?,?,?,?,?)`).run(`youtube:${id}`, "Online Zikr with Sheikhul Mukarram Hazrat Ameer Abdul Qadeer Awan MZA",
+      `https://www.youtube.com/watch?v=${id}`, id, published, published);
+    video("olderzikr01", "2026-10-28T16:00:00Z");
+    video("newestzikr1", "2026-10-29T16:00:00Z");
+    video("nomarks0001", "2026-10-29T20:00:00Z"); // newer, but not marked yet
+    const mark = (body: unknown, token = "marks-token") => worker.fetch(new Request("https://api.example.com/v1/service/video-marks", {
+      method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) }), env);
+    expect((await mark({ videoID: "newestzikr1", startSeconds: 216, endSeconds: 2642 }, "wrong-token!")).status).toBe(401);
+    expect((await mark({ videoID: "newestzikr1", startSeconds: 300, endSeconds: 200 })).status).toBe(400);
+    expect((await mark({ videoID: "olderzikr01", startSeconds: 100, endSeconds: 1900, method: "voice" })).status).toBe(200);
+    expect((await mark({ videoID: "newestzikr1", startSeconds: 216, endSeconds: 2642, method: "voice" })).status).toBe(200);
+
+    expect((await call(admin, "PUT", "/v1/groups/usa/zikr/evening", {
+      title: "Daily Evening Zikr", startHour: 21, startMinute: 0, timeZoneIdentifier: "America/New_York", weekdays: [5], autoplayNewest: true,
+    })).status).toBe(200);
+    const sessions = async () => ((await (await call(admin, "GET", "/v1/groups/usa")).json()) as {
+      zikrSessions: { autoplayNewest?: boolean; autoplay?: { id: string; startSeconds?: number; endSeconds?: number }[] }[] }).zikrSessions;
+    vi.useFakeTimers({ now, toFake: ["Date"] });
+    expect((await sessions())[0]).toMatchObject({ autoplayNewest: true, autoplay: [{ id: "newestzikr1", startSeconds: 216, endSeconds: 2642 }] });
+    await autoplayDue(env, now);
+    const live = ((await (await call(member, "GET", "/v1/groups/usa")).json()) as { live?: { queue: { id: string; startSeconds?: number; durationSeconds?: number }[] } }).live;
+    expect(live?.queue).toEqual([expect.objectContaining({ id: "newestzikr1", startSeconds: 216, durationSeconds: 2426 })]);
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    // An admin's own video wins for that day; the newest comes back the next.
+    raw.prepare("DELETE FROM group_live_history").run();
+    raw.prepare("UPDATE group_zikr_sessions SET last_autoplay_at=NULL").run();
+    expect((await call(admin, "PUT", "/v1/groups/usa/zikr/evening", {
+      title: "Daily Evening Zikr", startHour: 21, startMinute: 0, timeZoneIdentifier: "America/New_York", weekdays: [5],
+      autoplay: [{ recordingID: undefined, videoID: "olderzikr01" }],
+    })).status).toBe(200);
+    expect((await sessions())[0]?.autoplay?.[0]?.id).toBe("olderzikr01");
+    vi.setSystemTime(new Date(now.getTime() + 21 * 3_600_000));
+    expect((await sessions())[0]?.autoplay?.[0]?.id).toBe("newestzikr1");
+  });
+
+  it("plays a clip of a video (start and end times) only in a Halqah that allows clips", async () => {
+    vi.stubGlobal("fetch", async (url: string) => {
+      const ids = new URL(url).searchParams.get("id")?.split(",") ?? [];
+      return new Response(JSON.stringify({ items: ids.map(id => ({
+        id, snippet: { liveBroadcastContent: "none" }, contentDetails: { duration: "PT1H5M" },
+      })) }), { status: 200 });
+    });
+    const { env, raw, call, member, admin } = await setup({ YOUTUBE_API_KEY: "k" } as Partial<Env>);
+    const detail = async (token: string) => (await (await call(token, "GET", "/v1/groups/usa")).json()) as {
+      group: { videoClips?: boolean }; live?: Live & { queue: { startSeconds?: number; endSeconds?: number }[] };
+      zikrSessions: { autoplay?: { kind: string; id: string; startSeconds?: number; endSeconds?: number }[] }[];
+    };
+    const clip = { state: "live", videoID: "pastzikr001", videoStartSeconds: 221, videoEndSeconds: 2642 };
+
+    // Every other Halqah: the times are ignored and nothing new is shown.
+    await call(admin, "POST", "/v1/groups/usa/live", clip);
+    let seen = await detail(member);
+    expect(seen.group.videoClips).toBeUndefined();
+    expect(seen.live?.queue).toEqual([expect.objectContaining({ id: "pastzikr001", durationSeconds: 3900 })]);
+    expect(seen.live?.queue[0]).not.toHaveProperty("startSeconds");
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    expect((seen.group as { simplePage?: boolean }).simplePage).toBeUndefined();
+    raw.prepare("UPDATE member_groups SET video_clips=1,simple_page=1,start_title='Start Evening Zikr' WHERE id='usa'").run();
+    await call(admin, "POST", "/v1/groups/usa/live", clip);
+    seen = await detail(member);
+    expect(seen.group.videoClips).toBe(true);
+    expect((seen.group as { simplePage?: boolean }).simplePage).toBe(true);
+    expect((seen.group as { startTitle?: string }).startTitle).toBe("Start Evening Zikr");
+    expect(seen.live?.queue).toEqual([expect.objectContaining({ id: "pastzikr001", startSeconds: 221, endSeconds: 2642, durationSeconds: 2421 })]);
+    // Added while live: a clip of its own.
+    const added = await call(admin, "POST", "/v1/groups/usa/control", { action: "add", items: [{ videoID: "pastzikr002", startSeconds: 60, endSeconds: 120 }] });
+    expect(added.status).toBe(200);
+    expect((await detail(member)).live?.queue[1]).toMatchObject({ startSeconds: 60, endSeconds: 120, durationSeconds: 60 });
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    // A start alone plays to the video's end; times outside the video are refused.
+    await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoEndSeconds: undefined });
+    expect((await detail(member)).live?.queue[0]).toMatchObject({ startSeconds: 221, durationSeconds: 3679 });
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+    const pastEnd = await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoStartSeconds: 4000, videoEndSeconds: undefined });
+    expect(pastEnd.status).toBe(400);
+    expect(await pastEnd.json()).toEqual({ error: "The start time is past the end of the video." });
+    const backwards = await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoEndSeconds: 100 });
+    expect(await backwards.json()).toEqual({ error: "End must be after the start." });
+    // An end past the video's end stops at its end.
+    await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoEndSeconds: 9999 });
+    expect((await detail(member)).live?.queue[0]).toMatchObject({ startSeconds: 221, endSeconds: 3900, durationSeconds: 3679 });
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    // A zikr time plays the clip by itself; only admins see what it plays.
+    const saved = await call(admin, "PUT", "/v1/groups/usa/zikr/evening", {
+      title: "Evening Zikr", startHour: 21, startMinute: 0, timeZoneIdentifier: "America/New_York", weekdays: [5],
+      autoplay: [{ videoID: "pastzikr001", startSeconds: 221, endSeconds: 2642 }],
+    });
+    expect(saved.status).toBe(200);
+    expect((await detail(admin)).zikrSessions[0]?.autoplay).toEqual([
+      { kind: "video", id: "pastzikr001", title: "Recorded zikr", startSeconds: 221, endSeconds: 2642 }]);
+    expect((await detail(member)).zikrSessions[0]?.autoplay).toBeUndefined();
+    // (The sessions above were held "today" by the real clock; the schedule runs on a Thursday in 2026-10.)
+    raw.prepare("DELETE FROM group_live_history").run();
+    await autoplayDue(env, new Date("2026-10-30T01:02:00Z"));
+    expect((await detail(member)).live?.queue[0]).toMatchObject({ startSeconds: 221, durationSeconds: 2421 });
+  });
 });
 
 describe("recorded rooms", () => {

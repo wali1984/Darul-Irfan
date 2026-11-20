@@ -19,7 +19,7 @@ describe("app releases for the update banner", () => {
     const announced = { ios: { testflight: { version: "1.11.1", build: 68, releasedAt: "2026-10-29T17:39:00Z" } } };
     const response = await get(envWith({ "app/releases.json": JSON.stringify(announced) }));
     expect(response.status).toBe(200);
-    expect(response.headers.get("cache-control")).toBe("public, max-age=300");
+    expect(response.headers.get("cache-control")).toBe("public, max-age=60");
     expect(await response.json()).toEqual(announced);
   });
 });

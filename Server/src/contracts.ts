@@ -146,6 +146,8 @@ export interface Env {
   /** Audience of an Apple identity token: the app's bundle id. Falls back to
    *  APNS_TOPIC, which is the same value. */
   APPLE_CLIENT_ID?: string;
+  /** Services IDs of the websites' Sign in with Apple, comma-separated. */
+  APPLE_WEB_CLIENT_IDS?: string;
   /** Pictures forwarded to the WhatsApp Business number. */
   MEDIA?: R2Bucket;
   /** Graph API token of the WhatsApp Business account, to fetch pictures. */
@@ -164,6 +166,8 @@ export interface Env {
   LISTENER_TOKEN?: string;
   /** The live relay's own token for /v1/service/... (Tools/LiveRelay PLATFORM_CUE_TOKEN). */
   RELAY_TOKEN?: string;
+  /** The Daily Zikr start detector's token for /v1/service/video-marks (amd). */
+  VIDEO_MARKS_TOKEN?: string;
   /** The Silsila Markaz's daily digest reads "yesterday" in this zone (default America/New_York). */
   MARKAZ_TIME_ZONE?: string;
   /** The Paltalk room watched in Paltalk's directory, and its group number. */

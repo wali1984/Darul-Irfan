@@ -1,3 +1,4 @@
+import { saveVideoMarks } from "./dailyZikr";
 import {
   zikrStages, addZikrStage, zikrCues, broadcastZikrCue, dispatchZikrCues, zikrStage, postStageMessage, hideStageMessage,
   hideZikrCue, publicSheikhStage, relayZikrCue, relayLive, endAfterDua, endStaleRelaySessions,
@@ -17,7 +18,7 @@ import {
 } from "./computerLinks";
 import {
   access as markazAccessRoute, analytics as markazAnalytics, announce, announcements, approveReportingLink, dailyReport,
-  endReportingSession, exportCSV, markazDigest, monthlyReport, organization, personHistory, placeHalqah, pollReportingLink,
+  endReportingSession, exportCSV, halqahDailyReport, halqahMonthlyReport, markazDigest, monthlyReport, organization, personHistory, placeHalqah, pollReportingLink,
   reportingSessions, sessionDetail, startReportingLink, syncAdmins,
 } from "./markaz";
 import {
@@ -83,6 +84,18 @@ async function route(request: Request, env: Env): Promise<Response> {
     try { input = await request.json(); } catch { return json({ error: "Invalid request" }, { status: 400 }); }
     if (!input || typeof input !== "object" || Array.isArray(input)) return json({ error: "Invalid request" }, { status: 400 });
     return relay[2] === "live" ? relayLive(env, relay[1]!, input) : relayZikrCue(env, relay[1]!, input);
+  }
+  // The Daily Zikr start detector (bearer VIDEO_MARKS_TOKEN): where the Zikr
+  // begins and ends in a channel video.
+  if (path === "/v1/service/video-marks" && request.method === "POST") {
+    const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+    if (!env.VIDEO_MARKS_TOKEN || bearer.length !== env.VIDEO_MARKS_TOKEN.length || bearer !== env.VIDEO_MARKS_TOKEN) {
+      return json({ error: "Not authorized" }, { status: 401 });
+    }
+    let input: Record<string, unknown>;
+    try { input = await request.json(); } catch { return json({ error: "Invalid request" }, { status: 400 }); }
+    if (!input || typeof input !== "object" || Array.isArray(input)) return json({ error: "Invalid request" }, { status: 400 });
+    return saveVideoMarks(env, input);
   }
   // A website visitor joins a live Zikr (name and place) and stays counted while listening.
   const visit = /^\/v1\/public\/halqahs\/([a-z0-9-]{1,40})\/(join|presence)$/.exec(path);
@@ -301,7 +314,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues|stage|stage-chat|reports)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues|stage|stage-chat|reports|activity)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (section === "reports" && !entity && request.method === "POST") {
@@ -353,6 +366,9 @@ async function route(request: Request, env: Env): Promise<Response> {
       return uploadPostMedia(request, env, member, groupID);
     }
     if (section === "control" && !entity && request.method === "POST") return controlSession(env, member, groupID, await body());
+    // The Halqah's own daily and monthly reports, for its admins (app and website).
+    if (section === "activity" && entity === "daily" && request.method === "GET") return halqahDailyReport(env, member, groupID, url);
+    if (section === "activity" && entity === "monthly" && request.method === "GET") return halqahMonthlyReport(env, member, groupID, url);
     if (section === "presence" && !entity && request.method === "POST") return checkIn(env, member, groupID);
     if (section === "duas" && !entity && request.method === "GET") return duaRequests(env, member, groupID);
     if (section === "duas" && !entity && request.method === "POST") return requestDua(env, member, groupID, await body());
