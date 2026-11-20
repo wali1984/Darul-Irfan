@@ -605,6 +605,68 @@ describe("recorded zikr", () => {
     // A live video cannot be queued as a recording.
     expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ videoID: "liveliveliv" }] })).status).toBe(400);
   });
+
+  it("plays a clip of a video (start and end times) only in a Halqah that allows clips", async () => {
+    vi.stubGlobal("fetch", async (url: string) => {
+      const ids = new URL(url).searchParams.get("id")?.split(",") ?? [];
+      return new Response(JSON.stringify({ items: ids.map(id => ({
+        id, snippet: { liveBroadcastContent: "none" }, contentDetails: { duration: "PT1H5M" },
+      })) }), { status: 200 });
+    });
+    const { env, raw, call, member, admin } = await setup({ YOUTUBE_API_KEY: "k" } as Partial<Env>);
+    const detail = async (token: string) => (await (await call(token, "GET", "/v1/groups/usa")).json()) as {
+      group: { videoClips?: boolean }; live?: Live & { queue: { startSeconds?: number; endSeconds?: number }[] };
+      zikrSessions: { autoplay?: { kind: string; id: string; startSeconds?: number; endSeconds?: number }[] }[];
+    };
+    const clip = { state: "live", videoID: "pastzikr001", videoStartSeconds: 221, videoEndSeconds: 2642 };
+
+    // Every other Halqah: the times are ignored and nothing new is shown.
+    await call(admin, "POST", "/v1/groups/usa/live", clip);
+    let seen = await detail(member);
+    expect(seen.group.videoClips).toBeUndefined();
+    expect(seen.live?.queue).toEqual([expect.objectContaining({ id: "pastzikr001", durationSeconds: 3900 })]);
+    expect(seen.live?.queue[0]).not.toHaveProperty("startSeconds");
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    raw.prepare("UPDATE member_groups SET video_clips=1 WHERE id='usa'").run();
+    await call(admin, "POST", "/v1/groups/usa/live", clip);
+    seen = await detail(member);
+    expect(seen.group.videoClips).toBe(true);
+    expect(seen.live?.queue).toEqual([expect.objectContaining({ id: "pastzikr001", startSeconds: 221, endSeconds: 2642, durationSeconds: 2421 })]);
+    // Added while live: a clip of its own.
+    const added = await call(admin, "POST", "/v1/groups/usa/control", { action: "add", items: [{ videoID: "pastzikr002", startSeconds: 60, endSeconds: 120 }] });
+    expect(added.status).toBe(200);
+    expect((await detail(member)).live?.queue[1]).toMatchObject({ startSeconds: 60, endSeconds: 120, durationSeconds: 60 });
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    // A start alone plays to the video's end; times outside the video are refused.
+    await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoEndSeconds: undefined });
+    expect((await detail(member)).live?.queue[0]).toMatchObject({ startSeconds: 221, durationSeconds: 3679 });
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+    const pastEnd = await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoStartSeconds: 4000, videoEndSeconds: undefined });
+    expect(pastEnd.status).toBe(400);
+    expect(await pastEnd.json()).toEqual({ error: "The start time is past the end of the video." });
+    const backwards = await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoEndSeconds: 100 });
+    expect(await backwards.json()).toEqual({ error: "End must be after the start." });
+    // An end past the video's end stops at its end.
+    await call(admin, "POST", "/v1/groups/usa/live", { ...clip, videoEndSeconds: 9999 });
+    expect((await detail(member)).live?.queue[0]).toMatchObject({ startSeconds: 221, endSeconds: 3900, durationSeconds: 3679 });
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    // A zikr time plays the clip by itself; only admins see what it plays.
+    const saved = await call(admin, "PUT", "/v1/groups/usa/zikr/evening", {
+      title: "Evening Zikr", startHour: 21, startMinute: 0, timeZoneIdentifier: "America/New_York", weekdays: [5],
+      autoplay: [{ videoID: "pastzikr001", startSeconds: 221, endSeconds: 2642 }],
+    });
+    expect(saved.status).toBe(200);
+    expect((await detail(admin)).zikrSessions[0]?.autoplay).toEqual([
+      { kind: "video", id: "pastzikr001", title: "Recorded zikr", startSeconds: 221, endSeconds: 2642 }]);
+    expect((await detail(member)).zikrSessions[0]?.autoplay).toBeUndefined();
+    // (The sessions above were held "today" by the real clock; the schedule runs on a Thursday in 2026-10.)
+    raw.prepare("DELETE FROM group_live_history").run();
+    await autoplayDue(env, new Date("2026-10-30T01:02:00Z"));
+    expect((await detail(member)).live?.queue[0]).toMatchObject({ startSeconds: 221, durationSeconds: 2421 });
+  });
 });
 
 describe("recorded rooms", () => {

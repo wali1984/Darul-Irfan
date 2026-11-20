@@ -14,7 +14,13 @@ import { cleanText, json } from "./util";
 // The admin pauses, moves and adds to it; an item whose length is known moves
 // on to the next by itself. The session stays open until an admin ends it.
 
-export type QueueItem = { kind: "recording" | "video"; id: string; title: string; durationSeconds?: number };
+/** `startSeconds`/`endSeconds`: a clip of a YouTube video, in a Halqah that
+ *  allows clips (member_groups.video_clips). The player plays the video at
+ *  startSeconds + the group's place; `durationSeconds` is the clip's length,
+ *  so the clock, the controls and the end of the session work as for any item. */
+export type QueueItem = {
+  kind: "recording" | "video"; id: string; title: string; durationSeconds?: number; startSeconds?: number; endSeconds?: number;
+};
 export type Playback = { index: number; positionSeconds: number; paused: boolean; finished: boolean };
 
 type LiveRow = {
@@ -91,6 +97,37 @@ async function saveClock(env: Env, groupID: string, live: LiveRow, queue: QueueI
   if (!(saved.meta?.changes ?? 0)) throw new SessionConflictError();
 }
 
+/** Whether this Halqah lets its admins play a part of a YouTube video. */
+export async function videoClipsAllowed(env: Env, groupID: string): Promise<boolean> {
+  const row = await env.DB.prepare("SELECT video_clips FROM member_groups WHERE id=?").bind(groupID).first<{ video_clips: number }>();
+  return !!row?.video_clips;
+}
+
+const DAY_SECONDS = 86_400;
+
+/** A start and an end time (whole seconds into the video) as a clip: the
+ *  start, the end and the length the group plays. Neither given: the whole
+ *  video, unchanged. A start past the video's end, or an end not after the
+ *  start, is refused with words the admin can act on. */
+export function clipOf(start: unknown, end: unknown, fullSeconds: number | undefined):
+  Pick<QueueItem, "startSeconds" | "endSeconds" | "durationSeconds"> | Response {
+  const seconds = (value: unknown) => value === undefined || value === null || value === "" ? undefined
+    : typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= DAY_SECONDS ? Math.floor(value) : NaN;
+  const from = seconds(start), to = seconds(end);
+  if (Number.isNaN(from) || Number.isNaN(to)) return json({ error: "Start and end times must be times within the video." }, { status: 400 });
+  const startAt = from ?? 0;
+  const full = fullSeconds && fullSeconds > 0 ? fullSeconds : undefined;
+  if (!startAt && to === undefined) return { durationSeconds: full };
+  if (full && startAt >= full) return json({ error: "The start time is past the end of the video." }, { status: 400 });
+  const endAt = to === undefined ? full : full ? Math.min(to, full) : to;
+  if (endAt !== undefined && endAt <= startAt) return json({ error: "End must be after the start." }, { status: 400 });
+  return {
+    startSeconds: startAt || undefined,
+    endSeconds: to === undefined ? undefined : endAt,
+    durationSeconds: endAt === undefined ? undefined : endAt - startAt,
+  };
+}
+
 /** Turns what the admin chose - recordings of the group and YouTube videos -
  *  into queue items with their titles and lengths. A video still live is
  *  refused here; it is shared as a live video instead. */
@@ -99,9 +136,12 @@ export async function resolveQueue(env: Env, groupID: string, raw: unknown): Pro
   const videoIDs = entries.map(entry => (entry as { videoID?: unknown })?.videoID)
     .filter((id): id is string => typeof id === "string" && /^[\w-]{11}$/.test(id));
   const info = await youtubeVideos(env, videoIDs);
+  const clips = entries.length ? await videoClipsAllowed(env, groupID) : false;
   const items: QueueItem[] = [];
   for (const entry of entries) {
-    const { recordingID, videoID, title } = (entry ?? {}) as { recordingID?: unknown; videoID?: unknown; title?: unknown };
+    const { recordingID, videoID, title, startSeconds, endSeconds } = (entry ?? {}) as {
+      recordingID?: unknown; videoID?: unknown; title?: unknown; startSeconds?: unknown; endSeconds?: unknown;
+    };
     if (typeof recordingID === "string") {
       const recording = await groupRecording(env, groupID, recordingID);
       if (!recording) return notFound();
@@ -110,10 +150,16 @@ export async function resolveQueue(env: Env, groupID: string, raw: unknown): Pro
       const known = info?.get(videoID);
       if (known?.live) return json({ error: "That video is live now. Share it as a live video instead." }, { status: 400 });
       const stored = await env.DB.prepare("SELECT title FROM feed_items WHERE id=?").bind(`youtube:${videoID}`).first<{ title: string }>();
-      items.push({
-        kind: "video", id: videoID, title: cleanText(title, 200) ?? stored?.title ?? "Recorded zikr",
+      const item: QueueItem = {
+        kind: "video", id: videoID, title: cleanText(title, 200) ?? stored?.title ?? cleanText(known?.title, 200) ?? "Recorded zikr",
         durationSeconds: known?.durationSeconds ?? undefined,
-      });
+      };
+      if (clips) {
+        const clip = clipOf(startSeconds, endSeconds, known?.durationSeconds ?? undefined);
+        if (clip instanceof Response) return clip;
+        Object.assign(item, clip);
+      }
+      items.push(item);
     } else {
       return json({ error: "Each item needs a recording or a video" }, { status: 400 });
     }
@@ -265,7 +311,8 @@ export async function sessionPayload(env: Env, groupID: string, live: LiveRow, m
         url: recording ? await signedMediaURL(env, recording.media_key, 24 * 3_600) : undefined,
       });
     } else {
-      items.push({ kind: item.kind, id: item.id, title: item.title, durationSeconds: item.durationSeconds, videoID: item.id });
+      items.push({ kind: item.kind, id: item.id, title: item.title, durationSeconds: item.durationSeconds, videoID: item.id,
+        startSeconds: item.startSeconds, endSeconds: item.endSeconds });
     }
   }
   const since = new Date(now.getTime() - PRESENT_SECONDS * 1000).toISOString();

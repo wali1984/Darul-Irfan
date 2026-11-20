@@ -159,7 +159,7 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
   const role = await memberRole(env, memberID);
   if (!await canSee(env, memberID, role, groupID)) return notFound();
   const [group, live, zikr, meetings, people] = await Promise.all([
-    env.DB.prepare("SELECT id,name,description FROM member_groups WHERE id=?").bind(groupID).first(),
+    env.DB.prepare("SELECT id,name,description,video_clips FROM member_groups WHERE id=?").bind(groupID).first(),
     liveRow(env, groupID),
     env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,autoplay_json
       FROM group_zikr_sessions WHERE group_id=? AND is_active=1 ORDER BY start_hour,start_minute`).bind(groupID).all(),
@@ -175,7 +175,9 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
   // A test session is live only for the Halqah's admins.
   const isLive = live?.state === "live" && (!live.is_test || managing);
   return json({
-    group: { id: group?.id, name: group?.name, description: group?.description ?? undefined },
+    group: { id: group?.id, name: group?.name, description: group?.description ?? undefined,
+      // Admins of this Halqah may play part of a YouTube video (a start and an end time).
+      videoClips: group?.video_clips ? true : undefined },
     canManage: managing,
     memberCount: people?.n ?? 0,
     live: isLive && live ? {
@@ -193,6 +195,10 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
       anchor: row.anchor ?? undefined, durationMinutes: row.duration_minutes,
       // What this time plays by itself when no admin starts a session.
       autoplayTitle: queueOf({ queue_json: String(row.autoplay_json ?? "[]") }).map(item => item.title).join(" · ") || undefined,
+      // What it plays, for an admin changing it.
+      autoplay: managing && row.autoplay_json ? queueOf({ queue_json: String(row.autoplay_json) }).map(item => ({
+        kind: item.kind, id: item.id, title: item.title, startSeconds: item.startSeconds, endSeconds: item.endSeconds,
+      })) : undefined,
     })),
     meetings: (meetings.results ?? []).map(row => ({
       id: row.id, title: row.title, startsAt: row.starts_at, durationMinutes: row.duration_minutes,
@@ -407,7 +413,8 @@ export async function setLive(env: Env, memberID: string, groupID: string, input
     // YouTube says which it is; without it, the app does.
     const info = (await youtubeVideos(env, [video]))?.get(video);
     if (info ? !info.live : input.recorded === true) {
-      entries = [{ videoID: video }, ...entries];
+      // A clip's times (honoured only where the Halqah allows clips).
+      entries = [{ videoID: video, startSeconds: input.videoStartSeconds, endSeconds: input.videoEndSeconds }, ...entries];
       video = null;
     }
   }
