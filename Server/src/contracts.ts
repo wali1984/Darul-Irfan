@@ -164,6 +164,8 @@ export interface Env {
   LISTENER_TOKEN?: string;
   /** The live relay's own token for /v1/service/... (Tools/LiveRelay PLATFORM_CUE_TOKEN). */
   RELAY_TOKEN?: string;
+  /** The Daily Zikr start detector's token for /v1/service/video-marks (amd). */
+  VIDEO_MARKS_TOKEN?: string;
   /** The Silsila Markaz's daily digest reads "yesterday" in this zone (default America/New_York). */
   MARKAZ_TIME_ZONE?: string;
   /** The Paltalk room watched in Paltalk's directory, and its group number. */

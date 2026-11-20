@@ -3,7 +3,8 @@ import { cleanText, json, sha256, validHTTPURL, validISODate } from "./util";
 import { sendPushToInstallations } from "./apns";
 import { signedMediaURL } from "./media";
 import { youtubeVideos } from "./recordings";
-import { beginSession, endSession, liveRow, queueOf, resolveQueue, sessionPayload, unreadDuaCount } from "./session";
+import { beginSession, endSession, liveRow, queueOf, resolveQueue, sessionPayload, unreadDuaCount, type QueueItem } from "./session";
+import { newestDailyZikr, overrideActive } from "./dailyZikr";
 import { recordingConfig, trackRoom } from "./roomRecordings";
 import { announceDailyZikr } from "./live";
 import { presentAttachments, validAttachments } from "./postMedia";
@@ -161,7 +162,7 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
   const [group, live, zikr, meetings, people] = await Promise.all([
     env.DB.prepare("SELECT id,name,description,video_clips,simple_page,start_title FROM member_groups WHERE id=?").bind(groupID).first(),
     liveRow(env, groupID),
-    env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,autoplay_json
+    env.DB.prepare(`SELECT id,title,weekdays_json,start_hour,start_minute,time_zone,anchor,duration_minutes,autoplay_json,autoplay_latest,autoplay_override_at
       FROM group_zikr_sessions WHERE group_id=? AND is_active=1 ORDER BY start_hour,start_minute`).bind(groupID).all(),
     env.DB.prepare(`SELECT id,title,starts_at,duration_minutes FROM group_meetings
       WHERE group_id=? AND is_cancelled=0 AND starts_at >= ? ORDER BY starts_at LIMIT 20`)
@@ -172,6 +173,12 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
       WHERE g.group_id=?`).bind(groupID).first<{ n: number }>(),
   ]);
   const managing = await canManage(env, memberID, role, groupID);
+  // The newest Daily Zikr, for times that play it by itself and for a simple
+  // page's start sheet.
+  const newest = (zikr.results ?? []).some(row => row.autoplay_latest) || group?.simple_page ? await newestDailyZikr(env) : null;
+  const plays = (row: Record<string, unknown>): QueueItem[] =>
+    row.autoplay_latest && newest && !overrideActive(row.autoplay_override_at as string | null) ? [newest]
+      : queueOf({ queue_json: String(row.autoplay_json ?? "[]") });
   // A test session is live only for the Halqah's admins.
   const isLive = live?.state === "live" && (!live.is_test || managing);
   return json({
@@ -182,7 +189,11 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
       // page (no stage); admins get only People and Add a zikr time.
       simplePage: group?.simple_page ? true : undefined,
       // A simple page's start button, and the session's title.
-      startTitle: group?.simple_page && group?.start_title ? group.start_title : undefined },
+      startTitle: group?.simple_page && group?.start_title ? group.start_title : undefined,
+      // The newest Daily Zikr from where it begins: what a simple page's start sheet offers first.
+      newestZikr: group?.simple_page && managing && newest ? {
+        videoID: newest.id, title: newest.title, startSeconds: newest.startSeconds, endSeconds: newest.endSeconds,
+      } : undefined },
     canManage: managing,
     memberCount: people?.n ?? 0,
     live: isLive && live ? {
@@ -199,11 +210,13 @@ export async function groupDetail(env: Env, memberID: string, groupID: string): 
       startHour: row.start_hour, startMinute: row.start_minute, timeZoneIdentifier: row.time_zone,
       anchor: row.anchor ?? undefined, durationMinutes: row.duration_minutes,
       // What this time plays by itself when no admin starts a session.
-      autoplayTitle: queueOf({ queue_json: String(row.autoplay_json ?? "[]") }).map(item => item.title).join(" · ") || undefined,
+      autoplayTitle: plays(row).map(item => item.title).join(" · ") || undefined,
       // What it plays, for an admin changing it.
-      autoplay: managing && row.autoplay_json ? queueOf({ queue_json: String(row.autoplay_json) }).map(item => ({
+      autoplay: managing && plays(row).length ? plays(row).map(item => ({
         kind: item.kind, id: item.id, title: item.title, startSeconds: item.startSeconds, endSeconds: item.endSeconds,
       })) : undefined,
+      // It plays the newest Daily Zikr by itself (until an admin's own choice today).
+      autoplayNewest: row.autoplay_latest ? true : undefined,
     })),
     meetings: (meetings.results ?? []).map(row => ({
       id: row.id, title: row.title, startsAt: row.starts_at, durationMinutes: row.duration_minutes,
@@ -356,6 +369,15 @@ export async function saveZikrSession(env: Env, memberID: string, groupID: strin
       duration_minutes=excluded.duration_minutes,is_active=1,updated_at=excluded.updated_at,autoplay_json=excluded.autoplay_json`)
     .bind(sessionID, groupID, title, JSON.stringify(weekdays.length ? weekdays : [1, 2, 3, 4, 5, 6, 7]), hour, minute, zone, anchor, duration,
       new Date().toISOString(), autoplay).run();
+  if (typeof input.autoplayNewest === "boolean") {
+    // Switched to (or from) the newest Daily Zikr: no earlier choice of the admin's stands.
+    await env.DB.prepare("UPDATE group_zikr_sessions SET autoplay_latest=?,autoplay_override_at=NULL WHERE group_id=? AND id=?")
+      .bind(input.autoplayNewest ? 1 : 0, groupID, sessionID).run();
+  } else if (autoplay) {
+    // An admin's own video for a time that plays the newest Daily Zikr: theirs, for today.
+    await env.DB.prepare("UPDATE group_zikr_sessions SET autoplay_override_at=? WHERE group_id=? AND id=? AND autoplay_latest=1")
+      .bind(new Date().toISOString(), groupID, sessionID).run();
+  }
   return json({ ok: true, id: sessionID });
 }
 

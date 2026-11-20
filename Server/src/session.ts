@@ -4,6 +4,7 @@ import { signedMediaURL } from "./media";
 import { groupRecording, youtubeVideos } from "./recordings";
 import { startRoomRecording, stopRoomRecording } from "./roomRecordings";
 import { cleanText, json } from "./util";
+import { newestDailyZikr, overrideActive } from "./dailyZikr";
 
 // A Halqah session that plays recordings and past zikr to the group.
 //
@@ -613,10 +614,11 @@ export function localClock(now: Date, zone: string): { weekday: number; minutes:
  *  anything was live then). */
 export async function autoplayDue(env: Env, now = new Date()): Promise<void> {
   const rows = await env.DB.prepare(`SELECT s.id,s.group_id,s.title,s.weekdays_json,s.start_hour,s.start_minute,s.time_zone,s.autoplay_json,
-      s.duration_minutes,s.last_autoplay_at,l.state FROM group_zikr_sessions s LEFT JOIN group_live l ON l.group_id=s.group_id
-    WHERE s.is_active=1 AND s.anchor IS NULL AND s.autoplay_json IS NOT NULL`).all<{
+      s.duration_minutes,s.last_autoplay_at,s.autoplay_latest,s.autoplay_override_at,l.state FROM group_zikr_sessions s LEFT JOIN group_live l ON l.group_id=s.group_id
+    WHERE s.is_active=1 AND s.anchor IS NULL AND (s.autoplay_json IS NOT NULL OR s.autoplay_latest=1)`).all<{
       id: string; group_id: string; title: string; weekdays_json: string; start_hour: number; start_minute: number;
-      time_zone: string; autoplay_json: string; duration_minutes: number | null; last_autoplay_at: string | null; state: string | null;
+      time_zone: string; autoplay_json: string | null; duration_minutes: number | null; last_autoplay_at: string | null; state: string | null;
+      autoplay_latest: number; autoplay_override_at: string | null;
     }>();
   for (const row of rows.results ?? []) {
     if (row.state === "live") continue;
@@ -635,7 +637,10 @@ export async function autoplayDue(env: Env, now = new Date()): Promise<void> {
     const held = await env.DB.prepare("SELECT 1 AS n FROM group_live_history WHERE group_id=? AND is_test=0 AND started_at>=? LIMIT 1")
       .bind(row.group_id, began).first();
     if (held) continue;
-    const queue = queueOf({ queue_json: row.autoplay_json });
+    // The newest Daily Zikr from where it begins, unless an admin chose this
+    // time's video themselves today; without a marked one, the admin's choice.
+    const newest = row.autoplay_latest && !overrideActive(row.autoplay_override_at, now) ? await newestDailyZikr(env, now) : null;
+    const queue = newest ? [newest] : queueOf({ queue_json: row.autoplay_json ?? "[]" });
     if (!queue.length) continue;
     // Only while nothing is live: a session that started since the read above
     // (an admin's, the relay's) is never ended by the schedule.

@@ -606,6 +606,46 @@ describe("recorded zikr", () => {
     expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ videoID: "liveliveliv" }] })).status).toBe(400);
   });
 
+  it("plays the newest marked Daily Zikr by itself, unless an admin chose the video today", async () => {
+    const { env, raw, call, member, admin } = await setup({ VIDEO_MARKS_TOKEN: "marks-token" } as Partial<Env>);
+    const now = new Date("2026-10-30T01:02:00Z"); // Thursday 21:02 in New York
+    const video = (id: string, published: string) => raw.prepare(`INSERT INTO feed_items(id,source,kind,title,source_url,video_id,published_at,updated_at)
+      VALUES(?,'youtube','video',?,?,?,?,?)`).run(`youtube:${id}`, "Online Zikr with Sheikhul Mukarram Hazrat Ameer Abdul Qadeer Awan MZA",
+      `https://www.youtube.com/watch?v=${id}`, id, published, published);
+    video("olderzikr01", "2026-10-28T16:00:00Z");
+    video("newestzikr1", "2026-10-29T16:00:00Z");
+    video("nomarks0001", "2026-10-29T20:00:00Z"); // newer, but not marked yet
+    const mark = (body: unknown, token = "marks-token") => worker.fetch(new Request("https://api.example.com/v1/service/video-marks", {
+      method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) }), env);
+    expect((await mark({ videoID: "newestzikr1", startSeconds: 216, endSeconds: 2642 }, "wrong-token!")).status).toBe(401);
+    expect((await mark({ videoID: "newestzikr1", startSeconds: 300, endSeconds: 200 })).status).toBe(400);
+    expect((await mark({ videoID: "olderzikr01", startSeconds: 100, endSeconds: 1900, method: "voice" })).status).toBe(200);
+    expect((await mark({ videoID: "newestzikr1", startSeconds: 216, endSeconds: 2642, method: "voice" })).status).toBe(200);
+
+    expect((await call(admin, "PUT", "/v1/groups/usa/zikr/evening", {
+      title: "Daily Evening Zikr", startHour: 21, startMinute: 0, timeZoneIdentifier: "America/New_York", weekdays: [5], autoplayNewest: true,
+    })).status).toBe(200);
+    const sessions = async () => ((await (await call(admin, "GET", "/v1/groups/usa")).json()) as {
+      zikrSessions: { autoplayNewest?: boolean; autoplay?: { id: string; startSeconds?: number; endSeconds?: number }[] }[] }).zikrSessions;
+    vi.useFakeTimers({ now, toFake: ["Date"] });
+    expect((await sessions())[0]).toMatchObject({ autoplayNewest: true, autoplay: [{ id: "newestzikr1", startSeconds: 216, endSeconds: 2642 }] });
+    await autoplayDue(env, now);
+    const live = ((await (await call(member, "GET", "/v1/groups/usa")).json()) as { live?: { queue: { id: string; startSeconds?: number; durationSeconds?: number }[] } }).live;
+    expect(live?.queue).toEqual([expect.objectContaining({ id: "newestzikr1", startSeconds: 216, durationSeconds: 2426 })]);
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
+
+    // An admin's own video wins for that day; the newest comes back the next.
+    raw.prepare("DELETE FROM group_live_history").run();
+    raw.prepare("UPDATE group_zikr_sessions SET last_autoplay_at=NULL").run();
+    expect((await call(admin, "PUT", "/v1/groups/usa/zikr/evening", {
+      title: "Daily Evening Zikr", startHour: 21, startMinute: 0, timeZoneIdentifier: "America/New_York", weekdays: [5],
+      autoplay: [{ recordingID: undefined, videoID: "olderzikr01" }],
+    })).status).toBe(200);
+    expect((await sessions())[0]?.autoplay?.[0]?.id).toBe("olderzikr01");
+    vi.setSystemTime(new Date(now.getTime() + 21 * 3_600_000));
+    expect((await sessions())[0]?.autoplay?.[0]?.id).toBe("newestzikr1");
+  });
+
   it("plays a clip of a video (start and end times) only in a Halqah that allows clips", async () => {
     vi.stubGlobal("fetch", async (url: string) => {
       const ids = new URL(url).searchParams.get("id")?.split(",") ?? [];
