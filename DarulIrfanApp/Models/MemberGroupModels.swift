@@ -394,6 +394,10 @@ struct GroupDetail: Codable, Sendable {
         /// Its admins may play part of a YouTube video, from a start time to
         /// an end time (owner 2026-11-19). Absent for every other Halqah.
         var videoClips: Bool? = nil
+        /// Its page shows only the header, the session's player, the zikr
+        /// times and the People and Add a zikr time tiles: no stage (owner
+        /// 2026-11-19). Absent for every other Halqah.
+        var simplePage: Bool? = nil
     }
 
     var group: Summary
@@ -413,6 +417,8 @@ struct GroupDetail: Codable, Sendable {
 
     /// The Halqah's admins see Start at and End at for a YouTube link.
     var hasVideoClips: Bool { group.videoClips == true }
+    /// The Halqah's page is the simple one (`HalqahPageLayout`).
+    var hasSimplePage: Bool { group.simplePage == true }
 }
 
 /// Services a group feature depends on. Until one is connected the app says

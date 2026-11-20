@@ -1,5 +1,41 @@
 import SwiftUI
 
+/// What a Halqah's page shows. Every Halqah has the full page; one the server
+/// marks `simplePage` (owner 2026-11-19: "remove everything including stage,
+/// all buttons except for People, Add a zikr time") shows only the header,
+/// the live session's player on the page, its zikr times, and the People and
+/// Add a zikr time tiles for its admins. The keep-awake and the presence
+/// check-in follow the session on both.
+struct HalqahPageLayout: Equatable {
+    let isSimple: Bool
+
+    init(simplePage: Bool) { isSimple = simplePage }
+    init(_ detail: GroupDetail?) { isSimple = detail?.hasSimplePage == true }
+
+    /// The admin tiles a simple page keeps.
+    static let simpleAdminTiles: Set<String> = ["people", "zikr"]
+
+    var showsMethodOfZikr: Bool { !isSimple }
+    /// The live stage: its entry card, opening by itself when a session
+    /// starts, and opening from a Join or a notification.
+    var showsStage: Bool { !isSimple }
+    /// Our Sheikh's live banner.
+    var showsSheikhLive: Bool { !isSimple }
+    /// The whole session card (notice, dua, listeners, controls, End, Join);
+    /// otherwise only the session's player.
+    var showsSessionCard: Bool { !isSimple }
+    var showsNextZikr: Bool { !isSimple }
+    var showsMeetings: Bool { !isSimple }
+    var showsPosts: Bool { !isSimple }
+    /// "Return to session" for a room the member is in.
+    var showsRoomResume: Bool { !isSimple }
+    var showsGoLive: Bool { !isSimple }
+    /// The Markaz cards, integration notes and drafts in the admin section.
+    var showsAdminExtras: Bool { !isSimple }
+
+    func showsAdminTile(_ id: String) -> Bool { !isSimple || Self.simpleAdminTiles.contains(id) }
+}
+
 /// One community group: what is live now, its zikr times, its meetings, and
 /// what its admins have published. Everything is watched and joined inside
 /// the app.
@@ -96,8 +132,10 @@ struct GroupDetailView: View {
                     facts: headerFacts
                 )
                 .diAppear()
-                MethodOfZikrLink(compact: true)
-                if let activePass = NativeHalqaSession.shared.resumePass(groupID: group.id) {
+                if layout.showsMethodOfZikr {
+                    MethodOfZikrLink(compact: true)
+                }
+                if layout.showsRoomResume, let activePass = NativeHalqaSession.shared.resumePass(groupID: group.id) {
                     Button("Return to session") { room = activePass }
                         .buttonStyle(DIPrimaryButtonStyle())
                 }
@@ -121,17 +159,19 @@ struct GroupDetailView: View {
                     // stage and in its room only, never on the page once it ends
                     // (owner, 2026-11-04). Every Halqah's live Zikr has its stage,
                     // led in a room, on a live video or played from a recording.
-                    if detail?.live?.kind == "zikr" {
+                    if layout.showsStage && detail?.live?.kind == "zikr" {
                         StageEntryCard { stageOpen = true }
                     }
-                    officialLiveSection
+                    if layout.showsSheikhLive { officialLiveSection }
                     liveSection
-                    nextZikrSection
+                    if layout.showsNextZikr { nextZikrSection }
                     if detail?.canManage == true { adminSection }
                     zikrSection
-                    meetingsSection
-                    postsSection
-                        .accessibilityIdentifier("halqah-detail-posts")
+                    if layout.showsMeetings { meetingsSection }
+                    if layout.showsPosts {
+                        postsSection
+                            .accessibilityIdentifier("halqah-detail-posts")
+                    }
                 }
             }
             .padding(DISpacing.md)
@@ -223,6 +263,9 @@ struct GroupDetailView: View {
         // stage once per session; closing it leaves the page and its card.
         // A Join opens it whenever the Zikr is live, with the live sound.
         .onChange(of: detail?.live?.sessionID) { _, sessionID in
+            // A simple page never opens the stage, also from a Join or a
+            // notification: its session plays on the page.
+            guard layout.showsStage else { return }
             guard detail?.live?.kind == "zikr", let sessionID, room == nil else { return }
             if joinLive && !joinedLive {
                 joinedLive = true
@@ -291,6 +334,8 @@ struct GroupDetailView: View {
     private var whatsappReady: Bool { detail?.integrations?.whatsappForwarding ?? true }
     /// Only a Halqah the server marks with video clips (owner 2026-11-19).
     private var videoClips: Bool { detail?.hasVideoClips == true }
+    /// The full page, or the simple one the server marks.
+    private var layout: HalqahPageLayout { HalqahPageLayout(detail) }
 
     // MARK: Header
 
@@ -342,7 +387,14 @@ struct GroupDetailView: View {
 
     @ViewBuilder
     private var liveSection: some View {
-        if let live = detail?.live {
+        if let live = detail?.live, !layout.showsSessionCard {
+            // A simple page: the session's video or recording, played with
+            // the group as on the card, and nothing else of the session.
+            if GroupSessionMedia.shows(live, groupID: group.id) {
+                GroupSessionMedia(live: live, groupName: group.name, audioPlayer: dependencies?.audioPlayer)
+                    .halqahCard()
+            }
+        } else if let live = detail?.live {
             GroupSessionCard(
                 live: live, group: group, service: service, canManage: detail?.canManage == true,
                 meetingsReady: meetingsReady, audioPlayer: dependencies?.audioPlayer,
@@ -489,56 +541,66 @@ struct GroupDetailView: View {
     private var adminSection: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
             DISectionHeader(titleKey: "Halqah admin", systemImage: "person.badge.key")
-            if group.isMarkaz, let markazAccess, markazAccess.canReport {
+            if layout.showsAdminExtras, group.isMarkaz, let markazAccess, markazAccess.canReport {
                 MarkazEntryCards(service: service, access: markazAccess)
                     .diAppear(delay: 0.04)
             }
-            Button {
-                sheet = .live
-            } label: {
-                HalqahHeroTileLabel(
-                    titleKey: "Go live",
-                    subtitle: goLiveLine,
-                    systemImage: "dot.radiowaves.left.and.right",
-                    isLive: detail?.live != nil
-                )
+            if layout.showsGoLive {
+                Button {
+                    sheet = .live
+                } label: {
+                    HalqahHeroTileLabel(
+                        titleKey: "Go live",
+                        subtitle: goLiveLine,
+                        systemImage: "dot.radiowaves.left.and.right",
+                        isLive: detail?.live != nil
+                    )
+                }
+                .buttonStyle(HalqahTileButtonStyle())
+                .halqahTileAccessibility(titleKey: "Go live", value: goLiveLine, hintKey: "Starts a zikr or meeting for the whole Halqah.")
+                .diAppear(delay: 0.08)
             }
-            .buttonStyle(HalqahTileButtonStyle())
-            .halqahTileAccessibility(titleKey: "Go live", value: goLiveLine, hintKey: "Starts a zikr or meeting for the whole Halqah.")
-            .diAppear(delay: 0.08)
-            HalqahTileGrid(items: adminTiles)
+            HalqahTileGrid(items: adminTiles.filter { layout.showsAdminTile($0.id) })
                 .diAppear(delay: 0.12)
-            if !meetingsReady {
-                IntegrationPendingNote("Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete.")
-            }
-            if !whatsappReady {
-                IntegrationPendingNote("Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.")
-            }
-            if draftsFailed {
-                DICard {
-                    VStack(alignment: .leading, spacing: DISpacing.sm) {
-                        Text("Drafts could not be loaded. Try again to see posts waiting for approval.")
-                            .diInterfaceFont(.subheadline)
-                            .foregroundStyle(DIColor.textPrimary)
-                        Button("Try again") { Task { await load() } }
-                            .buttonStyle(DISecondaryButtonStyle())
-                    }
-                }
-            }
-            if !draftsFailed && !drafts.isEmpty {
-                DISectionHeader(titleKey: "Waiting for approval", systemImage: "tray.full")
-                ForEach(drafts) { draft in
-                    GroupDraftCard(draft: draft) { title, body in
-                        await performChange { try await service.publishDraft(draft.id, in: group.id, title: title, body: body) }
-                    } onDiscard: {
-                        await performChange { try await service.removePost(draft.id, in: group.id) }
-                    }
-                }
+            if layout.showsAdminExtras {
+                adminExtras
             }
         }
         .task(id: group.id) {
             guard group.isMarkaz else { return }
             markazAccess = await MarkazAccessCache.access(using: service)
+        }
+    }
+
+    /// The integration notes and the drafts waiting for approval.
+    @ViewBuilder
+    private var adminExtras: some View {
+        if !meetingsReady {
+            IntegrationPendingNote("Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete.")
+        }
+        if !whatsappReady {
+            IntegrationPendingNote("Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.")
+        }
+        if draftsFailed {
+            DICard {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    Text("Drafts could not be loaded. Try again to see posts waiting for approval.")
+                        .diInterfaceFont(.subheadline)
+                        .foregroundStyle(DIColor.textPrimary)
+                    Button("Try again") { Task { await load() } }
+                        .buttonStyle(DISecondaryButtonStyle())
+                }
+            }
+        }
+        if !draftsFailed && !drafts.isEmpty {
+            DISectionHeader(titleKey: "Waiting for approval", systemImage: "tray.full")
+            ForEach(drafts) { draft in
+                GroupDraftCard(draft: draft) { title, body in
+                    await performChange { try await service.publishDraft(draft.id, in: group.id, title: title, body: body) }
+                } onDiscard: {
+                    await performChange { try await service.removePost(draft.id, in: group.id) }
+                }
+            }
         }
     }
 
