@@ -143,6 +143,15 @@ struct GroupQueueItem: Codable, Sendable, Equatable, Identifiable {
     /// Where in the YouTube video the player is when the group is at
     /// `position` of this item.
     func videoTime(atGroupPosition position: Double) -> Double { clipStart + position }
+    /// The times "The group is at … of …" shows: a clip's in the video's own
+    /// times (owner 2026-11-19: "0:51 of 40:21" read as if the clip began at
+    /// 0:00), e.g. "4:12 of 44:02"; anything else as the group's place in
+    /// the item and its length. The progress and the controls stay counted
+    /// from the clip's start.
+    func shownTimes(atGroupPosition position: Double) -> (elapsed: Double, total: Double?) {
+        if isClip { return (videoTime(atGroupPosition: position), clipEnd) }
+        return (position, durationSeconds.map(Double.init))
+    }
     /// "3:41 - 44:02", shown after a clip's title.
     var clipRangeText: String? {
         guard isClip, let clipEnd else { return nil }

@@ -162,6 +162,24 @@ final class HalqahVideoClipsTests: XCTestCase {
         XCTAssertFalse(whole.isOver(atVideoTime: 100_000))
     }
 
+    func testTheGroupsPlaceIsShownInTheVideosOwnTimes() throws {
+        let detail = try decoder.decode(GroupDetail.self, from: Data(detailJSON.utf8))
+        let queue = try XCTUnwrap(detail.live?.queue)
+        // A clip from 3:41 to 44:02, 31 s in: "The group is at 4:12 of 44:02".
+        let clip = queue[0].shownTimes(atGroupPosition: 31)
+        XCTAssertEqual(clip.elapsed, 252)
+        XCTAssertEqual(clip.total, 2642)
+        XCTAssertEqual(ClipTime.text(clip.elapsed), "4:12")
+        XCTAssertEqual(clip.total.map { ClipTime.text($0) }, "44:02")
+        // A whole video and a recording: the place in the item and its length, as before.
+        let whole = queue[1].shownTimes(atGroupPosition: 31)
+        XCTAssertEqual(whole.elapsed, 31)
+        XCTAssertEqual(whole.total, 1800)
+        let recording = queue[2].shownTimes(atGroupPosition: 31)
+        XCTAssertEqual(recording.elapsed, 31)
+        XCTAssertEqual(recording.total, 600)
+    }
+
     func testAnotherPartOfTheSameVideoLoadsAgain() {
         let at = Date(timeIntervalSince1970: 1_000_000)
         let first = YouTubeSync(position: 0, paused: false, at: at, clipStart: 221, clipEnd: 2642)

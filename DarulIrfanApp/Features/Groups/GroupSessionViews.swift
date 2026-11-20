@@ -527,8 +527,10 @@ struct GroupSessionPlayer: View {
     }
 
     private func progress(at date: Date) -> String {
-        let elapsed = GroupSessionCard.clock(playback.position(at: date)) ?? ""
-        if let total = GroupSessionCard.clock(item.durationSeconds.map(Double.init)) {
+        // A clip in the video's own times; anything else as before.
+        let times = item.shownTimes(atGroupPosition: playback.position(at: date))
+        let elapsed = GroupSessionCard.clock(times.elapsed) ?? ""
+        if let total = GroupSessionCard.clock(times.total) {
             return String(localized: "The group is at \(elapsed) of \(total)")
         }
         return String(localized: "The group is at \(elapsed)")
