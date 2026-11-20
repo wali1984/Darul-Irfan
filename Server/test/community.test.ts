@@ -629,11 +629,12 @@ describe("recorded zikr", () => {
     await call(admin, "POST", "/v1/groups/usa/live", { state: "offline" });
 
     expect((seen.group as { simplePage?: boolean }).simplePage).toBeUndefined();
-    raw.prepare("UPDATE member_groups SET video_clips=1,simple_page=1 WHERE id='usa'").run();
+    raw.prepare("UPDATE member_groups SET video_clips=1,simple_page=1,start_title='Start Evening Zikr' WHERE id='usa'").run();
     await call(admin, "POST", "/v1/groups/usa/live", clip);
     seen = await detail(member);
     expect(seen.group.videoClips).toBe(true);
     expect((seen.group as { simplePage?: boolean }).simplePage).toBe(true);
+    expect((seen.group as { startTitle?: string }).startTitle).toBe("Start Evening Zikr");
     expect(seen.live?.queue).toEqual([expect.objectContaining({ id: "pastzikr001", startSeconds: 221, endSeconds: 2642, durationSeconds: 2421 })]);
     // Added while live: a clip of its own.
     const added = await call(admin, "POST", "/v1/groups/usa/control", { action: "add", items: [{ videoID: "pastzikr002", startSeconds: 60, endSeconds: 120 }] });
