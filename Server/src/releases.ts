@@ -9,7 +9,9 @@ import type { Env } from "./contracts";
 /** GET /v1/app/releases - the newest build out, per platform and channel. */
 export async function appReleases(env: Env): Promise<Response> {
   const object = await env.MEDIA?.get("app/releases.json").catch(() => null);
-  const headers = { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=300" };
+  // A minute at most: the apps check every few minutes while open, and a new
+  // release must reach their update banner at once (owner 2026-11-19).
+  const headers = { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=60" };
   if (!object) return new Response("{}", { headers });
   return new Response((object as R2ObjectBody).body, { headers });
 }
