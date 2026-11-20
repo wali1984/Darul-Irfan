@@ -58,7 +58,13 @@ function playing(row: Row, now = new Date()): Record<string, unknown> | null {
     const at = playbackAt(queue, row.queue_index, row.position_seconds, row.position_at, !!row.paused, now);
     const item = queue[at.index];
     if (!item || at.finished || item.kind !== "video" || !YOUTUBE_ID.test(item.id)) return null;
-    return { videoID: item.id, title: item.title, positionSeconds: Math.floor(at.positionSeconds), paused: at.paused,
+    // A clip (a Halqah with video clips): the place is the VIDEO's own time
+    // (its start + the group's place), so the page seeks straight to it, and
+    // it stops at endSeconds.
+    const start = item.startSeconds ?? 0;
+    return { videoID: item.id, title: item.title, positionSeconds: Math.floor(start + at.positionSeconds), paused: at.paused,
+      ...(item.startSeconds || item.endSeconds ? { startSeconds: start,
+        endSeconds: item.durationSeconds ? start + item.durationSeconds : item.endSeconds } : {}),
       at: now.toISOString(), mark: `${at.index}|${row.queue_index}|${row.position_at ?? ""}|${row.paused ? 1 : 0}` };
   }
   // A live YouTube stream of the Zikr, when the session has one.
