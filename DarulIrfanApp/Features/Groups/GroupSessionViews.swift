@@ -36,6 +36,8 @@ struct GroupSessionCard: View {
     /// False while the stage is open over the page: the stage shows the video
     /// or recording then, and one player at a time plays it.
     var showsMedia = true
+    /// The Halqah's admins may play part of a pasted YouTube video.
+    var videoClips = false
 
     private enum Sheet: String, Identifiable {
         case notice, dua, listeners, add
@@ -115,7 +117,8 @@ struct GroupSessionCard: View {
                 case .notice: GroupNoticeComposer(groupID: group.id, service: service, current: live.notice?.text, sessionID: sheetSessionID)
                 case .dua: GroupDuaComposer(groupID: group.id, service: service)
                 case .listeners: GroupListenersView(attendance: live.attendance ?? [])
-                case .add: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, addingToSession: true, sessionID: sheetSessionID)
+                case .add: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, addingToSession: true, sessionID: sheetSessionID,
+                                            videoClips: videoClips)
                 }
             }
         }
@@ -216,7 +219,7 @@ struct GroupSessionCard: View {
             Image(systemName: isCurrent ? "speaker.wave.2.fill" : (index < playback.index ? "checkmark.circle" : "circle"))
                 .foregroundStyle(isCurrent ? DIColor.primary : DIColor.textMuted)
                 .frame(width: 20)
-            Text(verbatim: item.title)
+            Text(verbatim: item.clipRangeText.map { "\(item.title) · \($0)" } ?? item.title)
                 .font(.subheadline.weight(isCurrent ? .semibold : .regular))
                 .lineLimit(1)
             Spacer(minLength: 0)
@@ -450,11 +453,16 @@ struct GroupSessionPlayer: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DISpacing.sm) {
-            Text(verbatim: item.title).diInterfaceFont(.subheadline, weight: .semibold)
+            Text(verbatim: item.clipRangeText.map { "\(item.title) · \($0)" } ?? item.title)
+                .diInterfaceFont(.subheadline, weight: .semibold)
             if item.isYouTube {
+                // A clip plays from its start in the video plus the group's
+                // place, and stops at its end; the group's place, and all
+                // shown here, stay counted from the clip's start.
                 YouTubePlayerView(
                     videoID: item.videoID ?? item.id,
-                    sync: YouTubeSync(position: playback.positionSeconds, paused: playback.paused, at: playback.at)
+                    sync: YouTubeSync(position: playback.positionSeconds, paused: playback.paused, at: playback.at,
+                                      clipStart: item.clipStart, clipEnd: item.clipEnd)
                 )
                 .aspectRatio(16 / 9, contentMode: .fit)
                 .frame(maxHeight: 360)

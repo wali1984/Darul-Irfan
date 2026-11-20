@@ -34,6 +34,9 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     var anchorOffsetMinutes: Int? = nil
     /// A group's zikr time that plays a recording by itself: what it plays.
     var autoplayTitle: String? = nil
+    /// The same, item by item, for the Halqah's admins, so the zikr time
+    /// editor can show it again (absent for members and from an older server).
+    var autoplay: [ZikrAutoplayItem]? = nil
     /// The Urdu wording of `title` and `availabilityNote`, shown when the app
     /// is in Urdu; the catalogue fills them once the owner approves the
     /// wording, and the English is shown until then.
@@ -66,6 +69,20 @@ struct ZikrSession: Codable, Sendable, Identifiable, Equatable {
     func title(inUrdu urdu: Bool) -> String { displayTitle(urdu: urdu) }
 
     func availabilityNote(inUrdu urdu: Bool) -> String? { displayAvailabilityNote(urdu: urdu) }
+}
+
+/// One thing a group's zikr time plays by itself: a recording, or a YouTube
+/// video - in a Halqah with video clips, possibly part of it, from
+/// `startSeconds` to `endSeconds` into the video.
+struct ZikrAutoplayItem: Codable, Sendable, Equatable {
+    /// "video" or "recording".
+    var kind: String
+    var id: String
+    var title: String? = nil
+    var startSeconds: Double? = nil
+    var endSeconds: Double? = nil
+
+    var isVideo: Bool { kind == "video" }
 }
 
 /// Prayer-time events an online zikr session is announced against.

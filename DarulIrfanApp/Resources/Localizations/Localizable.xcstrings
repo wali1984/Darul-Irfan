@@ -39896,6 +39896,159 @@
           }
         }
       }
+    },
+    "Start at": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start at"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آغاز کا وقت"
+          }
+        }
+      }
+    },
+    "End at": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End at"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختتام کا وقت"
+          }
+        }
+      }
+    },
+    "0:00": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "0:00"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "0:00"
+          }
+        }
+      }
+    },
+    "End must be after the start.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End must be after the start."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختتام کا وقت آغاز کے بعد ہونا چاہیے۔"
+          }
+        }
+      }
+    },
+    "Enter a time such as 3:41 or 1:02:03.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a time such as 3:41 or 1:02:03."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وقت اس طرح لکھیں: 3:41 یا 1:02:03۔"
+          }
+        }
+      }
+    },
+    "Optional: play only part of the video, for example from 3:41 to 44:02.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional: play only part of the video, for example from 3:41 to 44:02."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختیاری: ویڈیو کا صرف ایک حصہ چلائیں، مثلاً 3:41 سے 44:02 تک۔"
+          }
+        }
+      }
+    },
+    "YouTube link": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YouTube link"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یوٹیوب لنک"
+          }
+        }
+      }
+    },
+    "A link pasted here plays instead of a choice from the library.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A link pasted here plays instead of a choice from the library."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہاں دیا گیا لنک لائبریری سے چنی گئی چیز کی جگہ چلے گا۔"
+          }
+        }
+      }
+    },
+    "Change video": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change video"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویڈیو تبدیل کریں"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

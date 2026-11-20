@@ -118,9 +118,120 @@ struct GroupQueueItem: Codable, Sendable, Equatable, Identifiable {
     var url: URL?
     var contentType: String?
     var videoID: String?
+    /// Part of a YouTube video, in a Halqah with video clips (owner
+    /// 2026-11-19): where in the video the clip starts (absent: from the
+    /// start) and ends. `durationSeconds` is then the clip's own length, and
+    /// the group's place counts from the clip's start. Recordings never
+    /// carry them.
+    var startSeconds: Double? = nil
+    var endSeconds: Double? = nil
 
     var isYouTube: Bool { kind == "video" }
     var isVideoFile: Bool { contentType?.hasPrefix("video/") == true }
+
+    /// Only part of the YouTube video plays.
+    var isClip: Bool { isYouTube && (startSeconds != nil || endSeconds != nil) }
+    /// Where in the YouTube video the group's place 0 is: 0 for a whole video.
+    var clipStart: Double { isYouTube ? max(0, startSeconds ?? 0) : 0 }
+    /// Where in the YouTube video a clip is over: its start plus its length.
+    /// Nil for a whole video, which ends where it ends.
+    var clipEnd: Double? {
+        guard isClip else { return nil }
+        if let durationSeconds, durationSeconds > 0 { return clipStart + Double(durationSeconds) }
+        return endSeconds
+    }
+    /// Where in the YouTube video the player is when the group is at
+    /// `position` of this item.
+    func videoTime(atGroupPosition position: Double) -> Double { clipStart + position }
+    /// "3:41 - 44:02", shown after a clip's title.
+    var clipRangeText: String? {
+        guard isClip, let clipEnd else { return nil }
+        return ClipTime.range(start: clipStart, end: clipEnd)
+    }
+}
+
+/// Times an admin types for a clip: "3:41", "44:02", "1:02:03", or plain
+/// seconds "221".
+enum ClipTime {
+    /// Whole seconds, or nil when the text is empty or not a time.
+    static func seconds(from text: String) -> Int? {
+        // Typed with an Urdu or Arabic keyboard too.
+        let folded = text.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars.map { scalar -> String in
+            switch scalar.value {
+            case 0x0660...0x0669: return String(scalar.value - 0x0660)
+            case 0x06F0...0x06F9: return String(scalar.value - 0x06F0)
+            default: return String(scalar)
+            }
+        }.joined()
+        guard !folded.isEmpty else { return nil }
+        let parts = folded.split(separator: ":", omittingEmptySubsequences: false).map(String.init)
+        guard (1...3).contains(parts.count) else { return nil }
+        var total = 0
+        for (index, part) in parts.enumerated() {
+            guard !part.isEmpty, part.count <= 6, part.allSatisfy({ $0.isASCII && $0.isNumber }),
+                  let value = Int(part) else { return nil }
+            // Minutes and seconds after the first part are two digits under 60.
+            if index > 0 { guard part.count == 2, value < 60 else { return nil } }
+            total = total * 60 + value
+        }
+        return total
+    }
+
+    /// "3:41" or "1:02:03".
+    static func text(_ seconds: Int) -> String {
+        let value = max(0, seconds)
+        let hours = value / 3_600, minutes = (value % 3_600) / 60, rest = value % 60
+        return hours > 0
+            ? String(format: "%d:%02d:%02d", hours, minutes, rest)
+            : String(format: "%d:%02d", minutes, rest)
+    }
+
+    static func text(_ seconds: Double) -> String {
+        text(seconds.isFinite ? Int(seconds.rounded()) : 0)
+    }
+
+    /// "3:41 - 44:02".
+    static func range(start: Double, end: Double) -> String {
+        "\(text(start)) - \(text(end))"
+    }
+}
+
+/// The "Start at" and "End at" an admin gave a pasted YouTube link, in
+/// whole seconds into the video; either may be left empty.
+struct VideoClipTimes: Equatable, Hashable, Sendable {
+    var start: Int? = nil
+    var end: Int? = nil
+
+    var isEmpty: Bool { start == nil && end == nil }
+
+    enum Problem: Error, Equatable {
+        /// A field that is not a time.
+        case unreadable
+        case endNotAfterStart
+    }
+
+    /// The two fields as typed. A start of 0 is the same as no start.
+    static func read(start: String, end: String) -> Result<VideoClipTimes, Problem> {
+        let startText = start.trimmingCharacters(in: .whitespacesAndNewlines)
+        let endText = end.trimmingCharacters(in: .whitespacesAndNewlines)
+        var times = VideoClipTimes()
+        if !startText.isEmpty {
+            guard let value = ClipTime.seconds(from: startText) else { return .failure(.unreadable) }
+            times.start = value
+        }
+        if !endText.isEmpty {
+            guard let value = ClipTime.seconds(from: endText) else { return .failure(.unreadable) }
+            times.end = value
+        }
+        if let end = times.end, end <= (times.start ?? 0) { return .failure(.endNotAfterStart) }
+        if times.start == 0 { times.start = nil }
+        return .success(times)
+    }
+
+    static func problem(start: String, end: String) -> Problem? {
+        if case .failure(let problem) = read(start: start, end: end) { return problem }
+        return nil
+    }
 }
 
 /// Where the group is: item `index`, `positionSeconds` into it at `at`.
@@ -158,11 +269,42 @@ struct GroupAttendee: Codable, Sendable, Equatable, Identifiable {
 enum GroupQueueEntry: Hashable, Sendable {
     case recording(String)
     case video(String)
+    /// Part of a YouTube video, in a Halqah with video clips: seconds into
+    /// the video where it starts and ends; either may be absent.
+    case clip(String, start: Int?, end: Int?)
 
-    var payload: [String: String] {
+    /// A pasted YouTube video: the whole of it, or the part the admin gave.
+    static func youTube(_ videoID: String, times: VideoClipTimes) -> GroupQueueEntry {
+        times.isEmpty ? .video(videoID) : .clip(videoID, start: times.start, end: times.end)
+    }
+
+    /// A clip as the admin's lists show it: the video and its part.
+    static func clipTitle(_ videoID: String, start: Int?, end: Int?) -> String {
+        guard let end else { return start.map { "\(videoID) · \(ClipTime.text($0)) -" } ?? videoID }
+        return "\(videoID) · \(ClipTime.range(start: Double(start ?? 0), end: Double(end)))"
+    }
+
+    /// The recording's or the video's id.
+    var itemID: String {
         switch self {
-        case .recording(let id): ["recordingID": id]
-        case .video(let id): ["videoID": id]
+        case .recording(let id): return id
+        case .video(let id): return id
+        case .clip(let id, _, _): return id
+        }
+    }
+
+    /// As the server takes it: a clip's times are numbers.
+    var payload: [String: Any] {
+        switch self {
+        case .recording(let id):
+            return ["recordingID": id]
+        case .video(let id):
+            return ["videoID": id]
+        case .clip(let id, let start, let end):
+            var body: [String: Any] = ["videoID": id]
+            if let start { body["startSeconds"] = start }
+            if let end { body["endSeconds"] = end }
+            return body
         }
     }
 }
@@ -249,6 +391,9 @@ struct GroupDetail: Codable, Sendable {
         var id: String?
         var name: String?
         var description: String?
+        /// Its admins may play part of a YouTube video, from a start time to
+        /// an end time (owner 2026-11-19). Absent for every other Halqah.
+        var videoClips: Bool? = nil
     }
 
     var group: Summary
@@ -265,6 +410,9 @@ struct GroupDetail: Codable, Sendable {
     /// How many people the Halqah has, as its People list counts them: a
     /// number, never who. Absent from an older server.
     var memberCount: Int?
+
+    /// The Halqah's admins see Start at and End at for a YouTube link.
+    var hasVideoClips: Bool { group.videoClips == true }
 }
 
 /// Services a group feature depends on. Until one is connected the app says

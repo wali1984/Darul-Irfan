@@ -56,6 +56,8 @@ struct GroupDetailView: View {
     @State private var joining = false
     @State private var joinError: String?
     @State private var sheet: AdminSheet?
+    /// The zikr time an admin is changing (video clips only).
+    @State private var editingZikr: ZikrSession?
     /// Our Sheikh's own live Zikr, shown in every other Halqah while it is
     /// live and joined on its stage (owner, 2026-11-06).
     @State private var sheikhLive: SheikhLiveZikr?
@@ -249,12 +251,19 @@ struct GroupDetailView: View {
                 switch sheet {
                 case .people: GroupPeopleView(groupID: group.id, groupName: group.name, service: service)
                 case .post: GroupPostComposer(groupID: group.id, service: service)
-                case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady)
+                case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, videoClips: videoClips)
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
-                case .zikr: GroupZikrEditor(groupID: group.id, service: service)
+                case .zikr: GroupZikrEditor(groupID: group.id, service: service, videoClips: videoClips)
                 case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
                 case .history: GroupSessionHistoryView(groupID: group.id, service: service)
                 }
+            }
+        }
+        // A zikr time's Change video (video clips only): the editor filled
+        // with that time, saved under the same id.
+        .sheet(item: $editingZikr, onDismiss: { Task { await load() } }) { session in
+            NavigationStack {
+                GroupZikrEditor(groupID: group.id, service: service, videoClips: true, editing: session)
             }
         }
     }
@@ -280,6 +289,8 @@ struct GroupDetailView: View {
     /// Connected services; an older server that does not say is taken as ready.
     private var meetingsReady: Bool { detail?.integrations?.meetings ?? true }
     private var whatsappReady: Bool { detail?.integrations?.whatsappForwarding ?? true }
+    /// Only a Halqah the server marks with video clips (owner 2026-11-19).
+    private var videoClips: Bool { detail?.hasVideoClips == true }
 
     // MARK: Header
 
@@ -338,7 +349,8 @@ struct GroupDetailView: View {
                 joining: joining, joinError: joinError,
                 onJoinRoom: { Task { await join(meetingID: nil) } },
                 onChange: { await refreshQuietly() },
-                showsMedia: !stageOpen
+                showsMedia: !stageOpen,
+                videoClips: videoClips
             )
         }
     }
@@ -391,10 +403,12 @@ struct GroupDetailView: View {
                 DISectionHeader(titleKey: "Halqah Zikr", systemImage: "sparkles")
                 ForEach(sessions) { session in
                     GroupZikrRow(session: session, groupID: group.id, dependencies: dependencies,
-                                 canManage: detail?.canManage == true, removing: removingSchedule) {
-                        scheduleToRemove = ScheduleRemoval(id: session.id,
-                            title: session.displayTitle(urdu: DIBrand.readsUrdu(locale)), isMeeting: false)
-                    }
+                                 canManage: detail?.canManage == true, removing: removingSchedule,
+                                 onRemove: {
+                                     scheduleToRemove = ScheduleRemoval(id: session.id,
+                                         title: session.displayTitle(urdu: DIBrand.readsUrdu(locale)), isMeeting: false)
+                                 },
+                                 onEdit: detail?.canManage == true && videoClips ? { editingZikr = session } : nil)
                     .diScrollReveal()
                 }
             }
@@ -865,6 +879,9 @@ private struct GroupZikrRow: View {
     let canManage: Bool
     let removing: Bool
     let onRemove: () -> Void
+    /// Change video: what the time plays (admins of a Halqah with video
+    /// clips only; nil everywhere else).
+    let onEdit: (() -> Void)?
 
     @State private var reminderOn = false
     @State private var reminderBlocked = false
@@ -880,6 +897,15 @@ private struct GroupZikrRow: View {
     }
 
     private var reminderKey: String { "groupZikrReminder.\(groupID).\(session.id)" }
+
+    /// What the time plays by itself; a clip's part follows its title.
+    private var autoplayLine: String? {
+        guard let title = session.autoplayTitle else { return nil }
+        guard let item = session.autoplay?.first, item.isVideo, item.startSeconds != nil || item.endSeconds != nil else { return title }
+        let start = ClipTime.text(item.startSeconds ?? 0)
+        let end = item.endSeconds.map { ClipTime.text($0) } ?? ""
+        return "\(title) · \(start) - \(end)"
+    }
 
     var body: some View {
         let current = resolved
@@ -906,7 +932,7 @@ private struct GroupZikrRow: View {
                     Text(verbatim: ZikrScheduleMath.shortWeekdaySymbols(for: session.weekdays).joined(separator: " · "))
                         .diInterfaceFont(.caption).foregroundStyle(DIColor.textMuted)
                 }
-                if let autoplay = session.autoplayTitle {
+                if let autoplay = autoplayLine {
                     Label("Plays by itself: \(autoplay)", systemImage: "play.circle")
                         .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
@@ -924,6 +950,14 @@ private struct GroupZikrRow: View {
                         if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
                     }
                     .buttonStyle(DICompactButtonStyle())
+                }
+                if canManage, let onEdit {
+                    Button(action: onEdit) {
+                        Label("Change video", systemImage: "play.rectangle")
+                    }
+                    .buttonStyle(DISecondaryButtonStyle())
+                    .disabled(removing)
+                    .accessibilityIdentifier("zikr-time-change-video")
                 }
                 if canManage {
                     Button("Remove this time", role: .destructive, action: onRemove)

@@ -286,14 +286,19 @@ actor MemberGroupService {
     /// together; `queue` plays recordings and past zikr one after another.
     /// `record` records the room; the recording is kept in the group's
     /// recordings afterwards. `test` starts it as an admin's test: nobody is
-    /// notified and only the Halqah's admins see it.
+    /// notified and only the Halqah's admins see it. `clip` is the part of
+    /// the `videoID` video to play, in a Halqah with video clips.
     func startLive(
         in groupID: String, kind: String, title: String, videoID: String?, room: Bool,
-        queue: [GroupQueueEntry] = [], record: Bool = false, test: Bool = false
+        queue: [GroupQueueEntry] = [], record: Bool = false, test: Bool = false, clip: VideoClipTimes? = nil
     ) async throws {
         var payload: [String: Any] = ["state": "live", "kind": kind, "title": title, "room": room, "record": record && room]
         if test { payload["test"] = true }
-        if let videoID { payload["videoID"] = videoID }
+        if let videoID {
+            payload["videoID"] = videoID
+            if let start = clip?.start { payload["videoStartSeconds"] = start }
+            if let end = clip?.end { payload["videoEndSeconds"] = end }
+        }
         if !queue.isEmpty { payload["queue"] = queue.map(\.payload) }
         try await send("POST", path: "v1/groups/\(groupID)/live", payload: payload, expecting: [200])
     }

@@ -32,6 +32,91 @@ enum VideoLink {
         guard let candidate, candidate.range(of: #"^[A-Za-z0-9_-]{11}$"#, options: .regularExpression) != nil else { return nil }
         return candidate
     }
+
+    /// The time a pasted link starts at, as YouTube's "Share at" writes it:
+    /// `?t=221`, `&t=3m41s`, `?start=221`, `youtu.be/ID?t=90` (or `#t=90`).
+    /// Nil when the link has none.
+    static func startSeconds(from text: String) -> Int? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let components = URLComponents(string: trimmed) else { return nil }
+        var values = (components.queryItems ?? [])
+            .filter { $0.name == "t" || $0.name == "start" }
+            .compactMap(\.value)
+        if let fragment = components.fragment, fragment.hasPrefix("t=") {
+            values.append(String(fragment.dropFirst(2)))
+        }
+        for value in values {
+            if let seconds = timeParameter(value), seconds > 0 { return seconds }
+        }
+        return nil
+    }
+
+    /// "221", "221s", "3m41s", "1h2m3s" or "3:41".
+    static func timeParameter(_ value: String) -> Int? {
+        let text = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !text.isEmpty else { return nil }
+        if text.contains(":") { return ClipTime.seconds(from: text) }
+        var total = 0
+        var digits = ""
+        for character in text {
+            if character.isASCII && character.isNumber {
+                digits.append(character)
+                continue
+            }
+            guard !digits.isEmpty, digits.count <= 6, let number = Int(digits) else { return nil }
+            switch character {
+            case "h": total += number * 3_600
+            case "m": total += number * 60
+            case "s": total += number
+            default: return nil
+            }
+            digits = ""
+        }
+        if !digits.isEmpty {
+            guard digits.count <= 6, let number = Int(digits) else { return nil }
+            total += number
+        }
+        return total
+    }
+}
+
+/// "Start at" and "End at" under a pasted YouTube link, in a Halqah with
+/// video clips: only that part of the video plays, e.g. 3:41 to 44:02.
+/// Both are optional.
+struct VideoClipSection: View {
+    @Binding var start: String
+    @Binding var end: String
+
+    var body: some View {
+        Section {
+            field("Start at", text: $start)
+                .accessibilityIdentifier("clip-start")
+            field("End at", text: $end)
+                .accessibilityIdentifier("clip-end")
+        } footer: {
+            if let problem = VideoClipTimes.problem(start: start, end: end) {
+                let message: LocalizedStringKey = problem == .endNotAfterStart
+                    ? "End must be after the start."
+                    : "Enter a time such as 3:41 or 1:02:03."
+                Text(message).foregroundStyle(DIColor.danger)
+                    .accessibilityIdentifier("clip-error")
+            } else {
+                Text("Optional: play only part of the video, for example from 3:41 to 44:02.")
+            }
+        }
+    }
+
+    private func field(_ title: LocalizedStringKey, text: Binding<String>) -> some View {
+        LabeledContent {
+            TextField("0:00", text: text)
+                .keyboardType(.numbersAndPunctuation)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .multilineTextAlignment(.trailing)
+        } label: {
+            Text(title)
+        }
+    }
 }
 
 // MARK: - Post
@@ -241,6 +326,9 @@ struct GroupLiveStarter: View {
     /// Adds recordings and past zikr to the session already live.
     var addingToSession = false
     var sessionID: String? = nil
+    /// A Halqah with video clips: a pasted YouTube link may play from a
+    /// start time to an end time.
+    var videoClips = false
 
     private enum Kind: String, CaseIterable, Identifiable {
         case zikr = "Halqah Zikr"
@@ -261,6 +349,9 @@ struct GroupLiveStarter: View {
     @State private var source: Source = .room
     @State private var title = String(localized: "Halqah Zikr")
     @State private var videoLink = ""
+    /// "Start at" and "End at" for the pasted YouTube link (video clips only).
+    @State private var clipStart = ""
+    @State private var clipEnd = ""
     @State private var joinTogether = true
     /// Records the room into the group's recordings.
     @State private var recordRoom = true
@@ -423,6 +514,13 @@ struct GroupLiveStarter: View {
         } footer: {
             Text("A live link is watched live. A past zikr plays to everyone together, from one place you control: pause, move back or forward, or go to the next for the whole group.")
         }
+        if videoClips {
+            VideoClipSection(start: $clipStart, end: $clipEnd)
+                .onChange(of: videoLink) { _, link in
+                    // A link shared from a moment in the video starts there.
+                    if let seconds = VideoLink.startSeconds(from: link) { clipStart = ClipTime.text(seconds) }
+                }
+        }
         Section {
             if let videos = library?.pastVideos {
                 if videos.isEmpty {
@@ -570,6 +668,7 @@ struct GroupLiveStarter: View {
         switch entry {
         case .recording(let id): library?.recordings.first { $0.id == id }?.title ?? id
         case .video(let id): library?.pastVideos.first { $0.videoID == id }.map { "\($0.title) · \(GroupInvitationDate.text($0.publishedAt, locale: locale))" } ?? id
+        case .clip(let id, let start, let end): GroupQueueEntry.clipTitle(id, start: start, end: end)
         }
     }
 
@@ -583,9 +682,26 @@ struct GroupLiveStarter: View {
 
     // MARK: Starting
 
+    /// What plays of the pasted YouTube link: all of it, unless this Halqah
+    /// has video clips and the admin gave a start or an end.
+    private var clipTimes: VideoClipTimes {
+        guard showsClipFields, case .success(let times) = VideoClipTimes.read(start: clipStart, end: clipEnd) else {
+            return VideoClipTimes()
+        }
+        return times
+    }
+
+    /// Start at and End at are on the sheet: a YouTube zikr in a Halqah with
+    /// video clips.
+    private var showsClipFields: Bool {
+        videoClips && source == .youtube && (kind == .zikr || addingToSession)
+    }
+
     private var canStart: Bool {
         let video = VideoLink.id(from: videoLink)
         if !videoLink.isEmpty && video == nil && source != .recording { return false }
+        // End must be after the start.
+        if showsClipFields && VideoClipTimes.problem(start: clipStart, end: clipEnd) != nil { return false }
         if addingToSession { return !picked.isEmpty || (source == .youtube && video != nil) }
         if kind == .meeting { return meetingsReady }
         switch source {
@@ -607,7 +723,7 @@ struct GroupLiveStarter: View {
             if addingToSession {
                 // A pasted link here is a past video; a live one is refused.
                 var entries = picked
-                if source == .youtube, let video { entries.insert(.video(video), at: 0) }
+                if source == .youtube, let video { entries.insert(.youTube(video, times: clipTimes), at: 0) }
                 try await service.addToSession(entries, in: groupID, sessionID: sessionID)
             } else if kind == .meeting {
                 try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true, record: recordRoom,
@@ -618,8 +734,10 @@ struct GroupLiveStarter: View {
             } else {
                 // The server asks YouTube whether a pasted link is live or past:
                 // live is watched live, past joins the queue at the front.
+                let clip = source == .youtube && video != nil && !clipTimes.isEmpty ? clipTimes : nil
                 try await service.startLive(in: groupID, kind: "zikr", title: title,
-                                            videoID: source == .youtube ? video : nil, room: false, queue: picked, test: testOnly)
+                                            videoID: source == .youtube ? video : nil, room: false, queue: picked, test: testOnly,
+                                            clip: clip)
             }
             dismiss()
         } catch is CancellationError {
@@ -791,6 +909,34 @@ struct GroupMeetingScheduler: View {
 struct GroupZikrEditor: View {
     let groupID: String
     let service: MemberGroupService
+    /// A Halqah with video clips: the time may play a pasted YouTube link,
+    /// from a start time to an end time.
+    var videoClips = false
+
+    /// A new zikr time; or, in a Halqah with video clips, an existing one
+    /// filled in and saved under its own id, so the admin changes what it
+    /// plays in one step (owner 2026-11-19).
+    init(groupID: String, service: MemberGroupService, videoClips: Bool = false, editing existing: ZikrSession? = nil) {
+        self.groupID = groupID
+        self.service = service
+        self.videoClips = videoClips
+        guard let existing else { return }
+        let draft = ZikrTimeDraft(existing, videoClips: videoClips)
+        _title = State(initialValue: draft.title)
+        switch draft.anchor {
+        case .afterIsha?: _timing = State(initialValue: .afterIsha)
+        case .beforeFajr?, .tahajjud?: _timing = State(initialValue: .beforeFajr)
+        case nil: _timing = State(initialValue: .clock)
+        }
+        _time = State(initialValue: draft.time)
+        _weekdays = State(initialValue: draft.weekdays)
+        _duration = State(initialValue: draft.durationMinutes)
+        _autoplay = State(initialValue: draft.autoplay)
+        _videoLink = State(initialValue: draft.videoLink)
+        _clipStart = State(initialValue: draft.clipStart)
+        _clipEnd = State(initialValue: draft.clipEnd)
+        _sessionID = State(initialValue: existing.id)
+    }
 
     private enum Timing: String, CaseIterable, Identifiable {
         case clock = "At a time"
@@ -808,6 +954,11 @@ struct GroupZikrEditor: View {
     @State private var duration = 30
     /// A recording or past zikr this time plays by itself.
     @State private var autoplay: GroupQueueEntry?
+    /// A pasted YouTube link it plays instead, with its Start at and End at
+    /// (video clips only). A link wins over a choice from the library.
+    @State private var videoLink = ""
+    @State private var clipStart = ""
+    @State private var clipEnd = ""
     @State private var library: GroupRecordingLibrary?
     @State private var libraryFailed = false
     @State private var loadingLibrary = false
@@ -862,6 +1013,26 @@ struct GroupZikrEditor: View {
                         Text("At this time, if no admin has started a session, it starts by itself, plays this to the group and notifies everyone. An admin ends it.").foregroundStyle(DIColor.textMuted)
                     }
                 }
+                if timing == .clock && videoClips {
+                    Section {
+                        TextField("YouTube link", text: $videoLink)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .keyboardType(.URL)
+                            .accessibilityIdentifier("autoplay-video-link")
+                    } footer: {
+                        if !videoLink.isEmpty && VideoLink.id(from: videoLink) == nil {
+                            Text("That video link was not recognised.").foregroundStyle(DIColor.danger)
+                        } else {
+                            Text("A link pasted here plays instead of a choice from the library.").foregroundStyle(DIColor.textMuted)
+                        }
+                    }
+                    VideoClipSection(start: $clipStart, end: $clipEnd)
+                        .onChange(of: videoLink) { _, link in
+                            // A link shared from a moment in the video starts there.
+                            if let seconds = VideoLink.startSeconds(from: link) { clipStart = ClipTime.text(seconds) }
+                        }
+                }
                 Section("Days") {
                     let symbols = weekdayNames
                     ForEach(1...7, id: \.self) { day in
@@ -884,7 +1055,7 @@ struct GroupZikrEditor: View {
                         }
                     }
                         .buttonStyle(DIPrimaryButtonStyle())
-                        .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(working || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !videoReady)
                 }
             }
             .disabled(working)
@@ -921,8 +1092,29 @@ struct GroupZikrEditor: View {
         case .video(let id): return library?.pastVideos.first { $0.videoID == id }.map {
             "\($0.title) · \(GroupInvitationDate.text($0.publishedAt, locale: locale))"
         } ?? id
+        case .clip(let id, let start, let end): return GroupQueueEntry.clipTitle(id, start: start, end: end)
         case nil: return String(localized: "Nothing: an admin starts it")
         }
+    }
+
+    /// A pasted link (video clips only) is a video the server can find, and
+    /// its End at is after its Start at; with no link there is nothing to check.
+    private var videoReady: Bool {
+        guard videoClips, timing == .clock else { return true }
+        let link = videoLink.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !link.isEmpty && VideoLink.id(from: link) == nil { return false }
+        return VideoClipTimes.problem(start: clipStart, end: clipEnd) == nil
+    }
+
+    /// What the time plays by itself: a pasted link, from its Start at to its
+    /// End at, before a choice from the library.
+    private var autoplayEntries: [GroupQueueEntry] {
+        guard timing == .clock else { return [] }
+        if videoClips, let video = VideoLink.id(from: videoLink),
+           case .success(let times) = VideoClipTimes.read(start: clipStart, end: clipEnd) {
+            return [.youTube(video, times: times)]
+        }
+        return [autoplay].compactMap { $0 }
     }
 
     private var weekdayNames: [String] {
@@ -932,7 +1124,7 @@ struct GroupZikrEditor: View {
     }
 
     private func save() async {
-        guard !working, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        guard !working, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, videoReady else { return }
         working = true
         error = nil
         defer { working = false }
@@ -952,12 +1144,58 @@ struct GroupZikrEditor: View {
             anchor: timing == .clock ? nil : (timing == .afterIsha ? "afterIsha" : "beforeFajr")
         )
         do {
-            try await service.saveZikrSession(session, autoplay: timing == .clock ? [autoplay].compactMap { $0 } : [], in: groupID)
+            try await service.saveZikrSession(session, autoplay: autoplayEntries, in: groupID)
             dismiss()
         } catch is CancellationError {
             return
         } catch {
             self.error = error.localizedDescription
+        }
+    }
+}
+
+/// What the zikr time editor shows for an existing time: its title, when it
+/// is, its days and length, and what it plays by itself - in a Halqah with
+/// video clips a YouTube video as its link with its Start at and End at.
+struct ZikrTimeDraft {
+    var title: String
+    /// Nil for a clock time.
+    var anchor: ZikrAnchor?
+    /// Its start today, in its own time zone; the picker shows it in the phone's.
+    var time: Date
+    var weekdays: Set<Int>
+    var durationMinutes: Int
+    var autoplay: GroupQueueEntry?
+    var videoLink: String
+    var clipStart: String
+    var clipEnd: String
+
+    init(_ session: ZikrSession, videoClips: Bool, today: Date = Date()) {
+        title = session.title
+        anchor = session.zikrAnchor
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: session.timeZoneIdentifier) ?? .current
+        time = calendar.date(bySettingHour: min(max(session.startHour, 0), 23), minute: min(max(session.startMinute, 0), 59),
+                             second: 0, of: today) ?? today
+        let days = Set(session.weekdays.filter { (1...7).contains($0) })
+        weekdays = days.isEmpty ? Set(1...7) : days
+        // The editor's own range.
+        durationMinutes = min(max(session.durationMinutes, 10), 120)
+        autoplay = nil
+        videoLink = ""
+        clipStart = ""
+        clipEnd = ""
+        guard let item = session.autoplay?.first else { return }
+        if item.isVideo {
+            if videoClips {
+                videoLink = "https://youtu.be/" + item.id
+                clipStart = item.startSeconds.map { ClipTime.text($0) } ?? ""
+                clipEnd = item.endSeconds.map { ClipTime.text($0) } ?? ""
+            } else {
+                autoplay = .video(item.id)
+            }
+        } else if item.kind == "recording" {
+            autoplay = .recording(item.id)
         }
     }
 }
@@ -1022,6 +1260,6 @@ private struct GroupAutoplayChoices: View {
         }
         .buttonStyle(DIPressableStyle())
         .accessibilityAddTraits(entry == selection ? .isSelected : [])
-        .accessibilityIdentifier("autoplay-choice-" + (entry?.payload.values.first ?? "none"))
+        .accessibilityIdentifier("autoplay-choice-" + (entry?.itemID ?? "none"))
     }
 }

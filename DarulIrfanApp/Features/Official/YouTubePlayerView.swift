@@ -50,6 +50,24 @@ struct YouTubeSync: Equatable {
     var position: Double
     var paused: Bool
     var at: Date
+    /// A clip (owner 2026-11-19): where in the video the group's place 0 is,
+    /// and where in the video the clip is over. The group's place stays
+    /// counted from the clip's start; only the player adds `clipStart`.
+    /// 0 and nil for a whole video.
+    var clipStart: Double = 0
+    var clipEnd: Double? = nil
+
+    /// Where in the video the player belongs at `date`: the clip's start
+    /// plus the group's place.
+    func videoPosition(at date: Date = Date()) -> Double {
+        clipStart + (paused ? position : position + date.timeIntervalSince(at))
+    }
+
+    /// The player has reached the clip's end in the video.
+    func isOver(atVideoTime time: Double) -> Bool {
+        guard let clipEnd else { return false }
+        return time >= clipEnd
+    }
 }
 
 struct YouTubePlayerView: View {
@@ -122,18 +140,53 @@ struct YouTubeWebView: UIViewRepresentable {
         let safeID = videoID.filter { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }
         let html: String
         if let sync {
-            // Opens near the group's place; on play it moves to exactly where
-            // the group is then. Without the player script it still opens
-            // near the right place.
-            let start = max(0, Int(sync.paused ? sync.position : sync.position + Date().timeIntervalSince(sync.at)))
+            html = Self.syncPage(id: safeID, sync: sync)
+        } else {
             html = """
             <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
             <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#000;overflow:hidden}</style></head>
-            <body><iframe id="player" title="YouTube player" src="https://www.youtube-nocookie.com/embed/\(safeID)?playsinline=1&rel=0&enablejsapi=1&autoplay=\(sync.paused ? 0 : 1)&start=\(start)&origin=https://www.youtube-nocookie.com" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+            <body><iframe title="YouTube player" src="https://www.youtube-nocookie.com/embed/\(safeID)?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></body></html>
+            """
+        }
+        webView.loadHTMLString(html, baseURL: URL(string: "https://www.youtube-nocookie.com"))
+    }
+
+    /// The page for a past video played to a group, at the group's place.
+    /// A clip plays from `clipStart` plus the group's place and stops at
+    /// `clipEnd`; a whole video's page has none of the clip's parts.
+    static func syncPage(id safeID: String, sync: YouTubeSync, now: Date = Date()) -> String {
+        // Opens near the group's place; on play it moves to exactly where
+        // the group is then. Without the player script it still opens
+        // near the right place.
+        let start = max(0, Int(sync.videoPosition(at: now)))
+        let clock = "group.paused ? group.pos : group.pos + (Date.now() / 1000 - group.at)"
+        var endParameter = "", place = clock, clipGuard = ""
+        if let clipEnd = sync.clipEnd {
+            // Never past the clip's end: YouTube's own end, the group's place
+            // held there, and a pause when the player gets there. Held at the
+            // end, it plays again if an admin moves the group back.
+            endParameter = "&end=\(Int(clipEnd.rounded(.up)))"
+            place = "Math.min(\(clipEnd), \(clock))"
+            clipGuard = """
+
+            var clipEnd = \(clipEnd), clipHeld = false;
+            setInterval(function () {
+              if (!ready) return;
+              var state = player.getPlayerState();
+              if (state === YT.PlayerState.PLAYING && player.getCurrentTime() >= clipEnd - 0.3) { player.pauseVideo(); clipHeld = true; return; }
+              if (state === YT.PlayerState.ENDED) clipHeld = true;
+              if (clipHeld && !group.paused && place() < clipEnd - 1) { clipHeld = false; player.seekTo(place(), true); player.playVideo(); }
+            }, 250);
+            """
+        }
+        return """
+            <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+            <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#000;overflow:hidden}</style></head>
+            <body><iframe id="player" title="YouTube player" src="https://www.youtube-nocookie.com/embed/\(safeID)?playsinline=1&rel=0&enablejsapi=1&autoplay=\(sync.paused ? 0 : 1)&start=\(start)\(endParameter)&origin=https://www.youtube-nocookie.com" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
             <script>
-            var player = null, ready = false, joined = false;
-            var group = { pos: \(sync.position), paused: \(sync.paused), at: \(sync.at.timeIntervalSince1970) };
-            function place() { return group.paused ? group.pos : group.pos + (Date.now() / 1000 - group.at); }
+            var player = null, ready = false, joined = false;\(clipGuard)
+            var group = { pos: \(sync.clipStart + sync.position), paused: \(sync.paused), at: \(sync.at.timeIntervalSince1970) };
+            function place() { return \(place); }
             function follow() {
               if (!ready) return;
               var state = player.getPlayerState();
@@ -165,23 +218,18 @@ struct YouTubeWebView: UIViewRepresentable {
             }
             </script><script src="https://www.youtube.com/iframe_api"></script></body></html>
             """
-        } else {
-            html = """
-            <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-            <style>html,body,iframe{width:100%;height:100%;margin:0;border:0;background:#000;overflow:hidden}</style></head>
-            <body><iframe title="YouTube player" src="https://www.youtube-nocookie.com/embed/\(safeID)?playsinline=1&rel=0" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></body></html>
-            """
-        }
-        webView.loadHTMLString(html, baseURL: URL(string: "https://www.youtube-nocookie.com"))
     }
 
     /// Mode changes require a different page; pause/seek updates preserve the existing player.
+    /// Another part of the same video (a clip) is another page too.
     static func needsReload(loadedID: String?, previousSync: YouTubeSync?, videoID: String, sync: YouTubeSync?) -> Bool {
         loadedID != videoID || (previousSync == nil) != (sync == nil)
+            || previousSync?.clipStart != sync?.clipStart || previousSync?.clipEnd != sync?.clipEnd
     }
 
+    /// The group's place, as the video's time: a clip's start is added here.
     private static func script(_ sync: YouTubeSync) -> String {
-        "\(sync.position), \(sync.paused), \(sync.at.timeIntervalSince1970)"
+        "\(sync.clipStart + sync.position), \(sync.paused), \(sync.at.timeIntervalSince1970)"
     }
 
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
