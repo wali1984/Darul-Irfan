@@ -551,6 +551,8 @@ struct HalqahHeroTileLabel: View {
     let subtitle: Text
     let systemImage: String
     var isLive = false
+    /// Shown as written instead of `titleKey`: a server's own words.
+    var verbatimTitle: String? = nil
 
     @Environment(\.halqahTilePressed) private var pressed
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -572,7 +574,7 @@ struct HalqahHeroTileLabel: View {
                 .overlay(Circle().strokeBorder(DIColor.goldGlow.opacity(0.4), lineWidth: 1))
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                Text(titleKey)
+                (verbatimTitle.map { Text(verbatim: $0) } ?? Text(titleKey))
                     .diInterfaceFont(.title3, weight: .bold)
                     .foregroundStyle(.white)
                 subtitle

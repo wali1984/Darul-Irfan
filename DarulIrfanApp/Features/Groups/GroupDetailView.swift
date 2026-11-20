@@ -30,10 +30,17 @@ struct HalqahPageLayout: Equatable {
     /// "Return to session" for a room the member is in.
     var showsRoomResume: Bool { !isSimple }
     var showsGoLive: Bool { !isSimple }
+    /// A simple page's one start tile, which opens the simple start sheet
+    /// (owner 2026-11-19, addendum 2).
+    var showsStartTile: Bool { isSimple }
     /// The Markaz cards, integration notes and drafts in the admin section.
     var showsAdminExtras: Bool { !isSimple }
 
     func showsAdminTile(_ id: String) -> Bool { !isSimple || Self.simpleAdminTiles.contains(id) }
+
+    /// End session under a simple page's player, for its admins only
+    /// (addendum 3). The full page has it on the session card instead.
+    func showsPageEndSession(canManage: Bool) -> Bool { isSimple && canManage }
 }
 
 /// One community group: what is live now, its zikr times, its meetings, and
@@ -94,6 +101,11 @@ struct GroupDetailView: View {
     @State private var sheet: AdminSheet?
     /// The zikr time an admin is changing (video clips only).
     @State private var editingZikr: ZikrSession?
+    /// A simple page's End session (its admins): asking, which session, and
+    /// the request under way.
+    @State private var confirmEnd = false
+    @State private var endingSessionID: String?
+    @State private var endingSession = false
     /// Our Sheikh's own live Zikr, shown in every other Halqah while it is
     /// live and joined on its stage (owner, 2026-11-06).
     @State private var sheikhLive: SheikhLiveZikr?
@@ -294,7 +306,8 @@ struct GroupDetailView: View {
                 switch sheet {
                 case .people: GroupPeopleView(groupID: group.id, groupName: group.name, service: service)
                 case .post: GroupPostComposer(groupID: group.id, service: service)
-                case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, videoClips: videoClips)
+                case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, videoClips: videoClips,
+                                             form: HalqahStartForm(simple: layout.isSimple, startTitle: detail?.group.startTitle))
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
                 case .zikr: GroupZikrEditor(groupID: group.id, service: service, videoClips: videoClips)
                 case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
@@ -389,10 +402,40 @@ struct GroupDetailView: View {
     private var liveSection: some View {
         if let live = detail?.live, !layout.showsSessionCard {
             // A simple page: the session's video or recording, played with
-            // the group as on the card, and nothing else of the session.
-            if GroupSessionMedia.shows(live, groupID: group.id) {
-                GroupSessionMedia(live: live, groupName: group.name, audioPlayer: dependencies?.audioPlayer)
-                    .halqahCard()
+            // the group as on the card, and for its admins the card's own
+            // End session (addendum 3); nothing else of the session.
+            let media = GroupSessionMedia.shows(live, groupID: group.id)
+            let canEnd = layout.showsPageEndSession(canManage: detail?.canManage == true)
+            if media || canEnd {
+                VStack(alignment: .leading, spacing: DISpacing.sm) {
+                    if media {
+                        GroupSessionMedia(live: live, groupName: group.name, audioPlayer: dependencies?.audioPlayer)
+                    }
+                    if canEnd {
+                        Button(role: .destructive) {
+                            endingSessionID = live.sessionID
+                            confirmEnd = true
+                        } label: {
+                            Label("End session", systemImage: "stop.circle")
+                                .frame(maxWidth: .infinity, minHeight: 36)
+                        }
+                        .buttonStyle(DISecondaryButtonStyle(destructive: true))
+                        .disabled(endingSession)
+                        .accessibilityIdentifier("halqah-simple-end")
+                    }
+                }
+                .halqahCard()
+                .confirmationDialog("End the session for everyone?", isPresented: $confirmEnd, titleVisibility: .visible) {
+                    Button("End session", role: .destructive) {
+                        guard !endingSession else { return }
+                        let sessionID = endingSessionID
+                        endingSession = true
+                        Task {
+                            defer { endingSession = false }
+                            await performChange { try await service.endLive(in: group.id, sessionID: sessionID) }
+                        }
+                    }
+                }
             }
         } else if let live = detail?.live {
             GroupSessionCard(
@@ -560,6 +603,10 @@ struct GroupDetailView: View {
                 .halqahTileAccessibility(titleKey: "Go live", value: goLiveLine, hintKey: "Starts a zikr or meeting for the whole Halqah.")
                 .diAppear(delay: 0.08)
             }
+            if layout.showsStartTile {
+                startTile
+                    .diAppear(delay: 0.08)
+            }
             HalqahTileGrid(items: adminTiles.filter { layout.showsAdminTile($0.id) })
                 .diAppear(delay: 0.12)
             if layout.showsAdminExtras {
@@ -570,6 +617,29 @@ struct GroupDetailView: View {
             guard group.isMarkaz else { return }
             markazAccess = await MarkazAccessCache.access(using: service)
         }
+    }
+
+    /// A simple page's start tile: the server's own words ("Start Daily North
+    /// America Nightly Zikr"), or Go live without them. It opens the simple
+    /// start sheet.
+    private var startTile: some View {
+        let start = HalqahStartForm(simple: true, startTitle: detail?.group.startTitle)
+        return Button {
+            sheet = .live
+        } label: {
+            HalqahHeroTileLabel(
+                titleKey: "Go live",
+                subtitle: goLiveLine,
+                systemImage: "dot.radiowaves.left.and.right",
+                isLive: detail?.live != nil,
+                verbatimTitle: start.heading
+            )
+        }
+        .buttonStyle(HalqahTileButtonStyle())
+        .accessibilityLabel(start.heading.map { Text(verbatim: $0) } ?? Text("Go live"))
+        .accessibilityValue(goLiveLine)
+        .accessibilityHint(Text("Starts a zikr or meeting for the whole Halqah."))
+        .accessibilityIdentifier("halqah-simple-start")
     }
 
     /// The integration notes and the drafts waiting for approval.

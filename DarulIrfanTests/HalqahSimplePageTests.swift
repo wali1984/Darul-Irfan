@@ -24,6 +24,10 @@ final class HalqahSimplePageTests: XCTestCase {
         XCTAssertFalse(ordinary.hasSimplePage)
         XCTAssertFalse(HalqahPageLayout(ordinary).isSimple)
 
+        let titled = try detail(group: #"{"id":"na-evening","name":"NA","simplePage":true,"startTitle":"Start Daily North America Nightly Zikr"}"#)
+        XCTAssertEqual(titled.group.startTitle, "Start Daily North America Nightly Zikr")
+        XCTAssertNil(ordinary.group.startTitle)
+
         let off = try detail(group: #"{"id":"uk","name":"UK","simplePage":false}"#)
         XCTAssertFalse(off.hasSimplePage)
         XCTAssertFalse(HalqahPageLayout(nil).isSimple, "the full page until the Halqah has loaded")
@@ -46,6 +50,41 @@ final class HalqahSimplePageTests: XCTestCase {
         for tile in ["post", "meeting", "duas", "history"] {
             XCTAssertFalse(simple.showsAdminTile(tile), tile)
         }
+        // Addendum 2: the one start tile; addendum 3: admins end by hand.
+        XCTAssertTrue(simple.showsStartTile)
+        XCTAssertTrue(simple.showsPageEndSession(canManage: true))
+        XCTAssertFalse(simple.showsPageEndSession(canManage: false), "members never see End session")
+    }
+
+    func testSimpleStartSheet() {
+        let form = HalqahStartForm(simple: true, startTitle: "Start Daily North America Nightly Zikr")
+        XCTAssertEqual(form.heading, "Start Daily North America Nightly Zikr")
+        XCTAssertEqual(form.sessionTitle, "Daily North America Nightly Zikr", "the leading Start is dropped")
+        XCTAssertFalse(form.showsKindChoice, "always a Halqah Zikr")
+        XCTAssertFalse(form.offersLeadLive, "YouTube and Recording only: no room, record or live link")
+        XCTAssertFalse(form.showsTitleField, "the start title names the session")
+
+        XCTAssertEqual(HalqahStartForm(simple: true, startTitle: "Evening Zikr").sessionTitle, "Evening Zikr")
+        XCTAssertEqual(HalqahStartForm(simple: true, startTitle: "  Start Evening Zikr ").sessionTitle, "Evening Zikr")
+
+        // No start title: Go live's heading and the title field, as today.
+        let untitled = HalqahStartForm(simple: true, startTitle: nil)
+        XCTAssertNil(untitled.heading)
+        XCTAssertNil(untitled.sessionTitle)
+        XCTAssertTrue(untitled.showsTitleField)
+        XCTAssertFalse(untitled.offersLeadLive)
+        XCTAssertNil(HalqahStartForm(simple: true, startTitle: "   ").heading)
+    }
+
+    func testEveryOtherHalqahKeepsTheFullStartSheet() {
+        let full = HalqahStartForm()
+        XCTAssertFalse(full.isSimple)
+        XCTAssertNil(full.heading)
+        XCTAssertNil(full.sessionTitle)
+        XCTAssertTrue(full.showsKindChoice)
+        XCTAssertTrue(full.offersLeadLive)
+        XCTAssertTrue(full.showsTitleField)
+        XCTAssertNil(HalqahStartForm(simple: false, startTitle: "Start Something").heading, "only a simple page uses it")
     }
 
     func testEveryOtherHalqahKeepsTheFullPage() {
@@ -63,5 +102,7 @@ final class HalqahSimplePageTests: XCTestCase {
         for tile in ["people", "post", "meeting", "zikr", "duas", "history"] {
             XCTAssertTrue(full.showsAdminTile(tile), tile)
         }
+        XCTAssertFalse(full.showsStartTile, "Go live stays")
+        XCTAssertFalse(full.showsPageEndSession(canManage: true), "End session stays on the session card")
     }
 }

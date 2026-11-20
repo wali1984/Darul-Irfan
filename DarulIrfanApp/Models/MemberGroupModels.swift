@@ -398,6 +398,9 @@ struct GroupDetail: Codable, Sendable {
         /// times and the People and Add a zikr time tiles: no stage (owner
         /// 2026-11-19). Absent for every other Halqah.
         var simplePage: Bool? = nil
+        /// A simple page's start tile and sheet heading, shown as the server
+        /// wrote it, e.g. "Start Daily North America Nightly Zikr".
+        var startTitle: String? = nil
     }
 
     var group: Summary

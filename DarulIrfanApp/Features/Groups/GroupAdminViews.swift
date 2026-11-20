@@ -316,6 +316,38 @@ struct GroupPostComposer: View {
 
 // MARK: - Live now
 
+/// The start sheet's form. A simple Halqah page (owner 2026-11-19, addendum
+/// 2: "no meeting option, no lead live, no record zikr option") starts a
+/// Halqah Zikr from YouTube or a recording only, under the server's own
+/// heading, and names the session after it.
+struct HalqahStartForm: Equatable {
+    let isSimple: Bool
+    /// The server's start title, e.g. "Start Daily North America Nightly Zikr".
+    let startTitle: String?
+
+    init(simple: Bool = false, startTitle: String? = nil) {
+        isSimple = simple
+        let trimmed = startTitle?.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.startTitle = simple && trimmed?.isEmpty == false ? trimmed : nil
+    }
+
+    /// The sheet's heading and the start tile's label; nil: "Go live".
+    var heading: String? { startTitle }
+    /// "Halqah Zikr" or "Meeting": a simple form is always a Halqah Zikr.
+    var showsKindChoice: Bool { !isSimple }
+    /// Leading live in a room, with its join, record and live link options.
+    var offersLeadLive: Bool { !isSimple }
+    /// The title field, unless the server's start title names the session.
+    var showsTitleField: Bool { sessionTitle == nil }
+    /// The session's title: the start title without a leading "Start ".
+    var sessionTitle: String? {
+        guard let startTitle else { return nil }
+        let title = startTitle.hasPrefix("Start ") ? String(startTitle.dropFirst("Start ".count)) : startTitle
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
 @MainActor
 struct GroupLiveStarter: View {
     @Environment(\.locale) private var locale
@@ -329,6 +361,8 @@ struct GroupLiveStarter: View {
     /// A Halqah with video clips: a pasted YouTube link may play from a
     /// start time to an end time.
     var videoClips = false
+    /// The full sheet, or a simple Halqah page's.
+    var form = HalqahStartForm()
 
     private enum Kind: String, CaseIterable, Identifiable {
         case zikr = "Halqah Zikr"
@@ -370,19 +404,34 @@ struct GroupLiveStarter: View {
 
     @State private var deletingRecording: GroupRecording?
 
-    private var sources: [Source] { addingToSession ? [.youtube, .recording] : Source.allCases }
+    private var sources: [Source] { addingToSession || !form.offersLeadLive ? [.youtube, .recording] : Source.allCases }
+
+    /// The source in use: a simple form never leads live, also before the
+    /// sheet's first task has moved it to YouTube.
+    private var activeSource: Source { !form.offersLeadLive && source == .room ? .youtube : source }
+
+    /// "Add to the session", a simple page's own heading, or "Go live".
+    private var heading: Text {
+        if addingToSession { return Text("Add to the session") }
+        if let heading = form.heading { return Text(verbatim: heading) }
+        return Text("Go live")
+    }
 
     var body: some View {
         Form {
             Group {
-                if !addingToSession {
+                if !addingToSession && (form.showsKindChoice || form.showsTitleField) {
                     Section {
-                        DISegmentedControl(items: Kind.allCases, title: { LocalizedStringKey($0.rawValue) }, selection: $kind)
-                            .accessibilityLabel(Text("What is starting"))
-                        .onChange(of: kind) { _, value in
-                            title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
+                        if form.showsKindChoice {
+                            DISegmentedControl(items: Kind.allCases, title: { LocalizedStringKey($0.rawValue) }, selection: $kind)
+                                .accessibilityLabel(Text("What is starting"))
+                            .onChange(of: kind) { _, value in
+                                title = value == .zikr ? String(localized: "Halqah Zikr") : String(localized: "Group meeting")
+                            }
                         }
-                        TextField("Title", text: $title)
+                        if form.showsTitleField {
+                            TextField("Title", text: $title)
+                        }
                     }
                 }
                 if kind == .zikr || addingToSession {
@@ -390,12 +439,12 @@ struct GroupLiveStarter: View {
                         DISegmentedControl(items: sources, title: { LocalizedStringKey($0.rawValue) }, selection: $source)
                             .accessibilityLabel(Text("How the group joins"))
                     }
-                    switch source {
+                    switch activeSource {
                     case .room: roomSection
                     case .youtube: youtubeSections
                     case .recording: recordingSections
                     }
-                    if !picked.isEmpty && source != .room { orderSection }
+                    if !picked.isEmpty && activeSource != .room { orderSection }
                 } else {
                     Section {
                         if meetingsReady {
@@ -450,7 +499,7 @@ struct GroupLiveStarter: View {
         .diScreenBackground()
         .tint(DIColor.actionForeground)
         .toggleStyle(SwitchToggleStyle(tint: DIColor.primary))
-        .navigationTitle(addingToSession ? "Add to the session" : "Go live")
+        .navigationTitle(heading)
         .navigationBarTitleDisplayMode(.inline)
         .interactiveDismissDisabled(working || uploading)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { if !working && !uploading { dismiss() } }.buttonStyle(DIToolbarButtonStyle()).disabled(working || uploading) } }
@@ -477,7 +526,8 @@ struct GroupLiveStarter: View {
         }
         .task {
             // Until the room service is connected, start where a zikr can play.
-            if addingToSession || !meetingsReady { source = .youtube }
+            // A simple page's sheet starts on YouTube too.
+            if addingToSession || !meetingsReady || !form.offersLeadLive { source = .youtube }
             await loadLibrary()
         }
     }
@@ -694,21 +744,21 @@ struct GroupLiveStarter: View {
     /// Start at and End at are on the sheet: a YouTube zikr in a Halqah with
     /// video clips.
     private var showsClipFields: Bool {
-        videoClips && source == .youtube && (kind == .zikr || addingToSession)
+        videoClips && activeSource == .youtube && (kind == .zikr || addingToSession)
     }
 
     private var canStart: Bool {
         let video = VideoLink.id(from: videoLink)
-        if !videoLink.isEmpty && video == nil && source != .recording { return false }
+        if !videoLink.isEmpty && video == nil && activeSource != .recording { return false }
         // End must be after the start.
         if showsClipFields && VideoClipTimes.problem(start: clipStart, end: clipEnd) != nil { return false }
-        if addingToSession { return !picked.isEmpty || (source == .youtube && video != nil) }
+        if addingToSession { return !picked.isEmpty || (activeSource == .youtube && video != nil) }
         if kind == .meeting { return meetingsReady }
-        switch source {
+        switch activeSource {
         case .room:
             return (joinTogether && meetingsReady) || video != nil
         case .youtube, .recording:
-            return !picked.isEmpty || (source == .youtube && video != nil)
+            return !picked.isEmpty || (activeSource == .youtube && video != nil)
         }
     }
 
@@ -717,26 +767,27 @@ struct GroupLiveStarter: View {
         working = true
         error = nil
         defer { working = false }
-        let title = title.trimmingCharacters(in: .whitespaces)
+        // A simple page names the session after its start title.
+        let title = form.sessionTitle ?? title.trimmingCharacters(in: .whitespaces)
         let video = VideoLink.id(from: videoLink)
         do {
             if addingToSession {
                 // A pasted link here is a past video; a live one is refused.
                 var entries = picked
-                if source == .youtube, let video { entries.insert(.youTube(video, times: clipTimes), at: 0) }
+                if activeSource == .youtube, let video { entries.insert(.youTube(video, times: clipTimes), at: 0) }
                 try await service.addToSession(entries, in: groupID, sessionID: sessionID)
             } else if kind == .meeting {
                 try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true, record: recordRoom,
                                             test: testOnly)
-            } else if source == .room {
+            } else if activeSource == .room {
                 try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: video,
                                             room: joinTogether && meetingsReady, record: recordRoom, test: testOnly)
             } else {
                 // The server asks YouTube whether a pasted link is live or past:
                 // live is watched live, past joins the queue at the front.
-                let clip = source == .youtube && video != nil && !clipTimes.isEmpty ? clipTimes : nil
+                let clip = activeSource == .youtube && video != nil && !clipTimes.isEmpty ? clipTimes : nil
                 try await service.startLive(in: groupID, kind: "zikr", title: title,
-                                            videoID: source == .youtube ? video : nil, room: false, queue: picked, test: testOnly,
+                                            videoID: activeSource == .youtube ? video : nil, room: false, queue: picked, test: testOnly,
                                             clip: clip)
             }
             dismiss()
