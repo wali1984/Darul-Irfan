@@ -606,6 +606,28 @@ describe("recorded zikr", () => {
     expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", queue: [{ videoID: "liveliveliv" }] })).status).toBe(400);
   });
 
+  it("gives a Halqah's own admins its daily and monthly report, and nobody else", async () => {
+    const { raw, call, member, admin } = await setup();
+    const now = new Date().toISOString();
+    await call(admin, "POST", "/v1/groups/usa/live", { state: "live", room: false, recordingID: undefined, videoID: undefined, queue: [] });
+    raw.prepare(`INSERT INTO group_live_history(session_id,group_id,kind,title,started_at,started_by,ended_at,ended_by,attendees,is_test)
+      VALUES('s-1','usa','zikr','Evening Zikr',?,?,?, 'x', 1, 0)`).run(now, "b".repeat(32), now);
+    raw.prepare(`INSERT INTO group_live_presence(session_id,group_id,member_id,first_seen_at,last_seen_at) VALUES('s-1','usa',?,?,?)`)
+      .run("a".repeat(32), now, now);
+    expect((await call(member, "GET", "/v1/groups/usa/activity/daily")).status).toBe(403);
+    expect((await call(admin, "GET", "/v1/groups/canada/activity/daily")).status).toBe(404);
+    const day = (await (await call(admin, "GET", "/v1/groups/usa/activity/daily?tz=UTC")).json()) as {
+      halqah: { id: string }; sessions: { title: string; attendance: number; attendees: { name: string; via: string }[] }[] };
+    expect(day.halqah.id).toBe("usa");
+    expect(day.sessions).toEqual([expect.objectContaining({ title: "Evening Zikr", attendance: 1, attendees: [expect.objectContaining({ name: "member", via: "app" })] })]);
+    const month = (await (await call(admin, "GET", "/v1/groups/usa/activity/monthly?tz=UTC")).json()) as {
+      sessions: unknown[]; daily: { sessions: number }[]; attendanceByPerson: { name: string }[] };
+    expect(month.sessions).toHaveLength(1);
+    expect(month.daily.reduce((n, d) => n + d.sessions, 0)).toBe(1);
+    expect(month.attendanceByPerson.map(p => p.name)).toEqual(["member"]);
+    expect((await call(admin, "GET", "/v1/groups/usa/activity/monthly?month=2026-13")).status).toBe(400);
+  });
+
   it("plays the newest marked Daily Zikr by itself, unless an admin chose the video today", async () => {
     const { env, raw, call, member, admin } = await setup({ VIDEO_MARKS_TOKEN: "marks-token" } as Partial<Env>);
     const now = new Date("2026-10-30T01:02:00Z"); // Thursday 21:02 in New York

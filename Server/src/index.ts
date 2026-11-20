@@ -18,7 +18,7 @@ import {
 } from "./computerLinks";
 import {
   access as markazAccessRoute, analytics as markazAnalytics, announce, announcements, approveReportingLink, dailyReport,
-  endReportingSession, exportCSV, markazDigest, monthlyReport, organization, personHistory, placeHalqah, pollReportingLink,
+  endReportingSession, exportCSV, halqahDailyReport, halqahMonthlyReport, markazDigest, monthlyReport, organization, personHistory, placeHalqah, pollReportingLink,
   reportingSessions, sessionDetail, startReportingLink, syncAdmins,
 } from "./markaz";
 import {
@@ -314,7 +314,7 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Apple requires an account made in the app to be deletable from inside it.
     if (request.method === "DELETE" && path === "/v1/members/me") return deleteMember(env, member);
 
-    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues|stage|stage-chat|reports)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
+    const route = /^\/v1\/groups\/([a-z0-9-]{1,40})(?:\/(posts|zikr|live|meetings|join|people|invitations|recordings|control|presence|duas|history|media|zikr-stages|zikr-cues|stage|stage-chat|reports|activity)(?:\/([A-Za-z0-9:_-]{1,80})(?:\/(publish|read))?)?)?$/.exec(path);
     if (!route) return json({ error: "Not found" }, { status: 404 });
     const [, groupID = "", section, entity, action] = route;
     if (section === "reports" && !entity && request.method === "POST") {
@@ -366,6 +366,9 @@ async function route(request: Request, env: Env): Promise<Response> {
       return uploadPostMedia(request, env, member, groupID);
     }
     if (section === "control" && !entity && request.method === "POST") return controlSession(env, member, groupID, await body());
+    // The Halqah's own daily and monthly reports, for its admins (app and website).
+    if (section === "activity" && entity === "daily" && request.method === "GET") return halqahDailyReport(env, member, groupID, url);
+    if (section === "activity" && entity === "monthly" && request.method === "GET") return halqahMonthlyReport(env, member, groupID, url);
     if (section === "presence" && !entity && request.method === "POST") return checkIn(env, member, groupID);
     if (section === "duas" && !entity && request.method === "GET") return duaRequests(env, member, groupID);
     if (section === "duas" && !entity && request.method === "POST") return requestDua(env, member, groupID, await body());
