@@ -13,7 +13,7 @@ struct HalqahPageLayout: Equatable {
     init(_ detail: GroupDetail?) { isSimple = detail?.hasSimplePage == true }
 
     /// The admin tiles a simple page keeps.
-    static let simpleAdminTiles: Set<String> = ["people", "zikr"]
+    static let simpleAdminTiles: Set<String> = ["people", "zikr", "reports"]
 
     var showsMethodOfZikr: Bool { !isSimple }
     /// The live stage: its entry card, opening by itself when a session
@@ -38,6 +38,10 @@ struct HalqahPageLayout: Equatable {
     var showsAdminExtras: Bool { !isSimple }
 
     func showsAdminTile(_ id: String) -> Bool { !isSimple || Self.simpleAdminTiles.contains(id) }
+
+    /// The Reports tile, after Add a zikr time: the Halqah's own daily and
+    /// monthly reports (owner 2026-11-19, addendum 5). A simple page only.
+    var showsReports: Bool { isSimple }
 
     /// End session under a simple page's player, for its admins only
     /// (addendum 3). The full page has it on the session card instead.
@@ -130,7 +134,7 @@ struct GroupDetailView: View {
     }
 
     enum AdminSheet: String, Identifiable {
-        case people, post, live, meeting, zikr, duas, history
+        case people, post, live, meeting, zikr, duas, history, reports
         var id: String { rawValue }
     }
 
@@ -308,11 +312,13 @@ struct GroupDetailView: View {
                 case .people: GroupPeopleView(groupID: group.id, groupName: group.name, service: service)
                 case .post: GroupPostComposer(groupID: group.id, service: service)
                 case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, videoClips: videoClips,
-                                             form: HalqahStartForm(simple: layout.isSimple, startTitle: detail?.group.startTitle))
+                                             form: HalqahStartForm(simple: layout.isSimple, startTitle: detail?.group.startTitle,
+                                                                   zikrSessions: detail?.zikrSessions ?? []))
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
                 case .zikr: GroupZikrEditor(groupID: group.id, service: service, videoClips: videoClips)
                 case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
                 case .history: GroupSessionHistoryView(groupID: group.id, service: service)
+                case .reports: HalqahReportsView(groupID: group.id, service: service)
                 }
             }
         }
@@ -718,6 +724,13 @@ struct GroupDetailView: View {
             id: "history", titleKey: "Past sessions", subtitle: Text("Attendance of each session"),
             systemImage: "list.bullet.clipboard", hintKey: "Opens past sessions and who attended them."
         ) { sheet = .history })
+        if layout.showsReports {
+            tiles.append(HalqahTileItem(
+                id: "reports", titleKey: "Reports", subtitle: Text("Daily and monthly"),
+                systemImage: "chart.bar.doc.horizontal", tint: DIColor.accent,
+                hintKey: "Opens this Halqah's daily and monthly reports."
+            ) { sheet = .reports })
+        }
         return tiles
     }
 

@@ -31,6 +31,16 @@ struct MarkazService: Sendable {
         try await get(MarkazMonthlyReport.self, "v1/markaz/reports/monthly", [("month", month)])
     }
 
+    /// One Halqah's own day, for its admins ("2026-11-19"; nil: today).
+    func halqahDaily(_ groupID: String, date: String?) async throws -> HalqahDailyActivity {
+        try await get(HalqahDailyActivity.self, "v1/groups/\(groupID)/activity/daily", [("date", date)])
+    }
+
+    /// One Halqah's own month, for its admins ("2026-11"; nil: this month).
+    func halqahMonthly(_ groupID: String, month: String?) async throws -> HalqahMonthlyActivity {
+        try await get(HalqahMonthlyActivity.self, "v1/groups/\(groupID)/activity/monthly", [("month", month)])
+    }
+
     func session(_ sessionID: String) async throws -> MarkazSessionDetail {
         try await get(MarkazSessionDetail.self, "v1/markaz/sessions/\(sessionID)")
     }

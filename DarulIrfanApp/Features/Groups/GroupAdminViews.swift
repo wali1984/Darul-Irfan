@@ -316,6 +316,25 @@ struct GroupPostComposer: View {
 
 // MARK: - Live now
 
+/// A YouTube link with its Start at and End at, as the fields show them.
+struct VideoLinkDraft: Equatable {
+    var link: String
+    var start: String
+    var end: String
+
+    init(link: String, start: String, end: String) {
+        self.link = link
+        self.start = start
+        self.end = end
+    }
+
+    init(videoID: String, startSeconds: Double?, endSeconds: Double?) {
+        link = "https://youtu.be/" + videoID
+        start = startSeconds.map { ClipTime.text($0) } ?? ""
+        end = endSeconds.map { ClipTime.text($0) } ?? ""
+    }
+}
+
 /// The start sheet's form. A simple Halqah page (owner 2026-11-19, addendum
 /// 2: "no meeting option, no lead live, no record zikr option") starts a
 /// Halqah Zikr from YouTube or a recording only, under the server's own
@@ -325,10 +344,30 @@ struct HalqahStartForm: Equatable {
     /// The server's start title, e.g. "Start Daily North America Nightly Zikr".
     let startTitle: String?
 
-    init(simple: Bool = false, startTitle: String? = nil) {
+    /// The link and the Start at / End at the simple sheet opens with: the
+    /// Halqah's saved zikr time's video (owner 2026-11-19, addendum 5). The
+    /// admin may change them for this start; the zikr time stays as it is.
+    let prefill: VideoLinkDraft?
+
+    init(simple: Bool = false, startTitle: String? = nil, zikrSessions: [ZikrSession] = []) {
         isSimple = simple
         let trimmed = startTitle?.trimmingCharacters(in: .whitespacesAndNewlines)
         self.startTitle = simple && trimmed?.isEmpty == false ? trimmed : nil
+        prefill = simple ? Self.savedVideo(in: zikrSessions) : nil
+    }
+
+    /// The first zikr time, by its start, that plays a video by itself.
+    static func savedVideo(in sessions: [ZikrSession]) -> VideoLinkDraft? {
+        let ordered = sessions.enumerated().sorted { first, second in
+            let a = first.element.startHour * 60 + first.element.startMinute
+            let b = second.element.startHour * 60 + second.element.startMinute
+            return a != b ? a < b : first.offset < second.offset
+        }
+        for (_, session) in ordered {
+            guard let item = session.autoplay?.first, item.isVideo, !item.id.isEmpty else { continue }
+            return VideoLinkDraft(videoID: item.id, startSeconds: item.startSeconds, endSeconds: item.endSeconds)
+        }
+        return nil
     }
 
     /// The sheet's heading and the start tile's label; nil: "Go live".
@@ -386,6 +425,8 @@ struct GroupLiveStarter: View {
     /// "Start at" and "End at" for the pasted YouTube link (video clips only).
     @State private var clipStart = ""
     @State private var clipEnd = ""
+    /// The saved zikr time's video has been filled in once (simple page).
+    @State private var prefilled = false
     @State private var joinTogether = true
     /// Records the room into the group's recordings.
     @State private var recordRoom = true
@@ -528,6 +569,14 @@ struct GroupLiveStarter: View {
             // Until the room service is connected, start where a zikr can play.
             // A simple page's sheet starts on YouTube too.
             if addingToSession || !meetingsReady || !form.offersLeadLive { source = .youtube }
+            // A simple page's sheet opens with its saved zikr time's video and
+            // times; a change here is for this start only.
+            if !addingToSession, !prefilled, videoLink.isEmpty, let prefill = form.prefill {
+                prefilled = true
+                videoLink = prefill.link
+                clipStart = prefill.start
+                clipEnd = prefill.end
+            }
             await loadLibrary()
         }
     }
