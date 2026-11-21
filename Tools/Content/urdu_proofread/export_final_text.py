@@ -41,10 +41,9 @@ def main() -> int:
         titles.setdefault(item["id"], item.get("title") or item["id"])
 
     target = OUT / "final-text"
-    if target.exists():
-        shutil.rmtree(target)
-    (target / "by-book").mkdir(parents=True)
-    (target / "seed-json").mkdir()
+    # Written over what is there: Windows will not always let a folder in use be removed.
+    (target / "by-book").mkdir(parents=True, exist_ok=True)
+    (target / "seed-json").mkdir(exist_ok=True)
 
     pages = json.loads((SEED / "book_pages.json").read_text(encoding="utf-8"))
     by_book: dict[str, list[dict]] = defaultdict(list)
@@ -59,6 +58,9 @@ def main() -> int:
             lines += [f"===== page {row['page']} =====", row["text"], ""]
         (target / "by-book" / f"{book}.txt").write_text("\n".join(lines), encoding="utf-8", newline="\n")
         books.append({"bookID": book, "title": title, "pages": len(rows)})
+    for stale in (target / "by-book").glob("*.txt"):
+        if stale.stem not in by_book:
+            stale.unlink()
     (target / "books.json").write_text(json.dumps(books, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")
 
     passages: dict[str, list[str]] = defaultdict(list)
