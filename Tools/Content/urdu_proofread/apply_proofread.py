@@ -23,14 +23,20 @@ What is applied
     `low`): the reader asks for the printed page or an editor. Held, unless
     `decisions.json` says otherwise.
 
-What is never touched
+Arabic
 
-  * The Qur'an's Arabic. A change is refused when it alters a word that
+  * `quran_ayahs.json` is never touched, and is the measure for the rest.
+  * A slip inside a quotation from the Qur'an (a wrong or missing letter,
+    words run together, a quotation typed in bare and faulty letters) is put
+    right by writing the quotation as the mushaf writes it - the owner's
+    decision of 21 November 2026. A slip in other Arabic takes the reader's
+    small fix. Each is listed in `arabic_typos.json`.
+  * Any other change to Arabic is refused. A change counts as touching Arabic
+    when it alters a word that
     belongs to a run of three or more words found in the mushaf
     (`quran_ayahs.json`), a fully vowelled Arabic word, or a vowelled or
     mushaf-matching word inside a block the page's layout marks as an Arabic
-    quotation - and when it falls between two such words. A finding the
-    reader filed as a Qur'an or Arabic quotation is held as well.
+    quotation - and when it falls between two such words.
 
 After the findings, the same build tidies every Urdu page the same way,
 whether the reader has reached it or not: a space after ۔ ، ؟ ! where the next
@@ -86,7 +92,7 @@ CONFIRMED = {
     "original_confirms_transcription_error_proposed",
     "original_confirmed_spacing_only",
 }
-RANK = {"decision": 0, "high": 1, "confirmed": 1, "editorial": 2, "medium": 3, "probable": 4}
+RANK = {"decision": 0, "high": 1, "confirmed": 1, "arabic": 1, "editorial": 2, "medium": 3, "probable": 4}
 
 HARAKAT = set("\u064b\u064c\u064d\u064e\u064f\u0650\u0651\u0652\u0656\u0657\u0670")
 TOKEN = re.compile(r"\s+|[^\W_]+(?:[\u200c\u200d][^\W_]+)*|.", re.S)
@@ -367,7 +373,7 @@ def classify(finding: dict, decisions: dict) -> tuple[str, str | None, str]:
     if any(word in suggested and word not in original for word in NOTE_WORDS):
         return "hold", None, "proposal reads as a note to an editor, not as replacement words"
     if "quran" in category or "arabic" in category or finding.get("localQuranReference"):
-        return "hold", None, "filed as a Qur'an or Arabic quotation"
+        return "arabic", suggested, "filed as a Qur'an or Arabic quotation"
     old_letters, new_letters = form_key(original), form_key(suggested)
     form_only = old_letters == new_letters
     confirmed = finding.get("resolutionStatus") in CONFIRMED
@@ -666,6 +672,212 @@ def lift_headings(text: str, layout: str | None, mushaf: Mushaf, known: set[str]
 
 
 # --------------------------------------------------------------------------
+# Slips inside Arabic quotations (owner, 21 November 2026: "correction for
+# typos approved", "use mushaf as our app")
+
+# A quotation from the Qur'an that has a slip in it is not patched letter by
+# letter: its words are written as the app's own mushaf writes them
+# (`quran_ayahs.json`, which is never changed). A slip in other Arabic - a
+# hadith, a du'a, the kalima in a line of Urdu - takes the reader's small fix.
+
+NOT_TEXT = {0x200B, 0x200C, 0x200F, 0xFEFF, 0x2002, 0x2003}
+ARABIC_PARTICLES = frozenset("فی من ما لا ان الی علی یا ثم قد لم لن عن اذ اذا".split())
+PAUSE_MARKS = set("ؕۖۗۘۙۚۛۜ")
+
+
+def mushaf_word(word: str) -> str:
+    """A word of the mushaf without the signs that belong to its page, not to the word."""
+    return "".join(ch for ch in word if ord(ch) not in NOT_TEXT and not 0xE000 <= ord(ch) <= 0xF8FF)
+
+
+class Quotations:
+    """Finds which words of the mushaf a quotation is made of."""
+
+    def __init__(self, path: Path):
+        self.ayahs = json.loads(path.read_text(encoding="utf-8"))
+        self.words: list[list[str]] = []
+        self.frames: list[list[str]] = []
+        self.trigrams: dict[tuple, set[int]] = defaultdict(set)
+        self.bigrams: dict[tuple, set[int]] = defaultdict(set)
+        self.single: dict[str, set[int]] = defaultdict(set)
+        for n, ayah in enumerate(self.ayahs):
+            words = [w for w in (mushaf_word(w) for w in ayah["textArabic"].split()) if skeleton(w)]
+            frames = [skeleton(w) for w in words]
+            self.words.append(words)
+            self.frames.append(frames)
+            for tri in zip(frames, frames[1:], frames[2:]):
+                self.trigrams[tri].add(n)
+            for bi in zip(frames, frames[1:]):
+                self.bigrams[bi].add(n)
+            for frame in frames:
+                self.single[frame].add(n)
+
+    @staticmethod
+    def _frames(text: str) -> list[str]:
+        return [f for f in (skeleton(t) for _, _, t in tokens(text) if is_word_char(t[0])) if f]
+
+    def _ayah(self, text: str) -> int | None:
+        frames = self._frames(text)
+        votes: dict[int, int] = defaultdict(int)
+        for tri in zip(frames, frames[1:], frames[2:]):
+            for n in self.trigrams.get(tri, ()):
+                votes[n] += 3
+        for bi in zip(frames, frames[1:]):
+            for n in self.bigrams.get(bi, ()):
+                votes[n] += 1
+        if not votes:
+            return None
+        best = max(votes, key=lambda n: (votes[n], -n))
+        return best if votes[best] >= 3 else None
+
+    @staticmethod
+    def quoted(correct: str) -> str:
+        """The Arabic in the reader's correction: what stands between
+        quotation signs when there are any; otherwise the correction without
+        the unvowelled Urdu words at either end of a vowelled quotation."""
+        for opening, closing in (("«", "»"), ("﴿", "﴾")):
+            if opening in correct and closing in correct[correct.index(opening):]:
+                inner = correct[correct.index(opening) + 1:correct.index(closing, correct.index(opening))]
+                if skeleton_words(inner):
+                    return inner
+        words = [(s, e, sum(ch in HARAKAT for ch in t)) for s, e, t in tokens(correct) if is_word_char(t[0]) and skeleton(t)]
+        if not words or sum(1 for _, _, marks in words if marks >= 2) * 2 < len(words):
+            return correct
+        first, last = 0, len(words) - 1
+        while first < last and words[first][2] == 0:
+            first += 1
+        while last > first and words[last][2] == 0:
+            last -= 1
+        return correct[words[first][0]:words[last][1]]
+
+    def run(self, correct: str, around: str) -> tuple[int, int, int] | None:
+        """(ayah, first word, one past the last) of the mushaf words that
+        `correct` - the quotation with its slip mended - is made of. `around`
+        is the page near it, which settles a quotation found in several ayat."""
+        correct = self.quoted(correct)
+        asked = self._frames(correct)
+        wanted = "".join(asked)
+        if len(wanted) < 3:
+            return None
+
+        def written(place) -> str:
+            n, i, j = place[:3]
+            return " ".join(self.words[n][i:j]).rstrip("".join(PAUSE_MARKS))
+
+        def choose(places):
+            near = self._ayah(around)
+            here = [place for place in places if place[0] == near]
+            if here:
+                return here[0][:3]
+            # Written differently from ayah to ayah: the one written most like the correction is the one meant.
+            like = correct.translate(SKELETON)
+            return max(places, key=lambda place: (difflib.SequenceMatcher(None, written(place).translate(SKELETON), like, autojunk=False).ratio(), -place[0]))[:3]
+
+        # 1. Word for word.
+        places = [(n, i, i + len(asked)) for n in sorted(self.single.get(asked[0], ()))
+                  for i in range(len(self.frames[n]) - len(asked) + 1) if self.frames[n][i:i + len(asked)] == asked]
+        if places and (len(asked) >= 2 or len({written(place) for place in places}) == 1):
+            return choose(places)
+        # 2. The ayah told by its runs of words, then the nearest letters in it.
+        for source in (correct, around):
+            n = self._ayah(source)
+            if n is None:
+                continue
+            frames = self.frames[n]
+            joined = "".join(frames)
+            owner = [i for i, frame in enumerate(frames) for _ in frame]
+            blocks = [blk for blk in difflib.SequenceMatcher(None, joined, wanted, autojunk=False).get_matching_blocks() if blk.size >= 2]
+            if not blocks:
+                continue
+            first, last = owner[blocks[0].a], owner[blocks[-1].a + blocks[-1].size - 1] + 1
+            if difflib.SequenceMatcher(None, "".join(frames[first:last]), wanted, autojunk=False).ratio() >= 0.85:
+                return n, first, last
+        # 3. A short quotation with a slip in it: any few words of the mushaf with nearly these letters.
+        if len(asked) > 4:
+            return None
+        places = []
+        for n in sorted(set().union(*(self.single.get(frame, set()) for frame in asked))):
+            frames = self.frames[n]
+            for size in {max(1, len(asked) - 1), len(asked), len(asked) + 1}:
+                for i in range(len(frames) - size + 1):
+                    got = "".join(frames[i:i + size])
+                    if abs(len(got) - len(wanted)) <= 3:
+                        ratio = difflib.SequenceMatcher(None, got, wanted, autojunk=False).ratio()
+                        if ratio >= 0.85:
+                            places.append((n, i, i + size, ratio))
+        if not places:
+            return None
+        top = max(place[3] for place in places)
+        return choose([place for place in places if place[3] >= top - 0.02])
+
+    def conformed(self, original: str, correct: str, around: str) -> tuple[str | None, str]:
+        """`original` with its quotation as the mushaf writes it, and where
+        the quotation is from; (None, why) when that cannot be done safely."""
+        found = self.run(correct, around)
+        if found is None:
+            return None, "the quotation was not found in the mushaf"
+        n, first, last = found
+        target = "".join(self.frames[n][first:last])
+        words = [(s, e, t) for s, e, t in tokens(original) if is_word_char(t[0]) and skeleton(t)]
+        best, span = 0.0, None
+        for i in range(len(words)):
+            joined = ""
+            for j in range(i, len(words)):
+                joined += skeleton(words[j][2])
+                if len(joined) > len(target) * 1.4 + 3:
+                    break
+                ratio = difflib.SequenceMatcher(None, joined, target, autojunk=False).ratio()
+                if ratio > best:
+                    best, span = ratio, (i, j)
+        if span is None or best < 0.75:
+            return None, "the quotation and the ayah are too unlike"
+        i, j = span
+        # A little word of Arabic left standing beside the quotation, which the
+        # reader's correction did not keep, means the quotation was not taken whole.
+        kept = set(self._frames(correct))
+        for beside in (words[i - 1][2] if i else "", words[j + 1][2] if j + 1 < len(words) else ""):
+            if form_key(beside) in ARABIC_PARTICLES and skeleton(beside) not in kept:
+                return None, "a word of the quotation would be left outside it"
+        quoted = original[words[i][0]:words[j][1]]
+        vowelled = sum(ch in HARAKAT for ch in quoted) >= j - i + 1
+        if vowelled and [skeleton(t) for _, _, t in words[i:j + 1]] == self.frames[n][first:last]:
+            return None, "the quotation already has the mushaf's letters and spacing"
+        fresh = self.words[n][first:last]
+        fresh[-1] = fresh[-1].rstrip("".join(PAUSE_MARKS))
+        ayah = self.ayahs[n]
+        return original[:words[i][0]] + " ".join(fresh) + original[words[j][1]:], f"{ayah['surahNumber']}:{ayah['ayahNumber']}"
+
+
+def skeleton_words(text: str) -> str:
+    return "".join(skeleton(t) for _, _, t in tokens(text) if is_word_char(t[0]))
+
+
+def arabic_fix(finding: dict, text: str, at: int, quotations: Quotations, decided: bool = False) -> tuple[str | None, str]:
+    """What to put for a finding the shield refused or the reader filed as
+    Arabic: (replacement, how), or (None, why it stays as it is)."""
+    original, proposed = finding["original"], finding.get("suggested")
+    if not proposed or any(word in proposed and word not in original for word in NOTE_WORDS):
+        return None, "no replacement words"
+    category = finding.get("category", "").lower()
+    marks = sum(ch in HARAKAT for ch in original)
+    filed = "quran" in category or "arabic" in category or bool(finding.get("localQuranReference"))
+    around = text[max(0, at - 160):at] + proposed + text[at + len(original):at + len(original) + 160]
+    if filed or marks >= 3:
+        fresh, where = quotations.conformed(original, proposed, around)
+        if fresh is not None and fresh != original:
+            return fresh, f"mushaf {where}"
+        if "already" in where:
+            return None, "the words are the mushaf's already; only signs around them would change"
+        if filed and not (finding["confidence"] in SURE and form_key(original) == form_key(proposed)):
+            return None, where
+    old_letters, new_letters = form_key(original), form_key(proposed)
+    small = old_letters == new_letters or distance(old_letters, new_letters) <= 2
+    if decided or (finding["confidence"] in SURE and small):
+        return proposed, "the reader's fix"
+    return None, "not a plain slip"
+
+
+# --------------------------------------------------------------------------
 # The build
 
 # Which pages each Urdu tafsir under an ayah was cut from: (prefix, suffix, edition).
@@ -683,11 +895,15 @@ def seed_layout(raw: bytes):
     raise SystemExit("a seed file is not written in any known JSON layout; refusing to rewrite it")
 
 
-def protected_survive(mushaf: Mushaf, where: str, old: str, old_layout: str | None, new: str) -> None:
+def protected_survive(mushaf: Mushaf, where: str, old: str, old_layout: str | None, new: str,
+                      mended: tuple = ()) -> None:
     """The Qur'an's Arabic must come through untouched: every protected word
-    of the old text must still be in the new one, in order."""
+    of the old text must still be in the new one, in order. `mended` are the
+    places where an approved slip in a quotation was put right."""
     at = 0
     for s, e, _ in mushaf.protected(old, old_layout):
+        if any(ms <= e and s <= me for ms, me, _ in mended):
+            continue
         found = new.find(old[s:e], at)
         if found == -1:
             raise SystemExit(f"{where}: a protected Arabic word was lost ({old[s:e]}); nothing written")
@@ -707,6 +923,7 @@ def build(write: bool) -> int:
     urdu_books = {book["id"] for book in read_json(REGISTER / "inventory.json")["books"]}
     decisions = json.loads((HERE / "decisions.json").read_text(encoding="utf-8")) if (HERE / "decisions.json").exists() else {}
     mushaf = Mushaf(base_file("quran_ayahs.json"))
+    quotations = Quotations(base_file("quran_ayahs.json"))
     links, links_layout = seed_layout(base_file("book_links.json").read_bytes())
 
     ledger: dict[str, dict] = {}
@@ -722,7 +939,7 @@ def build(write: bool) -> int:
             ledger[fid] = {"status": "error", "why": "page text is not the text the finding was read from"}
             continue
         verdict, replacement, why = classify(finding, decisions)
-        if verdict != "apply":
+        if verdict not in ("apply", "arabic"):
             ledger[fid] = {"status": verdict, "why": why}
             continue
         original = finding["original"]
@@ -730,6 +947,13 @@ def build(write: bool) -> int:
         if text[first:first + len(original)] != original:
             ledger[fid] = {"status": "error", "why": "the words are not at the offset given"}
             continue
+        mends = verdict == "arabic"
+        if mends:
+            replacement, how = arabic_fix(finding, text, first, quotations)
+            if replacement is None:
+                ledger[fid] = {"status": "hold", "why": f"Arabic quotation: {how}"}
+                continue
+            why = "arabic"
         places = occurrences(text, original)
         if len(places) > 1:
             alone = [at for at in places if stands_alone(text, at, original)]
@@ -744,10 +968,13 @@ def build(write: bool) -> int:
             "id": fid, "places": places, "original": original, "replacement": replacement,
             "rank": RANK.get(why, 5), "why": why,
             "inWord": len(places) == 1 and not stands_alone(text, places[0], original),
+            "finding": finding, "mends": mends, "how": how if mends else "",
         })
 
     shown: list[dict] = []
     finding_edits: dict[tuple[str, int], list[Edit]] = {}
+    mended: dict[tuple[str, int], set[Edit]] = defaultdict(set)
+    arabic_log: list[dict] = []
     links_changed = 0
     for key, items in wanted.items():
         row = index[key]
@@ -771,10 +998,17 @@ def build(write: bool) -> int:
             done, notes = 0, []
             for at in item["places"]:
                 placed = [(at + s, at + e, r) for s, e, r in atoms]
-                why_not = next((w for w in (shield.refuses(s, e) for s, e, _ in placed) if w), None)
+                mends, how, put = item["mends"], item["how"], item["replacement"]
+                why_not = None if mends else next((w for w in (shield.refuses(s, e) for s, e, _ in placed) if w), None)
                 if why_not:
-                    notes.append(why_not)
-                    continue
+                    # Arabic stands in the way. A slip in it may be put right
+                    # (the Qur'an's as the mushaf has it); anything else is refused.
+                    put, how = arabic_fix(item["finding"], text, at, quotations, decided=item["why"] == "decision")
+                    if put is None:
+                        notes.append(f"{why_not} ({how})")
+                        continue
+                    placed = [(at + s, at + e, r) for s, e, r in atomic_edits(item["original"], put)]
+                    mends = True
                 other = next((o for o in (clash(*edit) for edit in placed) if o), None)
                 if other:
                     notes.append(f"gives way to {other}")
@@ -782,6 +1016,10 @@ def build(write: bool) -> int:
                 for edit in placed:
                     if not any((s, e, r) == edit for s, e, r, _ in accepted):
                         accepted.append((*edit, item["id"]))
+                if mends:
+                    mended[key].update(placed)
+                    arabic_log.append({"id": item["id"], "book": key[0], "page": key[1], "how": how,
+                                       "was": item["original"], "now": put})
                 done += 1
             if done:
                 ledger[item["id"]] = {"status": "applied", "why": item["why"], "places": done,
@@ -861,13 +1099,13 @@ def build(write: bool) -> int:
         old, old_layout = base_text[key]
         if row["text"] != old:
             changed_pages += 1
-            protected_survive(mushaf, f"{key}", old, old_layout, row["text"])
+            protected_survive(mushaf, f"{key}", old, old_layout, row["text"], tuple(mended.get(key, ())))
             if row.get("layout") is not None and len(row["layout"]) != row["text"].count("\n\n") + 1:
                 raise SystemExit(f"{key}: the layout no longer has one letter per part; nothing written")
     lost = [(book, page, entry["m"]) for book, by_page in links["books"].items() for page, entries in by_page.items()
             for entry in entries if (book, int(page)) in index and entry["m"] not in index[(book, int(page))]["text"]]
 
-    tafsir_rows, tafsir_layout, tafsir_summary = carry_to_tafsir(base_text, finding_edits, mushaf, headings_moved)
+    tafsir_rows, tafsir_layout, tafsir_summary = carry_to_tafsir(base_text, finding_edits, mushaf, headings_moved, mended)
 
     status = Counter(entry["status"] for entry in ledger.values())
     reviewed = read_json(REGISTER / "progress.json")
@@ -885,6 +1123,7 @@ def build(write: bool) -> int:
         "pagesChanged": changed_pages,
         "bookLinksRemapped": links_changed,
         "bookLinksNotOnTheirPage": len(lost),
+        "arabicSlipsMended": len(arabic_log),
         "tafsir": tafsir_summary,
         "written": write,
     }
@@ -895,6 +1134,9 @@ def build(write: bool) -> int:
               if ledger[finding["id"]]["status"] != "applied"]
     (OUT / "not-applied.json").write_text(json.dumps(review, ensure_ascii=False, indent=1), encoding="utf-8")
     (OUT / "links-lost.json").write_text(json.dumps(lost, ensure_ascii=False, indent=1), encoding="utf-8")
+    # Kept in the repository: verify_arabic.py allows exactly these words to have changed.
+    (HERE / "arabic_typos.json").write_text(json.dumps(sorted(arabic_log, key=lambda entry: entry["id"]), ensure_ascii=False, indent=1) + "\n",
+                                            encoding="utf-8", newline="\n")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     if write:
         (SEED / "book_pages.json").write_text(pages_layout.render(pages), encoding="utf-8", newline="")
@@ -904,7 +1146,7 @@ def build(write: bool) -> int:
     return 0
 
 
-def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headings_moved: dict):
+def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headings_moved: dict, mended: dict):
     """The Urdu tafsir under an ayah holds the same passages as the pages.
     Each correction is found there by the words around it and made there too."""
     rows, layout = seed_layout(base_file("quran_tafsir.json").read_bytes())
@@ -912,6 +1154,7 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headin
     for row in rows:
         by_edition[row["editionID"]].append(row)
     row_edits: dict[int, set[Edit]] = defaultdict(set)
+    row_mended: dict[int, set[Edit]] = defaultdict(set)
     carried = missing = unsure = 0
     for (book, page), edits in sorted(finding_edits.items()):
         target = next(((edition, book[len(prefix):len(book) - len(suffix)] if suffix else None)
@@ -943,6 +1186,8 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headin
                     for row, at in hits:
                         for s, e, r in cluster:
                             row_edits[id(row)].add((at + s - a, at + e - a, r))
+                            if (s, e, r) in mended.get((book, page), ()):
+                                row_mended[id(row)].add((at + s - a, at + e - a, r))
                     carried += 1
                 placed = True
                 break
@@ -963,7 +1208,7 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headin
             kept.append(edit)
         if kept:
             shield = Shield(mushaf, old, None)
-            kept = [edit for edit in kept if not shield.refuses(edit[0], edit[1])]
+            kept = [edit for edit in kept if edit in row_mended[id(row)] or not shield.refuses(edit[0], edit[1])]
             new = apply_edits(old, kept)
         new, _ = tidy(new, None, mushaf, tidied)
         known = headings_moved.get(f"asrar-{row['surahNumber']}-ur") if row["editionID"] == "asrar-at-tanzil-ur" else None
@@ -971,7 +1216,8 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headin
             new, _, moved_here = lift_headings(new, None, mushaf, known)
             headings += len(moved_here)
         if new != old:
-            protected_survive(mushaf, f"tafsir {row['editionID']} {row['surahNumber']}:{row['ayahStart']}", old, None, new)
+            protected_survive(mushaf, f"tafsir {row['editionID']} {row['surahNumber']}:{row['ayahStart']}", old, None, new,
+                              tuple(row_mended[id(row)]))
             row["text"] = new
             changed += 1
     return rows, layout, {"correctionsCarried": carried, "notInAnAyahPassage": missing, "ambiguousLeft": unsure,

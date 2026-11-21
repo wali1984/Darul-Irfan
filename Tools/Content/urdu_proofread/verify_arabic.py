@@ -5,8 +5,9 @@ reuse its rules. It compares the seed in the working tree with the seed at
 HEAD (or a commit given as the first argument) and insists that, in every row
 whose text changed:
 
-  * no fully vowelled word (three or more harakat: Arabic) has gone; every
-    vowelled word that changed at all is listed, to be read;
+  * no fully vowelled word (three or more harakat: Arabic) has gone, other
+    than the approved slips recorded in `arabic_typos.json`; every vowelled
+    word that changed at all is listed, to be read;
   * a page still has one layout letter per blank-line-separated part;
   * nothing but the text, the layout and the count of parts changed.
 
@@ -52,6 +53,26 @@ def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     commit = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
     problems = 0
+    # The slips in Arabic quotations that were approved and put right
+    # (arabic_typos.json): these words, and only these, may have gone.
+    approved: set[str] = set()
+    record = Path(__file__).with_name("arabic_typos.json")
+    if record.exists():
+        mushaf: set[str] = set()
+        for ayah in json.loads((SEED / "quran_ayahs.json").read_text(encoding="utf-8")):
+            for word in ayah["textArabic"].split():
+                word = "".join(ch for ch in word if ord(ch) not in (0x200B, 0x200C, 0x200F, 0xFEFF) and not 0xE000 <= ord(ch) <= 0xF8FF)
+                mushaf.update((word, word.rstrip("ؕۖۗۘۙۚۛۜ")))
+        for entry in json.loads(record.read_text(encoding="utf-8")):
+            approved.update(vowelled(entry["was"]))
+            if entry["how"].startswith("mushaf"):
+                # What was put in must be the mushaf's own words, letter for letter.
+                before = set(entry["was"].split())
+                for word in entry["now"].split():
+                    bare = word.strip("۔،؟!:؛()«»\"'")
+                    if word not in before and sum(c in HARAKAT for c in bare) >= 1 and bare not in mushaf:
+                        problems += 1
+                        print(f"{entry['id']}: {bare} is not a word of the mushaf")
     keys = {
         "book_pages.json": lambda r: (r["bookID"], r["page"]),
         "quran_tafsir.json": lambda r: (r["editionID"], r["surahNumber"], r["ayahStart"], r["ayahEnd"]),
@@ -81,7 +102,7 @@ def main() -> int:
                 # Urdu is vowelled here and there too ("اُمّت", "حُسنِ"), and a
                 # correction may add or move such a mark: listed, to be read.
                 # A fully vowelled word that is no longer there is Arabic lost.
-                lost = [word for word in gone if sum(c in HARAKAT for c in word) >= 3]
+                lost = [word for word in gone if sum(c in HARAKAT for c in word) >= 3 and word not in approved]
                 print(f"{name} {key(a)}: was {dict(gone)} now {dict(came)}" + ("  <-- ARABIC LOST" if lost else ""))
                 problems += bool(lost)
                 listed += 1
