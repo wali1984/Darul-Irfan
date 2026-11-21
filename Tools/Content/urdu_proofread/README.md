@@ -28,7 +28,7 @@ Run from the iOS checkout (`pw/i-proof`, branch `claude/urdu-proofread`).
    `book_pages.json`, `book_links.json` and `quran_tafsir.json` in the iOS seed.
 6. `python Tools/Content/urdu_proofread/verify_arabic.py <commit before>` and
    `python Tools/ContentIntegrity/check_content.py` - both must pass.
-7. Copy the three files and `manifest.json` to Android
+7. `python Tools/Content/urdu_proofread/spread.py` - copies the three files and `manifest.json` to Android
    (`app/src/main/assets/seed`) and the desktop (`content`), byte for byte.
 
 ## What is never changed

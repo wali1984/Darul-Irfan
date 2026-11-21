@@ -41,6 +41,10 @@ The Urdu tafsir under an ayah (`quran_tafsir.json`) was cut from these same
 pages, so every correction is carried to the passage it came from there, and
 those passages are tidied alike.
 
+Asrar-at-Tanzil prints its headings in the margin. Where one was read into the
+middle of a sentence, the sentence is made whole and the heading is set just
+above it (or just below it, where the sentence's opening cannot be found).
+
 Two findings that want different things at the same place are not merged: the
 surer one (then the longer one) is applied and the other is reported.
 
@@ -587,6 +591,81 @@ def tidy(text: str, layout: str | None, mushaf: Mushaf, counts: Counter) -> tupl
 
 
 # --------------------------------------------------------------------------
+# Margin headings that were read into the middle of a sentence
+
+# Asrar-at-Tanzil prints its headings in the margin, beside the prose. Read
+# into a single column, a heading sometimes landed between two halves of a
+# sentence ("... اور جب / دعا بھی تقدیر ہوتی ہے / موسیٰ علیہ السلام مصر پہنچے ...").
+# The words before it then end on a word that cannot end a sentence, or the
+# words after it begin with one that cannot begin one.
+CANNOT_END = frozenset("کی کا کے کو سے میں پر پہ نے کہ اور یا جب اگر مگر لیکن بلکہ جو جس جن تک چونکہ کیونکہ تاکہ نیز یعنی پھر".split())
+CANNOT_BEGIN = frozenset("کو کی کا کے سے میں پر نے تک".split())
+SENTENCE_END = "۔؟!"
+FARTHEST_MOVE = 400
+
+
+def interrupts(before: str, heading: str, after: str) -> bool:
+    """`heading` stands inside the sentence that runs from `before` into `after`."""
+    before = before.rstrip()
+    if not before or not after.strip() or len(heading) >= 120 or "\n" in heading.strip():
+        return False
+    if not re.match(f"[{LETTER}]", before[-1]) and not re.match(f"[{MARK}]", before[-1]):
+        return False  # closed by a mark, a bracket or a quotation mark
+    if not re.match(f"[{LETTER}]", after.lstrip()[:1] or " "):
+        return False
+    last = [form_key(t) for _, _, t in tokens(before[-40:]) if is_word_char(t[0])]
+    first = [form_key(t) for _, _, t in tokens(after[:40]) if is_word_char(t[0])]
+    return bool(last and last[-1] in CANNOT_END) or bool(first and first[0] in CANNOT_BEGIN)
+
+
+def lifted(before: str, heading: str, after: str) -> list[str] | None:
+    """The three parts with the sentence made whole and the heading moved up
+    to where the sentence begins or, failing that, down to where it ends."""
+    back = max(before.rfind(mark) for mark in SENTENCE_END)
+    opening = before[back + 1:].lstrip() if back != -1 else before
+    ends = [at for at in (after.find(mark) for mark in SENTENCE_END) if at != -1]
+    forward = min(ends) + 1 if ends else None
+    while forward is not None and forward < len(after) and after[forward] in SENTENCE_END + "”\"'’)":
+        forward += 1
+    up = len(opening) if (back != -1 or len(before) <= FARTHEST_MOVE) else None
+    down = forward
+    # A margin heading stands where its subject begins, so it goes above the
+    # sentence it was read into when that sentence's opening can be found.
+    if up is not None and up <= FARTHEST_MOVE:
+        head = before[:back + 1].rstrip() if back != -1 else ""
+        return ([head] if head else []) + [heading, f"{opening.rstrip()} {after.lstrip()}"]
+    if down is not None and down <= FARTHEST_MOVE:
+        rest = after[down:].lstrip()
+        return [f"{before.rstrip()} {after[:down].lstrip()}", heading] + ([rest] if rest else [])
+    return None
+
+
+def lift_headings(text: str, layout: str | None, mushaf: Mushaf, known: set[str] | None = None) -> tuple[str, str | None, list[str]]:
+    """The page (or, with `known` headings and no layout, a tafsir passage)
+    with every interrupting heading moved out of its sentence."""
+    parts = text.split("\n\n")
+    kinds = list(layout) if layout is not None and len(layout) == len(parts) else None
+    if kinds is None and known is None:
+        return text, layout, []
+    moved_headings, i = [], 0
+    while i + 2 < len(parts):
+        is_heading = kinds[i + 1] == "h" if kinds else parts[i + 1].strip() in known
+        is_prose = (kinds[i] == "p" and kinds[i + 2] == "p") if kinds else True
+        if is_heading and is_prose and interrupts(parts[i], parts[i + 1], parts[i + 2]) \
+                and not mushaf.protected(parts[i + 1], None):
+            new = lifted(parts[i], parts[i + 1], parts[i + 2])
+            if new is not None:
+                moved_headings.append(parts[i + 1].strip())
+                if kinds:
+                    at = new.index(parts[i + 1])
+                    kinds[i:i + 3] = ["p"] * at + ["h"] + ["p"] * (len(new) - at - 1)
+                parts[i:i + 3] = new
+                continue
+        i += 1
+    return "\n\n".join(parts), ("".join(kinds) if kinds else layout), moved_headings
+
+
+# --------------------------------------------------------------------------
 # The build
 
 # Which pages each Urdu tafsir under an ayah was cut from: (prefix, suffix, edition).
@@ -764,6 +843,18 @@ def build(write: bool) -> int:
         row["text"] = new
         pages_tidied += 1
 
+    # Asrar-at-Tanzil's margin headings come out of the sentences they were read into.
+    headings_moved: dict[str, set[str]] = defaultdict(set)
+    for row in pages:
+        if not (row["bookID"].startswith("asrar-") and row["bookID"].endswith("-ur")) or row.get("layout") is None:
+            continue
+        text, layout, moved_here = lift_headings(row["text"], row["layout"], mushaf)
+        if moved_here:
+            if "blocks" in row:
+                row["blocks"] += text.count("\n\n") - row["text"].count("\n\n")
+            row["text"], row["layout"] = text, layout
+            headings_moved[row["bookID"]].update(moved_here)
+
     changed_pages = 0
     for row in pages:
         key = (row["bookID"], row["page"])
@@ -776,7 +867,7 @@ def build(write: bool) -> int:
     lost = [(book, page, entry["m"]) for book, by_page in links["books"].items() for page, entries in by_page.items()
             for entry in entries if (book, int(page)) in index and entry["m"] not in index[(book, int(page))]["text"]]
 
-    tafsir_rows, tafsir_layout, tafsir_summary = carry_to_tafsir(base_text, finding_edits, mushaf)
+    tafsir_rows, tafsir_layout, tafsir_summary = carry_to_tafsir(base_text, finding_edits, mushaf, headings_moved)
 
     status = Counter(entry["status"] for entry in ledger.values())
     reviewed = read_json(REGISTER / "progress.json")
@@ -789,6 +880,7 @@ def build(write: bool) -> int:
         "pagesCorrectedFromFindings": len(finding_edits),
         "editsFromFindings": sum(len(edits) for edits in finding_edits.values()),
         "pagesTidied": pages_tidied,
+        "headingsMovedOutOfSentences": sum(len(v) for v in headings_moved.values()),
         "tidied": dict(tidied),
         "pagesChanged": changed_pages,
         "bookLinksRemapped": links_changed,
@@ -812,7 +904,7 @@ def build(write: bool) -> int:
     return 0
 
 
-def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf):
+def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headings_moved: dict):
     """The Urdu tafsir under an ayah holds the same passages as the pages.
     Each correction is found there by the words around it and made there too."""
     rows, layout = seed_layout(base_file("quran_tafsir.json").read_bytes())
@@ -857,7 +949,7 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf):
             if not placed:
                 missing += 1
     tidied: Counter = Counter()
-    changed = 0
+    changed = headings = 0
     editions = {edition for _, _, edition in TAFSIR}
     for row in rows:
         if row["editionID"] not in editions:
@@ -874,12 +966,16 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf):
             kept = [edit for edit in kept if not shield.refuses(edit[0], edit[1])]
             new = apply_edits(old, kept)
         new, _ = tidy(new, None, mushaf, tidied)
+        known = headings_moved.get(f"asrar-{row['surahNumber']}-ur") if row["editionID"] == "asrar-at-tanzil-ur" else None
+        if known:
+            new, _, moved_here = lift_headings(new, None, mushaf, known)
+            headings += len(moved_here)
         if new != old:
             protected_survive(mushaf, f"tafsir {row['editionID']} {row['surahNumber']}:{row['ayahStart']}", old, None, new)
             row["text"] = new
             changed += 1
     return rows, layout, {"correctionsCarried": carried, "notInAnAyahPassage": missing, "ambiguousLeft": unsure,
-                          "rowsChanged": changed, "tidied": dict(tidied)}
+                          "rowsChanged": changed, "headingsMovedOutOfSentences": headings, "tidied": dict(tidied)}
 
 
 if __name__ == "__main__":
