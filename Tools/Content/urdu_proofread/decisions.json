@@ -283,9 +283,757 @@
   "action": "hold",
   "note": "gender agreement in an idiom; possible author's usage"
  },
+ "ASRAR-34-P10-12-010": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-34-P10-12-011": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-34-P10-12-014": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-34-P19-22-006": {
+  "action": "hold",
+  "note": "adds words (کا آنا); author's wording"
+ },
+ "ASRAR-34-P19-22-007": {
+  "action": "hold",
+  "note": "adds a verb; author's elliptical style"
+ },
+ "ASRAR-34-P19-22-017": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
  "ASRAR-34-P4-6-005": {
   "action": "hold",
   "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-34-P7-9-003": {
+  "action": "hold",
+  "note": "print reads as app (ابی ابن کعب); name vocalisation needs editor"
+ },
+ "ASRAR-34-P7-9-010": {
+  "action": "hold",
+  "note": "author's usage (دو رائے); merely standardises"
+ },
+ "ASRAR-35-P1-2-004": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-35-P11-16-012": {
+  "action": "hold",
+  "note": "style (سالوں بعد is valid)"
+ },
+ "ASRAR-35-P11-16-030": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-35-P3-6-003": {
+  "action": "hold",
+  "note": "reason says print reads as app (کی missing in print too)"
+ },
+ "ASRAR-35-P3-6-010": {
+  "action": "apply",
+  "note": "بیشک → بے شک + question mark for a question; no negation involved"
+ },
+ "ASRAR-35-P3-6-039": {
+  "action": "hold",
+  "note": "adds ہیں; author's elliptical style possible, print not seen"
+ },
+ "ASRAR-35-P7-10-026": {
+  "action": "apply",
+  "note": "بیشک → بے شک + izafat mark only"
+ },
+ "ASRAR-35-P7-10-031": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-35-P7-10-042": {
+  "action": "hold",
+  "note": "gender the author gives a noun (ناک)"
+ },
+ "ASRAR-36-P1-2-003": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-36-P1-2-011": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-36-P11-14-010": {
+  "action": "hold",
+  "note": "طلوع غروب is possible usage; adds a conjunction"
+ },
+ "ASRAR-36-P11-14-020": {
+  "action": "hold",
+  "note": "author's usage; reason asks editor"
+ },
+ "ASRAR-36-P11-14-031": {
+  "action": "hold",
+  "note": "چکتی is a valid idiom (آ کیوں نہیں چکتی); proposal changes the word"
+ },
+ "ASRAR-36-P11-14-044": {
+  "action": "hold",
+  "note": "bundles مونہوں → منہ (plural to singular, valid old form) with the orthography"
+ },
+ "ASRAR-36-P15-20-008": {
+  "action": "hold",
+  "note": "adds اور and respells; reason asks editor"
+ },
+ "ASRAR-36-P15-20-020": {
+  "action": "hold",
+  "note": "مونہوں is a valid older plural; not a slip"
+ },
+ "ASRAR-36-P15-20-025": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-36-P15-20-040": {
+  "action": "hold",
+  "note": "agreement with predicate is possible in author's speech"
+ },
+ "ASRAR-36-P15-20-045": {
+  "action": "hold",
+  "note": "rewrites wording (دارانہ/یا); reason asks editor"
+ },
+ "ASRAR-36-P7-10-014": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-36-P7-10-042": {
+  "action": "hold",
+  "note": "adds اور and list commas; taste"
+ },
+ "ASRAR-37-P1-4-029": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-37-P1-4-040": {
+  "action": "apply",
+  "note": "print inspected: reads دائیں / آتے تھے (garbled transcription)"
+ },
+ "ASRAR-37-P1-4-045": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-37-P14-17-010": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-37-P14-17-014": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-37-P14-17-020": {
+  "action": "apply",
+  "note": "word typed twice (خالق خالق)"
+ },
+ "ASRAR-37-P18-21-030": {
+  "action": "apply",
+  "note": "obviously dropped میں (دوزخ میں جلنے)"
+ },
+ "ASRAR-37-P5-8-011": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-37-P5-8-033": {
+  "action": "hold",
+  "note": "gender the author gives a noun (فکر)"
+ },
+ "ASRAR-37-P9-13-035": {
+  "action": "hold",
+  "note": "adds a conjunction; reason asks to check original"
+ },
+ "ASRAR-37-P9-13-047": {
+  "action": "apply",
+  "note": "print inspected: reads بیکا نہ (idiom بال بیکا نہ کر سکے)"
+ },
+ "ASRAR-37-P9-13-052": {
+  "action": "apply",
+  "note": "dropped letter (واقع → واقعے before postposition)"
+ },
+ "ASRAR-38-P1-4-027": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only); izafat mark"
+ },
+ "ASRAR-38-P1-4-033": {
+  "action": "apply",
+  "note": "standard orthography (ہمکو split, دیجئے → دیجیے)"
+ },
+ "ASRAR-38-P5-8-005": {
+  "action": "hold",
+  "note": "number agreement; reason asks editor"
+ },
+ "ASRAR-38-P5-8-030": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-38-P9-12-008": {
+  "action": "apply",
+  "note": "final ہ → ے before postposition + spacing"
+ },
+ "ASRAR-38-P9-12-011": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-38-P9-12-012": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-38-P9-12-019": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-38-P9-12-033": {
+  "action": "hold",
+  "note": "respelling of a valid spelling (مُٹھہ) + taste comma"
+ },
+ "ASRAR-38-P9-12-036": {
+  "action": "hold",
+  "note": "print reads as app (علیہما); formula change needs editor"
+ },
+ "ASRAR-38-P9-12-039": {
+  "action": "hold",
+  "note": "name respelling + wording; reason asks editor"
+ },
+ "ASRAR-39-P1-4-009": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-39-P18-21-004": {
+  "action": "apply",
+  "note": "joined spelling split (بیہوش, ہوکر)"
+ },
+ "ASRAR-39-P18-21-009": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-39-P18-21-023": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-39-P18-21-026": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-39-P5-8-004": {
+  "action": "apply",
+  "note": "print inspected: ۲۵۱ is a footnote marker read into the sentence"
+ },
+ "ASRAR-39-P5-8-011": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-39-P9-13-023": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-39-P9-13-037": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-40-P1-4-003": {
+  "action": "apply",
+  "note": "joined spellings split (اسکو, بیہودہ)"
+ },
+ "ASRAR-40-P1-4-013": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-40-P1-4-015": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-40-P1-4-028": {
+  "action": "apply",
+  "note": "joined spelling split (بیجان) + sentence punctuation"
+ },
+ "ASRAR-40-P1-4-033": {
+  "action": "hold",
+  "note": "print reads as app (کر کر, valid older usage)"
+ },
+ "ASRAR-40-P1-4-036": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-40-P1-4-038": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-40-P1-4-042": {
+  "action": "apply",
+  "note": "words typed twice (دنیا میں دنیا میں)"
+ },
+ "ASRAR-40-P13-17-001": {
+  "action": "hold",
+  "note": "adds a verb; author's elliptical style"
+ },
+ "ASRAR-40-P13-17-021": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-40-P13-17-031": {
+  "action": "hold",
+  "note": "more than one possible fix (جاتا ہے / جائے); print reads as app"
+ },
+ "ASRAR-40-P18-23-036": {
+  "action": "hold",
+  "note": "adds conjunction and commas; reason asks editor"
+ },
+ "ASRAR-40-P5-8-018": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved"
+ },
+ "ASRAR-40-P5-8-037": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-40-P9-12-007": {
+  "action": "apply",
+  "note": "joined spelling split (بیکار)"
+ },
+ "ASRAR-40-P9-12-010": {
+  "action": "hold",
+  "note": "gender/verb change with more than one possible fix; print not seen"
+ },
+ "ASRAR-40-P9-12-030": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-40-P9-12-037": {
+  "action": "apply",
+  "note": "joined spelling split (بیکار, ہوگی)"
+ },
+ "ASRAR-41-P13-16-003": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-41-P13-16-011": {
+  "action": "hold",
+  "note": "gender the author gives a noun (طمع)"
+ },
+ "ASRAR-41-P13-16-033": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-41-P17-20-008": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-41-P17-20-012": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-41-P4-RUKU-RANGE": {
+  "action": "hold",
+  "note": "a number changes in a heading; printed heading not seen"
+ },
+ "ASRAR-41-P5-8-007": {
+  "action": "hold",
+  "note": "adds a conjunction; reason asks editor"
+ },
+ "ASRAR-41-P5-8-027": {
+  "action": "hold",
+  "note": "possible as it stands (ان کے ... ایام); not certain slip"
+ },
+ "ASRAR-41-P5-8-037": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-41-P9-12-033": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک → بے شک); no negation involved; comma"
+ },
+ "ASRAR-42-P1-4-027": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-42-P15-18-006": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-42-P15-18-013": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-42-P5-9-004": {
+  "action": "hold",
+  "note": "grammatical as it stands (تمہیں ... جوڑے بنایا)"
+ },
+ "ASRAR-42-P5-9-013": {
+  "action": "apply",
+  "note": "word typed twice (میں میں)"
+ },
+ "ASRAR-42-P5-9-033": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P1-2-002": {
+  "action": "apply",
+  "note": "reason: printed heading reads ۲۵/۷ (dropped in transcription)"
+ },
+ "ASRAR-43-P1-2-005": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P1-2-008": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P1-2-010": {
+  "action": "hold",
+  "note": "print reads as app; reason says do not auto-change"
+ },
+ "ASRAR-43-P13-16-004": {
+  "action": "apply",
+  "note": "joined spelling split (بیوقوف) + sentence stop"
+ },
+ "ASRAR-43-P13-16-006": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P13-16-009": {
+  "action": "apply",
+  "note": "joined spelling split (ہونگے); stop to comma only, no wording change"
+ },
+ "ASRAR-43-P13-16-013": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P13-16-019": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P13-16-023": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P13-16-024": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P13-16-025": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P13-16-028": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P17-18-002": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P17-18-003": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P17-18-020": {
+  "action": "hold",
+  "note": "لیجے/دیجے are valid spoken spellings; house-style respelling"
+ },
+ "ASRAR-43-P3-6-005": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-43-P3-6-006": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P3-6-008": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P3-6-009": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P3-6-024": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P3-6-026": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P7-8-007": {
+  "action": "hold",
+  "note": "print reads as app (extra کا); not an adjacent doubling"
+ },
+ "ASRAR-43-P7-8-016": {
+  "action": "apply",
+  "note": "final ہ → ے before postposition + sentence punctuation"
+ },
+ "ASRAR-43-P9-12-008": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P9-12-010": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P9-12-011": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P9-12-012": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P9-12-013": {
+  "action": "apply",
+  "note": "بیشک → بے شک + sentence stop; no negation involved"
+ },
+ "ASRAR-43-P9-12-025": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P9-12-027": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P9-12-030": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-43-P9-12-031": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-43-P9-12-033": {
+  "action": "apply",
+  "note": "joined spelling split (بیوقوف)"
+ },
+ "ASRAR-44-P1-4-005": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P1-4-013": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P1-4-014": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P1-4-027": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P5-9-015": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P5-9-016": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P5-9-020": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P5-9-021": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-44-P5-9-027": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P1-4-001": {
+  "action": "apply",
+  "note": "print inspected: numbers are in words only, digits not printed"
+ },
+ "ASRAR-45-P1-4-003": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-45-P1-4-008": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P1-4-016": {
+  "action": "apply",
+  "note": "reason: printed heading carries الیہ یرد ۲۵/۱۸ (dropped in transcription)"
+ },
+ "ASRAR-45-P1-4-018": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-45-P7-10-010": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P7-10-011": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P7-10-012": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P7-10-014": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P7-10-016": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P7-10-017": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P7-10-018": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-45-P7-10-019": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-46-P1-4-005": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-46-P1-4-010": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-46-P1-4-024": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-46-P11-13-001": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-46-P11-13-006": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-46-P11-13-009": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-46-P11-13-010": {
+  "action": "apply",
+  "note": "joined spellings split; stop to comma only, no wording change"
+ },
+ "ASRAR-46-P5-7-004": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only); izafat mark"
+ },
+ "ASRAR-46-P5-7-007": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-46-P8-10-003": {
+  "action": "apply",
+  "note": "question mark for a کیا question + standard لیے"
+ },
+ "ASRAR-46-P8-10-005": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-46-P8-10-006": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P1-5-001": {
+  "action": "apply",
+  "note": "print inspected: no digits after اڑتیس"
+ },
+ "ASRAR-47-P1-5-002": {
+  "action": "apply",
+  "note": "reason: printed heading reads ۲۶/۵ (dropped in transcription)"
+ },
+ "ASRAR-47-P1-5-003": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P1-5-005": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only); izafat marks"
+ },
+ "ASRAR-47-P1-5-008": {
+  "action": "apply",
+  "note": "standard orthography (لئے → لیے)"
+ },
+ "ASRAR-47-P1-5-015": {
+  "action": "hold",
+  "note": "added izafat changes letters (علماء → علمائے)"
+ },
+ "ASRAR-47-P1-5-017": {
+  "action": "hold",
+  "note": "added izafat changes letters (علماء → علمائے)"
+ },
+ "ASRAR-47-P1-5-023": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P1-5-026": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P1-5-029": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P1-5-031": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-47-P1-5-032": {
+  "action": "apply",
+  "note": "print reads a single اور (doubled word)"
+ },
+ "ASRAR-47-P12-13-004": {
+  "action": "apply",
+  "note": "standard orthography (کیلئے)"
+ },
+ "ASRAR-47-P6-8-016": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P6-8-020": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P6-8-021": {
+  "action": "apply",
+  "note": "joined spellings split + sentence punctuation; no wording change"
+ },
+ "ASRAR-47-P9-11-007": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-47-P9-11-010": {
+  "action": "apply",
+  "note": "old joined spelling written apart (جائیگی)"
+ },
+ "ASRAR-47-P9-11-011": {
+  "action": "apply",
+  "note": "reason says printed header carries /۸; next header has the same ۲۶/۹ pattern"
+ },
+ "ASRAR-47-P9-11-014": {
+  "action": "apply",
+  "note": "old joined spelling written apart (آزمائینگے)"
+ },
+ "ASRAR-47-P9-11-016": {
+  "action": "apply",
+  "note": "standard orthography (کیلئے)"
+ },
+ "ASRAR-48-P1-4-001": {
+  "action": "hold",
+  "note": "the ۳۹ to ۲۹ slip is certain (word says انتیس, print reads ۲۹) but proposal also adds two full stops and brackets; apply the digit only"
+ },
+ "ASRAR-48-P1-4-012": {
+  "action": "apply",
+  "note": "standard orthography, initial ھ for ہ in ہجری"
  },
  "ASRAR-ANBIYA-A-008": {
   "action": "hold",
