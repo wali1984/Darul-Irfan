@@ -1,0 +1,7114 @@
+{
+ "ASRAR-100-001": {
+  "action": "apply",
+  "note": "joined spellings written apart"
+ },
+ "ASRAR-100-002": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-104-003": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-105-002": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-108-001": {
+  "action": "hold",
+  "note": "stray digit is wrong per print, but proposal also adds two full stops"
+ },
+ "ASRAR-110-004": {
+  "action": "apply",
+  "note": "wrong look-alike: گڑھ for گڑ (flags planted)"
+ },
+ "ASRAR-113-004": {
+  "action": "hold",
+  "note": "word order rewrite"
+ },
+ "ASRAR-113-005": {
+  "action": "hold",
+  "note": "reason says print reads as app (کی شر)"
+ },
+ "ASRAR-29-P16-18-004": {
+  "action": "hold",
+  "note": "adds میں to author's کے بارے; orthography part alone would be fine"
+ },
+ "ASRAR-29-P16-18-015": {
+  "action": "apply",
+  "note": "old joined spellings written apart (کہدینگے → کہہ دیں گے)"
+ },
+ "ASRAR-29-P16-18-022": {
+  "action": "hold",
+  "note": "editorial rewrite adding words"
+ },
+ "ASRAR-29-P19-21-004": {
+  "action": "hold",
+  "note": "print reads as app; added ہیں is editorial"
+ },
+ "ASRAR-29-P19-21-006": {
+  "action": "apply",
+  "note": "joined spelling split (بیوقوفی → بے وقوفی) only"
+ },
+ "ASRAR-30-P1-3-008": {
+  "action": "apply",
+  "note": "print has 4 under 21; para-ruku fraction as in other headers (count checks out); Arabic untouched"
+ },
+ "ASRAR-30-P1-3-015": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage; added stop"
+ },
+ "ASRAR-30-P1-3-020": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-30-P10-12-001": {
+  "action": "hold",
+  "note": "adds اور and re-punctuates; taste"
+ },
+ "ASRAR-30-P10-12-009": {
+  "action": "hold",
+  "note": "number agreement اس/ان; author's usage, not certain"
+ },
+ "ASRAR-30-P10-12-019": {
+  "action": "apply",
+  "note": "joined spellings split only"
+ },
+ "ASRAR-30-P10-12-024": {
+  "action": "apply",
+  "note": "joined spellings split and sentence stop only"
+ },
+ "ASRAR-30-P13-16-013": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-30-P13-16-023": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-30-P4-6-016": {
+  "action": "hold",
+  "note": "print reads کا تلاش; gender agreement in the translation is editorial"
+ },
+ "ASRAR-31-P1-3-001": {
+  "action": "hold",
+  "note": "adds 'اس کی' and izafat; editorial rewrite of the heading line"
+ },
+ "ASRAR-31-P1-3-003": {
+  "action": "apply",
+  "note": "joined spelling split (بیہودہ → بے ہودہ) only"
+ },
+ "ASRAR-31-P1-3-023": {
+  "action": "hold",
+  "note": "print reads as app; added ہیں is editorial"
+ },
+ "ASRAR-31-P1-3-025": {
+  "action": "hold",
+  "note": "print has T.V; script change is taste"
+ },
+ "ASRAR-31-P10-13-011": {
+  "action": "apply",
+  "note": "question mark on the verse's question and joined spellings split only"
+ },
+ "ASRAR-31-P10-13-014": {
+  "action": "apply",
+  "note": "joined spellings split only"
+ },
+ "ASRAR-31-P10-13-026": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage; added stop"
+ },
+ "ASRAR-31-P4-6-006": {
+  "action": "hold",
+  "note": "print appears to read ہو; editor asked"
+ },
+ "ASRAR-31-P4-6-019": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-31-P7-9-014": {
+  "action": "apply",
+  "note": "joined spellings split only"
+ },
+ "ASRAR-31-P7-9-017": {
+  "action": "apply",
+  "note": "بیشک → بے شک, spacing, izafat mark and sentence stop; no wording change"
+ },
+ "ASRAR-31-P7-9-026": {
+  "action": "hold",
+  "note": "print reads as app; added ہیں is editorial"
+ },
+ "ASRAR-32-P1-3-001": {
+  "action": "hold",
+  "note": "adds 'اس کی'; editorial rewrite of the heading line"
+ },
+ "ASRAR-32-P1-3-002": {
+  "action": "apply",
+  "note": "print has digits, misread as alifs; 14 sits under 21 (count checks out)"
+ },
+ "ASRAR-32-P1-3-019": {
+  "action": "hold",
+  "note": "oblique standardisation and re-punctuation; reason asks editor"
+ },
+ "ASRAR-32-P4-6-009": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-32-P4-6-023": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-32-P4-6-024": {
+  "action": "hold",
+  "note": "more familiar wording; reason asks to check print"
+ },
+ "ASRAR-32-P7-9-008": {
+  "action": "apply",
+  "note": "question mark on the verse's question and joined spellings split only"
+ },
+ "ASRAR-32-P7-9-023": {
+  "action": "apply",
+  "note": "print has the full year ۱۴۱۴; 26 Ramadan 1414 = 9 March 94 agrees"
+ },
+ "ASRAR-33-P1-3-001": {
+  "action": "hold",
+  "note": "adds 'اس کی'; editorial rewrite of the heading line"
+ },
+ "ASRAR-33-P1-3-003": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-33-P1-3-014": {
+  "action": "hold",
+  "note": "added izafat that changes letters"
+ },
+ "ASRAR-33-P1-3-017": {
+  "action": "hold",
+  "note": "reason says print also shows جاتے and asks editor, though جائے is surely meant"
+ },
+ "ASRAR-33-P1-3-024": {
+  "action": "apply",
+  "note": "ت/ئ look-alike slip; 'رکھا جاتے' is not a sentence, only جائے fits"
+ },
+ "ASRAR-33-P10-12-007": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage; added stop"
+ },
+ "ASRAR-33-P10-12-010": {
+  "action": "hold",
+  "note": "author's gender for طمع; editor asked"
+ },
+ "ASRAR-33-P13-15-009": {
+  "action": "hold",
+  "note": "proper name; ض/ظ slip is near-certain but not confirmed in context and reason asks editor"
+ },
+ "ASRAR-33-P16-18-016": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-33-P16-18-017": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-33-P16-18-018": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-33-P19-21-008": {
+  "action": "apply",
+  "note": "print reads کے ساتھ; stray ر and joined spellings"
+ },
+ "ASRAR-33-P19-21-012": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-33-P22-24-005": {
+  "action": "hold",
+  "note": "print reads as app; added کو is editorial"
+ },
+ "ASRAR-33-P25-27-018": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-33-P28-30-018": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-33-P28-30-024": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage; added comma"
+ },
+ "ASRAR-33-P28-30-025": {
+  "action": "hold",
+  "note": "proposal is the wrong fix: the slip is ہوتے for ہوئے (رکھے ہوئے ہے), not a plural verb"
+ },
+ "ASRAR-33-P31-35-021": {
+  "action": "apply",
+  "note": "print reads مت; مست is a look-alike wrong word (negation confirmed by print and context)"
+ },
+ "ASRAR-33-P4-6-024": {
+  "action": "apply",
+  "note": "joined spelling split (کیساتھ → کے ساتھ)"
+ },
+ "ASRAR-33-P7-9-006": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-33-P7-9-023": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-34-P1-3-001": {
+  "action": "hold",
+  "note": "adds 'اس کی'; editorial rewrite of the heading line"
+ },
+ "ASRAR-34-P1-3-002": {
+  "action": "apply",
+  "note": "print has 7 under 22; para-ruku fraction as in other headers (count checks out)"
+ },
+ "ASRAR-34-P1-3-004": {
+  "action": "hold",
+  "note": "spellings are fine but added commas and ؟ after idiomatic 'کیوں نہیں' are taste"
+ },
+ "ASRAR-34-P1-3-019": {
+  "action": "apply",
+  "note": "ت/ئ look-alike slip; 'قسم دی جاتے' is not a sentence, only جائے fits"
+ },
+ "ASRAR-34-P1-3-020": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage; added stop"
+ },
+ "ASRAR-34-P1-3-021": {
+  "action": "hold",
+  "note": "gender agreement in an idiom; possible author's usage"
+ },
+ "ASRAR-34-P4-6-005": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-ANBIYA-A-008": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-ANBIYA-B-001": {
+  "action": "hold",
+  "note": "proposed word doubtful: معذرت looks like a misreading of مقدمہ, not مقدّر; needs the page"
+ },
+ "ASRAR-ANBIYA-B-007": {
+  "action": "apply",
+  "note": "ب/پ confusion, print reads پیس"
+ },
+ "ASRAR-ANBIYA-B-008": {
+  "action": "apply",
+  "note": "stray letter and joined words, print inspected"
+ },
+ "ASRAR-ANBIYA-D-007": {
+  "action": "apply",
+  "note": "dropped سے inside bracket, print inspected"
+ },
+ "ASRAR-ANBIYA-F-004": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-ANBIYA-F-009": {
+  "action": "apply",
+  "note": "ت/ئ slip, print reads آئے"
+ },
+ "ASRAR-ANBIYA-G-003": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-ANBIYA-G-008": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-ANBIYA-H-002": {
+  "action": "apply",
+  "note": "run-together words with stray letter, print inspected"
+ },
+ "ASRAR-ANBIYA-H-007": {
+  "action": "apply",
+  "note": "footnote mark as in print; no text change"
+ },
+ "ASRAR-ANBIYA-H-012": {
+  "action": "apply",
+  "note": "س/م confusion, print reads مگر"
+ },
+ "ASRAR-ANBIYA-I-001": {
+  "action": "hold",
+  "note": "added word and re-punctuation; reason asks for editor"
+ },
+ "ASRAR-ANBIYA-I-004": {
+  "action": "apply",
+  "note": "ے/ا slip; singular ذکر takes جاتا, no other reading"
+ },
+ "ASRAR-ANBIYA-I-005": {
+  "action": "hold",
+  "note": "word order and izafat; taste"
+ },
+ "ASRAR-ANBIYA-I-010": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-ANBIYA-I-014": {
+  "action": "apply",
+  "note": "spacing of compounds only"
+ },
+ "ASRAR-ANBIYA-I-015": {
+  "action": "apply",
+  "note": "oblique spelling; print reads علاقے"
+ },
+ "ASRAR-ANBIYA-J-009": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-ANBIYA-K-006": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-ANBIYA-K-007": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-ANBIYA-K-018": {
+  "action": "apply",
+  "note": "brackets misread as alifs, print inspected"
+ },
+ "ASRAR-ANBIYA-K-019": {
+  "action": "apply",
+  "note": "number; print inspected reads ۳۲۲"
+ },
+ "ASRAR-ANKABOOT-1-002": {
+  "action": "apply",
+  "note": "scan has digit ۱, misread as alif"
+ },
+ "ASRAR-ANKABOOT-1-020": {
+  "action": "hold",
+  "note": "scan reads as app; dropping تو is editorial"
+ },
+ "ASRAR-ANKABOOT-4-001": {
+  "action": "apply",
+  "note": "scan reads بھیدوں; word wrongly split"
+ },
+ "ASRAR-ANKABOOT-4-018": {
+  "action": "apply",
+  "note": "scan reads وہی; د/و look-alike non-word (question marks on rhetorical questions)"
+ },
+ "ASRAR-ANKABOOT-7-008": {
+  "action": "apply",
+  "note": "joined spellings split and sentence stop only"
+ },
+ "ASRAR-ANKABOOT-7-017": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage; added comma"
+ },
+ "ASRAR-FURQAAN-1-007": {
+  "action": "hold",
+  "note": "print heading reads as app; editor asked"
+ },
+ "ASRAR-FURQAAN-1-014": {
+  "action": "hold",
+  "note": "author's gender for تعین"
+ },
+ "ASRAR-FURQAAN-10-016": {
+  "action": "hold",
+  "note": "print reads as app (کو مشاہدہ)"
+ },
+ "ASRAR-FURQAAN-10-017": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-FURQAAN-10-020": {
+  "action": "hold",
+  "note": "rewrite adding words; print reads as app"
+ },
+ "ASRAR-FURQAAN-16-011": {
+  "action": "hold",
+  "note": "re-punctuation is taste; گذرے is a variant spelling"
+ },
+ "ASRAR-FURQAAN-16-016": {
+  "action": "hold",
+  "note": "adds a negation; scan reads as app; editor asked"
+ },
+ "ASRAR-FURQAAN-16-017": {
+  "action": "apply",
+  "note": "بیشک → بے شک and izafat mark only, no letters or wording change"
+ },
+ "ASRAR-FURQAAN-19-001": {
+  "action": "apply",
+  "note": "garbled opening bracket and stray alif; print reads (ان صفات کے)"
+ },
+ "ASRAR-FURQAAN-19-010": {
+  "action": "hold",
+  "note": "scan reads as app; added کو is editorial"
+ },
+ "ASRAR-FURQAAN-19-013": {
+  "action": "apply",
+  "note": "scan reads اور نہ; ورنہ reverses the sense"
+ },
+ "ASRAR-FURQAAN-19-014": {
+  "action": "apply",
+  "note": "scan reads یہ ہے کہ; dropped helper"
+ },
+ "ASRAR-FURQAAN-19-016": {
+  "action": "hold",
+  "note": "print reads as app (سے missing in print); editor asked"
+ },
+ "ASRAR-FURQAAN-22-008": {
+  "action": "hold",
+  "note": "adds اور; editorial suggestion"
+ },
+ "ASRAR-FURQAAN-22-013": {
+  "action": "hold",
+  "note": "print reads سورۃ فرقان; title change is editorial"
+ },
+ "ASRAR-FURQAAN-7-009": {
+  "action": "hold",
+  "note": "print reads as app; added helper verb is editorial"
+ },
+ "ASRAR-FURQAAN-7-010": {
+  "action": "apply",
+  "note": "word typed twice; scan has it once"
+ },
+ "ASRAR-FURQAAN-7-016": {
+  "action": "hold",
+  "note": "author's usage کے بارے without میں; print reads as app"
+ },
+ "ASRAR-HAJJ-1-002": {
+  "action": "apply",
+  "note": "تم cannot take دیکھے گا; تو is the only fit (تجھ follows); reason asked for a re-check"
+ },
+ "ASRAR-HAJJ-1-012": {
+  "action": "apply",
+  "note": "garbled phrase, print reads زمین تو زمین"
+ },
+ "ASRAR-HAJJ-10-003": {
+  "action": "hold",
+  "note": "bracket placement is a guess (likely only اور is bracketed)"
+ },
+ "ASRAR-HAJJ-10-006": {
+  "action": "hold",
+  "note": "orthography fine but سوا→سوائے is a word change by house style"
+ },
+ "ASRAR-HAJJ-10-016": {
+  "action": "hold",
+  "note": "author's gender for تلبیہ; reason asks for editor"
+ },
+ "ASRAR-HAJJ-10-018": {
+  "action": "hold",
+  "note": "valid traditional spelling; house-style preference"
+ },
+ "ASRAR-HAJJ-10-019": {
+  "action": "hold",
+  "note": "agreement style; reason asks for editor"
+ },
+ "ASRAR-HAJJ-13-001": {
+  "action": "apply",
+  "note": "stray alif, print reads نہ ہو"
+ },
+ "ASRAR-HAJJ-13-007": {
+  "action": "apply",
+  "note": "footnote mark as in print; no text change"
+ },
+ "ASRAR-HAJJ-13-009": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-13-012": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-HAJJ-16-001": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-16-003": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-16-005": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-16-008": {
+  "action": "apply",
+  "note": "oblique spelling plus a comma, no wording change"
+ },
+ "ASRAR-HAJJ-19-013": {
+  "action": "hold",
+  "note": "possible as it stands (کی agrees with آنکھیں)"
+ },
+ "ASRAR-HAJJ-19-018": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-22-012": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-25-002": {
+  "action": "apply",
+  "note": "spacing of بے شک and sentence stop"
+ },
+ "ASRAR-HAJJ-25-007": {
+  "action": "apply",
+  "note": "joined words written apart and sentence stop"
+ },
+ "ASRAR-HAJJ-25-011": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-HAJJ-25-014": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-HAJJ-28-004": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-28-006": {
+  "action": "apply",
+  "note": "footnote mark as in print; no text change"
+ },
+ "ASRAR-HAJJ-28-007": {
+  "action": "apply",
+  "note": "ayah number restored as printed"
+ },
+ "ASRAR-HAJJ-28-008": {
+  "action": "apply",
+  "note": "ayah-end marker only as printed; Arabic words untouched"
+ },
+ "ASRAR-HAJJ-4-011": {
+  "action": "apply",
+  "note": "spacing of بے شک and sentence stop"
+ },
+ "ASRAR-HAJJ-4-012": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-4-014": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-4-015": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-HAJJ-7-014": {
+  "action": "hold",
+  "note": "یہ is more likely a misread of the author's پہ than of پر; print reading not certain"
+ },
+ "ASRAR-HIJR-A-002": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed"
+ },
+ "ASRAR-HIJR-A-007": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-A-012": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-A-022": {
+  "action": "apply",
+  "note": "standard orthography and izafat mark only"
+ },
+ "ASRAR-HIJR-B-003": {
+  "action": "hold",
+  "note": "drops a word and adds bracket; original is a possible sentence"
+ },
+ "ASRAR-HIJR-B-004": {
+  "action": "apply",
+  "note": "oblique spelling plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-B-005": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-HIJR-B-009": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-B-014": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-HIJR-B-023": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-HIJR-B-025": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-C-001": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-C-010": {
+  "action": "apply",
+  "note": "old spelling of emphatic pronoun"
+ },
+ "ASRAR-HIJR-C-019": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed"
+ },
+ "ASRAR-HIJR-C-020": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-C-021": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-C-023": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-D-009": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-D-012": {
+  "action": "hold",
+  "note": "adjective may go with the fruit or author's gender; not certain"
+ },
+ "ASRAR-HIJR-D-013": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-D-014": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-HIJR-D-017": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-D-020": {
+  "action": "hold",
+  "note": "better-word substitution, author's usage"
+ },
+ "ASRAR-HIJR-E-008": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-E-011": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-E-012": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-E-015": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-E-018": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-F-001": {
+  "action": "hold",
+  "note": "list comma is right but jo->woh rewrite bundled"
+ },
+ "ASRAR-HIJR-F-014": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-G-003": {
+  "action": "hold",
+  "note": "izafat respelling that changes letters; current form valid"
+ },
+ "ASRAR-HIJR-G-010": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-G-012": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-G-016": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-G-019": {
+  "action": "hold",
+  "note": "older imperative form of the translation, not a slip"
+ },
+ "ASRAR-HIJR-G-023": {
+  "action": "hold",
+  "note": "bracket placement uncertain (likely closes after the first word)"
+ },
+ "ASRAR-HIJR-H-008": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-H-012": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-I-001": {
+  "action": "apply",
+  "note": "oblique spelling plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-I-003": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-I-004": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-I-010": {
+  "action": "apply",
+  "note": "standard orthography and izafat mark only"
+ },
+ "ASRAR-HIJR-I-011": {
+  "action": "apply",
+  "note": "standard orthography and izafat mark only"
+ },
+ "ASRAR-HIJR-I-018": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-HIJR-I-019": {
+  "action": "apply",
+  "note": "oblique spelling plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-I-021": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-I-030": {
+  "action": "hold",
+  "note": "izafat respelling that changes letters; current form valid"
+ },
+ "ASRAR-HIJR-J-004": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-J-007": {
+  "action": "apply",
+  "note": "wrong look-alike word (waqia for waqe)"
+ },
+ "ASRAR-HIJR-J-015": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed"
+ },
+ "ASRAR-HIJR-J-017": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-J-020": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-J-023": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-HIJR-J-024": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-J-027": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-HIJR-K-001": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-HIJR-K-002": {
+  "action": "apply",
+  "note": "standard orthography and izafat mark only"
+ },
+ "ASRAR-HIJR-K-013": {
+  "action": "hold",
+  "note": "rewrites conjunction, taste"
+ },
+ "ASRAR-HUD-A-001": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-HUD-A-006": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-HUD-B-003": {
+  "action": "hold",
+  "note": "print reads as app; rewrite"
+ },
+ "ASRAR-HUD-B-005": {
+  "action": "apply",
+  "note": "standard oblique spelling, same word"
+ },
+ "ASRAR-HUD-C-005": {
+  "action": "hold",
+  "note": "print reads as app (جس); editorial"
+ },
+ "ASRAR-HUD-C-011": {
+  "action": "hold",
+  "note": "author's usage 'کے بارے' without میں; added word"
+ },
+ "ASRAR-HUD-D-001": {
+  "action": "hold",
+  "note": "print reads as app; added اور"
+ },
+ "ASRAR-HUD-D-002": {
+  "action": "hold",
+  "note": "رعب داب is a valid compound; added و"
+ },
+ "ASRAR-HUD-D-003": {
+  "action": "hold",
+  "note": "print reads as app; added ہے"
+ },
+ "ASRAR-HUD-D-007": {
+  "action": "hold",
+  "note": "author's usage 'ایسے ہے جیسے'"
+ },
+ "ASRAR-HUD-E-008": {
+  "action": "hold",
+  "note": "print reads as app (تیسرے)"
+ },
+ "ASRAR-HUD-E-013": {
+  "action": "hold",
+  "note": "print reads as app; added کہ"
+ },
+ "ASRAR-HUD-F-004": {
+  "action": "hold",
+  "note": "print reads as app; infinitive agreement"
+ },
+ "ASRAR-HUD-F-013": {
+  "action": "hold",
+  "note": "print reads as app; more usual word"
+ },
+ "ASRAR-HUD-G-008": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-HUD-G-011": {
+  "action": "hold",
+  "note": "print reads as app; added میں"
+ },
+ "ASRAR-HUD-H-008": {
+  "action": "apply",
+  "note": "print inspected: section heading missing in app"
+ },
+ "ASRAR-HUD-H-010": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-HUD-I-005": {
+  "action": "apply",
+  "note": "joined spellings split (اسکے, بیشک) + sentence stop; no negation involved"
+ },
+ "ASRAR-HUD-J-001": {
+  "action": "apply",
+  "note": "print inspected: section heading missing in app"
+ },
+ "ASRAR-HUD-J-003": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-HUD-J-005": {
+  "action": "hold",
+  "note": "print reads as app; likely رکھے ہوئے ہے, proposed rewrite is not that"
+ },
+ "ASRAR-HUD-K-001": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-HUD-K-006": {
+  "action": "hold",
+  "note": "reason says print reads as app (ہوتے), though ہوئے is surely meant"
+ },
+ "ASRAR-HUD-L-003": {
+  "action": "apply",
+  "note": "look-alike slip جاتے for جائے (ئ/ت); only reading"
+ },
+ "ASRAR-HUD-L-005": {
+  "action": "hold",
+  "note": "print reads as app (جس نے)"
+ },
+ "ASRAR-HUD-M-001": {
+  "action": "apply",
+  "note": "print inspected: تمہیں misread as نہیں; joined spelling split"
+ },
+ "ASRAR-HUD-M-002": {
+  "action": "apply",
+  "note": "joined spellings split (اُسکے, بیشک); no negation involved"
+ },
+ "ASRAR-HUD-O-006": {
+  "action": "hold",
+  "note": "print reads as app; stylistic rewrite"
+ },
+ "ASRAR-HUD-O-008": {
+  "action": "hold",
+  "note": "print reads as app; more usual word"
+ },
+ "ASRAR-HUD-Q-002": {
+  "action": "hold",
+  "note": "added میں + izafat; author's usage"
+ },
+ "ASRAR-HUD-Q-011": {
+  "action": "hold",
+  "note": "print reads as app; added word"
+ },
+ "ASRAR-IBRAHIM-A-001": {
+  "action": "apply",
+  "note": "name spelt ابراہیم in the same context and in print"
+ },
+ "ASRAR-IBRAHIM-A-005": {
+  "action": "apply",
+  "note": "print inspected: second number missing; matches ruku sequence"
+ },
+ "ASRAR-IBRAHIM-A-006": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split; sentence stop"
+ },
+ "ASRAR-IBRAHIM-A-010": {
+  "action": "apply",
+  "note": "standard orthography (لیے) + izafat mark"
+ },
+ "ASRAR-IBRAHIM-A-012": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-IBRAHIM-A-021": {
+  "action": "hold",
+  "note": "honorific moved; print differs from proposal (ﷺ after کام may be a misread ہے)"
+ },
+ "ASRAR-IBRAHIM-B-003": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change; Urdu full stop"
+ },
+ "ASRAR-IBRAHIM-B-006": {
+  "action": "apply",
+  "note": "side heading had split a sentence; words unchanged, heading placed before it"
+ },
+ "ASRAR-IBRAHIM-B-021": {
+  "action": "hold",
+  "note": "touches Arabic phrase (وما فیھا); drops و"
+ },
+ "ASRAR-IBRAHIM-B-025": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-IBRAHIM-C-003": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-IBRAHIM-C-011": {
+  "action": "hold",
+  "note": "non-word, but faithful fix is انہیں (transposition, author's form), not اُنہی"
+ },
+ "ASRAR-IBRAHIM-C-017": {
+  "action": "hold",
+  "note": "fix uncertain (اسی خصوصیت vs انہی خصوصیات)"
+ },
+ "ASRAR-IBRAHIM-C-019": {
+  "action": "hold",
+  "note": "singular/plural style (قوم as singular)"
+ },
+ "ASRAR-IBRAHIM-D-001": {
+  "action": "apply",
+  "note": "standard orthography (گزار)"
+ },
+ "ASRAR-IBRAHIM-D-003": {
+  "action": "hold",
+  "note": "possible as it stands (اپنے with استعمال)"
+ },
+ "ASRAR-IBRAHIM-D-012": {
+  "action": "apply",
+  "note": "standard orthography (مُنہوں, دیے)"
+ },
+ "ASRAR-IBRAHIM-D-015": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-IBRAHIM-D-016": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split; izafat/tashdid marks only"
+ },
+ "ASRAR-IBRAHIM-D-019": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split; comma"
+ },
+ "ASRAR-IBRAHIM-E-007": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-IBRAHIM-E-014": {
+  "action": "apply",
+  "note": "standard orthography (گزر)"
+ },
+ "ASRAR-IBRAHIM-E-018": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-IBRAHIM-E-021": {
+  "action": "apply",
+  "note": "side heading cut the sentence; conjunction rejoined to its clause"
+ },
+ "ASRAR-IBRAHIM-E-023": {
+  "action": "hold",
+  "note": "drops a word and restructures the sentence"
+ },
+ "ASRAR-IBRAHIM-E-024": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-E-026": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-F-001": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-F-003": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-F-005": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-F-010": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-F-017": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-F-025": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-IBRAHIM-F-027": {
+  "action": "hold",
+  "note": "better-word substitution, author's usage"
+ },
+ "ASRAR-IBRAHIM-F-028": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-F-030": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-IBRAHIM-G-004": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-IBRAHIM-G-006": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-IBRAHIM-G-013": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-G-017": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-G-019": {
+  "action": "apply",
+  "note": "standard orthography and izafat mark only"
+ },
+ "ASRAR-IBRAHIM-H-018": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-H-027": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-I-018": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-I-019": {
+  "action": "apply",
+  "note": "heading mis-assembled: 13/18 are para numbers, ruku 6 is verses 35-41 (verse 35 follows)"
+ },
+ "ASRAR-IBRAHIM-J-001": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-J-022": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-J-025": {
+  "action": "apply",
+  "note": "relative pronoun number slip, only one fix"
+ },
+ "ASRAR-IBRAHIM-J-027": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-K-002": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-IBRAHIM-K-007": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-K-012": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-K-014": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-K-016": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-K-019": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-K-020": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-L-003": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-L-007": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-IBRAHIM-L-009": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-L-013": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-IBRAHIM-L-016": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-ISRA-A-005": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-ISRA-A-014": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-ISRA-A-020": {
+  "action": "apply",
+  "note": "garbled word (hamza read as re); same word in standard izafat spelling"
+ },
+ "ASRAR-ISRA-A-022": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-ISRA-A-025": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-ISRA-A-029": {
+  "action": "hold",
+  "note": "author's regional usage (ke bare without mein)"
+ },
+ "ASRAR-ISRA-A-032": {
+  "action": "hold",
+  "note": "author's regional usage (ke bare without mein)"
+ },
+ "ASRAR-ISRA-A-040": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-ISRA-B-008": {
+  "action": "hold",
+  "note": "print reads as app; meaning-bearing pronoun, editor to decide"
+ },
+ "ASRAR-ISRA-B-023": {
+  "action": "hold",
+  "note": "print reads as app; translation's own wording"
+ },
+ "ASRAR-ISRA-B-039": {
+  "action": "apply",
+  "note": "wrong postposition, parallel phrase in context shows ke"
+ },
+ "ASRAR-ISRA-C-014": {
+  "action": "hold",
+  "note": "print also lacks the word (fix looks certain) - editor to confirm"
+ },
+ "ASRAR-ISRA-C-018": {
+  "action": "apply",
+  "note": "oblique spelling plus plain sentence punctuation"
+ },
+ "ASRAR-ISRA-C-025": {
+  "action": "hold",
+  "note": "print reads as app; translation's own wording"
+ },
+ "ASRAR-ISRA-C-030": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-ISRA-C-035": {
+  "action": "hold",
+  "note": "print reads as app; adds a word, editor to decide"
+ },
+ "ASRAR-ISRA-C-037": {
+  "action": "hold",
+  "note": "editorial preference, current wording possible"
+ },
+ "ASRAR-ISRA-D-003": {
+  "action": "hold",
+  "note": "author's respectful plural for Allah"
+ },
+ "ASRAR-ISRA-D-023": {
+  "action": "apply",
+  "note": "dropped helper verb, only one fit"
+ },
+ "ASRAR-ISRA-D-025": {
+  "action": "hold",
+  "note": "print reads as app; adds a word, editor to decide"
+ },
+ "ASRAR-ISRA-D-035": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-ISRA-D-036": {
+  "action": "hold",
+  "note": "author's regional usage (ke bare without mein)"
+ },
+ "ASRAR-ISRA-E-001": {
+  "action": "hold",
+  "note": "current form valid, proposal standardises"
+ },
+ "ASRAR-ISRA-E-005": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-ISRA-E-006": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-ISRA-E-009": {
+  "action": "hold",
+  "note": "possible as it stands (predicate noun before ہونے)"
+ },
+ "ASRAR-ISRA-E-028": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-ISRA-E-035": {
+  "action": "hold",
+  "note": "editorial addition, not a slip"
+ },
+ "ASRAR-ISRA-F-004": {
+  "action": "hold",
+  "note": "کہلاتے→کہلانے is right (print), but proposal also drops یہی (taste); apply the one letter only"
+ },
+ "ASRAR-ISRA-F-023": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-ISRA-F-030": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-ISRA-F-033": {
+  "action": "hold",
+  "note": "sentence complete as it stands (shared ہیں); added word"
+ },
+ "ASRAR-ISRA-F-035": {
+  "action": "hold",
+  "note": "editorial addition"
+ },
+ "ASRAR-ISRA-G-018": {
+  "action": "apply",
+  "note": "د/و confusion, print reads واقعی"
+ },
+ "ASRAR-ISRA-G-020": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-ISRA-G-021": {
+  "action": "hold",
+  "note": "سُر تال is a normal compound; added word"
+ },
+ "ASRAR-ISRA-G-023": {
+  "action": "hold",
+  "note": "author's elliptical style; added word"
+ },
+ "ASRAR-ISRA-G-029": {
+  "action": "apply",
+  "note": "ح/خ slip, print reads اختیار"
+ },
+ "ASRAR-ISRA-H-002": {
+  "action": "hold",
+  "note": "number; print on this page reads as app"
+ },
+ "ASRAR-ISRA-H-005": {
+  "action": "hold",
+  "note": "added word and re-punctuation, print not seen"
+ },
+ "ASRAR-ISRA-H-018": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-ISRA-H-026": {
+  "action": "apply",
+  "note": "print reads ہے (translation), ہو is a transcription slip"
+ },
+ "ASRAR-ISRA-H-027": {
+  "action": "apply",
+  "note": "print reads ہے in both places"
+ },
+ "ASRAR-ISRA-H-028": {
+  "action": "apply",
+  "note": "print reads نماز میں; words run together"
+ },
+ "ASRAR-ISRA-H-038": {
+  "action": "hold",
+  "note": "number in print; dropping it is editorial"
+ },
+ "ASRAR-ISRA-J-004": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-ISRA-J-022": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-ISRA-J-028": {
+  "action": "hold",
+  "note": "dropped word plausible but پر vs author's پہ uncertain; also restyles گذشتہ"
+ },
+ "ASRAR-ISRA-J-031": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-ISRA-J-032": {
+  "action": "hold",
+  "note": "elliptical ہے after نہ…ہے اور نہ…; sentence possible as it stands"
+ },
+ "ASRAR-ISRA-J-033": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-ISRA-K-002": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-ISRA-K-004": {
+  "action": "hold",
+  "note": "added و is a standardisation of the author's phrase"
+ },
+ "ASRAR-ISRA-K-005": {
+  "action": "apply",
+  "note": "orthography and sentence stop only, no wording change"
+ },
+ "ASRAR-ISRA-K-006": {
+  "action": "hold",
+  "note": "دعوے is the older spelling of singular دعویٰ; verb is right as it stands"
+ },
+ "ASRAR-ISRA-K-011": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-ISRA-K-029": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-ISRA-K-037": {
+  "action": "hold",
+  "note": "number; print on this page reads as app"
+ },
+ "ASRAR-ISRA-K-041": {
+  "action": "apply",
+  "note": "stray letter, print inspected"
+ },
+ "ASRAR-KAHF-A-029": {
+  "action": "apply",
+  "note": "dropped سے, sentence broken without it; plus oblique spelling"
+ },
+ "ASRAR-KAHF-A-032": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-KAHF-A-033": {
+  "action": "hold",
+  "note": "adds a negation; print reads as app, reason asks for editor"
+ },
+ "ASRAR-KAHF-B-003": {
+  "action": "hold",
+  "note": "reason asks for approval; rewrite"
+ },
+ "ASRAR-KAHF-B-010": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-KAHF-C-004": {
+  "action": "hold",
+  "note": "print reads as app; کے agrees with دور"
+ },
+ "ASRAR-KAHF-C-012": {
+  "action": "apply",
+  "note": "oblique spelling only (سرمایہ کا → سرمائے کا); print has older spelling, no wording change"
+ },
+ "ASRAR-KAHF-C-013": {
+  "action": "hold",
+  "note": "print has a bullet mark there; plain removal loses it"
+ },
+ "ASRAR-KAHF-D-001": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-KAHF-E-005": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-KAHF-E-008": {
+  "action": "hold",
+  "note": "author's usage"
+ },
+ "ASRAR-KAHF-F-010": {
+  "action": "apply",
+  "note": "۲/۳ look-alike; rukoo 5 starts at ayah 32 and the Arabic excerpt confirms"
+ },
+ "ASRAR-KAHF-G-014": {
+  "action": "hold",
+  "note": "print reads as app; رعب داب is a normal compound"
+ },
+ "ASRAR-KAHF-H-005": {
+  "action": "apply",
+  "note": "print heading carries the para rukoo; same form used elsewhere in the book"
+ },
+ "ASRAR-KAHF-H-006": {
+  "action": "apply",
+  "note": "stray letter, print inspected"
+ },
+ "ASRAR-KAHF-H-007": {
+  "action": "apply",
+  "note": "print translation has the negation; app reverses the ayah's meaning"
+ },
+ "ASRAR-KAHF-J-004": {
+  "action": "hold",
+  "note": "heading re-punctuated and a word dropped; taste"
+ },
+ "ASRAR-KAHF-K-009": {
+  "action": "apply",
+  "note": "print heading carries the para rukoo"
+ },
+ "ASRAR-KAHF-K-011": {
+  "action": "apply",
+  "note": "stray alif (misread bracket), print inspected"
+ },
+ "ASRAR-KAHF-K-012": {
+  "action": "apply",
+  "note": "اکی is a non-word (misread bracket); کی is the only reading"
+ },
+ "ASRAR-KAHF-K-014": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "ASRAR-KAHF-K-015": {
+  "action": "hold",
+  "note": "print reads as app; عذر معذرت is a normal compound"
+ },
+ "ASRAR-KAHF-L-006": {
+  "action": "apply",
+  "note": "print heading carries the para rukoo"
+ },
+ "ASRAR-KAHF-L-015": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-KAHF-M-003": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-KAHF-M-004": {
+  "action": "apply",
+  "note": "dropped ن; print reads علماء نے"
+ },
+ "ASRAR-KAHF-M-014": {
+  "action": "apply",
+  "note": "print heading carries the para rukoo"
+ },
+ "ASRAR-KAHF-M-015": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-KAHF-N-004": {
+  "action": "apply",
+  "note": "print reads بھی"
+ },
+ "ASRAR-KAHF-N-008": {
+  "action": "apply",
+  "note": "ہ/م confusion, print reads مَیں"
+ },
+ "ASRAR-MARYAM-A-011": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-MARYAM-A-017": {
+  "action": "hold",
+  "note": "پہچاننے is right (print), but proposal also changes the author's پہ to پر; apply the dropped ن only"
+ },
+ "ASRAR-MARYAM-C-003": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-MARYAM-D-001": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-MARYAM-D-010": {
+  "action": "hold",
+  "note": "rewording"
+ },
+ "ASRAR-MARYAM-D-011": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-MARYAM-E-012": {
+  "action": "apply",
+  "note": "two words run together, print inspected"
+ },
+ "ASRAR-MARYAM-F-010": {
+  "action": "apply",
+  "note": "doubled word (repeated across a line break)"
+ },
+ "ASRAR-MUMINOON-1-002": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-MUMINOON-1-008": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-MUMINOON-1-011": {
+  "action": "apply",
+  "note": "dropped alif, print inspected"
+ },
+ "ASRAR-MUMINOON-10-004": {
+  "action": "hold",
+  "note": "author's usage; reason asks for editor"
+ },
+ "ASRAR-MUMINOON-10-018": {
+  "action": "apply",
+  "note": "dropped letter in English"
+ },
+ "ASRAR-MUMINOON-10-019": {
+  "action": "apply",
+  "note": "y/v slip in English"
+ },
+ "ASRAR-MUMINOON-13-010": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-MUMINOON-16-004": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-MUMINOON-16-008": {
+  "action": "hold",
+  "note": "print reads as app; reason asks for editor"
+ },
+ "ASRAR-MUMINOON-16-012": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-MUMINOON-16-013": {
+  "action": "apply",
+  "note": "word typed three times and joined"
+ },
+ "ASRAR-MUMINOON-19-005": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-MUMINOON-22-003": {
+  "action": "hold",
+  "note": "editorial addition"
+ },
+ "ASRAR-MUMINOON-22-005": {
+  "action": "apply",
+  "note": "oblique spelling and spacing only"
+ },
+ "ASRAR-MUMINOON-22-020": {
+  "action": "apply",
+  "note": "ل/ا confusion, print reads اے اللہ"
+ },
+ "ASRAR-MUMINOON-4-015": {
+  "action": "apply",
+  "note": "garbled word, print reads مادوں"
+ },
+ "ASRAR-MUMINOON-7-001": {
+  "action": "apply",
+  "note": "ayah-end marker only as printed; Arabic words untouched"
+ },
+ "ASRAR-MUMINOON-7-002": {
+  "action": "apply",
+  "note": "ayah number restored as printed; spacing"
+ },
+ "ASRAR-MUMINOON-7-009": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-MUMINOON-7-017": {
+  "action": "hold",
+  "note": "author's gender for عیش"
+ },
+ "ASRAR-MUMINOON-7-018": {
+  "action": "hold",
+  "note": "author's usage"
+ },
+ "ASRAR-NAHL-A-022": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-NAHL-A-026": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-NAHL-A-028": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-NAHL-B-004": {
+  "action": "apply",
+  "note": "doubled word (line-break repeat, also in print)"
+ },
+ "ASRAR-NAHL-B-013": {
+  "action": "hold",
+  "note": "print reads as app; adds a word, editor to decide"
+ },
+ "ASRAR-NAHL-B-023": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed"
+ },
+ "ASRAR-NAHL-B-030": {
+  "action": "hold",
+  "note": "print reads as app; compound without waw is in use"
+ },
+ "ASRAR-NAHL-B-031": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-NAHL-B-033": {
+  "action": "apply",
+  "note": "dropped letter, non-sentence otherwise (yad rahe)"
+ },
+ "ASRAR-NAHL-B-034": {
+  "action": "hold",
+  "note": "print reads as app (one-letter typo, fix looks certain) - editor to confirm"
+ },
+ "ASRAR-NAHL-C-006": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed"
+ },
+ "ASRAR-NAHL-C-013": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-NAHL-C-015": {
+  "action": "hold",
+  "note": "negation added; print reads as app, editor approval asked"
+ },
+ "ASRAR-NAHL-C-021": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-NAHL-C-025": {
+  "action": "hold",
+  "note": "added postposition not the only possible fix"
+ },
+ "ASRAR-NAHL-C-027": {
+  "action": "apply",
+  "note": "dropped ne and misdotted name; print reads Habsha"
+ },
+ "ASRAR-NAHL-C-030": {
+  "action": "apply",
+  "note": "doubled word (line-break repeat, also in print)"
+ },
+ "ASRAR-NAHL-C-032": {
+  "action": "apply",
+  "note": "doubled word (line-break repeat, also in print)"
+ },
+ "ASRAR-NAHL-D-004": {
+  "action": "hold",
+  "note": "more than one possible fix"
+ },
+ "ASRAR-NAHL-D-012": {
+  "action": "apply",
+  "note": "doubled word (line-break repeat, also in print)"
+ },
+ "ASRAR-NAHL-D-031": {
+  "action": "hold",
+  "note": "label rewritten beyond what print shows"
+ },
+ "ASRAR-NAHL-D-044": {
+  "action": "hold",
+  "note": "restyles label; minimal fix would only restore the para number 14"
+ },
+ "ASRAR-NAHL-E-012": {
+  "action": "apply",
+  "note": "standard orthography plus plain sentence punctuation"
+ },
+ "ASRAR-NAHL-F-001": {
+  "action": "hold",
+  "note": "negation added; print reads as app, editor approval asked"
+ },
+ "ASRAR-NAHL-F-006": {
+  "action": "hold",
+  "note": "singular/plural style in translation"
+ },
+ "ASRAR-NAHL-F-008": {
+  "action": "apply",
+  "note": "stray repeated postposition (also in print)"
+ },
+ "ASRAR-NAHL-F-013": {
+  "action": "hold",
+  "note": "print reads as app (kiya for kaha, fix looks certain); also re-punctuated"
+ },
+ "ASRAR-NAHL-F-020": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-NAHL-F-035": {
+  "action": "apply",
+  "note": "print inspected: verse-end circle misread as a digit"
+ },
+ "ASRAR-NAHL-G-005": {
+  "action": "hold",
+  "note": "author's regional usage (ke bare without mein)"
+ },
+ "ASRAR-NAHL-G-010": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "ASRAR-NAHL-G-016": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-NAHL-G-019": {
+  "action": "hold",
+  "note": "more than one possible fix"
+ },
+ "ASRAR-NAHL-G-029": {
+  "action": "apply",
+  "note": "print inspected: verse-end circle misread as a digit"
+ },
+ "ASRAR-NAHL-G-031": {
+  "action": "hold",
+  "note": "print has the full stop; adds a word"
+ },
+ "ASRAR-NAHL-G-032": {
+  "action": "hold",
+  "note": "print reads as app; adds a word, editor to decide"
+ },
+ "ASRAR-NAHL-G-036": {
+  "action": "hold",
+  "note": "print reads as app; adds a word, editor to decide"
+ },
+ "ASRAR-NAHL-H-021": {
+  "action": "apply",
+  "note": "oblique spelling plus plain sentence punctuation"
+ },
+ "ASRAR-NAHL-H-025": {
+  "action": "hold",
+  "note": "more than one possible fix"
+ },
+ "ASRAR-NAHL-H-027": {
+  "action": "hold",
+  "note": "author's regional usage (ke bare without mein)"
+ },
+ "ASRAR-NAHL-H-033": {
+  "action": "apply",
+  "note": "dropped helper verb, only one fit"
+ },
+ "ASRAR-NAHL-H-035": {
+  "action": "hold",
+  "note": "singular/plural style in translation"
+ },
+ "ASRAR-NAHL-I-001": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-NAHL-I-009": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-NAHL-I-014": {
+  "action": "hold",
+  "note": "print reads as app; translation's own wording"
+ },
+ "ASRAR-NAHL-I-019": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-NAHL-I-021": {
+  "action": "hold",
+  "note": "number change; print line also reads 100"
+ },
+ "ASRAR-NAHL-I-024": {
+  "action": "apply",
+  "note": "dropped helper verb, only one fit"
+ },
+ "ASRAR-NAHL-I-027": {
+  "action": "hold",
+  "note": "postposition unusual but possible; not certain"
+ },
+ "ASRAR-NAHL-I-034": {
+  "action": "hold",
+  "note": "editorial preference, current wording possible"
+ },
+ "ASRAR-NAHL-I-038": {
+  "action": "hold",
+  "note": "compound without waw is normal usage in the translation"
+ },
+ "ASRAR-NAHL-I-041": {
+  "action": "hold",
+  "note": "print reads as app; translation's own wording"
+ },
+ "ASRAR-NAHL-J-029": {
+  "action": "apply",
+  "note": "standard orthography (joined/old spelling written out)"
+ },
+ "ASRAR-NAHL-J-038": {
+  "action": "hold",
+  "note": "print reads as app (one-letter typo, fix looks certain) - editor to confirm"
+ },
+ "ASRAR-NAHL-J-045": {
+  "action": "apply",
+  "note": "oblique form before postposition, spelling only"
+ },
+ "ASRAR-NAHL-J-048": {
+  "action": "hold",
+  "note": "added postposition not the only possible fix"
+ },
+ "ASRAR-NAHL-J-050": {
+  "action": "apply",
+  "note": "dropped helper verb, only one fit"
+ },
+ "ASRAR-NAHL-J-055": {
+  "action": "hold",
+  "note": "adds a word in place of a full stop; current text possible"
+ },
+ "ASRAR-NAML-1-016": {
+  "action": "apply",
+  "note": "scan reads کہ; کر/کہ slip"
+ },
+ "ASRAR-NAML-1-017": {
+  "action": "apply",
+  "note": "scan reads وہ; د/و look-alike non-word"
+ },
+ "ASRAR-NAML-1-021": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NAML-10-005": {
+  "action": "hold",
+  "note": "print reads as app (میں missing in print); editor asked"
+ },
+ "ASRAR-NAML-10-023": {
+  "action": "hold",
+  "note": "print reads کے ساتھ; more usual idiom only"
+ },
+ "ASRAR-NAML-13-005": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NAML-13-017": {
+  "action": "apply",
+  "note": "کیسے typed twice; scan has it once"
+ },
+ "ASRAR-NAML-16-009": {
+  "action": "hold",
+  "note": "repetition is in the print across the page break; editorial"
+ },
+ "ASRAR-NAML-16-019": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NAML-16-020": {
+  "action": "hold",
+  "note": "proposal would delete the heading; needs a structural move, not this replacement"
+ },
+ "ASRAR-NAML-19-004": {
+  "action": "apply",
+  "note": "joined spelling split (بیقرار → بے قرار) only"
+ },
+ "ASRAR-NAML-19-012": {
+  "action": "hold",
+  "note": "author's gender for تعین; print reads کی"
+ },
+ "ASRAR-NAML-19-018": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NAML-22-016": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NAML-22-019": {
+  "action": "hold",
+  "note": "author's usage کے بارے without میں; print reads as app"
+ },
+ "ASRAR-NAML-22-020": {
+  "action": "hold",
+  "note": "author's usage کے بارہ; standardising rewrite"
+ },
+ "ASRAR-NAML-25-006": {
+  "action": "apply",
+  "note": "question mark on the verse's question and standard spellings only"
+ },
+ "ASRAR-NAML-25-008": {
+  "action": "apply",
+  "note": "old joined spellings written apart"
+ },
+ "ASRAR-NAML-25-009": {
+  "action": "apply",
+  "note": "old joined spellings written apart; sentence stop"
+ },
+ "ASRAR-NAML-25-015": {
+  "action": "hold",
+  "note": "verb restored by guess (گر جائے گی); scan unclear, editor asked"
+ },
+ "ASRAR-NAML-4-005": {
+  "action": "apply",
+  "note": "joined spellings split and sentence stop only"
+ },
+ "ASRAR-NAML-4-019": {
+  "action": "hold",
+  "note": "inserts a whole hadith sentence while the rest of the page is still missing; restore the passage from the scan as one piece"
+ },
+ "ASRAR-NAML-7-001": {
+  "action": "apply",
+  "note": "scan reads تھیں; ب/ت non-word"
+ },
+ "ASRAR-NAML-7-006": {
+  "action": "hold",
+  "note": "izafat spelling changes letters plus comma; editorial suggestion"
+ },
+ "ASRAR-NAML-7-013": {
+  "action": "apply",
+  "note": "stray letter ج; scan has none"
+ },
+ "ASRAR-NAML-7-016": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NOOR-1-016": {
+  "action": "hold",
+  "note": "touches Arabic formula; added izafat"
+ },
+ "ASRAR-NOOR-10-002": {
+  "action": "hold",
+  "note": "rewording; taste"
+ },
+ "ASRAR-NOOR-10-011": {
+  "action": "hold",
+  "note": "illegible in print; proposed word is a guess (likely کر دیں)"
+ },
+ "ASRAR-NOOR-10-015": {
+  "action": "apply",
+  "note": "standard orthography / joined words written apart"
+ },
+ "ASRAR-NOOR-13-001": {
+  "action": "hold",
+  "note": "valid traditional spelling; house-style preference"
+ },
+ "ASRAR-NOOR-13-002": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-NOOR-13-011": {
+  "action": "hold",
+  "note": "older usage; house-style preference"
+ },
+ "ASRAR-NOOR-16-003": {
+  "action": "hold",
+  "note": "bracket placement is a guess; reason asks for editor"
+ },
+ "ASRAR-NOOR-16-006": {
+  "action": "hold",
+  "note": "added word and re-punctuation; taste"
+ },
+ "ASRAR-NOOR-16-011": {
+  "action": "hold",
+  "note": "variant spelling پرواہ; reason leaves it to the editor"
+ },
+ "ASRAR-NOOR-16-012": {
+  "action": "hold",
+  "note": "verb agreement standardised; author's usage"
+ },
+ "ASRAR-NOOR-16-013": {
+  "action": "hold",
+  "note": "singular/plural style; author's usage"
+ },
+ "ASRAR-NOOR-16-014": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NOOR-19-001": {
+  "action": "hold",
+  "note": "loanword spelling variant; taste"
+ },
+ "ASRAR-NOOR-19-007": {
+  "action": "apply",
+  "note": "print reads جائے; ت/ئ look-alike slip"
+ },
+ "ASRAR-NOOR-19-011": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NOOR-25-005": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NOOR-25-008": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-NOOR-25-017": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-NOOR-28-005": {
+  "action": "hold",
+  "note": "proposed contains a bracketed editorial note, not replacement text"
+ },
+ "ASRAR-NOOR-28-014": {
+  "action": "apply",
+  "note": "old joined spellings written apart (کریگا → کرے گا)"
+ },
+ "ASRAR-NOOR-28-015": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-NOOR-31-006": {
+  "action": "hold",
+  "note": "variant spelling گذشتہ; reason leaves it to the editor"
+ },
+ "ASRAR-NOOR-31-010": {
+  "action": "apply",
+  "note": "phrase typed twice at line junction"
+ },
+ "ASRAR-NOOR-34-007": {
+  "action": "hold",
+  "note": "author's usage کے بارے without میں"
+ },
+ "ASRAR-NOOR-34-014": {
+  "action": "apply",
+  "note": "print has verse number 62; generic separator replaced, matches other verses"
+ },
+ "ASRAR-NOOR-34-017": {
+  "action": "apply",
+  "note": "print has verse number 63; generic separator replaced"
+ },
+ "ASRAR-NOOR-37-005": {
+  "action": "apply",
+  "note": "print reads صلی اللہ علیہ وسلم; dropped word in honorific"
+ },
+ "ASRAR-NOOR-37-009": {
+  "action": "hold",
+  "note": "print reads as app (اللہ twice); editor to decide"
+ },
+ "ASRAR-NOOR-37-011": {
+  "action": "hold",
+  "note": "print reads as app (honorific incomplete in print); editor asked"
+ },
+ "ASRAR-NOOR-37-015": {
+  "action": "hold",
+  "note": "variant spelling درگذر; reason leaves it to the editor"
+ },
+ "ASRAR-NOOR-4-004": {
+  "action": "apply",
+  "note": "ت/ئ slip, print inspected"
+ },
+ "ASRAR-NOOR-4-005": {
+  "action": "apply",
+  "note": "transposed letters"
+ },
+ "ASRAR-NOOR-4-007": {
+  "action": "hold",
+  "note": "loose agreement possible in the author's Urdu; print not seen"
+ },
+ "ASRAR-NOOR-4-008": {
+  "action": "hold",
+  "note": "agreement slip but two possible fixes (تفصیلات / ہے); print not seen"
+ },
+ "ASRAR-NOOR-4-010": {
+  "action": "apply",
+  "note": "doubled word"
+ },
+ "ASRAR-NOOR-7-001": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-NOOR-7-005": {
+  "action": "apply",
+  "note": "oblique ے spelling only (standard orthography), no wording change"
+ },
+ "ASRAR-QASAS-1-006": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-QASAS-1-009": {
+  "action": "apply",
+  "note": "کیلئے → کے لیے, بیشک → بے شک, izafat mark only"
+ },
+ "ASRAR-QASAS-1-017": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-QASAS-10-006": {
+  "action": "apply",
+  "note": "print has 7 under 20; para-ruku fraction as in other headers (count checks out)"
+ },
+ "ASRAR-QASAS-10-022": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-QASAS-13-015": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-QASAS-13-021": {
+  "action": "hold",
+  "note": "scan unclear; proposed اُن کا is itself doubtful (translation likely اُن سے)"
+ },
+ "ASRAR-QASAS-16-001": {
+  "action": "apply",
+  "note": "verse-number bracket restored, question mark on a question, joined spellings split; no wording change"
+ },
+ "ASRAR-QASAS-16-010": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-QASAS-16-011": {
+  "action": "apply",
+  "note": "joined spelling split (بیہودہ → بے ہودہ) only"
+ },
+ "ASRAR-QASAS-19-004": {
+  "action": "apply",
+  "note": "scan reads تم; verbs are second person"
+ },
+ "ASRAR-QASAS-19-005": {
+  "action": "hold",
+  "note": "print reads as app (ہیں missing in print); editor asked"
+ },
+ "ASRAR-QASAS-22-023": {
+  "action": "apply",
+  "note": "standard spelling of the two verbs only"
+ },
+ "ASRAR-QASAS-25-009": {
+  "action": "apply",
+  "note": "کیلئے → کے لیے joined spellings written apart"
+ },
+ "ASRAR-QASAS-25-010": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-QASAS-25-015": {
+  "action": "hold",
+  "note": "print reads کیا; gender agreement is editorial"
+ },
+ "ASRAR-QASAS-4-001": {
+  "action": "apply",
+  "note": "scan reads لوگو (vocative); stray nun ghunna"
+ },
+ "ASRAR-QASAS-4-008": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-QASAS-7-001": {
+  "action": "apply",
+  "note": "scan reads کھڑا نہ ہو جائے; garbled word, continues the previous page's 'کوئی فساد'"
+ },
+ "ASRAR-QASAS-7-015": {
+  "action": "hold",
+  "note": "print reads جونسی; colloquial form of the translation, taste"
+ },
+ "ASRAR-QASAS-7-017": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-RAD-A-001": {
+  "action": "apply",
+  "note": "print inspected: digit ۱ misread as alif"
+ },
+ "ASRAR-RAD-A-008": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-A-015": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک)"
+ },
+ "ASRAR-RAD-A-018": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-B-007": {
+  "action": "hold",
+  "note": "bundles added میں (author's 'کے بارے'); پیشگوییاں spelling fix alone would be fine"
+ },
+ "ASRAR-RAD-B-016": {
+  "action": "hold",
+  "note": "heading word order rewrite"
+ },
+ "ASRAR-RAD-B-022": {
+  "action": "hold",
+  "note": "added تو + re-punctuation"
+ },
+ "ASRAR-RAD-B-025": {
+  "action": "apply",
+  "note": "standard orthography (دیے)"
+ },
+ "ASRAR-RAD-C-002": {
+  "action": "hold",
+  "note": "print reads as app (کے توازن)"
+ },
+ "ASRAR-RAD-C-017": {
+  "action": "apply",
+  "note": "standard orthography (درگزر)"
+ },
+ "ASRAR-RAD-C-028": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-D-002": {
+  "action": "apply",
+  "note": "joined spelling split (بیکار)"
+ },
+ "ASRAR-RAD-D-004": {
+  "action": "apply",
+  "note": "word typed twice; print has it once"
+ },
+ "ASRAR-RAD-D-009": {
+  "action": "apply",
+  "note": "standard orthography (ٹھہرا) + sentence stop"
+ },
+ "ASRAR-RAD-D-016": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-RAD-D-019": {
+  "action": "apply",
+  "note": "standard orthography (گزرے)"
+ },
+ "ASRAR-RAD-D-022": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "ASRAR-RAD-E-005": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-RAD-E-006": {
+  "action": "hold",
+  "note": "author's usage (حوادثات)"
+ },
+ "ASRAR-RAD-E-016": {
+  "action": "apply",
+  "note": "wrong look-alike: واقعہ for واقع"
+ },
+ "ASRAR-RAD-E-019": {
+  "action": "hold",
+  "note": "author's usage 'ایسے ہے جیسے'"
+ },
+ "ASRAR-RAD-E-024": {
+  "action": "hold",
+  "note": "word swap کہ→کیونکہ; re-punctuation"
+ },
+ "ASRAR-RAD-E-026": {
+  "action": "hold",
+  "note": "added و; انہیں is author's older form"
+ },
+ "ASRAR-RAD-E-030": {
+  "action": "hold",
+  "note": "added و in نفع نقصان"
+ },
+ "ASRAR-RAD-F-006": {
+  "action": "apply",
+  "note": "wrong look-alike: چاہئیں for verb چاہیں; only reading"
+ },
+ "ASRAR-RAD-F-009": {
+  "action": "hold",
+  "note": "number added; ruku 3 would be 13/9 by sequence (13/7 for ruku 1), ۱۰ doubtful"
+ },
+ "ASRAR-RAD-F-012": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-F-013": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split; comma"
+ },
+ "ASRAR-RAD-F-014": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-F-015": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-G-002": {
+  "action": "apply",
+  "note": "standard orthography (درگزر) + sentence stop"
+ },
+ "ASRAR-RAD-G-008": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-G-011": {
+  "action": "hold",
+  "note": "heavy re-punctuation, partly taste (stop inserted mid-sentence)"
+ },
+ "ASRAR-RAD-G-017": {
+  "action": "apply",
+  "note": "standard orthography (چاہیے)"
+ },
+ "ASRAR-RAD-G-028": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-RAD-G-033": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-RAD-G-034": {
+  "action": "hold",
+  "note": "agreement style (verb agrees with nearest noun)"
+ },
+ "ASRAR-RAD-G-035": {
+  "action": "hold",
+  "note": "word swap کہ→کیونکہ"
+ },
+ "ASRAR-RAD-G-044": {
+  "action": "apply",
+  "note": "standard orthography (چاہیے)"
+ },
+ "ASRAR-RAD-H-003": {
+  "action": "apply",
+  "note": "print inspected: second number missing; matches existing ۱۳/۷ form and ruku sequence"
+ },
+ "ASRAR-RAD-H-006": {
+  "action": "apply",
+  "note": "standard orthography (کیے) + izafat mark + comma"
+ },
+ "ASRAR-RAD-H-012": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split; sentence continues on next page (see H-013)"
+ },
+ "ASRAR-RAD-H-013": {
+  "action": "apply",
+  "note": "print inspected: یا dropped at page start; joined spellings split"
+ },
+ "ASRAR-RAD-H-019": {
+  "action": "apply",
+  "note": "standard orthography (چاہیے)"
+ },
+ "ASRAR-RAD-H-020": {
+  "action": "apply",
+  "note": "dropped ں: plural راہیں needs ہیں"
+ },
+ "ASRAR-RAD-I-005": {
+  "action": "apply",
+  "note": "joined spelling split (بیقرار)"
+ },
+ "ASRAR-RAD-I-010": {
+  "action": "apply",
+  "note": "print inspected: reads پڑھا کئے, not گئے"
+ },
+ "ASRAR-RAD-I-011": {
+  "action": "apply",
+  "note": "standard orthography (کیے) + commas"
+ },
+ "ASRAR-RAD-I-020": {
+  "action": "apply",
+  "note": "standard spelling of the name (عیسیٰ)"
+ },
+ "ASRAR-RAD-I-027": {
+  "action": "hold",
+  "note": "drops کہ; re-punctuation is taste"
+ },
+ "ASRAR-RAD-J-005": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-J-007": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-RAD-J-013": {
+  "action": "apply",
+  "note": "standard orthography (کہیے) + sentence stop"
+ },
+ "ASRAR-RAD-J-019": {
+  "action": "hold",
+  "note": "added اور; stylistic"
+ },
+ "ASRAR-RAD-K-004": {
+  "action": "apply",
+  "note": "standard orthography (چاہیے)"
+ },
+ "ASRAR-RAD-K-016": {
+  "action": "apply",
+  "note": "standard orthography (گزارتا)"
+ },
+ "ASRAR-RAD-K-022": {
+  "action": "apply",
+  "note": "standard orthography (گزر)"
+ },
+ "ASRAR-RAD-K-024": {
+  "action": "hold",
+  "note": "inserted full stop splits the sentence; taste"
+ },
+ "ASRAR-RAD-K-027": {
+  "action": "hold",
+  "note": "author's usage: حدودِ اربعہ as singular"
+ },
+ "ASRAR-RAD-K-028": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-RAD-K-033": {
+  "action": "apply",
+  "note": "standard orthography (پتا) + izafat mark"
+ },
+ "ASRAR-RAD-K-035": {
+  "action": "apply",
+  "note": "standard orthography (بہ اسلام) + sentence stop"
+ },
+ "ASRAR-SHUARAA-10-002": {
+  "action": "hold",
+  "note": "print reads as app; agreement is editorial"
+ },
+ "ASRAR-SHUARAA-13-003": {
+  "action": "hold",
+  "note": "scan reads ہیں; author's usage"
+ },
+ "ASRAR-SHUARAA-13-008": {
+  "action": "hold",
+  "note": "word swap; scan dim and reason asks for re-check"
+ },
+ "ASRAR-SHUARAA-13-011": {
+  "action": "apply",
+  "note": "scan reads ہوئے; ت/ئ look-alike slip"
+ },
+ "ASRAR-SHUARAA-16-013": {
+  "action": "hold",
+  "note": "book title; scan reads محیطہ; needs confirmation"
+ },
+ "ASRAR-SHUARAA-22-007": {
+  "action": "hold",
+  "note": "orthography is fine but it also turns a printed full stop into a comma; taste"
+ },
+ "ASRAR-SHUARAA-22-010": {
+  "action": "apply",
+  "note": "scan reads رکاوٹ; stray letter"
+ },
+ "ASRAR-SHUARAA-22-022": {
+  "action": "apply",
+  "note": "joined spellings split and Latin period to Urdu stop only"
+ },
+ "ASRAR-SHUARAA-25-018": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-SHUARAA-28-006": {
+  "action": "apply",
+  "note": "incomplete duplicate of the opening line; scan has it once (deletion)"
+ },
+ "ASRAR-SHUARAA-31-001": {
+  "action": "apply",
+  "note": "joined spelling split / sentence stop only (بیشک → بے شک); 'negation' flag is a false positive"
+ },
+ "ASRAR-SHUARAA-31-007": {
+  "action": "hold",
+  "note": "proposal would delete the heading and adds izafat; needs a structural move, not this replacement"
+ },
+ "ASRAR-SHUARAA-31-012": {
+  "action": "hold",
+  "note": "print reads حشر نشر; author's usage"
+ },
+ "ASRAR-SHUARAA-31-022": {
+  "action": "hold",
+  "note": "oblique-form standardisation (-ہ before postposition); author's usage"
+ },
+ "ASRAR-SHUARAA-4-010": {
+  "action": "hold",
+  "note": "izafat spelling changes letters plus added commas; reason asks editor (same spelling recurs)"
+ },
+ "ASRAR-SHUARAA-4-014": {
+  "action": "hold",
+  "note": "print appears to read احساس; reason asks editor, though احسان is surely meant"
+ },
+ "ASRAR-SHUARAA-7-001": {
+  "action": "hold",
+  "note": "author's usage کے بارے without میں; print reads as app"
+ },
+ "ASRAR-SHUARAA-7-010": {
+  "action": "apply",
+  "note": "question mark on a کیا-question and بیشک → بے شک only"
+ },
+ "ASRAR-SHUARAA-7-016": {
+  "action": "hold",
+  "note": "print reads انسانی بس; more usual wording only"
+ },
+ "ASRAR-TAHA-A-013": {
+  "action": "apply",
+  "note": "ت/ئ slip, print inspected"
+ },
+ "ASRAR-TAHA-C-001": {
+  "action": "apply",
+  "note": "garbled word and split verb, print inspected"
+ },
+ "ASRAR-TAHA-D-001": {
+  "action": "apply",
+  "note": "dropped letters, print reads اُس نے"
+ },
+ "ASRAR-TAHA-D-009": {
+  "action": "hold",
+  "note": "Arabic quotation"
+ },
+ "ASRAR-TAHA-E-004": {
+  "action": "hold",
+  "note": "author's usage (کے بارے without میں)"
+ },
+ "ASRAR-TAHA-E-008": {
+  "action": "hold",
+  "note": "print reads as app; author's gender for تجویز"
+ },
+ "ASRAR-TAHA-F-004": {
+  "action": "apply",
+  "note": "stray alif, print inspected"
+ },
+ "ASRAR-TAHA-H-002": {
+  "action": "apply",
+  "note": "transposed letters and run-together words, print inspected"
+ },
+ "ASRAR-TAHA-K-004": {
+  "action": "hold",
+  "note": "better-word substitution"
+ },
+ "ASRAR-TAHA-K-005": {
+  "action": "apply",
+  "note": "doubled word in honorific"
+ },
+ "ASRAR-TAHA-K-006": {
+  "action": "apply",
+  "note": "ہ/پ confusion, print reads پیری"
+ },
+ "ASRAR-TAHA-K-009": {
+  "action": "apply",
+  "note": "doubled word (repeated across a line break)"
+ },
+ "ASRAR-TAHA-M-012": {
+  "action": "apply",
+  "note": "stray alif (misread bracket): جزائے اعمال is the only sense; reason asked for a re-check"
+ },
+ "ASRAR-YUSUF-A-001": {
+  "action": "hold",
+  "note": "print reads as app; added ہے"
+ },
+ "ASRAR-YUSUF-A-004": {
+  "action": "hold",
+  "note": "print reads as app; added میں"
+ },
+ "ASRAR-YUSUF-A-006": {
+  "action": "apply",
+  "note": "joined spellings split (کریگا, بیشک) + sentence stop; no negation involved"
+ },
+ "ASRAR-YUSUF-A-007": {
+  "action": "hold",
+  "note": "print reads as app; added میں"
+ },
+ "ASRAR-YUSUF-A-008": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-A-011": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change; question mark after a question"
+ },
+ "ASRAR-YUSUF-B-012": {
+  "action": "apply",
+  "note": "print inspected: third 'ابن الکریم' dropped in transcription (hadith wording restored to print)"
+ },
+ "ASRAR-YUSUF-B-013": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change (معاملے already in same sentence)"
+ },
+ "ASRAR-YUSUF-C-004": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-C-007": {
+  "action": "hold",
+  "note": "print reads as app; added words"
+ },
+ "ASRAR-YUSUF-C-008": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-C-011": {
+  "action": "hold",
+  "note": "print reads as app; likely ہو جائے, proposed ہو جاتا ہے is not that"
+ },
+ "ASRAR-YUSUF-C-012": {
+  "action": "hold",
+  "note": "author's usage: unit noun after a number stays درجہ"
+ },
+ "ASRAR-YUSUF-C-014": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-D-001": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-D-004": {
+  "action": "hold",
+  "note": "infinitive agreement (سن لینا چاہیئے)"
+ },
+ "ASRAR-YUSUF-D-013": {
+  "action": "apply",
+  "note": "print inspected: section heading missing in app"
+ },
+ "ASRAR-YUSUF-D-016": {
+  "action": "hold",
+  "note": "print reads as app; added میں"
+ },
+ "ASRAR-YUSUF-E-003": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-E-005": {
+  "action": "hold",
+  "note": "print reads as app (ہوتیں); tense change"
+ },
+ "ASRAR-YUSUF-F-011": {
+  "action": "apply",
+  "note": "joined spelling split (بیقرار); no negation involved"
+ },
+ "ASRAR-YUSUF-F-012": {
+  "action": "hold",
+  "note": "sentence rewrite"
+ },
+ "ASRAR-YUSUF-F-014": {
+  "action": "apply",
+  "note": "look-alike slip پاتے for پائے (ئ/ت); only reading; sentence stop"
+ },
+ "ASRAR-YUSUF-G-009": {
+  "action": "hold",
+  "note": "word swap کہ→چنانچہ; editorial"
+ },
+ "ASRAR-YUSUF-H-001": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-H-005": {
+  "action": "hold",
+  "note": "word change کی→کہی + infinitive agreement"
+ },
+ "ASRAR-YUSUF-I-001": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-I-007": {
+  "action": "hold",
+  "note": "reason says print reads as app (خواب), though خوب is surely meant"
+ },
+ "ASRAR-YUSUF-I-009": {
+  "action": "hold",
+  "note": "print reads as app; added مطابق"
+ },
+ "ASRAR-YUSUF-I-014": {
+  "action": "hold",
+  "note": "print reads as app; added میں"
+ },
+ "ASRAR-YUSUF-J-001": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-J-007": {
+  "action": "hold",
+  "note": "print reads as app; infinitive agreement"
+ },
+ "ASRAR-YUSUF-K-001": {
+  "action": "hold",
+  "note": "closing bracket position uncertain; print shows none"
+ },
+ "ASRAR-YUSUF-K-008": {
+  "action": "hold",
+  "note": "print reads as app (بیٹا); meaning change"
+ },
+ "ASRAR-YUSUF-K-010": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک) + izafat mark only; no negation involved"
+ },
+ "ASRAR-YUSUF-L-002": {
+  "action": "hold",
+  "note": "author's gender for تعین"
+ },
+ "ASRAR-YUSUF-L-003": {
+  "action": "hold",
+  "note": "author's gender for تعین"
+ },
+ "ASRAR-YUSUF-L-006": {
+  "action": "hold",
+  "note": "print reads as app; stylistic"
+ },
+ "ASRAR-YUSUF-L-008": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-M-013": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change; colon before speech"
+ },
+ "ASRAR-YUSUF-N-012": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک)"
+ },
+ "ASRAR-YUSUF-O-002": {
+  "action": "apply",
+  "note": "standard orthography (چاہیے)"
+ },
+ "ASRAR-YUSUF-O-004": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-O-014": {
+  "action": "hold",
+  "note": "drops a word; author's usage 'اور یا پھر'"
+ },
+ "ASRAR-YUSUF-O-021": {
+  "action": "apply",
+  "note": "print reads وائے; stray ل in app"
+ },
+ "ASRAR-YUSUF-O-022": {
+  "action": "hold",
+  "note": "added تک; stylistic"
+ },
+ "ASRAR-YUSUF-O-035": {
+  "action": "apply",
+  "note": "print reads بار کیے; بارکیں is a non-word here"
+ },
+ "ASRAR-YUSUF-P-003": {
+  "action": "apply",
+  "note": "joined spelling split (بیشک)"
+ },
+ "ASRAR-YUSUF-P-017": {
+  "action": "apply",
+  "note": "standard orthography (لیے) + comma after vocative"
+ },
+ "ASRAR-YUSUF-Q-013": {
+  "action": "hold",
+  "note": "stylistic rewrite"
+ },
+ "ASRAR-YUSUF-Q-017": {
+  "action": "apply",
+  "note": "standard orthography (ناامید, چاہیے)"
+ },
+ "ASRAR-YUSUF-Q-020": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-Q-024": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change"
+ },
+ "ASRAR-YUSUF-Q-030": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change; لے جا کر split"
+ },
+ "ASRAR-YUSUF-Q-036": {
+  "action": "apply",
+  "note": "standard orthography: بارہ→بارے"
+ },
+ "ASRAR-YUSUF-R-010": {
+  "action": "apply",
+  "note": "standard orthography / joined spelling split"
+ },
+ "ASRAR-YUSUF-S-004": {
+  "action": "apply",
+  "note": "standard spelling of the name (موسیٰ)"
+ },
+ "ASRAR-YUSUF-S-005": {
+  "action": "apply",
+  "note": "standard spelling of the name (ابراہیم)"
+ },
+ "ASRAR-YUSUF-S-007": {
+  "action": "apply",
+  "note": "standard orthography (چاہیے)"
+ },
+ "ASRAR-YUSUF-S-009": {
+  "action": "hold",
+  "note": "infinitive agreement + re-punctuation"
+ },
+ "ASRAR-YUSUF-S-011": {
+  "action": "apply",
+  "note": "standard orthography (حتیٰ, انبیاء)"
+ },
+ "ASRAR-YUSUF-S-015": {
+  "action": "hold",
+  "note": "re-punctuation partly taste (comma before کے بارے)"
+ },
+ "ASRAR-YUSUF-S-021": {
+  "action": "apply",
+  "note": "standard orthography: oblique -ہ written -ے, no wording change; spacing before punctuation"
+ },
+ "UR-ASAAS-P001-006-001": {
+  "action": "hold",
+  "note": "more than one possible fix; reason asks for original"
+ },
+ "UR-ASAAS-P007-010-001": {
+  "action": "apply",
+  "note": "doubled word (Urdu translation only)"
+ },
+ "UR-ASAAS-P007-010-002": {
+  "action": "hold",
+  "note": "'ke' optional; reason asks for original"
+ },
+ "UR-ASAAS-P011-014-002": {
+  "action": "hold",
+  "note": "adds a word; reason asks for original"
+ },
+ "UR-ASAAS-P015-018-001": {
+  "action": "hold",
+  "note": "singular/plural; hadith translation, reason asks for original"
+ },
+ "UR-ASAAS-P019-022-002": {
+  "action": "apply",
+  "note": "contents numbering 28, 28, 30: certain from sequence"
+ },
+ "UR-ASAAS-P043-046-004": {
+  "action": "apply",
+  "note": "ki/ke slip: siwa always takes ke"
+ },
+ "UR-ASAAS-P051-054-002": {
+  "action": "apply",
+  "note": "aik riwayaat ... ki hai: plural for singular"
+ },
+ "UR-ASAAS-P071-074-002": {
+  "action": "hold",
+  "note": "quoted text; reason asks for original"
+ },
+ "UR-ASAAS-P087-090-002": {
+  "action": "apply",
+  "note": "dropped 'liye' after ke"
+ },
+ "UR-ASAAS-P091-094-001": {
+  "action": "apply",
+  "note": "dropped alif in al-Jami (non-word)"
+ },
+ "UR-ASAAS-P095-098-001": {
+  "action": "hold",
+  "note": "quoted text; reason asks for original"
+ },
+ "UR-ASAAS-P095-098-006": {
+  "action": "hold",
+  "note": "quoted text; elided hai possible; reason asks for original"
+ },
+ "UR-ASAAS-P099-102-001": {
+  "action": "apply",
+  "note": "title spelt correctly just before in context"
+ },
+ "UR-ASAAS-P099-102-003": {
+  "action": "apply",
+  "note": "dropped 'mein', sentence broken"
+ },
+ "UR-ASAAS-P099-102-004": {
+  "action": "apply",
+  "note": "dropped 'ki', only word that fits"
+ },
+ "UR-ASAAS-P111-114-004": {
+  "action": "hold",
+  "note": "translator's gender usage; quoted"
+ },
+ "UR-ASAAS-P115-118-001": {
+  "action": "hold",
+  "note": "quoted text; reason asks for original"
+ },
+ "UR-ASAAS-P123-126-002": {
+  "action": "hold",
+  "note": "'ke' may agree with majmue; possible as it stands"
+ },
+ "UR-ASAAS-P127-130-001": {
+  "action": "apply",
+  "note": "title misspelt (impossible Arabic); author named, correct form elsewhere in book"
+ },
+ "UR-ASAAS-P127-130-003": {
+  "action": "apply",
+  "note": "title misspelt sh/th; Suyuti named in entry, correct form elsewhere in book"
+ },
+ "UR-ASAAS-P127-130-007": {
+  "action": "hold",
+  "note": "stray letter is probably a slash in print, not 'wa'"
+ },
+ "UR-ASAAS-P131-135-005": {
+  "action": "hold",
+  "note": "stray letter is probably a slash in print, not 'wa'"
+ },
+ "UR-ASRAR-FAATIHA-006": {
+  "action": "hold",
+  "note": "proposed is a note, not replacement text"
+ },
+ "UR-ASRAR-YUNUS-P001-006-004": {
+  "action": "hold",
+  "note": "word order, taste"
+ },
+ "UR-ASRAR-YUNUS-P001-006-007": {
+  "action": "hold",
+  "note": "author's gender for 'ta'ayyun'"
+ },
+ "UR-ASRAR-YUNUS-P001-006-008": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-ASRAR-YUNUS-P001-006-009": {
+  "action": "apply",
+  "note": "print inspected: second number restored"
+ },
+ "UR-ASRAR-YUNUS-P007-012-002": {
+  "action": "apply",
+  "note": "print inspected: footnote number is superscript"
+ },
+ "UR-ASRAR-YUNUS-P007-012-003": {
+  "action": "apply",
+  "note": "print inspected: section heading omitted in app"
+ },
+ "UR-ASRAR-YUNUS-P007-012-007": {
+  "action": "hold",
+  "note": "rewrite, taste"
+ },
+ "UR-ASRAR-YUNUS-P016-018-006": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-ASRAR-YUNUS-P019-021-005": {
+  "action": "hold",
+  "note": "author's usage: invariant 'poora karna'"
+ },
+ "UR-ASRAR-YUNUS-P022-024-005": {
+  "action": "apply",
+  "note": "print inspected: section heading omitted in app"
+ },
+ "UR-ASRAR-YUNUS-P025-027-006": {
+  "action": "apply",
+  "note": "print inspected: second number restored, digits unified"
+ },
+ "UR-ASRAR-YUNUS-P028-030-001": {
+  "action": "hold",
+  "note": "older spelling and added punctuation, taste"
+ },
+ "UR-ASRAR-YUNUS-P028-030-005": {
+  "action": "hold",
+  "note": "obvious 'art', but print reads as app"
+ },
+ "UR-ASRAR-YUNUS-P028-030-006": {
+  "action": "apply",
+  "note": "print inspected: footnote number is superscript"
+ },
+ "UR-ASRAR-YUNUS-P031-033-005": {
+  "action": "hold",
+  "note": "print reads as app; rewrite"
+ },
+ "UR-ASRAR-YUNUS-P031-033-006": {
+  "action": "hold",
+  "note": "Qur'anic-style spelling and added punctuation, taste"
+ },
+ "UR-ASRAR-YUNUS-P037-042-001": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-ASRAR-YUNUS-P043-051-003": {
+  "action": "hold",
+  "note": "print reads as app; valid as written ('ke ... kaam aana')"
+ },
+ "UR-BAIAT-002": {
+  "action": "apply",
+  "note": "stray 'se' after 'ki taraf' breaks the sentence"
+ },
+ "UR-BAIAT-003": {
+  "action": "apply",
+  "note": "honorific formula restored for plural (alaihim)"
+ },
+ "UR-BAIAT-004": {
+  "action": "hold",
+  "note": "author's usage (ke baare without mein)"
+ },
+ "UR-BAIAT-010": {
+  "action": "hold",
+  "note": "grammatical as it stands: us ki ... taarein"
+ },
+ "UR-BAIAT-011": {
+  "action": "apply",
+  "note": "dropped 'ka', sentence otherwise broken"
+ },
+ "UR-BAIAT-012": {
+  "action": "hold",
+  "note": "author's spoken usage; reason says not a definite error"
+ },
+ "UR-BAIAT-013": {
+  "action": "apply",
+  "note": "look-alike r/z: baaryaab is the only word that fits"
+ },
+ "UR-BAIAT-015": {
+  "action": "apply",
+  "note": "look-alike n/t: infinitive needed"
+ },
+ "UR-DALAEL-P001-010022": {
+  "action": "hold",
+  "note": "postposition not unique (par or se); older prose"
+ },
+ "UR-DALAEL-P001-010037": {
+  "action": "hold",
+  "note": "keh is optional"
+ },
+ "UR-DALAEL-P001-010045": {
+  "action": "hold",
+  "note": "keh probably dropped but older prose omits it; not certain"
+ },
+ "UR-DALAEL-P001-010064": {
+  "action": "apply",
+  "note": "ye/ya slip; ki karamat in same sentence"
+ },
+ "UR-DALAEL-P011-019047": {
+  "action": "hold",
+  "note": "aaza jawarih without wao recurs three times; likely the print's usage"
+ },
+ "UR-DALAEL-P011-019057": {
+  "action": "hold",
+  "note": "older usage; Urdu rendering of a verse"
+ },
+ "UR-DALAEL-P011-019065": {
+  "action": "hold",
+  "note": "aaza jawarih without wao recurs three times; likely the print's usage"
+ },
+ "UR-DALAEL-P011-019067": {
+  "action": "hold",
+  "note": "two readings possible (ke dawai / o dawai)"
+ },
+ "UR-DALAEL-P011-019068": {
+  "action": "hold",
+  "note": "gender the author gives kalam"
+ },
+ "UR-DALAEL-P011-019074": {
+  "action": "apply",
+  "note": "dropped ke; only word that fits"
+ },
+ "UR-DALAEL-P011-019079": {
+  "action": "apply",
+  "note": "dropped mein; only word that fits"
+ },
+ "UR-DALAEL-P011-019086": {
+  "action": "hold",
+  "note": "uninflected ka before oblique infinitive is author's usage"
+ },
+ "UR-DALAEL-P011-019090": {
+  "action": "hold",
+  "note": "copula agrees with predicate mahal; possible sentence"
+ },
+ "UR-DALAEL-P020-030034": {
+  "action": "hold",
+  "note": "verb agrees with zikr by sense; possible sentence"
+ },
+ "UR-DALAEL-P020-030039": {
+  "action": "hold",
+  "note": "older usage ko mushahida karna"
+ },
+ "UR-DALAEL-P020-030052": {
+  "action": "apply",
+  "note": "ye/ya slip; nuskha-jaat masculine plural"
+ },
+ "UR-DALAEL-P020-030053": {
+  "action": "hold",
+  "note": "verb agrees with nearest item in the list; possible sentence"
+ },
+ "UR-DALAEL-P031-039043": {
+  "action": "hold",
+  "note": "keh omitted twice in a row; likely the print's wording"
+ },
+ "UR-DALAEL-P031-039044": {
+  "action": "hold",
+  "note": "keh omitted twice in a row; likely the print's wording"
+ },
+ "UR-DALAEL-P031-039061": {
+  "action": "hold",
+  "note": "baqa as masculine recurs across books; author's gender"
+ },
+ "UR-DALAEL-P042-045005": {
+  "action": "hold",
+  "note": "author uses jis se throughout the rendering of the hadith"
+ },
+ "UR-DALAEL-P042-045011": {
+  "action": "hold",
+  "note": "aaza jawarih without wao recurs three times; likely the print's usage"
+ },
+ "UR-DALAEL-P046-052001": {
+  "action": "apply",
+  "note": "hain/hai slip, singular subject"
+ },
+ "UR-DALAEL-P046-052005": {
+  "action": "apply",
+  "note": "dropped letter: rahen for hain; sentence makes no sense otherwise"
+ },
+ "UR-DALAEL-P046-052035": {
+  "action": "apply",
+  "note": "name typed twice"
+ },
+ "UR-DALAEL-P053-060017": {
+  "action": "apply",
+  "note": "dropped ne; sentence otherwise broken"
+ },
+ "UR-DALAEL-P053-060019": {
+  "action": "hold",
+  "note": "changes who is joined to whom; meaning, print not seen"
+ },
+ "UR-DALAEL-P061-064001": {
+  "action": "apply",
+  "note": "stray repeated word"
+ },
+ "UR-DALAEL-P061-064010": {
+  "action": "apply",
+  "note": "ye/ya slip: ki taraf"
+ },
+ "UR-DALAEL-P061-064012": {
+  "action": "apply",
+  "note": "honorific formula restored to plural form"
+ },
+ "UR-DALAEL-P061-064013": {
+  "action": "hold",
+  "note": "hain is almost certainly a misread been (zahir-been); deleting it is the wrong fix"
+ },
+ "UR-DALAEL-P061-064017": {
+  "action": "apply",
+  "note": "wrong postposition: ko mutaalliq -> ke mutaalliq"
+ },
+ "UR-DALAEL-P061-064019": {
+  "action": "hold",
+  "note": "proposal doubtful: likely atkal (guess), not aql"
+ },
+ "UR-DALAEL-P061-064021": {
+  "action": "apply",
+  "note": "wrong postposition: makan ka naqsha"
+ },
+ "UR-DALAEL-P065-068021": {
+  "action": "apply",
+  "note": "ke/ki slip: ki zabani"
+ },
+ "UR-DALAEL-P069-072017": {
+  "action": "apply",
+  "note": "ke/ki slip: ki tarteeb"
+ },
+ "UR-DALAEL-P069-072023": {
+  "action": "apply",
+  "note": "dropped word: ke liye"
+ },
+ "UR-DALAEL-P073-076007": {
+  "action": "apply",
+  "note": "stray letter: karte ga -> kare ga"
+ },
+ "UR-DALAEL-P073-076020": {
+  "action": "hold",
+  "note": "singular/plural style, author's usage"
+ },
+ "UR-DALAEL-P073-076023": {
+  "action": "apply",
+  "note": "ke/ki slip: ki shaan"
+ },
+ "UR-DALAEL-P077-080006": {
+  "action": "apply",
+  "note": "ke/ki slip: ki haalat"
+ },
+ "UR-DALAEL-P077-080017": {
+  "action": "apply",
+  "note": "dropped ne with transitive past"
+ },
+ "UR-DALAEL-P085-088014": {
+  "action": "hold",
+  "note": "two possible fixes (is karamat / in karamaat)"
+ },
+ "UR-DALAEL-P089-092002": {
+  "action": "apply",
+  "note": "ka -> ke before istikhraj ka tareeqa"
+ },
+ "UR-DALAEL-P089-092033": {
+  "action": "hold",
+  "note": "possible as it stands (doosra, yeh baat keh)"
+ },
+ "UR-DALAEL-P089-092036": {
+  "action": "hold",
+  "note": "possible word order as it stands"
+ },
+ "UR-DALAEL-P093-096008": {
+  "action": "apply",
+  "note": "look-alike: keh -> ko"
+ },
+ "UR-DALAEL-P093-096011": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "UR-DALAEL-P093-096018": {
+  "action": "hold",
+  "note": "gender given to shawahid, possibly author's"
+ },
+ "UR-DALAEL-P093-096019": {
+  "action": "hold",
+  "note": "drops a word in hadith translation, print not seen"
+ },
+ "UR-DALAEL-P097-100014": {
+  "action": "apply",
+  "note": "dropped ne with transitive past"
+ },
+ "UR-DALAEL-P097-100017": {
+  "action": "apply",
+  "note": "word typed twice (mujhe)"
+ },
+ "UR-DALAEL-P102-105003": {
+  "action": "apply",
+  "note": "wrong postposition: ke -> ko"
+ },
+ "UR-DALAEL-P102-105010": {
+  "action": "hold",
+  "note": "compound quwwat-o-zoaf, agreement arguable"
+ },
+ "UR-DALAEL-P102-105014": {
+  "action": "apply",
+  "note": "ka/ki slip: ki nafi"
+ },
+ "UR-DALAEL-P102-105020": {
+  "action": "apply",
+  "note": "dropped ne with transitive past"
+ },
+ "UR-DALAEL-P111-114009": {
+  "action": "apply",
+  "note": "ka/ki slip: ki khatir"
+ },
+ "UR-DALAEL-P115-118003": {
+  "action": "hold",
+  "note": "author's construction (use rahnumai karna)"
+ },
+ "UR-DALAEL-P119-123007": {
+  "action": "apply",
+  "note": "dropped letter: tanazia"
+ },
+ "UR-DALAEL-P119-123008": {
+  "action": "hold",
+  "note": "omitted keh is normal spoken style"
+ },
+ "UR-DALAEL-P119-123010": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-DALAEL-P119-123012": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-DALAEL-P119-123014": {
+  "action": "hold",
+  "note": "adds a conjunction; a comma would also do"
+ },
+ "UR-DALAEL-P119-123022": {
+  "action": "apply",
+  "note": "dropped par in taur par"
+ },
+ "UR-DALAEL-P119-123024": {
+  "action": "hold",
+  "note": "gender given to maani, author's usage"
+ },
+ "UR-DALAEL-P124-129005": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "UR-DALAEL-P124-129014": {
+  "action": "apply",
+  "note": "ke/ki slip: ki miqdaar"
+ },
+ "UR-DALAEL-P124-129022": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-DALAEL-P124-129028": {
+  "action": "apply",
+  "note": "dropped letter: rok liya"
+ },
+ "UR-DALAEL-P124-129029": {
+  "action": "apply",
+  "note": "dropped letter: raste"
+ },
+ "UR-DALAEL-P130-137006": {
+  "action": "hold",
+  "note": "author's usage (mansab-e-jaleela)"
+ },
+ "UR-DALAEL-P130-137011": {
+  "action": "hold",
+  "note": "omitted keh is normal spoken style"
+ },
+ "UR-DALAEL-P130-137015": {
+  "action": "apply",
+  "note": "dropped letter; term spelt in full on same page"
+ },
+ "UR-DALAEL-P130-137018": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-DALAEL-P138-141001": {
+  "action": "hold",
+  "note": "aise jaame can stand adverbially"
+ },
+ "UR-DALAEL-P138-141002": {
+  "action": "apply",
+  "note": "dropped ka"
+ },
+ "UR-DALAEL-P138-141010": {
+  "action": "apply",
+  "note": "look-alike: kareen -> kareem before the durood sign"
+ },
+ "UR-DALAEL-P138-141011": {
+  "action": "hold",
+  "note": "adds a conjunction; a comma would also do"
+ },
+ "UR-DALAEL-P138-141015": {
+  "action": "hold",
+  "note": "more than one possible fix, print not seen"
+ },
+ "UR-DALAEL-P138-141016": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-DALAEL-P142-151004": {
+  "action": "apply",
+  "note": "run-together term: fana fi al-Rasool"
+ },
+ "UR-DALAEL-P142-151005": {
+  "action": "apply",
+  "note": "run-together term: fana fi Allah"
+ },
+ "UR-DALAEL-P142-151006": {
+  "action": "apply",
+  "note": "dropped hai"
+ },
+ "UR-DALAEL-P142-151007": {
+  "action": "apply",
+  "note": "dropped liye (parallel clause has ke liye)"
+ },
+ "UR-DALAEL-P142-151009": {
+  "action": "apply",
+  "note": "transposed letters: apna"
+ },
+ "UR-DALAEL-P142-151010": {
+  "action": "apply",
+  "note": "stray mein; parallel aakhirat bhi makes it certain"
+ },
+ "UR-DALAEL-P142-151013": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-DALAEL-P142-151014": {
+  "action": "hold",
+  "note": "omitted keh is normal spoken style"
+ },
+ "UR-DALAEL-P142-151020": {
+  "action": "apply",
+  "note": "dropped jab; sentence broken without it"
+ },
+ "UR-DALAEL-P142-151024": {
+  "action": "apply",
+  "note": "dropped se"
+ },
+ "UR-DALAEL-P142-151029": {
+  "action": "apply",
+  "note": "ki -> ke; verb in same clause is masculine plural"
+ },
+ "UR-DALAEL-P142-151035": {
+  "action": "hold",
+  "note": "doubled ko but fix not unique (could be to)"
+ },
+ "UR-DALAEL-P142-151037": {
+  "action": "apply",
+  "note": "wrong postposition: ka ehtemam"
+ },
+ "UR-DALAEL-P142-151043": {
+  "action": "apply",
+  "note": "dropped mein"
+ },
+ "UR-DALAEL-P142-151048": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-DEYAR-P09-16-004": {
+  "action": "apply",
+  "note": "extra letter: bushes form jhund (clumps), not flags"
+ },
+ "UR-DEYAR-P09-16-005": {
+  "action": "hold",
+  "note": "two changes across a page break; print needed"
+ },
+ "UR-DEYAR-P09-16-007": {
+  "action": "hold",
+  "note": "possible as it stands; drops a word"
+ },
+ "UR-DEYAR-P09-16-009": {
+  "action": "hold",
+  "note": "singular/plural unclear; reason unsure"
+ },
+ "UR-DEYAR-P17-24-001": {
+  "action": "apply",
+  "note": "homophone s slip in place name: Wadi Muhassir, certain from context"
+ },
+ "UR-DEYAR-P17-24-003": {
+  "action": "apply",
+  "note": "honorific formula restored for plural (alaihim)"
+ },
+ "UR-DEYAR-P17-24-004": {
+  "action": "apply",
+  "note": "ke/ka slip: ka madfan hai"
+ },
+ "UR-DEYAR-P17-24-006": {
+  "action": "hold",
+  "note": "drops a word; reason asks for page"
+ },
+ "UR-DEYAR-P17-24-007": {
+  "action": "hold",
+  "note": "possible as izafat (zaahir-e-wujood); adds a letter"
+ },
+ "UR-DEYAR-P17-24-008": {
+  "action": "apply",
+  "note": "transposed letters in name: Musailimah"
+ },
+ "UR-DEYAR-P17-24-012": {
+  "action": "apply",
+  "note": "look-alike d/w: ba-sad diqqat is the idiom, waqt senseless"
+ },
+ "UR-DEYAR-P25-32-001": {
+  "action": "hold",
+  "note": "author's usage (do wajh); style only"
+ },
+ "UR-DEYAR-P25-32-004": {
+  "action": "apply",
+  "note": "look-alike n/t: utarte charhte"
+ },
+ "UR-DEYAR-P25-32-005": {
+  "action": "apply",
+  "note": "plural antecedent surakhon, dropped nasal (hai/hain)"
+ },
+ "UR-DEYAR-P25-32-006": {
+  "action": "apply",
+  "note": "dropped dot d/dh in poet's name Bazil; same book spells it Bazil"
+ },
+ "UR-DEYAR-P25-32-019": {
+  "action": "hold",
+  "note": "likely mard-e-darvesh but more than a letter slip, print not seen"
+ },
+ "UR-DEYAR-P33-40-003": {
+  "action": "hold",
+  "note": "baqa/liqa both real words in a Sufi text; meaning change, print not seen"
+ },
+ "UR-DEYAR-P33-40-008": {
+  "action": "apply",
+  "note": "stray letter: uluw-e-rutbat, uloom rutbat senseless"
+ },
+ "UR-DEYAR-P33-40-009": {
+  "action": "hold",
+  "note": "se/ne: sentence structure unclear, not certain"
+ },
+ "UR-DEYAR-P33-40-010": {
+  "action": "hold",
+  "note": "keh/ek reading uncertain; print not seen"
+ },
+ "UR-DEYAR-P33-40-012": {
+  "action": "apply",
+  "note": "dropped word: fixed phrase marka-e-haq-o-batil, text broken as it stands"
+ },
+ "UR-DEYAR-P33-40-013": {
+  "action": "hold",
+  "note": "proper name (Umar/Amr), print not seen"
+ },
+ "UR-DEYAR-P33-40-015": {
+  "action": "apply",
+  "note": "stray letter in name: Salman (RA) advised the trench; honorific and context make it certain"
+ },
+ "UR-DEYAR-P33-40-017": {
+  "action": "hold",
+  "note": "mere/mujhe/meri: not the only fix; author's usage possible"
+ },
+ "UR-DEYAR-P33-40-018": {
+  "action": "apply",
+  "note": "transposed letters in name Musailma Kazzab"
+ },
+ "UR-DEYAR-P41-48-001": {
+  "action": "apply",
+  "note": "ke/ki slip: imarat thi is feminine in the same clause"
+ },
+ "UR-DEYAR-P41-48-005": {
+  "action": "hold",
+  "note": "is ko jawab ... deti hai is a possible sentence"
+ },
+ "UR-DEYAR-P41-48-007": {
+  "action": "apply",
+  "note": "wrong form before se: kempon ke mahal-e-wuqu se"
+ },
+ "UR-DEYAR-P41-48-008": {
+  "action": "hold",
+  "note": "nazuk aqdam could be meant (verse following speaks of walking); print not seen"
+ },
+ "UR-DEYAR-P41-48-009": {
+  "action": "apply",
+  "note": "ke/ki slip: ki tarah is a fixed postposition"
+ },
+ "UR-DEYAR-P41-48-012": {
+  "action": "hold",
+  "note": "drops a word; print not seen, other fixes possible"
+ },
+ "UR-DEYAR-P49-55-001": {
+  "action": "apply",
+  "note": "wrong look-alike word: jilau mein (in the retinue), not jalwa"
+ },
+ "UR-DEYAR-P49-55-003": {
+  "action": "hold",
+  "note": "singular/plural style; author's usage"
+ },
+ "UR-DEYAR-P49-55-005": {
+  "action": "hold",
+  "note": "added keh not required; spoken style"
+ },
+ "UR-DEYAR-P49-55-006": {
+  "action": "hold",
+  "note": "referent of woh ambiguous; number style"
+ },
+ "UR-DEYAR-P49-55-008": {
+  "action": "apply",
+  "note": "homophone slip ke/keh in Urdu verse"
+ },
+ "UR-DEYAR-P49-55-010": {
+  "action": "hold",
+  "note": "negation added; 'X aayi na Y' is a valid elliptical construction"
+ },
+ "UR-DEYAR-P49-55-011": {
+  "action": "apply",
+  "note": "dropped mein: maidan-e-Badr mein, only word that fits"
+ },
+ "UR-DEYAR003": {
+  "action": "apply",
+  "note": "homophone ke/keh: har chand keh"
+ },
+ "UR-DEYAR004": {
+  "action": "hold",
+  "note": "'fikr-e-farda na' is surely right, but proposal also adds zer marks and a comma; minimal form would be applicable"
+ },
+ "UR-HARMAIN-P01-08-004": {
+  "action": "apply",
+  "note": "honorific formula for plural: alaihimus-salam, as in the Arabic line just above"
+ },
+ "UR-HARMAIN-P01-08-005": {
+  "action": "apply",
+  "note": "word typed twice"
+ },
+ "UR-HARMAIN-P01-08-007": {
+  "action": "hold",
+  "note": "missing word could be mein or ne; not certain"
+ },
+ "UR-HARMAIN-P01-08-008": {
+  "action": "hold",
+  "note": "author's gender for (daro)madar, consistent in this book"
+ },
+ "UR-HARMAIN-P09-16-004": {
+  "action": "hold",
+  "note": "fix ambiguous (kehte hain / kehta hai), possible duplicate phrase"
+ },
+ "UR-HARMAIN-P09-16-005": {
+  "action": "hold",
+  "note": "tense reading uncertain"
+ },
+ "UR-HARMAIN-P09-16-006": {
+  "action": "hold",
+  "note": "word swap (rakhe/dekhe), meaning change, print not seen"
+ },
+ "UR-HARMAIN-P09-16-008": {
+  "action": "hold",
+  "note": "added auxiliary; translator's clipped style possible"
+ },
+ "UR-HARMAIN-P09-16-010": {
+  "action": "hold",
+  "note": "author's gender for madar, consistent in this book"
+ },
+ "UR-HARMAIN-P09-16-012": {
+  "action": "hold",
+  "note": "zahir/zahiran: other readings possible"
+ },
+ "UR-HARMAIN-P17-24-005": {
+  "action": "apply",
+  "note": "dropped se: isi wajh se, only word that fits"
+ },
+ "UR-HARMAIN-P17-24-008": {
+  "action": "hold",
+  "note": "this author's noun genders are non-standard throughout; gender usage"
+ },
+ "UR-HARMAIN-P17-24-009": {
+  "action": "hold",
+  "note": "author's gender for tatabbu"
+ },
+ "UR-HARMAIN-P17-24-010": {
+  "action": "hold",
+  "note": "Arabic vocalisation note; ba-kasr vs ba-zamm both possible readings"
+ },
+ "UR-HARMAIN-P17-24-011": {
+  "action": "hold",
+  "note": "ne/ke changes who grants; meaning change, print not seen"
+ },
+ "UR-HARMAIN-P17-24-012": {
+  "action": "apply",
+  "note": "diye hai impossible: dropped nasal (hain)"
+ },
+ "UR-HARMAIN-P17-24-013": {
+  "action": "apply",
+  "note": "phrase typed twice"
+ },
+ "UR-HARMAIN-P17-24-016": {
+  "action": "hold",
+  "note": "author's gender for hiss"
+ },
+ "UR-HARMAIN-P25-32-001": {
+  "action": "hold",
+  "note": "author's gender for baqa, consistent"
+ },
+ "UR-HARMAIN-P25-32-002": {
+  "action": "hold",
+  "note": "author's gender for baqa, consistent"
+ },
+ "UR-HARMAIN-P25-32-004": {
+  "action": "hold",
+  "note": "word swap (kitab/baat), meaning change"
+ },
+ "UR-HARMAIN-P25-32-005": {
+  "action": "apply",
+  "note": "look-alike t/hamza: muntaqil hue to zameen ro di"
+ },
+ "UR-HARMAIN-P25-32-013": {
+  "action": "apply",
+  "note": "honorific formula for a woman: anha"
+ },
+ "UR-HARMAIN-P25-32-018": {
+  "action": "hold",
+  "note": "author's usage (do wajh); style only"
+ },
+ "UR-HARMAIN-P33-36-004": {
+  "action": "apply",
+  "note": "spelling of the noun na-samjhi; no change of meaning"
+ },
+ "UR-HARMAIN-P33-36-005": {
+  "action": "hold",
+  "note": "gender agreement; author's usage, print not seen"
+ },
+ "UR-HARMAIN-P33-36-008": {
+  "action": "apply",
+  "note": "two words run together: us se ... bhaag"
+ },
+ "UR-HARMAIN-P37-40-001": {
+  "action": "hold",
+  "note": "added ne and comma; placement not certain"
+ },
+ "UR-HARMAIN-P37-40-002": {
+  "action": "hold",
+  "note": "apne/us ne reading uncertain"
+ },
+ "UR-HARMAIN-P37-40-003": {
+  "action": "hold",
+  "note": "added auxiliary; translator's style possible"
+ },
+ "UR-HARMAIN-P37-40-004": {
+  "action": "apply",
+  "note": "sentence typed twice"
+ },
+ "UR-HARMAIN-P41-44-003": {
+  "action": "apply",
+  "note": "garbled name; same page reads Husain bin Isa"
+ },
+ "UR-HARMAIN-P41-44-008": {
+  "action": "hold",
+  "note": "could be rahimahullah or rahmatullah alaih; two possible restorations"
+ },
+ "UR-HARMAIN-P41-44-009": {
+  "action": "apply",
+  "note": "garbled book title al-Yawaqit wal-Jawahir; given correctly on the next page"
+ },
+ "UR-HARMAIN-P41-44-010": {
+  "action": "apply",
+  "note": "dropped nasal: main zamin hoon"
+ },
+ "UR-HARMAIN-P41-44-013": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa (ye for alif maqsura); standard orthography"
+ },
+ "UR-HARMAIN-P45-48-003": {
+  "action": "apply",
+  "note": "dropped se: uloom-e-batiniya se ... muzayyan"
+ },
+ "UR-HARMAIN-P45-48-004": {
+  "action": "hold",
+  "note": "elliptical style possible; added word"
+ },
+ "UR-HARMAIN-P45-48-005": {
+  "action": "apply",
+  "note": "dropped letter in title: Sha'rani's Tabaqat al-Kubra, named in context"
+ },
+ "UR-HARMAIN-P45-48-006": {
+  "action": "apply",
+  "note": "phrase typed twice"
+ },
+ "UR-HARMAIN-P45-48-007": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa; standard orthography"
+ },
+ "UR-HARMAIN-P45-48-008": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa; standard orthography"
+ },
+ "UR-HARMAIN-P45-48-010": {
+  "action": "hold",
+  "note": "ke/wa reading uncertain"
+ },
+ "UR-HARMAIN-P49-52-002": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa; standard orthography"
+ },
+ "UR-HARMAIN-P49-52-004": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa; standard orthography"
+ },
+ "UR-HARMAIN-P49-52-006": {
+  "action": "hold",
+  "note": "singular/plural style; author's usage"
+ },
+ "UR-HARMAIN-P49-52-007": {
+  "action": "apply",
+  "note": "par doubled across the page break (previous page ends sooli par)"
+ },
+ "UR-HARMAIN-P49-52-009": {
+  "action": "apply",
+  "note": "look-alike m/w: wali-ullah, as on both sides in the same sentence"
+ },
+ "UR-HARMAIN-P49-52-012": {
+  "action": "apply",
+  "note": "word typed twice"
+ },
+ "UR-HARMAIN-P49-52-013": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa; standard orthography"
+ },
+ "UR-HARMAIN-P49-52-014": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa; standard orthography"
+ },
+ "UR-HARMAIN-P53-56-001": {
+  "action": "hold",
+  "note": "singular to plural rewrite; style"
+ },
+ "UR-HARMAIN-P53-56-002": {
+  "action": "hold",
+  "note": "added keh not required"
+ },
+ "UR-HARMAIN-P53-56-004": {
+  "action": "apply",
+  "note": "old spelling of singular fatwa; standard orthography"
+ },
+ "UR-HARMAIN-P53-56-008": {
+  "action": "apply",
+  "note": "look-alike t/q in title Qam' al-Mu'arid; given correctly on an earlier page"
+ },
+ "UR-HARMAIN-P53-56-009": {
+  "action": "hold",
+  "note": "drops a word; print not seen, author's slip possible"
+ },
+ "UR-HARMAIN-P61-64-001": {
+  "action": "apply",
+  "note": "is/in slip before plural farishton"
+ },
+ "UR-HARMAIN-P61-64-002": {
+  "action": "apply",
+  "note": "plural subject baatein, dropped nasal (hain)"
+ },
+ "UR-HARMAIN-P61-64-004": {
+  "action": "apply",
+  "note": "look-alike t/hamza: jo shakhs ... aaye use"
+ },
+ "UR-HARMAIN-P61-64-005": {
+  "action": "apply",
+  "note": "look-alike t/hamza: paida ho jaye to"
+ },
+ "UR-HARMAIN-P61-64-006": {
+  "action": "apply",
+  "note": "look-alike t/n: tajdid-e-bai'at karne ... ka mauqa"
+ },
+ "UR-HARMAIN-P65-68-002": {
+  "action": "hold",
+  "note": "the letter is the old date sign after the day number, not a stray"
+ },
+ "UR-HARMAIN-P65-68-004": {
+  "action": "hold",
+  "note": "infinitive agreement; author's usage"
+ },
+ "UR-HARMAIN-P65-68-005": {
+  "action": "hold",
+  "note": "accepted older oblique spelling with he"
+ },
+ "UR-HARMAIN-P69-72-001": {
+  "action": "hold",
+  "note": "author's gender for butlan"
+ },
+ "UR-HARMAIN-P73-76-002": {
+  "action": "hold",
+  "note": "verb form uncertain (thehro/thehrna)"
+ },
+ "UR-HARMAIN-P77-81-001": {
+  "action": "hold",
+  "note": "the letter is the old date sign after the day number, not a stray"
+ },
+ "UR-HARMAIN-P77-81-003": {
+  "action": "apply",
+  "note": "look-alike t/n: rawana hone se pehle"
+ },
+ "UR-HARMAIN-P77-81-005": {
+  "action": "apply",
+  "note": "look-alike t/hamza: khayal aaye to kyunkar (Urdu only)"
+ },
+ "UR-HAYYAT1-P001-016005": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT1-P035-046005": {
+  "action": "hold",
+  "note": "author's usage (ki zer-e-sarparasti)"
+ },
+ "UR-HAYYAT1-P035-046007": {
+  "action": "hold",
+  "note": "same spelling stands in print of vol. 2; editorial"
+ },
+ "UR-HAYYAT1-P063-079010": {
+  "action": "apply",
+  "note": "word typed twice (zindagi); number untouched"
+ },
+ "UR-HAYYAT1-P063-079011": {
+  "action": "apply",
+  "note": "homophone slip: nazar -> nazr"
+ },
+ "UR-HAYYAT1-P080-091003": {
+  "action": "hold",
+  "note": "gender given to madaarij, possibly author's"
+ },
+ "UR-HAYYAT1-P108-115003": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT1-P136-151010": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P152-159009": {
+  "action": "apply",
+  "note": "ki/ke slip: ke saath"
+ },
+ "UR-HAYYAT1-P184-191001": {
+  "action": "hold",
+  "note": "regional gender of naak in quoted speech"
+ },
+ "UR-HAYYAT1-P192-199012": {
+  "action": "apply",
+  "note": "dropped letter: minbar"
+ },
+ "UR-HAYYAT1-P208-215002": {
+  "action": "apply",
+  "note": "izafat orthography only"
+ },
+ "UR-HAYYAT1-P208-215004": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P216-223004": {
+  "action": "hold",
+  "note": "matma-e-nazar is a current variant"
+ },
+ "UR-HAYYAT1-P256-263010": {
+  "action": "hold",
+  "note": "author's usage; proposal breaks agreement with tha"
+ },
+ "UR-HAYYAT1-P256-263012": {
+  "action": "apply",
+  "note": "dropped o in ma-o-shuma"
+ },
+ "UR-HAYYAT1-P256-263013": {
+  "action": "hold",
+  "note": "author's usage (misaal aise hai)"
+ },
+ "UR-HAYYAT1-P272-279003": {
+  "action": "apply",
+  "note": "ke/ki slip: ki badaulat"
+ },
+ "UR-HAYYAT1-P272-279006": {
+  "action": "hold",
+  "note": "infinitive agreement, author's usage"
+ },
+ "UR-HAYYAT1-P296-303004": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P296-303007": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT1-P312-319005": {
+  "action": "apply",
+  "note": "dropped letter: waqia"
+ },
+ "UR-HAYYAT1-P328-335002": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P328-335003": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P328-335007": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P328-335015": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P336-343002": {
+  "action": "hold",
+  "note": "ke doosri taraf is common usage"
+ },
+ "UR-HAYYAT1-P352-359001": {
+  "action": "apply",
+  "note": "look-alike: arz kaha -> arz kiya"
+ },
+ "UR-HAYYAT1-P376-383001": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT1-P392-399008": {
+  "action": "hold",
+  "note": "reason asks for editor; author's usage"
+ },
+ "UR-HAYYAT1-P400-407001": {
+  "action": "hold",
+  "note": "author's usage (maktaba-e-fikr)"
+ },
+ "UR-HAYYAT1-P408-415004": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P416-423003": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P424-431005": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT1-P424-431007": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P424-431010": {
+  "action": "apply",
+  "note": "ke/ki slip: ki taraf"
+ },
+ "UR-HAYYAT1-P424-431011": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT1-P440-447010": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT1-P440-447013": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P440-447014": {
+  "action": "apply",
+  "note": "ke/ki slip: ki tabeer"
+ },
+ "UR-HAYYAT1-P448-455010": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P464-471017": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P480-487013": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT1-P488-495001": {
+  "action": "hold",
+  "note": "reason asks for editor; quoted speech"
+ },
+ "UR-HAYYAT1-P488-495013": {
+  "action": "hold",
+  "note": "izafat style; this book uses hamza form (cf. P208-215002)"
+ },
+ "UR-HAYYAT1-P512-519014": {
+  "action": "hold",
+  "note": "reason asks for editor"
+ },
+ "UR-HAYYAT1-P520-527002": {
+  "action": "hold",
+  "note": "dawa-e with hamza is a valid izafat form"
+ },
+ "UR-HAYYAT1-P544-551003": {
+  "action": "hold",
+  "note": "author's usage (qabil-e-deedni)"
+ },
+ "UR-HAYYAT1-P552-559004": {
+  "action": "hold",
+  "note": "izafat style; this book uses hamza form (cf. P208-215002)"
+ },
+ "UR-HAYYAT1-P560-567008": {
+  "action": "hold",
+  "note": "gender given to baqa in quoted speech"
+ },
+ "UR-HAYYAT1-P568-575004": {
+  "action": "hold",
+  "note": "reason asks for editor"
+ },
+ "UR-HAYYAT1-P576-583003": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT1-P576-583023": {
+  "action": "hold",
+  "note": "print reads as app; book title"
+ },
+ "UR-HAYYAT1-P576-583025": {
+  "action": "apply",
+  "note": "ke/ki slip: ki ilmi martabat"
+ },
+ "UR-HAYYAT1-P584-591005": {
+  "action": "hold",
+  "note": "agreement with jhalak, author's usage"
+ },
+ "UR-HAYYAT1-P584-591019": {
+  "action": "hold",
+  "note": "date without ko is acceptable style"
+ },
+ "UR-HAYYAT1-P592-599003": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT1-P592-599005": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT1-P592-599014": {
+  "action": "hold",
+  "note": "agreement by attraction, author's usage"
+ },
+ "UR-HAYYAT1-P600-607023": {
+  "action": "hold",
+  "note": "singular/plural; fix not unique"
+ },
+ "UR-HAYYAT1-P608-615003": {
+  "action": "apply",
+  "note": "standard orthography"
+ },
+ "UR-HAYYAT1-P616-623013": {
+  "action": "hold",
+  "note": "reason asks for editor; quoted speech"
+ },
+ "UR-HAYYAT1-P640-647002": {
+  "action": "hold",
+  "note": "print reads as app; name, editor pending"
+ },
+ "UR-HAYYAT1-P640-647003": {
+  "action": "hold",
+  "note": "print reads as app; name, editor pending"
+ },
+ "UR-HAYYAT1-P640-647007": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT1-P648-655012": {
+  "action": "hold",
+  "note": "infinitive agreement, author's usage"
+ },
+ "UR-HAYYAT1-P656-663005": {
+  "action": "hold",
+  "note": "infinitive agreement, author's usage"
+ },
+ "UR-HAYYAT1-P664-671001": {
+  "action": "apply",
+  "note": "stray ko (eye-skip from line above); only fix"
+ },
+ "UR-HAYYAT1-P664-671014": {
+  "action": "apply",
+  "note": "dropped ki"
+ },
+ "UR-HAYYAT1-P672-679003": {
+  "action": "hold",
+  "note": "print reads as app here; name, editor pending"
+ },
+ "UR-HAYYAT1-P672-679021": {
+  "action": "apply",
+  "note": "ke/ki slip: ki aankhon"
+ },
+ "UR-HAYYAT1-P680-687021": {
+  "action": "hold",
+  "note": "editor pending; proposal adds a word the print lacks"
+ },
+ "UR-HAYYAT1-P696-703006": {
+  "action": "hold",
+  "note": "gender given to manazil, author's usage"
+ },
+ "UR-HAYYAT1-P704-711005": {
+  "action": "hold",
+  "note": "singular/plural style in quoted text"
+ },
+ "UR-HAYYAT1-P704-711010": {
+  "action": "hold",
+  "note": "fix not unique (hai / rehta hai)"
+ },
+ "UR-HAYYAT2-P001-012-010": {
+  "action": "hold",
+  "note": "needs editor; proposal also drops the conjunction keh"
+ },
+ "UR-HAYYAT2-P001-012-011": {
+  "action": "hold",
+  "note": "handwriting reading needs editor"
+ },
+ "UR-HAYYAT2-P013-018-010": {
+  "action": "hold",
+  "note": "author's usage (mansab-e-jaleela)"
+ },
+ "UR-HAYYAT2-P013-018-019": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P023-026-008": {
+  "action": "hold",
+  "note": "gender given to manazil, author's usage"
+ },
+ "UR-HAYYAT2-P027-030-006": {
+  "action": "apply",
+  "note": "standard orthography (be-hosh), no negation change"
+ },
+ "UR-HAYYAT2-P035-038-002": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed (warna)"
+ },
+ "UR-HAYYAT2-P039-042-007": {
+  "action": "hold",
+  "note": "singular/plural; fix not unique, print not seen"
+ },
+ "UR-HAYYAT2-P043-046-010": {
+  "action": "hold",
+  "note": "reason asks for editor"
+ },
+ "UR-HAYYAT2-P051-054-002": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P051-054-012": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P055-058-012": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P059-062-009": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P063-066-018": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P067-070-024": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P075-078-002": {
+  "action": "hold",
+  "note": "print reads as app (doubled word is in the print)"
+ },
+ "UR-HAYYAT2-P075-078-003": {
+  "action": "hold",
+  "note": "print reads as app; author's usage"
+ },
+ "UR-HAYYAT2-P079-082-002": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P079-082-004": {
+  "action": "hold",
+  "note": "print reads as app (doubled ka is in the print)"
+ },
+ "UR-HAYYAT2-P079-082-005": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P099-102-007": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P099-102-013": {
+  "action": "apply",
+  "note": "print inspected, gap filled as printed"
+ },
+ "UR-HAYYAT2-P099-102-014": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P107-110-006": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT2-P111-114-001": {
+  "action": "apply",
+  "note": "print inspected: rahmatullah sign, not durood"
+ },
+ "UR-HAYYAT2-P111-114-029": {
+  "action": "apply",
+  "note": "homophone slip: nuqta -> nukta"
+ },
+ "UR-HAYYAT2-P115-118-038": {
+  "action": "hold",
+  "note": "apni can go with peshani; translated text"
+ },
+ "UR-HAYYAT2-P119-122-005": {
+  "action": "hold",
+  "note": "number change, print not seen"
+ },
+ "UR-HAYYAT2-P119-122-010": {
+  "action": "apply",
+  "note": "ki/ke swapped: ke zariye, ki islah"
+ },
+ "UR-HAYYAT2-P119-122-011": {
+  "action": "apply",
+  "note": "dropped ko before chahiye"
+ },
+ "UR-HAYYAT2-P123-126-003": {
+  "action": "hold",
+  "note": "se bar-aks is possible usage"
+ },
+ "UR-HAYYAT2-P123-126-004": {
+  "action": "hold",
+  "note": "agreement by attraction, author's usage"
+ },
+ "UR-HAYYAT2-P123-126-005": {
+  "action": "apply",
+  "note": "dropped letter in name; Ubaidullah Ahrar is the chapter's subject"
+ },
+ "UR-HAYYAT2-P127-130-009": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "UR-HAYYAT2-P135-138-009": {
+  "action": "hold",
+  "note": "honorific change, print reading not stated"
+ },
+ "UR-HAYYAT2-P139-142-005": {
+  "action": "hold",
+  "note": "apne zer-e-nageen is a valid reading; rewrite beyond need"
+ },
+ "UR-HAYYAT2-P139-142-006": {
+  "action": "apply",
+  "note": "print inspected, reads 877"
+ },
+ "UR-HAYYAT2-P139-142-017": {
+  "action": "hold",
+  "note": "omitted keh is normal spoken style"
+ },
+ "UR-HAYYAT2-P145-148-006": {
+  "action": "hold",
+  "note": "agreement with shakhsiyat, author's usage"
+ },
+ "UR-HAYYAT2-P145-148-008": {
+  "action": "apply",
+  "note": "stray nasal: likhin hain -> likhi hain, only one fix"
+ },
+ "UR-HAYYAT2-P145-148-009": {
+  "action": "hold",
+  "note": "'is' can go with 'satah'; possible as written"
+ },
+ "UR-HAYYAT2-P149-152-002": {
+  "action": "apply",
+  "note": "ya/ye slip: 'meri baal' cannot stand"
+ },
+ "UR-HAYYAT2-P149-152-004": {
+  "action": "apply",
+  "note": "ya/ye slip: 'bane hui the'"
+ },
+ "UR-HAYYAT2-P149-152-005": {
+  "action": "hold",
+  "note": "author's gender for the compound hiss-e-latafat"
+ },
+ "UR-HAYYAT2-P153-156-002": {
+  "action": "hold",
+  "note": "'ka' can agree with 'zamana'; possible as written"
+ },
+ "UR-HAYYAT2-P165-170-067": {
+  "action": "hold",
+  "note": "author's usage: invariant 'poora karna'"
+ },
+ "UR-HAYYAT2-P165-170-068": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-HAYYAT2-P165-170-072": {
+  "action": "hold",
+  "note": "verb may agree with singular 'aulad'; not certain"
+ },
+ "UR-HAYYAT2-P172-178-005": {
+  "action": "apply",
+  "note": "ya/ye slip: 'apni bhai' for a man"
+ },
+ "UR-HAYYAT2-P172-178-015": {
+  "action": "hold",
+  "note": "print reads as app; meaning change"
+ },
+ "UR-HAYYAT2-P172-178-016": {
+  "action": "hold",
+  "note": "author's gender for 'manazil'"
+ },
+ "UR-HAYYAT2-P177-RANGE-001": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-HAYYAT2-P177-RANGE-002": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-INTRO-004": {
+  "action": "apply",
+  "note": "garbled run-together: Apna TV channel, letter dropped"
+ },
+ "UR-INTRO-009": {
+  "action": "hold",
+  "note": "taste; re-punctuates; reason leaves it to author's intent"
+ },
+ "UR-INTRO-010": {
+  "action": "apply",
+  "note": "agreement slip, one fix (apne faislay)"
+ },
+ "UR-IRSHAAD-I-P001-010-003": {
+  "action": "hold",
+  "note": "older masculine treatment of Arabic plural possible"
+ },
+ "UR-IRSHAAD-I-P001-010-006": {
+  "action": "apply",
+  "note": "look-alike letters: hona for hota"
+ },
+ "UR-IRSHAAD-I-P011-014-005": {
+  "action": "hold",
+  "note": "sentence unclear; other readings possible (aage)"
+ },
+ "UR-IRSHAAD-I-P019-022-001": {
+  "action": "hold",
+  "note": "adds a word (baar/martaba); reason asks for original"
+ },
+ "UR-IRSHAAD-I-P019-022-002": {
+  "action": "hold",
+  "note": "'ke' may agree with halaat; possible as it stands"
+ },
+ "UR-IRSHAAD-I-P023-026-003": {
+  "action": "apply",
+  "note": "dropped 'ko', sentence broken"
+ },
+ "UR-IRSHAAD-I-P031-034-002": {
+  "action": "apply",
+  "note": "garbled word: ilqa kar ke (f/q look-alike, run together)"
+ },
+ "UR-IRSHAAD-I-P035-038-003": {
+  "action": "hold",
+  "note": "author's gender for ta'ayyun"
+ },
+ "UR-IRSHAAD-I-P039-042-005": {
+  "action": "hold",
+  "note": "meaning change, print not seen"
+ },
+ "UR-IRSHAAD-I-P039-042-007": {
+  "action": "apply",
+  "note": "non-word; karoron arbon is the only sensible reading"
+ },
+ "UR-IRSHAAD-I-P043-046-001": {
+  "action": "hold",
+  "note": "re-punctuates and rewords; reason asks for original"
+ },
+ "UR-IRSHAAD-I-P051-054-003": {
+  "action": "apply",
+  "note": "dropped 'se' (is se bhi ziyada)"
+ },
+ "UR-IRSHAAD-I-P055-058-006": {
+  "action": "hold",
+  "note": "more than one possible reading; reason asks for original"
+ },
+ "UR-IRSHAAD-I-P059-062-001": {
+  "action": "apply",
+  "note": "dropped 'kam' in kam az kam"
+ },
+ "UR-IRSHAAD-I-P063-066-003": {
+  "action": "hold",
+  "note": "meaning change; reason asks for original"
+ },
+ "UR-IRSHAAD-I-P071-074-001": {
+  "action": "hold",
+  "note": "possible in spoken Urdu; reason asks for original"
+ },
+ "UR-IRSHAAD2-005": {
+  "action": "hold",
+  "note": "author's agreement (with muhimmaat)"
+ },
+ "UR-IRSHAAD2-014": {
+  "action": "apply",
+  "note": "dropped 'liye'; same phrase intact in previous sentence"
+ },
+ "UR-IRSHAAD2-018": {
+  "action": "hold",
+  "note": "Arabic formula, reading not certain"
+ },
+ "UR-IRSHAAD2-021": {
+  "action": "hold",
+  "note": "adds a meaning word; could be another (muqarrar)"
+ },
+ "UR-IRSHAAD2-026": {
+  "action": "hold",
+  "note": "meaning change (whose), print not seen"
+ },
+ "UR-IRSHAAD2-031": {
+  "action": "apply",
+  "note": "stray word at page end (catchword): next page begins 'ki fikr'"
+ },
+ "UR-IRSHAAD2-033": {
+  "action": "hold",
+  "note": "Arabic term; proposal strips vowel marks beyond the slip"
+ },
+ "UR-IRSHAAD2-036": {
+  "action": "hold",
+  "note": "gender slip not a look-alike; may be spoken usage"
+ },
+ "UR-IRSHAAD2-043": {
+  "action": "hold",
+  "note": "second 'qalb' may be a garble of another word (baqi)"
+ },
+ "UR-IRSHAAD2-044": {
+  "action": "hold",
+  "note": "author's agreement (with libaas)"
+ },
+ "UR-IRSHAAD2-047": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-IRSHAAD2-050": {
+  "action": "hold",
+  "note": "reason says afkaar is meaningful; print not seen"
+ },
+ "UR-ISLAH-001": {
+  "action": "apply",
+  "note": "list label out of abjad sequence (after waw comes ze); same list labelled ze elsewhere in book"
+ },
+ "UR-ISLAH-002": {
+  "action": "hold",
+  "note": "author agrees with peshani; same wording in another booklet"
+ },
+ "UR-ISLAH-003": {
+  "action": "hold",
+  "note": "agreement may be with latifa; author's usage"
+ },
+ "UR-ISLAH-004": {
+  "action": "hold",
+  "note": "taste; adds comma; reason asks for original"
+ },
+ "UR-ISLAH-011": {
+  "action": "hold",
+  "note": "author's usage (ke baare without mein)"
+ },
+ "UR-ISLAH-012": {
+  "action": "apply",
+  "note": "wrong postposition: 'se saath' impossible, 'ke saath'"
+ },
+ "UR-KANOOZ-P118-121-004": {
+  "action": "hold",
+  "note": "infinitive agreement; author's usage"
+ },
+ "UR-KANOOZ-P122-125-002": {
+  "action": "hold",
+  "note": "ta'lim farmaya possible as a compound verb; author's usage"
+ },
+ "UR-KANOOZ-P122-125-004": {
+  "action": "hold",
+  "note": "infinitive agreement; author's usage"
+ },
+ "UR-KANOOZ-P126-129-002": {
+  "action": "hold",
+  "note": "word-order rewrite, matter of taste"
+ },
+ "UR-KANOOZ-P126-129-003": {
+  "action": "hold",
+  "note": "older spelling of emphatic inhi; author's usage"
+ },
+ "UR-KANOOZ-P130-133-003": {
+  "action": "apply",
+  "note": "homophone slip nazar/nazr: darya ki nazr hue"
+ },
+ "UR-KANOOZ-P138-141-001": {
+  "action": "hold",
+  "note": "khare ho kar used adverbially; author's usage"
+ },
+ "UR-KANOOZ-P138-141-002": {
+  "action": "hold",
+  "note": "infinitive agreement; author's usage"
+ },
+ "UR-KANOOZ-P146-149-001": {
+  "action": "hold",
+  "note": "rewrite, matter of taste"
+ },
+ "UR-KANOOZ-P146-149-002": {
+  "action": "apply",
+  "note": "he/do-chashmi he slip: gehre khuloos; ghire gives no sense"
+ },
+ "UR-KANOOZ-P15-18-001": {
+  "action": "hold",
+  "note": "rewrites more than the slip"
+ },
+ "UR-KANOOZ-P154-157-002": {
+  "action": "apply",
+  "note": "doubled plural marker: lagti hain"
+ },
+ "UR-KANOOZ-P19-22-002": {
+  "action": "apply",
+  "note": "honorific formula for a woman: alaihas-salam"
+ },
+ "UR-KANOOZ-P23-26-003": {
+  "action": "hold",
+  "note": "spoken usage: chaudah sadiyan baad"
+ },
+ "UR-KANOOZ-P31-34-001": {
+  "action": "hold",
+  "note": "drops a word; style"
+ },
+ "UR-KANOOZ-P35-38-001": {
+  "action": "apply",
+  "note": "doubled plural marker: kar li thin"
+ },
+ "UR-KANOOZ-P43-46-002": {
+  "action": "hold",
+  "note": "agreement with zaruratein; author's usage"
+ },
+ "UR-KANOOZ-P47-50-002": {
+  "action": "hold",
+  "note": "rewrite, matter of taste (reason says so)"
+ },
+ "UR-KANOOZ-P47-50-003": {
+  "action": "hold",
+  "note": "more than one possible fix"
+ },
+ "UR-KANOOZ-P59-62-001": {
+  "action": "apply",
+  "note": "doubled plural marker: hoti hain"
+ },
+ "UR-KANOOZ-P70-73-002": {
+  "action": "hold",
+  "note": "infinitive agreement; author's usage"
+ },
+ "UR-KANOOZ-P70-73-003": {
+  "action": "hold",
+  "note": "infinitive agreement; author's usage"
+ },
+ "UR-KANOOZ-P74-77-005": {
+  "action": "apply",
+  "note": "doubled plural marker: hoti hain"
+ },
+ "UR-KANOOZ-P94-97-003": {
+  "action": "hold",
+  "note": "older spelling of emphatic inhi; author's usage"
+ },
+ "UR-KANOOZ-P94-97-004": {
+  "action": "hold",
+  "note": "older spelling of emphatic inhi; author's usage"
+ },
+ "UR-KANOOZ-P94-97-005": {
+  "action": "hold",
+  "note": "added copula not required"
+ },
+ "UR-KANZ-P001-005-002": {
+  "action": "hold",
+  "note": "regional gender for mez"
+ },
+ "UR-KANZ-P001-005-003": {
+  "action": "hold",
+  "note": "author's gender for fuyooz o barakaat"
+ },
+ "UR-KANZ-P010-013006": {
+  "action": "apply",
+  "note": "dropped 'mein'; parallel phrase has it"
+ },
+ "UR-KANZ-P014-017006": {
+  "action": "hold",
+  "note": "both readings possible; reason asks for original"
+ },
+ "UR-KANZ-P014-017011": {
+  "action": "hold",
+  "note": "standardises case and adds comma; spoken style"
+ },
+ "UR-KANZ-P018-021001": {
+  "action": "hold",
+  "note": "author's usage; reason unsure"
+ },
+ "UR-KANZ-P026-029010": {
+  "action": "hold",
+  "note": "Qur'anic spelling of an Arabic phrase"
+ },
+ "UR-KANZ-P041-044008": {
+  "action": "hold",
+  "note": "author's usage; reason unsure"
+ },
+ "UR-KANZ-P049-053014": {
+  "action": "apply",
+  "note": "plural subject with hai: verb slip"
+ },
+ "UR-KANZ-P049-053015": {
+  "action": "apply",
+  "note": "plural subject with hai; plural verbs either side"
+ },
+ "UR-KANZ-P054-057003": {
+  "action": "apply",
+  "note": "singular subject with hain: verb slip"
+ },
+ "UR-KANZ-P054-057004": {
+  "action": "apply",
+  "note": "plural subject with hai: verb slip"
+ },
+ "UR-KANZ-P066-069002": {
+  "action": "apply",
+  "note": "hota for hoti with wus'at"
+ },
+ "UR-KANZ-P078-081002": {
+  "action": "hold",
+  "note": "adverbial 'itna'; same phrase recurs, author's usage"
+ },
+ "UR-KANZ-P082-085002": {
+  "action": "apply",
+  "note": "plural subject with hai: verb slip"
+ },
+ "UR-KANZ-P086-089001": {
+  "action": "apply",
+  "note": "kaise/kaisi slip with dunya"
+ },
+ "UR-KANZ-P086-089006": {
+  "action": "apply",
+  "note": "dropped 'ki' (paane ki koshish)"
+ },
+ "UR-KANZ-P100-103004": {
+  "action": "apply",
+  "note": "ke/ki slip with zindagi"
+ },
+ "UR-KANZ-P100-103007": {
+  "action": "apply",
+  "note": "ki/ke slip; parallel 'ke bhes' in context"
+ },
+ "UR-KANZ-P104-108008": {
+  "action": "apply",
+  "note": "apne/apni slip with pasand, copied from preceding phrase"
+ },
+ "UR-KANZ-P113-116002": {
+  "action": "apply",
+  "note": "standard spelling chahiyen"
+ },
+ "UR-KANZ-P113-116003": {
+  "action": "hold",
+  "note": "transliteration consistency only"
+ },
+ "UR-KANZ-P117-120005": {
+  "action": "apply",
+  "note": "ke/ki slip with sohbat"
+ },
+ "UR-KANZ-P117-120006": {
+  "action": "hold",
+  "note": "colloquial 'apna jaisa'; author's usage"
+ },
+ "UR-KANZ-P121-124004": {
+  "action": "apply",
+  "note": "standard form hoti hain"
+ },
+ "UR-KANZ-P125-128004": {
+  "action": "apply",
+  "note": "ke/ki slip with sohbat"
+ },
+ "UR-KANZ-P129-132026": {
+  "action": "hold",
+  "note": "more than one fix (naya / naye); context has unread marks"
+ },
+ "UR-KANZ-P137-140007": {
+  "action": "apply",
+  "note": "look-alike word: baryab needed (admittance), not bazyab"
+ },
+ "UR-KANZ-P137-140010": {
+  "action": "hold",
+  "note": "author's usage of ta'ayyun"
+ },
+ "UR-KANZ-P145-148003": {
+  "action": "hold",
+  "note": "meaning change, print not seen"
+ },
+ "UR-KANZ-P149-152005": {
+  "action": "hold",
+  "note": "accepted variant spelling"
+ },
+ "UR-KANZ-P153-156006": {
+  "action": "hold",
+  "note": "author's gender (follows the English gloss)"
+ },
+ "UR-KANZ-P157-160006": {
+  "action": "hold",
+  "note": "author's usage of ta'ayyun"
+ },
+ "UR-KANZ-P161-164003": {
+  "action": "hold",
+  "note": "reason asks for original"
+ },
+ "UR-KANZ-P165-168011": {
+  "action": "hold",
+  "note": "word swap; reason asks for original"
+ },
+ "UR-KANZ-P169-172006": {
+  "action": "hold",
+  "note": "meaning change, print not seen"
+ },
+ "UR-KANZ-P173-176007": {
+  "action": "apply",
+  "note": "gi/ge slip with aankhein"
+ },
+ "UR-KANZ-P173-176008": {
+  "action": "hold",
+  "note": "reason asks for original; other fixes possible"
+ },
+ "UR-KANZ-P185-188006": {
+  "action": "hold",
+  "note": "re-punctuates beyond the slip"
+ },
+ "UR-KANZ-P185-188013": {
+  "action": "hold",
+  "note": "re-punctuates beyond the slip"
+ },
+ "UR-KANZ-P205-208008": {
+  "action": "hold",
+  "note": "author's usage of ta'ayyun"
+ },
+ "UR-KANZ-P213-216003": {
+  "action": "hold",
+  "note": "meaning change, print not seen"
+ },
+ "UR-KANZ-P217-220008": {
+  "action": "apply",
+  "note": "chale for chali, copied from preceding clause"
+ },
+ "UR-KANZ-P229-232002": {
+  "action": "hold",
+  "note": "accepted older spelling; proposal leaves 'ka' unmatched"
+ },
+ "UR-KANZ-P229-232005": {
+  "action": "apply",
+  "note": "ki/ke slip with qurb, copied from preceding phrase"
+ },
+ "UR-KANZ-P241-244006": {
+  "action": "apply",
+  "note": "ke for ka: Allah ka qurb ... chahiye"
+ },
+ "UR-KANZ-P253-256001": {
+  "action": "hold",
+  "note": "two possible fixes (singular or plural)"
+ },
+ "UR-KANZ-P261-264003": {
+  "action": "apply",
+  "note": "apne/apni slip with aql"
+ },
+ "UR-KANZ-P261-264008": {
+  "action": "hold",
+  "note": "hamari may agree with tafreeq; possible as it stands"
+ },
+ "UR-KANZ-P261-264009": {
+  "action": "apply",
+  "note": "poore for poori, copied from preceding phrase"
+ },
+ "UR-LAIHA-003": {
+  "action": "hold",
+  "note": "rewrite for clarity; reason says not a transcription error"
+ },
+ "UR-LAIHA-004": {
+  "action": "hold",
+  "note": "adds explanatory words"
+ },
+ "UR-LAIHA-008": {
+  "action": "apply",
+  "note": "displaced word: 'sachche dil se' is the only sensible reading"
+ },
+ "UR-LAIHA-010": {
+  "action": "hold",
+  "note": "reordering for clarity, taste"
+ },
+ "UR-LATAIF-002": {
+  "action": "hold",
+  "note": "adds explanatory words"
+ },
+ "UR-LATAIF-003": {
+  "action": "hold",
+  "note": "author's gender for ta'ayyun"
+ },
+ "UR-LATAIF-004": {
+  "action": "hold",
+  "note": "term spelling variant; print not compared"
+ },
+ "UR-LATAIF-006": {
+  "action": "hold",
+  "note": "adds izafat/letter; author's usage"
+ },
+ "UR-LATAIF-007": {
+  "action": "hold",
+  "note": "author's usage (ke baare without mein)"
+ },
+ "UR-LATAIF-008": {
+  "action": "hold",
+  "note": "author's gender for ta'ayyun"
+ },
+ "UR-LATAIF-009": {
+  "action": "hold",
+  "note": "term spelling variant bundled with comma; print not compared"
+ },
+ "UR-LATAIF-010": {
+  "action": "hold",
+  "note": "adds izafat/letter; author's usage"
+ },
+ "UR-LATAIF-015": {
+  "action": "hold",
+  "note": "possible older genitive-object construction (us ke ... pahunchane)"
+ },
+ "UR-LATAIF-024": {
+  "action": "apply",
+  "note": "dropped 'ki': dil ki kaji"
+ },
+ "UR-LATAIF-026": {
+  "action": "hold",
+  "note": "gender given to amraaz; author's usage"
+ },
+ "UR-LATAIF-027": {
+  "action": "hold",
+  "note": "author's gender for ta'ayyun"
+ },
+ "UR-MAHAFIL-P017-020009": {
+  "action": "apply",
+  "note": "dropped 'hai'; parallel sentence just before"
+ },
+ "UR-MAHAFIL-P037-040006": {
+  "action": "apply",
+  "note": "standard form parhi hain"
+ },
+ "UR-MAHAFIL-P057-060017": {
+  "action": "hold",
+  "note": "second 'ka' belongs to the main text; bracket is a gloss"
+ },
+ "UR-MAHAFIL-P069-074013": {
+  "action": "apply",
+  "note": "ga for gi; noun feminine twice in context"
+ },
+ "UR-MAHAFIL-P079-082021": {
+  "action": "apply",
+  "note": "plural subject with hai: verb slip"
+ },
+ "UR-MAHAFIL-P079-082025": {
+  "action": "hold",
+  "note": "unchanged plural is older spelling; context garbled"
+ },
+ "UR-MAHAFIL-P091-094002": {
+  "action": "hold",
+  "note": "verb fix is right but adds a full stop"
+ },
+ "UR-MAHAFIL-P099-102002": {
+  "action": "hold",
+  "note": "adverbial 'itna'; same phrase recurs, author's usage"
+ },
+ "UR-MAHAFIL-P099-102003": {
+  "action": "hold",
+  "note": "'ke ain seedh mein' is possible usage"
+ },
+ "UR-MAHAFIL-P099-102005": {
+  "action": "hold",
+  "note": "re-punctuates; singular verb may be the author's"
+ },
+ "UR-MAHAFIL-P103-106003": {
+  "action": "apply",
+  "note": "dropped letter; parallel 'likha jaaye' both sides"
+ },
+ "UR-MAHAFIL-P107-110002": {
+  "action": "apply",
+  "note": "plural subject with hai: verb slip"
+ },
+ "UR-MAHAFIL-P107-110017": {
+  "action": "apply",
+  "note": "standard form aayi thin"
+ },
+ "UR-MAHAFIL-P119-122025": {
+  "action": "apply",
+  "note": "singular subject with hain: verb slip"
+ },
+ "UR-MAHAFIL-P123-126009": {
+  "action": "hold",
+  "note": "re-punctuates; 'tasweer' itself looks wrong (tasawwur)"
+ },
+ "UR-MAHAFIL-P123-126010": {
+  "action": "apply",
+  "note": "plural subject with hai; answer uses plural"
+ },
+ "UR-MAHAFIL-P131-134002": {
+  "action": "hold",
+  "note": "adverbial 'itna'; same phrase recurs, author's usage"
+ },
+ "UR-MAHAFIL-P139-142003": {
+  "action": "hold",
+  "note": "author's gender for amaliyaat"
+ },
+ "UR-MAHAFIL-P147-150001": {
+  "action": "apply",
+  "note": "rahun for rahein, copied from preceding 'hon ge'"
+ },
+ "UR-MAHAFIL-P159-162011": {
+  "action": "hold",
+  "note": "rak'at as unmarked plural; author's usage"
+ },
+ "UR-MAHAFIL-P163-166016": {
+  "action": "apply",
+  "note": "ke/ki slip with zaat"
+ },
+ "UR-MAHAFIL-P163-166018": {
+  "action": "apply",
+  "note": "two words run together (ke har)"
+ },
+ "UR-MAHAFIL-P167-170010": {
+  "action": "hold",
+  "note": "ghudood used as singular; author's usage"
+ },
+ "UR-MAHAFIL-P167-170011": {
+  "action": "hold",
+  "note": "ki may agree with kami; possible as it stands"
+ },
+ "UR-MAHAFIL-P175-178001": {
+  "action": "hold",
+  "note": "author's gender for sinn"
+ },
+ "UR-MAHAFIL-P175-178011": {
+  "action": "hold",
+  "note": "invariant 'dugna' is common usage"
+ },
+ "UR-MAK-P01-04-001": {
+  "action": "hold",
+  "note": "added word and comma; placement not certain"
+ },
+ "UR-MAK-P01-04-002": {
+  "action": "apply",
+  "note": "honorific formula restored: alaihir-rahmah"
+ },
+ "UR-MAK-P01-04-004": {
+  "action": "apply",
+  "note": "oblique required: apne ghar le gaye, only possible fix"
+ },
+ "UR-MAK-P01-04-005": {
+  "action": "hold",
+  "note": "author's gender for mata'"
+ },
+ "UR-MAK-P05-07-002": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P05-07-003": {
+  "action": "apply",
+  "note": "doubled plural marker: farmai hain"
+ },
+ "UR-MAK-P05-07-004": {
+  "action": "hold",
+  "note": "singular/plural style in author's letter"
+ },
+ "UR-MAK-P09-12-004": {
+  "action": "apply",
+  "note": "doubled plural marker: ki hain"
+ },
+ "UR-MAK-P101-104-004": {
+  "action": "apply",
+  "note": "salutation formula restored (wa rahmatullah)"
+ },
+ "UR-MAK-P109-112-002": {
+  "action": "apply",
+  "note": "dropped letter: pehluon"
+ },
+ "UR-MAK-P109-112-004": {
+  "action": "hold",
+  "note": "added postposition; reason calls it one possible fix"
+ },
+ "UR-MAK-P109-112-007": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P117-120-002": {
+  "action": "hold",
+  "note": "fix ambiguous (chali jaye gi / chala jaunga)"
+ },
+ "UR-MAK-P121-124-004": {
+  "action": "hold",
+  "note": "postposition choice in author's letter"
+ },
+ "UR-MAK-P121-124-006": {
+  "action": "apply",
+  "note": "spelling slip: subjunctive chahe (wants to), not chahiye"
+ },
+ "UR-MAK-P125-128-006": {
+  "action": "apply",
+  "note": "salutation formula restored (stray waw, rahmatullah)"
+ },
+ "UR-MAK-P129-132-001": {
+  "action": "hold",
+  "note": "ko/to likely but not certain; print not seen"
+ },
+ "UR-MAK-P129-132-003": {
+  "action": "hold",
+  "note": "word swap (wasta/wabasta); print not seen"
+ },
+ "UR-MAK-P13-16-004": {
+  "action": "hold",
+  "note": "word swap (laut/coat); reason asks for the original letter"
+ },
+ "UR-MAK-P137-140-002": {
+  "action": "apply",
+  "note": "spelling slip: subjunctive chahe (wants to), not chahiye"
+ },
+ "UR-MAK-P137-140-004": {
+  "action": "hold",
+  "note": "could be sakin or sakinin; two readings"
+ },
+ "UR-MAK-P137-140-005": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P137-140-007": {
+  "action": "apply",
+  "note": "garbled word: dar-ul-amal is the only reading against barzakh"
+ },
+ "UR-MAK-P137-140-009": {
+  "action": "apply",
+  "note": "doubled plural marker: likhi hui hain"
+ },
+ "UR-MAK-P141-144-003": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P141-144-004": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P145-149-001": {
+  "action": "apply",
+  "note": "salutation formula restored (stray waw, rahmatullah)"
+ },
+ "UR-MAK-P17-20-003": {
+  "action": "apply",
+  "note": "look-alike y/j: correlative jahan ... wahan hi"
+ },
+ "UR-MAK-P21-24-001": {
+  "action": "hold",
+  "note": "author's gender for ishtiyaq"
+ },
+ "UR-MAK-P21-24-006": {
+  "action": "apply",
+  "note": "spelling: wilayat, as earlier in the same paragraph"
+ },
+ "UR-MAK-P21-24-008": {
+  "action": "hold",
+  "note": "number style in author's letter"
+ },
+ "UR-MAK-P25-28-001": {
+  "action": "apply",
+  "note": "salutation formula restored (wa rahmatullahi wa barakatuh)"
+ },
+ "UR-MAK-P25-28-005": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P25-28-006": {
+  "action": "hold",
+  "note": "author's telegraphic letter style (ne omitted elsewhere too); print not seen"
+ },
+ "UR-MAK-P29-32-001": {
+  "action": "apply",
+  "note": "doubled plural marker: farmai hain"
+ },
+ "UR-MAK-P29-32-002": {
+  "action": "hold",
+  "note": "proper name of a bookshop; print not seen"
+ },
+ "UR-MAK-P29-32-009": {
+  "action": "hold",
+  "note": "author's telegraphic letter style; added word"
+ },
+ "UR-MAK-P33-36-003": {
+  "action": "hold",
+  "note": "word swap (ghar/khabar); reason asks for the original letter"
+ },
+ "UR-MAK-P45-48-001": {
+  "action": "hold",
+  "note": "gender in author's letter; author's usage"
+ },
+ "UR-MAK-P45-48-003": {
+  "action": "hold",
+  "note": "postposition choice; author's usage"
+ },
+ "UR-MAK-P45-48-005": {
+  "action": "hold",
+  "note": "place name; exact spelling not certain, print not seen"
+ },
+ "UR-MAK-P49-52-002": {
+  "action": "hold",
+  "note": "two possible fixes (mil ke / mil kar)"
+ },
+ "UR-MAK-P53-56-003": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P61-64-001": {
+  "action": "hold",
+  "note": "wahan wahan may be deliberate"
+ },
+ "UR-MAK-P69-72-001": {
+  "action": "hold",
+  "note": "accepted older oblique spelling with he (cf. chappa chappa mein beside it)"
+ },
+ "UR-MAK-P81-84-003": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P85-88-002": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P85-88-005": {
+  "action": "hold",
+  "note": "author's gender for daman"
+ },
+ "UR-MAK-P85-88-008": {
+  "action": "hold",
+  "note": "author's own letter; regional uninflected oblique"
+ },
+ "UR-MAK-P89-92-002": {
+  "action": "hold",
+  "note": "author's own letter; older oblique spelling"
+ },
+ "UR-NAQ-P101-104-005": {
+  "action": "apply",
+  "note": "gi/ge slip copied from preceding 'hon ge'"
+ },
+ "UR-NAQ-P101-104-007": {
+  "action": "hold",
+  "note": "reason asks for original; hai or ho both possible"
+ },
+ "UR-NAQ-P105-108-002": {
+  "action": "apply",
+  "note": "dropped 'bana'; sentence broken across paragraph, only word that fits"
+ },
+ "UR-NAQ-P105-108-003": {
+  "action": "hold",
+  "note": "spoken relative jis for plural; standardisation"
+ },
+ "UR-NAQ-P109-112-002": {
+  "action": "hold",
+  "note": "reason asks for original; rendering of an ayah"
+ },
+ "UR-NAQ-P113-116-003": {
+  "action": "hold",
+  "note": "'ke doosri taraf' is accepted usage (same pattern in context)"
+ },
+ "UR-NAQ-P113-116-006": {
+  "action": "hold",
+  "note": "spoken relative jis for plural; standardisation"
+ },
+ "UR-NAQ-P121-124-001": {
+  "action": "apply",
+  "note": "apna/apni slip with haisiyat, one fix"
+ },
+ "UR-NAQ-P125-128-004": {
+  "action": "apply",
+  "note": "stray letter: sakte for sake"
+ },
+ "UR-NAQ-P129-132-002": {
+  "action": "apply",
+  "note": "dropped 'mein' after oblique 'apne qaboo'"
+ },
+ "UR-NAQ-P137-140-002": {
+  "action": "hold",
+  "note": "agreement with predicate noun is possible; reason unsure"
+ },
+ "UR-NAQ-P145-148-002": {
+  "action": "apply",
+  "note": "homophone slip nukta/nuqta"
+ },
+ "UR-NAQ-P145-148-003": {
+  "action": "apply",
+  "note": "words transposed"
+ },
+ "UR-NAQ-P149-152-001": {
+  "action": "apply",
+  "note": "garbled word boundary; only sensible reading"
+ },
+ "UR-NAQ-P161-164-002": {
+  "action": "apply",
+  "note": "stray 'ko' after 'ke saamne'"
+ },
+ "UR-NAQ-P161-164-003": {
+  "action": "apply",
+  "note": "verb slip: taqseem ... hoti hai"
+ },
+ "UR-NAQ-P17-20-001": {
+  "action": "apply",
+  "note": "stray alif: sabat (permanence); isbat gives no sense"
+ },
+ "UR-NAQ-P17-20-002": {
+  "action": "hold",
+  "note": "fix ambiguous (drop hai, or chahte hi hain)"
+ },
+ "UR-NAQ-P177-180-003": {
+  "action": "apply",
+  "note": "dropped 'mein' (qaboo mein rakh)"
+ },
+ "UR-NAQ-P181-184-001": {
+  "action": "hold",
+  "note": "two possible fixes (farmate / farmaya karte)"
+ },
+ "UR-NAQ-P185-188-001": {
+  "action": "apply",
+  "note": "dropped 'hai' at sentence end"
+ },
+ "UR-NAQ-P189-192-005": {
+  "action": "apply",
+  "note": "rahe hain collapsed into rahein"
+ },
+ "UR-NAQ-P193-196-003": {
+  "action": "apply",
+  "note": "dropped 'hai' at sentence end"
+ },
+ "UR-NAQ-P201-204-002": {
+  "action": "hold",
+  "note": "reason asks for original; spoken agreement"
+ },
+ "UR-NAQ-P205-208-001": {
+  "action": "hold",
+  "note": "reason asks for original; other constructions possible"
+ },
+ "UR-NAQ-P209-212-001": {
+  "action": "apply",
+  "note": "compound verb slip likhein lein"
+ },
+ "UR-NAQ-P209-212-002": {
+  "action": "hold",
+  "note": "'ko' may be 'kal' rather than a stray word; not sure"
+ },
+ "UR-NAQ-P213-216-002": {
+  "action": "apply",
+  "note": "dropped 'ko' on the object, only word that fits"
+ },
+ "UR-NAQ-P217-220-001": {
+  "action": "hold",
+  "note": "'ne' may belong to the following clause; not sure"
+ },
+ "UR-NAQ-P217-220-003": {
+  "action": "apply",
+  "note": "stray 'ne' with subjunctive verb"
+ },
+ "UR-NAQ-P217-220-004": {
+  "action": "apply",
+  "note": "dropped 'kam' in kam az kam"
+ },
+ "UR-NAQ-P221-224-008": {
+  "action": "hold",
+  "note": "metaphor unclear; not sure which word is stray"
+ },
+ "UR-NAQ-P229-232-005": {
+  "action": "apply",
+  "note": "ka/ki slip with sehat (pair swapped with preceding clause)"
+ },
+ "UR-NAQ-P233-236-002": {
+  "action": "apply",
+  "note": "formula restored: Muhammad Rasool Allah"
+ },
+ "UR-NAQ-P241-244-002": {
+  "action": "apply",
+  "note": "sanwarti for sanwarne, copied from preceding verbs"
+ },
+ "UR-NAQ-P245-248-003": {
+  "action": "apply",
+  "note": "look-alike letters: jaaye for jaate"
+ },
+ "UR-NAQ-P245-248-004": {
+  "action": "hold",
+  "note": "possible sentence as it stands (tells the believer)"
+ },
+ "UR-NAQ-P249-252-003": {
+  "action": "hold",
+  "note": "agreement with nearest noun; singular/plural style"
+ },
+ "UR-NAQ-P253-256-002": {
+  "action": "apply",
+  "note": "look-alike in/is with singular amal"
+ },
+ "UR-NAQ-P253-256-003": {
+  "action": "hold",
+  "note": "reason unsure; hamari may go with shakl"
+ },
+ "UR-NAQ-P257-260-006": {
+  "action": "apply",
+  "note": "karte hai: verb slip, parallel 'hain' in context"
+ },
+ "UR-NAQ-P261-264-002": {
+  "action": "apply",
+  "note": "doubled letter"
+ },
+ "UR-NAQ-P269-272-002": {
+  "action": "apply",
+  "note": "doubled word"
+ },
+ "UR-NAQ-P289-292-002": {
+  "action": "hold",
+  "note": "singular/plural; reason asks for original"
+ },
+ "UR-NAQ-P301-304-001": {
+  "action": "apply",
+  "note": "formula restored: alhamdulillah"
+ },
+ "UR-NAQ-P301-304-002": {
+  "action": "apply",
+  "note": "dekho lo for dekh lo; correct form just before"
+ },
+ "UR-NAQ-P301-304-004": {
+  "action": "hold",
+  "note": "par or ko both possible; reason asks for original"
+ },
+ "UR-NAQ-P309-312-001": {
+  "action": "apply",
+  "note": "switch meant (masculine verb, light); dropped letter / standard spelling"
+ },
+ "UR-NAQ-P313-316-001": {
+  "action": "apply",
+  "note": "words transposed"
+ },
+ "UR-NAQ-P313-316-002": {
+  "action": "hold",
+  "note": "adds a meaning word; reason asks for original"
+ },
+ "UR-NAQ-P317-320-002": {
+  "action": "apply",
+  "note": "doubled word"
+ },
+ "UR-NAQ-P33-36-001": {
+  "action": "apply",
+  "note": "garbled non-word; faizan as in the sentence before"
+ },
+ "UR-NAQ-P37-40-002": {
+  "action": "hold",
+  "note": "ke can agree with tukre; possible as it stands"
+ },
+ "UR-NAQ-P49-52-005": {
+  "action": "apply",
+  "note": "dropped se: sab se ziyada"
+ },
+ "UR-NAQ-P57-60-001": {
+  "action": "apply",
+  "note": "'sau' dropped; same phrase on both sides in context"
+ },
+ "UR-NAQ-P57-60-002": {
+  "action": "apply",
+  "note": "ke/ki slip; noun takes feminine verbs in the preceding sentence"
+ },
+ "UR-NAQ-P61-64-002": {
+  "action": "hold",
+  "note": "more than one possible fix (ne / karne laga hun)"
+ },
+ "UR-NAQ-P65-68-004": {
+  "action": "apply",
+  "note": "hum ... hai: verb slip, one fix"
+ },
+ "UR-NAQ-P65-68-005": {
+  "action": "hold",
+  "note": "reason asks for original; wording change"
+ },
+ "UR-NAQ-P65-68-008": {
+  "action": "hold",
+  "note": "author's usage; reason unsure"
+ },
+ "UR-NAQ-P77-80-001": {
+  "action": "hold",
+  "note": "bracketed repeat may be editorial; not sure"
+ },
+ "UR-NAQ-P77-80-004": {
+  "action": "hold",
+  "note": "author's usage; a better word"
+ },
+ "UR-NAQ-P89-92-007": {
+  "action": "hold",
+  "note": "spoken relative jis for plural; standardisation"
+ },
+ "UR-NAQ-P97-100-004": {
+  "action": "apply",
+  "note": "gi/ge slip; parallel 'aayen gi' just before"
+ },
+ "UR-NISBAT-P013-021-036": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-NISBAT-P022-030-030": {
+  "action": "hold",
+  "note": "word order, taste"
+ },
+ "UR-NISBAT-P040-048-033": {
+  "action": "hold",
+  "note": "word order, taste"
+ },
+ "UR-NISBAT-P049-057-027": {
+  "action": "apply",
+  "note": "doubled 'keh'"
+ },
+ "UR-NISBAT-P067-074-002": {
+  "action": "hold",
+  "note": "author's usage: 'ke baare' without 'mein'"
+ },
+ "UR-NISBAT-P067-074-003": {
+  "action": "apply",
+  "note": "joined spelling written apart"
+ },
+ "UR-NISBAT-P083-090-004": {
+  "action": "hold",
+  "note": "author's choice of postposition"
+ },
+ "UR-NISBAT-P083-090-012": {
+  "action": "apply",
+  "note": "orthography and spacing only"
+ },
+ "UR-NISBAT-P111-117-020": {
+  "action": "hold",
+  "note": "rewrite, taste"
+ },
+ "UR-NISBAT-P125-131-040": {
+  "action": "hold",
+  "note": "author's usage: 'ke baare' without 'mein'"
+ },
+ "UR-NISBAT-P125-131-041": {
+  "action": "hold",
+  "note": "author's usage: 'ke baare' without 'mein'"
+ },
+ "UR-NISBAT-P132-138-039": {
+  "action": "hold",
+  "note": "author's usage: 'ke baare' without 'mein'"
+ },
+ "UR-NISBAT-P139-145-042": {
+  "action": "hold",
+  "note": "author's usage: 'ke baare' without 'mein'"
+ },
+ "UR-NISBAT-P146-152-017": {
+  "action": "hold",
+  "note": "possible as spoken"
+ },
+ "UR-NISBAT-P160-167-021": {
+  "action": "apply",
+  "note": "orthography and a list comma only"
+ },
+ "UR-NISBAT-P168-174-012": {
+  "action": "apply",
+  "note": "print inspected: lines lost at the page break restored"
+ },
+ "UR-NISBAT-P168-174-028": {
+  "action": "hold",
+  "note": "drops a word; possible as spoken"
+ },
+ "UR-NISBAT-P182-188-002": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-NISBAT-P273-277-007": {
+  "action": "apply",
+  "note": "honorific formula restored to standard form"
+ },
+ "UR-NISBAT-P278-285-004": {
+  "action": "apply",
+  "note": "honorific formula restored to standard form"
+ },
+ "UR-NISBAT-P278-285-009": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-NISBAT-P418-421-004": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-NISBAT-P490-493-002": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-NISBAT-P514-517-002": {
+  "action": "hold",
+  "note": "broken as it stands, but print unclear and an honorific sign is involved"
+ },
+ "UR-NISBAT-P526-529-001": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-NISBAT-P530-533-002": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-NISBAT-P534-537-003": {
+  "action": "hold",
+  "note": "print reads as app; rewrite"
+ },
+ "UR-NISBAT-P542-545-001": {
+  "action": "apply",
+  "note": "dropped dot: non-word 'ror' for 'zor'"
+ },
+ "UR-NISBAT-P542-545-005": {
+  "action": "hold",
+  "note": "doubled word, but print reads as app"
+ },
+ "UR-NISBAT-P546-549-005": {
+  "action": "hold",
+  "note": "author's gender for shan-e-nuzool"
+ },
+ "UR-NISBAT-P550-553-004": {
+  "action": "hold",
+  "note": "print reads as app"
+ },
+ "UR-NISBAT-P558-561-003": {
+  "action": "hold",
+  "note": "print reads as app; spoken repetition"
+ },
+ "UR-NISBAT-P562-565-001": {
+  "action": "hold",
+  "note": "re-punctuation and spelling style, taste"
+ },
+ "UR-NISBAT-P566-569-002": {
+  "action": "apply",
+  "note": "dropped nasal: plural subject"
+ },
+ "UR-NISBAT-P566-569-003": {
+  "action": "apply",
+  "note": "stray nasal: kin hain -> ki hain"
+ },
+ "UR-NISBAT-P570-573-003": {
+  "action": "hold",
+  "note": "print reads as app; rewrite"
+ },
+ "UR-NISBAT-P574-576-001": {
+  "action": "apply",
+  "note": "dropped nasal: plural subject"
+ },
+ "UR-PARDAH-001": {
+  "action": "hold",
+  "note": "more than one possible fix (full stop only / hai + full stop)"
+ },
+ "UR-PARDAH-007": {
+  "action": "apply",
+  "note": "garbled word: mubtala"
+ },
+ "UR-PARDAH-012": {
+  "action": "hold",
+  "note": "agreement by sense; quoted text"
+ },
+ "UR-PARDAH-021": {
+  "action": "apply",
+  "note": "dropped dot in name: Abu Bakr Jassas, the tafsir author quoted"
+ },
+ "UR-PARDAH-026": {
+  "action": "hold",
+  "note": "author gives haya masculine (twice in this book)"
+ },
+ "UR-PARDAH-032": {
+  "action": "hold",
+  "note": "drops words; spoken sentence structure"
+ },
+ "UR-PARDAH-033": {
+  "action": "hold",
+  "note": "variant spelling in use"
+ },
+ "UR-PARDAH-036": {
+  "action": "hold",
+  "note": "idiom swap, author's wording"
+ },
+ "UR-PARDAH-039": {
+  "action": "hold",
+  "note": "author gives haya masculine (twice in this book)"
+ },
+ "UR-PARDAH-041": {
+  "action": "hold",
+  "note": "infinitive agreement, author's usage"
+ },
+ "UR-PASANFAS-003": {
+  "action": "hold",
+  "note": "quoted letter; more than one possible fix (jawab/jawabaat)"
+ },
+ "UR-PASANFAS-004": {
+  "action": "hold",
+  "note": "stray letter may be remnant of 'aap'; print not seen"
+ },
+ "UR-PASANFAS-006": {
+  "action": "hold",
+  "note": "proper name supplied by inference"
+ },
+ "UR-PASANFAS-008": {
+  "action": "hold",
+  "note": "quoted fatwa; may be emphatic 'inhin'; not sure"
+ },
+ "UR-PASANFAS-010": {
+  "action": "hold",
+  "note": "quoted fatwa; word form is taste"
+ },
+ "UR-PASANFAS-011": {
+  "action": "apply",
+  "note": "homophone z slip in the name Zakariya; spelt correctly elsewhere in book"
+ },
+ "UR-PASANFAS-021": {
+  "action": "apply",
+  "note": "ungrammatical 'gayin hain' -> 'gayi hain', one fix"
+ },
+ "UR-PASANFAS-022": {
+  "action": "apply",
+  "note": "dropped 'mein': hudood mein rehte hue"
+ },
+ "UR-PASANFAS-029": {
+  "action": "apply",
+  "note": "number slip: one book, 'jis ki' follows"
+ },
+ "UR-PASANFAS-031": {
+  "action": "hold",
+  "note": "gender given to an Arabic plural in a quoted letter"
+ },
+ "UR-PASANFAS-032": {
+  "action": "hold",
+  "note": "garbled, reading not certain; quoted text"
+ },
+ "UR-PASANFAS-033": {
+  "action": "hold",
+  "note": "possible as it stands; quoted text"
+ },
+ "UR-PASANFAS-034": {
+  "action": "apply",
+  "note": "look-alike b/y: 'ma'mool bihi' is the set term, 'ma'mool yeh hai' leaves sentence broken"
+ },
+ "UR-PASANFAS-038": {
+  "action": "hold",
+  "note": "quoted older Urdu 'agar ... magar'; not certain"
+ },
+ "UR-PASANFAS-042": {
+  "action": "hold",
+  "note": "possible as it stands (ijaad-e-bid'at)"
+ },
+ "UR-PASANFAS-043": {
+  "action": "apply",
+  "note": "kehti/kehte slip, no feminine subject"
+ },
+ "UR-PASANFAS-044": {
+  "action": "hold",
+  "note": "more than one possible fix (hai / pas)"
+ },
+ "UR-PASANFAS-045": {
+  "action": "apply",
+  "note": "dropped letter: 'maakhooz az'"
+ },
+ "UR-PASANFAS-049": {
+  "action": "hold",
+  "note": "possible as it stands; quoted text"
+ },
+ "UR-PASANFAS-050": {
+  "action": "hold",
+  "note": "adds a connective; taste"
+ },
+ "UR-PASANFAS-053": {
+  "action": "apply",
+  "note": "'ke' for 'kahe' (verb needed, parallel to kare/rakhe); Urdu only"
+ },
+ "UR-PASANFAS-054": {
+  "action": "apply",
+  "note": "'ke' for 'kahe' (verb needed); Urdu only"
+ },
+ "UR-PASANFAS-055": {
+  "action": "apply",
+  "note": "look-alike d/w: adna harkat"
+ },
+ "UR-PASANFAS-057": {
+  "action": "apply",
+  "note": "stray alif: one person, 'Hazrat'"
+ },
+ "UR-PASANFAS-060": {
+  "action": "hold",
+  "note": "probably 'phir' but passage is garbled quoted old Urdu; print needed"
+ },
+ "UR-PASANFAS-061": {
+  "action": "hold",
+  "note": "not a simple stray letter; may be remnant of old imperative 'dijo'"
+ },
+ "UR-PASANFAS-067": {
+  "action": "hold",
+  "note": "possible as it stands; quoted text"
+ },
+ "UR-PASANFAS-068": {
+  "action": "hold",
+  "note": "ghalat-malat is a current colloquial variant"
+ },
+ "UR-PASANFAS-075": {
+  "action": "hold",
+  "note": "rewrite; reason says only a possible reading"
+ },
+ "UR-PASANFAS-076": {
+  "action": "hold",
+  "note": "proposal likely wrong: 'ko' is probably 'go' (although), paired with 'lekin'"
+ },
+ "UR-PASANFAS-079": {
+  "action": "hold",
+  "note": "older usage 'ka waqif'"
+ },
+ "UR-PASANFAS-080": {
+  "action": "apply",
+  "note": "garbled non-word: 'hamare mashaikh'"
+ },
+ "UR-PASANFAS-083": {
+  "action": "apply",
+  "note": "final ye slip: baghair ... hilaye"
+ },
+ "UR-PASANFAS-088": {
+  "action": "hold",
+  "note": "rewrite of quoted text"
+ },
+ "UR-PASANFAS-089": {
+  "action": "hold",
+  "note": "adds word and comma across a page break"
+ },
+ "UR-PASANFAS-091": {
+  "action": "hold",
+  "note": "singular/plural style; subject may be the zikr"
+ },
+ "UR-PASANFAS-095": {
+  "action": "apply",
+  "note": "dropped 'par': tab'i taur par"
+ },
+ "UR-PASANFAS-096": {
+  "action": "apply",
+  "note": "look-alike kar/keh: sentence needs 'keh'"
+ },
+ "UR-PASANFAS-099": {
+  "action": "apply",
+  "note": "ke/ki slip (haqiqat feminine)"
+ },
+ "UR-PASANFAS-100": {
+  "action": "hold",
+  "note": "adds words; possible as it stands"
+ },
+ "UR-PASANFAS-101": {
+  "action": "apply",
+  "note": "two final-ye slips: aise sahib-e-qalb ki nisbat"
+ },
+ "UR-RAMOOZ-003": {
+  "action": "hold",
+  "note": "print spelling: reason says book has it repeatedly"
+ },
+ "UR-RAMOOZ-004": {
+  "action": "hold",
+  "note": "print spelling: reason says book has it repeatedly"
+ },
+ "UR-RAMOOZ-005": {
+  "action": "hold",
+  "note": "print spelling: reason says book has it repeatedly"
+ },
+ "UR-RAMOOZ-006": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "UR-RAMOOZ-007": {
+  "action": "hold",
+  "note": "possible as it stands; adds a word"
+ },
+ "UR-RAMOOZ-008": {
+  "action": "hold",
+  "note": "meaning change: may mean the fifth latifa, not the five"
+ },
+ "UR-RAMOOZ-011": {
+  "action": "hold",
+  "note": "meaning change, print not seen"
+ },
+ "UR-RAMOOZ-013": {
+  "action": "hold",
+  "note": "adds negation; 'koi ... aur na hi' is an accepted construction"
+ },
+ "UR-RAMOOZ-015": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-RAMOOZ-017": {
+  "action": "apply",
+  "note": "number slip; 'nazar aati hain' for same subject in same sentence"
+ },
+ "UR-RAMOOZ-018": {
+  "action": "hold",
+  "note": "invariant 'khare ho kar' is the author's usage"
+ },
+ "UR-RAMOOZ-019": {
+  "action": "apply",
+  "note": "honorific formula restored (alaihim ajma'een)"
+ },
+ "UR-RAMOOZ-021": {
+  "action": "apply",
+  "note": "'rahe hai' impossible: rahe hain"
+ },
+ "UR-RAMOOZ-022": {
+  "action": "hold",
+  "note": "adds a word; print not seen"
+ },
+ "UR-RAMOOZ-023": {
+  "action": "hold",
+  "note": "agreement by sense (khabar with kaifiyaat)"
+ },
+ "UR-RAMOOZ-024": {
+  "action": "apply",
+  "note": "spelling: extra he in faqeeh"
+ },
+ "UR-RAMOOZ-028": {
+  "action": "hold",
+  "note": "book title, print not seen"
+ },
+ "UR-RAMOOZ-030": {
+  "action": "apply",
+  "note": "transposed letters in book title; author Ibn Qayyim named in the entry"
+ },
+ "UR-ROHANIYAT-001": {
+  "action": "hold",
+  "note": "repetition in a spoken question; which to drop is taste"
+ },
+ "UR-ROHANIYAT-002": {
+  "action": "hold",
+  "note": "infinitive agreement, author's usage"
+ },
+ "UR-ROHANIYAT-003": {
+  "action": "hold",
+  "note": "infinitive agreement, author's usage"
+ },
+ "UR-ROHANIYAT-011": {
+  "action": "apply",
+  "note": "word typed twice"
+ },
+ "UR-ROHANIYAT-014": {
+  "action": "hold",
+  "note": "author's agreement (with tawajjuh)"
+ },
+ "UR-ROHANIYAT-015": {
+  "action": "apply",
+  "note": "stray 'ka' picked up from next sentence; subject is rooh"
+ },
+ "UR-ROHANIYAT-018": {
+  "action": "apply",
+  "note": "ke/ki slip (khaak feminine)"
+ },
+ "UR-ROHANIYAT-019": {
+  "action": "apply",
+  "note": "ke/ki slip (daleel feminine)"
+ },
+ "UR-ROHANIYAT-022": {
+  "action": "hold",
+  "note": "reading not certain (saalik / saal)"
+ },
+ "UR-ROHANIYAT-023": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-ROHANIYAT-027": {
+  "action": "hold",
+  "note": "infinitive agreement, author's usage"
+ },
+ "UR-ROHANIYAT-035": {
+  "action": "apply",
+  "note": "gender slip; author uses reflection as feminine in same sentence and next"
+ },
+ "UR-ROHANIYAT-037": {
+  "action": "hold",
+  "note": "adds words"
+ },
+ "UR-ROHANIYAT-043": {
+  "action": "hold",
+  "note": "amaaraat recurs in these books; print not seen"
+ },
+ "UR-ROHANIYAT-046": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-ROHANIYAT-050": {
+  "action": "hold",
+  "note": "not certain; reason asks for original"
+ },
+ "UR-ROHANIYAT-051": {
+  "action": "hold",
+  "note": "agreement by sense (with tawajjuh)"
+ },
+ "UR-ROHANIYAT-052": {
+  "action": "apply",
+  "note": "transposed letters: batere"
+ },
+ "UR-ROHANIYAT-056": {
+  "action": "apply",
+  "note": "truncated honorific completed as in every other row of the list"
+ },
+ "UR-ROOH-002": {
+  "action": "hold",
+  "note": "proper name, print not seen"
+ },
+ "UR-ROOH-003": {
+  "action": "apply",
+  "note": "ke/ki slip (bunyaad feminine)"
+ },
+ "UR-ROOH-010": {
+  "action": "apply",
+  "note": "number slip; same sentence continues with 'hain' for same subject"
+ },
+ "UR-ROOH-011": {
+  "action": "hold",
+  "note": "author's gender for manazil (masculine throughout)"
+ },
+ "UR-ROOH-013": {
+  "action": "hold",
+  "note": "amaaraat recurs in these books; print not seen, not certain"
+ },
+ "UR-ROOH-014": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-ROOH-016": {
+  "action": "apply",
+  "note": "jin/jis slip; antecedent is one risala"
+ },
+ "UR-ROOH-017": {
+  "action": "hold",
+  "note": "singular/plural style in speech; also adds comma"
+ },
+ "UR-ROOH-018": {
+  "action": "apply",
+  "note": "ke/ki slip (zindagi feminine)"
+ },
+ "UR-ROOH-019": {
+  "action": "apply",
+  "note": "passage typed twice with a broken word; duplicate removed"
+ },
+ "UR-ROOH-020": {
+  "action": "apply",
+  "note": "waale/waala slip, one fix"
+ },
+ "UR-ROOH-023": {
+  "action": "hold",
+  "note": "not sure a word is missing; print not seen"
+ },
+ "UR-ROOH-024": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-ROOH-026": {
+  "action": "hold",
+  "note": "possible as it stands (matloob of the creation); meaning change"
+ },
+ "UR-ROOH-027": {
+  "action": "apply",
+  "note": "ke/ki slip (daleel feminine)"
+ },
+ "UR-ROOH-028": {
+  "action": "hold",
+  "note": "agreement by sense; more than one possible fix"
+ },
+ "UR-ROOH-029": {
+  "action": "hold",
+  "note": "'is ka nafi ho jana' is correct as it stands; only 'ke daleel'->'ki daleel' is warranted"
+ },
+ "UR-ROOH-034": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-ROOH-035": {
+  "action": "apply",
+  "note": "dropped letters: chaupaon translates al-an'am"
+ },
+ "UR-ROOH-036": {
+  "action": "hold",
+  "note": "more than one possible fix (samajh aur / samajh ki)"
+ },
+ "UR-SHAJARAH-012": {
+  "action": "hold",
+  "note": "author's gender for mi'raj"
+ },
+ "UR-SHAJARAH-017": {
+  "action": "apply",
+  "note": "CE sign contradicts 'Hijri' that follows; number unchanged"
+ },
+ "UR-SHAJARAH-019": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "UR-SHAJARAH-026": {
+  "action": "hold",
+  "note": "invariant 'khare ho kar' is the author's usage; subject unclear"
+ },
+ "UR-SHAJARAH-027": {
+  "action": "apply",
+  "note": "number slip: ta'daad ... hai"
+ },
+ "UR-SHAJARAH-029": {
+  "action": "hold",
+  "note": "author's gender for manazil"
+ },
+ "UR-SHAJARAH-030": {
+  "action": "apply",
+  "note": "aate/aati slip; 'saari barkaat' feminine in same sentence"
+ },
+ "UR-SHAJARAH-032": {
+  "action": "hold",
+  "note": "singular/plural style; reason unsure"
+ },
+ "UR-TALEMAAT-P001-006005": {
+  "action": "apply",
+  "note": "words transposed"
+ },
+ "UR-TALEMAAT-P001-006018": {
+  "action": "hold",
+  "note": "gender of sharait varies; re-punctuates"
+ },
+ "UR-TALEMAAT-P007-010008": {
+  "action": "apply",
+  "note": "plural object with hai: verb slip"
+ },
+ "UR-TALEMAAT-P007-010009": {
+  "action": "hold",
+  "note": "part of the change is gender standardisation (ke barakaat)"
+ },
+ "UR-TALEMAAT-P007-010010": {
+  "action": "hold",
+  "note": "redundant ka is possible spoken usage; drops a word"
+ },
+ "UR-TALEMAAT-P011-014005": {
+  "action": "apply",
+  "note": "standard formula ayat-e-karima, dropped letter"
+ },
+ "UR-TALEMAAT-P011-014006": {
+  "action": "hold",
+  "note": "two fixes possible (singular subject or plural verb); spoken style"
+ },
+ "UR-TALEMAAT-P015-018009": {
+  "action": "hold",
+  "note": "jab for tab is the author's spoken usage"
+ },
+ "UR-TALEMAAT-P015-018012": {
+  "action": "apply",
+  "note": "verb gender slip after feminine plural ayatein, one fix"
+ },
+ "UR-TALEMAAT-P015-018019": {
+  "action": "apply",
+  "note": "hai/hain number slip, plural subject"
+ },
+ "UR-TALEMAAT-P019-022001": {
+  "action": "hold",
+  "note": "two fixes possible (drop ko or change verb)"
+ },
+ "UR-TALEMAAT-P019-022002": {
+  "action": "apply",
+  "note": "hain/hai slip, singular infinitive subject"
+ },
+ "UR-TALEMAAT-P019-022003": {
+  "action": "apply",
+  "note": "hain/hai slip, singular subject"
+ },
+ "UR-TALEMAAT-P023-026002": {
+  "action": "apply",
+  "note": "ye/ya slip; mutalaa is masculine, one fix"
+ },
+ "UR-TALEMAAT-P035-038011": {
+  "action": "apply",
+  "note": "ga/gi slip after ki ziyadati; spacing"
+ },
+ "UR-TALEMAAT-P035-038012": {
+  "action": "apply",
+  "note": "hai/hain number slip, plural subject"
+ },
+ "UR-TALEMAAT-P039-042007": {
+  "action": "hold",
+  "note": "trailing spoken phrase; referent of ka unclear"
+ },
+ "UR-TALEMAAT-P047-050003": {
+  "action": "hold",
+  "note": "singular barabar hai is idiomatic; loose spoken rendering"
+ },
+ "UR-TALEMAAT-P047-050004": {
+  "action": "apply",
+  "note": "hai/hain slip; barkaat plural, plural verb just before"
+ },
+ "UR-TALEMAAT-P047-050008": {
+  "action": "hold",
+  "note": "verb agrees with predicate wasf; possible sentence"
+ },
+ "UR-TALEMAAT-P051-054015": {
+  "action": "apply",
+  "note": "dropped hai, sentence otherwise broken"
+ },
+ "UR-TALEMAAT-P051-054018": {
+  "action": "hold",
+  "note": "transposition is real but proposal re-punctuates; its trailing comma would double with the one already in the text"
+ },
+ "UR-TALEMAAT-P051-054020": {
+  "action": "hold",
+  "note": "author treats lagan as masculine (masculine adjectives follow)"
+ },
+ "UR-TALEMAAT-P055-060003": {
+  "action": "hold",
+  "note": "spoken ellipsis; adds word and comma"
+ },
+ "UR-TALEMAAT-P061-064006": {
+  "action": "apply",
+  "note": "word typed twice"
+ },
+ "UR-TALEMAAT-P061-064007": {
+  "action": "apply",
+  "note": "apne/apna slip; apna waqt in same sentence"
+ },
+ "UR-TALEMAAT-P061-064008": {
+  "action": "hold",
+  "note": "uninflected ka before oblique phrase is author's spoken usage"
+ },
+ "UR-TALEMAAT-P069-072009": {
+  "action": "apply",
+  "note": "transposed letters dunyawi; hai/hain number slip"
+ },
+ "UR-TALEMAAT-P069-072011": {
+  "action": "hold",
+  "note": "verb agrees with predicate sabab; possible sentence"
+ },
+ "UR-TALEMAAT-P073-076006": {
+  "action": "hold",
+  "note": "sentence mood unclear; more than one possible fix"
+ },
+ "UR-TALEMAAT-P073-076014": {
+  "action": "apply",
+  "note": "dropped par in bunyadi taur par"
+ },
+ "UR-TALEMAAT-P073-076019": {
+  "action": "hold",
+  "note": "singular with koi is author's style"
+ },
+ "UR-TALEMAAT-P073-076020": {
+  "action": "apply",
+  "note": "ye/ya slip; anasir masculine plural, one fix"
+ },
+ "UR-TALEMAAT-P077-080027": {
+  "action": "apply",
+  "note": "dropped ho, sentence otherwise broken"
+ },
+ "UR-TALEMAAT-P081-084006": {
+  "action": "apply",
+  "note": "hai/hain slip; warid hoti hain just before"
+ },
+ "UR-TALEMAAT-P081-084008": {
+  "action": "hold",
+  "note": "two fixes possible (barkat or plural verb); mimicked speech"
+ },
+ "UR-TALEMAAT-P081-084009": {
+  "action": "apply",
+  "note": "hai/hain number slip, plural subjects"
+ },
+ "UR-TALEMAAT-P081-084015": {
+  "action": "apply",
+  "note": "stray letter: tabdeeli for tabdeel"
+ },
+ "UR-TALEMAAT-P085-088003": {
+  "action": "hold",
+  "note": "two-word regendering; spoken agreement, jis se stays singular anyway"
+ },
+ "UR-TALEMAAT-P085-088013": {
+  "action": "apply",
+  "note": "doubled nasal, standard form farmai thin"
+ },
+ "UR-TALEMAAT-P089-092007": {
+  "action": "apply",
+  "note": "doubled nasal, standard form gai hain"
+ },
+ "UR-TALEMAAT-P089-092008": {
+  "action": "apply",
+  "note": "oblique plural required before ne, one fix"
+ },
+ "UR-TALEMAAT-P093-096012": {
+  "action": "apply",
+  "note": "karen/kare slip; singular subject, parallel kare"
+ },
+ "UR-TALEMAAT-P093-096015": {
+  "action": "apply",
+  "note": "dropped letter kamzori; comma separates the pairs"
+ },
+ "UR-TALEMAAT-P093-096021": {
+  "action": "apply",
+  "note": "wrong postposition ko for ki, one fix"
+ },
+ "UR-TALEMAAT-P097-100001": {
+  "action": "hold",
+  "note": "author's agreement; attraction to umoor possible"
+ },
+ "UR-TALEMAAT-P101-104001": {
+  "action": "apply",
+  "note": "ye/ya slip; hadd feminine, is hadd tak follows"
+ },
+ "UR-TALEMAAT-P109-114021": {
+  "action": "hold",
+  "note": "author treats eeza as masculine (recurs in another book)"
+ },
+ "UR-TALEMAAT-P123-126004": {
+  "action": "hold",
+  "note": "chih jaikeh keh is common author usage, not a transcription double"
+ },
+ "UR-TALEMAAT-P123-126009": {
+  "action": "apply",
+  "note": "hain/hai slip; singular har tarah ki qabahat"
+ },
+ "UR-TALEMAAT-P123-126012": {
+  "action": "apply",
+  "note": "gender slip; taalluq masculine, one fix"
+ },
+ "UR-TALEMAAT-P127-130005": {
+  "action": "hold",
+  "note": "hudood as masculine is established older usage"
+ },
+ "UR-TALEMAAT-P131-134003": {
+  "action": "hold",
+  "note": "verb agrees with predicate mojza; possible sentence"
+ },
+ "UR-TALEMAAT-P131-134004": {
+  "action": "apply",
+  "note": "hain/hai slip, singular subject"
+ },
+ "UR-TALEMAAT-P135-138002": {
+  "action": "apply",
+  "note": "dropped nasal; bat gain in same sentence"
+ },
+ "UR-TALEMAAT-P135-138006": {
+  "action": "hold",
+  "note": "adds ko that is not strictly required"
+ },
+ "UR-TALEMAAT-P135-138008": {
+  "action": "apply",
+  "note": "stray alif: karamat with singular verb; singular parallel earlier on page"
+ },
+ "UR-TALEMAAT-P135-138018": {
+  "action": "apply",
+  "note": "gender slip; parallel clauses all hota"
+ },
+ "UR-TALEMAAT-P139-142002": {
+  "action": "hold",
+  "note": "baqa as masculine recurs across books; author's gender"
+ },
+ "UR-TALEMAAT-P147-150006": {
+  "action": "hold",
+  "note": "two fixes possible (tajalli singular as in the Persian verse)"
+ },
+ "UR-TALEMAAT-P151-154001": {
+  "action": "hold",
+  "note": "multi-word verb change; speaker's loose agreement after a list"
+ },
+ "UR-TALEMAAT-P151-154007": {
+  "action": "apply",
+  "note": "hai/hain number slip, plural subject"
+ },
+ "UR-TALEMAAT-P151-154009": {
+  "action": "apply",
+  "note": "ye/ya slip: ajeeb si baat"
+ },
+ "UR-TALEMAAT-P159-162006": {
+  "action": "hold",
+  "note": "infinitive/participle agreement, author's usage"
+ },
+ "UR-TALEMAAT-P159-162009": {
+  "action": "apply",
+  "note": "dropped nasal, plural subject"
+ },
+ "UR-TALEMAAT-P159-162012": {
+  "action": "apply",
+  "note": "dropped nasal, plural subject"
+ },
+ "UR-TALEMAAT-P159-162013": {
+  "action": "apply",
+  "note": "garbled: awamir o nawahi"
+ },
+ "UR-TALEMAAT-P163-166002": {
+  "action": "apply",
+  "note": "hain/hai slip, singular subject"
+ },
+ "UR-TALEMAAT-P167-170007": {
+  "action": "apply",
+  "note": "stray nasal in a run of imperatives"
+ },
+ "UR-TALEMAAT-P179-182025": {
+  "action": "apply",
+  "note": "ya/ye slip: bane gi"
+ },
+ "UR-TALEMAAT-P183-186017": {
+  "action": "hold",
+  "note": "author treats lagan as masculine (three places)"
+ },
+ "UR-TALEMAAT-P183-186020": {
+  "action": "hold",
+  "note": "swaps a word; spoken construction"
+ },
+ "UR-TALEMAAT-P191-194010": {
+  "action": "apply",
+  "note": "hain/hai slip: ek hai"
+ },
+ "UR-TALEMAAT-P191-194022": {
+  "action": "hold",
+  "note": "adverbial jitna is acceptable"
+ },
+ "UR-TALEMAAT-P199-202001": {
+  "action": "hold",
+  "note": "two fixes possible (muashra singular or plural verb)"
+ },
+ "UR-TALEMAAT-P203-206005": {
+  "action": "apply",
+  "note": "dropped ki in neki ki taraf; parallel in context"
+ },
+ "UR-TALEMAAT-P207-210014": {
+  "action": "hold",
+  "note": "two fixes possible; author elsewhere says ka mani hota hai"
+ },
+ "UR-TALEMAAT-P219-222007": {
+  "action": "hold",
+  "note": "two fixes possible (jis ne or plural verb)"
+ },
+ "UR-TALEMAAT-P219-222010": {
+  "action": "apply",
+  "note": "hai/hain slip, plural honorific subject"
+ },
+ "UR-TALEMAAT-P223-226005": {
+  "action": "apply",
+  "note": "old spelling of emphatic unhi"
+ },
+ "UR-TALEMAAT-P231-234017": {
+  "action": "apply",
+  "note": "hain/hai slip, singular subject"
+ },
+ "UR-TALEMAAT-P235-238003": {
+  "action": "hold",
+  "note": "author treats lagan as masculine (three places)"
+ },
+ "UR-TALEMAAT-P235-238006": {
+  "action": "hold",
+  "note": "gender the author gives taamul"
+ },
+ "UR-TALEMAAT-P239-242004": {
+  "action": "apply",
+  "note": "dropped ka; sentence otherwise broken"
+ },
+ "UR-TALEMAAT-P239-242009": {
+  "action": "apply",
+  "note": "gender slip; ka jo haal shows masculine"
+ },
+ "UR-TALEMAAT-P243-246005": {
+  "action": "apply",
+  "note": "number slip; plural object tees pare, one fix"
+ },
+ "UR-TALEMAAT-P243-246011": {
+  "action": "apply",
+  "note": "hai/hain number slip, plural subject"
+ },
+ "UR-TALEMAAT-P247-250016": {
+  "action": "hold",
+  "note": "text is correct as it stands: un se ... baat manwana"
+ },
+ "UR-TALEMAAT-P255-258004": {
+  "action": "apply",
+  "note": "wrong postposition ne for ke after baghair"
+ },
+ "UR-TALEMAAT-P255-258012": {
+  "action": "apply",
+  "note": "ye/ya slip; zindagi feminine"
+ },
+ "UR-TALEMAAT-P255-258013": {
+  "action": "apply",
+  "note": "ye/ya slip; parallel apni series"
+ },
+ "UR-TALEMAAT-P259-262005": {
+  "action": "apply",
+  "note": "hai/hain number slip, plural subject"
+ },
+ "UR-TALEMAAT-P259-262019": {
+  "action": "apply",
+  "note": "hai/hain number slip, plural subject"
+ },
+ "UR-TALEMAAT-P267-270014": {
+  "action": "apply",
+  "note": "misspelt nahin"
+ },
+ "UR-TALEMAAT-P267-270018": {
+  "action": "apply",
+  "note": "hai/hain slip; maujood hon follows"
+ },
+ "UR-TALEMAAT-P271-274006": {
+  "action": "apply",
+  "note": "look-alike ko for keh"
+ },
+ "UR-TALEMAAT-P275-278006": {
+  "action": "hold",
+  "note": "surrounding sentence is garbled; cannot be sure of the reading"
+ },
+ "UR-TALEMAAT-P275-278008": {
+  "action": "apply",
+  "note": "stray letter; parallel na kare"
+ },
+ "UR-TALEMAAT-P283-286011": {
+  "action": "hold",
+  "note": "shart yeh keh ellipsis is idiomatic"
+ },
+ "UR-TALEMAAT-P283-286013": {
+  "action": "apply",
+  "note": "ye/ya slip; arwah feminine elsewhere in the book"
+ },
+ "UR-TALEMAAT-P283-286014": {
+  "action": "apply",
+  "note": "number slip; singular mafhoom, parallel ikhtiyar kiya"
+ },
+ "UR-TALEMAAT-P287-290001": {
+  "action": "apply",
+  "note": "dropped nasal; plural, parallel aflak hon"
+ },
+ "UR-TALEMAAT-P291-294017": {
+  "action": "hold",
+  "note": "keh is optional in speech"
+ },
+ "UR-TALEMAAT-P295-298006": {
+  "action": "apply",
+  "note": "look-alike ke for ko; verb needs its object"
+ },
+ "UR-TALEMAAT-P295-298008": {
+  "action": "apply",
+  "note": "hai/hain slip; ho jati hain follows"
+ },
+ "UR-TALEMAAT-P295-298013": {
+  "action": "hold",
+  "note": "subject may lie before the context; two-verb change"
+ },
+ "UR-TALEMAAT-P299-302004": {
+  "action": "apply",
+  "note": "dropped nasal, plural subject"
+ },
+ "UR-TALEMAAT-P299-302017": {
+  "action": "apply",
+  "note": "wrong look-alike word nuzool for nazil"
+ },
+ "UR-TALEMAAT-P299-302027": {
+  "action": "hold",
+  "note": "verb agrees with nearest noun ilm; possible sentence"
+ },
+ "UR-TALEMAAT-P303-306012": {
+  "action": "apply",
+  "note": "hain/hai slip, singular subject"
+ },
+ "UR-TALEMAAT-P303-306017": {
+  "action": "hold",
+  "note": "more than one possible reading (raza, talab / raza-talabi)"
+ },
+ "UR-TALEMAAT-P307-310002": {
+  "action": "apply",
+  "note": "ye/ya slip; ki baqa in same sentence"
+ },
+ "UR-TALEMAAT-P307-310009": {
+  "action": "hold",
+  "note": "two fixes possible (kashishen plural in a plural series)"
+ },
+ "UR-TALEMAAT-P311-314001": {
+  "action": "hold",
+  "note": "spoken ellipsis; adds a word"
+ },
+ "UR-TALEMAAT-P311-314004": {
+  "action": "apply",
+  "note": "look-alike letter: hue, parallel phrases"
+ },
+ "UR-TALEMAAT-P311-314006": {
+  "action": "apply",
+  "note": "ye/ya slip; khetiyan feminine plural"
+ },
+ "UR-TALEMAAT-P315-318003": {
+  "action": "apply",
+  "note": "hain/hai slip, singular dawam"
+ },
+ "UR-TALEMAAT-P319-322012": {
+  "action": "hold",
+  "note": "copula agrees with predicate zariya; possible sentence"
+ },
+ "UR-TALEMAAT-P327-330008": {
+  "action": "apply",
+  "note": "number slip; ka koi muahida is singular"
+ },
+ "UR-TALEMAAT-P327-330015": {
+  "action": "hold",
+  "note": "author uses munafa as singular (common usage)"
+ },
+ "UR-TALEMAAT-P331-334008": {
+  "action": "apply",
+  "note": "ye/ya slip: bohat si cheezon"
+ },
+ "UR-TALEMAAT-P331-334016": {
+  "action": "hold",
+  "note": "two readings possible (is se [pehle]); meaning"
+ },
+ "UR-TALEMAAT-P335-338014": {
+  "action": "hold",
+  "note": "gender the author gives parhez; multi-word change"
+ },
+ "UR-TAREEQ-P001-010-092": {
+  "action": "hold",
+  "note": "print reads as app (editorial correction)"
+ },
+ "UR-TAREEQ-P001-010-094": {
+  "action": "apply",
+  "note": "print inspected, reads as proposed"
+ },
+ "UR-TAREEQ-P011-018-086": {
+  "action": "hold",
+  "note": "drops a word; author's redundancy"
+ },
+ "UR-TAREEQ-P023-027-001": {
+  "action": "apply",
+  "note": "standard oblique spelling, same word"
+ },
+ "UR-TAREEQ-P023-027-005": {
+  "action": "apply",
+  "note": "homophone slip nuqta/nukta"
+ },
+ "UR-TAREEQ-P023-027-011": {
+  "action": "hold",
+  "note": "word-order rewrite; print not shown to differ"
+ },
+ "UR-TAREEQ-P023-027-016": {
+  "action": "hold",
+  "note": "hadith translation; editor asked to decide"
+ },
+ "UR-TAREEQ-P023-027-021": {
+  "action": "hold",
+  "note": "author's usage ('arz ki' is current)"
+ },
+ "UR-TAREEQ-P023-027-025": {
+  "action": "apply",
+  "note": "dropped nasal: plural feminine subject needs 'thin'"
+ },
+ "UR-TAREEQ-P023-027-035": {
+  "action": "apply",
+  "note": "transposed letters, non-word; Mujaddid named in same sentence"
+ },
+ "UR-TAREEQ-P028-032-016": {
+  "action": "hold",
+  "note": "author's usage: uninflected 'chhutkara'"
+ },
+ "UR-TAREEQ-P028-032-019": {
+  "action": "hold",
+  "note": "book title, a real word as it stands; print reading not given"
+ },
+ "UR-TAREEQ-P033-037-006": {
+  "action": "apply",
+  "note": "stray waw in the known title Awarif al-Ma'arif"
+ },
+ "UR-TAREEQ-P033-037-056": {
+  "action": "hold",
+  "note": "valid as written ('ke ... kaam aana'); Qur'an translation"
+ },
+ "UR-TAREEQ-P038-042-013": {
+  "action": "apply",
+  "note": "look-alike slip: 'ek taraf ... doosri taraf'"
+ },
+ "UR-TAREEQ-P038-042-025": {
+  "action": "apply",
+  "note": "wrong look-alike word; Arabic beside it has yatadabbarun"
+ },
+ "UR-TAREEQ-P038-042-032": {
+  "action": "hold",
+  "note": "drops a word in a quoted saying; possible as written"
+ },
+ "UR-TAREEQ-P043-047-007": {
+  "action": "hold",
+  "note": "'ke' can go with 'marakiz'; possible as written"
+ },
+ "UR-TAREEQ-P043-047-014": {
+  "action": "hold",
+  "note": "author's gender for 'manazil'"
+ },
+ "UR-TAREEQ-P043-047-022": {
+  "action": "apply",
+  "note": "homophone slip nuqta/nukta"
+ },
+ "UR-TAREEQ-P043-047-025": {
+  "action": "hold",
+  "note": "author's usage; rewrite of number and gender"
+ },
+ "UR-TAREEQ-P043-047-038": {
+  "action": "hold",
+  "note": "one real word swapped for another; print not seen"
+ },
+ "UR-TAREEQ-P048-052-005": {
+  "action": "hold",
+  "note": "drops a word in a quotation; not certain"
+ },
+ "UR-TAREEQ-P048-052-031": {
+  "action": "apply",
+  "note": "dal/re slip, non-word; title cited correctly elsewhere in book"
+ },
+ "UR-TAREEQ-P048-052-038": {
+  "action": "apply",
+  "note": "doubled word"
+ },
+ "UR-TAREEQ-P053-057-009": {
+  "action": "hold",
+  "note": "possible as written; quoted passage"
+ },
+ "UR-TAREEQ-P053-057-010": {
+  "action": "apply",
+  "note": "homophone slip nuqta/nukta"
+ },
+ "UR-TAREEQ-P053-057-016": {
+  "action": "hold",
+  "note": "author's usage ('arz ki' is current)"
+ },
+ "UR-TAREEQ-P053-057-035": {
+  "action": "hold",
+  "note": "author's gender for 'imaniyat' (repeated elsewhere)"
+ },
+ "UR-TAREEQ-P063-067-005": {
+  "action": "apply",
+  "note": "dropped letter in title; correct on same page"
+ },
+ "UR-TAREEQ-P068-072-008": {
+  "action": "hold",
+  "note": "antecedent unclear; not certain"
+ },
+ "UR-TAREEQ-P068-072-034": {
+  "action": "apply",
+  "note": "dropped letter in Arabic plural"
+ },
+ "UR-TAREEQ-P068-072-039": {
+  "action": "apply",
+  "note": "doubled word"
+ },
+ "UR-TAREEQ-P073-077-004": {
+  "action": "hold",
+  "note": "'ke' can go with 'noor'; possible as written"
+ },
+ "UR-TAREEQ-P073-077-039": {
+  "action": "hold",
+  "note": "accepted variant spelling of a name"
+ },
+ "UR-TAREEQ-P073-077-042": {
+  "action": "hold",
+  "note": "print reads as app; meaning change"
+ },
+ "UR-TAREEQ-P078-082-003": {
+  "action": "hold",
+  "note": "probable but not certain; editor asked to decide"
+ },
+ "UR-TAREEQ-P078-082-011": {
+  "action": "apply",
+  "note": "garbled 'subhanahu' (non-word); proposal also adds an izafat zer"
+ },
+ "UR-TAREEQ-P078-082-016": {
+  "action": "hold",
+  "note": "title/author reference; possible as written"
+ },
+ "UR-TAREEQ-P078-082-025": {
+  "action": "apply",
+  "note": "stray waw; next line has the phrase correctly"
+ },
+ "UR-TAREEQ-P078-082-030": {
+  "action": "hold",
+  "note": "author treats 'aasteen' as masculine throughout the phrase"
+ },
+ "UR-TAREEQ-P078-082-037": {
+  "action": "apply",
+  "note": "dropped waw; same pair written with it just before"
+ },
+ "UR-TAREEQ-P083-087-009": {
+  "action": "hold",
+  "note": "spoken text; original asked for"
+ },
+ "UR-TAREEQ-P083-087-017": {
+  "action": "hold",
+  "note": "meaning change; original asked for"
+ },
+ "UR-TAREEQ-P083-087-022": {
+  "action": "hold",
+  "note": "accepted variant spelling"
+ },
+ "UR-TAREEQ-P088-092-022": {
+  "action": "apply",
+  "note": "dropped letter in title; correct elsewhere on page"
+ },
+ "UR-TAREEQ-P088-092-029": {
+  "action": "hold",
+  "note": "printer's spelling of the same word; not a slip"
+ },
+ "UR-TAREEQ-P093-097-005": {
+  "action": "hold",
+  "note": "possible as written (Arabic plural khabatha)"
+ },
+ "UR-TAREEQ-P093-097-019": {
+  "action": "apply",
+  "note": "dropped letter in title; correct elsewhere on page"
+ },
+ "UR-TAREEQ-P093-097-029": {
+  "action": "hold",
+  "note": "author's gender for 'chiraghan'"
+ },
+ "UR-TAREEQ-P098-102-041": {
+  "action": "apply",
+  "note": "look-alike slip baat/baar after 'doosri dafa'; proposal also adds an izafat zer"
+ },
+ "UR-TAREEQ-P098-102-042": {
+  "action": "hold",
+  "note": "author's gender for 'manazil'"
+ },
+ "UR-TAREEQ-P103-107-040": {
+  "action": "apply",
+  "note": "stray waw in the known title Awarif al-Ma'arif"
+ },
+ "UR-TAREEQ-P103-107-046": {
+  "action": "apply",
+  "note": "heh orthography only"
+ },
+ "UR-TAREEQ-P108-112-006": {
+  "action": "apply",
+  "note": "dropped 'se'; heading and next sentence have it"
+ },
+ "UR-TAREEQ-P108-112-010": {
+  "action": "apply",
+  "note": "dropped nasal: plural subject, plural verbs follow"
+ },
+ "UR-TAREEQ-P108-112-011": {
+  "action": "apply",
+  "note": "dropped nasal: plural subject"
+ },
+ "UR-TAREEQ-P108-112-013": {
+  "action": "apply",
+  "note": "homophone-letter misspelling of the prophet's name"
+ },
+ "UR-TAREEQ-P108-112-014": {
+  "action": "apply",
+  "note": "dropped 'ki'; sentence broken without it"
+ },
+ "UR-TAREEQ-P108-112-015": {
+  "action": "apply",
+  "note": "ya/ye slip: 'dunya ki ek sire'"
+ },
+ "UR-TAREEQ-P108-112-029": {
+  "action": "hold",
+  "note": "author's agreement by attraction; rewrite"
+ },
+ "UR-TAREEQ-P108-112-032": {
+  "action": "apply",
+  "note": "standard oblique spelling, same word"
+ },
+ "UR-TAREEQ-P108-112-037": {
+  "action": "apply",
+  "note": "wrong postposition run into next word; only 'ke' fits"
+ },
+ "UR-TAREEQ-P113-117-011": {
+  "action": "apply",
+  "note": "dropped 'ki' in heading; only fit"
+ },
+ "UR-TAREEQ-P113-117-016": {
+  "action": "hold",
+  "note": "may be plural 'galle' in older spelling; not certain"
+ },
+ "UR-TAREEQ-P113-117-024": {
+  "action": "apply",
+  "note": "dropped 'kar' after 'zikr'; sentence broken without it"
+ },
+ "UR-TAREEQ-P113-117-048": {
+  "action": "hold",
+  "note": "two possible fixes; not certain"
+ },
+ "UR-TAREEQ-P113-117-054": {
+  "action": "apply",
+  "note": "dropped word; sentence broken, only 'for' fits"
+ },
+ "UR-TAREEQ-P113-117-067": {
+  "action": "apply",
+  "note": "dropped nasal: plural subject"
+ },
+ "UR-TAREEQ-P118-122-007": {
+  "action": "apply",
+  "note": "broken verb 'karte hai'; context is singular"
+ },
+ "UR-TAREEQ-P118-122-009": {
+  "action": "apply",
+  "note": "dropped 'ke'; sentence broken without it"
+ },
+ "UR-TAREEQ-P118-122-012": {
+  "action": "hold",
+  "note": "subjunctive 'hon' possible as written"
+ },
+ "UR-TAREEQ-P118-122-017": {
+  "action": "apply",
+  "note": "dropped initial alif in title; correct elsewhere"
+ },
+ "UR-TAREEQ-P123-125-019": {
+  "action": "apply",
+  "note": "orthography only"
+ },
+ "UR-TAREEQ-P126-130-017": {
+  "action": "apply",
+  "note": "orthography only (heh form)"
+ },
+ "UR-TAREEQ-P126-130-018": {
+  "action": "apply",
+  "note": "orthography only (heh form)"
+ },
+ "UR-TAREEQ-P131-135-005": {
+  "action": "hold",
+  "note": "author's usage: plural verb with collective 'lashkar'"
+ },
+ "UR-TAREEQ-P131-135-018": {
+  "action": "apply",
+  "note": "dropped letter in title; correct elsewhere"
+ },
+ "UR-TAREEQ-P136-140-045": {
+  "action": "apply",
+  "note": "orthography only (heh forms, oblique spelling)"
+ },
+ "UR-TAREEQ-P166-170-040": {
+  "action": "apply",
+  "note": "standard ta marbuta in Arabic title"
+ },
+ "UR-TAREEQ-P171-175-052": {
+  "action": "apply",
+  "note": "dropped 'mein'; sentence broken without it"
+ },
+ "UR-TAREEQ-P181-185-039": {
+  "action": "apply",
+  "note": "standard ta marbuta in Arabic title"
+ },
+ "UR-TAREEQ-P186-190-043": {
+  "action": "apply",
+  "note": "standard ta marbuta in Arabic title"
+ },
+ "UR-TAREEQ-P191-195-040": {
+  "action": "apply",
+  "note": "broken verb 'kiya jati hai'; only one fix"
+ },
+ "UR-TAREEQ-P196-200-018": {
+  "action": "apply",
+  "note": "dropped 'kar'; sentence broken without it"
+ },
+ "UR-TAREEQ-P211-215-022": {
+  "action": "hold",
+  "note": "author's usage: infinitive agreement"
+ },
+ "UR-TAREEQ-P216-220-023": {
+  "action": "apply",
+  "note": "orthography only"
+ },
+ "UR-TAREEQ-P216-220-024": {
+  "action": "hold",
+  "note": "author's gender for 'manazil'"
+ },
+ "UR-TAREEQ-P231-235-032": {
+  "action": "apply",
+  "note": "non-word; fixed pair Qaisar o Kisra among the kings"
+ },
+ "UR-TAREEQ-P236-240-011": {
+  "action": "hold",
+  "note": "author's gender for shan-e-nuzool"
+ },
+ "UR-TAREEQ-P236-240-016": {
+  "action": "hold",
+  "note": "the noun itself may be a garble (hikayat?); not certain"
+ },
+ "UR-TAREEQ-P236-240-025": {
+  "action": "hold",
+  "note": "possible as spoken; original asked for"
+ },
+ "UR-TAREEQ-P246-250-010": {
+  "action": "hold",
+  "note": "more than one possible fix; not certain"
+ },
+ "UR-TAREEQ-P246-250-022": {
+  "action": "apply",
+  "note": "standard ta marbuta in Arabic title"
+ },
+ "UR-TAREEQ-P246-250-025": {
+  "action": "apply",
+  "note": "ya/ye slip: 'halqe ki peechhe'"
+ },
+ "UR-TAREEQ-P266-273-004": {
+  "action": "apply",
+  "note": "orthography only"
+ },
+ "UR-TAREEQ-P266-273-024": {
+  "action": "hold",
+  "note": "second 'farmate hain' introduces the quotation; not a duplicate"
+ },
+ "UR-TAREEQ-P282-293-041": {
+  "action": "hold",
+  "note": "misspelt, but Puzzle or puzzles both possible; print not seen"
+ },
+ "UR-TAREEQ-P282-293-054": {
+  "action": "hold",
+  "note": "author's usage: 'ko' of direction"
+ },
+ "UR-TASAW-P001-006005": {
+  "action": "hold",
+  "note": "postposition not unique (par or mein)"
+ },
+ "UR-TASAW-P011-014003": {
+  "action": "hold",
+  "note": "fix not unique; subject number unclear from context"
+ },
+ "UR-TASAW-P015-018012": {
+  "action": "hold",
+  "note": "more than one possible reading (dil ki / dili tawajjuh)"
+ },
+ "UR-TASAW-P023-026014": {
+  "action": "apply",
+  "note": "dropped hai, sentence otherwise broken"
+ },
+ "UR-TASAW-P031-034006": {
+  "action": "apply",
+  "note": "ye/ya slip: kitni sharm ki baat"
+ },
+ "UR-TASAW-P031-034009": {
+  "action": "hold",
+  "note": "feminine continues in the sentence; subject is on the previous page"
+ },
+ "UR-TASAW-P039-043004": {
+  "action": "hold",
+  "note": "keh is optional"
+ },
+ "UR-TASAW-P052-055010": {
+  "action": "hold",
+  "note": "feminine may follow implied halat from the preceding clause"
+ },
+ "UR-TASAW-P060-063002": {
+  "action": "apply",
+  "note": "word typed twice"
+ },
+ "UR-TASAW-P060-063007": {
+  "action": "hold",
+  "note": "verb agrees with taleem; possible sentence"
+ },
+ "UR-TASAW-P064-067004": {
+  "action": "hold",
+  "note": "possible sentence as it stands; meaning change"
+ },
+ "UR-TASAW-P068-071004": {
+  "action": "apply",
+  "note": "dropped hain, sentence otherwise broken"
+ },
+ "UR-TASAW-P068-071006": {
+  "action": "hold",
+  "note": "text is correct as it stands: hamare qualifies gawah"
+ },
+ "UR-TASAW-P072-075007": {
+  "action": "hold",
+  "note": "keh is optional"
+ },
+ "UR-TASAW-P076-079011": {
+  "action": "hold",
+  "note": "author treats eeza as masculine (recurs in another book)"
+ },
+ "UR-TASAW-P104-107009": {
+  "action": "hold",
+  "note": "hai plausibly dropped but proposal also re-punctuates the book's stops"
+ },
+ "UR-TASAW-P112-115003": {
+  "action": "hold",
+  "note": "fix not unique (karo / karen / kijiye); third person possible"
+ },
+ "UR-TASAW-P112-115009": {
+  "action": "hold",
+  "note": "jin/jis slip is real but proposal also removes the book's habitual stop"
+ },
+ "UR-TASAW-P112-115011": {
+  "action": "apply",
+  "note": "dropped hai and sentence break; only reading"
+ },
+ "UR-TASAW-P116-119002": {
+  "action": "hold",
+  "note": "us ke banane wala recurs in this book (author's usage); re-punctuates"
+ },
+ "UR-TASAW-P120-123004": {
+  "action": "hold",
+  "note": "rhetorical kya hai is author's style; adds punctuation"
+ },
+ "UR-TASAW-P124-127013": {
+  "action": "apply",
+  "note": "dropped ki; only word that fits"
+ },
+ "UR-TASAW-P128-131007": {
+  "action": "hold",
+  "note": "the se is almost certainly the verse sign misread; a colon is not the right restoration"
+ },
+ "UR-TASAW-P128-131016": {
+  "action": "hold",
+  "note": "older usage ko intikhab farmaya"
+ },
+ "UR-TASAW-P132-135004": {
+  "action": "hold",
+  "note": "keh is optional"
+ },
+ "UR-TASAW-P136-139007": {
+  "action": "hold",
+  "note": "ke nazil karne wala recurs in this book; author's usage"
+ },
+ "UR-TASAW-P152-156001": {
+  "action": "hold",
+  "note": "rewrites the book's own glossary meaning; needs an editor"
+ },
+ "UR-TASAW-P152-156010": {
+  "action": "hold",
+  "note": "gender the author gives waridat"
+ },
+ "UR-ZIKRALLAH-002": {
+  "action": "hold",
+  "note": "possible sentence (agrees with giroh); quoted Qur'an translation"
+ },
+ "UR-ZIKRALLAH-003": {
+  "action": "hold",
+  "note": "more than one possible fix (zikr karne ke liye)"
+ },
+ "UR-ZIKRALLAH-004": {
+  "action": "hold",
+  "note": "likely 'is shiddat' but not a look-alike; print not seen"
+ },
+ "UR-ZIKRALLAH-008": {
+  "action": "apply",
+  "note": "list number out of sequence between 32 and 35; 3/4 look-alike"
+ },
+ "UR-ZIKRALLAH-009": {
+  "action": "apply",
+  "note": "list number out of sequence between 33 and 35; 3/4 look-alike"
+ }
+}
