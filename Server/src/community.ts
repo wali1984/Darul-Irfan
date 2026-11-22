@@ -574,10 +574,11 @@ export async function joinRoom(env: Env, memberID: string, groupID: string, inpu
   return json({ authToken: token, pageURL: `${env.PUBLIC_BASE_URL}/v1/meet`, roomID });
 }
 
-/** Which outside services are connected. The app leaves out what depends on
- *  the others instead of offering something that cannot work, and offers it
- *  by itself once the service's keys are set. All three flags are always
- *  sent: the released apps read each of them as a required field. */
+/** Which outside services are connected. The app offers only what a
+ *  connected service makes possible, never something that cannot work, and
+ *  the rest appears by itself once that service's keys are set. All three
+ *  flags are always sent: the released apps read each of them as a required
+ *  field. */
 export function integrationStatus(env: Env): { meetings: boolean; whatsappForwarding: boolean; liveBroadcast: boolean } {
   return {
     meetings: realtimeBase(env) !== null,
