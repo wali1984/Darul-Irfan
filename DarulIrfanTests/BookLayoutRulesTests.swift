@@ -11,6 +11,7 @@ final class BookLayoutRulesTests: XCTestCase {
         "book-hayyat-e-tayyabah-i",
         "book-ocr-gard-e-safar",
         "book-ocr-hamd-o-naat",
+        "book-ocr-hasht-roza-course",
         "book-ocr-pardah",
         "book-ocr-sai-hafta-course",
         "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah",
@@ -178,6 +179,18 @@ final class BookLayoutRulesTests: XCTestCase {
             [.noText(1...2), .page(book[1]), .noText(4...5), .page(book[2]), .noText(7...8)]
         )
         XCTAssertEqual(BookTextEntry.entries(of: [blank(1), blank(2)]), [])
+    }
+
+    @MainActor
+    func testACardAtTheEndCountsToTheBooksLastPage() {
+        let entries = BookTextEntry.entries(of: pages("book-ocr-hasht-roza-course"))
+        XCTAssertEqual(entries.last, .noText(207...208))
+        let session = BookReaderSession()
+        session.pageNumbers = entries.map(\.id)
+        session.lastPage = entries.last?.lastPage
+        XCTAssertEqual(session.pageNumbers.last, 207)
+        XCTAssertEqual(session.pageTotal, 208)
+        XCTAssertEqual(BookTextEntry.holding(208, in: entries)?.id, 207)
     }
 
     func testNoSentenceCrossesAPageWithoutText() throws {

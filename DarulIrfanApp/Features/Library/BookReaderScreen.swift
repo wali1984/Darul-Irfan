@@ -39,8 +39,13 @@ final class BookReaderSession {
     /// The PDF page, or the printed page of the text, at the top of the screen.
     var currentPage: Int = 1
     /// The pages that can be turned to, in order: 1...N for the PDF, the
-    /// printed numbers for the text (a scan skips blank pages).
+    /// printed numbers for the text (neighbours with no text share the first
+    /// one's number).
     var pageNumbers: [Int] = []
+    /// The book's last page, where the last place stands for several.
+    var lastPage: Int?
+    /// The N of "Page n of N".
+    var pageTotal: Int? { lastPage ?? pageNumbers.last }
     /// A page the bars asked for; the page view goes there and clears it.
     var requestedPage: Int?
     /// The cached PDF, once open, for Share.
@@ -362,7 +367,7 @@ struct BookReaderScreen: View {
             }
             Button("Cancel", role: .cancel) { goToPageText = "" }
         } message: {
-            if let first = activeSession.pageNumbers.first, let last = activeSession.pageNumbers.last {
+            if let first = activeSession.pageNumbers.first, let last = activeSession.pageTotal {
                 Text("Pages \(first) to \(last)")
             }
         }
@@ -378,7 +383,7 @@ struct BookReaderScreen: View {
             // for, which can be turned to only once the PDF's pages are known.
             if text.hasNoPages, let startPage { pdf.requestedPage = startPage }
         }
-        .onChange(of: text.pageNumbers.last) { _, last in
+        .onChange(of: text.pageTotal) { _, last in
             if let last { BookReadingHistory.savePageCount(last, itemID: item.id, mode: .text) }
         }
         // A work with no text to show turns to its printed pages. The reader
@@ -427,7 +432,7 @@ struct BookReaderScreen: View {
 
     @ViewBuilder
     private var pageCaption: some View {
-        if let last = activeSession.pageNumbers.last {
+        if let last = activeSession.pageTotal {
             Text("Page \(displayedPage) of \(last)")
                 .font(.caption2.weight(.bold).monospacedDigit())
                 .tracking(readsUrdu ? 0 : 0.6)
@@ -508,6 +513,7 @@ struct BookReaderScreen: View {
 
     private var pageBar: some View {
         let numbers = activeSession.pageNumbers
+        let total = activeSession.pageTotal ?? 1
         let current = activeSession.currentPage
         let lastPosition = Double(max(numbers.count - 1, 1))
         return HStack(spacing: 10) {
@@ -538,7 +544,7 @@ struct BookReaderScreen: View {
                 .environment(\.layoutDirection, .leftToRight)
                 .scaleEffect(x: bookIsRightToLeft ? -1 : 1, y: 1)
                 .accessibilityLabel(Text("Page"))
-                .accessibilityValue(Text("Page \(displayedPage) of \(numbers.last ?? 1)"))
+                .accessibilityValue(Text("Page \(displayedPage) of \(total)"))
                 HStack(spacing: DISpacing.xs) {
                     Text(verbatim: "\(numbers.first ?? 1)")
                     Spacer(minLength: DISpacing.xs)
@@ -550,7 +556,7 @@ struct BookReaderScreen: View {
                     }
                     .buttonStyle(DICompactButtonStyle())
                     Spacer(minLength: DISpacing.xs)
-                    Text(verbatim: "\(numbers.last ?? 1)")
+                    Text(verbatim: "\(total)")
                 }
                 .font(.caption2.weight(.bold).monospacedDigit())
                 .foregroundStyle(DIColor.textMuted)
@@ -634,7 +640,7 @@ struct BookReaderScreen: View {
 
     private func goTo(_ number: Int) {
         let session = activeSession
-        guard let first = session.pageNumbers.first, let last = session.pageNumbers.last else { return }
+        guard let first = session.pageNumbers.first, let last = session.pageTotal else { return }
         let page = min(max(number, first), last)
         session.requestedPage = page
         if session.pageNumbers.contains(page) {
@@ -648,10 +654,13 @@ struct BookReaderScreen: View {
         return { page in showPrintedPage(page) }
     }
 
-    /// The printed pages, at the page that has no text.
+    /// The printed pages, at the page that has no text. A look at one page is
+    /// not choosing how to read the work: "Keep reading" still opens its
+    /// text, where that was left.
     private func showPrintedPage(_ page: Int) {
         pdf.requestedPage = page
-        choose(.pages)
+        opened.insert(.pages)
+        mode = .pages
     }
 
     /// A result of search in the book: the text, at that page.

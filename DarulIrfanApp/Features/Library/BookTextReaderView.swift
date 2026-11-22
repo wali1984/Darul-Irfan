@@ -295,6 +295,7 @@ struct BookTextPagesView: View {
             formatted = prepared
             entries = BookTextEntry.entries(of: loaded)
             session?.pageNumbers = entries.map(\.id)
+            session?.lastPage = entries.last?.lastPage
             session?.hasNoPages = entries.isEmpty
             if let first = entries.first?.id { session?.currentPage = first }
         } catch is CancellationError {
