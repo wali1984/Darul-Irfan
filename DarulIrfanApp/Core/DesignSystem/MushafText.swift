@@ -13,6 +13,8 @@ enum MushafFaceGaps {
         /// U+06DD with its number, whole in Amiri Quran, which sets the number
         /// inside the circle. The mushaf face loses the circle or the number.
         case marker
+        /// A whole word holding U+06DF, in Amiri Quran, which has that sign.
+        case smallHighZero
         /// A whole word, in the Urdu face, so that its letters join.
         case urdu
     }
@@ -32,15 +34,21 @@ enum MushafFaceGaps {
 
     /// U+067C, U+069A and U+06BC are empty too, and are left so: the books
     /// have them only as pause signs of an older mushaf encoding, which
-    /// another face would show as stray letters inside an ayah. U+06DF is
-    /// the mushaf's own and takes part in its ligatures.
+    /// another face would show as stray letters inside an ayah.
     static let letters: Set<UInt32> = [
         0x0679, 0x067E, 0x0685, 0x0686, 0x0688, 0x0689, 0x0691,
         0x0693, 0x0696, 0x0698, 0x06A4, 0x06AB, 0x06CD, 0x06D0
     ]
 
-    /// The stretches of `text` that the mushaf face cannot draw.
-    static func spans(in text: some Sequence<Unicode.Scalar>) -> [Span] {
+    /// U+06DF, the small high rounded zero, has an empty glyph too. Only book
+    /// pages and narrations ask for it to be drawn: the same helper sets ayat
+    /// on other screens, and those stay as they are.
+    static let smallHighZero: UInt32 = 0x06DF
+
+    /// The stretches of `text` that the mushaf face cannot draw. An ayah's
+    /// circle is taken first, then a word with U+06DF where that is asked
+    /// for, then a word with an Urdu letter.
+    static func spans(in text: some Sequence<Unicode.Scalar>, showsSmallHighZero: Bool = false) -> [Span] {
         let scalars = Array(text)
         var spans: [Span] = []
         var index = 0
@@ -59,11 +67,17 @@ enum MushafFaceGaps {
                 spans.append(Span(range: start..<index, face: .signs))
             } else if joins(scalars[index]) {
                 var hasGap = false
+                var hasZero = false
                 while index < scalars.count, joins(scalars[index]) {
                     if letters.contains(scalars[index].value) { hasGap = true }
+                    if scalars[index].value == smallHighZero { hasZero = true }
                     index += 1
                 }
-                if hasGap { spans.append(Span(range: start..<index, face: .urdu)) }
+                if showsSmallHighZero && hasZero {
+                    spans.append(Span(range: start..<index, face: .smallHighZero))
+                } else if hasGap {
+                    spans.append(Span(range: start..<index, face: .urdu))
+                }
             } else {
                 index += 1
             }
@@ -73,9 +87,9 @@ enum MushafFaceGaps {
 
     /// `text` with only those stretches given a face of their own, for a
     /// `Text` in `DIFont.quranArabic(scale:)`. Links and colours are kept.
-    static func filling(_ text: AttributedString, scale: Double) -> AttributedString {
+    static func filling(_ text: AttributedString, scale: Double, showsSmallHighZero: Bool = false) -> AttributedString {
         var filled = text
-        for span in spans(in: text.unicodeScalars) {
+        for span in spans(in: text.unicodeScalars, showsSmallHighZero: showsSmallHighZero) {
             // By scalar, not by character: a span is counted in scalars, and
             // U+06DD with the digit after it is one character.
             let lower = filled.unicodeScalars.index(filled.startIndex, offsetBy: span.range.lowerBound)
@@ -84,6 +98,7 @@ enum MushafFaceGaps {
             switch span.face {
             case .signs: face = DIFont.mushafSigns(scale: scale)
             case .marker: face = DIFont.mushafMarker(scale: scale)
+            case .smallHighZero: face = DIFont.mushafAmiriWord(scale: scale)
             case .urdu: face = DIFont.mushafUrduWord(scale: scale)
             }
             filled[lower..<upper].font = face
@@ -109,16 +124,16 @@ enum MushafFaceGaps {
 
 extension Text {
     /// `string` in the mushaf face, with what that face cannot draw in a face
-    /// that can.
-    static func mushaf(verbatim string: String, scale: Double) -> Text {
-        guard !MushafFaceGaps.spans(in: string.unicodeScalars).isEmpty else {
+    /// that can. `showsSmallHighZero` is for book pages and narrations only.
+    static func mushaf(verbatim string: String, scale: Double, showsSmallHighZero: Bool = false) -> Text {
+        guard !MushafFaceGaps.spans(in: string.unicodeScalars, showsSmallHighZero: showsSmallHighZero).isEmpty else {
             return Text(verbatim: string).font(DIFont.quranArabic(scale: scale))
         }
-        return mushaf(AttributedString(string), scale: scale)
+        return mushaf(AttributedString(string), scale: scale, showsSmallHighZero: showsSmallHighZero)
     }
 
-    static func mushaf(_ text: AttributedString, scale: Double) -> Text {
-        Text(MushafFaceGaps.filling(text, scale: scale))
+    static func mushaf(_ text: AttributedString, scale: Double, showsSmallHighZero: Bool = false) -> Text {
+        Text(MushafFaceGaps.filling(text, scale: scale, showsSmallHighZero: showsSmallHighZero))
             .font(DIFont.quranArabic(scale: scale))
     }
 }

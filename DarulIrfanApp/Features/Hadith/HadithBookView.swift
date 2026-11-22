@@ -333,7 +333,7 @@ struct HadithBookView: View {
                         // shaped; the isnad narrators and any quoted verse are
                         // links (rendered in our green via `.tint`), the matn is
                         // plain (near-black). Taps are routed by `openURL`.
-                        Text.mushaf(arabicAttributed(from: segments), scale: fontScale * 1.15)
+                        Text.mushaf(arabicAttributed(from: segments), scale: fontScale * 1.15, showsSmallHighZero: true)
                             .lineSpacing(CGFloat(18 * fontScale))
                             .foregroundStyle(DIColor.textPrimary)
                             .tint(DIColor.actionForeground)

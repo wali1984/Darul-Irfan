@@ -7,6 +7,7 @@ import XCTest
 final class BookLayoutRulesTests: XCTestCase {
     /// The books these tests read.
     private static let books: Set<String> = [
+        "asrar-10-en",
         "book-ocr-sai-hafta-course",
         "tafaseer-parah-1",
         "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
@@ -65,6 +66,28 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertTrue(BookTextPlace.article.followsBookRules)
         XCTAssertFalse(BookTextPlace.hadith.followsBookRules)
         XCTAssertFalse(BookTextPlace.quranReader.followsBookRules)
+    }
+
+    // MARK: - The small high rounded zero
+
+    func testEverySmallHighZeroOfAPageIsDrawnInAmiri() throws {
+        let text = try page("asrar-10-en", 2).text
+        let scalars = Array(text.unicodeScalars)
+        let zeros = scalars.indices.filter { scalars[$0].value == MushafFaceGaps.smallHighZero }
+        XCTAssertEqual(zeros.count, 12)
+        let spans = MushafFaceGaps.spans(in: scalars, showsSmallHighZero: true).filter { $0.face == .smallHighZero }
+        for zero in zeros {
+            let word = try XCTUnwrap(spans.first { $0.range.contains(zero) })
+            // The whole word, so that its letters stay joined.
+            let before = word.range.lowerBound - 1
+            let after = word.range.upperBound
+            if before >= 0 { XCTAssertTrue(scalars[before].properties.isWhitespace) }
+            if after < scalars.count { XCTAssertTrue(scalars[after].properties.isWhitespace) }
+        }
+        XCTAssertFalse(MushafFaceGaps.spans(in: scalars).contains { $0.face == .smallHighZero })
+        XCTAssertTrue(BookTextPlace.book.showsSmallHighZero)
+        XCTAssertFalse(BookTextPlace.article.showsSmallHighZero)
+        XCTAssertFalse(BookTextPlace.quranReader.showsSmallHighZero)
     }
 
     // MARK: - An empty cell keeps its column

@@ -8,14 +8,15 @@ final class MushafFaceGapsTests: XCTestCase {
     private typealias FontKey = AttributeScopes.SwiftUIAttributes.FontAttribute
 
     /// The words given a face, in the order they stand, with that face.
-    private func faced(_ text: String) -> [String] {
+    private func faced(_ text: String, showsSmallHighZero: Bool = false) -> [String] {
         let scalars = Array(text.unicodeScalars)
-        return MushafFaceGaps.spans(in: scalars).map { span in
+        return MushafFaceGaps.spans(in: scalars, showsSmallHighZero: showsSmallHighZero).map { span in
             var words = String.UnicodeScalarView()
             words.append(contentsOf: scalars[span.range])
             switch span.face {
             case .signs: return "signs:" + String(words)
             case .marker: return "marker:" + String(words)
+            case .smallHighZero: return "zero:" + String(words)
             case .urdu: return "urdu:" + String(words)
             }
         }
@@ -49,6 +50,17 @@ final class MushafFaceGapsTests: XCTestCase {
 
     func testOldPauseSignsAndTheMushafsOwnMarkAreLeftAlone() {
         XCTAssertEqual(faced("\u{069A} \u{06BC} \u{067C} \u{06DF} \u{E022}"), [])
+    }
+
+    func testABooksWordWithTheSmallHighZeroIsTakenWhole() {
+        let word = "\u{0648}\u{064E}\u{0645}\u{064E}\u{0644}\u{064E}\u{0627}\u{06DF}\u{0626}\u{0650}\u{06C1}\u{0656}"
+        XCTAssertEqual(faced("قال " + word + " ثم", showsSmallHighZero: true), ["zero:" + word])
+        XCTAssertEqual(faced("قال \u{06DF}", showsSmallHighZero: true), ["zero:\u{06DF}"])
+        // The circle comes first, and this rule before the Urdu letters'.
+        XCTAssertEqual(faced("\u{06DD}\u{0661}\u{06DF}", showsSmallHighZero: true), ["marker:\u{06DD}\u{0661}", "zero:\u{06DF}"])
+        XCTAssertEqual(faced("پ\u{06DF}", showsSmallHighZero: true), ["zero:پ\u{06DF}"])
+        // Unasked, as on every other screen, nothing changes.
+        XCTAssertEqual(faced(word), [])
     }
 
     func testTheAyatAreNotTouched() {

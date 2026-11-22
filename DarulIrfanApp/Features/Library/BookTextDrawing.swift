@@ -13,6 +13,10 @@ enum BookTextPlace: Sendable {
 
     /// The rules of book and article text: the size of the salawat sign.
     var followsBookRules: Bool { self == .book || self == .article }
+
+    /// U+06DF is drawn in books and narrations. An article also sets ayat from
+    /// the mushaf's own text, which stay as they are.
+    var showsSmallHighZero: Bool { self == .book || self == .hadith }
 }
 
 /// How book text is drawn where its face alone would not draw it well. The
