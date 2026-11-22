@@ -207,6 +207,9 @@ struct BookTextPagesView: View {
                     page: formattedPage,
                     scale: fontScale,
                     place: .book,
+                    // A page laid out from its text alone is here only as
+                    // right-to-left text.
+                    language: (page.layout ?? "").isEmpty ? "ur" : item.language,
                     links: appState == nil ? [] : (links[page.page] ?? []),
                     // A sentence cut by the page break is shown whole here:
                     // its words keep the links of the page they are printed on.
@@ -554,7 +557,10 @@ struct FormattedBookPage: View {
     /// The reader's text size.
     var scale: Double = 1
     /// Where the text is shown: some display rules hold only for books.
-    var place: BookTextPlace = .article
+    var place: BookTextPlace = .other
+    /// The language of the page: a block with no letters, or as many Latin as
+    /// Arabic-script ones, follows it.
+    var language = "ur"
     /// The places in this page's text that open an ayah, a narration or a
     /// narrator's biography. Empty leaves the text plain.
     var links: [BookLink] = []
@@ -564,6 +570,7 @@ struct FormattedBookPage: View {
     var onLink: ((BookLink) -> Void)? = nil
     @State private var showsContents = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.locale) private var locale
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
 
     var body: some View {
@@ -571,12 +578,7 @@ struct FormattedBookPage: View {
             if page.isContents {
                 DisclosureGroup(isExpanded: $showsContents) {
                     if let text = contentsText {
-                        words(shown(text, rightToLeft: true), urduSize: 0.85)
-                            .font(DIFont.urduBody(scale: 0.85 * scale))
-                            .foregroundStyle(DIColor.textMuted)
-                            .lineSpacing(6)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .modifier(selection(text, rightToLeft: true))
+                        contentsList(text)
                     } else {
                         blockList
                     }
@@ -590,8 +592,22 @@ struct FormattedBookPage: View {
                 blockList
             }
         }
-        .environment(\.layoutDirection, .rightToLeft)
+        .environment(\.layoutDirection, pageIsRightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
         .modifier(BookLinkTaps(links: links + carriedLinks, onLink: onLink))
+    }
+
+    private var pageIsRightToLeft: Bool { ScriptDirection.readsRightToLeft(language) }
+
+    /// The rows of a contents page that has no layout of its own.
+    private func contentsList(_ text: String) -> some View {
+        let rightToLeft = isRightToLeft(text)
+        return words(shown(text, rightToLeft: rightToLeft), urduSize: rightToLeft ? 0.85 : nil)
+            .font(face(rightToLeft, size: 0.85))
+            .foregroundStyle(DIColor.textMuted)
+            .lineSpacing(6)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
+            .modifier(selection(text, rightToLeft: rightToLeft))
     }
 
     /// The text of a contents page from the original OCR, which is one
@@ -635,6 +651,8 @@ struct FormattedBookPage: View {
                     RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
                         .fill(DIColor.primary.opacity(0.07))
                 )
+                // Arabic runs right to left on an English page too.
+                .environment(\.layoutDirection, .rightToLeft)
                 .modifier(selection(text, rightToLeft: true))
         case .arabic(let text):
             arabicQuotation(text, cutFrom: page.cutQuotation(at: index))
@@ -717,6 +735,11 @@ struct FormattedBookPage: View {
                 .fill(DIColor.sandstone.opacity(0.6))
         )
         .accessibilityElement(children: .combine)
+        // The note speaks the interface's language.
+        .environment(
+            \.layoutDirection,
+            pageIsRightToLeft || DIBrand.readsUrdu(locale) ? LayoutDirection.rightToLeft : .leftToRight
+        )
     }
 
     /// A table as printed: its cells in columns that share the width by what
@@ -1005,9 +1028,9 @@ struct FormattedBookPage: View {
     }
 
     /// Arabic script reads right to left. Text with no letters (a row of
-    /// numbers) follows the page, which is Urdu.
-    private func isRightToLeft(_ text: String) -> Bool {
-        ScriptDirection.isRightToLeft(text, fallbackLanguage: "ur")
+    /// stars or numbers) follows the page.
+    func isRightToLeft(_ text: String) -> Bool {
+        ScriptDirection.isRightToLeft(text, fallbackLanguage: language)
     }
 }
 
@@ -1029,9 +1052,16 @@ enum ScriptDirection {
             }
         }
         if arabic == latin {
-            return fallbackLanguage == "ur" || fallbackLanguage == "ar"
+            return readsRightToLeft(fallbackLanguage)
         }
         return arabic > latin
+    }
+
+    /// A language written in Arabic script: Urdu, Arabic and the books'
+    /// Punjabi ("pa").
+    static func readsRightToLeft(_ language: String?) -> Bool {
+        guard let code = language?.lowercased() else { return false }
+        return code.hasPrefix("ur") || code.hasPrefix("ar") || code.hasPrefix("pa")
     }
 }
 

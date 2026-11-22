@@ -736,8 +736,7 @@ struct ContentItemDetailView: View {
     // MARK: - Native reader
 
     private func isRightToLeft(_ item: ContentItem) -> Bool {
-        let code = item.language.lowercased()
-        return code.hasPrefix("ur") || code.hasPrefix("ar")
+        ScriptDirection.readsRightToLeft(item.language)
     }
 
     private func bodyFont(for item: ContentItem) -> Font {
@@ -752,7 +751,12 @@ struct ContentItemDetailView: View {
         DICard(padding: DISpacing.lg) {
             VStack(alignment: .leading, spacing: DISpacing.md) {
                 ForEach(Array(viewModel.bodyParagraphs.enumerated()), id: \.offset) { index, paragraph in
-                    FormattedBookPage(page: BookPageFormatter.articleParagraph(paragraph, itemID: item.id), scale: appState.settings.readerFontScale.rawValue)
+                    FormattedBookPage(
+                        page: BookPageFormatter.articleParagraph(paragraph, itemID: item.id),
+                        scale: appState.settings.readerFontScale.rawValue,
+                        place: .article,
+                        language: item.language
+                    )
                         .id("library-paragraph-\(index)")
                 }
             }

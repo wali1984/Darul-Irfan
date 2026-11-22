@@ -11,6 +11,8 @@ enum BookTextPlace: Sendable {
     case hadith
     /// The tafsir under an ayah, which is drawn as the Qur'an reader draws it.
     case quranReader
+    /// Any other screen, such as the Method of Zikr: none of these rules.
+    case other
 
     /// The rules of book and article text: the size of the salawat sign and
     /// the order of its numbers.

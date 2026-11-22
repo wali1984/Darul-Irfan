@@ -18,6 +18,7 @@ final class BookLayoutRulesTests: XCTestCase {
         "asrar-5-en",
         "asrar-6-ur",
         "book-hayyat-e-tayyabah-i",
+        "book-ocr-dil-darwaza",
         "book-ocr-gard-e-safar",
         "book-ocr-hamd-o-naat",
         "book-ocr-hasht-roza-course",
@@ -147,6 +148,30 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertTrue(BookTextPlace.article.followsBookRules)
         XCTAssertFalse(BookTextPlace.hadith.followsBookRules)
         XCTAssertFalse(BookTextPlace.quranReader.followsBookRules)
+        XCTAssertFalse(BookTextPlace.other.followsBookRules)
+        XCTAssertFalse(BookTextPlace.other.showsSmallHighZero)
+    }
+
+    @MainActor
+    func testAScreenThatNamesNoPlaceHasNoBookRules() {
+        // The Method of Zikr, as on Android.
+        let view = FormattedBookPage(page: .init(isContents: false, blocks: []))
+        XCTAssertEqual(view.place, .other)
+    }
+
+    // MARK: - A block without letters follows its page
+
+    @MainActor
+    func testStarsFollowAnEnglishPageAndDatesAPunjabiOne() throws {
+        let english = BookPageFormatter.format(page: try page("asrar-5-en", 37))
+        XCTAssertTrue(english.blocks.contains(.paragraph([.init(text: "*****", isQuranic: false)])))
+        XCTAssertFalse(FormattedBookPage(page: english, language: "en").isRightToLeft("*****"))
+        XCTAssertTrue(FormattedBookPage(page: english, language: "ur").isRightToLeft("*****"))
+
+        let punjabi = BookPageFormatter.format(page: try page("book-ocr-dil-darwaza", 30))
+        XCTAssertTrue(FormattedBookPage(page: punjabi, language: "pa").isRightToLeft("27-04-01"))
+        XCTAssertTrue(ScriptDirection.readsRightToLeft(SeedBundle.libraryItem(id: "book-ocr-dil-darwaza")?.language))
+        XCTAssertEqual(BookTextDrawing.numberTokens(in: "27-04-01"), [NSRange(location: 0, length: 8)])
     }
 
     // MARK: - The small high rounded zero

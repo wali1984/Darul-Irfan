@@ -294,10 +294,7 @@ struct BookReaderScreen: View {
     private var activeSession: BookReaderSession { mode == .pages ? pdf : text }
 
     /// An Urdu or Arabic book turns its pages right to left.
-    private var bookIsRightToLeft: Bool {
-        let code = item.language.lowercased()
-        return code.hasPrefix("ur") || code.hasPrefix("ar")
-    }
+    private var bookIsRightToLeft: Bool { ScriptDirection.readsRightToLeft(item.language) }
 
     private var readsUrdu: Bool { locale.language.languageCode?.identifier == "ur" }
 
