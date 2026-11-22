@@ -79,10 +79,12 @@ struct BayansSection: View {
                 .frame(maxWidth: .infinity)
                 .padding(DISpacing.lg)
         } else if media.isEmpty && media.loadErrorMessage == nil {
-            DIEmptyState(
+            ContentImportRetryView(
                 systemImage: "waveform",
-                titleKey: "Preparing the bayans…",
-                messageKey: "Lectures and programs will appear here after the first content sync. Pull down to refresh."
+                titleKey: "The bayans could not be loaded",
+                openingTitleKey: "Opening the bayans…",
+                contentSync: dependencies.contentSync,
+                reload: { await media.load() }
             )
             .diOctagramWatermark(size: 260, opacity: 0.05)
         } else if !shownCategories.isEmpty {

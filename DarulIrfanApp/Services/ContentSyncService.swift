@@ -76,7 +76,7 @@ enum SeedStage: String, CaseIterable, Sendable {
     }
 }
 
-/// What the launch screen says while bundled content is being prepared.
+/// What the launch screen says while bundled content is imported.
 /// Reported only for work that actually runs.
 enum SeedImportStep: Sendable, Equatable {
     case quran

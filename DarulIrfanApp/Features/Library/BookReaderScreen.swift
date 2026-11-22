@@ -45,6 +45,8 @@ final class BookReaderSession {
     var requestedPage: Int?
     /// The cached PDF, once open, for Share.
     var shareURL: URL?
+    /// The text was looked up and the work has none.
+    var hasNoPages = false
 }
 
 // MARK: - Turning pages
@@ -372,6 +374,14 @@ struct BookReaderScreen: View {
         }
         .onChange(of: text.pageNumbers.last) { _, last in
             if let last { BookReadingHistory.savePageCount(last, itemID: item.id, mode: .text) }
+        }
+        // A work with no text to show turns to its printed pages. The reader
+        // did not choose them, so no choice is noted.
+        .onChange(of: text.hasNoPages) { _, hasNoPages in
+            guard hasNoPages, hasPDF else { return }
+            hasText = false
+            opened = [.pages]
+            mode = .pages
         }
         .task {
             // Opening a work is not choosing how to read it: only the switch,

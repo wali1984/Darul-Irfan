@@ -75,11 +75,14 @@ struct BookTextPagesView: View {
                         .buttonStyle(DICompactButtonStyle())
                 }
             } else if pages.isEmpty {
-                DIEmptyState(
-                    systemImage: "text.book.closed",
-                    titleKey: "No text for this book yet",
-                    messageKey: "This work is available as a PDF. Its text has not been added yet."
-                )
+                if session != nil && BookReadingHistory.hasPDF(item) {
+                    // The reader is turning to the printed pages.
+                    ProgressView()
+                        .tint(DIColor.primary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    DIEmptyState(systemImage: "text.book.closed", titleKey: "This work could not be opened")
+                }
             } else {
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -245,6 +248,7 @@ struct BookTextPagesView: View {
     private func load() async {
         isLoading = true
         loadFailed = false
+        session?.hasNoPages = false
         defer { isLoading = false }
         do {
             let loaded = try await dependencies.contentRepository.bookPages(bookID: item.id)
@@ -275,6 +279,7 @@ struct BookTextPagesView: View {
             formatted = prepared
             pages = loaded.filter { !$0.text.isEmpty }
             session?.pageNumbers = pages.map(\.page)
+            session?.hasNoPages = pages.isEmpty
             if let first = pages.first?.page { session?.currentPage = first }
         } catch is CancellationError {
             return

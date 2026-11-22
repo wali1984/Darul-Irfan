@@ -3583,24 +3583,24 @@
         }
       }
     },
-    "Books, articles, and announcements will appear here after the first verified content update.": {
+    "No items in this section": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Books, articles, and announcements appear here once the library is ready. If it stays empty, update the app."
+            "value": "No items in this section"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "کتب خانہ تیار ہونے پر کتابیں، مضامین اور اعلانات یہاں نظر آئیں گے۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
+            "value": "اس حصے میں کوئی اندراج نہیں"
           }
         }
       }
     },
-    "Items in this section will appear automatically after the next verified content update.": {
+    "This section has no items in this version of the app.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3634,7 +3634,7 @@
         }
       }
     },
-    "Offline text packs arrive automatically through verified content updates.": {
+    "Updating or reinstalling the app restores the bundled Qur'an text.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3685,7 +3685,7 @@
         }
       }
     },
-    "The online zikr schedule could not be loaded. Pull down later to check for a verified update.": {
+    "The online zikr schedule could not be loaded. Check your connection and pull down to try again.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5878,19 +5878,19 @@
         }
       }
     },
-    "This collection does not contain sourced book divisions.": {
+    "This collection is not divided into books.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This collection does not contain sourced book divisions."
+            "value": "This collection is not divided into books."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اس مجموعے میں ماخذ سے تصدیق شدہ کتابی تقسیم موجود نہیں ہے۔"
+            "value": "یہ مجموعہ کتابوں میں تقسیم نہیں ہے۔"
           }
         }
       }
@@ -6184,19 +6184,19 @@
         }
       }
     },
-    "Choose a lecture from the Media tab to begin listening.": {
+    "Choose a bayan in Discover › Bayans to begin listening.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose a lecture in Discover › Media to begin listening."
+            "value": "Choose a bayan in Discover › Bayans to begin listening."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سماعت شروع کرنے کے لیے «دریافت» ٹیب میں «میڈیا» سے کوئی خطاب منتخب کریں۔"
+            "value": "سماعت شروع کرنے کے لیے «دریافت» ٹیب میں «بیانات» سے کوئی بیان منتخب کریں۔"
           }
         }
       }
@@ -8700,19 +8700,19 @@
         }
       }
     },
-    "Lectures and programs will appear here after the first content sync. Pull down to refresh.": {
+    "The bayans could not be loaded": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lectures and programs appear here once the app has prepared them. If this stays empty, update the app."
+            "value": "The bayans could not be loaded"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "ایپ کی تیاری مکمل ہونے پر خطابات اور پروگرام یہاں نظر آئیں گے۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
+            "value": "بیانات لوڈ نہیں ہو سکے"
           }
         }
       }
@@ -13596,19 +13596,19 @@
         }
       }
     },
-    "The library is being prepared": {
+    "The library could not be loaded": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The library is being prepared"
+            "value": "The library could not be loaded"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "کتب خانہ تیار کیا جا رہا ہے"
+            "value": "کتب خانہ لوڈ نہیں ہو سکا"
           }
         }
       }
@@ -14599,19 +14599,19 @@
         }
       }
     },
-    "Yearly lecture archives will appear here after the library syncs. Pull down to refresh.": {
+    "No lectures are listed here.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The yearly lecture archive appears here once the app has prepared it. If it stays empty, update the app."
+            "value": "No lectures are listed here."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "ایپ کی تیاری مکمل ہونے پر سالانہ خطابات کا آرکائیو یہاں نظر آئے گا۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
+            "value": "یہاں کوئی خطاب درج نہیں۔"
           }
         }
       }
@@ -14905,23 +14905,6 @@
         }
       }
     },
-    "Archive record": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Archive record"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "محفوظ شدہ ریکارڈ"
-          }
-        }
-      }
-    },
     "Day streak": {
       "extractionState": "manual",
       "localizations": {
@@ -15003,23 +14986,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "تفسیر کی دستیابی"
-          }
-        }
-      }
-    },
-    "This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This item is listed in the Darul Irfan archive; its text or document is not in the app."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "یہ اندراج دارالعرفان کے ذخیرے میں درج ہے؛ اس کا متن یا دستاویز ایپ میں موجود نہیں۔"
           }
         }
       }
@@ -16214,19 +16180,19 @@
         }
       }
     },
-    "Hadith collections are being prepared": {
+    "The hadith collections could not be loaded": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hadith collections are being prepared"
+            "value": "The hadith collections could not be loaded"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "حدیث کے مجموعے تیار کیے جا رہے ہیں"
+            "value": "حدیث کے مجموعے لوڈ نہیں ہو سکے"
           }
         }
       }
@@ -16333,7 +16299,7 @@
         }
       }
     },
-    "It will arrive with the next content update.": {
+    "Updating the app restores the bundled collections.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -16346,23 +16312,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ایپ اپ ڈیٹ کرنے سے شامل مجموعے بحال ہو جائیں گے۔"
-          }
-        }
-      }
-    },
-    "It will be restored automatically after a verified content refresh.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The illustration could not be loaded. Check your connection and try again."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تصویر لوڈ نہیں ہو سکی۔ اپنا کنکشن دیکھ کر دوبارہ کوشش کریں۔"
           }
         }
       }
@@ -16741,19 +16690,19 @@
         }
       }
     },
-    "No text for this book yet": {
+    "This work could not be opened": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No text for this book yet"
+            "value": "This work could not be opened"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اس کتاب کا متن ابھی دستیاب نہیں"
+            "value": "یہ کتاب نہیں کھل سکی"
           }
         }
       }
@@ -17880,23 +17829,6 @@
         }
       }
     },
-    "They will appear here after the next content update.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "They appear here once the app has prepared them. If this stays empty, update the app."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ایپ کی تیاری مکمل ہونے پر یہ یہاں نظر آئیں گے۔ اگر یہ خالی رہے تو ایپ اپ ڈیٹ کریں۔"
-          }
-        }
-      }
-    },
     "This collection is not on your device yet": {
       "extractionState": "manual",
       "localizations": {
@@ -17914,19 +17846,19 @@
         }
       }
     },
-    "This commentary has not been prepared in the language you are reading. It is available in:": {
+    "This commentary is not in the language you are reading. It is available in:": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This commentary has not been prepared in the language you are reading. It is available in:"
+            "value": "This commentary is not in the language you are reading. It is available in:"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "یہ تفسیر آپ کی منتخب زبان میں تیار نہیں کی گئی۔ یہ ان زبانوں میں دستیاب ہے:"
+            "value": "یہ تفسیر آپ کی منتخب زبان میں نہیں۔ یہ ان زبانوں میں دستیاب ہے:"
           }
         }
       }
@@ -17944,23 +17876,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "اس سورت کی تلاوت کی آواز ایپ میں موجود نہیں، اس لیے ابھی اس کی مشق نہیں ہو سکتی۔"
-          }
-        }
-      }
-    },
-    "This work is available as a PDF. Its text has not been added yet.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This work is available as a PDF. Its text has not been added yet."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "یہ کتاب پی ڈی ایف کی صورت میں دستیاب ہے۔ اس کا متن ابھی شامل نہیں کیا گیا۔"
           }
         }
       }
@@ -26669,121 +26584,121 @@
         }
       }
     },
-    "Preparing the Qur'an…": {
+    "Opening the Qur'an…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing the Qur'an…"
+            "value": "Opening the Qur'an…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "قرآن تیار کیا جا رہا ہے…"
+            "value": "قرآن کھل رہا ہے…"
           }
         }
       }
     },
-    "Preparing the library…": {
+    "Opening the library…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing the library…"
+            "value": "Opening the library…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "کتب خانہ تیار کیا جا رہا ہے…"
+            "value": "کتب خانہ کھل رہا ہے…"
           }
         }
       }
     },
-    "Preparing the bayans…": {
+    "Opening the bayans…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing the bayans…"
+            "value": "Opening the bayans…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "بیانات تیار کیے جا رہے ہیں…"
+            "value": "بیانات کھل رہے ہیں…"
           }
         }
       }
     },
-    "Preparing the events…": {
+    "Opening the events…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing the events…"
+            "value": "Opening the events…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "تقریبات تیار کی جا رہی ہیں…"
+            "value": "تقریبات کھل رہی ہیں…"
           }
         }
       }
     },
-    "Preparing the books…": {
+    "Opening the books…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing the books…"
+            "value": "Opening the books…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "کتابیں تیار کی جا رہی ہیں…"
+            "value": "کتابیں کھل رہی ہیں…"
           }
         }
       }
     },
-    "Preparing the hadith collections…": {
+    "Opening the hadith collections…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing the hadith collections…"
+            "value": "Opening the hadith collections…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "حدیث کے مجموعے تیار کیے جا رہے ہیں…"
+            "value": "حدیث کے مجموعے کھل رہے ہیں…"
           }
         }
       }
     },
-    "Preparing search…": {
+    "Opening search…": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preparing search…"
+            "value": "Opening search…"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "تلاش تیار کی جا رہی ہے…"
+            "value": "تلاش کھل رہی ہے…"
           }
         }
       }
@@ -28335,23 +28250,6 @@
         }
       }
     },
-    "Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس سورت کی اکرم التفاسیر پارہ 30 کے حصہ دوم میں ہے، جو ابھی ایپ میں شامل نہیں۔"
-          }
-        }
-      }
-    },
     "This commentary is not in the app for this surah.": {
       "extractionState": "manual",
       "localizations": {
@@ -28641,19 +28539,19 @@
         }
       }
     },
-    "The source no longer provides this file, or what it sends is not a readable PDF. Trying again will not bring it back.": {
+    "This book's printed pages cannot be opened. Trying again will not bring them back.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The source no longer provides this file, or what it sends is not a readable PDF. Trying again will not bring it back."
+            "value": "This book's printed pages cannot be opened. Trying again will not bring them back."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "ماخذ اب یہ فائل فراہم نہیں کرتا، یا جو بھیجتا ہے وہ پڑھنے کے قابل PDF نہیں۔ دوبارہ کوشش سے یہ واپس نہیں آئے گی۔"
+            "value": "اس کتاب کے مطبوعہ صفحات نہیں کھل سکتے۔ دوبارہ کوشش سے یہ واپس نہیں آئیں گے۔"
           }
         }
       }
@@ -39183,19 +39081,19 @@
         }
       }
     },
-    "Asrar-at-Tanzil's translation of this ayah is not available yet.": {
+    "Asrar-at-Tanzil's translation of this ayah is not included.": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Asrar-at-Tanzil's translation of this ayah is not available yet."
+            "value": "Asrar-at-Tanzil's translation of this ayah is not included."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اس آیت کا اسرار التنزیل کا ترجمہ ابھی دستیاب نہیں۔"
+            "value": "اس آیت کا اسرار التنزیل کا ترجمہ شامل نہیں۔"
           }
         }
       }

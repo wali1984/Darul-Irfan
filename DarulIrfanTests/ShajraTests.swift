@@ -154,6 +154,21 @@ final class ShajraTests: XCTestCase {
     func testTheStringTablesHoldNoCreditOrLicenceWording() throws {
         let pattern = #"licen[cs]e|credit|acknowledg|public domain|permission of|['’]s permission"#
             + #"|proofread|machine|\bocr\b|quran\.com|لائسنس|اعترافات"#
+        try assertTheStringTablesHoldNone(of: pattern)
+    }
+
+    /// Nor wording that calls the app's content work in progress, still to
+    /// come, or handed on from a source.
+    func testTheStringTablesHoldNoUnfinishedContentWording() throws {
+        let pattern: String = #"being prepared|not been prepared|has prepared|^preparing (the |search)"#
+            + #"|no text for this book yet|text has not been added yet|of this ayah is not available yet"#
+            + #"|part 2, which is not in the app yet|verified content|verified update|next content update"#
+            + #"|first content sync|sourced book|the source no longer|archive record|discover › media"#
+            + #"|تیار کیا جا رہ|تیار کیے جا رہ|تیار کی جا رہ|تیار نہیں کی گئی|ماخذ سے تصدیق|ماخذ اب"#
+        try assertTheStringTablesHoldNone(of: pattern)
+    }
+
+    private func assertTheStringTablesHoldNone(of pattern: String) throws {
         for language in ["en", "ur"] {
             let path = try XCTUnwrap(
                 Bundle.main.path(forResource: "Localizable", ofType: "strings", inDirectory: nil, forLocalization: language)

@@ -86,7 +86,7 @@ struct HadithBookView: View {
                         DIEmptyState(
                             systemImage: "book.closed",
                             titleKey: "This collection is not on your device yet",
-                            messageKey: "It will arrive with the next content update."
+                            messageKey: "Updating the app restores the bundled collections."
                         )
                     } else {
                         if isLoadingEarlier {
@@ -795,7 +795,7 @@ private struct HadithContentsView: View {
                     ContentUnavailableView(
                         "Contents unavailable",
                         systemImage: "list.bullet.rectangle",
-                        description: Text("This collection does not contain sourced book divisions.")
+                        description: Text("This collection is not divided into books.")
                     )
                 } else {
                     Section("Books") {

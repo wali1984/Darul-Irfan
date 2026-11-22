@@ -87,7 +87,7 @@ struct ArchiveBrowserView: View {
                         DIEmptyState(
                             systemImage: viewModel.loadErrorMessage == nil ? "calendar" : "wifi.exclamationmark",
                             titleKey: viewModel.loadErrorMessage == nil ? "No archive yet" : "Something went wrong",
-                            messageKey: LocalizedStringKey(viewModel.loadErrorMessage ?? "Yearly lecture archives will appear here after the library syncs. Pull down to refresh.")
+                            messageKey: LocalizedStringKey(viewModel.loadErrorMessage ?? "No lectures are listed here.")
                         )
                         .diOctagramWatermark(size: 260, opacity: 0.05)
                         Button("Try Again") { Task { await viewModel.load() } }

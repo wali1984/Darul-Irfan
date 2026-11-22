@@ -19,7 +19,7 @@ struct DarulIrfanApp: App {
 
     @State private var launchState: LaunchState = .loading
 
-    /// What the seed import is preparing, shown under the splash.
+    /// The step the seed import is on, shown under the splash.
     @State private var importProgress = SeedImportProgress()
 
     /// Throttles the scene-active refresh so rapid app switching does not
@@ -327,7 +327,7 @@ final class SeedImportProgress {
     var step: SeedImportStep?
 }
 
-/// Says under the splash what is being prepared, so a long first import
+/// Says under the splash what is opening, so a long first import
 /// after installing or updating reads as work rather than a hung app.
 private struct SeedImportStatusLine: View {
     let step: SeedImportStep
@@ -349,13 +349,13 @@ private struct SeedImportStatusLine: View {
 
     private var title: LocalizedStringKey {
         switch step {
-        case .quran: return "Preparing the Qur'an…"
-        case .library: return "Preparing the library…"
-        case .media: return "Preparing the bayans…"
-        case .events: return "Preparing the events…"
-        case .books: return "Preparing the books…"
-        case .hadith: return "Preparing the hadith collections…"
-        case .search: return "Preparing search…"
+        case .quran: return "Opening the Qur'an…"
+        case .library: return "Opening the library…"
+        case .media: return "Opening the bayans…"
+        case .events: return "Opening the events…"
+        case .books: return "Opening the books…"
+        case .hadith: return "Opening the hadith collections…"
+        case .search: return "Opening search…"
         }
     }
 }

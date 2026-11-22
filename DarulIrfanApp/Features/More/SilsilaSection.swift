@@ -225,8 +225,8 @@ struct SilsilaCategoryDestination: View {
                 case .empty:
                     DIEmptyState(
                         systemImage: entry.systemImage,
-                        titleKey: "Nothing here yet",
-                        messageKey: "Items in this section will appear automatically after the next verified content update."
+                        titleKey: "No items in this section",
+                        messageKey: "This section has no items in this version of the app."
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .diScreenBackground()

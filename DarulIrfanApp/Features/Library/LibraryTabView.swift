@@ -58,10 +58,12 @@ struct LibraryTabView: View {
                             shelfSection("The Silsila's publications", shelves: LibraryShelf.publications)
                             shelfSection("Qur'an translation and tafsir", shelves: LibraryShelf.quranVolumes)
                         } else {
-                            DIEmptyState(
+                            ContentImportRetryView(
                                 systemImage: "books.vertical",
-                                titleKey: "The library is being prepared",
-                                messageKey: "Books, articles, and announcements will appear here after the first verified content update."
+                                titleKey: "The library could not be loaded",
+                                openingTitleKey: "Opening the library…",
+                                contentSync: dependencies.contentSync,
+                                reload: { await viewModel.reloadHome() }
                             )
                             .diOctagramWatermark(size: 260, opacity: 0.05)
                             .diAppear(delay: 0.1)

@@ -59,10 +59,12 @@ struct HadithHomeView: View {
                         .frame(maxWidth: .infinity)
                         .padding(DISpacing.xl)
                 } else if books.isEmpty {
-                    DIEmptyState(
+                    ContentImportRetryView(
                         systemImage: "books.vertical",
-                        titleKey: "Hadith collections are being prepared",
-                        messageKey: "They will appear here after the next content update."
+                        titleKey: "The hadith collections could not be loaded",
+                        openingTitleKey: "Opening the hadith collections…",
+                        contentSync: dependencies.contentSync,
+                        reload: { await load() }
                     )
                 } else {
                     if let resume {

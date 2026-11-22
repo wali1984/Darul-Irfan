@@ -8,7 +8,7 @@ import SwiftUI
 /// at the page it was left on, the text and the printed pages, keeping it on
 /// this phone, the rights line, and the excerpt and dates.
 ///
-/// Everything else - articles, pages, notices, archive records - keeps the
+/// Everything else - articles, pages, notices - keeps the
 /// metadata card, rights-aware native reader, native image presentation,
 /// downloadable files, and dates. Both open the app's one reader
 /// (`BookReaderScreen`).
@@ -164,7 +164,7 @@ struct ContentItemDetailView: View {
     }
 
     /// Metadata, the native reader or the excerpt, files and dates: an
-    /// article, a page, a notice, an archive record.
+    /// article, a page, a notice.
     private func itemPage(for item: ContentItem) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             detailHeader(for: item)
@@ -187,12 +187,6 @@ struct ContentItemDetailView: View {
                 }
             } else {
                 excerptCard(for: item)
-                // Only when there is nothing to read here at all:
-                // a work whose text opens above is not a bare
-                // archive record.
-                if !hasReadablePDF(item) && item.mediaUrls.isEmpty && viewModel.bookPageCount == 0 {
-                    nativeAvailabilityCard
-                }
             }
             downloadsSection(for: item)
             dateSection(for: item)
@@ -712,7 +706,7 @@ struct ContentItemDetailView: View {
         .environment(\.layoutDirection, isRightToLeft(item) ? .rightToLeft : .leftToRight)
     }
 
-    // MARK: - Native media and availability
+    // MARK: - Native media
 
     @ViewBuilder
     private func nativeMediaSection(for item: ContentItem) -> some View {
@@ -763,23 +757,6 @@ struct ContentItemDetailView: View {
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                 }
-            }
-        }
-    }
-
-    private var nativeAvailabilityCard: some View {
-        DIElevatedCard(glow: DIColor.primary) {
-            VStack(alignment: .leading, spacing: DISpacing.sm) {
-                HStack(spacing: DISpacing.md) {
-                    LibraryMedallion(systemImage: "arrow.triangle.2.circlepath", diameter: 40, breathing: true)
-                    Text("Archive record")
-                        .diInterfaceFont(.headline, design: .serif)
-                        .foregroundStyle(DIColor.textPrimary)
-                        .multilineTextAlignment(.leading)
-                }
-                Text("This item is preserved in the Darul Irfan archive. Any verified native text, artwork, audio, or document added later will appear here automatically.")
-                    .diInterfaceFont(.subheadline)
-                    .foregroundStyle(DIColor.textMuted)
             }
         }
     }

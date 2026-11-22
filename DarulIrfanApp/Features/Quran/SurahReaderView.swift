@@ -232,7 +232,7 @@ struct SurahReaderView: View {
                 DIEmptyState(
                     systemImage: "arrow.down.circle",
                     titleKey: "This surah's text is not on your device yet",
-                    messageKey: "Offline text packs arrive automatically through verified content updates."
+                    messageKey: "Updating or reinstalling the app restores the bundled Qur'an text."
                 )
             }
             .padding(.vertical, DISpacing.xl)
@@ -752,7 +752,7 @@ struct SurahReaderView: View {
                 if viewModel.fullVolumes.isEmpty {
                     Text("\(viewModel.contentMode.localizedTitle) is not in this language")
                         .diInterfaceFont(.headline)
-                    Text("This commentary has not been prepared in the language you are reading. It is available in:")
+                    Text("This commentary is not in the language you are reading. It is available in:")
                         .diInterfaceFont(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
@@ -849,15 +849,9 @@ struct SurahReaderView: View {
                 Text("Tafsir availability")
                     .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
-                Group {
-                    if viewModel.contentMode == .akramTafaseer && viewModel.surah.id >= 92 {
-                        Text("Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet.")
-                    } else {
-                        Text("This commentary is not in the app for this surah.")
-                    }
-                }
-                .diInterfaceFont(.subheadline)
-                .foregroundStyle(DIColor.textMuted)
+                Text("This commentary is not in the app for this surah.")
+                    .diInterfaceFont(.subheadline)
+                    .foregroundStyle(DIColor.textMuted)
                 if otherHasVerses || !otherVolumes.isEmpty {
                     Text("The Silsila's other tafsir is available:")
                         .diInterfaceFont(.subheadline)
@@ -1010,7 +1004,7 @@ struct SurahReaderView: View {
 /// Opens a tafsir volume's text at a page. The library row gives the title;
 /// if the library has not imported it, a minimal item still opens the pages,
 /// which is all the text reader needs. A volume with no stored pages opens
-/// nothing, not an empty reader.
+/// as its printed pages; one with neither says it could not be opened.
 struct TafsirVolumeDestination: View {
     let volume: TafsirVolume
     let dependencies: AppDependencies
@@ -1019,7 +1013,7 @@ struct TafsirVolumeDestination: View {
     /// Lets a reference in the book's text open over the page.
     var appState: AppState? = nil
     @State private var item: ContentItem?
-    @State private var hasNoPages = false
+    @State private var cannotOpen = false
     @State private var failed = false
     @State private var attempt = 0
 
@@ -1036,8 +1030,8 @@ struct TafsirVolumeDestination: View {
                     Button("Retry") { attempt += 1 }
                         .buttonStyle(DICompactButtonStyle())
                 }.padding(DISpacing.md)
-            } else if hasNoPages {
-                DIEmptyState(systemImage: "text.book.closed", titleKey: "No text for this book yet")
+            } else if cannotOpen {
+                DIEmptyState(systemImage: "text.book.closed", titleKey: "This work could not be opened")
             } else {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -1049,17 +1043,18 @@ struct TafsirVolumeDestination: View {
     @MainActor
     private func load() async {
         item = nil
-        hasNoPages = false
+        cannotOpen = false
         failed = false
         do {
             let pageCount = try await dependencies.contentRepository.bookPageCount(bookID: volume.bookID)
             try Task.checkCancellation()
-            guard pageCount > 0 else {
-                hasNoPages = true
-                return
-            }
             let stored = try? await dependencies.contentRepository.item(id: volume.bookID)
             try Task.checkCancellation()
+            let hasPrintedPages = stored.map { BookReadingHistory.hasPDF($0) } ?? false
+            guard pageCount > 0 || hasPrintedPages else {
+                cannotOpen = true
+                return
+            }
             item = stored ?? ContentItem(
                 id: volume.bookID,
                 sourceUrl: "",
@@ -1129,7 +1124,7 @@ private struct AyahCardView: View {
                     translationView(translation)
                 } else if displayMode.showsTranslation, viewModel.isAsrarTranslationWithheld(ayah.ayahNumber) {
                     if displayMode.showsArabic { Divider() }
-                    Text("Asrar-at-Tanzil's translation of this ayah is not available yet.")
+                    Text("Asrar-at-Tanzil's translation of this ayah is not included.")
                         .diInterfaceFont(.footnote)
                         .italic()
                         .foregroundStyle(DIColor.textMuted)

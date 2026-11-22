@@ -125,9 +125,7 @@ struct AyahTafsirSheet: View {
         DICard(background: DIColor.sandstone) {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
                 Group {
-                    if work == .akramTafaseer && ayah.surahNumber >= 92 {
-                        Text("Akram-ut-Tafaseer for this surah is in Parah 30, part 2, which is not in the app yet.")
-                    } else if volumes.isEmpty {
+                    if volumes.isEmpty {
                         Text("This tafsir has no commentary on this ayah in this language.")
                     } else {
                         Text("This tafsir has no verse-by-verse commentary on this ayah in this language. The printed volume is below, opened where the surah begins.")

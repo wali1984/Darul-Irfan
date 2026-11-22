@@ -330,7 +330,7 @@ struct ZikrHomeView: View {
         DIEmptyState(
             systemImage: "clock",
             titleKey: "Schedule not available",
-            messageKey: "The online zikr schedule could not be loaded. Pull down later to check for a verified update."
+            messageKey: "The online zikr schedule could not be loaded. Check your connection and pull down to try again."
         )
         .diOctagramWatermark(size: 200, opacity: 0.06)
         .frame(maxWidth: .infinity)

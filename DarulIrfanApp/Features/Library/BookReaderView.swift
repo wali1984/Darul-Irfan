@@ -33,7 +33,7 @@ struct BookReaderView: View {
         case preparing
         case downloading
         case ready(URL)
-        /// The source no longer has the file (HTTP 404/410), or what came
+        /// The server no longer has the file (HTTP 404/410), or what came
         /// back is not a readable PDF. Trying again will not help.
         case notAvailable
         /// The file could not be fetched; another try, online, may work.
@@ -118,7 +118,7 @@ struct BookReaderView: View {
             DIEmptyState(
                 systemImage: "doc.questionmark",
                 titleKey: "This file is not available",
-                messageKey: "The source no longer provides this file, or what it sends is not a readable PDF. Trying again will not bring it back."
+                messageKey: "This book's printed pages cannot be opened. Trying again will not bring them back."
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         case .connectionFailed:

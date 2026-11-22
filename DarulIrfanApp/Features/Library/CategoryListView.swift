@@ -117,8 +117,8 @@ struct CategoryListView: View {
         } else {
             DIEmptyState(
                 systemImage: category.librarySymbol,
-                titleKey: "Nothing here yet",
-                messageKey: "Items in this section will appear automatically after the next verified content update."
+                titleKey: "No items in this section",
+                messageKey: "This section has no items in this version of the app."
             )
             .diOctagramWatermark(size: 260, opacity: 0.05)
             .frame(maxWidth: .infinity, maxHeight: .infinity)

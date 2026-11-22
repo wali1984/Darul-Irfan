@@ -136,7 +136,7 @@ struct PlayerSheetView: View {
                     DIEmptyState(
                         systemImage: "waveform",
                         titleKey: "Nothing is playing",
-                        messageKey: "Choose a lecture from the Media tab to begin listening."
+                        messageKey: "Choose a bayan in Discover › Bayans to begin listening."
                     )
                     .diOctagramWatermark(size: 280, opacity: 0.05)
                 } else {
