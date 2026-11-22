@@ -5,14 +5,16 @@ import Observation
 // MARK: - Narration catalog
 
 /// What `GET /v1/audio/quran/manifest` lists: which ayat and tafsir passages
-/// have a narration, per edition, and whose recordings each voice is modelled on.
+/// have a narration, per edition, and the revision they are at.
 struct NarrationManifest: Codable, Sendable, Equatable {
     struct Voice: Codable, Sendable, Equatable {
-        /// The reader whose published recordings the voice is modelled on.
         var name: String
     }
 
     var version: Int
+    /// Changes whenever narrations are re-made. A list kept on the phone from
+    /// before the server sent one has none.
+    var revision: String?
     /// Keyed by language ("ur", "en").
     var voices: [String: Voice]
     /// edition id -> kind ("translation" / "tafsir") -> file names
@@ -59,18 +61,18 @@ final class NarrationCatalog {
 
     private func apply(_ manifest: NarrationManifest) {
         self.manifest = manifest
-        let tag = Self.tag(for: manifest.voices)
-        let isNewVoice = tag != Self.voiceTag
+        let tag = Self.tag(for: manifest)
+        let isNewRevision = tag != Self.voiceTag
         Self.voiceTag = tag
         var sets: [String: Set<String>] = [:]
         for (edition, kinds) in manifest.editions {
             for (kind, names) in kinds { sets["\(edition)/\(kind)"] = Set(names) }
         }
         available = sets
-        if isNewVoice { Self.removeCopies(otherThan: tag) }
+        if isNewRevision { Self.removeCopies(otherThan: tag) }
     }
 
-    /// Copies kept under an earlier voice or revision are never played again
+    /// Copies kept under an earlier revision are never played again
     /// (`localURL` names the folder after the current one); they are removed
     /// rather than left filling the phone.
     private static func removeCopies(otherThan tag: String) {
@@ -94,7 +96,7 @@ final class NarrationCatalog {
         available["\(edition)/\(kind)"]?.contains(Self.name(surah: surah, start: start, end: end)) ?? false
     }
 
-    /// The file's address, carrying the voice revision. A re-made narration
+    /// The file's address, carrying the narration revision. A re-made narration
     /// keeps its file name, and the server lets copies be cached for a week;
     /// with the revision in the address, a cache on the phone or on the way
     /// holds an old recording only under the old address.
@@ -106,14 +108,21 @@ final class NarrationCatalog {
         return components?.url ?? file
     }
 
-    /// The voices the kept narrations were made with: a hash of each voice's
-    /// credit line, which carries a revision mark ("· rev 2") when the
-    /// narrations are re-made. When it changes, earlier copies are no longer
-    /// used, so nobody keeps hearing a withdrawn voice or an uncorrected ayah
-    /// from their own cache.
+    /// The revision of the kept narrations. When it changes, earlier copies
+    /// are no longer used, so nobody keeps hearing a withdrawn narration or an
+    /// uncorrected ayah from their own cache.
     private static var voiceTag = "v0"
 
-    private static func tag(for voices: [String: NarrationManifest.Voice]) -> String {
+    /// The manifest's revision, used as written: the server works it out as
+    /// the hash below, so the copies already kept stay in use. It names a
+    /// folder that is later swept, so anything but a plain mark is not taken;
+    /// then, as for a list without a revision, the hash of `voices` stands in.
+    static func tag(for manifest: NarrationManifest) -> String {
+        if let revision = manifest.revision,
+           revision.range(of: #"^[0-9a-z]{1,13}\z"#, options: .regularExpression) != nil {
+            return revision
+        }
+        let voices = manifest.voices
         let signature = voices.keys.sorted().map { "\($0)=\(voices[$0]?.name ?? "")" }.joined(separator: ";")
         // FNV-1a: stable across launches, unlike hashValue.
         var hash: UInt64 = 0xcbf29ce484222325
@@ -125,11 +134,6 @@ final class NarrationCatalog {
     static func localURL(edition: String, kind: String, name: String) -> URL {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("narration/\(voiceTag)/\(edition)/\(kind)/\(name).mp3")
-    }
-
-    /// Credit for the voice reading a language, e.g. "Shamshad Ali Khan".
-    func voiceName(language: String) -> String? {
-        manifest?.voices[language]?.name
     }
 }
 
