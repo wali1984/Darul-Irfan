@@ -63,8 +63,18 @@ def main() -> int:
             for word in ayah["textArabic"].split():
                 word = "".join(ch for ch in word if ord(ch) not in (0x200B, 0x200C, 0x200F, 0xFEFF) and not 0xE000 <= ord(ch) <= 0xF8FF)
                 mushaf.update((word, word.rstrip("ؕۖۗۘۙۚۛۜ")))
+        printed = {(r["bookID"], r["page"]): r["text"] for r in json.loads(at(commit, "book_pages.json"))}
         for entry in json.loads(record.read_text(encoding="utf-8")):
             approved.update(vowelled(entry["was"]))
+            # An approved span can stop inside a word as printed (before a sign on it): that whole word may go.
+            page, start = printed.get((entry["book"], entry["page"]), ""), -1
+            while (start := page.find(entry["was"], start + 1)) != -1:
+                left, right = start, start + len(entry["was"])
+                while left and page[left - 1] not in BREAKS:
+                    left -= 1
+                while right < len(page) and page[right] not in BREAKS:
+                    right += 1
+                approved.update(vowelled(page[left:right]))
             if entry["how"].startswith("mushaf"):
                 # What was put in must be the mushaf's own words, letter for letter.
                 before = set(entry["was"].split())

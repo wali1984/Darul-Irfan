@@ -1045,6 +1045,12 @@ def build(write: bool) -> int:
     quotations = Quotations(base_file("quran_ayahs.json"))
     links, links_layout = seed_layout(base_file("book_links.json").read_bytes())
 
+    # An approved change that no finding asked for (an old-style sign) is pinned to its place.
+    for fid, entry in APPROVED.items():
+        if "at" in entry:
+            findings.append({"id": fid, "bookID": entry["book"], "page": entry["page"], "offsetUtf16": entry["at"],
+                             "original": entry["was"], "suggested": entry["now"], "confidence": "high", "category": "quran",
+                             "sourceTextSha256": hashlib.sha256(index[(entry["book"], entry["page"])]["text"].encode("utf-8")).hexdigest()})
     ledger: dict[str, dict] = {}
     wanted: dict[tuple[str, int], list[dict]] = defaultdict(list)
     for finding in findings:
@@ -1084,7 +1090,7 @@ def build(write: bool) -> int:
                 if text.count(span) != 1 or original not in span:
                     raise SystemExit(f"{fid}: the approved words are not one place on the page; nothing written")
                 original, first = span, text.index(span)
-        places = occurrences(text, original)
+        places = [first] if "at" in APPROVED.get(fid, {}) else occurrences(text, original)
         if len(places) > 1:
             alone = [at for at in places if stands_alone(text, at, original)]
             decision = decisions.get(fid) or {}

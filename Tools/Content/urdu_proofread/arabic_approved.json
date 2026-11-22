@@ -1,5 +1,14 @@
 [
  {
+  "id": "ASRAR-102-001",
+  "book": "asrar-102-ur",
+  "page": 1,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "علم لیقین حاصل ہوگا",
+  "now": "علم الیقین حاصل ہوگا",
+  "authority": "approved by the owner 2026-11-22, page 2 item F87"
+ },
+ {
   "id": "ASRAR-108-002",
   "book": "asrar-108-ur",
   "page": 1,
@@ -42,12 +51,30 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E62"
  },
  {
+  "id": "ASRAR-43-P13-16-011",
+  "book": "asrar-43-ur",
+  "page": 14,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "یا معاذاللہ وہ بھی جہنم میں جائیں گے تو یہ اعتراض",
+  "now": "یا معاذ اللہ وہ بھی جہنم میں جائیں گے؟ تو یہ اعتراض",
+  "authority": "approved by the owner 2026-11-22, page 2 item K76"
+ },
+ {
   "id": "ASRAR-45-P1-4-016",
   "book": "asrar-45-ur",
   "page": 3,
   "how": "name of a para (the Qur'an's own words)",
   "was": "رکوع نمبر ۲ آیات ۱۲ تا ۲۱",
   "now": "رکوع نمبر ۲ آیات ۱۲ تا ۲۱ الیہ یرد ۲۵/۱۸"
+ },
+ {
+  "id": "ASRAR-46-P11-13-023",
+  "book": "asrar-46-ur",
+  "page": 13,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "(واللہ اعلم بالثواب)",
+  "now": "(واللہ اعلم بالصواب)",
+  "authority": "approved by the owner 2026-11-22, page 2 item H5"
  },
  {
   "id": "ASRAR-48-P15-18-014",
@@ -57,6 +84,15 @@
   "was": "انشاء اللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
+ },
+ {
+  "id": "ASRAR-57-P11-15-009",
+  "book": "asrar-57-ur",
+  "page": 15,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ حدید تمام ہوئی",
+  "now": "سورۂ حدید تمام ہوئی",
+  "authority": "approved by the owner 2026-11-22, page 2 item G54"
  },
  {
   "id": "ASRAR-58-UR-P1-4-011",
@@ -75,12 +111,93 @@
   "now": "عیسیٰ ابنِ مریم نے"
  },
  {
+  "id": "ASRAR-62-UR-P1-6-016",
+  "book": "asrar-62-ur",
+  "page": 6,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "سب کو ذکر اللہ سے",
+  "now": "سب کو ذکرُ اللہ سے",
+  "authority": "approved by the owner 2026-11-22, page 2 item K42"
+ },
+ {
+  "id": "ASRAR-71-UR-P1-5-013",
+  "book": "asrar-71-ur",
+  "page": 5,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "ود، سواع، یعوث، یعوق اور نسر",
+  "now": "ود، سواع، یغوث، یعوق اور نسر",
+  "authority": "approved by the owner 2026-11-22, page 2 item F117"
+ },
+ {
+  "id": "ASRAR-72-UR-P1-7-017",
+  "book": "asrar-72-ur",
+  "page": 7,
+  "how": "the reader's fix",
+  "was": "اس کی صفت ہے عَلِمُ الغیب",
+  "now": "اس کی صفت ہے عَالِمُ الغیب",
+  "authority": "approved by the owner 2026-11-22, page 2 item H10"
+ },
+ {
+  "id": "ASRAR-79-UR-P1-7-002",
+  "book": "asrar-79-ur",
+  "page": 1,
+  "how": "the reader's fix",
+  "was": "رکوع نمبر ا آیات ا تا ٢٦",
+  "now": "رکوع نمبر ۱، آیات ۱ تا ۲۶",
+  "authority": "approved by the owner 2026-11-22, page 2 item H45"
+ },
+ {
+  "id": "ASRAR-79-UR-P1-7-011",
+  "book": "asrar-79-ur",
+  "page": 2,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "الا ماشاء اللہ یعنی بہت کم لوگوں",
+  "now": "اِلّا ما شاء اللہ، یعنی بہت کم لوگوں",
+  "authority": "approved by the owner 2026-11-22, page 2 item F27"
+ },
+ {
+  "id": "ASRAR-88-UR-P1-3-010",
+  "book": "asrar-88-ur",
+  "page": 2,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "انجام کار سب تباہی سے دوچار ہونگے۔ ”العیاذ اُباللہ“",
+  "now": "انجامِ کار سب تباہی سے دوچار ہوں گے۔ ”العیاذ باللہ“",
+  "authority": "approved by the owner 2026-11-22, page 2 item H23"
+ },
+ {
+  "id": "ASRAR-89-UR-P1-5-007",
+  "book": "asrar-89-ur",
+  "page": 2,
+  "how": "inside a block of Arabic",
+  "was": "بِجَهَنَّمَ ڏ يَوْمَىِٕذٍ",
+  "now": "بِجَهَنَّمَ ۙ يَوْمَىِٕذٍ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H34"
+ },
+ {
+  "id": "ASRAR-92-UR-P1-3-001",
+  "book": "asrar-92-ur",
+  "page": 1,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "سُوْرَۃُ الَّیْلِ",
+  "now": "سُوْرَۃُ اللَّیْلِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H49"
+ },
+ {
   "id": "ASRAR-FURQAAN-22-014",
   "book": "asrar-25-ur",
   "page": 23,
   "how": "words of the Qur'an, typed bare or given vowels",
   "was": "یاارحم الرحمین",
   "now": "یا ارحم الرحمین"
+ },
+ {
+  "id": "ASRAR-HAJJ-13-017",
+  "book": "asrar-22-ur",
+  "page": 15,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "تو انشاء اللہ کفار کے غلبہ کی بساط",
+  "now": "تو ان شاء اللہ کفار کے غلبے کی بساط",
+  "authority": "approved by the owner 2026-11-22, page 2 item F63"
  },
  {
   "id": "ASRAR-HAJJ-28-008",
@@ -117,6 +234,15 @@
   "now": "قُلِ الرُّوْحُ مِنْ اَمْرِ رَبِّىْ۔"
  },
  {
+  "id": "ASRAR-HUD-H-013",
+  "book": "asrar-11-ur",
+  "page": 28,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "العیاذ اً باللہ۔",
+  "now": "العیاذ باللہ۔",
+  "authority": "approved by the owner 2026-11-22, page 2 item E30"
+ },
+ {
   "id": "ASRAR-IBRAHIM-A-001",
   "book": "asrar-14-ur",
   "page": 1,
@@ -124,6 +250,15 @@
   "was": "سُورہ ابراھیم",
   "now": "سُورہ ابراہیم",
   "authority": "delegated by the owner 2026-11-21, page 2 item G68"
+ },
+ {
+  "id": "ASRAR-IBRAHIM-B-014",
+  "book": "asrar-14-ur",
+  "page": 4,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "رُوح امر ربیّ سے ہے اب ظاہر",
+  "now": "رُوح امرِ ربّی سے ہے۔ اب ظاہر",
+  "authority": "approved by the owner 2026-11-22, page 2 item F78"
  },
  {
   "id": "ASRAR-IBRAHIM-D-005",
@@ -175,6 +310,33 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F91"
  },
  {
+  "id": "ASRAR-ISRA-E-008",
+  "book": "asrar-17-ur",
+  "page": 21,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "انسانی دل یا فواد دل کا",
+  "now": "انسانی دل، یا فؤاد، دل کا",
+  "authority": "approved by the owner 2026-11-22, page 2 item K22"
+ },
+ {
+  "id": "ASRAR-ISRA-G-006",
+  "book": "asrar-17-ur",
+  "page": 31,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "یہاں رویار سے مراد",
+  "now": "یہاں رؤیا سے مراد",
+  "authority": "approved by the owner 2026-11-22, page 2 item F145"
+ },
+ {
+  "id": "ASRAR-KAHF-D-008",
+  "book": "asrar-18-ur",
+  "page": 16,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "مگر (انشاء اللہ کہہ کر",
+  "now": "مگر (ان شاء اللہ کہہ کر",
+  "authority": "approved by the owner 2026-11-22, page 2 item E82"
+ },
+ {
   "id": "ASRAR-KAHF-E-001",
   "book": "asrar-18-ur",
   "page": 17,
@@ -182,6 +344,15 @@
   "was": "انشاء اللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
+ },
+ {
+  "id": "ASRAR-KAHF-F-008",
+  "book": "asrar-18-ur",
+  "page": 21,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "تم نے ماشاء اللہ لاقوۃ الا باللہ کیوں نہ کہا؟",
+  "now": "تم نے «ما شاء اللہ، لا قوۃ الا باللہ» کیوں نہ کہا؟",
+  "authority": "approved by the owner 2026-11-22, page 2 item F62"
  },
  {
   "id": "ASRAR-KAHF-F-010",
@@ -267,6 +438,33 @@
   "now": "اَلعِیاذُ بِاللّٰہ"
  },
  {
+  "id": "ASRAR-NAHL-I-011",
+  "book": "asrar-16-ur",
+  "page": 42,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "اسکو روح القدس",
+  "now": "اس کو روحُ القدس",
+  "authority": "approved by the owner 2026-11-22, page 2 item K10"
+ },
+ {
+  "id": "ASRAR-NAHL-I-031",
+  "book": "asrar-16-ur",
+  "page": 44,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "افترٰی",
+  "now": "افترا",
+  "authority": "approved by the owner 2026-11-22, page 2 item K11"
+ },
+ {
+  "id": "ASRAR-NOOR-13-012",
+  "book": "asrar-24-ur",
+  "page": 14,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "مابغت امراۃ نبی قط",
+  "now": "ما بغت امراۃ نبی قط",
+  "authority": "approved by the owner 2026-11-22, page 2 item H66"
+ },
+ {
   "id": "ASRAR-NOOR-28-013",
   "book": "asrar-24-ur",
   "page": 30,
@@ -283,6 +481,33 @@
   "was": "الحمدللہ سورۃ نور کی تفسیر",
   "now": "الحمد للہ، سورۃ نور کی تفسیر",
   "authority": "delegated by the owner 2026-11-21, page 2 item E27"
+ },
+ {
+  "id": "ASRAR-QASAS-25-024",
+  "book": "asrar-28-ur",
+  "page": 28,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "کوشش کی جائے تو بفضل اللہ",
+  "now": "کوشش کی جائے تو بفضلِ اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K72"
+ },
+ {
+  "id": "ASRAR-QASAS-7-014",
+  "book": "asrar-28-ur",
+  "page": 8,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "تم مجھے انشاء اللہ نیک لوگوں میں",
+  "now": "تم مجھے ان شاء اللہ نیک لوگوں میں",
+  "authority": "approved by the owner 2026-11-22, page 2 item E61"
+ },
+ {
+  "id": "ASRAR-RAD-B-014",
+  "book": "asrar-13-ur",
+  "page": 2,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "ارشادات بھی منزل من اللہ",
+  "now": "ارشادات بھی مُنزّل مِن اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F25"
  },
  {
   "id": "ASRAR-RAD-C-024",
@@ -380,6 +605,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E93"
  },
  {
+  "id": "SAI-COURSE-P001-009-001",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 2,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "الطریہ الجدیدہ حصہ دوم",
+  "now": "الطریقہ الجدیدہ، حصہ دوم",
+  "authority": "approved by the owner 2026-11-22, page 2 item H15"
+ },
+ {
   "id": "SAI-COURSE-P001-009-005",
   "book": "book-ocr-sai-hafta-course",
   "page": 3,
@@ -416,6 +650,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E55"
  },
  {
+  "id": "SAI-COURSE-P017-022-005",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 17,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "مَصْرُوْ فاً عَنْھُمْ",
+  "now": "مَصْرُوْفًا عَنْھُمْ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H73"
+ },
+ {
   "id": "SAI-COURSE-P023-027-006",
   "book": "book-ocr-sai-hafta-course",
   "page": 23,
@@ -434,6 +677,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item K63"
  },
  {
+  "id": "SAI-COURSE-P028-034-023",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 31,
+  "how": "mushaf 11:59",
+  "was": "''تِلْکَ عَادٌ جَحَدُوْا بِاٰیٰتِ رَبِّھِمْ ''",
+  "now": "''وَتِلْكَ عَادٌ جَحَدُوْا بِاٰيٰتِ رَبِّهِمْ ''",
+  "authority": "approved by the owner 2026-11-22, page 2 item F12"
+ },
+ {
+  "id": "SAI-COURSE-P035-038-008",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 36,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "الا ماشاء اللہ تو یہ ہوگا کیا",
+  "now": "اِلّا ما شاء اللہ۔ تو یہ ہو گا کیا؟",
+  "authority": "approved by the owner 2026-11-22, page 2 item E14"
+ },
+ {
   "id": "SAI-COURSE-P039-042-003",
   "book": "book-ocr-sai-hafta-course",
   "page": 39,
@@ -441,6 +702,24 @@
   "was": "فَلَمَّا جَآءَ اَمْرُنَا جَعَلْنَا عَالِیَهَا سَافِلَهَا وَ اَمْطَرْنَا",
   "now": "فَلَمَّا جَآءَ اَمْرُنَا جَعَلْنَا عَالِيَهَا سَافِلَهَا وَاَمْطَرْنَا",
   "authority": "delegated by the owner 2026-11-21, page 2 item F96"
+ },
+ {
+  "id": "SAI-COURSE-P039-042-017",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 41,
+  "how": "mushaf 48:29",
+  "was": "''ذٰلِکَ مَثَلُھُمْ فِی التَّوْرٰۃِ وَمَثَلُھُمْ فِی الْاِنْجِیْلِ ''(الفتح:۲۹)",
+  "now": "''ذٰ لِكَ مَثَلُهُمْ فِى التَّوْرٰٮةِ وَمَثَلُهُمْ فِى الْاِنْجِيْلِ ''(الفتح:۲۹)",
+  "authority": "approved by the owner 2026-11-22, page 2 item F13"
+ },
+ {
+  "id": "SAI-COURSE-P043-046-015",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 44,
+  "how": "mushaf 42:13",
+  "was": "''یَھْدِیْٓ اِلَیْهِ مَنْ یُّنِیْبُ ''(الشوریٰ:۱۳)",
+  "now": "''وَيَهْدِىْۤ اِلَيْهِ مَنْ يُّنِيْبُ ''(الشوریٰ:۱۳)",
+  "authority": "approved by the owner 2026-11-22, page 2 item F22"
  },
  {
   "id": "SAI-COURSE-P043-046-021",
@@ -461,6 +740,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F21"
  },
  {
+  "id": "SAI-COURSE-P043-046-028",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 46,
+  "how": "mushaf 26:2",
+  "was": "”تلک ایت الکتب المبین“",
+  "now": "”تِلْكَ اٰيٰتُ الْكِتٰبِ الْمُبِيْنِ“",
+  "authority": "approved by the owner 2026-11-22, page 2 item F147"
+ },
+ {
   "id": "SAI-COURSE-P051-054-001",
   "book": "book-ocr-sai-hafta-course",
   "page": 51,
@@ -468,6 +756,24 @@
   "was": "وَ اِنْ کُنْتَ مِنْ قَبْلِهٖ لَمِنَ الْغٰفِلِیْنَ ۝",
   "now": "وَاِنْ كُنْتَ مِنْ قَبْلِهٖ لَمِنَ الْغٰفِلِيْنَ ۝",
   "authority": "delegated by the owner 2026-11-21, page 2 item F123"
+ },
+ {
+  "id": "SAI-COURSE-P051-054-018",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 53,
+  "how": "mushaf 72:18",
+  "was": "اَنَّ الْمَسٰجِدَ لِلّٰہِ مسجدیں",
+  "now": "وَّاَنَّ الْمَسٰجِدَ لِلّٰهِ مسجدیں",
+  "authority": "approved by the owner 2026-11-22, page 2 item F49"
+ },
+ {
+  "id": "SAI-COURSE-P055-057-023",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 57,
+  "how": "mushaf 25:18",
+  "was": "'' وَلٰـکِنْ مَّتَّعْتَهُمْ وَاٰبَآءَهُمْ ''",
+  "now": "'' وَ لٰـكِنْ مَّتَّعْتَهُمْ وَاٰبَآءَهُمْ ''",
+  "authority": "approved by the owner 2026-11-22, page 2 item F11"
  },
  {
   "id": "SAI-COURSE-P058-061-013",
@@ -515,6 +821,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F10"
  },
  {
+  "id": "SAI-COURSE-P069-072-011",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 71,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "”فزت ورب الکعبہ“",
+  "now": "«فُزْتُ وَرَبِّ الْكَعْبَةِ»",
+  "authority": "approved by the owner 2026-11-22, page 2 item H101"
+ },
+ {
   "id": "SAI-COURSE-P069-072-013",
   "book": "book-ocr-sai-hafta-course",
   "page": 71,
@@ -522,6 +837,15 @@
   "was": "”وَ اذْکُرُوا اللّٰہَ کَثِیْرًا“",
   "now": "”وَاذْكُرُوا اللّٰهَ كَثِيْرًا“",
   "authority": "delegated by the owner 2026-11-21, page 2 item F148"
+ },
+ {
+  "id": "SAI-COURSE-P073-076-005",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 73,
+  "how": "mushaf 8:45",
+  "was": "''واذکر اللہ کثیرا''",
+  "now": "''وَاذْكُرُوا اللّٰهَ كَثِيْرًا''",
+  "authority": "approved by the owner 2026-11-22, page 2 item F16"
  },
  {
   "id": "SAI-COURSE-P077-080-005",
@@ -533,6 +857,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F17"
  },
  {
+  "id": "SAI-COURSE-P077-080-006",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 77,
+  "how": "mushaf 8:60",
+  "was": "''وَ مِنْ رِّبَاطِ الْخَيْلِ''",
+  "now": "''وَّمِنْ رِّبَاطِ الْخَـيْلِ''",
+  "authority": "approved by the owner 2026-11-22, page 2 item F19"
+ },
+ {
   "id": "SAI-COURSE-P077-080-008",
   "book": "book-ocr-sai-hafta-course",
   "page": 77,
@@ -540,6 +873,234 @@
   "was": "''وَ عَدُوَّكُم''",
   "now": "''وَعَدُوَّكُمْ''",
   "authority": "delegated by the owner 2026-11-21, page 2 item F18"
+ },
+ {
+  "id": "SAI-COURSE-P077-080-019",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 79,
+  "how": "mushaf 2:272",
+  "was": "”وَ اَنۡتُمۡ لَا تُظۡلَمُوۡنَ“",
+  "now": "”وَاَنْـتُمْ لَا تُظْلَمُوْنَ“",
+  "authority": "approved by the owner 2026-11-22, page 2 item F149"
+ },
+ {
+  "id": "SAI-COURSE-P081-084-014",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 82,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "مفسرین اس کے نیچے لکھتے ہیں یعرفون۔",
+  "now": "مفسرین اس کے نیچے لکھتے ہیں: «يَعْرِفُونَ»۔",
+  "authority": "approved by the owner 2026-11-22, page 2 item H67"
+ },
+ {
+  "id": "SIGN-asrar-12-ur-P15-1167",
+  "book": "asrar-12-ur",
+  "page": 15,
+  "at": 1167,
+  "how": "mushaf 12:29",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-13-ur-P7-3337",
+  "book": "asrar-13-ur",
+  "page": 7,
+  "at": 3337,
+  "how": "mushaf 13:18",
+  "was": "ڼ",
+  "now": "ؕ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-2-ur-P10-1298",
+  "book": "asrar-2-ur",
+  "page": 10,
+  "at": 1298,
+  "how": "mushaf 2:14",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-2-ur-P158-673",
+  "book": "asrar-2-ur",
+  "page": 158,
+  "at": 673,
+  "how": "mushaf 2:174",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-24-ur-P11-2343",
+  "book": "asrar-24-ur",
+  "page": 11,
+  "at": 2343,
+  "how": "mushaf 24:22",
+  "was": "ښ",
+  "now": "ۖ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-3-ur-P120-646",
+  "book": "asrar-3-ur",
+  "page": 120,
+  "at": 646,
+  "how": "mushaf 3:167",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-3-ur-P85-3568",
+  "book": "asrar-3-ur",
+  "page": 85,
+  "at": 3568,
+  "how": "mushaf 3:118",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-3-ur-P85-4471",
+  "book": "asrar-3-ur",
+  "page": 85,
+  "at": 4471,
+  "how": "mushaf 3:119",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-30-en-P1-1071",
+  "book": "asrar-30-en",
+  "page": 1,
+  "at": 1071,
+  "how": "mushaf 30:7",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-34-ur-P14-112",
+  "book": "asrar-34-ur",
+  "page": 14,
+  "at": 112,
+  "how": "mushaf 34:31",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-36-ur-P9-453",
+  "book": "asrar-36-ur",
+  "page": 9,
+  "at": 453,
+  "how": "mushaf 36:37",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-37-ur-P1-402",
+  "book": "asrar-37-ur",
+  "page": 1,
+  "at": 402,
+  "how": "mushaf 37:6",
+  "was": "ﹰالْكَوَاكِبِ",
+  "now": "اۨلْكَوَاكِبِ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-40-ur-P17-1670",
+  "book": "asrar-40-ur",
+  "page": 17,
+  "at": 1670,
+  "how": "mushaf 40:64",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-48-ur-P16-1086",
+  "book": "asrar-48-ur",
+  "page": 16,
+  "at": 1086,
+  "how": "mushaf 48:29",
+  "was": "ټ",
+  "now": "ۛۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-5-ur-P35-1562",
+  "book": "asrar-5-ur",
+  "page": 35,
+  "at": 1562,
+  "how": "mushaf 5:41",
+  "was": "ښ",
+  "now": "ۚۖ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-asrar-7-ur-P2-795",
+  "book": "asrar-7-ur",
+  "page": 2,
+  "at": 795,
+  "how": "mushaf 7:8",
+  "was": "ﹰالْحَقُّ",
+  "now": "اۨلْحَـقُّ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-tafaseer-parah-10-P138-267",
+  "book": "tafaseer-parah-10",
+  "page": 138,
+  "at": 267,
+  "how": "mushaf 9:17",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-tafaseer-parah-19-P15-709",
+  "book": "tafaseer-parah-19",
+  "page": 15,
+  "at": 709,
+  "how": "mushaf 25:26",
+  "was": "ﹰالْحَقُّ",
+  "now": "اۨلْحَـقُّ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-tafaseer-parah-21-P50-570",
+  "book": "tafaseer-parah-21",
+  "page": 50,
+  "at": 570,
+  "how": "mushaf 30:7",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-tafaseer-parah-21-P53-818",
+  "book": "tafaseer-parah-21",
+  "page": 53,
+  "at": 818,
+  "how": "mushaf 30:7",
+  "was": "ښ",
+  "now": "ۖۚ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
+ },
+ {
+  "id": "SIGN-tafaseer-parah-24-P58-1065",
+  "book": "tafaseer-parah-24",
+  "page": 58,
+  "at": 1065,
+  "how": "mushaf 40:8",
+  "was": "ﹰالَّتِیْ",
+  "now": "اۨلَّتِىْ",
+  "authority": "approved by the owner 2026-11-22: old-style signs, from the app's mushaf"
  },
  {
   "id": "TEAM-early-tafaseer-parah-1-P136-003",
@@ -656,6 +1217,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E46"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-1-P45-003",
+  "book": "tafaseer-parah-1",
+  "page": 45,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "علماء ظواہر الحمدللہ",
+  "now": "علمائے ظواہر، الحمد للہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item E79"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-1-P59-003",
   "book": "tafaseer-parah-1",
   "page": 59,
@@ -681,6 +1251,42 @@
   "was": "سورۃالتوبہ رکوع8آیات60تا66",
   "now": "سورۃ التوبہ رکوع 8 آیات 60 تا 66",
   "authority": "delegated by the owner 2026-11-21, page 2 item G67"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-10-P20-003",
+  "book": "tafaseer-parah-10",
+  "page": 20,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "یوم الفرقان:",
+  "now": "یومُ الفرقان:",
+  "authority": "approved by the owner 2026-11-22, page 2 item F143"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-10-P44-002",
+  "book": "tafaseer-parah-10",
+  "page": 44,
+  "how": "mushaf 6:112",
+  "was": "شیاطین الانس والجن",
+  "now": "شَيٰطِيْنَ الْاِنْسِ وَالْجِنِّ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F84"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-10-P63-004",
+  "book": "tafaseer-parah-10",
+  "page": 63,
+  "how": "mushaf 8:58",
+  "was": "اِمَّا تَخَافَنَّ مِنْ قَوْمٍ",
+  "now": "وَاِمَّا تَخَافَنَّ مِنْ قَوْمٍ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F53"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-10-P81-003",
+  "book": "tafaseer-parah-10",
+  "page": 81,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "الرحم الرحمین",
+  "now": "ارحم الراحمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item E29"
  },
  {
   "id": "TEAM-early-tafaseer-parah-10-P9-003",
@@ -715,6 +1321,42 @@
   "how": "mushaf 2:180",
   "was": "حَضَرَ اَحَدَ کُمُ الْمَوْتُ",
   "now": "حَضَرَ اَحَدَكُمُ الْمَوْتُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P132-001",
+  "book": "tafaseer-parah-2",
+  "page": 132,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "اسلام ہی الھدیٰ ہے",
+  "now": "اسلام ہی الہدیٰ ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F2"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P14-002",
+  "book": "tafaseer-parah-2",
+  "page": 14,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "دہشتگردی کا علاج",
+  "now": "دہشت گردی کا علاج",
+  "authority": "approved by the owner 2026-11-22, page 2 item F68"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P14-003",
+  "book": "tafaseer-parah-2",
+  "page": 14,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "اسلام ہی الھدیٰ ہے",
+  "now": "اسلام ہی الہدیٰ ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F2"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P140-002",
+  "book": "tafaseer-parah-2",
+  "page": 140,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "(النسآء: 164)",
+  "now": "(النساء: 164)",
+  "authority": "approved by the owner 2026-11-22, page 2 item G24"
  },
  {
   "id": "TEAM-early-tafaseer-parah-2-P143-001",
@@ -765,6 +1407,15 @@
   "was": "(ال عمران: 164)",
   "now": "(آلِ عمران: 164)",
   "authority": "delegated by the owner 2026-11-21, page 2 item G8"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P293-001",
+  "book": "tafaseer-parah-2",
+  "page": 293,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "(آل عمران:103)",
+  "now": "(آلِ عمران: 103)",
+  "authority": "approved by the owner 2026-11-22, page 2 item G5"
  },
  {
   "id": "TEAM-early-tafaseer-parah-2-P300-002",
@@ -833,6 +1484,15 @@
   "now": "كَمَنْ لَا ذَنْبَ لَهٗ"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-2-P77-002",
+  "book": "tafaseer-parah-2",
+  "page": 77,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "سورت فاتحہ کی تفسیر",
+  "now": "سورۂ فاتحہ کی تفسیر",
+  "authority": "approved by the owner 2026-11-22, page 2 item K43"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-3-P100-003",
   "book": "tafaseer-parah-3",
   "page": 100,
@@ -872,6 +1532,15 @@
   "how": "the reader's fix",
   "was": "يُهَوِّدَ انِهٖ",
   "now": "يُهَوِّدَانِهٖ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P163-001",
+  "book": "tafaseer-parah-3",
+  "page": 163,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "جو چیزیں اس مالک الملک نے",
+  "now": "جو چیزیں اس مالکُ الملک نے",
+  "authority": "approved by the owner 2026-11-22, page 2 item K35"
  },
  {
   "id": "TEAM-early-tafaseer-parah-3-P169-001",
@@ -1076,6 +1745,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-4-P12-001",
+  "book": "tafaseer-parah-4",
+  "page": 12,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورہ النساء لیات 1 تا 10",
+  "now": "سورۃ النساء، آیات 1 تا 10",
+  "authority": "approved by the owner 2026-11-22, page 2 item G38"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-4-P135-003",
   "book": "tafaseer-parah-4",
   "page": 135,
@@ -1099,6 +1777,15 @@
   "how": "mushaf 3:152",
   "was": "ثم صرفکم عنھم لیبتلیکم",
   "now": "ثُمَّ صَرَفَكُمْ عَنْهُمْ لِيَبْتَلِيَكُمْ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P199-004",
+  "book": "tafaseer-parah-4",
+  "page": 199,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "لات وعزیٰ",
+  "now": "لات و عُزّیٰ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K51"
  },
  {
   "id": "TEAM-early-tafaseer-parah-4-P206-001",
@@ -1167,6 +1854,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E2"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-4-P272-001",
+  "book": "tafaseer-parah-4",
+  "page": 272,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "رحمۃ العالمین",
+  "now": "رحمۃ للعالمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item F74"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-4-P272-002",
   "book": "tafaseer-parah-4",
   "page": 272,
@@ -1190,6 +1886,15 @@
   "was": "ہماری تو عمر الحمد اللہ",
   "now": "ہماری تو عمر الحمد للہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E92"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P297-005",
+  "book": "tafaseer-parah-4",
+  "page": 297,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "الْغُرُوْرِ ۝",
+  "now": "الْغُرُوْرِ ۝۱۸۵",
+  "authority": "approved by the owner 2026-11-22, page 2 item F39"
  },
  {
   "id": "TEAM-early-tafaseer-parah-4-P318-003",
@@ -1225,6 +1930,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E2"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-4-P5-001",
+  "book": "tafaseer-parah-4",
+  "page": 5,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "رحمۃ اللعلمین ﷺ",
+  "now": "رحمۃٌ للعالمین ﷺ",
+  "authority": "approved by the owner 2026-11-22, page 2 item E77"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P50-004",
+  "book": "tafaseer-parah-4",
+  "page": 50,
+  "how": "words of the Qur'an, typed bare",
+  "was": "محمد الرسول اللہ",
+  "now": "محمد رسول اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F108"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-4-P60-003",
   "book": "tafaseer-parah-4",
   "page": 60,
@@ -1240,6 +1963,33 @@
   "was": "الحمد اللہ",
   "now": "الحمد للہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E2"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P9-001",
+  "book": "tafaseer-parah-4",
+  "page": 9,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورہ ال عمران لایات 130تا143",
+  "now": "سورۂ آل عمران، آیات 130 تا 143",
+  "authority": "approved by the owner 2026-11-22, page 2 item G36"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P93-001",
+  "book": "tafaseer-parah-4",
+  "page": 93,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "ایک صبر دوسرا التقویٰ",
+  "now": "ایک صبر، دوسرا تقویٰ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K29"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P106-002",
+  "book": "tafaseer-parah-5",
+  "page": 106,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "رحمۃ العالمین بنا کر معبوث کردیا ہے",
+  "now": "رحمۃ للعالمین بنا کر مبعوث کر دیا ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F75"
  },
  {
   "id": "TEAM-early-tafaseer-parah-5-P115-003",
@@ -1359,6 +2109,15 @@
   "now": "خَلَقَ لَـكُمْ مَّا فِى الْاَرْضِ جَمِيْعًا"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-6-P155-001",
+  "book": "tafaseer-parah-6",
+  "page": 155,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "مَنْ تَشَبَّہَ بِقَوْمٍ فَھُوْ مِنْھُمْ",
+  "now": "مَنْ تَشَبَّهَ بِقَوْمٍ فَهُوَ مِنْهُمْ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H75"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-6-P158-003",
   "book": "tafaseer-parah-6",
   "page": 158,
@@ -1382,6 +2141,33 @@
   "was": "اور انشاء اللہ یہ باقی رہے گا",
   "now": "اور ان شاء اللہ یہ باقی رہے گا",
   "authority": "delegated by the owner 2026-11-21, page 2 item H25"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P272-002",
+  "book": "tafaseer-parah-6",
+  "page": 272,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "مَنْ وَّالِدِہٖ",
+  "now": "مِنْ وَالِدِهِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H76"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P288-001",
+  "book": "tafaseer-parah-6",
+  "page": 288,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "صائبین",
+  "now": "صابئین",
+  "authority": "approved by the owner 2026-11-22, page 2 item K45"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P299-005",
+  "book": "tafaseer-parah-6",
+  "page": 299,
+  "how": "mushaf 2:62",
+  "was": "امن باللہ والیوم الآخر",
+  "now": "اٰمَنَ بِاللّٰهِ وَالْيَوْمِ الْاٰخِرِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F42"
  },
  {
   "id": "TEAM-early-tafaseer-parah-6-P4-003",
@@ -1425,12 +2211,30 @@
   "now": "لَاۤ اِلٰهَ اِلَّا اللّٰهُ"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-6-P82-004",
+  "book": "tafaseer-parah-6",
+  "page": 82,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "وہ وحدہٗ لاشریک معبود برحق ہے",
+  "now": "وہ وحدہٗ لا شریک، معبودِ برحق ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item E89"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-6-P9-003",
   "book": "tafaseer-parah-6",
   "page": 9,
   "how": "the reader's fix",
   "was": "اور انشاء اللہ",
   "now": "اور ان شاء اللہ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P90-001",
+  "book": "tafaseer-parah-6",
+  "page": 90,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "فزت ورب الکعبہ",
+  "now": "فُزْتُ وَرَبِّ الْكَعْبَةِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H55"
  },
  {
   "id": "TEAM-early-tafaseer-parah-7-P100-001",
@@ -1440,6 +2244,15 @@
   "was": "خاتم النبین",
   "now": "خاتم النبیین",
   "authority": "delegated by the owner 2026-11-21, page 2 item F1"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-7-P126-001",
+  "book": "tafaseer-parah-7",
+  "page": 126,
+  "how": "mushaf 6:1",
+  "was": "وَ النُّوْرَ",
+  "now": "وَالنُّوْرَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F121"
  },
  {
   "id": "TEAM-early-tafaseer-parah-7-P155-001",
@@ -1505,6 +2318,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F38"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-7-P294-004",
+  "book": "tafaseer-parah-7",
+  "page": 294,
+  "how": "mushaf 6:72",
+  "was": "وَاتَّقُوْہُ ط",
+  "now": "وَ اتَّقُوْهُ ط",
+  "authority": "approved by the owner 2026-11-22, page 2 item F130"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-7-P301-004",
+  "book": "tafaseer-parah-7",
+  "page": 301,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "یہ صرف الصدق الصادقین ﷺ ہیں",
+  "now": "یہ صرف اصدق الصادقین ﷺ ہیں",
+  "authority": "approved by the owner 2026-11-22, page 2 item H99"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-7-P316-001",
   "book": "tafaseer-parah-7",
   "page": 316,
@@ -1512,6 +2343,15 @@
   "was": "وَ وَهَبْنَا",
   "now": "وَوَهَبْنَا",
   "authority": "delegated by the owner 2026-11-21, page 2 item F129"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-7-P33-002",
+  "book": "tafaseer-parah-7",
+  "page": 33,
+  "how": "mushaf 5:54",
+  "was": "یحبھم و یحبونہٗ",
+  "now": "يُّحِبُّهُمْ وَيُحِبُّوْنَهٗۤ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F141"
  },
  {
   "id": "TEAM-early-tafaseer-parah-7-P386-001",
@@ -1523,6 +2363,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F70"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-7-P39-002",
+  "book": "tafaseer-parah-7",
+  "page": 39,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "جواءوَ الْاَنْصَابُ",
+  "now": "جوا۔ وَالْاَنْصَابُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H39"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-7-P4-001",
   "book": "tafaseer-parah-7",
   "page": 4,
@@ -1530,6 +2379,15 @@
   "was": "انشاء اللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-7-P46-003",
+  "book": "tafaseer-parah-7",
+  "page": 46,
+  "how": "mushaf 5:92",
+  "was": "اَطِيْعُوا اللّٰهَ وَاَطِيْعُوا الرَّسُوْلَ۔",
+  "now": "وَاَطِيْعُوا اللّٰهَ وَاَطِيْعُوا الرَّسُوْلَ۔",
+  "authority": "approved by the owner 2026-11-22, page 2 item F47"
  },
  {
   "id": "TEAM-early-tafaseer-parah-7-P59-001",
@@ -1568,6 +2426,42 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-7-P90-003",
+  "book": "tafaseer-parah-7",
+  "page": 90,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "بُحیرہ",
+  "now": "بَحیرہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K31"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-7-P94-004",
+  "book": "tafaseer-parah-7",
+  "page": 94,
+  "how": "mushaf 5:102",
+  "was": "قَدْ سَاَلَهَا قَوْمٌ مِّنْ قَبْلِكُمْ ثُمَّ اَصْبَحُوْا بِهَا كٰفِرِيْنَ۝",
+  "now": "قَدْ سَاَ لَهَا قَوْمٌ مِّنْ قَبْلِكُمْ ثُمَّ اَصْبَحُوْا بِهَا كٰفِرِيْنَ۝",
+  "authority": "approved by the owner 2026-11-22, page 2 item F100"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P149-001",
+  "book": "tafaseer-parah-8",
+  "page": 149,
+  "how": "mushaf 9:30",
+  "was": "و قالت الیھود عزیز ن ابن اللہ",
+  "now": "وَقَالَتِ الْيَهُوْدُ عُزَيْرُ ۨابْنُ اللّٰهِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F115"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P161-002",
+  "book": "tafaseer-parah-8",
+  "page": 161,
+  "how": "mushaf 4:97",
+  "was": "کنا مستضعفین فی الارض",
+  "now": "كُنَّا مُسْتَضْعَفِيْنَ فِىْ الْاَرْضِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F140"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-8-P161-003",
   "book": "tafaseer-parah-8",
   "page": 161,
@@ -1575,6 +2469,15 @@
   "was": "الم تکن ارض اللہ واسعۃ",
   "now": "اَلَمْ تَكُنْ اَرْضُ اللّٰهِ وَاسِعَةً",
   "authority": "delegated by the owner 2026-11-21, page 2 item F33"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P219-001",
+  "book": "tafaseer-parah-8",
+  "page": 219,
+  "how": "the reader's fix",
+  "was": "اللہ وحدہ لاشریک",
+  "now": "اللہ وحدہٗ لاشریک",
+  "authority": "approved by the owner 2026-11-22, page 2 item H16"
  },
  {
   "id": "TEAM-early-tafaseer-parah-8-P24-001",
@@ -1586,6 +2489,33 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F72"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-8-P246-002",
+  "book": "tafaseer-parah-8",
+  "page": 246,
+  "how": "mushaf 7:35",
+  "was": "اِیَاْتِیَنَّکُمْ رُسُلٌ مِّنْکُمْ",
+  "now": "اِمَّا يَاْتِيَنَّكُمْ رُسُلٌ مِّنْكُمْ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F54"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P260-002",
+  "book": "tafaseer-parah-8",
+  "page": 260,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "وہ اتنا غفورؒ رحیم ہے۔",
+  "now": "وہ اتنا غفور و رحیم ہے۔",
+  "authority": "approved by the owner 2026-11-22, page 2 item K68"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P28-001",
+  "book": "tafaseer-parah-8",
+  "page": 28,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "الرحم الرحمین",
+  "now": "ارحم الراحمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item F32"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-8-P293-003",
   "book": "tafaseer-parah-8",
   "page": 293,
@@ -1593,6 +2523,15 @@
   "was": "واحد ولاشریک",
   "now": "واحد و لا شریک",
   "authority": "delegated by the owner 2026-11-21, page 2 item K1"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P295-001",
+  "book": "tafaseer-parah-8",
+  "page": 295,
+  "how": "mushaf 4:97",
+  "was": "فیما کنتم",
+  "now": "فِيْمَ كُنْتُمْ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F98"
  },
  {
   "id": "TEAM-early-tafaseer-parah-8-P295-002",
@@ -1613,6 +2552,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F124"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-8-P306-002",
+  "book": "tafaseer-parah-8",
+  "page": 306,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "فان لم تكن تراہ فانہٗ يراك",
+  "now": "فَإِنْ لَمْ تَكُنْ تَرَاهُ فَإِنَّهُ يَرَاكَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H54"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P319-003",
+  "book": "tafaseer-parah-8",
+  "page": 319,
+  "how": "mushaf 37:35",
+  "was": "لا الہ الا اللہ",
+  "now": "لَاۤ اِلٰهَ اِلَّا اللّٰهُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F6"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-8-P325-002",
   "book": "tafaseer-parah-8",
   "page": 325,
@@ -1622,6 +2579,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E87"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-8-P328-001",
+  "book": "tafaseer-parah-8",
+  "page": 328,
+  "how": "mushaf 7:64",
+  "was": "فَاَنْجَیْنٰهُ وَالَّذِیْنَ مَعَ",
+  "now": "فَاَنْجَيْنٰهُ وَالَّذِيْنَ مَعَهٗ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F94"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P328-002",
+  "book": "tafaseer-parah-8",
+  "page": 328,
+  "how": "mushaf 7:64",
+  "was": "وَالَّذِیْنَ مَعَ یعنی",
+  "now": "وَالَّذِيْنَ مَعَهٗ یعنی",
+  "authority": "approved by the owner 2026-11-22, page 2 item F131"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-8-P34-002",
   "book": "tafaseer-parah-8",
   "page": 34,
@@ -1629,6 +2604,15 @@
   "was": "انشاء اللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P38-002",
+  "book": "tafaseer-parah-8",
+  "page": 38,
+  "how": "mushaf 7:43",
+  "was": "الحمد اللہ",
+  "now": "الْحَمْدُ لِلّٰهِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F30"
  },
  {
   "id": "TEAM-early-tafaseer-parah-8-P4-001",
@@ -1647,6 +2631,15 @@
   "was": "فاذنوا بحرب من اللہ ورسولہ",
   "now": "فَاْذَنُوْا بِحَرْبٍ مِّنَ اللّٰهِ وَرَسُوْلِهٖ",
   "authority": "delegated by the owner 2026-11-21, page 2 item F88"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P56-002",
+  "book": "tafaseer-parah-8",
+  "page": 56,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "بسمہ اللہ اللہ اکبر",
+  "now": "بسم اللہ، اللہ اکبر",
+  "authority": "approved by the owner 2026-11-22, page 2 item H33"
  },
  {
   "id": "TEAM-early-tafaseer-parah-8-P78-004",
@@ -1685,6 +2678,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E84"
  },
  {
+  "id": "TEAM-early-tafaseer-parah-9-P190-002",
+  "book": "tafaseer-parah-9",
+  "page": 190,
+  "how": "mushaf 7:184",
+  "was": "اَوَلَمْ يَتَفَكَّرُوْن کبھی",
+  "now": "اَوَلَمْ يَتَفَكَّرُوْا کبھی",
+  "authority": "approved by the owner 2026-11-22, page 2 item F50"
+ },
+ {
   "id": "TEAM-early-tafaseer-parah-9-P245-001",
   "book": "tafaseer-parah-9",
   "page": 245,
@@ -1710,6 +2712,24 @@
   "was": "فَقَدْ جَآءَ كُمُ الْفَتْحُ",
   "now": "فَقَدْ جَآءَكُمُ الْفَتْحُ",
   "authority": "delegated by the owner 2026-11-21, page 2 item F95"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-9-P291-001",
+  "book": "tafaseer-parah-9",
+  "page": 291,
+  "how": "mushaf 37:35",
+  "was": "لا ءالہ الا اللہ",
+  "now": "لَاۤ اِلٰهَ اِلَّا اللّٰهُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F102"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-9-P293-003",
+  "book": "tafaseer-parah-9",
+  "page": 293,
+  "how": "mushaf 8:28",
+  "was": "اِعْلَمُوْٓا اَنَّمَآ اَمْوَالُكُمْ",
+  "now": "وَاعْلَمُوْۤا اَنَّمَاۤ اَمْوَالُكُمْ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F51"
  },
  {
   "id": "TEAM-early-tafaseer-parah-9-P297-002",
@@ -1775,6 +2795,42 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G46"
  },
  {
+  "id": "TEAM-late-asrar-567-asrar-5-ur-P62-001",
+  "book": "asrar-5-ur",
+  "page": 62,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "ما جاء بہ محمد ﷺ",
+  "now": "مَا جَاءَ بِهِ مُحَمَّدٌ ﷺ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H65"
+ },
+ {
+  "id": "TEAM-late-asrar-567-asrar-6-ur-P1-001",
+  "book": "asrar-6-ur",
+  "page": 1,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "سُوْرَةُ الْاَنْعَامِ",
+  "now": "سُورَةُ الْأَنْعَامِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H48"
+ },
+ {
+  "id": "TEAM-late-asrar-567-asrar-6-ur-P67-002",
+  "book": "asrar-6-ur",
+  "page": 67,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "رب العلمین",
+  "now": "رَبّ العالمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item E68"
+ },
+ {
+  "id": "TEAM-late-asrar-567-asrar-6-ur-P97-002",
+  "book": "asrar-6-ur",
+  "page": 97,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "ولا تقربوا الفواحش ماظھر منھا وما بطن",
+  "now": "وَلَا تَقْرَبُوا الْفَوَاحِشَ مَا ظَهَرَ مِنْهَا وَمَا بَطَنَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H89"
+ },
+ {
   "id": "TEAM-late-asrar-asrar-3-ur-P126-002",
   "book": "asrar-3-ur",
   "page": 126,
@@ -1782,6 +2838,15 @@
   "was": "انشاءاللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E7"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-3-ur-P36-002",
+  "book": "asrar-3-ur",
+  "page": 36,
+  "how": "the reader's fix",
+  "was": "جس کا نام اور لقب مسیح عیسےٰ بن مریم",
+  "now": "جس کا نام اور لقب مسیح عیسیٰ بن مریم",
+  "authority": "approved by the owner 2026-11-22, page 2 item H38"
  },
  {
   "id": "TEAM-late-asrar-asrar-3-ur-P54-002",
@@ -1793,6 +2858,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E72"
  },
  {
+  "id": "TEAM-late-asrar-asrar-3-ur-P60-002",
+  "book": "asrar-3-ur",
+  "page": 60,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "سُبحان اللہ وبحمدہٖ",
+  "now": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H47"
+ },
+ {
   "id": "TEAM-late-asrar-asrar-3-ur-P64-003",
   "book": "asrar-3-ur",
   "page": 64,
@@ -1800,6 +2874,42 @@
   "was": "(انشاء اللہ)",
   "now": "(ان شاء اللہ)",
   "authority": "delegated by the owner 2026-11-21, page 2 item E12"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P112-001",
+  "book": "asrar-4-ur",
+  "page": 112,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "علمك مالم تكن تعلم",
+  "now": "عَلَّمَكَ مَا لَمْ تَكُنْ تَعْلَمُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H51"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P42-001",
+  "book": "asrar-4-ur",
+  "page": 42,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "ما تنھون عنہ",
+  "now": "مَا تُنْهَوْنَ عَنْهُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H64"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P66-002",
+  "book": "asrar-4-ur",
+  "page": 66,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "یہاں بین الناس فرما کر",
+  "now": "یہاں بَيْنَ النَّاسِ فرما کر",
+  "authority": "approved by the owner 2026-11-22, page 2 item H100"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P87-001",
+  "book": "asrar-4-ur",
+  "page": 87,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "اس کی تحقیق فرماتے (اولوالامر",
+  "now": "اس کی تحقیق فرماتے (اُولِي الْأَمْرِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H9"
  },
  {
   "id": "TEAM-late-rah-nawerd-uploads-books-rah-nawerd-e-shauk-2-P129-003",
@@ -1818,6 +2928,15 @@
   "was": "انشاء اللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
+ },
+ {
+  "id": "TEAM-late-rah-nawerd-uploads-books-rah-nawerd-e-shauk-2-P14-001",
+  "book": "uploads-books-rah-nawerd-e-shauk-2",
+  "page": 14,
+  "how": "mushaf 98:8",
+  "was": "رضی اللہ عنھم و رضوٰعنہ",
+  "now": "رَضِىَ اللّٰهُ عَنْهُمْ وَرَضُوْا عَنْهُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F76"
  },
  {
   "id": "TEAM-late-rah-nawerd-uploads-books-rah-nawerd-e-shauk-2-P14-002",
@@ -1928,6 +3047,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item H95"
  },
  {
+  "id": "TEAM-late-rah-nawerd-uploads-books-rah-nawerd-e-shauk-2-P52-004",
+  "book": "uploads-books-rah-nawerd-e-shauk-2",
+  "page": 52,
+  "how": "mushaf 11:88",
+  "was": "وماتوفیقی الاباللہ",
+  "now": "وَمَا تَوْفِيْقِىْۤ اِلَّا بِاللّٰهِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F119"
+ },
+ {
   "id": "TEAM-late-rah-nawerd-uploads-books-rah-nawerd-e-shauk-2-P79-001",
   "book": "uploads-books-rah-nawerd-e-shauk-2",
   "page": 79,
@@ -2000,6 +3128,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G7"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-21-P189-004",
+  "book": "tafaseer-parah-21",
+  "page": 189,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "وہ بھی من جانب اللہ",
+  "now": "وہ بھی من جانبِ اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K69"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-21-P49-004",
   "book": "tafaseer-parah-21",
   "page": 49,
@@ -2043,6 +3180,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G12"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-22-P123-004",
+  "book": "tafaseer-parah-22",
+  "page": 123,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "۔۔۔(اٰل عمران:169)اور",
+  "now": "۔۔۔ (آل عمران: 169) اور",
+  "authority": "approved by the owner 2026-11-22, page 2 item G70"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-22-P131-005",
   "book": "tafaseer-parah-22",
   "page": 131,
@@ -2050,6 +3196,24 @@
   "was": "اوکما قال رسول اللہ",
   "now": "او کما قال رسول اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item H2"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P177-005",
+  "book": "tafaseer-parah-22",
+  "page": 177,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "(بنی اسرآءیل:65)",
+  "now": "(بنی اسرائیل: 65)",
+  "authority": "approved by the owner 2026-11-22, page 2 item G28"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P178-006",
+  "book": "tafaseer-parah-22",
+  "page": 178,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "(المآئدہ:3)",
+  "now": "(المائدہ: 3)",
+  "authority": "approved by the owner 2026-11-22, page 2 item G19"
  },
  {
   "id": "TEAM-late-tafaseer-parah-22-P187-001",
@@ -2129,6 +3293,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G32"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-22-P87-004",
+  "book": "tafaseer-parah-22",
+  "page": 87,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "مَعْصِيَّةِ",
+  "now": "مَعْصِيَةِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H74"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-22-P88-002",
   "book": "tafaseer-parah-22",
   "page": 88,
@@ -2144,6 +3317,24 @@
   "was": "واحد ولاشریک",
   "now": "واحد و لا شریک",
   "authority": "delegated by the owner 2026-11-21, page 2 item K1"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-23-P104-001",
+  "book": "tafaseer-parah-23",
+  "page": 104,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "لفظ الہٰ",
+  "now": "لفظ الٰہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K53"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-23-P105-002",
+  "book": "tafaseer-parah-23",
+  "page": 105,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "لفظ اھل کی وضاحت ہوگئی",
+  "now": "لفظ اہل کی وضاحت ہو گئی",
+  "authority": "approved by the owner 2026-11-22, page 2 item K54"
  },
  {
   "id": "TEAM-late-tafaseer-parah-23-P19-005",
@@ -2173,6 +3364,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item K62"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-23-P53-003",
+  "book": "tafaseer-parah-23",
+  "page": 53,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "(الانبیآء:69)",
+  "now": "(الانبیاء: 69)",
+  "authority": "approved by the owner 2026-11-22, page 2 item G14"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-23-P86-005",
   "book": "tafaseer-parah-23",
   "page": 86,
@@ -2182,12 +3382,39 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G30"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-23-P87-001",
+  "book": "tafaseer-parah-23",
+  "page": 87,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "لفظ آل یا اھل",
+  "now": "لفظ آل یا اہل",
+  "authority": "approved by the owner 2026-11-22, page 2 item K52"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-24-P112-001",
+  "book": "tafaseer-parah-24",
+  "page": 112,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "انکار کر دینا جو د ہے",
+  "now": "انکار کر دینا جحود ہے۔",
+  "authority": "approved by the owner 2026-11-22, page 2 item K23"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-24-P116-001",
   "book": "tafaseer-parah-24",
   "page": 116,
   "how": "mushaf 40:68",
   "was": "هُوَالَّذِیْ",
   "now": "هُوَ الَّذِىْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-24-P135-002",
+  "book": "tafaseer-parah-24",
+  "page": 135,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "اقرارٌ بلسان وتصدیقٌ بالقلب",
+  "now": "اقرارٌ بلسان و تصدیقٌ بالقلب",
+  "authority": "approved by the owner 2026-11-22, page 2 item H12"
  },
  {
   "id": "TEAM-late-tafaseer-parah-24-P151-001",
@@ -2205,6 +3432,24 @@
   "was": "(المومنون:97,98)",
   "now": "(المؤمنون:97، 98)",
   "authority": "delegated by the owner 2026-11-21, page 2 item G23"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-24-P48-003",
+  "book": "tafaseer-parah-24",
+  "page": 48,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "(الانبیآء:69)",
+  "now": "(الأنبیاء:69)",
+  "authority": "approved by the owner 2026-11-22, page 2 item G13"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-24-P75-001",
+  "book": "tafaseer-parah-24",
+  "page": 75,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "او کمال قال رسول اللہ",
+  "now": "او کما قال رسول اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H3"
  },
  {
   "id": "TEAM-late-tafaseer-parah-24-P75-002",
@@ -2256,6 +3501,96 @@
   "now": "(نبوت) کو بانٹتے ہیں؟"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-25-P127-001",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "قَرِيْنٌ ۝",
+  "now": "قَرِيْنٌ ﴿۳۶﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H57"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-002",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "مُّهْتَدُوْنَ ۝",
+  "now": "مُّهْتَدُوْنَ ﴿۳۷﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H83"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-003",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "الْقَرِيْنُ ۝",
+  "now": "الْقَرِيْنُ ﴿۳۸﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H18"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-004",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "مُشْتَرِكُوْنَ ۝",
+  "now": "مُشْتَرِكُوْنَ ﴿۳۹﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H78"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-005",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "مُّبِيْنٍ ۝",
+  "now": "مُّبِيْنٍ ﴿۴۰﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H79"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-006",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "مُّنْتَقِمُوْنَ ۝",
+  "now": "مُّنْتَقِمُوْنَ ﴿۴۱﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H82"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-007",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "مُّقْتَدِرُوْنَ ۝",
+  "now": "مُّقْتَدِرُوْنَ ﴿۴۲﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H81"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-008",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "مُّسْتَقِيْمٍ ۝",
+  "now": "مُّسْتَقِيْمٍ ﴿۴۳﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H80"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-009",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "تُسْـَٔلُوْنَ ۝",
+  "now": "تُسْـَٔلُوْنَ ﴿۴۴﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H37"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P127-010",
+  "book": "tafaseer-parah-25",
+  "page": 127,
+  "how": "inside a block of Arabic",
+  "was": "يُّعْبَدُوْنَ ۝",
+  "now": "يُّعْبَدُوْنَ ﴿۴۵﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H93"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-25-P128-003",
   "book": "tafaseer-parah-25",
   "page": 128,
@@ -2298,6 +3633,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G18"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-25-P171-003",
+  "book": "tafaseer-parah-25",
+  "page": 171,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "(نوحؑ:25)",
+  "now": "(نوح:25)",
+  "authority": "approved by the owner 2026-11-22, page 2 item G29"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-25-P178-004",
   "book": "tafaseer-parah-25",
   "page": 178,
@@ -2321,6 +3665,15 @@
   "how": "the reader's fix",
   "was": "اَحَبَّ الْعَمِلِ",
   "now": "أَحَبَّ الْعَمَلِ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P191-003",
+  "book": "tafaseer-parah-25",
+  "page": 191,
+  "how": "inside a block of Arabic",
+  "was": "لِّقَوْمٍ يُّوْقِنُوْنَ\n\nتمہارے",
+  "now": "لِّقَوْمٍ يُّوْقِنُوْنَ ﴿۴﴾\n\nتمہارے",
+  "authority": "approved by the owner 2026-11-22, page 2 item H63"
  },
  {
   "id": "TEAM-late-tafaseer-parah-25-P194-001",
@@ -2434,6 +3787,15 @@
   "now": "عَجْبُ الذَّنَب"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-26-P13-003",
+  "book": "tafaseer-parah-26",
+  "page": 13,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "سآئق اور شھید :",
+  "now": "سائق اور شہید:",
+  "authority": "approved by the owner 2026-11-22, page 2 item F80"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-26-P193-003",
   "book": "tafaseer-parah-26",
   "page": 193,
@@ -2448,6 +3810,15 @@
   "how": "the reader's fix",
   "was": "حَدِيْدٌ۝۲۲ یقینا",
   "now": "حَدِيْدٌ ﴿۲۲﴾ یقیناً"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P240-001",
+  "book": "tafaseer-parah-26",
+  "page": 240,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "زاریات کہتے ہیں",
+  "now": "ذاریات کہتے ہیں",
+  "authority": "approved by the owner 2026-11-22, page 2 item F79"
  },
  {
   "id": "TEAM-late-tafaseer-parah-26-P30-003",
@@ -2524,6 +3895,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F92"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-27-P101-001",
+  "book": "tafaseer-parah-27",
+  "page": 101,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "بشیراونذیرا",
+  "now": "بشیرًا و نذیرًا",
+  "authority": "approved by the owner 2026-11-22, page 2 item F59"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P129-001",
+  "book": "tafaseer-parah-27",
+  "page": 129,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "تُكَذِّبٰنِ﴿۳۷﴾",
+  "now": "تُكَذِّبٰنِ ﴿۳۶﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item F66"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-27-P16-001",
   "book": "tafaseer-parah-27",
   "page": 16,
@@ -2587,6 +3976,15 @@
   "was": "فواد",
   "now": "فؤاد",
   "authority": "delegated by the owner 2026-11-21, page 2 item F90"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P69-004",
+  "book": "tafaseer-parah-27",
+  "page": 69,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "لات منات اور عزیٰ",
+  "now": "لات، منات اور عُزّیٰ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K49"
  },
  {
   "id": "TEAM-late-tafaseer-parah-28-P10-003",
@@ -2654,6 +4052,24 @@
   "now": "ۚ ﴿۱﴾"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-28-P150-003",
+  "book": "tafaseer-parah-28",
+  "page": 150,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "يَعْمَلُوْنَ ۝",
+  "now": "يَعْمَلُوْنَ ۝۲",
+  "authority": "approved by the owner 2026-11-22, page 2 item F137"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P155-003",
+  "book": "tafaseer-parah-28",
+  "page": 155,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "لَا يَفْقَهُوْنَ۝",
+  "now": "لَا يَفْقَهُوْنَ ۝۷",
+  "authority": "approved by the owner 2026-11-22, page 2 item F103"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-28-P165-001",
   "book": "tafaseer-parah-28",
   "page": 165,
@@ -2661,6 +4077,15 @@
   "was": "واحد ولاشریک",
   "now": "واحد و لا شریک",
   "authority": "delegated by the owner 2026-11-21, page 2 item K1"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P169-004",
+  "book": "tafaseer-parah-28",
+  "page": 169,
+  "how": "inside a block of Arabic",
+  "was": "حَمِيْدٌ۝",
+  "now": "حَمِيْدٌ ۝۶",
+  "authority": "approved by the owner 2026-11-22, page 2 item H41"
  },
  {
   "id": "TEAM-late-tafaseer-parah-28-P171-003",
@@ -2678,6 +4103,15 @@
   "how": "mushaf 64:10",
   "was": "وَ كَذَّبُوْا",
   "now": "وَكَذَّبُوْا"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P183-001",
+  "book": "tafaseer-parah-28",
+  "page": 183,
+  "how": "inside a block of Arabic",
+  "was": "یُّسۡرًا ۟",
+  "now": "یُّسۡرًا ﴿۷﴾",
+  "authority": "approved by the owner 2026-11-22, page 2 item H98"
  },
  {
   "id": "TEAM-late-tafaseer-parah-28-P187-002",
@@ -2713,12 +4147,39 @@
   "now": "لِيَسْأَلْ"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-28-P214-004",
+  "book": "tafaseer-parah-28",
+  "page": 214,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "يُؤْمَرُوْنَ۝",
+  "now": "يُؤْمَرُوْنَ ۝۶",
+  "authority": "approved by the owner 2026-11-22, page 2 item F138"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P214-005",
+  "book": "tafaseer-parah-28",
+  "page": 214,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "تَعْمَلُوْنَ۝",
+  "now": "تَعْمَلُوْنَ ۝۷",
+  "authority": "approved by the owner 2026-11-22, page 2 item F65"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-28-P216-001",
   "book": "tafaseer-parah-28",
   "page": 216,
   "how": "inside a block of Arabic",
   "was": "يٰۤاَيُّهَا الَّذِيْنَ اٰمَنُوْا تُوْبُوْۤا اِلَى اللهِ تَوْبَةً نَّصُوْحًا ؕ عَسٰى رَبُّكُمْ اَنْ يُّكَفِّرَ عَنْكُمْ سَيِّاٰتِكُمْ وَيُدْخِلَكُمْ جَنّٰتٍ تَجْرِيْ مِنْ تَحْتِهَا الْاَنْهٰرُ ۙ يَوْمَ لَا يُخْزِى اللهُ النَّبِيَّ وَالَّذِيْنَ اٰمَنُوْا مَعَهٗ ۚ نُوْرُهُمْ يَسْعٰى بَيْنَ اَيْدِيْهِمْ وَبِاَيْمَانِهِمْ يَقُوْلُوْنَ رَبَّنَاۤ اَتْمِمْ لَنَا نُوْرَنَا وَاغْفِرْ لَنَا ۚ اِنَّكَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ ۸ يٰۤاَيُّهَا النَّبِيُّ جَاهِدِ الْكُفَّارَ وَالْمُنٰفِقِيْنَ وَاغْلُظْ عَلَيْهِمْ ؕ وَمَاْوٰىهُمْ جَهَنَّمُ ؕ وَبِئْسَ الْمَصِيْرُ ۹ ضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ كَفَرُوا امْرَاَتَ نُوْحٍ وَّامْرَاَتَ لُوْطٍ ؕ كَانَتَا تَحْتَ عَبْدَيْنِ مِنْ عِبَادِنَا صَالِحَيْنِ فَخَانَتٰهُمَا فَلَمْ يُغْنِيَا عَنْهُمَا مِنَ اللهِ شَيْـًٔا وَّقِيْلَ ادْخُلَا النَّارَ مَعَ الدّٰخِلِيْنَ ۱۰ وَضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ اٰمَنُوا امْرَاَتَ فِرْعَوْنَ ۘ اِذْ قَالَتْ رَبِّ ابْنِ لِيْ عِنْدَكَ بَيْتًا فِي الْجَنَّةِ وَنَجِّنِيْ مِنْ فِرْعَوْنَ وَعَمَلِهٖ وَنَجِّنِيْ مِنَ الْقَوْمِ الظّٰلِمِيْنَ ۱۱ وَمَرْيَمَ ابْنَتَ عِمْرٰنَ الَّتِيْۤ اَحْصَنَتْ فَرْجَهَا فَنَفَخْنَا فِيْهِ مِنْ رُّوْحِنَا وَصَدَّقَتْ بِكَلِمٰتِ رَبِّهَا وَكُتُبِهٖ وَكَانَتْ مِنَ الْقٰنِتِيْنَ ۱۲",
   "now": "يٰۤاَيُّهَا الَّذِيْنَ اٰمَنُوْا تُوْبُوْۤا اِلَى اللهِ تَوْبَةً نَّصُوْحًا ؕ عَسٰى رَبُّكُمْ اَنْ يُّكَفِّرَ عَنْكُمْ سَيِّاٰتِكُمْ وَيُدْخِلَكُمْ جَنّٰتٍ تَجْرِيْ مِنْ تَحْتِهَا الْاَنْهٰرُ ۙ يَوْمَ لَا يُخْزِى اللهُ النَّبِيَّ وَالَّذِيْنَ اٰمَنُوْا مَعَهٗ ۚ نُوْرُهُمْ يَسْعٰى بَيْنَ اَيْدِيْهِمْ وَبِاَيْمَانِهِمْ يَقُوْلُوْنَ رَبَّنَاۤ اَتْمِمْ لَنَا نُوْرَنَا وَاغْفِرْ لَنَا ۚ اِنَّكَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ ﴿۸﴾ يٰۤاَيُّهَا النَّبِيُّ جَاهِدِ الْكُفَّارَ وَالْمُنٰفِقِيْنَ وَاغْلُظْ عَلَيْهِمْ ؕ وَمَاْوٰىهُمْ جَهَنَّمُ ؕ وَبِئْسَ الْمَصِيْرُ ﴿۹﴾ ضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ كَفَرُوا امْرَاَتَ نُوْحٍ وَّامْرَاَتَ لُوْطٍ ؕ كَانَتَا تَحْتَ عَبْدَيْنِ مِنْ عِبَادِنَا صَالِحَيْنِ فَخَانَتٰهُمَا فَلَمْ يُغْنِيَا عَنْهُمَا مِنَ اللهِ شَيْـًٔا وَّقِيْلَ ادْخُلَا النَّارَ مَعَ الدّٰخِلِيْنَ ﴿۱۰﴾ وَضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ اٰمَنُوا امْرَاَتَ فِرْعَوْنَ ۘ اِذْ قَالَتْ رَبِّ ابْنِ لِيْ عِنْدَكَ بَيْتًا فِي الْجَنَّةِ وَنَجِّنِيْ مِنْ فِرْعَوْنَ وَعَمَلِهٖ وَنَجِّنِيْ مِنَ الْقَوْمِ الظّٰلِمِيْنَ ﴿۱۱﴾ وَمَرْيَمَ ابْنَتَ عِمْرٰنَ الَّتِيْۤ اَحْصَنَتْ فَرْجَهَا فَنَفَخْنَا فِيْهِ مِنْ رُّوْحِنَا وَصَدَّقَتْ بِكَلِمٰتِ رَبِّهَا وَكُتُبِهٖ وَكَانَتْ مِنَ الْقٰنِتِيْنَ ﴿۱۲﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P221-002",
+  "book": "tafaseer-parah-28",
+  "page": 221,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "الْمَصِيْرُ ۝",
+  "now": "الْمَصِيْرُ ۝۹",
+  "authority": "approved by the owner 2026-11-22, page 2 item F40"
  },
  {
   "id": "TEAM-late-tafaseer-parah-28-P222-001",
@@ -2728,6 +4189,15 @@
   "was": "واحد ولاشریک",
   "now": "واحد و لا شریک",
   "authority": "delegated by the owner 2026-11-21, page 2 item K1"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P227-001",
+  "book": "tafaseer-parah-28",
+  "page": 227,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "استقامت علی الدین",
+  "now": "استقامت علی الدّین",
+  "authority": "approved by the owner 2026-11-22, page 2 item H11"
  },
  {
   "id": "TEAM-late-tafaseer-parah-28-P28-003",
@@ -2787,6 +4257,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item K70"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-28-P91-003",
+  "book": "tafaseer-parah-28",
+  "page": 91,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "الْحَكِيمُ ۝",
+  "now": "الْحَكِيمُ ۝۵",
+  "authority": "approved by the owner 2026-11-22, page 2 item F37"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-28-P97-005",
   "book": "tafaseer-parah-28",
   "page": 97,
@@ -2811,12 +4290,57 @@
   "now": "دِيَارِكُمْ"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-29-P10-002",
+  "book": "tafaseer-parah-29",
+  "page": 10,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "قرآن حق الیقین ہے",
+  "now": "قرآن حقُّ الیقین ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F99"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P10-003",
+  "book": "tafaseer-parah-29",
+  "page": 10,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ الحآقہ",
+  "now": "سورۃ الحاقہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item G43"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-29-P114-003",
   "book": "tafaseer-parah-29",
   "page": 114,
   "how": "the reader's fix",
   "was": "توبہ کر لی اللہ نے",
   "now": "توبہ کر لی، اللہ نے"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P120-002",
+  "book": "tafaseer-parah-29",
+  "page": 120,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "رب العالمین",
+  "now": "ربّ العالمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item K5"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P121-001",
+  "book": "tafaseer-parah-29",
+  "page": 121,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "اور وڈ اور سواع",
+  "now": "اور وَدّ اور سواع",
+  "authority": "approved by the owner 2026-11-22, page 2 item K25"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P123-006",
+  "book": "tafaseer-parah-29",
+  "page": 123,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "اور وِدّ اور سواع",
+  "now": "اور وَدّ اور سواع",
+  "authority": "approved by the owner 2026-11-22, page 2 item K24"
  },
  {
   "id": "TEAM-late-tafaseer-parah-29-P125-003",
@@ -2826,6 +4350,15 @@
   "was": "اوکما قال",
   "now": "او کما قال",
   "authority": "delegated by the owner 2026-11-21, page 2 item H1"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P131-003",
+  "book": "tafaseer-parah-29",
+  "page": 131,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "اکام المرجان فی احکام الجآن",
+  "now": "آکام المرجان فی أحکام الجان",
+  "authority": "approved by the owner 2026-11-22, page 2 item H30"
  },
  {
   "id": "TEAM-late-tafaseer-parah-29-P145-002",
@@ -2912,12 +4445,39 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F128"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-29-P25-003",
+  "book": "tafaseer-parah-29",
+  "page": 25,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "مَاغَابَ عَنِ الْحَوَاسِ",
+  "now": "مَا غَابَ عَنِ الْحَوَاسِّ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H71"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-29-P35-002",
   "book": "tafaseer-parah-29",
   "page": 35,
   "how": "mushaf 67:23",
   "was": "هُوَالَّذِيْٓ",
   "now": "هُوَ الَّذِىْۤ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P61-005",
+  "book": "tafaseer-parah-29",
+  "page": 61,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "یداللہ",
+  "now": "یدُ اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F142"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P69-002",
+  "book": "tafaseer-parah-29",
+  "page": 69,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "ان شآءاللہ",
+  "now": "ان شاء اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item E34"
  },
  {
   "id": "TEAM-late-tafaseer-parah-29-P81-004",
@@ -2929,6 +4489,33 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item H1"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-30-P14-003",
+  "book": "tafaseer-parah-30",
+  "page": 14,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورہ النبا",
+  "now": "سورۂ نبأ",
+  "authority": "approved by the owner 2026-11-22, page 2 item G37"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P144-004",
+  "book": "tafaseer-parah-30",
+  "page": 144,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "ان شآ ءاللہ",
+  "now": "ان شاء اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item E33"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P149-003",
+  "book": "tafaseer-parah-30",
+  "page": 149,
+  "how": "the reader's fix",
+  "was": "مَامِنْ مَوْلُوْدٍ",
+  "now": "مَا مِنْ مَوْلُوْدٍ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H72"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-30-P149-005",
   "book": "tafaseer-parah-30",
   "page": 149,
@@ -2938,6 +4525,33 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item H1"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-30-P162-002",
+  "book": "tafaseer-parah-30",
+  "page": 162,
+  "how": "mushaf 6:128",
+  "was": "الاّ ماشآء اللہ",
+  "now": "اِلَّا مَا شَآءَ اللّٰهُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F29"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P163-003",
+  "book": "tafaseer-parah-30",
+  "page": 163,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "يذ كر",
+  "now": "يَذْكُرُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H92"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P20-001",
+  "book": "tafaseer-parah-30",
+  "page": 20,
+  "how": "mushaf 78:1",
+  "was": "پارہ 30 عم یتسآء لون",
+  "now": "پارہ 30 عَمَّ يَتَسَآءَلُوْنَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F139"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-30-P28-004",
   "book": "tafaseer-parah-30",
   "page": 28,
@@ -2945,6 +4559,24 @@
   "was": "وَّ کَذَّبُوْا",
   "now": "وَّكَذَّبُوْا",
   "authority": "delegated by the owner 2026-11-21, page 2 item F135"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P74-005",
+  "book": "tafaseer-parah-30",
+  "page": 74,
+  "how": "the reader's fix",
+  "was": "عَنِ الحَوَاسِ",
+  "now": "عَنِ الْحَوَاسِّ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H53"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P8-004",
+  "book": "tafaseer-parah-30",
+  "page": 8,
+  "how": "mushaf 10:10",
+  "was": "الحمد للہ رب العلمین",
+  "now": "الْحَمْدُ لِلّٰهِ رَبِّ الْعٰلَمِيْنَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F31"
  },
  {
   "id": "TEAM-late-tafaseer-parah-30-P84-004",
@@ -2965,6 +4597,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item H1"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-30-P89-002",
+  "book": "tafaseer-parah-30",
+  "page": 89,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "باب اجر الاجراء",
+  "now": "بابُ أجرِ الأُجَراء",
+  "authority": "approved by the owner 2026-11-22, page 2 item H31"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P91-004",
+  "book": "tafaseer-parah-30",
+  "page": 91,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "رب العالمین",
+  "now": "ربّ العالمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item K5"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-30-P96-002",
   "book": "tafaseer-parah-30",
   "page": 96,
@@ -2972,6 +4622,105 @@
   "was": "اوکما قال",
   "now": "او کما قال",
   "authority": "delegated by the owner 2026-11-21, page 2 item H1"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P96-004",
+  "book": "tafaseer-parah-30",
+  "page": 96,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "آلَا وَهِیَ الْقَلْبُ",
+  "now": "أَلَا وَهِيَ الْقَلْبُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H7"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P100-003",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 100,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "مِنْ وعَنْ",
+  "now": "مِنْ وَعَنْ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H84"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P109-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 109,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "كُلُّكُمْ رَاعٍ وَ كُلُّكُمْ مَّسْئُوْلٌ",
+  "now": "كُلُّكُمْ رَاعٍ وَكُلُّكُمْ مَسْؤُولٌ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H58"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P112-004",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 112,
+  "how": "the reader's fix",
+  "was": "کیا اس کو معلوم نہیں کہ اللہ دیکھ رہے ہیں۔",
+  "now": "کیا اس کو معلوم نہیں کہ اللہ دیکھ رہے ہیں؟",
+  "authority": "approved by the owner 2026-11-22, page 2 item H94"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P128-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 128,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "أَرَبًّا وَاحِدًا اَمْ أَلْفَ رَبٍّ",
+  "now": "أَرَبًّا وَاحِدًا أَمْ أَلْفَ رَبٍّ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H8"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P129-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 129,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "لات وعزّیٰ",
+  "now": "لات و عُزّیٰ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K50"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P132-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 132,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "من الحیث القوم",
+  "now": "من حیث القوم",
+  "authority": "approved by the owner 2026-11-22, page 2 item H68"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P136-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 136,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "اَللّٰہُ وَرَسُوْلُہٗ اَعْلَمُ",
+  "now": "اللَّهُ وَرَسُولُهُ أَعْلَمُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H28"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P14-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 14,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ الیل",
+  "now": "سورۃ اللیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G3"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P146-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 146,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ العٰدیٰت",
+  "now": "سورۃ العادیات",
+  "authority": "approved by the owner 2026-11-22, page 2 item G44"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P149-003",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 149,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "رب العالمین کے سامنے",
+  "now": "ربِّ العالمین کے سامنے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F71"
  },
  {
   "id": "TEAM-late-tafaseer-parah-30-part-2-P150-004",
@@ -2983,6 +4732,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F110"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P154-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 154,
+  "how": "mushaf 101:10",
+  "was": "مَآ اَدْرٰىكَ مَاهِيَهْ ۝۱۰",
+  "now": "وَمَاۤ اَدْرٰٮكَ مَا هِيَهْ ۝۱۰",
+  "authority": "approved by the owner 2026-11-22, page 2 item F109"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P172-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 172,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "امام الانبیاؑ خاتم النبین",
+  "now": "امامُ الانبیاء، خاتمُ النبیین",
+  "authority": "approved by the owner 2026-11-22, page 2 item F41"
+ },
+ {
   "id": "TEAM-late-tafaseer-parah-30-part-2-P175-001",
   "book": "tafaseer-parah-30-part-2",
   "page": 175,
@@ -2990,6 +4757,33 @@
   "was": "سورۃ الھمزۃ",
   "now": "سورۃ الہمزۃ",
   "authority": "delegated by the owner 2026-11-21, page 2 item G49"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P18-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 18,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "الْعُصُرُوْا",
+  "now": "الْعُصُورُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H17"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P20-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 20,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ الیل",
+  "now": "سورۃ اللیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G3"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P204-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 204,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ الکٰفرون",
+  "now": "سورۃ الکافرون",
+  "authority": "approved by the owner 2026-11-22, page 2 item G47"
  },
  {
   "id": "TEAM-late-tafaseer-parah-30-part-2-P233-001",
@@ -3010,6 +4804,78 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F125"
  },
  {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P41-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 41,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "ان شآء اللہ",
+  "now": "ان شاء اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item E8"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P68-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 68,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "قَالَ مَاشِتَ",
+  "now": "قَالَ مَا شِئْتَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H56"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P8-005",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 8,
+  "how": "mushaf 1:2",
+  "was": "رب العلمین",
+  "now": "رَبِّ الْعٰلَمِيْنَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F73"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P93-001",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 93,
+  "how": "the reader's fix",
+  "was": "مَا اَنَا بِقَارِیٍٔ",
+  "now": "مَا أَنَا بِقَارِئٍ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H70"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-part-2-P95-002",
+  "book": "tafaseer-parah-30-part-2",
+  "page": 95,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "زَمِّلُوْنِیْ زَمِّلونی",
+  "now": "زَمِّلُونِي، زَمِّلُونِي",
+  "authority": "approved by the owner 2026-11-22, page 2 item H46"
+ },
+ {
+  "id": "TEAM-middle-asrar-asrar-2-ur-P116-001",
+  "book": "asrar-2-ur",
+  "page": 116,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "الا فلا کہ کشف عالم بالا یا عالم غیب کا۔",
+  "now": "إلّا فلا۔ کشفِ عالمِ بالا یا عالمِ غیب کا،",
+  "authority": "approved by the owner 2026-11-22, page 2 item H14"
+ },
+ {
+  "id": "TEAM-middle-asrar-asrar-2-ur-P125-003",
+  "book": "asrar-2-ur",
+  "page": 125,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "دغیرہ ذالک",
+  "now": "وغیرہ ذٰلک",
+  "authority": "approved by the owner 2026-11-22, page 2 item K38"
+ },
+ {
+  "id": "TEAM-middle-asrar-asrar-2-ur-P186-001",
+  "book": "asrar-2-ur",
+  "page": 186,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "یہ باب ابرچل رہا ہے",
+  "now": "یہ بابُ البرّ چل رہا ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F144"
+ },
+ {
   "id": "TEAM-middle-asrar-asrar-2-ur-P190-003",
   "book": "asrar-2-ur",
   "page": 190,
@@ -3028,6 +4894,42 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E64"
  },
  {
+  "id": "TEAM-middle-asrar-asrar-2-ur-P7-002",
+  "book": "asrar-2-ur",
+  "page": 7,
+  "how": "the reader's fix",
+  "was": "والا فلا",
+  "now": "وَإِلَّا فَلَا",
+  "authority": "approved by the owner 2026-11-22, page 2 item H86"
+ },
+ {
+  "id": "TEAM-middle-asrar-asrar-2-ur-P96-002",
+  "book": "asrar-2-ur",
+  "page": 96,
+  "how": "mushaf 9:30",
+  "was": "عزیز ابن اللہ",
+  "now": "عُزَيْرُ ۨابْنُ اللّٰهِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F86"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P105-001",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 105,
+  "how": "mushaf 43:32",
+  "was": "اھم یقسمون رَحْمتہِ ربك",
+  "now": "اَهُمْ يَقْسِمُوْنَ رَحْمَتَ رَبِّكَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F55"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P107-001",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 107,
+  "how": "mushaf 11:88",
+  "was": "وما توفیقی الا باالله علیه توکلت و الیه انیب۔",
+  "now": "وَمَا تَوْفِيْقِىْۤ اِلَّا بِاللّٰهِ عَلَيْهِ تَوَكَّلْتُ وَاِلَيْهِ اُنِيْبُ۔",
+  "authority": "approved by the owner 2026-11-22, page 2 item F118"
+ },
+ {
   "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P131-002",
   "book": "uploads-books-rah-nawerd-e-shauk-1",
   "page": 131,
@@ -3037,6 +4939,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E41"
  },
  {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P132-002",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 132,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "مگر حمد اللہ بالغ تھا",
+  "now": "مگر بحمد اللہ بالغ تھا",
+  "authority": "approved by the owner 2026-11-22, page 2 item E83"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P155-003",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 155,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "(الاماشاء اللہ)",
+  "now": "(إِلَّا مَا شَاءَ اللّٰهُ)",
+  "authority": "approved by the owner 2026-11-22, page 2 item E11"
+ },
+ {
   "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P169-002",
   "book": "uploads-books-rah-nawerd-e-shauk-1",
   "page": 169,
@@ -3044,6 +4964,24 @@
   "was": "انشاء اللہ ہوتی رہے گی",
   "now": "ان شاء اللہ ہوتی رہے گی",
   "authority": "delegated by the owner 2026-11-21, page 2 item E50"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P271-001",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 271,
+  "how": "mushaf 37:35",
+  "was": "لا الہ الا اللہ",
+  "now": "لَاۤ اِلٰهَ اِلَّا اللّٰهُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F6"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P275-001",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 275,
+  "how": "mushaf 1:1",
+  "was": "بسم اللہ الرحمن الرحیم",
+  "now": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F58"
  },
  {
   "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P278-001",
@@ -3082,6 +5020,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F44"
  },
  {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P299-001",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 299,
+  "how": "mushaf 6:128",
+  "was": "الا ماشاءاللہ",
+  "now": "اِلَّا مَا شَآءَ اللّٰهُ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F28"
+ },
+ {
   "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P305-001",
   "book": "uploads-books-rah-nawerd-e-shauk-1",
   "page": 305,
@@ -3089,6 +5036,24 @@
   "was": "اور انشاء اللہ پوری دنیا",
   "now": "اور ان شاء اللہ پوری دنیا",
   "authority": "delegated by the owner 2026-11-21, page 2 item E52"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P346-002",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 346,
+  "how": "mushaf 1:1",
+  "was": "بسم الله الرحمن الرحیم",
+  "now": "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F57"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P354-002",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 354,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "وہ غفور الرحیم ہے",
+  "now": "وہ غفور و رحیم ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F136"
  },
  {
   "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P434-001",
@@ -3107,6 +5072,15 @@
   "was": "اب انشاء اللہ",
   "now": "اب ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E5"
+ },
+ {
+  "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P68-003",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 68,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "محبوب خدا رحمت العالمین ﷺ",
+  "now": "محبوبِ خدا، رحمۃ للعالمین ﷺ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F107"
  },
  {
   "id": "TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P77-002",
@@ -3201,6 +5175,15 @@
   "now": "او کما قال رسول اللہ"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-11-P63-001",
+  "book": "tafaseer-parah-11",
+  "page": 63,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "اَلسَّآئِحُوْنَ وہ میری بارگاہ میں سربسجود رہتے ہیں۔",
+  "now": "السّٰجِدُوْنَ وہ میری بارگاہ میں سربسجود رہتے ہیں۔",
+  "authority": "approved by the owner 2026-11-22, page 2 item H27"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-12-P10-001",
   "book": "tafaseer-parah-12",
   "page": 10,
@@ -3208,6 +5191,24 @@
   "was": "سورہ ھود رکوع 1 آیات 6 تا 8",
   "now": "سورۂ ہود، رکوع 1، آیات 6 تا 8",
   "authority": "delegated by the owner 2026-11-21, page 2 item G39"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P105-001",
+  "book": "tafaseer-parah-12",
+  "page": 105,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ھود رکوع 7 آیات 69 تا 83",
+  "now": "سورۂ ہود، رکوع 7، آیات 69 تا 83",
+  "authority": "approved by the owner 2026-11-22, page 2 item G62"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P117-001",
+  "book": "tafaseer-parah-12",
+  "page": 117,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ھود رکوع 8 آیات 84 تا 95",
+  "now": "سورۂ ہود، رکوع 8، آیات 84 تا 95",
+  "authority": "approved by the owner 2026-11-22, page 2 item G63"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-12-P130-001",
@@ -3219,6 +5220,33 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G15"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-12-P133-001",
+  "book": "tafaseer-parah-12",
+  "page": 133,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ہود رکوع 9 آیات 96 تا 109",
+  "now": "سورۂ ہود، رکوع 9، آیات 96 تا 109",
+  "authority": "approved by the owner 2026-11-22, page 2 item G64"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P146-001",
+  "book": "tafaseer-parah-12",
+  "page": 146,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ھود رکوع 10 آیات 110 تا 123",
+  "now": "سورۂ ہود، رکوع 10، آیات 110 تا 123",
+  "authority": "approved by the owner 2026-11-22, page 2 item G57"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P172-001",
+  "book": "tafaseer-parah-12",
+  "page": 172,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ یوسف رکوع 2 آیات 7تا20",
+  "now": "سورۂ یوسف، رکوع 2، آیات 7 تا 20",
+  "authority": "approved by the owner 2026-11-22, page 2 item G65"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-12-P190-002",
   "book": "tafaseer-parah-12",
   "page": 190,
@@ -3228,12 +5256,39 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G27"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-12-P198-001",
+  "book": "tafaseer-parah-12",
+  "page": 198,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ یوسف رکوع 4 آیات 30 تا 35",
+  "now": "سورۂ یوسف، رکوع 4، آیات 30 تا 35",
+  "authority": "approved by the owner 2026-11-22, page 2 item G66"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P25-001",
+  "book": "tafaseer-parah-12",
+  "page": 25,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ھود رکوع 2 آیات 9 تا 24",
+  "now": "سورۂ ہود، رکوع 2، آیات 9 تا 24",
+  "authority": "approved by the owner 2026-11-22, page 2 item G58"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-12-P39-001",
   "book": "tafaseer-parah-12",
   "page": 39,
   "how": "words of the Qur'an, typed bare",
   "was": "ایک گواہ ہے محمد رسول صلی اللہ علیہ وسلم۔",
   "now": "ایک گواہ ہے، محمد رسول اللہ صلی اللہ علیہ وسلم۔"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P45-001",
+  "book": "tafaseer-parah-12",
+  "page": 45,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ھود رکوع 3 آیات 25 تا 35",
+  "now": "سورۂ ہود، رکوع 3، آیات 25 تا 35",
+  "authority": "approved by the owner 2026-11-22, page 2 item G59"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-12-P49-001",
@@ -3251,6 +5306,24 @@
   "was": "(ال عمران:179)",
   "now": "(آل عمران:179)",
   "authority": "delegated by the owner 2026-11-21, page 2 item G10"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P82-001",
+  "book": "tafaseer-parah-12",
+  "page": 82,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ھود رکوع 5 آیات 50 تا 60",
+  "now": "سورۂ ہود، رکوع 5، آیات 50 تا 60",
+  "authority": "approved by the owner 2026-11-22, page 2 item G60"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P94-002",
+  "book": "tafaseer-parah-12",
+  "page": 94,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ ھود رکوع 6 آیات 61 تا 68",
+  "now": "سورۂ ہود، رکوع 6، آیات 61 تا 68",
+  "authority": "approved by the owner 2026-11-22, page 2 item G61"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-12-P97-001",
@@ -3331,6 +5404,15 @@
   "how": "mushaf 14:41",
   "was": "رَبَّنَا اغْفِرْلِيْ",
   "now": "رَبَّنَا اغْفِرْ لِىْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P38-001",
+  "book": "tafaseer-parah-13",
+  "page": 38,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "كَذٰلِكَ نَجْزِي الظّٰلِمِيْنَ (۵)",
+  "now": "كَذٰلِكَ نَجْزِي الظّٰلِمِيْنَ (۷۵)",
+  "authority": "approved by the owner 2026-11-22, page 2 item F101"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-13-P92-003",
@@ -3433,6 +5515,33 @@
   "now": "عَلَيْكُمْ بِسُنَّتِي وَسُنَّتِ الْخُلَفَاءِ"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-15-P103-001",
+  "book": "tafaseer-parah-15",
+  "page": 103,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۂ بنی اسرآءیل",
+  "now": "سورۂ بنی اسرائیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G2"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P112-001",
+  "book": "tafaseer-parah-15",
+  "page": 112,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۂ بنی اسرآءیل",
+  "now": "سورۂ بنی اسرائیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G2"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P124-001",
+  "book": "tafaseer-parah-15",
+  "page": 124,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ بنی اسرآءیل",
+  "now": "سورۂ بنی اسرائیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G4"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-15-P124-002",
   "book": "tafaseer-parah-15",
   "page": 124,
@@ -3456,6 +5565,15 @@
   "how": "mushaf 28:10",
   "was": "لَوْلَآ اَنْ رَّبَطْنَا عَلٰى قُلُوْبِهِمْ",
   "now": "لَوْلَاۤ اَنْ رَّبَطْنَا عَلٰى قَلْبِهَا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P16-001",
+  "book": "tafaseer-parah-15",
+  "page": 16,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۂ بنی اسرآءیل",
+  "now": "سورۂ بنی اسرائیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G2"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-15-P167-001",
@@ -3562,6 +5680,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G1"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-15-P31-001",
+  "book": "tafaseer-parah-15",
+  "page": 31,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ بنی اسرآءیل",
+  "now": "سورۂ بنی اسرائیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G4"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-15-P36-001",
   "book": "tafaseer-parah-15",
   "page": 36,
@@ -3571,12 +5698,30 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E2"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-15-P42-001",
+  "book": "tafaseer-parah-15",
+  "page": 42,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ بنی اسرآءیل رکوع 3 آیات 23تا30",
+  "now": "سورۂ بنی اسرائیل رکوع 3 آیات 23 تا 30",
+  "authority": "approved by the owner 2026-11-22, page 2 item G50"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-15-P45-002",
   "book": "tafaseer-parah-15",
   "page": 45,
   "how": "the reader's fix",
   "was": "اَنْتَ وَ مَالَكَ لِاَبِيكَ",
   "now": "أَنْتَ وَمَالُكَ لِأَبِيكَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P52-001",
+  "book": "tafaseer-parah-15",
+  "page": 52,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ بنی اسرآءیل رکوع 4 آیات 31تا40",
+  "now": "سورۂ بنی اسرائیل رکوع 4 آیات 31 تا 40",
+  "authority": "approved by the owner 2026-11-22, page 2 item G51"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-15-P61-001",
@@ -3606,6 +5751,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item F5"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-15-P64-002",
+  "book": "tafaseer-parah-15",
+  "page": 64,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "فوأد کے محاسبہ",
+  "now": "فؤاد کے محاسبے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F89"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-15-P65-003",
   "book": "tafaseer-parah-15",
   "page": 65,
@@ -3615,6 +5769,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item K8"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-15-P66-001",
+  "book": "tafaseer-parah-15",
+  "page": 66,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ بنی اسرآءیل رکوع 5 آیات 41تا52",
+  "now": "سورۂ بنی اسرائیل رکوع 5 آیات 41 تا 52",
+  "authority": "approved by the owner 2026-11-22, page 2 item G52"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-15-P73-002",
   "book": "tafaseer-parah-15",
   "page": 73,
@@ -3622,6 +5785,24 @@
   "was": "الوالعزم رسولؑ",
   "now": "اولو العزم رسولؑ",
   "authority": "delegated by the owner 2026-11-21, page 2 item F34"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P86-001",
+  "book": "tafaseer-parah-15",
+  "page": 86,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ بنی اسرآءیل رکوع 7 آیات 61تا70",
+  "now": "سورۂ بنی اسرائیل رکوع 7 آیات 61 تا 70",
+  "authority": "approved by the owner 2026-11-22, page 2 item G53"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P9-001",
+  "book": "tafaseer-parah-15",
+  "page": 9,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۂ بنی اسرآءیل",
+  "now": "سورۂ بنی اسرائیل",
+  "authority": "approved by the owner 2026-11-22, page 2 item G2"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-16-P103-001",
@@ -3663,6 +5844,15 @@
   "how": "mushaf 20:55",
   "was": "نُعِيْدُ كُمْ",
   "now": "نُعِيْدُكُمْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P18-001",
+  "book": "tafaseer-parah-16",
+  "page": 18,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "ان شآء اللہ",
+  "now": "ان شاء اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item E8"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-16-P199-001",
@@ -3766,6 +5956,15 @@
   "now": "هُوَ مَوْلٰٮكُمْ"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-17-P8-001",
+  "book": "tafaseer-parah-17",
+  "page": 8,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "سورۃ الانبیآء رکوع 1",
+  "now": "سورۃ الانبیاء رکوع 1",
+  "authority": "approved by the owner 2026-11-22, page 2 item G42"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-17-P97-001",
   "book": "tafaseer-parah-17",
   "page": 97,
@@ -3805,6 +6004,15 @@
   "was": "سورۃ المومنون رکوع 1",
   "now": "سورۃ المؤمنون رکوع 1",
   "authority": "delegated by the owner 2026-11-21, page 2 item G45"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-19-P128-002",
+  "book": "tafaseer-parah-19",
+  "page": 128,
+  "how": "Arabic words, spelt or vowelled as Arabic",
+  "was": "صِقَالَةُ الْقُلُوبِ ذِكْرَ اللہِ",
+  "now": "صِقَالَةُ الْقُلُوبِ ذِكْرُ اللهِ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H50"
  },
  {
   "id": "TEAM-middle-tafaseer-parah-19-P136-001",
@@ -3857,6 +6065,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item G56"
  },
  {
+  "id": "TEAM-middle-tafaseer-parah-20-P118-003",
+  "book": "tafaseer-parah-20",
+  "page": 118,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "والشمسنا",
+  "now": "وَشَمْسُنَا",
+  "authority": "approved by the owner 2026-11-22, page 2 item H87"
+ },
+ {
   "id": "TEAM-middle-tafaseer-parah-20-P135-001",
   "book": "tafaseer-parah-20",
   "page": 135,
@@ -3864,6 +6081,33 @@
   "was": "وَمَا عِنْدَ اللّٰهِ خَيْرٌ وَّ اَبْقٰى",
   "now": "وَمَا عِنْدَ اللّٰهِ خَيْرٌ وَّاَبْقٰى",
   "authority": "delegated by the owner 2026-11-21, page 2 item F134"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-20-P15-001",
+  "book": "tafaseer-parah-20",
+  "page": 15,
+  "how": "name of a para or surah (the Qur'an's own words)",
+  "was": "پارہ 20 امن خلق",
+  "now": "پارہ 20 اَمَّنْ خَلَقَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item G69"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-20-P28-001",
+  "book": "tafaseer-parah-20",
+  "page": 28,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "عالم الغیب ہونا",
+  "now": "عالمُ الغیب ہونا",
+  "authority": "approved by the owner 2026-11-22, page 2 item K46"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-20-P74-001",
+  "book": "tafaseer-parah-20",
+  "page": 74,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "شہر میں داخل ہوئے ا فَوَجَدَ",
+  "now": "شہر میں داخل ہوئے۔ فَوَجَدَ",
+  "authority": "approved by the owner 2026-11-22, page 2 item F83"
  },
  {
   "id": "UR-ASAAS-P091-094-001",
@@ -3881,6 +6125,15 @@
   "how": "mushaf 2:21",
   "was": "یاَیّھاالنّاس اعبدُوا ربّکم",
   "now": "يٰۤاَيُّهَا النَّاسُ اعْبُدُوْا رَبَّكُمُ"
+ },
+ {
+  "id": "UR-ASRAR-FAATIHA-005",
+  "book": "asrar-1-ur",
+  "page": 4,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "رحیماً لآخرت",
+  "now": "رحیمُ الآخرت",
+  "authority": "approved by the owner 2026-11-22, page 2 item H43"
  },
  {
   "id": "UR-ASRAR-YUNUS-P001-006-002",
@@ -3960,6 +6213,33 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E2"
  },
  {
+  "id": "UR-DEYAR-P41-48-014",
+  "book": "book-ocr-deyar-e-habib-sall-allah-o-alaihi-wa-sallam-mai-chand-roz",
+  "page": 46,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "رحمتہ للعالمین",
+  "now": "رحمۃ للعالمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item F3"
+ },
+ {
+  "id": "UR-DEYAR-P49-55-013",
+  "book": "book-ocr-deyar-e-habib-sall-allah-o-alaihi-wa-sallam-mai-chand-roz",
+  "page": 55,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "رحمتہ للعالمین",
+  "now": "رحمۃ للعالمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item F3"
+ },
+ {
+  "id": "UR-HAYYAT1-P192-199011",
+  "book": "book-hayyat-e-tayyabah-i",
+  "page": 199,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "عالِم",
+  "now": "عالَم",
+  "authority": "approved by the owner 2026-11-22, page 2 item K47"
+ },
+ {
   "id": "UR-HAYYAT1-P376-383001",
   "book": "book-hayyat-e-tayyabah-i",
   "page": 376,
@@ -4021,6 +6301,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item K40"
  },
  {
+  "id": "UR-HAYYAT2-P095-098-005",
+  "book": "uploads-books-hayyat-e-tayyabah-2",
+  "page": 97,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "اسراء کی کیفیت",
+  "now": "اصرار کی کیفیت",
+  "authority": "approved by the owner 2026-11-22, page 2 item K9"
+ },
+ {
   "id": "UR-HAYYAT2-P099-102-017",
   "book": "uploads-books-hayyat-e-tayyabah-2",
   "page": 102,
@@ -4045,6 +6334,24 @@
   "was": "سبحانہٗ وتعالیٰ",
   "now": "سبحانہٗ و تعالیٰ",
   "authority": "delegated by the owner 2026-11-21, page 2 item K3"
+ },
+ {
+  "id": "UR-HAYYAT2-P115-118-031",
+  "book": "uploads-books-hayyat-e-tayyabah-2",
+  "page": 118,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": " ھو",
+  "now": " ہو",
+  "authority": "approved by the owner 2026-11-22, page 2 item K7"
+ },
+ {
+  "id": "UR-HAYYAT2-P119-122-002",
+  "book": "uploads-books-hayyat-e-tayyabah-2",
+  "page": 119,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": " ھو",
+  "now": " ہو",
+  "authority": "approved by the owner 2026-11-22, page 2 item K7"
  },
  {
   "id": "UR-HAYYAT2-P127-130-008",
@@ -4083,6 +6390,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E57"
  },
  {
+  "id": "UR-HAYYAT2-P165-170-069",
+  "book": "uploads-books-hayyat-e-tayyabah-2",
+  "page": 168,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "رحمت اللعلمین",
+  "now": "رحمت للعالمین",
+  "authority": "approved by the owner 2026-11-22, page 2 item E75"
+ },
+ {
   "id": "UR-ISLAH-014",
   "book": "book-ocr-islah-e-qalb-aur-zarorat-e-shaikh",
   "page": 11,
@@ -4118,6 +6434,15 @@
   "now": "الکہف"
  },
  {
+  "id": "UR-KANZ-P153-156007",
+  "book": "uploads-books-kanz-al-talibeen",
+  "page": 156,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "اللہ ھو ھو رہا ہے",
+  "now": "اللہ ھو ہو رہا ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item K18"
+ },
+ {
   "id": "UR-LAIHA-007",
   "book": "book-ocr-laiha-e-amal",
   "page": 16,
@@ -4125,6 +6450,15 @@
   "was": "انشاء اللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
+ },
+ {
+  "id": "UR-LATAIF-011",
+  "book": "book-ocr-lataif-aur-tazkiya-e-nafs",
+  "page": 7,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "نسلاً بعد نسلاً",
+  "now": "نسلاً بعد نسل",
+  "authority": "approved by the owner 2026-11-22, page 2 item K59"
  },
  {
   "id": "UR-LATAIF-012",
@@ -4136,6 +6470,24 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E1"
  },
  {
+  "id": "UR-MAHAFIL-P119-122005",
+  "book": "uploads-books-mahafil-e-sheikh",
+  "page": 119,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "ہیں۔توتلک الرسل",
+  "now": "ہیں۔ تو تلک الرسل",
+  "authority": "approved by the owner 2026-11-22, page 2 item K75"
+ },
+ {
+  "id": "UR-MAK-P01-04-002",
+  "book": "uploads-books-maktobaat",
+  "page": 3,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "علیہ رحمتہ",
+  "now": "علیہ الرحمۃ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H52"
+ },
+ {
   "id": "UR-MAK-P29-32-006",
   "book": "uploads-books-maktobaat",
   "page": 32,
@@ -4143,6 +6495,15 @@
   "was": "اللہ آپ کو استقامت دے۔ امین۔",
   "now": "اللہ آپ کو استقامت دے۔ آمین۔",
   "authority": "delegated by the owner 2026-11-21, page 2 item K12"
+ },
+ {
+  "id": "UR-MAK-P33-36-005",
+  "book": "uploads-books-maktobaat",
+  "page": 34,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "موئفہ",
+  "now": "مؤلفہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K57"
  },
  {
   "id": "UR-MAK-P57-60-002",
@@ -4204,6 +6565,15 @@
   "was": "وہ دولت الحمد اللہ بٹ رہی ہے",
   "now": "وہ دولت الحمد للہ بٹ رہی ہے",
   "authority": "delegated by the owner 2026-11-21, page 2 item E88"
+ },
+ {
+  "id": "UR-NAQ-P49-52-003",
+  "book": "uploads-books-naqoosh-e-haq",
+  "page": 50,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "اقرب الی الثواب",
+  "now": "اقرب الی الصواب",
+  "authority": "approved by the owner 2026-11-22, page 2 item H13"
  },
  {
   "id": "UR-NAQ-P93-96-002",
@@ -4286,6 +6656,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E40"
  },
  {
+  "id": "UR-NISBAT-P168-174-003",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 168,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "او کمال قال رسول اللہ",
+  "now": "او کما قال رسول اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H3"
+ },
+ {
   "id": "UR-NISBAT-P175-181-007",
   "book": "uploads-books-tareeq-nisbat-owaisiah",
   "page": 178,
@@ -4309,6 +6688,15 @@
   "how": "mushaf 18:27",
   "was": "تَجِدَمِنْ",
   "now": "تَجِدَ مِنْ"
+ },
+ {
+  "id": "UR-NISBAT-P233-240-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 233,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "تینتیس بار الحمداللہ",
+  "now": "تینتیس بار الحمد للہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item E63"
  },
  {
   "id": "UR-NISBAT-P233-240-014",
@@ -4354,6 +6742,15 @@
   "authority": "delegated by the owner 2026-11-21, page 2 item E9"
  },
  {
+  "id": "UR-NISBAT-P290-297-015",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 296,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "لا تتحرک ذرۃ الاباذن اللہ",
+  "now": "لا تتحرک ذرۃ الا باذن اللہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H59"
+ },
+ {
   "id": "UR-NISBAT-P303-312-007",
   "book": "uploads-books-tareeq-nisbat-owaisiah",
   "page": 305,
@@ -4379,6 +6776,33 @@
   "now": "مَا لَـيْسَ لَـكَ"
  },
  {
+  "id": "UR-NISBAT-P356-360-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 358,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "روحانی دنیا کا سراج ”منیرا",
+  "now": "روحانی دنیا کا سراجاً منیراً",
+  "authority": "approved by the owner 2026-11-22, page 2 item F77"
+ },
+ {
+  "id": "UR-NISBAT-P356-360-005",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 358,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "اور سورج ہی سراجا” منیرا ہے",
+  "now": "اور سورج ہی سراجاً منیراً ہے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F46"
+ },
+ {
+  "id": "UR-NISBAT-P356-360-006",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 358,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "اسی سراجا” منیرا سے",
+  "now": "اسی سراجاً منیراً سے",
+  "authority": "approved by the owner 2026-11-22, page 2 item F26"
+ },
+ {
   "id": "UR-NISBAT-P361-365-006",
   "book": "uploads-books-tareeq-nisbat-owaisiah",
   "page": 363,
@@ -4393,6 +6817,24 @@
   "how": "the reader's fix",
   "was": "وَلَا فَخْرَلِیْ",
   "now": "وَلَا فَخْرَ لِیْ"
+ },
+ {
+  "id": "UR-NISBAT-P366-370-005",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 368,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "ولا فخرلی یعنی",
+  "now": "ولا فخر لی۔ یعنی",
+  "authority": "approved by the owner 2026-11-22, page 2 item H90"
+ },
+ {
+  "id": "UR-NISBAT-P382-385-002",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 383,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "اتبعو هم",
+  "now": "اتبعوهم",
+  "authority": "approved by the owner 2026-11-22, page 2 item F24"
  },
  {
   "id": "UR-NISBAT-P394-397-003",
@@ -4419,6 +6861,15 @@
   "how": "mushaf 57:3",
   "was": "هوالاول و الاخرو و الظاہرو الباطن و هو بکل شئ علیم",
   "now": "هُوَ الْاَوَّلُ وَالْاٰخِرُ وَالظَّاهِرُ وَالْبَاطِنُۚ وَهُوَ بِكُلِّ شَىْءٍ عَلِيْمٌ"
+ },
+ {
+  "id": "UR-NISBAT-P418-421-003",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 420,
+  "how": "a phrase of the Qur'an or of dhikr, typed bare",
+  "was": "و حبینا و حبیب ربنا",
+  "now": "و حبیبنا و حبیب ربنا",
+  "authority": "approved by the owner 2026-11-22, page 2 item E85"
  },
  {
   "id": "UR-NISBAT-P426-429-004",
@@ -4459,6 +6910,15 @@
   "how": "mushaf 3:135",
   "was": "لم یصرو اعلٰی ما فعلوا۔",
   "now": "وَلَمْ يُصِرُّوْا عَلٰى مَا فَعَلُوْا۔"
+ },
+ {
+  "id": "UR-NISBAT-P458-461-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 460,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "نذیرا\" کی حقیقت",
+  "now": "نذیراً کی حقیقت",
+  "authority": "approved by the owner 2026-11-22, page 2 item F113"
  },
  {
   "id": "UR-NISBAT-P458-461-006",
@@ -4692,6 +7152,24 @@
   "now": "ارشاد فرمایا ویسئلونک"
  },
  {
+  "id": "UR-TALEMAAT-P055-060026",
+  "book": "uploads-books-talemaat-o-barkaat-e-nabuwat-saw",
+  "page": 60,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "باللہ وبالرسول",
+  "now": "باللہ و بالرسول",
+  "authority": "approved by the owner 2026-11-22, page 2 item H32"
+ },
+ {
+  "id": "UR-TALEMAAT-P115-118006",
+  "book": "uploads-books-talemaat-o-barkaat-e-nabuwat-saw",
+  "page": 116,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "دیکھواذیغشیکم",
+  "now": "دیکھو اذیغشیکم",
+  "authority": "approved by the owner 2026-11-22, page 2 item K39"
+ },
+ {
   "id": "UR-TALEMAAT-P175-178001",
   "book": "uploads-books-talemaat-o-barkaat-e-nabuwat-saw",
   "page": 175,
@@ -4699,6 +7177,24 @@
   "was": "رب العلمین ارشاد",
   "now": "رب العالمین ارشاد",
   "authority": "delegated by the owner 2026-11-21, page 2 item E69"
+ },
+ {
+  "id": "UR-TALEMAAT-P175-178013",
+  "book": "uploads-books-talemaat-o-barkaat-e-nabuwat-saw",
+  "page": 176,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "وعدہ ہےانا",
+  "now": "وعدہ ہے انا",
+  "authority": "approved by the owner 2026-11-22, page 2 item K67"
+ },
+ {
+  "id": "UR-TALEMAAT-P199-202006",
+  "book": "uploads-books-talemaat-o-barkaat-e-nabuwat-saw",
+  "page": 200,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": " ٗ",
+  "now": "، ",
+  "authority": "approved by the owner 2026-11-22, page 2 item K71"
  },
  {
   "id": "UR-TALEMAAT-P239-242008",
@@ -4726,6 +7222,15 @@
   "was": "لیلتہ القدر",
   "now": "لیلۃ القدر",
   "authority": "delegated by the owner 2026-11-21, page 2 item K2"
+ },
+ {
+  "id": "UR-TALEMAAT-P295-298005",
+  "book": "uploads-books-talemaat-o-barkaat-e-nabuwat-saw",
+  "page": 296,
+  "how": "may be Arabic: read as Arabic until the owner says",
+  "was": "نسلاً\n\nبعد نسلاً\"",
+  "now": "نسلاً بعد نسل",
+  "authority": "approved by the owner 2026-11-22, page 2 item K60"
  },
  {
   "id": "UR-TALEMAAT-P295-298012",
@@ -4797,6 +7302,15 @@
   "was": "انشاءاللہ",
   "now": "ان شاء اللہ",
   "authority": "delegated by the owner 2026-11-21, page 2 item E7"
+ },
+ {
+  "id": "UR-TAREEQ-P078-082-011",
+  "book": "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
+  "page": 80,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "حقوق حق سجانہ",
+  "now": "حقوقِ حق سبحانہ",
+  "authority": "approved by the owner 2026-11-22, page 2 item H40"
  },
  {
   "id": "UR-TAREEQ-P088-092-027",
