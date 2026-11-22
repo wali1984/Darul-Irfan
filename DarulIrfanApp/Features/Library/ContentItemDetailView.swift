@@ -6,7 +6,8 @@ import SwiftUI
 /// article body - opens as a book page (boards/Book.dc.html): a cover made in
 /// the Silsila's style, the title, author and chips, the gold "Keep reading"
 /// at the page it was left on, the text and the printed pages, keeping it on
-/// this phone, and the excerpt and dates.
+/// this phone, and the excerpt and dates. An Akram-ut-Tarajum volume's gold
+/// button opens the Qur'an reader instead (`TarajumVolume`).
 ///
 /// Everything else - articles, pages, notices - keeps the
 /// metadata card, native reader, native image presentation,
@@ -360,9 +361,11 @@ struct ContentItemDetailView: View {
 
     // MARK: - Book page
 
-    /// A work read as text or as printed pages, with no article body.
+    /// A work read as text or as printed pages, with no article body, or an
+    /// Akram-ut-Tarajum volume.
     private func isBookPage(_ item: ContentItem) -> Bool {
-        !viewModel.showsBody && (hasReadablePDF(item) || viewModel.bookPageCount > 0)
+        if TarajumVolume(item) != nil { return true }
+        return !viewModel.showsBody && (hasReadablePDF(item) || viewModel.bookPageCount > 0)
     }
 
     private func bookPage(for item: ContentItem) -> some View {
@@ -371,7 +374,7 @@ struct ContentItemDetailView: View {
                 .diAppear(delay: 0.02)
             bookTitleBlock(for: item)
                 .diAppear(delay: 0.05)
-            keepReadingButton(for: item)
+            goldButton(for: item)
                 .diAppear(delay: 0.08)
             readingTiles(for: item)
                 .diAppear(delay: 0.11)
@@ -425,6 +428,37 @@ struct ContentItemDetailView: View {
         return BookReadingHistory.pageCount(itemID: item.id, mode: .pages)
     }
 
+    /// The main way in: a volume of the translation to the Qur'an reader,
+    /// any other work to the book reader.
+    @ViewBuilder
+    private func goldButton(for item: ContentItem) -> some View {
+        if let volume = TarajumVolume(item) {
+            translationButton(for: volume)
+        } else {
+            keepReadingButton(for: item)
+        }
+    }
+
+    /// Gold, on an Akram-ut-Tarajum volume: its text is the translation in
+    /// the Qur'an reader. The printed pages stay in the tile below.
+    private func translationButton(for volume: TarajumVolume) -> some View {
+        NavigationLink {
+            TarajumVolumeReader(volume: volume, dependencies: dependencies, appState: appState)
+        } label: {
+            goldButtonLabel {
+                Text("Read the text")
+                    .diInterfaceFont(.headline, weight: .heavy)
+                Text("In the Quran from Parah \(volume.parah), with the Urdu translation")
+                    .diInterfaceFont(.footnote, weight: .semibold)
+                    .opacity(0.8)
+                    .multilineTextAlignment(.leading)
+            }
+        }
+        .buttonStyle(DIPressableStyle())
+        .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
+        .accessibilityElement(children: .combine)
+    }
+
     /// Gold: back to the page it was left on, or the first reading - the
     /// text, and the printed pages only for a work that has no text.
     private func keepReadingButton(for item: ContentItem) -> some View {
@@ -432,72 +466,79 @@ struct ContentItemDetailView: View {
         return NavigationLink {
             reader(for: item, mode: startMode)
         } label: {
-            HStack(spacing: 14) {
-                Image(systemName: "book")
-                    .diInterfaceFont(.headline)
-                    .foregroundStyle(Color(hex: 0xFFE9A8))
-                    .frame(width: 46, height: 46)
-                    .background(Circle().fill(Color(hex: 0x064B34)))
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 2) {
-                    if let resume {
-                        Text("Keep reading")
-                            .diInterfaceFont(.headline, weight: .heavy)
-                        Group {
-                            if let count = resume.pageCount {
-                                Text("Page \(resume.page) of \(count)")
-                            } else {
-                                Text("Page \(resume.page)")
-                            }
+            goldButtonLabel {
+                if let resume {
+                    Text("Keep reading")
+                        .diInterfaceFont(.headline, weight: .heavy)
+                    Group {
+                        if let count = resume.pageCount {
+                            Text("Page \(resume.page) of \(count)")
+                        } else {
+                            Text("Page \(resume.page)")
                         }
-                        .diInterfaceFont(.footnote, weight: .semibold)
-                        .opacity(0.8)
-                        if let fraction = resume.fraction {
-                            ReadProgressLight(
-                                fraction: fraction,
-                                height: 4,
-                                track: Color(hex: 0x064B34).opacity(0.18),
-                                colors: [Color(hex: 0x064B34), Color(hex: 0x064B34)],
-                                glows: false
-                            )
-                            .padding(.top, 6)
-                        }
-                    } else {
-                        Text("Read in App")
-                            .diInterfaceFont(.headline, weight: .heavy)
-                        Group {
-                            if viewModel.bookPageCount > 0 {
-                                Text("\(viewModel.bookPageCount) pages — searchable text")
-                            } else {
-                                Text("Read the pages here — offline after first open")
-                            }
-                        }
-                        .diInterfaceFont(.footnote, weight: .semibold)
-                        .opacity(0.8)
                     }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .foregroundStyle(Color(hex: 0x064B34))
-            .padding(.vertical, DISpacing.md)
-            .padding(.horizontal, 18)
-            .background(
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(hex: 0xFFE9A8), Color(hex: 0xE0B75F), Color(hex: 0xC99A3A)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+                    .diInterfaceFont(.footnote, weight: .semibold)
+                    .opacity(0.8)
+                    if let fraction = resume.fraction {
+                        ReadProgressLight(
+                            fraction: fraction,
+                            height: 4,
+                            track: Color(hex: 0x064B34).opacity(0.18),
+                            colors: [Color(hex: 0x064B34), Color(hex: 0x064B34)],
+                            glows: false
                         )
-                    )
-                    .shadow(color: DIColor.goldGlow.opacity(0.45), radius: 14)
-            )
-            .readSheen(cornerRadius: 26, period: 4, strength: 0.5)
-            .contentShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                        .padding(.top, 6)
+                    }
+                } else {
+                    Text("Read in App")
+                        .diInterfaceFont(.headline, weight: .heavy)
+                    Group {
+                        if viewModel.bookPageCount > 0 {
+                            Text("\(viewModel.bookPageCount) pages — searchable text")
+                        } else {
+                            Text("Read the pages here — offline after first open")
+                        }
+                    }
+                    .diInterfaceFont(.footnote, weight: .semibold)
+                    .opacity(0.8)
+                }
+            }
         }
         .buttonStyle(DIPressableStyle())
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
         .accessibilityElement(children: .combine)
+    }
+
+    /// The gold button's face: the book, and the lines that say where it opens.
+    private func goldButtonLabel<Lines: View>(@ViewBuilder lines: () -> Lines) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: "book")
+                .diInterfaceFont(.headline)
+                .foregroundStyle(Color(hex: 0xFFE9A8))
+                .frame(width: 46, height: 46)
+                .background(Circle().fill(Color(hex: 0x064B34)))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                lines()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .foregroundStyle(Color(hex: 0x064B34))
+        .padding(.vertical, DISpacing.md)
+        .padding(.horizontal, 18)
+        .background(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(hex: 0xFFE9A8), Color(hex: 0xE0B75F), Color(hex: 0xC99A3A)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: DIColor.goldGlow.opacity(0.45), radius: 14)
+        )
+        .readSheen(cornerRadius: 26, period: 4, strength: 0.5)
+        .contentShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
     }
 
     /// The text, then the printed pages (the PDF), each opening the reader.

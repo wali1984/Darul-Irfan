@@ -11,6 +11,8 @@ struct SurahReaderView: View {
     private let appState: AppState
     private let onRequestNextSurah: () -> Void
     private let initialFocusAyah: Int?
+    /// Set when the reader was opened from an Akram-ut-Tarajum volume.
+    private let tarajumReading: Binding<TarajumReading>?
     @State private var hasAppliedInitialFocus = false
     /// Needed to turn a linked bayan into something playable: the index stores
     /// only the media id, so the catalogue stays the one description of a
@@ -47,9 +49,11 @@ struct SurahReaderView: View {
         focusAyah: Int?,
         dependencies: AppDependencies,
         appState: AppState,
+        tarajumReading: Binding<TarajumReading>? = nil,
         onRequestNextSurah: @escaping () -> Void
     ) {
         self.appState = appState
+        self.tarajumReading = tarajumReading
         self.onRequestNextSurah = onRequestNextSurah
         self.mediaRepository = dependencies.mediaRepository
         self.audioPlayer = dependencies.audioPlayer
@@ -65,7 +69,7 @@ struct SurahReaderView: View {
             surah: surah,
             repository: dependencies.quranRepository,
             devotionalMetrics: dependencies.devotionalMetrics,
-            preferredLanguageCode: langCode
+            preferredLanguageCode: tarajumReading?.wrappedValue.language ?? langCode
         ))
     }
 
@@ -106,6 +110,9 @@ struct SurahReaderView: View {
                 #if DEBUG
                 await recordReaderResponsivenessIfRequested()
                 #endif
+            }
+            .onChange(of: viewModel.readingLanguage) { _, code in
+                if let tarajumReading { tarajumReading.wrappedValue.language = code }
             }
             .onAppear {
                 isOnScreen = true
@@ -255,10 +262,10 @@ struct SurahReaderView: View {
                 if viewModel.recitation != nil || canPlayTranslation {
                     listenBar
                 }
-                if appState.settings.quranReaderDisplayMode.showsTranslation {
+                if displayMode.showsTranslation {
                     contentModeSelector
                 }
-                if appState.settings.quranReaderDisplayMode.showsTranslation
+                if displayMode.showsTranslation
                     && viewModel.contentMode.isTafsir
                     && !viewModel.hasTafsirForMode {
                     // No verse-by-verse commentary in this language: the
@@ -282,13 +289,13 @@ struct SurahReaderView: View {
                         speaker: speaker,
                         listen: { start(from: $0) },
                         fontScale: appState.settings.readerFontScale.rawValue,
-                        displayMode: appState.settings.quranReaderDisplayMode,
+                        displayMode: displayMode,
                         playBayan: { play($0) },
                         scrollToAyah: { pendingScrollAyah = $0 }
                     )
                     .id(ayah.ayahNumber)
                 }
-                if appState.settings.quranReaderDisplayMode.showsTranslation
+                if displayMode.showsTranslation
                     && viewModel.contentMode.isTafsir
                     && viewModel.hasTafsirForMode
                     && !viewModel.fullVolumes.isEmpty {
@@ -949,7 +956,7 @@ struct SurahReaderView: View {
                 }
             }
             Toggle("Automatically open next surah", isOn: autoAdvanceBinding)
-            if appState.settings.quranReaderDisplayMode.showsTranslation,
+            if displayMode.showsTranslation,
                viewModel.availableTranslationEditions.count > 1 {
                 Picker("Translation", selection: editionBinding) {
                     ForEach(viewModel.availableTranslationEditions) { edition in
@@ -981,10 +988,20 @@ struct SurahReaderView: View {
         )
     }
 
+    /// What each ayah shows: the reader's setting, except that a volume of
+    /// the translation shows it until another display is chosen here.
+    private var displayMode: QuranReaderDisplayMode {
+        let chosen = appState.settings.quranReaderDisplayMode
+        guard let tarajumReading, tarajumReading.wrappedValue.showsTranslation,
+              !chosen.showsTranslation else { return chosen }
+        return .arabicAndTranslation
+    }
+
     private var displayModeBinding: Binding<QuranReaderDisplayMode> {
         Binding(
-            get: { appState.settings.quranReaderDisplayMode },
+            get: { displayMode },
             set: { newValue in
+                if let tarajumReading { tarajumReading.wrappedValue.showsTranslation = false }
                 Task { await appState.updateSettings { $0.quranReaderDisplayMode = newValue } }
             }
         )

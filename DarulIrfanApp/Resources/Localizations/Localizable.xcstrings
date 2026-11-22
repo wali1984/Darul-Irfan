@@ -17285,6 +17285,23 @@
         }
       }
     },
+    "In the Quran from Parah %lld, with the Urdu translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In the Quran from Parah %lld, with the Urdu translation"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قرآن میں پارہ %lld سے، اردو ترجمے کے ساتھ"
+          }
+        }
+      }
+    },
     "Reading language": {
       "extractionState": "manual",
       "localizations": {
