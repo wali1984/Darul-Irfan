@@ -315,7 +315,7 @@ struct GroupDetailView: View {
                                              form: HalqahStartForm(simple: layout.isSimple, startTitle: detail?.group.startTitle,
                                                                    zikrSessions: detail?.zikrSessions ?? [],
                                                                    meetingsReady: meetingsReady))
-                case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
+                case .meeting: GroupMeetingScheduler(groupID: group.id, service: service, meetingsReady: meetingsReady)
                 case .zikr: GroupZikrEditor(groupID: group.id, service: service, videoClips: videoClips)
                 case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
                 case .history: GroupSessionHistoryView(groupID: group.id, service: service)
@@ -611,7 +611,7 @@ struct GroupDetailView: View {
                     )
                 }
                 .buttonStyle(HalqahTileButtonStyle())
-                .halqahTileAccessibility(titleKey: "Go live", value: goLiveLine, hintKey: "Starts a zikr or meeting for the whole Halqah.")
+                .halqahTileAccessibility(titleKey: "Go live", value: goLiveLine, hintKey: goLiveHint)
                 .diAppear(delay: 0.08)
             }
             if layout.showsStartTile(isLive: detail?.live != nil) {
@@ -679,13 +679,20 @@ struct GroupDetailView: View {
         }
     }
 
-    /// What the Go live tile says: what is live now, or what it starts.
+    /// What the Go live tile says: what is live now, or what it starts. It
+    /// names no meeting while no room can open.
     private var goLiveLine: Text {
         if let live = detail?.live {
             let title = live.title ?? (live.isMeeting ? String(localized: "Group meeting") : String(localized: "Halqah Zikr"))
             return Text("Live now: \(title)")
         }
+        guard meetingsReady else { return Text("Start now and notify the group") }
         return Text("Start Halqah zikr or meeting now")
+    }
+
+    /// What VoiceOver says the Go live tile does.
+    private var goLiveHint: LocalizedStringKey {
+        meetingsReady ? "Starts a zikr or meeting for the whole Halqah." : "Starts the Zikr for the whole Halqah."
     }
 
     /// The admin tiles. Each opens the sheet its button always opened; the

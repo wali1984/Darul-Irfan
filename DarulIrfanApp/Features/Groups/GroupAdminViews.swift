@@ -935,6 +935,8 @@ struct GroupLiveStarter: View {
 struct GroupMeetingScheduler: View {
     let groupID: String
     let service: MemberGroupService
+    /// False while the server can open no room: nothing is said of joining.
+    var meetingsReady = true
 
     @Environment(\.dismiss) private var dismiss
     @State private var requestID = UUID()
@@ -955,7 +957,11 @@ struct GroupMeetingScheduler: View {
                         Text("\(duration) minutes")
                     }
                 } footer: {
-                    Text("Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before.").foregroundStyle(DIColor.textMuted)
+                    if meetingsReady {
+                        Text("Members see the time in their own time zone, are told when it is scheduled, and can join from ten minutes before.").foregroundStyle(DIColor.textMuted)
+                    } else {
+                        Text("The time is in your own time zone; members see it in theirs.").foregroundStyle(DIColor.textMuted)
+                    }
                 }
                 if let error {
                     Section { Text(verbatim: error).foregroundStyle(DIColor.danger) }
