@@ -152,7 +152,7 @@ private struct BookPageDestination: View {
                     id: bookID,
                     sourceUrl: "",
                     type: .book,
-                    title: bookID,
+                    title: String(localized: "Book"),
                     titleUrdu: nil,
                     language: "ur",
                     author: nil,

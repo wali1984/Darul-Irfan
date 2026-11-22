@@ -38,6 +38,61 @@ struct SearchResultGroup: Identifiable, Equatable {
     var id: String { domain.rawValue }
 }
 
+// MARK: - Copy reference
+
+/// The text "Copy reference" puts on the pasteboard: what a person is shown
+/// of the hit, never the id it is kept under.
+enum SearchReference {
+    /// - Parameters:
+    ///   - lecture: The catalogue entry of a media hit, for its speaker and day.
+    ///   - event: The programme of an events hit, for its days and venue.
+    ///   - locale: Writes the numbers and the days.
+    static func text(for result: SearchResult, lecture: MediaItem?, event: CommunityEvent?, locale: Locale) -> String {
+        var parts: [String] = [result.title]
+        switch result.domain {
+        case .quran:
+            if let reference = result.ayahReference {
+                parts.append("Quran \(reference.surah):\(reference.ayah)")
+            }
+        case .hadith:
+            // The title is the reference: the collection and the number.
+            break
+        case .library:
+            // A work's title is its reference; a page of its text adds the page.
+            if let page = result.bookPage {
+                parts = [String(localized: "\(result.workTitle), p. \(page.page)", locale: locale)]
+            }
+        case .media:
+            if let speaker = lecture?.speaker, !speaker.isEmpty {
+                parts.append(speaker)
+            }
+            if let date = lecture?.date {
+                // Read in UTC, as the lecture's row shows it.
+                parts.append(date.formatted(Date.FormatStyle(date: .abbreviated, time: .omitted, locale: locale, timeZone: .gmt)))
+            }
+        case .events:
+            if let event {
+                if let dates = datesText(of: event, locale: locale) {
+                    parts.append(dates)
+                }
+                if let venue = event.venue, !venue.isEmpty {
+                    parts.append(String(localized: String.LocalizationValue(venue), locale: locale))
+                }
+            }
+        }
+        return parts.joined(separator: " — ")
+    }
+
+    /// The days the programme's own screen shows: none while they are only
+    /// approximate, unless it has taken place.
+    private static func datesText(of event: CommunityEvent, locale: Locale) -> String? {
+        guard let start = event.startDate, !event.datesAreApproximate || event.hasEnded() else { return nil }
+        let first = CommunityEvent.dayText(start, .long, locale: locale)
+        guard let end = event.endDate, end > start else { return first }
+        return "\(first) – \(CommunityEvent.dayText(end, .long, locale: locale))"
+    }
+}
+
 // MARK: - View model
 
 /// Drives the global search sheet: debounced querying, domain filtering, and
@@ -62,6 +117,8 @@ final class SearchViewModel {
 
     // `let` constants are never observation-tracked, so no annotation needed.
     private let searchIndex: any SearchIndexServicing
+    private let mediaRepository: any MediaRepositoryProtocol
+    private let eventsRepository: any EventsRepositoryProtocol
 
     // MARK: Observable state
 
@@ -70,6 +127,9 @@ final class SearchViewModel {
     private(set) var selectedDomain: SearchDomain?
     private(set) var phase: Phase = .idle
     private(set) var groups: [SearchResultGroup] = []
+    /// What "Copy reference" adds to the lectures and programmes found, by id.
+    private var lectures: [String: MediaItem] = [:]
+    private var programmes: [String: CommunityEvent] = [:]
 
     // MARK: Private state
 
@@ -87,11 +147,11 @@ final class SearchViewModel {
         eventsRepository: any EventsRepositoryProtocol
     ) {
         self.searchIndex = searchIndex
+        self.mediaRepository = mediaRepository
+        self.eventsRepository = eventsRepository
         // Preserve the dependency-injection contract while result navigation
         // is resolved by the presenting view instead of external URLs.
         _ = contentRepository
-        _ = mediaRepository
-        _ = eventsRepository
     }
 
     // MARK: Derived
@@ -142,27 +202,14 @@ final class SearchViewModel {
     // MARK: Row helpers
 
     /// Plain-text reference for the "Copy reference" context action:
-    /// the title plus a locator (ayah reference or source URL when known).
+    /// the title plus what names the hit to a reader (`SearchReference`).
     func reference(for result: SearchResult) -> String {
-        var parts: [String] = [result.title]
-        switch result.domain {
-        case .quran:
-            if let reference = result.ayahReference {
-                parts.append("Quran \(reference.surah):\(reference.ayah)")
-            }
-        case .hadith:
-            // The title is the reference: the collection and the number.
-            break
-        case .library:
-            if let page = result.bookPage {
-                parts.append("\(page.bookID), p. \(page.page)")
-            } else {
-                parts.append(result.itemID)
-            }
-        case .media, .events:
-            parts.append(result.itemID)
-        }
-        return parts.joined(separator: " — ")
+        SearchReference.text(
+            for: result,
+            lecture: lectures[result.itemID],
+            event: programmes[result.itemID],
+            locale: LanguageManager.locale(for: LanguageManager.current)
+        )
     }
 
     // MARK: Search pipeline
@@ -200,8 +247,12 @@ final class SearchViewModel {
                 domains: domains,
                 limit: Self.resultLimit
             )
+            let foundLectures = await loadLectures(among: results)
+            let foundProgrammes = await loadProgrammes(among: results)
             if Task.isCancelled { return }
 
+            lectures = foundLectures
+            programmes = foundProgrammes
             groups = Self.grouped(results)
             phase = groups.isEmpty ? .empty : .results
         } catch is CancellationError {
@@ -211,6 +262,25 @@ final class SearchViewModel {
             groups = []
             phase = .failed
         }
+    }
+
+    /// The catalogue entries of the media hits. One that cannot be read
+    /// leaves its reference as the title alone.
+    private func loadLectures(among results: [SearchResult]) async -> [String: MediaItem] {
+        var found: [String: MediaItem] = [:]
+        for result in results where result.domain == .media {
+            if let item = try? await mediaRepository.item(id: result.itemID) {
+                found[result.itemID] = item
+            }
+        }
+        return found
+    }
+
+    /// The programmes of the events hits, likewise.
+    private func loadProgrammes(among results: [SearchResult]) async -> [String: CommunityEvent] {
+        guard results.contains(where: { $0.domain == .events }),
+              let events = try? await eventsRepository.events() else { return [:] }
+        return Dictionary(events.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
     /// Buckets results by domain in the fixed Quran/Hadith/Library/Media/

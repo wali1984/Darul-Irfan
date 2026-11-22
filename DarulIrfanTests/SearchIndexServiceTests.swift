@@ -234,6 +234,20 @@ final class SearchIndexServiceTests: XCTestCase {
         XCTAssertTrue(page.snippet?.contains("طلب") == true)
     }
 
+    /// A page whose work is not in the catalogue is titled "Book", never by
+    /// the id it is kept under.
+    func testAPageWithoutACatalogueEntryIsTitledBook() async throws {
+        try await contentRepository.upsertBookPages([
+            BookPage(bookID: "book-ocr-unlisted", page: 4, text: "اللہ کریم نے اپنے بندوں سے ایک شے طلب فرمائی", blocks: 1,
+                     unresolvedBlocks: 0),
+        ])
+        await LargeSearchIndexBuilder.shared.buildStaleIndexes(database: database)
+        let results = try await service.search("طلب", domains: [.library], limit: 20)
+        let page = try XCTUnwrap(results.first { $0.bookPage != nil })
+        XCTAssertEqual(page.workTitle, String(localized: "Book"))
+        XCTAssertFalse(page.title.contains("book-ocr"))
+    }
+
     func testEmptyAndWhitespaceQueriesReturnNothing() async throws {
         try await seedAllDomains()
 

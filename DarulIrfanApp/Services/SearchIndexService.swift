@@ -240,6 +240,16 @@ actor LargeSearchIndexBuilder {
 // MARK: - Result locators
 
 extension SearchResult {
+    /// Stands between a work's title and the page in a page hit's title.
+    static let pageSeparator = " — "
+
+    /// The work's title alone: a page hit's without the page after it.
+    var workTitle: String {
+        guard bookPage != nil,
+              let separator = title.range(of: Self.pageSeparator, options: .backwards) else { return title }
+        return String(title[..<separator.lowerBound])
+    }
+
     /// A hit on one page of a book's text: which book, which page.
     var bookPage: (bookID: String, page: Int)? {
         let parts = itemID.split(separator: "|", omittingEmptySubsequences: false)
@@ -659,7 +669,7 @@ struct SearchIndexService: SearchIndexServicing {
             guard let edition = row.text("edition_id"),
                   let surah = row.int("surah_number"),
                   let ayah = row.int("ayah_start") else { return nil }
-            let work = row.text("edition_title") ?? edition
+            let work = row.text("edition_title") ?? String(localized: "Quran Tafsir")
             let name = row.text("surah_name") ?? "\(surah)"
             return SearchResult(
                 domain: .quran,
@@ -687,11 +697,11 @@ struct SearchIndexService: SearchIndexServicing {
         )) ?? []
         return rows.compactMap { row in
             guard let bookID = row.text("book_id"), let page = row.int("page") else { return nil }
-            let title = row.text("title") ?? bookID
+            let title = row.text("title") ?? String(localized: "Book")
             return SearchResult(
                 domain: .library,
                 itemID: "bookpage|\(bookID)|\(page)",
-                title: "\(title) — " + String(localized: "Page \(page)"),
+                title: title + SearchResult.pageSeparator + String(localized: "Page \(page)"),
                 snippet: row.text("text").flatMap { SearchSnippet.make(from: $0, terms: highlight) },
                 language: row.text("language") ?? "ur"
             )
@@ -716,7 +726,7 @@ struct SearchIndexService: SearchIndexServicing {
             }
             // The text the words were found in; the first there is otherwise.
             let shown = snippets.first { $0.snippet.contains("\u{2039}") } ?? snippets.first
-            var collection = entry.bookID
+            var collection = String(localized: "Hadith")
             if let book = books[entry.bookID] {
                 let inUrdu = shown.map { $0.language != "en" } ?? false
                 collection = inUrdu && !book.titleUrdu.isEmpty ? book.titleUrdu : book.titleEnglish
