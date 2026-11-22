@@ -100,7 +100,7 @@ extension of the Silsila rather than a generic azan app.
 | Script | Face | Use |
 |---|---|---|
 | **Arabic (Qur'an)** | **IndoPak script** (bundled) | All Qur'anic Arabic — the mushaf reading face |
-| **Arabic (other)** | **Amiri Quran** (bundled) | Arabic du'as and devotional prose |
+| **Arabic (other)** | **IndoPak script** in the app, **Amiri Quran** on share cards (both bundled) | Arabic du'as and devotional text |
 | **Urdu** | **Noto Nastaliq Urdu** (Apple's, on the device) | All Urdu — wordmark, titles, body, captions; always RTL |
 | **Headings (Latin)** | **Serif** (the app's serif heading face) | English titles, taglines, marketing headlines — scholarly, calm |
 | **Body / UI (Latin)** | **SF Pro / system** | English body, controls, numerals; scales with Dynamic Type |

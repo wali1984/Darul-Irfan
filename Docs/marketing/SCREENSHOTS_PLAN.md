@@ -36,13 +36,13 @@ tablet screenshots don't look like blown-up phone shots. Localise a full **Urdu
 ## The 8 shots
 
 ### 1 — Prayer dashboard (hero)
-- **Screen:** Today tab, top — next-prayer hero with live countdown, today's six
-  times, Hijri + Gregorian date, alert bells.
+- **Screen:** Today tab, top — next-prayer hero with live countdown, the five
+  prayers' times with their tracker marks, Hijri + Gregorian date.
 - **Caption EN:** *Accurate prayer times, fully offline.*
 - **Caption UR:** *درست اوقاتِ نماز، مکمل آف لائن۔*
 - **Notes:** The signature opener. Show a mid-day state so a real countdown reads
   (e.g. "Asr in 1:24"). Emerald hero card, gold hairline, octagram watermark
-  faint in the corner. iPad: show the hero plus the week strip side-by-side.
+  faint in the corner.
 
 ### 2 — The complete Qur'an
 - **Screen:** Surah reader on **Al-Fatihah** (or Al-Ikhlas 112) — Arabic in the

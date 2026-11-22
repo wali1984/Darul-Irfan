@@ -54,10 +54,10 @@ ad-free, and private by design.
 - **Explore the Qur'an by topic** — themes cross-linked across ayat, the library,
   and bayans; a study experience commodity prayer apps don't offer.
 - **Private by design** — no ads, no trackers; an account is optional and used
-  only for Halqahs. Prayer times and Qibla are calculated on the device; the
-  chosen place's location is sent only for weather, when it is on (approximate),
-  and for a nearby-masjid search the user starts. Core features work fully
-  offline.
+  only for Halqahs. Prayer times and Qibla are calculated on the device; our
+  service receives the chosen place's location only for weather, when it is on
+  (approximate), and for a nearby-masjid search the user starts. Core features
+  work fully offline.
 - **The Sheikh's own words** — religious content is presented exactly, never
   paraphrased; the app issues no religious rulings.
 - **Serious prayer engine** — 12 calculation methods, Hanafi/Shafi Asr,
@@ -100,9 +100,9 @@ ad-free, and private by design.
 >
 > Darul Irfan is free and private by design: no ads and no trackers. An account
 > is optional and used only for Halqahs, which have live meetings with chat.
-> Prayer times and Qibla are calculated on the device; the chosen place's
-> location is sent only for weather, when it is on (approximate), and for a
-> nearby-masjid search the user starts.
+> Prayer times and Qibla are calculated on the device; our service receives
+> the chosen place's location only for weather, when it is on (approximate),
+> and for a nearby-masjid search the user starts.
 
 ---
 
@@ -116,7 +116,7 @@ ad-free, and private by design.
 | Media | Audio bayans (background + offline) · videos · official live hub · Al-Murshid magazine archive |
 | Zikr | Method of Zikr · online zikr schedule · tasbih |
 | Halqahs | Optional account · announcements · live meetings with chat |
-| Privacy | No ads, no trackers · location sent only for weather (approximate) and nearby-masjid search |
+| Privacy | No ads, no trackers · our service receives location only for weather (approximate) and nearby-masjid search |
 | Localisation | English & Urdu, full RTL |
 
 ---
@@ -166,8 +166,9 @@ ad-free, and private by design.
 - **HQ:** Dar-ul-Irfan, Munara, Khushab Road, District Chakwal, Punjab, Pakistan
 - **Press assets:** app icon, seal/octagram emblem, and the 8 screenshots (see
   `SCREENSHOTS_PLAN.md`); colours and type in `BRAND_GUIDE.md`.
-- **Privacy:** no ads or tracking; devotional activity stays on-device;
-  location is sent only for weather and nearby-masjid search; official alerts
+- **Privacy:** no ads or tracking; prayer and reading records stay on-device;
+  attendance is recorded for those who join a Halqah's session; our service
+  receives location only for weather and nearby-masjid search; official alerts
   and anonymous diagnostics are opt-in — see `Docs/PRIVACY.md`.
 
 *Please observe honorifics when quoting: the Prophet Muhammad ﷺ; Hazrat Ameer

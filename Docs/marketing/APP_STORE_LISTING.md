@@ -8,9 +8,9 @@ limit.
 > Accuracy guardrails observed here (do not "improve" past them):
 > - The Quran ships **complete** — all 114 surahs / 6,236 ayat, Arabic in the
 >   IndoPak script, with the Akram-ut-Tarajum translation in Urdu and English.
-> - An account is optional and only for Halqahs, which have chat. Approximate
->   location leaves the device for weather. Never write "no accounts", "no
->   chat" or "location never leaves the device".
+> - An account is optional and only for Halqahs, which have chat. Location
+>   leaves the device for weather (approximate) and for a nearby-masjid search.
+>   Never write "no accounts", "no chat" or "location never leaves the device".
 > - Official YouTube broadcasts use a foreground, controlled in-app player
 >   with an external YouTube fallback. YouTube content is never extracted or
 >   downloaded; only organization-owned direct audio supports background play.
@@ -138,10 +138,10 @@ the Silsila's own library, to read in the app. Nothing tracks you.
   simple tasbih counter with a daily habit strip.
 
 **Halqahs (optional)**
-- Join Our Sheikh with your name, city and country, or a private Halqah with
-  an invitation code, or sign in with Apple and its admin adds you:
-  announcements, zikr, and live meetings with voice, video and chat. You can
-  delete your account in the app.
+- Join Our Sheikh with your name, city and country. For a private Halqah, use
+  an invitation code, or sign in with Apple and ask its admin to add you.
+  Announcements, zikr, live meetings with voice, video and chat. You can
+  delete your account.
 
 **Events & Dar-ul-Irfan**
 - Programmes and announcements, add-to-calendar and reminders, map and
@@ -408,5 +408,6 @@ Answers for the App Privacy / age questionnaire:
 > App Privacy: disclose the optional APNs installation/device identifier for
 > app functionality and optional MetricKit diagnostics (neither linked to
 > identity), and for Halqah members the User ID, name and email linked to
-> identity. Nothing is used for tracking. See `Docs/PRIVACY.md`. An account
-> is needed only for Halqahs.
+> identity. Answer Location and User Content as `Docs/PRIVACY.md` says once
+> they are rechecked. Nothing is used for tracking. An account is needed only
+> for Halqahs.

@@ -220,7 +220,7 @@ Qur'an reciter is not named in the app: the Listen bar says "Recitation".
 - [ ] Official alert opt-in registers an APNs token, topic changes update it,
       opt-out deletes it, and duplicate event IDs do not redeliver.
 - [ ] YouTube stays foreground-only; owned HTTPS audio uses native background
-      playback; Paltalk opens externally.
+      playback; live Zikr sound plays inside the app.
 
 **Permissions & flows**:
 - [ ] Onboarding: deny location → manual city path works end-to-end.
@@ -234,5 +234,7 @@ Qur'an reciter is not named in the app: the Listen bar says "Recitation".
 **Final**:
 - [ ] Archive a Release build; run once from TestFlight before submitting.
 - [ ] Re-read `Docs/PRIVACY.md` and disclose optional Device ID/APNs app
-      functionality plus optional diagnostics. Do **not** use the obsolete
+      functionality, optional diagnostics and the Halqah account's data; settle
+      its Location and User Content items and make
+      `PrivacyInfo.xcprivacy` match. Do **not** use the obsolete
       blanket “Data Not Collected” answer for this build.
