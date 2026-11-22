@@ -63,7 +63,11 @@ struct LibraryTabView: View {
                                 titleKey: "The library could not be loaded",
                                 openingTitleKey: "Opening the library…",
                                 contentSync: dependencies.contentSync,
-                                reload: { await viewModel.reloadHome() }
+                                reload: {
+                                    await viewModel.reloadHome()
+                                    // Keep reading finds its work only once the library is in.
+                                    await refreshLastBook()
+                                }
                             )
                             .diOctagramWatermark(size: 260, opacity: 0.05)
                             .diAppear(delay: 0.1)

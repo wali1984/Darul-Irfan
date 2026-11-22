@@ -227,7 +227,8 @@ enum BookReadingHistory {
 struct BookReaderScreen: View {
     let item: ContentItem
     let dependencies: AppDependencies
-    /// A printed page to open the text at (a search result, a surah's start).
+    /// A printed page to open the work at (a search result, a surah's start):
+    /// in its text, or in its printed pages when it has no text to show.
     private let startPage: Int?
     /// Where the text size is kept; nil keeps it for this reading only.
     private let appState: AppState?
@@ -370,7 +371,11 @@ struct BookReaderScreen: View {
             }
         }
         .onChange(of: pdf.pageNumbers.last) { _, last in
-            if let last { BookReadingHistory.savePageCount(last, itemID: item.id, mode: .pages) }
+            guard let last else { return }
+            BookReadingHistory.savePageCount(last, itemID: item.id, mode: .pages)
+            // Printed pages standing in for the text open at the page asked
+            // for, which can be turned to only once the PDF's pages are known.
+            if text.hasNoPages, let startPage { pdf.requestedPage = startPage }
         }
         .onChange(of: text.pageNumbers.last) { _, last in
             if let last { BookReadingHistory.savePageCount(last, itemID: item.id, mode: .text) }
