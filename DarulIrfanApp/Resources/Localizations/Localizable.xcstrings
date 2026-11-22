@@ -22079,57 +22079,6 @@
         }
       }
     },
-    "Video meetings: integration in progress. The time is kept, and the room opens here once it is complete.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Video meetings: integration in progress. The time is kept, and the room opens here once it is complete."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویڈیو میٹنگز: انضمام جاری ہے۔ وقت محفوظ ہے، اور مکمل ہونے پر کمرہ یہیں کھلے گا۔"
-          }
-        }
-      }
-    },
-    "Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "واٹس ایپ سے آنے والی پوسٹس: انضمام جاری ہے۔ تب تک براہِ راست یہاں پوسٹ کریں۔"
-          }
-        }
-      }
-    },
-    "Video meetings: integration in progress. They open here once it is complete.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Video meetings: integration in progress. They open here once it is complete."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویڈیو میٹنگز: انضمام جاری ہے۔ مکمل ہونے پر یہیں کھلیں گی۔"
-          }
-        }
-      }
-    },
     "Before Fajr at Dar-ul-Irfan": {
       "extractionState": "manual",
       "localizations": {
@@ -23575,23 +23524,6 @@
         }
       }
     },
-    "Leading live in a room: integration in progress. Meanwhile share a live YouTube link here, or play a past zikr or a recording.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Leading live in a room: integration in progress. Meanwhile share a live YouTube link here, or play a past zikr or a recording."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "روم میں براہِ راست ذکر کروانا: انضمام جاری ہے۔ اس دوران یہاں یوٹیوب کا براہِ راست لنک دیں، یا گزشتہ ذکر یا کوئی ریکارڈنگ چلائیں۔"
-          }
-        }
-      }
-    },
     "MP3, M4A, AAC, WAV, MP4 or MOV, up to 95 MB. Members listen together from the moment you start, and the session ends when the recording does.": {
       "extractionState": "manual",
       "localizations": {
@@ -23860,23 +23792,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ایک ساتھ سنیں"
-          }
-        }
-      }
-    },
-    "Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویڈیو میٹنگز اور روم میں براہِ راست ذکر: انضمام جاری ہے۔ اس دوران یوٹیوب سے ذکر شروع کریں یا کوئی ریکارڈنگ چلائیں۔ میٹنگز ابھی طے کی جا سکتی ہیں؛ ان کے روم انضمام مکمل ہونے پر کھلیں گے۔"
           }
         }
       }

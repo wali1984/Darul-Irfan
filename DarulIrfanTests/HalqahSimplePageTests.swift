@@ -88,6 +88,15 @@ final class HalqahSimplePageTests: XCTestCase {
         XCTAssertNil(HalqahStartForm(simple: false, startTitle: "Start Something").heading, "only a simple page uses it")
     }
 
+    func testWithoutRoomsTheStartSheetOffersNoMeetingAndNoLeadLive() {
+        let form = HalqahStartForm(meetingsReady: false)
+        XCTAssertFalse(form.isSimple, "still the full page's sheet")
+        XCTAssertFalse(form.showsKindChoice, "no Meeting to choose")
+        XCTAssertFalse(form.offersLeadLive, "YouTube and Recording only")
+        XCTAssertTrue(form.showsTitleField)
+        XCTAssertNil(form.heading)
+    }
+
     func testEveryOtherHalqahKeepsTheFullPage() {
         let full = HalqahPageLayout(simplePage: false)
         XCTAssertTrue(full.showsStage)

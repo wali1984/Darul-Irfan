@@ -26,6 +26,7 @@ struct GroupSessionCard: View {
     let group: MemberGroup
     let service: MemberGroupService
     let canManage: Bool
+    /// False while the server can open no room: no Join and no recording of one.
     var meetingsReady = true
     let audioPlayer: (any AudioPlayerServicing)?
     let joining: Bool
@@ -84,7 +85,7 @@ struct GroupSessionCard: View {
                     .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.danger)
             }
-            if live.hasRoom {
+            if offersRoom {
                 // The one button that glows: there is a room to join now.
                 Button(action: onJoinRoom) {
                     Label(live.isMeeting ? "Join the meeting" : "Join the zikr together", systemImage: "person.3.fill")
@@ -117,7 +118,7 @@ struct GroupSessionCard: View {
                 case .notice: GroupNoticeComposer(groupID: group.id, service: service, current: live.notice?.text, sessionID: sheetSessionID)
                 case .dua: GroupDuaComposer(groupID: group.id, service: service)
                 case .listeners: GroupListenersView(attendance: live.attendance ?? [])
-                case .add: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, addingToSession: true, sessionID: sheetSessionID,
+                case .add: GroupLiveStarter(groupID: group.id, service: service, addingToSession: true, sessionID: sheetSessionID,
                                             videoClips: videoClips)
                 }
             }
@@ -129,6 +130,9 @@ struct GroupSessionCard: View {
             }
         }
     }
+
+    /// The session has a room, and rooms can open.
+    private var offersRoom: Bool { live.hasRoom && meetingsReady }
 
     private var header: some View {
         HStack(spacing: DISpacing.sm) {
@@ -288,7 +292,7 @@ struct GroupSessionCard: View {
                 systemImage: "text.badge.plus", hintKey: "Adds recordings or past zikr to this session."
             ) { sheetSessionID = live.sessionID; sheet = .add })
         }
-        if live.hasRoom {
+        if offersRoom {
             if live.roomRecording == true {
                 tiles.append(HalqahTileItem(
                     id: "record", titleKey: "Stop recording", subtitle: Text("Recording now"),

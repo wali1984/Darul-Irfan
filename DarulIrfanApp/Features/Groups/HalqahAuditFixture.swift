@@ -28,7 +28,7 @@ struct HalqahAuditFixture: View {
             if ProcessInfo.processInfo.arguments.contains("--uitesting-playback-choices") {
                 GroupZikrEditor(groupID: "admin", service: service)
             } else if ProcessInfo.processInfo.arguments.contains("--uitesting-recording-library") {
-                GroupLiveStarter(groupID: "admin", service: service, meetingsReady: false)
+                GroupLiveStarter(groupID: "admin", service: service, form: HalqahStartForm(meetingsReady: false))
             } else if ProcessInfo.processInfo.arguments.contains("--uitesting-directory-detail") {
                 DirectoryPersonView(person: DirectoryPerson(
                     id: "audit-person", name: "Audit member", email: nil, lastSeenAt: Date(timeIntervalSince1970: 1_700_000_000),

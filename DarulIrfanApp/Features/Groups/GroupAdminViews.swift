@@ -338,9 +338,12 @@ struct VideoLinkDraft: Equatable {
 /// The start sheet's form. A simple Halqah page (owner 2026-11-19, addendum
 /// 2: "no meeting option, no lead live, no record zikr option") starts a
 /// Halqah Zikr from YouTube or a recording only, under the server's own
-/// heading, and names the session after it.
+/// heading, and names the session after it. Without rooms, the full form
+/// starts from YouTube or a recording only, too.
 struct HalqahStartForm: Equatable {
     let isSimple: Bool
+    /// False while the server can open no room: no meeting, no Lead live.
+    let meetingsReady: Bool
     /// The server's start title, e.g. "Start Daily North America Nightly Zikr".
     let startTitle: String?
 
@@ -349,8 +352,9 @@ struct HalqahStartForm: Equatable {
     /// admin may change them for this start; the zikr time stays as it is.
     let prefill: VideoLinkDraft?
 
-    init(simple: Bool = false, startTitle: String? = nil, zikrSessions: [ZikrSession] = []) {
+    init(simple: Bool = false, startTitle: String? = nil, zikrSessions: [ZikrSession] = [], meetingsReady: Bool = true) {
         isSimple = simple
+        self.meetingsReady = meetingsReady
         let trimmed = startTitle?.trimmingCharacters(in: .whitespacesAndNewlines)
         self.startTitle = simple && trimmed?.isEmpty == false ? trimmed : nil
         prefill = simple ? Self.savedVideo(in: zikrSessions) : nil
@@ -372,10 +376,11 @@ struct HalqahStartForm: Equatable {
 
     /// The sheet's heading and the start tile's label; nil: "Go live".
     var heading: String? { startTitle }
-    /// "Halqah Zikr" or "Meeting": a simple form is always a Halqah Zikr.
-    var showsKindChoice: Bool { !isSimple }
+    /// "Halqah Zikr" or "Meeting": a simple form is always a Halqah Zikr, and
+    /// so is any form without rooms.
+    var showsKindChoice: Bool { !isSimple && meetingsReady }
     /// Leading live in a room, with its join, record and live link options.
-    var offersLeadLive: Bool { !isSimple }
+    var offersLeadLive: Bool { !isSimple && meetingsReady }
     /// The title field, unless the server's start title names the session.
     var showsTitleField: Bool { sessionTitle == nil }
     /// The session's title: the start title without a leading "Start ".
@@ -392,8 +397,6 @@ struct GroupLiveStarter: View {
     @Environment(\.locale) private var locale
     let groupID: String
     let service: MemberGroupService
-    /// False while video meetings await their integration: no room can open.
-    var meetingsReady = true
     /// Adds recordings and past zikr to the session already live.
     var addingToSession = false
     var sessionID: String? = nil
@@ -447,9 +450,13 @@ struct GroupLiveStarter: View {
 
     private var sources: [Source] { addingToSession || !form.offersLeadLive ? [.youtube, .recording] : Source.allCases }
 
-    /// The source in use: a simple form never leads live, also before the
-    /// sheet's first task has moved it to YouTube.
+    /// The source in use: a form without Lead live never leads live, also
+    /// before the sheet's first task has moved it to YouTube.
     private var activeSource: Source { !form.offersLeadLive && source == .room ? .youtube : source }
+
+    /// The kind in use: a zikr where no choice is offered, also if the rooms
+    /// went off while the sheet was open on Meeting.
+    private var activeKind: Kind { form.showsKindChoice ? kind : .zikr }
 
     /// "Add to the session", a simple page's own heading, or "Go live".
     private var heading: Text {
@@ -475,7 +482,7 @@ struct GroupLiveStarter: View {
                         }
                     }
                 }
-                if kind == .zikr || addingToSession {
+                if activeKind == .zikr || addingToSession {
                     Section {
                         DISegmentedControl(items: sources, title: { LocalizedStringKey($0.rawValue) }, selection: $source)
                             .accessibilityLabel(Text("How the group joins"))
@@ -488,14 +495,9 @@ struct GroupLiveStarter: View {
                     if !picked.isEmpty && activeSource != .room { orderSection }
                 } else {
                     Section {
-                        if meetingsReady {
-                            Text("Members join with audio and video from the group page.")
-                                .foregroundStyle(DIColor.textMuted)
-                            Toggle("Record the meeting", isOn: $recordRoom)
-                        } else {
-                            Text("Video meetings: integration in progress. They open here once it is complete.")
-                                .foregroundStyle(DIColor.textMuted)
-                        }
+                        Text("Members join with audio and video from the group page.")
+                            .foregroundStyle(DIColor.textMuted)
+                        Toggle("Record the meeting", isOn: $recordRoom)
                     }
                 }
                 if libraryFailed {
@@ -567,9 +569,9 @@ struct GroupLiveStarter: View {
             if case .success(let file) = result { Task { await upload(file) } }
         }
         .task {
-            // Until the room service is connected, start where a zikr can play.
-            // A simple page's sheet starts on YouTube too.
-            if addingToSession || !meetingsReady || !form.offersLeadLive { source = .youtube }
+            // Without Lead live (no rooms, or a simple page), start where a
+            // zikr can play.
+            if addingToSession || !form.offersLeadLive { source = .youtube }
             // A simple page's sheet opens with its saved zikr time's video and
             // times; a change here is for this start only.
             if !addingToSession, !prefilled, videoLink.isEmpty, let prefill = form.prefill {
@@ -587,8 +589,7 @@ struct GroupLiveStarter: View {
     private var roomSection: some View {
         Section {
             Toggle("Members join the zikr together", isOn: $joinTogether)
-                .disabled(!meetingsReady)
-            if meetingsReady && joinTogether {
+            if joinTogether {
                 Toggle("Record the zikr", isOn: $recordRoom)
             }
             TextField("Live video link (optional)", text: $videoLink)
@@ -596,11 +597,7 @@ struct GroupLiveStarter: View {
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
         } footer: {
-            if meetingsReady {
-                Text("Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both.")
-            } else {
-                Text("Leading live in a room: integration in progress. Meanwhile share a live YouTube link here, or play a past zikr or a recording.")
-            }
+            Text("Joining together opens a room where members listen as you lead the zikr. A live video link lets them watch it as well. Use either, or both.")
         }
     }
 
@@ -798,7 +795,7 @@ struct GroupLiveStarter: View {
     /// Start at and End at are on the sheet: a YouTube zikr in a Halqah with
     /// video clips.
     private var showsClipFields: Bool {
-        videoClips && activeSource == .youtube && (kind == .zikr || addingToSession)
+        videoClips && activeSource == .youtube && (activeKind == .zikr || addingToSession)
     }
 
     private var canStart: Bool {
@@ -807,10 +804,10 @@ struct GroupLiveStarter: View {
         // End must be after the start.
         if showsClipFields && VideoClipTimes.problem(start: clipStart, end: clipEnd) != nil { return false }
         if addingToSession { return !picked.isEmpty || (activeSource == .youtube && video != nil) }
-        if kind == .meeting { return meetingsReady }
+        if activeKind == .meeting { return true }
         switch activeSource {
         case .room:
-            return (joinTogether && meetingsReady) || video != nil
+            return joinTogether || video != nil
         case .youtube, .recording:
             return !picked.isEmpty || (activeSource == .youtube && video != nil)
         }
@@ -830,12 +827,12 @@ struct GroupLiveStarter: View {
                 var entries = picked
                 if activeSource == .youtube, let video { entries.insert(.youTube(video, times: clipTimes), at: 0) }
                 try await service.addToSession(entries, in: groupID, sessionID: sessionID)
-            } else if kind == .meeting {
+            } else if activeKind == .meeting {
                 try await service.startLive(in: groupID, kind: "meeting", title: title, videoID: nil, room: true, record: recordRoom,
                                             test: testOnly)
             } else if activeSource == .room {
                 try await service.startLive(in: groupID, kind: "zikr", title: title, videoID: video,
-                                            room: joinTogether && meetingsReady, record: recordRoom, test: testOnly)
+                                            room: joinTogether, record: recordRoom, test: testOnly)
             } else {
                 // The server asks YouTube whether a pasted link is live or past:
                 // live is watched live, past joins the queue at the front.

@@ -34,7 +34,7 @@ struct HalqahPageLayout: Equatable {
     /// (owner 2026-11-19, addendum 2). Hidden while a session is live: End
     /// session under the player is the admins' control then (as desktop).
     func showsStartTile(isLive: Bool) -> Bool { isSimple && !isLive }
-    /// The Markaz cards, integration notes and drafts in the admin section.
+    /// The Markaz cards and drafts in the admin section.
     var showsAdminExtras: Bool { !isSimple }
 
     func showsAdminTile(_ id: String) -> Bool { !isSimple || Self.simpleAdminTiles.contains(id) }
@@ -311,9 +311,10 @@ struct GroupDetailView: View {
                 switch sheet {
                 case .people: GroupPeopleView(groupID: group.id, groupName: group.name, service: service)
                 case .post: GroupPostComposer(groupID: group.id, service: service)
-                case .live: GroupLiveStarter(groupID: group.id, service: service, meetingsReady: meetingsReady, videoClips: videoClips,
+                case .live: GroupLiveStarter(groupID: group.id, service: service, videoClips: videoClips,
                                              form: HalqahStartForm(simple: layout.isSimple, startTitle: detail?.group.startTitle,
-                                                                   zikrSessions: detail?.zikrSessions ?? []))
+                                                                   zikrSessions: detail?.zikrSessions ?? [],
+                                                                   meetingsReady: meetingsReady))
                 case .meeting: GroupMeetingScheduler(groupID: group.id, service: service)
                 case .zikr: GroupZikrEditor(groupID: group.id, service: service, videoClips: videoClips)
                 case .duas: GroupDuaRequestsView(groupID: group.id, service: service)
@@ -349,9 +350,8 @@ struct GroupDetailView: View {
         }
     }
 
-    /// Connected services; an older server that does not say is taken as ready.
+    /// Whether rooms can open; an older server that does not say is taken as ready.
     private var meetingsReady: Bool { detail?.integrations?.meetings ?? true }
-    private var whatsappReady: Bool { detail?.integrations?.whatsappForwarding ?? true }
     /// Only a Halqah the server marks with video clips (owner 2026-11-19).
     private var videoClips: Bool { detail?.hasVideoClips == true }
     /// The full page, or the simple one the server marks.
@@ -533,9 +533,11 @@ struct GroupDetailView: View {
     }
 
     /// A meeting: its day, its time in the phone's own time, and Join, lit
-    /// while its room is open.
+    /// while its room is open. With no rooms there is no Join, and nothing is
+    /// said of a room opening.
     private func meetingCard(_ meeting: GroupMeeting) -> some View {
         let roomOpen = meetingsReady && meeting.isOpen()
+        let hasActions = meetingsReady || detail?.canManage == true
         let layout = typeSize.halqahRowLayout(alignment: .top)
         return VStack(alignment: .leading, spacing: DISpacing.sm) {
             layout {
@@ -551,13 +553,13 @@ struct GroupDetailView: View {
                 }
                 .fixedSize(horizontal: false, vertical: true)
             }
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: DISpacing.sm) { meetingActions(meeting, roomOpen: roomOpen) }
-                VStack(spacing: DISpacing.sm) { meetingActions(meeting, roomOpen: roomOpen) }
+            if hasActions {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: DISpacing.sm) { meetingActions(meeting, roomOpen: roomOpen) }
+                    VStack(spacing: DISpacing.sm) { meetingActions(meeting, roomOpen: roomOpen) }
+                }
             }
-            if !meetingsReady {
-                IntegrationPendingNote("Video meetings: integration in progress. The time is kept, and the room opens here once it is complete.")
-            } else if !meeting.isOpen() {
+            if meetingsReady && !meeting.isOpen() {
                 Text("The room opens ten minutes before the meeting starts.")
                     .diInterfaceFont(.caption)
                     .foregroundStyle(DIColor.textMuted)
@@ -568,13 +570,15 @@ struct GroupDetailView: View {
 
     @ViewBuilder
     private func meetingActions(_ meeting: GroupMeeting, roomOpen: Bool) -> some View {
-        Button {
-            Task { await join(meetingID: meeting.id) }
-        } label: {
-            Label("Join the meeting", systemImage: "video.fill")
+        if meetingsReady {
+            Button {
+                Task { await join(meetingID: meeting.id) }
+            } label: {
+                Label("Join the meeting", systemImage: "video.fill")
+            }
+            .buttonStyle(HalqahLiveButtonStyle(isLive: roomOpen))
+            .disabled(joining || removingSchedule || !(meeting.isOpen() || detail?.canManage == true))
         }
-        .buttonStyle(HalqahLiveButtonStyle(isLive: roomOpen))
-        .disabled(joining || removingSchedule || !meetingsReady || !(meeting.isOpen() || detail?.canManage == true))
         if detail?.canManage == true {
             Button("Cancel meeting", role: .destructive) {
                 scheduleToRemove = ScheduleRemoval(id: meeting.id, title: meeting.title, isMeeting: true)
@@ -649,15 +653,9 @@ struct GroupDetailView: View {
         .accessibilityIdentifier("halqah-simple-start")
     }
 
-    /// The integration notes and the drafts waiting for approval.
+    /// The drafts waiting for approval.
     @ViewBuilder
     private var adminExtras: some View {
-        if !meetingsReady {
-            IntegrationPendingNote("Video meetings and leading the zikr live in a room: integration in progress. Meanwhile start a zikr from YouTube or play a recording. Meetings can be scheduled now; their rooms open once it is complete.")
-        }
-        if !whatsappReady {
-            IntegrationPendingNote("Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.")
-        }
         if draftsFailed {
             DICard {
                 VStack(alignment: .leading, spacing: DISpacing.sm) {
@@ -1225,18 +1223,5 @@ private struct GroupDraftCard: View {
         }
         .buttonStyle(DISecondaryButtonStyle(destructive: true))
         .disabled(working)
-    }
-}
-
-/// A feature that waits on an outside service: said plainly, never a broken button.
-struct IntegrationPendingNote: View {
-    let text: LocalizedStringKey
-    init(_ text: LocalizedStringKey) { self.text = text }
-
-    var body: some View {
-        Label(text, systemImage: "hourglass")
-            .diInterfaceFont(.caption)
-            .foregroundStyle(DIColor.textMuted)
-            .fixedSize(horizontal: false, vertical: true)
     }
 }

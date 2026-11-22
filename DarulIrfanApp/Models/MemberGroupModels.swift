@@ -433,9 +433,9 @@ struct GroupDetail: Codable, Sendable {
     var hasSimplePage: Bool { group.simplePage == true }
 }
 
-/// Services a group feature depends on. Until one is connected the app says
-/// "integration in progress" rather than offering something that cannot work;
-/// the server flips these as each service's keys are set, with no app update.
+/// Services a group feature depends on. While one is off the app leaves out
+/// what depends on it, with no notice; the server flips these as each
+/// service's keys are set, with no app update.
 struct GroupIntegrations: Codable, Sendable, Equatable {
     var meetings: Bool
     var whatsappForwarding: Bool
