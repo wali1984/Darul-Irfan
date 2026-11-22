@@ -67,7 +67,7 @@ struct MediaItem: Codable, Sendable, Identifiable, Equatable {
     var month: Int?
     var category: MediaCategory
     var transcriptUrl: String?
-    var rightsStatus: RightsStatus
+    var rightsStatus: RightsStatus?
     /// The file's real type when its name says otherwise: "audio/mp4" for
     /// MPEG-4 audio named .mp3. Read from the catalogue by the audio player;
     /// the database does not keep it.

@@ -48,8 +48,8 @@ enforces the rights model mechanically:
 
 `--full-text` without `--rights-confirmed` is refused. `validate` fails any
 `linkOnly` item that carries `bodyHtml`/`bodyPlainText`, so a rights
-violation cannot pass CI-style checks. The app still renders any `linkOnly`
-item as metadata plus a "Read on naqshbandiaowaisiah.org" link. Even with
+violation cannot pass CI-style checks. The app does not read the value as a
+gate: it shows whatever text an item carries, with or without one. Even with
 permission granted, book/magazine/tafsir PDFs and lecture MP3s stay as
 **remote URLs on the site** — the app downloads/streams them natively but
 never bulk re-hosts or bundles them. Religious text is copied verbatim or

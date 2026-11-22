@@ -76,7 +76,7 @@ struct DailyAyah: Codable, Sendable, Identifiable, Equatable {
 }
 
 /// The "daily inspiration" card: an ayah reference, tafsir excerpt, or
-/// Aqwal-e-Sheikh quote (only where rights permit).
+/// Aqwal-e-Sheikh quote.
 struct DailyInspiration: Codable, Sendable, Identifiable, Equatable {
     var id: String
     var kind: Kind
@@ -85,7 +85,7 @@ struct DailyInspiration: Codable, Sendable, Identifiable, Equatable {
     /// e.g. "Surah Al-Fatihah 1:5" or the book/page attribution.
     var attribution: String
     var sourceUrl: String?
-    var rightsStatus: RightsStatus
+    var rightsStatus: RightsStatus?
 
     enum Kind: String, Codable, Sendable {
         case ayah

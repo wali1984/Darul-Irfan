@@ -9,7 +9,7 @@ import SwiftUI
 /// this phone, the rights line, and the excerpt and dates.
 ///
 /// Everything else - articles, pages, notices - keeps the
-/// metadata card, rights-aware native reader, native image presentation,
+/// metadata card, native reader, native image presentation,
 /// downloadable files, and dates. Both open the app's one reader
 /// (`BookReaderScreen`).
 ///

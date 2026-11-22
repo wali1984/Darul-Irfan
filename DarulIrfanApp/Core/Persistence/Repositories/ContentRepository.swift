@@ -5,8 +5,8 @@ import Foundation
 ///
 /// Enum handling on read: rows whose `type` or `category` raw value is
 /// unknown are skipped (they belong to a newer taxonomy this build does not
-/// understand); an unknown `rights_status` falls back to `.linkOnly`, the
-/// most restrictive option.
+/// understand); an empty or unknown `rights_status` reads as nil. The column
+/// is NOT NULL, so nil is written as empty text.
 struct ContentRepository: ContentRepositoryProtocol {
     private let database: AppDatabase
 
@@ -270,7 +270,7 @@ struct ContentRepository: ContentRepositoryProtocol {
                     .text(encodeStringArray(item.mediaUrls)),
                     .text(encodeStringArray(item.downloadUrls)),
                     .optionalText(item.checksum),
-                    .text(item.rightsStatus.rawValue),
+                    .text(item.rightsStatus?.rawValue ?? ""),
                 ]
             )
         }
@@ -395,8 +395,7 @@ struct ContentRepository: ContentRepositoryProtocol {
             let categoryRaw = row.text("category"),
             let category = ContentCategory(rawValue: categoryRaw)
         else { return nil }
-        let rightsRaw = row.text("rights_status") ?? ""
-        let rights = RightsStatus(rawValue: rightsRaw) ?? .linkOnly
+        let rights = row.text("rights_status").flatMap(RightsStatus.init(rawValue:))
         return ContentItem(
             id: id,
             sourceUrl: sourceUrl,

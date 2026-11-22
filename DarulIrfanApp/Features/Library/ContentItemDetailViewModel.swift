@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 /// State for one content item's detail screen: the loaded item, its
-/// rights-aware body paragraphs, per-file download states, and throttled
+/// body paragraphs, per-file download states, and throttled
 /// reading-progress persistence.
 @Observable
 @MainActor
@@ -53,11 +53,9 @@ final class ContentItemDetailViewModel {
 
     // MARK: - Derived state
 
-    /// Whether the native reader may show the body. Items without distribution
-    /// permission remain represented by their native metadata and placeholder.
+    /// Whether the native reader shows the body: whenever the item has text.
     var showsBody: Bool {
-        guard let item else { return false }
-        return item.rightsStatus != .linkOnly && !bodyParagraphs.isEmpty
+        item != nil && !bodyParagraphs.isEmpty
     }
 
     // MARK: - Loading
@@ -87,19 +85,15 @@ final class ContentItemDetailViewModel {
         }
         if let item {
             await Task.detached(priority: .utility) { QuranQuotation.warmUp() }.value
-            if item.rightsStatus != .linkOnly {
-                let plain: String
-                if let bodyPlainText = item.bodyPlainText, !bodyPlainText.isEmpty {
-                    plain = bodyPlainText
-                } else if let bodyHtml = item.bodyHtml, !bodyHtml.isEmpty {
-                    plain = LibraryHTMLText.plainText(fromHTML: bodyHtml)
-                } else {
-                    plain = ""
-                }
-                bodyParagraphs = LibraryHTMLText.paragraphs(from: plain)
+            let plain: String
+            if let bodyPlainText = item.bodyPlainText, !bodyPlainText.isEmpty {
+                plain = bodyPlainText
+            } else if let bodyHtml = item.bodyHtml, !bodyHtml.isEmpty {
+                plain = LibraryHTMLText.plainText(fromHTML: bodyHtml)
             } else {
-                bodyParagraphs = []
+                plain = ""
             }
+            bodyParagraphs = LibraryHTMLText.paragraphs(from: plain)
             bookPageCount = (try? await contentRepository.bookPageCount(bookID: item.id)) ?? 0
             if let progress = try? await contentRepository.readingProgress(contentItemID: item.id) {
                 initialReadingFraction = min(max(progress.fraction, 0), 1)
@@ -183,7 +177,7 @@ final class ContentItemDetailViewModel {
     /// every 2 seconds and only for meaningful movement.
     func scrollFractionChanged(_ fraction: Double) {
         latestFraction = min(max(fraction, 0), 1)
-        guard let item, item.rightsStatus != .linkOnly, !bodyParagraphs.isEmpty else { return }
+        guard showsBody else { return }
         let movedMeaningfully = abs((lastSavedFraction ?? -1) - latestFraction) >= 0.02
         guard movedMeaningfully, Date().timeIntervalSince(lastSaveDate) >= 2 else { return }
         persistProgress()
@@ -191,7 +185,7 @@ final class ContentItemDetailViewModel {
 
     /// Final save when leaving the screen.
     func flushReadingProgress() {
-        guard let item, item.rightsStatus != .linkOnly, !bodyParagraphs.isEmpty else { return }
+        guard showsBody else { return }
         guard latestFraction != (lastSavedFraction ?? -1) else { return }
         persistProgress()
     }

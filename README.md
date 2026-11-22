@@ -71,7 +71,8 @@ provisioned the app uses cached and bundled fallbacks.
 
 Content from naqshbandiaowaisiah.org is copyright reserved. The owner
 **granted content permission on 2026-07-10** (keep the written confirmation
-on file). Every item carries a `rightsStatus`:
+on file). The ingest tool gives each item a `rightsStatus`, which is
+optional to the app:
 
 - `permissionConfirmed` — full text/assets may ship; produced by the ingest
   tool's `--full-text --rights-confirmed` mode. Since the 2026-07-10 grant
@@ -84,8 +85,8 @@ on file). Every item carries a `rightsStatus`:
 - `publicDomain` — Quran Arabic text, the Pickthall English translation,
   surah index, 99 Names, Quranic duas.
 - `linkOnly` — metadata + source URL only, no body text. No longer the
-  default for site content, but the UI still degrades gracefully for any
-  item carrying it (metadata plus a "Read on naqshbandiaowaisiah.org" link).
+  default for site content. The app does not gate on it: it shows whatever
+  text an item carries.
 
 Religious text is always copied verbatim — never summarized or paraphrased;
 a clearly-labeled excerpt field is the only exception.

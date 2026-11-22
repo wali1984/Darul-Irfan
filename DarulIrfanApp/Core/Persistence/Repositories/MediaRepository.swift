@@ -4,8 +4,9 @@ import Foundation
 /// Column names follow schema v1 in `AppDatabase.migrationV1` exactly.
 ///
 /// Enum handling on read: rows whose `media_type` or `category` raw value is
-/// unknown are skipped (this build cannot present them); an unknown
-/// `rights_status` falls back to `.linkOnly`, the most restrictive option.
+/// unknown are skipped (this build cannot present them); an empty or unknown
+/// `rights_status` reads as nil. The column is NOT NULL, so nil is written as
+/// empty text.
 struct MediaRepository: MediaRepositoryProtocol {
     private let database: AppDatabase
 
@@ -336,7 +337,7 @@ struct MediaRepository: MediaRepositoryProtocol {
                     .optionalInt(item.month),
                     .text(item.category.rawValue),
                     .optionalText(item.transcriptUrl),
-                    .text(item.rightsStatus.rawValue),
+                    .text(item.rightsStatus?.rawValue ?? ""),
                 ]
             )
         }
@@ -370,8 +371,7 @@ struct MediaRepository: MediaRepositoryProtocol {
             let categoryRaw = row.text("category"),
             let category = MediaCategory(rawValue: categoryRaw)
         else { return nil }
-        let rightsRaw = row.text("rights_status") ?? ""
-        let rights = RightsStatus(rawValue: rightsRaw) ?? .linkOnly
+        let rights = row.text("rights_status").flatMap(RightsStatus.init(rawValue:))
         return MediaItem(
             id: id,
             title: title,

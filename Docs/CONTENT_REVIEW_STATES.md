@@ -14,16 +14,16 @@ by accident.
 | `publicApproved` | Additionally proofread by a person, or cross-verified line by line against independent authoritative sources. | yes | yes |
 | `rejected` | Found faulty. Must not ship anywhere. | no | no |
 
-The App Store gate is **defined but not enforced yet**. `ReviewState.allowedOnAppStore`
-exists and is correct; nothing calls it. It turns on when the proofreading pass
-is far enough along that enforcing it would not empty the reader.
+The App Store gate is **not enforced yet**. It turns on when the proofreading
+pass is far enough along that enforcing it would not empty the reader. The app
+itself does not read the state: only the content gate does.
 
 ## Where the state lives
 
 Internal metadata only, in three places:
 
-- `quran_editions.json` — `reviewState` per edition, persisted to
-  `quran_editions.review_state` so the model round-trips through the store.
+- `quran_editions.json` — `reviewState` per edition. The app neither decodes
+  nor stores it; the `quran_editions.review_state` column is retired.
 - `hadith_books.json` — `reviewState` for the corpus as a whole.
 - `manifest.json` — `reviewState` for the seed, the single field the content
   gate checks before a build may ship.

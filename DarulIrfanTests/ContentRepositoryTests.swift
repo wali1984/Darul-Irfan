@@ -134,6 +134,41 @@ final class ContentRepositoryTests: XCTestCase {
         XCTAssertNil(missing)
     }
 
+    // MARK: - Seed records without a rights or review value
+
+    /// A library item decodes without a rights value and is stored without
+    /// one, also over a row that had one.
+    func testItemWithoutARightsValueDecodesAndRoundtrips() async throws {
+        let json = """
+        {"id":"article-ur","sourceUrl":"","type":"article","title":"Article in Urdu","language":"ur",
+         "category":"articles","bodyPlainText":"text","mediaUrls":[],"downloadUrls":[]}
+        """
+        let item = try JSONDecoder().decode(ContentItem.self, from: Data(json.utf8))
+        XCTAssertNil(item.rightsStatus)
+
+        var earlier = item
+        earlier.rightsStatus = .linkOnly
+        try await repository.upsertItems([earlier])
+        try await repository.upsertItems([item])
+        let stored = try await repository.item(id: item.id)
+        XCTAssertEqual(stored, item)
+    }
+
+    /// The manifest decodes whatever its review word is, and without one.
+    func testManifestDecodesWhateverItsReviewWord() throws {
+        for json in [#"{"version":62}"#, #"{"version":62,"reviewState":"anotherWord"}"#] {
+            let manifest = try JSONDecoder().decode(SeedManifest.self, from: Data(json.utf8))
+            XCTAssertEqual(manifest.version, 62)
+        }
+    }
+
+    /// A saying decodes without a rights value.
+    func testSayingWithoutARightsValueDecodes() throws {
+        let json = #"{"id":"saying","kind":"aqwalESheikh","text":"text","attribution":"by"}"#
+        let saying = try JSONDecoder().decode(DailyInspiration.self, from: Data(json.utf8))
+        XCTAssertNil(saying.rightsStatus)
+    }
+
     // MARK: - Favorites
 
     func testFavoritesAddListNewestFirstAndRemove() async throws {

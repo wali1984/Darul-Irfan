@@ -40,8 +40,8 @@ final class SearchIndexServiceTests: XCTestCase {
     func testQuranSnippetKeepsMatchedSourceLanguageAndScriptureIdentity() async throws {
         try await seedAllDomains()
         try await quranRepository.upsertEditions([
-            QuranEdition(id: "qa-en", title: "English", kind: .translation, language: "en", author: nil, sourceUrl: nil, rightsStatus: .publicDomain, isAvailableOffline: true, reviewState: nil),
-            QuranEdition(id: "qa-ur", title: "Urdu", kind: .translation, language: "ur", author: nil, sourceUrl: nil, rightsStatus: .publicDomain, isAvailableOffline: true, reviewState: nil)
+            QuranEdition(id: "qa-en", title: "English", kind: .translation, language: "en", author: nil, sourceUrl: nil, rightsStatus: .publicDomain, isAvailableOffline: true),
+            QuranEdition(id: "qa-ur", title: "Urdu", kind: .translation, language: "ur", author: nil, sourceUrl: nil, rightsStatus: .publicDomain, isAvailableOffline: true)
         ])
         try await quranRepository.upsertTranslations([
             QuranTranslation(editionID: "qa-en", surahNumber: 1, ayahNumber: 1, text: "In the name of Allah, the Beneficent"),

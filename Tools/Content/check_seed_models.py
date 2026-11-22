@@ -48,8 +48,8 @@ def t_list(check): return lambda v: isinstance(v, list) and all(check(x) for x i
 MODELS = {
     "MediaItem": (
         {"id": t_str, "title": t_str, "language": t_str, "mediaType": t_enum(MEDIA_TYPE),
-         "sourceUrl": t_str, "category": t_enum(MEDIA_CATEGORY), "rightsStatus": t_enum(RIGHTS)},
-        {"speaker": t_str, "date": t_date, "durationSeconds": t_num, "streamUrl": t_str,
+         "sourceUrl": t_str, "category": t_enum(MEDIA_CATEGORY)},
+        {"rightsStatus": t_enum(RIGHTS), "speaker": t_str, "date": t_date, "durationSeconds": t_num, "streamUrl": t_str,
          "downloadUrl": t_str, "youtubeId": t_str, "year": t_int, "month": t_int,
          "transcriptUrl": t_str}),
     "CommunityEvent": (
@@ -64,9 +64,8 @@ MODELS = {
             {"translationEnglish": t_str, "translationUrdu": t_str, "category": t_str,
              "rightsStatus": t_enum(RIGHTS), "titleUrdu": t_str}),
     "DailyInspiration": (
-        {"id": t_str, "kind": t_enum(INSPIRATION_KIND), "text": t_str, "attribution": t_str,
-         "rightsStatus": t_enum(RIGHTS)},
-        {"sourceUrl": t_str}),
+        {"id": t_str, "kind": t_enum(INSPIRATION_KIND), "text": t_str, "attribution": t_str},
+        {"sourceUrl": t_str, "rightsStatus": t_enum(RIGHTS)}),
     "IslamicDay": ({"id": t_str, "title": t_str, "hijriMonth": t_int, "hijriDay": t_int},
                    {"note": t_str, "titleUrdu": t_str, "noteUrdu": t_str, "observedOnEve": t_bool}),
     "ZikrSession": (
@@ -81,8 +80,8 @@ MODELS = {
     "ContentItem": (
         {"id": t_str, "sourceUrl": t_str, "type": t_enum(CONTENT_TYPE), "title": t_str,
          "language": t_str, "category": t_enum(CONTENT_CATEGORY), "mediaUrls": t_list(t_str),
-         "downloadUrls": t_list(t_str), "rightsStatus": t_enum(RIGHTS)},
-        {"titleUrdu": t_str, "author": t_str, "bodyHtml": t_str, "bodyPlainText": t_str,
+         "downloadUrls": t_list(t_str)},
+        {"rightsStatus": t_enum(RIGHTS), "titleUrdu": t_str, "author": t_str, "bodyHtml": t_str, "bodyPlainText": t_str,
          "excerpt": t_str, "publishedAt": t_date, "updatedAt": t_date, "checksum": t_str}),
     "QuranSurah": (
         {"id": t_int, "nameArabic": t_str, "nameTransliterated": t_str, "nameEnglish": t_str,

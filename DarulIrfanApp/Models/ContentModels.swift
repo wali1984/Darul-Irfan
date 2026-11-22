@@ -2,48 +2,12 @@ import Foundation
 
 // MARK: - Rights
 
-/// Whether the app may store/display an item's full text or only link to it.
-/// Official content is copyright-reserved; the owner granted content
-/// permission on 2026-07-10, so ingested items are `permissionConfirmed`.
-/// `linkOnly` remains valid for anything ingested without that grant.
+/// A value older seeds and stored rows carry. It is still decoded, but it is
+/// optional everywhere and hides nothing: an item is shown with or without it.
 enum RightsStatus: String, Codable, Sendable {
-    /// Only metadata + source link may be shown; body must not be stored.
     case linkOnly
-    /// Full text/asset use confirmed by the content owner.
     case permissionConfirmed
-    /// Public-domain or app-original content (e.g. Quran Arabic text, UI copy).
     case publicDomain
-}
-
-// MARK: - Review state
-
-/// How far a body of sacred text has got through review.
-///
-/// Internal metadata only. It gates what may ship in which channel; it is
-/// never surfaced as a label on the text itself. Readers see the work and
-/// its author, not the pipeline that produced it; provenance is shown
-/// nowhere in the app.
-enum ReviewState: String, Codable, Sendable, CaseIterable {
-    /// Incomplete or unreviewed. Ships to no channel.
-    case draft
-    /// Vision review, extracted-text review and the content validators all
-    /// passed, with no known corruption, duplicate loss or schema fault.
-    /// Line-by-line human proofreading is still outstanding.
-    case testFlightApproved
-    /// Additionally proofread by a person, or cross-verified line by line
-    /// against independent authoritative sources.
-    case publicApproved
-    /// Found faulty; must not ship anywhere.
-    case rejected
-
-    /// TestFlight carries reviewed content as well as fully-approved content.
-    var allowedOnTestFlight: Bool {
-        self == .testFlightApproved || self == .publicApproved
-    }
-
-    /// The eventual App Store gate. Not enforced yet — see
-    /// `Docs/CONTENT_REVIEW_STATES.md` for when it turns on.
-    var allowedOnAppStore: Bool { self == .publicApproved }
 }
 
 // MARK: - Library content
@@ -134,9 +98,9 @@ struct ContentItem: Codable, Sendable, Identifiable, Equatable {
     var language: String
     var author: String?
     var category: ContentCategory
-    /// Sanitized HTML body; nil when rightsStatus is `linkOnly`.
+    /// Sanitized HTML body, where the item has one.
     var bodyHtml: String?
-    /// Plain-text body for search indexing; nil when `linkOnly`.
+    /// Plain-text body, for reading and search indexing.
     var bodyPlainText: String?
     var excerpt: String?
     var publishedAt: Date?
@@ -147,7 +111,7 @@ struct ContentItem: Codable, Sendable, Identifiable, Equatable {
     var downloadUrls: [String]
     /// Ingest checksum for idempotent sync.
     var checksum: String?
-    var rightsStatus: RightsStatus
+    var rightsStatus: RightsStatus?
 }
 
 /// A named, ordered grouping of content items (e.g. a magazine year, a course).

@@ -185,9 +185,7 @@ final class SurahReaderViewModel {
             for edition in allEditions where edition.kind == .tafsir {
                 let rows = (try? await repository.tafsir(editionID: edition.id, surahNumber: surah.id)) ?? []
                 if rows.isEmpty {
-                    if edition.sourceUrl != nil {
-                        pointers.append(edition)
-                    }
+                    pointers.append(edition)
                 } else {
                     entries.append(contentsOf: rows)
                 }

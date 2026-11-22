@@ -191,6 +191,41 @@ final class QuranRepositoryTests: XCTestCase {
         XCTAssertEqual(fetchedTafsir, [tafsir])
     }
 
+    /// An edition decodes without a rights value, whatever its review word,
+    /// and is stored that way.
+    func testEditionWithoutARightsValueDecodesAndRoundtrips() async throws {
+        let json = """
+        {"id":"test-tafsir-ur","title":"Test Tafsir","kind":"tafsir","language":"ur",
+         "isAvailableOffline":true,"reviewState":"anotherWord"}
+        """
+        let edition = try JSONDecoder().decode(QuranEdition.self, from: Data(json.utf8))
+        XCTAssertNil(edition.rightsStatus)
+
+        try await repository.upsertEditions([edition])
+        let editions = try await repository.editions()
+        XCTAssertEqual(editions, [edition])
+    }
+
+    /// An empty tafsir edition counts as present without a web address.
+    @MainActor
+    func testReaderKeepsAnEmptyTafsirEditionThatHasNoWebAddress() async throws {
+        let surah = fatihah()
+        try await repository.upsertSurahs([surah])
+        try await repository.upsertAyahs([
+            QuranAyah(surahNumber: 1, ayahNumber: 1, textArabic: "Reader edition fixture")
+        ])
+        try await repository.upsertEditions([
+            QuranEdition(id: "test-tafsir-ur", title: "Test Tafsir", kind: .tafsir, language: "ur",
+                         author: nil, sourceUrl: nil, rightsStatus: nil, isAvailableOffline: true)
+        ])
+        let metrics = DevotionalMetricsSyncService(quranRepository: repository,
+            trackerRepository: TrackerRepository(database: database), watchSync: WatchSyncService())
+        let model = SurahReaderViewModel(surah: surah, repository: repository, devotionalMetrics: metrics)
+        await model.load()
+        XCTAssertEqual(model.tafsirEditionPointers.map(\.id), ["test-tafsir-ur"])
+        XCTAssertTrue(model.hasAnyTafsir)
+    }
+
     // MARK: - Bookmarks
 
     func testBookmarkAddListNewestFirstAndRemove() async throws {

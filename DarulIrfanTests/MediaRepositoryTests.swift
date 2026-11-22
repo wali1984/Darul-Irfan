@@ -48,6 +48,21 @@ final class MediaRepositoryTests: XCTestCase {
         )
     }
 
+    // MARK: - Seed records without a rights value
+
+    func testItemWithoutARightsValueDecodesAndRoundtrips() async throws {
+        let json = """
+        {"id":"lecture","title":"Lecture","language":"ur","mediaType":"audio","sourceUrl":"",
+         "category":"audioLectures"}
+        """
+        let item = try JSONDecoder().decode(MediaItem.self, from: Data(json.utf8))
+        XCTAssertNil(item.rightsStatus)
+
+        try await repository.upsertItems([item])
+        let stored = try await repository.items(category: nil, year: nil, month: nil, limit: 10)
+        XCTAssertEqual(stored, [item])
+    }
+
     // MARK: - Available years
 
     func testAvailableYearsAreDistinctNewestFirstAndSkipNilYears() async throws {

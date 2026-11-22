@@ -177,6 +177,27 @@ final class ReadRedesignTests: XCTestCase {
         XCTAssertNil(model.item, "Explicit reload must still read current catalogue state")
     }
 
+    /// An article's text shows with no rights value and with the old
+    /// `linkOnly` one.
+    @MainActor
+    func testArticleTextShowsWhateverItsRightsValue() async throws {
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        let downloads = DownloadsRepository(database: database)
+        let values: [RightsStatus?] = [nil, .linkOnly]
+        for value in values {
+            var article = libraryItem("article-text", category: .tasawwuf, type: .article)
+            article.bodyPlainText = "The text of the article."
+            article.rightsStatus = value
+            try await repository.upsertItems([article])
+            let model = ContentItemDetailViewModel(itemID: "article-text", contentRepository: repository,
+                downloadsRepository: downloads, downloadManager: DownloadManager(downloadsRepository: downloads))
+            await model.load()
+            XCTAssertTrue(model.showsBody)
+            XCTAssertEqual(model.bodyParagraphs, ["The text of the article."])
+        }
+    }
+
     @MainActor
     func testArticleReadFailureCanRetryAndMissingItemRemainsDistinct() async throws {
         let database = try await AppDatabase.inMemory()

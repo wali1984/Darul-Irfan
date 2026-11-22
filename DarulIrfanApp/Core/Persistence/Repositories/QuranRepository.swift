@@ -6,8 +6,9 @@ import Foundation
 /// Enum handling on read: an unknown `revelation_place` falls back to
 /// `.makkah` (so a surah row is never dropped from the index); a
 /// `quran_editions` row with an unknown `kind` is skipped (the reader cannot
-/// use it); an unknown `rights_status` falls back to `.linkOnly` and an
-/// unknown `review_state` to nil — in both cases the most restrictive option.
+/// use it); an empty or unknown `rights_status` reads as nil, and nil is
+/// written as empty text because the column is NOT NULL. The nullable
+/// `quran_editions.review_state` is no longer read or written.
 struct QuranRepository: QuranRepositoryProtocol {
     private let database: AppDatabase
 
@@ -66,7 +67,7 @@ struct QuranRepository: QuranRepositoryProtocol {
         let rows = try await database.connection.query(
             """
             SELECT id, title, kind, language, author, source_url,
-                   rights_status, is_available_offline, review_state
+                   rights_status, is_available_offline
             FROM quran_editions
             ORDER BY title ASC
             """
@@ -280,8 +281,8 @@ struct QuranRepository: QuranRepositoryProtocol {
             (
                 sql: """
                 INSERT INTO quran_editions (id, title, kind, language, author,
-                    source_url, rights_status, is_available_offline, review_state)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    source_url, rights_status, is_available_offline)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     title = excluded.title,
                     kind = excluded.kind,
@@ -289,8 +290,7 @@ struct QuranRepository: QuranRepositoryProtocol {
                     author = excluded.author,
                     source_url = excluded.source_url,
                     rights_status = excluded.rights_status,
-                    is_available_offline = excluded.is_available_offline,
-                    review_state = excluded.review_state
+                    is_available_offline = excluded.is_available_offline
                 """,
                 parameters: [
                     .text(edition.id),
@@ -299,9 +299,8 @@ struct QuranRepository: QuranRepositoryProtocol {
                     .text(edition.language),
                     .optionalText(edition.author),
                     .optionalText(edition.sourceUrl),
-                    .text(edition.rightsStatus.rawValue),
+                    .text(edition.rightsStatus?.rawValue ?? ""),
                     .bool(edition.isAvailableOffline),
-                    .optionalText(edition.reviewState?.rawValue),
                 ]
             )
         }
@@ -409,8 +408,7 @@ struct QuranRepository: QuranRepositoryProtocol {
             let kind = QuranEdition.Kind(rawValue: kindRaw),
             let language = row.text("language")
         else { return nil }
-        let rightsRaw = row.text("rights_status") ?? ""
-        let rights = RightsStatus(rawValue: rightsRaw) ?? .linkOnly
+        let rights = row.text("rights_status").flatMap(RightsStatus.init(rawValue:))
         return QuranEdition(
             id: id,
             title: title,
@@ -419,10 +417,7 @@ struct QuranRepository: QuranRepositoryProtocol {
             author: row.text("author"),
             sourceUrl: row.text("source_url"),
             rightsStatus: rights,
-            isAvailableOffline: row.bool("is_available_offline"),
-            // An unreadable value is treated as unreviewed rather than assumed
-            // approved — the safe direction for a shipping gate.
-            reviewState: row.text("review_state").flatMap(ReviewState.init(rawValue:))
+            isAvailableOffline: row.bool("is_available_offline")
         )
     }
 }
