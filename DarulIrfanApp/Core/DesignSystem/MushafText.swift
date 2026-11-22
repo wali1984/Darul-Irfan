@@ -14,7 +14,7 @@ enum MushafFaceGaps {
         /// U+06DD with its number, whole in Amiri Quran, which sets the number
         /// inside the circle. The mushaf face loses the circle or the number.
         case marker
-        /// A whole word holding U+06DF, in Amiri Quran, which has that sign.
+        /// A word holding U+06DF, in Amiri Quran, which has that sign.
         case smallHighZero
         /// A whole word, in the Urdu face, so that its letters join.
         case urdu
@@ -46,6 +46,14 @@ enum MushafFaceGaps {
     /// on other screens, and those stay as they are.
     static let smallHighZero: UInt32 = 0x06DF
 
+    /// Urdu letters Amiri Quran does not have.
+    private static let amiriLacks: Set<UInt32> = [0x06C1, 0x06C2, 0x06C3, 0x06BE, 0x06A9, 0x06AF, 0x06D2, 0x06D3]
+
+    /// Letters that never join the one after them.
+    private static let joinsNoFollower: Set<UInt32> = [
+        0x0622, 0x0623, 0x0624, 0x0625, 0x0627, 0x062F, 0x0630, 0x0631, 0x0632, 0x0648, 0x0671
+    ]
+
     /// The stretches of `text` that the mushaf face cannot draw. An ayah's
     /// circle is taken first, then a word with U+06DF where that is asked
     /// for, then a word with an Urdu letter.
@@ -68,14 +76,19 @@ enum MushafFaceGaps {
                 spans.append(Span(range: start..<index, face: .signs))
             } else if joins(scalars[index]) {
                 var hasGap = false
-                var hasZero = false
+                var lastZero: Int?
                 while index < scalars.count, joins(scalars[index]) {
                     if letters.contains(scalars[index].value) { hasGap = true }
-                    if scalars[index].value == smallHighZero { hasZero = true }
+                    if scalars[index].value == smallHighZero { lastZero = index }
                     index += 1
                 }
-                if showsSmallHighZero && hasZero {
-                    spans.append(Span(range: start..<index, face: .smallHighZero))
+                if showsSmallHighZero, let lastZero {
+                    index = amiriEnd(of: start..<index, lastZero: lastZero, in: scalars)
+                    // Standing alone, the sign takes the space it sits on:
+                    // a run that begins with a mark has nothing to carry it.
+                    var lower = start
+                    if isMark(scalars[start]), start > 0, scalars[start - 1].value == 0x20 { lower -= 1 }
+                    spans.append(Span(range: lower..<index, face: .smallHighZero))
                 } else if hasGap {
                     spans.append(Span(range: start..<index, face: .urdu))
                 }
@@ -105,6 +118,25 @@ enum MushafFaceGaps {
             filled[lower..<upper].font = face
         }
         return filled
+    }
+
+    /// Where Amiri Quran stops in a word with U+06DF. Letters it lacks would
+    /// fall to a third face and not join the letter before them, so a word
+    /// that has them after the sign is cut behind it, where the letter that
+    /// carries the sign joins nothing after it: "وَمَلَا۟" and "ئِہٖ".
+    private static func amiriEnd(of word: Range<Int>, lastZero: Int, in scalars: [Unicode.Scalar]) -> Int {
+        var after = lastZero + 1
+        while after < word.upperBound, isMark(scalars[after]) { after += 1 }
+        guard scalars[after..<word.upperBound].contains(where: { amiriLacks.contains($0.value) }) else {
+            return word.upperBound
+        }
+        var base = lastZero
+        while base > word.lowerBound, isMark(scalars[base]) { base -= 1 }
+        return joinsNoFollower.contains(scalars[base].value) ? after : word.upperBound
+    }
+
+    private static func isMark(_ scalar: Unicode.Scalar) -> Bool {
+        scalar.properties.generalCategory == .nonspacingMark
     }
 
     /// An Arabic-Indic or Urdu digit.

@@ -52,10 +52,15 @@ final class MushafFaceGapsTests: XCTestCase {
         XCTAssertEqual(faced("\u{069A} \u{06BC} \u{067C} \u{06DF} \u{E022}"), [])
     }
 
-    func testABooksWordWithTheSmallHighZeroIsTakenWhole() {
+    func testABooksWordWithTheSmallHighZeroKeepsItsLettersJoined() {
         let word = "\u{0648}\u{064E}\u{0645}\u{064E}\u{0644}\u{064E}\u{0627}\u{06DF}\u{0626}\u{0650}\u{06C1}\u{0656}"
-        XCTAssertEqual(faced("قال " + word + " ثم", showsSmallHighZero: true), ["zero:" + word])
-        XCTAssertEqual(faced("قال \u{06DF}", showsSmallHighZero: true), ["zero:\u{06DF}"])
+        let plain = "\u{0648}\u{064E}\u{0645}\u{064E}\u{0644}\u{064E}\u{0627}\u{06DF}"
+        XCTAssertEqual(faced("قال " + plain + " ثم", showsSmallHighZero: true), ["zero:" + plain])
+        // Amiri Quran has no U+06C1: what follows the alif stays in the
+        // mushaf face, where it joins.
+        XCTAssertEqual(faced("قال " + word + " ثم", showsSmallHighZero: true), ["zero:" + plain])
+        // Standing alone, the sign keeps the space it sits on.
+        XCTAssertEqual(faced("قال \u{06DF}", showsSmallHighZero: true), ["zero: \u{06DF}"])
         // The circle comes first, and this rule before the Urdu letters'.
         XCTAssertEqual(faced("\u{06DD}\u{0661}\u{06DF}", showsSmallHighZero: true), ["marker:\u{06DD}\u{0661}", "zero:\u{06DF}"])
         XCTAssertEqual(faced("پ\u{06DF}", showsSmallHighZero: true), ["zero:پ\u{06DF}"])
