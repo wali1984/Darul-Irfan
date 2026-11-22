@@ -12,6 +12,42 @@ export const cleanText = (value: unknown, max = 2_000): string | undefined => {
   return normalized ? normalized.slice(0, max) : undefined;
 };
 
+/** The start of `text`, at most `max` characters, ending on a whole word
+ *  and an ellipsis; `text` itself when it is no longer than that. Characters
+ *  are counted with Array.from, so an emoji or a letter outside the basic
+ *  plane is one character and is never cut in half. */
+export const wholeWords = (text: string, max: number): string => {
+  const characters = Array.from(text);
+  if (characters.length <= max) return text;
+  // One place is kept for the ellipsis.
+  let end = Math.max(1, max - 1);
+  if (!/\s/.test(characters[end] ?? "")) {
+    let space = end - 1;
+    while (space > 0 && !/\s/.test(characters[space] ?? "")) space -= 1;
+    // A word boundary in the first half would throw most of the text away
+    // (one very long word, a link): then the cut falls inside the word, but
+    // never between a letter and the marks that belong to it.
+    if (space >= Math.floor(end / 2)) end = space;
+    else while (end > 1 && (/^[\p{M}\u200d\ufe0f]$/u.test(characters[end] ?? "") || characters[end - 1] === "\u200d")) end -= 1;
+  }
+  const kept = characters.slice(0, end).join("");
+  // Punctuation left hanging before the ellipsis goes with the cut.
+  return `${kept.replace(/[\s.,;:،؛۔\-–—…]+$/u, "") || kept}…`;
+};
+
+/** Longer text, an article's, with its paragraphs kept: control characters
+ *  go, the spaces inside a line become one, a line break stays a line break
+ *  and more than one empty line becomes one. Text longer than `max`
+ *  characters ends on a whole word and an ellipsis. */
+export const cleanBody = (value: unknown, max = 20_000): string | undefined => {
+  if (typeof value !== "string") return undefined;
+  const text = value.replace(/\r\n?|[\u2028\u2029]/g, "\n")
+    .replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, " ")
+    .split("\n").map(line => line.replace(/\s+/g, " ").trim()).join("\n")
+    .replace(/\n{3,}/g, "\n\n").trim();
+  return text ? wholeWords(text, max) : undefined;
+};
+
 export const validHTTPURL = (value: unknown): string | undefined => {
   if (typeof value !== "string") return undefined;
   try {

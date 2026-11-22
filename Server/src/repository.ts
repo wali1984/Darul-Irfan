@@ -107,6 +107,7 @@ export async function feed(env: Env, limit: number, cursor?: string): Promise<{ 
       id: String(row.id), source: row.source as OfficialFeedItem["source"], kind: row.kind as OfficialFeedItem["kind"],
       title: String(row.title), body: typeof row.body === "string" ? row.body : undefined, sourceURL: String(row.source_url),
       imageURL: validHTTPURL(row.image_url), videoID: typeof row.video_id === "string" ? row.video_id : undefined,
+      ...feedTarget(row.source, String(row.id)),
       publishedAt, isFeatured: Number(row.is_featured) === 1
     });
   }
@@ -114,6 +115,16 @@ export async function feed(env: Env, limit: number, cursor?: string): Promise<{ 
   // compares against exactly that.
   const last = rows.length > bounded ? visible.at(-1) : undefined;
   return { items, nextCursor: last ? encodeFeedCursor(Number(last.is_featured) === 1, String(last.published_at), String(last.id)) : undefined };
+}
+
+/** What a feed item opens inside the app. A website item is stored as
+ *  "website:<catalogue id>" and a programme as "event:<catalogue id>", and
+ *  the catalogue id is the one the apps' library and events carry; it is
+ *  sent by name so the apps need not know how the feed's ids are written. */
+export function feedTarget(source: unknown, id: string): Pick<OfficialFeedItem, "libraryID" | "eventID"> {
+  if (source === "website" && id.startsWith("website:") && id.length > 8) return { libraryID: id.slice(8) };
+  if (source === "event" && id.startsWith("event:") && id.length > 6) return { eventID: id.slice(6) };
+  return {};
 }
 
 export interface FeedCursor { featured: number; date: string; id: string }

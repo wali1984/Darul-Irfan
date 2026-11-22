@@ -1,12 +1,12 @@
 import type { Env } from "./contracts";
-import { cleanText, validHTTPURL, wholeSeconds } from "./util";
+import { cleanBody, cleanText, validHTTPURL, wholeSeconds, wholeWords } from "./util";
 import { announceDailyZikr } from "./live";
 
 interface YouTubeVideoItem { id?: string; snippet?: { title?: string; description?: string; publishedAt?: string; liveBroadcastContent?: string; thumbnails?: { high?: { url?: string } } }; liveStreamingDetails?: { scheduledStartTime?: string; actualStartTime?: string; actualEndTime?: string } }
 interface YouTubeVideosResponse { items?: YouTubeVideoItem[] }
 interface YouTubePlaylistResponse { items?: Array<{ contentDetails?: { videoId?: string } }> }
 interface FacebookResponse { data?: Array<{ id?: string; message?: string; created_time?: string; permalink_url?: string; full_picture?: string }> }
-interface CatalogContent { id?: string; title?: string; excerpt?: string; sourceUrl?: string; publishedAt?: string; updatedAt?: string; mediaUrls?: string[] }
+interface CatalogContent { id?: string; title?: string; excerpt?: string; bodyPlainText?: string; sourceUrl?: string; publishedAt?: string; updatedAt?: string; mediaUrls?: string[] }
 interface CatalogEvent { id?: string; title?: string; details?: string; sourceUrl?: string; startDate?: string; updatedAt?: string }
 interface CatalogManifest { version?: number; generatedAt?: string; files?: { articles?: string; events?: string } }
 
@@ -110,6 +110,9 @@ export async function refreshYouTube(env: Env): Promise<void> {
   }
 }
 
+/** How much of a Facebook post stands as its title in Updates. */
+const FACEBOOK_TITLE_CHARACTERS = 100;
+
 export async function refreshFacebook(env: Env): Promise<void> {
   if (!env.FACEBOOK_PAGE_ACCESS_TOKEN) throw new Error("FACEBOOK_PAGE_ACCESS_TOKEN is not configured");
   const fields = "id,message,created_time,permalink_url,full_picture";
@@ -121,9 +124,11 @@ export async function refreshFacebook(env: Env): Promise<void> {
   for (const post of payload.data ?? []) {
     const message = cleanText(post.message); const sourceURL = validHTTPURL(post.permalink_url);
     if (!post.id || !post.created_time || !sourceURL || !message) continue;
+    // A post has no headline: its opening words stand in for one, ending on
+    // a whole word, with an ellipsis only when the post goes on.
     await env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,image_url,published_at,raw_json,updated_at)
       VALUES(?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,updated_at=excluded.updated_at`)
-      .bind(`facebook:${post.id}`, "facebook", "post", message.slice(0, 120), message, sourceURL, validHTTPURL(post.full_picture) ?? null,
+      .bind(`facebook:${post.id}`, "facebook", "post", wholeWords(message, FACEBOOK_TITLE_CHARACTERS), message, sourceURL, validHTTPURL(post.full_picture) ?? null,
         post.created_time, JSON.stringify(post), now).run();
   }
 }
@@ -153,10 +158,14 @@ export async function refreshWebsiteCatalog(env: Env): Promise<void> {
     const publishedAt = catalogTimestamp(item);
     if (!item.id || !sourceURL || !title || !publishedAt) continue;
     const image = (item.mediaUrls ?? []).map(validHTTPURL).find(Boolean);
+    // The whole text when the catalogue carries it, so a newly published
+    // item can be read in Updates before the apps hold it themselves; the
+    // teaser otherwise.
+    const body = cleanBody(item.bodyPlainText) ?? cleanBody(item.excerpt);
     kept.push(`website:${item.id}`);
     writes.push(env.DB.prepare(`INSERT INTO feed_items(id,source,kind,title,body,source_url,image_url,published_at,is_hidden,updated_at)
       VALUES(?,?,?,?,?,?,?,?,0,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,body=excluded.body,image_url=excluded.image_url,published_at=excluded.published_at,is_hidden=0,updated_at=excluded.updated_at`)
-      .bind(`website:${item.id}`, "website", "post", title, cleanText(item.excerpt) ?? null, sourceURL, image ?? null, publishedAt, now));
+      .bind(`website:${item.id}`, "website", "post", title, body ?? null, sourceURL, image ?? null, publishedAt, now));
   }
   // Existing deployments may contain evergreen pages that older code marked
   // as freshly published on every run. Website rows that are not dated news

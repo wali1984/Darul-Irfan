@@ -14,6 +14,10 @@ export interface OfficialFeedItem {
   sourceURL: string;
   imageURL?: string;
   videoID?: string;
+  /** A website item: its id in the apps' library, where its text is read. */
+  libraryID?: string;
+  /** A programme: its id among the apps' events. */
+  eventID?: string;
   publishedAt: string;
   isFeatured: boolean;
 }
