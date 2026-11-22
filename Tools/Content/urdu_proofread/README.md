@@ -49,3 +49,15 @@ Run from the iOS checkout (`pw/i-proof`, branch `claude/urdu-proofread`).
 `outputs/darul-urdu-proofread-apply/`: `summary.json`, `ledger.json` (every
 finding and what became of it), `applied-edits.json` (before and after),
 `not-applied.json`, `HELD.csv`, `review/`.
+
+## Arabic: what changes it, and nothing else
+
+- `arabic_approved.json`: the owner's approved wordings, each pinned to its finding (45, then 215).
+  An entry with `span` was approved over more words than the finding's own.
+- `arabic_kept.json`: proposals the owner answered "leave as printed".
+- `arabic_held.json`: changes read as Arabic that the rules cannot see. `unseen_arabic()` holds the
+  common kinds by rule: bare phrases, Arabic spellings, surah names in citations.
+- After every build read `scan_arabic.py`. The shield alone has missed bare Arabic before: before any
+  export or release, have the applied changes read independently as well.
+- Checks and exports must read the register the build read: copy it and set `DI_PROOFREAD_REGISTER`.
+- `export_quran_works.py` writes the Qur'an works for amd (`quran-works-proofread` there).

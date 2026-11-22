@@ -84,7 +84,7 @@ For text to speech. The export of 11 November 2026 (../final-text) is the text b
 Proofreading had reached {progress.get('pageEntriesInspected')} of {progress.get('totalUrduPages')} Urdu pages when this was written{'' if done else ' - NOT yet the whole library; this folder is replaced as the reading goes on'}.
 Findings applied: {summary['status'].get('applied')}. Every Urdu page also has its spacing tidied
 (a space after a sentence mark, none before it). The mushaf itself is untouched. Arabic quoted inside
-the books is as printed, apart from 45 corrections the owner approved (21 November 2026).
+the books is as printed, apart from the corrections the owner approved one by one (21 November 2026).
 
 - by-book/<bookID>.txt   one file per book, "===== page N =====" separators ({len(pages):,} pages, {len(books)} books)
 - books.json             bookID, title, page count

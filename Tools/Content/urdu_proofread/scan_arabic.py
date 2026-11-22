@@ -1,14 +1,18 @@
 """A different road from the shield: every applied edit that could be a change to Arabic, listed to be read.
 
-A finding is listed when, outside the owner's approved 45, any of these holds:
+A finding is listed when, outside what the owner approved, any of these holds:
   A  a changed word carries two or more harakat;
   B  the change lies in a block the layout marks as Arabic;
   C  with the change made, the changed word stands in three words of the mushaf (a bare quotation
      whose slip hid it from the shield);
   D  a changed pair of words, both free of Urdu-only letters, is a pair in the mushaf;
-  E  the reader filed it, or explains it, as a Qur'an, hadith, du'a or Arabic matter and letters change.
+  E  the reader filed it, or explains it, as a Qur'an, hadith, du'a or Arabic matter and letters change;
+  F  a well-known phrase of the Qur'an or of dhikr changes (typed bare, the shield cannot see it);
+  G  the proposal puts in a vowelled or Arabic-spelt word where the print had none;
+  N  the name of a surah or para changes.
 """
 import json
+import re
 import sys
 from collections import Counter
 
@@ -23,6 +27,9 @@ URDU_ONLY = set("ٹپچڈڑژگںےۂ")
 CATEGORY = ("quran", "arab", "hadith", "dua", "ayah", "verse", "scripture", "kalima")
 REASON = ("آیت", "قرآنی", "مصحف", "عربی", "حدیث", "دعائیہ", "کلمہ طیبہ")
 
+PHRASE = re.compile("الر[ّ]?ح[یي]?م|الراحم|العالم|العلم[یي]ن|النب[یيّ]+ن|ا?ن ?شا[ءئ]? ?ال|بسم|سبحان|الحمد|العیاذ|اعوذ"
+                    "|لاحول|لا حول|استغفر|جزاک|الا اللہ|ما ?شا[ءئ]? ?ال|للعالم|من اللہ|حقُّ")
+NAME = re.compile(r"(?:سور[ہۃۂت]|پار[ہۂ])\s*[0-9۰-۹]*\s*([^\s،۔]+)")
 counts, rows = Counter(), []
 for fid, entry in ledger.items():
     if entry["status"] != "applied" or fid in ap.APPROVED or fid not in findings:
@@ -61,6 +68,16 @@ for fid, entry in ledger.items():
     if changed_letters and (any(w in f.get("category", "").lower() for w in CATEGORY)
                             or any(w in f.get("reasonUrdu", "") for w in REASON)):
         flags.add("E")
+    if PHRASE.findall(original) != PHRASE.findall(proposed):
+        flags.add("F")
+    old_words = {t for _, _, t in ap.tokens(original)}
+    for _, _, t in ap.tokens(proposed):
+        if t in old_words or URDU_ONLY & set(t):
+            continue
+        if sum(c in ap.HARAKAT for c in t) >= 2 or any(c in "ةإأيكٱ" for c in t):
+            flags.add("G")
+    if changed_letters and NAME.findall(original) != NAME.findall(proposed):
+        flags.add("N")
     if flags:
         tag = "".join(sorted(flags))
         counts[tag] += 1

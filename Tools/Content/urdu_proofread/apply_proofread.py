@@ -27,7 +27,7 @@ Arabic
 
   * `quran_ayahs.json` is never touched, and is the measure for the rest.
   * Arabic quoted in the books changes only where the owner approved that
-    very finding (`arabic_approved.json`: the 45 shown and approved on 21
+    very finding (`arabic_approved.json`: the 45 and the further 215 shown and approved on 21
     November 2026, a Qur'an quotation in them as the mushaf writes it). A new
     slip is listed for approval (arabic-awaiting-approval.json) and left.
   * Any other change to Arabic is refused. A change counts as touching Arabic
@@ -85,6 +85,8 @@ BASE_SHA256 = "43ef075d7223ed847fc8512734b9013a536b7ef28276827a0ec8135b8247bda6"
 # The changes to Arabic the owner approved, each by its finding. The rule is
 # the list: a new slip is never mended because an old one like it was approved.
 APPROVED = {entry["id"]: entry for entry in json.loads((HERE / "arabic_approved.json").read_text(encoding="utf-8"))}
+# Proposals the owner answered "leave as printed".
+KEPT_AS_PRINTED = json.loads((HERE / "arabic_kept.json").read_text(encoding="utf-8"))
 AWAITING: dict[str, dict] = {}
 # Findings read as a change to Arabic that the rules cannot see (scan_arabic.py
 # lists the candidates): they wait for the owner like the others.
@@ -107,7 +109,7 @@ CONFIRMED = {
     "original_confirms_transcription_error_proposed",
     "original_confirmed_spacing_only",
 }
-RANK = {"decision": 0, "high": 1, "confirmed": 1, "arabic": 1, "editorial": 2, "medium": 3, "probable": 4}
+RANK = {"decision": 0, "high": 1, "confirmed": 1, "arabic": -1, "editorial": 2, "medium": 3, "probable": 4}
 
 HARAKAT = set("\u064b\u064c\u064d\u064e\u064f\u0650\u0651\u0652\u0656\u0657\u0670")
 TOKEN = re.compile(r"\s+|[^\W_]+(?:[\u200c\u200d][^\W_]+)*|.", re.S)
@@ -360,10 +362,34 @@ def base_file(name: str) -> Path:
     return cache
 
 
+# The shield knows Arabic by its vowels and by runs of the mushaf's words. These
+# phrases are printed bare in the middle of Urdu, and it cannot see them.
+BARE_PHRASE = re.compile("الر[ّ]?ح[یي]?م|الراحم|العالم|العلم[یي]ن|النب[یيّ]+ن|ا?ن ?ش[اآ][ءئ]? ?ال|بسم|سبحان|الحمد ?ا?لل?ہ|الحمد"
+                         "|العیاذ|اعوذ|لاحول|لا حول|استغفر|جزاک|الا اللہ|ما ?ش[اآ][ءئ]? ?ال|ا?للعالم|اللعلم|من اللہ|حقُّ")
+SURAH_NAMED = re.compile(r"(?:سورۃ\s*|\()(ال[^\s:()،]+)")
+URDU_LETTERS = frozenset("ٹپچڈڑژگںےۂ")
+
+
+def unseen_arabic(original: str, suggested: str) -> str | None:
+    """Why a proposal is a change to Arabic though the print shows no vowels, or None."""
+    if BARE_PHRASE.findall(original) != BARE_PHRASE.findall(suggested):
+        return "a phrase of the Qur'an or of dhikr, typed bare"
+    if SURAH_NAMED.findall(original) != SURAH_NAMED.findall(suggested) and (
+            "سور" in original or re.search(r"[:：]\s*[0-9۰-۹٠-٩]", original)):
+        return "name of a para or surah (the Qur'an's own words)"
+    old = {token for _, _, token in tokens(original)}
+    for _, _, token in tokens(suggested):
+        if token not in old and not URDU_LETTERS & set(token) and any(ch in "\u0652\u0643\u064a\u0629\u0671\u0625" for ch in token):
+            return "Arabic words, spelt or vowelled as Arabic"
+    return None
+
+
 def classify(finding: dict, decisions: dict) -> tuple[str, str | None, str]:
     """(verdict, replacement, why). Verdict is `apply`, `hold` or `review`."""
     decision = decisions.get(finding["id"])
     suggested = finding.get("suggested")
+    if finding["id"] in KEPT_AS_PRINTED:
+        return "hold", None, KEPT_AS_PRINTED[finding["id"]]
     if finding["id"] in APPROVED:
         return "arabic", suggested, "approved by the owner"
     if finding["id"] in READ_AS_ARABIC and suggested:
@@ -1032,6 +1058,11 @@ def build(write: bool) -> int:
             ledger[fid] = {"status": "error", "why": "page text is not the text the finding was read from"}
             continue
         verdict, replacement, why = classify(finding, decisions)
+        if verdict == "apply":
+            unseen = unseen_arabic(finding["original"], replacement)
+            if unseen:
+                await_owner({**finding, "suggested": replacement}, unseen, replacement)
+                verdict, why = "hold", "Arabic quotation: waiting for the owner's approval"
         if verdict not in ("apply", "arabic"):
             ledger[fid] = {"status": verdict, "why": why}
             continue
@@ -1047,6 +1078,12 @@ def build(write: bool) -> int:
                 ledger[fid] = {"status": "hold", "why": f"Arabic quotation: {how}"}
                 continue
             why = "arabic"
+            span = APPROVED[fid].get("span")
+            if span:
+                # Approved over more words than the finding's own.
+                if text.count(span) != 1 or original not in span:
+                    raise SystemExit(f"{fid}: the approved words are not one place on the page; nothing written")
+                original, first = span, text.index(span)
         places = occurrences(text, original)
         if len(places) > 1:
             alone = [at for at in places if stands_alone(text, at, original)]
@@ -1292,8 +1329,14 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headin
         for cluster in clusters:
             lo, hi = cluster[0][0], cluster[-1][1]
             placed = False
-            for reach in (32, 16, 8):
-                a, b = max(0, lo - reach), min(len(text), hi + reach)
+            windows = [(reach, max(0, lo - reach), min(len(text), hi + reach)) for reach in (32, 16, 8)]
+            if all(edit in mended.get((book, page), ()) for edit in cluster):
+                # An approved place may close or open a passage: the words on
+                # one side are then enough, where only one passage has them.
+                windows += [(0, max(0, lo - 32), hi), (0, lo, min(len(text), hi + 32))]
+            for reach, a, b in windows:
+                if b - a < 24:
+                    continue
                 window = text[a:b]
                 # A word wholly inside the window is a whole word of any passage holding the window.
                 inner = window.split()[1:-1]

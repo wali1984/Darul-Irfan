@@ -1,11 +1,83 @@
 [
  {
+  "id": "ASRAR-108-002",
+  "book": "asrar-108-ur",
+  "page": 1,
+  "how": "name of a para (the Qur'an's own words)",
+  "was": "عـوٓ ۳۰/۳۳",
+  "now": "عَمَّ ۳۰/۳۳"
+ },
+ {
+  "id": "ASRAR-109-001",
+  "book": "asrar-109-ur",
+  "page": 1,
+  "how": "name of a para (the Qur'an's own words)",
+  "was": "عــــو ۳۰/۳۴",
+  "now": "عَمَّ ۳۰/۳۴"
+ },
+ {
+  "id": "ASRAR-111-001",
+  "book": "asrar-111-ur",
+  "page": 1,
+  "how": "name of a para (the Qur'an's own words)",
+  "was": "آیات ۱ تا ۵ عو ۳۰/۳۶",
+  "now": "آیات ۱ تا ۵ عَمَّ ۳۰/۳۶"
+ },
+ {
+  "id": "ASRAR-45-P1-4-016",
+  "book": "asrar-45-ur",
+  "page": 3,
+  "how": "name of a para (the Qur'an's own words)",
+  "was": "رکوع نمبر ۲ آیات ۱۲ تا ۲۱",
+  "now": "رکوع نمبر ۲ آیات ۱۲ تا ۲۱ الیہ یرد ۲۵/۱۸"
+ },
+ {
+  "id": "ASRAR-58-UR-P1-4-011",
+  "book": "asrar-58-ur",
+  "page": 4,
+  "how": "name of a para (the Qur'an's own words)",
+  "was": "رکوع نمبر ۲ آیات ۷ تا ۱۳",
+  "now": "رکوع نمبر ۲ آیات ۷ تا ۱۳ قَدْ سَمِعَ اللّٰهُ ۲۸/۲"
+ },
+ {
+  "id": "ASRAR-61-UR-P1-5-014",
+  "book": "asrar-61-ur",
+  "page": 4,
+  "how": "the reader's fix",
+  "was": "عیسیٰ ابن مریم نے",
+  "now": "عیسیٰ ابنِ مریم نے"
+ },
+ {
+  "id": "ASRAR-FURQAAN-22-014",
+  "book": "asrar-25-ur",
+  "page": 23,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "یاارحم الرحمین",
+  "now": "یا ارحم الرحمین"
+ },
+ {
+  "id": "ASRAR-HAJJ-28-008",
+  "book": "asrar-22-ur",
+  "page": 29,
+  "how": "inside a block of Arabic",
+  "was": "وَنِعْمَ النَّصِيْرُ ؀",
+  "now": "وَنِعْمَ النَّصِيْرُ ﴿۷۸﴾"
+ },
+ {
   "id": "ASRAR-HIJR-F-003",
   "book": "asrar-15-ur",
   "page": 11,
   "how": "mushaf 17:85",
   "was": "قل الروح من امرِ ربی۔",
   "now": "قُلِ الرُّوْحُ مِنْ اَمْرِ رَبِّىْ۔"
+ },
+ {
+  "id": "ASRAR-IBRAHIM-D-005",
+  "book": "asrar-14-ur",
+  "page": 8,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "ایام اللہ میں",
+  "now": "ایّامِ اللہ میں"
  },
  {
   "id": "ASRAR-IBRAHIM-D-022",
@@ -32,12 +104,1597 @@
   "now": "وَّلِيَذَّكَّرَ اُولُوا الْا َلْبَابِ"
  },
  {
+  "id": "ASRAR-ISRA-D-033",
+  "book": "asrar-17-ur",
+  "page": 20,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "عہد رب العالمین کے ساتھ",
+  "now": "عہد ربُّ العالمین کے ساتھ"
+ },
+ {
+  "id": "ASRAR-KAHF-F-010",
+  "book": "asrar-18-ur",
+  "page": 22,
+  "how": "the reader's fix",
+  "was": "۲۲ تا ۴۴",
+  "now": "۳۲ تا ۴۴"
+ },
+ {
+  "id": "ASRAR-MUMINOON-7-001",
+  "book": "asrar-23-ur",
+  "page": 7,
+  "how": "inside a block of Arabic",
+  "was": "فَلَا تَتَّقُوْنَ ۟",
+  "now": "فَلَا تَتَّقُوْنَ ﴿۳۲﴾"
+ },
+ {
+  "id": "ASRAR-NAHL-B-023",
+  "book": "asrar-16-ur",
+  "page": 9,
+  "how": "inside a block of Arabic",
+  "was": "پ۱۴ رکوع ۶",
+  "now": "پ۱۴ رکوع ۱۰"
+ },
+ {
+  "id": "ASRAR-NAHL-C-006",
+  "book": "asrar-16-ur",
+  "page": 11,
+  "how": "the reader's fix",
+  "was": "پ۱۴ رکوع ۵",
+  "now": "پ۱۴ رکوع ۱۱"
+ },
+ {
+  "id": "ASRAR-NAHL-F-035",
+  "book": "asrar-16-ur",
+  "page": 30,
+  "how": "the reader's fix",
+  "was": "۰ ۷۷ تا ۸۳",
+  "now": "○ ۷۷ تا ۸۳"
+ },
+ {
+  "id": "ASRAR-NAHL-G-029",
+  "book": "asrar-16-ur",
+  "page": 34,
+  "how": "inside a block of Arabic",
+  "was": "٥ ۸۴ تا ۸۹",
+  "now": "○ ۸۴ تا ۸۹"
+ },
+ {
+  "id": "ASRAR-NAHL-H-029",
+  "book": "asrar-16-ur",
+  "page": 39,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "اَلعیاذُ بااللّٰہ",
+  "now": "اَلعِیاذُ بِاللّٰہ"
+ },
+ {
+  "id": "ASRAR-RAD-C-024",
+  "book": "asrar-13-ur",
+  "page": 6,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "دعوت الی اللہ کے پہنچانے",
+  "now": "دعوتِ اِلَی اللہ کے پہنچانے"
+ },
+ {
+  "id": "ASRAR-RAD-J-023",
+  "book": "asrar-13-ur",
+  "page": 23,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "جس کے لیے مجھے بھی دعوت الی اللہ",
+  "now": "جس کے لیے مجھے بھی دعوتِ اِلَی اللہ"
+ },
+ {
+  "id": "ASRAR-TAHA-H-002",
+  "book": "asrar-20-ur",
+  "page": 22,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "یوم الزنیہ جوان کا",
+  "now": "یوم الزینہ، جو ان کا"
+ },
+ {
   "id": "ASRAR-YUSUF-O-027",
   "book": "asrar-12-ur",
   "page": 53,
   "how": "mushaf 2:165",
   "was": "والذین امنوا اشد حبًا للہ۔ کہ مومن",
   "now": "وَالَّذِيْنَ اٰمَنُوْٓا اَشَدُّ حُبًّا لِّلّٰهِ۔ کہ مومن"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-1-P160-002",
+  "book": "tafaseer-parah-1",
+  "page": 160,
+  "how": "the reader's fix",
+  "was": "لا الہ الاا اللہ نوح",
+  "now": "لا الہ الا اللہ نوح"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-1-P179-005",
+  "book": "tafaseer-parah-1",
+  "page": 179,
+  "how": "the reader's fix",
+  "was": "یہ کونسا جانور ہے۔",
+  "now": "یہ کون سا جانور ہے؟"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-1-P286-002",
+  "book": "tafaseer-parah-1",
+  "page": 286,
+  "how": "mushaf 3:81",
+  "was": "وَاِذْاَخَذَ اللّٰہُ",
+  "now": "وَاِذْ اَخَذَ اللّٰهُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P117-001",
+  "book": "tafaseer-parah-2",
+  "page": 117,
+  "how": "the reader's fix",
+  "was": "وَأَجْسَامُهُمْ قَبْلَ الْقُبُوْرُ قُبُوْرُهُمْ",
+  "now": "وَأَجْسَامُهُمْ قَبْلَ الْقُبُوْرِ قُبُوْرُهُمْ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P118-001",
+  "book": "tafaseer-parah-2",
+  "page": 118,
+  "how": "mushaf 2:180",
+  "was": "حَضَرَ اَحَدَ کُمُ الْمَوْتُ",
+  "now": "حَضَرَ اَحَدَكُمُ الْمَوْتُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P143-001",
+  "book": "tafaseer-parah-2",
+  "page": 143,
+  "how": "the reader's fix",
+  "was": "اِذَا کَانَ اَحَدُ کُمْ فِی الصَّلٰوۃِ",
+  "now": "اِذَا کَانَ اَحَدُکُمْ فِی الصَّلٰوۃِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P190-002",
+  "book": "tafaseer-parah-2",
+  "page": 190,
+  "how": "mushaf 2:196",
+  "was": "فَاِنْ اُحْصِرْ تُمْ فَمَا اسْتَيْسَرَ مِنَ الْهَدْيِ",
+  "now": "فَاِنْ اُحْصِرْتُمْ فَمَا اسْتَيْسَرَ مِنَ الْهَدْىِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P201-003",
+  "book": "tafaseer-parah-2",
+  "page": 201,
+  "how": "the reader's fix",
+  "was": "کیا یہ اس بات کے منتظر ہیں کہ اللہ بادلوں کے سائے میں ان کے پاس آئیں اور فرشتے (بھی) اور کام ختم ہو جائے اور سب کام اللہ کی طرف پھیرے جاتے ہیں",
+  "now": "کیا یہ اس بات کے منتظر ہیں کہ اللہ بادلوں کے سائے میں ان کے پاس آئیں اور فرشتے (بھی)، اور کام ختم ہو جائے؟ اور سب کام اللہ کی طرف پھیرے جاتے ہیں"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P211-001",
+  "book": "tafaseer-parah-2",
+  "page": 211,
+  "how": "the reader's fix",
+  "was": "وَأَجۡسَامُهُمۡ قَبۡلَ ٱلۡقُبُوۡرُ قَبُوۡرُهُمۡ",
+  "now": "وَأَجۡسَامُهُمۡ قَبۡلَ ٱلۡقُبُوۡرِ قُبُوۡرُهُمۡ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P300-002",
+  "book": "tafaseer-parah-2",
+  "page": 300,
+  "how": "mushaf 2:266",
+  "was": "اَحَدَ كُمْ",
+  "now": "اَحَدُكُمْ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P31-001",
+  "book": "tafaseer-parah-2",
+  "page": 31,
+  "how": "words of the Qur'an, typed bare",
+  "was": "اور تم پر محمد رسول صلی اللہ علیہ وسلّم گواہ ہوں گے",
+  "now": "اور تم پر محمد رسول اللہ صلی اللہ علیہ وسلّم گواہ ہوں گے"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P33-002",
+  "book": "tafaseer-parah-2",
+  "page": 33,
+  "how": "words of the Qur'an, typed bare",
+  "was": "یا محمد رسول صلی اللہ علیہ وسلّم کی غلامی",
+  "now": "یا محمد رسول اللہ صلی اللہ علیہ وسلّم کی غلامی"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P340-002",
+  "book": "tafaseer-parah-2",
+  "page": 340,
+  "how": "mushaf 2:249",
+  "was": "جَاوَزَہٗ ھُوَوَالَّذِیْنَ",
+  "now": "جَاوَزَهٗ هُوَ وَالَّذِيْنَ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P36-002",
+  "book": "tafaseer-parah-2",
+  "page": 36,
+  "how": "words of the Qur'an, typed bare",
+  "was": "محمد رسول صلی اللہ علیہ وسلم کا اتباع کرے",
+  "now": "محمد رسول اللہ صلی اللہ علیہ وسلم کا اتباع کرے"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-2-P55-002",
+  "book": "tafaseer-parah-2",
+  "page": 55,
+  "how": "the reader's fix",
+  "was": "كَمَنْ لَاذَنْبَ لَهٗ",
+  "now": "كَمَنْ لَا ذَنْبَ لَهٗ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P100-003",
+  "book": "tafaseer-parah-3",
+  "page": 100,
+  "how": "mushaf 2:275",
+  "was": "مِثْلُ الرِّبٰوام کہ",
+  "now": "مِثْلُ الرِّبٰوا ۘ کہ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P132-001",
+  "book": "tafaseer-parah-3",
+  "page": 132,
+  "how": "mushaf 3:4",
+  "was": "وَاللّٰهُ عَزِيْزٌ ذُوانْتِقَامٍ",
+  "now": "وَاللّٰهُ عَزِيْزٌ ذُو انْتِقَامٍ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P14-001",
+  "book": "tafaseer-parah-3",
+  "page": 14,
+  "how": "mushaf 2:67",
+  "was": "اَعُوْذُبَاللّٰہِ",
+  "now": "اَعُوْذُ بِاللّٰهِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P160-001",
+  "book": "tafaseer-parah-3",
+  "page": 160,
+  "how": "the reader's fix",
+  "was": "يُهَوِّدَ انِهٖ",
+  "now": "يُهَوِّدَانِهٖ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P169-001",
+  "book": "tafaseer-parah-3",
+  "page": 169,
+  "how": "mushaf 3:16",
+  "was": "فَاغْفِرْلَنَا ذُنُوْبَنَا",
+  "now": "فَاغْفِرْ لَنَا ذُنُوْبَنَا"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P248-001",
+  "book": "tafaseer-parah-3",
+  "page": 248,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "کن فیکون کے رموز",
+  "now": "کُنْ فَیَکُونُ کے رموز"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P250-003",
+  "book": "tafaseer-parah-3",
+  "page": 250,
+  "how": "the reader's fix",
+  "was": "آج کوئی نبی نہیں ہے اَسْتَغْفِرُاللہ!",
+  "now": "آج کوئی نبی نہیں ہے۔ اَسْتَغْفِرُ اللہ!"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P290-002",
+  "book": "tafaseer-parah-3",
+  "page": 290,
+  "how": "the reader's fix",
+  "was": "رب العلمین",
+  "now": "رب العالمین"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P290-004",
+  "book": "tafaseer-parah-3",
+  "page": 290,
+  "how": "mushaf 3:64",
+  "was": "لَا يَتَّخِذَ بَعْضُنَا",
+  "now": "وَّلَا يَتَّخِذَ بَعْضُنَا"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P300-002",
+  "book": "tafaseer-parah-3",
+  "page": 300,
+  "how": "the reader's fix",
+  "was": "اَلصَّحَابَةُ كُلُّهُمْ عَدُوْل۔",
+  "now": "اَلصَّحَابَةُ كُلُّهُمْ عُدُولٌ۔"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P311-001",
+  "book": "tafaseer-parah-3",
+  "page": 311,
+  "how": "mushaf 2:105",
+  "was": "ذُوالْفَضْلِ",
+  "now": "ذُو الْفَضْلِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P327-003",
+  "book": "tafaseer-parah-3",
+  "page": 327,
+  "how": "mushaf 3:81",
+  "was": "تو لتومنن تم سب کو",
+  "now": "تو لَـتُؤْمِنُنَّ، تم سب کو"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P333-003",
+  "book": "tafaseer-parah-3",
+  "page": 333,
+  "how": "the reader's fix",
+  "was": "فَهُوَمِنْهُمْ اَوْ كَمَاقَالَ",
+  "now": "فَهُوَ مِنْهُمْ، اَوْ كَمَا قَالَ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P39-002",
+  "book": "tafaseer-parah-3",
+  "page": 39,
+  "how": "the reader's fix",
+  "was": "لَا تَتَحَرَّكُ ذَرَّةً",
+  "now": "لَا تَتَحَرَّكُ ذَرَّةٌ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P60-001",
+  "book": "tafaseer-parah-3",
+  "page": 60,
+  "how": "mushaf 9:30",
+  "was": "عزیرن ابن الله",
+  "now": "عُزَيْرُ ۨابْنُ اللّٰهِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P67-003",
+  "book": "tafaseer-parah-3",
+  "page": 67,
+  "how": "the question mark moved to the end of its question",
+  "was": "کیا تم میں سے کوئی پسند کرتا ہے؟ کہ اس کا ایک باغ",
+  "now": "کیا تم میں سے کوئی پسند کرتا ہے کہ اس کا ایک باغ ہو کھجور اور انگوروں کا' اس کے نیچے نہریں بہتی ہوں' اس کے لئے اس میں ہر قسم کے پھل ہوں' اور اس پر بڑھاپا آ گیا ہو' اور اس کے بچے بہت کمزور ہوں' تب اس پر ایک بگولا آ پڑا' اس میں آگ تھی تو وہ (باغ) جل گیا؟",
+  "span": "کیا تم میں سے کوئی پسند کرتا ہے؟ کہ اس کا ایک باغ ہو کھجور اور انگوروں کا' اس کے نیچے نہریں بہتی ہوں' اس کے لئے اس میں ہر قسم کے پھل ہوں' اور اس پر بڑھاپا آ گیا ہو' اور اس کے بچے بہت کمزور ہوں' تب اس پر ایک بگولا آ پڑا' اس میں آگ تھی تو وہ (باغ) جل گیا'"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P73-002",
+  "book": "tafaseer-parah-3",
+  "page": 73,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "وہ ھدیٰ یا ہدایت کہلاتا ہے",
+  "now": "وہ ہُدیٰ یا ہدایت کہلاتا ہے"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-3-P86-003",
+  "book": "tafaseer-parah-3",
+  "page": 86,
+  "how": "the reader's fix",
+  "was": "اِنَّمَا الْاَعْمَالُ بِالنِّيَات",
+  "now": "اِنَّمَا الْاَعْمَالُ بِالنِّيَّاتِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P113-002",
+  "book": "tafaseer-parah-4",
+  "page": 113,
+  "how": "words of the Qur'an, typed bare",
+  "was": "محمد رسول صلی اللہ علیہ وآلہ وسلم نے بتایا۔",
+  "now": "محمد رسول اللہ صلی اللہ علیہ وآلہ وسلم نے بتایا۔"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P185-002",
+  "book": "tafaseer-parah-4",
+  "page": 185,
+  "how": "mushaf 2:156",
+  "was": "انا للہ وانا الیہ راجعون۔",
+  "now": "اِنَّا لِلّٰهِ وَاِنَّـآ اِلَيْهِ رٰجِعُوْنَ۔"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P197-003",
+  "book": "tafaseer-parah-4",
+  "page": 197,
+  "how": "mushaf 3:152",
+  "was": "ثم صرفکم عنھم لیبتلیکم",
+  "now": "ثُمَّ صَرَفَكُمْ عَنْهُمْ لِيَبْتَلِيَكُمْ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P206-001",
+  "book": "tafaseer-parah-4",
+  "page": 206,
+  "how": "mushaf 3:158",
+  "was": "لَاِالَى اللّٰهِ تُحْشَرُوْنَ",
+  "now": "لَا اِلَى اللّٰهِ تُحْشَرُوْنَ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P212-001",
+  "book": "tafaseer-parah-4",
+  "page": 212,
+  "how": "mushaf 3:158",
+  "was": "لَاِالَى اللهِ تُحْشَرُوْنَ",
+  "now": "لَا اِلَى اللّٰهِ تُحْشَرُوْنَ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P229-003",
+  "book": "tafaseer-parah-4",
+  "page": 229,
+  "how": "mushaf 3:160",
+  "was": "اِنْ یَّنْصُرْ کُمُ اللّٰہُ",
+  "now": "اِنْ يَّنْصُرْكُمُ اللّٰهُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P235-001",
+  "book": "tafaseer-parah-4",
+  "page": 235,
+  "how": "mushaf 53:17",
+  "was": "ما زاغ البصر وما طغیO (النجم: 17)",
+  "now": "مَا زَاغَ الْبَصَرُ وَمَا طَغٰى○ (النجم: 17)"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P236-001",
+  "book": "tafaseer-parah-4",
+  "page": 236,
+  "how": "words of the Qur'an, typed bare",
+  "was": "محمد رسول ﷺ کا ہے",
+  "now": "محمد رسول اللہ ﷺ کا ہے"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P248-003",
+  "book": "tafaseer-parah-4",
+  "page": 248,
+  "how": "mushaf 3:167",
+  "was": "لَّااتَّبَعْنٰكُمْ",
+  "now": "لَّا تَّبَعْنٰكُمْ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P272-002",
+  "book": "tafaseer-parah-4",
+  "page": 272,
+  "how": "mushaf 3:173",
+  "was": "ونعم الوکیل",
+  "now": "وَنِعْمَ الْوَكِيْلُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P280-002",
+  "book": "tafaseer-parah-4",
+  "page": 280,
+  "how": "mushaf 2:90",
+  "was": "عذاب مھین",
+  "now": "عَذَابٌ مُّهِيْنٌ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P318-003",
+  "book": "tafaseer-parah-4",
+  "page": 318,
+  "how": "mushaf 3:193",
+  "was": "تَوَفَّنَا مَعَ الْاَبْرَارِ",
+  "now": "وَتَوَفَّنَا مَعَ الْاَبْرَارِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P34-001",
+  "book": "tafaseer-parah-4",
+  "page": 34,
+  "how": "mushaf 37:35",
+  "was": "لا اللہ الا اللہ",
+  "now": "لَاۤ اِلٰهَ اِلَّا اللّٰهُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P342-001",
+  "book": "tafaseer-parah-4",
+  "page": 342,
+  "how": "the reader's fix",
+  "was": "اذافات الشرط فات المشروط",
+  "now": "إِذَا فَاتَ الشَّرْطُ فَاتَ الْمَشْرُوطُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-4-P60-003",
+  "book": "tafaseer-parah-4",
+  "page": 60,
+  "how": "the reader's fix",
+  "was": "یہاں اِکْرَاہَ ہوگا فیصلہ قوت سے نافذ ہوگا۔",
+  "now": "یہاں اِکراہ ہو گا، فیصلہ قوت سے نافذ ہو گا۔"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P115-003",
+  "book": "tafaseer-parah-5",
+  "page": 115,
+  "how": "mushaf 7:43",
+  "was": "الحمد اللہ",
+  "now": "الْحَمْدُ لِلّٰهِ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P14-002",
+  "book": "tafaseer-parah-5",
+  "page": 14,
+  "how": "mushaf 2:127",
+  "was": "ربّنا تقبل منا انك انت السميع العليم",
+  "now": "رَبَّنَا تَقَبَّلْ مِنَّا اِنَّكَ اَنْتَ السَّمِيْعُ الْعَلِيْمُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P251-002",
+  "book": "tafaseer-parah-5",
+  "page": 251,
+  "how": "the reader's fix",
+  "was": "اللہ رب العلمین تمہارے ساتھ ہے",
+  "now": "اللہ رب العالمین تمہارے ساتھ ہے"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P272-005",
+  "book": "tafaseer-parah-5",
+  "page": 272,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "مفضی الی الکفر ہوتا ہے ہر گناہ",
+  "now": "مُفضی اِلَی الْکُفر ہوتا ہے۔ ہر گناہ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P78-001",
+  "book": "tafaseer-parah-5",
+  "page": 78,
+  "how": "the reader's fix",
+  "was": "وانظرنا کہہ کر",
+  "now": "وَانْظُرْنَا کہہ کر"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P9-003",
+  "book": "tafaseer-parah-5",
+  "page": 9,
+  "how": "the reader's fix",
+  "was": "اٰل عمران آیت 101",
+  "now": "آلِ عمران، آیت 101"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-5-P98-002",
+  "book": "tafaseer-parah-5",
+  "page": 98,
+  "how": "the reader's fix",
+  "was": "اذافات الشرط فات المشروط",
+  "now": "إِذَا فَاتَ الشَّرْطُ فَاتَ الْمَشْرُوطُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P107-004",
+  "book": "tafaseer-parah-6",
+  "page": 107,
+  "how": "the reader's fix",
+  "was": "لبيك اللهم لبيك، لبيك لاشريك لك لبيك",
+  "now": "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P118-001",
+  "book": "tafaseer-parah-6",
+  "page": 118,
+  "how": "mushaf 2:29",
+  "was": "خَلَقَ لَکُمْ مَّافِی الْاَرْضِ جَمِیْعًا",
+  "now": "خَلَقَ لَـكُمْ مَّا فِى الْاَرْضِ جَمِيْعًا"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P158-003",
+  "book": "tafaseer-parah-6",
+  "page": 158,
+  "how": "the reader's fix",
+  "was": "اَنْ تَعْبُدُ اللّٰهَ",
+  "now": "أَنْ تَعْبُدَ اللّٰهَ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P174-004",
+  "book": "tafaseer-parah-6",
+  "page": 174,
+  "how": "mushaf 37:35",
+  "was": "لاالٰہ الا اللہ",
+  "now": "لَاۤ اِلٰهَ اِلَّا اللّٰهُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P4-003",
+  "book": "tafaseer-parah-6",
+  "page": 4,
+  "how": "the reader's fix",
+  "was": "انشاء اللہ آئندہ",
+  "now": "ان شاء اللہ آئندہ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P43-004",
+  "book": "tafaseer-parah-6",
+  "page": 43,
+  "how": "mushaf 6:128",
+  "was": "الا ماشاء اللہ",
+  "now": "اِلَّا مَا شَآءَ اللّٰهُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P46-004",
+  "book": "tafaseer-parah-6",
+  "page": 46,
+  "how": "mushaf 6:128",
+  "was": "الا ماشاء اللہ",
+  "now": "اِلَّا مَا شَآءَ اللّٰهُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P61-003",
+  "book": "tafaseer-parah-6",
+  "page": 61,
+  "how": "mushaf 37:35",
+  "was": "لاالہ الا اللہ",
+  "now": "لَاۤ اِلٰهَ اِلَّا اللّٰهُ"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-6-P9-003",
+  "book": "tafaseer-parah-6",
+  "page": 9,
+  "how": "the reader's fix",
+  "was": "اور انشاء اللہ",
+  "now": "اور ان شاء اللہ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-21-P95-005",
+  "book": "tafaseer-parah-21",
+  "page": 95,
+  "how": "the reader's fix",
+  "was": "اللہ رب العالمین",
+  "now": "اللہ ربّ العالمین"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P105-004",
+  "book": "tafaseer-parah-22",
+  "page": 105,
+  "how": "mushaf 34:6",
+  "was": "هُوَالْحَقَّ",
+  "now": "هُوَ الْحَـقَّ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P193-001",
+  "book": "tafaseer-parah-22",
+  "page": 193,
+  "how": "mushaf 35:15",
+  "was": "ھُوَالْغَنِیُّ",
+  "now": "هُوَ الْغَنِىُّ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P221-002",
+  "book": "tafaseer-parah-22",
+  "page": 221,
+  "how": "mushaf 35:37",
+  "was": "اَوَلَمْ نُعَمِّرْ کُمْ",
+  "now": "اَوَلَمْ نُعَمِّرْكُمْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P221-003",
+  "book": "tafaseer-parah-22",
+  "page": 221,
+  "how": "mushaf 35:37",
+  "was": "وَجَآءَ کُمُ النَّذِیْرُ",
+  "now": "وَجَآءَكُمُ النَّذِيْرُ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P46-003",
+  "book": "tafaseer-parah-22",
+  "page": 46,
+  "how": "mushaf 33:43",
+  "was": "هُوَالَّذِيْ",
+  "now": "هُوَ الَّذِىْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-22-P88-002",
+  "book": "tafaseer-parah-22",
+  "page": 88,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "ملک الجبال",
+  "now": "مَلَکُ الجبال"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-24-P116-001",
+  "book": "tafaseer-parah-24",
+  "page": 116,
+  "how": "mushaf 40:68",
+  "was": "هُوَالَّذِیْ",
+  "now": "هُوَ الَّذِىْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-24-P151-001",
+  "book": "tafaseer-parah-24",
+  "page": 151,
+  "how": "the reader's fix",
+  "was": "لا الہ الآ اللہ",
+  "now": "لا الہ الا اللہ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-24-P92-001",
+  "book": "tafaseer-parah-24",
+  "page": 92,
+  "how": "inside a block of Arabic",
+  "was": "لِاَ کْفُرَ",
+  "now": "لِاَکْفُرَ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P109-002",
+  "book": "tafaseer-parah-25",
+  "page": 109,
+  "how": "inside a block of Arabic",
+  "was": "یَخْرُصُوْنَ۝۲۰",
+  "now": "یَخْرُصُوْنَ ﴿۲۰﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P121-002",
+  "book": "tafaseer-parah-25",
+  "page": 121,
+  "how": "the reader's fix",
+  "was": "؁۳۱",
+  "now": "﴿۳۱﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P121-003",
+  "book": "tafaseer-parah-25",
+  "page": 121,
+  "how": "the reader's fix",
+  "was": "؁۳۲",
+  "now": "﴿۳۲﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P121-004",
+  "book": "tafaseer-parah-25",
+  "page": 121,
+  "how": "the reader's fix",
+  "was": "( نبوت کو ) بانٹتے ہیں؟",
+  "now": "(نبوت) کو بانٹتے ہیں؟"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P128-003",
+  "book": "tafaseer-parah-25",
+  "page": 128,
+  "how": "mushaf 43:36",
+  "was": "فَهُوَلَهٗ قَرِيْنٌ",
+  "now": "فَهُوَ لَهٗ قَرِيْنٌ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P129-001",
+  "book": "tafaseer-parah-25",
+  "page": 129,
+  "how": "the reader's fix",
+  "was": "مَامِنْكُمْ مِنْ اَحَدٍ اِلَّا وَ قَدْ",
+  "now": "مَا مِنْكُمْ مِنْ اَحَدٍ اِلَّا وَقَدْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P151-004",
+  "book": "tafaseer-parah-25",
+  "page": 151,
+  "how": "mushaf 43:71",
+  "was": "وَّ اَكْوَابٍ",
+  "now": "وَّاَكْوَابٍ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P183-001",
+  "book": "tafaseer-parah-25",
+  "page": 183,
+  "how": "mushaf 76:3",
+  "was": "شَا كِرًا",
+  "now": "شَاكِرًا"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P183-004",
+  "book": "tafaseer-parah-25",
+  "page": 183,
+  "how": "the reader's fix",
+  "was": "اَحَبَّ الْعَمِلِ",
+  "now": "أَحَبَّ الْعَمَلِ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P194-001",
+  "book": "tafaseer-parah-25",
+  "page": 194,
+  "how": "mushaf 45:9",
+  "was": "شَيْئَا ِۨاتَّخَذَهَا",
+  "now": "شَيْــًٔـا اۨتَّخَذَهَا"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P203-002",
+  "book": "tafaseer-parah-25",
+  "page": 203,
+  "how": "inside a block of Arabic",
+  "was": "فرمایا:ثُمَّ",
+  "now": "فرمایا: ثُمَّ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P210-002",
+  "book": "tafaseer-parah-25",
+  "page": 210,
+  "how": "mushaf 45:22",
+  "was": "حَقِّ وَلِتُجْزٰی",
+  "now": "بِالْحَقِّ وَلِتُجْزٰى"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P91-001",
+  "book": "tafaseer-parah-25",
+  "page": 91,
+  "how": "mushaf 53:17",
+  "was": "مَازَاغَ الْبَصَرُ وَمَاطَغٰی",
+  "now": "مَا زَاغَ الْبَصَرُ وَمَا طَغٰى"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P107-001",
+  "book": "tafaseer-parah-26",
+  "page": 107,
+  "how": "mushaf 47:37",
+  "was": "فرمایا: یَّسْـَٔلْكُمُوْهَا",
+  "now": "فرمایا: اِنْ يَّسْـَٔــلْكُمُوْهَا"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P13-002",
+  "book": "tafaseer-parah-26",
+  "page": 13,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "عجب الذنب",
+  "now": "عَجْبُ الذَّنَب"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P193-003",
+  "book": "tafaseer-parah-26",
+  "page": 193,
+  "how": "the reader's fix",
+  "was": "رب العٰلمین",
+  "now": "رب العالمین"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P220-003",
+  "book": "tafaseer-parah-26",
+  "page": 220,
+  "how": "the reader's fix",
+  "was": "حَدِيْدٌ۝۲۲ یقینا",
+  "now": "حَدِيْدٌ ﴿۲۲﴾ یقیناً"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P30-003",
+  "book": "tafaseer-parah-26",
+  "page": 30,
+  "how": "mushaf 46:12",
+  "was": "ظَلَمُوْا ڰ وَبُشْرٰى",
+  "now": "ظَلَمُوْا ۖ  وَبُشْرٰى"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P44-002",
+  "book": "tafaseer-parah-26",
+  "page": 44,
+  "how": "inside a block of Arabic",
+  "was": "قَالُوْٓا : کہنے لگے",
+  "now": "قَالُوْٓا: کہنے لگے"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P44-003",
+  "book": "tafaseer-parah-26",
+  "page": 44,
+  "how": "inside a block of Arabic",
+  "was": "ہم کو ہمارے معبودوں سے پھیر دو۔ اگر سچے ہو",
+  "now": "ہم کو ہمارے معبودوں سے پھیر دو؟ اگر سچے ہو"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P46-003",
+  "book": "tafaseer-parah-26",
+  "page": 46,
+  "how": "mushaf 46:24",
+  "was": "بَلْ هُوَمَا اسْتَعْجَلْتُمْ",
+  "now": "بَلْ هُوَ مَا اسْتَعْجَلْتُمْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P53-003",
+  "book": "tafaseer-parah-26",
+  "page": 53,
+  "how": "the reader's fix",
+  "was": "۝۲۹",
+  "now": "﴿۲۹﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P61-001",
+  "book": "tafaseer-parah-26",
+  "page": 61,
+  "how": "inside a block of Arabic",
+  "was": "الْفٰسِقُوْنَ۝۳۵",
+  "now": "الْفٰسِقُوْنَ ﴿۳۵﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-26-P62-002",
+  "book": "tafaseer-parah-26",
+  "page": 62,
+  "how": "mushaf 47:4",
+  "was": "اَوْزَارَھَا ڔ ذٰلِکَ ڔ",
+  "now": "اَوْزَارَهَا ۛۚ  ذٰ لِكَ ۛؕ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P16-001",
+  "book": "tafaseer-parah-27",
+  "page": 16,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "سورۃ الذٰریٰت",
+  "now": "سورۃ الذّٰریٰت"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P164-002",
+  "book": "tafaseer-parah-27",
+  "page": 164,
+  "how": "mushaf 24:35",
+  "was": "نورٌ علی نور",
+  "now": "نُوْرٌ عَلٰى نُوْرٍ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P175-004",
+  "book": "tafaseer-parah-27",
+  "page": 175,
+  "how": "mushaf 57:3",
+  "was": "هُوَالْاَوَّلُ",
+  "now": "هُوَ الْاَوَّلُ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P176-005",
+  "book": "tafaseer-parah-27",
+  "page": 176,
+  "how": "the reader's fix",
+  "was": "'كُنْ' ہو جا اور فَيَكُوْنَ",
+  "now": "‘كُنْ’ (ہو جا) اور فَيَكُوْنُ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P19-004",
+  "book": "tafaseer-parah-27",
+  "page": 19,
+  "how": "inside a block of Arabic",
+  "was": "الْمُؤْمِنِيْنَ ۳۵",
+  "now": "الْمُؤْمِنِيْنَ ﴿۳۵﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P207-002",
+  "book": "tafaseer-parah-27",
+  "page": 207,
+  "how": "mushaf 27:40",
+  "was": "ھذا من فضل ربی",
+  "now": "هٰذَا مِنْ فَضْلِ رَبِّىْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P209-002",
+  "book": "tafaseer-parah-27",
+  "page": 209,
+  "how": "mushaf 57:24",
+  "was": "بِالْبُخْلِ ط وَمَنْ",
+  "now": "بِالْبُخْلِؕ وَمَنْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P10-003",
+  "book": "tafaseer-parah-28",
+  "page": 10,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "حُسنٰی",
+  "now": "حُسنیٰ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P106-004",
+  "book": "tafaseer-parah-28",
+  "page": 106,
+  "how": "mushaf 59:1",
+  "was": "وَھُوَالْعَزِیْزُ",
+  "now": "وَهُوَ الْعَزِيْزُ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P107-003",
+  "book": "tafaseer-parah-28",
+  "page": 107,
+  "how": "inside a block of Arabic",
+  "was": "اَجۡسَامُهُمۡ قَبۡلَ الۡقُبُوۡرِ قُبُوۡرُهُمۡ",
+  "now": "أَجْسَامُهُمْ قَبْلَ الْقُبُورِ قُبُورُهُمْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P116-001",
+  "book": "tafaseer-parah-28",
+  "page": 116,
+  "how": "mushaf 9:33",
+  "was": "هُوَالَّذِیْٓ",
+  "now": "هُوَ الَّذِىْۤ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P124-001",
+  "book": "tafaseer-parah-28",
+  "page": 124,
+  "how": "mushaf 61:14",
+  "was": "وَ كَفَرَتْ",
+  "now": "وَكَفَرَتْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P127-005",
+  "book": "tafaseer-parah-28",
+  "page": 127,
+  "how": "mushaf 62:2",
+  "was": "هُوَالَّذِيْ",
+  "now": "هُوَ الَّذِىْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P145-002",
+  "book": "tafaseer-parah-28",
+  "page": 145,
+  "how": "inside a block of Arabic",
+  "was": "ۚ﴿۱﴾",
+  "now": "ۚ ﴿۱﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P174-002",
+  "book": "tafaseer-parah-28",
+  "page": 174,
+  "how": "mushaf 64:10",
+  "was": "وَ كَذَّبُوْا",
+  "now": "وَكَذَّبُوْا"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P187-002",
+  "book": "tafaseer-parah-28",
+  "page": 187,
+  "how": "the reader's fix",
+  "was": "اَمْرًا①",
+  "now": "اَمْرًا ①"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P204-002",
+  "book": "tafaseer-parah-28",
+  "page": 204,
+  "how": "mushaf 66:4",
+  "was": "ھُوَمَوْلٰہُ",
+  "now": "هُوَ مَوْلٰٮهُ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P211-002",
+  "book": "tafaseer-parah-28",
+  "page": 211,
+  "how": "inside a block of Arabic",
+  "was": "لِيَسْاَلْ",
+  "now": "لِيَسْأَلْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P216-001",
+  "book": "tafaseer-parah-28",
+  "page": 216,
+  "how": "inside a block of Arabic",
+  "was": "يٰۤاَيُّهَا الَّذِيْنَ اٰمَنُوْا تُوْبُوْۤا اِلَى اللهِ تَوْبَةً نَّصُوْحًا ؕ عَسٰى رَبُّكُمْ اَنْ يُّكَفِّرَ عَنْكُمْ سَيِّاٰتِكُمْ وَيُدْخِلَكُمْ جَنّٰتٍ تَجْرِيْ مِنْ تَحْتِهَا الْاَنْهٰرُ ۙ يَوْمَ لَا يُخْزِى اللهُ النَّبِيَّ وَالَّذِيْنَ اٰمَنُوْا مَعَهٗ ۚ نُوْرُهُمْ يَسْعٰى بَيْنَ اَيْدِيْهِمْ وَبِاَيْمَانِهِمْ يَقُوْلُوْنَ رَبَّنَاۤ اَتْمِمْ لَنَا نُوْرَنَا وَاغْفِرْ لَنَا ۚ اِنَّكَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ ۸ يٰۤاَيُّهَا النَّبِيُّ جَاهِدِ الْكُفَّارَ وَالْمُنٰفِقِيْنَ وَاغْلُظْ عَلَيْهِمْ ؕ وَمَاْوٰىهُمْ جَهَنَّمُ ؕ وَبِئْسَ الْمَصِيْرُ ۹ ضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ كَفَرُوا امْرَاَتَ نُوْحٍ وَّامْرَاَتَ لُوْطٍ ؕ كَانَتَا تَحْتَ عَبْدَيْنِ مِنْ عِبَادِنَا صَالِحَيْنِ فَخَانَتٰهُمَا فَلَمْ يُغْنِيَا عَنْهُمَا مِنَ اللهِ شَيْـًٔا وَّقِيْلَ ادْخُلَا النَّارَ مَعَ الدّٰخِلِيْنَ ۱۰ وَضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ اٰمَنُوا امْرَاَتَ فِرْعَوْنَ ۘ اِذْ قَالَتْ رَبِّ ابْنِ لِيْ عِنْدَكَ بَيْتًا فِي الْجَنَّةِ وَنَجِّنِيْ مِنْ فِرْعَوْنَ وَعَمَلِهٖ وَنَجِّنِيْ مِنَ الْقَوْمِ الظّٰلِمِيْنَ ۱۱ وَمَرْيَمَ ابْنَتَ عِمْرٰنَ الَّتِيْۤ اَحْصَنَتْ فَرْجَهَا فَنَفَخْنَا فِيْهِ مِنْ رُّوْحِنَا وَصَدَّقَتْ بِكَلِمٰتِ رَبِّهَا وَكُتُبِهٖ وَكَانَتْ مِنَ الْقٰنِتِيْنَ ۱۲",
+  "now": "يٰۤاَيُّهَا الَّذِيْنَ اٰمَنُوْا تُوْبُوْۤا اِلَى اللهِ تَوْبَةً نَّصُوْحًا ؕ عَسٰى رَبُّكُمْ اَنْ يُّكَفِّرَ عَنْكُمْ سَيِّاٰتِكُمْ وَيُدْخِلَكُمْ جَنّٰتٍ تَجْرِيْ مِنْ تَحْتِهَا الْاَنْهٰرُ ۙ يَوْمَ لَا يُخْزِى اللهُ النَّبِيَّ وَالَّذِيْنَ اٰمَنُوْا مَعَهٗ ۚ نُوْرُهُمْ يَسْعٰى بَيْنَ اَيْدِيْهِمْ وَبِاَيْمَانِهِمْ يَقُوْلُوْنَ رَبَّنَاۤ اَتْمِمْ لَنَا نُوْرَنَا وَاغْفِرْ لَنَا ۚ اِنَّكَ عَلٰى كُلِّ شَيْءٍ قَدِيْرٌ ﴿۸﴾ يٰۤاَيُّهَا النَّبِيُّ جَاهِدِ الْكُفَّارَ وَالْمُنٰفِقِيْنَ وَاغْلُظْ عَلَيْهِمْ ؕ وَمَاْوٰىهُمْ جَهَنَّمُ ؕ وَبِئْسَ الْمَصِيْرُ ﴿۹﴾ ضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ كَفَرُوا امْرَاَتَ نُوْحٍ وَّامْرَاَتَ لُوْطٍ ؕ كَانَتَا تَحْتَ عَبْدَيْنِ مِنْ عِبَادِنَا صَالِحَيْنِ فَخَانَتٰهُمَا فَلَمْ يُغْنِيَا عَنْهُمَا مِنَ اللهِ شَيْـًٔا وَّقِيْلَ ادْخُلَا النَّارَ مَعَ الدّٰخِلِيْنَ ﴿۱۰﴾ وَضَرَبَ اللهُ مَثَلًا لِّلَّذِيْنَ اٰمَنُوا امْرَاَتَ فِرْعَوْنَ ۘ اِذْ قَالَتْ رَبِّ ابْنِ لِيْ عِنْدَكَ بَيْتًا فِي الْجَنَّةِ وَنَجِّنِيْ مِنْ فِرْعَوْنَ وَعَمَلِهٖ وَنَجِّنِيْ مِنَ الْقَوْمِ الظّٰلِمِيْنَ ﴿۱۱﴾ وَمَرْيَمَ ابْنَتَ عِمْرٰنَ الَّتِيْۤ اَحْصَنَتْ فَرْجَهَا فَنَفَخْنَا فِيْهِ مِنْ رُّوْحِنَا وَصَدَّقَتْ بِكَلِمٰتِ رَبِّهَا وَكُتُبِهٖ وَكَانَتْ مِنَ الْقٰنِتِيْنَ ﴿۱۲﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P28-003",
+  "book": "tafaseer-parah-28",
+  "page": 28,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "اسام علیکم",
+  "now": "السام علیکم"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P35-001",
+  "book": "tafaseer-parah-28",
+  "page": 35,
+  "how": "inside a block of Arabic",
+  "was": "تَعْمَلُوْنَ۝۱۳",
+  "now": "تَعْمَلُوْنَ ۝۱۳"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P52-005",
+  "book": "tafaseer-parah-28",
+  "page": 52,
+  "how": "mushaf 59:2",
+  "was": "هُوَالَّذِيْٓ",
+  "now": "هُوَ الَّذِىْۤ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P76-001",
+  "book": "tafaseer-parah-28",
+  "page": 76,
+  "how": "inside a block of Arabic",
+  "was": "الْفٰسِقُوْنَ﴿۱۹﴾",
+  "now": "الْفٰسِقُوْنَ ﴿۱۹﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P79-001",
+  "book": "tafaseer-parah-28",
+  "page": 79,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "حُسنٰی ،اللہ",
+  "now": "حُسنیٰ، اللہ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P79-002",
+  "book": "tafaseer-parah-28",
+  "page": 79,
+  "how": "mushaf 59:22",
+  "was": "هُوَاللهُ",
+  "now": "هُوَ اللّٰهُ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P97-005",
+  "book": "tafaseer-parah-28",
+  "page": 97,
+  "how": "mushaf 60:8",
+  "was": "یُقَاتِلُوْ کُمْ",
+  "now": "يُقَاتِلُوْكُمْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P97-006",
+  "book": "tafaseer-parah-28",
+  "page": 97,
+  "how": "mushaf 60:8",
+  "was": "یُخْرِ جُوْ کُمْ",
+  "now": "يُخْرِجُوْكُمْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P97-007",
+  "book": "tafaseer-parah-28",
+  "page": 97,
+  "how": "mushaf 60:8",
+  "was": "دِیَارِ کُمْ",
+  "now": "دِيَارِكُمْ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P114-003",
+  "book": "tafaseer-parah-29",
+  "page": 114,
+  "how": "the reader's fix",
+  "was": "توبہ کر لی اللہ نے",
+  "now": "توبہ کر لی، اللہ نے"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P145-002",
+  "book": "tafaseer-parah-29",
+  "page": 145,
+  "how": "mushaf 72:19",
+  "was": "عَبْدُاللّٰهِ",
+  "now": "عَبْدُ اللّٰهِ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P146-003",
+  "book": "tafaseer-parah-29",
+  "page": 146,
+  "how": "the reader's fix",
+  "was": "اَحَدًا۝۲۰",
+  "now": "اَحَدًا ﴿۲۰﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P152-003",
+  "book": "tafaseer-parah-29",
+  "page": 152,
+  "how": "inside a block of Arabic",
+  "was": "عَدَدًا﴿۲۴﴾",
+  "now": "عَدَدًا ﴿۲۴﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P153-002",
+  "book": "tafaseer-parah-29",
+  "page": 153,
+  "how": "the reader's fix",
+  "was": "مَاغَابَ عَنِ الْحَوَاس",
+  "now": "مَا غَابَ عَنِ الْحَوَاسِّ"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P16-002",
+  "book": "tafaseer-parah-29",
+  "page": 16,
+  "how": "inside a block of Arabic",
+  "was": "ۙ﴿۱﴾",
+  "now": "ۙ ﴿۱﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P19-002",
+  "book": "tafaseer-parah-29",
+  "page": 19,
+  "how": "inside a block of Arabic",
+  "was": "الْغَفُوْرُ ۲",
+  "now": "الْغَفُوْرُ ﴿۲﴾"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P35-002",
+  "book": "tafaseer-parah-29",
+  "page": 35,
+  "how": "mushaf 67:23",
+  "was": "هُوَالَّذِيْٓ",
+  "now": "هُوَ الَّذِىْۤ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-11-P165-001",
+  "book": "tafaseer-parah-11",
+  "page": 165,
+  "how": "words of the Qur'an, typed bare",
+  "was": "محمد رسول ﷺ اللہ کا متبع ہو",
+  "now": "محمد رسول اللہ ﷺ کا متبع ہو"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-11-P262-004",
+  "book": "tafaseer-parah-11",
+  "page": 262,
+  "how": "words of the Qur'an, typed bare",
+  "was": "ہمیں محمد رسول ﷺ نے بتایا",
+  "now": "ہمیں محمد رسول اللہ ﷺ نے بتایا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-11-P284-002",
+  "book": "tafaseer-parah-11",
+  "page": 284,
+  "how": "the reader's fix",
+  "was": "اَفَاَنْتَ تُکْرِهُ النَّاسَ حَتّٰی یَکُوْنُوْا مُؤْمِنِیْنَ99 تو کیا لوگوں سے زبردستی منوا سکتے ہیں۔",
+  "now": "اَفَاَنْتَ تُکْرِهُ النَّاسَ حَتّٰی یَکُوْنُوْا مُؤْمِنِیْنَ ﴿99﴾ تو کیا لوگوں سے زبردستی منوا سکتے ہیں؟"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-11-P288-003",
+  "book": "tafaseer-parah-11",
+  "page": 288,
+  "how": "words of the Qur'an, typed bare",
+  "was": "محمد رسول ﷺ کے حکم کے مطابق",
+  "now": "محمد رسول اللہ ﷺ کے حکم کے مطابق"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-11-P297-003",
+  "book": "tafaseer-parah-11",
+  "page": 297,
+  "how": "words of the Qur'an, typed bare",
+  "was": "بعثت محمد رسول ﷺ کی صورت میں",
+  "now": "بعثتِ محمد رسول اللہ ﷺ کی صورت میں"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-11-P301-004",
+  "book": "tafaseer-parah-11",
+  "page": 301,
+  "how": "the reader's fix",
+  "was": "تو نور ”علی نور ہے۔",
+  "now": "تو نورٌ علیٰ نور ہے۔"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-11-P50-003",
+  "book": "tafaseer-parah-11",
+  "page": 50,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "اوکمال قال رسول اللہ",
+  "now": "او کما قال رسول اللہ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P39-001",
+  "book": "tafaseer-parah-12",
+  "page": 39,
+  "how": "words of the Qur'an, typed bare",
+  "was": "ایک گواہ ہے محمد رسول صلی اللہ علیہ وسلم۔",
+  "now": "ایک گواہ ہے، محمد رسول اللہ صلی اللہ علیہ وسلم۔"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P49-001",
+  "book": "tafaseer-parah-12",
+  "page": 49,
+  "how": "inside a block of Arabic",
+  "was": "اَنْظُرُ أَلَى اَهْلِ النَّار",
+  "now": "اَنْظُرُ إِلَى اَهْلِ النَّار"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-12-P97-001",
+  "book": "tafaseer-parah-12",
+  "page": 97,
+  "how": "mushaf 11:61",
+  "was": "وَاسْتَعْمَرَ کُمْ فِیْهَا",
+  "now": "وَاسْتَعْمَرَكُمْ فِيْهَا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P128-003",
+  "book": "tafaseer-parah-13",
+  "page": 128,
+  "how": "mushaf 13:37",
+  "was": "وَ كَذٰلِكَ اَنْزَلْنٰهُ",
+  "now": "وَكَذٰلِكَ اَنْزَلْنٰهُ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P135-002",
+  "book": "tafaseer-parah-13",
+  "page": 135,
+  "how": "mushaf 22:47",
+  "was": "اِنَّ يَوْمًا عِنْدَ رَبِّكَ كَاَلْفِ",
+  "now": "وَاِنَّ يَوْمًا عِنْدَ رَبِّكَ كَاَ لْفِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P141-001",
+  "book": "tafaseer-parah-13",
+  "page": 141,
+  "how": "mushaf 14:5",
+  "was": "بِاَيّٰىمِ اللهِ",
+  "now": "بِاَيّٰٮمِ اللّٰهِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P151-004",
+  "book": "tafaseer-parah-13",
+  "page": 151,
+  "how": "mushaf 14:2",
+  "was": "وَ مَا فِی الْاَرْضِ",
+  "now": "وَمَا فِى الْاَرْضِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P155-001",
+  "book": "tafaseer-parah-13",
+  "page": 155,
+  "how": "mushaf 14:5",
+  "was": "وَذَكِّرْهُمْ بِاَيّٰىمِ اللّٰهِ",
+  "now": "وَذَكِّرْهُمْ بِاَيّٰٮمِ اللّٰهِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P161-004",
+  "book": "tafaseer-parah-13",
+  "page": 161,
+  "how": "mushaf 14:10",
+  "was": "فَاطِرِ السَّمٰوٰتِ وَ الْاَرْضِ",
+  "now": "فَاطِرِ السَّمٰوٰتِ وَالْاَرْضِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P167-001",
+  "book": "tafaseer-parah-13",
+  "page": 167,
+  "how": "mushaf 14:12",
+  "was": "وَ لَنَصْبِرَنَّ عَلٰى مَآ اٰذَيْتُمُوْنَا",
+  "now": "وَلَــنَصْبِرَنَّ عَلٰى مَاۤ اٰذَيْتُمُوْنَا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P199-001",
+  "book": "tafaseer-parah-13",
+  "page": 199,
+  "how": "mushaf 14:41",
+  "was": "رَبَّنَا اغْفِرْلِیْ وَلِوَالِدَیَّ",
+  "now": "رَبَّنَا اغْفِرْ لِىْ وَلـِوَالِدَىَّ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P208-003",
+  "book": "tafaseer-parah-13",
+  "page": 208,
+  "how": "mushaf 14:41",
+  "was": "رَبَّنَا اغْفِرْلِيْ",
+  "now": "رَبَّنَا اغْفِرْ لِىْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P92-003",
+  "book": "tafaseer-parah-13",
+  "page": 92,
+  "how": "mushaf 13:14",
+  "was": "وَمَا هُوَبِبَالِغِهٖ",
+  "now": "وَمَا هُوَ بِبَالِـغِهٖ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-13-P93-001",
+  "book": "tafaseer-parah-13",
+  "page": 93,
+  "how": "mushaf 13:15",
+  "was": "طَوْعًاوَّ كَرْهًا",
+  "now": "طَوْعًا وَّكَرْهًا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-14-P137-002",
+  "book": "tafaseer-parah-14",
+  "page": 137,
+  "how": "inside a block of Arabic",
+  "was": "اخْتَلَفُوْا فِيْهِ----",
+  "now": "اخْتَلَفُوْا فِيْهِ …"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-14-P175-001",
+  "book": "tafaseer-parah-14",
+  "page": 175,
+  "how": "inside a block of Arabic",
+  "was": "يَعِظُكُمْ لَعَلَّكُمْ تَذَكَّرُوْنَ ۞",
+  "now": "يَعِظُكُمْ لَعَلَّكُمْ تَذَكَّرُوْنَ ﴿۹۰﴾"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-14-P76-001",
+  "book": "tafaseer-parah-14",
+  "page": 76,
+  "how": "mushaf 16:10",
+  "was": "هُوَالَّذِیْٓ اَنْزَلَ",
+  "now": "هُوَ الَّذِىْۤ اَنْزَلَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-14-P86-001",
+  "book": "tafaseer-parah-14",
+  "page": 86,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "اِلٰہ واحد ہی مستحق عبادت ہے:",
+  "now": "اِلٰہِ واحد ہی مستحقِ عبادت ہے:"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-14-P90-001",
+  "book": "tafaseer-parah-14",
+  "page": 90,
+  "how": "an Arabic phrase, hadith or word being explained",
+  "was": "بدا کے لغوی معنی ہیں",
+  "now": "بَدْع کے لغوی معنی ہیں"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-14-P90-002",
+  "book": "tafaseer-parah-14",
+  "page": 90,
+  "how": "the reader's fix",
+  "was": "عَلَيْكُمْ بِسُنَّتِي وَ سُنَّتِ الْخُلَفَاءِ",
+  "now": "عَلَيْكُمْ بِسُنَّتِي وَسُنَّتِ الْخُلَفَاءِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P124-002",
+  "book": "tafaseer-parah-15",
+  "page": 124,
+  "how": "mushaf 17:96",
+  "was": "بَيْنِىْ وَبَيْنَكُمْ ط اِنَّهٗ",
+  "now": "بَيْنِىْ وَبَيْنَكُمْؕ اِنَّهٗ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P157-001",
+  "book": "tafaseer-parah-15",
+  "page": 157,
+  "how": "mushaf 28:10",
+  "was": "لَوْلَآ اَنْ رَّبَطْنَا عَلٰى قُلُوْبِهِمْ",
+  "now": "لَوْلَاۤ اَنْ رَّبَطْنَا عَلٰى قَلْبِهَا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P167-002",
+  "book": "tafaseer-parah-15",
+  "page": 167,
+  "how": "mushaf 18:22",
+  "was": "قَلِيْلٌ ڣ فَلَا",
+  "now": "قَلِيْلٌ فَلَا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P195-004",
+  "book": "tafaseer-parah-15",
+  "page": 195,
+  "how": "mushaf 18:39",
+  "was": "ماشاء اللہ لاقوۃ الا باللہ",
+  "now": "مَا شَآءَ اللّٰهُ ۙ لَا قُوَّةَ اِلَّا بِاللّٰهِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P217-002",
+  "book": "tafaseer-parah-15",
+  "page": 217,
+  "how": "mushaf 18:54",
+  "was": "مَثَلٍ ط وَکَانَ",
+  "now": "مَثَلٍ ؕ وَكَانَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P225-001",
+  "book": "tafaseer-parah-15",
+  "page": 225,
+  "how": "mushaf 18:58",
+  "was": "ذُوالرَّحْمَةِ",
+  "now": "ذُوْ الرَّحْمَةِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-15-P45-002",
+  "book": "tafaseer-parah-15",
+  "page": 45,
+  "how": "the reader's fix",
+  "was": "اَنْتَ وَ مَالَكَ لِاَبِيكَ",
+  "now": "أَنْتَ وَمَالُكَ لِأَبِيكَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P103-001",
+  "book": "tafaseer-parah-16",
+  "page": 103,
+  "how": "the reader's fix",
+  "was": "بَلِّغُوا عَنِّي وَلَوْ اٰيَۃً اوکما قال",
+  "now": "بَلِّغُوا عَنِّي وَلَوْ آيَةً۔ اَوْ کَمَا قَالَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P144-001",
+  "book": "tafaseer-parah-16",
+  "page": 144,
+  "how": "mushaf 18:19",
+  "was": "اَحَدَ کُمْ",
+  "now": "اَحَدَكُمْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P15-003",
+  "book": "tafaseer-parah-16",
+  "page": 15,
+  "how": "mushaf 18:80",
+  "was": "طُغْیَانًا وَّ کُفْرًا",
+  "now": "طُغْيَانًا وَّكُفْرًا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P177-002",
+  "book": "tafaseer-parah-16",
+  "page": 177,
+  "how": "mushaf 20:55",
+  "was": "نُعِيْدُ كُمْ",
+  "now": "نُعِيْدُكُمْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P216-002",
+  "book": "tafaseer-parah-16",
+  "page": 216,
+  "how": "mushaf 20:96",
+  "was": "وَ كَذٰلِكَ",
+  "now": "وَكَذٰلِكَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P228-001",
+  "book": "tafaseer-parah-16",
+  "page": 228,
+  "how": "mushaf 20:113",
+  "was": "وَ كَذٰلِكَ اَنْزَلْنٰهُ",
+  "now": "وَكَذٰلِكَ اَنْزَلْنٰهُ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P260-001",
+  "book": "tafaseer-parah-16",
+  "page": 260,
+  "how": "mushaf 20:134",
+  "was": "لَوْ لَآ اَرْسَلْتَ",
+  "now": "لَوْلَاۤ اَرْسَلْتَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-16-P62-002",
+  "book": "tafaseer-parah-16",
+  "page": 62,
+  "how": "mushaf 19:23",
+  "was": "قَالَتْ يٰلَيْتَنِيْ مِتُّ قَبْلَ هٰذَا وَ كُنْتُ",
+  "now": "قَالَتْ يٰلَيْتَنِىْ مِتُّ قَبْلَ هٰذَا وَكُنْتُ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-17-P158-001",
+  "book": "tafaseer-parah-17",
+  "page": 158,
+  "how": "mushaf 22:16",
+  "was": "وَ كَذٰلِكَ اَنْزَلْنٰهُ",
+  "now": "وَكَذٰلِكَ اَنْزَلْنٰهُ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-17-P280-002",
+  "book": "tafaseer-parah-17",
+  "page": 280,
+  "how": "mushaf 22:78",
+  "was": "کامِلَّةَ اَبِيْكُمْ",
+  "now": "مِلَّةَ اَبِيْكُمْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-17-P282-001",
+  "book": "tafaseer-parah-17",
+  "page": 282,
+  "how": "mushaf 22:78",
+  "was": "هُوَمَوْلٰـكُمْ",
+  "now": "هُوَ مَوْلٰٮكُمْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-17-P97-001",
+  "book": "tafaseer-parah-17",
+  "page": 97,
+  "how": "the reader's fix",
+  "was": "لَايَقْعُدُ قَوْمٌ يَذْكُرُوْنَ اللهَ اِلَّاحَفَّتْهُمُ",
+  "now": "لَا يَقْعُدُ قَوْمٌ يَذْكُرُونَ اللّٰهَ إِلَّا حَفَّتْهُمُ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-18-P105-001",
+  "book": "tafaseer-parah-18",
+  "page": 105,
+  "how": "mushaf 23:97",
+  "was": "اَعُوْذُبِكَ مِنْ هَمَزٰتِ",
+  "now": "اَعُوْذُ بِكَ مِنْ هَمَزٰتِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-18-P130-001",
+  "book": "tafaseer-parah-18",
+  "page": 130,
+  "how": "words of the Qur'an, typed bare",
+  "was": "صحابہ رضی اللہ عنہا نے سمجھا",
+  "now": "صحابہ رضی اللہ عنہم نے سمجھا"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-18-P246-001",
+  "book": "tafaseer-parah-18",
+  "page": 246,
+  "how": "the reader's fix",
+  "was": "وَ تَصْدِيْقٌ بِالْقَلْبُ",
+  "now": "وَتَصْدِيقٌ بِالْقَلْبِ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-19-P136-001",
+  "book": "tafaseer-parah-19",
+  "page": 136,
+  "how": "mushaf 26:105",
+  "was": "نُوْحِ ﹰالْمُرْسَلِيْنَ",
+  "now": "نُوْحِ ۨالْمُرْسَلِيْنَ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-19-P145-001",
+  "book": "tafaseer-parah-19",
+  "page": 145,
+  "how": "mushaf 11:6",
+  "was": "وَمَامِنْ دَآبَّةٍ",
+  "now": "وَمَا مِنْ دَآ بَّةٍ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-19-P187-001",
+  "book": "tafaseer-parah-19",
+  "page": 187,
+  "how": "mushaf 17:85",
+  "was": "قل الروح من امرِ ربّی",
+  "now": "قُلِ الرُّوْحُ مِنْ اَمْرِ رَبِّىْ"
+ },
+ {
+  "id": "TEAM-middle-tafaseer-parah-19-P37-001",
+  "book": "tafaseer-parah-19",
+  "page": 37,
+  "how": "the reader's fix",
+  "was": "لَمۡ تَرَقَّطُ عَيۡنِيۡ",
+  "now": "لَمْ تَرَ قَطُّ عَيْنِيْ"
  },
  {
   "id": "UR-ASRAR-FAATIHA-004",
@@ -80,6 +1737,14 @@
   "now": "محمد رسول اللہ"
  },
  {
+  "id": "UR-HAYYAT1-P432-439001",
+  "book": "book-hayyat-e-tayyabah-i",
+  "page": 433,
+  "how": "inside a block of Arabic",
+  "was": "صفحہ 52' نسائی شریف",
+  "now": "صفحہ 52، نسائی شریف"
+ },
+ {
   "id": "UR-HAYYAT1-P504-511014",
   "book": "book-hayyat-e-tayyabah-i",
   "page": 510,
@@ -96,12 +1761,36 @@
   "now": "والسلام علیکم ورحمة الله وبرکاته''"
  },
  {
+  "id": "UR-KANOOZ-P66-69-002",
+  "book": "uploads-books-kanooz-e-dil-urdu",
+  "page": 67,
+  "how": "inside a block of Arabic",
+  "was": "الکھف",
+  "now": "الکہف"
+ },
+ {
   "id": "UR-NAQ-P153-156-001",
   "book": "uploads-books-naqoosh-e-haq",
   "page": 153,
   "how": "the reader's fix",
   "was": "محمد ارسول اللہ ﷺ",
   "now": "محمد رسول اللہ ﷺ"
+ },
+ {
+  "id": "UR-NAQ-P233-236-002",
+  "book": "uploads-books-naqoosh-e-haq",
+  "page": 233,
+  "how": "words of the Qur'an, typed bare",
+  "was": "محمد الرسول اللہ ﷺ کی ہر ادا",
+  "now": "محمد رسول اللہ ﷺ کی ہر ادا"
+ },
+ {
+  "id": "UR-NAQ-P93-96-002",
+  "book": "uploads-books-naqoosh-e-haq",
+  "page": 94,
+  "how": "words of the Qur'an, typed bare or given vowels",
+  "was": "رب اللعالمین",
+  "now": "رب العالمین"
  },
  {
   "id": "UR-NISBAT-P175-181-007",
@@ -126,6 +1815,14 @@
   "how": "mushaf 57:4",
   "was": "اَیْنَ مَاکُنْتُمْ",
   "now": "اَيْنَ مَا كُنْتُمْ"
+ },
+ {
+  "id": "UR-NISBAT-P241-248-007",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 244,
+  "how": "inside a block of Arabic",
+  "was": "(آلعمران)",
+  "now": "(آل عمران)"
  },
  {
   "id": "UR-NISBAT-P343-351-013",
@@ -352,6 +2049,14 @@
   "now": "اِلَّا عِبَادَكَ مِنْهُمُ الْمُخْلَصِيْنَ"
  },
  {
+  "id": "UR-PASANFAS-102",
+  "book": "book-ocr-zikr-pas-anfas",
+  "page": 3,
+  "how": "inside a block of Arabic",
+  "was": "رحمتہ اللہ تعالیٰ",
+  "now": "رحمۃ اللہ تعالیٰ"
+ },
+ {
   "id": "UR-ROOH-008",
   "book": "book-ocr-haqiqat-e-rooh",
   "page": 7,
@@ -374,5 +2079,21 @@
   "how": "the reader's fix",
   "was": "نور'' علیٰ نور",
   "now": "نور علیٰ نور"
+ },
+ {
+  "id": "UR-ZIKRALLAH-008",
+  "book": "book-ocr-zikr-allah",
+  "page": 23,
+  "how": "inside a block of Arabic",
+  "was": "(۴۳)",
+  "now": "(۳۳)"
+ },
+ {
+  "id": "UR-ZIKRALLAH-009",
+  "book": "book-ocr-zikr-allah",
+  "page": 23,
+  "how": "inside a block of Arabic",
+  "was": "(۴۴)",
+  "now": "(۳۴)"
  }
 ]
