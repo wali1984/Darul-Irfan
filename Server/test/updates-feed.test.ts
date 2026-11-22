@@ -186,6 +186,15 @@ describe("wholeWords", () => {
     expect(() => encodeURIComponent(solid)).not.toThrow();
   });
 
+  it("keeps a flag's two letters and an emoji's skin tone together", () => {
+    // Each is two characters; the cut at 99 would fall between them.
+    const flag = "\u{1F1F5}\u{1F1F0}"; const hand = "\u{1F44D}\u{1F3FD}";
+    expect(wholeWords(flag.repeat(80), 100)).toBe(`${flag.repeat(49)}…`);
+    expect(wholeWords(hand.repeat(80), 100)).toBe(`${hand.repeat(49)}…`);
+    // A cut that already falls between two flags stays where it is.
+    expect(wholeWords(`x${flag.repeat(80)}`, 100)).toBe(`x${flag.repeat(49)}…`);
+  });
+
   it("cuts inside one very long word rather than throwing most of the text away, keeping a letter's marks with it", () => {
     expect(wholeWords(`Hi ${"x".repeat(200)}`, 100)).toBe(`Hi ${"x".repeat(96)}…`);
     // The mark after the 9th letter would be the first character cut off.

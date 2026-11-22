@@ -28,7 +28,14 @@ export const wholeWords = (text: string, max: number): string => {
     // (one very long word, a link): then the cut falls inside the word, but
     // never between a letter and the marks that belong to it.
     if (space >= Math.floor(end / 2)) end = space;
-    else while (end > 1 && (/^[\p{M}\u200d\ufe0f]$/u.test(characters[end] ?? "") || characters[end - 1] === "\u200d")) end -= 1;
+    else {
+      // A mark, a joiner or an emoji's skin tone stays with what it follows.
+      while (end > 1 && (/^[\p{M}\u200d\ufe0f\u{1F3FB}-\u{1F3FF}]$/u.test(characters[end] ?? "") || characters[end - 1] === "\u200d")) end -= 1;
+      // A flag is two letters: an odd count before the cut is half a flag.
+      let flagLetters = 0;
+      while (flagLetters < end && /^[\u{1F1E6}-\u{1F1FF}]$/u.test(characters[end - 1 - flagLetters] ?? "")) flagLetters += 1;
+      if (flagLetters % 2 === 1 && end > 1) end -= 1;
+    }
   }
   const kept = characters.slice(0, end).join("");
   // Punctuation left hanging before the ellipsis goes with the cut.
