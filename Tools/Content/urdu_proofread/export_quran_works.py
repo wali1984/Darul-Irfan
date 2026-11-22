@@ -112,15 +112,17 @@ Written {datetime.now().strftime('%Y-%m-%d %H:%M')} New York time.
 {chr(10).join(table)}
 - asrar-at-tanzil, English: per ayah, as the app carries it (outside the Urdu proofreading).
 
-This is NOT the last copy: this folder is replaced as the remaining volumes and readings finish.
-STATUS.json says where each volume stands. A volume with "readThrough": false is partly uncorrected.
+Places of Arabic in the whole library still waiting for the owner's answer, as printed until then:
+{len(read_json(OUT / 'arabic-awaiting-approval.json'))}. This folder is replaced when they are answered.
+STATUS.json says where each volume stands and how many findings were left as printed.
+A volume with "readThrough": false is partly uncorrected.
 
 The mushaf itself is not here and is not changed. Arabic quoted inside the books is as printed,
-except the corrections the owner approved one by one (21 November 2026).
+except the corrections the owner approved or left to judgement (21 and 22 November 2026).
 [؟] marks a word that could not be read on the scan.
 
 Check a copy with: sha256sum -c SHA256SUMS
-The other books and publications are copied when their reading finishes.""".split("\n"))
+The other books and publications are in ../final-text-proofread.""".split("\n"))
 
     sums = [f"{hashlib.sha256((target / name).read_bytes()).hexdigest()}  {name}" for name in sorted(written)]
     (target / "SHA256SUMS").write_text("\n".join(sums) + "\n", encoding="utf-8", newline="\n")
