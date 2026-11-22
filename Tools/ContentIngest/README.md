@@ -122,8 +122,8 @@ mechanical gate is unchanged:
 
 - an item ingested **without** `--full-text --rights-confirmed` carries
   `rightsStatus: "linkOnly"` — metadata plus the source URL only, **no body
-  text** — and the app shows it with a "Read on naqshbandiaowaisiah.org"
-  link;
+  text**. The app does not gate on the value: it shows whatever text an
+  item carries;
 - `--full-text` alone is still refused; `--rights-confirmed` asserts the
   (now on-file) permission and marks items `permissionConfirmed`;
 - PDFs and MP3s are never bundled or re-hosted regardless of rights — the

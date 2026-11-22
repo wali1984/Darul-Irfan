@@ -6,7 +6,7 @@ import SwiftUI
 /// article body - opens as a book page (boards/Book.dc.html): a cover made in
 /// the Silsila's style, the title, author and chips, the gold "Keep reading"
 /// at the page it was left on, the text and the printed pages, keeping it on
-/// this phone, the rights line, and the excerpt and dates.
+/// this phone, and the excerpt and dates.
 ///
 /// Everything else - articles, pages, notices - keeps the
 /// metadata card, native reader, native image presentation,
@@ -559,7 +559,7 @@ struct ContentItemDetailView: View {
     }
 
     /// Keep it on this phone (the PDF downloaded for offline reading, with
-    /// every state a file row has), any further files, and the rights line.
+    /// every state a file row has), and any further files.
     @ViewBuilder
     private func keepOnPhonePanel(for item: ContentItem) -> some View {
         let primary = item.downloadUrls.first { $0.lowercased().hasSuffix(".pdf") }
