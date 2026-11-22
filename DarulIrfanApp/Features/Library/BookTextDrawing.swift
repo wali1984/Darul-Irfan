@@ -73,6 +73,10 @@ enum BookTextDrawing {
     static let overrideStart = "\u{202D}"
     static let overrideEnd = "\u{202C}"
 
+    /// WORD JOINER: no line breaks at it. One follows each sign and space
+    /// inside such a number, so that the number never takes two lines.
+    static let wordJoiner = "\u{2060}"
+
     private static let anyDigit = #"0-9٠-٩۰-۹"#
     /// Digit groups joined by a dash, slash or stop: a date when there are three.
     private static let threeGroups = pattern("(?<![\(anyDigit)])[\(anyDigit)]+(?:[ ]?[-/–.][ ]?[\(anyDigit)]+){2,}")
@@ -122,6 +126,8 @@ enum BookTextDrawing {
             if rises || (first.count == 4 && second.count == 2) { found.append(match.range) }
         }
 
+        // A number after the ayah sign stands inside its circle.
+        found.removeAll { $0.location > 0 && whole.character(at: $0.location - 1) == ayahSign }
         var tokens: [NSRange] = []
         for range in found.sorted(by: { $0.location < $1.location }) {
             if let last = tokens.last, range.location < NSMaxRange(last) {
@@ -147,29 +153,58 @@ enum BookTextDrawing {
         return false
     }
 
+    private static let ayahSign: unichar = 0x06DD
+    private static let noBreakSpace = "\u{00A0}"
+
+    /// A Western, Arabic-Indic or Urdu digit.
+    private static func isDigit(_ unit: unichar) -> Bool {
+        (0x30...0x39).contains(unit) || (0x0660...0x0669).contains(unit) || (0x06F0...0x06F9).contains(unit)
+    }
+
+    /// `text`'s words for measuring, where each such number is one word: it
+    /// never takes two lines.
+    static func unbrokenWords(of text: String) -> [String] {
+        let joined = NSMutableString(string: text)
+        for token in numberTokens(in: text) {
+            joined.replaceOccurrences(of: " ", with: noBreakSpace, options: .literal, range: token)
+        }
+        return (joined as String)
+            .split(whereSeparator: { $0.isWhitespace && String($0) != noBreakSpace })
+            .map(String.init)
+    }
+
     private static func holdsArabicIndicDigits(_ text: String) -> Bool {
         text.unicodeScalars.contains { (0x0660...0x0669).contains($0.value) }
     }
 
     /// `pieces` of one stretch of right-to-left text with each such number in
-    /// an isolate, for drawing only. Found in the whole stretch, as a link
-    /// may end inside a number.
+    /// an isolate and unbroken, for drawing only. Found in the whole stretch,
+    /// as a link may end inside a number.
     static func isolatingNumbers(_ pieces: [String]) -> [String] {
         let joined = pieces.joined()
         let tokens = numberTokens(in: joined)
         guard !tokens.isEmpty else { return pieces }
         let whole = joined as NSString
         let overridden = tokens.map { holdsArabicIndicDigits(whole.substring(with: $0)) }
+        // Where a line could break inside each: after a sign or a space.
+        let joints = tokens.map { token in
+            (token.location + 1..<NSMaxRange(token)).filter { !isDigit(whole.character(at: $0 - 1)) }
+        }
         var drawn: [String] = []
         var start = 0
         for piece in pieces {
             let shown = NSMutableString(string: piece)
             let end = start + shown.length
             // From the last, so that the places before it do not move.
-            for (token, overrides) in zip(tokens, overridden).reversed() {
+            for index in tokens.indices.reversed() {
+                let token = tokens[index]
+                let overrides = overridden[index]
                 let tokenEnd = NSMaxRange(token)
                 if tokenEnd > start && tokenEnd <= end {
                     shown.insert(overrides ? overrideEnd + isolateEnd : isolateEnd, at: tokenEnd - start)
+                }
+                for joint in joints[index].reversed() where joint > start && joint <= end {
+                    shown.insert(wordJoiner, at: joint - start)
                 }
                 if token.location >= start && token.location < end {
                     shown.insert(overrides ? isolateStart + overrideStart : isolateStart, at: token.location - start)
@@ -200,13 +235,17 @@ enum BookTableMeasure {
     /// Each column's longest word at the cells' size. The row naming the
     /// columns is measured bold; a row naming a section spans the table and
     /// is left out.
-    /// - Parameter enlargesSalawat: the cells are Urdu, with the salawat sign
-    ///   drawn larger.
+    /// - Parameters:
+    ///   - enlargesSalawat: the cells are Urdu, with the salawat sign drawn
+    ///     larger.
+    ///   - keepsNumbersWhole: the cells run right to left, where a date or a
+    ///     telephone number never takes two lines.
     static func columnMinimums(
         _ rows: [[String]],
         layout: BookPageFormatter.TableLayout,
         font: UIFont,
-        enlargesSalawat: Bool
+        enlargesSalawat: Bool,
+        keepsNumbersWhole: Bool = false
     ) -> [Double] {
         let columns = max(1, rows.map(\.count).max() ?? 1)
         var minimums = Array(repeating: 0.0, count: columns)
@@ -214,7 +253,10 @@ enum BookTableMeasure {
         for (index, row) in rows.enumerated() where !BookPageFormatter.isSectionRow(row, columns: columns) {
             let isHeader = index == 0 && layout.hasHeaderRow
             for (column, cell) in row.enumerated() {
-                for word in cell.split(whereSeparator: \.isWhitespace).map(String.init) {
+                let words = keepsNumbersWhole
+                    ? BookTextDrawing.unbrokenWords(of: cell)
+                    : cell.split(whereSeparator: \.isWhitespace).map(String.init)
+                for word in words {
                     var widest = width(of: word, font: font, enlargesSalawat: enlargesSalawat)
                     if isHeader {
                         widest = max(widest, width(of: word, font: heading, enlargesSalawat: enlargesSalawat))
@@ -250,8 +292,10 @@ enum BookTableMeasure {
     }
 }
 
-/// Selecting a block's text. Where numbers were isolated for drawing, Copy
-/// and Share give the book's own words, without the isolates.
+/// Selecting a block's text. SwiftUI's selection on iOS takes the whole of
+/// a `Text`, to Copy or Share it, as drawn. Where numbers were isolated or
+/// joined for drawing, a menu of the same two gives the book's own words
+/// instead, without those marks.
 struct BookTextSelection: ViewModifier {
     /// The block as the book has it.
     let text: String

@@ -208,11 +208,12 @@ final class BookLayoutRulesTests: XCTestCase {
         for (bookID, number, token) in cases {
             let text = try page(bookID, number).text
             let drawn = BookTextDrawing.isolatingNumbers([text]).joined()
-            XCTAssertTrue(drawn.contains("\u{2066}\(token)\u{2069}"), token)
-            // The isolates are all that drawing adds.
+            XCTAssertTrue(drawn.contains("\u{2066}\(unbroken(token))\u{2069}"), token)
+            // The isolates and joiners are all that drawing adds.
             let without = drawn
                 .replacingOccurrences(of: "\u{2066}", with: "", options: .literal)
                 .replacingOccurrences(of: "\u{2069}", with: "", options: .literal)
+                .replacingOccurrences(of: "\u{2060}", with: "", options: .literal)
             XCTAssertEqual(Array(without.unicodeScalars), Array(text.unicodeScalars))
         }
     }
@@ -225,7 +226,10 @@ final class BookLayoutRulesTests: XCTestCase {
         for untouched in ["70-7-4", "25-1924", "4:103", "102-101"] {
             XCTAssertEqual(BookTextDrawing.numberTokens(in: "تاریخ \(untouched) کو"), [], untouched)
         }
-        XCTAssertEqual(BookTextDrawing.isolatingNumbers(["آیت 79:18-19 ہے"]), ["آیت \u{2066}79:18-19\u{2069} ہے"])
+        XCTAssertEqual(
+            BookTextDrawing.isolatingNumbers(["آیت 79:18-19 ہے"]),
+            ["آیت \u{2066}79:\u{2060}18-\u{2060}19\u{2069} ہے"]
+        )
     }
 
     func testArabicIndicDigitsKeepTheirOrderToo() throws {
@@ -233,7 +237,37 @@ final class BookLayoutRulesTests: XCTestCase {
         let token = "\u{0666}\u{0667} : \u{0661}\u{0660}"
         XCTAssertTrue(text.contains(token))
         // An isolate alone leaves them turned round, as these digits are not strong.
-        XCTAssertTrue(BookTextDrawing.isolatingNumbers([text]).joined().contains("\u{2066}\u{202D}\(token)\u{202C}\u{2069}"))
+        XCTAssertTrue(BookTextDrawing.isolatingNumbers([text]).joined().contains("\u{2066}\u{202D}\(unbroken(token))\u{202C}\u{2069}"))
+    }
+
+    /// A token as drawn: a joiner after each sign and space inside it.
+    private func unbroken(_ token: String) -> String {
+        var drawn = String.UnicodeScalarView()
+        for (index, scalar) in token.unicodeScalars.enumerated() {
+            drawn.append(scalar)
+            if index + 1 < token.unicodeScalars.count, scalar.properties.numericType != .decimal {
+                drawn.append("\u{2060}")
+            }
+        }
+        return String(drawn)
+    }
+
+    func testANumberNeverTakesTwoLines() throws {
+        let cases = [
+            ("uploads-books-tareeq-e-saluk-fi-adab-e-shayuk", 16, "3 : 164", "3 \u{2060}:\u{2060} \u{2060}164"),
+            ("book-ocr-hamd-o-naat", 3, "0300-6658928", "0300-\u{2060}6658928"),
+        ]
+        for (bookID, number, token, joined) in cases {
+            let text = try page(bookID, number).text
+            XCTAssertTrue(BookTextDrawing.isolatingNumbers([text]).joined().contains(joined), token)
+        }
+        // A table gives such a number the width of all of it.
+        XCTAssertEqual(BookTextDrawing.unbrokenWords(of: "آیت 3 : 164 ہے"), ["آیت", "3\u{00A0}:\u{00A0}164", "ہے"])
+        XCTAssertEqual(BookTextDrawing.unbrokenWords(of: "دو لفظ"), ["دو", "لفظ"])
+    }
+
+    func testANumberInsideAnAyahsCircleIsLeftThere() {
+        XCTAssertEqual(BookTextDrawing.numberTokens(in: "آیت \u{06DD}12-13 ہے"), [])
     }
 
     func testANumberAfterLatinLettersIsLeftWithItsWord() throws {
@@ -244,14 +278,14 @@ final class BookLayoutRulesTests: XCTestCase {
         // Another block's Latin does not reach a number on a later line.
         XCTAssertEqual(
             BookTextDrawing.isolatingNumbers(["Tel\n0300-6658928"]),
-            ["Tel\n\u{2066}0300-6658928\u{2069}"]
+            ["Tel\n\u{2066}0300-\u{2060}6658928\u{2069}"]
         )
     }
 
     func testALinkThatEndsInsideANumberKeepsItsWords() {
         XCTAssertEqual(
             BookTextDrawing.isolatingNumbers(["آیت ", "3 : 1", "64 ہے"]),
-            ["آیت ", "\u{2066}3 : 1", "64\u{2069} ہے"]
+            ["آیت ", "\u{2066}3 \u{2060}:\u{2060} \u{2060}1", "64\u{2069} ہے"]
         )
     }
 

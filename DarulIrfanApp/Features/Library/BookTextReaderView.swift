@@ -758,7 +758,8 @@ struct FormattedBookPage: View {
             font: rightToLeft
                 ? DIFont.urduBodyUIFont(scale: 0.85 * scale, typeSize: dynamicTypeSize)
                 : UIFont.systemFont(ofSize: bodyBaseSize * CGFloat(0.85 * scale)),
-            enlargesSalawat: rightToLeft && place.followsBookRules
+            enlargesSalawat: rightToLeft && place.followsBookRules,
+            keepsNumbersWhole: rightToLeft && place.followsBookRules
         )
         return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
