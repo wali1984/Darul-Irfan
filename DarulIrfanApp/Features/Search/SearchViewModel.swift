@@ -52,7 +52,7 @@ enum SearchReference {
         switch result.domain {
         case .quran:
             if let reference = result.ayahReference {
-                parts.append("Quran \(reference.surah):\(reference.ayah)")
+                parts.append("\(String(localized: "Quran", locale: locale)) \(reference.surah):\(reference.ayah)")
             }
         case .hadith:
             // The title is the reference: the collection and the number.

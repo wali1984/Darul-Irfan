@@ -1082,7 +1082,7 @@ struct TafsirVolumeDestination: View {
                 id: volume.bookID,
                 sourceUrl: "",
                 type: .book,
-                title: volume.bookID,
+                title: String(localized: "Book"),
                 titleUrdu: nil,
                 language: volume.language,
                 author: nil,
