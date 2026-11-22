@@ -29,9 +29,9 @@ Internal metadata only, in three places:
   gate checks before a build may ship.
 
 It is **never rendered as a label on the text**. No badge saying "OCR-derived",
-no asterisk, no disclaimer beside an ayah. A reader sees the work, its author
-and its source. Provenance and review state belong in Acknowledgements and in
-`Docs/CONTENT_INTEGRITY.md`, not in the reader.
+no asterisk, no disclaimer beside an ayah. A reader sees the work and its
+author. Provenance and review state belong in `Docs/CONTENT_INTEGRITY.md`,
+and are shown nowhere in the app.
 
 The same rule governs missing text: a gap is shown as a gap. The reader never
 substitutes English prose into an Urdu slot (Nastaliq, right-to-left, reading as

@@ -21,7 +21,7 @@ normal MP3/M4A files.
 - **Author:** Adam-synagda (own work, uploaded 2022-04-29)
 - **License:** **CC0 1.0 Universal** (public domain dedication) — verified on the
   Commons file page and via the Commons API extmetadata on 2026-07-10.
-  No attribution required; credited anyway in More → About → Acknowledgements.
+  No attribution required.
 
 ### `azan-full.mp3` — complete azan for in-app playback
 
@@ -42,9 +42,11 @@ normal MP3/M4A files.
   <https://commons.wikimedia.org/wiki/File:Eid_al-Fitr_Fajr_azan_at_Malm%C3%B6_Mosque_-_19_August_2012.webm>
 - **Author:** Islamic Center Malmö
 - **License:** **CC BY 3.0 Unported** — verified on the Commons file page on
-  2026-07-10. **Attribution is required** and is shown in More → About →
-  Acknowledgements (author, source link, license, and a note that the audio
-  was extracted from the original video and converted).
+  2026-07-10. **Attribution is required** by this license (author, source
+  link, license, and a note that the audio was extracted from the original
+  video and converted). The app has no credits screen since 2026-11-21, so
+  keep this record, and the author's written confirmation that no credit in
+  the app is needed, with the release records.
 
 ### `prayer-chime.wav` — fallback chime
 
@@ -72,5 +74,5 @@ ffmpeg -i input -t 18 -af "afade=t=out:st=15.5:d=2.5" \
 ```
 
 Drop the file into this folder and regenerate the project (XcodeGen picks up
-the folder automatically). Update the license records above and the
-Acknowledgements screen whenever a recording changes.
+the folder automatically). Update the license records above whenever a
+recording changes.

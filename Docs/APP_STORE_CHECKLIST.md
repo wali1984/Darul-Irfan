@@ -52,8 +52,8 @@ before archiving.
 
 - [ ] App icon: a single 1024 px universal icon exists
       (`AppIcon.appiconset/icon-1024.png`). Confirm final artwork — the visual
-      identity requires organization approval (see AcknowledgementsView), so
-      retain that approval with the release records.
+      identity requires organization approval, so retain that approval
+      with the release records.
 - [ ] `AccentColor` and `LaunchBackground` color sets exist; verify dark-mode
       values on device.
 - [ ] Screenshots — required device classes given
@@ -112,12 +112,15 @@ before archiving.
 
 ## 5. Licensing & rights checklist
 
-- [ ] **adhan-swift** (Batoul Apps) — MIT License. Attribution ships in-app
-      (More → About → Acknowledgements) with a link to the repository. Keep
-      the license text available; MIT requires the copyright notice with
-      substantial portions of the software.
+These are records kept with the release. The app has no credits or licences
+screen (removed 2026-11-21).
+
+- [ ] **adhan-swift** (Batoul Apps) — MIT License. MIT requires the copyright
+      notice with substantial portions of the software: keep the license
+      text, or the authors' written confirmation that it is not needed, with
+      the release records.
 - [ ] **Pickthall translation** — *The Meaning of the Glorious Koran* (1930),
-      public domain; noted in Acknowledgements. No action needed.
+      public domain. No action needed.
 - [x] **Akram-ut-Tarajum** — complete Urdu and English editions, 6,236 ayat
       each, copied verbatim from the official structured Quran reader under
       the recorded content permission. Counts, alignment, and checksum are in
@@ -127,13 +130,16 @@ before archiving.
       Uthmani, public domain. When
       expanding to the full text, record the exact source edition here.
 - [ ] **prayer-chime.wav** — original work created for this app (no rights
-      issues); noted in Acknowledgements.
+      issues).
 - [x] **Azan notification clip & full azan recordings** — shipped 2026-07-10.
       `azan-short.caf` + `azan-full.mp3` from "Beautiful adhan" (Wikimedia
       Commons, CC0 1.0); `azan-fajr-full.mp3` from Islamic Center Malmö
-      (Wikimedia Commons, CC BY 3.0 — attribution shown in Acknowledgements).
+      (Wikimedia Commons, CC BY 3.0).
       Full source/license records in `DarulIrfanApp/Resources/Audio/README.md`.
       `prayer-chime.wav` remains the fallback.
+- [ ] **Fajr azan (CC BY 3.0)** — the license requires attribution and the app
+      shows none: keep the author's written confirmation that no credit in
+      the app is needed with the release records before submission.
 - [x] **Site content permission status** — **GRANTED 2026-07-10** by the
       owner of naqshbandiaowaisiah.org. Scope: full text and assets from the
       site may ship in the app; the 2026-07-10 ingest

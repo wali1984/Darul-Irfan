@@ -35,9 +35,10 @@ final class SearchInTheAppTests: XCTestCase {
         XCTAssertTrue(SearchAppDestination.matches(for: "q", names: english).isEmpty)
         XCTAssertTrue(SearchAppDestination.matches(for: "   ", names: english).isEmpty)
         XCTAssertTrue(SearchAppDestination.matches(for: "prophet", names: english).isEmpty)
-        // Licences left with its Settings row: the credits are linked at
-        // the foot of About Darul Irfan.
-        XCTAssertTrue(SearchAppDestination.matches(for: "licences", names: english).isEmpty)
+        // No screen of credits or licences is offered.
+        for query in ["licences", "credits", "acknowledgements"] {
+            XCTAssertTrue(SearchAppDestination.matches(for: query, names: english).isEmpty, query)
+        }
     }
 
     /// An Urdu name is found however it was typed: an Arabic keyboard's

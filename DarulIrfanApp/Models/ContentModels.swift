@@ -20,9 +20,9 @@ enum RightsStatus: String, Codable, Sendable {
 /// How far a body of sacred text has got through review.
 ///
 /// Internal metadata only. It gates what may ship in which channel; it is
-/// never surfaced as a label on the text itself. Readers see the work, its
-/// author and its source — not the pipeline that produced it. Provenance
-/// belongs in Acknowledgements, not beside an ayah.
+/// never surfaced as a label on the text itself. Readers see the work and
+/// its author, not the pipeline that produced it; provenance is shown
+/// nowhere in the app.
 enum ReviewState: String, Codable, Sendable, CaseIterable {
     /// Incomplete or unreviewed. Ships to no channel.
     case draft

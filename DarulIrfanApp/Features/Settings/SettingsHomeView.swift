@@ -3,8 +3,7 @@ import SwiftUI
 /// Every setting, in the order the redesign lists them: Language first, then
 /// Location, Prayer calculation and Notifications (one screen for every
 /// alert and reminder); then Appearance, Widgets (how to place them), the
-/// Hijri calendar, Content and storage, and Privacy. The credits and licences, which must stay in the
-/// app, are linked at the foot of About Darul Irfan (Halqah › Silsila).
+/// Hijri calendar, Content and storage, and Privacy.
 enum SettingsEntry: String, CaseIterable, Identifiable {
     case language
     case location

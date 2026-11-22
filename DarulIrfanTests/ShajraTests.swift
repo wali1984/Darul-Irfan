@@ -5,8 +5,8 @@ import XCTest
 
 /// The Shajra, recreated in the app's own theme (owner, 30 October 2026):
 /// its 13 links in order, every line exactly as parity-spec/redesign/
-/// shajra.json has it, the ways that open it, and the Licences row that left
-/// Settings and search (the credits stay at the foot of About Darul Irfan).
+/// shajra.json has it, the ways that open it, and the absence of Licences
+/// from Settings, search and the app's string tables.
 final class ShajraTests: XCTestCase {
 
     // BEGIN GENERATED from parity-spec/redesign/shajra.json
@@ -139,8 +139,7 @@ final class ShajraTests: XCTestCase {
 
     // MARK: - Licences
 
-    /// The Licences row left Settings and search's "In the app"; the credits
-    /// are linked at the foot of About Darul Irfan instead.
+    /// Neither Settings nor search's "In the app" lists Licences.
     func testSearchNoLongerListsLicences() {
         XCTAssertNil(SearchAppDestination(rawValue: "licences"))
         XCTAssertFalse(SearchAppDestination.allCases.contains { $0.nameKeys.contains("Licences") })
@@ -148,5 +147,24 @@ final class ShajraTests: XCTestCase {
         XCTAssertTrue(SearchAppDestination.matches(for: "licences", names: english).isEmpty)
         XCTAssertTrue(SearchAppDestination.matches(for: "Licences").isEmpty)
         XCTAssertFalse(SettingsEntry.allCases.map(\.title).contains("Licences"))
+    }
+
+    /// The compiled English and Urdu tables hold no credit or licence wording,
+    /// as a key or as a value. (A permission the phone asks for is not one.)
+    func testTheStringTablesHoldNoCreditOrLicenceWording() throws {
+        let pattern = #"licen[cs]e|credit|acknowledg|public domain|permission of|['’]s permission"#
+            + #"|proofread|machine|\bocr\b|quran\.com|لائسنس|اعترافات"#
+        for language in ["en", "ur"] {
+            let path = try XCTUnwrap(
+                Bundle.main.path(forResource: "Localizable", ofType: "strings", inDirectory: nil, forLocalization: language)
+            )
+            let table = try XCTUnwrap(NSDictionary(contentsOfFile: path) as? [String: String])
+            XCTAssertFalse(table.isEmpty, language)
+            for (key, value) in table {
+                for text in [key, value] {
+                    XCTAssertNil(text.range(of: pattern, options: [.regularExpression, .caseInsensitive]), "\(language): \(text)")
+                }
+            }
+        }
     }
 }

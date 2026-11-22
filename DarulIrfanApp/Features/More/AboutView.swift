@@ -2,10 +2,8 @@ import SwiftUI
 
 /// About Darul Irfan: a premium brand moment (living emerald crest, seal,
 /// wordmark, anchor verse and version), followed by a short verified
-/// introduction to Silsila Naqshbandia Owaisiah and contact details, and
-/// at the foot of the page one quiet link, Credits and licences, to the
-/// open-source and Creative Commons credits (`AcknowledgementsView`),
-/// which must stay in the app. All organizational facts come from
+/// introduction to Silsila Naqshbandia Owaisiah and contact details; the
+/// page ends with the contact card. All organizational facts come from
 /// Docs/RESEARCH_NOTES.md (verified against naqshbandiaowaisiah.org).
 @MainActor
 struct AboutView: View {
@@ -22,8 +20,6 @@ struct AboutView: View {
                     .diAppear(delay: 0.14)
                 sourceAndContactCard
                     .diAppear(delay: 0.20)
-                creditsLink
-                    .diAppear(delay: 0.26)
             }
             .padding(DISpacing.md)
             .diResponsiveWidth()
@@ -167,30 +163,6 @@ struct AboutView: View {
                 }
             }
         }
-    }
-
-    // MARK: - Credits
-
-    /// The open-source and Creative Commons credits (adhan-swift, the
-    /// typefaces, the azan recordings): each licence requires its
-    /// attribution to ship in the app. One quiet link at the foot of the
-    /// page, as small as the page's own links.
-    private var creditsLink: some View {
-        NavigationLink {
-            AcknowledgementsView()
-        } label: {
-            HStack(spacing: DISpacing.xs) {
-                Text("Credits and licences")
-                Image(systemName: "chevron.forward")
-                    .diInterfaceFont(.caption2, weight: .bold)
-                    .accessibilityHidden(true)
-            }
-            .diInterfaceFont(.footnote, weight: .semibold)
-            .foregroundStyle(DIColor.actionForeground)
-            .frame(maxWidth: .infinity, minHeight: 44)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(DISecondaryButtonStyle())
     }
 
     // MARK: - Shared

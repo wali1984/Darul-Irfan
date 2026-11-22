@@ -3192,23 +3192,6 @@
         }
       }
     },
-    "The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The complete Urdu and English Akram-ut-Tarajum editions are by Hazrat Ameer Muhammad Akram Awan (RA) and are included with the organization's permission."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اکرم التراجم کے مکمل اردو اور انگریزی تراجم حضرت امیر محمد اکرم اعوان رحمۃ اللہ علیہ کے ہیں اور تنظیم کی اجازت سے ایپ میں شامل کیے گئے ہیں۔"
-          }
-        }
-      }
-    },
     "Videos": {
       "extractionState": "manual",
       "localizations": {
@@ -3600,23 +3583,6 @@
         }
       }
     },
-    "This entry is already part of the Darul Irfan archive. Its complete native text or document will appear automatically after a verified content update.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This entry is already part of the Darul Irfan archive. Its complete native text or document will appear automatically after a verified content update."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "یہ اندراج دارالعرفان کے ذخیرے کا حصہ ہے۔ تصدیق شدہ اپ ڈیٹ کے بعد مکمل متن یا دستاویز خود بخود ظاہر ہو جائے گی۔"
-          }
-        }
-      }
-    },
     "Books, articles, and announcements will appear here after the first verified content update.": {
       "extractionState": "manual",
       "localizations": {
@@ -3681,23 +3647,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ایپ اپ ڈیٹ یا دوبارہ انسٹال کرنے سے قرآن کا شامل متن بحال ہو جائے گا۔"
-          }
-        }
-      }
-    },
-    "This tafsir for this surah is being added to the native reader and will arrive through a verified content update.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This tafsir for this surah is being added to the native reader and will arrive through a verified content update."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس سورت کی تفسیر ایپ کے قاری میں شامل کی جا رہی ہے اور تصدیق شدہ اپ ڈیٹ کے ذریعے پہنچے گی۔"
           }
         }
       }
@@ -4174,23 +4123,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "یوٹیوب پر دیکھیں"
-          }
-        }
-      }
-    },
-    "Join OURSHEIKH on Paltalk": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Join OURSHEIKH on Paltalk"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "پال ٹاک پر OURSHEIKH میں شامل ہوں"
           }
         }
       }
@@ -4837,23 +4769,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "درست اوقاتِ نماز اور نرم اذان یاد دہانیاں، ترجمہ و تفسیر کے ساتھ قرآنِ کریم، نقشبندیہ اویسیہ کتب خانے کے خطابات اور کتابیں، اور روزانہ ذکر کی رہنمائی — سب کچھ ایک پُرسکون رفیق میں یکجا۔"
-          }
-        }
-      }
-    },
-    "Acknowledgements": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Acknowledgements"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اعترافات"
           }
         }
       }
@@ -5585,23 +5500,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "اذان کلپ"
-          }
-        }
-      }
-    },
-    "Azan Recordings": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Azan Recordings"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اذان کی ریکارڈنگز"
           }
         }
       }
@@ -6469,23 +6367,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "قطب نما کی کیلیبریشن درکار ہے"
-          }
-        }
-      }
-    },
-    "Content & Artwork": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Content & Artwork"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مواد اور آرٹ ورک"
           }
         }
       }
@@ -10281,23 +10162,6 @@
         }
       }
     },
-    "Notification Chime": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notification Chime"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اطلاعی گھنٹی"
-          }
-        }
-      }
-    },
     "Notifications": {
       "extractionState": "manual",
       "localizations": {
@@ -10515,23 +10379,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "بند — ترتیبات میں کبھی بھی فعال کریں"
-          }
-        }
-      }
-    },
-    "Offline text packs arrive through content updates. Until then, you can read this surah on quran.com.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offline text packs arrive through content updates. Until then, you can read this surah on quran.com."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "آف لائن متن مواد کی اپ ڈیٹس کے ذریعے آتا ہے۔ اس وقت تک آپ یہ سورت quran.com پر پڑھ سکتے ہیں۔"
           }
         }
       }
@@ -11284,23 +11131,6 @@
         }
       }
     },
-    "Prayer times are calculated entirely on this device using the open-source adhan-swift library by Batoul Apps, used under the MIT License.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prayer times are calculated entirely on this device using the open-source adhan-swift library by Batoul Apps, used under the MIT License."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "نماز کے اوقات مکمل طور پر اسی ڈیوائس پر Batoul Apps کی اوپن سورس لائبریری adhan-swift کے ذریعے حساب کیے جاتے ہیں، جو MIT لائسنس کے تحت استعمال ہوتی ہے۔"
-          }
-        }
-      }
-    },
     "Prayer times are calculated privately on your device once a location is set.": {
       "extractionState": "manual",
       "localizations": {
@@ -11739,23 +11569,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "قطار"
-          }
-        }
-      }
-    },
-    "Qur'an Translation": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Qur'an Translation"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قرآن کا ترجمہ"
           }
         }
       }
@@ -12644,23 +12457,6 @@
         }
       }
     },
-    "Share source link": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Share source link"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ماخذ کا لنک شیئر کریں"
-          }
-        }
-      }
-    },
     "Share this month's timetable": {
       "extractionState": "manual",
       "localizations": {
@@ -12946,23 +12742,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "آواز"
-          }
-        }
-      }
-    },
-    "Source & Contact": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source & Contact"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ماخذ اور رابطہ"
           }
         }
       }
@@ -13613,23 +13392,6 @@
         }
       }
     },
-    "The English translation of the Qur'an included in this app is by Muhammad Marmaduke Pickthall (The Meaning of the Glorious Koran, 1930), which is in the public domain.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The English translation of the Qur'an included in this app is by Muhammad Marmaduke Pickthall (The Meaning of the Glorious Koran, 1930), which is in the public domain."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس ایپ میں شامل قرآنِ کریم کا انگریزی ترجمہ محمد مارماڈیوک پکتھال (The Meaning of the Glorious Koran، 1930) کا ہے، جو پبلک ڈومین میں ہے۔"
-          }
-        }
-      }
-    },
     "The archive could not be loaded right now. Please try again in a moment.": {
       "extractionState": "manual",
       "localizations": {
@@ -13660,23 +13422,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "اذان اس وقت نہیں چل سکی۔"
-          }
-        }
-      }
-    },
-    "The azan notification clip and the full azan playback use the recording “Beautiful adhan” by Adam-synagda, from Wikimedia Commons, dedicated to the public domain under CC0 1.0.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The azan notification clip and the full azan playback use the recording “Beautiful adhan” by Adam-synagda, from Wikimedia Commons, dedicated to the public domain under CC0 1.0."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اذان کی اطلاعاتی کلپ اور مکمل اذان کی پلے بیک “Beautiful adhan” ریکارڈنگ پر مبنی ہے، جو Adam-synagda نے Wikimedia Commons پر CC0 1.0 کے تحت پبلک ڈومین میں وقف کی ہے۔"
           }
         }
       }
@@ -13902,23 +13647,6 @@
         }
       }
     },
-    "The online zikr session begins soon. The Paltalk room opens while the session is in progress.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The online zikr session begins soon. The Paltalk room opens while the session is in progress."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "آن لائن ذکر کی نشست جلد شروع ہو رہی ہے۔ Paltalk روم نشست کے دوران کھلتا ہے۔"
-          }
-        }
-      }
-    },
     "The order was revived in the last century by Shaikh Allah Yar Khan (1904–1984) and afterwards led by Hazrat Ameer Muhammad Akram Awan (RA). It is presently led by Sheikh-e-Silsila Hazrat Ameer Abdul Qadeer Awan (MZA), born 26 March 1973 in Munara, District Chakwal.": {
       "extractionState": "manual",
       "localizations": {
@@ -13966,40 +13694,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "تلاش مکمل نہیں ہو سکی۔ براہِ کرم اپنا کنکشن چیک کر کے دوبارہ کوشش کریں۔"
-          }
-        }
-      }
-    },
-    "The Fajr azan recording is by Islamic Center Malmö, from Wikimedia Commons, used under the Creative Commons Attribution 3.0 license. The audio was extracted from the original video and converted for playback in the app.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The Fajr azan recording is by Islamic Center Malmö, from Wikimedia Commons, used under the Creative Commons Attribution 3.0 license. The audio was extracted from the original video and converted for playback in the app."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فجر کی اذان کی ریکارڈنگ Islamic Center Malmö کی ہے، جو Wikimedia Commons سے Creative Commons Attribution 3.0 لائسنس کے تحت استعمال کی گئی ہے۔ آڈیو اصل ویڈیو سے نکال کر ایپ میں چلانے کے لیے تبدیل کی گئی ہے۔"
-          }
-        }
-      }
-    },
-    "The short prayer chime is an original recording created for this app, kept as a fallback alert sound.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The short prayer chime is an original recording created for this app, kept as a fallback alert sound."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مختصر نمازی گھنٹی اس ایپ کے لیے تیار کردہ اصل ریکارڈنگ ہے، جو متبادل الرٹ آواز کے طور پر رکھی گئی ہے۔"
           }
         }
       }
@@ -14769,57 +14463,6 @@
         }
       }
     },
-    "View the adhan-swift project on GitHub": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View the adhan-swift project on GitHub"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GitHub پر adhan-swift پروجیکٹ دیکھیں"
-          }
-        }
-      }
-    },
-    "View the azan recording on Wikimedia Commons": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View the azan recording on Wikimedia Commons"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اذان کی ریکارڈنگ Wikimedia Commons پر دیکھیں"
-          }
-        }
-      }
-    },
-    "View the Fajr azan recording on Wikimedia Commons": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View the Fajr azan recording on Wikimedia Commons"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فجر اذان کی ریکارڈنگ Wikimedia Commons پر دیکھیں"
-          }
-        }
-      }
-    },
     "We could not finish setting up": {
       "extractionState": "manual",
       "localizations": {
@@ -15194,23 +14837,6 @@
         }
       }
     },
-    "adhan-swift": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "adhan-swift"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "adhan-swift"
-          }
-        }
-      }
-    },
     "of %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -15394,23 +15020,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "یہ اندراج دارالعرفان کے ذخیرے میں درج ہے؛ اس کا متن یا دستاویز ایپ میں موجود نہیں۔"
-          }
-        }
-      }
-    },
-    "This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This tafsir is not included for this surah in the current offline edition. Darul Irfan checks for verified native content updates automatically."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "موجودہ آف لائن نسخے میں اس سورت کی یہ تفسیر شامل نہیں۔ دارالعرفان تصدیق شدہ مقامی مواد کی تازہ کاری خودکار طور پر دیکھتا ہے۔"
           }
         }
       }
@@ -16826,40 +16435,6 @@
         }
       }
     },
-    "Library articles, lectures, publications, tafsir, and organizational information are provided by Silsila Naqshbandia Owaisiah, which retains all rights to its content. The app icon and visual identity are used with the organization's permission.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Library articles, lectures, publications, tafsir, and organizational information are provided by Silsila Naqshbandia Owaisiah, which retains all rights to its content. The app icon and visual identity are used with the organization's permission."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "کتب خانے کے مضامین، بیانات، مطبوعات، تفسیر اور تنظیمی معلومات سلسلہ نقشبندیہ اویسیہ کی فراہم کردہ ہیں، اور اس مواد کے تمام حقوق سلسلہ کے پاس محفوظ ہیں۔ ایپ کا آئیکن اور بصری شناخت تنظیم کی اجازت سے استعمال کی گئی ہے۔"
-          }
-        }
-      }
-    },
-    "Licences": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Licences"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لائسنس"
-          }
-        }
-      }
-    },
     "Lifetime total %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -17251,23 +16826,6 @@
         }
       }
     },
-    "Official archive content is included in the app with the owner's permission. Source addresses are retained privately for verification and synchronization, while reading and playback are presented natively.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Official archive content is included in the app with the owner's permission. Source addresses are retained privately for verification and synchronization, while reading and playback are presented natively."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "سرکاری ذخیرے کا مواد مالک کی اجازت سے ایپ میں شامل ہے۔ ماخذ کے پتے تصدیق اور ہم آہنگی کے لیے نجی طور پر محفوظ رکھے جاتے ہیں، جبکہ پڑھنا اور سننا ایپ ہی میں ہوتا ہے۔"
-          }
-        }
-      }
-    },
     "On-device by design": {
       "extractionState": "manual",
       "localizations": {
@@ -17655,23 +17213,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "پیشہ"
-          }
-        }
-      }
-    },
-    "Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text is set in Noto Nastaliq Urdu, with Amiri Quran bundled as a fallback (both under the SIL Open Font License 1.1).": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text is set in Noto Nastaliq Urdu, with Amiri Quran bundled as a fallback (both under the SIL Open Font License 1.1)."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قرآنی عربی متن ایمن صدیقی اور آر صدیقہ کے تیار کردہ AlQuran IndoPak فونٹ میں ہے، جو QuranWBW.com اور Quran.com کے لیے بنایا گیا اور یہاں صدقۂ جاریہ کے طور پر انتساب کے ساتھ استعمال ہوا ہے۔ اردو متن Noto Nastaliq Urdu میں ہے، اور متبادل کے طور پر Amiri Quran شامل ہے (دونوں SIL Open Font License 1.1 کے تحت)۔"
           }
         }
       }
@@ -18390,23 +17931,6 @@
         }
       }
     },
-    "This narrator's biography will arrive with a future content update.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This narrator's biography will arrive with a future content update."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس راوی کی سوانح آئندہ مواد کی تجدید کے ساتھ آئے گی۔"
-          }
-        }
-      }
-    },
     "This surah has no recitation audio in the app, so it cannot be practised yet.": {
       "extractionState": "manual",
       "localizations": {
@@ -18607,40 +18131,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "آیات، تفسیر، کتب اور بیانات موضوع کے لحاظ سے"
-          }
-        }
-      }
-    },
-    "View the Amiri Quran font project": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View the Amiri Quran font project"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amiri Quran فونٹ کا منصوبہ دیکھیں"
-          }
-        }
-      }
-    },
-    "View the Noto Nastaliq Urdu font project": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View the Noto Nastaliq Urdu font project"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Noto Nastaliq Urdu فونٹ کا منصوبہ دیکھیں"
           }
         }
       }
@@ -22691,23 +22181,6 @@
         }
       }
     },
-    "Video meetings and joining the zikr together: integration in progress. Meetings can be scheduled now; their rooms open once it is complete.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Video meetings and joining the zikr together: integration in progress. Meetings can be scheduled now; their rooms open once it is complete."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ویڈیو میٹنگز اور مل کر ذکر میں شامل ہونا: انضمام جاری ہے۔ میٹنگز ابھی طے کی جا سکتی ہیں؛ ان کے کمرے مکمل ہونے پر کھلیں گے۔"
-          }
-        }
-      }
-    },
     "Posts forwarded from WhatsApp: integration in progress. Post here directly meanwhile.": {
       "extractionState": "manual",
       "localizations": {
@@ -22725,23 +22198,6 @@
         }
       }
     },
-    "Joining together: integration in progress. Share a live video link meanwhile.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Joining together: integration in progress. Share a live video link meanwhile."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مل کر شامل ہونا: انضمام جاری ہے۔ تب تک براہِ راست ویڈیو لنک شیئر کریں۔"
-          }
-        }
-      }
-    },
     "Video meetings: integration in progress. They open here once it is complete.": {
       "extractionState": "manual",
       "localizations": {
@@ -22755,23 +22211,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ویڈیو میٹنگز: انضمام جاری ہے۔ مکمل ہونے پر یہیں کھلیں گی۔"
-          }
-        }
-      }
-    },
-    "Starting Daily Zikr here automatically: integration in progress.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Starting Daily Zikr here automatically: integration in progress."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "روزانہ ذکر کا یہاں خودکار آغاز: انضمام جاری ہے۔"
           }
         }
       }
@@ -22840,23 +22279,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "بند ہو تو اردو معیاری رسم الخط میں دکھائی جاتی ہے، جس میں حروف ہمیشہ جڑے رہتے ہیں۔ نستعلیق کے لیے اسے آن کریں؛ تبدیلی دیکھنے کے لیے صفحہ دوبارہ کھولیں۔"
-          }
-        }
-      }
-    },
-    "Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text uses the iPhone's own typefaces. Amiri Quran is bundled as a fallback for the Qur'an (SIL Open Font License 1.1).": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Qur'an Arabic is set in the AlQuran IndoPak typeface by Ayman Siddiqui and R. Siddiqua, created for QuranWBW.com and Quran.com and used here with attribution as Sadaqa-e-Jaria. Urdu text uses the iPhone's own typefaces. Amiri Quran is bundled as a fallback for the Qur'an (SIL Open Font License 1.1)."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قرآن کا عربی متن AlQuran IndoPak ٹائپ فیس میں ہے، جسے ایمن صدیقی اور آر صدیقہ نے QuranWBW.com اور Quran.com کے لیے بنایا، اور یہاں صدقۂ جاریہ کے طور پر حوالے کے ساتھ استعمال کیا گیا ہے۔ اردو متن آئی فون کے اپنے ٹائپ فیس میں ہے۔ قرآن کے لیے Amiri Quran متبادل کے طور پر شامل ہے (SIL Open Font License 1.1)۔"
           }
         }
       }
@@ -27145,23 +26567,6 @@
         }
       }
     },
-    "Live on Paltalk now · %lld listening": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Live on Paltalk now · %lld listening"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ابھی پال ٹاک پر براہِ راست · %lld سن رہے ہیں"
-          }
-        }
-      }
-    },
     "Available when Daily Zikr is live": {
       "extractionState": "manual",
       "localizations": {
@@ -27213,23 +26618,6 @@
         }
       }
     },
-    "Join Zikr on Paltalk": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Join Zikr on Paltalk"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "پال ٹاک پر ذکر میں شامل ہوں"
-          }
-        }
-      }
-    },
     "Available when the zikr is live on YouTube": {
       "extractionState": "manual",
       "localizations": {
@@ -27243,23 +26631,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "یوٹیوب پر ذکر براہِ راست ہونے پر دستیاب"
-          }
-        }
-      }
-    },
-    "Available when the Paltalk room is open": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available when the Paltalk room is open"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "پال ٹاک روم کھلنے پر دستیاب"
           }
         }
       }
@@ -27430,23 +26801,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ایپ انسٹال یا اپ ڈیٹ کرنے کے بعد اس میں کچھ دیر لگتی ہے۔"
-          }
-        }
-      }
-    },
-    "Tahajjud Zikr begins soon. Join it on Paltalk from Darul Irfan.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tahajjud Zikr begins soon. Join it on Paltalk from Darul Irfan."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تہجد ذکر جلد شروع ہو رہا ہے۔ دارالعرفان سے پال ٹاک پر اس میں شامل ہوں۔"
           }
         }
       }
@@ -30953,23 +30307,6 @@
         }
       }
     },
-    "Shared with the Silsila's permission": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shared with the Silsila's permission"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "سلسلہ کی اجازت سے پیش کیا گیا"
-          }
-        }
-      }
-    },
     "Cover of %@": {
       "extractionState": "manual",
       "localizations": {
@@ -31663,23 +31000,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ذکرِ خفی قلبی، مصوّر طریقہ"
-          }
-        }
-      }
-    },
-    "Credits and licences": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Credits and licences"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اعترافات اور لائسنس"
           }
         }
       }
@@ -35604,23 +34924,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "سامنے سے نظر آنے والا نمبر وار خاکہ: 1 نیچے دائیں، 2 نیچے بائیں، 3 درمیان میں دائیں، 4 درمیان میں بائیں، 5 مرکز میں، 6 اوپر مرکز میں، 7 پورے جسم کے گرد ایک دائرہ۔"
-          }
-        }
-      }
-    },
-    "Typography": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Typography"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "خطوط"
           }
         }
       }
