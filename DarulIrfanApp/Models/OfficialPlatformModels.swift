@@ -24,6 +24,12 @@ struct OfficialFeedItem: Codable, Sendable, Identifiable, Equatable {
     var sourceURL: URL
     var imageURL: URL?
     var videoID: String?
+    /// A website item: its id in the app's library, where its text is read.
+    /// Nil from an older server; `libraryItemID` reads either.
+    var libraryID: String? = nil
+    /// A programme: its id among the app's events. Nil from an older
+    /// server; `programmeID` reads either.
+    var eventID: String? = nil
     var publishedAt: Date
     var isFeatured: Bool
 }

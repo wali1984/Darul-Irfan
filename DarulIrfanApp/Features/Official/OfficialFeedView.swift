@@ -27,6 +27,70 @@ enum UpdatesFilter: String, CaseIterable, Identifiable {
     }
 }
 
+// MARK: - What an update opens
+
+/// What an official update opens when it is chosen.
+enum UpdateDestination: Equatable, Sendable {
+    /// A video, played in the app.
+    case video(id: String, title: String)
+    /// A website item the library holds: its page there, with its text.
+    case libraryItem(id: String)
+    /// A programme the app holds: its page, with its dates and reminder.
+    case event(CommunityEvent)
+    /// Anything else: the update's own sheet.
+    case sheet(OfficialFeedItem)
+
+    /// Where `item` opens. A website item goes to its library page when
+    /// the library holds it (and `opensLibrary`: the page needs the app's
+    /// state), a programme to its event page when the app holds it; the
+    /// sheet is left for an update the app holds nothing more about.
+    static func resolve(
+        _ item: OfficialFeedItem,
+        opensLibrary: Bool,
+        contentRepository: any ContentRepositoryProtocol,
+        eventsRepository: any EventsRepositoryProtocol
+    ) async -> UpdateDestination {
+        if item.source == .youtube, let videoID = item.videoID {
+            return .video(id: videoID, title: item.title)
+        }
+        if opensLibrary, let id = item.libraryItemID {
+            let stored = try? await contentRepository.item(id: id)
+            if let stored {
+                return .libraryItem(id: stored.id)
+            }
+        }
+        if let id = item.programmeID {
+            let events = (try? await eventsRepository.events()) ?? []
+            if let event = events.first(where: { $0.id == id }) {
+                return .event(event)
+            }
+        }
+        return .sheet(item)
+    }
+}
+
+extension OfficialFeedItem {
+    /// A website item's id in the library: the one the server names, or
+    /// what follows "website:" in the update's own id.
+    var libraryItemID: String? {
+        Self.linkedID(named: libraryID, in: id, prefix: "website:", when: source == .website)
+    }
+
+    /// A programme's id among the events: the one the server names, or
+    /// what follows "event:" in the update's own id.
+    var programmeID: String? {
+        Self.linkedID(named: eventID, in: id, prefix: "event:", when: source == .event)
+    }
+
+    private static func linkedID(named: String?, in id: String, prefix: String, when applies: Bool) -> String? {
+        guard applies else { return nil }
+        if let named, !named.isEmpty { return named }
+        guard id.hasPrefix(prefix) else { return nil }
+        let rest = String(id.dropFirst(prefix.count))
+        return rest.isEmpty ? nil : rest
+    }
+}
+
 // MARK: - Page
 
 /// The official updates as a page of their own (the Halqah tab's link).
@@ -94,6 +158,12 @@ struct UpdatesSection: View {
     @State private var linkFailure: String?
     @State private var presentedVideo: FeedVideo?
     @State private var presentedItem: OfficialFeedItem?
+    /// A website update the library holds, opened on its page there.
+    @State private var openedLibraryItemID: String?
+    /// A programme update the app holds, opened on its event page.
+    @State private var openedEvent: CommunityEvent?
+    /// Finding what the update last chosen opens.
+    @State private var opening: Task<Void, Never>?
     /// For a library item opened from here: its favourite star.
     @State private var libraryViewModel: LibraryViewModel
 
@@ -181,6 +251,27 @@ struct UpdatesSection: View {
         .sheet(item: $presentedItem) { item in
             OfficialFeedDetailView(item: item)
         }
+        .navigationDestination(isPresented: Binding(
+            get: { openedLibraryItemID != nil },
+            set: { if !$0 { openedLibraryItemID = nil } }
+        )) {
+            if let openedLibraryItemID, let appState {
+                ContentItemDetailView(
+                    itemID: openedLibraryItemID,
+                    dependencies: dependencies,
+                    appState: appState,
+                    libraryViewModel: libraryViewModel
+                )
+            }
+        }
+        .navigationDestination(isPresented: Binding(
+            get: { openedEvent != nil },
+            set: { if !$0 { openedEvent = nil } }
+        )) {
+            if let openedEvent {
+                EventDetailView(event: openedEvent, notifications: dependencies.notifications)
+            }
+        }
     }
 
     /// A link to one update ("darulirfan://feed/<id>") opens it once the
@@ -210,13 +301,33 @@ struct UpdatesSection: View {
         }
     }
 
-    /// A video plays in the app; anything else opens in full.
+    /// A video plays in the app. An article the library holds opens on its
+    /// page there, with its text, and a programme on its event page; an
+    /// update the app holds nothing more about opens in its own sheet.
     private func open(_ item: OfficialFeedItem) {
         DIHaptics.light()
-        if item.source == .youtube, let videoID = item.videoID {
-            presentedVideo = FeedVideo(id: videoID, title: item.title)
-        } else {
-            presentedItem = item
+        opening?.cancel()
+        let opensLibrary = appState != nil
+        let contentRepository = dependencies.contentRepository
+        let eventsRepository = dependencies.eventsRepository
+        opening = Task {
+            let destination = await UpdateDestination.resolve(
+                item,
+                opensLibrary: opensLibrary,
+                contentRepository: contentRepository,
+                eventsRepository: eventsRepository
+            )
+            guard !Task.isCancelled else { return }
+            switch destination {
+            case .video(let id, let title):
+                presentedVideo = FeedVideo(id: id, title: title)
+            case .libraryItem(let id):
+                openedLibraryItemID = id
+            case .event(let event):
+                openedEvent = event
+            case .sheet(let update):
+                presentedItem = update
+            }
         }
     }
 

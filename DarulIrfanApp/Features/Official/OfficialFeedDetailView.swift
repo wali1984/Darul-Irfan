@@ -31,12 +31,16 @@ struct OfficialFeedDetailView: View {
                             .foregroundStyle(DIColor.textMuted)
                     }
 
-                    Text(item.title)
-                        .diInterfaceFont(.title2, weight: .semibold, design: .serif)
-                        .foregroundStyle(DIColor.textPrimary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    // A post's title is how its text begins: the text is
+                    // shown alone, not its opening words twice.
+                    if !item.titleRepeatsBody {
+                        Text(item.title)
+                            .diInterfaceFont(.title2, weight: .semibold, design: .serif)
+                            .foregroundStyle(DIColor.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
 
-                    if let body = item.body, !body.isEmpty, body != item.title {
+                    if let body = item.body, !body.isEmpty, item.titleRepeatsBody || body != item.title {
                         DICard(padding: DISpacing.lg) {
                             Text(body)
                                 .diInterfaceFont(.body)
@@ -85,5 +89,23 @@ struct OfficialFeedDetailView: View {
         case .announcement: return "megaphone.fill"
         case .event: return "calendar"
         }
+    }
+}
+
+extension OfficialFeedItem {
+    /// Whether the title only repeats how the text begins. A Facebook post
+    /// has no headline, so its opening words stand as its title, ending in
+    /// an ellipsis when the post goes on; the sheet then shows the text
+    /// alone.
+    var titleRepeatsBody: Bool {
+        guard source == .facebook, let text = body, !text.isEmpty else { return false }
+        var opening = Substring(title)
+        while let last = opening.last, last == "…" || last.isWhitespace {
+            opening.removeLast()
+        }
+        guard !opening.isEmpty else { return false }
+        // By code point, so a title cut inside a letter and its marks
+        // still counts as the start of the text.
+        return text.unicodeScalars.starts(with: opening.unicodeScalars)
     }
 }
