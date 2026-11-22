@@ -350,6 +350,7 @@ struct GlobalSearchView: View {
                                              close: { dismiss() }) {
                                 SearchResultRow(
                                     result: result,
+                                    secondTitle: viewModel.secondTitle(for: result),
                                     reference: viewModel.reference(for: result)
                                 )
                             }

@@ -532,7 +532,7 @@ struct UpdatesSection: View {
             kind: isPress ? "Press Release" : "Announcement",
             date: (item.publishedAt ?? item.updatedAt).map { Self.dayText($0, timeZone: .gmt) },
             title: item.title,
-            urduTitle: item.titleUrdu,
+            urduTitle: item.urduTitle,
             systemImage: isPress ? "newspaper.fill" : "megaphone.fill"
         )
     }
@@ -574,7 +574,8 @@ struct UpdatesSection: View {
 // MARK: - Row
 
 /// One update as the board draws it: a glass row with the kind's tile, the
-/// kind and the day in small gold capitals, and the title.
+/// kind and the day in small gold capitals, and the title in the interface's
+/// language, with the other's under it where there is one.
 struct DiscoverUpdateRow: View {
     let kind: LocalizedStringKey
     let date: Text?
@@ -606,18 +607,31 @@ struct DiscoverUpdateRow: View {
                 }
                 .textCase(.uppercase)
                 .foregroundStyle(DiscoverStyle.goldInk)
-                Text(verbatim: title)
-                    .diInterfaceFont(.subheadline, weight: .bold)
-                    .foregroundStyle(DIColor.textPrimary)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                if let urduTitle, !urduTitle.isEmpty {
-                    Text(verbatim: urduTitle)
-                        .font(DIFont.urduBody(scale: 0.85))
+                if DIBrand.readsUrdu(locale), let urduTitle, !urduTitle.isEmpty {
+                    BookTextDrawing.urduName(urduTitle, scale: 0.95)
+                        .font(DIFont.urduBody(scale: 0.95).weight(.bold))
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
+                    if title != urduTitle {
+                        LibraryCatalogueText(text: title, latinFont: .footnote, urduScale: 0.8)
+                            .foregroundStyle(DIColor.textMuted)
+                    }
+                } else {
+                    Text(verbatim: title)
+                        .diInterfaceFont(.subheadline, weight: .bold)
+                        .foregroundStyle(DIColor.textPrimary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let urduTitle, !urduTitle.isEmpty {
+                        BookTextDrawing.urduName(urduTitle, scale: 0.85)
+                            .font(DIFont.urduBody(scale: 0.85))
+                            .foregroundStyle(DIColor.textPrimary)
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .environment(\.layoutDirection, .rightToLeft)
+                    }
                 }
                 if let detail, !detail.isEmpty, detail != title {
                     Text(verbatim: detail)

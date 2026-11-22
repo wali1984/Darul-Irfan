@@ -112,6 +112,36 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertNil(offered(240))
     }
 
+    // MARK: - A work's name
+
+    func testVolumesThatShareAnUrduNameAreNumbered() throws {
+        func named(_ id: String) throws -> String {
+            let item = try XCTUnwrap(SeedBundle.libraryItem(id: id), id)
+            return WorkTitle(item, urduInterface: true).text
+        }
+        XCTAssertEqual(try named("tafaseer-parah-5"), "اکرم التفاسیر — پارہ 5")
+        XCTAssertEqual(try named("tafaseer-parah-30"), "اکرم التفاسیر — پارہ 30 (حصہ 1)")
+        XCTAssertEqual(try named("tafaseer-parah-30-part-2"), "اکرم التفاسیر — پارہ 30 (حصہ 2)")
+        XCTAssertEqual(try named("tarajum-Akram-ut-Tarajum-Parah06.pdf"), "اکرم التراجم — پارہ 6")
+        XCTAssertEqual(try named("tarajum-Akram-ut-Tarajum-Parah-16-to-30.pdf"), "اکرم التراجم — پارہ 16 تا 30")
+
+        var seen = Set<String>()
+        for item in SeedBundle.libraryItems() where item.category == .quranTafsir || item.category == .quranTranslation {
+            let name = WorkTitle(item, urduInterface: true).text
+            XCTAssertTrue(seen.insert(name).inserted, "\(item.id): \(name)")
+        }
+    }
+
+    func testAWorkIsNamedInTheInterfacesLanguage() throws {
+        let pardah = try XCTUnwrap(SeedBundle.libraryItem(id: "book-ocr-pardah"))
+        let urdu = WorkTitle(pardah, urduInterface: true)
+        XCTAssertEqual(urdu.text, pardah.titleUrdu)
+        XCTAssertEqual(urdu.second, pardah.title)
+        let english = WorkTitle(pardah, urduInterface: false)
+        XCTAssertEqual(english.text, pardah.title)
+        XCTAssertEqual(english.second, pardah.titleUrdu)
+    }
+
     // MARK: - An article's paragraphs
 
     func testAnArticleIsCutAtItsBlankLines() throws {

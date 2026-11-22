@@ -388,13 +388,24 @@ struct ContentItemDetailView: View {
     }
 
     private func bookTitleBlock(for item: ContentItem) -> some View {
-        let urdu = locale.language.languageCode?.identifier == "ur" ? item.titleUrdu.flatMap { $0.isEmpty ? nil : $0 } : nil
+        let name = WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale))
+        let rightToLeft = ScriptDirection.isRightToLeft(name.text, fallbackLanguage: nil)
         return VStack(spacing: 6) {
-            Text(verbatim: urdu ?? item.title)
-                .font(urdu == nil ? .title2.weight(.heavy) : DIFont.urduBody(scale: 1.3).weight(.heavy))
+            (rightToLeft ? BookTextDrawing.urduName(name.text, scale: 1.3) : Text(verbatim: name.text))
+                .font(rightToLeft ? DIFont.urduBody(scale: 1.3).weight(.heavy) : .title2.weight(.heavy))
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+                .environment(\.layoutDirection, rightToLeft ? .rightToLeft : .leftToRight)
+            if let second = name.second {
+                let secondRightToLeft = ScriptDirection.isRightToLeft(second, fallbackLanguage: nil)
+                (secondRightToLeft ? BookTextDrawing.urduName(second, scale: 0.85) : Text(verbatim: second))
+                    .font(secondRightToLeft ? DIFont.urduBody(scale: 0.85) : .footnote)
+                    .foregroundStyle(DIColor.textMuted)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .environment(\.layoutDirection, secondRightToLeft ? .rightToLeft : .leftToRight)
+            }
             if let author = item.author, !author.isEmpty {
                 Text(LocalizedStringKey(author))
                     .diInterfaceFont(.subheadline, weight: .semibold)
@@ -664,20 +675,21 @@ struct ContentItemDetailView: View {
                     Spacer(minLength: 0)
                 }
 
-                Text(verbatim: item.title)
-                    .diInterfaceFont(.title2, weight: .semibold, design: .serif)
-                    .foregroundStyle(Color(hex: 0xFFE3A0))
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
+                let name = WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale))
+                LibraryCatalogueText(
+                    text: name.text,
+                    latinFont: .system(.title2, design: .serif),
+                    bold: true,
+                    urduScale: 1.25
+                )
+                .foregroundStyle(Color(hex: 0xFFE3A0))
+                .diGoldGlow(radius: 3, opacity: 0.25)
+                .fixedSize(horizontal: false, vertical: true)
 
-                if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                    Text(verbatim: titleUrdu)
-                        .font(DIFont.urduBody())
-                        .foregroundStyle(Color(hex: 0xFFE3A0))
-                        .diGoldGlow(radius: 3, opacity: 0.25)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .environment(\.layoutDirection, .rightToLeft)
+                if let second = name.second {
+                    LibraryCatalogueText(text: second, latinFont: .footnote, urduScale: 0.9)
+                        .foregroundStyle(Color(hex: 0xFFE3A0).opacity(0.85))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 HStack(spacing: DISpacing.sm) {

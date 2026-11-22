@@ -460,8 +460,9 @@ struct SearchIndexService: SearchIndexServicing {
         )
         return items.map { item in
             var bodyParts: [String] = []
-            if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                bodyParts.append(titleUrdu)
+            // With its volume's number, as the lists show it.
+            if let urduTitle = item.urduTitle {
+                bodyParts.append(urduTitle)
             }
             if let body = item.bodyPlainText, !body.isEmpty {
                 bodyParts.append(body)

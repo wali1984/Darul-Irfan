@@ -184,18 +184,24 @@ struct LibraryTabView: View {
 
     @ViewBuilder
     private func bookTitle(_ item: ContentItem) -> some View {
-        if let urdu = item.titleUrdu, !urdu.isEmpty {
-            Text(verbatim: urdu)
+        let name = WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale))
+        if ScriptDirection.isRightToLeft(name.text, fallbackLanguage: nil) {
+            BookTextDrawing.urduName(name.text, scale: 1.1)
                 .font(DIFont.urduBody(scale: 1.1))
                 .foregroundStyle(Color.white)
                 .lineLimit(2)
                 .environment(\.layoutDirection, .rightToLeft)
         } else {
-            Text(verbatim: item.title)
+            Text(verbatim: name.text)
                 .diInterfaceFont(.headline, weight: .heavy)
                 .foregroundStyle(Color.white)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
+        }
+        if let second = name.second {
+            LibraryCatalogueText(text: second, latinFont: .footnote, urduScale: 0.75)
+                .foregroundStyle(Color.white.opacity(0.85))
+                .lineLimit(1)
         }
     }
 
@@ -298,7 +304,7 @@ struct LibraryTabView: View {
     private func shelfCount(_ shelf: LibraryShelf) -> some View {
         let count = viewModel.count(for: shelf)
         if let sole = viewModel.soleItem(for: shelf.categories) {
-            Text(verbatim: sole.title)
+            Text(verbatim: WorkTitle(sole, urduInterface: DIBrand.readsUrdu(locale)).text)
         } else {
             switch shelf.noun {
             case .titles: Text("\(count) titles")

@@ -294,22 +294,15 @@ private struct SilsilaItemRow: View {
     @Environment(\.locale) private var locale
 
     var body: some View {
-        let urduTitle = item.titleUrdu.flatMap { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0 }
-        let prefersUrdu = locale.language.languageCode?.identifier == "ur" && urduTitle != nil
+        let name = WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale))
         HStack(spacing: 12) {
             HalqahRowTile(systemImage: "doc.text.fill")
             VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: prefersUrdu ? (urduTitle ?? item.title) : item.title)
+                Text(verbatim: name.text)
                     .diInterfaceFont(.subheadline, weight: .semibold)
                     .foregroundStyle(DIColor.textPrimary)
-                if prefersUrdu {
-                    Text(verbatim: item.title)
-                        .font(.footnote)
-                        .foregroundStyle(DIColor.textMuted)
-                        .environment(\.layoutDirection, .leftToRight)
-                } else if let urduTitle {
-                    Text(verbatim: urduTitle)
-                        .font(DIFont.urduBody(scale: 0.85))
+                if let second = name.second {
+                    LibraryCatalogueText(text: second, latinFont: .footnote, urduScale: 0.85)
                         .foregroundStyle(DIColor.textMuted)
                 }
             }

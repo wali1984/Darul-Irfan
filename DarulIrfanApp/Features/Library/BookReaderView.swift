@@ -20,6 +20,7 @@ struct BookReaderView: View {
     var session: BookReaderSession? = nil
 
     @State private var phase: Phase = .preparing
+    @Environment(\.locale) private var locale
     @State private var document: PDFDocument?
     @State private var pageCount: Int = 0
     @State private var currentPage: Int = 1
@@ -48,7 +49,7 @@ struct BookReaderView: View {
     var body: some View {
         content
             .diScreenBackground()
-            .navigationTitle(Text(verbatim: item.title))
+            .navigationTitle(Text(verbatim: WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale)).text))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 // In the reader, its own bars carry Go to page and Share.

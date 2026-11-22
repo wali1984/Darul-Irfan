@@ -298,6 +298,8 @@ struct BookReaderScreen: View {
 
     private var readsUrdu: Bool { locale.language.languageCode?.identifier == "ur" }
 
+    private var name: WorkTitle { WorkTitle(item, urduInterface: readsUrdu) }
+
     var body: some View {
         ZStack {
             if opened.contains(.pages) {
@@ -317,7 +319,7 @@ struct BookReaderScreen: View {
                 .modifier(BookReaderLayer(isActive: mode == .text))
             }
         }
-        .navigationTitle(Text(verbatim: item.title))
+        .navigationTitle(Text(verbatim: name.text))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -342,8 +344,18 @@ struct BookReaderScreen: View {
             }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
-            if showsModeSwitch {
-                modeSwitch
+            if showsModeSwitch || name.second != nil {
+                VStack(spacing: 0) {
+                    // The bar above has room for one name and the page.
+                    if let second = name.second {
+                        secondTitle(second)
+                    }
+                    if showsModeSwitch {
+                        modeSwitch
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .background(.ultraThinMaterial, in: Rectangle())
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -408,20 +420,39 @@ struct BookReaderScreen: View {
 
     private var titleBlock: some View {
         VStack(spacing: 0) {
-            if let urdu = item.titleUrdu, !urdu.isEmpty, bookIsRightToLeft {
-                Text(verbatim: urdu)
+            // A volume's number is at the end: a name too long is shortened
+            // in its middle.
+            if ScriptDirection.isRightToLeft(name.text, fallbackLanguage: nil) {
+                BookTextDrawing.urduName(name.text, scale: 0.85)
                     .font(DIFont.urduBody(scale: 0.85))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .truncationMode(.middle)
+                    .environment(\.layoutDirection, .rightToLeft)
             } else {
-                Text(verbatim: item.title)
+                Text(verbatim: name.text)
                     .diInterfaceFont(.subheadline, weight: .semibold)
                     .lineLimit(1)
+                    .truncationMode(.middle)
             }
             pageCaption
         }
         .foregroundStyle(DIColor.textPrimary)
         .frame(maxWidth: 220)
         .accessibilityElement(children: .combine)
+    }
+
+    /// The work's name in the other language, quietly under the bar.
+    private func secondTitle(_ second: String) -> some View {
+        let rightToLeft = ScriptDirection.isRightToLeft(second, fallbackLanguage: nil)
+        return (rightToLeft ? BookTextDrawing.urduName(second, scale: 0.7) : Text(verbatim: second))
+            .font(rightToLeft ? DIFont.urduBody(scale: 0.7) : .caption2)
+            .foregroundStyle(DIColor.textMuted)
+            .lineLimit(1)
+            .truncationMode(.middle)
+            .environment(\.layoutDirection, rightToLeft ? .rightToLeft : .leftToRight)
+            .padding(.horizontal, DISpacing.md)
+            .padding(.top, DISpacing.xs)
     }
 
     @ViewBuilder
@@ -455,8 +486,6 @@ struct BookReaderScreen: View {
         .frame(maxWidth: 280)
         .padding(.horizontal, DISpacing.md)
         .padding(.vertical, DISpacing.sm)
-        .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial, in: Rectangle())
     }
 
     private var modeBinding: Binding<BookReaderMode> {

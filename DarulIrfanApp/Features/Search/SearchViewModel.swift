@@ -118,6 +118,7 @@ final class SearchViewModel {
 
     // `let` constants are never observation-tracked, so no annotation needed.
     private let searchIndex: any SearchIndexServicing
+    private let contentRepository: any ContentRepositoryProtocol
     private let mediaRepository: any MediaRepositoryProtocol
     private let eventsRepository: any EventsRepositoryProtocol
 
@@ -131,6 +132,8 @@ final class SearchViewModel {
     /// What "Copy reference" adds to the lectures and programmes found, by id.
     private var lectures: [String: MediaItem] = [:]
     private var programmes: [String: CommunityEvent] = [:]
+    /// The works' names in the other language, by result id.
+    private var secondTitles: [String: String] = [:]
 
     // MARK: Private state
 
@@ -150,9 +153,7 @@ final class SearchViewModel {
         self.searchIndex = searchIndex
         self.mediaRepository = mediaRepository
         self.eventsRepository = eventsRepository
-        // Preserve the dependency-injection contract while result navigation
-        // is resolved by the presenting view instead of external URLs.
-        _ = contentRepository
+        self.contentRepository = contentRepository
     }
 
     // MARK: Derived
@@ -202,6 +203,11 @@ final class SearchViewModel {
 
     // MARK: Row helpers
 
+    /// A library hit's name in the other language.
+    func secondTitle(for result: SearchResult) -> String? {
+        secondTitles[result.id]
+    }
+
     /// Plain-text reference for the "Copy reference" context action:
     /// the title plus what names the hit to a reader (`SearchReference`).
     func reference(for result: SearchResult) -> String {
@@ -250,11 +256,13 @@ final class SearchViewModel {
             )
             let foundLectures = await loadLectures(among: results)
             let foundProgrammes = await loadProgrammes(among: results)
+            let named = await namingWorks(among: results)
             if Task.isCancelled { return }
 
             lectures = foundLectures
             programmes = foundProgrammes
-            groups = Self.grouped(results)
+            secondTitles = named.seconds
+            groups = Self.grouped(named.results)
             phase = groups.isEmpty ? .empty : .results
         } catch is CancellationError {
             return
@@ -275,6 +283,25 @@ final class SearchViewModel {
             }
         }
         return found
+    }
+
+    /// The library hits under the work's name in the interface's language
+    /// (a page's hit keeps its page after it), and the other language's
+    /// names by result id. One that cannot be read keeps its title.
+    private func namingWorks(among results: [SearchResult]) async -> (results: [SearchResult], seconds: [String: String]) {
+        let urdu = DIBrand.readsUrdu(LanguageManager.locale(for: LanguageManager.current))
+        var named = results
+        var seconds: [String: String] = [:]
+        for index in named.indices where named[index].domain == .library {
+            let result = named[index]
+            let id = result.bookPage?.bookID ?? result.itemID
+            guard let item = try? await contentRepository.item(id: id) else { continue }
+            let name = WorkTitle(item, urduInterface: urdu)
+            let page = result.bookPage == nil ? "" : String(result.title.dropFirst(result.workTitle.count))
+            named[index].title = name.text + page
+            if let second = name.second { seconds[result.id] = second }
+        }
+        return (named, seconds)
     }
 
     /// The programmes of the events hits, likewise.

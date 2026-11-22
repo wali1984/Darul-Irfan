@@ -172,11 +172,16 @@ struct TopicDetailView: View {
                     .foregroundStyle(DIColor.accent)
                     .frame(width: 32)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(verbatim: item.title)
+                    (item.isUrdu ? BookTextDrawing.urduName(item.title, scale: 0.9) : Text(verbatim: item.title))
                         .font(item.isUrdu ? DIFont.urduBody(scale: 0.9) : .subheadline.weight(.medium))
                         .foregroundStyle(DIColor.textPrimary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(2)
+                    if let second = item.second {
+                        LibraryCatalogueText(text: second, latinFont: .caption, urduScale: 0.7)
+                            .foregroundStyle(DIColor.textMuted)
+                            .lineLimit(1)
+                    }
                     if let subtitle = item.subtitle, !subtitle.isEmpty {
                         Text(verbatim: subtitle)
                             .diInterfaceFont(.caption)
@@ -352,6 +357,8 @@ final class TopicDetailViewModel {
         var title: String
         var subtitle: String?
         var isUrdu: Bool
+        /// The work's name in the other language.
+        var second: String? = nil
     }
 
     let topic: Topic
@@ -484,10 +491,12 @@ final class TopicDetailViewModel {
         var items: [RelatedItem] = []
         for result in merged {
             var title = result.title
+            var second: String?
             if result.domain == .library,
                let item = try? await dependencies.contentRepository.item(id: result.itemID) {
-                title = item.title
-                if isUrdu, let urduTitle = item.titleUrdu, !urduTitle.isEmpty { title = urduTitle }
+                let name = WorkTitle(item, urduInterface: isUrdu)
+                title = name.text
+                second = name.second
             }
             let titleIsUrdu = ScriptDirection.isRightToLeft(title, fallbackLanguage: nil)
             // The snippet only where it is in the same script as the title:
@@ -497,7 +506,7 @@ final class TopicDetailViewModel {
             }
             items.append(RelatedItem(
                 id: result.id, domain: result.domain, itemID: result.itemID, title: title,
-                subtitle: snippet, isUrdu: titleIsUrdu
+                subtitle: snippet, isUrdu: titleIsUrdu, second: second
             ))
         }
         // Works in the reader's language first, each group in search order.

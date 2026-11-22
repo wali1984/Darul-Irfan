@@ -6,6 +6,8 @@ import UIKit
 /// context menu offers a private, app-native reference for copying.
 struct SearchResultRow: View {
     let result: SearchResult
+    /// A work's name in the other language, quietly under its title.
+    var secondTitle: String? = nil
     /// Plain-text reference placed on the pasteboard by "Copy reference".
     let reference: String
 
@@ -65,13 +67,19 @@ struct SearchResultRow: View {
 
     private var textBlock: some View {
         VStack(alignment: .leading, spacing: DISpacing.xs) {
-            Text(result.title)
+            (isRightToLeftTitle ? BookTextDrawing.urduName(result.title, scale: 1) : Text(verbatim: result.title))
                 .font(titleFont)
                 .foregroundStyle(DIColor.textPrimary)
                 .multilineTextAlignment(.leading)
                 .lineLimit(3)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .environment(\.layoutDirection, isRightToLeftTitle ? .rightToLeft : .leftToRight)
+
+            if let secondTitle {
+                LibraryCatalogueText(text: secondTitle, latinFont: .footnote, urduScale: 0.75)
+                    .foregroundStyle(DIColor.textMuted)
+                    .lineLimit(1)
+            }
 
             if let snippet = result.snippet, !snippet.isEmpty {
                 Text(highlightedSnippet(from: snippet))

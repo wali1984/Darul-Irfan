@@ -1,6 +1,77 @@
 import Foundation
 import SwiftUI
 
+/// A work's name on its cards and over its readers: by the interface's
+/// language, with the other language's name as a quiet second line. The rule
+/// and the words are the same on every platform.
+struct WorkTitle: Equatable, Sendable {
+    let text: String
+    /// `text` is the Urdu name.
+    let isUrdu: Bool
+    /// The other language's name, where there is another.
+    let second: String?
+
+    init(_ item: ContentItem, urduInterface: Bool) {
+        let english = item.title
+        guard let urdu = item.urduTitle else {
+            (text, isUrdu, second) = (english, false, nil)
+            return
+        }
+        // The one name there is: an Urdu article's English field holds it too.
+        if english == urdu || english.isEmpty {
+            (text, isUrdu, second) = (urdu, true, nil)
+        } else if urduInterface {
+            (text, isUrdu, second) = (urdu, true, english)
+        } else {
+            (text, isUrdu, second) = (english, false, urdu)
+        }
+    }
+
+    private static let tafseer = try? NSRegularExpression(pattern: #"^tafaseer-parah-(\d+)(?:-part-(\d+))?$"#)
+    private static let tarajum = try? NSRegularExpression(
+        pattern: #"tarajum.*parah-?(\d+)(?:-to-(\d+))?"#,
+        options: [.caseInsensitive]
+    )
+    private static let asrar = try? NSRegularExpression(pattern: #"^asrar-(\d+)-(en|ur)$"#)
+
+    /// A work's Urdu name; nil where it has none. Volumes that share one are
+    /// told apart in Western digits: by their parah, and an Asrar-at-Tanzil
+    /// volume by its surah.
+    static func urdu(id: String, name: String?) -> String? {
+        guard let name, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        if let found = groups(tafseer, in: id) {
+            let parah = found[0]
+            let part = found[1]
+            let half = !part.isEmpty || parah == "30" ? " (حصہ \(part.isEmpty ? "1" : part))" : ""
+            return "\(name) — پارہ \(parah)\(half)"
+        }
+        if let found = groups(tarajum, in: id), let first = Int(found[0]) {
+            let through = Int(found[1]).map { " تا \($0)" } ?? ""
+            return "\(name) — پارہ \(first)\(through)"
+        }
+        if let found = groups(asrar, in: id) {
+            return "\(name) — سورۃ \(found[0])\(found[1] == "en" ? " (انگریزی)" : "")"
+        }
+        return name
+    }
+
+    /// The pattern's two groups, an empty one for a group not there.
+    private static func groups(_ pattern: NSRegularExpression?, in text: String) -> [String]? {
+        let whole = text as NSString
+        guard let pattern,
+              let match = pattern.firstMatch(in: text, range: NSRange(location: 0, length: whole.length)) else { return nil }
+        return (1..<match.numberOfRanges).map { group in
+            let range = match.range(at: group)
+            return range.location == NSNotFound ? "" : whole.substring(with: range)
+        }
+    }
+}
+
+extension ContentItem {
+    /// The Urdu name with its volume's number (`WorkTitle.urdu`).
+    var urduTitle: String? { WorkTitle.urdu(id: id, name: titleUrdu) }
+}
+
 struct LibraryFavoriteButton: View {
     let isFavorite: Bool
     let action: () -> Void

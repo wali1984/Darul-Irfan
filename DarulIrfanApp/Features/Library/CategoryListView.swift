@@ -199,19 +199,12 @@ struct ContentItemRow: View {
                         }
                         VStack(alignment: .leading, spacing: DISpacing.xs) {
                             VStack(alignment: .leading, spacing: DISpacing.xs) {
-                                if locale.language.languageCode?.identifier == "ur",
-                                   let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                                    LibraryCatalogueText(text: titleUrdu, latinFont: .body, bold: true)
-                                        .foregroundStyle(DIColor.textPrimary)
-                                    LibraryCatalogueText(text: item.title, latinFont: .footnote, urduScale: 0.75)
+                                let name = WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale))
+                                LibraryCatalogueText(text: name.text, latinFont: .body, bold: true)
+                                    .foregroundStyle(DIColor.textPrimary)
+                                if let second = name.second {
+                                    LibraryCatalogueText(text: second, latinFont: .footnote, urduScale: name.isUrdu ? 0.75 : 0.9)
                                         .foregroundStyle(DIColor.textMuted)
-                                } else {
-                                    LibraryCatalogueText(text: item.title, latinFont: .body, bold: true)
-                                        .foregroundStyle(DIColor.textPrimary)
-                                    if let titleUrdu = item.titleUrdu, !titleUrdu.isEmpty {
-                                        LibraryCatalogueText(text: titleUrdu, latinFont: .footnote, urduScale: 0.9)
-                                            .foregroundStyle(DIColor.textMuted)
-                                    }
                                 }
                             }
                             if !subtitleText.isEmpty {
@@ -255,7 +248,7 @@ struct LibraryCatalogueText: View {
     var body: some View {
         let rtl = ScriptDirection.isRightToLeft(text, fallbackLanguage: nil)
         let font = rtl ? DIFont.urduBody(scale: urduScale) : latinFont
-        Text(verbatim: text)
+        (rtl ? BookTextDrawing.urduName(text, scale: urduScale) : Text(verbatim: text))
             .font(bold ? font.weight(.semibold) : font)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)

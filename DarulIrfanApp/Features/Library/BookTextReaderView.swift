@@ -51,6 +51,7 @@ struct BookTextPagesView: View {
 
     /// The pages with text and, between them, those with none.
     @State private var entries: [BookTextEntry] = []
+    @Environment(\.locale) private var locale
     /// Pages set out into headings, paragraphs, poetry and quotations.
     @State private var formatted: [String: BookPageFormatter.Page] = [:]
     @State private var isLoading = true
@@ -128,7 +129,7 @@ struct BookTextPagesView: View {
             }
         }
         .diScreenBackground()
-        .navigationTitle(Text(verbatim: item.title))
+        .navigationTitle(Text(verbatim: WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale)).text))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             // In the reader, its floating bar carries Go to page.

@@ -57,7 +57,7 @@ struct BookCoverView: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Cover of \(item.title)"))
+        .accessibilityLabel(Text("Cover of \(WorkTitle(item, urduInterface: DIBrand.readsUrdu(locale)).text)"))
     }
 
     private var cover: some View {
@@ -121,8 +121,8 @@ struct BookCoverView: View {
 
     @ViewBuilder
     private var titleText: some View {
-        if let urdu = item.titleUrdu, !urdu.isEmpty {
-            Text(verbatim: urdu)
+        if let urdu = item.urduTitle {
+            BookTextDrawing.urduName(urdu, scale: 1.3)
                 .font(DIFont.urduBody(scale: 1.3))
                 .foregroundStyle(Color(hex: 0xFFE9A8))
                 .multilineTextAlignment(.center)
