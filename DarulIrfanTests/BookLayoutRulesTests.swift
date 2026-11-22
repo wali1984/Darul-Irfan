@@ -8,6 +8,13 @@ final class BookLayoutRulesTests: XCTestCase {
     /// The books these tests read.
     private static let books: Set<String> = [
         "asrar-10-en",
+        "asrar-100-en",
+        "asrar-11-ur",
+        "asrar-16-en",
+        "asrar-18-en",
+        "asrar-23-ur",
+        "asrar-5-en",
+        "asrar-6-ur",
         "book-hayyat-e-tayyabah-i",
         "book-ocr-gard-e-safar",
         "book-ocr-hamd-o-naat",
@@ -16,6 +23,8 @@ final class BookLayoutRulesTests: XCTestCase {
         "book-ocr-sai-hafta-course",
         "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah",
         "tafaseer-parah-1",
+        "tafaseer-parah-4",
+        "tafaseer-parah-9",
         "uploads-books-maktobaat",
         "uploads-books-tasawwuf-aur-tameer-e-seraat",
         "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
@@ -35,6 +44,67 @@ final class BookLayoutRulesTests: XCTestCase {
             guard case .table(let rows) = block else { return nil }
             return rows
         }
+    }
+
+    // MARK: - A sentence the page break cuts
+
+    /// The words page `number` takes from the next one.
+    private func carried(_ bookID: String, _ number: Int) throws -> String? {
+        let first = try page(bookID, number)
+        let next = try page(bookID, number + 1)
+        let laid = try XCTUnwrap(BookPageFormatter.format(pages: [first, next])[first.id])
+        guard let carried = laid.carried, case .paragraph(let runs)? = laid.blocks.last else { return nil }
+        return (runs[carried.run].text as NSString).substring(from: carried.offset)
+    }
+
+    func testTheClosingQuoteGoesWithItsSentence() throws {
+        let moved = try carried("book-ocr-pardah", 3)
+        let words = try XCTUnwrap(moved)
+        XCTAssertTrue(words.hasSuffix("احکام شامل ہیں۔\""), words)
+        let pair = [try page("book-ocr-pardah", 3), try page("book-ocr-pardah", 4)]
+        let laid = try XCTUnwrap(BookPageFormatter.format(pages: pair)[pair[1].id])
+        // Page 4 no longer opens with a paragraph that is only a quote mark.
+        guard case .paragraph(let runs)? = laid.blocks.first else { return XCTFail("\(laid.blocks)") }
+        XCTAssertTrue(runs[0].text.hasPrefix("عیسائی مذہب"), runs[0].text)
+        XCTAssertEqual(try carried("asrar-18-en", 24), "believe this simple fact.\"")
+        XCTAssertEqual(try carried("asrar-10-en", 11), "brotherhood.")
+    }
+
+    func testAnEndedSentenceASerialNumberAndASplitWordTakeNothing() throws {
+        let cases: [(String, Int)] = [
+            // "4۔" and "10." stay with their items.
+            ("uploads-books-tareeq-e-saluk-fi-adab-e-shayuk", 129),
+            ("asrar-100-en", 1),
+            // "i.e." is not cut after its "i.".
+            ("asrar-16-en", 21),
+            // A full stop inside the quote that closes the page.
+            ("book-hayyat-e-tayyabah-i", 200),
+            // A row of stars is no sentence.
+            ("asrar-5-en", 37),
+        ]
+        for (bookID, number) in cases {
+            XCTAssertNil(try carried(bookID, number), "\(bookID) p\(number)")
+        }
+    }
+
+    func testAtMost240CharactersAreCarried() throws {
+        let cases: [(String, Int)] = [
+            ("asrar-11-ur", 31), ("asrar-23-ur", 14), ("asrar-6-ur", 27),
+            ("book-ocr-sai-hafta-course", 156), ("tafaseer-parah-4", 160), ("tafaseer-parah-9", 108),
+        ]
+        for (bookID, number) in cases {
+            XCTAssertNil(try carried(bookID, number), "\(bookID) p\(number) has 241")
+        }
+        // The stop is one of the 240.
+        func offered(_ letters: Int) -> BookPageFormatter.Carried? {
+            let cut = BookPage(bookID: "b", page: 1, text: "یہ جملہ اس صفحے پر پورا نہیں ہوا اور",
+                               blocks: 1, unresolvedBlocks: 0, layout: "p")
+            let next = BookPage(bookID: "b", page: 2, text: String(repeating: "ا", count: letters) + "۔ دوسرا جملہ۔",
+                                blocks: 1, unresolvedBlocks: 0, layout: "p")
+            return BookPageFormatter.format(pages: [cut, next])[cut.id]?.carried
+        }
+        XCTAssertNotNil(offered(239))
+        XCTAssertNil(offered(240))
     }
 
     // MARK: - The salawat sign among Urdu words

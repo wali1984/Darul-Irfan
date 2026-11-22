@@ -115,12 +115,22 @@ enum BookPageFormatter {
         case caption(String)
     }
 
+    /// Where the words that finish a page's last paragraph from the next
+    /// page begin: in which run, and how far into it in UTF-16. They keep
+    /// that page's links.
+    struct Carried: Equatable, Sendable {
+        var run: Int
+        var offset: Int
+    }
+
     struct Page: Equatable, Sendable {
         /// A contents (index) page: shown folded, not as reading text.
         var isContents: Bool
         var blocks: [Block]
         /// The page's footnotes, set after its text.
         var footnotes: [String] = []
+        /// Set where the last paragraph takes words from the next page.
+        var carried: Carried?
         /// Words the reading of the scan could not make out ("[؟]"), and all
         /// the page's words: a page with many shows a note pointing to the
         /// printed page (a handwritten letter, faint print).
@@ -304,7 +314,9 @@ enum BookPageFormatter {
                case .paragraph(let head)? = formatted.blocks.first,
                case let (fragment, rest)? = finishingFragment(of: head),
                !(rest.isEmpty && formatted.blocks.count == 1) {
-                earlier.blocks[earlier.blocks.count - 1] = .paragraph(merge(tail, fragment))
+                let (runs, carried) = joining(fragment, to: tail)
+                earlier.blocks[earlier.blocks.count - 1] = .paragraph(runs)
+                earlier.carried = carried
                 if rest.isEmpty {
                     formatted.blocks.removeFirst()
                 } else {
@@ -319,27 +331,46 @@ enum BookPageFormatter {
     }
 
     /// The words at the start of a paragraph up to and including the end of
-    /// its first sentence, when that comes within a short distance, and what
-    /// is left after them. Nil when the paragraph opens with a quotation, its
-    /// first sentence runs on, or it crosses a printed line break (a title or
-    /// a verse): then nothing is carried across.
-    private static func finishingFragment(of head: [Run]) -> (fragment: [Run], rest: [Run])? {
+    /// its first sentence, with the quote, bracket or repeated stop that
+    /// closes it, and what is left after them. Nil when the paragraph opens
+    /// with a quotation or its sentence does not end within
+    /// `maximumCarriedCharacters` (marks apart) on its first printed line.
+    /// Nil also when that end is inside a word ("i.e.") or is the number of
+    /// the next item ("10."): then nothing is carried across.
+    private static func finishingFragment(of head: [Run]) -> (fragment: String, rest: [Run])? {
         guard let first = head.first, !first.isQuranic else { return nil }
-        let text = first.text
-        var offset = 0
-        var cut: String.Index?
-        for index in text.indices {
-            if offset > maximumCarriedCharacters { break }
-            if sentenceEnds.contains(text[index]) { cut = text.index(after: index); break }
-            offset += 1
+        let scalars = Array(first.text.unicodeScalars)
+        var end = 0
+        var seen = 0
+        var ended = false
+        for scalar in scalars {
+            let mark = isMark(scalar)
+            // A mark on the sentence's sign belongs to it.
+            if ended && !mark { break }
+            if scalar == "\n" { return nil }
+            if !mark {
+                seen += 1
+                if seen > maximumCarriedCharacters { break }
+            }
+            end += 1
+            if sentenceEnds.contains(scalar) { ended = true }
         }
-        guard let cut else { return nil }
-        let fragment = text[..<cut].trimmingCharacters(in: .whitespaces)
-        let remainder = text[cut...].trimmingCharacters(in: .whitespaces)
-        guard !fragment.isEmpty, !fragment.contains("\n") else { return nil }
-        var rest: [Run] = remainder.isEmpty ? [] : [Run(text: remainder, isQuranic: false)]
-        rest.append(contentsOf: head.dropFirst())
-        return ([Run(text: fragment, isQuranic: false)], rest)
+        guard ended else { return nil }
+        while end < scalars.count, isMark(scalars[end]) || goesWithTheEnd.contains(scalars[end]) { end += 1 }
+        if end < scalars.count, !scalars[end].properties.isWhitespace { return nil }
+        let length = scalars[..<end].filter { !isMark($0) }.count
+        guard length <= maximumCarriedCharacters else { return nil }
+
+        let fragment = string(scalars[..<end]).trimmingCharacters(in: .whitespaces)
+        guard !fragment.isEmpty, fragment.range(of: serialNumber, options: .regularExpression) == nil else { return nil }
+        let remainder = string(scalars[end...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        var rest = Array(head.dropFirst())
+        if !remainder.isEmpty {
+            rest.insert(Run(text: remainder, isQuranic: false), at: 0)
+        } else if !rest.isEmpty {
+            rest[0].startsLine = false
+        }
+        return (fragment, rest)
     }
 
     // MARK: - Pages that carry their layout
@@ -746,18 +777,48 @@ enum BookPageFormatter {
 
     // MARK: - Joining pages
 
+    /// A paragraph of words that stops before its sentence does. One that
+    /// ends in a question, or in a quote or bracket closing a sentence, has
+    /// ended; a row of stars or a rule is no sentence.
     private static func endsMidSentence(_ runs: [Run]) -> Bool {
-        guard let last = runs.last?.text.trimmingCharacters(in: .whitespaces).last else { return false }
-        return !terminators.contains(last)
+        guard let text = runs.last?.text.trimmingCharacters(in: .whitespaces) else { return false }
+        let signs = Array(text.unicodeScalars).filter { !isMark($0) }
+        guard let last = signs.last, !terminatorScalars.contains(last), !sentenceEnds.contains(last) else { return false }
+        if let closed = signs.reversed().first(where: { !$0.properties.isWhitespace && !closers.contains($0) }),
+           sentenceEnds.contains(closed) {
+            return false
+        }
+        return runs.contains { run in run.text.unicodeScalars.contains(where: isLetter) }
     }
 
-    private static func merge(_ tail: [Run], _ head: [Run]) -> [Run] {
-        guard let first = head.first, let last = tail.last, first.isQuranic == last.isQuranic else {
-            return tail + head
+    /// `fragment` on the last printed line of `tail`, and where it begins.
+    private static func joining(_ fragment: String, to tail: [Run]) -> (runs: [Run], carried: Carried) {
+        guard let last = tail.last, !last.isQuranic else {
+            return (tail + [Run(text: fragment, isQuranic: false)], Carried(run: tail.count, offset: 0))
         }
-        var merged = tail
-        merged[merged.count - 1].text += " " + first.text
-        return merged + head.dropFirst()
+        var runs = tail
+        runs[runs.count - 1].text += " " + fragment
+        return (runs, Carried(run: runs.count - 1, offset: last.text.utf16.count + 1))
+    }
+
+    private static func string(_ scalars: ArraySlice<Unicode.Scalar>) -> String {
+        var view = String.UnicodeScalarView()
+        view.append(contentsOf: scalars)
+        return String(view)
+    }
+
+    private static func isMark(_ scalar: Unicode.Scalar) -> Bool {
+        switch scalar.properties.generalCategory {
+        case .nonspacingMark, .spacingMark, .enclosingMark: return true
+        default: return false
+        }
+    }
+
+    private static func isLetter(_ scalar: Unicode.Scalar) -> Bool {
+        switch scalar.properties.generalCategory {
+        case .uppercaseLetter, .lowercaseLetter, .titlecaseLetter, .modifierLetter, .otherLetter: return true
+        default: return false
+        }
     }
 
     // MARK: - Character sets
@@ -770,8 +831,16 @@ enum BookPageFormatter {
     private static let digits: Set<Character> = Set("0123456789٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹")
     private static let noiseCharacters: Set<Character> = digits.union(" .,:;-–—()[]/۔،*")
     private static let terminators: Set<Character> = Set("۔؟!.:”\"؛")
+    /// The same signs as scalars: a sign with a mark on it is one Character.
+    private static let terminatorScalars: Set<Unicode.Scalar> = Set("۔؟!.:”\"؛".unicodeScalars)
     /// Where a sentence carried across a page break may end.
-    private static let sentenceEnds: Set<Character> = Set("۔؟!.?")
+    private static let sentenceEnds: Set<Unicode.Scalar> = Set("۔؟!.?".unicodeScalars)
+    /// What may stand after the mark that ends a sentence, closing it.
+    private static let closers: Set<Unicode.Scalar> = Set("'\"‘’“”)]»›".unicodeScalars)
+    /// What is carried along with that mark.
+    private static let goesWithTheEnd: Set<Unicode.Scalar> = Set("'\"‘’“”)]».۔؟!".unicodeScalars)
+    /// The number of a list's next item or of a verse: "10.", "۲۔".
+    private static let serialNumber = #"^[(\[]?\p{Nd}+[.۔)\]\s-]*$"#
     /// The most text carried back to the page before; longer than this, the
     /// sentence stays on its own page.
     private static let maximumCarriedCharacters = 240
