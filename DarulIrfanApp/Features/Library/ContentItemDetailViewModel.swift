@@ -85,15 +85,7 @@ final class ContentItemDetailViewModel {
         }
         if let item {
             await Task.detached(priority: .utility) { QuranQuotation.warmUp() }.value
-            let plain: String
-            if let bodyPlainText = item.bodyPlainText, !bodyPlainText.isEmpty {
-                plain = bodyPlainText
-            } else if let bodyHtml = item.bodyHtml, !bodyHtml.isEmpty {
-                plain = LibraryHTMLText.plainText(fromHTML: bodyHtml)
-            } else {
-                plain = ""
-            }
-            bodyParagraphs = LibraryHTMLText.paragraphs(from: plain)
+            bodyParagraphs = LibraryHTMLText.articleParagraphs(plain: item.bodyPlainText, html: item.bodyHtml)
             bookPageCount = (try? await contentRepository.bookPageCount(bookID: item.id)) ?? 0
             if let progress = try? await contentRepository.readingProgress(contentItemID: item.id) {
                 initialReadingFraction = min(max(progress.fraction, 0), 1)

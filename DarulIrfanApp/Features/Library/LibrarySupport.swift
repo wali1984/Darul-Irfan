@@ -399,12 +399,49 @@ enum LibraryHTMLText {
         return decodeEntities(in: text)
     }
 
-    /// Splits plain text into trimmed, non-empty paragraphs for rendering.
-    static func paragraphs(from plainText: String) -> [String] {
-        plainText
-            .components(separatedBy: CharacterSet.newlines)
+    /// An article's paragraphs, as on desktop: its plain text cut at blank
+    /// lines, each keeping its own line breaks. Where it has no blank line,
+    /// the paragraphs of its markup if they are the same words, otherwise
+    /// each line is a paragraph. With markup alone, that markup's paragraphs.
+    static func articleParagraphs(plain: String?, html: String?) -> [String] {
+        let markup = html ?? ""
+        let isMarked = markup.range(of: "<[a-z!/]", options: [.regularExpression, .caseInsensitive]) != nil
+        // The source's own line breaks are drawn as spaces.
+        let laidOut = isMarked
+            ? plainText(fromHTML: markup.replacingOccurrences(of: "[\\r\\n]+", with: " ", options: .regularExpression))
+            : ""
+        let text: String
+        if let plain, !plain.isEmpty {
+            text = plain
+        } else if isMarked {
+            return partsAtBlankLines(laidOut)
+        } else {
+            text = plainText(fromHTML: markup)
+        }
+        let lines = trimmedLines(text)
+        guard lines.contains(where: { !$0.isEmpty }) else { return partsAtBlankLines(laidOut) }
+        if lines.contains(where: \.isEmpty) { return partsAtBlankLines(text) }
+        if !laidOut.isEmpty, words(of: text) == words(of: laidOut) { return partsAtBlankLines(laidOut) }
+        return lines
+    }
+
+    private static func partsAtBlankLines(_ text: String) -> [String] {
+        trimmedLines(text)
+            .split(whereSeparator: \.isEmpty)
+            .map { $0.joined(separator: "\n") }
+    }
+
+    /// The text's lines, none empty at either end, each trimmed.
+    private static func trimmedLines(_ text: String) -> [String] {
+        text.replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .components(separatedBy: "\n")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
+    }
+
+    private static func words(of text: String) -> [Substring] {
+        text.split(whereSeparator: \.isWhitespace)
     }
 
     private static func decodeEntities(in input: String) -> String {

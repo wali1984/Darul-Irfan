@@ -112,6 +112,34 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertNil(offered(240))
     }
 
+    // MARK: - An article's paragraphs
+
+    func testAnArticleIsCutAtItsBlankLines() throws {
+        let item = try XCTUnwrap(SeedBundle.libraryItem(id: "what-is-tasawwuf-ur"))
+        let parts = LibraryHTMLText.articleParagraphs(plain: item.bodyPlainText, html: item.bodyHtml)
+        // 33 paragraphs; a cut at every newline made 39.
+        XCTAssertEqual(parts.count, 33)
+        // Its header keeps its lines.
+        XCTAssertEqual(parts.first?.components(separatedBy: "\n").count, 6)
+        let plain = try XCTUnwrap(item.bodyPlainText)
+        XCTAssertEqual(
+            parts.joined(separator: " ").split(whereSeparator: \.isWhitespace),
+            plain.split(whereSeparator: \.isWhitespace)
+        )
+
+        let release = try XCTUnwrap(SeedBundle.libraryItem(
+            id: "press-release-4263-2026-08-23-mah-e-rabi-ul-awal-tajdeed-e-ehad-ka-din-hai"
+        ))
+        XCTAssertEqual(LibraryHTMLText.articleParagraphs(plain: release.bodyPlainText, html: nil).count, 8)
+        XCTAssertEqual(
+            LibraryHTMLText.articleParagraphs(plain: "one\ntwo three", html: "<p>one<br>two\nthree</p>"),
+            ["one\ntwo three"]
+        )
+        XCTAssertEqual(LibraryHTMLText.articleParagraphs(plain: "one\ntwo", html: nil), ["one", "two"])
+        XCTAssertEqual(LibraryHTMLText.articleParagraphs(plain: nil, html: "<p>one</p><p>two</p>"), ["one", "two"])
+        XCTAssertEqual(LibraryHTMLText.articleParagraphs(plain: nil, html: nil), [])
+    }
+
     // MARK: - The salawat sign among Urdu words
 
     func testOnlyTheSalawatSignIsEnlargedAndItsLinkIsKept() throws {
