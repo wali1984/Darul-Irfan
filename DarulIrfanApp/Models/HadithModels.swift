@@ -18,8 +18,8 @@ enum HadithEnglishText {
 
 /// One hadith collection (Sahih al-Bukhari, Sahih Muslim, …).
 ///
-/// The corpus is the public-domain (Unlicense) `hadith-api` data set; every
-/// bundled collection carries Arabic, English and Urdu.
+/// Not every collection carries all three scripts: see `hasArabic`,
+/// `hasEnglish` and `hasUrdu`.
 /// `Hashable` (which implies `Equatable`) so it can address a `HadithRoute`
 /// in a navigation path.
 struct HadithBook: Codable, Sendable, Identifiable, Hashable {
@@ -103,15 +103,9 @@ struct HadithSection: Codable, Sendable, Identifiable, Hashable {
     }
 }
 
-/// The seed index file: the collections plus the provenance of the corpus.
+/// The seed index file: the collections and the languages they come in.
 struct HadithCatalog: Codable, Sendable, Equatable {
-    var source: String?
-    var license: String?
-    var licenseUrl: String?
     var languages: [String]?
-    /// Review state of the corpus as a whole. Internal metadata, never a label
-    /// shown beside a narration.
-    var reviewState: ReviewState?
     var books: [HadithBook]
 }
 
@@ -172,16 +166,6 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
     var chapterTitleEnglish: String?
     var chapterTitleArabic: String?
     var chapterTitleUrdu: String?
-    /// Provenance of each translation, written by the promotion gate:
-    /// `humanVerified` once a qualified reviewer has vouched for it, or
-    /// `machineTranslated` while it is still a draft. Absent on the original
-    /// sourced corpus, which was never machine-translated. The reader labels a
-    /// draft so no one mistakes it for reviewed scholarship.
-    var englishReviewState: String?
-    var urduReviewState: String?
-    /// Where the Urdu came from, when it is not the corpus's own (e.g. a
-    /// provisional text from another site, pending review).
-    var urduSource: String?
 
     enum CodingKeys: String, CodingKey {
         case canonicalID
@@ -204,24 +188,6 @@ struct HadithEntry: Codable, Sendable, Identifiable, Equatable {
         case chapterTitleEnglish
         case chapterTitleArabic
         case chapterTitleUrdu
-        case englishReviewState
-        case urduReviewState
-        case urduSource
-    }
-
-    /// True when the text shown for this language is an unreviewed machine
-    /// draft. Drives the reader's "pending review" note.
-    func isMachineTranslated(languageCode: String) -> Bool {
-        let state = languageCode == "ur" ? urduReviewState : englishReviewState
-        return state == "machineTranslated"
-    }
-
-    /// True when the text shown for this language is provisional - taken
-    /// from a source that has not been reviewed (the packs mark it
-    /// `machine_provisional`). The reader says so beside it.
-    func isProvisional(languageCode: String) -> Bool {
-        let state = languageCode == "ur" ? urduReviewState : englishReviewState
-        return state == "machine_provisional"
     }
 
     /// The Arabic as segments, always. When the pack has no segmentation yet,

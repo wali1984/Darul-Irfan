@@ -288,7 +288,7 @@ final class ContentSyncServiceTests: XCTestCase {
             (.quran, "quran_editions", "author"),
             (.quranTranslations, "quran_translations", "text"),
             (.quranTafsir, "quran_tafsir", "source_url"),
-            (.bookPages, "book_pages", "validator"),
+            (.bookPages, "book_pages", "layout"),
         ]
         for sentinel in sentinels {
             try await database.connection.execute(

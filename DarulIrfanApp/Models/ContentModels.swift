@@ -199,57 +199,44 @@ struct ContentReadingProgress: Codable, Sendable, Equatable {
 
 // MARK: - Book pages
 
-/// One printed page of a Silsila book, as OCR'd text.
+/// One printed page of a Silsila book, as text.
 ///
 /// Books ship two ways: a PDF that `BookReaderView` renders through PDFKit,
-/// and — for the works that have been OCR'd — this page-structured text, which
-/// is searchable, selectable and readable offline without the PDF.
+/// and, for the works that have it, this page-structured text, which is
+/// searchable, selectable and readable offline without the PDF.
 ///
 /// Records are per page rather than per book on purpose. A whole book's text
 /// runs to hundreds of kilobytes; the largest single page here is ~10 KB, so
 /// the reader can render lazily and no record approaches the size that crashed
 /// the Quran reader in v1.6.9.
 ///
-/// `reviewState` is `claudeTranscribed` for pages re-read from the scan by
-/// Claude, and `machineProvisional` for the original OCR (arbitration and a
-/// visual cross-check, no human proofreading). `unresolvedBlocks` carries how many of the page's blocks the
-/// validator could not settle, so the reader can mark a page rather than
-/// present unverified text as if it were checked. Arabic quotations inside the
-/// prose are the book's own and are NOT canonical scripture — they must never
-/// be rendered as Qur'an or hadith.
+/// Arabic quotations inside the prose are the book's own and are NOT
+/// canonical scripture: one is set as Qur'an only where the mushaf confirms
+/// it (`QuranQuotation`), and never as hadith.
 ///
-/// `layout` is set for the pages Claude re-read: Claude returned each page as
-/// typed blocks, and the layout keeps their kinds, one letter per block in
-/// the order of the text's blank-line-separated parts (see `layoutKinds`), so
-/// the reader sets headings, poetry, Arabic quotations and footnotes out as
-/// printed instead of guessing them from the plain text. Nil for the original
-/// OCR, which is laid out from its text as before.
+/// `layout` keeps the kinds of the page's blocks, one letter per block in the
+/// order of the text's blank-line-separated parts (see
+/// `BookPageFormatter.Kind`), so the reader sets headings, poetry, Arabic
+/// quotations and footnotes out as printed instead of guessing them from the
+/// plain text. A page without one is laid out from its text.
 struct BookPage: Codable, Sendable, Identifiable, Equatable {
     /// `library_items.json` id of the book this page belongs to.
     var bookID: String
     /// Printed/PDF page number, 1-based.
     var page: Int
     var text: String
-    /// Blocks the OCR pipeline found on this page.
+    /// Blocks of text on this page.
     var blocks: Int
-    /// Blocks the validator left unresolved (subset of `blocks`).
+    /// Blocks left unresolved (subset of `blocks`).
     var unresolvedBlocks: Int
-    /// Provenance: `machineProvisional` until a human has proofread it.
-    var reviewState: String
-    /// Model that produced the arbitrated text.
-    var validator: String
     /// One letter per block of `text`: h heading, p paragraph, v verse (a
     /// couplet or stanza, its printed lines kept), a Arabic quotation,
-    /// f footnote, t table, c caption. Optional in the seed, so older rows
-    /// and the original OCR decode without it.
+    /// f footnote, t table, c caption. Optional in the seed, so a page
+    /// without a layout decodes.
     var layout: String? = nil
 
     var id: String { "\(bookID)|\(page)" }
 
-    /// True when the validator could not settle any block on this page.
+    /// True when every block on this page is settled.
     var isFullyResolved: Bool { unresolvedBlocks == 0 }
-
-    /// Still the original OCR text. Pages re-read from the scan by Claude
-    /// (`claudeTranscribed`) are shown without the proofreading notice.
-    var isMachineProvisional: Bool { reviewState == "machineProvisional" }
 }

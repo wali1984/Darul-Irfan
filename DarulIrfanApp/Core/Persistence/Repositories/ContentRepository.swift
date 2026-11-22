@@ -290,8 +290,7 @@ struct ContentRepository: ContentRepositoryProtocol {
     func bookPages(bookID: String) async throws -> [BookPage] {
         let rows = try await database.connection.query(
             """
-            SELECT book_id, page, text, blocks, unresolved_blocks,
-                   review_state, validator, layout
+            SELECT book_id, page, text, blocks, unresolved_blocks, layout
             FROM book_pages
             WHERE book_id = ?
             ORDER BY page
@@ -309,39 +308,24 @@ struct ContentRepository: ContentRepositoryProtocol {
         return rows.first?.int("n") ?? 0
     }
 
-    func bookMachineProvisionalPageCount(bookID: String) async throws -> Int {
-        let rows = try await database.connection.query(
-            "SELECT COUNT(*) AS n FROM book_pages WHERE book_id = ? AND review_state = 'machineProvisional'",
-            [.text(bookID)]
-        )
-        return rows.first?.int("n") ?? 0
-    }
-
-    func bookHasMachineProvisionalPages(bookID: String) async throws -> Bool {
-        let rows = try await database.connection.query(
-            "SELECT COUNT(*) AS n FROM book_pages WHERE book_id = ? AND review_state = 'machineProvisional'",
-            [.text(bookID)]
-        )
-        return (rows.first?.int("n") ?? 0) > 0
-    }
-
     /// Upsert on `(book_id, page)`. The generator verifies that pair is unique
     /// before writing the seed, so a re-import updates in place rather than
     /// dropping pages on a key collision.
+    ///
+    /// `review_state` is retired but NOT NULL, and a store made before schema
+    /// v11 keeps its older default, so it is always written blank.
     func upsertBookPages(_ pages: [BookPage]) async throws {
         guard !pages.isEmpty else { return }
         var statements: [(sql: String, parameters: [SQLValue])] = pages.map { page in
             (
                 sql: """
                 INSERT INTO book_pages (book_id, page, text, blocks,
-                    unresolved_blocks, review_state, validator, layout)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    unresolved_blocks, review_state, layout)
+                VALUES (?, ?, ?, ?, ?, '', ?)
                 ON CONFLICT(book_id, page) DO UPDATE SET
                     text = excluded.text,
                     blocks = excluded.blocks,
                     unresolved_blocks = excluded.unresolved_blocks,
-                    review_state = excluded.review_state,
-                    validator = excluded.validator,
                     layout = excluded.layout
                 """,
                 parameters: [
@@ -350,8 +334,6 @@ struct ContentRepository: ContentRepositoryProtocol {
                     .text(page.text),
                     .int(page.blocks),
                     .int(page.unresolvedBlocks),
-                    .text(page.reviewState),
-                    .text(page.validator),
                     // NULL when the page has none, so a page that loses its
                     // layout is laid out from its text, not from a stale one.
                     .optionalText(page.layout),
@@ -398,8 +380,6 @@ struct ContentRepository: ContentRepositoryProtocol {
             text: text,
             blocks: row.int("blocks") ?? 0,
             unresolvedBlocks: row.int("unresolved_blocks") ?? 0,
-            reviewState: row.text("review_state") ?? "machineProvisional",
-            validator: row.text("validator") ?? "unknown",
             layout: row.text("layout")
         )
     }

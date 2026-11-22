@@ -99,18 +99,12 @@ protocol ContentRepositoryProtocol: Sendable {
     func deleteItems(ids: [String]) async throws
     func upsertCollections(_ collections: [ContentCollection]) async throws
 
-    /// OCR'd page text for a book, ordered by printed page. Empty when the
+    /// Page text for a book, ordered by printed page. Empty when the
     /// book has no bundled text — the caller falls back to the PDF reader.
     func bookPages(bookID: String) async throws -> [BookPage]
 
-    /// How many OCR'd pages a book has, without loading their text.
+    /// How many pages of text a book has, without loading their text.
     func bookPageCount(bookID: String) async throws -> Int
-
-    /// True while any of a book's pages is still original OCR text.
-    func bookHasMachineProvisionalPages(bookID: String) async throws -> Bool
-
-    /// How many of a book's pages are still original OCR text.
-    func bookMachineProvisionalPageCount(bookID: String) async throws -> Int
 
     func upsertBookPages(_ pages: [BookPage]) async throws
     func categoryCounts() async throws -> [ContentCategory: Int]

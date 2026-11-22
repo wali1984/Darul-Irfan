@@ -3,9 +3,8 @@ import Foundation
 /// Recognises Qur'anic quotations inside book and tafsir text by finding them
 /// in the mushaf the app ships (quran_ayahs.json).
 ///
-/// The pages are read from scans. On the original OCR pages most quoted
-/// Arabic is corrupt, and every kind of page also quotes hadith, du'as and
-/// Arabic sayings that look like a quotation from the Qur'an. Set in the
+/// The books quote hadith, du'as and Arabic sayings that look like a
+/// quotation from the Qur'an, and some quote an ayah inexactly. Set in the
 /// Qur'an face, all of it would read as scripture. So the face is kept for
 /// Arabic whose every run of words is in the mushaf, in the same order; the
 /// rest is shown as the book's own Arabic.
@@ -13,11 +12,11 @@ enum QuranQuotation {
     /// How closely a quotation must follow the mushaf.
     enum Check: Sendable, Equatable {
         /// The same letters in the same order. Vowel marks are not compared,
-        /// because a scan and the mushaf write them differently. For pages
-        /// re-read from the scan by Claude.
+        /// because the books and the mushaf write them differently. Every
+        /// book page is compared this way.
         case letters
-        /// The same letters and the same vowel marks. For the original OCR,
-        /// whose letters can be right while a vowel is wrong.
+        /// The same letters and the same vowel marks. For tafsir text whose
+        /// letters can be right while a vowel is wrong.
         case exact
     }
 

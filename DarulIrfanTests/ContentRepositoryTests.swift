@@ -205,16 +205,16 @@ final class ContentRepositoryTests: XCTestCase {
 
     // MARK: - Book pages
 
-    /// A re-read page's layout is stored and read back with it; the original
-    /// OCR has none, and a page imported again without one loses it.
+    /// A page's layout is stored and read back with it; a page can have none,
+    /// and a page imported again without one loses it.
     func testBookPageLayoutRoundtrip() async throws {
         let laidOut = BookPage(bookID: "book-ur", page: 3, text: "باب اول\n\nانسان جو چیز بناتا ہے۔", blocks: 2,
-                               unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test", layout: "hp")
-        let original = BookPage(bookID: "book-ur", page: 4, text: "انسان جو چیز بناتا ہے۔", blocks: 1,
-                                unresolvedBlocks: 0, reviewState: "machineProvisional", validator: "test")
-        try await repository.upsertBookPages([laidOut, original])
+                               unresolvedBlocks: 0, layout: "hp")
+        let plain = BookPage(bookID: "book-ur", page: 4, text: "انسان جو چیز بناتا ہے۔", blocks: 1,
+                             unresolvedBlocks: 0)
+        try await repository.upsertBookPages([laidOut, plain])
         let pages = try await repository.bookPages(bookID: "book-ur")
-        XCTAssertEqual(pages, [laidOut, original])
+        XCTAssertEqual(pages, [laidOut, plain])
         XCTAssertEqual(pages.first?.layout, "hp")
         XCTAssertNil(pages.last?.layout)
 
@@ -230,5 +230,57 @@ final class ContentRepositoryTests: XCTestCase {
     func testBookPagesTableHasALayoutColumn() async throws {
         let columns = try await database.connection.query("SELECT name FROM pragma_table_info('book_pages')")
         XCTAssertTrue(columns.compactMap { $0.text("name") }.contains("layout"))
+    }
+
+    /// The retired keys are optional in the seed: a page decodes with them
+    /// and without them.
+    func testBookPageDecodesWithAndWithoutTheRetiredKeys() throws {
+        let json = """
+        [{"bookID":"b","page":1,"text":"t","blocks":1,"unresolvedBlocks":0,"reviewState":"final","validator":""},
+         {"bookID":"b","page":2,"text":"t","blocks":1,"unresolvedBlocks":0}]
+        """
+        let pages = try JSONDecoder().decode([BookPage].self, from: Data(json.utf8))
+        XCTAssertEqual(pages.map(\.page), [1, 2])
+    }
+
+    /// An import writes the retired page columns empty.
+    func testImportLeavesTheRetiredPageColumnsEmpty() async throws {
+        let page = BookPage(bookID: "book-ur", page: 1, text: "page", blocks: 1, unresolvedBlocks: 0)
+        try await repository.upsertBookPages([page])
+        let rows = try await database.connection.query("SELECT review_state, validator FROM book_pages")
+        let row = try XCTUnwrap(rows.first)
+        XCTAssertEqual(row.text("review_state"), "")
+        XCTAssertNil(row.text("validator"))
+    }
+
+    /// Schema v11 clears what earlier builds stored in the retired columns
+    /// and keeps the text.
+    func testSchemaV11ClearsTheRetiredColumns() async throws {
+        try await database.connection.execute(
+            "INSERT INTO book_pages (book_id, page, text, review_state, validator) VALUES ('b', 1, 'page', 'old', 'old')"
+        )
+        try await database.connection.execute(
+            """
+            INSERT INTO hadith_entries (canonical_id, book_id, display_number, number_major, source_sequence,
+                text_ur, english_review_state, urdu_review_state, urdu_source)
+            VALUES ('b|1|1', 'b', '1', 1, 1, 'narration', 'old', 'old', 'old')
+            """
+        )
+        try await database.connection.executeScript(AppDatabase.migrationV11)
+
+        let pages = try await database.connection.query("SELECT text, review_state, validator FROM book_pages")
+        let page = try XCTUnwrap(pages.first)
+        XCTAssertEqual(page.text("text"), "page")
+        XCTAssertEqual(page.text("review_state"), "")
+        XCTAssertNil(page.text("validator"))
+
+        let entries = try await database.connection.query(
+            "SELECT text_ur, english_review_state, urdu_review_state, urdu_source FROM hadith_entries"
+        )
+        let entry = try XCTUnwrap(entries.first)
+        XCTAssertEqual(entry.text("text_ur"), "narration")
+        for column in ["english_review_state", "urdu_review_state", "urdu_source"] {
+            XCTAssertNil(entry.text(column), column)
+        }
     }
 }

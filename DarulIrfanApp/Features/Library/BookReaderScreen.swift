@@ -8,8 +8,8 @@ import SwiftUI
 // at the top carries the title and "PAGE n OF N", the text size and search
 // in the book; a floating bar at the foot turns the pages, with a scrubber
 // that runs right to left for an Urdu book, and Go to page. Each view keeps
-// its own logic: caching, the "Preparing pages" seal, the machine-read
-// notice, the page it was left on.
+// its own logic: caching, the "Preparing pages" seal, the page it
+// was left on.
 
 // MARK: - Mode
 

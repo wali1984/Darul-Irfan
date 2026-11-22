@@ -39,7 +39,7 @@ final class HadithSearchTests: XCTestCase {
 
     private func entry(
         _ book: String, _ sequence: Int, arabic: String = "", english: String = "",
-        sourceBook: Int? = nil, urduReviewState: String? = nil, urduSource: String? = nil
+        sourceBook: Int? = nil
     ) -> HadithEntry {
         HadithEntry(
             canonicalID: "\(book)|\(sequence)|\(sequence)",
@@ -51,9 +51,7 @@ final class HadithSearchTests: XCTestCase {
             textArabic: arabic,
             textEnglish: english,
             textUrdu: nil,
-            sourceBook: sourceBook,
-            urduReviewState: urduReviewState,
-            urduSource: urduSource
+            sourceBook: sourceBook
         )
     }
 
@@ -123,19 +121,6 @@ final class HadithSearchTests: XCTestCase {
         try await repository.upsertEntries(rows)
         let first = try await repository.firstEntry(bookID: "muslim", sourceBook: 43)
         XCTAssertEqual(first?.sourceSequence, 11)
-    }
-
-    /// The provenance of a provisional Urdu text survives the store, so its
-    /// notice can show (HAD-013).
-    func testProvisionalUrduKeepsItsReviewState() async throws {
-        try await repository.upsertEntries([
-            entry("mishkat", 1, english: "x", urduReviewState: "machine_provisional", urduSource: "ahlesunnatpak.com"),
-        ])
-        let stored = try await repository.entries(bookID: "mishkat", limit: 10, offset: 0)
-        XCTAssertEqual(stored.first?.urduReviewState, "machine_provisional")
-        XCTAssertEqual(stored.first?.urduSource, "ahlesunnatpak.com")
-        XCTAssertEqual(stored.first?.isProvisional(languageCode: "ur"), true)
-        XCTAssertEqual(stored.first?.isProvisional(languageCode: "en"), false)
     }
 
     /// The collection list leads with the two Sahihs, not the largest works.

@@ -9,8 +9,7 @@ struct HadithRepository: HadithRepositoryProtocol {
     canonical_id, book_id, display_number, number_major, number_minor,
     source_sequence, text_ar, text_en, text_ur, grades, source_book, source_hadith,
     arabic_segments_json, quran_refs_json, urdu_sanad, urdu_text,
-    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur,
-    english_review_state, urdu_review_state, urdu_source
+    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur
     """
 
     /// The source edition's own order. See `HadithEntry` for why neither the
@@ -462,9 +461,8 @@ struct HadithRepository: HadithRepositoryProtocol {
                     number_major, number_minor, source_sequence,
                     text_ar, text_en, text_ur, grades, source_book, source_hadith,
                     arabic_segments_json, quran_refs_json, urdu_sanad, urdu_text,
-                    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur,
-                    english_review_state, urdu_review_state, urdu_source)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    chapter_number, chapter_title_en, chapter_title_ar, chapter_title_ur)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(canonical_id) DO UPDATE SET
                     book_id = excluded.book_id,
                     display_number = excluded.display_number,
@@ -484,10 +482,7 @@ struct HadithRepository: HadithRepositoryProtocol {
                     chapter_number = excluded.chapter_number,
                     chapter_title_en = excluded.chapter_title_en,
                     chapter_title_ar = excluded.chapter_title_ar,
-                    chapter_title_ur = excluded.chapter_title_ur,
-                    english_review_state = excluded.english_review_state,
-                    urdu_review_state = excluded.urdu_review_state,
-                    urdu_source = excluded.urdu_source
+                    chapter_title_ur = excluded.chapter_title_ur
                 """,
                 parameters: [
                     .text(entry.canonicalID),
@@ -510,9 +505,6 @@ struct HadithRepository: HadithRepositoryProtocol {
                     .optionalText(entry.chapterTitleEnglish),
                     .optionalText(entry.chapterTitleArabic),
                     .optionalText(entry.chapterTitleUrdu),
-                    .optionalText(entry.englishReviewState),
-                    .optionalText(entry.urduReviewState),
-                    .optionalText(entry.urduSource),
                 ]
             )
         }
@@ -551,10 +543,7 @@ struct HadithRepository: HadithRepositoryProtocol {
             chapterNumber: row.int("chapter_number"),
             chapterTitleEnglish: row.text("chapter_title_en"),
             chapterTitleArabic: row.text("chapter_title_ar"),
-            chapterTitleUrdu: row.text("chapter_title_ur"),
-            englishReviewState: row.text("english_review_state"),
-            urduReviewState: row.text("urdu_review_state"),
-            urduSource: row.text("urdu_source")
+            chapterTitleUrdu: row.text("chapter_title_ur")
         )
     }
 }

@@ -1,22 +1,20 @@
 import Foundation
 
-/// Turns one scanned page into blocks a reader can follow: headings,
+/// Turns one printed page into blocks a reader can follow: headings,
 /// paragraphs, poetry, footnotes, and Qur'anic quotations set apart.
 ///
-/// A page Claude re-read from the scan comes with its own layout: Claude
-/// typed every block as it read it (heading, paragraph, verse, Arabic
-/// quotation, footnote, table, caption), and `BookPage.layout` keeps one
-/// letter per block, in the order of the text's blank-line-separated parts.
-/// Such a page is set out from that; the one thing still decided here is
-/// whether an Arabic quotation is the Qur'an.
+/// Most pages come with their own layout: `BookPage.layout` keeps one letter
+/// per block (heading, paragraph, verse, Arabic quotation, footnote, table,
+/// caption), in the order of the text's blank-line-separated parts. Such a
+/// page is set out from that; the one thing still decided here is whether an
+/// Arabic quotation is the Qur'an.
 ///
-/// The original OCR text arrives as the scanner laid it out: lines broken
-/// wherever the printed column ended, the two-column Asrar pages (Arabic
-/// beside its Urdu translation) read straight across into one mixed line,
-/// contents pages full of page numbers, and the calligraphic "اللہ"
-/// ornament read as a word. Its blocks are inferred from the text. Nothing
-/// here changes a word of the text; it only decides how the words are
-/// grouped and styled.
+/// Text without a layout can have its lines broken wherever the printed
+/// column ended, the two-column Asrar pages (Arabic beside its Urdu
+/// translation) running straight across into one mixed line, contents pages
+/// full of page numbers, and the calligraphic "اللہ" ornament standing as a
+/// word. Its blocks are inferred from the text. Nothing here changes a word
+/// of the text; it only decides how the words are grouped and styled.
 ///
 /// Arabic is set as Qur'an only when the mushaf confirms it
 /// (`QuranQuotation`). Vowelled Arabic that is not found there - a hadith, a
@@ -94,7 +92,7 @@ enum BookPageFormatter {
         var text: String
         /// Qur'anic Arabic quoted inside the prose.
         var isQuranic: Bool
-        /// Printed on a line of its own: a re-read paragraph keeps the line
+        /// Printed on a line of its own: a laid-out paragraph keeps the line
         /// breaks it was printed with (an address, a signature, a list).
         var startsLine = false
         /// Vowelled Arabic inside an article; this does not identify it as Quran.
@@ -230,8 +228,8 @@ enum BookPageFormatter {
     }
 
     /// - Parameter quranCheck: how closely Arabic must follow the mushaf to be
-    ///   set as Qur'an: `.letters` for pages re-read by Claude, `.exact` for
-    ///   the original OCR.
+    ///   set as Qur'an. A book page is always compared by its letters; for a
+    ///   tafsir entry see `SurahReaderViewModel.quranCheck(forTafsirEdition:)`.
     static func format(_ text: String, quranCheck: QuranQuotation.Check = .letters) -> Page {
         let normalized = hidingUnreadable(text.replacingOccurrences(of: "\r\n", with: "\n"))
         if isContentsPage(normalized) {
@@ -250,9 +248,10 @@ enum BookPageFormatter {
     }
 
     /// One page: from its own layout when it has one that fits its text,
-    /// otherwise from the text alone.
+    /// otherwise from the text alone. Either way its Arabic is matched to
+    /// the mushaf by its letters.
     static func format(page: BookPage) -> Page {
-        let check = quranCheck(for: page)
+        let check = QuranQuotation.Check.letters
         var shown = page
         shown.text = hidingUnreadable(page.text)
         var result: Page
@@ -264,11 +263,6 @@ enum BookPageFormatter {
         result.unreadableWords = unreadableCount(page.text)
         result.wordCount = page.text.split(whereSeparator: \.isWhitespace).count
         return result
-    }
-
-    /// The Qur'an check a page's provenance calls for.
-    static func quranCheck(for page: BookPage) -> QuranQuotation.Check {
-        page.isMachineProvisional ? .exact : .letters
     }
 
     /// Formats a run of consecutive pages. When a printed page stops in the
@@ -422,7 +416,7 @@ enum BookPageFormatter {
 
     /// An Arabic quotation is the Qur'an when all of it, up to a short
     /// citation in brackets at its end ("(البقرۃ:۲۵۵)"), is found in the
-    /// mushaf in the same order. It is compared whole, as Claude read it: a
+    /// mushaf in the same order. It is compared whole, as printed: a
     /// hadith that quotes an ayah, or a formula made of Qur'anic phrases, must
     /// not pass piece by piece.
     static func isQuranQuotation(_ text: String, check: QuranQuotation.Check) -> Bool {
@@ -515,7 +509,7 @@ enum BookPageFormatter {
         return nil
     }
 
-    /// A re-read paragraph's words in runs, with a Qur'anic quotation the
+    /// A paragraph's words in runs, with a Qur'anic quotation the
     /// mushaf confirms marked for the Qur'an face. The quotation stays in the
     /// sentence, where the page printed it, and the paragraph keeps its
     /// printed line breaks.

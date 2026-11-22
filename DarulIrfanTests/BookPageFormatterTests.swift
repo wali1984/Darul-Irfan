@@ -101,9 +101,9 @@ final class BookPageFormatterTests: XCTestCase {
         }
     }
 
-    /// The original OCR must match the mushaf's vowels too; a page re-read by
-    /// Claude is compared by its letters.
-    func testOriginalOCRMustMatchTheVowelsToo() throws {
+    /// Only the exact check compares the mushaf's vowels; a book page is
+    /// compared by its letters.
+    func testOnlyTheExactCheckComparesVowels() throws {
         let ayahs = SeedBundle.quranAyahs()
         try XCTSkipIf(ayahs.isEmpty, "Arabic text pack not bundled in this configuration")
         let ayah = try XCTUnwrap(ayahs.first { $0.surahNumber == 112 && $0.ayahNumber == 1 })
@@ -114,6 +114,8 @@ final class BookPageFormatterTests: XCTestCase {
         XCTAssertNotEqual(misread, words)
         XCTAssertTrue(QuranQuotation.isVerified(misread, check: .letters))
         XCTAssertFalse(QuranQuotation.isVerified(misread, check: .exact))
+        let quote = misread.joined(separator: " ")
+        XCTAssertEqual(BookPageFormatter.format(page: laidOut([quote], layout: "a")).blocks, [.quran(quote)])
     }
 
     func testUrduWithAnOccasionalVowelMarkStaysProse() {
@@ -152,10 +154,10 @@ final class BookPageFormatterTests: XCTestCase {
     /// only a short finishing fragment is ever carried back.
     func testALongFirstParagraphStaysOnItsOwnPage() {
         let first = BookPage(bookID: "b", page: 23, text: "جو شخص اپنے طریقے سے یا اپنے خیال کے مطابق اصلاح کرنا چاہتا ہے وہ", blocks: 1,
-                             unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test")
+                             unresolvedBlocks: 0)
         let long = String(repeating: "یہ ایک طویل جملہ ہے جو اگلے صفحے پر جاری رہتا ہے اور ", count: 10) + "ختم ہوا۔"
         let second = BookPage(bookID: "b", page: 24, text: long, blocks: 1,
-                              unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test")
+                              unresolvedBlocks: 0)
         let pages = BookPageFormatter.format(pages: [first, second])
         XCTAssertEqual(pages[second.id]?.blocks.count, 1)
         XCTAssertEqual(pages[first.id]?.blocks, [.paragraph([.init(text: first.text, isQuranic: false)])])
@@ -164,18 +166,18 @@ final class BookPageFormatterTests: XCTestCase {
     /// A page that is nothing but the words finishing the last one keeps them.
     func testAPageIsNeverLeftEmpty() {
         let first = BookPage(bookID: "b", page: 4, text: "جو شخص اپنے طریقے سے یا اپنے خیال کے مطابق اصلاح کرنا چاہتا ہے وہ", blocks: 1,
-                             unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test")
+                             unresolvedBlocks: 0)
         let second = BookPage(bookID: "b", page: 5, text: "فساد پیدا کرتا ہے۔", blocks: 1,
-                              unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test")
+                              unresolvedBlocks: 0)
         let pages = BookPageFormatter.format(pages: [first, second])
         XCTAssertEqual(pages[second.id]?.blocks.count, 1)
     }
 
     func testSentenceCutByThePageContinuesOnIt() {
         let first = BookPage(bookID: "b", page: 4, text: "اللہ کریم نے حضور اکرم ﷺ کو صحابہ کرام کی", blocks: 1,
-                             unresolvedBlocks: 0, reviewState: "machineProvisional", validator: "test")
+                             unresolvedBlocks: 0)
         let second = BookPage(bookID: "b", page: 5, text: "جماعت عطا فرمائی۔\n\nدوسرا پیراگراف یہاں سے شروع ہوتا ہے۔", blocks: 1,
-                              unresolvedBlocks: 0, reviewState: "machineProvisional", validator: "test")
+                              unresolvedBlocks: 0)
         let pages = BookPageFormatter.format(pages: [first, second])
         XCTAssertEqual(pages[first.id]?.blocks, [.paragraph([.init(
             text: "اللہ کریم نے حضور اکرم ﷺ کو صحابہ کرام کی جماعت عطا فرمائی۔", isQuranic: false
@@ -187,7 +189,7 @@ final class BookPageFormatterTests: XCTestCase {
 
     private func laidOut(_ parts: [String], layout: String, page: Int = 1) -> BookPage {
         BookPage(bookID: "b", page: page, text: parts.joined(separator: "\n\n"), blocks: parts.count,
-                 unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test", layout: layout)
+                 unresolvedBlocks: 0, layout: layout)
     }
 
     func testVerifiedScriptureHeadingUsesQuranBlockWithoutChangingText() {
@@ -198,7 +200,7 @@ final class BookPageFormatterTests: XCTestCase {
         XCTAssertEqual(BookPageFormatter.format(page: laidOut(["Introduction to remembrance"], layout: "h")).blocks, [.heading("Introduction to remembrance")])
     }
 
-    /// A re-read page is set out block by block as it was typed - nothing is
+    /// A laid-out page is set out block by block as it was typed - nothing is
     /// guessed - and its footnote goes to the foot of the page.
     func testLaidOutPageIsSetOutAsTyped() {
         let page = BookPageFormatter.format(page: laidOut([
@@ -321,7 +323,7 @@ final class BookPageFormatterTests: XCTestCase {
         XCTAssertEqual(pages[second.id]?.blocks, [.verse(couplet)])
     }
 
-    /// A re-read contents page still folds, and keeps its table to unfold.
+    /// A laid-out contents page still folds, and keeps its table to unfold.
     func testLaidOutContentsPageFoldsWithItsBlocks() {
         let rows = (1...12).map { "\($0)- باب \($0) | \($0 * 7)" }.joined(separator: "\n")
         let page = BookPageFormatter.format(page: laidOut(["فہرست", rows], layout: "ht"))
@@ -389,7 +391,7 @@ final class BookPageFormatterTests: XCTestCase {
         let shown = String(describing: letter.blocks)
         XCTAssertFalse(shown.contains("[؟]"))
         let page = BookPage(bookID: "b", page: 1, text: "عزیزم [؟] [؟] [؟] [؟] [؟] [؟] [؟] [؟] [؟] السلام علیکم", blocks: 1,
-                            unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "claude-opus-5-5")
+                            unresolvedBlocks: 0)
         let formatted = BookPageFormatter.format(page: page)
         XCTAssertEqual(formatted.unreadableWords, 9)
         XCTAssertTrue(formatted.isPartlyUnreadable)

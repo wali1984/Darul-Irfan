@@ -6,7 +6,7 @@ final class AppDatabase: Sendable {
     let connection: SQLiteDatabase
 
     /// Current schema version. Bump alongside a new migration script.
-    static let schemaVersion = 10
+    static let schemaVersion = 11
 
     /// User-owned tables that no content migration may ever disturb. Migration
     /// v4 asserts their row counts are identical before and after it runs; a
@@ -100,14 +100,38 @@ final class AppDatabase: Sendable {
             // before a crash would fail on every later launch.
             try await connection.migrate(to: 10, script: Self.migrationV10)
         }
+        if version < 11 {
+            try await connection.migrate(to: 11, script: Self.migrationV11)
+        }
     }
 
-    // MARK: - Schema v10 (the printed layout of re-read book pages)
+    // MARK: - Schema v11 (retired book page and hadith columns cleared)
 
-    /// Adds `book_pages.layout`: for a page Claude re-read from the scan, one
-    /// letter per block of its text (heading, paragraph, verse, Arabic
-    /// quotation, footnote, table, caption), so the reader sets the page out
-    /// as it was printed instead of guessing from the plain text.
+    /// Clears five columns the app no longer reads: `review_state` and
+    /// `validator` of the book pages, and the two review states and the Urdu
+    /// source of the narrations.
+    ///
+    /// They are emptied rather than dropped or redefined: both tables' search
+    /// indexes are keyed by rowid, which rebuilding a table could renumber.
+    /// So `review_state` stays NOT NULL and is blanked, not nulled.
+    ///
+    /// No text is touched, and nothing user-owned.
+    static let migrationV11 = """
+    UPDATE book_pages SET review_state = '', validator = NULL
+        WHERE review_state <> '' OR validator IS NOT NULL;
+    UPDATE hadith_entries
+        SET english_review_state = NULL, urdu_review_state = NULL, urdu_source = NULL
+        WHERE english_review_state IS NOT NULL
+           OR urdu_review_state IS NOT NULL
+           OR urdu_source IS NOT NULL;
+    """
+
+    // MARK: - Schema v10 (the printed layout of book pages)
+
+    /// Adds `book_pages.layout`: one letter per block of a page's text
+    /// (heading, paragraph, verse, Arabic quotation, footnote, table,
+    /// caption), so the reader sets the page out as it was printed instead of
+    /// guessing from the plain text.
     ///
     /// Its own version rather than part of v9, so a store that ran v9 in
     /// any build still gets the column.
@@ -139,9 +163,8 @@ final class AppDatabase: Sendable {
     /// built in the background whenever their content changes; the
     /// `search.fts.*` rows in key_value say whether each is in step.
     ///
-    /// The hadith columns record each translation's provenance, which was
-    /// decoded from the packs but never stored, so a provisional Urdu text
-    /// could not carry its notice.
+    /// The three hadith columns are no longer read or written; v11 clears
+    /// them.
     ///
     /// Additive only: new tables, new nullable columns and three sync-state
     /// rows; no content table rewritten and nothing user-owned touched.
@@ -181,7 +204,7 @@ final class AppDatabase: Sendable {
 
     // MARK: - Schema v8 (page-structured book text)
 
-    /// Adds `book_pages`: the OCR'd text of the Silsila's books, one row per
+    /// Adds `book_pages`: the text of the Silsila's books, one row per
     /// printed page, keyed to a `library_items.json` id.
     ///
     /// Per page rather than per book deliberately. A whole book runs to
@@ -194,11 +217,7 @@ final class AppDatabase: Sendable {
     /// that pair before writing, so an upsert updates in place and cannot
     /// silently drop a page the way a colliding key would.
     ///
-    /// `review_state` records provenance per row: every bundled page is
-    /// `machineProvisional` — OCR arbitration and a visual cross-check, no
-    /// human proofreading — and `unresolved_blocks` carries how many blocks
-    /// the validator could not settle, so the reader can mark the page instead
-    /// of presenting unverified text as checked.
+    /// `review_state` and `validator` are no longer read; v11 clears them.
     ///
     /// Purely additive: a new table only, nothing user-owned touched and no
     /// content table rewritten, so no row-count guard is needed.
@@ -209,7 +228,7 @@ final class AppDatabase: Sendable {
         text TEXT NOT NULL,
         blocks INTEGER NOT NULL DEFAULT 0,
         unresolved_blocks INTEGER NOT NULL DEFAULT 0,
-        review_state TEXT NOT NULL DEFAULT 'machineProvisional',
+        review_state TEXT NOT NULL DEFAULT '',
         validator TEXT,
         PRIMARY KEY (book_id, page)
     );

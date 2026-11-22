@@ -48,9 +48,8 @@ enum SeedStage: String, CaseIterable, Sendable {
     /// device imports that stage once more.
     var revision: Int {
         switch self {
-        // 2: schema v9 stores each narration's translation provenance
-        // (english/urdu review state, Urdu source), so every collection
-        // imports once more to fill it, changed file or not.
+        // 2: every collection imported once more after schema v9. Kept:
+        // another number would import every collection again.
         case .hadith: return 2
         default: return 1
         }
@@ -302,9 +301,8 @@ struct ContentSyncService: ContentSyncServicing {
     /// delete rows before re-inserting them, so an earlier import cut short
     /// by a force-quit could leave them incomplete under an older stamp; they
     /// qualify only from 44, the last manifest earlier builds shipped, which
-    /// none of them ever re-ran. Hadith is absent too: schema v9 stores
-    /// each narration's translation provenance, which earlier imports never
-    /// wrote, so every collection must import once more.
+    /// none of them ever re-ran. Hadith is absent too: every collection
+    /// imports once more after schema v9 (see `SeedStage.revision`).
     static let earlierImports: [SeedStage: (fromVersion: Int, fingerprint: String)] = [
         .quran: (42, "e474028b8d940217ac453be2e8e48727ae16c524d6ea9d6e02c36e291edc771d"),
         .quranTranslations: (44, "370584fed3ef084fa1d0ff703f0c6252f8acd13e92f2adde1145a03a9895d41a"),

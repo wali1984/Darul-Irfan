@@ -224,7 +224,7 @@ final class SearchIndexServiceTests: XCTestCase {
         try await seedAllDomains()
         try await contentRepository.upsertBookPages([
             BookPage(bookID: "method-of-zikr", page: 23, text: "اللہ کریم نے اپنے بندوں سے ایک شے طلب فرمائی", blocks: 1,
-                     unresolvedBlocks: 0, reviewState: "claudeTranscribed", validator: "test"),
+                     unresolvedBlocks: 0),
         ])
         await LargeSearchIndexBuilder.shared.buildStaleIndexes(database: database)
         let results = try await service.search("طلب", domains: [.library], limit: 20)

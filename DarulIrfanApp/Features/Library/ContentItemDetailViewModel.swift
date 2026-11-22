@@ -31,13 +31,8 @@ final class ContentItemDetailViewModel {
     /// Download state per remote URL string.
     private(set) var downloadStates: [String: DownloadRowState] = [:]
     @ObservationIgnored private var downloadRequests: [String: UUID] = [:]
-    /// OCR'd pages available for this work; 0 when only the PDF exists.
+    /// Pages of text available for this work; 0 when only the PDF exists.
     private(set) var bookPageCount: Int = 0
-    /// False once every page of the book has been re-read from the scan.
-    private(set) var bookTextIsMachineRead = true
-    /// Pages still in their original OCR; a book can mix them with pages
-    /// re-read from the scan.
-    private(set) var machineReadPageCount = 0
 
     // Reading-progress throttling
     private var latestFraction: Double = 0
@@ -106,8 +101,6 @@ final class ContentItemDetailViewModel {
                 bodyParagraphs = []
             }
             bookPageCount = (try? await contentRepository.bookPageCount(bookID: item.id)) ?? 0
-            machineReadPageCount = (try? await contentRepository.bookMachineProvisionalPageCount(bookID: item.id)) ?? bookPageCount
-            bookTextIsMachineRead = machineReadPageCount > 0
             if let progress = try? await contentRepository.readingProgress(contentItemID: item.id) {
                 initialReadingFraction = min(max(progress.fraction, 0), 1)
             }

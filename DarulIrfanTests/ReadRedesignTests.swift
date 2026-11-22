@@ -415,8 +415,7 @@ final class ReadRedesignTests: XCTestCase {
     }
 
     private func textPage(_ bookID: String, _ page: Int) -> BookPage {
-        BookPage(bookID: bookID, page: page, text: "متن", blocks: 1, unresolvedBlocks: 0,
-                 reviewState: "claudeTranscribed", validator: "test")
+        BookPage(bookID: bookID, page: page, text: "متن", blocks: 1, unresolvedBlocks: 0)
     }
 
     /// Before works opened as text, the gold button opened the PDF and every
@@ -558,12 +557,9 @@ final class ReadRedesignTests: XCTestCase {
 
     func testSearchInABookFindsWordsAsTheAppSearchDoes() {
         let pages = [
-            BookPage(bookID: "b", page: 4, text: "ذکرِ الٰہی دل کی زندگی ہے", blocks: 1, unresolvedBlocks: 0,
-                     reviewState: "claudeTranscribed", validator: "test"),
-            BookPage(bookID: "b", page: 7, text: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ", blocks: 1, unresolvedBlocks: 0,
-                     reviewState: "machineProvisional", validator: "test"),
-            BookPage(bookID: "b", page: 9, text: "The Method of Zikr", blocks: 1, unresolvedBlocks: 0,
-                     reviewState: "claudeTranscribed", validator: "test"),
+            BookPage(bookID: "b", page: 4, text: "ذکرِ الٰہی دل کی زندگی ہے", blocks: 1, unresolvedBlocks: 0),
+            BookPage(bookID: "b", page: 7, text: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ", blocks: 1, unresolvedBlocks: 0),
+            BookPage(bookID: "b", page: 9, text: "The Method of Zikr", blocks: 1, unresolvedBlocks: 0),
         ]
         let index = BookTextSearch.index(pages)
         XCTAssertEqual(BookTextSearch.pages(matching: "زندگی", in: index), [4])

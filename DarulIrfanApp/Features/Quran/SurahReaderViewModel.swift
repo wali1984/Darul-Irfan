@@ -376,11 +376,10 @@ final class SurahReaderViewModel {
     }
 
     /// How closely an Urdu tafsir's Arabic must follow the mushaf to be set
-    /// as Qur'an, as `BookPageFormatter.quranCheck(for:)` decides for a book
-    /// page. Asrar-at-Tanzil's Urdu rows are cut from pages Claude re-read
-    /// from the scan, so a quotation is matched by its letters. Akram-ut-
-    /// Tafaseer's come from the original OCR of the printed volumes, so a
-    /// quotation must match exactly, vowel marks included.
+    /// as Qur'an. Asrar-at-Tanzil's Urdu rows are cut from the book's pages,
+    /// so, as on a book page, a quotation is matched by its letters. In
+    /// Akram-ut-Tafaseer's a quotation must match exactly, vowel marks
+    /// included.
     nonisolated static func quranCheck(forTafsirEdition editionID: String) -> QuranQuotation.Check {
         editionID == "asrar-at-tanzil-ur" ? .letters : .exact
     }
