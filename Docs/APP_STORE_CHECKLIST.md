@@ -115,6 +115,11 @@ before archiving.
 These are records kept with the release. The app has no credits or licences
 screen (removed 2026-11-21).
 
+That removal does not cover two services (owner's decision, 2026-11-21): the
+Apple Weather name, mark and link, and the Google Maps name and provider
+buttons, stay as they are on every platform, as those services' terms ask. The
+Qur'an reciter is not named in the app: the Listen bar says "Recitation".
+
 - [ ] **adhan-swift** (Batoul Apps) — MIT License. MIT requires the copyright
       notice with substantial portions of the software: keep the license
       text, or the authors' written confirmation that it is not needed, with

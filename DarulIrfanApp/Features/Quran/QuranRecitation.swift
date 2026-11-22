@@ -57,8 +57,6 @@ final class RecitationProvider: @unchecked Sendable {
         await Task.detached(priority: .utility) { _ = RecitationProvider.shared }.value
     }
 
-    var reciterName: String { data?.reciter ?? "" }
-
     func recitation(forSurah surah: Int) -> SurahRecitation? {
         data?.surahs[String(surah)]
     }

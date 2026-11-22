@@ -642,10 +642,11 @@ struct SurahReaderView: View {
         .onChange(of: listenScope) { if isHere { player.stop() } }
     }
 
-    /// Who reads: the reciter, the translation, or both.
+    /// What is heard: the recitation, the translation, or both. The reciter
+    /// is not named to readers.
     private var listenSubtitle: String {
         switch effectiveContent {
-        case .arabic: return RecitationProvider.shared.reciterName
+        case .arabic: return String(localized: "Recitation")
         case .translation: return String(localized: String.LocalizationValue(viewModel.translationEdition?.title ?? "Translation"))
         case .both: return String(localized: "Recitation, then translation, ayah by ayah")
         }
