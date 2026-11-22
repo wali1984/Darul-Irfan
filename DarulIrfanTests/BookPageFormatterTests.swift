@@ -252,7 +252,7 @@ final class BookPageFormatterTests: XCTestCase {
     }
 
     func testTableRowsAreCutIntoCells() {
-        let page = BookPageFormatter.format(page: laidOut(["نام نماز | فرض | نفل\n| فجر | ۲ | |"], layout: "t"))
+        let page = BookPageFormatter.format(page: laidOut(["| نام نماز | فرض | نفل |\n| فجر | ۲ | |"], layout: "t"))
         XCTAssertEqual(page.blocks, [.table([["نام نماز", "فرض", "نفل"], ["فجر", "۲", ""]])])
     }
 

@@ -538,16 +538,21 @@ enum BookPageFormatter {
         return runs
     }
 
-    /// A table's rows, one to a line, cut into cells at "|". A rule at either
-    /// end of a row ("| a | b |") does not make an empty cell.
+    /// A table's rows, one to a line, cut into cells at "|". A rule down
+    /// either edge of the whole table ("| a | b |" on every row) does not
+    /// make a cell. On some rows only, it closes an empty cell, which keeps
+    /// its column: an entry without a serial number, a title without a page.
     private static func tableRows(_ text: String) -> [[String]] {
-        text.split(separator: "\n").map { line -> [String] in
-            let row = line.trimmingCharacters(in: .whitespaces)
+        let lines = text.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+        let ruled = lines.filter { $0.contains("|") }
+        let ruledAtStart = ruled.allSatisfy { $0.hasPrefix("|") }
+        let ruledAtEnd = ruled.allSatisfy { $0.hasSuffix("|") }
+        return lines.map { row -> [String] in
             if let entry = contentsEntry(row) { return entry }
             var cells = row.split(separator: "|", omittingEmptySubsequences: false)
                 .map { $0.trimmingCharacters(in: .whitespaces) }
-            if cells.count > 1, row.hasPrefix("|") { cells.removeFirst() }
-            if cells.count > 1, row.hasSuffix("|") { cells.removeLast() }
+            if cells.count > 1, ruledAtStart { cells.removeFirst() }
+            if cells.count > 1, ruledAtEnd { cells.removeLast() }
             return cells
         }
     }
