@@ -59,7 +59,7 @@ enum SeedBundle {
 
     // MARK: Hadith
 
-    /// The collection index (also carries the corpus licence/provenance).
+    /// The collection index.
     static func hadithCatalog() -> HadithCatalog? {
         decodeObject(HadithCatalog.self, fromFile: "hadith_books")
     }
@@ -91,7 +91,7 @@ enum SeedBundle {
         libraryItems().first { $0.id == id }
     }
 
-    /// OCR'd page text for the Silsila's books (`book_pages.json`), one record
+    /// Page text for the Silsila's books (`book_pages.json`), one record
     /// per printed page keyed to a `library_items.json` id. Absent until the
     /// books are ingested — returns [] and each book falls back to its PDF.
     static func bookPages() -> [BookPage] {

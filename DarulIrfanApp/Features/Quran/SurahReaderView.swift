@@ -41,8 +41,6 @@ struct SurahReaderView: View {
     @State private var showsGoToAyah = false
     @State private var goToAyahText = ""
     @State private var pendingScrollAyah: Int?
-    /// Volumes whose book still has original OCR pages, which carry the
-    /// "not yet proofread" line; the re-read volumes do not.
 
     init(
         surah: QuranSurah,

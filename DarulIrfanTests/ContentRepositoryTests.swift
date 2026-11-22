@@ -283,4 +283,35 @@ final class ContentRepositoryTests: XCTestCase {
             XCTAssertNil(entry.text(column), column)
         }
     }
+
+    /// A store whose v11 clear-up cannot be written (no space left) still
+    /// opens, and is cleared at a later launch.
+    func testAFailedSchemaV11StillOpensAndRetries() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appendingPathComponent("store.sqlite")
+
+        let installed = try await AppDatabase(url: url)
+        try await installed.connection.executeScript(
+            """
+            INSERT INTO book_pages (book_id, page, text, review_state) VALUES ('b', 1, 'page', 'old');
+            CREATE TRIGGER refuse_update BEFORE UPDATE ON book_pages
+                BEGIN SELECT RAISE(ABORT, 'no space'); END;
+            PRAGMA user_version = 10;
+            """
+        )
+
+        let opened = try await AppDatabase(url: url)
+        let failedVersion = try await opened.connection.schemaVersion()
+        XCTAssertEqual(failedVersion, 10)
+        try await opened.connection.execute("DROP TRIGGER refuse_update")
+
+        let retried = try await AppDatabase(url: url)
+        let retriedVersion = try await retried.connection.schemaVersion()
+        XCTAssertEqual(retriedVersion, AppDatabase.schemaVersion)
+        let rows = try await retried.connection.query("SELECT review_state FROM book_pages")
+        XCTAssertEqual(rows.first?.text("review_state"), "")
+    }
 }

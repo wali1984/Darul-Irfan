@@ -101,7 +101,17 @@ final class AppDatabase: Sendable {
             try await connection.migrate(to: 10, script: Self.migrationV10)
         }
         if version < 11 {
-            try await connection.migrate(to: 11, script: Self.migrationV11)
+            // Only clears what nothing reads, so it must not keep the app from
+            // opening: on a full store it needs over 100 MB free while it
+            // runs. If it fails it rolls back and is tried at the next launch.
+            do {
+                try await connection.migrate(to: 11, script: Self.migrationV11)
+            } catch {
+                AppLog.content("Schema v11 not applied, will retry: \(error)")
+            }
+            // Those megabytes are in the write-ahead log, which keeps its
+            // size until it is truncated.
+            try? await connection.executeScript("PRAGMA wal_checkpoint(TRUNCATE)")
         }
     }
 
