@@ -39,13 +39,10 @@ final class BookReaderSession {
     /// The PDF page, or the printed page of the text, at the top of the screen.
     var currentPage: Int = 1
     /// The pages that can be turned to, in order: 1...N for the PDF, the
-    /// printed numbers for the text (neighbours with no text share the first
-    /// one's number).
+    /// printed numbers for the text, those with no text among them.
     var pageNumbers: [Int] = []
-    /// The book's last page, where the last place stands for several.
-    var lastPage: Int?
     /// The N of "Page n of N".
-    var pageTotal: Int? { lastPage ?? pageNumbers.last }
+    var pageTotal: Int? { pageNumbers.last }
     /// A page the bars asked for; the page view goes there and clears it.
     var requestedPage: Int?
     /// The cached PDF, once open, for Share.

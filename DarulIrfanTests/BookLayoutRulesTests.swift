@@ -259,11 +259,46 @@ final class BookLayoutRulesTests: XCTestCase {
         let entries = BookTextEntry.entries(of: pages("book-ocr-hasht-roza-course"))
         XCTAssertEqual(entries.last, .noText(207...208))
         let session = BookReaderSession()
-        session.pageNumbers = entries.map(\.id)
-        session.lastPage = entries.last?.lastPage
-        XCTAssertEqual(session.pageNumbers.last, 207)
+        session.pageNumbers = BookTextEntry.numbers(of: entries)
+        XCTAssertEqual(session.pageNumbers, Array(1...208))
         XCTAssertEqual(session.pageTotal, 208)
-        XCTAssertEqual(BookTextEntry.holding(208, in: entries)?.id, 207)
+        let card = BookTextEntry.holding(208, in: entries)
+        XCTAssertEqual(card?.id, 207)
+        XCTAssertEqual(card?.number(nearest: 208), 208)
+        XCTAssertEqual(BookPageNavigator.page(after: 207, in: session.pageNumbers), 208)
+        XCTAssertNil(BookPageNavigator.page(after: 208, in: session.pageNumbers))
+    }
+
+    func testTheCardAtTheEndKeepsTheReadingPlace() throws {
+        let books: [(String, Int)] = [
+            ("book-ocr-hasht-roza-course", 208), ("tafaseer-parah-1", 320), ("tafaseer-parah-4", 379),
+        ]
+        for (bookID, lastPage) in books {
+            let entries = BookTextEntry.entries(of: pages(bookID))
+            let end = try XCTUnwrap(entries.last)
+            XCTAssertEqual(end.lastPage, lastPage, bookID)
+            // The card cannot come to the top: a page above it stays there.
+            let top = entries[entries.count - 2]
+            let higher = entries[entries.count - 3]
+
+            var asked = BookTextAskedPage()
+            asked.ask(lastPage)
+            // The top is told first, the end a moment after.
+            XCTAssertEqual(asked.pageOnScreen(top: top, through: top), top.id, bookID)
+            XCTAssertEqual(asked.pageOnScreen(top: top, through: end), lastPage, bookID)
+            // Scrolled away, it is the page at the top, and stays so back at the end.
+            XCTAssertEqual(asked.pageOnScreen(top: higher, through: higher), higher.id, bookID)
+            XCTAssertEqual(asked.pageOnScreen(top: top, through: end), top.id, bookID)
+
+            // Previous, from the card to the page above it.
+            asked.ask(top.id)
+            XCTAssertEqual(asked.pageOnScreen(top: higher, through: end), top.id, bookID)
+        }
+        // Inside a card at the top, the page asked for stays.
+        let card = BookTextEntry.noText(1...2)
+        var inside = BookTextAskedPage()
+        inside.ask(2)
+        XCTAssertEqual(inside.pageOnScreen(top: card, through: card), 2)
     }
 
     func testNoSentenceCrossesAPageWithoutText() throws {

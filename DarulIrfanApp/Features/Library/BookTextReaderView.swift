@@ -59,6 +59,10 @@ struct BookTextPagesView: View {
     @State private var hasScrolledToStart = false
     /// The printed page at the top of the screen.
     @State private var topPage: Int?
+    /// The list can go no further up.
+    @State private var isAtEnd = false
+    /// The page asked for, while it is still the page being read.
+    @State private var askedPage = BookTextAskedPage()
     @State private var showsGoToPage = false
     @State private var goToPageText = ""
     @State private var pendingPage: Int?
@@ -101,20 +105,21 @@ struct BookTextPagesView: View {
                         }
                         .scrollTargetLayout()
                         .padding(DISpacing.md)
+                        .background(BookTextEndWatcher(isAtEnd: $isAtEnd))
                     }
                     .scrollPosition(id: $topPage, anchor: .top)
-                    .onChange(of: topPage) { _, page in
-                        if let page {
-                            BookReadingPosition.save(page: page, bookID: item.id)
-                            session?.currentPage = page
-                        }
-                    }
+                    .onChange(of: topPage) { _, _ in keepPlace() }
+                    // The last card cannot come to the top: where the list
+                    // ends, a page asked for there is the page being read.
+                    .onChange(of: isAtEnd) { _, _ in keepPlace() }
                     .onChange(of: pendingPage) { _, requested in
                         guard let requested else { return }
                         if let target = BookTextEntry.holding(requested, in: entries) {
+                            let page = target.number(nearest: requested)
+                            askedPage.ask(page)
                             proxy.scrollTo(target.id, anchor: .top)
-                            BookReadingPosition.save(page: target.id, bookID: item.id)
-                            session?.currentPage = target.id
+                            BookReadingPosition.save(page: page, bookID: item.id)
+                            session?.currentPage = page
                         }
                         pendingPage = nil
                     }
@@ -257,10 +262,22 @@ struct BookTextPagesView: View {
         hasScrolledToStart = true
         if requested != nil { session?.requestedPage = nil }
         guard let target = BookTextEntry.holding(wanted, in: entries) else { return }
-        session?.currentPage = target.id
+        let page = target.number(nearest: wanted)
+        askedPage.ask(page)
+        session?.currentPage = page
         DispatchQueue.main.async {
             proxy.scrollTo(target.id, anchor: .top)
         }
+    }
+
+    /// Saves and reports the page being read, as the list has come to rest.
+    private func keepPlace() {
+        guard let topPage,
+              let top = entries.first(where: { $0.id == topPage }),
+              let last = entries.last else { return }
+        let page = askedPage.pageOnScreen(top: top, through: isAtEnd ? last : top)
+        BookReadingPosition.save(page: page, bookID: item.id)
+        session?.currentPage = page
     }
 
     private func load() async {
@@ -287,8 +304,7 @@ struct BookTextPagesView: View {
             links = found
             formatted = prepared
             entries = BookTextEntry.entries(of: loaded)
-            session?.pageNumbers = entries.map(\.id)
-            session?.lastPage = entries.last?.lastPage
+            session?.pageNumbers = BookTextEntry.numbers(of: entries)
             session?.hasNoPages = entries.isEmpty
             if let first = entries.first?.id { session?.currentPage = first }
         } catch is CancellationError {
@@ -338,9 +354,67 @@ enum BookTextEntry: Identifiable, Equatable {
         return entries
     }
 
+    /// Every page number they stand for, for the bars, Go to page and the
+    /// place kept: a card for 207 and 208 is both.
+    static func numbers(of entries: [BookTextEntry]) -> [Int] {
+        entries.flatMap { Array($0.id...$0.lastPage) }
+    }
+
+    /// `number`, or the nearest it stands for.
+    func number(nearest number: Int) -> Int {
+        min(max(number, id), lastPage)
+    }
+
     /// The place that holds `number`, else the last one.
     static func holding(_ number: Int, in entries: [BookTextEntry]) -> BookTextEntry? {
         entries.first { $0.lastPage >= number } ?? entries.last
+    }
+}
+
+/// A page the reader asked for (Go to page, the bars, the place kept). It
+/// stays the page being read while it is on show: inside the card at the top,
+/// or at the end of the book, whose last slim card never reaches the top.
+struct BookTextAskedPage {
+    private var page: Int?
+    /// The place at the top when it was first on show.
+    private var landedTop: Int?
+
+    mutating func ask(_ number: Int) {
+        page = number
+        landedTop = nil
+    }
+
+    /// The page being read, with `top` at the top and `through` the last
+    /// place that cannot come any higher: the book's last where the list is
+    /// at its end, otherwise `top` itself.
+    mutating func pageOnScreen(top: BookTextEntry, through: BookTextEntry) -> Int {
+        guard let page else { return top.id }
+        if top.id <= page && page <= through.lastPage {
+            if landedTop == nil { landedTop = top.id }
+            return page
+        }
+        // The end is told a moment after the top: only a move from where
+        // the page landed lets it go.
+        if let landedTop, landedTop != top.id { self.page = nil }
+        return top.id
+    }
+}
+
+/// Tells whether the scroll view it lies in shows the foot of its content.
+private struct BookTextEndWatcher: View {
+    @Binding var isAtEnd: Bool
+
+    var body: some View {
+        GeometryReader { content in
+            Color.clear.onChange(of: showsFoot(content), initial: true) { _, shows in
+                isAtEnd = shows
+            }
+        }
+    }
+
+    private func showsFoot(_ content: GeometryProxy) -> Bool {
+        guard let shown = content.bounds(of: .scrollView) else { return false }
+        return shown.maxY >= content.size.height - 2
     }
 }
 
