@@ -267,7 +267,16 @@ struct BookReaderView: View {
 /// The page each PDF was left at, so it reopens there. Small, and private to
 /// the device.
 enum PDFReadingPosition {
-    private static func key(_ itemID: String) -> String { "bookPDF.page.\(itemID)" }
+    private static let keyPrefix = "bookPDF.page."
+
+    private static func key(_ itemID: String) -> String { keyPrefix + itemID }
+
+    /// The works a page is kept for.
+    static func itemIDs() -> [String] {
+        UserDefaults.standard.dictionaryRepresentation().keys
+            .filter { $0.hasPrefix(keyPrefix) }
+            .map { String($0.dropFirst(keyPrefix.count)) }
+    }
 
     static func save(page: Int, itemID: String) {
         UserDefaults.standard.set(page, forKey: key(itemID))

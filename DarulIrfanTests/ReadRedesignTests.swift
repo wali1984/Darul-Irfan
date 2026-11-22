@@ -352,12 +352,15 @@ final class ReadRedesignTests: XCTestCase {
         XCTAssertEqual(BookReaderMode.pages.rawValue, "pages")
     }
 
-    func testKeepReadingReturnsToTheTextUnlessThePrintedPagesWereReadLast() {
+    func testKeepReadingReturnsToTheTextUnlessTheReaderChoseThePrintedPages() {
         let defaults = UserDefaults.standard
         let id = "text-first-\(UUID().uuidString)"
         let lastBook = defaults.string(forKey: "library.lastBook")
         defer {
-            for key in ["bookPDF.page.\(id)", "bookText.page.\(id)", "library.book.mode.\(id)"] {
+            for key in [
+                "bookPDF.page.\(id)", "bookText.page.\(id)",
+                "library.book.mode.\(id)", "library.book.choice.\(id)",
+            ] {
                 defaults.removeObject(forKey: key)
             }
             if let lastBook {
@@ -368,26 +371,166 @@ final class ReadRedesignTests: XCTestCase {
         }
         XCTAssertNil(BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true))
 
-        // A place kept in both and no note of which was read last: the text.
+        // A place kept in both and no choice made: the text.
         PDFReadingPosition.save(page: 9, itemID: id)
         BookReadingPosition.save(page: 4, bookID: id)
         var resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true)
         XCTAssertEqual(resume?.mode, .text)
         XCTAssertEqual(resume?.page, 4)
 
-        // The printed pages read last: back to them, at their page.
-        BookReadingHistory.recordOpened(itemID: id, mode: .pages)
+        // Opening a work is not choosing how to read it, and the note older
+        // builds kept at every opening is not read: still the text.
+        defaults.set("pages", forKey: "library.book.mode.\(id)")
+        BookReadingHistory.recordOpened(itemID: id)
+        XCTAssertEqual(BookReadingHistory.lastItemID(), id)
+        XCTAssertNil(BookReadingHistory.choice(itemID: id))
+        resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true)
+        XCTAssertEqual(resume?.mode, .text)
+        XCTAssertEqual(resume?.page, 4)
+
+        // The reader chose the printed pages: back to them, at their page.
+        BookReadingHistory.recordChoice(itemID: id, mode: .pages)
+        XCTAssertEqual(defaults.string(forKey: "library.book.choice.\(id)"), "pages")
+        XCTAssertEqual(BookReadingHistory.choice(itemID: id), .pages)
         resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true)
         XCTAssertEqual(resume?.mode, .pages)
         XCTAssertEqual(resume?.page, 9)
 
-        BookReadingHistory.recordOpened(itemID: id, mode: .text)
+        // And the text again, with the switch.
+        BookReadingHistory.recordChoice(itemID: id, mode: .text)
         resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true)
         XCTAssertEqual(resume?.mode, .text)
+        XCTAssertEqual(resume?.page, 4)
 
         // A work with no text has only its printed pages to go back to.
         resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: false)
         XCTAssertEqual(resume?.mode, .pages)
+        XCTAssertEqual(resume?.page, 9)
+
+        // The printed pages chosen, but the work no longer has its PDF: the text.
+        BookReadingHistory.recordChoice(itemID: id, mode: .pages)
+        resume = BookReadingHistory.resume(itemID: id, hasPDF: false, hasText: true)
+        XCTAssertEqual(resume?.mode, .text)
+        XCTAssertEqual(resume?.page, 4)
+    }
+
+    private func textPage(_ bookID: String, _ page: Int) -> BookPage {
+        BookPage(bookID: bookID, page: page, text: "متن", blocks: 1, unresolvedBlocks: 0,
+                 reviewState: "claudeTranscribed", validator: "test")
+    }
+
+    /// Before works opened as text, the gold button opened the PDF and every
+    /// opening noted "pages". A device that read that way keeps its place:
+    /// the PDF's page becomes the place in the text.
+    func testAPlaceKeptInThePrintedPagesBecomesThePlaceInTheText() async throws {
+        let defaults = UserDefaults.standard
+        let suffix = UUID().uuidString
+        let readInPages = "carried-pages-\(suffix)"
+        let readInBoth = "carried-both-\(suffix)"
+        let noText = "carried-no-text-\(suffix)"
+        let ids = [readInPages, readInBoth, noText]
+        defer {
+            for id in ids {
+                for prefix in ["bookPDF.page.", "bookText.page.", "library.book.mode.", "library.book.choice."] {
+                    defaults.removeObject(forKey: prefix + id)
+                }
+            }
+        }
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertBookPages([
+            textPage(readInPages, 3), textPage(readInPages, 40), textPage(readInPages, 41),
+            textPage(readInBoth, 2), textPage(readInBoth, 7),
+        ])
+        // As an older build left them: the PDF's page, and "pages" noted.
+        PDFReadingPosition.save(page: 40, itemID: readInPages)
+        PDFReadingPosition.save(page: 12, itemID: readInBoth)
+        BookReadingPosition.save(page: 7, bookID: readInBoth)
+        PDFReadingPosition.save(page: 5, itemID: noText)
+        for id in ids {
+            defaults.set("pages", forKey: "library.book.mode.\(id)")
+        }
+        XCTAssertTrue(Set(PDFReadingPosition.itemIDs()).isSuperset(of: ids))
+
+        let carried = await BookReadingHistory.carryPrintedPlacesToText(contentRepository: repository)
+        XCTAssertTrue(carried)
+
+        // Read only in its printed pages: the text, at that page.
+        var resume = BookReadingHistory.resume(itemID: readInPages, hasPDF: true, hasText: true)
+        XCTAssertEqual(resume?.mode, .text)
+        XCTAssertEqual(resume?.page, 40)
+        XCTAssertEqual(PDFReadingPosition.page(itemID: readInPages), 40, "The PDF keeps its own place")
+
+        // A place already kept in the text is not written over.
+        resume = BookReadingHistory.resume(itemID: readInBoth, hasPDF: true, hasText: true)
+        XCTAssertEqual(resume?.mode, .text)
+        XCTAssertEqual(resume?.page, 7)
+
+        // A work with no text is left with its printed pages.
+        XCTAssertNil(BookReadingPosition.page(bookID: noText))
+        resume = BookReadingHistory.resume(itemID: noText, hasPDF: true, hasText: false)
+        XCTAssertEqual(resume?.mode, .pages)
+        XCTAssertEqual(resume?.page, 5)
+
+        // The older note is gone, and nothing was taken for a choice.
+        for id in ids {
+            XCTAssertNil(defaults.object(forKey: "library.book.mode.\(id)"))
+            XCTAssertNil(BookReadingHistory.choice(itemID: id))
+        }
+    }
+
+    /// When the works that have text cannot be told, nothing is settled, and
+    /// the next launch tries again.
+    func testCarryingPlacesWaitsWhenTheTextCannotBeLookedUp() async throws {
+        let defaults = UserDefaults.standard
+        let id = "carried-later-\(UUID().uuidString)"
+        defer {
+            for prefix in ["bookPDF.page.", "bookText.page.", "library.book.mode."] {
+                defaults.removeObject(forKey: prefix + id)
+            }
+        }
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertBookPages([textPage(id, 6)])
+        PDFReadingPosition.save(page: 6, itemID: id)
+        defaults.set("pages", forKey: "library.book.mode.\(id)")
+
+        try await database.connection.execute("ALTER TABLE book_pages RENAME TO unavailable_book_pages")
+        let failed = await BookReadingHistory.carryPrintedPlacesToText(contentRepository: repository)
+        XCTAssertFalse(failed)
+        XCTAssertNil(BookReadingPosition.page(bookID: id))
+
+        try await database.connection.execute("ALTER TABLE unavailable_book_pages RENAME TO book_pages")
+        let carried = await BookReadingHistory.carryPrintedPlacesToText(contentRepository: repository)
+        XCTAssertTrue(carried)
+        XCTAssertEqual(BookReadingPosition.page(bookID: id), 6)
+        XCTAssertNil(defaults.object(forKey: "library.book.mode.\(id)"))
+    }
+
+    /// The step is taken once: a device that has taken it keeps what the
+    /// reader has done since.
+    func testCarryingPlacesIsDoneOnce() async throws {
+        let defaults = UserDefaults.standard
+        let id = "carried-once-\(UUID().uuidString)"
+        let done = defaults.object(forKey: "library.book.textFirst")
+        defer {
+            for prefix in ["bookPDF.page.", "bookText.page."] {
+                defaults.removeObject(forKey: prefix + id)
+            }
+            if let done {
+                defaults.set(done, forKey: "library.book.textFirst")
+            } else {
+                defaults.removeObject(forKey: "library.book.textFirst")
+            }
+        }
+        let database = try await AppDatabase.inMemory()
+        let repository = ContentRepository(database: database)
+        try await repository.upsertBookPages([textPage(id, 8)])
+        PDFReadingPosition.save(page: 8, itemID: id)
+
+        defaults.set(true, forKey: "library.book.textFirst")
+        await BookReadingHistory.moveToTextFirstIfNeeded(contentRepository: repository)
+        XCTAssertNil(BookReadingPosition.page(bookID: id), "Already done on this device")
     }
 
     // MARK: - Turning pages

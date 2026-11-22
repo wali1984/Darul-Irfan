@@ -300,10 +300,11 @@ struct ContentItemDetailView: View {
 
     /// The second way in, under "Read the text": the same work as its printed
     /// pages (the PDF). Shown only beside the text, so a work with only a PDF
-    /// keeps the emerald button.
+    /// keeps the emerald button. Opening it is the reader's choice of the
+    /// printed pages, which "Keep reading" then follows.
     private func printedPagesButton(for item: ContentItem) -> some View {
         NavigationLink {
-            reader(for: item, mode: .pages)
+            reader(for: item, mode: .pages, readerChosePages: true)
         } label: {
             HStack(spacing: DISpacing.md) {
                 Image(systemName: "doc.richtext")
@@ -339,13 +340,20 @@ struct ContentItemDetailView: View {
     }
 
     /// The app's one reader, on the text or the printed pages.
-    private func reader(for item: ContentItem, mode: BookReaderMode) -> some View {
+    /// `readerChosePages` is for the printed pages' own button on a work that
+    /// has text as well: the reader notes that choice as it opens.
+    private func reader(
+        for item: ContentItem,
+        mode: BookReaderMode,
+        readerChosePages: Bool = false
+    ) -> some View {
         BookReaderScreen(
             item: item,
             dependencies: dependencies,
             mode: mode,
             appState: appState,
-            fontScale: appState.settings.readerFontScale.rawValue
+            fontScale: appState.settings.readerFontScale.rawValue,
+            readerChosePages: readerChosePages
         )
     }
 
@@ -505,8 +513,10 @@ struct ContentItemDetailView: View {
                 .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages"))
             }
             if hasReadablePDF(item) {
+                // Beside the text, this tile is the reader's choice of the
+                // printed pages; on a work with no text there is none to make.
                 NavigationLink {
-                    reader(for: item, mode: .pages)
+                    reader(for: item, mode: .pages, readerChosePages: viewModel.bookPageCount > 0)
                 } label: {
                     readingTile(
                         systemImage: "doc.richtext",

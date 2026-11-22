@@ -97,30 +97,46 @@ struct BookResume: Equatable {
     }
 }
 
-/// The work opened last, the way each work was read last, and how many pages
-/// each has, beside the page positions the readers keep
+/// The work opened last, the way the reader chose to read each work, and how
+/// many pages each has, beside the page positions the readers keep
 /// (`PDFReadingPosition`, `BookReadingPosition`). Small, and private to the
 /// device.
 enum BookReadingHistory {
     private static let lastItemKey = "library.lastBook"
 
-    private static func modeKey(_ itemID: String) -> String { "library.book.mode.\(itemID)" }
+    /// Set once `moveToTextFirstIfNeeded` has done its work on this device.
+    private static let textFirstKey = "library.book.textFirst"
+
+    /// Builds before works opened as text noted, at every opening, the way
+    /// the work was shown. It is no longer read, and is removed.
+    private static let olderModePrefix = "library.book.mode."
+
+    private static func choiceKey(_ itemID: String) -> String { "library.book.choice.\(itemID)" }
 
     private static func pageCountKey(_ itemID: String, _ mode: BookReaderMode) -> String {
         "library.book.pages.\(mode.rawValue).\(itemID)"
     }
 
-    static func recordOpened(itemID: String, mode: BookReaderMode) {
+    /// The work is the one "Keep reading" offers. Opening a work says nothing
+    /// of how the reader wants to read it: see `recordChoice`.
+    static func recordOpened(itemID: String) {
         UserDefaults.standard.set(itemID, forKey: lastItemKey)
-        UserDefaults.standard.set(mode.rawValue, forKey: modeKey(itemID))
     }
 
     static func lastItemID() -> String? {
         UserDefaults.standard.string(forKey: lastItemKey)
     }
 
-    static func lastMode(itemID: String) -> BookReaderMode? {
-        guard let raw = UserDefaults.standard.string(forKey: modeKey(itemID)) else { return nil }
+    /// The reader chose how to read the work: with the reader's Text | Pages
+    /// switch, by a result of search in the book (the text), or with the
+    /// printed pages' own button on the work's page.
+    static func recordChoice(itemID: String, mode: BookReaderMode) {
+        UserDefaults.standard.set(mode.rawValue, forKey: choiceKey(itemID))
+    }
+
+    /// What the reader chose last for the work; nil when they never chose.
+    static func choice(itemID: String) -> BookReaderMode? {
+        guard let raw = UserDefaults.standard.string(forKey: choiceKey(itemID)) else { return nil }
         return BookReaderMode(rawValue: raw)
     }
 
@@ -145,12 +161,12 @@ enum BookReadingHistory {
         resume?.mode ?? (hasText ? .text : .pages)
     }
 
-    /// Where the work was left: the way it was read last first, then the
-    /// other - the text first unless the printed pages were read last; nil
-    /// when it has not been opened.
+    /// Where the work was left: in its text first, and in its printed pages
+    /// first only when the reader chose them; then in the other. Nil when no
+    /// place is kept for it.
     static func resume(itemID: String, hasPDF: Bool, hasText: Bool) -> BookResume? {
         var order: [BookReaderMode] = [.text, .pages]
-        if lastMode(itemID: itemID) == .pages {
+        if choice(itemID: itemID) == .pages {
             order = [.pages, .text]
         }
         for mode in order {
@@ -165,6 +181,42 @@ enum BookReadingHistory {
         }
         return nil
     }
+
+    // MARK: Places kept before works opened as text
+
+    /// Once on each device, at launch: the places kept while a work opened
+    /// in its printed pages are carried to its text (`carryPrintedPlacesToText`).
+    /// Left for the next launch when the works that have text cannot be told.
+    static func moveToTextFirstIfNeeded(contentRepository: any ContentRepositoryProtocol) async {
+        guard !UserDefaults.standard.bool(forKey: textFirstKey) else { return }
+        guard await carryPrintedPlacesToText(contentRepository: contentRepository) else { return }
+        UserDefaults.standard.set(true, forKey: textFirstKey)
+    }
+
+    /// A work that has text, with a place kept in its printed pages and none
+    /// in its text, takes that page as its place in the text, so "Keep
+    /// reading" opens the text there: the text's pages carry the numbers of
+    /// the PDF's pages, and the text opens at the nearest page at or after
+    /// the one asked for. The older note of how each work was shown is
+    /// removed. False, with that note left in place, when a work's text
+    /// could not be looked up.
+    static func carryPrintedPlacesToText(contentRepository: any ContentRepositoryProtocol) async -> Bool {
+        for itemID in PDFReadingPosition.itemIDs() {
+            guard BookReadingPosition.page(bookID: itemID) == nil,
+                  let page = PDFReadingPosition.page(itemID: itemID) else { continue }
+            guard let textPages = try? await contentRepository.bookPageCount(bookID: itemID) else {
+                return false
+            }
+            if textPages > 0 {
+                BookReadingPosition.save(page: page, bookID: itemID)
+            }
+        }
+        let defaults = UserDefaults.standard
+        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix(olderModePrefix) {
+            defaults.removeObject(forKey: key)
+        }
+        return true
+    }
 }
 
 // MARK: - Reader
@@ -177,8 +229,15 @@ struct BookReaderScreen: View {
     private let startPage: Int?
     /// Where the text size is kept; nil keeps it for this reading only.
     private let appState: AppState?
+    /// The printed pages' own button opened the reader, on a work that has
+    /// text as well: the reader chose them.
+    private let readerChosePages: Bool
 
     @State private var mode: BookReaderMode
+    /// The choice the reader was opened with has been noted. The screen
+    /// coming back into view (from another tab) is not a new choice, and
+    /// must not undo what the switch was set to since.
+    @State private var notedOpeningChoice = false
     /// The views built so far; each is kept once built, with its place.
     @State private var opened: Set<BookReaderMode>
     @State private var pdf: BookReaderSession
@@ -199,13 +258,15 @@ struct BookReaderScreen: View {
         mode: BookReaderMode,
         startPage: Int? = nil,
         appState: AppState? = nil,
-        fontScale: Double = 1
+        fontScale: Double = 1,
+        readerChosePages: Bool = false
     ) {
         self.item = item
         self.dependencies = dependencies
         self.startPage = startPage
         self.appState = appState
         let first: BookReaderMode = (mode == .pages && !BookReadingHistory.hasPDF(item)) ? .text : mode
+        self.readerChosePages = readerChosePages && first == .pages
         _mode = State(initialValue: first)
         _opened = State(initialValue: [first])
         _pdf = State(initialValue: BookReaderSession())
@@ -306,7 +367,14 @@ struct BookReaderScreen: View {
             if let last { BookReadingHistory.savePageCount(last, itemID: item.id, mode: .text) }
         }
         .task {
-            BookReadingHistory.recordOpened(itemID: item.id, mode: mode)
+            // Opening a work is not choosing how to read it: only the switch,
+            // a result of search in the book and the printed pages' own
+            // button say that.
+            BookReadingHistory.recordOpened(itemID: item.id)
+            if readerChosePages, !notedOpeningChoice {
+                notedOpeningChoice = true
+                BookReadingHistory.recordChoice(itemID: item.id, mode: .pages)
+            }
             if !hasText {
                 let count = (try? await dependencies.contentRepository.bookPageCount(bookID: item.id)) ?? 0
                 hasText = count > 0
@@ -376,10 +444,12 @@ struct BookReaderScreen: View {
         )
     }
 
+    /// The reader's switch: the way chosen is the way "Keep reading" opens
+    /// the work from now on.
     private func choose(_ next: BookReaderMode) {
         opened.insert(next)
         mode = next
-        BookReadingHistory.recordOpened(itemID: item.id, mode: next)
+        BookReadingHistory.recordChoice(itemID: item.id, mode: next)
     }
 
     /// Aa: the reader's text size, kept in Settings when the reader came
@@ -554,7 +624,7 @@ struct BookReaderScreen: View {
         opened.insert(.text)
         text.requestedPage = page
         mode = .text
-        BookReadingHistory.recordOpened(itemID: item.id, mode: .text)
+        BookReadingHistory.recordChoice(itemID: item.id, mode: .text)
     }
 }
 

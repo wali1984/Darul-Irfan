@@ -167,10 +167,20 @@ struct DarulIrfanApp: App {
             // ships. Only the stages whose files changed run; the launch
             // screen says which while they do.
             let progress = importProgress
-            _ = try? await dependencies.contentSync.importSeedDataIfNeeded { step in
+            let seedImport = try? await dependencies.contentSync.importSeedDataIfNeeded { step in
                 await MainActor.run { progress.step = step }
             }
             progress.step = nil
+
+            // Works open as text now. Once, a place kept in a work's printed
+            // pages becomes its place in the text, before any screen offers
+            // "Keep reading". It asks which works have text, so it waits for
+            // a launch whose import finished.
+            if seedImport != nil {
+                await BookReadingHistory.moveToTextFirstIfNeeded(
+                    contentRepository: dependencies.contentRepository
+                )
+            }
 
             // Hold the brand splash for a beat so the emblem reads, rather than
             // flashing past when launch work finishes quickly. Skipped in UI tests.
