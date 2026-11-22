@@ -569,11 +569,13 @@ final class RedesignScreenshotTests: XCTestCase {
                 app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72)).tap()
             }
             do {
+                // A book opens as its text; the printed pages are the
+                // switch's second choice.
                 pause(5)
-                shot("book-reader")
-                if tap(button("Text")) {
-                    pause(3)
-                    shot("book-reader-text")
+                shot("book-reader-text")
+                if tap(button("Pages")) {
+                    pause(5)
+                    shot("book-reader")
                 }
                 goBack()
             }

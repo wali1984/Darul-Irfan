@@ -1,9 +1,10 @@
 import Observation
 import SwiftUI
 
-// The one reader for the Silsila's books and publications: the printed pages
-// (`BookReaderView`, the PDF, cached for offline reading) and the text
-// (`BookTextPagesView`, searchable), under a Pages | Text switch. A glass bar
+// The one reader for the Silsila's books and publications: the text
+// (`BookTextPagesView`, searchable), which a work opens as, and the printed
+// pages (`BookReaderView`, the PDF, cached for offline reading) as the other
+// choice, under a Text | Pages switch. A glass bar
 // at the top carries the title and "PAGE n OF N", the text size and search
 // in the book; a floating bar at the foot turns the pages, with a scrubber
 // that runs right to left for an Urdu book, and Go to page. Each view keeps
@@ -12,17 +13,18 @@ import SwiftUI
 
 // MARK: - Mode
 
-/// How a work is read: its printed pages (the PDF) or its text.
+/// How a work is read: its text, or its printed pages (the PDF). In the
+/// order the reader's switch shows them: Text | Pages.
 enum BookReaderMode: String, CaseIterable, Hashable, Identifiable {
-    case pages
     case text
+    case pages
 
     var id: String { rawValue }
 
     var title: LocalizedStringKey {
         switch self {
-        case .pages: return "Pages"
         case .text: return "Text"
+        case .pages: return "Pages"
         }
     }
 }
@@ -137,12 +139,19 @@ enum BookReadingHistory {
         item.downloadUrls.contains { $0.lowercased().hasSuffix(".pdf") }
     }
 
+    /// The way a work opens: as it was left, or else its text - and its
+    /// printed pages only when it has no text.
+    static func startMode(resume: BookResume?, hasText: Bool) -> BookReaderMode {
+        resume?.mode ?? (hasText ? .text : .pages)
+    }
+
     /// Where the work was left: the way it was read last first, then the
-    /// other; nil when it has not been opened.
+    /// other - the text first unless the printed pages were read last; nil
+    /// when it has not been opened.
     static func resume(itemID: String, hasPDF: Bool, hasText: Bool) -> BookResume? {
-        var order: [BookReaderMode] = [.pages, .text]
-        if lastMode(itemID: itemID) == .text {
-            order = [.text, .pages]
+        var order: [BookReaderMode] = [.text, .pages]
+        if lastMode(itemID: itemID) == .pages {
+            order = [.pages, .text]
         }
         for mode in order {
             let available = mode == .pages ? hasPDF : hasText

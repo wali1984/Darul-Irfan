@@ -2,10 +2,10 @@ import SwiftUI
 
 /// Detail screen for one library item.
 ///
-/// A book or publication - a work read as printed pages or as text, with no
+/// A book or publication - a work read as text or as printed pages, with no
 /// article body - opens as a book page (boards/Book.dc.html): a cover made in
 /// the Silsila's style, the title, author and chips, the gold "Keep reading"
-/// at the page it was left on, the printed pages and the text, keeping it on
+/// at the page it was left on, the text and the printed pages, keeping it on
 /// this phone, the rights line, and the excerpt and dates.
 ///
 /// Everything else - articles, pages, notices, archive records - keeps the
@@ -169,11 +169,15 @@ struct ContentItemDetailView: View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             detailHeader(for: item)
                 .diAppear(delay: 0.03)
-            if hasReadablePDF(item) {
-                readInAppButton(for: item).diAppear(delay: 0.06)
-            }
+            // The text first wherever the work has text; its printed pages
+            // are the second way in, and the first only when there is no text.
             if viewModel.bookPageCount > 0 {
-                readTextButton(for: item).diAppear(delay: 0.09)
+                readTextButton(for: item).diAppear(delay: 0.06)
+                if hasReadablePDF(item) {
+                    printedPagesButton(for: item).diAppear(delay: 0.09)
+                }
+            } else if hasReadablePDF(item) {
+                readInAppButton(for: item).diAppear(delay: 0.06)
             }
             nativeMediaSection(for: item)
             if viewModel.showsBody {
@@ -224,11 +228,18 @@ struct ContentItemDetailView: View {
         item.downloadUrls.contains { $0.lowercased().hasSuffix(".pdf") }
     }
 
-    /// Primary CTA: read the work's actual pages inside the app (cached
-    /// offline), not an external viewer or a bare download.
-    private func readInAppButton(for item: ContentItem) -> some View {
+    /// The emerald button: the main way into a work, opening the app's
+    /// reader (not an external viewer or a bare download).
+    private func primaryReadButton(
+        for item: ContentItem,
+        mode: BookReaderMode,
+        systemImage: String,
+        title: Text,
+        caption: Text,
+        spokenLabel: Text
+    ) -> some View {
         NavigationLink {
-            reader(for: item, mode: .pages)
+            reader(for: item, mode: mode)
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
@@ -236,14 +247,14 @@ struct ContentItemDetailView: View {
                 DIPatternTexture(tint: .white, opacity: 0.07)
                     .clipShape(RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous))
                 HStack(spacing: DISpacing.md) {
-                    Image(systemName: "book.pages.fill")
+                    Image(systemName: systemImage)
                         .diInterfaceFont(.title2)
                         .foregroundStyle(DIColor.onPrimary)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Read in App")
+                        title
                             .diInterfaceFont(.headline, design: .serif)
                             .foregroundStyle(DIColor.onPrimary)
-                        Text("Read the pages here — offline after first open")
+                        caption
                             .diInterfaceFont(.caption)
                             .foregroundStyle(DIColor.onPrimary.opacity(0.85))
                     }
@@ -259,26 +270,50 @@ struct ContentItemDetailView: View {
         .buttonStyle(DIPressableStyle())
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("Read in app"))
+        .accessibilityLabel(spokenLabel)
     }
 
-    /// Secondary entry: the work's machine-read text layer. Shown only when
-    /// pages exist, so a PDF-only work is unchanged. Deliberately quieter than
-    /// "Read in App" — the PDF is the authoritative copy and this text has not
-    /// been proofread.
+    /// A work that has text opens as text: this is its main button.
     private func readTextButton(for item: ContentItem) -> some View {
+        primaryReadButton(
+            for: item,
+            mode: .text,
+            systemImage: "text.book.closed.fill",
+            title: Text("Read the text"),
+            caption: Text("\(viewModel.bookPageCount) pages — searchable text"),
+            spokenLabel: Text("Read the text, \(viewModel.bookPageCount) pages")
+        )
+    }
+
+    /// A work with no text: its printed pages (the PDF, cached offline) are
+    /// the main button.
+    private func readInAppButton(for item: ContentItem) -> some View {
+        primaryReadButton(
+            for: item,
+            mode: .pages,
+            systemImage: "book.pages.fill",
+            title: Text("Read in App"),
+            caption: Text("Read the pages here — offline after first open"),
+            spokenLabel: Text("Read in app")
+        )
+    }
+
+    /// The second way in, under "Read the text": the same work as its printed
+    /// pages (the PDF). Shown only beside the text, so a work with only a PDF
+    /// keeps the emerald button.
+    private func printedPagesButton(for item: ContentItem) -> some View {
         NavigationLink {
-            reader(for: item, mode: .text)
+            reader(for: item, mode: .pages)
         } label: {
             HStack(spacing: DISpacing.md) {
-                Image(systemName: "text.book.closed")
+                Image(systemName: "doc.richtext")
                     .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.primary)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Read the text")
+                    Text("The printed pages")
                         .diInterfaceFont(.headline, design: .serif)
                         .foregroundStyle(DIColor.textPrimary)
-                    Text("\(viewModel.bookPageCount) pages — searchable text")
+                    Text("As published. Offline after the first open.")
                         .diInterfaceFont(.caption)
                         .foregroundStyle(DIColor.textMuted)
                 }
@@ -299,10 +334,9 @@ struct ContentItemDetailView: View {
         .buttonStyle(DIPressableStyle())
         .simultaneousGesture(TapGesture().onEnded { DIHaptics.soft() })
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages"))
     }
 
-    /// The app's one reader, on the printed pages or the text.
+    /// The app's one reader, on the text or the printed pages.
     private func reader(for item: ContentItem, mode: BookReaderMode) -> some View {
         BookReaderScreen(
             item: item,
@@ -315,7 +349,7 @@ struct ContentItemDetailView: View {
 
     // MARK: - Book page
 
-    /// A work read as printed pages or as text, with no article body.
+    /// A work read as text or as printed pages, with no article body.
     private func isBookPage(_ item: ContentItem) -> Bool {
         !viewModel.showsBody && (hasReadablePDF(item) || viewModel.bookPageCount > 0)
     }
@@ -380,9 +414,10 @@ struct ContentItemDetailView: View {
         return BookReadingHistory.pageCount(itemID: item.id, mode: .pages)
     }
 
-    /// Gold: back to the page it was left on, or the first reading.
+    /// Gold: back to the page it was left on, or the first reading - the
+    /// text, and the printed pages only for a work that has no text.
     private func keepReadingButton(for item: ContentItem) -> some View {
-        let startMode: BookReaderMode = resume?.mode ?? (hasReadablePDF(item) ? .pages : .text)
+        let startMode = BookReadingHistory.startMode(resume: resume, hasText: viewModel.bookPageCount > 0)
         return NavigationLink {
             reader(for: item, mode: startMode)
         } label: {
@@ -420,10 +455,10 @@ struct ContentItemDetailView: View {
                         Text("Read in App")
                             .diInterfaceFont(.headline, weight: .heavy)
                         Group {
-                            if hasReadablePDF(item) {
-                                Text("Read the pages here — offline after first open")
-                            } else {
+                            if viewModel.bookPageCount > 0 {
                                 Text("\(viewModel.bookPageCount) pages — searchable text")
+                            } else {
+                                Text("Read the pages here — offline after first open")
                             }
                         }
                         .diInterfaceFont(.footnote, weight: .semibold)
@@ -454,9 +489,19 @@ struct ContentItemDetailView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// The printed pages (the PDF) and the text, each opening the reader.
+    /// The text, then the printed pages (the PDF), each opening the reader.
     private func readingTiles(for item: ContentItem) -> some View {
         HStack(alignment: .top, spacing: 10) {
+            if viewModel.bookPageCount > 0 {
+                NavigationLink {
+                    reader(for: item, mode: .text)
+                } label: {
+                    readingTile(systemImage: "text.alignleft", titleKey: "The text", detail: textTileDetail)
+                }
+                .buttonStyle(DIPressableStyle())
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages"))
+            }
             if hasReadablePDF(item) {
                 NavigationLink {
                     reader(for: item, mode: .pages)
@@ -469,16 +514,6 @@ struct ContentItemDetailView: View {
                 }
                 .buttonStyle(DIPressableStyle())
                 .accessibilityElement(children: .combine)
-            }
-            if viewModel.bookPageCount > 0 {
-                NavigationLink {
-                    reader(for: item, mode: .text)
-                } label: {
-                    readingTile(systemImage: "text.alignleft", titleKey: "The text", detail: textTileDetail)
-                }
-                .buttonStyle(DIPressableStyle())
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages"))
             }
         }
         .fixedSize(horizontal: false, vertical: true)

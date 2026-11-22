@@ -331,6 +331,65 @@ final class ReadRedesignTests: XCTestCase {
         }
     }
 
+    // MARK: - Text first
+
+    func testAWorkWithTextOpensAsTextAndOneWithoutAsItsPrintedPages() {
+        // Never opened: the text when the work has text (it may have a PDF
+        // as well), the printed pages only when it has none.
+        XCTAssertEqual(BookReadingHistory.startMode(resume: nil, hasText: true), .text)
+        XCTAssertEqual(BookReadingHistory.startMode(resume: nil, hasText: false), .pages)
+        // Left in the printed pages: Keep reading goes back to them.
+        let leftInPages = BookResume(mode: .pages, page: 12, pageCount: 300)
+        XCTAssertEqual(BookReadingHistory.startMode(resume: leftInPages, hasText: true), .pages)
+        let leftInText = BookResume(mode: .text, page: 7, pageCount: nil)
+        XCTAssertEqual(BookReadingHistory.startMode(resume: leftInText, hasText: true), .text)
+    }
+
+    func testTheReaderSwitchReadsTextThenPages() {
+        XCTAssertEqual(BookReaderMode.allCases, [.text, .pages])
+        // What is kept on the device does not change with the order.
+        XCTAssertEqual(BookReaderMode.text.rawValue, "text")
+        XCTAssertEqual(BookReaderMode.pages.rawValue, "pages")
+    }
+
+    func testKeepReadingReturnsToTheTextUnlessThePrintedPagesWereReadLast() {
+        let defaults = UserDefaults.standard
+        let id = "text-first-\(UUID().uuidString)"
+        let lastBook = defaults.string(forKey: "library.lastBook")
+        defer {
+            for key in ["bookPDF.page.\(id)", "bookText.page.\(id)", "library.book.mode.\(id)"] {
+                defaults.removeObject(forKey: key)
+            }
+            if let lastBook {
+                defaults.set(lastBook, forKey: "library.lastBook")
+            } else {
+                defaults.removeObject(forKey: "library.lastBook")
+            }
+        }
+        XCTAssertNil(BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true))
+
+        // A place kept in both and no note of which was read last: the text.
+        PDFReadingPosition.save(page: 9, itemID: id)
+        BookReadingPosition.save(page: 4, bookID: id)
+        var resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true)
+        XCTAssertEqual(resume?.mode, .text)
+        XCTAssertEqual(resume?.page, 4)
+
+        // The printed pages read last: back to them, at their page.
+        BookReadingHistory.recordOpened(itemID: id, mode: .pages)
+        resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true)
+        XCTAssertEqual(resume?.mode, .pages)
+        XCTAssertEqual(resume?.page, 9)
+
+        BookReadingHistory.recordOpened(itemID: id, mode: .text)
+        resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: true)
+        XCTAssertEqual(resume?.mode, .text)
+
+        // A work with no text has only its printed pages to go back to.
+        resume = BookReadingHistory.resume(itemID: id, hasPDF: true, hasText: false)
+        XCTAssertEqual(resume?.mode, .pages)
+    }
+
     // MARK: - Turning pages
 
     func testTurningPagesSkipsTheOnesAScanLeftOut() {
