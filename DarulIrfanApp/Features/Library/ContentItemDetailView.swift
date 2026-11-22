@@ -309,6 +309,7 @@ struct ContentItemDetailView: View {
                 Image(systemName: "doc.richtext")
                     .diInterfaceFont(.title3)
                     .foregroundStyle(DIColor.primary)
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("The printed pages")
                         .diInterfaceFont(.headline, design: .serif)
@@ -321,6 +322,7 @@ struct ContentItemDetailView: View {
                 Image(systemName: "chevron.forward")
                     .diInterfaceFont(.footnote, weight: .semibold)
                     .foregroundStyle(DIColor.textMuted)
+                    .accessibilityHidden(true)
             }
             .padding(DISpacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
