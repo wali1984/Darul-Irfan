@@ -1,9 +1,11 @@
 # Privacy
 
-Darul Irfan has no advertising, user account, community posting, or
-cross-app tracking. Prayer calculations, precise location, bookmarks, prayer
-history, reading/listening progress, tasbih activity, and downloads remain on
-the device.
+Darul Irfan has no advertising or cross-app tracking. An account is optional
+and used only for Halqahs, where members can chat in live meetings. Prayer
+calculations, bookmarks, prayer history, reading/listening progress, tasbih
+activity, and downloads remain on the device. Location leaves the device only
+as the table below says: for weather, a nearby-masjid search and Apple's
+geocoding.
 
 ## Network and data inventory
 
@@ -14,6 +16,9 @@ the device.
 | Android alert delivery | For each alert, the Worker sends its title, text, in-app link and the phone's FCM token to Google's Firebase Cloud Messaging, which delivers it, as Apple's APNs does on iPhone | Google processes it only to deliver the alert. The Firebase Messaging SDK creates a Firebase installation ID on the phone. No Firebase Analytics, Crashlytics or other Firebase product is included. |
 | Google sign-in (Android, private groups only) | Google ID token: Google's stable account ID for the app, the name, and the verified email | Stored as the member's Google subject, name and email. The email recognises the silsila's administrators and links the account to an Apple sign-in with the same email; nothing is sent to it. Removed by "Delete my account". |
 | Opt-in diagnostics | Hash of the random installation UUID, app/OS version, and Apple MetricKit payload | Stored for 30 days, then deleted by the Worker cron. Precise location, names, email, APNs token, prayer history, bookmarks, and reading activity are rejected/removed. |
+| Local weather (when Weather on Today is on; on by default) | The chosen city's approximate coordinates, rounded to a 0.1-degree grid, go to the Worker, which asks Apple Weather | The reading is cached by grid square for 10 minutes; no member or device identifier is sent with it. Switch it off in the location settings. |
+| Nearby-masjid search (only when the user starts it) | The chosen place's coordinates, which the app keeps rounded to two decimals, go to the Worker, which asks Google Maps' places service | No content cache is kept and no member identifier is sent. Nothing is searched in the background. |
+| Halqahs (optional) | The name, city, country and optional email given to join; membership and attendance; what is said, shown or sent in a live meeting, on the Zikr stage or as a du'a request | A message is shared with the people it is sent to; du'a requests and attendance with the admins; an administrator can record a meeting. Meeting media and chat travel through Cloudflare RealtimeKit. |
 | Content catalog | GET requests to the GitHub-hosted content manifest and its JSON payloads | Public catalog data is cached in SQLite; no personal data is sent. |
 | YouTube playback | The selected video ID and normal web request metadata go to YouTube through a non-persistent `WKWebView` | The app does not receive YouTube cookies or account data and does not extract/download YouTube streams. Users can instead open YouTube externally. |
 | Audio/PDF use | Requested public media/document URL | Files explicitly downloaded by the user stay in the app container. Owned direct audio streams use `AVPlayer`. |
@@ -35,8 +40,13 @@ are enabled in the submitted binary, even though collection is optional:
   alert delivery.
 - **Diagnostics — App Functionality, not linked to identity, not used for
   tracking:** consent-gated MetricKit diagnostic and performance payloads.
-- **Precise/Coarse Location — Not collected by the developer:** used locally
-  for prayer/Qibla; never sent to the Darul Irfan service.
+- **Precise/Coarse Location — recheck before submission:** prayer times and
+  Qibla use it on the device, but the weather and nearby-masjid requests above
+  send a rounded location to the Darul Irfan service. "Not collected" holds
+  only while neither the service nor its logs keep those coordinates longer
+  than the request needs.
+- **User Content — recheck before submission:** Halqah chat, pictures, files,
+  du'a requests and recorded meetings exist.
 - **Usage Data — Not collected:** no product analytics or reading/prayer event
   telemetry.
 - **Identifiers / User ID, Name and Email Address — App Functionality,
@@ -46,7 +56,8 @@ are enabled in the submitted binary, even though collection is optional:
   administrator recognise who to add; the email (which the member may replace
   with Apple's relay address) is used only to recognise the silsila's own
   administrators, and nothing is ever sent to it. Members who join with an
-  invitation code give none of these. These are the app's only linked data.
+  invitation code may give a name but no email; Our Sheikh's visitors give a
+  name, city, country and, optionally, an email.
   (Changed 2026-10-27: the email scope is now requested. App Store Connect's
   privacy answers must list Email Address the same way.)
 - **Tracking — No:** no IDFA, ATT prompt, data broker sharing, advertising, or
@@ -65,8 +76,10 @@ group membership in one call.
 Signing in grants nothing by itself. A new member belongs to no group until an
 administrator adds them, and a group the member does not belong to answers
 exactly as a group that does not exist, so one region cannot discover another's
-existence, let alone read it. Members never post: administrators publish and
-members read, so no member's words are ever shown to another member.
+existence, let alone read it. Our Sheikh is the exception: anyone may join it.
+Only administrators publish group posts. In a live meeting the other
+participants see a member's name and what they send in its chat; on the Zikr
+stage they see a member's name, city and ready-made messages.
 
 Recheck App Store Connect terminology at submission time. Optional collection
 still needs disclosure; do not select the older blanket “Data Not Collected”

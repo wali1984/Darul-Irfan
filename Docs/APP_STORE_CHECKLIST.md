@@ -63,57 +63,66 @@ before archiving.
       - iPad Pro 13" — mandatory because the app installs on iPad
       Suggested shot list: Prayer dashboard with next-prayer countdown;
       Monthly timetable; Qibla compass; Quran reader on Surah Al-Fatihah
-      (public-domain Arabic + Pickthall); Library article reader (real
-      content — permitted, see below); Media lecture list; Next Prayer widget
-      on the Home/Lock Screen; Tasbih counter; Settings/privacy screen.
-- [ ] **Screenshots may show real site content** — the owner of
-      naqshbandiaowaisiah.org granted content permission on 2026-07-10, so
-      article/page body text, lecture titles, and publication listings that
-      ship in the app may appear in screenshots and marketing imagery. Keep
-      the written confirmation on file before submission, and keep religious
-      text in screenshots verbatim (no crops that distort meaning).
+      (Arabic + Akram-ut-Tarajum); Library article reader; Media lecture
+      list; Next Prayer widget on the Home/Lock Screen; Tasbih counter;
+      Settings/privacy screen.
+- [ ] **Screenshots may show the app's real content**: article text, lecture
+      titles and publication listings. Keep religious text verbatim (no crops
+      that distort meaning).
 
 ## 4. App Review notes (paste into the Review Notes field)
 
-- [ ] **Religious content sourcing**: explain that organizational and
-      spiritual content comes from naqshbandiaowaisiah.org (the order's
-      official site) and is included **with the content owner's permission
-      (granted 2026-07-10)**; that Quran Arabic text and the Pickthall
-      translation are public domain; that the complete Urdu and English
-      Akram-ut-Tarajum editions are included under that permission; that
-      book/magazine/tafsir PDFs download
-      from the site's own URLs and audio lectures stream from the site's own
-      public URLs (no re-hosting); and that religious text is preserved
-      verbatim.
-- [ ] **Location**: used only on-device for prayer-time calculation and Qibla
-      direction; the app is fully functional with a manually chosen city and
-      never transmits location (see `Docs/PRIVACY.md`).
+- [ ] **Religious content**: the content is the Silsila's own.
+- [ ] **Location**: prayer times and Qibla are calculated on the device, and
+      the app is fully functional with a manually chosen city. When Weather on
+      Today is on (it is by default, and has a switch), the chosen city's
+      approximate location, rounded to 0.1 degree, is sent to our weather
+      service. A nearby-masjid search, only when the user starts it, sends the
+      chosen place's location to our service and on to Google Maps' places
+      service (see `Docs/PRIVACY.md`).
 - [ ] **Background audio**: the `audio` background mode is used solely to
       continue user-initiated lecture/recitation playback with Lock Screen
       controls.
 - [ ] **No account** is needed for prayer times, Quran, hadith, books or
       lectures; a reviewer can exercise all of that immediately after
       onboarding with no credentials.
-- [ ] **Private groups do create an account** via Sign in with Apple, so:
-      in-app account deletion is mandatory (5.1.1(v)) and lives on the groups
-      screen; the privacy manifest declares User ID and Name as linked; and the
-      Sign in with Apple capability must be enabled on the App ID in the
-      developer portal or signing fails even though the build compiles.
-- [ ] Tell review that a reviewer who signs in will correctly see **no groups**:
-      membership is granted by an administrator, so an empty state is the
-      expected result and not a broken feature. Members cannot post — admins
-      publish and members read — so the user-generated-content obligations of
-      guideline 1.2 do not apply to member-to-member content.
+- [ ] **An account is optional and used only for Halqahs**: Sign in with
+      Apple, an invitation code, or Our Sheikh's entry with a name, city and
+      country. So: in-app account deletion is mandatory (5.1.1(v)) and lives on
+      the Halqah screen; the privacy manifest declares User ID, Name and Email
+      Address as linked; and the Sign in with Apple capability must be enabled
+      on the App ID in the developer portal or signing fails even though the
+      build compiles.
+- [ ] Tell review that a reviewer who signs in will correctly see **no private
+      Halqahs**: membership is granted by an administrator, so an empty list
+      is the expected result and not a broken feature. Our Sheikh is open
+      through "Join Daily Zikr".
+- [ ] **User-generated content: Yes** (guideline 1.2 applies). Live meetings
+      have voice, video and chat (text, pictures, files, to everyone or to one
+      participant); the Zikr stage has members' ready-made messages and admins'
+      own text; members can send du'a requests to admins; only admins publish
+      group posts. The moderation that exists: private Halqahs by invitation
+      or an admin's approval; admins remove members, posts, stage messages and
+      du'a requests; meeting hosts mute, stop a camera and remove a
+      participant; stage messages are rate limited.
+- [ ] **[blocker]** Guideline 1.2 also asks for filtering, a way to report
+      content and a way to block a person. The server accepts content reports,
+      but the iPhone app has no report or block control and chat has no
+      filter. Settle this before submission, and do not claim them until then.
 - [ ] Explain the official read-only social feed, non-persistent YouTube
-      embed, Paltalk handoff, opt-in APNs alerts, 30-day opt-in MetricKit
+      embed, live Zikr sound heard inside the app, opt-in APNs alerts, 30-day
+      opt-in MetricKit
       diagnostics, and Cloudflare-hosted public configuration.
-- [ ] Age rating: no objectionable content and no unrestricted embedded web
-      browser. Official reading is native; the YouTube player is host-limited.
+- [ ] Age rating: answer Yes to user-generated content and to messaging and
+      chat, and take the rating calculated from that. There is no objectionable
+      content and no unrestricted embedded web browser.
+      Official reading is native; the YouTube player is host-limited.
 
-## 5. Licensing & rights checklist
+## 5. Private record of the owner's confirmations
 
-These are records kept with the release. The app has no credits or licences
-screen (removed 2026-11-21).
+These are private records kept with the release. None of them requires anything
+on screen, and none is copied into store text, notes or screenshots. The app
+has no credits or licences screen (removed 2026-11-21).
 
 That removal does not cover two services (owner's decision, 2026-11-21): the
 Apple Weather name, mark and link, and the Google Maps name and provider
@@ -124,16 +133,10 @@ Qur'an reciter is not named in the app: the Listen bar says "Recitation".
       notice with substantial portions of the software: keep the license
       text, or the authors' written confirmation that it is not needed, with
       the release records.
-- [ ] **Pickthall translation** — *The Meaning of the Glorious Koran* (1930),
-      public domain. No action needed.
-- [x] **Akram-ut-Tarajum** — complete Urdu and English editions, 6,236 ayat
-      each, copied verbatim from the official structured Quran reader under
-      the recorded content permission. Counts, alignment, and checksum are in
-      `Docs/AKRAM_UT_TARAJUM_VERIFICATION.md`.
-- [x] **Quran Arabic text** — complete Quran (all 114 surahs / 6,236 ayat)
-      bundled, triple-verified error-free (Docs/QURAN_VERIFICATION.md). Tanzil
-      Uthmani, public domain. When
-      expanding to the full text, record the exact source edition here.
+- [x] **Akram-ut-Tarajum** — the Silsila's own Urdu and English editions,
+      6,236 ayat each, covered by the owner's confirmation of 2026-07-10.
+- [x] **Quran Arabic text** — all 114 surahs / 6,236 ayat, never edited. Its
+      record is `Docs/QURAN_VERIFICATION.md`.
 - [ ] **prayer-chime.wav** — original work created for this app (no rights
       issues).
 - [x] **Azan notification clip & full azan recordings** — shipped 2026-07-10.
@@ -145,23 +148,15 @@ Qur'an reciter is not named in the app: the Listen bar says "Recitation".
 - [ ] **Fajr azan (CC BY 3.0)** — the license requires attribution and the app
       shows none: keep the author's written confirmation that no credit in
       the app is needed with the release records before submission.
-- [x] **Site content permission status** — **GRANTED 2026-07-10** by the
-      owner of naqshbandiaowaisiah.org. Scope: full text and assets from the
-      site may ship in the app; the 2026-07-10 ingest
-      (`--full-text --rights-confirmed`, seed manifest v2) shipped full
-      verbatim text for About pages, Method of Zikr, zikr-joining
-      instructions, articles, and both Akram-ut-Tarajum editions as
-      `rightsStatus: permissionConfirmed`;
-      books/magazines/tafsir PDFs and lecture MP3s remain remote URLs on the
-      site (no re-hosting).
+- [x] **The Silsila's content** — the owner confirmed on 2026-07-10 that its
+      full text and assets may ship in the app and appear in screenshots.
 - [ ] **[blocker]** Obtain and keep the owner's **written confirmation on
-      file** before submission (the 2026-07-10 grant is recorded; archive the
-      written record with the submission materials).
+      file** before submission (the 2026-07-10 confirmation is recorded;
+      archive the written record with the submission materials).
 - [ ] **Owned live audio** — if an MP3/AAC/HLS endpoint is configured, keep
       written confirmation that it is authorized for public app streaming.
-- [ ] **App icon / visual identity** — attributed to naqshbandiaowaisiah.org.
-      Content permission was granted 2026-07-10; confirm the icon/visual
-      identity is covered by that grant or obtain separate approval.
+- [ ] **App icon / visual identity** — check that the owner's confirmation
+      of 2026-07-10 covers it, or record a separate approval.
 
 ## 6. Pre-submission QA pass (on a physical device where noted)
 

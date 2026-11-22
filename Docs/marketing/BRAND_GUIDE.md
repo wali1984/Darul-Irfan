@@ -35,11 +35,11 @@ shipping design system (`DarulIrfanApp/Core/DesignSystem/Theme.swift`,
   tagline)*.
 - **Anchor verse — the spiritual signature (Qur'an 13:28):**
   - Arabic: **اَلَا بِذِكْرِ اللّٰهِ تَطْمَئِنُّ الْقُلُوْبُ**
-  - English (Pickthall): *"Verily, in the remembrance of Allah do hearts find
-    peace."*
+  - English (Akram-ut-Tarajum): *"Remember! Only in Allah’s Zikr do hearts find satisfaction."*
+  - Urdu (Akram-ut-Tarajum): *"یاد رکھو! اللہ کے ذکر سے ہی دل اطمینان پاتے ہیں۔"*
   - Reference: **Qur'an 13:28**
   - Use it on splash, home headers, the press kit, and hero marketing — it is the
-    emotional through-line of the entire product. Always attribute
+    emotional through-line of the entire product. Always give the reference
     ("Qur'an 13:28") and keep the Arabic verbatim.
 
 ---
@@ -99,21 +99,22 @@ extension of the Silsila rather than a generic azan app.
 
 | Script | Face | Use |
 |---|---|---|
-| **Arabic (Qur'an)** | **Amiri Quran** (bundled) | All Qur'anic Arabic — the mushaf reading face; verses, anchor verse, Arabic du'as |
-| **Urdu** | **Noto Nastaliq Urdu** (bundled) | All Urdu — wordmark, titles, body, captions; always RTL |
+| **Arabic (Qur'an)** | **IndoPak script** (bundled) | All Qur'anic Arabic — the mushaf reading face |
+| **Arabic (other)** | **Amiri Quran** (bundled) | Arabic du'as and devotional prose |
+| **Urdu** | **Noto Nastaliq Urdu** (Apple's, on the device) | All Urdu — wordmark, titles, body, captions; always RTL |
 | **Headings (Latin)** | **Serif** (the app's serif heading face) | English titles, taglines, marketing headlines — scholarly, calm |
 | **Body / UI (Latin)** | **SF Pro / system** | English body, controls, numerals; scales with Dynamic Type |
 
 **Rules**
-- Arabic Qur'anic text is **only ever** set in Amiri Quran — never the system
-  Arabic face, never a display font.
+- Arabic Qur'anic text is **only ever** set in the bundled IndoPak face — never
+  the system Arabic face, never a display font.
 - Urdu is always Nastaliq and right-to-left; never force Urdu into a Latin face or
   LTR layout.
 - Generous line-height for Arabic/Urdu; never tighten to fit.
 - All text must support Dynamic Type and RTL. Never bake text into images except
   in marketing captions.
-- Numerals: Western digits in English UI; Eastern-Arabic digits (۰۱۲۳) are
-  appropriate in Urdu contexts and Qur'an references.
+- Numerals: Western digits (0-9) in both English and Urdu, verse references
+  included. The Qur'an's own Arabic is never altered.
 
 ---
 
@@ -124,8 +125,8 @@ Reverent, scholarly, warm — the register of a trusted teacher, not a marketer.
 - **Reverent:** dignified and unhurried. No hype, no exclamation-stacking, no
   urgency ("Download now!!"). Let the content's weight speak.
 - **Scholarly & precise:** never paraphrase Qur'an, hadith, zikr instructions, or
-  the Sheikh's words. Attribute sources. Say "verified," "verbatim," "sourced" —
-  and only when true.
+  the Sheikh's words. Copy says nothing about how the text was produced or
+  checked, and gives no credit lines.
 - **Warm & inclusive:** welcoming to every Muslim and open-hearted seeker; "a
   gift to the community." Gentle, never shaming (mirrors the no-shame prayer
   tracker).
@@ -145,14 +146,14 @@ Reverent, scholarly, warm — the register of a trusted teacher, not a marketer.
 
 ## 7. Voice — words we use / avoid
 
-**Use:** official companion, Silsila Naqshbandia Owaisiah, verified, verbatim,
+**Use:** official companion, Silsila Naqshbandia Owaisiah, complete,
 offline, private, reverent, the Sheikh's works, calm, barakah, remembrance,
 accurate prayer times.
 
-**Avoid:** "best azan app ever", "#1", "revolutionary", "AI-powered fatwas",
-"unlimited", growth-hacky urgency, emojis in reverent copy, any claim of a
-feature not shipping (Live Activities, Apple Watch, in-app video, full offline
-tafsir text), and anything that could read as issuing a religious ruling.
+**Avoid:** "best azan app ever", "#1", "revolutionary", "unlimited",
+growth-hacky urgency, emojis in reverent copy, "no accounts", "no chat",
+"location never leaves the device", any claim of a feature not shipping, and
+anything that could read as issuing a religious ruling.
 
 ---
 
@@ -160,20 +161,20 @@ tafsir text), and anything that could read as issuing a religious ruling.
 
 **Do**
 - Lead with the twin identity: *accurate offline azan* **and** *official Silsila
-  companion with the complete, verified Qur'an*.
-- Use the octagram seal, emerald/cream/gold triad, and Amiri Quran / Nastaliq
-  faithfully.
-- Attribute all religious content and keep it verbatim.
+  companion with the complete Qur'an*.
+- Use the octagram seal, emerald/cream/gold triad, and IndoPak / Nastaliq
+  faces faithfully.
+- Keep all religious content verbatim.
 - Observe honorifics every time a Sheikh or the Prophet ﷺ is named.
-- Describe the Sheikh's tafsir/translation works as a **catalogue with source
-  links** (not "full offline tafsir").
+- Describe the books and tafsir as **read in the app as text**, with the PDF as
+  an option, and Akram-ut-Tarajum as the Qur'an reader's translation.
 
 **Don't**
 - Don't call it "just" a prayer app, or compare on price/gimmicks.
-- Don't overstate: no invented features, no exaggerated numbers, no "AI answers
-  your Islamic questions".
+- Don't overstate: no invented features, no exaggerated numbers, no claim that the
+  app answers religious questions.
 - Don't misuse crimson outside Al-Murshid/live media.
-- Don't set Qur'anic Arabic in anything but Amiri Quran, or Urdu in a Latin face.
+- Don't set Qur'anic Arabic in anything but the IndoPak face, or Urdu in a Latin face.
 - Don't use flashy gradients, noisy animation, ad-style CTAs, or stock
   "lifestyle" imagery.
 - Don't alter the seal geometry, tilt it, or swap it for a generic crescent/mosque.

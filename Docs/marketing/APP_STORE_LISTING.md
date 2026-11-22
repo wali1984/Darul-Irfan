@@ -1,17 +1,16 @@
 # App Store Listing — Darul Irfan
 
-Copy-ready App Store Connect metadata for **Darul Irfan v1.0**. Every claim
-below is traced to a shipping feature (see `README.md` "Feature status" and the
-seed data). Character counts are noted where Apple enforces a limit.
+Copy-ready App Store Connect metadata for **Darul Irfan**. Every claim
+below must be true of the build being submitted: check it against the app and
+its seed data before pasting. Character counts are noted where Apple enforces a
+limit.
 
 > Accuracy guardrails observed here (do not "improve" past them):
 > - The Quran ships **complete** — all 114 surahs / 6,236 ayat, Arabic in the
->   Amiri Quran mushaf face, with Pickthall (English) and Jalandhry (Urdu),
->   triple-verified error-free (`Docs/QURAN_VERIFICATION.md`).
-> - The Sheikh's own tafsir/translation works (**Asrar-at-Tanzil**,
->   **Akram-ut-Tafaseer**, **Akram-ut-Tarajum**) are catalogued as **editions
->   with source links**, not yet full offline text — describe them as a
->   *catalogue*, never as "read the full tafsir offline."
+>   IndoPak script, with the Akram-ut-Tarajum translation in Urdu and English.
+> - An account is optional and only for Halqahs, which have chat. Approximate
+>   location leaves the device for weather. Never write "no accounts", "no
+>   chat" or "location never leaves the device".
 > - Official YouTube broadcasts use a foreground, controlled in-app player
 >   with an external YouTube fallback. YouTube content is never extracted or
 >   downloaded; only organization-owned direct audio supports background play.
@@ -24,8 +23,8 @@ seed data). Character counts are noted where Apple enforces a limit.
 
 **Primary: Reference.** **Secondary: Lifestyle.**
 
-Rationale: Darul Irfan is anchored by a complete, verified Quran, a 291-item
-scholarly library, the works catalogue of Hazrat Ameer Muhammad Akram Awan (RA),
+Rationale: Darul Irfan is anchored by a complete Quran, the Silsila's
+scholarly library, the works of Hazrat Ameer Muhammad Akram Awan (RA),
 99 Names, duas, and topic-linked study — a body of reference content that a
 generic azan utility does not carry. Reference positions the app against Quran
 and Islamic-knowledge apps (its true peers) rather than against commodity prayer
@@ -61,16 +60,16 @@ Alternate, if a shorter mark is preferred: `Darul Irfan — Azan & Quran` (26).
 > the complete Quran, Qibla, zikr and the Sheikh's works — offline, ad-free,
 > private.
 
-*(168 chars)*
+*(161 chars)*
 
 **Urdu**
 
 > سلسلہ نقشبندیہ اویسیہ کا سرکاری ساتھی: درست اوقاتِ نماز، مکمل قرآن، قبلہ، ذکر
-> اور مشائخ کی تصانیف — آف لائن، بغیر اشتہار، مکمل نجی۔
+> اور مشائخ کی تصانیف — آف لائن، بغیر اشتہار، نجی۔
 
 ---
 
-## Description — English
+## Description — English  (≤4000 characters)
 
 > Structured, benefit-led, respectful. Paste into the Description field as-is.
 
@@ -80,14 +79,13 @@ Naqshbandia Owaisiah together in one calm, private, ad-free place.**
 Built as the official companion of the Silsila (Dar-ul-Irfan, Chakwal) under the
 guidance of Hazrat Ameer Abdul Qadeer Awan (MZA), and honouring the works of
 Hazrat Ameer Muhammad Akram Awan (RA), it pairs a best-in-class azan engine with
-a library of verified, verbatim Islamic content. Nothing is paraphrased. Nothing
-tracks you.
+the Silsila's own library, to read in the app. Nothing tracks you.
 
-*"Verily, in the remembrance of Allah do hearts find peace." — Qur'an 13:28*
+*"Remember! Only in Allah’s Zikr do hearts find satisfaction." — Qur'an 13:28*
 
 **Prayer times you can trust — fully offline**
 - Accurate Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha times, calculated on your
-  device with the respected adhan engine — no account, no connection needed.
+  device — no account, no connection needed.
 - 12 calculation methods (Muslim World League, ISNA, Umm al-Qura, Karachi,
   Egyptian, Moonsighting and more), plus Hanafi and Shafi Asr, high-latitude
   rules, and per-prayer manual offsets.
@@ -104,10 +102,12 @@ tracks you.
   fallback when the compass is unavailable.
 
 **The complete Holy Qur'an — offline**
-- All 114 surahs and 6,236 ayat, with the Arabic rendered in the elegant Amiri
-  Quran mushaf typeface.
+- All 114 surahs and 6,236 ayat, with the Arabic in the familiar IndoPak
+  script.
 - Complete Urdu and English Akram-ut-Tarajum editions by Hazrat Ameer Muhammad
-  Akram Awan (RA), alongside Pickthall English and Jalandhry Urdu.
+  Akram Awan (RA).
+- His tafsir, Akram-ut-Tafaseer in Urdu and Asrar-at-Tanzil in Urdu and
+  English, to read beside the ayah.
 - Bookmarks, continue-reading, adjustable text size, Arabic-only,
   translation-only, or combined reading modes, plus optional automatic
   movement to the next surah.
@@ -115,124 +115,131 @@ tracks you.
 **Explore the Qur'an by topic**
 - Follow a theme — remembrance of Allah, patience, gratitude, love of the Prophet
   ﷺ, tasawwuf and more — across linked ayat, the Silsila's library, and the
-  Sheikh's works catalogue.
+  Sheikh's works.
 
 **A daily spiritual companion**
-- Every day: an ayah, a du'a, a name of Allah, a remembrance (dhikr) with its
-  count, and an Aqwal-e-Sheikh reflection — with beautiful share cards.
+- Every day: an ayah, a hadith, a du'a, a name of Allah, a remembrance (dhikr)
+  with its count, and an Aqwal-e-Sheikh reflection — with beautiful share cards.
 
 **The Naqshbandia Owaisiah library**
-- Articles and About pages in full, verbatim text, included with the content
-  owner's permission.
-- The works catalogue of Hazrat Ameer Muhammad Akram Awan (RA) —
-  Asrar-at-Tanzil, Akram-ut-Tafaseer and Akram-ut-Tarajum — and books on
-  tasawwuf, with source links and PDF downloads.
+- Articles and About pages in full.
+- The Silsila's books, booklets and tafsir, read in the app as text, with the
+  PDF as an option.
 - Filters, favourites, reading progress, and full right-to-left support.
 
 **Bayans & Al-Murshid**
 - Audio lectures of the Sheikh with background playback, Lock Screen controls,
   0.75×–2× speed, a queue, bookmarks and continue-listening.
-- Download talks to listen offline; an Al-Murshid TV card and the Al-Murshid
-  magazine archive.
+- Download talks to listen offline; Al-Murshid TV programmes, and the Al-Murshid
+  magazine archive as PDF.
 
 **Online Zikr & tasbih**
-- The verified Method of Zikr, the online zikr schedule with reminders, and a
+- The Method of Zikr, the online zikr schedule with reminders, and a
   simple tasbih counter with a daily habit strip.
+
+**Halqahs (optional)**
+- Join Our Sheikh with your name, city and country, or a private Halqah with
+  an invitation code, or sign in with Apple and its admin adds you:
+  announcements, zikr, and live meetings with voice, video and chat. You can
+  delete your account in the app.
 
 **Events & Dar-ul-Irfan**
 - Programmes and announcements, add-to-calendar and reminders, map and
   directions to Dar-ul-Irfan, and one-tap contact.
 
 **More for every day**
-- 99 Names of Allah, sourced du'as, the Islamic (Hijri) calendar with an offset
+- 99 Names of Allah, du'as, the Islamic (Hijri) calendar with an offset
   setting, Home and Lock Screen widgets, and full English & Urdu with proper
   Nastaliq and RTL.
 
 **Private by design**
-- No ads. No trackers. No accounts. Your location stays on your device and is
-  used only to calculate prayer times and Qibla. Everything core works offline.
+- No ads. No trackers. An account is optional and used only for Halqahs.
+- Prayer times and Qibla are calculated on your device. With Weather on, your
+  chosen city's approximate location goes to our weather service; a nearby-masjid
+  search you start sends your chosen place's location.
+- Everything core works offline.
 
-Darul Irfan is a gift to the community — reverent, scholarly and beautifully
-made. May it be a means of barakah for all who use it.
-
-*Darul Irfan is the official app of Silsila Naqshbandia Owaisiah. Religious and
-organisational content is included with the permission of, and sourced from,
-naqshbandiaowaisiah.org; Qur'an Arabic and the Pickthall translation are public
-domain.*
+May it be a means of barakah for all who use it.
 
 ---
 
-## Description — Urdu
+## Description — Urdu  (≤4000 characters)
 
 **دارالعرفان آپ کی نمازوں، قرآنِ کریم اور سلسلہ نقشبندیہ اویسیہ کی رہنمائی کو
 ایک پُرسکون، نجی اور بغیر اشتہار جگہ پر یکجا کرتا ہے۔**
 
 یہ ایپ سلسلہ نقشبندیہ اویسیہ (دارالعرفان، چکوال) کا سرکاری ساتھی ہے، حضرت امیر
 عبدالقدیر اعوان (مدظلہ العالی) کی رہنمائی میں، اور حضرت امیر محمد اکرم اعوان
-(رحمۃ اللہ علیہ) کی تصانیف کے احترام کے ساتھ۔ بہترین اذان انجن کے ساتھ تصدیق شدہ،
-لفظ بہ لفظ اسلامی مواد کی لائبریری۔ کچھ بھی تبدیل نہیں کیا گیا، اور کوئی چیز آپ
-کا پیچھا نہیں کرتی۔
+(رحمۃ اللہ علیہ) کی تصانیف کے احترام کے ساتھ۔ بہترین اذان انجن کے ساتھ سلسلہ کی
+اپنی لائبریری، ایپ ہی میں پڑھنے کے لیے۔ کوئی چیز آپ کا پیچھا نہیں کرتی۔
 
-*"خبردار! اللہ کے ذکر سے دلوں کو اطمینان نصیب ہوتا ہے۔" — القرآن ۱۳:۲۸*
+*"یاد رکھو! اللہ کے ذکر سے ہی دل اطمینان پاتے ہیں۔" — القرآن 13:28*
 
 **اوقاتِ نماز جن پر بھروسہ کیا جا سکے — مکمل آف لائن**
-- فجر، طلوعِ آفتاب، ظہر، عصر، مغرب اور عشاء کے درست اوقات، آپ کے آلے پر معتبر
-  اذان انجن سے شمار کیے گئے — بغیر اکاؤنٹ، بغیر انٹرنیٹ۔
-- ۱۲ حسابی طریقے، حنفی و شافعی عصر، بلند عرض بلد کے اصول، اور فی نماز دستی
+- فجر، طلوعِ آفتاب، ظہر، عصر، مغرب اور عشاء کے درست اوقات، آپ کے آلے پر
+  شمار کیے گئے — بغیر اکاؤنٹ، بغیر انٹرنیٹ۔
+- 12 حسابی طریقے، حنفی و شافعی عصر، بلند عرض بلد کے اصول، اور فی نماز دستی
   ایڈجسٹمنٹ۔
 - زندہ ہوم اسکرین: اگلی نماز کا الٹی گنتی، آج کا مکمل نقشہ، اور نرم انداز کا
   نماز ٹریکر۔
 
 **اذان کبھی نہ چھوٹے**
 - فی نماز الرٹ: بند، خاموش، ہلکی چائم، یا خوبصورت مختصر اذان۔
-- نماز سے ۵ تا ۳۰ منٹ پہلے یاد دہانی، اور رمضان میں سحر و افطار کارڈ۔
+- نماز سے 5 تا 30 منٹ پہلے یاد دہانی، اور رمضان میں سحر و افطار کارڈ۔
 
 **قبلہ، ایک نظر میں**
 - کعبہ کی درست سمت نما، کیلبریشن رہنمائی اور متبادل کے ساتھ۔
 
 **مکمل قرآنِ کریم — آف لائن**
-- تمام ۱۱۴ سورتیں اور ۶۲۳۶ آیات، عربی متن خوبصورت امیری قرآن مصحف فونٹ میں۔
-- انگریزی (پکتھال) اور اردو (جالندھری) ترجمہ، متعدد مستند ذرائع سے تصدیق شدہ۔
+- تمام 114 سورتیں اور 6236 آیات، عربی متن مانوس انڈو پاک رسم الخط میں۔
+- حضرت امیر محمد اکرم اعوان (رحمۃ اللہ علیہ) کا اکرم التراجم، مکمل اردو اور
+  انگریزی میں۔
+- آپ کی تفاسیر، اکرم التفاسیر اردو میں اور اسرارالتنزیل اردو و انگریزی میں،
+  آیت کے ساتھ پڑھنے کے لیے۔
 - بک مارک، مطالعہ جاری رکھیں، اور فونٹ سائز کنٹرول۔
 
 **قرآن کو موضوع کے اعتبار سے دیکھیں**
 - ذکرِ الٰہی، صبر، شکر، عشقِ رسول ﷺ، تصوف اور دیگر موضوعات کو آیات، لائبریری اور
-  مشائخ کی تصانیف کے حوالوں سے جوڑ کر پڑھیں۔
+  مشائخ کی تصانیف سے جوڑ کر پڑھیں۔
 
 **روزانہ روحانی ساتھی**
-- ہر دن: ایک آیت، ایک دعا، اللہ کا ایک نام، ایک ذکر اور اقوالِ شیخ — خوبصورت
-  شیئر کارڈز کے ساتھ۔
+- ہر دن: ایک آیت، ایک حدیث، ایک دعا، اللہ کا ایک نام، ایک ذکر اور اقوالِ شیخ —
+  خوبصورت شیئر کارڈز کے ساتھ۔
 
 **نقشبندیہ اویسیہ لائبریری**
-- مضامین اور تعارفی صفحات مکمل، لفظ بہ لفظ متن میں (مالکِ مواد کی اجازت سے)۔
-- حضرت امیر محمد اکرم اعوان (رحمۃ اللہ علیہ) کی تصانیف کا کیٹلاگ —
-  اسرارالتنزیل، اکرم التفاسیر اور اکرم التراجم — اور تصوف پر کتب، حوالوں اور
-  PDF ڈاؤن لوڈ کے ساتھ۔
+- مضامین اور تعارفی صفحات مکمل متن میں۔
+- سلسلہ کی کتابیں اور کتابچے، اور حضرت امیر محمد اکرم اعوان (رحمۃ اللہ علیہ) کی
+  تفاسیر اکرم التفاسیر اور اسرارالتنزیل، ایپ ہی میں متن کی صورت میں پڑھیں؛ PDF
+  کا اختیار بھی موجود ہے۔
 
 **بیانات و المرشد**
-- شیخ کے آڈیو بیانات، پس منظر پلے بیک، لاک اسکرین کنٹرول، ۰.۷۵×–۲× رفتار، قطار،
-  بک مارک اور سماعت جاری رکھیں۔ آف لائن سننے کے لیے ڈاؤن لوڈ؛ المرشد ٹی وی کارڈ
-  اور المرشد میگزین کا ذخیرہ۔
+- شیخ کے آڈیو بیانات، پس منظر پلے بیک، لاک اسکرین کنٹرول، 0.75×–2× رفتار، قطار،
+  بک مارک اور سماعت جاری رکھیں۔ آف لائن سننے کے لیے ڈاؤن لوڈ؛ المرشد ٹی وی کے پروگرام،
+  اور المرشد میگزین کا ذخیرہ PDF کی صورت میں۔
 
 **آن لائن ذکر و تسبیح**
-- تصدیق شدہ طریقۂ ذکر، آن لائن ذکر کا شیڈول یاد دہانی کے ساتھ، اور سادہ تسبیح
+- طریقۂ ذکر، آن لائن ذکر کا شیڈول یاد دہانی کے ساتھ، اور سادہ تسبیح
   کاؤنٹر۔
+
+**حلقے (اختیاری)**
+- ہمارے شیخ کے حلقے میں اپنے نام، شہر اور ملک کے ساتھ، اور نجی حلقے میں دعوتی کوڈ
+  سے شامل ہوں، یا ایپل کے ساتھ سائن اِن کریں تاکہ منتظم آپ کو شامل کر سکے: اعلانات،
+  ذکر، اور آواز، ویڈیو اور گفتگو والی براہ راست نشستیں۔ اپنا اکاؤنٹ ایپ ہی میں حذف کر سکتے ہیں۔
 
 **تقریبات و دارالعرفان**
 - پروگرام اور اعلانات، کیلنڈر میں شامل کریں اور یاد دہانی، دارالعرفان کا نقشہ و
   راستہ، اور ایک ٹچ رابطہ۔
 
 **ہر دن کے لیے مزید**
-- اللہ کے ۹۹ نام، مستند دعائیں، ہجری کیلنڈر، ہوم اور لاک اسکرین وجٹس، اور مکمل
+- اللہ کے 99 نام، دعائیں، ہجری کیلنڈر، ہوم اور لاک اسکرین وجٹس، اور مکمل
   اردو و انگریزی درست نستعلیق اور RTL کے ساتھ۔
 
 **نجی، بنیادی ڈیزائن کے اعتبار سے**
-- کوئی اشتہار نہیں۔ کوئی ٹریکر نہیں۔ کوئی اکاؤنٹ نہیں۔ آپ کا مقام آپ کے آلے پر
-  رہتا ہے۔ بنیادی خصوصیات آف لائن کام کرتی ہیں۔
-
-*دارالعرفان سلسلہ نقشبندیہ اویسیہ کی سرکاری ایپ ہے۔ دینی و تنظیمی مواد
-naqshbandiaowaisiah.org سے، اجازت کے ساتھ شامل کیا گیا ہے؛ قرآن کا عربی متن اور
-پکتھال ترجمہ عوامی ملکیت میں ہیں۔*
+- کوئی اشتہار نہیں۔ کوئی ٹریکر نہیں۔ اکاؤنٹ اختیاری ہے اور صرف حلقوں کے لیے ہے۔
+- نماز کے اوقات اور قبلے کا حساب آپ کے آلے پر ہوتا ہے۔ موسم فعال ہونے کی صورت میں
+  منتخب شہر کا اندازاً مقام ہماری موسم کی سروس کو جاتا ہے، اور قریبی مساجد کی
+  تلاش، صرف آپ کے کہنے پر، منتخب جگہ کا مقام بھیجتی ہے۔
+- بنیادی خصوصیات آف لائن کام کرتی ہیں۔
 
 ---
 
@@ -318,7 +325,7 @@ cover both spellings.
 > and 6,236 ayat. The Quran reader also adds Arabic-only, translation-only,
 > and combined display modes, with an optional setting to continue
 > automatically into the next surah. This update includes reader refinements
-> and expanded verification for reliable offline reading.
+> for reliable offline reading.
 
 **Urdu**
 
@@ -358,16 +365,31 @@ cover both spellings.
 
 ## Age rating
 
-**Recommended: 4+ (suitable for all ages).**
+**Take the rating App Store Connect calculates from the answers below. Do not
+assume 4+: the app has chat.**
 
-Rationale for the App Privacy / age questionnaire:
+Answers for the App Privacy / age questionnaire:
 - No objectionable content — reverent religious and reference material only.
-- No user-generated content, chat, or social feed; no in-app purchases, ads, or
-  gambling.
-- No unrestricted web browsing: in-app links open **specific** source pages on
-  naqshbandiaowaisiah.org (and a few explicit hand-offs such as YouTube watch
-  URLs and Apple Maps) via `SFSafariViewController` or the system, opened only on
-  a deliberate user tap. Answer the "unrestricted web access" question **No**.
+- User-generated content: **Yes**. Messaging and chat: **Yes**.
+  - In a Halqah's live meeting, people share voice, video, text, pictures and
+    files, to everyone or to one participant.
+  - On a live Zikr's stage, members send ready-made messages and admins may
+    write. Members can send du'a requests to the admins.
+  - Group posts are published by admins only.
+- The moderation that exists:
+  - Private Halqahs are entered by invitation or an admin's approval; Our
+    Sheikh is open to anyone who gives a name, city and country.
+  - Admins can remove members, posts, stage messages and du'a requests.
+  - Meeting hosts can mute, stop a camera and remove a participant.
+  - Stage messages are rate limited.
+  - The iPhone app has no control yet to report content or block a person, and
+    chat has no word filter: do not claim any of these (see
+    `Docs/APP_STORE_CHECKLIST.md` §4).
+- No in-app purchases, ads, or gambling.
+- No unrestricted web browsing: reading is native, video plays in a player for
+  that video, and the few links out (YouTube, maps, Apple Weather's data
+  sources, mail and phone) open only on a deliberate tap. Answer the
+  "unrestricted web access" question **No**.
 - Answer all content descriptors (violence, sexual content, profanity, mature
   themes, horror, medical, drugs, gambling, contests) as **None / No**.
 
@@ -384,5 +406,7 @@ Rationale for the App Privacy / age questionnaire:
 | Copyright | `© 2026 Silsila Naqshbandia Owaisiah, Dar-ul-Irfan` |
 
 > App Privacy: disclose the optional APNs installation/device identifier for
-> app functionality and optional MetricKit diagnostics; neither is linked to
-> identity or used for tracking. See `Docs/PRIVACY.md`. No account is needed.
+> app functionality and optional MetricKit diagnostics (neither linked to
+> identity), and for Halqah members the User ID, name and email linked to
+> identity. Nothing is used for tracking. See `Docs/PRIVACY.md`. An account
+> is needed only for Halqahs.
