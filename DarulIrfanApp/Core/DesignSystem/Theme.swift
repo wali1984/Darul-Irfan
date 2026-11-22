@@ -103,6 +103,12 @@ enum DIFont {
         .custom(AppFonts.generalArabicName, size: 27 * scale * 0.72, relativeTo: .title2)
     }
 
+    /// Amiri Quran for an ayah's circle with its number inside: large enough
+    /// for three digits to be read.
+    static func mushafMarker(scale: Double) -> Font {
+        .custom(AppFonts.generalArabicName, size: 27 * scale * 0.9, relativeTo: .title2)
+    }
+
     /// The Urdu face for a word the mushaf face cannot draw, in the proportion
     /// the book reader gives Urdu prose and the Arabic quoted inside it.
     static func mushafUrduWord(scale: Double) -> Font {

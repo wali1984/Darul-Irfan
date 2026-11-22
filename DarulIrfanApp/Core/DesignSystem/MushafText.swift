@@ -10,6 +10,9 @@ enum MushafFaceGaps {
     enum Face: Equatable {
         /// Digits, brackets and dashes, in Amiri Quran.
         case signs
+        /// U+06DD with its number, whole in Amiri Quran, which sets the number
+        /// inside the circle. The mushaf face loses the circle or the number.
+        case marker
         /// A whole word, in the Urdu face, so that its letters join.
         case urdu
     }
@@ -43,7 +46,13 @@ enum MushafFaceGaps {
         var index = 0
         while index < scalars.count {
             let start = index
-            if signs.contains(scalars[index].value) {
+            if scalars[index].value == 0x06DD, index + 1 < scalars.count, isDigit(scalars[index + 1]) {
+                index += 1
+                while index < scalars.count, isDigit(scalars[index]) {
+                    index += 1
+                }
+                spans.append(Span(range: start..<index, face: .marker))
+            } else if signs.contains(scalars[index].value) {
                 while index < scalars.count, signs.contains(scalars[index].value) {
                     index += 1
                 }
@@ -67,18 +76,24 @@ enum MushafFaceGaps {
     static func filling(_ text: AttributedString, scale: Double) -> AttributedString {
         var filled = text
         for span in spans(in: text.unicodeScalars) {
-            // By scalar, not by character: U+06DD and the digit after it are
-            // one character, and only the digit changes face.
+            // By scalar, not by character: a span is counted in scalars, and
+            // U+06DD with the digit after it is one character.
             let lower = filled.unicodeScalars.index(filled.startIndex, offsetBy: span.range.lowerBound)
             let upper = filled.unicodeScalars.index(lower, offsetBy: span.range.count)
             let face: Font
             switch span.face {
             case .signs: face = DIFont.mushafSigns(scale: scale)
+            case .marker: face = DIFont.mushafMarker(scale: scale)
             case .urdu: face = DIFont.mushafUrduWord(scale: scale)
             }
             filled[lower..<upper].font = face
         }
         return filled
+    }
+
+    /// An Arabic-Indic or Urdu digit.
+    private static func isDigit(_ scalar: Unicode.Scalar) -> Bool {
+        (0x0660...0x0669).contains(scalar.value) || (0x06F0...0x06F9).contains(scalar.value)
     }
 
     /// A letter, a mark on it, or a joiner: what is shaped as one word.

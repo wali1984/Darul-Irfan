@@ -13,7 +13,11 @@ final class MushafFaceGapsTests: XCTestCase {
         return MushafFaceGaps.spans(in: scalars).map { span in
             var words = String.UnicodeScalarView()
             words.append(contentsOf: scalars[span.range])
-            return (span.face == .signs ? "signs:" : "urdu:") + String(words)
+            switch span.face {
+            case .signs: return "signs:" + String(words)
+            case .marker: return "marker:" + String(words)
+            case .urdu: return "urdu:" + String(words)
+            }
         }
     }
 
@@ -23,6 +27,13 @@ final class MushafFaceGapsTests: XCTestCase {
         // The mushaf face draws U+0660, and all of the Urdu digits.
         XCTAssertEqual(faced("\u{FD3F}\u{0661}\u{0660}\u{FD3E}"), ["signs:\u{0661}"])
         XCTAssertEqual(faced("\u{FD3F}\u{06F1}\u{06F2}\u{FD3E}"), [])
+    }
+
+    func testACircleTakesItsNumberWhole() {
+        for number in ["\u{0665}", "\u{06F5}", "\u{0661}\u{0660}", "\u{06F1}\u{06F2}", "\u{06F2}\u{06F5}\u{06F5}"] {
+            XCTAssertEqual(faced("قوم \u{06DD}" + number + " ثم"), ["marker:\u{06DD}" + number])
+        }
+        XCTAssertEqual(faced("قوم \u{06DD} ثم"), [])
     }
 
     func testCitationsAndDashes() {
@@ -48,7 +59,7 @@ final class MushafFaceGapsTests: XCTestCase {
     }
 
     func testFillingKeepsTheTextAndItsLinksAndChangesOnlyTheGaps() throws {
-        // U+06DD and the digit after it are one character; only the digit changes.
+        // U+06DD and the digit after it are one character, and change face together.
         let original = "قوم \u{06DD}\u{0661}\u{0662} پھول (عند)"
         var linked = AttributedString(original)
         let url = try XCTUnwrap(URL(string: "book-link:3"))
@@ -68,7 +79,7 @@ final class MushafFaceGapsTests: XCTestCase {
             let part = filled[index..<next]
             XCTAssertEqual(part.link, url)
             if let face = part[FontKey.self] {
-                if face == DIFont.mushafSigns(scale: 1) {
+                if face == DIFont.mushafSigns(scale: 1) || face == DIFont.mushafMarker(scale: 1) {
                     signs.append(scalars[index])
                 } else if face == DIFont.mushafUrduWord(scale: 1) {
                     urdu.append(scalars[index])
@@ -78,7 +89,7 @@ final class MushafFaceGapsTests: XCTestCase {
             }
             index = next
         }
-        XCTAssertEqual(String(signs), "\u{0661}\u{0662}()")
+        XCTAssertEqual(String(signs), "\u{06DD}\u{0661}\u{0662}()")
         XCTAssertEqual(String(urdu), "پھول")
     }
 
