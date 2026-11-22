@@ -476,6 +476,13 @@ final class BookLayoutRulesTests: XCTestCase {
             XCTAssertEqual(asked.pageOnScreen(top: higher, through: higher), higher.id, bookID)
             XCTAssertEqual(asked.pageOnScreen(top: top, through: end), top.id, bookID)
 
+            // Asked for with the list already at its end, it moves nothing.
+            var still = BookTextAskedPage()
+            still.ask(lastPage)
+            XCTAssertEqual(still.pageOnScreen(top: top, through: end), lastPage, bookID)
+            XCTAssertEqual(still.pageOnScreen(top: higher, through: higher), higher.id, bookID)
+            XCTAssertEqual(still.pageOnScreen(top: top, through: end), top.id, bookID)
+
             // Previous, from the card to the page above it.
             asked.ask(top.id)
             XCTAssertEqual(asked.pageOnScreen(top: higher, through: end), top.id, bookID)

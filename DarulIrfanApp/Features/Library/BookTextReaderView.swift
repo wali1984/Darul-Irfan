@@ -118,6 +118,10 @@ struct BookTextPagesView: View {
                         if let target = BookTextEntry.holding(requested, in: entries) {
                             let page = target.number(nearest: requested)
                             askedPage.ask(page)
+                            // One already on show moves nothing: it has landed.
+                            if let (top, through) = placesOnScreen {
+                                _ = askedPage.pageOnScreen(top: top, through: through)
+                            }
                             proxy.scrollTo(target.id, anchor: .top)
                             BookReadingPosition.save(page: page, bookID: item.id)
                             session?.currentPage = page
@@ -276,12 +280,18 @@ struct BookTextPagesView: View {
 
     /// Saves and reports the page being read, as the list has come to rest.
     private func keepPlace() {
-        guard let topPage,
-              let top = entries.first(where: { $0.id == topPage }),
-              let last = entries.last else { return }
-        let page = askedPage.pageOnScreen(top: top, through: isAtEnd ? last : top)
+        guard let (top, through) = placesOnScreen else { return }
+        let page = askedPage.pageOnScreen(top: top, through: through)
         BookReadingPosition.save(page: page, bookID: item.id)
         session?.currentPage = page
+    }
+
+    /// The place at the top and the last that cannot come any higher.
+    private var placesOnScreen: (top: BookTextEntry, through: BookTextEntry)? {
+        guard let topPage,
+              let top = entries.first(where: { $0.id == topPage }),
+              let last = entries.last else { return nil }
+        return (top, isAtEnd ? last : top)
     }
 
     private func load() async {
@@ -305,12 +315,15 @@ struct BookTextPagesView: View {
                 BookLinkProvider.shared.links(bookID: bookID)
             }.value
             try Task.checkCancellation()
+            // The task runs again whenever the screen comes back into view:
+            // only the first load sets the bars to the book's first page.
+            let isFirstLoad = entries.isEmpty
             links = found
             formatted = prepared
             entries = BookTextEntry.entries(of: loaded)
             session?.pageNumbers = BookTextEntry.numbers(of: entries)
             session?.hasNoPages = entries.isEmpty
-            if let first = entries.first?.id { session?.currentPage = first }
+            if isFirstLoad, let first = entries.first?.id { session?.currentPage = first }
         } catch is CancellationError {
             return
         } catch {
