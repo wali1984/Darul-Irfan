@@ -166,8 +166,7 @@ private struct FeaturedDuaCard: View {
                     .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(.white)
 
-                Text(verbatim: dua.arabic)
-                    .font(DIFont.quranArabic(scale: 1.0))
+                Text.mushaf(verbatim: dua.arabic, scale: 1.0)
                     .foregroundStyle(.white)
                     .diGoldGlow(radius: 12, opacity: 0.5)
                     .lineSpacing(8)
@@ -205,8 +204,7 @@ private struct DuaCard: View {
                     .diInterfaceFont(.headline, design: .serif)
                     .foregroundStyle(DIColor.textPrimary)
 
-                Text(verbatim: dua.arabic)
-                    .font(DIFont.quranArabic())
+                Text.mushaf(verbatim: dua.arabic, scale: 1.0)
                     .foregroundStyle(DIColor.scripture)
                     .diGoldGlow(radius: 6, opacity: 0.22)
                     .lineSpacing(8)

@@ -286,7 +286,9 @@ struct HadithHomeView: View {
                 // Nastaliq and reversed would misrepresent it as the Urdu.
                 if let preview = entry.availableText(preferring: languageCode) {
                     let style = Self.snippetStyle(for: preview.languageCode)
-                    Text(verbatim: preview.text)
+                    (preview.languageCode == "ar"
+                        ? Text.mushaf(verbatim: preview.text, scale: Self.arabicSnippetScale)
+                        : Text(verbatim: preview.text))
                         .font(style.font)
                         .foregroundStyle(DIColor.textPrimary)
                         .lineLimit(4)
@@ -298,13 +300,15 @@ struct HadithHomeView: View {
         }
     }
 
+    private static let arabicSnippetScale = 0.62
+
     /// Typography for a snippet, chosen by the language the text actually is
     /// rather than the reader's, so a match in one script is never dressed up
     /// as another.
     private static func snippetStyle(for languageCode: String) -> (font: Font, isRTL: Bool) {
         switch languageCode {
         case "ur": return (DIFont.urduBody(scale: 0.95), true)
-        case "ar": return (DIFont.quranArabic(scale: 0.62), true)
+        case "ar": return (DIFont.quranArabic(scale: arabicSnippetScale), true)
         default: return (.subheadline, false)
         }
     }

@@ -86,8 +86,7 @@ struct NarratorBioSheet: View {
             // Names: Arabic in the Quran face, then the reader-language name.
             VStack(alignment: .leading, spacing: DISpacing.xs) {
                 if let ar = n.nameArabic, !ar.isEmpty {
-                    Text(verbatim: ar)
-                        .font(DIFont.quranArabic(scale: fontScale * 0.9))
+                    Text.mushaf(verbatim: ar, scale: fontScale * 0.9)
                         .foregroundStyle(DIColor.textPrimary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
@@ -145,8 +144,7 @@ struct NarratorBioSheet: View {
                                     .foregroundStyle(DIColor.accent)
                             }
                             if let ar = a.textArabic, !ar.isEmpty {
-                                Text(verbatim: ar)
-                                    .font(DIFont.quranArabic(scale: fontScale * 0.7))
+                                Text.mushaf(verbatim: ar, scale: fontScale * 0.7)
                                     .foregroundStyle(DIColor.textPrimary)
                                     .environment(\.layoutDirection, .rightToLeft)
                                     .frame(maxWidth: .infinity, alignment: .trailing)

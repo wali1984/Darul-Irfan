@@ -760,8 +760,8 @@ struct ZikrStageView: View {
                 Text(verbatim: titleUr).font(DIFont.urduBody(scale: 1.0)).foregroundStyle(DIColor.onPrimary.opacity(0.85))
                     .multilineTextAlignment(.center)
             }
-            Text(verbatim: arabic)
-                .font(DIFont.quranArabic(scale: 2.0)).foregroundStyle(DIColor.accent)
+            Text.mushaf(verbatim: arabic, scale: 2.0)
+                .foregroundStyle(DIColor.accent)
                 .multilineTextAlignment(.center).environment(\.layoutDirection, .rightToLeft)
                 .lineSpacing(14)
                 .minimumScaleFactor(0.5)
@@ -790,8 +790,8 @@ struct ZikrStageView: View {
                 .diGoldTextShimmer(delay: 2)
         }
         if let arabic = cue.arabic {
-            Text(verbatim: arabic)
-                .font(DIFont.quranArabic(scale: 1.5)).foregroundStyle(DIColor.onPrimary)
+            Text.mushaf(verbatim: arabic, scale: 1.5)
+                .foregroundStyle(DIColor.onPrimary)
                 .multilineTextAlignment(.center).environment(\.layoutDirection, .rightToLeft)
                 .lineSpacing(10)
                 .diGoldTextShimmer(delay: 1.4)

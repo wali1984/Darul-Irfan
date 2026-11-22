@@ -202,9 +202,9 @@ private struct TranscriptLineRow: View {
         case .speech:
             rightToLeft(Text(verbatim: line.text ?? "").font(DIFont.urduBody()).lineSpacing(6))
         case .quran:
-            rightToLeft(Text(verbatim: line.text ?? "").font(DIFont.quranArabic(scale: 0.85)).foregroundStyle(DIColor.scripture))
+            rightToLeft(Text.mushaf(verbatim: line.text ?? "", scale: 0.85).foregroundStyle(DIColor.scripture))
         case .hadith, .dua:
-            rightToLeft(Text(verbatim: line.text ?? "").font(DIFont.quranArabic(scale: 0.75)))
+            rightToLeft(Text.mushaf(verbatim: line.text ?? "", scale: 0.75))
         }
     }
 

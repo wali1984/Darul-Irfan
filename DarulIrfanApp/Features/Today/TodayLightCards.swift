@@ -316,8 +316,7 @@ struct TodayHadithCard: View {
                     TodayTranslationText(text: String(localized: "Urdu translation is not available for this narration."), urdu: true)
                 }
                 if let arabic = hadith.arabic, !arabic.isEmpty {
-                    Text(verbatim: arabic)
-                        .font(DIFont.quranArabic(scale: 0.7))
+                    Text.mushaf(verbatim: arabic, scale: 0.7)
                         .foregroundStyle(DIColor.scripture)
                         .lineLimit(3)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -442,8 +441,7 @@ struct TodayDuaCard: View {
                     .diInterfaceFont(.title3, weight: .heavy)
                     .foregroundStyle(DIColor.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
-                Text(dua.arabic)
-                    .font(DIFont.quranArabic(scale: 0.9))
+                Text.mushaf(verbatim: dua.arabic, scale: 0.9)
                     .foregroundStyle(TodayPalette.arabicInk)
                     .diGoldGlow(radius: 8, opacity: 0.3)
                     .lineSpacing(8)

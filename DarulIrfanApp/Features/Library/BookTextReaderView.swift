@@ -458,8 +458,7 @@ struct FormattedBookPage: View {
         case .paragraph(let runs):
             paragraph(runs)
         case .quran(let text):
-            linkedText(text)
-                .font(DIFont.quranArabic(scale: 0.8 * scale))
+            linkedText(text, mushafScale: 0.8 * scale)
                 .foregroundStyle(DIColor.scripture)
                 .lineSpacing(8)
                 .multilineTextAlignment(.center)
@@ -507,8 +506,7 @@ struct FormattedBookPage: View {
     /// Arabic the mushaf does not confirm - a hadith, a du'a, a saying - set
     /// apart in the Arabic face, without the Qur'an's colour and panel.
     private func arabicQuotation(_ text: String) -> some View {
-        linkedText(text)
-            .font(DIFont.quranArabic(scale: 0.75 * scale))
+        linkedText(text, mushafScale: 0.75 * scale)
             .foregroundStyle(DIColor.scripture)
             .lineSpacing(CGFloat(8 * scale))
             .multilineTextAlignment(.center)
@@ -655,29 +653,41 @@ struct FormattedBookPage: View {
     }
 
     /// The words of a link: tappable, in the tint the page gives its links.
-    private func linkText(_ string: String, index: Int) -> Text {
+    private func linkText(_ string: String, index: Int, mushafScale: Double? = nil) -> Text {
         var attributed = AttributedString(string)
         if let url = URL(string: "\(BookLinkTaps.scheme):\(index)") {
             attributed.link = url
         }
-        return Text(attributed)
+        guard let mushafScale else { return Text(attributed) }
+        return Text.mushaf(attributed, scale: mushafScale)
+    }
+
+    /// Words as they are: in the mushaf face at `mushafScale`, or in the face
+    /// around them.
+    private func unlinkedText(_ string: String, mushafScale: Double?) -> Text {
+        guard let mushafScale else { return Text(verbatim: string) }
+        return Text.mushaf(verbatim: string, scale: mushafScale)
     }
 
     /// A quotation or a footnote, tappable where one of the page's links
     /// names its words.
-    private func linkedText(_ string: String) -> Text {
-        guard !links.isEmpty else { return Text(verbatim: string) }
+    private func linkedText(_ string: String, mushafScale: Double? = nil) -> Text {
+        guard !links.isEmpty else { return unlinkedText(string, mushafScale: mushafScale) }
         let pieces = BookLinkMatcher.pieces(of: string, links: links)
-        guard pieces.contains(where: { $0.link != nil }) else { return Text(verbatim: string) }
+        guard pieces.contains(where: { $0.link != nil }) else {
+            return unlinkedText(string, mushafScale: mushafScale)
+        }
         var text = Text(verbatim: "")
         for piece in pieces {
             if let index = piece.link {
-                text = text + linkText(piece.text, index: index)
+                text = text + linkText(piece.text, index: index, mushafScale: mushafScale)
             } else {
-                text = text + Text(verbatim: piece.text)
+                text = text + unlinkedText(piece.text, mushafScale: mushafScale)
             }
         }
-        return text
+        // The empty first Text takes the quotation's face, as its words do.
+        guard let mushafScale else { return text }
+        return text.font(DIFont.quranArabic(scale: mushafScale))
     }
 
     /// Words of prose in the page's own face, the mushaf's waqf signs and the
@@ -703,20 +713,19 @@ struct FormattedBookPage: View {
         let pieces = BookLinkMatcher.pieces(of: run.text, links: links)
         guard pieces.contains(where: { $0.link != nil }) else { return nil }
         let quoted = run.isQuranic || run.isArabic
+        let mushafScale: Double? = quoted ? 0.72 * scale : nil
         var text = Text(verbatim: "")
         for piece in pieces {
             var part: Text
             if let index = piece.link {
-                part = linkText(piece.text, index: index)
+                part = linkText(piece.text, index: index, mushafScale: mushafScale)
             } else if quoted {
-                part = Text(verbatim: piece.text)
+                part = unlinkedText(piece.text, mushafScale: mushafScale)
             } else {
                 part = plainProse(piece.text, leftToRight: leftToRight)
             }
             if quoted {
-                part = part
-                    .font(DIFont.quranArabic(scale: 0.72 * scale))
-                    .foregroundStyle(DIColor.scripture)
+                part = part.foregroundStyle(DIColor.scripture)
             }
             text = text + part
         }
@@ -735,8 +744,7 @@ struct FormattedBookPage: View {
                 continue
             }
             if run.isQuranic || run.isArabic {
-                text = text + Text(verbatim: run.text)
-                    .font(DIFont.quranArabic(scale: 0.72 * scale))
+                text = text + Text.mushaf(verbatim: run.text, scale: 0.72 * scale)
                     .foregroundStyle(DIColor.scripture)
             } else {
                 if leftToRight && run.text.contains("\u{FDFA}") {

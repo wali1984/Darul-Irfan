@@ -96,6 +96,19 @@ enum DIFont {
         .custom(AppFonts.quranArabicName, size: 27 * scale, relativeTo: .title2)
     }
 
+    /// Amiri Quran for the digits, brackets and dashes the mushaf face leaves
+    /// blank. At this size its line is no taller than the mushaf face's and
+    /// its digits match that face's own Urdu digits.
+    static func mushafSigns(scale: Double) -> Font {
+        .custom(AppFonts.generalArabicName, size: 27 * scale * 0.72, relativeTo: .title2)
+    }
+
+    /// The Urdu face for a word the mushaf face cannot draw, in the proportion
+    /// the book reader gives Urdu prose and the Arabic quoted inside it.
+    static func mushafUrduWord(scale: Double) -> Font {
+        urduBody(scale: scale / 0.72)
+    }
+
     /// Urdu body text, scaled with Dynamic Type. The system face by default:
     /// its letters always join. Apple's Nastaliq when the reader chose it in
     /// Settings (see `AppFonts.urduNastaliqName`).

@@ -64,8 +64,7 @@ struct TasbihCounterView: View {
                     } label: {
                         VStack(spacing: DISpacing.lg) {
                             if showFullText {
-                                Text(verbatim: viewModel.counter.title)
-                                    .font(DIFont.quranArabic(scale: 1))
+                                Text.mushaf(verbatim: viewModel.counter.title, scale: 1)
                                     .foregroundStyle(DIColor.actionForeground)
                                     .multilineTextAlignment(.center)
                                     .fixedSize(horizontal: false, vertical: true)

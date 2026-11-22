@@ -273,8 +273,7 @@ struct HadithBookView: View {
                 Text(verbatim: "۞")
                     .font(.system(size: 44))
                     .foregroundStyle(DIColor.accent)
-                Text(verbatim: book.titleUrdu)
-                    .font(DIFont.quranArabic(scale: fontScale * 1.6))
+                Text.mushaf(verbatim: book.titleUrdu, scale: fontScale * 1.6)
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .environment(\.layoutDirection, .rightToLeft)
@@ -334,8 +333,7 @@ struct HadithBookView: View {
                         // shaped; the isnad narrators and any quoted verse are
                         // links (rendered in our green via `.tint`), the matn is
                         // plain (near-black). Taps are routed by `openURL`.
-                        Text(arabicAttributed(from: segments))
-                            .font(DIFont.quranArabic(scale: fontScale * 1.15))
+                        Text.mushaf(arabicAttributed(from: segments), scale: fontScale * 1.15)
                             .lineSpacing(CGFloat(18 * fontScale))
                             .foregroundStyle(DIColor.textPrimary)
                             .tint(DIColor.actionForeground)
@@ -550,8 +548,7 @@ struct HadithBookView: View {
                         .foregroundStyle(DIColor.textPrimary)
                 }
                 if let arabic = section?.titleArabic, !arabic.isEmpty, arabic != title {
-                    Text(verbatim: arabic)
-                        .font(DIFont.quranArabic(scale: fontScale * 0.7))
+                    Text.mushaf(verbatim: arabic, scale: fontScale * 0.7)
                         .foregroundStyle(DIColor.textMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
@@ -587,8 +584,7 @@ struct HadithBookView: View {
                         .foregroundStyle(DIColor.actionForeground)
                 }
                 if let arabic {
-                    Text(verbatim: arabic)
-                        .font(DIFont.quranArabic(scale: fontScale * 0.6))
+                    Text.mushaf(verbatim: arabic, scale: fontScale * 0.6)
                         .foregroundStyle(DIColor.textMuted)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .environment(\.layoutDirection, .rightToLeft)
@@ -816,8 +812,7 @@ private struct HadithContentsView: View {
                                             .multilineTextAlignment(.leading)
                                         if languageCode != "ur", !section.titleArabic.isEmpty,
                                            section.titleArabic != section.title(languageCode: languageCode) {
-                                            Text(verbatim: section.titleArabic)
-                                                .font(DIFont.quranArabic(scale: 0.65))
+                                            Text.mushaf(verbatim: section.titleArabic, scale: 0.65)
                                                 .foregroundStyle(DIColor.textMuted)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                                 .environment(\.layoutDirection, .rightToLeft)

@@ -280,8 +280,7 @@ private struct TopicHadithCard: View {
                     }
                 }
                 if let arabic = item.arabic, !arabic.isEmpty {
-                    Text(verbatim: arabic)
-                        .font(DIFont.quranArabic(scale: 0.7))
+                    Text.mushaf(verbatim: arabic, scale: 0.7)
                         .foregroundStyle(DIColor.scripture)
                         .lineLimit(expanded ? nil : 2)
                         .frame(maxWidth: .infinity, alignment: .trailing)
