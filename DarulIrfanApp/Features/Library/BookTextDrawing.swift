@@ -65,6 +65,12 @@ enum BookTextDrawing {
     static let isolateStart = "\u{2066}"
     static let isolateEnd = "\u{2069}"
 
+    /// LEFT-TO-RIGHT OVERRIDE and POP DIRECTIONAL FORMATTING. Arabic-Indic
+    /// digits need them inside an isolate: their groups still turn round
+    /// in left-to-right text.
+    static let overrideStart = "\u{202D}"
+    static let overrideEnd = "\u{202C}"
+
     private static let anyDigit = #"0-9٠-٩۰-۹"#
     /// Digit groups joined by a dash, slash or stop: a date when there are three.
     private static let threeGroups = pattern("(?<![\(anyDigit)])[\(anyDigit)]+(?:[ ]?[-/–.][ ]?[\(anyDigit)]+){2,}")
@@ -86,7 +92,9 @@ enum BookTextDrawing {
     /// in order and not overlapping, counted in UTF-16. After Urdu letters a
     /// hyphen or a spaced colon turns their groups round. Only these four
     /// shapes are taken: the books also store some dates back to front
-    /// ("70-7-4", "57-1956"), and those read correctly as they are.
+    /// ("70-7-4", "57-1956"), and those read correctly as they are. So does
+    /// a number after Latin letters ("Ph:+92 41 2615359"), which an isolate
+    /// would part from its word.
     static func numberTokens(in text: String) -> [NSRange] {
         guard text.unicodeScalars.contains(where: { $0.properties.numericType == .decimal }) else { return [] }
         let whole = text as NSString
@@ -120,28 +128,49 @@ enum BookTextDrawing {
                 tokens.append(range)
             }
         }
-        return tokens
+        return tokens.filter { token in
+            holdsArabicIndicDigits(whole.substring(with: token)) || !followsLatin(whole, token.location)
+        }
+    }
+
+    /// The last letter before `location` on its line is Latin.
+    private static func followsLatin(_ text: NSString, _ location: Int) -> Bool {
+        var index = location
+        while index > 0 {
+            index -= 1
+            guard let scalar = Unicode.Scalar(text.character(at: index)) else { continue }
+            if scalar == "\n" { return false }
+            if scalar.properties.isAlphabetic { return scalar.value < 0x0250 }
+        }
+        return false
+    }
+
+    private static func holdsArabicIndicDigits(_ text: String) -> Bool {
+        text.unicodeScalars.contains { (0x0660...0x0669).contains($0.value) }
     }
 
     /// `pieces` of one stretch of right-to-left text with each such number in
     /// an isolate, for drawing only. Found in the whole stretch, as a link
     /// may end inside a number.
     static func isolatingNumbers(_ pieces: [String]) -> [String] {
-        let tokens = numberTokens(in: pieces.joined())
+        let joined = pieces.joined()
+        let tokens = numberTokens(in: joined)
         guard !tokens.isEmpty else { return pieces }
+        let whole = joined as NSString
+        let overridden = tokens.map { holdsArabicIndicDigits(whole.substring(with: $0)) }
         var drawn: [String] = []
         var start = 0
         for piece in pieces {
             let shown = NSMutableString(string: piece)
             let end = start + shown.length
             // From the last, so that the places before it do not move.
-            for token in tokens.reversed() {
+            for (token, overrides) in zip(tokens, overridden).reversed() {
                 let tokenEnd = NSMaxRange(token)
                 if tokenEnd > start && tokenEnd <= end {
-                    shown.insert(isolateEnd, at: tokenEnd - start)
+                    shown.insert(overrides ? overrideEnd + isolateEnd : isolateEnd, at: tokenEnd - start)
                 }
                 if token.location >= start && token.location < end {
-                    shown.insert(isolateStart, at: token.location - start)
+                    shown.insert(overrides ? isolateStart + overrideStart : isolateStart, at: token.location - start)
                 }
             }
             drawn.append(shown as String)

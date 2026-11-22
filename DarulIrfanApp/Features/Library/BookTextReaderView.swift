@@ -598,7 +598,7 @@ struct FormattedBookPage: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
-            .modifier(selection(plain, rightToLeft: rightToLeft))
+            .modifier(selection(plain, rightToLeft: rightToLeft, drawnIn: runs.map(\.text)))
     }
 
     /// Arabic the mushaf does not confirm - a hadith, a du'a, a saying - set
@@ -762,10 +762,14 @@ struct FormattedBookPage: View {
         shown([text], rightToLeft: rightToLeft).joined()
     }
 
-    private func selection(_ text: String, rightToLeft: Bool) -> BookTextSelection {
+    /// `stretches` are what `shown` is given of the block, where that is not
+    /// the whole of it: a number is looked for in each by itself, so that
+    /// Copy never takes an isolate along.
+    private func selection(_ text: String, rightToLeft: Bool, drawnIn stretches: [String]? = nil) -> BookTextSelection {
         BookTextSelection(
             text: text,
-            isIsolated: rightToLeft && place.followsBookRules && !BookTextDrawing.numberTokens(in: text).isEmpty
+            isIsolated: rightToLeft && place.followsBookRules
+                && (stretches ?? [text]).contains { !BookTextDrawing.numberTokens(in: $0).isEmpty }
         )
     }
 

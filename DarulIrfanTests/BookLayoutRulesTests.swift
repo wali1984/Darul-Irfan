@@ -16,6 +16,7 @@ final class BookLayoutRulesTests: XCTestCase {
         "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah",
         "tafaseer-parah-1",
         "uploads-books-maktobaat",
+        "uploads-books-tasawwuf-aur-tameer-e-seraat",
         "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
     ]
     private static let shipped: [BookPage] = SeedBundle.bookPages().filter { books.contains($0.bookID) }
@@ -126,6 +127,26 @@ final class BookLayoutRulesTests: XCTestCase {
             XCTAssertEqual(BookTextDrawing.numberTokens(in: "تاریخ \(untouched) کو"), [], untouched)
         }
         XCTAssertEqual(BookTextDrawing.isolatingNumbers(["آیت 79:18-19 ہے"]), ["آیت \u{2066}79:18-19\u{2069} ہے"])
+    }
+
+    func testArabicIndicDigitsKeepTheirOrderToo() throws {
+        let text = try page("uploads-books-tasawwuf-aur-tameer-e-seraat", 67).text
+        let token = "\u{0666}\u{0667} : \u{0661}\u{0660}"
+        XCTAssertTrue(text.contains(token))
+        // An isolate alone leaves them turned round, as these digits are not strong.
+        XCTAssertTrue(BookTextDrawing.isolatingNumbers([text]).joined().contains("\u{2066}\u{202D}\(token)\u{202C}\u{2069}"))
+    }
+
+    func testANumberAfterLatinLettersIsLeftWithItsWord() throws {
+        let text = try page("book-ocr-hamd-o-naat", 3).text
+        let after = "Ph:+92 41 2615359"
+        XCTAssertTrue(text.contains(after))
+        XCTAssertTrue(BookTextDrawing.isolatingNumbers([text]).joined().contains(after))
+        // Another block's Latin does not reach a number on a later line.
+        XCTAssertEqual(
+            BookTextDrawing.isolatingNumbers(["Tel\n0300-6658928"]),
+            ["Tel\n\u{2066}0300-6658928\u{2069}"]
+        )
     }
 
     func testALinkThatEndsInsideANumberKeepsItsWords() {
