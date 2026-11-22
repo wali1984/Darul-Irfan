@@ -868,12 +868,13 @@ struct FormattedBookPage: View {
     }
 
     /// Words in a block's own face. In the Urdu face, `urduSize` times the
-    /// reader's text size, the salawat sign is drawn as a book draws it.
+    /// reader's text size, the salawat sign and U+06DF are drawn as a book
+    /// draws them.
     private func words(_ string: String, urduSize: Double?) -> Text {
-        guard let urduSize, place.followsBookRules, BookTextDrawing.holdsSalawat(string) else {
+        guard let urduSize, BookTextDrawing.needsDressing(string, place: place) else {
             return Text(verbatim: string)
         }
-        return Text(BookTextDrawing.enlargingSalawat(AttributedString(string), scale: urduSize * scale))
+        return Text(BookTextDrawing.dressing(AttributedString(string), place: place, scale: urduSize * scale))
     }
 
     /// The mushaf's waqf signs are private-use characters only its font draws; a
@@ -898,8 +899,8 @@ struct FormattedBookPage: View {
     private func linkText(_ string: String, index: Int, mushafScale: Double?, urduSize: Double?) -> Text {
         var attributed = BookTextDrawing.link(string, index: index)
         guard let mushafScale else {
-            if let urduSize, place.followsBookRules {
-                attributed = BookTextDrawing.enlargingSalawat(attributed, scale: urduSize * scale)
+            if let urduSize, BookTextDrawing.needsDressing(string, place: place) {
+                attributed = BookTextDrawing.dressing(attributed, place: place, scale: urduSize * scale)
             }
             return Text(attributed)
         }
@@ -993,13 +994,19 @@ struct FormattedBookPage: View {
             BookLinkMatcher.pieces(ofParagraph: runs, carried: carried, links: links, carriedLinks: carriedLinks)
         var text = Text(verbatim: "")
         for (index, run) in runs.enumerated() {
-            if index > 0 { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
-            if index < linkedPieces.count,
-               let linked = linkedRun(run, pieces: linkedPieces[index], leftToRight: leftToRight) {
+            let linked = index < linkedPieces.count
+                ? linkedRun(run, pieces: linkedPieces[index], leftToRight: leftToRight)
+                : nil
+            // A run that opens with U+06DF takes the space before it, so
+            // that the sign has something to sit on in its own face.
+            let takesSpace = index > 0 && linked == nil && !run.startsLine && place.showsSmallHighZero
+                && run.text.unicodeScalars.first?.value == MushafFaceGaps.smallHighZero
+            if index > 0 && !takesSpace { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
+            if let linked {
                 text = text + linked
                 continue
             }
-            let drawn = shown(run.text, rightToLeft: !leftToRight)
+            let drawn = (takesSpace ? " " : "") + shown(run.text, rightToLeft: !leftToRight)
             if run.isQuranic || run.isArabic {
                 text = text + Text.mushaf(verbatim: drawn, scale: 0.72 * scale, showsSmallHighZero: place.showsSmallHighZero)
                     .foregroundStyle(DIColor.scripture)

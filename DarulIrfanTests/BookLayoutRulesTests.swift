@@ -19,6 +19,7 @@ final class BookLayoutRulesTests: XCTestCase {
         "asrar-6-ur",
         "book-hayyat-e-tayyabah-i",
         "book-ocr-dil-darwaza",
+        "tafaseer-parah-10",
         "book-ocr-gard-e-safar",
         "book-ocr-hamd-o-naat",
         "book-ocr-hasht-roza-course",
@@ -194,6 +195,38 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertTrue(BookTextPlace.book.showsSmallHighZero)
         XCTAssertFalse(BookTextPlace.article.showsSmallHighZero)
         XCTAssertFalse(BookTextPlace.quranReader.showsSmallHighZero)
+    }
+
+    func testTheSignShowsInUrduFaceTextToo() throws {
+        let cases: [(String, Int)] = [("tafaseer-parah-10", 300), ("tafaseer-parah-9", 40)]
+        for (bookID, number) in cases {
+            let laid = BookPageFormatter.format(page: try page(bookID, number))
+            var signs = 0
+            for case .paragraph(let runs) in laid.blocks {
+                for run in runs where !run.isQuranic && run.text.unicodeScalars.contains("\u{06DF}") {
+                    XCTAssertTrue(BookTextDrawing.needsDressing(run.text, place: .book))
+                    XCTAssertFalse(BookTextDrawing.needsDressing(run.text, place: .quranReader))
+                    let drawn = BookTextDrawing.dressing(AttributedString(run.text), place: .book, scale: 1.2)
+                    XCTAssertEqual(Array(drawn.unicodeScalars), Array(run.text.unicodeScalars))
+                    var at = drawn.unicodeScalars.startIndex
+                    while at < drawn.unicodeScalars.endIndex {
+                        let next = drawn.unicodeScalars.index(after: at)
+                        if drawn.unicodeScalars[at] == "\u{06DF}" {
+                            let face = drawn[at..<next][AttributeScopes.SwiftUIAttributes.FontAttribute.self]
+                            XCTAssertEqual(face, DIFont.urduAmiriWord(scale: 1.2), "\(bookID) p\(number)")
+                            signs += 1
+                        }
+                        at = next
+                    }
+                }
+            }
+            XCTAssertEqual(signs, 1, bookID)
+        }
+        // At the head of a run it is given the space before it to sit on.
+        XCTAssertEqual(
+            MushafFaceGaps.spans(in: " \u{06DF} یہ".unicodeScalars, showsSmallHighZero: true).map(\.range),
+            [0..<2]
+        )
     }
 
     // MARK: - Numbers in their stored order

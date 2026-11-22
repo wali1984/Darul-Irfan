@@ -47,6 +47,60 @@ enum BookTextDrawing {
         return drawn
     }
 
+    // MARK: - Words in the Urdu face
+
+    /// Whether `text`, in the Urdu face at `place`, holds a sign that face
+    /// alone would not draw well.
+    static func needsDressing(_ text: String, place: BookTextPlace) -> Bool {
+        (place.followsBookRules && holdsSalawat(text))
+            || (place.showsSmallHighZero && holdsSmallHighZero(text))
+    }
+
+    /// `text`, for an Urdu face at `scale`, as `place` draws it: the salawat
+    /// sign enlarged, and a word with U+06DF in Amiri Quran.
+    static func dressing(_ text: AttributedString, place: BookTextPlace, scale: Double) -> AttributedString {
+        var drawn = text
+        if place.showsSmallHighZero {
+            drawn = drawingSmallHighZero(drawn, scale: scale)
+        }
+        if place.followsBookRules {
+            drawn = enlargingSalawat(drawn, scale: scale)
+        }
+        return drawn
+    }
+
+    /// A passage of a book in the Urdu face, as a search in the book lists
+    /// it: its signs and its numbers as the page shows them.
+    static func passage(_ text: String, scale: Double) -> Text {
+        let drawn = isolatingNumbers([text]).joined()
+        guard needsDressing(drawn, place: .book) else { return Text(verbatim: drawn) }
+        return Text(dressing(AttributedString(drawn), place: .book, scale: scale))
+    }
+
+    /// A work's name in the Urdu face, with its salawat sign as book text
+    /// has it.
+    static func urduName(_ name: String, scale: Double) -> Text {
+        guard holdsSalawat(name) else { return Text(verbatim: name) }
+        return Text(enlargingSalawat(AttributedString(name), scale: scale))
+    }
+
+    private static func holdsSmallHighZero(_ text: String) -> Bool {
+        text.unicodeScalars.contains { $0.value == MushafFaceGaps.smallHighZero }
+    }
+
+    /// Each word with U+06DF, as far as Amiri Quran can set it, in that
+    /// face: the books' seven in Urdu text have no glyph in the Urdu face.
+    private static func drawingSmallHighZero(_ text: AttributedString, scale: Double) -> AttributedString {
+        var drawn = text
+        let spans = MushafFaceGaps.spans(in: text.unicodeScalars, showsSmallHighZero: true)
+        for span in spans where span.face == .smallHighZero {
+            let lower = drawn.unicodeScalars.index(drawn.startIndex, offsetBy: span.range.lowerBound)
+            let upper = drawn.unicodeScalars.index(lower, offsetBy: span.range.count)
+            drawn[lower..<upper].font = DIFont.urduAmiriWord(scale: scale)
+        }
+        return drawn
+    }
+
     // MARK: - Links
 
     /// The words of a link: tappable, with a thin dotted underline in the

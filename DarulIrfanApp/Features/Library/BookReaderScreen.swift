@@ -934,7 +934,7 @@ struct BookTextSearchView: View {
                 .diInterfaceFont(.caption, weight: .semibold)
                 .foregroundStyle(DIColor.actionForeground)
             if let passage {
-                Text(verbatim: passage)
+                (rightToLeft ? BookTextDrawing.passage(passage, scale: 0.9) : Text(verbatim: passage))
                     .font(rightToLeft ? DIFont.urduBody(scale: 0.9) : .subheadline)
                     .foregroundStyle(DIColor.textPrimary)
                     .lineLimit(3)

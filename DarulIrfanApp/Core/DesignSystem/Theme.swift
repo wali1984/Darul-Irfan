@@ -145,9 +145,17 @@ enum DIFont {
     /// The salawat sign among words in `urduBody(scale:)`: the mushaf face,
     /// 1.25 times their size, growing with them at every text size.
     static func urduSalawat(scale: Double) -> Font {
-        let wordSize: Double = AppFonts.urduNastaliqName == nil ? 19 : 17
-        return .custom(AppFonts.quranArabicName, size: wordSize * scale * 1.25, relativeTo: .body)
+        .custom(AppFonts.quranArabicName, size: urduWordSize * scale * 1.25, relativeTo: .body)
     }
+
+    /// Amiri Quran for a word with U+06DF among words in `urduBody(scale:)`,
+    /// at their size: no Urdu face has that sign.
+    static func urduAmiriWord(scale: Double) -> Font {
+        .custom(AppFonts.generalArabicName, size: urduWordSize * scale, relativeTo: .body)
+    }
+
+    /// The size `urduBody(scale:)` sets its words at.
+    private static var urduWordSize: Double { AppFonts.urduNastaliqName == nil ? 19 : 17 }
 
     /// Section headings with a slightly bookish feel.
     static let heading = Font.system(.title2, design: .serif).weight(.semibold)
