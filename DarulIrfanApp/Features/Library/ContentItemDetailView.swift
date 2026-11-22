@@ -239,7 +239,7 @@ struct ContentItemDetailView: View {
         spokenLabel: Text
     ) -> some View {
         NavigationLink {
-            reader(for: item, mode: mode)
+            reader(for: item, mode: mode, choice: readerChoice(of: mode, for: item))
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: DIRadius.lg, style: .continuous)
@@ -304,7 +304,7 @@ struct ContentItemDetailView: View {
     /// printed pages, which "Keep reading" then follows.
     private func printedPagesButton(for item: ContentItem) -> some View {
         NavigationLink {
-            reader(for: item, mode: .pages, readerChosePages: true)
+            reader(for: item, mode: .pages, choice: readerChoice(of: .pages, for: item))
         } label: {
             HStack(spacing: DISpacing.md) {
                 Image(systemName: "doc.richtext")
@@ -339,13 +339,13 @@ struct ContentItemDetailView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// The app's one reader, on the text or the printed pages.
-    /// `readerChosePages` is for the printed pages' own button on a work that
-    /// has text as well: the reader notes that choice as it opens.
+    /// The app's one reader, on the text or the printed pages. `choice` is
+    /// for a button that asks for one way of reading (`readerChoice`): the
+    /// reader notes it as it opens. The gold button gives none.
     private func reader(
         for item: ContentItem,
         mode: BookReaderMode,
-        readerChosePages: Bool = false
+        choice: BookReaderMode? = nil
     ) -> some View {
         BookReaderScreen(
             item: item,
@@ -353,8 +353,15 @@ struct ContentItemDetailView: View {
             mode: mode,
             appState: appState,
             fontScale: appState.settings.readerFontScale.rawValue,
-            readerChosePages: readerChosePages
+            choice: choice
         )
+    }
+
+    /// What a button for one way of reading says of the reader's choice: that
+    /// way, on a work that has both its text and its printed pages, so "Keep
+    /// reading" returns to it; nothing on a work with only one way to read.
+    private func readerChoice(of mode: BookReaderMode, for item: ContentItem) -> BookReaderMode? {
+        hasReadablePDF(item) && viewModel.bookPageCount > 0 ? mode : nil
     }
 
     // MARK: - Book page
@@ -500,11 +507,12 @@ struct ContentItemDetailView: View {
     }
 
     /// The text, then the printed pages (the PDF), each opening the reader.
+    /// On a work that has both, each tile is the reader's choice of that way.
     private func readingTiles(for item: ContentItem) -> some View {
         HStack(alignment: .top, spacing: 10) {
             if viewModel.bookPageCount > 0 {
                 NavigationLink {
-                    reader(for: item, mode: .text)
+                    reader(for: item, mode: .text, choice: readerChoice(of: .text, for: item))
                 } label: {
                     readingTile(systemImage: "text.alignleft", titleKey: "The text", detail: textTileDetail)
                 }
@@ -513,10 +521,8 @@ struct ContentItemDetailView: View {
                 .accessibilityLabel(Text("Read the text, \(viewModel.bookPageCount) pages"))
             }
             if hasReadablePDF(item) {
-                // Beside the text, this tile is the reader's choice of the
-                // printed pages; on a work with no text there is none to make.
                 NavigationLink {
-                    reader(for: item, mode: .pages, readerChosePages: viewModel.bookPageCount > 0)
+                    reader(for: item, mode: .pages, choice: readerChoice(of: .pages, for: item))
                 } label: {
                     readingTile(
                         systemImage: "doc.richtext",

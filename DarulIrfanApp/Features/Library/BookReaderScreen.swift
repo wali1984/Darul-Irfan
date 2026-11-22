@@ -128,8 +128,8 @@ enum BookReadingHistory {
     }
 
     /// The reader chose how to read the work: with the reader's Text | Pages
-    /// switch, by a result of search in the book (the text), or with the
-    /// printed pages' own button on the work's page.
+    /// switch, by a result of search in the book (the text), or with "The
+    /// text" or "The printed pages" on the page of a work that has both.
     static func recordChoice(itemID: String, mode: BookReaderMode) {
         UserDefaults.standard.set(mode.rawValue, forKey: choiceKey(itemID))
     }
@@ -229,9 +229,10 @@ struct BookReaderScreen: View {
     private let startPage: Int?
     /// Where the text size is kept; nil keeps it for this reading only.
     private let appState: AppState?
-    /// The printed pages' own button opened the reader, on a work that has
-    /// text as well: the reader chose them.
-    private let readerChosePages: Bool
+    /// The way the reader asked for on the work's page, with "The text" or
+    /// "The printed pages", on a work that has both; nil when the work was
+    /// simply opened.
+    private let openingChoice: BookReaderMode?
 
     @State private var mode: BookReaderMode
     /// The choice the reader was opened with has been noted. The screen
@@ -259,14 +260,20 @@ struct BookReaderScreen: View {
         startPage: Int? = nil,
         appState: AppState? = nil,
         fontScale: Double = 1,
-        readerChosePages: Bool = false
+        choice: BookReaderMode? = nil
     ) {
         self.item = item
         self.dependencies = dependencies
         self.startPage = startPage
         self.appState = appState
         let first: BookReaderMode = (mode == .pages && !BookReadingHistory.hasPDF(item)) ? .text : mode
-        self.readerChosePages = readerChosePages && first == .pages
+        // Printed pages asked for on a work that has no PDF open as its
+        // text, and are not a choice.
+        if let choice, choice == first {
+            self.openingChoice = choice
+        } else {
+            self.openingChoice = nil
+        }
         _mode = State(initialValue: first)
         _opened = State(initialValue: [first])
         _pdf = State(initialValue: BookReaderSession())
@@ -368,12 +375,12 @@ struct BookReaderScreen: View {
         }
         .task {
             // Opening a work is not choosing how to read it: only the switch,
-            // a result of search in the book and the printed pages' own
-            // button say that.
+            // a result of search in the book, and "The text" or "The printed
+            // pages" on the page of a work that has both, say that.
             BookReadingHistory.recordOpened(itemID: item.id)
-            if readerChosePages, !notedOpeningChoice {
+            if let openingChoice, !notedOpeningChoice {
                 notedOpeningChoice = true
-                BookReadingHistory.recordChoice(itemID: item.id, mode: .pages)
+                BookReadingHistory.recordChoice(itemID: item.id, mode: openingChoice)
             }
             if !hasText {
                 let count = (try? await dependencies.contentRepository.bookPageCount(bookID: item.id)) ?? 0
