@@ -61,3 +61,6 @@ finding and what became of it), `applied-edits.json` (before and after),
   export or release, have the applied changes read independently as well.
 - Checks and exports must read the register the build read: copy it and set `DI_PROOFREAD_REGISTER`.
 - `export_quran_works.py` writes the Qur'an works for amd (`quran-works-proofread` there).
+- An approved entry with `authority` was delegated: the owner left that page to judgement, and only
+  what two independent readers and a final check all passed was pinned. It is leave for that page
+  only, never a rule for later findings.

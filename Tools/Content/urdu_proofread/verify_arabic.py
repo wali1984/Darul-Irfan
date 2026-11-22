@@ -69,7 +69,7 @@ def main() -> int:
                 # What was put in must be the mushaf's own words, letter for letter.
                 before = set(entry["was"].split())
                 for word in entry["now"].split():
-                    bare = "".join(ch for ch in word.strip("۔،؟!:؛()«»\"'○") if ord(ch) not in (0x200B, 0x200C, 0x200F, 0xFEFF)
+                    bare = "".join(ch for ch in word.strip("۔،؟!:؛()«»\"'○“”‘’.") if ord(ch) not in (0x200B, 0x200C, 0x200F, 0xFEFF)
                                    and not 0xE000 <= ord(ch) <= 0xF8FF).rstrip("ؕۖۗۘۙۚۛۜ")
                     if word not in before and sum(c in HARAKAT for c in bare) >= 1 and bare not in mushaf:
                         problems += 1
