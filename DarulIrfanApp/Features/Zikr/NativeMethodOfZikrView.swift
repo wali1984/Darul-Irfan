@@ -29,6 +29,8 @@ struct NativeMethodOfZikrView: View {
     @State private var isLoading = true
     @State private var attempt = 0
     private var urdu: Bool { locale.language.languageCode?.identifier == "ur" }
+    /// The guide is read as an article is, in the language it is shown in.
+    private var pageLanguage: String { urdu ? "ur" : "en" }
 
     var body: some View {
         ScrollView {
@@ -50,7 +52,7 @@ struct NativeMethodOfZikrView: View {
                             .frame(maxWidth: .infinity)
                         FormattedBookPage(page: .init(isContents: false, blocks: [
                             .caption(urdu ? guide.diagramCaptionUr : guide.diagramCaptionEn)
-                        ]), scale: readerFontScale)
+                        ]), scale: readerFontScale, place: .article, language: pageLanguage)
                     }
                     .padding(DISpacing.lg)
                     .diGlassPanel(cornerRadius: 24)
@@ -103,14 +105,14 @@ struct NativeMethodOfZikrView: View {
     private func sectionCard(_ section: MethodGuide.Section) -> some View {
         VStack(alignment: .leading, spacing: DISpacing.md) {
             if let title = section.title {
-                FormattedBookPage(page: .init(isContents: false, blocks: [.heading(title)]), scale: readerFontScale)
+                FormattedBookPage(page: .init(isContents: false, blocks: [.heading(title)]), scale: readerFontScale, place: .article, language: pageLanguage)
                 DIJaliDivider(height: 12, opacity: 0.4)
             }
             FormattedBookPage(page: section.kind == "arabic"
                 ? .init(isContents: false, blocks: [.arabic(section.text)])
-                : BookPageFormatter.articleParagraph(section.text), scale: readerFontScale)
+                : BookPageFormatter.articleParagraph(section.text), scale: readerFontScale, place: .article, language: pageLanguage)
             if let attribution = section.attribution {
-                FormattedBookPage(page: .init(isContents: false, blocks: [.caption(attribution)]), scale: readerFontScale)
+                FormattedBookPage(page: .init(isContents: false, blocks: [.caption(attribution)]), scale: readerFontScale, place: .article, language: pageLanguage)
             }
         }
         .padding(DISpacing.lg)

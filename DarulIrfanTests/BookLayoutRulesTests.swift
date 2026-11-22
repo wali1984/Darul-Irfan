@@ -154,7 +154,7 @@ final class BookLayoutRulesTests: XCTestCase {
 
     @MainActor
     func testAScreenThatNamesNoPlaceHasNoBookRules() {
-        // The Method of Zikr, as on Android.
+        // Books, articles and the Method of Zikr each name theirs.
         let view = FormattedBookPage(page: .init(isContents: false, blocks: []))
         XCTAssertEqual(view.place, .other)
     }
