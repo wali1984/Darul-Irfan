@@ -574,9 +574,10 @@ export async function joinRoom(env: Env, memberID: string, groupID: string, inpu
   return json({ authToken: token, pageURL: `${env.PUBLIC_BASE_URL}/v1/meet`, roomID });
 }
 
-/** Which outside services are connected yet. The app marks the rest
- *  "integration in progress" instead of offering something that cannot work,
- *  and the label goes away by itself once the service's keys are set. */
+/** Which outside services are connected. The app leaves out what depends on
+ *  the others instead of offering something that cannot work, and offers it
+ *  by itself once the service's keys are set. All three flags are always
+ *  sent: the released apps read each of them as a required field. */
 export function integrationStatus(env: Env): { meetings: boolean; whatsappForwarding: boolean; liveBroadcast: boolean } {
   return {
     meetings: realtimeBase(env) !== null,
@@ -592,7 +593,7 @@ export function realtimeBase(env: Env): string | null {
   return `https://api.cloudflare.com/client/v4/accounts/${env.REALTIME_ACCOUNT_ID}/realtime/kit/${env.REALTIME_APP_ID}`;
 }
 
-const notConfigured = () => json({ error: "Video meetings: integration in progress. They open here once it is complete." }, { status: 503 });
+const notConfigured = () => json({ error: "Video meetings are not available." }, { status: 503 });
 
 /** Opens a room. With `recordFor` (the group), the room records itself from
  *  when the first person joins. */

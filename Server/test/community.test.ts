@@ -75,10 +75,11 @@ describe("community groups", () => {
     expect((await call(member, "GET", "/v1/groups/canada")).status).toBe(200);
   });
 
-  it("tells the app which integrations are connected, so it can say what is still in progress", async () => {
+  it("tells the app which services are connected, always with all three flags, so it offers only what works", async () => {
     const pending = await setup();
     const status = async (call: typeof pending.call, token: string) =>
       ((await (await call(token, "GET", "/v1/groups/usa")).json()) as { integrations: Record<string, boolean> }).integrations;
+    // The released apps read every one of the three as a required field.
     expect(await status(pending.call, pending.member)).toEqual({ meetings: false, whatsappForwarding: false, liveBroadcast: false });
     const connected = await setup({
       REALTIME_ACCOUNT_ID: "acct", REALTIME_APP_ID: "app", REALTIME_API_TOKEN: "token", WHATSAPP_ACCESS_TOKEN: "wa",
@@ -138,7 +139,32 @@ describe("community groups", () => {
     const detail = (await (await call(member, "GET", "/v1/groups/usa")).json()) as { live?: { videoID?: string; hasRoom: boolean } };
     expect(detail.live).toMatchObject({ videoID: "abcdefghijk", hasRoom: false });
     // No meeting service configured: a room is refused plainly, not half-made.
-    expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", room: true })).status).toBe(503);
+    const refused = await call(admin, "POST", "/v1/groups/usa/live", { state: "live", room: true });
+    expect(refused.status).toBe(503);
+    expect(await refused.json()).toEqual({ error: "Video meetings are not available." });
+  });
+
+  it("refuses a room or a recording in plain words when the meeting service is not connected", async () => {
+    const { raw, call, member, admin } = await setup();
+    const now = new Date();
+    const refusal = async (response: Response) => {
+      expect(response.status).toBe(503);
+      const body = (await response.json()) as { error: string };
+      // Nothing that speaks of work under way.
+      expect(body.error).not.toMatch(/integration|in progress|once it is|complete|yet|soon|prepar/i);
+      return body.error;
+    };
+    // A scheduled meeting whose room has not been opened.
+    raw.prepare(`INSERT INTO group_meetings(id,group_id,title,starts_at,duration_minutes,created_by,updated_at)
+      VALUES('m1','usa','Weekly meeting',?,60,?,?)`).run(now.toISOString(), "b".repeat(32), now.toISOString());
+    expect(await refusal(await call(member, "POST", "/v1/groups/usa/join", { meetingID: "m1" }))).toBe("Video meetings are not available.");
+    expect(raw.prepare("SELECT room_id FROM group_meetings WHERE id='m1'").get()).toEqual({ room_id: null });
+    // A session whose room was opened while the service was connected.
+    expect((await call(admin, "POST", "/v1/groups/usa/live", { state: "live", title: "Community Zikr", videoID: "abcdefghijk" })).status).toBe(200);
+    raw.prepare("UPDATE group_live SET room_id='room-1' WHERE group_id='usa'").run();
+    expect(await refusal(await call(member, "POST", "/v1/groups/usa/join", {}))).toBe("Video meetings are not available.");
+    expect(await refusal(await call(admin, "POST", "/v1/groups/usa/control", { action: "record" }))).toBe("Recording is not available.");
+    expect(raw.prepare("SELECT room_recording FROM group_live WHERE group_id='usa'").get()).toEqual({ room_recording: 0 });
   });
 
   it("joins members into the group's room through the meeting service", async () => {

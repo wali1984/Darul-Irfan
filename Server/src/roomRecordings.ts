@@ -45,7 +45,7 @@ export async function trackRoom(
  *  is in, and says so. */
 export async function startRoomRecording(env: Env, groupID: string, roomID: string): Promise<Response | null> {
   const base = realtimeBase(env);
-  if (!base) return json({ error: "Recording: integration in progress." }, { status: 503 });
+  if (!base) return json({ error: "Recording is not available." }, { status: 503 });
   const response = await fetch(`${base}/recordings`, {
     method: "POST", headers: headers(env),
     body: JSON.stringify({ meeting_id: roomID, ...recordingConfig(groupID) }),
