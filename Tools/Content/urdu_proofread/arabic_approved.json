@@ -1,0 +1,378 @@
+[
+ {
+  "id": "ASRAR-HIJR-F-003",
+  "book": "asrar-15-ur",
+  "page": 11,
+  "how": "mushaf 17:85",
+  "was": "قل الروح من امرِ ربی۔",
+  "now": "قُلِ الرُّوْحُ مِنْ اَمْرِ رَبِّىْ۔"
+ },
+ {
+  "id": "ASRAR-IBRAHIM-D-022",
+  "book": "asrar-14-ur",
+  "page": 10,
+  "how": "mushaf 14:7",
+  "was": "فرمایا کہ لا زیدنکم کہ یقیناً میں زیادہ کردُوں گا",
+  "now": "فرمایا کہ لَاَزِيْدَنَّـكُمْ کہ یقیناً میں زیادہ کردُوں گا"
+ },
+ {
+  "id": "ASRAR-IBRAHIM-J-030",
+  "book": "asrar-14-ur",
+  "page": 25,
+  "how": "mushaf 2:142",
+  "was": "فرمایا من الناس یعنی کچھ لوگوں",
+  "now": "فرمایا مِنَ النَّاسِ یعنی کچھ لوگوں"
+ },
+ {
+  "id": "ASRAR-IBRAHIM-L-001",
+  "book": "asrar-14-ur",
+  "page": 28,
+  "how": "mushaf 14:52",
+  "was": "لیذکر و اولوا الالباب",
+  "now": "وَّلِيَذَّكَّرَ اُولُوا الْا َلْبَابِ"
+ },
+ {
+  "id": "ASRAR-YUSUF-O-027",
+  "book": "asrar-12-ur",
+  "page": 53,
+  "how": "mushaf 2:165",
+  "was": "والذین امنوا اشد حبًا للہ۔ کہ مومن",
+  "now": "وَالَّذِيْنَ اٰمَنُوْٓا اَشَدُّ حُبًّا لِّلّٰهِ۔ کہ مومن"
+ },
+ {
+  "id": "UR-ASRAR-FAATIHA-004",
+  "book": "asrar-1-ur",
+  "page": 3,
+  "how": "mushaf 2:21",
+  "was": "یاَیّھاالنّاس اعبدُوا ربّکم",
+  "now": "يٰۤاَيُّهَا النَّاسُ اعْبُدُوْا رَبَّكُمُ"
+ },
+ {
+  "id": "UR-ASRAR-YUNUS-P001-006-002",
+  "book": "asrar-10-ur",
+  "page": 2,
+  "how": "mushaf 10:5",
+  "was": "هُوَالَّذِيْ",
+  "now": "هُوَ الَّذِىْ"
+ },
+ {
+  "id": "UR-ASRAR-YUNUS-P016-018-002",
+  "book": "asrar-10-ur",
+  "page": 16,
+  "how": "mushaf 42:13",
+  "was": "یھدی الیہِ مَن یُنِیب۔ کہ خلوصِ دل",
+  "now": "وَيَهْدِىْۤ اِلَيْهِ مَنْ يُّنِيْبُ۔ کہ خلوصِ دل"
+ },
+ {
+  "id": "UR-DALAEL-P142-151043",
+  "book": "book-dalael-us-salook-urdu",
+  "page": 150,
+  "how": "the reader's fix",
+  "was": "بیان کتاب اللہ ان الفاظ",
+  "now": "بیان کتاب اللہ میں ان الفاظ"
+ },
+ {
+  "id": "UR-DEYAR-P17-24-005",
+  "book": "book-ocr-deyar-e-habib-sall-allah-o-alaihi-wa-sallam-mai-chand-roz",
+  "page": 19,
+  "how": "the reader's fix",
+  "was": "محمد رسول للہ",
+  "now": "محمد رسول اللہ"
+ },
+ {
+  "id": "UR-HAYYAT1-P504-511014",
+  "book": "book-hayyat-e-tayyabah-i",
+  "page": 510,
+  "how": "the reader's fix",
+  "was": "مَولِدّ",
+  "now": "مَولِد"
+ },
+ {
+  "id": "UR-HAYYAT2-P099-102-017",
+  "book": "uploads-books-hayyat-e-tayyabah-2",
+  "page": 102,
+  "how": "the reader's fix",
+  "was": "والسلام علیکم ورحمة الله وبرکاته",
+  "now": "والسلام علیکم ورحمة الله وبرکاته''"
+ },
+ {
+  "id": "UR-NAQ-P153-156-001",
+  "book": "uploads-books-naqoosh-e-haq",
+  "page": 153,
+  "how": "the reader's fix",
+  "was": "محمد ارسول اللہ ﷺ",
+  "now": "محمد رسول اللہ ﷺ"
+ },
+ {
+  "id": "UR-NISBAT-P175-181-007",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 178,
+  "how": "mushaf 33:43",
+  "was": "لِيُخْرِ جَكُمْ",
+  "now": "لِيُخْرِجَكُمْ"
+ },
+ {
+  "id": "UR-NISBAT-P209-216-014",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 216,
+  "how": "mushaf 18:27",
+  "was": "تَجِدَمِنْ",
+  "now": "تَجِدَ مِنْ"
+ },
+ {
+  "id": "UR-NISBAT-P241-248-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 241,
+  "how": "mushaf 57:4",
+  "was": "اَیْنَ مَاکُنْتُمْ",
+  "now": "اَيْنَ مَا كُنْتُمْ"
+ },
+ {
+  "id": "UR-NISBAT-P343-351-013",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 349,
+  "how": "mushaf 17:36",
+  "was": "مَالَیْسَ لَکَ",
+  "now": "مَا لَـيْسَ لَـكَ"
+ },
+ {
+  "id": "UR-NISBAT-P343-351-013",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 349,
+  "how": "mushaf 17:36",
+  "was": "مَالَیْسَ لَکَ",
+  "now": "مَا لَـيْسَ لَـكَ"
+ },
+ {
+  "id": "UR-NISBAT-P361-365-006",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 363,
+  "how": "mushaf 3:135",
+  "was": "عَلٰی مَافَعَلُوْا",
+  "now": "عَلٰى مَا فَعَلُوْا"
+ },
+ {
+  "id": "UR-NISBAT-P366-370-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 367,
+  "how": "the reader's fix",
+  "was": "وَلَا فَخْرَلِیْ",
+  "now": "وَلَا فَخْرَ لِیْ"
+ },
+ {
+  "id": "UR-NISBAT-P414-417-003",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 416,
+  "how": "mushaf 57:3",
+  "was": "هوالاول و الاخرو و الظاہرو الباطن و هو بکل شئ علیم",
+  "now": "هُوَ الْاَوَّلُ وَالْاٰخِرُ وَالظَّاهِرُ وَالْبَاطِنُۚ وَهُوَ بِكُلِّ شَىْءٍ عَلِيْمٌ"
+ },
+ {
+  "id": "UR-NISBAT-P426-429-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 429,
+  "how": "mushaf 6:121",
+  "was": "اولیاء هم۔",
+  "now": "اَوْلِيٰٓـٮِٕـهِمْ۔"
+ },
+ {
+  "id": "UR-NISBAT-P438-441-002",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 439,
+  "how": "mushaf 2:260",
+  "was": "اولم تو من",
+  "now": "اَوَلَمْ تُؤْمِنْ"
+ },
+ {
+  "id": "UR-NISBAT-P446-449-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 446,
+  "how": "mushaf 21:107",
+  "was": "وما ارسلنک الا رحمته للعالمین۔",
+  "now": "وَمَاۤ اَرْسَلْنٰكَ اِلَّا رَحْمَةً لِّـلْعٰلَمِيْنَ۔"
+ },
+ {
+  "id": "UR-NISBAT-P446-449-002",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 447,
+  "how": "mushaf 17:44",
+  "was": "یسبح له السموات السبع والارض۔",
+  "now": "تُسَبِّحُ لَهُ السَّمٰوٰتُ السَّبْعُ وَالْاَرْضُ۔"
+ },
+ {
+  "id": "UR-NISBAT-P450-453-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 452,
+  "how": "mushaf 3:135",
+  "was": "لم یصرو اعلٰی ما فعلوا۔",
+  "now": "وَلَمْ يُصِرُّوْا عَلٰى مَا فَعَلُوْا۔"
+ },
+ {
+  "id": "UR-NISBAT-P458-461-006",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 461,
+  "how": "mushaf 58:4",
+  "was": "لتو منوا باللہ و رسولہ۔",
+  "now": "لِتُؤْمِنُوْا بِاللّٰهِ وَرَسُوْلِهٖ۔"
+ },
+ {
+  "id": "UR-NISBAT-P458-461-006",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 461,
+  "how": "mushaf 58:4",
+  "was": "لتو منوا باللہ و رسولہ۔",
+  "now": "لِتُؤْمِنُوْا بِاللّٰهِ وَرَسُوْلِهٖ۔"
+ },
+ {
+  "id": "UR-NISBAT-P462-465-002",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 462,
+  "how": "mushaf 48:10",
+  "was": "ان الذین یبا یعونک انما یبایعون اللہ",
+  "now": "اِنَّ الَّذِيْنَ يُبَايِعُوْنَكَ اِنَّمَا يُبَايِعُوْنَ اللّٰهَ"
+ },
+ {
+  "id": "UR-NISBAT-P466-469-003",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 467,
+  "how": "mushaf 67:2",
+  "was": "خلق الموت و الحیاتہ",
+  "now": "خَلَقَ الْمَوْتَ وَالْحَيٰوةَ"
+ },
+ {
+  "id": "UR-NISBAT-P470-473-002",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 471,
+  "how": "mushaf 48:10",
+  "was": "ید اللہ فوق ایدیھم۔",
+  "now": "يَدُ اللّٰهِ فَوْقَ اَيْدِيْهِمْ۔"
+ },
+ {
+  "id": "UR-NISBAT-P498-501-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 501,
+  "how": "mushaf 11:43",
+  "was": "لا عاصمه الیوم",
+  "now": "لَا عَاصِمَ الْيَوْمَ"
+ },
+ {
+  "id": "UR-NISBAT-P522-525-002",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 522,
+  "how": "mushaf 22:7",
+  "was": "اتیتہ لا ریب فیھا",
+  "now": "اٰتِيَةٌ لَّا رَيْبَ فِيْهَا"
+ },
+ {
+  "id": "UR-NISBAT-P534-537-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 534,
+  "how": "mushaf 4:97",
+  "was": "فرشتے کافر کو کہتے ہیں فیما کنتم۔",
+  "now": "فرشتے کافر کو کہتے ہیں فِيْمَ كُنْتُمْ۔"
+ },
+ {
+  "id": "UR-NISBAT-P538-541-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 538,
+  "how": "mushaf 29:54",
+  "was": "ان جھنم لمحیطتہ بالکفرین",
+  "now": "اِنَّ جَهَنَّمَ لَمُحِيْطَةٌ بِالْكٰفِرِيْنَ"
+ },
+ {
+  "id": "UR-NISBAT-P538-541-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 541,
+  "how": "mushaf 3:186",
+  "was": "لتبلون فی امرالکم و انفسکم",
+  "now": "لَـتُبْلَوُنَّ فِىْۤ اَمْوَالِكُمْ وَاَنْفُسِكُمْ"
+ },
+ {
+  "id": "UR-NISBAT-P550-553-005",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 553,
+  "how": "mushaf 3:120",
+  "was": "و ان تصبرو اوتتقوا",
+  "now": "وَاِنْ تَصْبِرُوْا وَتَتَّقُوْا"
+ },
+ {
+  "id": "UR-NISBAT-P554-557-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 554,
+  "how": "mushaf 3:186",
+  "was": "وان تصبرو اوتتقوا",
+  "now": "وَاِنْ تَصْبِرُوْا وَتَتَّقُوْا"
+ },
+ {
+  "id": "UR-NISBAT-P554-557-004",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 556,
+  "how": "mushaf 29:45",
+  "was": "و لذکر اللہ اکبر",
+  "now": "وَلَذِكْرُ اللّٰهِ اَكْبَرُ"
+ },
+ {
+  "id": "UR-NISBAT-P554-557-005",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 556,
+  "how": "mushaf 39:23",
+  "was": "ثم تلین جلودھم و قلوبھم الی ذکر اللہ",
+  "now": "ثُمَّ تَلِيْنُ جُلُوْدُهُمْ وَقُلُوْبُهُمْ اِلٰى ذِكْرِ اللّٰهِ"
+ },
+ {
+  "id": "UR-NISBAT-P554-557-006",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 557,
+  "how": "mushaf 3:186",
+  "was": "وان ذلک من عزم الامور",
+  "now": "فَاِنَّ ذٰلِكَ مِنْ عَزْمِ الْاُمُوْرِ"
+ },
+ {
+  "id": "UR-NISBAT-P558-561-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 558,
+  "how": "mushaf 3:186",
+  "was": "و لتسمعن الذین اوتو الکتاب من قبلکم من الذین اشرکوا اذی کثیرا",
+  "now": "وَلَـتَسْمَعُنَّ مِنَ الَّذِيْنَ اُوْتُوا الْكِتٰبَ مِنْ قَبْلِكُمْ وَمِنَ الَّذِيْنَ اَشْرَكُوْۤا اَذًى كَثِيْـرًا"
+ },
+ {
+  "id": "UR-NISBAT-P562-565-003",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 565,
+  "how": "mushaf 15:42",
+  "was": "ان عبادی لیس لک علیہ شیطان",
+  "now": "اِنَّ عِبَادِىْ لَـيْسَ لَكَ عَلَيْهِمْ سُلْطٰنٌ"
+ },
+ {
+  "id": "UR-NISBAT-P566-569-001",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 566,
+  "how": "mushaf 15:40",
+  "was": "الا عبادک منھم اصالحین",
+  "now": "اِلَّا عِبَادَكَ مِنْهُمُ الْمُخْلَصِيْنَ"
+ },
+ {
+  "id": "UR-ROOH-008",
+  "book": "book-ocr-haqiqat-e-rooh",
+  "page": 7,
+  "how": "the reader's fix",
+  "was": "فرمایاوما",
+  "now": "فرمایا وما"
+ },
+ {
+  "id": "UR-ROOH-009",
+  "book": "book-ocr-haqiqat-e-rooh",
+  "page": 7,
+  "how": "the reader's fix",
+  "was": "ارشادفرمایاویسئلونک",
+  "now": "ارشاد فرمایا ویسئلونک"
+ },
+ {
+  "id": "UR-TAREEQ-P048-052-033",
+  "book": "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
+  "page": 50,
+  "how": "the reader's fix",
+  "was": "نور'' علیٰ نور",
+  "now": "نور علیٰ نور"
+ }
+]

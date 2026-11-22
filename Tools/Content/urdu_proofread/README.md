@@ -26,16 +26,21 @@ Run from the iOS checkout (`pw/i-proof`, branch `claude/urdu-proofread`).
    answers into `decisions.json` (kept in the repository).
 5. `python Tools/Content/urdu_proofread/apply_proofread.py --write` - writes
    `book_pages.json`, `book_links.json` and `quran_tafsir.json` in the iOS seed.
-6. `python Tools/Content/urdu_proofread/verify_arabic.py <commit before>` and
+6. `python Tools/Content/urdu_proofread/scan_arabic.py` - lists edits that could
+   be a change to Arabic the shield cannot see. Read every new line; what is
+   Arabic goes into `arabic_held.json`, and step 5 is run again. Then
+   `python Tools/Content/urdu_proofread/verify_arabic.py <commit before>` and
    `python Tools/ContentIntegrity/check_content.py` - both must pass.
 7. `python Tools/Content/urdu_proofread/spread.py` - copies the three files and `manifest.json` to Android
    (`app/src/main/assets/seed`) and the desktop (`content`), byte for byte.
 
 ## What is never changed
 
-- `quran_ayahs.json`, and the Qur'an's Arabic wherever it is quoted: a finding
-  that touches it is refused (`protected` in the ledger) however sure the
-  reader is. So is a mark or number that closes a line of Arabic.
+- `quran_ayahs.json`, ever; and Arabic wherever it is quoted, except the
+  findings the owner approved one by one (`arabic_approved.json`). A new slip
+  in Arabic is written to `arabic-awaiting-approval.json` and left as printed
+  until the owner has seen it and approved it. An earlier approval of similar
+  slips is not an approval of this one.
 - The wording of the author where the printed book reads as the app does. Such
   findings are held for the owner (`HELD.csv`).
 

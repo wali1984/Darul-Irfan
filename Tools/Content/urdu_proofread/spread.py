@@ -2,9 +2,9 @@
 
     python Tools/Content/urdu_proofread/spread.py
 
-The three files `apply_proofread.py` writes, and `manifest.json`, go to the
-Android checkout beside this one (`pw/a-proof`) and to the desktop checkout
-(`DarulIrfanDesktop-proof`). Afterwards the three folders are compared.
+Every seed file that differs goes to the Android checkout beside this one
+(`pw/a-proof`) and to the desktop checkout (`DarulIrfanDesktop-proof`).
+Afterwards the three folders are compared.
 """
 
 from __future__ import annotations
@@ -30,11 +30,17 @@ def main() -> int:
         if not folder.is_dir():
             print(f"{platform}: {folder} is not there")
             return 1
-        for name in FILES:
+        # Every seed file both sides have, wherever the bytes differ; the four
+        # the proofreading writes are copied even where the other side lacks them.
+        names = sorted({path.name for path in source.iterdir() if path.is_file() and (folder / path.name).exists()} | set(FILES))
+        for name in names:
             data = (source / name).read_bytes()
             if not (folder / name).exists() or (folder / name).read_bytes() != data:
                 (folder / name).write_bytes(data)
                 print(f"{platform}: {name} copied")
+        missing = sorted(path.name for path in source.iterdir() if path.is_file() and not (folder / path.name).exists())
+        if missing:
+            print(f"{platform}: does not carry {missing}")
     # Every seed file the platforms share must be the same bytes, not only the four.
     different = []
     for path in sorted(source.iterdir()):

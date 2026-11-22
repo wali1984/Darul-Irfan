@@ -26,11 +26,10 @@ What is applied
 Arabic
 
   * `quran_ayahs.json` is never touched, and is the measure for the rest.
-  * A slip inside a quotation from the Qur'an (a wrong or missing letter,
-    words run together, a quotation typed in bare and faulty letters) is put
-    right by writing the quotation as the mushaf writes it - the owner's
-    decision of 21 November 2026. A slip in other Arabic takes the reader's
-    small fix. Each is listed in `arabic_typos.json`.
+  * Arabic quoted in the books changes only where the owner approved that
+    very finding (`arabic_approved.json`: the 45 shown and approved on 21
+    November 2026, a Qur'an quotation in them as the mushaf writes it). A new
+    slip is listed for approval (arabic-awaiting-approval.json) and left.
   * Any other change to Arabic is refused. A change counts as touching Arabic
     when it alters a word that
     belongs to a run of three or more words found in the mushaf
@@ -82,6 +81,22 @@ OUT = Path(os.environ.get("DI_PROOFREAD_OUT", WORKSPACE / "outputs" / "darul-urd
 # The commit whose book_pages.json the register is anchored to.
 BASE = "3ae7029"
 BASE_SHA256 = "43ef075d7223ed847fc8512734b9013a536b7ef28276827a0ec8135b8247bda6"
+
+# The changes to Arabic the owner approved, each by its finding. The rule is
+# the list: a new slip is never mended because an old one like it was approved.
+APPROVED = {entry["id"]: entry for entry in json.loads((HERE / "arabic_approved.json").read_text(encoding="utf-8"))}
+AWAITING: dict[str, dict] = {}
+# Findings read as a change to Arabic that the rules cannot see (scan_arabic.py
+# lists the candidates): they wait for the owner like the others.
+READ_AS_ARABIC = json.loads((HERE / "arabic_held.json").read_text(encoding="utf-8"))
+
+
+def await_owner(finding: dict, how: str, put: str) -> None:
+    AWAITING.setdefault(finding["id"], {"id": finding["id"], "book": finding.get("bookID"), "page": finding.get("page"),
+                                        "how": how, "was": finding["original"], "now": put})
+
+# What every page's reviewState says in the seed that is written.
+PAGE_STATE = "final"
 
 SURE = {"high"}
 FORM_ONLY_OK = {"editorial", "medium", "probable"}
@@ -185,6 +200,7 @@ WORDING = (
     "missing_word", "missing_particle", "missing_postposition", "missing_link", "extra_word", "intrusive",
     "relative", "pronoun", "possessive", "oblique", "postposition", "case_", "name", "label", "title", "plural",
     "syntax", "duplicat", "repetition", "word_omission", "editorial", "copyedit", "source", "reading",
+    "reference", "narrator",
     "نحو", "مطابقت", "تذکیر", "واحد", "فعل", "اضافت", "اصل", "لفظ", "ترکیب", "حرفِ",
 )
 
@@ -348,6 +364,11 @@ def classify(finding: dict, decisions: dict) -> tuple[str, str | None, str]:
     """(verdict, replacement, why). Verdict is `apply`, `hold` or `review`."""
     decision = decisions.get(finding["id"])
     suggested = finding.get("suggested")
+    if finding["id"] in APPROVED:
+        return "arabic", suggested, "approved by the owner"
+    if finding["id"] in READ_AS_ARABIC and suggested:
+        await_owner(finding, READ_AS_ARABIC[finding["id"]], suggested)
+        return "hold", None, "Arabic quotation: waiting for the owner's approval"
     if (suggested and finding["confidence"] in SURE and oblique_only(finding["original"], suggested)
             and not (decision or {}).get("firm")):
         # "واقعہ سے" and "واقعے سے" are one spoken word written two ways; the
@@ -500,6 +521,19 @@ def remap_entries(entries: list[dict], old: str, new: str, edits: list[Edit]) ->
 AYAH_SIGNS = re.compile("[۝۞؀-؅ۖ-ۭ﴾﴿0-9۰-۹٠-٩-①-⑳]")
 
 
+def completes_ayah_words(mushaf: "Mushaf", text: str, start: int, end: int, put: str) -> bool:
+    """The change makes three words of the mushaf where there were none: a
+    quotation typed bare, whose slip hid it from the shield."""
+    if skeleton_words(text[start:end]) == skeleton_words(put):
+        return False
+    left = text[max(0, start - 70):start]
+    new = left + put + text[end:end + 70]
+    words = [(s, e, skeleton(t)) for s, e, t in tokens(new) if is_word_char(t[0]) and skeleton(t)]
+    changed = {i for i, (s, e, _) in enumerate(words) if s < len(left) + len(put) and len(left) < e}
+    return any(changed & {i, i + 1, i + 2} and (words[i][2], words[i + 1][2], words[i + 2][2]) in mushaf.trigrams
+               for i in range(len(words) - 2))
+
+
 class Shield:
     """What must not be touched in one text."""
 
@@ -512,13 +546,27 @@ class Shield:
         # Every word of the text, and whether it is one of the protected ones.
         self.all_words = [(s, e, (s, e) in held) for s, e, t in tokens(text) if is_word_char(t[0])]
         self.closed: list[tuple[int, int]] = []
+        self.arabic: list[tuple[int, int]] = []
+        if layout:
+            bounds = block_bounds(text)
+            if len(bounds) == len(layout):
+                self.arabic = [bound for bound, kind in zip(bounds, layout) if kind == "a"]
         if layout and skip_kinds:
             bounds = block_bounds(text)
             if len(bounds) == len(layout):
                 self.closed = [bound for bound, kind in zip(bounds, layout) if kind in skip_kinds]
 
-    def refuses(self, start: int, end: int) -> str | None:
+    def refuses(self, start: int, end: int, replacement: str = "") -> str | None:
         text = self.text
+        touched = text[start:end] + replacement
+        if AYAH_SIGNS.search(touched) and not re.search(f"[{LETTER}]", touched):
+            left, right = start, end
+            while left > 0 and text[left - 1] in " \t":
+                left -= 1
+            while right < len(text) and text[right] in " \t":
+                right += 1
+            if left in self.ends or right in self.begins:
+                return "belongs to a line of Arabic (an ayah's sign or number beside it)"
         for s, e, _ in self.words:
             if start < e and s < end:
                 return "touches the Qur'an's or other vowelled Arabic"
@@ -539,6 +587,9 @@ class Shield:
             if left and left[2] and (right is None or right[2]):
                 return "belongs to a line of Arabic (the mark or number that closes it)"
         return None
+
+    def in_arabic_block(self, start: int, end: int) -> bool:
+        return any(s <= start and end <= e for s, e in self.arabic)
 
     def is_closed(self, start: int, end: int) -> bool:
         return any(s <= start and end <= e for s, e in self.closed)
@@ -872,7 +923,24 @@ def skeleton_words(text: str) -> str:
 
 
 def arabic_fix(finding: dict, text: str, at: int, quotations: Quotations, decided: bool = False) -> tuple[str | None, str]:
-    """What to put for a finding the shield refused or the reader filed as
+    """What to put where a finding would change Arabic: only what the owner
+    approved for that very finding. Anything else that looks like a slip is
+    put on the list for approval (arabic-awaiting-approval.json) and left."""
+    fid = finding.get("id")
+    approved = APPROVED.get(fid)
+    if approved is not None and approved["was"] == finding["original"]:
+        return approved["now"], approved["how"]
+    put, how = arabic_proposal(finding, text, at, quotations, decided)
+    if put is None:
+        return None, how
+    if fid:
+        AWAITING[fid] = {"id": fid, "book": finding.get("bookID"), "page": finding.get("page"), "how": how,
+                         "was": finding["original"], "now": put}
+    return None, "waiting for the owner's approval"
+
+
+def arabic_proposal(finding: dict, text: str, at: int, quotations: Quotations, decided: bool = False) -> tuple[str | None, str]:
+    """What could be put for a finding the shield refused or the reader filed as
     Arabic: (replacement, how), or (None, why it stays as it is)."""
     original, proposed = finding["original"], finding.get("suggested")
     if not proposed or any(word in proposed and word not in original for word in NOTE_WORDS):
@@ -1024,7 +1092,17 @@ def build(write: bool) -> int:
             for at in item["places"]:
                 placed = [(at + s, at + e, r) for s, e, r in atoms]
                 mends, how, put = item["mends"], item["how"], item["replacement"]
-                why_not = None if mends else next((w for w in (shield.refuses(s, e) for s, e, _ in placed) if w), None)
+                why_not = None if mends else next((w for w in (shield.refuses(s, e, r) for s, e, r in placed) if w), None)
+                if not mends:
+                    unseen = None
+                    if any(shield.in_arabic_block(s, e) for s, e, _ in placed):
+                        unseen = "inside a block of Arabic"
+                    elif any(completes_ayah_words(mushaf, text, s, e, r) for s, e, r in placed):
+                        unseen = "words of the Qur'an, typed bare"
+                    if unseen:
+                        await_owner(item["finding"], unseen, put)
+                        notes.append(f"Arabic: {unseen} (waiting for the owner's approval)")
+                        continue
                 if why_not:
                     # Arabic stands in the way. A slip in it may be put right
                     # (the Qur'an's as the mushaf has it); anything else is refused.
@@ -1118,6 +1196,12 @@ def build(write: bool) -> int:
             row["text"], row["layout"] = text, layout
             headings_moved[row["bookID"]].update(moved_here)
 
+    # No page says how its text was made (the owner, 21 November 2026). The two
+    # keys stay because the phones' importers require them; the values are plain.
+    for row in pages:
+        row["reviewState"] = PAGE_STATE
+        row["validator"] = ""
+
     changed_pages = 0
     for row in pages:
         key = (row["bookID"], row["page"])
@@ -1149,6 +1233,8 @@ def build(write: bool) -> int:
         "bookLinksRemapped": links_changed,
         "bookLinksNotOnTheirPage": len(lost),
         "arabicSlipsMended": len(arabic_log),
+        "arabicFindingsMended": len({entry["id"] for entry in arabic_log}),
+        "arabicAwaitingApproval": len(AWAITING),
         "tafsir": tafsir_summary,
         "written": write,
     }
@@ -1158,6 +1244,8 @@ def build(write: bool) -> int:
     review = [dict(finding, ledger=ledger[finding["id"]]) for finding in findings
               if ledger[finding["id"]]["status"] != "applied"]
     (OUT / "not-applied.json").write_text(json.dumps(review, ensure_ascii=False, indent=1), encoding="utf-8")
+    (OUT / "arabic-awaiting-approval.json").write_text(
+        json.dumps(sorted(AWAITING.values(), key=lambda entry: entry["id"]), ensure_ascii=False, indent=1), encoding="utf-8")
     (OUT / "links-lost.json").write_text(json.dumps(lost, ensure_ascii=False, indent=1), encoding="utf-8")
     # Kept in the repository: verify_arabic.py allows exactly these words to have changed.
     (HERE / "arabic_typos.json").write_text(json.dumps(sorted(arabic_log, key=lambda entry: entry["id"]), ensure_ascii=False, indent=1) + "\n",
@@ -1181,6 +1269,11 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headin
     row_edits: dict[int, set[Edit]] = defaultdict(set)
     row_mended: dict[int, set[Edit]] = defaultdict(set)
     carried = missing = unsure = 0
+    holding: dict[str, dict[str, set[int]]] = {edition: defaultdict(set) for _, _, edition in TAFSIR}
+    for edition, index in holding.items():
+        for n, row in enumerate(by_edition[edition]):
+            for word in set(row["text"].split()):
+                index[word].add(n)
     for (book, page), edits in sorted(finding_edits.items()):
         target = next(((edition, book[len(prefix):len(book) - len(suffix)] if suffix else None)
                        for prefix, suffix, edition in TAFSIR
@@ -1202,7 +1295,16 @@ def carry_to_tafsir(base_text: dict, finding_edits: dict, mushaf: Mushaf, headin
             for reach in (32, 16, 8):
                 a, b = max(0, lo - reach), min(len(text), hi + reach)
                 window = text[a:b]
-                hits = [(row, at) for row in pool for at in occurrences(row["text"], window)]
+                # A word wholly inside the window is a whole word of any passage holding the window.
+                inner = window.split()[1:-1]
+                if inner:
+                    sets = sorted((holding[edition].get(word, set()) for word in set(inner)), key=len)[:6]
+                    candidates = [by_edition[edition][n] for n in sorted(set.intersection(*(set(x) for x in sets)))]
+                    if surah is not None:
+                        candidates = [row for row in candidates if str(row["surahNumber"]) == surah]
+                else:
+                    candidates = pool
+                hits = [(row, at) for row in candidates for at in occurrences(row["text"], window)]
                 if not hits:
                     continue
                 if len(hits) > 1 and reach < 32:

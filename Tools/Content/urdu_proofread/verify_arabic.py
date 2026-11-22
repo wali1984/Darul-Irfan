@@ -89,6 +89,11 @@ def main() -> int:
                 print(f"{name}: rows are no longer in the same order at {key(a)}")
                 return 1
             other = {k for k in set(a) | set(b) if k not in ("text", "layout", "blocks") and a.get(k) != b.get(k)}
+            # A page's two stamps may become the plain values, and only those.
+            if b.get("reviewState") == "final":
+                other.discard("reviewState")
+            if b.get("validator") == "":
+                other.discard("validator")
             if other:
                 problems += 1
                 print(f"{name} {key(a)}: {sorted(other)} changed")
