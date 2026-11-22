@@ -100,6 +100,13 @@ struct BookReaderView: View {
                 requestedPage = page
                 session?.requestedPage = nil
             }
+            // One asked for before these pages opened, as from a page with
+            // no text, is not a change and is taken here.
+            .onAppear {
+                guard let page = session?.requestedPage else { return }
+                requestedPage = page
+                session?.requestedPage = nil
+            }
             .task { await prepare() }
     }
 
@@ -313,7 +320,9 @@ private struct PDFReaderKit: UIViewRepresentable {
         zoom.view = view
         let count = document.pageCount
         DispatchQueue.main.async { pageCount = count }
-        if startPage > 1, let page = document.page(at: min(startPage, count) - 1) {
+        // A page already asked for wins over the place these pages were left.
+        let first = requestedPage ?? startPage
+        if first > 1, let page = document.page(at: min(first, count) - 1) {
             DispatchQueue.main.async { view.go(to: page) }
         }
         NotificationCenter.default.addObserver(

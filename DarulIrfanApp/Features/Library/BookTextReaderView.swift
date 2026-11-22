@@ -21,6 +21,8 @@ import SwiftUI
 /// narrator, those words open the ayah, the narration or the biography over
 /// the page (`BookLinks.swift`).
 ///
+/// A page number with no text keeps its place as a slim card that says so.
+///
 /// The page at the top of the screen is kept, so the book reopens there.
 ///
 /// Each page is set on a softly lit sheet of paper (a warm dark page at
@@ -42,8 +44,12 @@ struct BookTextPagesView: View {
     /// Lets a reference in the text open over the page; nil leaves the text
     /// plain.
     var appState: AppState? = nil
+    /// Turns the reader to one of the book's printed pages; nil where it has
+    /// none to show.
+    var onShowPrintedPage: ((Int) -> Void)? = nil
 
-    @State private var pages: [BookPage] = []
+    /// The pages with text and, between them, those with none.
+    @State private var entries: [BookTextEntry] = []
     /// Pages set out into headings, paragraphs, poetry and quotations.
     @State private var formatted: [String: BookPageFormatter.Page] = [:]
     @State private var isLoading = true
@@ -63,7 +69,7 @@ struct BookTextPagesView: View {
 
     var body: some View {
         Group {
-            if isLoading && pages.isEmpty {
+            if isLoading && entries.isEmpty {
                 ProgressView()
                     .tint(DIColor.primary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -74,7 +80,7 @@ struct BookTextPagesView: View {
                     Button("Try Again") { loadAttempt += 1 }
                         .buttonStyle(DICompactButtonStyle())
                 }
-            } else if pages.isEmpty {
+            } else if entries.isEmpty {
                 if session != nil && BookReadingHistory.hasPDF(item) {
                     // The reader is turning to the printed pages.
                     ProgressView()
@@ -87,9 +93,9 @@ struct BookTextPagesView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(alignment: .leading, spacing: DISpacing.lg) {
-                            ForEach(pages, id: \.page) { page in
-                                pageView(page)
-                                    .id(page.page)
+                            ForEach(entries) { entry in
+                                entryView(entry)
+                                    .id(entry.id)
                             }
                         }
                         .scrollTargetLayout()
@@ -104,11 +110,10 @@ struct BookTextPagesView: View {
                     }
                     .onChange(of: pendingPage) { _, requested in
                         guard let requested else { return }
-                        // Scans skip blank pages: the nearest page at or after.
-                        if let target = pages.first(where: { $0.page >= requested }) ?? pages.last {
-                            proxy.scrollTo(target.page, anchor: .top)
-                            BookReadingPosition.save(page: target.page, bookID: item.id)
-                            session?.currentPage = target.page
+                        if let target = BookTextEntry.holding(requested, in: entries) {
+                            proxy.scrollTo(target.id, anchor: .top)
+                            BookReadingPosition.save(page: target.id, bookID: item.id)
+                            session?.currentPage = target.id
                         }
                         pendingPage = nil
                     }
@@ -121,7 +126,7 @@ struct BookTextPagesView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             // In the reader, its floating bar carries Go to page.
-            if session == nil && pages.count > 1 {
+            if session == nil && entries.count > 1 {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showsGoToPage = true
@@ -142,14 +147,14 @@ struct BookTextPagesView: View {
             }
             Button("Cancel", role: .cancel) { goToPageText = "" }
         } message: {
-            if let first = pages.first?.page, let last = pages.last?.page {
+            if let first = entries.first?.id, let last = entries.last?.lastPage {
                 Text("Pages \(first) to \(last)")
             }
         }
         // A page the reader's bars asked for, once the pages are here; one
         // asked for before they load is taken by `scrollToStartIfNeeded`.
         .onChange(of: session?.requestedPage) { _, requested in
-            guard let requested, !pages.isEmpty else { return }
+            guard let requested, !entries.isEmpty else { return }
             pendingPage = requested
             session?.requestedPage = nil
         }
@@ -174,6 +179,16 @@ struct BookTextPagesView: View {
                     NarratorBioSheet(narratorId: id, repository: dependencies.hadithRepository, appState: appState)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func entryView(_ entry: BookTextEntry) -> some View {
+        switch entry {
+        case .page(let page):
+            pageView(page)
+        case .noText(let numbers):
+            BookNoTextCard(pages: numbers, onShowPrintedPage: onShowPrintedPage)
         }
     }
 
@@ -232,17 +247,15 @@ struct BookTextPagesView: View {
     /// Opens at the page asked for (by the reader's bars or search, or by
     /// whoever opened the book), else where the reader left the book.
     private func scrollToStartIfNeeded(_ proxy: ScrollViewProxy) {
-        guard !hasScrolledToStart, !pages.isEmpty else { return }
+        guard !hasScrolledToStart, !entries.isEmpty else { return }
         let requested = session?.requestedPage
         guard let wanted = requested ?? startPage ?? BookReadingPosition.page(bookID: item.id) else { return }
         hasScrolledToStart = true
         if requested != nil { session?.requestedPage = nil }
-        // The nearest page at or after the requested one: scans skip blank
-        // pages, so the exact number is not always present.
-        guard let target = pages.first(where: { $0.page >= wanted }) ?? pages.last else { return }
-        session?.currentPage = target.page
+        guard let target = BookTextEntry.holding(wanted, in: entries) else { return }
+        session?.currentPage = target.id
         DispatchQueue.main.async {
-            proxy.scrollTo(target.page, anchor: .top)
+            proxy.scrollTo(target.id, anchor: .top)
         }
     }
 
@@ -268,20 +281,21 @@ struct BookTextPagesView: View {
             }.value
             try Task.checkCancellation()
             // A sentence cut by the page break is shown whole on the earlier
-            // page: its words keep their links there.
+            // page: its words keep their links there. None crosses a page
+            // that has no text.
             var byPage = found
             let numbers = loaded.filter { !$0.text.isEmpty }.map(\.page)
-            for (index, number) in numbers.enumerated() where index + 1 < numbers.count {
-                if let carried = found[numbers[index + 1]] {
+            for (number, next) in zip(numbers, numbers.dropFirst()) where number + 1 == next {
+                if let carried = found[next] {
                     byPage[number, default: []] += carried
                 }
             }
             links = byPage
             formatted = prepared
-            pages = loaded.filter { !$0.text.isEmpty }
-            session?.pageNumbers = pages.map(\.page)
-            session?.hasNoPages = pages.isEmpty
-            if let first = pages.first?.page { session?.currentPage = first }
+            entries = BookTextEntry.entries(of: loaded)
+            session?.pageNumbers = entries.map(\.id)
+            session?.hasNoPages = entries.isEmpty
+            if let first = entries.first?.id { session?.currentPage = first }
         } catch is CancellationError {
             return
         } catch {
@@ -290,6 +304,84 @@ struct BookTextPagesView: View {
         }
     }
 
+}
+
+/// One place in a book's text: a page with its words, or neighbouring page
+/// numbers that have none (an empty page, or no page at all).
+enum BookTextEntry: Identifiable, Equatable {
+    case page(BookPage)
+    case noText(ClosedRange<Int>)
+
+    /// The first page number it stands for.
+    var id: Int {
+        switch self {
+        case .page(let page): return page.page
+        case .noText(let numbers): return numbers.lowerBound
+        }
+    }
+
+    var lastPage: Int {
+        switch self {
+        case .page(let page): return page.page
+        case .noText(let numbers): return numbers.upperBound
+        }
+    }
+
+    /// Every page number from 1 to the book's last, in order. Empty for a
+    /// book with no text at all, which opens as its printed pages.
+    static func entries(of pages: [BookPage]) -> [BookTextEntry] {
+        let written = pages.filter { !$0.text.isEmpty }.sorted { $0.page < $1.page }
+        guard !written.isEmpty, let last = pages.map(\.page).max() else { return [] }
+        var entries: [BookTextEntry] = []
+        var next = 1
+        for page in written {
+            if page.page > next { entries.append(.noText(next...(page.page - 1))) }
+            entries.append(.page(page))
+            next = page.page + 1
+        }
+        if next <= last { entries.append(.noText(next...last)) }
+        return entries
+    }
+
+    /// The place that holds `number`, else the last one.
+    static func holding(_ number: Int, in entries: [BookTextEntry]) -> BookTextEntry? {
+        entries.first { $0.lastPage >= number } ?? entries.last
+    }
+}
+
+/// The slim card that stands for pages without text, with the way to the
+/// printed page where the book has one.
+private struct BookNoTextCard: View {
+    let pages: ClosedRange<Int>
+    var onShowPrintedPage: ((Int) -> Void)?
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
+        VStack(alignment: .leading, spacing: DISpacing.xs) {
+            number
+                .diInterfaceFont(.footnote, weight: .heavy)
+                .foregroundStyle(ReadPalette.goldLine)
+            Text("This page has no text.")
+                .diInterfaceFont(.footnote)
+                .foregroundStyle(DIColor.textMuted)
+            if let onShowPrintedPage {
+                Button("See the printed page") { onShowPrintedPage(pages.lowerBound) }
+                    .buttonStyle(DICompactButtonStyle())
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 22)
+        .padding(.vertical, DISpacing.sm)
+        .background(shape.fill(ReadPalette.paper))
+        .overlay(shape.stroke(ReadPalette.paperEdge, lineWidth: 1))
+    }
+
+    private var number: Text {
+        if pages.count == 1 {
+            return Text("Page \(pages.lowerBound)")
+        }
+        return Text("Pages \(pages.lowerBound)–\(pages.upperBound)")
+    }
 }
 
 /// Reads a book's text in the app's one reader, at a page when one is given.

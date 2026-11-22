@@ -1,6 +1,57 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Pages %lld–%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pages %1$lld–%2$lld"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صفحات \u2066%1$lld–%2$lld\u2069"
+          }
+        }
+      }
+    },
+    "This page has no text.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This page has no text."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس صفحے پر متن نہیں۔"
+          }
+        }
+      }
+    },
+    "See the printed page": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See the printed page"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطبوعہ صفحہ دیکھیں"
+          }
+        }
+      }
+    },
     "Playing Bayan": {
       "extractionState": "manual",
       "localizations": {

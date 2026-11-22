@@ -312,7 +312,8 @@ struct BookReaderScreen: View {
                     startPage: startPage,
                     fontScale: scale,
                     session: text,
-                    appState: appState
+                    appState: appState,
+                    onShowPrintedPage: printedPageAction
                 )
                 .modifier(BookReaderLayer(isActive: mode == .text))
             }
@@ -639,6 +640,18 @@ struct BookReaderScreen: View {
         if session.pageNumbers.contains(page) {
             session.currentPage = page
         }
+    }
+
+    /// Offered on a page with no text, where the book has printed pages.
+    private var printedPageAction: ((Int) -> Void)? {
+        guard hasPDF else { return nil }
+        return { page in showPrintedPage(page) }
+    }
+
+    /// The printed pages, at the page that has no text.
+    private func showPrintedPage(_ page: Int) {
+        pdf.requestedPage = page
+        choose(.pages)
     }
 
     /// A result of search in the book: the text, at that page.

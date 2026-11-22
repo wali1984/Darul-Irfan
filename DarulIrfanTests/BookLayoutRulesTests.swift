@@ -9,7 +9,9 @@ final class BookLayoutRulesTests: XCTestCase {
     private static let books: Set<String> = [
         "asrar-10-en",
         "book-hayyat-e-tayyabah-i",
+        "book-ocr-gard-e-safar",
         "book-ocr-hamd-o-naat",
+        "book-ocr-pardah",
         "book-ocr-sai-hafta-course",
         "tafaseer-parah-1",
         "uploads-books-maktobaat",
@@ -129,6 +131,46 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertEqual(
             BookTextDrawing.isolatingNumbers(["آیت ", "3 : 1", "64 ہے"]),
             ["آیت ", "\u{2066}3 : 1", "64\u{2069} ہے"]
+        )
+    }
+
+    // MARK: - Pages without text
+
+    func testAnEmptyPageAndAMissingPageEachKeepACard() throws {
+        let pardah = BookTextEntry.entries(of: pages("book-ocr-pardah"))
+        XCTAssertEqual(pardah.first, .noText(1...1))
+        XCTAssertEqual(pardah.dropFirst().first?.id, 2)
+
+        let safar = BookTextEntry.entries(of: pages("book-ocr-gard-e-safar"))
+        XCTAssertEqual(BookTextEntry.holding(6, in: safar), .noText(6...6))
+        XCTAssertEqual(BookTextEntry.holding(7, in: safar)?.id, 7)
+    }
+
+    func testNeighboursShareACardAndABookWithoutTextHasNone() {
+        func blank(_ number: Int, _ text: String = "") -> BookPage {
+            BookPage(bookID: "b", page: number, text: text, blocks: 0, unresolvedBlocks: 0)
+        }
+        let book = [blank(2), blank(3, "متن"), blank(6, "متن"), blank(8)]
+        XCTAssertEqual(
+            BookTextEntry.entries(of: book),
+            [.noText(1...2), .page(book[1]), .noText(4...5), .page(book[2]), .noText(7...8)]
+        )
+        XCTAssertEqual(BookTextEntry.entries(of: [blank(1), blank(2)]), [])
+    }
+
+    func testNoSentenceCrossesAPageWithoutText() throws {
+        let safar = pages("book-ocr-gard-e-safar")
+        let before = try page("book-ocr-gard-e-safar", 5)
+        let after = try page("book-ocr-gard-e-safar", 7)
+        let together = BookPageFormatter.format(pages: safar)
+        // Nothing is added to the page before the card from the page after it.
+        XCTAssertEqual(
+            together[before.id]?.blocks.last,
+            BookPageFormatter.format(page: before).blocks.last
+        )
+        XCTAssertEqual(
+            together[after.id]?.blocks.first,
+            BookPageFormatter.format(page: after).blocks.first
         )
     }
 
