@@ -4280,19 +4280,19 @@
         }
       }
     },
-    "%@, p. %lld": {
+    "%@, p. %@": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@, p. %2$lld"
+            "value": "%1$@, p. %2$@"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@، صفحہ %2$lld"
+            "value": "%1$@، صفحہ %2$@"
           }
         }
       }

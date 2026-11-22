@@ -70,8 +70,8 @@ final class SearchReferenceTests: XCTestCase {
             title: work + SearchResult.pageSeparator + String(localized: "Page \(1200)")
         )
         XCTAssertEqual(result.workTitle, work, "Only the page is taken off, not a dash in the title")
-        XCTAssertEqual(reference(result), String(localized: "\(work), p. \(1200)", locale: locale))
-        XCTAssertTrue(reference(result).contains("1200"))
+        XCTAssertEqual(reference(result), String(localized: "\(work), p. \(String(1200))", locale: locale))
+        XCTAssertTrue(reference(result).contains("1200"), "A page number is not grouped")
         XCTAssertFalse(reference(result).contains("book-ocr"))
     }
 

@@ -46,7 +46,7 @@ enum SearchReference {
     /// - Parameters:
     ///   - lecture: The catalogue entry of a media hit, for its speaker and day.
     ///   - event: The programme of an events hit, for its days and venue.
-    ///   - locale: Writes the numbers and the days.
+    ///   - locale: Writes the days.
     static func text(for result: SearchResult, lecture: MediaItem?, event: CommunityEvent?, locale: Locale) -> String {
         var parts: [String] = [result.title]
         switch result.domain {
@@ -60,7 +60,8 @@ enum SearchReference {
         case .library:
             // A work's title is its reference; a page of its text adds the page.
             if let page = result.bookPage {
-                parts = [String(localized: "\(result.workTitle), p. \(page.page)", locale: locale)]
+                // As text: a number would be grouped ("1,200"), and a page is not.
+                parts = [String(localized: "\(result.workTitle), p. \(String(page.page))", locale: locale)]
             }
         case .media:
             if let speaker = lecture?.speaker, !speaker.isEmpty {
