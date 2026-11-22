@@ -407,12 +407,12 @@ struct FormattedBookPage: View {
             if page.isContents {
                 DisclosureGroup(isExpanded: $showsContents) {
                     if let text = contentsText {
-                        words(text, urduSize: 0.85)
+                        words(shown(text, rightToLeft: true), urduSize: 0.85)
                             .font(DIFont.urduBody(scale: 0.85 * scale))
                             .foregroundStyle(DIColor.textMuted)
                             .lineSpacing(6)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
+                            .modifier(selection(text, rightToLeft: true))
                     } else {
                         blockList
                     }
@@ -461,7 +461,7 @@ struct FormattedBookPage: View {
         case .paragraph(let runs):
             paragraph(runs)
         case .quran(let text):
-            linkedText(text, mushafScale: 0.8 * scale)
+            linkedText(text, rightToLeft: true, mushafScale: 0.8 * scale)
                 .foregroundStyle(DIColor.scripture)
                 .lineSpacing(8)
                 .multilineTextAlignment(.center)
@@ -471,7 +471,7 @@ struct FormattedBookPage: View {
                     RoundedRectangle(cornerRadius: DIRadius.md, style: .continuous)
                         .fill(DIColor.primary.opacity(0.07))
                 )
-                .textSelection(.enabled)
+                .modifier(selection(text, rightToLeft: true))
         case .arabic(let text):
             arabicQuotation(text)
         case .verse(let text):
@@ -485,7 +485,7 @@ struct FormattedBookPage: View {
 
     private func heading(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return words(text, urduSize: rightToLeft ? 1.1 : nil)
+        return words(shown(text, rightToLeft: rightToLeft), urduSize: rightToLeft ? 1.1 : nil)
             .font(face(rightToLeft, size: 1.1).weight(.semibold))
             .foregroundStyle(DIColor.actionForeground)
             .multilineTextAlignment(.leading)
@@ -495,7 +495,8 @@ struct FormattedBookPage: View {
     }
 
     private func paragraph(_ runs: [BookPageFormatter.Run]) -> some View {
-        let rightToLeft = isRightToLeft(plainText(runs))
+        let plain = plainText(runs)
+        let rightToLeft = isRightToLeft(plain)
         return prose(runs)
             .font(face(rightToLeft))
             .foregroundStyle(DIColor.textPrimary)
@@ -503,34 +504,34 @@ struct FormattedBookPage: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
-            .textSelection(.enabled)
+            .modifier(selection(plain, rightToLeft: rightToLeft))
     }
 
     /// Arabic the mushaf does not confirm - a hadith, a du'a, a saying - set
     /// apart in the Arabic face, without the Qur'an's colour and panel.
     private func arabicQuotation(_ text: String) -> some View {
-        linkedText(text, mushafScale: 0.75 * scale)
+        linkedText(text, rightToLeft: true, mushafScale: 0.75 * scale)
             .foregroundStyle(DIColor.scripture)
             .lineSpacing(CGFloat(8 * scale))
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .padding(.vertical, DISpacing.xs)
             .environment(\.layoutDirection, .rightToLeft)
-            .textSelection(.enabled)
+            .modifier(selection(text, rightToLeft: true))
     }
 
     /// A couplet or stanza: each printed line on a line of its own, centred
     /// as Urdu books set their verse.
     private func verse(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return keepingWaqfMarks(text, urduSize: rightToLeft ? 1 : nil)
+        return keepingWaqfMarks(shown(text, rightToLeft: rightToLeft), urduSize: rightToLeft ? 1 : nil)
             .font(face(rightToLeft))
             .foregroundStyle(DIColor.textPrimary)
             .lineSpacing(CGFloat((rightToLeft ? 12 : 6) * scale))
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
-            .textSelection(.enabled)
+            .modifier(selection(text, rightToLeft: rightToLeft))
     }
 
     /// Words the reading could not make out are shown as "…"; a page with
@@ -569,21 +570,24 @@ struct FormattedBookPage: View {
                 }
                 Group {
                     if BookPageFormatter.isSectionRow(row, columns: columns) {
-                        words(row.first { !$0.isEmpty } ?? "", urduSize: rightToLeft ? 0.9 : nil)
+                        let name = row.first { !$0.isEmpty } ?? ""
+                        words(shown(name, rightToLeft: rightToLeft), urduSize: rightToLeft ? 0.9 : nil)
                             .font(face(rightToLeft, size: 0.9))
                             .fontWeight(.semibold)
                             .foregroundStyle(DIColor.primary)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .modifier(selection(name, rightToLeft: rightToLeft))
                     } else {
                         WeightedColumns(weights: layout.weights, spacing: DISpacing.sm) {
                             ForEach(0..<columns, id: \.self) { column in
                                 let cell = column < row.count ? row[column] : ""
-                                words(cell, urduSize: rightToLeft ? 0.85 : nil)
+                                words(shown(cell, rightToLeft: rightToLeft), urduSize: rightToLeft ? 0.85 : nil)
                                     .font(face(rightToLeft, size: 0.85))
                                     .fontWeight(index == 0 && layout.hasHeaderRow ? .semibold : .regular)
                                     .foregroundStyle(index == 0 && layout.hasHeaderRow ? DIColor.textMuted : DIColor.textPrimary)
                                     .multilineTextAlignment(.leading)
                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                    .modifier(selection(cell, rightToLeft: rightToLeft))
                             }
                         }
                     }
@@ -597,18 +601,17 @@ struct FormattedBookPage: View {
                 .fill(DIColor.sandstone)
         )
         .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
-        .textSelection(.enabled)
     }
 
     private func caption(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return words(text, urduSize: rightToLeft ? 0.8 : nil)
+        return words(shown(text, rightToLeft: rightToLeft), urduSize: rightToLeft ? 0.8 : nil)
             .font(face(rightToLeft, size: 0.8))
             .foregroundStyle(DIColor.textMuted)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
-            .textSelection(.enabled)
+            .modifier(selection(text, rightToLeft: rightToLeft))
     }
 
     /// The page's footnotes after its text, small, under a short rule as a
@@ -628,14 +631,32 @@ struct FormattedBookPage: View {
 
     private func footnote(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return linkedText(text, urduSize: rightToLeft ? 0.8 : nil)
+        return linkedText(text, rightToLeft: rightToLeft, urduSize: rightToLeft ? 0.8 : nil)
             .font(face(rightToLeft, size: 0.8))
             .foregroundStyle(DIColor.textMuted)
             .lineSpacing(CGFloat((rightToLeft ? 6 : 3) * scale))
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
-            .textSelection(.enabled)
+            .modifier(selection(text, rightToLeft: rightToLeft))
+    }
+
+    /// A stretch as it is drawn: in a right-to-left block of a book or an
+    /// article, its dates, telephone numbers and references in isolates.
+    private func shown(_ pieces: [String], rightToLeft: Bool) -> [String] {
+        guard rightToLeft, place.followsBookRules else { return pieces }
+        return BookTextDrawing.isolatingNumbers(pieces)
+    }
+
+    private func shown(_ text: String, rightToLeft: Bool) -> String {
+        shown([text], rightToLeft: rightToLeft).joined()
+    }
+
+    private func selection(_ text: String, rightToLeft: Bool) -> BookTextSelection {
+        BookTextSelection(
+            text: text,
+            isIsolated: rightToLeft && place.followsBookRules && !BookTextDrawing.numberTokens(in: text).isEmpty
+        )
     }
 
     /// Words in a block's own face. In the Urdu face, `urduSize` times the
@@ -688,18 +709,18 @@ struct FormattedBookPage: View {
 
     /// A quotation or a footnote, tappable where one of the page's links
     /// names its words.
-    private func linkedText(_ string: String, mushafScale: Double? = nil, urduSize: Double? = nil) -> Text {
-        guard !links.isEmpty else { return unlinkedText(string, mushafScale: mushafScale, urduSize: urduSize) }
-        let pieces = BookLinkMatcher.pieces(of: string, links: links)
+    private func linkedText(_ string: String, rightToLeft: Bool, mushafScale: Double? = nil, urduSize: Double? = nil) -> Text {
+        // Links are found in the book's own words, without the isolates.
+        let pieces = links.isEmpty ? [] : BookLinkMatcher.pieces(of: string, links: links)
         guard pieces.contains(where: { $0.link != nil }) else {
-            return unlinkedText(string, mushafScale: mushafScale, urduSize: urduSize)
+            return unlinkedText(shown(string, rightToLeft: rightToLeft), mushafScale: mushafScale, urduSize: urduSize)
         }
         var text = Text(verbatim: "")
-        for piece in pieces {
+        for (piece, drawn) in zip(pieces, shown(pieces.map(\.text), rightToLeft: rightToLeft)) {
             if let index = piece.link {
-                text = text + linkText(piece.text, index: index, mushafScale: mushafScale, urduSize: urduSize)
+                text = text + linkText(drawn, index: index, mushafScale: mushafScale, urduSize: urduSize)
             } else {
-                text = text + unlinkedText(piece.text, mushafScale: mushafScale, urduSize: urduSize)
+                text = text + unlinkedText(drawn, mushafScale: mushafScale, urduSize: urduSize)
             }
         }
         // The empty first Text takes the quotation's face, as its words do.
@@ -737,14 +758,14 @@ struct FormattedBookPage: View {
         let quoted = run.isQuranic || run.isArabic
         let mushafScale: Double? = quoted ? 0.72 * scale : nil
         var text = Text(verbatim: "")
-        for piece in pieces {
+        for (piece, drawn) in zip(pieces, shown(pieces.map(\.text), rightToLeft: !leftToRight)) {
             var part: Text
             if let index = piece.link {
-                part = linkText(piece.text, index: index, mushafScale: mushafScale, urduSize: leftToRight ? nil : 1)
+                part = linkText(drawn, index: index, mushafScale: mushafScale, urduSize: leftToRight ? nil : 1)
             } else if quoted {
-                part = unlinkedText(piece.text, mushafScale: mushafScale, urduSize: nil)
+                part = unlinkedText(drawn, mushafScale: mushafScale, urduSize: nil)
             } else {
-                part = plainProse(piece.text, leftToRight: leftToRight)
+                part = plainProse(drawn, leftToRight: leftToRight)
             }
             if quoted {
                 part = part.foregroundStyle(DIColor.scripture)
@@ -765,11 +786,12 @@ struct FormattedBookPage: View {
                 text = text + linked
                 continue
             }
+            let drawn = shown(run.text, rightToLeft: !leftToRight)
             if run.isQuranic || run.isArabic {
-                text = text + Text.mushaf(verbatim: run.text, scale: 0.72 * scale, showsSmallHighZero: place.showsSmallHighZero)
+                text = text + Text.mushaf(verbatim: drawn, scale: 0.72 * scale, showsSmallHighZero: place.showsSmallHighZero)
                     .foregroundStyle(DIColor.scripture)
             } else {
-                text = text + plainProse(run.text, leftToRight: leftToRight)
+                text = text + plainProse(drawn, leftToRight: leftToRight)
             }
         }
         return text

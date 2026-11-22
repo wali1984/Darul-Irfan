@@ -8,8 +8,11 @@ final class BookLayoutRulesTests: XCTestCase {
     /// The books these tests read.
     private static let books: Set<String> = [
         "asrar-10-en",
+        "book-hayyat-e-tayyabah-i",
+        "book-ocr-hamd-o-naat",
         "book-ocr-sai-hafta-course",
         "tafaseer-parah-1",
+        "uploads-books-maktobaat",
         "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
     ]
     private static let shipped: [BookPage] = SeedBundle.bookPages().filter { books.contains($0.bookID) }
@@ -88,6 +91,45 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertTrue(BookTextPlace.book.showsSmallHighZero)
         XCTAssertFalse(BookTextPlace.article.showsSmallHighZero)
         XCTAssertFalse(BookTextPlace.quranReader.showsSmallHighZero)
+    }
+
+    // MARK: - Numbers in their stored order
+
+    func testDatesPhonesAndReferencesAreIsolated() throws {
+        let cases = [
+            ("uploads-books-maktobaat", 8, "13-9-63"),
+            ("uploads-books-tareeq-e-saluk-fi-adab-e-shayuk", 16, "3 : 164"),
+            ("book-ocr-hamd-o-naat", 3, "0300-6658928"),
+            ("book-ocr-sai-hafta-course", 2, "12-13"),
+        ]
+        for (bookID, number, token) in cases {
+            let text = try page(bookID, number).text
+            let drawn = BookTextDrawing.isolatingNumbers([text]).joined()
+            XCTAssertTrue(drawn.contains("\u{2066}\(token)\u{2069}"), token)
+            // The isolates are all that drawing adds.
+            let without = drawn
+                .replacingOccurrences(of: "\u{2066}", with: "", options: .literal)
+                .replacingOccurrences(of: "\u{2069}", with: "", options: .literal)
+            XCTAssertEqual(Array(without.unicodeScalars), Array(text.unicodeScalars))
+        }
+    }
+
+    func testNumbersStoredBackToFrontAreLeftAlone() throws {
+        let text = try page("book-hayyat-e-tayyabah-i", 156).text
+        XCTAssertTrue(text.contains("57-1956"))
+        let whole = text as NSString
+        XCTAssertFalse(BookTextDrawing.numberTokens(in: text).map { whole.substring(with: $0) }.contains("57-1956"))
+        for untouched in ["70-7-4", "25-1924", "4:103", "102-101"] {
+            XCTAssertEqual(BookTextDrawing.numberTokens(in: "تاریخ \(untouched) کو"), [], untouched)
+        }
+        XCTAssertEqual(BookTextDrawing.isolatingNumbers(["آیت 79:18-19 ہے"]), ["آیت \u{2066}79:18-19\u{2069} ہے"])
+    }
+
+    func testALinkThatEndsInsideANumberKeepsItsWords() {
+        XCTAssertEqual(
+            BookTextDrawing.isolatingNumbers(["آیت ", "3 : 1", "64 ہے"]),
+            ["آیت ", "\u{2066}3 : 1", "64\u{2069} ہے"]
+        )
     }
 
     // MARK: - An empty cell keeps its column

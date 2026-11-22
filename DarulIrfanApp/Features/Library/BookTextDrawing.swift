@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Where laid-out text is shown, for the display rules that hold only there.
 enum BookTextPlace: Sendable {
@@ -11,7 +12,8 @@ enum BookTextPlace: Sendable {
     /// The tafsir under an ayah, which is drawn as the Qur'an reader draws it.
     case quranReader
 
-    /// The rules of book and article text: the size of the salawat sign.
+    /// The rules of book and article text: the size of the salawat sign and
+    /// the order of its numbers.
     var followsBookRules: Bool { self == .book || self == .article }
 
     /// U+06DF is drawn in books and narrations. An article also sets ayat from
@@ -41,5 +43,135 @@ enum BookTextDrawing {
             drawn[lower..<upper].font = DIFont.urduSalawat(scale: scale)
         }
         return drawn
+    }
+
+    // MARK: - Numbers in right-to-left text
+
+    /// LEFT-TO-RIGHT ISOLATE and POP DIRECTIONAL ISOLATE.
+    static let isolateStart = "\u{2066}"
+    static let isolateEnd = "\u{2069}"
+
+    private static let anyDigit = #"0-9٠-٩۰-۹"#
+    /// Digit groups joined by a dash, slash or stop: a date when there are three.
+    private static let threeGroups = pattern("(?<![\(anyDigit)])[\(anyDigit)]+(?:[ ]?[-/–.][ ]?[\(anyDigit)]+){2,}")
+    /// "3 : 164", and "79:18-19" with its range.
+    private static let colonGroups = pattern(
+        "(?<![\(anyDigit)])[\(anyDigit)]+(?:[ ]+:[ ]*|[ ]*:[ ]+)[\(anyDigit)]+(?:[ ]?[-–][ ]?[\(anyDigit)]+)?"
+            + "|(?<![\(anyDigit)])[\(anyDigit)]+:[\(anyDigit)]+[ ]?[-–][ ]?[\(anyDigit)]+"
+    )
+    /// A telephone number.
+    private static let telephone = pattern(#"(?<![\d.])(?:\+|0)[0-9]{1,4}(?:[- ][0-9]{2,8}){1,3}(?!\d)"#)
+    /// "12-13", "1981-82".
+    private static let span = pattern(#"(?<![\d:./–-])([0-9]{1,4})[-–]([0-9]{1,4})(?![\d:./–-])"#)
+
+    private static func pattern(_ source: String) -> NSRegularExpression? {
+        try? NSRegularExpression(pattern: source)
+    }
+
+    /// The numbers that must be read left to right inside right-to-left text,
+    /// in order and not overlapping, counted in UTF-16. After Urdu letters a
+    /// hyphen or a spaced colon turns their groups round. Only these four
+    /// shapes are taken: the books also store some dates back to front
+    /// ("70-7-4", "57-1956"), and those read correctly as they are.
+    static func numberTokens(in text: String) -> [NSRange] {
+        guard text.unicodeScalars.contains(where: { $0.properties.numericType == .decimal }) else { return [] }
+        let whole = text as NSString
+        let all = NSRange(location: 0, length: whole.length)
+        var found: [NSRange] = []
+
+        for match in threeGroups?.matches(in: text, range: all) ?? [] {
+            let groups = digitGroups(whole.substring(with: match.range))
+            if groups.count == 3, number(groups[0]) <= 31, number(groups[1]) <= 12 {
+                found.append(match.range)
+            }
+        }
+        found += (colonGroups?.matches(in: text, range: all) ?? []).map(\.range)
+        for match in telephone?.matches(in: text, range: all) ?? [] {
+            let western = whole.substring(with: match.range).unicodeScalars.filter { (0x30...0x39).contains($0.value) }
+            if western.count >= 9 { found.append(match.range) }
+        }
+        for match in span?.matches(in: text, range: all) ?? [] {
+            let first = whole.substring(with: match.range(at: 1))
+            let second = whole.substring(with: match.range(at: 2))
+            let rises = number(first) < number(second)
+                && ((first.count <= 3 && second.count <= 3) || (first.count == 4 && second.count == 4))
+            if rises || (first.count == 4 && second.count == 2) { found.append(match.range) }
+        }
+
+        var tokens: [NSRange] = []
+        for range in found.sorted(by: { $0.location < $1.location }) {
+            if let last = tokens.last, range.location < NSMaxRange(last) {
+                tokens[tokens.count - 1] = NSUnionRange(last, range)
+            } else {
+                tokens.append(range)
+            }
+        }
+        return tokens
+    }
+
+    /// `pieces` of one stretch of right-to-left text with each such number in
+    /// an isolate, for drawing only. Found in the whole stretch, as a link
+    /// may end inside a number.
+    static func isolatingNumbers(_ pieces: [String]) -> [String] {
+        let tokens = numberTokens(in: pieces.joined())
+        guard !tokens.isEmpty else { return pieces }
+        var drawn: [String] = []
+        var start = 0
+        for piece in pieces {
+            let shown = NSMutableString(string: piece)
+            let end = start + shown.length
+            // From the last, so that the places before it do not move.
+            for token in tokens.reversed() {
+                let tokenEnd = NSMaxRange(token)
+                if tokenEnd > start && tokenEnd <= end {
+                    shown.insert(isolateEnd, at: tokenEnd - start)
+                }
+                if token.location >= start && token.location < end {
+                    shown.insert(isolateStart, at: token.location - start)
+                }
+            }
+            drawn.append(shown as String)
+            start = end
+        }
+        return drawn
+    }
+
+    private static func digitGroups(_ text: String) -> [String] {
+        text.split(whereSeparator: { $0.wholeNumberValue == nil }).map(String.init)
+    }
+
+    /// A group's value in Western, Arabic-Indic or Urdu digits. A group too
+    /// long to be a day, a month or a year is above all of them.
+    private static func number(_ group: String) -> Int {
+        guard group.count <= 9 else { return Int.max }
+        return group.reduce(0) { $0 * 10 + ($1.wholeNumberValue ?? 0) }
+    }
+}
+
+/// Selecting a block's text. Where numbers were isolated for drawing, Copy
+/// and Share give the book's own words, without the isolates.
+struct BookTextSelection: ViewModifier {
+    /// The block as the book has it.
+    let text: String
+    /// The block is drawn with isolates.
+    let isIsolated: Bool
+
+    func body(content: Content) -> some View {
+        if isIsolated {
+            content
+                .textSelection(.disabled)
+                .contextMenu {
+                    Button {
+                        UIPasteboard.general.string = text
+                    } label: {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    ShareLink(item: text) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                }
+        } else {
+            content.textSelection(.enabled)
+        }
     }
 }
