@@ -128,6 +128,45 @@ describe("the narration list the apps are sent", () => {
     expect(odd).toEqual({ version: 0, revision: phoneTag({}), voices: {}, editions: {} });
   });
 
+  it("lists only files the apps can then fetch, and nothing else stored among them", async () => {
+    const { text, manifest } = await served(JSON.stringify({
+      version: 4,
+      voices: { ur: { name: "Some Reader" } },
+      editions: {
+        "akram-ut-tarajum-ur": { translation: ["001001", "Some Reader", 7, "001002", "1"], reader: "Some Reader", tafsir: "Some Tool" },
+        "akram-ut-tafaseer-ur": { tafsir: ["002001-005"], translation: [], notes: ["Some Tool"] },
+        "Some Reader": { translation: ["001001"] },
+        "asrar-at-tanzil-en": "Some Tool",
+        made: { with: ["Some Tool"] },
+      },
+    }));
+    expect(manifest.editions).toEqual({
+      "akram-ut-tarajum-ur": { translation: ["001001", "001002"] },
+      "akram-ut-tafaseer-ur": { tafsir: ["002001-005"] },
+    });
+    expect(text).not.toMatch(/Reader|Tool|notes|made/);
+    // Every name listed is one the file route answers for.
+    const files: Record<string, Uint8Array> = {};
+    const paths: string[] = [];
+    for (const [edition, kinds] of Object.entries(manifest.editions)) {
+      for (const [kind, names] of Object.entries(kinds)) for (const name of names) paths.push(`${edition}/${kind}/${name}.mp3`);
+    }
+    for (const path of paths) files[`audio/quran/${path}`] = new Uint8Array([1]);
+    expect(paths).toHaveLength(3);
+    for (const path of paths) expect((await get(envWith(files), `/v1/audio/quran/${path}`)).status).toBe(200);
+  });
+
+  it("changes a language's mark when anything stored for it changes", async () => {
+    const first = (await served(stored({ ur: { name: "Some Reader", made: 2 } }))).manifest;
+    const same = (await served(stored({ ur: { name: "Some Reader", made: 2 } }))).manifest;
+    const remade = await served(stored({ ur: { name: "Some Reader", made: 3 } }));
+    expect(same.voices).toEqual(first.voices);
+    expect(remade.manifest.voices.ur?.name).not.toBe(first.voices.ur?.name);
+    expect(remade.manifest.revision).not.toBe(first.revision);
+    expect(remade.manifest.revision).toBe(phoneTag(remade.manifest.voices));
+    expect(remade.text).not.toMatch(/Reader|made/);
+  });
+
   it("answers that the list is unavailable, not an empty list, when the stored one cannot be read", async () => {
     const response = await get(envWith({ "audio/quran/manifest.json": "{\"version\":3,\"voices\":{\"ur\":{\"name\":\"Some Rea" }), "/v1/audio/quran/manifest");
     expect(response.status).toBe(503);

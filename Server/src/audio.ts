@@ -17,7 +17,7 @@ export interface NarrationManifest {
   version: number;
   revision: string;
   voices: Record<string, { name: string }>;
-  editions: Record<string, unknown>;
+  editions: Record<string, Record<string, string[]>>;
 }
 
 /** 64-bit FNV-1a in base 36: the hash the released apps make of the `voices`
@@ -34,13 +34,31 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** The stored manifest as the apps receive it. Only the count, the list of
+/** The stored lists of files, edition -> kind -> names, keeping only names the
+ *  file route below serves. Anything else stored among them is left behind. */
+function listedFiles(stored: unknown): Record<string, Record<string, string[]>> {
+  const editions: Record<string, Record<string, string[]>> = {};
+  if (!isRecord(stored)) return editions;
+  for (const [edition, kinds] of Object.entries(stored)) {
+    if (!isRecord(kinds)) continue;
+    const kept: Record<string, string[]> = {};
+    for (const [kind, names] of Object.entries(kinds)) {
+      if (!Array.isArray(names)) continue;
+      const files = names.filter((name): name is string => typeof name === "string" && FILE.test(`${edition}/${kind}/${name}.mp3`));
+      if (files.length > 0) kept[kind] = files;
+    }
+    if (Object.keys(kept).length > 0) editions[edition] = kept;
+  }
+  return editions;
+}
+
+/** The stored manifest as the apps receive it. Only the count, the lists of
  *  files and revision marks go out: whatever storage holds for a language, or
  *  as its own `revision`, is folded into a mark and never sent as written, and
  *  any other field is left behind.
  *
- *  A language's mark changes exactly when its stored entry (or the stored
- *  `revision`) changes, so the released apps - which hash the names - still
+ *  A language's mark changes whenever anything in its stored entry (or the
+ *  stored `revision`) changes, so the released apps - which hash the names - still
  *  drop the copies they kept of a narration that has since been re-made.
  *  `revision` is that same hash, worked out here: an app that reads it lands
  *  on the folder it already uses. */
@@ -52,7 +70,7 @@ export function publicNarrationManifest(stored: unknown): NarrationManifest {
   const given = isRecord(source.voices) ? source.voices : {};
   for (const language of Object.keys(given).filter(key => LANGUAGE.test(key)).sort()) {
     const entry = given[language];
-    const text = typeof entry === "string" ? entry : isRecord(entry) && typeof entry.name === "string" ? entry.name : "";
+    const text = typeof entry === "string" ? entry : JSON.stringify(entry) ?? "";
     const name = `r${mark(`${stamp}\n${text}`)}`;
     voices[language] = { name };
     signature.push(`${language}=${name}`);
@@ -61,7 +79,7 @@ export function publicNarrationManifest(stored: unknown): NarrationManifest {
     version: typeof source.version === "number" && Number.isFinite(source.version) ? Math.trunc(source.version) : 0,
     revision: mark(signature.length > 0 ? signature.join(";") : stamp),
     voices,
-    editions: isRecord(source.editions) ? source.editions : {},
+    editions: listedFiles(source.editions),
   };
 }
 
