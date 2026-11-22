@@ -998,10 +998,12 @@ struct FormattedBookPage: View {
             let linked = index < linkedPieces.count
                 ? linkedRun(run, pieces: linkedPieces[index], leftToRight: leftToRight)
                 : nil
-            // A run that opens with U+06DF takes the space before it, so
-            // that the sign has something to sit on in its own face.
-            let takesSpace = index > 0 && linked == nil && !run.startsLine && place.showsSmallHighZero
-                && run.text.unicodeScalars.first?.value == MushafFaceGaps.smallHighZero
+            // A run that opens with a mark (a pause sign after a quotation,
+            // U+06DF) takes the space before it, so that the mark has
+            // something to sit on in its own face.
+            let takesSpace = index > 0 && linked == nil && !run.startsLine
+                && (place.followsBookRules || place.showsSmallHighZero)
+                && run.text.unicodeScalars.first?.properties.generalCategory == .nonspacingMark
             if index > 0 && !takesSpace { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
             if let linked {
                 text = text + linked

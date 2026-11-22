@@ -25,7 +25,7 @@ enum BookPageFormatter {
     /// Articles already have deliberate paragraphs. Preserve them and their line
     /// breaks; do not apply scanned-page heading/noise/column heuristics.
     static func articleParagraph(_ text: String, itemID: String? = nil) -> Page {
-        let words = text.split(whereSeparator: \.isWhitespace).map(String.init)
+        let words = writtenWords(of: text)
         let block: Block
         if isQuranQuotation(text, check: .letters) {
             block = .quran(text)
@@ -319,7 +319,7 @@ enum BookPageFormatter {
             result = format(shown.text, quranCheck: check)
         }
         result.unreadableWords = unreadableCount(page.text)
-        result.wordCount = page.text.split(whereSeparator: \.isWhitespace).count
+        result.wordCount = writtenWords(of: page.text).count
         return result
     }
 
@@ -446,7 +446,7 @@ enum BookPageFormatter {
         for part in parts {
             switch part.kind {
             case .heading:
-                let words = part.text.split(whereSeparator: \.isWhitespace).map(String.init)
+                let words = writtenWords(of: part.text)
                 let confirmed = QuranQuotation.isVerified(words, check: check)
                 blocks.append(confirmed ? .quran(part.text) : .heading(part.text))
                 if confirmed { cuts.append(nil) }
@@ -508,7 +508,7 @@ enum BookPageFormatter {
     /// hadith that quotes an ayah, or a formula made of Qur'anic phrases, must
     /// not pass piece by piece.
     static func isQuranQuotation(_ text: String, check: QuranQuotation.Check) -> Bool {
-        let words = text.split(whereSeparator: \.isWhitespace).map(String.init)
+        let words = writtenWords(of: text)
         let end = trailingCitationStart(words) ?? words.count
         return QuranQuotation.isVerified(words[..<end], check: check)
     }
@@ -524,10 +524,10 @@ enum BookPageFormatter {
         let ayat = ayahRanges(in: text)
         guard ayat.count > 1 else { return [(.arabic(text), nil)] }
         func span(_ first: Int, _ last: Int) -> String {
-            String(text[ayat[first].lowerBound..<ayat[last].upperBound])
+            string(text.unicodeScalars[ayat[first].lowerBound..<ayat[last].upperBound])
         }
         func cut(_ first: Int) -> CutQuotation {
-            CutQuotation(whole: text, start: text[..<ayat[first].lowerBound].utf16.count)
+            CutQuotation(whole: text, start: text.utf16.distance(from: text.startIndex, to: ayat[first].lowerBound))
         }
         var result: [(block: Block, cut: CutQuotation?)] = []
         var confirmed = false
@@ -554,11 +554,12 @@ enum BookPageFormatter {
 
     /// Where each ayah of a quotation lies, as printed: it ends with its
     /// number (﴿۱۸﴾, ۝۱, ○). The text after the last number is a piece too.
+    /// Cut scalar by scalar, as `writtenWords(of:)` is.
     private static func ayahRanges(in text: String) -> [Range<String.Index>] {
         var ranges: [Range<String.Index>] = []
         var start: String.Index?
         var end = text.startIndex
-        for word in text.split(whereSeparator: \.isWhitespace) {
+        for word in text.unicodeScalars.split(whereSeparator: { $0.properties.isWhitespace }) {
             if start == nil { start = word.startIndex }
             end = word.endIndex
             if endsAyah(word), let first = start {
@@ -572,15 +573,14 @@ enum BookPageFormatter {
 
     /// An ayah number, or the sign closing an ayah. Read scalar by scalar:
     /// ۝ joins the digits after it into one Character.
-    private static func endsAyah(_ word: Substring) -> Bool {
-        let scalars = word.unicodeScalars
+    private static func endsAyah(_ scalars: Substring.UnicodeScalarView) -> Bool {
         if scalars.contains("\u{06DD}") || scalars.contains("\u{25CB}") { return true }
         return scalars.last == "\u{FD3E}" && scalars.contains { $0.properties.numericType == .decimal }
     }
 
     private static func isQuran(_ ayat: ArraySlice<Range<String.Index>>, in text: String,
                                 check: QuranQuotation.Check) -> Bool {
-        let words = ayat.flatMap { text[$0].split(whereSeparator: \.isWhitespace).map(String.init) }
+        let words = ayat.flatMap { writtenWords(of: string(text.unicodeScalars[$0])) }
         return QuranQuotation.isVerified(words, check: check)
     }
 
@@ -605,7 +605,7 @@ enum BookPageFormatter {
     private static func proseRuns(_ text: String, check: QuranQuotation.Check, includeArabicQuotations: Bool = false) -> [Run] {
         var runs: [Run] = []
         for line in text.split(separator: "\n") {
-            let tokens = line.split(whereSeparator: \.isWhitespace).map(String.init)
+            let tokens = writtenWords(of: String(line))
             guard !tokens.isEmpty else { continue }
             let quranic = verifiedQuranic(tokens, check: check)
             let arabic = includeArabicQuotations ? markQuranic(tokens) : Array(repeating: false, count: tokens.count)
@@ -836,7 +836,15 @@ enum BookPageFormatter {
         return (runs, Carried(run: runs.count - 1, offset: last.text.utf16.count + 1))
     }
 
-    private static func string(_ scalars: ArraySlice<Unicode.Scalar>) -> String {
+    /// The words of a laid-out page, an article or a narration, cut at white
+    /// space scalar by scalar. A space and a mark after it ("موسیٰ ؑ", a
+    /// pause sign) are one Character, and it is white space: a split by
+    /// Character drops the mark with the space.
+    private static func writtenWords(of text: String) -> [String] {
+        text.unicodeScalars.split(whereSeparator: { $0.properties.isWhitespace }).map { string($0) }
+    }
+
+    private static func string(_ scalars: some Sequence<Unicode.Scalar>) -> String {
         var view = String.UnicodeScalarView()
         view.append(contentsOf: scalars)
         return String(view)

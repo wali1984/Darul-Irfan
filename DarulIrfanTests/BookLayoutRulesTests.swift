@@ -12,6 +12,7 @@ final class BookLayoutRulesTests: XCTestCase {
         "asrar-100-en",
         "asrar-11-ur",
         "asrar-16-en",
+        "asrar-17-ur",
         "asrar-18-en",
         "asrar-2-en",
         "asrar-23-ur",
@@ -49,6 +50,41 @@ final class BookLayoutRulesTests: XCTestCase {
             guard case .table(let rows) = block else { return nil }
             return rows
         }
+    }
+
+    // MARK: - A mark after a space
+
+    func testAMarkAfterASpaceIsNeverDropped() throws {
+        let text = "حضرت موسیٰ \u{0611} نے عرض کیا"
+        guard case .paragraph(let runs)? = BookPageFormatter.articleParagraph(text).blocks.last else {
+            return XCTFail("no paragraph")
+        }
+        XCTAssertEqual(runs.map { Array($0.text.unicodeScalars) }, [Array(text.unicodeScalars)])
+
+        // The honorifics and pause signs these books set apart by a space.
+        for bookID in ["asrar-17-ur", "tafaseer-parah-9"] {
+            for page in pages(bookID) where BookPageFormatter.laidOutParts(of: page) != nil {
+                let laid = BookPageFormatter.format(page: page)
+                var shown: [String] = laid.footnotes
+                for block in laid.blocks {
+                    switch block {
+                    case .paragraph(let runs): shown += runs.map { $0.text }
+                    case .table(let rows): shown += rows.flatMap { $0 }
+                    case .heading(let words), .quran(let words), .arabic(let words), .verse(let words), .caption(let words):
+                        shown.append(words)
+                    }
+                }
+                XCTAssertEqual(marks(in: shown.joined(separator: "\n")), marks(in: page.text), "\(bookID) p\(page.page)")
+            }
+        }
+    }
+
+    /// Every nonspacing mark in `text`, by value.
+    private func marks(in text: String) -> [UInt32] {
+        text.unicodeScalars
+            .filter { $0.properties.generalCategory == .nonspacingMark }
+            .map { $0.value }
+            .sorted()
     }
 
     // MARK: - A sentence the page break cuts
