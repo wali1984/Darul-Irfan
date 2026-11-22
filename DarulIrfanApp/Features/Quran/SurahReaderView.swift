@@ -1338,7 +1338,7 @@ private struct AyahCardView: View {
                     // Urdu tafsir quotes the Qur'an inside its prose; set
                     // the quotations apart as the book pages do. Laid out
                     // once by the view model, not on every redraw.
-                    FormattedBookPage(page: viewModel.formattedTafsir(entry), scale: fontScale)
+                    FormattedBookPage(page: viewModel.formattedTafsir(entry), scale: fontScale, place: .quranReader)
                 } else if !entry.text.isEmpty {
                     bodyText(entry.text, languageCode: edition?.language)
                 }

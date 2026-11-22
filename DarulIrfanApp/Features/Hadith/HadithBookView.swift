@@ -358,7 +358,7 @@ struct HadithBookView: View {
                     urduSplitView(entry)
                 } else if let text = entry.text(languageCode: languageCode) {
                     if languageCode == "ur" {
-                        FormattedBookPage(page: BookPageFormatter.articleParagraph(text), scale: fontScale)
+                        FormattedBookPage(page: BookPageFormatter.articleParagraph(text), scale: fontScale, place: .hadith)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .environment(\.layoutDirection, .rightToLeft)
                             .textSelection(.enabled)
@@ -480,7 +480,7 @@ struct HadithBookView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let matn = entry.urduText, !matn.isEmpty {
-                FormattedBookPage(page: BookPageFormatter.articleParagraph(matn), scale: fontScale)
+                FormattedBookPage(page: BookPageFormatter.articleParagraph(matn), scale: fontScale, place: .hadith)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .environment(\.layoutDirection, .rightToLeft)
                     .textSelection(.enabled)

@@ -9,6 +9,7 @@ final class BookLayoutRulesTests: XCTestCase {
     private static let books: Set<String> = [
         "book-ocr-sai-hafta-course",
         "tafaseer-parah-1",
+        "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
     ]
     private static let shipped: [BookPage] = SeedBundle.bookPages().filter { books.contains($0.bookID) }
 
@@ -25,6 +26,45 @@ final class BookLayoutRulesTests: XCTestCase {
             guard case .table(let rows) = block else { return nil }
             return rows
         }
+    }
+
+    // MARK: - The salawat sign among Urdu words
+
+    func testOnlyTheSalawatSignIsEnlargedAndItsLinkIsKept() throws {
+        let original = try page("uploads-books-tareeq-e-saluk-fi-adab-e-shayuk", 16).text
+        let signs = original.unicodeScalars.filter { $0 == BookTextDrawing.salawat }.count
+        XCTAssertGreaterThanOrEqual(signs, 4)
+
+        var linked = AttributedString(original)
+        let url = try XCTUnwrap(URL(string: "dibooklink:2"))
+        linked.link = url
+        let drawn = BookTextDrawing.enlargingSalawat(linked, scale: 1.2)
+        XCTAssertEqual(Array(drawn.unicodeScalars), Array(original.unicodeScalars))
+
+        let scalars = drawn.unicodeScalars
+        var index = scalars.startIndex
+        var enlarged = 0
+        while index < scalars.endIndex {
+            let next = scalars.index(after: index)
+            let part = drawn[index..<next]
+            XCTAssertEqual(part.link, url)
+            let face = part[AttributeScopes.SwiftUIAttributes.FontAttribute.self]
+            if scalars[index] == BookTextDrawing.salawat {
+                XCTAssertEqual(face, DIFont.urduSalawat(scale: 1.2))
+                enlarged += 1
+            } else {
+                XCTAssertNil(face)
+            }
+            index = next
+        }
+        XCTAssertEqual(enlarged, signs)
+    }
+
+    func testTheQuranReadersTafsirKeepsItsDrawing() {
+        XCTAssertTrue(BookTextPlace.book.followsBookRules)
+        XCTAssertTrue(BookTextPlace.article.followsBookRules)
+        XCTAssertFalse(BookTextPlace.hadith.followsBookRules)
+        XCTAssertFalse(BookTextPlace.quranReader.followsBookRules)
     }
 
     // MARK: - An empty cell keeps its column

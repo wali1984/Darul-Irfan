@@ -125,6 +125,13 @@ enum DIFont {
         return .system(size: UIFontMetrics(forTextStyle: .body).scaledValue(for: 19 * scale))
     }
 
+    /// The salawat sign among words in `urduBody(scale:)`: the mushaf face,
+    /// 1.25 times their size, growing with them at every text size.
+    static func urduSalawat(scale: Double) -> Font {
+        let wordSize: Double = AppFonts.urduNastaliqName == nil ? 19 : 17
+        return .custom(AppFonts.quranArabicName, size: wordSize * scale * 1.25, relativeTo: .body)
+    }
+
     /// Section headings with a slightly bookish feel.
     static let heading = Font.system(.title2, design: .serif).weight(.semibold)
     static let subheading = Font.system(.headline, design: .serif)

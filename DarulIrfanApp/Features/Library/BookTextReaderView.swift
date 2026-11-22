@@ -185,6 +185,7 @@ struct BookTextPagesView: View {
                 FormattedBookPage(
                     page: formattedPage,
                     scale: fontScale,
+                    place: .book,
                     links: appState == nil ? [] : (links[page.page] ?? []),
                     onLink: { link in openedLink = BookLinkTarget(link.t) }
                 )
@@ -391,6 +392,8 @@ struct FormattedBookPage: View {
     let page: BookPageFormatter.Page
     /// The reader's text size.
     var scale: Double = 1
+    /// Where the text is shown: some display rules hold only for books.
+    var place: BookTextPlace = .article
     /// The places in this page's text that open an ayah, a narration or a
     /// narrator's biography. Empty leaves the text plain.
     var links: [BookLink] = []
@@ -404,7 +407,7 @@ struct FormattedBookPage: View {
             if page.isContents {
                 DisclosureGroup(isExpanded: $showsContents) {
                     if let text = contentsText {
-                        Text(verbatim: text)
+                        words(text, urduSize: 0.85)
                             .font(DIFont.urduBody(scale: 0.85 * scale))
                             .foregroundStyle(DIColor.textMuted)
                             .lineSpacing(6)
@@ -482,7 +485,7 @@ struct FormattedBookPage: View {
 
     private func heading(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return Text(verbatim: text)
+        return words(text, urduSize: rightToLeft ? 1.1 : nil)
             .font(face(rightToLeft, size: 1.1).weight(.semibold))
             .foregroundStyle(DIColor.actionForeground)
             .multilineTextAlignment(.leading)
@@ -520,7 +523,7 @@ struct FormattedBookPage: View {
     /// as Urdu books set their verse.
     private func verse(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return keepingWaqfMarks(text)
+        return keepingWaqfMarks(text, urduSize: rightToLeft ? 1 : nil)
             .font(face(rightToLeft))
             .foregroundStyle(DIColor.textPrimary)
             .lineSpacing(CGFloat((rightToLeft ? 12 : 6) * scale))
@@ -566,7 +569,7 @@ struct FormattedBookPage: View {
                 }
                 Group {
                     if BookPageFormatter.isSectionRow(row, columns: columns) {
-                        Text(verbatim: row.first { !$0.isEmpty } ?? "")
+                        words(row.first { !$0.isEmpty } ?? "", urduSize: rightToLeft ? 0.9 : nil)
                             .font(face(rightToLeft, size: 0.9))
                             .fontWeight(.semibold)
                             .foregroundStyle(DIColor.primary)
@@ -575,7 +578,7 @@ struct FormattedBookPage: View {
                         WeightedColumns(weights: layout.weights, spacing: DISpacing.sm) {
                             ForEach(0..<columns, id: \.self) { column in
                                 let cell = column < row.count ? row[column] : ""
-                                Text(verbatim: cell)
+                                words(cell, urduSize: rightToLeft ? 0.85 : nil)
                                     .font(face(rightToLeft, size: 0.85))
                                     .fontWeight(index == 0 && layout.hasHeaderRow ? .semibold : .regular)
                                     .foregroundStyle(index == 0 && layout.hasHeaderRow ? DIColor.textMuted : DIColor.textPrimary)
@@ -599,7 +602,7 @@ struct FormattedBookPage: View {
 
     private func caption(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return Text(verbatim: text)
+        return words(text, urduSize: rightToLeft ? 0.8 : nil)
             .font(face(rightToLeft, size: 0.8))
             .foregroundStyle(DIColor.textMuted)
             .multilineTextAlignment(.center)
@@ -625,7 +628,7 @@ struct FormattedBookPage: View {
 
     private func footnote(_ text: String) -> some View {
         let rightToLeft = isRightToLeft(text)
-        return linkedText(text)
+        return linkedText(text, urduSize: rightToLeft ? 0.8 : nil)
             .font(face(rightToLeft, size: 0.8))
             .foregroundStyle(DIColor.textMuted)
             .lineSpacing(CGFloat((rightToLeft ? 6 : 3) * scale))
@@ -635,54 +638,68 @@ struct FormattedBookPage: View {
             .textSelection(.enabled)
     }
 
+    /// Words in a block's own face. In the Urdu face, `urduSize` times the
+    /// reader's text size, the salawat sign is drawn as a book draws it.
+    private func words(_ string: String, urduSize: Double?) -> Text {
+        guard let urduSize, place.followsBookRules, BookTextDrawing.holdsSalawat(string) else {
+            return Text(verbatim: string)
+        }
+        return Text(BookTextDrawing.enlargingSalawat(AttributedString(string), scale: urduSize * scale))
+    }
+
     /// The mushaf's waqf signs are private-use characters only its font draws; a
     /// quotation that reached the prose or verse face keeps them in that font.
-    private func keepingWaqfMarks(_ string: String) -> Text {
+    private func keepingWaqfMarks(_ string: String, urduSize: Double?) -> Text {
         var text = Text(verbatim: "")
         var plain = String.UnicodeScalarView()
         for scalar in string.unicodeScalars {
             if (0xE000...0xF8FF).contains(scalar.value) {
-                text = text + Text(verbatim: String(plain))
+                text = text + words(String(plain), urduSize: urduSize)
                 plain = String.UnicodeScalarView()
                 text = text + Text(verbatim: String(scalar)).font(DIFont.quranArabic(scale: (17.0 / 27.0) * scale))
             } else {
                 plain.append(scalar)
             }
         }
-        return text + Text(verbatim: String(plain))
+        return text + words(String(plain), urduSize: urduSize)
     }
 
     /// The words of a link: tappable, in the tint the page gives its links.
-    private func linkText(_ string: String, index: Int, mushafScale: Double? = nil) -> Text {
+    private func linkText(_ string: String, index: Int, mushafScale: Double?, urduSize: Double?) -> Text {
         var attributed = AttributedString(string)
         if let url = URL(string: "\(BookLinkTaps.scheme):\(index)") {
             attributed.link = url
         }
-        guard let mushafScale else { return Text(attributed) }
+        guard let mushafScale else {
+            if let urduSize, place.followsBookRules {
+                attributed = BookTextDrawing.enlargingSalawat(attributed, scale: urduSize * scale)
+            }
+            return Text(attributed)
+        }
         return Text.mushaf(attributed, scale: mushafScale)
     }
 
     /// Words as they are: in the mushaf face at `mushafScale`, or in the face
     /// around them.
-    private func unlinkedText(_ string: String, mushafScale: Double?) -> Text {
-        guard let mushafScale else { return Text(verbatim: string) }
+    private func unlinkedText(_ string: String, mushafScale: Double?, urduSize: Double?) -> Text {
+        guard let mushafScale else { return words(string, urduSize: urduSize) }
         return Text.mushaf(verbatim: string, scale: mushafScale)
     }
 
     /// A quotation or a footnote, tappable where one of the page's links
     /// names its words.
-    private func linkedText(_ string: String, mushafScale: Double? = nil) -> Text {
-        guard !links.isEmpty else { return unlinkedText(string, mushafScale: mushafScale) }
+    private func linkedText(_ string: String, mushafScale: Double? = nil, urduSize: Double? = nil) -> Text {
+        guard !links.isEmpty else { return unlinkedText(string, mushafScale: mushafScale, urduSize: urduSize) }
         let pieces = BookLinkMatcher.pieces(of: string, links: links)
         guard pieces.contains(where: { $0.link != nil }) else {
-            return unlinkedText(string, mushafScale: mushafScale)
+            return unlinkedText(string, mushafScale: mushafScale, urduSize: urduSize)
         }
         var text = Text(verbatim: "")
         for piece in pieces {
             if let index = piece.link {
-                text = text + linkText(piece.text, index: index, mushafScale: mushafScale)
+                text = text + linkText(piece.text, index: index, mushafScale: mushafScale, urduSize: urduSize)
             } else {
-                text = text + unlinkedText(piece.text, mushafScale: mushafScale)
+                text = text + unlinkedText(piece.text, mushafScale: mushafScale, urduSize: urduSize)
             }
         }
         // The empty first Text takes the quotation's face, as its words do.
@@ -693,7 +710,12 @@ struct FormattedBookPage: View {
     /// Words of prose in the page's own face, the mushaf's waqf signs and the
     /// salutation sign kept in the face that draws them.
     private func plainProse(_ string: String, leftToRight: Bool) -> Text {
-        guard leftToRight && string.contains("\u{FDFA}") else { return keepingWaqfMarks(string) }
+        guard leftToRight && string.contains("\u{FDFA}") else {
+            return keepingWaqfMarks(string, urduSize: leftToRight ? nil : 1)
+        }
+        // Urdu locale's system fallback uses a tall Nastaliq ligature
+        // that can collide with adjacent Latin lines. Keep the same
+        // symbol, explicitly set in the bundled Arabic body face.
         var text = Text(verbatim: "")
         let parts = string.components(separatedBy: "\u{FDFA}")
         for (partIndex, part) in parts.enumerated() {
@@ -718,9 +740,9 @@ struct FormattedBookPage: View {
         for piece in pieces {
             var part: Text
             if let index = piece.link {
-                part = linkText(piece.text, index: index, mushafScale: mushafScale)
+                part = linkText(piece.text, index: index, mushafScale: mushafScale, urduSize: leftToRight ? nil : 1)
             } else if quoted {
-                part = unlinkedText(piece.text, mushafScale: mushafScale)
+                part = unlinkedText(piece.text, mushafScale: mushafScale, urduSize: nil)
             } else {
                 part = plainProse(piece.text, leftToRight: leftToRight)
             }
@@ -747,21 +769,7 @@ struct FormattedBookPage: View {
                 text = text + Text.mushaf(verbatim: run.text, scale: 0.72 * scale)
                     .foregroundStyle(DIColor.scripture)
             } else {
-                if leftToRight && run.text.contains("\u{FDFA}") {
-                    // Urdu locale's system fallback uses a tall Nastaliq ligature
-                    // that can collide with adjacent Latin lines. Keep the same
-                    // symbol, explicitly set in the bundled Arabic body face.
-                    let parts = run.text.components(separatedBy: "\u{FDFA}")
-                    for (partIndex, part) in parts.enumerated() {
-                        if partIndex > 0 {
-                            text = text + Text(verbatim: "\u{FDFA}")
-                                .font(DIFont.quranArabic(scale: (17.0 / 27.0) * scale))
-                        }
-                        text = text + Text(verbatim: part)
-                    }
-                } else {
-                    text = text + keepingWaqfMarks(run.text)
-                }
+                text = text + plainProse(run.text, leftToRight: leftToRight)
             }
         }
         return text

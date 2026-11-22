@@ -106,7 +106,7 @@ struct AyahTafsirSheet: View {
                     .foregroundStyle(DIColor.textMuted)
             }
             if language == "ur" {
-                FormattedBookPage(page: viewModel.formattedTafsir(entry), scale: fontScale)
+                FormattedBookPage(page: viewModel.formattedTafsir(entry), scale: fontScale, place: .quranReader)
             } else {
                 Text(verbatim: entry.text)
                     .font(.system(size: bodyBaseSize * fontScale))
