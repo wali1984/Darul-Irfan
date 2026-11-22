@@ -193,6 +193,55 @@ final class BookLayoutRulesTests: XCTestCase {
         XCTAssertFalse(BookLinkMatcher.pieces(of: parts[4].text, links: links).contains { $0.link != nil })
     }
 
+    // MARK: - Tables on a phone
+
+    /// What a 360 pt screen leaves a table: the list, the sheet and the
+    /// table's own padding.
+    private let tableWidthOnAPhone = 360.0 - 2 * 16 - 2 * 22 - 2 * 8
+
+    func testNoWordOfATableIsBrokenOnAPhone() throws {
+        AppFonts.registerBundledFonts()
+        let formatted = BookPageFormatter.format(page: try page("book-ocr-sai-hafta-course", 2))
+        let found = tables(formatted)
+        XCTAssertFalse(found.isEmpty)
+        let font = DIFont.urduBodyUIFont(scale: 0.85, typeSize: .large)
+        for rows in found {
+            let layout = BookPageFormatter.tableLayout(rows)
+            let minimums = BookTableMeasure.columnMinimums(rows, layout: layout, font: font, enlargesSalawat: true)
+            if let widths = BookPageFormatter.tableWidths(
+                available: tableWidthOnAPhone, spacing: 8, minimums: minimums, layout: layout
+            ) {
+                for (width, minimum) in zip(widths, minimums) {
+                    XCTAssertGreaterThanOrEqual(width + 0.001, minimum)
+                }
+                XCTAssertLessThanOrEqual(widths.reduce(0, +) + 8 * Double(widths.count - 1), tableWidthOnAPhone + 0.001)
+            } else {
+                // Stacked, every cell has the whole width.
+                for minimum in minimums {
+                    XCTAssertLessThanOrEqual(minimum, tableWidthOnAPhone)
+                }
+            }
+        }
+    }
+
+    func testTwoColumnsOfLongTextStackUnder480() throws {
+        let formatted = BookPageFormatter.format(page: try page("uploads-books-tareeq-e-saluk-fi-adab-e-shayuk", 16))
+        let rows = try XCTUnwrap(tables(formatted).last)
+        let layout = BookPageFormatter.tableLayout(rows)
+        XCTAssertTrue(layout.hasLongTextColumns)
+        XCTAssertNil(BookPageFormatter.tableWidths(available: 479, spacing: 8, minimums: [90, 90], layout: layout))
+        XCTAssertNotNil(BookPageFormatter.tableWidths(available: 480, spacing: 8, minimums: [90, 90], layout: layout))
+    }
+
+    func testColumnsShareOnlyWhatTheLongestWordsLeave() {
+        let layout = BookPageFormatter.TableLayout(weights: [1, 3], hasHeaderRow: false, hasLongTextColumns: false)
+        XCTAssertEqual(
+            BookPageFormatter.tableWidths(available: 188, spacing: 8, minimums: [60, 40], layout: layout),
+            [80, 100]
+        )
+        XCTAssertNil(BookPageFormatter.tableWidths(available: 100, spacing: 8, minimums: [60, 40], layout: layout))
+    }
+
     // MARK: - An empty cell keeps its column
 
     func testAnEntryWithoutASerialNumberKeepsItsColumns() throws {

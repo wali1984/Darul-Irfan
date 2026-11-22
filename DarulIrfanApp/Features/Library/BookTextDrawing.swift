@@ -162,6 +162,63 @@ enum BookTextDrawing {
     }
 }
 
+/// Measures a table's words, so that none is broken inside.
+enum BookTableMeasure {
+    private static let measured = NSCache<NSString, NSNumber>()
+
+    /// Each column's longest word at the cells' size. The row naming the
+    /// columns is measured bold; a row naming a section spans the table and
+    /// is left out.
+    /// - Parameter enlargesSalawat: the cells are Urdu, with the salawat sign
+    ///   drawn larger.
+    static func columnMinimums(
+        _ rows: [[String]],
+        layout: BookPageFormatter.TableLayout,
+        font: UIFont,
+        enlargesSalawat: Bool
+    ) -> [Double] {
+        let columns = max(1, rows.map(\.count).max() ?? 1)
+        var minimums = Array(repeating: 0.0, count: columns)
+        let heading = bold(font)
+        for (index, row) in rows.enumerated() where !BookPageFormatter.isSectionRow(row, columns: columns) {
+            let isHeader = index == 0 && layout.hasHeaderRow
+            for (column, cell) in row.enumerated() {
+                for word in cell.split(whereSeparator: \.isWhitespace).map(String.init) {
+                    var widest = width(of: word, font: font, enlargesSalawat: enlargesSalawat)
+                    if isHeader {
+                        widest = max(widest, width(of: word, font: heading, enlargesSalawat: enlargesSalawat))
+                    }
+                    minimums[column] = max(minimums[column], widest)
+                }
+            }
+        }
+        return minimums
+    }
+
+    /// Rounded up, with a point to spare: a width short by a fraction breaks
+    /// the word.
+    static func width(of word: String, font: UIFont, enlargesSalawat: Bool) -> Double {
+        let key = "\(font.fontName)|\(font.pointSize)|\(enlargesSalawat)|\(word)" as NSString
+        if let known = measured.object(forKey: key) { return known.doubleValue }
+        let text = NSMutableAttributedString(string: word, attributes: [NSAttributedString.Key.font: font])
+        if enlargesSalawat, BookTextDrawing.holdsSalawat(word),
+           let face = UIFont(name: AppFonts.quranArabicName, size: font.pointSize * 1.25) {
+            for (offset, unit) in word.utf16.enumerated() where UInt32(unit) == BookTextDrawing.salawat.value {
+                text.addAttribute(NSAttributedString.Key.font, value: face, range: NSRange(location: offset, length: 1))
+            }
+        }
+        let width = Double(text.size().width.rounded(.up)) + 1
+        measured.setObject(NSNumber(value: width), forKey: key)
+        return width
+    }
+
+    private static func bold(_ font: UIFont) -> UIFont {
+        let traits = font.fontDescriptor.symbolicTraits.union(.traitBold)
+        guard let descriptor = font.fontDescriptor.withSymbolicTraits(traits) else { return font }
+        return UIFont(descriptor: descriptor, size: font.pointSize)
+    }
+}
+
 /// Selecting a block's text. Where numbers were isolated for drawing, Copy
 /// and Share give the book's own words, without the isolates.
 struct BookTextSelection: ViewModifier {

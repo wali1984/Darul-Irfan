@@ -173,6 +173,27 @@ enum BookPageFormatter {
         var weights: [Double]
         /// The first row names the columns ("نمبر شمار | عنوانات | صفحہ نمبر").
         var hasHeaderRow: Bool
+        /// Two columns or more of text that averages 40 characters or more:
+        /// side by side they want `longColumnsWidth`.
+        var hasLongTextColumns: Bool
+    }
+
+    /// The narrowest table in which two columns of long text stand side by side.
+    static let longColumnsWidth = 480.0
+
+    /// Each column's width in a table `available` wide: at least its longest
+    /// word (`minimums`), with the rest shared by weight, so that no word is
+    /// broken. Nil where each row is to be stacked instead, one cell under
+    /// another.
+    static func tableWidths(available: Double, spacing: Double, minimums: [Double], layout: TableLayout) -> [Double]? {
+        let count = minimums.count
+        guard count > 1 else { return [available] }
+        if layout.hasLongTextColumns && available < longColumnsWidth { return nil }
+        let spare = available - spacing * Double(count - 1) - minimums.reduce(0, +)
+        guard spare >= 0 else { return nil }
+        let shares = (0..<count).map { $0 < layout.weights.count ? max(layout.weights[$0], 0.5) : 1 }
+        let sum = shares.reduce(0, +)
+        return zip(minimums, shares).map { $0 + spare * $1 / sum }
     }
 
     static func tableLayout(_ rows: [[String]]) -> TableLayout {
@@ -185,6 +206,7 @@ enum BookPageFormatter {
         for (index, row) in rows.enumerated() where !(hasHeader && index == 0) && !isSectionRow(row, columns: columns) {
             body.append(row)
         }
+        var longTextColumns = 0
         let weights = (0..<columns).map { column -> Double in
             let cells = body.compactMap { column < $0.count ? $0[column] : nil }.filter { !$0.isEmpty }
             guard !cells.isEmpty else { return 2 }
@@ -192,9 +214,10 @@ enum BookPageFormatter {
                 return Double(min(8, max(3, cells.map(\.count).max() ?? 3)))
             }
             let mean = Double(cells.map(\.count).reduce(0, +)) / Double(cells.count)
+            if mean >= 40 { longTextColumns += 1 }
             return min(40, max(8, mean))
         }
-        return TableLayout(weights: weights, hasHeaderRow: hasHeader)
+        return TableLayout(weights: weights, hasHeaderRow: hasHeader, hasLongTextColumns: longTextColumns >= 2)
     }
 
     /// A row naming a section of the table ("عقائد"): its one cell spans

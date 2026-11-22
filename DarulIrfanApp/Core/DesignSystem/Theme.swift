@@ -131,6 +131,17 @@ enum DIFont {
         return .system(size: UIFontMetrics(forTextStyle: .body).scaledValue(for: 19 * scale))
     }
 
+    /// `urduBody(scale:)` for measuring its words.
+    static func urduBodyUIFont(scale: Double, typeSize: DynamicTypeSize) -> UIFont {
+        let metrics = UIFontMetrics(forTextStyle: .body)
+        if let nastaliq = AppFonts.urduNastaliqName {
+            let traits = UITraitCollection(preferredContentSizeCategory: UIContentSizeCategory(typeSize))
+            let size = metrics.scaledValue(for: 17 * scale, compatibleWith: traits)
+            if let font = UIFont(name: nastaliq, size: size) { return font }
+        }
+        return .systemFont(ofSize: metrics.scaledValue(for: 19 * scale))
+    }
+
     /// The salawat sign among words in `urduBody(scale:)`: the mushaf face,
     /// 1.25 times their size, growing with them at every text size.
     static func urduSalawat(scale: Double) -> Font {

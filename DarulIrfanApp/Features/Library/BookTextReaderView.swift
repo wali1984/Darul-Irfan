@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Reads a book's text, one printed page at a time.
 ///
@@ -492,6 +493,7 @@ struct FormattedBookPage: View {
     /// Called with the link a reader tapped.
     var onLink: ((BookLink) -> Void)? = nil
     @State private var showsContents = false
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric(relativeTo: .body) private var bodyBaseSize: CGFloat = 17
 
     var body: some View {
@@ -648,13 +650,23 @@ struct FormattedBookPage: View {
     }
 
     /// A table as printed: its cells in columns that share the width by what
-    /// they hold (numbers narrow, titles wide), a rule between the rows. The
-    /// row naming the columns is set in bold; a row naming a section spans
-    /// the width. A row with fewer cells leaves the rest of its columns empty.
+    /// they hold (numbers narrow, titles wide), none narrower than its
+    /// longest word, a rule between the rows. Where those cannot fit, each
+    /// row is stacked, one cell under another. The row naming the columns is
+    /// set in bold; a row naming a section spans the width. A row with fewer
+    /// cells leaves the rest of its columns empty.
     private func table(_ rows: [[String]]) -> some View {
         let columns = max(1, rows.map(\.count).max() ?? 1)
         let layout = BookPageFormatter.tableLayout(rows)
         let rightToLeft = isRightToLeft(rows.joined().joined(separator: " "))
+        let minimums = BookTableMeasure.columnMinimums(
+            rows,
+            layout: layout,
+            font: rightToLeft
+                ? DIFont.urduBodyUIFont(scale: 0.85 * scale, typeSize: dynamicTypeSize)
+                : UIFont.systemFont(ofSize: bodyBaseSize * CGFloat(0.85 * scale)),
+            enlargesSalawat: rightToLeft && place.followsBookRules
+        )
         return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
                 if index > 0 {
@@ -670,7 +682,13 @@ struct FormattedBookPage: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .modifier(selection(name, rightToLeft: rightToLeft))
                     } else {
-                        WeightedColumns(weights: layout.weights, spacing: DISpacing.sm) {
+                        WeightedColumns(
+                            layout: layout,
+                            minimums: minimums,
+                            filled: (0..<columns).map { $0 < row.count && !row[$0].isEmpty },
+                            spacing: DISpacing.sm,
+                            stackSpacing: DISpacing.xs
+                        ) {
                             ForEach(0..<columns, id: \.self) { column in
                                 let cell = column < row.count ? row[column] : ""
                                 words(shown(cell, rightToLeft: rightToLeft), urduSize: rightToLeft ? 0.85 : nil)
@@ -937,37 +955,60 @@ enum ScriptDirection {
 }
 
 
-/// A row of cells sharing the proposed width by weight (a table's columns:
-/// numbers narrow, titles wide). Each cell is offered its share and the row
-/// is as tall as its tallest cell. Placed from the leading edge, so a
-/// right-to-left table runs from the right.
+/// A row of a table's cells. Its columns share the proposed width by weight
+/// (numbers narrow, titles wide), none narrower than its longest word; where
+/// those do not fit, the cells stand one under another in their own order.
+/// Every row is given the same minimums, so a table stacks as a whole. Placed
+/// from the leading edge, so a right-to-left table runs from the right.
 struct WeightedColumns: Layout {
-    var weights: [Double]
+    var layout: BookPageFormatter.TableLayout
+    var minimums: [Double]
+    /// The cells with words: an empty one takes no room in a stacked row.
+    var filled: [Bool]
     var spacing: CGFloat
+    var stackSpacing: CGFloat
 
-    private func widths(for total: CGFloat, count: Int) -> [CGFloat] {
-        let shares = (0..<count).map { $0 < weights.count ? max(weights[$0], 0.5) : 1 }
-        let sum = shares.reduce(0, +)
-        let available = max(0, total - spacing * CGFloat(max(0, count - 1)))
-        return shares.map { CGFloat($0 / sum) * available }
+    /// Nil where the row is stacked.
+    private func widths(for total: CGFloat) -> [CGFloat]? {
+        BookPageFormatter.tableWidths(
+            available: Double(total),
+            spacing: Double(spacing),
+            minimums: minimums,
+            layout: layout
+        )?.map { CGFloat($0) }
+    }
+
+    private func height(of subview: LayoutSubview, width: CGFloat) -> CGFloat {
+        subview.sizeThatFits(ProposedViewSize(width: width, height: nil)).height
     }
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? 320
-        let columns = widths(for: width, count: subviews.count)
-        let height = zip(subviews, columns)
-            .map { $0.sizeThatFits(ProposedViewSize(width: $1, height: nil)).height }
-            .max() ?? 0
-        return CGSize(width: width, height: height)
+        let proposed = proposal.width ?? 320
+        let width = proposed.isFinite ? max(0, proposed) : 320
+        if let columns = widths(for: width) {
+            let tallest = zip(subviews, columns).map { height(of: $0, width: $1) }.max() ?? 0
+            return CGSize(width: width, height: tallest)
+        }
+        let heights = zip(subviews, filled).filter { $0.1 }.map { height(of: $0.0, width: width) }
+        let gaps = stackSpacing * CGFloat(max(0, heights.count - 1))
+        return CGSize(width: width, height: heights.reduce(0, +) + gaps)
     }
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let columns = widths(for: bounds.width, count: subviews.count)
-        var x = bounds.minX
-        for (subview, width) in zip(subviews, columns) {
-            subview.place(at: CGPoint(x: x, y: bounds.minY), anchor: .topLeading,
-                          proposal: ProposedViewSize(width: width, height: nil))
-            x += width + spacing
+        if let columns = widths(for: bounds.width) {
+            var x = bounds.minX
+            for (subview, width) in zip(subviews, columns) {
+                subview.place(at: CGPoint(x: x, y: bounds.minY), anchor: .topLeading,
+                              proposal: ProposedViewSize(width: width, height: nil))
+                x += width + spacing
+            }
+            return
+        }
+        var y = bounds.minY
+        for (subview, hasWords) in zip(subviews, filled) {
+            subview.place(at: CGPoint(x: bounds.minX, y: y), anchor: .topLeading,
+                          proposal: ProposedViewSize(width: bounds.width, height: hasWords ? nil : 0))
+            if hasWords { y += height(of: subview, width: bounds.width) + stackSpacing }
         }
     }
 }
