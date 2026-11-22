@@ -5,7 +5,8 @@ import SwiftUI
 /// so those characters are given another face here. The text is never changed.
 ///
 /// Book, hadith and other free text set in that face goes through
-/// `Text.mushaf`. The ayat hold none of these characters and do not need it.
+/// `Text.mushaf`. The ayat hold none of these characters but U+06DF, and are
+/// left as they are.
 enum MushafFaceGaps {
     enum Face: Equatable {
         /// Digits, brackets and dashes, in Amiri Quran.
