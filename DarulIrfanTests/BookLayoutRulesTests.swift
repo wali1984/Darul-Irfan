@@ -13,6 +13,7 @@ final class BookLayoutRulesTests: XCTestCase {
         "book-ocr-hamd-o-naat",
         "book-ocr-pardah",
         "book-ocr-sai-hafta-course",
+        "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah",
         "tafaseer-parah-1",
         "uploads-books-maktobaat",
         "uploads-books-tareeq-e-saluk-fi-adab-e-shayuk",
@@ -172,6 +173,24 @@ final class BookLayoutRulesTests: XCTestCase {
             together[after.id]?.blocks.first,
             BookPageFormatter.format(page: after).blocks.first
         )
+    }
+
+    // MARK: - Links are underlined
+
+    func testALinkIsUnderlinedAndTheSalawatLineIsNot() throws {
+        let bookID = "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah"
+        let parts = try XCTUnwrap(BookPageFormatter.laidOutParts(of: try page(bookID, 2)))
+        let links = try XCTUnwrap(BookLinkProvider.shared.links(bookID: bookID)[2])
+
+        // "بِسْمِ اللّٰہِ" opens 1:1; the fifth line, the salawat, opens nothing.
+        let linked = BookLinkMatcher.pieces(of: parts[1].text, links: links).filter { $0.link != nil }
+        let piece = try XCTUnwrap(linked.first)
+        let drawn = BookTextDrawing.link(piece.text, index: try XCTUnwrap(piece.link))
+        XCTAssertNotNil(drawn.link)
+        XCTAssertNotNil(drawn[AttributeScopes.SwiftUIAttributes.UnderlineStyleAttribute.self])
+        XCTAssertEqual(Array(drawn.unicodeScalars), Array(piece.text.unicodeScalars))
+
+        XCTAssertFalse(BookLinkMatcher.pieces(of: parts[4].text, links: links).contains { $0.link != nil })
     }
 
     // MARK: - An empty cell keeps its column

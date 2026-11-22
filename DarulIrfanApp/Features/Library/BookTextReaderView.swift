@@ -777,12 +777,10 @@ struct FormattedBookPage: View {
         return text + words(String(plain), urduSize: urduSize)
     }
 
-    /// The words of a link: tappable, in the tint the page gives its links.
+    /// The words of a link: tappable, underlined, in the tint the page gives
+    /// its links.
     private func linkText(_ string: String, index: Int, mushafScale: Double?, urduSize: Double?) -> Text {
-        var attributed = AttributedString(string)
-        if let url = URL(string: "\(BookLinkTaps.scheme):\(index)") {
-            attributed.link = url
-        }
+        var attributed = BookTextDrawing.link(string, index: index)
         guard let mushafScale else {
             if let urduSize, place.followsBookRules {
                 attributed = BookTextDrawing.enlargingSalawat(attributed, scale: urduSize * scale)

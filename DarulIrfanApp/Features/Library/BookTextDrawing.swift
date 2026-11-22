@@ -45,6 +45,20 @@ enum BookTextDrawing {
         return drawn
     }
 
+    // MARK: - Links
+
+    /// The words of a link: tappable, with a thin dotted underline in the
+    /// link's colour, as colour alone does not tell a link from a quotation
+    /// that opens nothing.
+    static func link(_ string: String, index: Int) -> AttributedString {
+        var attributed = AttributedString(string)
+        guard let url = URL(string: "\(BookLinkTaps.scheme):\(index)") else { return attributed }
+        attributed.link = url
+        attributed[AttributeScopes.SwiftUIAttributes.UnderlineStyleAttribute.self] =
+            Text.LineStyle(pattern: .dot, color: DIColor.actionForeground)
+        return attributed
+    }
+
     // MARK: - Numbers in right-to-left text
 
     /// LEFT-TO-RIGHT ISOLATE and POP DIRECTIONAL ISOLATE.
