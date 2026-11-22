@@ -1035,6 +1035,326 @@
   "action": "apply",
   "note": "standard orthography, initial ھ for ہ in ہجری"
  },
+ "ASRAR-48-P11-14-003": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-48-P15-18-024": {
+  "action": "apply",
+  "note": "joined spelling split (chih jaye kih) + comma; no wording change"
+ },
+ "ASRAR-48-P5-8-021": {
+  "action": "apply",
+  "note": "joined/old spelling written apart + sentence stop; no wording change"
+ },
+ "ASRAR-48-P5-8-023": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-48-P5-8-024": {
+  "action": "apply",
+  "note": "standard spelling (liye) only"
+ },
+ "ASRAR-48-P9-10-001": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-48-P9-10-003": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-48-P9-10-004": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-48-P9-10-008": {
+  "action": "apply",
+  "note": "joined verb split + izafat mark only"
+ },
+ "ASRAR-49-P1-4-017": {
+  "action": "apply",
+  "note": "word typed twice (mein mein), doubling at a line break"
+ },
+ "ASRAR-49-P1-4-020": {
+  "action": "apply",
+  "note": "final he to ye before postposition (orthography only)"
+ },
+ "ASRAR-50-P1-5-001": {
+  "action": "apply",
+  "note": "print inspected: numbers in words only, stray digits (3, 45) removed; values unchanged"
+ },
+ "ASRAR-50-P1-5-007": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-50-P1-5-021": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-50-P1-5-022": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-50-P1-5-023": {
+  "action": "apply",
+  "note": "joined spelling split + list commas; no wording change"
+ },
+ "ASRAR-50-P6-10-004": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-50-P6-10-010": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-50-P6-10-012": {
+  "action": "apply",
+  "note": "joined spellings split + comma; no wording change"
+ },
+ "ASRAR-50-P6-10-013": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-50-P6-10-014": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-50-P6-10-028": {
+  "action": "hold",
+  "note": "surat to sura-e changes letters for an added izafat; valid as written"
+ },
+ "ASRAR-51-P1-6-005": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only); no negation involved"
+ },
+ "ASRAR-51-P1-6-008": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-51-P1-6-016": {
+  "action": "apply",
+  "note": "joined verb split + comma; no wording change"
+ },
+ "ASRAR-51-P1-6-022": {
+  "action": "hold",
+  "note": "reason says print reads as app; apne (with baat karne) is valid"
+ },
+ "ASRAR-51-P1-6-023": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-51-P1-6-028": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-51-P7-9-002": {
+  "action": "apply",
+  "note": "final he to ye before postposition (orthography only)"
+ },
+ "ASRAR-51-P7-9-006": {
+  "action": "apply",
+  "note": "final he to ye before postposition + sentence stop"
+ },
+ "ASRAR-51-P7-9-009": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-51-P7-9-010": {
+  "action": "apply",
+  "note": "stray alif (a-azab to azab) + joined spellings split and plain punctuation"
+ },
+ "ASRAR-52-P1-5-002": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed (27/3); neighbouring headings agree"
+ },
+ "ASRAR-52-P1-5-004": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-52-P1-5-006": {
+  "action": "apply",
+  "note": "standard spelling + comma and sentence stop; no wording change"
+ },
+ "ASRAR-52-P1-5-008": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-52-P1-5-009": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-52-P1-5-024": {
+  "action": "apply",
+  "note": "standard spelling (kiye) + sentence stop; no wording change"
+ },
+ "ASRAR-52-P1-5-025": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-53-P1-5-010": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-53-P1-5-011": {
+  "action": "apply",
+  "note": "final he to ye before postposition (orthography only)"
+ },
+ "ASRAR-53-P1-5-023": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed (27/6); neighbouring headings agree"
+ },
+ "ASRAR-53-P1-5-024": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-53-P6-11-011": {
+  "action": "hold",
+  "note": "adds a conjunction and respells a valid spelling (aza with hamza); possible as written"
+ },
+ "ASRAR-53-P6-11-012": {
+  "action": "apply",
+  "note": "print inspected: para/ruku number in heading as printed (27/7); neighbouring headings agree"
+ },
+ "ASRAR-53-P6-11-020": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-53-P6-11-021": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-54-P5-9-001": {
+  "action": "apply",
+  "note": "standard spelling (liye) only"
+ },
+ "ASRAR-54-P5-9-002": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-54-P5-9-016": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-54-P5-9-017": {
+  "action": "apply",
+  "note": "joined spellings split + comma; no wording change"
+ },
+ "ASRAR-55-P1-4-002": {
+  "action": "hold",
+  "note": "digit fix (alif typed for 1) and 27/11 are right, but the proposal also puts commas into the heading, which no neighbouring ruku heading carries and the reason does not say are printed; apply without the commas"
+ },
+ "ASRAR-55-P1-4-015": {
+  "action": "hold",
+  "note": "para name and 27/12 are right, but the proposal also puts commas into the heading, which no neighbouring ruku heading carries and the reason does not say are printed; apply without the commas"
+ },
+ "ASRAR-55-P1-4-016": {
+  "action": "apply",
+  "note": "joined spellings split, izafat mark, comma; no wording change"
+ },
+ "ASRAR-55-P5-9-006": {
+  "action": "apply",
+  "note": "joined verb split + sentence stop; no wording change"
+ },
+ "ASRAR-55-P5-9-009": {
+  "action": "apply",
+  "note": "joined verb split + commas round the vocative; no wording change"
+ },
+ "ASRAR-55-P5-9-010": {
+  "action": "apply",
+  "note": "joined spellings split + comma; no wording change"
+ },
+ "ASRAR-55-P5-9-011": {
+  "action": "apply",
+  "note": "joined spellings split + comma; no wording change"
+ },
+ "ASRAR-55-P5-9-018": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-55-P5-9-023": {
+  "action": "apply",
+  "note": "joined verb split + sentence stop; no wording change"
+ },
+ "ASRAR-55-P5-9-027": {
+  "action": "apply",
+  "note": "joined/old spelling written apart (orthography only)"
+ },
+ "ASRAR-57-P1-3-005": {
+  "action": "apply",
+  "note": "beshak to be shak + sentence stop; no negation involved"
+ },
+ "ASRAR-57-P4-6-008": {
+  "action": "apply",
+  "note": "print inspected: first letter of mein dropped at page start"
+ },
+ "ASRAR-57-P7-10-002": {
+  "action": "hold",
+  "note": "bracket problem in the translation; proposal rewrites wording and reason asks for the print to be checked"
+ },
+ "ASRAR-57-P7-10-009": {
+  "action": "apply",
+  "note": "garbled word (har for hai) in zard par jati hai; only reading"
+ },
+ "ASRAR-58-UR-P1-4-011": {
+  "action": "apply",
+  "note": "print inspected: para name and ruku number in heading as printed (28/2)"
+ },
+ "ASRAR-58-UR-P9-12-008": {
+  "action": "hold",
+  "note": "printed abbreviation sign; expanding it is an editorial uniformity decision per the reason"
+ },
+ "ASRAR-59-UR-P5-8-001": {
+  "action": "hold",
+  "note": "reason says the book spelling is as the app has it; editorial decision"
+ },
+ "ASRAR-59-UR-P5-8-006": {
+  "action": "hold",
+  "note": "respells a term and changes its form (sadaqat-ul-fitr); reason leaves it to the editor"
+ },
+ "ASRAR-59-UR-P5-8-010": {
+  "action": "apply",
+  "note": "honorific written twice (raz + sign) reduced to the standard sign; izafat mark only besides"
+ },
+ "ASRAR-59-UR-P9-11-005": {
+  "action": "apply",
+  "note": "beshak to be shak + sentence stop; no negation involved"
+ },
+ "ASRAR-59-UR-P9-11-009": {
+  "action": "hold",
+  "note": "adds a conjunction; reason says print reads ghaur fikr"
+ },
+ "ASRAR-60-UR-P1-7-014": {
+  "action": "apply",
+  "note": "joined verbs split + list commas; no wording change"
+ },
+ "ASRAR-60-UR-P1-7-021": {
+  "action": "apply",
+  "note": "garbled word (ulamar-haq): print reads ulama-e-haq"
+ },
+ "ASRAR-60-UR-P1-7-023": {
+  "action": "apply",
+  "note": "standard spellings only (lijiye, be shak); no negation involved"
+ },
+ "ASRAR-61-UR-P1-5-005": {
+  "action": "apply",
+  "note": "stray alif before ki"
+ },
+ "ASRAR-62-UR-P1-6-002": {
+  "action": "hold",
+  "note": "adds aur; reason asks editorial approval"
+ },
+ "ASRAR-62-UR-P1-6-010": {
+  "action": "apply",
+  "note": "garbled word (ulamar): ulama-e-yahud is the only reading"
+ },
+ "ASRAR-62-UR-P1-6-011": {
+  "action": "apply",
+  "note": "print inspected: closing line of the sentence missing from the app, restored as printed"
+ },
+ "ASRAR-63-UR-P1-6-014": {
+  "action": "apply",
+  "note": "look-alike slip (be/pe): idiom peshtar is ke kih is the only sensible reading"
+ },
  "ASRAR-ANBIYA-A-008": {
   "action": "hold",
   "note": "author's usage (کے بارے without میں)"
@@ -3622,6 +3942,2814 @@
  "ASRAR-YUSUF-S-021": {
   "action": "apply",
   "note": "standard orthography: oblique -ہ written -ے, no wording change; spacing before punctuation"
+ },
+ "TEAM-early-tafaseer-parah-1-P107-004": {
+  "action": "hold",
+  "note": "swaps the author word (ibtidaan)"
+ },
+ "TEAM-early-tafaseer-parah-1-P108-004": {
+  "action": "hold",
+  "note": "ki bajaye is valid usage; merely standardises"
+ },
+ "TEAM-early-tafaseer-parah-1-P11-004": {
+  "action": "apply",
+  "note": "final he to ye before postposition (sarmaye, istifade) + standard spelling and izafat mark"
+ },
+ "TEAM-early-tafaseer-parah-1-P110-001": {
+  "action": "hold",
+  "note": "author usage (Allah ka haya)"
+ },
+ "TEAM-early-tafaseer-parah-1-P110-004": {
+  "action": "hold",
+  "note": "ulama to ulama-e changes letters for an added izafat; bundled with the rawaiye fix"
+ },
+ "TEAM-early-tafaseer-parah-1-P111-003": {
+  "action": "apply",
+  "note": "unread word between chal and hoga: raha is the only possible word and matches the visible letters"
+ },
+ "TEAM-early-tafaseer-parah-1-P112-006": {
+  "action": "hold",
+  "note": "rewrites parallel clauses; editorial style"
+ },
+ "TEAM-early-tafaseer-parah-1-P113-004": {
+  "action": "hold",
+  "note": "word order only"
+ },
+ "TEAM-early-tafaseer-parah-1-P114-002": {
+  "action": "hold",
+  "note": "sab se ... tareen is the author's wording"
+ },
+ "TEAM-early-tafaseer-parah-1-P121-003": {
+  "action": "hold",
+  "note": "adds ya; optional wording"
+ },
+ "TEAM-early-tafaseer-parah-1-P123-004": {
+  "action": "hold",
+  "note": "bataur ... ke is valid spoken usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P123-006": {
+  "action": "hold",
+  "note": "gender the author gives parwaz"
+ },
+ "TEAM-early-tafaseer-parah-1-P125-004": {
+  "action": "hold",
+  "note": "raho>ho likely right but bundled with respelling of valid gunahgar"
+ },
+ "TEAM-early-tafaseer-parah-1-P128-003": {
+  "action": "hold",
+  "note": "ke saath naraz is possible spoken usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P128-005": {
+  "action": "hold",
+  "note": "adds ya; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P129-003": {
+  "action": "hold",
+  "note": "agreement and commas; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P130-004": {
+  "action": "hold",
+  "note": "printed reads as app; hadith term needs editor"
+ },
+ "TEAM-early-tafaseer-parah-1-P141-002": {
+  "action": "hold",
+  "note": "ki bajaye is a valid form"
+ },
+ "TEAM-early-tafaseer-parah-1-P141-003": {
+  "action": "hold",
+  "note": "aise hoti hai is valid adverbial usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P141-005": {
+  "action": "hold",
+  "note": "gender the author gives manazil"
+ },
+ "TEAM-early-tafaseer-parah-1-P15-001": {
+  "action": "hold",
+  "note": "gender the author gives shan-e-nuzul (masculine, also elsewhere)"
+ },
+ "TEAM-early-tafaseer-parah-1-P151-005": {
+  "action": "hold",
+  "note": "regional gender of gehun"
+ },
+ "TEAM-early-tafaseer-parah-1-P154-007": {
+  "action": "hold",
+  "note": "ki bajaye and uninflected iaada are valid"
+ },
+ "TEAM-early-tafaseer-parah-1-P156-001": {
+  "action": "hold",
+  "note": "adds a negation; printed reads as app"
+ },
+ "TEAM-early-tafaseer-parah-1-P157-005": {
+  "action": "hold",
+  "note": "wujuhat is a valid plural"
+ },
+ "TEAM-early-tafaseer-parah-1-P16-003": {
+  "action": "hold",
+  "note": "infinitive agreement; author usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P163-005": {
+  "action": "hold",
+  "note": "valid joined spelling; izafat respelling"
+ },
+ "TEAM-early-tafaseer-parah-1-P168-003": {
+  "action": "hold",
+  "note": "Persian verse; printed reads as app"
+ },
+ "TEAM-early-tafaseer-parah-1-P171-003": {
+  "action": "hold",
+  "note": "ki bajaye is valid"
+ },
+ "TEAM-early-tafaseer-parah-1-P171-004": {
+  "action": "hold",
+  "note": "ko chimte rahe is possible; rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P171-005": {
+  "action": "hold",
+  "note": "valid spelling guzarah"
+ },
+ "TEAM-early-tafaseer-parah-1-P178-004": {
+  "action": "hold",
+  "note": "jaunsa is a valid spoken word"
+ },
+ "TEAM-early-tafaseer-parah-1-P179-003": {
+  "action": "hold",
+  "note": "rewrites; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P189-006": {
+  "action": "hold",
+  "note": "hain>hai plausible but bundled with respellings; not certain"
+ },
+ "TEAM-early-tafaseer-parah-1-P19-001": {
+  "action": "hold",
+  "note": "spoken style (banda dafn kiya); adds a word"
+ },
+ "TEAM-early-tafaseer-parah-1-P19-002": {
+  "action": "hold",
+  "note": "tense change in reported speech; taste"
+ },
+ "TEAM-early-tafaseer-parah-1-P190-005": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P193-005": {
+  "action": "hold",
+  "note": "ki bajaye valid; izafat respelling"
+ },
+ "TEAM-early-tafaseer-parah-1-P194-001": {
+  "action": "hold",
+  "note": "adds a word; reason asks to compare with print"
+ },
+ "TEAM-early-tafaseer-parah-1-P194-006": {
+  "action": "hold",
+  "note": "bataur ... ke is valid spoken usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P195-005": {
+  "action": "hold",
+  "note": "adds words; rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P196-003": {
+  "action": "hold",
+  "note": "gender the author gives rooh"
+ },
+ "TEAM-early-tafaseer-parah-1-P20-001": {
+  "action": "hold",
+  "note": "spoken repetition (bakhsha hai); rewrite of agreement"
+ },
+ "TEAM-early-tafaseer-parah-1-P20-002": {
+  "action": "hold",
+  "note": "gender the author gives gaind + word order rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P200-002": {
+  "action": "hold",
+  "note": "drops a word in translation; reason asks for print check"
+ },
+ "TEAM-early-tafaseer-parah-1-P200-003": {
+  "action": "apply",
+  "note": "dropped ho in translation sentence; question mark alongside"
+ },
+ "TEAM-early-tafaseer-parah-1-P204-004": {
+  "action": "apply",
+  "note": "dropped ki; only word that fits"
+ },
+ "TEAM-early-tafaseer-parah-1-P205-001": {
+  "action": "hold",
+  "note": "optional keh and respelling of pata"
+ },
+ "TEAM-early-tafaseer-parah-1-P208-001": {
+  "action": "hold",
+  "note": "drops aur from translation; editor to confirm"
+ },
+ "TEAM-early-tafaseer-parah-1-P21-002": {
+  "action": "hold",
+  "note": "optional kih added and valid spelling respelt"
+ },
+ "TEAM-early-tafaseer-parah-1-P218-004": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P219-003": {
+  "action": "hold",
+  "note": "uninflected dawa is a valid older spelling"
+ },
+ "TEAM-early-tafaseer-parah-1-P221-002": {
+  "action": "hold",
+  "note": "uninflected dawa is a valid older spelling"
+ },
+ "TEAM-early-tafaseer-parah-1-P230-004": {
+  "action": "hold",
+  "note": "optional keh and respelling of pata"
+ },
+ "TEAM-early-tafaseer-parah-1-P24-004": {
+  "action": "hold",
+  "note": "reason says print reads as app; fix not unique (kar le ga / kare ga)"
+ },
+ "TEAM-early-tafaseer-parah-1-P241-001": {
+  "action": "hold",
+  "note": "gender the author gives manazil"
+ },
+ "TEAM-early-tafaseer-parah-1-P244-001": {
+  "action": "hold",
+  "note": "adds a negation; printed reads as app"
+ },
+ "TEAM-early-tafaseer-parah-1-P245-002": {
+  "action": "hold",
+  "note": "Persian verse; needs original"
+ },
+ "TEAM-early-tafaseer-parah-1-P245-004": {
+  "action": "hold",
+  "note": "better-word substitution"
+ },
+ "TEAM-early-tafaseer-parah-1-P249-002": {
+  "action": "hold",
+  "note": "style rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P255-003": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P259-001": {
+  "action": "hold",
+  "note": "drops copula; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P261-002": {
+  "action": "hold",
+  "note": "do vs donon is style"
+ },
+ "TEAM-early-tafaseer-parah-1-P263-004": {
+  "action": "hold",
+  "note": "ki bajaye valid; izafat respelling"
+ },
+ "TEAM-early-tafaseer-parah-1-P265-003": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P266-001": {
+  "action": "hold",
+  "note": "adds ya; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P267-004": {
+  "action": "hold",
+  "note": "printed reads Right off as app; editor"
+ },
+ "TEAM-early-tafaseer-parah-1-P27-004": {
+  "action": "hold",
+  "note": "koi goes with gunjaish; valid as written"
+ },
+ "TEAM-early-tafaseer-parah-1-P273-004": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "TEAM-early-tafaseer-parah-1-P276-001": {
+  "action": "hold",
+  "note": "rewrites sentence"
+ },
+ "TEAM-early-tafaseer-parah-1-P276-002": {
+  "action": "hold",
+  "note": "spoken construction; not certain"
+ },
+ "TEAM-early-tafaseer-parah-1-P277-001": {
+  "action": "apply",
+  "note": "dropped letter: banna, parallel infinitives rokna / pahuncha dena"
+ },
+ "TEAM-early-tafaseer-parah-1-P278-002": {
+  "action": "hold",
+  "note": "drops words; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P279-002": {
+  "action": "hold",
+  "note": "infinitive agreement with namazen; author's style"
+ },
+ "TEAM-early-tafaseer-parah-1-P279-003": {
+  "action": "apply",
+  "note": "doubled plural marker: parhi thin"
+ },
+ "TEAM-early-tafaseer-parah-1-P281-001": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P281-002": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "TEAM-early-tafaseer-parah-1-P281-003": {
+  "action": "hold",
+  "note": "adds waw; list style"
+ },
+ "TEAM-early-tafaseer-parah-1-P282-001": {
+  "action": "hold",
+  "note": "rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P282-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P283-001": {
+  "action": "hold",
+  "note": "swaps words; clarity rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P284-002": {
+  "action": "hold",
+  "note": "infinitive agreement style"
+ },
+ "TEAM-early-tafaseer-parah-1-P285-001": {
+  "action": "hold",
+  "note": "singular pronoun is spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P288-002": {
+  "action": "hold",
+  "note": "adds a meaning-bearing word"
+ },
+ "TEAM-early-tafaseer-parah-1-P289-001": {
+  "action": "hold",
+  "note": "rewrites and re-punctuates"
+ },
+ "TEAM-early-tafaseer-parah-1-P289-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P290-001": {
+  "action": "hold",
+  "note": "two readings possible: stray te, or to + wahdahu run together"
+ },
+ "TEAM-early-tafaseer-parah-1-P290-003": {
+  "action": "hold",
+  "note": "rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P292-001": {
+  "action": "hold",
+  "note": "heading wording; better-word swap"
+ },
+ "TEAM-early-tafaseer-parah-1-P292-002": {
+  "action": "hold",
+  "note": "gender the author gives tawahhumat"
+ },
+ "TEAM-early-tafaseer-parah-1-P292-003": {
+  "action": "hold",
+  "note": "chahiyen the is a valid form"
+ },
+ "TEAM-early-tafaseer-parah-1-P294-001": {
+  "action": "hold",
+  "note": "ke saath iman mirrors the Arabic bihi; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P294-002": {
+  "action": "hold",
+  "note": "word order/style"
+ },
+ "TEAM-early-tafaseer-parah-1-P296-002": {
+  "action": "hold",
+  "note": "broken but fix not unique (use / us ko)"
+ },
+ "TEAM-early-tafaseer-parah-1-P297-001": {
+  "action": "apply",
+  "note": "walon insanon > wale insanon; one fix"
+ },
+ "TEAM-early-tafaseer-parah-1-P297-002": {
+  "action": "hold",
+  "note": "uninflected list item; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P299-002": {
+  "action": "hold",
+  "note": "izafat additions change letters"
+ },
+ "TEAM-early-tafaseer-parah-1-P30-003": {
+  "action": "hold",
+  "note": "rewrites wording; reason asks comparison with the author"
+ },
+ "TEAM-early-tafaseer-parah-1-P302-001": {
+  "action": "hold",
+  "note": "slip likely but fix not unique (farma / farmaiye)"
+ },
+ "TEAM-early-tafaseer-parah-1-P302-002": {
+  "action": "hold",
+  "note": "gender the author gives manazil"
+ },
+ "TEAM-early-tafaseer-parah-1-P302-003": {
+  "action": "hold",
+  "note": "rewrite"
+ },
+ "TEAM-early-tafaseer-parah-1-P303-002": {
+  "action": "hold",
+  "note": "rewrite plus respelling of guzarish"
+ },
+ "TEAM-early-tafaseer-parah-1-P303-004": {
+  "action": "hold",
+  "note": "re-punctuates and adds pronoun"
+ },
+ "TEAM-early-tafaseer-parah-1-P305-001": {
+  "action": "hold",
+  "note": "par tilawat mirrors the Arabic; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P305-002": {
+  "action": "hold",
+  "note": "adds a word; could be a list comma"
+ },
+ "TEAM-early-tafaseer-parah-1-P305-003": {
+  "action": "hold",
+  "note": "shared se at end of list is valid"
+ },
+ "TEAM-early-tafaseer-parah-1-P306-001": {
+  "action": "hold",
+  "note": "slip but fix not unique (drop ne / farmaya)"
+ },
+ "TEAM-early-tafaseer-parah-1-P306-002": {
+  "action": "hold",
+  "note": "honorific number changed; author may use the general plural"
+ },
+ "TEAM-early-tafaseer-parah-1-P306-003": {
+  "action": "hold",
+  "note": "honorific change plus izafat; fix not unique (sayyida / sayyidatuna)"
+ },
+ "TEAM-early-tafaseer-parah-1-P307-002": {
+  "action": "hold",
+  "note": "word order"
+ },
+ "TEAM-early-tafaseer-parah-1-P310-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P311-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P311-003": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P311-004": {
+  "action": "hold",
+  "note": "better-idiom substitution"
+ },
+ "TEAM-early-tafaseer-parah-1-P312-003": {
+  "action": "hold",
+  "note": "word order; gender of ittiba"
+ },
+ "TEAM-early-tafaseer-parah-1-P315-002": {
+  "action": "hold",
+  "note": "word-order rewrite of a possible sentence"
+ },
+ "TEAM-early-tafaseer-parah-1-P316-001": {
+  "action": "hold",
+  "note": "word order only; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P316-003": {
+  "action": "hold",
+  "note": "rewrites and adds a word; original is possible"
+ },
+ "TEAM-early-tafaseer-parah-1-P317-001": {
+  "action": "hold",
+  "note": "paired nouns without waw are spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P34-002": {
+  "action": "hold",
+  "note": "author word (rawajat); style"
+ },
+ "TEAM-early-tafaseer-parah-1-P38-007": {
+  "action": "hold",
+  "note": "author wording (muhr kar di); reason asks comparison with print"
+ },
+ "TEAM-early-tafaseer-parah-1-P39-004": {
+  "action": "hold",
+  "note": "tumhara goes with rasta; valid as written"
+ },
+ "TEAM-early-tafaseer-parah-1-P39-005": {
+  "action": "hold",
+  "note": "author wording; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P43-001": {
+  "action": "hold",
+  "note": "verse number; 4:145 is certainly the right reference, but reason says print reads 45 - editor to confirm"
+ },
+ "TEAM-early-tafaseer-parah-1-P44-008": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage throughout"
+ },
+ "TEAM-early-tafaseer-parah-1-P44-009": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage throughout"
+ },
+ "TEAM-early-tafaseer-parah-1-P45-001": {
+  "action": "hold",
+  "note": "author wording; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P45-005": {
+  "action": "hold",
+  "note": "ki bajaye is valid usage; merely standardises"
+ },
+ "TEAM-early-tafaseer-parah-1-P47-001": {
+  "action": "hold",
+  "note": "ki bajaye is valid usage; merely standardises"
+ },
+ "TEAM-early-tafaseer-parah-1-P51-005": {
+  "action": "hold",
+  "note": "spoken aap ... karte ho is the author usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P52-001": {
+  "action": "hold",
+  "note": "ki bajaye is valid usage; merely standardises"
+ },
+ "TEAM-early-tafaseer-parah-1-P52-002": {
+  "action": "hold",
+  "note": "singular after a number is valid usage"
+ },
+ "TEAM-early-tafaseer-parah-1-P52-006": {
+  "action": "apply",
+  "note": "bewaqoof written apart + mark after farmaya; no negation involved, no wording change"
+ },
+ "TEAM-early-tafaseer-parah-1-P53-001": {
+  "action": "apply",
+  "note": "bewaqoof written apart (orthography only); no negation involved"
+ },
+ "TEAM-early-tafaseer-parah-1-P55-001": {
+  "action": "hold",
+  "note": "rewrites the sentence; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P58-003": {
+  "action": "hold",
+  "note": "clearly ke baad, but reason says print reads as app and asks editorial approval"
+ },
+ "TEAM-early-tafaseer-parah-1-P59-001": {
+  "action": "apply",
+  "note": "print inspected: reads jorne (dropped letter); only sensible reading"
+ },
+ "TEAM-early-tafaseer-parah-1-P61-002": {
+  "action": "hold",
+  "note": "word order; author style"
+ },
+ "TEAM-early-tafaseer-parah-1-P62-005": {
+  "action": "apply",
+  "note": "slip chahiye for chahe in a run of parallel verbs; only reading"
+ },
+ "TEAM-early-tafaseer-parah-1-P62-006": {
+  "action": "apply",
+  "note": "number slip (barishen barasti hain), parallel clauses plural; only fix"
+ },
+ "TEAM-early-tafaseer-parah-1-P67-003": {
+  "action": "hold",
+  "note": "drops a repeated pronoun; style"
+ },
+ "TEAM-early-tafaseer-parah-1-P68-004": {
+  "action": "hold",
+  "note": "rewrites the author wording"
+ },
+ "TEAM-early-tafaseer-parah-1-P69-006": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage throughout"
+ },
+ "TEAM-early-tafaseer-parah-1-P72-002": {
+  "action": "hold",
+  "note": "ki bajaye is valid usage; merely standardises"
+ },
+ "TEAM-early-tafaseer-parah-1-P72-007": {
+  "action": "apply",
+  "note": "beshak to be shak; no negation involved"
+ },
+ "TEAM-early-tafaseer-parah-1-P86-001": {
+  "action": "hold",
+  "note": "word order; author spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P86-004": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage throughout"
+ },
+ "TEAM-early-tafaseer-parah-1-P86-005": {
+  "action": "hold",
+  "note": "rewrites spoken ellipsis; editorial"
+ },
+ "TEAM-early-tafaseer-parah-1-P88-005": {
+  "action": "hold",
+  "note": "adds words and respells; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-1-P96-003": {
+  "action": "hold",
+  "note": "verse number; 7:21 is certainly the right reference, but reason says print reads 12 - editor to confirm"
+ },
+ "TEAM-early-tafaseer-parah-1-P98-003": {
+  "action": "hold",
+  "note": "possible as written; reason asks print check"
+ },
+ "TEAM-early-tafaseer-parah-1-P99-004": {
+  "action": "hold",
+  "note": "gender the author gives tabai"
+ },
+ "TEAM-early-tafaseer-parah-2-P100-001": {
+  "action": "hold",
+  "note": "ek ek can be distributive; question mark alone not enough"
+ },
+ "TEAM-early-tafaseer-parah-2-P100-002": {
+  "action": "hold",
+  "note": "pair without waw is spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P101-001": {
+  "action": "hold",
+  "note": "verb agrees with predicate bidat; valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P102-001": {
+  "action": "hold",
+  "note": "singular verb with bhi...bhi subjects is possible spoken style; agreement standardisation"
+ },
+ "TEAM-early-tafaseer-parah-2-P102-002": {
+  "action": "hold",
+  "note": "adds a negation and reorders; single-nah construction is valid Urdu"
+ },
+ "TEAM-early-tafaseer-parah-2-P102-003": {
+  "action": "hold",
+  "note": "rewrites subject and number; reason itself is unsure of the referent"
+ },
+ "TEAM-early-tafaseer-parah-2-P103-002": {
+  "action": "hold",
+  "note": "adds a word for clarity; text is a possible sentence"
+ },
+ "TEAM-early-tafaseer-parah-2-P105-003": {
+  "action": "apply",
+  "note": "stray doubled mein (is mein mulk mein); is mulk just precedes"
+ },
+ "TEAM-early-tafaseer-parah-2-P107-002": {
+  "action": "hold",
+  "note": "adds negation; single-nah construction is valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P108-003": {
+  "action": "hold",
+  "note": "lan tan without waw is valid usage"
+ },
+ "TEAM-early-tafaseer-parah-2-P112-003": {
+  "action": "hold",
+  "note": "stylistic rewording (ke saath iman / jis ko)"
+ },
+ "TEAM-early-tafaseer-parah-2-P113-001": {
+  "action": "hold",
+  "note": "ko rukh karna is the author's wording; rewrite"
+ },
+ "TEAM-early-tafaseer-parah-2-P113-002": {
+  "action": "hold",
+  "note": "word-order rewrite adding words"
+ },
+ "TEAM-early-tafaseer-parah-2-P114-001": {
+  "action": "hold",
+  "note": "ahd wafa karna is valid; word swap"
+ },
+ "TEAM-early-tafaseer-parah-2-P116-001": {
+  "action": "hold",
+  "note": "Persian izafat baqa-e-muashra is correct as it stands"
+ },
+ "TEAM-early-tafaseer-parah-2-P116-003": {
+  "action": "hold",
+  "note": "author's spoken usage; better-word change"
+ },
+ "TEAM-early-tafaseer-parah-2-P119-001": {
+  "action": "hold",
+  "note": "rewrite adding hissa; original is fine spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P121-001": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-2-P123-002": {
+  "action": "hold",
+  "note": "stylistic parallelism rewrite"
+ },
+ "TEAM-early-tafaseer-parah-2-P124-001": {
+  "action": "apply",
+  "note": "banaye ge is a plain slip for passive banaye gaye"
+ },
+ "TEAM-early-tafaseer-parah-2-P124-002": {
+  "action": "hold",
+  "note": "rewrite of number and punctuation; taste"
+ },
+ "TEAM-early-tafaseer-parah-2-P124-003": {
+  "action": "hold",
+  "note": "word-order standardisation"
+ },
+ "TEAM-early-tafaseer-parah-2-P125-002": {
+  "action": "hold",
+  "note": "reference label respelt; valid as it stands"
+ },
+ "TEAM-early-tafaseer-parah-2-P127-001": {
+  "action": "hold",
+  "note": "swaps a fiqh term (kaffara/fidya); reason asks editorial confirmation"
+ },
+ "TEAM-early-tafaseer-parah-2-P127-002": {
+  "action": "hold",
+  "note": "word swap; ziyadati here means doing more"
+ },
+ "TEAM-early-tafaseer-parah-2-P128-002": {
+  "action": "apply",
+  "note": "main roza rakh sakta hai - verb must be hoon; only fix"
+ },
+ "TEAM-early-tafaseer-parah-2-P129-001": {
+  "action": "hold",
+  "note": "reorder/rewrite; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P13-001": {
+  "action": "hold",
+  "note": "singular to plural in a heading; style"
+ },
+ "TEAM-early-tafaseer-parah-2-P130-001": {
+  "action": "hold",
+  "note": "verb parallels the preceding nazar aata hai; possibly intended; not certain"
+ },
+ "TEAM-early-tafaseer-parah-2-P130-002": {
+  "action": "hold",
+  "note": "rewrite of construction and postposition"
+ },
+ "TEAM-early-tafaseer-parah-2-P131-001": {
+  "action": "hold",
+  "note": "repeated list is not word-for-word; printed page has it; editorial choice"
+ },
+ "TEAM-early-tafaseer-parah-2-P131-002": {
+  "action": "hold",
+  "note": "adds a verb; original is normal ellipsis"
+ },
+ "TEAM-early-tafaseer-parah-2-P131-003": {
+  "action": "hold",
+  "note": "pairs without waw are valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P132-002": {
+  "action": "hold",
+  "note": "garbled, but proposal rewrites beyond the slip (tak mahdood)"
+ },
+ "TEAM-early-tafaseer-parah-2-P133-001": {
+  "action": "hold",
+  "note": "rewrite (furoo, verb number); taste"
+ },
+ "TEAM-early-tafaseer-parah-2-P133-002": {
+  "action": "hold",
+  "note": "re-punctuates and rewords"
+ },
+ "TEAM-early-tafaseer-parah-2-P134-001": {
+  "action": "hold",
+  "note": "reorders and adds a subject; more than the slip"
+ },
+ "TEAM-early-tafaseer-parah-2-P134-002": {
+  "action": "hold",
+  "note": "swaps to for magar and adds a pronoun"
+ },
+ "TEAM-early-tafaseer-parah-2-P134-003": {
+  "action": "hold",
+  "note": "added izafat in a heading; reason offers alternatives"
+ },
+ "TEAM-early-tafaseer-parah-2-P135-002": {
+  "action": "hold",
+  "note": "number agreement and respelling rewrite; spoken style possible"
+ },
+ "TEAM-early-tafaseer-parah-2-P135-003": {
+  "action": "hold",
+  "note": "apna mani singular is valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P136-001": {
+  "action": "apply",
+  "note": "us ki dil mein - dil is masculine, must be us ke dil mein; comma only"
+ },
+ "TEAM-early-tafaseer-parah-2-P137-002": {
+  "action": "hold",
+  "note": "drops a numeral; word and figure may both be the book's"
+ },
+ "TEAM-early-tafaseer-parah-2-P138-003": {
+  "action": "hold",
+  "note": "adds Ramazan but agle refers to etikaf; proposal doubtful"
+ },
+ "TEAM-early-tafaseer-parah-2-P139-002": {
+  "action": "apply",
+  "note": "woh mujh pehchanein - dropped letter, mujhe"
+ },
+ "TEAM-early-tafaseer-parah-2-P141-001": {
+  "action": "hold",
+  "note": "bari khoobsurat is valid; better-word change"
+ },
+ "TEAM-early-tafaseer-parah-2-P141-002": {
+  "action": "hold",
+  "note": "rewrite adding words and changing the honorific form"
+ },
+ "TEAM-early-tafaseer-parah-2-P142-001": {
+  "action": "apply",
+  "note": "stray second Rasool after the durood; plain repetition"
+ },
+ "TEAM-early-tafaseer-parah-2-P147-002": {
+  "action": "hold",
+  "note": "adds aur and a comma; style"
+ },
+ "TEAM-early-tafaseer-parah-2-P148-002": {
+  "action": "hold",
+  "note": "adds kya and turns it into a question; rhetorical exclamation is valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P148-003": {
+  "action": "apply",
+  "note": "mere taraf - taraf is feminine, meri taraf; one-letter slip"
+ },
+ "TEAM-early-tafaseer-parah-2-P149-002": {
+  "action": "hold",
+  "note": "rewrites the wording"
+ },
+ "TEAM-early-tafaseer-parah-2-P149-003": {
+  "action": "hold",
+  "note": "rewrite adding words"
+ },
+ "TEAM-early-tafaseer-parah-2-P151-001": {
+  "action": "hold",
+  "note": "garm o sard is a valid idiom"
+ },
+ "TEAM-early-tafaseer-parah-2-P151-003": {
+  "action": "hold",
+  "note": "khareed farokht without waw is valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P153-001": {
+  "action": "hold",
+  "note": "honorific pronoun change plus added izafat; anhum is commonly written so"
+ },
+ "TEAM-early-tafaseer-parah-2-P153-003": {
+  "action": "hold",
+  "note": "Ramazan ke ... auqaat is a possible sentence"
+ },
+ "TEAM-early-tafaseer-parah-2-P154-002": {
+  "action": "hold",
+  "note": "aap ... ho is the author's spoken register"
+ },
+ "TEAM-early-tafaseer-parah-2-P155-001": {
+  "action": "hold",
+  "note": "garbled, but more than one possible fix (ashab-e-Muhammad ... / ke sahaba)"
+ },
+ "TEAM-early-tafaseer-parah-2-P155-003": {
+  "action": "hold",
+  "note": "printed page reads as the app; rewrite of a fiqh statement"
+ },
+ "TEAM-early-tafaseer-parah-2-P156-001": {
+  "action": "hold",
+  "note": "drops jis and re-punctuates; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P156-003": {
+  "action": "apply",
+  "note": "dropped ne (jis ne nahin dekha), parallel to the clause before"
+ },
+ "TEAM-early-tafaseer-parah-2-P159-002": {
+  "action": "hold",
+  "note": "adds emphatic hi; optional"
+ },
+ "TEAM-early-tafaseer-parah-2-P16-001": {
+  "action": "apply",
+  "note": "unreadable marker in contents; body heading on p.207 gives the full title"
+ },
+ "TEAM-early-tafaseer-parah-2-P16-002": {
+  "action": "apply",
+  "note": "unreadable marker in contents; body heading on p.207 gives the full title"
+ },
+ "TEAM-early-tafaseer-parah-2-P160-002": {
+  "action": "hold",
+  "note": "a slip, but the author's style suggests gosht ke jalane rather than ko; not a single fix"
+ },
+ "TEAM-early-tafaseer-parah-2-P160-003": {
+  "action": "hold",
+  "note": "rewrite of wording"
+ },
+ "TEAM-early-tafaseer-parah-2-P163-001": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-2-P164-002": {
+  "action": "hold",
+  "note": "restyles the list in a translation"
+ },
+ "TEAM-early-tafaseer-parah-2-P164-003": {
+  "action": "hold",
+  "note": "par sawalat karna is possible older usage"
+ },
+ "TEAM-early-tafaseer-parah-2-P17-003": {
+  "action": "hold",
+  "note": "singular/plural style in a contents label"
+ },
+ "TEAM-early-tafaseer-parah-2-P18-002": {
+  "action": "hold",
+  "note": "singular/plural agreement in a heading; style"
+ },
+ "TEAM-early-tafaseer-parah-2-P23-001": {
+  "action": "hold",
+  "note": "rewrite of a valid idiom (min jumla ... ke)"
+ },
+ "TEAM-early-tafaseer-parah-2-P24-002": {
+  "action": "hold",
+  "note": "word order taste"
+ },
+ "TEAM-early-tafaseer-parah-2-P25-001": {
+  "action": "hold",
+  "note": "added ke not required; original readable as a list"
+ },
+ "TEAM-early-tafaseer-parah-2-P26-002": {
+  "action": "hold",
+  "note": "replaces the author's wording with a synonym"
+ },
+ "TEAM-early-tafaseer-parah-2-P26-003": {
+  "action": "hold",
+  "note": "verb agrees with feminine subject masjid; valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P27-001": {
+  "action": "hold",
+  "note": "adds a noun and izafat; original possible"
+ },
+ "TEAM-early-tafaseer-parah-2-P28-002": {
+  "action": "hold",
+  "note": "stylistic rewording of a translation"
+ },
+ "TEAM-early-tafaseer-parah-2-P29-002": {
+  "action": "hold",
+  "note": "stylistic rewording"
+ },
+ "TEAM-early-tafaseer-parah-2-P31-001": {
+  "action": "apply",
+  "note": "broken formula: Allah dropped from Muhammad Rasul Allah"
+ },
+ "TEAM-early-tafaseer-parah-2-P31-002": {
+  "action": "hold",
+  "note": "stylistic rewrite"
+ },
+ "TEAM-early-tafaseer-parah-2-P33-002": {
+  "action": "apply",
+  "note": "broken formula: Allah dropped from Muhammad Rasul Allah"
+ },
+ "TEAM-early-tafaseer-parah-2-P36-002": {
+  "action": "apply",
+  "note": "broken formula: Allah dropped from Muhammad Rasul Allah"
+ },
+ "TEAM-early-tafaseer-parah-2-P36-003": {
+  "action": "hold",
+  "note": "swaps a valid word for a more usual one"
+ },
+ "TEAM-early-tafaseer-parah-2-P38-001": {
+  "action": "apply",
+  "note": "dropped alif: masjid banta cannot stand, subject koi needs banata"
+ },
+ "TEAM-early-tafaseer-parah-2-P38-003": {
+  "action": "hold",
+  "note": "rewrite; original understandable"
+ },
+ "TEAM-early-tafaseer-parah-2-P4-002": {
+  "action": "hold",
+  "note": "the author's own compound; reason defers to author style"
+ },
+ "TEAM-early-tafaseer-parah-2-P44-001": {
+  "action": "hold",
+  "note": "agreement style plus respelling of a valid spelling"
+ },
+ "TEAM-early-tafaseer-parah-2-P44-002": {
+  "action": "hold",
+  "note": "respelling of a month name; valid as it stands"
+ },
+ "TEAM-early-tafaseer-parah-2-P46-002": {
+  "action": "hold",
+  "note": "replaces the author's loanword"
+ },
+ "TEAM-early-tafaseer-parah-2-P47-003": {
+  "action": "hold",
+  "note": "parallel ek doosre ke ... muhafiz is a possible spoken construction"
+ },
+ "TEAM-early-tafaseer-parah-2-P49-001": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "TEAM-early-tafaseer-parah-2-P49-002": {
+  "action": "hold",
+  "note": "ne with infinitive is the author's regional Urdu"
+ },
+ "TEAM-early-tafaseer-parah-2-P51-001": {
+  "action": "apply",
+  "note": "homophone slip ke for kih"
+ },
+ "TEAM-early-tafaseer-parah-2-P53-001": {
+  "action": "hold",
+  "note": "adds a negation; reason says print lacks it and asks for confirmation"
+ },
+ "TEAM-early-tafaseer-parah-2-P56-001": {
+  "action": "apply",
+  "note": "word doubled across the page break (previous page ends ho jaye); doubled-word case, confirmed on second reading"
+ },
+ "TEAM-early-tafaseer-parah-2-P57-003": {
+  "action": "hold",
+  "note": "valid spoken causative"
+ },
+ "TEAM-early-tafaseer-parah-2-P60-002": {
+  "action": "hold",
+  "note": "pair without waw is spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P61-002": {
+  "action": "hold",
+  "note": "replaces the author's English word and reorders"
+ },
+ "TEAM-early-tafaseer-parah-2-P62-001": {
+  "action": "hold",
+  "note": "rewrite of spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P66-001": {
+  "action": "hold",
+  "note": "singular to plural in a heading; style"
+ },
+ "TEAM-early-tafaseer-parah-2-P66-002": {
+  "action": "hold",
+  "note": "optional pronoun; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P68-002": {
+  "action": "hold",
+  "note": "stylistic rewrite"
+ },
+ "TEAM-early-tafaseer-parah-2-P68-003": {
+  "action": "hold",
+  "note": "doubled plural marking is spoken/regional usage; not sure"
+ },
+ "TEAM-early-tafaseer-parah-2-P69-002": {
+  "action": "hold",
+  "note": "rewrite of a common spoken collocation"
+ },
+ "TEAM-early-tafaseer-parah-2-P69-003": {
+  "action": "hold",
+  "note": "adjective agreement in spoken style (like infinitive agreement)"
+ },
+ "TEAM-early-tafaseer-parah-2-P71-001": {
+  "action": "hold",
+  "note": "swaps a meaning-bearing word (har to tamam)"
+ },
+ "TEAM-early-tafaseer-parah-2-P73-003": {
+  "action": "hold",
+  "note": "stylistic rewrite"
+ },
+ "TEAM-early-tafaseer-parah-2-P75-001": {
+  "action": "hold",
+  "note": "two possible fixes (drop ke, or kih)"
+ },
+ "TEAM-early-tafaseer-parah-2-P75-002": {
+  "action": "hold",
+  "note": "rewrite beyond the agreement point"
+ },
+ "TEAM-early-tafaseer-parah-2-P76-001": {
+  "action": "hold",
+  "note": "adds a pronoun and repunctuates"
+ },
+ "TEAM-early-tafaseer-parah-2-P77-003": {
+  "action": "hold",
+  "note": "ke bare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-2-P78-001": {
+  "action": "hold",
+  "note": "respelling of an Arabic compound; taste"
+ },
+ "TEAM-early-tafaseer-parah-2-P78-002": {
+  "action": "hold",
+  "note": "honorific fix is bundled with respelling anbiya (valid spelling)"
+ },
+ "TEAM-early-tafaseer-parah-2-P78-003": {
+  "action": "apply",
+  "note": "ye/ya slip: sare with feminine insaniyat"
+ },
+ "TEAM-early-tafaseer-parah-2-P8-002": {
+  "action": "hold",
+  "note": "signature plus printed byline; reason says print carries both"
+ },
+ "TEAM-early-tafaseer-parah-2-P80-001": {
+  "action": "hold",
+  "note": "drops a number word; figure plus words may be the print style"
+ },
+ "TEAM-early-tafaseer-parah-2-P80-003": {
+  "action": "hold",
+  "note": "zameen ka ... zinda ho jana is valid"
+ },
+ "TEAM-early-tafaseer-parah-2-P83-001": {
+  "action": "hold",
+  "note": "adds a negation; single nah serving both verbs is valid idiom"
+ },
+ "TEAM-early-tafaseer-parah-2-P84-001": {
+  "action": "hold",
+  "note": "proper name change; reason asks for source confirmation"
+ },
+ "TEAM-early-tafaseer-parah-2-P85-003": {
+  "action": "hold",
+  "note": "infinitive agreement; the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-2-P86-001": {
+  "action": "hold",
+  "note": "relative pronoun number; spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P86-002": {
+  "action": "hold",
+  "note": "removes a verse number that the printed page carries"
+ },
+ "TEAM-early-tafaseer-parah-2-P87-002": {
+  "action": "hold",
+  "note": "number agreement unclear; reason itself is unsure"
+ },
+ "TEAM-early-tafaseer-parah-2-P88-001": {
+  "action": "hold",
+  "note": "valid older usage (ko of direction)"
+ },
+ "TEAM-early-tafaseer-parah-2-P89-001": {
+  "action": "hold",
+  "note": "adds a negation; single nah serving both clauses is valid idiom"
+ },
+ "TEAM-early-tafaseer-parah-2-P9-001": {
+  "action": "hold",
+  "note": "mixes valid-spelling respelling (ulama) with the oblique fix"
+ },
+ "TEAM-early-tafaseer-parah-2-P9-002": {
+  "action": "hold",
+  "note": "rewrite adding a noun and changing number"
+ },
+ "TEAM-early-tafaseer-parah-2-P9-003": {
+  "action": "hold",
+  "note": "drops a word and respells; loose spoken syntax, not a slip"
+ },
+ "TEAM-early-tafaseer-parah-2-P92-001": {
+  "action": "hold",
+  "note": "jaise is likely, but proposal also changes mood; translation needs review"
+ },
+ "TEAM-early-tafaseer-parah-2-P96-001": {
+  "action": "hold",
+  "note": "replaces the author's English word"
+ },
+ "TEAM-early-tafaseer-parah-2-P96-003": {
+  "action": "hold",
+  "note": "swaps a valid word"
+ },
+ "TEAM-early-tafaseer-parah-2-P97-003": {
+  "action": "hold",
+  "note": "dropped auxiliary is spoken style"
+ },
+ "TEAM-early-tafaseer-parah-2-P98-001": {
+  "action": "hold",
+  "note": "ke bare without mein is the author's usage"
+ },
+ "TEAM-early-tafaseer-parah-2-P98-002": {
+  "action": "hold",
+  "note": "broken, but more than one possible fix"
+ },
+ "TEAM-early-tafaseer-parah-2-P99-002": {
+  "action": "hold",
+  "note": "number shift follows the author's sentence; style"
+ },
+ "TEAM-late-tafaseer-parah-21-P110-004": {
+  "action": "hold",
+  "note": "valid spelling ilqa with hamza"
+ },
+ "TEAM-late-tafaseer-parah-21-P118-003": {
+  "action": "hold",
+  "note": "reference label format; valid variant spelling"
+ },
+ "TEAM-late-tafaseer-parah-21-P119-004": {
+  "action": "hold",
+  "note": "printed reads as app"
+ },
+ "TEAM-late-tafaseer-parah-21-P130-002": {
+  "action": "hold",
+  "note": "printed reads as app; infinitive agreement style"
+ },
+ "TEAM-late-tafaseer-parah-21-P131-002": {
+  "action": "hold",
+  "note": "printed has the repeated phrase; proposal also adds keh and a stop"
+ },
+ "TEAM-late-tafaseer-parah-21-P134-001": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-21-P136-001": {
+  "action": "hold",
+  "note": "second reader: reason says the printed page is ambiguous here and asks for editorial confirmation; fix also turns gar into agar (two-part reconstruction, not unique)"
+ },
+ "TEAM-late-tafaseer-parah-21-P137-001": {
+  "action": "hold",
+  "note": "printed reads bataya as app"
+ },
+ "TEAM-late-tafaseer-parah-21-P140-001": {
+  "action": "hold",
+  "note": "printed reads ahsab as app; near-certain printer slip but left to editor per rule"
+ },
+ "TEAM-late-tafaseer-parah-21-P142-003": {
+  "action": "hold",
+  "note": "spoken plural without nasal; style"
+ },
+ "TEAM-late-tafaseer-parah-21-P150-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-21-P151-003": {
+  "action": "hold",
+  "note": "spelling of kargah; izafat respelling"
+ },
+ "TEAM-late-tafaseer-parah-21-P152-002": {
+  "action": "hold",
+  "note": "second reader: filed as a printed typo and the reason says the printed page does not show the meem either; left to editor like other print-reads-as-app cases"
+ },
+ "TEAM-late-tafaseer-parah-21-P153-002": {
+  "action": "apply",
+  "note": "doubled plural marker: uthti hain"
+ },
+ "TEAM-late-tafaseer-parah-21-P153-004": {
+  "action": "hold",
+  "note": "peh is a valid spoken form"
+ },
+ "TEAM-late-tafaseer-parah-21-P156-002": {
+  "action": "apply",
+  "note": "garbled le raho > le rahe ho; parallel clauses"
+ },
+ "TEAM-late-tafaseer-parah-21-P156-003": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-21-P158-003": {
+  "action": "hold",
+  "note": "printed reads as app"
+ },
+ "TEAM-late-tafaseer-parah-21-P159-001": {
+  "action": "hold",
+  "note": "gender of baqa; printed reads as app"
+ },
+ "TEAM-late-tafaseer-parah-21-P167-004": {
+  "action": "hold",
+  "note": "spelling of kargah; izafat respelling"
+ },
+ "TEAM-late-tafaseer-parah-21-P168-002": {
+  "action": "apply",
+  "note": "bahut se baaten > bahut si baaten; look-alike slip"
+ },
+ "TEAM-late-tafaseer-parah-21-P170-002": {
+  "action": "apply",
+  "note": "paida kiya hain > hai; impossible agreement, one fix"
+ },
+ "TEAM-late-tafaseer-parah-21-P173-002": {
+  "action": "hold",
+  "note": "singular/plural agreement in spoken style; not certain"
+ },
+ "TEAM-late-tafaseer-parah-21-P181-004": {
+  "action": "apply",
+  "note": "do-chashmi he in Ibrahim label; spacing"
+ },
+ "TEAM-late-tafaseer-parah-21-P187-001": {
+  "action": "hold",
+  "note": "valid spelling mansha with hamza"
+ },
+ "TEAM-late-tafaseer-parah-21-P189-003": {
+  "action": "hold",
+  "note": "apni can agree with the following feminine nouns"
+ },
+ "TEAM-late-tafaseer-parah-21-P192-003": {
+  "action": "hold",
+  "note": "respelling of a valid spelling and izafat"
+ },
+ "TEAM-late-tafaseer-parah-21-P201-002": {
+  "action": "hold",
+  "note": "word order; reason asks for print"
+ },
+ "TEAM-late-tafaseer-parah-21-P202-004": {
+  "action": "hold",
+  "note": "pair without waw; reason asks for print"
+ },
+ "TEAM-late-tafaseer-parah-21-P21-005": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage throughout"
+ },
+ "TEAM-late-tafaseer-parah-21-P212-003": {
+  "action": "hold",
+  "note": "reason says the printed page reads yahin; editorial approval asked"
+ },
+ "TEAM-late-tafaseer-parah-21-P217-002": {
+  "action": "hold",
+  "note": "relative pronoun number; spoken style"
+ },
+ "TEAM-late-tafaseer-parah-21-P220-004": {
+  "action": "hold",
+  "note": "ke bare without mein is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-21-P225-004": {
+  "action": "apply",
+  "note": "non-word; dropped meem in lamha (print shows the meem faintly per the reason)"
+ },
+ "TEAM-late-tafaseer-parah-21-P230-003": {
+  "action": "hold",
+  "note": "reason says print reads kih to; not a doubled word"
+ },
+ "TEAM-late-tafaseer-parah-21-P36-003": {
+  "action": "hold",
+  "note": "respelling of a valid spelling (jinhon)"
+ },
+ "TEAM-late-tafaseer-parah-21-P39-001": {
+  "action": "hold",
+  "note": "reason says print reads as app (khwab), though khoob is surely meant - editor to confirm"
+ },
+ "TEAM-late-tafaseer-parah-21-P48-004": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage throughout"
+ },
+ "TEAM-late-tafaseer-parah-21-P57-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage throughout"
+ },
+ "TEAM-late-tafaseer-parah-21-P60-005": {
+  "action": "hold",
+  "note": "fix not unique (likely ek aadh din)"
+ },
+ "TEAM-late-tafaseer-parah-21-P70-002": {
+  "action": "apply",
+  "note": "look-alike slip (te/nun): paida farmana hai, parallel to hona hai in the same sentence"
+ },
+ "TEAM-late-tafaseer-parah-21-P71-001": {
+  "action": "apply",
+  "note": "stray letter: dekh lo is the only reading"
+ },
+ "TEAM-late-tafaseer-parah-21-P71-004": {
+  "action": "hold",
+  "note": "valid as written (fazl ka talash karna)"
+ },
+ "TEAM-late-tafaseer-parah-21-P73-001": {
+  "action": "apply",
+  "note": "grammatical slip (ki hukm se); only fix"
+ },
+ "TEAM-late-tafaseer-parah-21-P77-001": {
+  "action": "hold",
+  "note": "word order of the translation; style"
+ },
+ "TEAM-late-tafaseer-parah-21-P78-003": {
+  "action": "hold",
+  "note": "adds a word; bare stem 'dekh' followed by 'ghaur o fikr kar ke' is a possible spoken series (shared kar), and the reason only says a word seems missing and asks for the print to be checked"
+ },
+ "TEAM-late-tafaseer-parah-21-P78-005": {
+  "action": "apply",
+  "note": "number slip (mulazimat ... rehti hai); only fix"
+ },
+ "TEAM-late-tafaseer-parah-21-P85-003": {
+  "action": "hold",
+  "note": "word order of the translation; style"
+ },
+ "TEAM-late-tafaseer-parah-21-P89-002": {
+  "action": "hold",
+  "note": "buland o bang is in common use; reason asks to weigh the author intent"
+ },
+ "TEAM-late-tafaseer-parah-21-P91-005": {
+  "action": "hold",
+  "note": "valid as written (ahl-e-iman ka ghalib karna); wording of the translation"
+ },
+ "TEAM-late-tafaseer-parah-21-P95-001": {
+  "action": "hold",
+  "note": "reading taken from a blurred image and unsure; reason asks editorial confirmation"
+ },
+ "TEAM-late-tafaseer-parah-21-P95-003": {
+  "action": "hold",
+  "note": "apne goes with ghar; valid as written"
+ },
+ "TEAM-late-tafaseer-parah-21-P96-001": {
+  "action": "hold",
+  "note": "agreement with the nearer noun is valid"
+ },
+ "TEAM-late-tafaseer-parah-21-P97-004": {
+  "action": "hold",
+  "note": "valid as written (ahl-e-iman ka ghalib karna); wording of the translation"
+ },
+ "TEAM-late-tafaseer-parah-22-P100-003": {
+  "action": "hold",
+  "note": "added conjunction is stylistic"
+ },
+ "TEAM-late-tafaseer-parah-22-P101-001": {
+  "action": "hold",
+  "note": "replaces the author's English word; publisher's choice per reason"
+ },
+ "TEAM-late-tafaseer-parah-22-P101-002": {
+  "action": "hold",
+  "note": "spoken list style with repeated plural verb; rewrite is standardisation"
+ },
+ "TEAM-late-tafaseer-parah-22-P102-003": {
+  "action": "hold",
+  "note": "kargahh is a possible spelling showing the sounded h; reason asks for print check"
+ },
+ "TEAM-late-tafaseer-parah-22-P104-006": {
+  "action": "apply",
+  "note": "confirmed: banain hain has a stray nun ghunna; banai hain is the only correct form, no wording change"
+ },
+ "TEAM-late-tafaseer-parah-22-P107-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P107-003": {
+  "action": "hold",
+  "note": "sawal as unmarked plural is possible; number is the author's style"
+ },
+ "TEAM-late-tafaseer-parah-22-P109-002": {
+  "action": "hold",
+  "note": "pe is valid spoken Urdu; standardisation only"
+ },
+ "TEAM-late-tafaseer-parah-22-P11-001": {
+  "action": "hold",
+  "note": "both forms valid; taste"
+ },
+ "TEAM-late-tafaseer-parah-22-P113-004": {
+  "action": "hold",
+  "note": "shai with hamza is a valid older spelling"
+ },
+ "TEAM-late-tafaseer-parah-22-P114-002": {
+  "action": "hold",
+  "note": "maqam as plural is the author's style; reason concedes it"
+ },
+ "TEAM-late-tafaseer-parah-22-P114-004": {
+  "action": "apply",
+  "note": "confirmed: joined Persian ba- written apart (dast ba dast), same class as beshak to be shak; orthography only"
+ },
+ "TEAM-late-tafaseer-parah-22-P115-003": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P117-003": {
+  "action": "hold",
+  "note": "mein is likely a slip for hain, but the proposal adds yeh and a colon beyond the slip"
+ },
+ "TEAM-late-tafaseer-parah-22-P121-006": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P123-002": {
+  "action": "hold",
+  "note": "drops a word from the author's translation; reason asks for print confirmation"
+ },
+ "TEAM-late-tafaseer-parah-22-P123-005": {
+  "action": "hold",
+  "note": "shuhada with hamza is a valid spelling; style choice"
+ },
+ "TEAM-late-tafaseer-parah-22-P127-004": {
+  "action": "apply",
+  "note": "confirmed: basain thin has a stray nun ghunna; basai thin is the only correct form, no wording change"
+ },
+ "TEAM-late-tafaseer-parah-22-P129-001": {
+  "action": "hold",
+  "note": "apni may agree with khushhali; not certainly a slip"
+ },
+ "TEAM-late-tafaseer-parah-22-P129-003": {
+  "action": "hold",
+  "note": "stylistic rewording of the author's phrase"
+ },
+ "TEAM-late-tafaseer-parah-22-P133-002": {
+  "action": "hold",
+  "note": "rewrites the author's translation; reason says it may stand"
+ },
+ "TEAM-late-tafaseer-parah-22-P134-003": {
+  "action": "hold",
+  "note": "farmaye is a valid older spelling, like lijje/lijiye"
+ },
+ "TEAM-late-tafaseer-parah-22-P135-001": {
+  "action": "hold",
+  "note": "added conjunction is stylistic"
+ },
+ "TEAM-late-tafaseer-parah-22-P146-005": {
+  "action": "hold",
+  "note": "text looks garbled but the right wording is not certain (laye ho / laye hain); needs the print"
+ },
+ "TEAM-late-tafaseer-parah-22-P147-001": {
+  "action": "hold",
+  "note": "stylistic rewording of the author's phrase"
+ },
+ "TEAM-late-tafaseer-parah-22-P149-001": {
+  "action": "hold",
+  "note": "reason says the print has the marker where the app does; needs translator/publisher approval"
+ },
+ "TEAM-late-tafaseer-parah-22-P159-001": {
+  "action": "hold",
+  "note": "farmaye is a valid older spelling, like lijje/lijiye"
+ },
+ "TEAM-late-tafaseer-parah-22-P159-003": {
+  "action": "apply",
+  "note": "confirmed: oblique zimma after ke, standard spelling zimme, sound unchanged"
+ },
+ "TEAM-late-tafaseer-parah-22-P161-003": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P161-004": {
+  "action": "hold",
+  "note": "verb agrees with the nearest noun kirdar; possible spoken style"
+ },
+ "TEAM-late-tafaseer-parah-22-P162-006": {
+  "action": "apply",
+  "note": "confirmed: jua is not an Arabic word and takes no final hamza; stray letter, sound unchanged"
+ },
+ "TEAM-late-tafaseer-parah-22-P167-001": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P169-002": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P17-007": {
+  "action": "hold",
+  "note": "infinitive agreement; the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P17-008": {
+  "action": "hold",
+  "note": "valid idiomatic verb form"
+ },
+ "TEAM-late-tafaseer-parah-22-P170-003": {
+  "action": "hold",
+  "note": "also changes doosre to doosron, which the author uses in the sentence before; partly taste"
+ },
+ "TEAM-late-tafaseer-parah-22-P172-003": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P172-006": {
+  "action": "hold",
+  "note": "adds a conjunction beyond the agreement fix; partly taste"
+ },
+ "TEAM-late-tafaseer-parah-22-P174-003": {
+  "action": "hold",
+  "note": "chhor without kar is valid spoken Urdu; reason calls it stylistic"
+ },
+ "TEAM-late-tafaseer-parah-22-P175-003": {
+  "action": "apply",
+  "note": "confirmed: joined bechare written apart as elsewhere on the page; orthography only"
+ },
+ "TEAM-late-tafaseer-parah-22-P179-005": {
+  "action": "hold",
+  "note": "reason says the print reads bhook as the app does and asks for publisher approval"
+ },
+ "TEAM-late-tafaseer-parah-22-P181-003": {
+  "action": "hold",
+  "note": "rewrites the author's translation; plural after har ek is possible; adds izafat"
+ },
+ "TEAM-late-tafaseer-parah-22-P182-004": {
+  "action": "hold",
+  "note": "added conjunction is stylistic"
+ },
+ "TEAM-late-tafaseer-parah-22-P183-002": {
+  "action": "hold",
+  "note": "singular noun after a number is the author's style"
+ },
+ "TEAM-late-tafaseer-parah-22-P184-004": {
+  "action": "hold",
+  "note": "zalim is likely but it swaps a meaning word; reason asks to compare the original"
+ },
+ "TEAM-late-tafaseer-parah-22-P185-001": {
+  "action": "hold",
+  "note": "bhalai is garbled but bhala and bhai are both possible; needs the print"
+ },
+ "TEAM-late-tafaseer-parah-22-P185-002": {
+  "action": "hold",
+  "note": "kargahh is a possible spelling; proposal also adds izafat; reason asks for print check"
+ },
+ "TEAM-late-tafaseer-parah-22-P188-001": {
+  "action": "hold",
+  "note": "do hisse mein is possible spoken Urdu; plural is standardisation"
+ },
+ "TEAM-late-tafaseer-parah-22-P189-002": {
+  "action": "hold",
+  "note": "adds hai as well as changing khushk to khushki; more than the slip; reason asks for original"
+ },
+ "TEAM-late-tafaseer-parah-22-P19-003": {
+  "action": "hold",
+  "note": "respelling of a valid spelling"
+ },
+ "TEAM-late-tafaseer-parah-22-P19-004": {
+  "action": "hold",
+  "note": "proposal adds ke beyond the spelling slip"
+ },
+ "TEAM-late-tafaseer-parah-22-P190-002": {
+  "action": "hold",
+  "note": "rewrites the sentence structure; reason asks for print check"
+ },
+ "TEAM-late-tafaseer-parah-22-P194-003": {
+  "action": "hold",
+  "note": "zinde in the author's translation is possible; reason defers to the print"
+ },
+ "TEAM-late-tafaseer-parah-22-P195-005": {
+  "action": "hold",
+  "note": "added conjunction and comma are stylistic"
+ },
+ "TEAM-late-tafaseer-parah-22-P197-005": {
+  "action": "hold",
+  "note": "ek ek is a real Urdu phrase, not a plain doubling; reason asks for print check"
+ },
+ "TEAM-late-tafaseer-parah-22-P198-004": {
+  "action": "hold",
+  "note": "insan as collective with plural verb is possible"
+ },
+ "TEAM-late-tafaseer-parah-22-P198-005": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P199-001": {
+  "action": "hold",
+  "note": "word order change is a matter of taste"
+ },
+ "TEAM-late-tafaseer-parah-22-P22-007": {
+  "action": "apply",
+  "note": "broken honorific formula: karram Allah dropped before wajhahu"
+ },
+ "TEAM-late-tafaseer-parah-22-P23-001": {
+  "action": "hold",
+  "note": "sambhala dena is a valid idiom"
+ },
+ "TEAM-late-tafaseer-parah-22-P23-004": {
+  "action": "hold",
+  "note": "relative pronoun number; spoken style"
+ },
+ "TEAM-late-tafaseer-parah-22-P24-002": {
+  "action": "apply",
+  "note": "misspelt chahiyen (as written means they want); only reading"
+ },
+ "TEAM-late-tafaseer-parah-22-P24-004": {
+  "action": "hold",
+  "note": "established valid spelling; reason defers to author preference"
+ },
+ "TEAM-late-tafaseer-parah-22-P30-003": {
+  "action": "hold",
+  "note": "changes verb and honorific register; editorial uniformity"
+ },
+ "TEAM-late-tafaseer-parah-22-P31-007": {
+  "action": "hold",
+  "note": "gender the author gives manazil"
+ },
+ "TEAM-late-tafaseer-parah-22-P31-008": {
+  "action": "hold",
+  "note": "gender the author gives manazil"
+ },
+ "TEAM-late-tafaseer-parah-22-P32-006": {
+  "action": "hold",
+  "note": "verb agrees with the predicate ata; possible sentence"
+ },
+ "TEAM-late-tafaseer-parah-22-P33-001": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P34-003": {
+  "action": "hold",
+  "note": "adds a verb; spoken listing style"
+ },
+ "TEAM-late-tafaseer-parah-22-P35-002": {
+  "action": "hold",
+  "note": "gender given to shan-e-nuzool and respelling"
+ },
+ "TEAM-late-tafaseer-parah-22-P35-003": {
+  "action": "hold",
+  "note": "bad iddat is valid; added word"
+ },
+ "TEAM-late-tafaseer-parah-22-P39-003": {
+  "action": "hold",
+  "note": "optional ke"
+ },
+ "TEAM-late-tafaseer-parah-22-P41-006": {
+  "action": "hold",
+  "note": "poori may follow insaniyat; not certainly a slip"
+ },
+ "TEAM-late-tafaseer-parah-22-P43-003": {
+  "action": "hold",
+  "note": "nonstandard farmain hain may be the translation's own form; reason asks to compare the original"
+ },
+ "TEAM-late-tafaseer-parah-22-P43-004": {
+  "action": "apply",
+  "note": "dropped ki (phuphiyon ki betiyan); parallel phrases and p60 confirm"
+ },
+ "TEAM-late-tafaseer-parah-22-P45-001": {
+  "action": "hold",
+  "note": "mutaaddid jagah is valid"
+ },
+ "TEAM-late-tafaseer-parah-22-P46-001": {
+  "action": "hold",
+  "note": "infinitive agreement (karna hoti)"
+ },
+ "TEAM-late-tafaseer-parah-22-P48-001": {
+  "action": "hold",
+  "note": "respelling of a valid spelling"
+ },
+ "TEAM-late-tafaseer-parah-22-P50-002": {
+  "action": "hold",
+  "note": "ke baare is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P50-003": {
+  "action": "hold",
+  "note": "ke baare is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P50-004": {
+  "action": "hold",
+  "note": "dunya par rehna is possible; idiom preference"
+ },
+ "TEAM-late-tafaseer-parah-22-P50-005": {
+  "action": "apply",
+  "note": "rooh ... mukallaf hota hai - the next sentence has feminine hoti hai; slip"
+ },
+ "TEAM-late-tafaseer-parah-22-P51-001": {
+  "action": "hold",
+  "note": "ke baare is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P51-003": {
+  "action": "apply",
+  "note": "broken durood (sallallahu) restored to the full formula used in the same line"
+ },
+ "TEAM-late-tafaseer-parah-22-P54-006": {
+  "action": "hold",
+  "note": "same as p43: possibly the translation's own form; reason asks to compare"
+ },
+ "TEAM-late-tafaseer-parah-22-P55-002": {
+  "action": "hold",
+  "note": "ke baare is the author's usage; reason says the print reads so"
+ },
+ "TEAM-late-tafaseer-parah-22-P56-002": {
+  "action": "hold",
+  "note": "ke baare is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P57-004": {
+  "action": "hold",
+  "note": "ke baare is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P59-003": {
+  "action": "hold",
+  "note": "respelling of a valid spelling (bina)"
+ },
+ "TEAM-late-tafaseer-parah-22-P59-004": {
+  "action": "apply",
+  "note": "beemar kisi ko bhi ho sakti hai - dropped final letter of beemari (feminine verb, word just before)"
+ },
+ "TEAM-late-tafaseer-parah-22-P60-001": {
+  "action": "apply",
+  "note": "aap ki chacha ki betiyan - chacha is masculine; the same translation on p43 has aap ke"
+ },
+ "TEAM-late-tafaseer-parah-22-P60-005": {
+  "action": "apply",
+  "note": "woh haram hai after plural kiye hain and parallel woh halal hain; dropped nasal"
+ },
+ "TEAM-late-tafaseer-parah-22-P61-006": {
+  "action": "hold",
+  "note": "singular/plural style (haq/huqooq)"
+ },
+ "TEAM-late-tafaseer-parah-22-P62-004": {
+  "action": "apply",
+  "note": "dropped ki (mere Nabi ki humsafar hain); sentence broken without it"
+ },
+ "TEAM-late-tafaseer-parah-22-P63-003": {
+  "action": "hold",
+  "note": "hamara aaj kirdar is possible with adverbial aaj"
+ },
+ "TEAM-late-tafaseer-parah-22-P63-004": {
+  "action": "hold",
+  "note": "word-order rewrite; reason asks editorial confirmation"
+ },
+ "TEAM-late-tafaseer-parah-22-P64-002": {
+  "action": "hold",
+  "note": "more than one possible fix; reason asks to compare the print"
+ },
+ "TEAM-late-tafaseer-parah-22-P65-010": {
+  "action": "hold",
+  "note": "dena is probably dunya (mata-e-dunya); the proposed deletion is the wrong fix"
+ },
+ "TEAM-late-tafaseer-parah-22-P72-001": {
+  "action": "hold",
+  "note": "ke baare is the author's usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P72-003": {
+  "action": "hold",
+  "note": "restyle with izafat; editorial"
+ },
+ "TEAM-late-tafaseer-parah-22-P74-002": {
+  "action": "hold",
+  "note": "respelling of a valid spelling (shai)"
+ },
+ "TEAM-late-tafaseer-parah-22-P74-007": {
+  "action": "apply",
+  "note": "old joined spelling bebak written apart"
+ },
+ "TEAM-late-tafaseer-parah-22-P75-004": {
+  "action": "hold",
+  "note": "spoken asyndeton; adds aur"
+ },
+ "TEAM-late-tafaseer-parah-22-P76-004": {
+  "action": "hold",
+  "note": "gender given to salat o salam"
+ },
+ "TEAM-late-tafaseer-parah-22-P78-001": {
+  "action": "apply",
+  "note": "oblique zimma written zimme (standard orthography)"
+ },
+ "TEAM-late-tafaseer-parah-22-P78-003": {
+  "action": "hold",
+  "note": "us ke peeth peechhe is the standard idiom"
+ },
+ "TEAM-late-tafaseer-parah-22-P80-002": {
+  "action": "hold",
+  "note": "ke baare is the author's usage; the print reads so"
+ },
+ "TEAM-late-tafaseer-parah-22-P80-003": {
+  "action": "apply",
+  "note": "phrase typed twice in the translation (dittography; the Arabic has it once), even though the print repeats it"
+ },
+ "TEAM-late-tafaseer-parah-22-P81-005": {
+  "action": "hold",
+  "note": "loanword transliteration variant"
+ },
+ "TEAM-late-tafaseer-parah-22-P84-001": {
+  "action": "hold",
+  "note": "hisab kitab without waw is valid"
+ },
+ "TEAM-late-tafaseer-parah-22-P84-003": {
+  "action": "hold",
+  "note": "respelling of a book title; reason asks a source check"
+ },
+ "TEAM-late-tafaseer-parah-22-P84-005": {
+  "action": "hold",
+  "note": "rewording; mushkil ho jata hai is possible"
+ },
+ "TEAM-late-tafaseer-parah-22-P84-006": {
+  "action": "hold",
+  "note": "second reader: sentence is broken but two fixes fit (kisi ka kya dakhl / kisi ko kya dakhl); proposal also swaps the stop for a question mark; needs the print"
+ },
+ "TEAM-late-tafaseer-parah-22-P87-001": {
+  "action": "hold",
+  "note": "ke baare without mein is the author's own usage"
+ },
+ "TEAM-late-tafaseer-parah-22-P88-003": {
+  "action": "hold",
+  "note": "adds a verb; reason asks for print confirmation; other fixes possible"
+ },
+ "TEAM-late-tafaseer-parah-22-P89-005": {
+  "action": "apply",
+  "note": "confirmed: oblique zimma after apne, standard spelling zimme, sound unchanged (same class as waqia se to waqie se)"
+ },
+ "TEAM-late-tafaseer-parah-22-P90-006": {
+  "action": "apply",
+  "note": "confirmed: chahen (subjunctive of chahna) is the wrong word after aane; plural of chahiye is the only reading"
+ },
+ "TEAM-late-tafaseer-parah-22-P90-007": {
+  "action": "hold",
+  "note": "editorial removal of a repeated word; reason itself says original may stand"
+ },
+ "TEAM-late-tafaseer-parah-22-P93-003": {
+  "action": "apply",
+  "note": "confirmed: oblique zimma after apne, standard spelling zimme, sound unchanged"
+ },
+ "TEAM-late-tafaseer-parah-22-P95-001": {
+  "action": "apply",
+  "note": "confirmed: kho jata has no subject and cannot stand; infinitive kho jana parallel to na lana is the only reading (te/nun slip)"
+ },
+ "TEAM-late-tafaseer-parah-22-P96-004": {
+  "action": "hold",
+  "note": "adds ya; spoken style without it is possible; reason asks for print check"
+ },
+ "TEAM-middle-tafaseer-parah-11-P10-002": {
+  "action": "apply",
+  "note": "standard form of hamza-izafat on final he (orthography only)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P103-001": {
+  "action": "hold",
+  "note": "not certain: sentence may be missing nahin rather than hain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P104-001": {
+  "action": "apply",
+  "note": "dropped letter: ne"
+ },
+ "TEAM-middle-tafaseer-parah-11-P105-001": {
+  "action": "apply",
+  "note": "stray letter after ayah mark"
+ },
+ "TEAM-middle-tafaseer-parah-11-P105-003": {
+  "action": "hold",
+  "note": "swaps keh for taakeh and re-punctuates"
+ },
+ "TEAM-middle-tafaseer-parah-11-P110-002": {
+  "action": "hold",
+  "note": "gender the author gives tama"
+ },
+ "TEAM-middle-tafaseer-parah-11-P111-001": {
+  "action": "apply",
+  "note": "dot slip tahalli>tajalli; printed inspected, context has tajalli"
+ },
+ "TEAM-middle-tafaseer-parah-11-P117-001": {
+  "action": "hold",
+  "note": "gender the author gives ibtida"
+ },
+ "TEAM-middle-tafaseer-parah-11-P117-002": {
+  "action": "apply",
+  "note": "garbled word; printed reads khwah makhwah"
+ },
+ "TEAM-middle-tafaseer-parah-11-P118-001": {
+  "action": "hold",
+  "note": "extra yeh is spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P122-001": {
+  "action": "hold",
+  "note": "reason says printed reads yeh; editor to decide"
+ },
+ "TEAM-middle-tafaseer-parah-11-P125-001": {
+  "action": "apply",
+  "note": "dropped letter: insan; context certain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P125-002": {
+  "action": "apply",
+  "note": "ki baad > ke baad, only possible fix"
+ },
+ "TEAM-middle-tafaseer-parah-11-P127-001": {
+  "action": "hold",
+  "note": "gender the author gives manazil"
+ },
+ "TEAM-middle-tafaseer-parah-11-P130-001": {
+  "action": "apply",
+  "note": "dropped letter: lamha"
+ },
+ "TEAM-middle-tafaseer-parah-11-P134-002": {
+  "action": "hold",
+  "note": "drops a word; spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P136-001": {
+  "action": "hold",
+  "note": "older common spelling of miad; respelling"
+ },
+ "TEAM-middle-tafaseer-parah-11-P139-001": {
+  "action": "apply",
+  "note": "garbled run-together; printed reads to radd ho"
+ },
+ "TEAM-middle-tafaseer-parah-11-P143-001": {
+  "action": "apply",
+  "note": "dropped hai; parallel clauses all have raha hai"
+ },
+ "TEAM-middle-tafaseer-parah-11-P144-002": {
+  "action": "apply",
+  "note": "joined spelling written apart: be-waquf"
+ },
+ "TEAM-middle-tafaseer-parah-11-P146-001": {
+  "action": "hold",
+  "note": "ka maani is heard in spoken Urdu; fix not unique"
+ },
+ "TEAM-middle-tafaseer-parah-11-P146-002": {
+  "action": "hold",
+  "note": "same ko + ghalat taweelen pattern recurs on P151; may be the author's usage"
+ },
+ "TEAM-middle-tafaseer-parah-11-P149-002": {
+  "action": "hold",
+  "note": "adds waw and respells aaba"
+ },
+ "TEAM-middle-tafaseer-parah-11-P150-003": {
+  "action": "hold",
+  "note": "fix not unique (kisi bhi kaam ko / koi bhi kaam)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P151-001": {
+  "action": "apply",
+  "note": "dropped letter: mutaqaddimin, same word nearby"
+ },
+ "TEAM-middle-tafaseer-parah-11-P151-002": {
+  "action": "hold",
+  "note": "same ko + ghalat tabeeren pattern recurs on P146; may be the author's usage"
+ },
+ "TEAM-middle-tafaseer-parah-11-P156-003": {
+  "action": "hold",
+  "note": "gender the author gives zehr"
+ },
+ "TEAM-middle-tafaseer-parah-11-P159-001": {
+  "action": "hold",
+  "note": "subject is on previous page; not certain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P160-001": {
+  "action": "apply",
+  "note": "word typed twice: keh keh"
+ },
+ "TEAM-middle-tafaseer-parah-11-P161-003": {
+  "action": "hold",
+  "note": "adds two words; reason asks editor"
+ },
+ "TEAM-middle-tafaseer-parah-11-P165-001": {
+  "action": "apply",
+  "note": "honorific misplaced inside the name; same sentence has the right order"
+ },
+ "TEAM-middle-tafaseer-parah-11-P167-001": {
+  "action": "hold",
+  "note": "ke baare without mein; respelling and added stop"
+ },
+ "TEAM-middle-tafaseer-parah-11-P169-003": {
+  "action": "hold",
+  "note": "har haal can stand without mein; reason asks print check"
+ },
+ "TEAM-middle-tafaseer-parah-11-P171-002": {
+  "action": "hold",
+  "note": "mitti ki neeche ki teh is a possible reading"
+ },
+ "TEAM-middle-tafaseer-parah-11-P173-002": {
+  "action": "hold",
+  "note": "gender the author gives manazil"
+ },
+ "TEAM-middle-tafaseer-parah-11-P174-001": {
+  "action": "apply",
+  "note": "is ki karam > is ke karam; wrong postposition, one fix"
+ },
+ "TEAM-middle-tafaseer-parah-11-P175-001": {
+  "action": "apply",
+  "note": "kar ki > kar ke; look-alike slip"
+ },
+ "TEAM-middle-tafaseer-parah-11-P176-001": {
+  "action": "apply",
+  "note": "dropped hain after farmate; sentence broken otherwise"
+ },
+ "TEAM-middle-tafaseer-parah-11-P178-002": {
+  "action": "apply",
+  "note": "mein > hain look-alike slip; sentence broken otherwise"
+ },
+ "TEAM-middle-tafaseer-parah-11-P179-001": {
+  "action": "hold",
+  "note": "printed reads as app (no mein)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P18-001": {
+  "action": "hold",
+  "note": "reason says print reads as app; fix not unique (lag gaye / lage)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P18-004": {
+  "action": "hold",
+  "note": "ke baare without mein is the author usage; reason calls it an editorial change"
+ },
+ "TEAM-middle-tafaseer-parah-11-P180-001": {
+  "action": "hold",
+  "note": "repeated main is a spoken restart, not adjacent doubling"
+ },
+ "TEAM-middle-tafaseer-parah-11-P181-003": {
+  "action": "hold",
+  "note": "address may be singular to the fire; reason unsure"
+ },
+ "TEAM-middle-tafaseer-parah-11-P183-002": {
+  "action": "hold",
+  "note": "jaisa vs jaise is style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P187-003": {
+  "action": "apply",
+  "note": "dropped letter: lamha"
+ },
+ "TEAM-middle-tafaseer-parah-11-P189-001": {
+  "action": "hold",
+  "note": "printed reads as app"
+ },
+ "TEAM-middle-tafaseer-parah-11-P190-003": {
+  "action": "hold",
+  "note": "shared hue is valid; rewrite"
+ },
+ "TEAM-middle-tafaseer-parah-11-P191-001": {
+  "action": "apply",
+  "note": "dropped letter: al-makhluqat"
+ },
+ "TEAM-middle-tafaseer-parah-11-P194-001": {
+  "action": "apply",
+  "note": "misspelt koi"
+ },
+ "TEAM-middle-tafaseer-parah-11-P195-002": {
+  "action": "hold",
+  "note": "agreement with nearest noun is valid style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P197-001": {
+  "action": "apply",
+  "note": "dropped letter; printed reads bakhshta"
+ },
+ "TEAM-middle-tafaseer-parah-11-P20-001": {
+  "action": "hold",
+  "note": "gender the author gives mushkilat"
+ },
+ "TEAM-middle-tafaseer-parah-11-P20-003": {
+  "action": "hold",
+  "note": "gender the author gives ittiba (masculine is usual)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P200-001": {
+  "action": "hold",
+  "note": "number change; printed reads 54 as app"
+ },
+ "TEAM-middle-tafaseer-parah-11-P202-001": {
+  "action": "hold",
+  "note": "rewrite of spoken construction"
+ },
+ "TEAM-middle-tafaseer-parah-11-P203-001": {
+  "action": "hold",
+  "note": "adds a word; fix not certain; reason asks print check"
+ },
+ "TEAM-middle-tafaseer-parah-11-P205-001": {
+  "action": "hold",
+  "note": "printed reads as app; editor"
+ },
+ "TEAM-middle-tafaseer-parah-11-P205-002": {
+  "action": "apply",
+  "note": "printed reads khaliq hai with stop; se is a misreading"
+ },
+ "TEAM-middle-tafaseer-parah-11-P206-001": {
+  "action": "hold",
+  "note": "repeated phrase may be a spoken restart; drops words"
+ },
+ "TEAM-middle-tafaseer-parah-11-P207-001": {
+  "action": "hold",
+  "note": "adds a verb; printed has stop after nuqsan"
+ },
+ "TEAM-middle-tafaseer-parah-11-P211-003": {
+  "action": "hold",
+  "note": "adjective agreement in spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P214-002": {
+  "action": "hold",
+  "note": "reason says the printed page also reads qiyam; editorial"
+ },
+ "TEAM-middle-tafaseer-parah-11-P214-003": {
+  "action": "apply",
+  "note": "stray to typed twice (ho to gi to); ho gi to is the only source of the garble; doubled-word case even though print repeats it"
+ },
+ "TEAM-middle-tafaseer-parah-11-P217-002": {
+  "action": "hold",
+  "note": "tense change; reason asks for print check"
+ },
+ "TEAM-middle-tafaseer-parah-11-P218-001": {
+  "action": "apply",
+  "note": "to typed twice"
+ },
+ "TEAM-middle-tafaseer-parah-11-P218-003": {
+  "action": "hold",
+  "note": "number agreement shift in spoken style; not certain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P22-003": {
+  "action": "hold",
+  "note": "adds a conjunction; editorial"
+ },
+ "TEAM-middle-tafaseer-parah-11-P221-001": {
+  "action": "apply",
+  "note": "garbled non-word; awamir o nawahi is the only reading (lam/nun look-alike)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P221-002": {
+  "action": "hold",
+  "note": "print has the repetition; spoken self-repeat, not an adjacent doubled word"
+ },
+ "TEAM-middle-tafaseer-parah-11-P223-002": {
+  "action": "hold",
+  "note": "postposition swap; reason asks for print check"
+ },
+ "TEAM-middle-tafaseer-parah-11-P227-001": {
+  "action": "hold",
+  "note": "print reads as app; the author's own phrasing"
+ },
+ "TEAM-middle-tafaseer-parah-11-P228-002": {
+  "action": "hold",
+  "note": "reason says print also lacks kar; editorial approval asked"
+ },
+ "TEAM-middle-tafaseer-parah-11-P229-002": {
+  "action": "hold",
+  "note": "reason says scan reads waqia; publisher confirmation asked"
+ },
+ "TEAM-middle-tafaseer-parah-11-P231-002": {
+  "action": "hold",
+  "note": "ke bare without mein is the author's usage"
+ },
+ "TEAM-middle-tafaseer-parah-11-P238-001": {
+  "action": "hold",
+  "note": "print reads as app; pair without conjunction is style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P238-002": {
+  "action": "hold",
+  "note": "print reads as app; adds a pronoun for clarity only"
+ },
+ "TEAM-middle-tafaseer-parah-11-P239-002": {
+  "action": "hold",
+  "note": "adds a negation; print reads as app"
+ },
+ "TEAM-middle-tafaseer-parah-11-P239-003": {
+  "action": "apply",
+  "note": "reason says printed page reads hum ne; transcription slip"
+ },
+ "TEAM-middle-tafaseer-parah-11-P241-002": {
+  "action": "hold",
+  "note": "stylistic rewrite; editorial"
+ },
+ "TEAM-middle-tafaseer-parah-11-P242-001": {
+  "action": "hold",
+  "note": "adds a noun and changes gender; spoken ellipsis"
+ },
+ "TEAM-middle-tafaseer-parah-11-P244-004": {
+  "action": "apply",
+  "note": "old joined spelling written apart (be-waqoof), like beshak"
+ },
+ "TEAM-middle-tafaseer-parah-11-P245-001": {
+  "action": "hold",
+  "note": "two possible fixes (pattha hai / patthe hain)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P245-002": {
+  "action": "hold",
+  "note": "uncertain reconstruction; reason asks for print check"
+ },
+ "TEAM-middle-tafaseer-parah-11-P245-003": {
+  "action": "hold",
+  "note": "Allah ke beta hai is valid possessive idiom (has a son)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P246-001": {
+  "action": "hold",
+  "note": "gender the author gives the noun"
+ },
+ "TEAM-middle-tafaseer-parah-11-P246-002": {
+  "action": "hold",
+  "note": "dunya ka ... hissa is a valid reading"
+ },
+ "TEAM-middle-tafaseer-parah-11-P247-001": {
+  "action": "hold",
+  "note": "dunya ka ... hissa is a valid reading"
+ },
+ "TEAM-middle-tafaseer-parah-11-P249-004": {
+  "action": "hold",
+  "note": "rewrites translation wording; ke bare is the author's usage"
+ },
+ "TEAM-middle-tafaseer-parah-11-P250-001": {
+  "action": "hold",
+  "note": "valid habitual form; translation wording"
+ },
+ "TEAM-middle-tafaseer-parah-11-P251-002": {
+  "action": "hold",
+  "note": "optional pronoun; spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P255-002": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P256-001": {
+  "action": "apply",
+  "note": "transposed word: ki belongs before jaye; only sensible reading"
+ },
+ "TEAM-middle-tafaseer-parah-11-P257-001": {
+  "action": "hold",
+  "note": "reason says print also reads tarjeeh; publisher approval asked"
+ },
+ "TEAM-middle-tafaseer-parah-11-P257-002": {
+  "action": "hold",
+  "note": "print reads as app; editorial reconstruction"
+ },
+ "TEAM-middle-tafaseer-parah-11-P260-001": {
+  "action": "hold",
+  "note": "gender/plural style rewrite"
+ },
+ "TEAM-middle-tafaseer-parah-11-P261-001": {
+  "action": "hold",
+  "note": "valid habitual form; translation wording"
+ },
+ "TEAM-middle-tafaseer-parah-11-P261-002": {
+  "action": "hold",
+  "note": "word swap not a look-alike slip; print not checked"
+ },
+ "TEAM-middle-tafaseer-parah-11-P261-003": {
+  "action": "hold",
+  "note": "more than one possible fix plus repunctuation"
+ },
+ "TEAM-middle-tafaseer-parah-11-P262-003": {
+  "action": "hold",
+  "note": "reorders spoken sentence"
+ },
+ "TEAM-middle-tafaseer-parah-11-P262-004": {
+  "action": "apply",
+  "note": "broken formula: Allah dropped from Muhammad Rasul Allah"
+ },
+ "TEAM-middle-tafaseer-parah-11-P263-001": {
+  "action": "hold",
+  "note": "page-start word; reason says print begins as app, needs both pages checked"
+ },
+ "TEAM-middle-tafaseer-parah-11-P263-003": {
+  "action": "hold",
+  "note": "valid habitual form"
+ },
+ "TEAM-middle-tafaseer-parah-11-P264-004": {
+  "action": "hold",
+  "note": "proposed field is an instruction, not replacement text"
+ },
+ "TEAM-middle-tafaseer-parah-11-P265-001": {
+  "action": "hold",
+  "note": "second reader: the unnumbered verse-end sign is not a misreading of a word; the reason says the same sign stands on all ten verses 83-92 and asks for the numbers to be restored against the Qur'an text, so changing this one alone leaves the block inconsistent, and the digit form differs from the Arabic markers elsewhere in the volume"
+ },
+ "TEAM-middle-tafaseer-parah-11-P268-002": {
+  "action": "hold",
+  "note": "stylistic trimming of spoken repetition"
+ },
+ "TEAM-middle-tafaseer-parah-11-P269-001": {
+  "action": "hold",
+  "note": "print has the same repeated passage; publisher permission asked"
+ },
+ "TEAM-middle-tafaseer-parah-11-P269-002": {
+  "action": "hold",
+  "note": "both forms valid; consistency taste"
+ },
+ "TEAM-middle-tafaseer-parah-11-P270-001": {
+  "action": "hold",
+  "note": "spoken agreement style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P273-003": {
+  "action": "hold",
+  "note": "respelling of a valid spelling plus repunctuation"
+ },
+ "TEAM-middle-tafaseer-parah-11-P275-002": {
+  "action": "hold",
+  "note": "replaces the author's word; print reads as app"
+ },
+ "TEAM-middle-tafaseer-parah-11-P277-004": {
+  "action": "hold",
+  "note": "valid construction in a translation"
+ },
+ "TEAM-middle-tafaseer-parah-11-P279-001": {
+  "action": "hold",
+  "note": "gender the author gives the noun"
+ },
+ "TEAM-middle-tafaseer-parah-11-P281-001": {
+  "action": "hold",
+  "note": "print ends as app; proposal invents words"
+ },
+ "TEAM-middle-tafaseer-parah-11-P282-003": {
+  "action": "apply",
+  "note": "old joined beshak and a sentence stop; the rahmatullah sign cannot stand after Allah Kareem, which the author writes without a sign throughout"
+ },
+ "TEAM-middle-tafaseer-parah-11-P284-003": {
+  "action": "hold",
+  "note": "would delete the author's gloss; print reads as app"
+ },
+ "TEAM-middle-tafaseer-parah-11-P286-001": {
+  "action": "hold",
+  "note": "possible spoken usage; not the only fix"
+ },
+ "TEAM-middle-tafaseer-parah-11-P287-002": {
+  "action": "hold",
+  "note": "valid construction"
+ },
+ "TEAM-middle-tafaseer-parah-11-P288-003": {
+  "action": "apply",
+  "note": "broken formula: Allah dropped from Muhammad Rasul Allah"
+ },
+ "TEAM-middle-tafaseer-parah-11-P288-004": {
+  "action": "hold",
+  "note": "valid construction"
+ },
+ "TEAM-middle-tafaseer-parah-11-P290-001": {
+  "action": "hold",
+  "note": "rewrites translation wording"
+ },
+ "TEAM-middle-tafaseer-parah-11-P291-001": {
+  "action": "hold",
+  "note": "print reads as app; publisher approval asked"
+ },
+ "TEAM-middle-tafaseer-parah-11-P292-002": {
+  "action": "hold",
+  "note": "verse line; respelling and added punctuation"
+ },
+ "TEAM-middle-tafaseer-parah-11-P294-001": {
+  "action": "hold",
+  "note": "adds a meaning-bearing word; rhetorical reading possible without it"
+ },
+ "TEAM-middle-tafaseer-parah-11-P294-002": {
+  "action": "hold",
+  "note": "stylistic change of verb form"
+ },
+ "TEAM-middle-tafaseer-parah-11-P294-003": {
+  "action": "apply",
+  "note": "old joined spellings written apart (kaun sa, be-waqoof)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P295-003": {
+  "action": "hold",
+  "note": "repunctuates and rewrites spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P296-001": {
+  "action": "apply",
+  "note": "hai for hain with plural sab; next clause has muhtaj hain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P296-002": {
+  "action": "hold",
+  "note": "spoken self-repeat; reason asks for print"
+ },
+ "TEAM-middle-tafaseer-parah-11-P297-001": {
+  "action": "hold",
+  "note": "gender the author gives an Arabic plural"
+ },
+ "TEAM-middle-tafaseer-parah-11-P297-003": {
+  "action": "apply",
+  "note": "broken formula: Allah dropped from Muhammad Rasul Allah (zer only otherwise)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P297-004": {
+  "action": "hold",
+  "note": "verb swap in an explanation; not a plain slip"
+ },
+ "TEAM-middle-tafaseer-parah-11-P298-002": {
+  "action": "hold",
+  "note": "rewrites Arabic adhan wording wholesale; print reads as app"
+ },
+ "TEAM-middle-tafaseer-parah-11-P299-001": {
+  "action": "apply",
+  "note": "ye/ya slip: karti among parallel plural karte; plain stop added"
+ },
+ "TEAM-middle-tafaseer-parah-11-P299-004": {
+  "action": "hold",
+  "note": "burai ko haar hogi is valid"
+ },
+ "TEAM-middle-tafaseer-parah-11-P301-002": {
+  "action": "hold",
+  "note": "garbled, but two possible fixes (hota / ho gaya); needs page"
+ },
+ "TEAM-middle-tafaseer-parah-11-P301-003": {
+  "action": "hold",
+  "note": "garbled spot with uncertain marker; needs page inspection"
+ },
+ "TEAM-middle-tafaseer-parah-11-P302-003": {
+  "action": "hold",
+  "note": "print reads as app; reason asks for original"
+ },
+ "TEAM-middle-tafaseer-parah-11-P304-002": {
+  "action": "hold",
+  "note": "regional compound verb; valid as it stands"
+ },
+ "TEAM-middle-tafaseer-parah-11-P304-003": {
+  "action": "hold",
+  "note": "swaps the verb; taste"
+ },
+ "TEAM-middle-tafaseer-parah-11-P305-003": {
+  "action": "hold",
+  "note": "adds a pronoun and reorders; spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P306-001": {
+  "action": "hold",
+  "note": "likely inzar, but proposal also alters ka and reason asks for print"
+ },
+ "TEAM-middle-tafaseer-parah-11-P306-002": {
+  "action": "apply",
+  "note": "honorific formula: dual alaihima with plural anbiya"
+ },
+ "TEAM-middle-tafaseer-parah-11-P309-003": {
+  "action": "hold",
+  "note": "adds a word and punctuation; spoken ellipsis possible"
+ },
+ "TEAM-middle-tafaseer-parah-11-P311-001": {
+  "action": "hold",
+  "note": "spoken repetition of kyun; style"
+ },
+ "TEAM-middle-tafaseer-parah-11-P37-002": {
+  "action": "hold",
+  "note": "adds mein; spoken usage, reason says editorial"
+ },
+ "TEAM-middle-tafaseer-parah-11-P38-001": {
+  "action": "apply",
+  "note": "print inspected: reads mutarizeen (look-alike letter); context confirms"
+ },
+ "TEAM-middle-tafaseer-parah-11-P39-004": {
+  "action": "hold",
+  "note": "word order; editorial"
+ },
+ "TEAM-middle-tafaseer-parah-11-P40-001": {
+  "action": "hold",
+  "note": "swaps a postposition; valid as written, editorial"
+ },
+ "TEAM-middle-tafaseer-parah-11-P42-003": {
+  "action": "hold",
+  "note": "rewrites the clause; editorial"
+ },
+ "TEAM-middle-tafaseer-parah-11-P44-003": {
+  "action": "hold",
+  "note": "valid as written (ke tamir ho jane ke baad)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P5-001": {
+  "action": "hold",
+  "note": "obvious misspelling (mufassirin), but reason says print reads as app - editor to confirm"
+ },
+ "TEAM-middle-tafaseer-parah-11-P50-001": {
+  "action": "hold",
+  "note": "reason says print reads as app; a dropped word after ki is also possible"
+ },
+ "TEAM-middle-tafaseer-parah-11-P51-001": {
+  "action": "apply",
+  "note": "grammatical slip (un ke aankhon), carried over from the parallel phrases; only fix"
+ },
+ "TEAM-middle-tafaseer-parah-11-P51-003": {
+  "action": "hold",
+  "note": "pronoun number change; not certain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P55-001": {
+  "action": "hold",
+  "note": "optional kih; reason says print lacks it"
+ },
+ "TEAM-middle-tafaseer-parah-11-P6-005": {
+  "action": "apply",
+  "note": "doubled alif (ba-alfaz to bil-alfaz) + izafat mark"
+ },
+ "TEAM-middle-tafaseer-parah-11-P63-001": {
+  "action": "apply",
+  "note": "print inspected: Arabic word is as-sajidun (explained as prostration); wrong word of the same verse typed"
+ },
+ "TEAM-middle-tafaseer-parah-11-P67-002": {
+  "action": "hold",
+  "note": "gender the author gives shan-e-nuzul"
+ },
+ "TEAM-middle-tafaseer-parah-11-P71-004": {
+  "action": "hold",
+  "note": "respelling of a valid spelling (afza)"
+ },
+ "TEAM-middle-tafaseer-parah-11-P73-003": {
+  "action": "hold",
+  "note": "kaun with a plural verb is valid"
+ },
+ "TEAM-middle-tafaseer-parah-11-P74-004": {
+  "action": "hold",
+  "note": "possibly spoken usage (use sawal karna); not certain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P76-001": {
+  "action": "apply",
+  "note": "ne typed twice around the bracketed honorific + joined verb split"
+ },
+ "TEAM-middle-tafaseer-parah-11-P78-002": {
+  "action": "hold",
+  "note": "gender the author gives khel"
+ },
+ "TEAM-middle-tafaseer-parah-11-P82-001": {
+  "action": "hold",
+  "note": "bracket gives an alternative ending to sachon; adds a word"
+ },
+ "TEAM-middle-tafaseer-parah-11-P89-002": {
+  "action": "apply",
+  "note": "two-word phrase typed twice"
+ },
+ "TEAM-middle-tafaseer-parah-11-P89-003": {
+  "action": "hold",
+  "note": "fix not unique: following verbs are plural, the singular may be the slip"
+ },
+ "TEAM-middle-tafaseer-parah-11-P90-002": {
+  "action": "hold",
+  "note": "ke may cover riwayat aur tariqa together; not certain"
+ },
+ "TEAM-middle-tafaseer-parah-11-P93-003": {
+  "action": "hold",
+  "note": "adds mein; reason says print lacks it"
+ },
+ "TEAM-middle-tafaseer-parah-11-P95-002": {
+  "action": "hold",
+  "note": "adds ko and re-punctuates; spoken usage, reason asks print check"
+ },
+ "TEAM-middle-tafaseer-parah-12-P100-001": {
+  "action": "hold",
+  "note": "farq hai as predicate is the author's idiom; word swap"
+ },
+ "TEAM-middle-tafaseer-parah-12-P102-001": {
+  "action": "hold",
+  "note": "rewording; reason asks the publisher"
+ },
+ "TEAM-middle-tafaseer-parah-12-P102-002": {
+  "action": "hold",
+  "note": "word-order rewrite beyond the spacing of qad o qamat"
+ },
+ "TEAM-middle-tafaseer-parah-12-P102-003": {
+  "action": "hold",
+  "note": "tumhare se is regional spoken usage; re-punctuation"
+ },
+ "TEAM-middle-tafaseer-parah-12-P16-001": {
+  "action": "hold",
+  "note": "ayah-marker number formatting (Western digit), one of several; not a wording slip"
+ },
+ "TEAM-middle-tafaseer-parah-12-P17-002": {
+  "action": "apply",
+  "note": "khana khana peena - word typed twice; waw spacing"
+ },
+ "TEAM-middle-tafaseer-parah-12-P18-002": {
+  "action": "hold",
+  "note": "dropped copula in spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-12-P19-001": {
+  "action": "hold",
+  "note": "us ki ... dharkan can agree with dharkan; possible sentence"
+ },
+ "TEAM-middle-tafaseer-parah-12-P19-002": {
+  "action": "hold",
+  "note": "ke poora karne is the author's older construction"
+ },
+ "TEAM-middle-tafaseer-parah-12-P20-002": {
+  "action": "hold",
+  "note": "rewrite; the text is juzv-e-badan and needs only spacing"
+ },
+ "TEAM-middle-tafaseer-parah-12-P20-003": {
+  "action": "hold",
+  "note": "proposal misreads asbab-e-zarooriya (a split word); wrong fix"
+ },
+ "TEAM-middle-tafaseer-parah-12-P21-001": {
+  "action": "hold",
+  "note": "unclear original (perhaps a different verb); reason asks to confirm"
+ },
+ "TEAM-middle-tafaseer-parah-12-P22-001": {
+  "action": "hold",
+  "note": "printed page reads as the app"
+ },
+ "TEAM-middle-tafaseer-parah-12-P29-002": {
+  "action": "hold",
+  "note": "rewrite adding a negation; reason asks to verify"
+ },
+ "TEAM-middle-tafaseer-parah-12-P30-002": {
+  "action": "hold",
+  "note": "karte for karna is a slip, but the proposal also adds se; reason asks to read the original"
+ },
+ "TEAM-middle-tafaseer-parah-12-P31-003": {
+  "action": "hold",
+  "note": "word-order and word-form restyle"
+ },
+ "TEAM-middle-tafaseer-parah-12-P32-003": {
+  "action": "hold",
+  "note": "phrase treated as a unit (kehna aur ... karna); the fix would be partial"
+ },
+ "TEAM-middle-tafaseer-parah-12-P33-001": {
+  "action": "hold",
+  "note": "more than one possible fix (us ne ... karna hai / woh ... kare)"
+ },
+ "TEAM-middle-tafaseer-parah-12-P34-002": {
+  "action": "hold",
+  "note": "rewrite; reason asks to settle from the source"
+ },
+ "TEAM-middle-tafaseer-parah-12-P34-003": {
+  "action": "hold",
+  "note": "honorific-style standardisation of the verb"
+ },
+ "TEAM-middle-tafaseer-parah-12-P35-001": {
+  "action": "hold",
+  "note": "printed page reads ayatein; meaning-bearing word"
+ },
+ "TEAM-middle-tafaseer-parah-12-P36-001": {
+  "action": "hold",
+  "note": "printed page reads ayat; reason asks editorial approval"
+ },
+ "TEAM-middle-tafaseer-parah-12-P36-003": {
+  "action": "hold",
+  "note": "rewrite of wording"
+ },
+ "TEAM-middle-tafaseer-parah-12-P38-001": {
+  "action": "apply",
+  "note": "mahz mahz - word typed twice"
+ },
+ "TEAM-middle-tafaseer-parah-12-P39-001": {
+  "action": "apply",
+  "note": "Muhammad Rasool sallallahu... - dropped Allah in the standard formula; comma only"
+ },
+ "TEAM-middle-tafaseer-parah-12-P40-001": {
+  "action": "hold",
+  "note": "restructuring and verb number; taste"
+ },
+ "TEAM-middle-tafaseer-parah-12-P42-002": {
+  "action": "apply",
+  "note": "sharait tay hoti hai - plural needs hain; one-letter slip"
+ },
+ "TEAM-middle-tafaseer-parah-12-P43-002": {
+  "action": "hold",
+  "note": "adds aur, izafat and commas; taste"
+ },
+ "TEAM-middle-tafaseer-parah-12-P46-001": {
+  "action": "hold",
+  "note": "literal translation aur lekin; reason asks the publisher"
+ },
+ "TEAM-middle-tafaseer-parah-12-P48-002": {
+  "action": "hold",
+  "note": "adds a meaning-bearing word; reason asks to check the original"
+ },
+ "TEAM-middle-tafaseer-parah-12-P49-002": {
+  "action": "hold",
+  "note": "changes the word (nabi/anbiya); reason asks to check the original"
+ },
+ "TEAM-middle-tafaseer-parah-12-P52-001": {
+  "action": "hold",
+  "note": "second reader: istemal is a plain typo, but alfaz->lafz swaps a word that is not a look-alike slip; alfaz with singular ka...kiya is possible spoken usage and a second fix exists (ke alfaz ... kiye); proposal changes more than the certain slip"
+ },
+ "TEAM-middle-tafaseer-parah-12-P53-003": {
+  "action": "hold",
+  "note": "adds a word and re-punctuates"
+ },
+ "TEAM-middle-tafaseer-parah-12-P54-001": {
+  "action": "hold",
+  "note": "rewording"
+ },
+ "TEAM-middle-tafaseer-parah-12-P54-003": {
+  "action": "hold",
+  "note": "adds words for clarity"
+ },
+ "TEAM-middle-tafaseer-parah-12-P55-001": {
+  "action": "hold",
+  "note": "possibly a dropped ho, but too little context to be sure"
+ },
+ "TEAM-middle-tafaseer-parah-12-P56-001": {
+  "action": "apply",
+  "note": "un ki raye saib nahin hain - raye is singular, stray nasal; hai"
+ },
+ "TEAM-middle-tafaseer-parah-12-P57-003": {
+  "action": "hold",
+  "note": "ke baare is the author's usage; rewording of ittila kar dete"
+ },
+ "TEAM-middle-tafaseer-parah-12-P58-001": {
+  "action": "apply",
+  "note": "garbled Persian idiom ma o shuma; reason says the printed page reads so"
+ },
+ "TEAM-middle-tafaseer-parah-12-P59-001": {
+  "action": "apply",
+  "note": "dropped main (balke main to ... insaan hoon); sentence broken without it"
+ },
+ "TEAM-middle-tafaseer-parah-12-P59-003": {
+  "action": "hold",
+  "note": "dilon ke haal plural is valid; re-punctuation"
+ },
+ "TEAM-middle-tafaseer-parah-12-P60-001": {
+  "action": "hold",
+  "note": "a slip, but more than one fix (kare / kare ga)"
+ },
+ "TEAM-middle-tafaseer-parah-12-P63-003": {
+  "action": "hold",
+  "note": "ke irshad karda is valid; reason says the printed wording may stay"
+ },
+ "TEAM-middle-tafaseer-parah-12-P64-001": {
+  "action": "hold",
+  "note": "ayah-marker number formatting, one of ten; not a wording slip"
+ },
+ "TEAM-middle-tafaseer-parah-12-P65-001": {
+  "action": "hold",
+  "note": "ayah-marker number formatting, one of four; not a wording slip"
+ },
+ "TEAM-middle-tafaseer-parah-12-P65-002": {
+  "action": "hold",
+  "note": "printed page reads as the app; word-order rewrite of the translation"
+ },
+ "TEAM-middle-tafaseer-parah-12-P69-001": {
+  "action": "hold",
+  "note": "gender depends on the implied noun (kashti); reason asks to confirm"
+ },
+ "TEAM-middle-tafaseer-parah-12-P70-003": {
+  "action": "hold",
+  "note": "style; the repeated verb is fine"
+ },
+ "TEAM-middle-tafaseer-parah-12-P71-002": {
+  "action": "hold",
+  "note": "singular/plural style"
+ },
+ "TEAM-middle-tafaseer-parah-12-P73-002": {
+  "action": "hold",
+  "note": "reorders numerals; style"
+ },
+ "TEAM-middle-tafaseer-parah-12-P75-002": {
+  "action": "hold",
+  "note": "second reader: deletes a whole sentence across a page turn, not a doubled word; correctness depends on how the next page begins, which cannot be seen here; reason asks to compare with the printed page first"
+ },
+ "TEAM-middle-tafaseer-parah-12-P77-001": {
+  "action": "hold",
+  "note": "adds a negation; printed page reads as the app; reason asks scholars"
+ },
+ "TEAM-middle-tafaseer-parah-12-P77-003": {
+  "action": "hold",
+  "note": "rewrite adding words"
+ },
+ "TEAM-middle-tafaseer-parah-12-P80-002": {
+  "action": "apply",
+  "note": "dropped verb karein before ge (itaat nahin karein ge); only fit"
+ },
+ "TEAM-middle-tafaseer-parah-12-P81-003": {
+  "action": "hold",
+  "note": "better-word change"
+ },
+ "TEAM-middle-tafaseer-parah-12-P85-002": {
+  "action": "hold",
+  "note": "word-order restyle"
+ },
+ "TEAM-middle-tafaseer-parah-12-P86-003": {
+  "action": "hold",
+  "note": "rewrite; ka izzat o ehtram agrees with ehtram"
+ },
+ "TEAM-middle-tafaseer-parah-12-P90-001": {
+  "action": "hold",
+  "note": "rewrite; spoken style"
+ },
+ "TEAM-middle-tafaseer-parah-12-P91-003": {
+  "action": "hold",
+  "note": "spoken emphasis; reason asks to check the original"
+ },
+ "TEAM-middle-tafaseer-parah-12-P93-001": {
+  "action": "hold",
+  "note": "ko is wrong, but the fix could be ka or ki ittiba (author's gender unknown)"
+ },
+ "TEAM-middle-tafaseer-parah-12-P94-001": {
+  "action": "hold",
+  "note": "printed page lacks siwa; proposal also reorders and re-punctuates the translation"
+ },
+ "TEAM-middle-tafaseer-parah-12-P95-002": {
+  "action": "hold",
+  "note": "printed page also lacks the marker; a number is added"
+ },
+ "TEAM-middle-tafaseer-parah-12-P96-001": {
+  "action": "hold",
+  "note": "apne biwi bachon is standard idiom"
+ },
+ "TEAM-middle-tafaseer-parah-12-P96-003": {
+  "action": "hold",
+  "note": "infinitive agreement (poora karne); author's style"
+ },
+ "TEAM-middle-tafaseer-parah-12-P97-002": {
+  "action": "hold",
+  "note": "gender given to ibtida and respelling of valid spellings"
+ },
+ "TEAM-middle-tafaseer-parah-12-P97-003": {
+  "action": "hold",
+  "note": "adds a name (Allah); reason asks to confirm from the original"
+ },
+ "TEAM-middle-tafaseer-parah-12-P98-001": {
+  "action": "hold",
+  "note": "farq hai as predicate recurs (p100); author's idiom"
+ },
+ "TEAM-middle-tafaseer-parah-12-P99-001": {
+  "action": "hold",
+  "note": "infinitive agreement (janna/janni)"
  },
  "UR-ASAAS-P001-006-001": {
   "action": "hold",

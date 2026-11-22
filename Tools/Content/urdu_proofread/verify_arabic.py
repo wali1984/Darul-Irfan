@@ -29,7 +29,7 @@ from pathlib import Path
 IOS = Path(__file__).resolve().parents[3]
 SEED = IOS / "DarulIrfanApp" / "Resources" / "SeedData"
 HARAKAT = set("ًٌٍَُِّْٰٖٗ")
-BREAKS = set(" \t\n\r()[]{}«»\"'“”‘’،۔؟!:؛.,|/-–—﴿﴾*0123456789۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩")
+BREAKS = set(" \t\n\r()[]{}«»\"'“”‘’،۔؟!:؛.,|/-–—﴿﴾*0123456789۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩\u06dd\u06de\u0600\u200b\u200f")
 
 
 def vowelled(text: str) -> list[str]:

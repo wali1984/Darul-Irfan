@@ -496,6 +496,10 @@ def remap_entries(entries: list[dict], old: str, new: str, edits: list[Edit]) ->
     return fresh, changed
 
 
+# The signs and numbers a mushaf sets at the end of an ayah or over a word.
+AYAH_SIGNS = re.compile("[۝۞؀-؅ۖ-ۭ﴾﴿0-9۰-۹٠-٩-①-⑳]")
+
+
 class Shield:
     """What must not be touched in one text."""
 
@@ -503,6 +507,7 @@ class Shield:
         self.text = text
         self.words = mushaf.protected(text, layout)
         self.ends = {e for _, e, _ in self.words}
+        self.begins = {s for s, _, _ in self.words}
         held = {(s, e) for s, e, _ in self.words}
         # Every word of the text, and whether it is one of the protected ones.
         self.all_words = [(s, e, (s, e) in held) for s, e, t in tokens(text) if is_word_char(t[0])]
@@ -523,6 +528,9 @@ class Shield:
             return "falls between two words of an Arabic quotation"
         # A sign, a number or a mark that closes a line of Arabic (the end of
         # an ayah) or stands between two Arabic words belongs to the Arabic.
+        if start != end and (start in self.ends or end in self.begins) and AYAH_SIGNS.search(text[start:end]) \
+                and not re.search(f"[{LETTER}]", text[start:end]):
+            return "belongs to a line of Arabic (the ayah's sign or number written against a word)"
         if not re.search(f"[{LETTER}]", text[start:end]):
             left = next(((s, e, held) for s, e, held in reversed(self.all_words)
                          if e <= start and "\n" not in text[e:start]), None)
@@ -711,6 +719,17 @@ class Quotations:
                 self.bigrams[bi].add(n)
             for frame in frames:
                 self.single[frame].add(n)
+        # Each ayah's letters in one string, and where its words begin and end in it.
+        self.joined = ["".join(frames) for frames in self.frames]
+        self.starts, self.ends = [], []
+        for frames in self.frames:
+            starts, ends, at = {}, {}, 0
+            for i, frame in enumerate(frames):
+                starts[at] = i
+                at += len(frame)
+                ends[at] = i + 1
+            self.starts.append(starts)
+            self.ends.append(ends)
 
     @staticmethod
     def _frames(text: str) -> list[str]:
@@ -752,63 +771,40 @@ class Quotations:
 
     def run(self, correct: str, around: str) -> tuple[int, int, int] | None:
         """(ayah, first word, one past the last) of the mushaf words that
-        `correct` - the quotation with its slip mended - is made of. `around`
-        is the page near it, which settles a quotation found in several ayat."""
+        `correct` - the quotation with its slip mended - is made of: a run of
+        whole words of one ayah whose letters are exactly these. `around` is
+        the page near it, which settles a quotation found in several ayat."""
         correct = self.quoted(correct)
-        asked = self._frames(correct)
-        wanted = "".join(asked)
+        wanted = "".join(self._frames(correct))
         if len(wanted) < 3:
+            return None
+        places = []
+        for n, frames in enumerate(self.frames):
+            joined = self.joined[n]
+            at = joined.find(wanted)
+            while at != -1:
+                first = self.starts[n].get(at)
+                if first is None and at and joined[at - 1] in "وفبلک":
+                    # The book quotes from just after a one-letter particle the mushaf writes joined on ("وَلَمْ").
+                    first = self.starts[n].get(at - 1)
+                last = self.ends[n].get(at + len(wanted))
+                if first is not None and last is not None:
+                    places.append((n, first, last))
+                at = joined.find(wanted, at + 1)
+        if not places:
             return None
 
         def written(place) -> str:
-            n, i, j = place[:3]
+            n, i, j = place
             return " ".join(self.words[n][i:j]).rstrip("".join(PAUSE_MARKS))
 
-        def choose(places):
-            near = self._ayah(around)
-            here = [place for place in places if place[0] == near]
-            if here:
-                return here[0][:3]
-            # Written differently from ayah to ayah: the one written most like the correction is the one meant.
-            like = correct.translate(SKELETON)
-            return max(places, key=lambda place: (difflib.SequenceMatcher(None, written(place).translate(SKELETON), like, autojunk=False).ratio(), -place[0]))[:3]
-
-        # 1. Word for word.
-        places = [(n, i, i + len(asked)) for n in sorted(self.single.get(asked[0], ()))
-                  for i in range(len(self.frames[n]) - len(asked) + 1) if self.frames[n][i:i + len(asked)] == asked]
-        if places and (len(asked) >= 2 or len({written(place) for place in places}) == 1):
-            return choose(places)
-        # 2. The ayah told by its runs of words, then the nearest letters in it.
-        for source in (correct, around):
-            n = self._ayah(source)
-            if n is None:
-                continue
-            frames = self.frames[n]
-            joined = "".join(frames)
-            owner = [i for i, frame in enumerate(frames) for _ in frame]
-            blocks = [blk for blk in difflib.SequenceMatcher(None, joined, wanted, autojunk=False).get_matching_blocks() if blk.size >= 2]
-            if not blocks:
-                continue
-            first, last = owner[blocks[0].a], owner[blocks[-1].a + blocks[-1].size - 1] + 1
-            if difflib.SequenceMatcher(None, "".join(frames[first:last]), wanted, autojunk=False).ratio() >= 0.85:
-                return n, first, last
-        # 3. A short quotation with a slip in it: any few words of the mushaf with nearly these letters.
-        if len(asked) > 4:
-            return None
-        places = []
-        for n in sorted(set().union(*(self.single.get(frame, set()) for frame in asked))):
-            frames = self.frames[n]
-            for size in {max(1, len(asked) - 1), len(asked), len(asked) + 1}:
-                for i in range(len(frames) - size + 1):
-                    got = "".join(frames[i:i + size])
-                    if abs(len(got) - len(wanted)) <= 3:
-                        ratio = difflib.SequenceMatcher(None, got, wanted, autojunk=False).ratio()
-                        if ratio >= 0.85:
-                            places.append((n, i, i + size, ratio))
-        if not places:
-            return None
-        top = max(place[3] for place in places)
-        return choose([place for place in places if place[3] >= top - 0.02])
+        near = self._ayah(around)
+        here = [place for place in places if place[0] == near]
+        if here:
+            return here[0]
+        # Written differently from ayah to ayah: the one written most like the correction is the one meant.
+        like = correct.translate(SKELETON)
+        return max(places, key=lambda place: (difflib.SequenceMatcher(None, written(place).translate(SKELETON), like, autojunk=False).ratio(), -place[0]))
 
     def conformed(self, original: str, correct: str, around: str) -> tuple[str | None, str]:
         """`original` with its quotation as the mushaf writes it, and where
@@ -842,6 +838,29 @@ class Quotations:
         vowelled = sum(ch in HARAKAT for ch in quoted) >= j - i + 1
         if vowelled and [skeleton(t) for _, _, t in words[i:j + 1]] == self.frames[n][first:last]:
             return None, "the quotation already has the mushaf's letters and spacing"
+        if j == i and not vowelled:
+            return None, "one bare word (a name or a reference, not a quotation)"
+        if j - i == 1 and not vowelled and "".join(skeleton(t) for _, _, t in words[i:j + 1]) != target:
+            return None, "two bare words whose letters are not the mushaf's (a term in the author's own words)"
+        # What is mended is a slip: letters wrong or missing, words run together
+        # or split. A whole word of the mushaf that the book does not have, or
+        # a word of the book that the mushaf does not, is the book's own
+        # wording and is left for the owner.
+        mine = [skeleton(t) for _, _, t in words[i:j + 1]]
+        theirs = self.frames[n][first:last]
+        book, mushaf_letters = "".join(mine), "".join(theirs)
+        if distance(book, mushaf_letters) > max(2, len(mushaf_letters) // 12):
+            return None, "the book's words differ from the mushaf's by more than a slip"
+        matched_book, matched_mushaf = set(), set()
+        for block in difflib.SequenceMatcher(None, book, mushaf_letters, autojunk=False).get_matching_blocks():
+            matched_book.update(range(block.a, block.a + block.size))
+            matched_mushaf.update(range(block.b, block.b + block.size))
+        for letters, frames, matched in ((book, mine, matched_book), (mushaf_letters, theirs, matched_mushaf)):
+            at = 0
+            for frame in frames:
+                if len(frame) >= 2 and not any(k in matched for k in range(at, at + len(frame))):
+                    return None, "a whole word differs between the book and the mushaf"
+                at += len(frame)
         fresh = self.words[n][first:last]
         fresh[-1] = fresh[-1].rstrip("".join(PAUSE_MARKS))
         ayah = self.ayahs[n]
@@ -870,9 +889,15 @@ def arabic_fix(finding: dict, text: str, at: int, quotations: Quotations, decide
             return None, "the words are the mushaf's already; only signs around them would change"
         if filed and not (finding["confidence"] in SURE and form_key(original) == form_key(proposed)):
             return None, where
+    arabic = filed or marks >= 3
+    if not arabic and decided:
+        return proposed, "the reader's fix"
+    # In Arabic the reader's own fix is taken only where no letter and no
+    # number changes: words parted or joined, a vowel or a mark put right.
+    same_letters = skeleton_words(original) == skeleton_words(proposed) and digits_of(original) == digits_of(proposed)
     old_letters, new_letters = form_key(original), form_key(proposed)
     small = old_letters == new_letters or distance(old_letters, new_letters) <= 2
-    if decided or (finding["confidence"] in SURE and small):
+    if finding["confidence"] in SURE and (same_letters if arabic else small):
         return proposed, "the reader's fix"
     return None, "not a plain slip"
 
