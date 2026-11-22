@@ -16,9 +16,9 @@ What is done to an Urdu publication's body:
   * Arabic is shielded as in the books.
 
 Three teaching articles opened with a note on how their Urdu came to be. The
-owner's decision (21 November 2026): it is not shown to readers. The notes are
-kept, with the article ids, in `article_notes.json` beside this file, which is
-not bundled.
+owner's decision (21 November 2026): it is removed, from the plain body and
+from the HTML copy of it, and not kept. An article's HTML copy follows every
+correction made to its plain body, line for line.
 
     python Tools/Content/urdu_proofread/apply_publications.py            report only
     python Tools/Content/urdu_proofread/apply_publications.py --write    write the iOS seed
@@ -28,7 +28,9 @@ not bundled.
 from __future__ import annotations
 
 import hashlib
+import html
 import json
+import re
 import sys
 from collections import Counter
 from datetime import datetime
@@ -36,6 +38,25 @@ from datetime import datetime
 import apply_proofread as ap
 
 NOTE_OPENING = "یہ اردو متن سلسلے کی ویب سائٹ پر شائع"
+
+
+TEXT_BETWEEN_TAGS = re.compile(r"(?:(?<=>)|^)[^<>]+(?=<|$)")
+
+
+def html_following(markup: str, before: str, after: str) -> str:
+    """The HTML copy of a body, with each line as the corrected plain body has it."""
+    markup = re.sub(rf"^\s*<p>{re.escape(NOTE_OPENING)}.*?</p>\s*", "", markup, count=1, flags=re.S)
+    old = [line.strip() for line in before.split("\n") if line.strip()]
+    new = [line.strip() for line in after.split("\n") if line.strip()]
+    shown = [match for match in TEXT_BETWEEN_TAGS.finditer(markup) if match.group().strip()]
+    if len(old) != len(new) or [html.unescape(match.group()).strip() for match in shown] != old:
+        raise SystemExit("an article's HTML copy is not line for line its plain body; nothing written")
+    out, at = [], 0
+    for match, was, now in zip(shown, old, new):
+        out.append(markup[at:match.start()])
+        out.append(match.group() if was == now else html.escape(now, quote=False))
+        at = match.end()
+    return "".join(out) + markup[at:]
 
 
 def main() -> int:
@@ -99,7 +120,7 @@ def main() -> int:
         if accepted:
             item["bodyPlainText"] = ap.apply_edits(body, sorted(set(accepted), key=lambda edit: (edit[0], edit[1])))
 
-    notes = {}
+    notes = set()
     tidied: Counter = Counter()
     changed = 0
     for item in items:
@@ -107,13 +128,16 @@ def main() -> int:
         if item.get("language") != "ur" or not body:
             continue
         if body.startswith(NOTE_OPENING):
-            note, _, rest = body.partition("\n")
-            notes[item["id"]] = note
-            body = rest.lstrip("\n")
+            notes.add(item["id"])
+            body = body.partition("\n")[2].lstrip("\n")
         body, _ = ap.tidy(body, None, mushaf, tidied)
         if body != base_body[item["id"]]:
             ap.protected_survive(mushaf, f"publication {item['id']}", base_body[item["id"]].partition("\n")[2] if item["id"] in notes else base_body[item["id"]], None, body)
             item["bodyPlainText"] = body
+            if item.get("bodyHtml"):
+                before = base_body[item["id"]]
+                before = before.partition("\n")[2].lstrip("\n") if item["id"] in notes else before
+                item["bodyHtml"] = html_following(item["bodyHtml"], before, body)
             item["checksum"] = hashlib.sha256(body.encode("utf-8")).hexdigest()
             changed += 1
 
@@ -129,7 +153,6 @@ def main() -> int:
         print(f"{len(waiting)} findings wait for a reading: {name}")
     if write:
         (ap.SEED / "library_items.json").write_text(layout.render(items), encoding="utf-8", newline="")
-        (ap.HERE / "article_notes.json").write_text(json.dumps(notes, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
         print(f"wrote library_items.json in {ap.SEED}")
     return 0
 
