@@ -105,6 +105,8 @@ KNOWN_KEYS = {
     "Hadith %lld": "Hadith %@",
     "Page %lld of %@": "Page %lld of %lld",
     "Resume %@, %@ percent played": "Resume %@, %lld percent played",
+    # A copied page reference passes the page as text, so it is not grouped.
+    "%@, p. %lld": "%@, p. %@",
 }
 
 
