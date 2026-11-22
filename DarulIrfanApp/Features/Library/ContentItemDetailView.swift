@@ -562,7 +562,7 @@ struct ContentItemDetailView: View {
                     readingTile(
                         systemImage: "doc.richtext",
                         titleKey: "The printed pages",
-                        detail: Text("As published. Offline after the first open.")
+                        detail: pagesTileDetail(for: item)
                     )
                 }
                 .buttonStyle(DIPressableStyle())
@@ -570,6 +570,19 @@ struct ContentItemDetailView: View {
             }
         }
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// What the printed pages are. On an Akram-ut-Tarajum volume, whose gold
+    /// button opens the Qur'an, the page they were left on is said here: the
+    /// Books page's "Keep reading" card names that page and leads here.
+    private func pagesTileDetail(for item: ContentItem) -> Text {
+        guard TarajumVolume(item) != nil, let resume else {
+            return Text("As published. Offline after the first open.")
+        }
+        if let count = resume.pageCount {
+            return Text("Page \(resume.page) of \(count)")
+        }
+        return Text("Page \(resume.page)")
     }
 
     /// How many pages the text has.

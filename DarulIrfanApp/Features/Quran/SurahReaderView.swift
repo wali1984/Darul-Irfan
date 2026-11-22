@@ -1001,8 +1001,13 @@ struct SurahReaderView: View {
         Binding(
             get: { displayMode },
             set: { newValue in
-                if let tarajumReading { tarajumReading.wrappedValue.showsTranslation = false }
-                Task { await appState.updateSettings { $0.quranReaderDisplayMode = newValue } }
+                Task { @MainActor in
+                    // In one turn with the setting: dropped before it, the
+                    // translation could leave every ayah for a frame and the
+                    // reader's place move with it.
+                    if let tarajumReading { tarajumReading.wrappedValue.showsTranslation = false }
+                    await appState.updateSettings { $0.quranReaderDisplayMode = newValue }
+                }
             }
         )
     }
