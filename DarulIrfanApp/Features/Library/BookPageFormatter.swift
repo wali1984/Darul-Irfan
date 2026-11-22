@@ -113,6 +113,14 @@ enum BookPageFormatter {
         case table([[String]])
         /// The words under a picture.
         case caption(String)
+
+        /// A block of Arabic standing on its own, the Qur'an or not.
+        var isQuotation: Bool {
+            switch self {
+            case .quran, .arabic: return true
+            default: return false
+            }
+        }
     }
 
     /// Where the words that finish a page's last paragraph from the next
@@ -123,6 +131,13 @@ enum BookPageFormatter {
         var offset: Int
     }
 
+    /// The quotation a block was cut from, and where in it the block
+    /// stands, in UTF-16: a link is found in the whole.
+    struct CutQuotation: Equatable, Sendable {
+        var whole: String
+        var start: Int
+    }
+
     struct Page: Equatable, Sendable {
         /// A contents (index) page: shown folded, not as reading text.
         var isContents: Bool
@@ -131,11 +146,21 @@ enum BookPageFormatter {
         var footnotes: [String] = []
         /// Set where the last paragraph takes words from the next page.
         var carried: Carried?
+        /// One for each Qur'an or Arabic block, in their order: where it was
+        /// cut from a longer quotation.
+        var cutQuotations: [CutQuotation?] = []
         /// Words the reading of the scan could not make out ("[؟]"), and all
         /// the page's words: a page with many shows a note pointing to the
         /// printed page (a handwritten letter, faint print).
         var unreadableWords = 0
         var wordCount = 0
+
+        /// Where the block at `index` was cut from a longer quotation.
+        func cutQuotation(at index: Int) -> CutQuotation? {
+            guard blocks.indices.contains(index), blocks[index].isQuotation else { return nil }
+            let place = blocks[..<index].filter(\.isQuotation).count
+            return place < cutQuotations.count ? cutQuotations[place] : nil
+        }
 
         var isPartlyUnreadable: Bool {
             unreadableWords >= 8 || (wordCount > 0 && Double(unreadableWords) / Double(wordCount) >= 0.1)
@@ -417,11 +442,14 @@ enum BookPageFormatter {
     private static func format(parts: [Part], text: String, check: QuranQuotation.Check) -> Page {
         var blocks: [Block] = []
         var footnotes: [String] = []
+        var cuts: [CutQuotation?] = []
         for part in parts {
             switch part.kind {
             case .heading:
                 let words = part.text.split(whereSeparator: \.isWhitespace).map(String.init)
-                blocks.append(QuranQuotation.isVerified(words, check: check) ? .quran(part.text) : .heading(part.text))
+                let confirmed = QuranQuotation.isVerified(words, check: check)
+                blocks.append(confirmed ? .quran(part.text) : .heading(part.text))
+                if confirmed { cuts.append(nil) }
             case .paragraph:
                 if isContentsList(part.text) {
                     blocks.append(.table(tableRows(part.text)))
@@ -431,7 +459,10 @@ enum BookPageFormatter {
             case .verse:
                 blocks.append(.verse(part.text))
             case .arabic:
-                blocks.append(contentsOf: arabicBlocks(part.text, check: check))
+                for piece in arabicBlocks(part.text, check: check) {
+                    blocks.append(piece.block)
+                    cuts.append(piece.cut)
+                }
             case .footnote:
                 footnotes.append(part.text)
             case .table:
@@ -440,7 +471,10 @@ enum BookPageFormatter {
                 blocks.append(.caption(part.text))
             }
         }
-        return Page(isContents: isContentsPage(text), blocks: joiningTables(blocks), footnotes: footnotes)
+        var page = Page(isContents: isContentsPage(text), blocks: joiningTables(blocks), footnotes: footnotes)
+        // Joining tables never takes a quotation away, so their order holds.
+        page.cutQuotations = cuts
+        return page
     }
 
     /// One table where the reading cut a printed table into pieces: a table
@@ -485,14 +519,18 @@ enum BookPageFormatter {
     /// whole ayat the mushaf confirms is set as the Qur'an, while the rest -
     /// an ayah the page spells differently, a hadith, a du'a - stays the
     /// book's own Arabic. A quotation with nothing confirmed stays one block.
-    private static func arabicBlocks(_ text: String, check: QuranQuotation.Check) -> [Block] {
-        if isQuranQuotation(text, check: check) { return [.quran(text)] }
+    private static func arabicBlocks(_ text: String, check: QuranQuotation.Check) -> [(block: Block, cut: CutQuotation?)] {
+        if isQuranQuotation(text, check: check) { return [(.quran(text), nil)] }
         let ayat = ayahRanges(in: text)
-        guard ayat.count > 1 else { return [.arabic(text)] }
+        guard ayat.count > 1 else { return [(.arabic(text), nil)] }
         func span(_ first: Int, _ last: Int) -> String {
             String(text[ayat[first].lowerBound..<ayat[last].upperBound])
         }
-        var result: [Block] = []
+        func cut(_ first: Int) -> CutQuotation {
+            CutQuotation(whole: text, start: text[..<ayat[first].lowerBound].utf16.count)
+        }
+        var result: [(block: Block, cut: CutQuotation?)] = []
+        var confirmed = false
         var plainStart: Int?
         var start = 0
         while start < ayat.count {
@@ -500,21 +538,18 @@ enum BookPageFormatter {
             var end = start
             while end < ayat.count, isQuran(ayat[start...end], in: text, check: check) { end += 1 }
             if end > start {
-                if let first = plainStart { result.append(.arabic(span(first, start - 1))) }
+                if let first = plainStart { result.append((.arabic(span(first, start - 1)), cut(first))) }
                 plainStart = nil
-                result.append(.quran(span(start, end - 1)))
+                result.append((.quran(span(start, end - 1)), cut(start)))
+                confirmed = true
                 start = end
             } else {
                 if plainStart == nil { plainStart = start }
                 start += 1
             }
         }
-        if let first = plainStart { result.append(.arabic(span(first, ayat.count - 1))) }
-        let confirmed = result.contains { block in
-            if case .quran = block { return true }
-            return false
-        }
-        return confirmed ? result : [.arabic(text)]
+        if let first = plainStart { result.append((.arabic(span(first, ayat.count - 1)), cut(first))) }
+        return confirmed ? result : [(.arabic(text), nil)]
     }
 
     /// Where each ayah of a quotation lies, as printed: it ends with its

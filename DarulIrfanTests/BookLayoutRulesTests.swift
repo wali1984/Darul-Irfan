@@ -8,10 +8,12 @@ final class BookLayoutRulesTests: XCTestCase {
     /// The books these tests read.
     private static let books: Set<String> = [
         "asrar-10-en",
+        "asrar-10-ur",
         "asrar-100-en",
         "asrar-11-ur",
         "asrar-16-en",
         "asrar-18-en",
+        "asrar-2-en",
         "asrar-23-ur",
         "asrar-5-en",
         "asrar-6-ur",
@@ -23,6 +25,7 @@ final class BookLayoutRulesTests: XCTestCase {
         "book-ocr-sai-hafta-course",
         "book-ocr-shajarah-e-silsilah-e-nisbaat-e-owaisiah",
         "tafaseer-parah-1",
+        "tafaseer-parah-28",
         "tafaseer-parah-4",
         "tafaseer-parah-9",
         "uploads-books-maktobaat",
@@ -277,6 +280,63 @@ final class BookLayoutRulesTests: XCTestCase {
             together[after.id]?.blocks.first,
             BookPageFormatter.format(page: after).blocks.first
         )
+    }
+
+    // MARK: - A reference is found in its whole paragraph
+
+    func testALinkAcrossAQuotationInsideAParagraphIsWhole() throws {
+        let bookID = "tafaseer-parah-28"
+        let laid = BookPageFormatter.format(page: try page(bookID, 108))
+        let links = try XCTUnwrap(BookLinkProvider.shared.links(bookID: bookID)[108])
+        let verse = try XCTUnwrap(links.first { $0.t == "q:61:4" })
+        var linked: [String] = []
+        for case .paragraph(let runs) in laid.blocks {
+            let byRun = BookLinkMatcher.pieces(ofParagraph: runs, carried: nil, links: links, carriedLinks: [])
+            let parts = byRun.flatMap { $0 }.filter { piece in piece.link.map { links[$0] == verse } ?? false }
+            if !parts.isEmpty { linked.append(parts.map(\.text).joined(separator: " ")) }
+            // No run on its own holds these words.
+            XCTAssertFalse(runs.contains { $0.text.contains(verse.m) })
+        }
+        XCTAssertEqual(linked, [verse.m])
+    }
+
+    func testALinkAcrossTheCutOfAQuotationIsFound() throws {
+        let bookID = "asrar-10-ur"
+        let laid = BookPageFormatter.format(page: try page(bookID, 2))
+        let links = try XCTUnwrap(BookLinkProvider.shared.links(bookID: bookID)[2])
+        var alone = 0
+        var whole = 0
+        for (index, block) in laid.blocks.enumerated() {
+            let text: String
+            switch block {
+            case .quran(let words), .arabic(let words): text = words
+            default: continue
+            }
+            let cut = laid.cutQuotation(at: index)
+            alone += BookLinkMatcher.pieces(of: text, links: links).filter { $0.link != nil }.count
+            whole += BookLinkMatcher.pieces(of: text, cutFrom: cut, links: links).filter { $0.link != nil }.count
+        }
+        XCTAssertGreaterThan(whole, alone)
+    }
+
+    func testCarriedWordsTakeTheNextPagesLinksAndOnlyThose() throws {
+        let bookID = "asrar-2-en"
+        let first = try page(bookID, 26)
+        let next = try page(bookID, 27)
+        let laid = try XCTUnwrap(BookPageFormatter.format(pages: [first, next])[first.id])
+        let carried = try XCTUnwrap(laid.carried)
+        guard case .paragraph(let runs)? = laid.blocks.last else { return XCTFail("\(laid.blocks)") }
+        let found = BookLinkProvider.shared.links(bookID: bookID)
+        let own = found[26] ?? []
+        let theirs = try XCTUnwrap(found[27])
+        let byRun = BookLinkMatcher.pieces(ofParagraph: runs, carried: carried, links: own, carriedLinks: theirs)
+        let piece = try XCTUnwrap(byRun.flatMap { $0 }.first { $0.text == "(7:172)" })
+        let index = try XCTUnwrap(piece.link)
+        XCTAssertGreaterThanOrEqual(index, own.count)
+        XCTAssertEqual((own + theirs)[index].t, "q:7:172")
+        // The same words without a carry open nothing of the next page's.
+        let without = BookLinkMatcher.pieces(ofParagraph: runs, carried: nil, links: own, carriedLinks: theirs)
+        XCTAssertFalse(without.flatMap { $0 }.contains { ($0.link ?? -1) >= own.count })
     }
 
     // MARK: - Links are underlined

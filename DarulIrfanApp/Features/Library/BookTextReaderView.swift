@@ -203,6 +203,9 @@ struct BookTextPagesView: View {
                     scale: fontScale,
                     place: .book,
                     links: appState == nil ? [] : (links[page.page] ?? []),
+                    // A sentence cut by the page break is shown whole here:
+                    // its words keep the links of the page they are printed on.
+                    carriedLinks: appState == nil || formattedPage.carried == nil ? [] : (links[page.page + 1] ?? []),
                     onLink: { link in openedLink = BookLinkTarget(link.t) }
                 )
             } else {
@@ -281,17 +284,7 @@ struct BookTextPagesView: View {
                 BookLinkProvider.shared.links(bookID: bookID)
             }.value
             try Task.checkCancellation()
-            // A sentence cut by the page break is shown whole on the earlier
-            // page: its words keep their links there. None crosses a page
-            // that has no text.
-            var byPage = found
-            let numbers = loaded.filter { !$0.text.isEmpty }.map(\.page)
-            for (number, next) in zip(numbers, numbers.dropFirst()) where number + 1 == next {
-                if let carried = found[next] {
-                    byPage[number, default: []] += carried
-                }
-            }
-            links = byPage
+            links = found
             formatted = prepared
             entries = BookTextEntry.entries(of: loaded)
             session?.pageNumbers = entries.map(\.id)
@@ -491,6 +484,8 @@ struct FormattedBookPage: View {
     /// The places in this page's text that open an ayah, a narration or a
     /// narrator's biography. Empty leaves the text plain.
     var links: [BookLink] = []
+    /// The next page's, for the words carried from it to the last paragraph.
+    var carriedLinks: [BookLink] = []
     /// Called with the link a reader tapped.
     var onLink: ((BookLink) -> Void)? = nil
     @State private var showsContents = false
@@ -522,7 +517,7 @@ struct FormattedBookPage: View {
             }
         }
         .environment(\.layoutDirection, .rightToLeft)
-        .modifier(BookLinkTaps(links: links, onLink: onLink))
+        .modifier(BookLinkTaps(links: links + carriedLinks, onLink: onLink))
     }
 
     /// The text of a contents page from the original OCR, which is one
@@ -539,8 +534,8 @@ struct FormattedBookPage: View {
             if page.isPartlyUnreadable {
                 unreadableNote
             }
-            ForEach(Array(page.blocks.enumerated()), id: \.offset) { _, block in
-                blockView(block)
+            ForEach(Array(page.blocks.enumerated()), id: \.offset) { index, block in
+                blockView(block, at: index)
             }
             if !page.footnotes.isEmpty {
                 footnoteList
@@ -549,14 +544,14 @@ struct FormattedBookPage: View {
     }
 
     @ViewBuilder
-    private func blockView(_ block: BookPageFormatter.Block) -> some View {
+    private func blockView(_ block: BookPageFormatter.Block, at index: Int) -> some View {
         switch block {
         case .heading(let text):
             heading(text)
         case .paragraph(let runs):
-            paragraph(runs)
+            paragraph(runs, carried: index == page.blocks.count - 1 ? page.carried : nil)
         case .quran(let text):
-            linkedText(text, rightToLeft: true, mushafScale: 0.8 * scale)
+            linkedText(text, cutFrom: page.cutQuotation(at: index), rightToLeft: true, mushafScale: 0.8 * scale)
                 .foregroundStyle(DIColor.scripture)
                 .lineSpacing(8)
                 .multilineTextAlignment(.center)
@@ -568,7 +563,7 @@ struct FormattedBookPage: View {
                 )
                 .modifier(selection(text, rightToLeft: true))
         case .arabic(let text):
-            arabicQuotation(text)
+            arabicQuotation(text, cutFrom: page.cutQuotation(at: index))
         case .verse(let text):
             verse(text)
         case .table(let rows):
@@ -589,10 +584,10 @@ struct FormattedBookPage: View {
             .environment(\.layoutDirection, rightToLeft ? LayoutDirection.rightToLeft : .leftToRight)
     }
 
-    private func paragraph(_ runs: [BookPageFormatter.Run]) -> some View {
+    private func paragraph(_ runs: [BookPageFormatter.Run], carried: BookPageFormatter.Carried?) -> some View {
         let plain = plainText(runs)
         let rightToLeft = isRightToLeft(plain)
-        return prose(runs)
+        return prose(runs, carried: carried)
             .font(face(rightToLeft))
             .foregroundStyle(DIColor.textPrimary)
             .lineSpacing(CGFloat((rightToLeft ? 10 : 5) * scale))
@@ -604,8 +599,8 @@ struct FormattedBookPage: View {
 
     /// Arabic the mushaf does not confirm - a hadith, a du'a, a saying - set
     /// apart in the Arabic face, without the Qur'an's colour and panel.
-    private func arabicQuotation(_ text: String) -> some View {
-        linkedText(text, rightToLeft: true, mushafScale: 0.75 * scale)
+    private func arabicQuotation(_ text: String, cutFrom quotation: BookPageFormatter.CutQuotation?) -> some View {
+        linkedText(text, cutFrom: quotation, rightToLeft: true, mushafScale: 0.75 * scale)
             .foregroundStyle(DIColor.scripture)
             .lineSpacing(CGFloat(8 * scale))
             .multilineTextAlignment(.center)
@@ -822,9 +817,15 @@ struct FormattedBookPage: View {
 
     /// A quotation or a footnote, tappable where one of the page's links
     /// names its words.
-    private func linkedText(_ string: String, rightToLeft: Bool, mushafScale: Double? = nil, urduSize: Double? = nil) -> Text {
+    private func linkedText(
+        _ string: String,
+        cutFrom quotation: BookPageFormatter.CutQuotation? = nil,
+        rightToLeft: Bool,
+        mushafScale: Double? = nil,
+        urduSize: Double? = nil
+    ) -> Text {
         // Links are found in the book's own words, without the isolates.
-        let pieces = links.isEmpty ? [] : BookLinkMatcher.pieces(of: string, links: links)
+        let pieces = links.isEmpty ? [] : BookLinkMatcher.pieces(of: string, cutFrom: quotation, links: links)
         guard pieces.contains(where: { $0.link != nil }) else {
             return unlinkedText(shown(string, rightToLeft: rightToLeft), mushafScale: mushafScale, urduSize: urduSize)
         }
@@ -864,9 +865,7 @@ struct FormattedBookPage: View {
 
     /// A run that holds one of the page's links, cut at the link so that its
     /// words can be tapped; nil when the run holds none.
-    private func linkedRun(_ run: BookPageFormatter.Run, leftToRight: Bool) -> Text? {
-        guard !links.isEmpty else { return nil }
-        let pieces = BookLinkMatcher.pieces(of: run.text, links: links)
+    private func linkedRun(_ run: BookPageFormatter.Run, pieces: [BookLinkMatcher.Piece], leftToRight: Bool) -> Text? {
         guard pieces.contains(where: { $0.link != nil }) else { return nil }
         let quoted = run.isQuranic || run.isArabic
         let mushafScale: Double? = quoted ? 0.72 * scale : nil
@@ -890,12 +889,15 @@ struct FormattedBookPage: View {
 
     /// Prose, with a short Qur'anic quotation kept inline in the Qur'an face
     /// and a printed line break kept where the paragraph had one.
-    private func prose(_ runs: [BookPageFormatter.Run]) -> Text {
+    private func prose(_ runs: [BookPageFormatter.Run], carried: BookPageFormatter.Carried?) -> Text {
         let leftToRight = !isRightToLeft(plainText(runs))
+        let linkedPieces: [[BookLinkMatcher.Piece]] = links.isEmpty && carriedLinks.isEmpty ? [] :
+            BookLinkMatcher.pieces(ofParagraph: runs, carried: carried, links: links, carriedLinks: carriedLinks)
         var text = Text(verbatim: "")
         for (index, run) in runs.enumerated() {
             if index > 0 { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }
-            if let linked = linkedRun(run, leftToRight: leftToRight) {
+            if index < linkedPieces.count,
+               let linked = linkedRun(run, pieces: linkedPieces[index], leftToRight: leftToRight) {
                 text = text + linked
                 continue
             }

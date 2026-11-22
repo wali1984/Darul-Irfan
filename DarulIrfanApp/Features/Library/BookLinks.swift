@@ -47,7 +47,9 @@ enum BookLinkTarget: Identifiable, Equatable {
     }
 }
 
-/// Finds a page's links in a piece of its text.
+/// Finds a page's links in its text. A paragraph is searched whole, so that
+/// a name cut by a printed line's end or by a quotation inside it is still a
+/// link; each of its runs then shows its part of the link.
 enum BookLinkMatcher {
     struct Piece: Equatable {
         var text: String
@@ -55,40 +57,112 @@ enum BookLinkMatcher {
         var link: Int?
     }
 
-    /// Cuts `string` at every place one of `links` names. The longest names
-    /// are placed first, so a whole reference wins over a shorter one inside
-    /// it, and no word is linked twice.
-    static func pieces(of string: String, links: [BookLink]) -> [Piece] {
-        guard !string.isEmpty, !links.isEmpty else { return [Piece(text: string, link: nil)] }
-        var taken: [(range: Range<String.Index>, link: Int)] = []
+    /// A link's place in a text, counted in UTF-16.
+    struct Mark: Equatable {
+        var range: Range<Int>
+        var link: Int
+    }
+
+    /// Every place in `string` that one of `links` names and that opens
+    /// something, in order. The longest names are placed first, so a whole
+    /// reference wins over a shorter one inside it, and no word is linked
+    /// twice.
+    static func marks(in string: String, links: [BookLink]) -> [Mark] {
+        guard !string.isEmpty, !links.isEmpty else { return [] }
+        let text = string as NSString
+        var taken: [Mark] = []
         let order = links.indices.sorted { links[$0].m.count > links[$1].m.count }
         for index in order {
             let needle = links[index].m
             guard !needle.isEmpty else { continue }
-            var searchFrom = string.startIndex
-            while searchFrom < string.endIndex,
-                  let found = string.range(of: needle, options: [.literal], range: searchFrom..<string.endIndex) {
-                if !taken.contains(where: { $0.range.overlaps(found) }) {
-                    taken.append((range: found, link: index))
+            var from = 0
+            while from < text.length {
+                let rest = NSRange(location: from, length: text.length - from)
+                let found = text.range(of: needle, options: .literal, range: rest)
+                guard found.location != NSNotFound, found.length > 0 else { break }
+                let range = found.location..<NSMaxRange(found)
+                if !taken.contains(where: { $0.range.overlaps(range) }) {
+                    taken.append(Mark(range: range, link: index))
                 }
-                searchFrom = found.upperBound
+                from = range.upperBound
             }
         }
-        guard !taken.isEmpty else { return [Piece(text: string, link: nil)] }
-        taken.sort { $0.range.lowerBound < $1.range.lowerBound }
+        return taken
+            .filter { BookLinkTarget(links[$0.link].t) != nil }
+            .sorted { $0.range.lowerBound < $1.range.lowerBound }
+    }
+
+    /// `string`, which stands at `start` in the text `marks` were found in,
+    /// cut at their edges.
+    static func pieces(of string: String, at start: Int, marks: [Mark]) -> [Piece] {
+        let text = string as NSString
         var pieces: [Piece] = []
-        var cursor = string.startIndex
-        for item in taken {
-            if cursor < item.range.lowerBound {
-                pieces.append(Piece(text: String(string[cursor..<item.range.lowerBound]), link: nil))
+        var done = 0
+        for mark in marks {
+            let lower = max(done, mark.range.lowerBound - start)
+            let upper = min(text.length, mark.range.upperBound - start)
+            guard lower < upper else { continue }
+            if done < lower {
+                pieces.append(Piece(text: text.substring(with: NSRange(location: done, length: lower - done)), link: nil))
             }
-            pieces.append(Piece(text: String(string[item.range]), link: item.link))
-            cursor = item.range.upperBound
+            pieces.append(Piece(text: text.substring(with: NSRange(location: lower, length: upper - lower)), link: mark.link))
+            done = upper
         }
-        if cursor < string.endIndex {
-            pieces.append(Piece(text: String(string[cursor..<string.endIndex]), link: nil))
+        guard !pieces.isEmpty else { return [Piece(text: string, link: nil)] }
+        if done < text.length {
+            pieces.append(Piece(text: text.substring(from: done), link: nil))
         }
         return pieces
+    }
+
+    /// `string` cut at every place one of `links` names.
+    static func pieces(of string: String, links: [BookLink]) -> [Piece] {
+        pieces(of: string, at: 0, marks: marks(in: string, links: links))
+    }
+
+    /// A quotation's pieces, found in the whole of it where it was cut.
+    static func pieces(
+        of string: String,
+        cutFrom quotation: BookPageFormatter.CutQuotation?,
+        links: [BookLink]
+    ) -> [Piece] {
+        guard let quotation else { return pieces(of: string, links: links) }
+        return pieces(of: string, at: quotation.start, marks: marks(in: quotation.whole, links: links))
+    }
+
+    /// Each run of a paragraph cut at its links. The paragraph is searched
+    /// whole, with a space for each break between its runs. The words that
+    /// finish it from the next page take that page's links (`carriedLinks`,
+    /// counted on after `links`), and only those.
+    static func pieces(
+        ofParagraph runs: [BookPageFormatter.Run],
+        carried: BookPageFormatter.Carried?,
+        links: [BookLink],
+        carriedLinks: [BookLink]
+    ) -> [[Piece]] {
+        var starts: [Int] = []
+        var whole = ""
+        var length = 0
+        for run in runs {
+            if !starts.isEmpty {
+                whole += " "
+                length += 1
+            }
+            starts.append(length)
+            whole += run.text
+            length += run.text.utf16.count
+        }
+        var own = length
+        if let carried, carried.run < starts.count {
+            own = min(length, starts[carried.run] + carried.offset)
+        }
+        let text = whole as NSString
+        var found = marks(in: text.substring(to: own), links: links)
+        for mark in marks(in: text.substring(from: own), links: carriedLinks) {
+            let range = (mark.range.lowerBound + own)..<(mark.range.upperBound + own)
+            found.append(Mark(range: range, link: mark.link + links.count))
+        }
+        return zip(runs, starts).map { run, start in pieces(of: run.text, at: start, marks: found) }
     }
 }
 
