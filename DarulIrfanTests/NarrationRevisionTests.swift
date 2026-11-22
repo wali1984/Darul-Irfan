@@ -30,6 +30,15 @@ final class NarrationRevisionTests: XCTestCase {
         XCTAssertEqual(NarrationCatalog.tag(for: list), "328az7unrobdi")
     }
 
+    func testARevisionThatIsNotAStringDoesNotLoseTheList() throws {
+        for revision in ["4", "4.5", "true", "{}", "[]", "null"] {
+            let list = try manifest(#"{"version":3,"revision":\#(revision),"voices":{"ur":{"name":"Narration · rev 2"},"en":{"name":"Recitation"}},"editions":{"akram-ut-tarajum-ur":{"translation":["001001"]}}}"#)
+            XCTAssertNil(list.revision, "revision \(revision)")
+            XCTAssertEqual(list.editions, ["akram-ut-tarajum-ur": ["translation": ["001001"]]])
+            XCTAssertEqual(NarrationCatalog.tag(for: list), "328az7unrobdi", "revision \(revision)")
+        }
+    }
+
     func testARevisionThatCannotNameAFolderIsNotTaken() {
         for revision in ["", ".", "..", "../narration", "r 2", "R2", "2\n", "12345678901234"] {
             let list = NarrationManifest(version: 1, revision: revision, voices: [:], editions: [:])

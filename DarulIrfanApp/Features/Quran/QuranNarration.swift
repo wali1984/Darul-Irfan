@@ -22,6 +22,18 @@ struct NarrationManifest: Codable, Sendable, Equatable {
     var editions: [String: [String: [String]]]
 }
 
+// In an extension, so the memberwise initializer stays. A revision that is not
+// a string counts as none: it must not cost the phone the list itself.
+extension NarrationManifest {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decode(Int.self, forKey: .version)
+        revision = try? container.decodeIfPresent(String.self, forKey: .revision)
+        voices = try container.decode([String: Voice].self, forKey: .voices)
+        editions = try container.decode([String: [String: [String]]].self, forKey: .editions)
+    }
+}
+
 /// The Silsila's narrated translations and tafsir. One MP3 per ayah (or per
 /// tafsir passage), so playback starts and stops on ayah ends. The manifest
 /// is fetched from the server and kept on disk, so new narrations reach the
