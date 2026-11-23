@@ -514,20 +514,31 @@ final class BookLayoutRulesTests: XCTestCase {
 
     // MARK: - A reference is found in its whole paragraph
 
+    /// Some page of Akram-ut-Tafaseer has a reference that a quotation cuts in
+    /// two: no run on its own holds its words, and the paragraph links them
+    /// whole. (Parah 28 p108 held one until its ayah sign went back to the
+    /// print on 23 November 2026, so the test now searches, as on Android.)
     func testALinkAcrossAQuotationInsideAParagraphIsWhole() throws {
-        let bookID = "tafaseer-parah-28"
-        let laid = BookPageFormatter.format(page: try page(bookID, 108))
-        let links = try XCTUnwrap(BookLinkProvider.shared.links(bookID: bookID)[108])
-        let verse = try XCTUnwrap(links.first { $0.t == "q:61:4" })
-        var linked: [String] = []
-        for case .paragraph(let runs) in laid.blocks {
-            let byRun = BookLinkMatcher.pieces(ofParagraph: runs, carried: nil, links: links, carriedLinks: [])
-            let parts = byRun.flatMap { $0 }.filter { piece in piece.link.map { links[$0] == verse } ?? false }
-            if !parts.isEmpty { linked.append(parts.map(\.text).joined(separator: " ")) }
-            // No run on its own holds these words.
-            XCTAssertFalse(runs.contains { $0.text.contains(verse.m) })
+        var found: String?
+        let akram = SeedBundle.bookPages().filter { $0.bookID.hasPrefix("tafaseer-parah-") }
+        var linksByBook: [String: [Int: [BookLink]]] = [:]
+        search: for shown in akram {
+            if linksByBook[shown.bookID] == nil {
+                linksByBook[shown.bookID] = BookLinkProvider.shared.links(bookID: shown.bookID)
+            }
+            guard let links = linksByBook[shown.bookID]?[shown.page], !links.isEmpty else { continue }
+            for case .paragraph(let runs) in BookPageFormatter.format(page: shown).blocks {
+                let pieces = BookLinkMatcher.pieces(ofParagraph: runs, carried: nil, links: links, carriedLinks: []).flatMap { $0 }
+                for link in links where !runs.contains(where: { $0.text.contains(link.m) }) {
+                    let parts = pieces.filter { piece in piece.link.map { links[$0] == link } ?? false }
+                    if !parts.isEmpty && parts.map(\.text).joined(separator: " ") == link.m {
+                        found = "\(shown.bookID) p\(shown.page)"
+                        break search
+                    }
+                }
+            }
         }
-        XCTAssertEqual(linked, [verse.m])
+        XCTAssertNotNil(found, "no reference cut by a quotation in Akram-ut-Tafaseer")
     }
 
     func testALinkAcrossTheCutOfAQuotationIsFound() throws {
