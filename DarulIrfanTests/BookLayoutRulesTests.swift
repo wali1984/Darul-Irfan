@@ -591,7 +591,10 @@ final class BookLayoutRulesTests: XCTestCase {
 
     /// What a 360 pt screen leaves a table: the list, the sheet and the
     /// table's own padding.
-    private let tableWidthOnAPhone = 360.0 - 2 * 16 - 2 * 22 - 2 * 8
+    /// (Typed, and summed in two steps: the compiler could not type-check the
+    /// whole expression in reasonable time, build 6b046867.)
+    private let tableMargins: Double = 2 * 16 + 2 * 22 + 2 * 8
+    private var tableWidthOnAPhone: Double { 360 - tableMargins }
 
     func testNoWordOfATableIsBrokenOnAPhone() throws {
         AppFonts.registerBundledFonts()
