@@ -113,13 +113,15 @@ The text of every printed page as the apps carry it, after the Urdu proofreading
 For text to speech. The export of 11 November 2026 (../final-text) is the text before it.
 
 Proofreading had reached {progress.get('pageEntriesInspected')} of {progress.get('totalUrduPages')} Urdu pages when this was written{'' if done else ' - NOT yet the whole library; this folder is replaced as the reading goes on'}.
-Findings applied: {summary['status'].get('applied')}. Every Urdu page also has its spacing tidied
-(a space after a sentence mark, none before it). The mushaf itself is untouched. Arabic quoted inside
-the books is as printed, apart from the corrections the owner approved or left to judgement (21 and 22 November 2026).
+The text follows the printed books (the owner's rule of 22 November 2026). A correction stays only where two
+readers, each looking at the printed page, found that the print says so or that it mends an obvious printing
+mistake outside a translation of an ayah; spaces that paper cannot show were tidied. Findings applied:
+{summary['status'].get('applied')}. The mushaf itself is untouched. Arabic quoted inside the books is as printed,
+apart from the corrections the owner approved, and those decided on 23 November under the owner's authority
+where the words put in are exactly the mushaf's.
 
 Findings not applied: {sum(n for status, n in summary['status'].items() if status != 'applied')} (doubtful, notes without replacement words, or Arabic).
-Places of Arabic still waiting for the owner's answer, as printed until then: {len(read_json(OUT / 'arabic-awaiting-approval.json'))}.
-This folder is replaced when they are answered.
+Proposed changes to Arabic left as printed (not exactly the mushaf's words): {len(read_json(OUT / 'arabic-awaiting-approval.json'))}.
 
 - by-book/<bookID>.txt   one file per book, "===== page N =====" separators ({len(pages):,} pages, {len(books)} books)
 - books.json             bookID, title, page count

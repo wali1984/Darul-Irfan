@@ -112,13 +112,16 @@ Written {datetime.now().strftime('%Y-%m-%d %H:%M')} New York time.
 {chr(10).join(table)}
 - asrar-at-tanzil, English: per ayah, as the app carries it (outside the Urdu proofreading).
 
-Places of Arabic in the whole library still waiting for the owner's answer, as printed until then:
-{len(read_json(OUT / 'arabic-awaiting-approval.json'))}. This folder is replaced when they are answered.
+Proposed changes to Arabic in the whole library left as printed (not exactly the mushaf's words):
+{len(read_json(OUT / 'arabic-awaiting-approval.json'))}.
 STATUS.json says where each volume stands and how many findings were left as printed.
 A volume with "readThrough": false is partly uncorrected.
 
-The mushaf itself is not here and is not changed. Arabic quoted inside the books is as printed,
-except the corrections the owner approved or left to judgement (21 and 22 November 2026).
+The text follows the printed volumes: a correction stays only where two readers, each looking at the
+printed page, found that the print says so or that it mends an obvious printing mistake outside a
+translation of an ayah. The mushaf itself is not here and is not changed. Arabic quoted inside the books
+is as printed, except the corrections the owner approved, and those decided on 23 November under the
+owner's authority where the words put in are exactly the mushaf's.
 [؟] marks a word that could not be read on the scan.
 
 Check a copy with: sha256sum -c SHA256SUMS

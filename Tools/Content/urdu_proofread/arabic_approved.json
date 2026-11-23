@@ -7417,5 +7417,1031 @@
   "how": "inside a block of Arabic",
   "was": "(۴۴)",
   "now": "(۳۴)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P116-002",
+  "book": "tafaseer-parah-30",
+  "page": 116,
+  "how": "mushaf 85:11",
+  "was": "الْاَنْهٰرُ ڛ ذٰلِكَ",
+  "now": "الْاَنْهٰرُ ؕ ذٰلِكَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, F35)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P115-002",
+  "book": "tafaseer-parah-30",
+  "page": 115,
+  "how": "mushaf 84:24",
+  "was": "اَلِيْمٍ o",
+  "now": "اَلِيْمٍ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, F48)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P224-001",
+  "book": "tafaseer-parah-30",
+  "page": 224,
+  "how": "mushaf 91:5",
+  "was": "بَنٰـهَا ۞",
+  "now": "بَنٰٮهَا ۞",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, F60)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P225-004",
+  "book": "tafaseer-parah-30",
+  "page": 225,
+  "how": "mushaf 91:7",
+  "was": "سَوّٰىهَا۪ۙ اور",
+  "now": "سَوّٰٮهَا ۙ اور",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, F82)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P109-003",
+  "book": "tafaseer-parah-30",
+  "page": 109,
+  "how": "mushaf 84:6",
+  "was": "فَمُلٰقِيْهِ o",
+  "now": "فَمُلٰقِيْهِ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, F97)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-30-P202-002",
+  "book": "tafaseer-parah-30",
+  "page": 202,
+  "how": "mushaf 90:3",
+  "was": "وَلَدَ ''اور",
+  "now": "وَلَدَ ''اور",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, F133)"
+ },
+ {
+  "id": "SAI-COURSE-P077-080-017",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 79,
+  "how": "mushaf 8:60",
+  "was": "”وَ مَا تُنۡفِقُوۡا مِنۡ شَیۡءٍ“",
+  "now": "”وَمَا تُـنْفِقُوْا مِنْ شَىْءٍ“",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, F150)"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-8-P300-003",
+  "book": "tafaseer-parah-8",
+  "page": 300,
+  "how": "mushaf 7:54",
+  "was": "''والامر''",
+  "now": "«وَالْاَمْرُ»",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H4)"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P113-002",
+  "book": "asrar-4-ur",
+  "page": 113,
+  "how": "mushaf 4:114",
+  "was": "امر بصدقۃ",
+  "now": "اَمَرَ بِصَدَقَةٍ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H20)"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P39-002",
+  "book": "asrar-4-ur",
+  "page": 39,
+  "how": "mushaf 4:29",
+  "was": "اموالکم فرما کر",
+  "now": "اَمْوَالَـكُمْ فرما کر",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H21)"
+ },
+ {
+  "id": "TEAM-late-asrar-567-asrar-5-ur-P1-002",
+  "book": "asrar-5-ur",
+  "page": 1,
+  "how": "mushaf 5:1",
+  "was": "اوفوا بالعقود",
+  "now": "اَوْفُوْا بِالْعُقُوْدِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H26)"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P109-001",
+  "book": "asrar-4-ur",
+  "page": 109,
+  "how": "mushaf 4:105",
+  "was": "بِمَا اَرٰكَ اللّٰهُ",
+  "now": "بِمَاۤ اَرٰٮكَ اللّٰهُ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H35)"
+ },
+ {
+  "id": "TEAM-late-asrar-567-asrar-5-ur-P19-002",
+  "book": "asrar-5-ur",
+  "page": 19,
+  "how": "mushaf 5:13",
+  "was": "لعنّٰھم",
+  "now": "لَعَنّٰهُمْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H60)"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P85-001",
+  "book": "asrar-4-ur",
+  "page": 85,
+  "how": "mushaf 4:80",
+  "was": "من تولّٰی",
+  "now": "مَنْ تَوَلّٰى",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H69)"
+ },
+ {
+  "id": "TEAM-late-asrar-asrar-4-ur-P11-002",
+  "book": "asrar-4-ur",
+  "page": 11,
+  "how": "mushaf 4:7",
+  "was": "وراثت کا سبب دو چیزوں کو قرار دیا الولدان والاقربون",
+  "now": "وراثت کا سبب دو چیزوں کو قرار دیا۔ الْوَالِدٰنِ وَالْاَقْرَبُوْنَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (the 39, H88)"
+ },
+ {
+  "id": "SAI-COURSE-P085-088-022",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 88,
+  "how": "mushaf 11:114",
+  "was": "ذالک ذکری للذاکرین ۝",
+  "now": "ذٰ لِكَ ذِكْرٰى لِلذّٰكِرِيْنَ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L2)"
+ },
+ {
+  "id": "SAI-COURSE-P089-092-005",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 89,
+  "how": "mushaf 13:22",
+  "was": "وَ الَّذِيْنَ صَبَرُوا ابْتِغَآءَ وَجْهِ رَبِّهِم اللہ",
+  "now": "وَالَّذِيْنَ صَبَرُوا ابْتِغَآءَ وَجْهِ رَبِّهِمْ اللہ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L3)"
+ },
+ {
+  "id": "SAI-COURSE-P089-092-010",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 90,
+  "how": "mushaf 13:22",
+  "was": "وَ الَّذِيْنَ صَبَرُوا ابْتِغَآءَ وَجْهِ رَبِّهِم وہ",
+  "now": "وَالَّذِيْنَ صَبَرُوا ابْتِغَآءَ وَجْهِ رَبِّهِمْ وہ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L4)"
+ },
+ {
+  "id": "SAI-COURSE-P089-092-012",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 90,
+  "how": "mushaf 13:22",
+  "was": "وَ اَنْفَقُوْا مِمَّا رَزَقْنٰهُمْ اور",
+  "now": "وَاَنْفَقُوْا مِمَّا رَزَقْنٰهُمْ اور",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L5)"
+ },
+ {
+  "id": "SAI-COURSE-P089-092-014",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 90,
+  "how": "mushaf 2:274",
+  "was": "سِرًّا وَّ عَلَانِيَةً خواہ",
+  "now": "سِرًّا وَّعَلَانِيَةً خواہ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L6)"
+ },
+ {
+  "id": "SAI-COURSE-P089-092-017",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 91,
+  "how": "mushaf 13:22",
+  "was": "وَّ یَدْرَءُ وْنَ بِالْحَسَنَةِ السَّیِّئَةَ",
+  "now": "وَّيَدْرَءُوْنَ بِالْحَسَنَةِ السَّيِّئَةَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L7)"
+ },
+ {
+  "id": "SAI-COURSE-P093-096-011",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 94,
+  "how": "mushaf 13:26",
+  "was": "اَللّٰہُ یَبْسُطُ الرِّزْقَ لِمَنْ یَّشَآءُ وَ یَقْدِرِ اللہ",
+  "now": "اَللّٰهُ يَبْسُطُ الرِّزْقَ لِمَنْ يَّشَآءُ وَيَقْدِرُ اللہ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L8)"
+ },
+ {
+  "id": "SAI-COURSE-P093-096-024",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 96,
+  "how": "mushaf 13:7",
+  "was": "وَ يَـقُـوْلُ الَّذِيْنَ كَفَرُوْا لَوْ لَآ اُنْزِلَ عَلَيْهِ اٰيَةٌ مِّنْ رَّبِّهٖ",
+  "now": "وَيَقُوْلُ الَّذِيْنَ كَفَرُوْا لَوْلَاۤ اُنْزِلَ عَلَيْهِ اٰيَةٌ مِّنْ رَّبِّهٖ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L9)"
+ },
+ {
+  "id": "SAI-COURSE-P097-100-002",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 97,
+  "how": "mushaf 13:27",
+  "was": "قُلْ اِنَّ اللّٰهَ یُضِلُّ مَنْ یَّشَآءُ وَ یَهْدِیْٓ اِلَیْهِ مَنْ اَنَابَ ○",
+  "now": "قُلْ اِنَّ اللّٰهَ يُضِلُّ مَنْ يَّشَآءُ وَيَهْدِىْۤ اِلَيْهِ مَنْ اَنَابَ ○",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L10)"
+ },
+ {
+  "id": "SAI-COURSE-P097-100-012",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 98,
+  "how": "mushaf 13:29",
+  "was": "طُوْبٰی لَهُمْ وَ حُسْنُ مَاٰب (الرعد:29)",
+  "now": "طُوْبٰى لَهُمْ وَحُسْنُ مَاٰبٍ (الرعد:29)",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L13)"
+ },
+ {
+  "id": "SAI-COURSE-P113-115-010",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 114,
+  "how": "mushaf 15:98",
+  "was": "وَ کُنْ مِّنَ السّٰجِدِیْنَ",
+  "now": "وَكُنْ مِّنَ السّٰجِدِيْنَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L17)"
+ },
+ {
+  "id": "SAI-COURSE-P116-118-016",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 118,
+  "how": "mushaf 17:23",
+  "was": "فَلَا تَقُلْ لَّھُمَآ اُفٍّ وَّ لَا تَنْھَرْ ھُمَا",
+  "now": "فَلَا تَقُلْ لَّهُمَاۤ اُفٍّ وَّلَا تَنْهَرْهُمَا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L18)"
+ },
+ {
+  "id": "SAI-COURSE-P116-118-019",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 118,
+  "how": "mushaf 17:23",
+  "was": "وَّ لَا تَنْھَرْ ھُمَا کسی بات",
+  "now": "وَّلَا تَنْهَرْهُمَا کسی بات",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L19)"
+ },
+ {
+  "id": "SAI-COURSE-P119-122-002",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 119,
+  "how": "mushaf 17:23",
+  "was": "وَ قُلْ لَّهُمَا قَوْلًا كَرِيْمًا ۝",
+  "now": "وَقُلْ لَّهُمَا قَوْلًا كَرِيْمًا ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L20)"
+ },
+ {
+  "id": "SAI-COURSE-P119-122-003",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 119,
+  "how": "mushaf 17:24",
+  "was": "وَ اخْفِضْ لَهُمَا جَنَاحَ الذُّلِّ مِنَ الرَّحْمَةِ",
+  "now": "وَاخْفِضْ لَهُمَا جَنَاحَ الذُّلِّ مِنَ الرَّحْمَةِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L21)"
+ },
+ {
+  "id": "SAI-COURSE-P119-122-004",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 119,
+  "how": "mushaf 17:24",
+  "was": "وَ قُلْ رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيٰنِيْ صَغِيْرًا",
+  "now": "وَقُلْ رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيٰنِىْ صَغِيْرًا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L22)"
+ },
+ {
+  "id": "SAI-COURSE-P119-122-016",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 120,
+  "how": "mushaf 17:35",
+  "was": "وَ اَوْفُوا الْکَیْلَ اِذَا کِلْتُمْ وَزِنُوْا بِالْقِسْطَاسِ الْمُسْتَقِیْمِ",
+  "now": "وَاَوْفُوا الْـكَيْلَ اِذَا كِلْتُمْ وَزِنُوْا بِالْقِسْطَاسِ الْمُسْتَقِيْمِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L23)"
+ },
+ {
+  "id": "SAI-COURSE-P119-122-017",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 120,
+  "how": "mushaf 4:59",
+  "was": "و احسن تاویلا",
+  "now": "وَّاَحْسَنُ تَاْوِيْلًا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L24)"
+ },
+ {
+  "id": "SAI-COURSE-P123-126-006",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 124,
+  "how": "mushaf 17:26",
+  "was": "وَ اٰتِ ذَا الْقُرْبٰی حَقَّهٗ",
+  "now": "وَاٰتِ ذَا الْقُرْبٰى حَقَّهٗ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L25)"
+ },
+ {
+  "id": "SAI-COURSE-P123-126-010",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 124,
+  "how": "mushaf 17:26",
+  "was": "وَ الْمِسْكِيْنَ اور",
+  "now": "وَالْمِسْكِيْنَ اور",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L26)"
+ },
+ {
+  "id": "SAI-COURSE-P123-126-011",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 124,
+  "how": "mushaf 17:26",
+  "was": "وَ لَا تُبَذِّرْ ○",
+  "now": "وَلَا تُبَذِّرْ ○",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L27)"
+ },
+ {
+  "id": "SAI-COURSE-P123-126-018",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 126,
+  "how": "mushaf 17:27",
+  "was": "وَ كَانَ الشَّیْطٰنُ لِرَبِّهٖ كَفُوْرًا ○",
+  "now": "وَكَانَ الشَّيْطٰنُ لِرَبِّهٖ كَفُوْرًا ○",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L29)"
+ },
+ {
+  "id": "SAI-COURSE-P127-129-016",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 129,
+  "how": "mushaf 17:31",
+  "was": "وَ لَا تَقْتُلُوْٓا اَوْلَادَكُمْ خَشْيَةَ اِمْلَاقٍ",
+  "now": "وَلَا تَقْتُلُوْۤا اَوْلَادَكُمْ خَشْيَةَ اِمْلَاقٍ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L30)"
+ },
+ {
+  "id": "SAI-COURSE-P127-129-017",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 129,
+  "how": "mushaf 17:31",
+  "was": "نَحْنُ نَرْزُقُهُمْ وَ اِيَّاكُمْ",
+  "now": "نَحْنُ نَرْزُقُهُمْ وَاِيَّاكُمْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L31)"
+ },
+ {
+  "id": "SAI-COURSE-P130-132-008",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 131,
+  "how": "mushaf 29:2",
+  "was": "اَحَسِبَ النَّاسُ اَنْ يُّتْرَكُوْٓا اَنْ يَّقُوْلُوْٓا اٰمَنَّا وَ هُمْ لَا يُفْتَنُوْنَ ۝",
+  "now": "اَحَسِبَ النَّاسُ اَنْ يُّتْرَكُوْۤا اَنْ يَّقُوْلُوْۤا اٰمَنَّا وَهُمْ لَا يُفْتَـنُوْنَ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L32)"
+ },
+ {
+  "id": "SAI-COURSE-P130-132-009",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 131,
+  "how": "mushaf 29:3",
+  "was": "وَ لَقَدْ فَتَنَّا الَّذِيْنَ مِنْ قَبْلِهِمْ",
+  "now": "وَلَقَدْ فَتَـنَّا الَّذِيْنَ مِنْ قَبْلِهِمْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L33)"
+ },
+ {
+  "id": "SAI-COURSE-P130-132-010",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 131,
+  "how": "mushaf 29:3",
+  "was": "فَلَيَعْلَمَنَّ اللّٰهُ الَّذِيْنَ صَدَقُوْا وَ لَيَعْلَمَنَّ الْكٰذِبِيْنَ ۝",
+  "now": "فَلَيَـعْلَمَنَّ اللّٰهُ الَّذِيْنَ صَدَقُوْا وَلَيَعْلَمَنَّ الْكٰذِبِيْنَ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L34)"
+ },
+ {
+  "id": "SAI-COURSE-P130-132-015",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 132,
+  "how": "mushaf 29:5",
+  "was": "وَ هُوَ السَّمِيْعُ الْعَلِيْمُ ۝",
+  "now": "وَهُوَ السَّمِيْعُ الْعَلِيْمُ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L35)"
+ },
+ {
+  "id": "SAI-COURSE-P130-132-018",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 132,
+  "how": "mushaf 29:7",
+  "was": "وَ لَنَجْزِيَنَّهُمْ اَحْسَنَ الَّذِیْ كَانُوْا يَعْمَلُوْنَ ۝",
+  "now": "وَلَـنَجْزِيَنَّهُمْ اَحْسَنَ الَّذِىْ كَانُوْا يَعْمَلُوْنَ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L36)"
+ },
+ {
+  "id": "SAI-COURSE-P148-150-014",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 150,
+  "how": "mushaf 25:43",
+  "was": "اَرَءَ یْتَ مَنِ اتَّخَذَ اِلٰـھَهُ ھَوٰهُ",
+  "now": "اَرَءَيْتَ مَنِ اتَّخَذَ اِلٰهَهٗ هَوٰٮهُ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L41)"
+ },
+ {
+  "id": "SAI-COURSE-P154-156-010",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 155,
+  "how": "mushaf 11:85",
+  "was": "اَوۡفُوا الۡمِکۡیَالَ وَ الۡمِیۡزَانَ بِالۡقِسۡطِ",
+  "now": "اَوْفُوا الْمِكْيَالَ وَالْمِيْزَانَ بِالْقِسْطِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L44)"
+ },
+ {
+  "id": "SAI-COURSE-P154-156-012",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 155,
+  "how": "mushaf 11:85",
+  "was": "وَ لَا تَبۡخَسُوا النَّاسَ اَشۡیَآءَهُمۡ (ھود:85)",
+  "now": "وَلَا تَبْخَسُوا النَّاسَ اَشْيَآءَهُمْ (ھود:85)",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L45)"
+ },
+ {
+  "id": "SAI-COURSE-P154-156-013",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 155,
+  "how": "mushaf 11:84",
+  "was": "وَّ اِنِّیۡۤ اَخَافُ عَلَیۡكُمۡ عَذَابَ یَوۡمٍ مُّحِیۡطٍ ۝",
+  "now": "وَّاِنِّىْۤ اَخَافُ عَلَيْكُمْ عَذَابَ يَوْمٍ مُّحِيْطٍ ۝",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L46)"
+ },
+ {
+  "id": "SAI-COURSE-P157-159-002",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 157,
+  "how": "mushaf 16:58",
+  "was": "وَ اِذَا بُشِّرَ اَحَدُھُمْ بِالْاُنْثٰی ظَلَّ وَجْھُهٗ مُسْوَدًّا وَّ ھُوَ کَظِیْمٌ",
+  "now": "وَاِذَا بُشِّرَ اَحَدُهُمْ بِالْاُنْثٰى ظَلَّ وَجْهُهٗ مُسْوَدًّا وَّهُوَ كَظِيْمٌ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L47)"
+ },
+ {
+  "id": "SAI-COURSE-P157-159-005",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 157,
+  "how": "mushaf 16:59",
+  "was": "اَلَاسَآءَ مَا یَحْکُمُوْن",
+  "now": "اَلَا سَآءَ مَا يَحْكُمُوْنَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L48)"
+ },
+ {
+  "id": "TEAM-early-course-160-book-ocr-sai-hafta-course-P166-003",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 166,
+  "how": "mushaf 12:50",
+  "was": "فَلَمَّا جَآءَ ہُ الرَّسُوْلُ",
+  "now": "فَلَمَّا جَآءَهُ الرَّسُوْلُ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L50)"
+ },
+ {
+  "id": "TEAM-early-course-171-book-ocr-sai-hafta-course-P182-001",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 182,
+  "how": "mushaf 16:78",
+  "was": "مِنْ م بُطُوْنِ",
+  "now": "مِّنْۢ بُطُوْنِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L52)"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-10-P180-003",
+  "book": "tafaseer-parah-10",
+  "page": 180,
+  "how": "mushaf 5:90",
+  "was": "فَاجْتَنِبُوْ (المایدہ:90)",
+  "now": "فَاجْتَنِبُوْهُ (المایدہ:90)",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L58)"
+ },
+ {
+  "id": "TEAM-early-tafaseer-parah-10-P260-003",
+  "book": "tafaseer-parah-10",
+  "page": 260,
+  "how": "mushaf 53:4",
+  "was": "اِنْ ھُوَاِلَّا",
+  "now": "اِنْ هُوَ اِلَّا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L60)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P270-002",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 270,
+  "how": "mushaf 3:31",
+  "was": "فَا تَّبِعُوْنِیْ",
+  "now": "فَاتَّبِعُوْنِىْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L62)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P280-003",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 280,
+  "how": "mushaf 51:56",
+  "was": "وَالْاِ نْسَ",
+  "now": "وَالْاِنْسَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L64)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P313-002",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 313,
+  "how": "mushaf 14:41",
+  "was": "اغْفِرْلِىْ",
+  "now": "اغْفِرْ لِىْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L67)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P315-001",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 315,
+  "how": "mushaf 2:255",
+  "was": "مَنْ ذَاالَّذِیْ",
+  "now": "مَنْ ذَا الَّذِىْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L68)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P317-002",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 317,
+  "how": "mushaf 3:102",
+  "was": "يٰاَيُّهَاالَّذِيْنَ",
+  "now": "يٰۤـاَيُّهَا الَّذِيْنَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L70)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P317-003",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 317,
+  "how": "mushaf 4:1",
+  "was": "تَسَآءَ لُوْنَ",
+  "now": "تَسَآءَلُوْنَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L71)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P317-004",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 317,
+  "how": "mushaf 33:71",
+  "was": "وَيَغْفِرْلَكُمْ",
+  "now": "وَيَغْفِرْ لَـكُمْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L72)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P10-003",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 10,
+  "how": "mushaf 1:7",
+  "was": "وَلاالضَّآلِیْن",
+  "now": "وَلَا الضَّآلِّيْنَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L78)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P108-003",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 108,
+  "how": "mushaf 4:97",
+  "was": "فَتُهَا جِرُوْا",
+  "now": "فَتُهَاجِرُوْا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L80)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P113-002",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 113,
+  "how": "mushaf 23:2",
+  "was": "فِیْ صَلَا تِہِمْ",
+  "now": "فِىْ صَلَاتِهِمْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L82)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P115-003",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 115,
+  "how": "mushaf 23:6",
+  "was": "اَوْمَا مَلَكَتْ",
+  "now": "اَوْ مَا مَلَـكَتْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L83)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P123-002",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 123,
+  "how": "mushaf 2:186",
+  "was": "وَاِذَاسَالَکَ عِبَادِیْ عَنِّیْ",
+  "now": "وَاِذَا سَاَلَـكَ عِبَادِىْ عَنِّىْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L86)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P123-003",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 123,
+  "how": "mushaf 8:32",
+  "was": "اَوِئْتِنَابِعَذَابٍ",
+  "now": "اَوِ ائْتِنَا بِعَذَابٍ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L87)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P123-004",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 123,
+  "how": "mushaf 8:33",
+  "was": "مَاکَانَ اللّٰہُ لِیُعَذِّبَھُمْ وَاَنْتَ فِیْھِمْ",
+  "now": "وَمَا كَانَ اللّٰهُ لِيُعَذِّبَهُمْ وَاَنْتَ فِيْهِمْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L88)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P128-003",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 128,
+  "how": "mushaf 24:55",
+  "was": "وَعَدَاللّٰہُ",
+  "now": "وَعَدَ اللّٰهُ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L90)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P147-005",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 147,
+  "how": "mushaf 66:6",
+  "was": "قُوْٓا اَنْفُسَکُمْ وَ اَھْلِیْکُمْ نَارًا",
+  "now": "قُوْۤا اَنْفُسَكُمْ وَاَهْلِيْكُمْ نَارًا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L93)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P159-005",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 159,
+  "how": "mushaf 49:10",
+  "was": "انما المومنون اخوۃ",
+  "now": "اِنَّمَا الْمُؤْمِنُوْنَ اِخْوَةٌ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L94)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P184-001",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 184,
+  "how": "mushaf 14:41",
+  "was": "اغْفِرْلِیْ",
+  "now": "اغْفِرْ لِىْ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L95)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P204-003",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 204,
+  "how": "mushaf 5:120",
+  "was": "وَهُوَاعَلٰی کُلِّ شَيٍ قَدِی",
+  "now": "وَهُوَ عَلٰى كُلِّ شَىْءٍ قَدِيْرٌ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L99)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P29-002",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 29,
+  "how": "mushaf 2:286",
+  "was": "واعف عنا",
+  "now": "وَاعْفُ عَنَّا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L102)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P32-003",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 32,
+  "how": "mushaf 3:19",
+  "was": "جَآءَ هُمُ",
+  "now": "جَآءَهُمُ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L103)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P57-002",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 57,
+  "how": "mushaf 33:41",
+  "was": "فَاذْكُرُوا اللّٰهَ ذِكْرًا كَثِيرًا",
+  "now": "اذْكُرُوْا اللّٰهَ ذِكْرًا كَثِيْرًا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L106)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P73-001",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 73,
+  "how": "mushaf 16:97",
+  "was": "صَالِحًامِّنْ ذَکَرٍ اَوْاُنْثٰی",
+  "now": "صَالِحًـا مِّنْ ذَكَرٍ اَوْ اُنْثٰى",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L107)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P77-001",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 77,
+  "how": "mushaf 5:8",
+  "was": "كُوْنُوْ قَوّٰمِيْنَ",
+  "now": "كُوْنُوْا قَوَّا امِيْنَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L108)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P77-004",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 77,
+  "how": "mushaf 5:8",
+  "was": "هو اقرب للتقوىٰ",
+  "now": "هُوَ اَقْرَبُ لِلتَّقْوٰى",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L109)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P79-002",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 79,
+  "how": "mushaf 2:189",
+  "was": "واتقو الله",
+  "now": "وَاتَّقُوا اللّٰهَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L110)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-25-P210-003",
+  "book": "tafaseer-parah-25",
+  "page": 210,
+  "how": "mushaf",
+  "was": "لَا يُظْلَمُوْنَ۝",
+  "now": "لَا يُظْلَمُوْنَ ﴿۲۲﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L114)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P114-005",
+  "book": "tafaseer-parah-27",
+  "page": 114,
+  "how": "mushaf",
+  "was": "الْقُرْاٰنَ ؁",
+  "now": "الْقُرْاٰنَ ﴿۲﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L115)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P114-006",
+  "book": "tafaseer-parah-27",
+  "page": 114,
+  "how": "mushaf",
+  "was": "الْاِنْسَانَ ؂",
+  "now": "الْاِنْسَانَ ﴿۳﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L116)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P163-002",
+  "book": "tafaseer-parah-27",
+  "page": 163,
+  "how": "mushaf",
+  "was": "الْمُطَهَّرُوْنَ ؁",
+  "now": "الْمُطَهَّرُوْنَ ﴿۷۹﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L117)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P50-R001",
+  "book": "tafaseer-parah-27",
+  "page": 50,
+  "how": "mushaf",
+  "was": "الْمَكِيْدُوْنَ ؁",
+  "now": "الْمَكِيْدُوْنَ ﴿۴۲﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L118)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P50-R002",
+  "book": "tafaseer-parah-27",
+  "page": 50,
+  "how": "mushaf",
+  "was": "يُشْرِكُوْنَ ؁",
+  "now": "يُشْرِكُوْنَ ﴿۴۳﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L119)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-27-P78-002",
+  "book": "tafaseer-parah-27",
+  "page": 78,
+  "how": "mushaf",
+  "was": "بِالْحُسْنٰى ؀",
+  "now": "بِالْحُسْنٰى ﴿۳۱﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L120)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P228-003",
+  "book": "tafaseer-parah-29",
+  "page": 228,
+  "how": "mushaf",
+  "was": "لَوَاقِعٌ ۞",
+  "now": "لَوَاقِعٌ ﴿۷﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L122)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P228-004",
+  "book": "tafaseer-parah-29",
+  "page": 228,
+  "how": "mushaf",
+  "was": "طُمِسَتْ ۞",
+  "now": "طُمِسَتْ ﴿۸﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L123)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P229-002",
+  "book": "tafaseer-parah-29",
+  "page": 229,
+  "how": "mushaf",
+  "was": "فُرِجَتْ ۝",
+  "now": "فُرِجَتْ ﴿۹﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L124)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P229-003",
+  "book": "tafaseer-parah-29",
+  "page": 229,
+  "how": "mushaf",
+  "was": "نُسِفَتْ ۝",
+  "now": "نُسِفَتْ ﴿۱۰﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L125)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P229-004",
+  "book": "tafaseer-parah-29",
+  "page": 229,
+  "how": "mushaf",
+  "was": "اُقِّتَتْ ۝",
+  "now": "اُقِّتَتْ ﴿۱۱﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L126)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P229-005",
+  "book": "tafaseer-parah-29",
+  "page": 229,
+  "how": "mushaf",
+  "was": "اُجِّلَتْ ۝",
+  "now": "اُجِّلَتْ ﴿۱۲﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L127)"
+ },
+ {
+  "id": "TEAM-middle-asrar-89-asrar-9-ur-P36-002",
+  "book": "asrar-9-ur",
+  "page": 36,
+  "how": "mushaf 20:46",
+  "was": "انی معکما اسمع وارٰی",
+  "now": "اِنَّنِىْ مَعَكُمَاۤ اَسْمَعُ وَاَرٰى",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L134)"
+ },
+ {
+  "id": "TEAM-middle-asrar-89-asrar-9-ur-P36-005",
+  "book": "asrar-9-ur",
+  "page": 36,
+  "how": "mushaf 12:84",
+  "was": "وابیضّت عیناہُ من الحزن",
+  "now": "وَابْيَـضَّتْ عَيْنٰهُ مِنَ الْحُـزْنِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L135)"
+ },
+ {
+  "id": "TEAM-middle-asrar-89-asrar-9-ur-P39-005",
+  "book": "asrar-9-ur",
+  "page": 39,
+  "how": "mushaf 9:43",
+  "was": "عفا اللّٰہ عنك",
+  "now": "عَفَا اللّٰهُ عَنْكَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L137)"
+ },
+ {
+  "id": "TEAM-middle-asrar-89-asrar-9-ur-P83-004",
+  "book": "asrar-9-ur",
+  "page": 83,
+  "how": "mushaf 19:47",
+  "was": "کہ ساستغفر لك ربّی۔",
+  "now": "کہ سَاَسْتَغْفِرُ لَـكَ رَبِّىْ۔",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L140)"
+ },
+ {
+  "id": "SAI-COURSE-P097-100-005",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 97,
+  "how": "mushaf 13:27",
+  "was": "یَهْـدِیْ اِلَیْـهِ.",
+  "now": "يَهْدِىْۤ اِلَيْهِ.",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L11)"
+ },
+ {
+  "id": "SAI-COURSE-P105-108-022",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 108,
+  "how": "mushaf 2:41",
+  "was": "لَا تَشْتَرُوْا بِاٰیٰتِیْ ثَمَنًا قَلِیْلًا (البقرہ: 41)",
+  "now": "لَا تَشْتَرُوْا بِاٰيٰتِىْ ثَمَنًا قَلِيْلًا (البقرہ: 41)",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L15)"
+ },
+ {
+  "id": "SAI-COURSE-P109-112-012",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 111,
+  "how": "mushaf 2:208",
+  "was": "اُدْخُلُوْا فِی السِّلْمِ کَآفَّۃً وَ لَا تَتَّبِعُوْا خُطُوٰتِ الشَّیْطٰن (البقرہ:208)",
+  "now": "ادْخُلُوْا فِى السِّلْمِ کَآفَّةً  وَلَا تَتَّبِعُوْا خُطُوٰتِ الشَّيْطٰنِ (البقرہ:208)",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L16)"
+ },
+ {
+  "id": "SAI-COURSE-P123-126-017",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 126,
+  "how": "mushaf 7:12",
+  "was": "اَنَا خَیْرٌ مِّنْهُ خَلَقْتَنِیْ مِنْ نَّارٍ وَّ خَلَقْتَهٗ مِنْ طِیْنٍ (الاعراف:12)",
+  "now": "اَنَا خَيْرٌ مِّنْهُ​ ۚ خَلَقْتَنِىْ مِنْ نَّارٍ وَّخَلَقْتَهٗ مِنْ طِيْنٍ (الاعراف:12)",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L28)"
+ },
+ {
+  "id": "SAI-COURSE-P145-147-012",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 146,
+  "how": "mushaf 49:9",
+  "was": "اَصْلِحُوْا بَیْنَہُمَا بِالْعَدْلِ",
+  "now": "اَصْلِحُوْا بَيْنَهُمَا بِالْعَدْلِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L39)"
+ },
+ {
+  "id": "SAI-COURSE-P151-153-005",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 151,
+  "how": "mushaf 7:85",
+  "was": "اِلٰی مَدْیَنَ اَخَاھُمْ شُعَیْبًاہ",
+  "now": "اِلٰى مَدْيَنَ اَخَاهُمْ شُعَيْبًا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L43)"
+ },
+ {
+  "id": "TEAM-early-course-book-ocr-sai-hafta-course-P245-003",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 245,
+  "how": "mushaf",
+  "was": "انماالمومنون اخوۃ",
+  "now": "اِنَّمَا الْمُؤْمِنُوْنَ اِخْوَةٌ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L55)"
+ },
+ {
+  "id": "TEAM-late-course-tail-book-ocr-sai-hafta-course-P269-003",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 269,
+  "how": "mushaf 2:165",
+  "was": "حُبًّالِّلّٰهِ",
+  "now": "حُبًّا لِّلّٰهِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L61)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P144-001",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 144,
+  "how": "mushaf 6:153",
+  "was": "وَ اَنَّ ھٰذَا صِرَاطِیْ مُسْتَقِیْمًا فَاتَّبِعُوْہُ وَ لَا تَتَّبِعُوا السُّبُل",
+  "now": "وَاَنَّ هٰذَا صِرَاطِىْ مُسْتَقِيْمًا فَاتَّبِعُوْهُ​ ۚ وَلَا تَتَّبِعُوْا السُّبُلَ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L92)"
+ },
+ {
+  "id": "TEAM-late-hasht-roza-book-ocr-hasht-roza-course-P28-004",
+  "book": "book-ocr-hasht-roza-course",
+  "page": 28,
+  "how": "mushaf 2:187",
+  "was": "کلوا واشربوا حتی یتبین لکم الخیط الابیض من الخیط الاسود من الفجر",
+  "now": "كُلُوْا وَاشْرَبُوْا حَتّٰى يَتَبَيَّنَ لَـكُمُ الْخَـيْطُ الْاَبْيَضُ مِنَ الْخَـيْطِ الْاَسْوَدِ مِنَ الْفَجْرِ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L101)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-23-P161-001",
+  "book": "tafaseer-parah-23",
+  "page": 161,
+  "how": "mushaf",
+  "was": "اَنِّیْ مَسَّنِیَ الشَّیْطٰنُ اَنِّیْ مَسَّنِیَ الشَّیْطٰنُ",
+  "now": "اَنِّىْ مَسَّنِىَ الشَّيْطٰنُ",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L112)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-28-P91-002",
+  "book": "tafaseer-parah-28",
+  "page": 91,
+  "how": "mushaf",
+  "was": "الْمَصِيرُ ۝",
+  "now": "الْمَصِيْرُ ۝۴",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L121)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P229-006",
+  "book": "tafaseer-parah-29",
+  "page": 229,
+  "how": "mushaf",
+  "was": "لِیَوْمِ الْفَصْلِ ۝",
+  "now": "لِيَوْمِ الْفَصْلِ ﴿۱۳﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L128)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P229-007",
+  "book": "tafaseer-parah-29",
+  "page": 229,
+  "how": "mushaf",
+  "was": "مَا یَوْمُ الْفَصْلِ ۝",
+  "now": "مَا يَوْمُ الْفَصْلِ ﴿۱۴﴾",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L129)"
+ },
+ {
+  "id": "TEAM-late-tafaseer-parah-29-P72-004",
+  "book": "tafaseer-parah-29",
+  "page": 72,
+  "how": "mushaf",
+  "was": "اَلْحَآقَّةُ ۝ مَا الْحَآقَّةُ ۝",
+  "now": "اَلْحَـآقَّةُ ۝۱ مَا الْحَـآقَّةُ ۝۲",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L131)"
+ },
+ {
+  "id": "TEAM-middle-asrar-89-asrar-9-ur-P38-001",
+  "book": "asrar-9-ur",
+  "page": 38,
+  "how": "mushaf 9:52",
+  "was": "بِاَيْدِيْنَا ڮ فَتَرَبَّصُوْٓا",
+  "now": "بِاَيْدِيْنَا  ​ۖ  فَتَرَبَّصُوْۤا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L136)"
+ },
+ {
+  "id": "TEAM-middle-asrar-89-asrar-9-ur-P70-003",
+  "book": "asrar-9-ur",
+  "page": 70,
+  "how": "mushaf 9:107",
+  "was": "الَّذِیْنَ اتَّخَذُوْا مَسْجِدًا ضِرَارًا",
+  "now": "الَّذِيْنَ اتَّخَذُوْا مَسْجِدًا ضِرَارًا",
+  "authority": "decided 2026-11-23 under the owner's authority: exactly the mushaf's words (last page L139)"
  }
 ]
