@@ -28,6 +28,9 @@ from pathlib import Path
 
 IOS = Path(__file__).resolve().parents[3]
 SEED = IOS / "DarulIrfanApp" / "Resources" / "SeedData"
+_WORDS = Path(__file__).with_name("outside_translation_words.json")
+OUTSIDE_TRANSLATION_WORDS = {(entry["book"], entry["page"]): set(entry["words"])
+                             for entry in json.loads(_WORDS.read_text(encoding="utf-8"))} if _WORDS.exists() else {}
 HARAKAT = set("ًٌٍَُِّْٰٖٗ")
 BREAKS = set(" \t\n\r()[]{}«»\"'“”‘’،۔؟!:؛.,|/-–—﴿﴾*0123456789۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩\u06dd\u06de\u0600\u200b\u200f")
 
@@ -118,7 +121,10 @@ def main() -> int:
                 # Urdu is vowelled here and there too ("اُمّت", "حُسنِ"), and a
                 # correction may add or move such a mark: listed, to be read.
                 # A fully vowelled word that is no longer there is Arabic lost.
-                lost = [word for word in gone if sum(c in HARAKAT for c in word) >= 3 and word not in approved]
+                # Vowelled Urdu words inside the Pickthall and Jalandhry translations the
+                # owner had taken out (23 November 2026) may go, on their own page only.
+                lost = [word for word in gone if sum(c in HARAKAT for c in word) >= 3 and word not in approved
+                        and word not in OUTSIDE_TRANSLATION_WORDS.get(key(a), ())]
                 print(f"{name} {key(a)}: was {dict(gone)} now {dict(came)}" + ("  <-- ARABIC LOST" if lost else ""))
                 problems += bool(lost)
                 listed += 1
