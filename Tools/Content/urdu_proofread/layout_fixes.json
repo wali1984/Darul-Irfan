@@ -1,0 +1,836 @@
+[
+ {
+  "id": "LAY-ASRAR-12-029",
+  "book": "asrar-12-ur",
+  "page": 51,
+  "kind": "text",
+  "was": "بھائیوں نے بہت کوشش کی کہ کسی طرح",
+  "now": "اسرار و معارف\n\nبھائیوں نے بہت کوشش کی کہ کسی طرح"
+ },
+ {
+  "id": "LAY-ASRAR-12-032",
+  "book": "asrar-12-ur",
+  "page": 57,
+  "kind": "text",
+  "was": "ادھر یعقوب علیہ السلام بے قراری سے",
+  "now": "اسرار و معارف\n\nادھر یعقوب علیہ السلام بے قراری سے"
+ },
+ {
+  "id": "LAY-ASRAR-16-010",
+  "book": "asrar-16-ur",
+  "page": 43,
+  "kind": "text",
+  "was": "پ۱۴-ع ۲۰- ",
+  "now": "اسرار و معارف\n\nپ۱۴-ع ۲۰- "
+ },
+ {
+  "id": "LAY-TEAM-middle-asrar-89-asrar-8-ur-P20",
+  "book": "asrar-8-ur",
+  "page": 20,
+  "kind": "text",
+  "was": "تقویٰ کے ثمرات\n\nاطاعتِ نبویؐ",
+  "now": "اسرار و معارف\n\nتقویٰ کے ثمرات\n\nاطاعتِ نبویؐ"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P58",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 58,
+  "kind": "text",
+  "was": "سے اودھار کرتے",
+  "now": "سے ادھار کرتے"
+ },
+ {
+  "id": "LAY-TEAM-early-dil-book-ocr-dil-darwaza-P41",
+  "book": "book-ocr-dil-darwaza",
+  "page": 41,
+  "kind": "text",
+  "was": "پینڈا چا مکاویں سائیاں یار تتڑی دا\nموڑ لیاویں سائیاں یار تتڑی دا",
+  "now": "پینڈا چا مکاویں سائیاں یار تتڑی دا\nموڑ لیاویں سائیاں یار تتڑی دا\n\nدارالعرفان 17-11-00"
+ },
+ {
+  "id": "LAY-PARDAH-004",
+  "book": "book-ocr-pardah",
+  "page": 36,
+  "kind": "text",
+  "was": "تدریجاً\n\nاحکام پردہ",
+  "now": "تدریجاً احکام پردہ"
+ },
+ {
+  "id": "LAY-SAI-COURSE-P039-042",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 39,
+  "kind": "text",
+  "was": "سبق نمبر۵:\n\nسورۃ ھود",
+  "now": "ایمانیات\n\nسبق نمبر۵:\n\nسورۃ ھود"
+ },
+ {
+  "id": "LAY-SAI-COURSE-P151-153",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 151,
+  "kind": "text",
+  "was": "سبق نمبر ۲۵: سورۃ ہود",
+  "now": "معاملات\n\nسبق نمبر ۲۵: سورۃ ہود"
+ },
+ {
+  "id": "LAY-SAI-COURSE-P154-156",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 155,
+  "kind": "text",
+  "was": " تو اللہ سے دعا کیجئے کہ اللہ ہمارے دلوں میں یہ یقین راسخ فرمائے آمین۔",
+  "now": " تو اللہ سے دعا کیجئے کہ اللہ ہمارے دلوں میں یہ یقین راسخ فرمائے آمین۔\n\n☆ ☆ ☆"
+ },
+ {
+  "id": "LAY-SAI-COURSE-P154-156",
+  "book": "book-ocr-sai-hafta-course",
+  "page": 156,
+  "kind": "text",
+  "was": "سبق نمبر ۲۶: سورۃ النحل",
+  "now": "معاملات\n\nسبق نمبر ۲۶: سورۃ النحل"
+ },
+ {
+  "id": "LAY-TEAM-late-tafaseer-parah-28-P40",
+  "book": "tafaseer-parah-28",
+  "page": 40,
+  "kind": "text",
+  "was": "وقتی ہے لحاظی ہے",
+  "now": "وقتی ہے لمحاتی ہے"
+ },
+ {
+  "id": "LAY-TEAM-late-tafaseer-parah-29-P211",
+  "book": "tafaseer-parah-29",
+  "page": 211,
+  "kind": "text",
+  "was": "اور بجے تلے ہوں",
+  "now": "اور جچے تلے ہوں"
+ },
+ {
+  "id": "LAY-IRSHAAD-I-002",
+  "book": "uploads-books-irshaad-us-salikeen-i",
+  "page": 24,
+  "kind": "text",
+  "was": "بائیس۲۲",
+  "now": "بائیس ۲۲"
+ },
+ {
+  "id": "LAY-HARMAIN-003",
+  "book": "uploads-books-israr-ul-harmain",
+  "page": 70,
+  "kind": "text",
+  "was": "بقیہ حاشیہ صفحہ ۹۶",
+  "now": "بقیہ حاشیہ صفحہ ۶۸"
+ },
+ {
+  "id": "LAY-HARMAIN-003",
+  "book": "uploads-books-israr-ul-harmain",
+  "page": 71,
+  "kind": "text",
+  "was": "بقیہ حاشیہ ۵۹",
+  "now": "بقیہ حاشیہ ۶۹"
+ },
+ {
+  "id": "LAY-TEAM-late-rah-nawerd-uploads-books-rah-nawerd-e-shauk-2-P275",
+  "book": "uploads-books-rah-nawerd-e-shauk-2",
+  "page": 275,
+  "kind": "text",
+  "was": "ہو گیا ہے۔\n\nاس کی ماں",
+  "now": "بولتا ہے۔\n\nاس کی ماں"
+ },
+ {
+  "id": "LAY-NISBAT-009",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 75,
+  "kind": "text",
+  "was": "درخواست کرتے رہو۔ اللہ کریم آپ سب کو اس کی توفیق عطا فرمائے۔",
+  "now": "درخواست کرتے رہو۔ اللہ کریم آپ سب کو اس کی توفیق عطا فرمائے۔\n\n☆ ☆ ☆"
+ },
+ {
+  "id": "LAY-NISBAT-036",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 268,
+  "kind": "text",
+  "was": "ا جائے؟ مجھے بتاؤ۔ کس لیے لوگوں کے پاس بیٹھا جائے؟",
+  "now": "ا جائے؟ مجھے بتاؤ۔ کس لیے لوگوں کے پاس بیٹھا جائے؟\n\n☆ ☆ ☆"
+ },
+ {
+  "id": "LAY-NISBAT-065",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 424,
+  "kind": "text",
+  "was": "ی خیر خلقہ محمد و علی الہ و صحبہ اجمعین۔",
+  "now": "ی خیر خلقہ محمد و علی الہ و صحبہ اجمعین۔\n\n☆ ☆ ☆"
+ },
+ {
+  "id": "LAY-NISBAT-065",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 425,
+  "kind": "text",
+  "was": "خصوصاً\n\nاس دور میں",
+  "now": "خصوصاً اس دور میں"
+ },
+ {
+  "id": "LAY-NISBAT-066",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 428,
+  "kind": "text",
+  "was": "مثلاً\n\nدنیا میں وقوع",
+  "now": "مثلاً دنیا میں وقوع"
+ },
+ {
+  "id": "LAY-NISBAT-066",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 428,
+  "kind": "text",
+  "was": "اصطلاحاً\n\nسفلی علوم",
+  "now": "اصطلاحاً سفلی علوم"
+ },
+ {
+  "id": "LAY-NISBAT-079",
+  "book": "uploads-books-tareeq-nisbat-owaisiah",
+  "page": 476,
+  "kind": "text",
+  "was": "تنی بڑی دولت شاید روئے زمین کی سلطنت دے کر بھی نہیں مل سکتی۔",
+  "now": "تنی بڑی دولت شاید روئے زمین کی سلطنت دے کر بھی نہیں مل سکتی۔\n\n☆ ☆ ☆"
+ },
+ {
+  "id": "LAY-TASAW-001",
+  "book": "uploads-books-tasawwuf-aur-tameer-e-seraat",
+  "page": 78,
+  "kind": "text",
+  "was": "مجلسِ ذِکر (۹)",
+  "now": "مجلسِ ذِکر (۶)"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P20",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 20,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P22",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 22,
+  "kind": "layout",
+  "was": "hvvvvvvvp",
+  "now": "hvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P27",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 27,
+  "kind": "layout",
+  "was": "vvvvvvp",
+  "now": "vvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P28",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 28,
+  "kind": "layout",
+  "was": "vvvvvvvp",
+  "now": "vvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P29",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 29,
+  "kind": "layout",
+  "was": "vvvvvvvvp",
+  "now": "vvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P30",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 30,
+  "kind": "layout",
+  "was": "vvvvvvvvvp",
+  "now": "vvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P32",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 32,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P33",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 33,
+  "kind": "layout",
+  "was": "vvvvvvvvvp",
+  "now": "vvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P34",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 34,
+  "kind": "layout",
+  "was": "vvvvvvvvp",
+  "now": "vvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P35",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 35,
+  "kind": "layout",
+  "was": "vvvvvvp",
+  "now": "vvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P36",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 36,
+  "kind": "layout",
+  "was": "vvvvvvp",
+  "now": "vvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P37",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 37,
+  "kind": "layout",
+  "was": "vvvvvvvvvvp",
+  "now": "vvvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P43",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 43,
+  "kind": "layout",
+  "was": "hvvvvvvp",
+  "now": "hvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P44",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 44,
+  "kind": "layout",
+  "was": "vvvvvvvp",
+  "now": "vvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P45",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 45,
+  "kind": "layout",
+  "was": "vvvvvvvp",
+  "now": "vvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P48",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 48,
+  "kind": "layout",
+  "was": "vvvvvvp",
+  "now": "vvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P49",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 49,
+  "kind": "layout",
+  "was": "hvvvvvvp",
+  "now": "hvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P50",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 50,
+  "kind": "layout",
+  "was": "vvvvvvvp",
+  "now": "vvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P52",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 52,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P53",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 53,
+  "kind": "layout",
+  "was": "vvvvvvvvvvvp",
+  "now": "vvvvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P59",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 59,
+  "kind": "layout",
+  "was": "hvvvvvvvvp",
+  "now": "hvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P60",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 60,
+  "kind": "layout",
+  "was": "hvvvvvvvvvp",
+  "now": "hvvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P62",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 62,
+  "kind": "layout",
+  "was": "vvvvvvvp",
+  "now": "vvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P64",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 64,
+  "kind": "layout",
+  "was": "hvvvvvvvvp",
+  "now": "hvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P65",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 65,
+  "kind": "layout",
+  "was": "hvvvvvvvvvvvp",
+  "now": "hvvvvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P66",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 66,
+  "kind": "layout",
+  "was": "hvvvvvvvvp",
+  "now": "hvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P67",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 67,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P68",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 68,
+  "kind": "layout",
+  "was": "hvvvvvvvvvp",
+  "now": "hvvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P70",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 70,
+  "kind": "layout",
+  "was": "vvvvvvvvvp",
+  "now": "vvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P71",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 71,
+  "kind": "layout",
+  "was": "hvvvvvvvvp",
+  "now": "hvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P72",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 72,
+  "kind": "layout",
+  "was": "vvvvvvvvvvvp",
+  "now": "vvvvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P73",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 73,
+  "kind": "layout",
+  "was": "hvvvvvvp",
+  "now": "hvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P74",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 74,
+  "kind": "layout",
+  "was": "vvvvvvvvvp",
+  "now": "vvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P75",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 75,
+  "kind": "layout",
+  "was": "vvvvvvvvp",
+  "now": "vvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P76",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 76,
+  "kind": "layout",
+  "was": "vvvvvvvvvp",
+  "now": "vvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P78",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 78,
+  "kind": "layout",
+  "was": "vvvvvvvvp",
+  "now": "vvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P79",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 79,
+  "kind": "layout",
+  "was": "vvvvvvvp",
+  "now": "vvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P81",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 81,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-deeda-book-ocr-deeda-e-tar-P82",
+  "book": "book-ocr-deeda-e-tar",
+  "page": 82,
+  "kind": "layout",
+  "was": "vvvvvvvvvvvp",
+  "now": "vvvvvvvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P12",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 12,
+  "kind": "layout",
+  "was": "vvp",
+  "now": "vvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P17",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 17,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P19",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 19,
+  "kind": "layout",
+  "was": "vvvp",
+  "now": "vvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P22",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 22,
+  "kind": "layout",
+  "was": "vvp",
+  "now": "vvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P24",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 24,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P26",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 26,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P28",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 28,
+  "kind": "layout",
+  "was": "vvvp",
+  "now": "vvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P32",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 32,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P34",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 34,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P36",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 36,
+  "kind": "layout",
+  "was": "vvvpp",
+  "now": "vvvcc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P39",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 39,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P42",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 42,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P44",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 44,
+  "kind": "layout",
+  "was": "vvvp",
+  "now": "vvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P46",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 46,
+  "kind": "layout",
+  "was": "vvvvvvp",
+  "now": "vvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P51",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 51,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P53",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 53,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P56",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 56,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P59",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 59,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P64",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 64,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P67",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 67,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P70",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 70,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P73",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 73,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P75",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 75,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P77",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 77,
+  "kind": "layout",
+  "was": "vvvp",
+  "now": "vvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P79",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 79,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P81",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 81,
+  "kind": "layout",
+  "was": "vvvvvvp",
+  "now": "vvvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P83",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 83,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P89",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 89,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P91",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 91,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P94",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 94,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P96",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 96,
+  "kind": "layout",
+  "was": "vvvvp",
+  "now": "vvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P100",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 100,
+  "kind": "layout",
+  "was": "vvp",
+  "now": "vvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P103",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 103,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P108",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 108,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P111",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 111,
+  "kind": "layout",
+  "was": "vp",
+  "now": "vc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P113",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 113,
+  "kind": "layout",
+  "was": "vvvvvp",
+  "now": "vvvvvc"
+ },
+ {
+  "id": "LAY-TEAM-late-kon-si-book-ocr-kon-si-aaisi-baat-hoi-hai-P121",
+  "book": "book-ocr-kon-si-aaisi-baat-hoi-hai",
+  "page": 121,
+  "kind": "layout",
+  "was": "vvp",
+  "now": "vvc"
+ },
+ {
+  "id": "LAY-TEAM-late-tafaseer-parah-26-P8",
+  "book": "tafaseer-parah-26",
+  "page": 8,
+  "kind": "text",
+  "was": "ابوالاحمدین (دستخط)\nابوالاحمدین",
+  "now": "ابوالاحمدین\n\nابوالاحمدین",
+  "layoutWas": "pppp",
+  "layoutNow": "ppppp"
+ },
+ {
+  "id": "LAY-TEAM-middle-rah-nawerd-uploads-books-rah-nawerd-e-shauk-1-P163",
+  "book": "uploads-books-rah-nawerd-e-shauk-1",
+  "page": 163,
+  "kind": "text",
+  "was": "آپ کو اس سلسلۂ عالیہ میں داخل ہونا مبارک ہو اس بات کو نہ بھولئے کہ آپ کا مقصد صرف تزکیۂ باطن ہے\n\nجس کا واحد ذریعہ ذکر الٰہی کی مداومت ہے",
+  "now": "آپ کو اس سلسلۂ عالیہ\nمیں داخل ہونا مبارک ہو\nاس بات کو نہ بھولئے کہ\nآپ کا مقصد صرف تزکیۂ باطن ہے\n\nجس کا\nواحد ذریعہ ذکر الٰہی کی\nمداومت ہے"
+ },
+ {
+  "id": "LAY-TEAM-late-rah-nawerd-uploads-books-rah-nawerd-e-shauk-2-P278",
+  "book": "uploads-books-rah-nawerd-e-shauk-2",
+  "page": 278,
+  "kind": "layout",
+  "was": "hhhp",
+  "now": "hppp"
+ }
+]
