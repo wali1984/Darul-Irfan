@@ -918,14 +918,16 @@ struct FormattedBookPage: View {
             }
             return Text(attributed)
         }
-        return Text.mushaf(attributed, scale: mushafScale, showsSmallHighZero: place.showsSmallHighZero)
+        return Text.mushaf(attributed, scale: mushafScale, showsSmallHighZero: place.showsSmallHighZero,
+                           stopsAtTheCarrier: place.stopsAtTheCarrier)
     }
 
     /// Words as they are: in the mushaf face at `mushafScale`, or in the face
     /// around them.
     private func unlinkedText(_ string: String, mushafScale: Double?, urduSize: Double?) -> Text {
         guard let mushafScale else { return words(string, urduSize: urduSize) }
-        return Text.mushaf(verbatim: string, scale: mushafScale, showsSmallHighZero: place.showsSmallHighZero)
+        return Text.mushaf(verbatim: string, scale: mushafScale, showsSmallHighZero: place.showsSmallHighZero,
+                           stopsAtTheCarrier: place.stopsAtTheCarrier)
     }
 
     /// A quotation or a footnote, tappable where one of the page's links
@@ -1023,7 +1025,8 @@ struct FormattedBookPage: View {
             }
             let drawn = (takesSpace ? " " : "") + shown(run.text, rightToLeft: !leftToRight)
             if run.isQuranic || run.isArabic {
-                text = text + Text.mushaf(verbatim: drawn, scale: 0.72 * scale, showsSmallHighZero: place.showsSmallHighZero)
+                text = text + Text.mushaf(verbatim: drawn, scale: 0.72 * scale, showsSmallHighZero: place.showsSmallHighZero,
+                                          stopsAtTheCarrier: place.stopsAtTheCarrier)
                     .foregroundStyle(DIColor.scripture)
             } else {
                 text = text + plainProse(drawn, leftToRight: leftToRight)

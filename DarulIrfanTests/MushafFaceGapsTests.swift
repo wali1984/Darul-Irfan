@@ -8,9 +8,12 @@ final class MushafFaceGapsTests: XCTestCase {
     private typealias FontKey = AttributeScopes.SwiftUIAttributes.FontAttribute
 
     /// The words given a face, in the order they stand, with that face.
-    private func faced(_ text: String, showsSmallHighZero: Bool = false) -> [String] {
+    private func faced(_ text: String, showsSmallHighZero: Bool = false, stopsAtTheCarrier: Bool = false) -> [String] {
         let scalars = Array(text.unicodeScalars)
-        return MushafFaceGaps.spans(in: scalars, showsSmallHighZero: showsSmallHighZero).map { span in
+        let found = MushafFaceGaps.spans(
+            in: scalars, showsSmallHighZero: showsSmallHighZero, stopsAtTheCarrier: stopsAtTheCarrier
+        )
+        return found.map { span in
             var words = String.UnicodeScalarView()
             words.append(contentsOf: scalars[span.range])
             switch span.face {
@@ -68,6 +71,25 @@ final class MushafFaceGapsTests: XCTestCase {
         XCTAssertEqual(faced(word), [])
     }
 
+    func testInTheAyatAmiriStopsAtTheAlifThatCarriesTheSign() {
+        // 3:144: Amiri sets the hamza below the seat under the line, so the
+        // seat stays in the mushaf face; a book draws the word whole.
+        let carrying = "\u{0627}\u{064E}\u{0641}\u{064E}\u{0627}\u{06DF}"
+        let word = carrying + "\u{066E}\u{0655}\u{0650}\u{0646}\u{0652}"
+        XCTAssertEqual(faced("قال " + word + " ثم", showsSmallHighZero: true), ["zero:" + word])
+        XCTAssertEqual(faced("قال " + word + " ثم", showsSmallHighZero: true, stopsAtTheCarrier: true), ["zero:" + carrying])
+        // A word that ends on the sign is drawn whole either way.
+        XCTAssertEqual(faced("قال " + carrying, showsSmallHighZero: true, stopsAtTheCarrier: true), ["zero:" + carrying])
+        // A sign on a letter that joins the next keeps its word whole.
+        XCTAssertEqual(faced("\u{0628}\u{06DF}\u{0646}", showsSmallHighZero: true, stopsAtTheCarrier: true), ["zero:\u{0628}\u{06DF}\u{0646}"])
+        // The sign standing alone still takes the space it sits on.
+        XCTAssertEqual(faced("قال \u{06DF}", showsSmallHighZero: true, stopsAtTheCarrier: true), ["zero: \u{06DF}"])
+        XCTAssertTrue(BookTextPlace.quranReader.stopsAtTheCarrier)
+        XCTAssertTrue(BookTextPlace.article.stopsAtTheCarrier)
+        XCTAssertFalse(BookTextPlace.book.stopsAtTheCarrier)
+        XCTAssertFalse(BookTextPlace.hadith.stopsAtTheCarrier)
+    }
+
     func testTheAyatAreNotTouched() {
         let ayat = SeedBundle.quranAyahs()
         XCTAssertEqual(ayat.count, 6236)
@@ -84,6 +106,10 @@ final class MushafFaceGapsTests: XCTestCase {
         "25:38", "27:21", "28:32", "29:38", "29:50", "30:39", "37:68", "38:70", "47:4",
         "47:31", "53:50", "53:51", "62:11", "76:4", "76:15", "76:16"
     ]
+
+    /// Those whose word goes on after the alif that carries the sign: the
+    /// letters after it stay in the mushaf face.
+    private static let ayatWithLettersAfterTheSign = ["3:144", "7:103", "21:34", "23:46", "27:21", "28:32", "37:68"]
 
     private func signs(in text: String) -> Int {
         text.unicodeScalars.filter { $0.value == MushafFaceGaps.smallHighZero }.count
@@ -124,22 +150,28 @@ final class MushafFaceGapsTests: XCTestCase {
 
         let face = DIFont.mushafAmiriWord(scale: 1.15)
         var shownSigns = 0
+        var lettersAfter: [String] = []
         for ayah in ayat {
             let name = "\(ayah.surahNumber):\(ayah.ayahNumber)"
             let text = ayah.textArabic
-            let shown = MushafFaceGaps.showingSmallHighZero(AttributedString(text), in: face)
+            // As `Text.ayah` draws it.
+            let shown = MushafFaceGaps.showingSmallHighZero(AttributedString(text), in: face, stopsAtTheCarrier: true)
             // Drawing only: not a character added, removed or moved.
             XCTAssertEqual(Array(shown.unicodeScalars), Array(text.unicodeScalars), name)
-            // The whole word that holds the sign is in Amiri Quran, so that
-            // its letters stay joined; every other word keeps the mushaf face.
+            // The word that holds the sign is in Amiri Quran from its start to
+            // the sign, which in every ayah sits on an alif: the letters after
+            // that alif join nothing before them and stay in the mushaf face,
+            // as does every other word.
             let scalars = Array(text.unicodeScalars)
             var expected = Array(repeating: false, count: scalars.count)
             var start = 0
             while start < scalars.count {
                 var end = start
                 while end < scalars.count, !scalars[end].properties.isWhitespace { end += 1 }
-                if scalars[start..<end].contains(where: { $0.value == MushafFaceGaps.smallHighZero }) {
-                    for index in start..<end { expected[index] = true }
+                if let sign = scalars[start..<end].firstIndex(where: { $0.value == MushafFaceGaps.smallHighZero }) {
+                    XCTAssertEqual(scalars[sign - 1].value, 0x0627, name)
+                    for index in start...sign { expected[index] = true }
+                    if sign + 1 < end { lettersAfter.append(name) }
                 }
                 start = end + 1
             }
@@ -149,6 +181,7 @@ final class MushafFaceGapsTests: XCTestCase {
             shownSigns += signsIn(shown, face: face, name)
         }
         XCTAssertEqual(shownSigns, 25)
+        XCTAssertEqual(lettersAfter, Self.ayatWithLettersAfterTheSign)
         // The book helper, unasked, still leaves every ayah alone.
         XCTAssertTrue(ayat.allSatisfy { MushafFaceGaps.spans(in: $0.textArabic.unicodeScalars).isEmpty })
     }
@@ -200,7 +233,8 @@ final class MushafFaceGapsTests: XCTestCase {
             urdu += page.footnotes
             for text in mushaf where MushafFaceGaps.holdsSmallHighZero(text.unicodeScalars) {
                 let shown = MushafFaceGaps.filling(
-                    AttributedString(text), scale: 0.72, showsSmallHighZero: place.showsSmallHighZero
+                    AttributedString(text), scale: 0.72,
+                    showsSmallHighZero: place.showsSmallHighZero, stopsAtTheCarrier: place.stopsAtTheCarrier
                 )
                 XCTAssertEqual(Array(shown.unicodeScalars), Array(text.unicodeScalars), name)
                 laidOut += signs(in: text)

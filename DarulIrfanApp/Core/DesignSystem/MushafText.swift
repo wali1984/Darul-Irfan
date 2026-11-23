@@ -56,10 +56,16 @@ enum MushafFaceGaps {
     /// `text` with each word that holds U+06DF in `face`, an Amiri Quran
     /// font, as far as `spans` sets it; nothing else changes face. Links,
     /// colours and the reader's highlight are kept, and not a character is
-    /// changed.
-    static func showingSmallHighZero(_ text: AttributedString, in face: Font) -> AttributedString {
+    /// changed. `stopsAtTheCarrier` is for the ayat and the tafsir under an
+    /// ayah (see `spans`).
+    static func showingSmallHighZero(
+        _ text: AttributedString,
+        in face: Font,
+        stopsAtTheCarrier: Bool = false
+    ) -> AttributedString {
         var shown = text
-        for span in spans(in: text.unicodeScalars, showsSmallHighZero: true) where span.face == .smallHighZero {
+        let found = spans(in: text.unicodeScalars, showsSmallHighZero: true, stopsAtTheCarrier: stopsAtTheCarrier)
+        for span in found where span.face == .smallHighZero {
             let lower = shown.unicodeScalars.index(shown.startIndex, offsetBy: span.range.lowerBound)
             let upper = shown.unicodeScalars.index(lower, offsetBy: span.range.count)
             shown[lower..<upper].font = face
@@ -78,7 +84,18 @@ enum MushafFaceGaps {
     /// The stretches of `text` that the mushaf face cannot draw. An ayah's
     /// circle is taken first, then a word with U+06DF where that is asked
     /// for, then a word with an Urdu letter.
-    static func spans(in text: some Sequence<Unicode.Scalar>, showsSmallHighZero: Bool = false) -> [Span] {
+    ///
+    /// With `stopsAtTheCarrier`, for the ayat and the tafsir under an ayah,
+    /// Amiri Quran always stops behind the alif (or other letter that joins
+    /// nothing after it) that carries the last U+06DF: Amiri sets the
+    /// mushaf's hamza below a seat ("اَفَا۟ٮِٕنْ") under the line, and the
+    /// letters after that alif join nothing before them, so the mushaf face
+    /// keeps them as it drew them. Books keep their own rule.
+    static func spans(
+        in text: some Sequence<Unicode.Scalar>,
+        showsSmallHighZero: Bool = false,
+        stopsAtTheCarrier: Bool = false
+    ) -> [Span] {
         let scalars = Array(text)
         var spans: [Span] = []
         var index = 0
@@ -104,7 +121,9 @@ enum MushafFaceGaps {
                     index += 1
                 }
                 if showsSmallHighZero, let lastZero {
-                    index = amiriEnd(of: start..<index, lastZero: lastZero, in: scalars)
+                    index = amiriEnd(
+                        of: start..<index, lastZero: lastZero, in: scalars, stopsAtTheCarrier: stopsAtTheCarrier
+                    )
                     // Standing alone, the sign takes the space it sits on:
                     // a run that begins with a mark has nothing to carry it.
                     var lower = start
@@ -122,9 +141,17 @@ enum MushafFaceGaps {
 
     /// `text` with only those stretches given a face of their own, for a
     /// `Text` in `DIFont.quranArabic(scale:)`. Links and colours are kept.
-    static func filling(_ text: AttributedString, scale: Double, showsSmallHighZero: Bool = false) -> AttributedString {
+    static func filling(
+        _ text: AttributedString,
+        scale: Double,
+        showsSmallHighZero: Bool = false,
+        stopsAtTheCarrier: Bool = false
+    ) -> AttributedString {
         var filled = text
-        for span in spans(in: text.unicodeScalars, showsSmallHighZero: showsSmallHighZero) {
+        let found = spans(
+            in: text.unicodeScalars, showsSmallHighZero: showsSmallHighZero, stopsAtTheCarrier: stopsAtTheCarrier
+        )
+        for span in found {
             // By scalar, not by character: a span is counted in scalars, and
             // U+06DD with the digit after it is one character.
             let lower = filled.unicodeScalars.index(filled.startIndex, offsetBy: span.range.lowerBound)
@@ -145,10 +172,18 @@ enum MushafFaceGaps {
     /// fall to a third face and not join the letter before them, so a word
     /// that has them after the sign is cut behind it, where the letter that
     /// carries the sign joins nothing after it: "وَمَلَا۟" and "ئِہٖ".
-    private static func amiriEnd(of word: Range<Int>, lastZero: Int, in scalars: [Unicode.Scalar]) -> Int {
+    /// `stopsAtTheCarrier` cuts there whatever follows.
+    private static func amiriEnd(
+        of word: Range<Int>,
+        lastZero: Int,
+        in scalars: [Unicode.Scalar],
+        stopsAtTheCarrier: Bool
+    ) -> Int {
         var after = lastZero + 1
         while after < word.upperBound, isMark(scalars[after]) { after += 1 }
-        guard scalars[after..<word.upperBound].contains(where: { amiriLacks.contains($0.value) }) else {
+        guard after < word.upperBound,
+              stopsAtTheCarrier || scalars[after..<word.upperBound].contains(where: { amiriLacks.contains($0.value) })
+        else {
             return word.upperBound
         }
         var base = lastZero
@@ -178,22 +213,40 @@ enum MushafFaceGaps {
 
 extension Text {
     /// `string` in the mushaf face, with what that face cannot draw in a face
-    /// that can. `showsSmallHighZero` is for book pages and narrations only.
-    static func mushaf(verbatim string: String, scale: Double, showsSmallHighZero: Bool = false) -> Text {
+    /// that can. `showsSmallHighZero` is for the places that draw U+06DF
+    /// (`BookTextPlace`), `stopsAtTheCarrier` for those among them that set
+    /// ayat or the tafsir under an ayah.
+    static func mushaf(
+        verbatim string: String,
+        scale: Double,
+        showsSmallHighZero: Bool = false,
+        stopsAtTheCarrier: Bool = false
+    ) -> Text {
         guard !MushafFaceGaps.spans(in: string.unicodeScalars, showsSmallHighZero: showsSmallHighZero).isEmpty else {
             return Text(verbatim: string).font(DIFont.quranArabic(scale: scale))
         }
-        return mushaf(AttributedString(string), scale: scale, showsSmallHighZero: showsSmallHighZero)
+        return mushaf(
+            AttributedString(string), scale: scale,
+            showsSmallHighZero: showsSmallHighZero, stopsAtTheCarrier: stopsAtTheCarrier
+        )
     }
 
-    static func mushaf(_ text: AttributedString, scale: Double, showsSmallHighZero: Bool = false) -> Text {
-        Text(MushafFaceGaps.filling(text, scale: scale, showsSmallHighZero: showsSmallHighZero))
-            .font(DIFont.quranArabic(scale: scale))
+    static func mushaf(
+        _ text: AttributedString,
+        scale: Double,
+        showsSmallHighZero: Bool = false,
+        stopsAtTheCarrier: Bool = false
+    ) -> Text {
+        Text(MushafFaceGaps.filling(
+            text, scale: scale, showsSmallHighZero: showsSmallHighZero, stopsAtTheCarrier: stopsAtTheCarrier
+        ))
+        .font(DIFont.quranArabic(scale: scale))
     }
 
     /// Ayat of the mushaf (quran_ayahs.json) in the mushaf face at `scale`.
     /// A word that holds U+06DF, which that face leaves blank, is drawn in
-    /// Amiri Quran at the same size; every other word exactly as before.
+    /// Amiri Quran at the same size as far as the alif that carries the
+    /// sign; the letters after it, and every other word, exactly as before.
     static func ayah(verbatim string: String, scale: Double) -> Text {
         guard MushafFaceGaps.holdsSmallHighZero(string.unicodeScalars) else {
             return Text(verbatim: string).font(DIFont.quranArabic(scale: scale))
@@ -202,7 +255,9 @@ extension Text {
     }
 
     static func ayah(_ text: AttributedString, scale: Double) -> Text {
-        Text(MushafFaceGaps.showingSmallHighZero(text, in: DIFont.mushafAmiriWord(scale: scale)))
-            .font(DIFont.quranArabic(scale: scale))
+        Text(MushafFaceGaps.showingSmallHighZero(
+            text, in: DIFont.mushafAmiriWord(scale: scale), stopsAtTheCarrier: true
+        ))
+        .font(DIFont.quranArabic(scale: scale))
     }
 }

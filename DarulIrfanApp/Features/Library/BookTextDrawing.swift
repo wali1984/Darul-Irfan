@@ -23,6 +23,12 @@ enum BookTextPlace: Sendable {
     /// wherever they are drawn (owner, 23 November 2026).
     var showsSmallHighZero: Bool { self != .other }
 
+    /// Where Amiri Quran always stops behind the alif that carries U+06DF,
+    /// as in the ayat (`MushafFaceGaps.spans`): the tafsir under an ayah,
+    /// and an article, whose only signs are those of the ayat it sets from
+    /// the mushaf. Books and narrations keep the books' rule.
+    var stopsAtTheCarrier: Bool { self == .quranReader || self == .article }
+
     /// Whether a run that opens with `scalar` takes the space before it, so
     /// that a mark has something to sit on in its own face. Books, articles
     /// and narrations give it to every mark; the tafsir under an ayah only to
@@ -75,7 +81,7 @@ enum BookTextDrawing {
     static func dressing(_ text: AttributedString, place: BookTextPlace, scale: Double) -> AttributedString {
         var drawn = text
         if place.showsSmallHighZero {
-            drawn = drawingSmallHighZero(drawn, scale: scale)
+            drawn = drawingSmallHighZero(drawn, scale: scale, stopsAtTheCarrier: place.stopsAtTheCarrier)
         }
         if place.followsBookRules {
             drawn = enlargingSalawat(drawn, scale: scale)
@@ -105,8 +111,14 @@ enum BookTextDrawing {
     /// Each word with U+06DF, as far as Amiri Quran can set it, in that
     /// face: the books' seven in Urdu text, and the tafsir's, have no glyph
     /// in the Urdu face.
-    static func drawingSmallHighZero(_ text: AttributedString, scale: Double) -> AttributedString {
-        MushafFaceGaps.showingSmallHighZero(text, in: DIFont.urduAmiriWord(scale: scale))
+    static func drawingSmallHighZero(
+        _ text: AttributedString,
+        scale: Double,
+        stopsAtTheCarrier: Bool = false
+    ) -> AttributedString {
+        MushafFaceGaps.showingSmallHighZero(
+            text, in: DIFont.urduAmiriWord(scale: scale), stopsAtTheCarrier: stopsAtTheCarrier
+        )
     }
 
     // MARK: - Links

@@ -112,14 +112,19 @@ struct SearchResultRow: View {
     /// The snippet as its face draws it: U+06DF is blank in the mushaf face
     /// and has no glyph in the Urdu face, so a word that holds it, in an
     /// ayah, the tafsir or a book, is drawn in Amiri Quran at the snippet's
-    /// size, as the reader draws it.
+    /// size, as the reader draws it: in an ayah and the tafsir only as far as
+    /// the alif that carries the sign, in a book by the books' rule.
     private func drawnSnippet(from snippet: String) -> AttributedString {
         let highlighted = highlightedSnippet(from: snippet)
         guard MushafFaceGaps.holdsSmallHighZero(highlighted.unicodeScalars) else { return highlighted }
         if result.isQuranArabic {
-            return MushafFaceGaps.showingSmallHighZero(highlighted, in: DIFont.mushafAmiriWord(scale: 0.75))
+            return MushafFaceGaps.showingSmallHighZero(
+                highlighted, in: DIFont.mushafAmiriWord(scale: 0.75), stopsAtTheCarrier: true
+            )
         }
         guard isRightToLeftContent else { return highlighted }
-        return BookTextDrawing.drawingSmallHighZero(highlighted, scale: 0.85)
+        return BookTextDrawing.drawingSmallHighZero(
+            highlighted, scale: 0.85, stopsAtTheCarrier: result.itemID.hasPrefix("tafsir|")
+        )
     }
 }
