@@ -65,11 +65,15 @@ enum SearchNormalizer {
 /// the matched words are marked ‹ › for `SearchSnippetFormatter`.
 enum SearchSnippet {
     static func make(from text: String, terms: [String], radius: Int = 7) -> String? {
-        let words = text.split(whereSeparator: \.isWhitespace)
+        // Cut scalar by scalar: a space and a mark after it (a pause sign, an
+        // honorific) are one Character, and a split by Character drops the mark.
+        let words = text.unicodeScalars
+            .split(whereSeparator: { $0.properties.isWhitespace })
+            .map { String(Substring($0)) }
         guard !words.isEmpty else { return nil }
         let needles = terms.map(fold).filter { !$0.isEmpty }
-        func matches(_ word: Substring) -> Bool {
-            let folded = fold(SearchNormalizer.normalize(String(word)))
+        func matches(_ word: String) -> Bool {
+            let folded = fold(SearchNormalizer.normalize(word))
                 .trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
             return !folded.isEmpty && needles.contains { folded.hasPrefix($0) }
         }

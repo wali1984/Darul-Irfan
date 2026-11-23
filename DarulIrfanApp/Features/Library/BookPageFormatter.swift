@@ -696,7 +696,7 @@ enum BookPageFormatter {
         }
 
         let joined = lines.joined(separator: " ")
-        let tokens = joined.split(whereSeparator: \.isWhitespace).map(String.init)
+        let tokens = writtenWords(of: joined)
         let quranic = verifiedQuranic(tokens, check: check)
         if tokens.count <= 8, !quranic.contains(true), let last = joined.last,
            last == ":" || !(terminators.contains(last) || last == "،" || last == ",") {
@@ -734,7 +734,7 @@ enum BookPageFormatter {
         var urdu: [String] = []
         var hits = 0
         for line in lines {
-            let tokens = line.split(whereSeparator: \.isWhitespace).map(String.init)
+            let tokens = writtenWords(of: line)
             let quranic = markQuranic(tokens)
             let split = quranic.firstIndex(of: false) ?? tokens.count
             if split >= 2 && split < tokens.count { hits += 1 }
@@ -743,7 +743,7 @@ enum BookPageFormatter {
         }
         guard Double(hits) >= 0.6 * Double(lines.count) else { return nil }
         let arabicText = arabic.joined(separator: " ")
-        let arabicTokens = arabicText.split(whereSeparator: \.isWhitespace).map(String.init)
+        let arabicTokens = writtenWords(of: arabicText)
         var result: [Block] = QuranQuotation.isVerified(arabicTokens, check: check)
             ? [.quran(arabicText)]
             : [.paragraph([Run(text: arabicText, isQuranic: false)])]
