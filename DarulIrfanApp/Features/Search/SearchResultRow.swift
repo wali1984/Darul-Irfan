@@ -82,7 +82,7 @@ struct SearchResultRow: View {
             }
 
             if let snippet = result.snippet, !snippet.isEmpty {
-                Text(highlightedSnippet(from: snippet))
+                Text(drawnSnippet(from: snippet))
                     .font(snippetFont)
                     .foregroundStyle(result.isQuranArabic ? DIColor.scripture : DIColor.textMuted)
                     .multilineTextAlignment(.leading)
@@ -107,5 +107,19 @@ struct SearchResultRow: View {
             attributed[range].foregroundColor = DIColor.actionForeground
         }
         return attributed
+    }
+
+    /// The snippet as its face draws it: U+06DF is blank in the mushaf face
+    /// and has no glyph in the Urdu face, so a word that holds it, in an
+    /// ayah, the tafsir or a book, is drawn in Amiri Quran at the snippet's
+    /// size, as the reader draws it.
+    private func drawnSnippet(from snippet: String) -> AttributedString {
+        let highlighted = highlightedSnippet(from: snippet)
+        guard MushafFaceGaps.holdsSmallHighZero(highlighted.unicodeScalars) else { return highlighted }
+        if result.isQuranArabic {
+            return MushafFaceGaps.showingSmallHighZero(highlighted, in: DIFont.mushafAmiriWord(scale: 0.75))
+        }
+        guard isRightToLeftContent else { return highlighted }
+        return BookTextDrawing.drawingSmallHighZero(highlighted, scale: 0.85)
     }
 }

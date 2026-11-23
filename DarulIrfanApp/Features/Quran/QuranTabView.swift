@@ -499,8 +499,7 @@ private struct QuranParaRow: View {
                     .diInterfaceFont(.footnote, weight: .medium)
                     .foregroundStyle(DIColor.textMuted)
                 if let opening {
-                    Text(verbatim: opening)
-                        .font(DIFont.quranArabic(scale: 0.6))
+                    Text.ayah(verbatim: opening, scale: 0.6)
                         .foregroundStyle(DIColor.scripture)
                         .fixedSize(horizontal: false, vertical: true)
                         .environment(\.layoutDirection, .rightToLeft)
@@ -551,8 +550,7 @@ struct QuranParaListView: View {
                                 .diInterfaceFont(.subheadline, weight: .semibold)
                                 .foregroundStyle(DIColor.textPrimary)
                             if let opening = openings[para.number] {
-                                Text(verbatim: opening)
-                                    .font(DIFont.quranArabic(scale: 0.6))
+                                Text.ayah(verbatim: opening, scale: 0.6)
                                     .foregroundStyle(DIColor.scripture)
                                     .fixedSize(horizontal: false, vertical: true)
                                     .frame(maxWidth: .infinity, alignment: .trailing)

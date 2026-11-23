@@ -173,8 +173,7 @@ struct HifzView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, DISpacing.md)
             } else {
-                Text(text)
-                    .font(DIFont.quranArabic(scale: 1.15))
+                Text.ayah(verbatim: text, scale: 1.15)
                     .foregroundStyle(DIColor.scripture)
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: .infinity, alignment: .trailing)

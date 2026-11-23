@@ -204,8 +204,7 @@ struct TodayAyahCard: View {
             if let picture {
                 DailyPicture(item: picture)
             } else if let ayah {
-                Text(verbatim: silsila?.arabic ?? ayah.arabic)
-                    .font(DIFont.quranArabic(scale: 1.05))
+                Text.ayah(verbatim: silsila?.arabic ?? ayah.arabic, scale: 1.05)
                     .foregroundStyle(TodayPalette.arabicInk)
                     .diGoldGlow(radius: 10, opacity: 0.35)
                     .lineSpacing(10)

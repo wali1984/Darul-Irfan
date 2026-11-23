@@ -1013,8 +1013,7 @@ struct FormattedBookPage: View {
             // U+06DF) takes the space before it, so that the mark has
             // something to sit on in its own face. A link takes no space.
             let takesSpace = index > 0 && !run.startsLine && pieces.first?.link == nil
-                && (place.followsBookRules || place.showsSmallHighZero)
-                && run.text.unicodeScalars.first?.properties.generalCategory == .nonspacingMark
+                && run.text.unicodeScalars.first.map { place.givesTheSpaceBefore($0) } == true
             if takesSpace && !pieces.isEmpty { pieces[0].text = " " + pieces[0].text }
             let linked = linkedRun(run, pieces: pieces, leftToRight: leftToRight)
             if index > 0 && !takesSpace { text = text + Text(verbatim: run.startsLine ? "\n" : " ") }

@@ -287,8 +287,10 @@ final class BookLayoutRulesTests: XCTestCase {
         }
         XCTAssertFalse(MushafFaceGaps.spans(in: scalars).contains { $0.face == .smallHighZero })
         XCTAssertTrue(BookTextPlace.book.showsSmallHighZero)
-        XCTAssertFalse(BookTextPlace.article.showsSmallHighZero)
-        XCTAssertFalse(BookTextPlace.quranReader.showsSmallHighZero)
+        // The ayat show it wherever they are drawn (owner, 23 November 2026).
+        XCTAssertTrue(BookTextPlace.article.showsSmallHighZero)
+        XCTAssertTrue(BookTextPlace.quranReader.showsSmallHighZero)
+        XCTAssertFalse(BookTextPlace.other.showsSmallHighZero)
     }
 
     func testTheSignShowsInUrduFaceTextToo() throws {
@@ -299,7 +301,7 @@ final class BookLayoutRulesTests: XCTestCase {
             for case .paragraph(let runs) in laid.blocks {
                 for run in runs where !run.isQuranic && run.text.unicodeScalars.contains("\u{06DF}") {
                     XCTAssertTrue(BookTextDrawing.needsDressing(run.text, place: .book))
-                    XCTAssertFalse(BookTextDrawing.needsDressing(run.text, place: .quranReader))
+                    XCTAssertFalse(BookTextDrawing.needsDressing(run.text, place: .other))
                     let drawn = BookTextDrawing.dressing(AttributedString(run.text), place: .book, scale: 1.2)
                     XCTAssertEqual(Array(drawn.unicodeScalars), Array(run.text.unicodeScalars))
                     var at = drawn.unicodeScalars.startIndex

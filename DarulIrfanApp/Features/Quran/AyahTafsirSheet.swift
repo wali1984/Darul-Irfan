@@ -68,8 +68,7 @@ struct AyahTafsirSheet: View {
                 DISegmentedControl(items: ["ur", "en"], title: { $0 == "ur" ? "اردو" : "English" }, selection: languageBinding)
                 .accessibilityLabel(Text("Language"))
 
-                Text(ayah.textArabic)
-                    .font(DIFont.quranArabic(scale: 0.85 * fontScale))
+                Text.ayah(verbatim: ayah.textArabic, scale: 0.85 * fontScale)
                     .foregroundStyle(DIColor.scripture)
                     .multilineTextAlignment(.center)
                     .lineSpacing(6)

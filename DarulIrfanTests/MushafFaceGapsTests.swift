@@ -75,6 +75,150 @@ final class MushafFaceGapsTests: XCTestCase {
         XCTAssertEqual(touched.map { "\($0.surahNumber):\($0.ayahNumber)" }, [])
     }
 
+    // MARK: - U+06DF in the ayat and the tafsir (owner, 23 November 2026)
+
+    /// The ayat of the mushaf that hold U+06DF, which the mushaf face leaves
+    /// blank.
+    private static let ayatWithTheSmallHighZero = [
+        "3:144", "7:103", "10:83", "11:68", "11:97", "13:30", "18:38", "21:34", "23:46",
+        "25:38", "27:21", "28:32", "29:38", "29:50", "30:39", "37:68", "38:70", "47:4",
+        "47:31", "53:50", "53:51", "62:11", "76:4", "76:15", "76:16"
+    ]
+
+    private func signs(in text: String) -> Int {
+        text.unicodeScalars.filter { $0.value == MushafFaceGaps.smallHighZero }.count
+    }
+
+    /// The face given to each scalar of `shown`, nil where it keeps the
+    /// face of the whole text.
+    private func faces(of shown: AttributedString) -> [Font?] {
+        var given: [Font?] = []
+        let scalars = shown.unicodeScalars
+        var index = scalars.startIndex
+        while index < scalars.endIndex {
+            let next = scalars.index(after: index)
+            given.append(shown[index..<next][FontKey.self])
+            index = next
+        }
+        return given
+    }
+
+    /// The signs of `shown` drawn in `face`; each one not so drawn fails.
+    private func signsIn(_ shown: AttributedString, face: Font, _ name: String) -> Int {
+        let given = faces(of: shown)
+        let scalars = Array(shown.unicodeScalars)
+        var count = 0
+        for index in scalars.indices where scalars[index].value == MushafFaceGaps.smallHighZero {
+            XCTAssertEqual(given[index], face, "\(name): a sign left in a face that has no ink for it")
+            if given[index] == face { count += 1 }
+        }
+        return count
+    }
+
+    func testTheSmallHighZeroShowsInEveryAyahThatHoldsIt() {
+        let ayat = SeedBundle.quranAyahs()
+        XCTAssertEqual(ayat.count, 6236)
+        let holding = ayat.filter { MushafFaceGaps.holdsSmallHighZero($0.textArabic.unicodeScalars) }
+        XCTAssertEqual(holding.map { "\($0.surahNumber):\($0.ayahNumber)" }, Self.ayatWithTheSmallHighZero)
+        XCTAssertEqual(holding.map { signs(in: $0.textArabic) }.reduce(0, +), 25)
+
+        let face = DIFont.mushafAmiriWord(scale: 1.15)
+        var shownSigns = 0
+        for ayah in ayat {
+            let name = "\(ayah.surahNumber):\(ayah.ayahNumber)"
+            let text = ayah.textArabic
+            let shown = MushafFaceGaps.showingSmallHighZero(AttributedString(text), in: face)
+            // Drawing only: not a character added, removed or moved.
+            XCTAssertEqual(Array(shown.unicodeScalars), Array(text.unicodeScalars), name)
+            // The whole word that holds the sign is in Amiri Quran, so that
+            // its letters stay joined; every other word keeps the mushaf face.
+            let scalars = Array(text.unicodeScalars)
+            var expected = Array(repeating: false, count: scalars.count)
+            var start = 0
+            while start < scalars.count {
+                var end = start
+                while end < scalars.count, !scalars[end].properties.isWhitespace { end += 1 }
+                if scalars[start..<end].contains(where: { $0.value == MushafFaceGaps.smallHighZero }) {
+                    for index in start..<end { expected[index] = true }
+                }
+                start = end + 1
+            }
+            let given = faces(of: shown)
+            XCTAssertEqual(given.map { $0 != nil }, expected, name)
+            XCTAssertTrue(given.allSatisfy { $0 == nil || $0 == face }, name)
+            shownSigns += signsIn(shown, face: face, name)
+        }
+        XCTAssertEqual(shownSigns, 25)
+        // The book helper, unasked, still leaves every ayah alone.
+        XCTAssertTrue(ayat.allSatisfy { MushafFaceGaps.spans(in: $0.textArabic.unicodeScalars).isEmpty })
+    }
+
+    func testTheSmallHighZeroShowsInTheTafsirUnderAnAyah() {
+        let place = BookTextPlace.quranReader
+        XCTAssertTrue(place.showsSmallHighZero)
+        XCTAssertFalse(place.followsBookRules)
+        // A run that opens with the sign takes the space before it; the
+        // tafsir's other marks are drawn as before.
+        XCTAssertTrue(place.givesTheSpaceBefore("\u{06DF}"))
+        XCTAssertFalse(place.givesTheSpaceBefore("\u{0615}"))
+        XCTAssertFalse(place.givesTheSpaceBefore("\u{0627}"))
+        XCTAssertTrue(BookTextPlace.book.givesTheSpaceBefore("\u{0615}"))
+        XCTAssertTrue(BookTextPlace.hadith.givesTheSpaceBefore("\u{0615}"))
+        XCTAssertFalse(BookTextPlace.other.givesTheSpaceBefore("\u{06DF}"))
+
+        let entries = SeedBundle.quranTafsir().filter { MushafFaceGaps.holdsSmallHighZero($0.text.unicodeScalars) }
+        XCTAssertEqual(entries.count, 75)
+        XCTAssertEqual(entries.map { signs(in: $0.text) }.reduce(0, +), 95)
+        var laidOut = 0
+        var shownSigns = 0
+        for entry in entries {
+            let name = "\(entry.editionID) \(entry.surahNumber):\(entry.ayahStart)"
+            let page = BookPageFormatter.format(
+                entry.text,
+                quranCheck: SurahReaderViewModel.quranCheck(forTafsirEdition: entry.editionID)
+            )
+            var mushaf: [String] = []
+            var urdu: [String] = []
+            for block in page.blocks {
+                switch block {
+                case .quran(let text), .arabic(let text):
+                    mushaf.append(text)
+                case .heading(let text), .verse(let text), .caption(let text):
+                    urdu.append(text)
+                case .table(let rows):
+                    urdu += rows.joined()
+                case .paragraph(let runs):
+                    for run in runs {
+                        if (run.isQuranic || run.isArabic) && !page.isContents {
+                            mushaf.append(run.text)
+                        } else {
+                            urdu.append(run.text)
+                        }
+                    }
+                }
+            }
+            urdu += page.footnotes
+            for text in mushaf where MushafFaceGaps.holdsSmallHighZero(text.unicodeScalars) {
+                let shown = MushafFaceGaps.filling(
+                    AttributedString(text), scale: 0.72, showsSmallHighZero: place.showsSmallHighZero
+                )
+                XCTAssertEqual(Array(shown.unicodeScalars), Array(text.unicodeScalars), name)
+                laidOut += signs(in: text)
+                shownSigns += signsIn(shown, face: DIFont.mushafAmiriWord(scale: 0.72), name)
+            }
+            for text in urdu where MushafFaceGaps.holdsSmallHighZero(text.unicodeScalars) {
+                XCTAssertTrue(BookTextDrawing.needsDressing(text, place: place), name)
+                let shown = BookTextDrawing.dressing(AttributedString(text), place: place, scale: 1)
+                XCTAssertEqual(Array(shown.unicodeScalars), Array(text.unicodeScalars), name)
+                laidOut += signs(in: text)
+                shownSigns += signsIn(shown, face: DIFont.urduAmiriWord(scale: 1), name)
+            }
+        }
+        // Every sign of the tafsir is laid out, and drawn in a face that has it.
+        XCTAssertEqual(laidOut, 95)
+        XCTAssertEqual(shownSigns, laidOut)
+    }
+
     func testFillingKeepsTheTextAndItsLinksAndChangesOnlyTheGaps() throws {
         // U+06DD and the digit after it are one character, and change face together.
         let original = "قوم \u{06DD}\u{0661}\u{0662} پھول (عند)"

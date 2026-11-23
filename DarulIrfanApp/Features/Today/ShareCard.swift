@@ -40,6 +40,16 @@ struct ShareCardView: View {
         return .system(size: size, weight: weight, design: design)
     }
 
+    /// An ayah as the reader draws it: a word that holds U+06DF, which the
+    /// mushaf face leaves blank, in Amiri Quran at the same size.
+    private func arabicText(_ arabic: String) -> Text {
+        guard content.isQuran, MushafFaceGaps.holdsSmallHighZero(arabic.unicodeScalars) else {
+            return Text(arabic)
+        }
+        let face = Font.custom(AppFonts.generalArabicName, fixedSize: side * 0.062)
+        return Text(MushafFaceGaps.showingSmallHighZero(AttributedString(arabic), in: face))
+    }
+
     var body: some View {
         VStack(spacing: side * 0.045) {
             Text(content.badge.uppercased())
@@ -48,7 +58,7 @@ struct ShareCardView: View {
                 .foregroundStyle(Color(hex: 0xE0B75F))
 
             if let arabic = content.arabic, !arabic.isEmpty {
-                Text(arabic)
+                arabicText(arabic)
                     .font(.custom(content.isQuran ? AppFonts.quranArabicName : AppFonts.generalArabicName, fixedSize: side * 0.062))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)

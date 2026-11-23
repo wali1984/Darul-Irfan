@@ -110,8 +110,7 @@ struct TopicDetailView: View {
     private func verseCard(_ verse: TopicDetailViewModel.VerseItem) -> some View {
         DICard {
             VStack(alignment: .leading, spacing: DISpacing.sm) {
-                Text(verse.arabic)
-                    .font(DIFont.quranArabic(scale: 1.0))
+                Text.ayah(verbatim: verse.arabic, scale: 1.0)
                     .foregroundStyle(DIColor.scripture)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .environment(\.layoutDirection, .rightToLeft)

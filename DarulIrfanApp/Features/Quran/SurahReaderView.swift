@@ -1286,8 +1286,7 @@ private struct AyahCardView: View {
     // MARK: Arabic (word-by-word highlight)
 
     private var arabicText: some View {
-        Text(arabicAttributedText)
-            .font(DIFont.quranArabic(scale: fontScale * 1.15))
+        Text.ayah(arabicAttributedText, scale: fontScale * 1.15)
             .lineSpacing(CGFloat(18 * fontScale))
             .foregroundStyle(DIColor.scripture)
             .diGoldGlow(radius: 5, opacity: 0.18)

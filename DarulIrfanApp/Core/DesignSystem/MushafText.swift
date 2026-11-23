@@ -5,8 +5,9 @@ import SwiftUI
 /// so those characters are given another face here. The text is never changed.
 ///
 /// Book, hadith and other free text set in that face goes through
-/// `Text.mushaf`. The ayat hold none of these characters but U+06DF, and are
-/// left as they are.
+/// `Text.mushaf`. The ayat hold none of these characters but U+06DF, and go
+/// through `Text.ayah`, which gives a face of its own to that sign's word
+/// alone.
 enum MushafFaceGaps {
     enum Face: Equatable {
         /// Digits, brackets and dashes, in Amiri Quran.
@@ -41,10 +42,30 @@ enum MushafFaceGaps {
         0x0693, 0x0696, 0x0698, 0x06A4, 0x06AB, 0x06CD, 0x06D0
     ]
 
-    /// U+06DF, the small high rounded zero, has an empty glyph too. Only book
-    /// pages and narrations ask for it to be drawn: the same helper sets ayat
-    /// on other screens, and those stay as they are.
+    /// U+06DF, the small high rounded zero, has an empty glyph too. It stands
+    /// in 25 ayat of the mushaf, in the tafsir and in the books. It is drawn
+    /// where that is asked for: the ayat, the tafsir under an ayah, books,
+    /// articles and narrations. Duas, the Zikr stage and the like set other
+    /// text in this face, and stay as they are.
     static let smallHighZero: UInt32 = 0x06DF
+
+    static func holdsSmallHighZero(_ text: some Sequence<Unicode.Scalar>) -> Bool {
+        text.contains { $0.value == smallHighZero }
+    }
+
+    /// `text` with each word that holds U+06DF in `face`, an Amiri Quran
+    /// font, as far as `spans` sets it; nothing else changes face. Links,
+    /// colours and the reader's highlight are kept, and not a character is
+    /// changed.
+    static func showingSmallHighZero(_ text: AttributedString, in face: Font) -> AttributedString {
+        var shown = text
+        for span in spans(in: text.unicodeScalars, showsSmallHighZero: true) where span.face == .smallHighZero {
+            let lower = shown.unicodeScalars.index(shown.startIndex, offsetBy: span.range.lowerBound)
+            let upper = shown.unicodeScalars.index(lower, offsetBy: span.range.count)
+            shown[lower..<upper].font = face
+        }
+        return shown
+    }
 
     /// Urdu letters Amiri Quran does not have.
     private static let amiriLacks: Set<UInt32> = [0x06C1, 0x06C2, 0x06C3, 0x06BE, 0x06A9, 0x06AF, 0x06D2, 0x06D3]
@@ -167,6 +188,21 @@ extension Text {
 
     static func mushaf(_ text: AttributedString, scale: Double, showsSmallHighZero: Bool = false) -> Text {
         Text(MushafFaceGaps.filling(text, scale: scale, showsSmallHighZero: showsSmallHighZero))
+            .font(DIFont.quranArabic(scale: scale))
+    }
+
+    /// Ayat of the mushaf (quran_ayahs.json) in the mushaf face at `scale`.
+    /// A word that holds U+06DF, which that face leaves blank, is drawn in
+    /// Amiri Quran at the same size; every other word exactly as before.
+    static func ayah(verbatim string: String, scale: Double) -> Text {
+        guard MushafFaceGaps.holdsSmallHighZero(string.unicodeScalars) else {
+            return Text(verbatim: string).font(DIFont.quranArabic(scale: scale))
+        }
+        return ayah(AttributedString(string), scale: scale)
+    }
+
+    static func ayah(_ text: AttributedString, scale: Double) -> Text {
+        Text(MushafFaceGaps.showingSmallHighZero(text, in: DIFont.mushafAmiriWord(scale: scale)))
             .font(DIFont.quranArabic(scale: scale))
     }
 }

@@ -18,9 +18,23 @@ enum BookTextPlace: Sendable {
     /// the order of its numbers.
     var followsBookRules: Bool { self == .book || self == .article }
 
-    /// U+06DF is drawn in books and narrations. An article also sets ayat from
-    /// the mushaf's own text, which stay as they are.
-    var showsSmallHighZero: Bool { self == .book || self == .hadith }
+    /// U+06DF is drawn in books, narrations, the tafsir under an ayah, and
+    /// articles, which set ayat from the mushaf's own text: the ayat show it
+    /// wherever they are drawn (owner, 23 November 2026).
+    var showsSmallHighZero: Bool { self != .other }
+
+    /// Whether a run that opens with `scalar` takes the space before it, so
+    /// that a mark has something to sit on in its own face. Books, articles
+    /// and narrations give it to every mark; the tafsir under an ayah only to
+    /// U+06DF, its other marks drawn as before.
+    func givesTheSpaceBefore(_ scalar: Unicode.Scalar) -> Bool {
+        guard scalar.properties.generalCategory == .nonspacingMark else { return false }
+        switch self {
+        case .book, .article, .hadith: return true
+        case .quranReader: return scalar.value == MushafFaceGaps.smallHighZero
+        case .other: return false
+        }
+    }
 }
 
 /// How book text is drawn where its face alone would not draw it well. The
@@ -85,20 +99,14 @@ enum BookTextDrawing {
     }
 
     private static func holdsSmallHighZero(_ text: String) -> Bool {
-        text.unicodeScalars.contains { $0.value == MushafFaceGaps.smallHighZero }
+        MushafFaceGaps.holdsSmallHighZero(text.unicodeScalars)
     }
 
     /// Each word with U+06DF, as far as Amiri Quran can set it, in that
-    /// face: the books' seven in Urdu text have no glyph in the Urdu face.
-    private static func drawingSmallHighZero(_ text: AttributedString, scale: Double) -> AttributedString {
-        var drawn = text
-        let spans = MushafFaceGaps.spans(in: text.unicodeScalars, showsSmallHighZero: true)
-        for span in spans where span.face == .smallHighZero {
-            let lower = drawn.unicodeScalars.index(drawn.startIndex, offsetBy: span.range.lowerBound)
-            let upper = drawn.unicodeScalars.index(lower, offsetBy: span.range.count)
-            drawn[lower..<upper].font = DIFont.urduAmiriWord(scale: scale)
-        }
-        return drawn
+    /// face: the books' seven in Urdu text, and the tafsir's, have no glyph
+    /// in the Urdu face.
+    static func drawingSmallHighZero(_ text: AttributedString, scale: Double) -> AttributedString {
+        MushafFaceGaps.showingSmallHighZero(text, in: DIFont.urduAmiriWord(scale: scale))
     }
 
     // MARK: - Links
